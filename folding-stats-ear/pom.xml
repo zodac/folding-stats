@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>me.zodac</groupId>
+        <artifactId>folding-stats</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>${project.parent.artifactId}-ear</artifactId>
+    <packaging>ear</packaging>
+    <name>[${project.parent.artifactId}] EAR module</name>
+
+    <properties>
+        <project-war-contextRoot>/device</project-war-contextRoot>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>${project.parent.artifactId}-war</artifactId>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <outputDirectory>${project.parent.artifactId}-${project.version}</outputDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-ear-plugin</artifactId>
+                <configuration>
+                    <modules>
+                        <webModule>
+                            <groupId>${project.parent.groupId}</groupId>
+                            <artifactId>${project.parent.artifactId}-war</artifactId>
+                            <contextRoot>${project-war-contextRoot}</contextRoot>
+                        </webModule>
+                    </modules>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
