@@ -9,7 +9,7 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>${project.parent.artifactId}-jar</artifactId>
+    <artifactId>folding-stats-jar</artifactId>
     <name>[${project.parent.artifactId}] JAR module</name>
 
     <dependencies>

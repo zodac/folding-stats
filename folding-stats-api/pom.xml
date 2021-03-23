@@ -9,6 +9,6 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>${project.parent.artifactId}-api</artifactId>
+    <artifactId>folding-stats-api</artifactId>
     <name>[${project.parent.artifactId}] API module</name>
 </project>
