@@ -66,5 +66,4 @@ services:
 
 volumes:
   postgres_data:
-
   m2:

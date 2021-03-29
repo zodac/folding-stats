@@ -1,24 +1,32 @@
 package me.zodac.folding.rest;
 
 import com.google.gson.Gson;
+import me.zodac.folding.api.HardwareCategory;
 import me.zodac.folding.api.exception.FoldingException;
-import me.zodac.folding.api.rest.HardwareCategory;
-import me.zodac.folding.api.service.HardwareCategoryWithId;
 import me.zodac.folding.db.postgres.PostgresDbManager;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.RequestScoped;
-import javax.ws.rs.*;
-import javax.ws.rs.core.*;
-import java.sql.SQLException;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 import java.util.List;
 import java.util.NoSuchElementException;
+
 
 /**
  * REST endpoints for hardware categories for <code>folding-stats</code>.
  */
+// TODO: [zodac] Add a DELETE and PUT endpoint
 @Path("/hardware/")
 @RequestScoped
 public class HardwareEndpoint {
@@ -35,8 +43,7 @@ public class HardwareEndpoint {
     public Response createHardware(final HardwareCategory hardwareCategory) {
         LOGGER.info("POST request received to create hardware category at '{}' with request: {}", this.uriContext.getAbsolutePath(), hardwareCategory);
 
-        // TODO: [zodac] Assuming multiplier cannot be less than 0, assuming we might want a 0.1/0.5 at some point with future hardware?
-        if (StringUtils.isBlank(hardwareCategory.getCategoryName()) || hardwareCategory.getMultiplier() <= 0.0D){
+        if (!hardwareCategory.isValid()) {
             return Response
                     .status(Response.Status.BAD_REQUEST)
                     .entity(GSON.toJson(hardwareCategory))
@@ -44,7 +51,7 @@ public class HardwareEndpoint {
         }
 
         try {
-            final HardwareCategoryWithId hardwareCategoryWithId = PostgresDbManager.createHardwareCategory(hardwareCategory);
+            final HardwareCategory hardwareCategoryWithId = PostgresDbManager.createHardwareCategory(hardwareCategory);
 
             final UriBuilder builder = uriContext.getBaseUriBuilder()
                     .path(String.valueOf(hardwareCategoryWithId.getId()));
@@ -64,11 +71,11 @@ public class HardwareEndpoint {
         LOGGER.info("GET request received for all hardware categories at '{}'", this.uriContext.getAbsolutePath());
 
         try {
-            final List<HardwareCategoryWithId> hardwareCategoryWithIds = PostgresDbManager.getAllHardwareCategories();
-			LOGGER.info("Found {} hardware categories", hardwareCategoryWithIds.size());
+            final List<HardwareCategory> hardwareCategories = PostgresDbManager.getAllHardwareCategories();
+            LOGGER.info("Found {} hardware categories", hardwareCategories.size());
             return Response
                     .ok()
-                    .entity(GSON.toJson(hardwareCategoryWithIds))
+                    .entity(GSON.toJson(hardwareCategories))
                     .build();
         } catch (final FoldingException e) {
             LOGGER.error("Error getting all hardware categories", e.getCause());
@@ -87,10 +94,10 @@ public class HardwareEndpoint {
         LOGGER.info("GET request for hardware category received at '{}'", this.uriContext.getAbsolutePath());
 
         try {
-            final HardwareCategoryWithId hardwareCategoryWithId = PostgresDbManager.getHardwareCategory(hardwareCategoryId);
+            final HardwareCategory hardwareCategory = PostgresDbManager.getHardwareCategory(hardwareCategoryId);
             return Response
                     .ok()
-                    .entity(hardwareCategoryWithId)
+                    .entity(hardwareCategory)
                     .build();
         } catch (final NoSuchElementException e) {
             LOGGER.debug("No hardware category found with ID: {}", hardwareCategoryId, e);

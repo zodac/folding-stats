@@ -8,17 +8,19 @@ CREATE INDEX index_hardware_id
     ON hardware_categories(hardware_id);
 
 
-CREATE TABLE tc_users (
+CREATE TABLE folding_users (
     user_id SERIAL PRIMARY KEY,
     user_name TEXT NOT NULL,
-    team_position TEXT NOT NULL,
+    passkey TEXT NOT NULL,
     hardware_id INT NOT NULL,
     hardware_name TEXT NOT NULL,
-    FOREIGN KEY (hardware_id) hardware_categories(hardware_id)
+    CONSTRAINT fk_hardware_id
+        FOREIGN KEY(hardware_id)
+            REFERENCES hardware_categories(hardware_id)
 );
 
-CREATE INDEX index_tc_user_id
-    ON tc_users(user_id);
+CREATE INDEX index_folding_user_id
+    ON folding_users(user_id);
 
 
 CREATE TABLE tc_teams (
@@ -29,12 +31,31 @@ CREATE TABLE tc_teams (
     user_three INT NOT NULL,
     user_four INT NOT NULL,
     user_five INT NOT NULL,
-    FOREIGN KEY (user_one) tc_users(user_id),
-    FOREIGN KEY (user_two) tc_users(user_id),
-    FOREIGN KEY (user_three) tc_users(user_id),
-    FOREIGN KEY (user_four) tc_users(user_id),
-    FOREIGN KEY (user_five) tc_users(user_id)
+    CONSTRAINT fk_user_one
+        FOREIGN KEY(user_one)
+            REFERENCES folding_users(user_id),
+    CONSTRAINT fk_user_two
+        FOREIGN KEY(user_two)
+            REFERENCES folding_users(user_id),
+    CONSTRAINT fk_user_three
+        FOREIGN KEY(user_three)
+            REFERENCES folding_users(user_id),
+    CONSTRAINT fk_user_four
+        FOREIGN KEY(user_four)
+            REFERENCES folding_users(user_id),
+    CONSTRAINT fk_user_five
+        FOREIGN KEY(user_five)
+            REFERENCES folding_users(user_id)
 );
 
 CREATE INDEX index_tc_team_id
     ON tc_teams(team_id);
+
+CREATE TABLE individual_points (
+    user_id INT PRIMARY KEY,
+    utc_timestamp TIMESTAMP,
+    total_points BIGINT NOT NULL,
+    CONSTRAINT fk_user_id
+        FOREIGN KEY(user_id)
+            REFERENCES folding_users(user_id)
+)
