@@ -27,6 +27,10 @@ public class HardwareCategory implements Serializable {
         return new HardwareCategory(id, categoryName, multiplier);
     }
 
+    public static HardwareCategory createWithoutId(final String categoryName, final double multiplier) {
+        return new HardwareCategory(0, categoryName, multiplier);
+    }
+
     public static HardwareCategory updateHardwareCategoryWithId(final int id, final HardwareCategory hardwareCategory) {
         return new HardwareCategory(id, hardwareCategory.getCategoryName(), hardwareCategory.getMultiplier());
     }

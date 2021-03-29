@@ -2,6 +2,11 @@ package me.zodac.folding.db.postgres;
 
 import me.zodac.folding.api.FoldingUser;
 import me.zodac.folding.api.HardwareCategory;
+import me.zodac.folding.parsing.FoldingStats;
+
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 class PostgresSqlQueryBuilder {
 
@@ -31,5 +36,12 @@ class PostgresSqlQueryBuilder {
 
     public static String getFoldingUser(final String foldingUserId) {
         return String.format("SELECT * FROM folding_users WHERE user_id = '%s';", foldingUserId);
+    }
+
+    public static List<String> insertFoldingStats(final List<FoldingStats> foldingStats) {
+        return foldingStats.stream()
+                .map(foldingStatsForUser -> String.format("INSERT INTO individual_points (user_id, utc_timestamp, total_points) VALUES ('%s', '%s', '%s');",
+                        foldingStatsForUser.getUserId(), foldingStatsForUser.getTimestamp(), foldingStatsForUser.getTotalPoints()))
+                .collect(toList());
     }
 }

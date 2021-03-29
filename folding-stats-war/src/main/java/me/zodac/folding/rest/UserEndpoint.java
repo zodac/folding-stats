@@ -43,7 +43,7 @@ public class UserEndpoint {
     public Response createFoldingUser(final FoldingUser foldingUser) {
         LOGGER.info("POST request received to create Folding user at '{}' with request: {}", this.uriContext.getAbsolutePath(), foldingUser);
 
-		// TODO: [zodac] Check that hardware category ID is valid, else will fail at persist and return a 500. Should clean for a 400 instead.
+        // TODO: [zodac] Check that hardware category ID is valid, else will fail at persist and return a 500. Should clean and return a 400 instead.
         if (!foldingUser.isValid()) {
             return Response
                     .status(Response.Status.BAD_REQUEST)

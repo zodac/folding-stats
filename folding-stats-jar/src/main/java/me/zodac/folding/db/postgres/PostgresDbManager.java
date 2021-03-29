@@ -4,6 +4,7 @@ import me.zodac.folding.api.FoldingUser;
 import me.zodac.folding.api.HardwareCategory;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.exception.FoldingException;
+import me.zodac.folding.parsing.FoldingStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -159,5 +160,23 @@ public class PostgresDbManager implements DbManager {
         }
 
         throw new IllegalStateException("No ID was returned from the DB, but no exception was raised");
+    }
+
+    public static void persistStats(final List<FoldingStats> foldingStats) throws FoldingException {
+        LOGGER.info("Inserting stats for {} Folding users to DB", foldingStats.size());
+        final List<String> insertSqlStatements = PostgresSqlQueryBuilder.insertFoldingStats(foldingStats);
+
+        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+             final Statement statement = connection.createStatement()) {
+            for (final String insertSqlStatement : insertSqlStatements) {
+                try {
+                    statement.execute(insertSqlStatement);
+                } catch (final SQLException e) {
+                    LOGGER.warn("Unable to INSERT folding stats for user: {}", insertSqlStatement, e);
+                }
+            }
+        } catch (final SQLException e) {
+            throw new FoldingException("Error opening connection to the DB", e);
+        }
     }
 }

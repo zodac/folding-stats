@@ -31,12 +31,16 @@ public class FoldingUser implements Serializable {
         return new FoldingUser(userId, userName, passkey, hardwareCategoryId, hardwareName);
     }
 
+    public static FoldingUser createWithoutId(final String userName, final String passkey, final int hardwareCategoryId, final String hardwareName) {
+        return new FoldingUser(0, userName, passkey, hardwareCategoryId, hardwareName);
+    }
+
     public static FoldingUser updateFoldingUserWithId(final int userId, final FoldingUser foldingUser) {
         return new FoldingUser(userId, foldingUser.getUserName(), foldingUser.getPasskey(), foldingUser.getHardwareCategoryId(), foldingUser.getHardwareName());
     }
 
     // Quick function used for REST requests. Since a JSON payload may have a missing/incorrect field, we need to check
-	// TODO: [zodac] hardwareCategoryId needs to be checked against DB (cache)
+    // TODO: [zodac] hardwareCategoryId needs to be checked against DB (cache)
     public boolean isValid() {
         return isNotBlank(userName) && isNotBlank(passkey) && isNotBlank(hardwareName);
     }

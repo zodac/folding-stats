@@ -15,9 +15,10 @@ public class JaxRsApplication extends Application {
 
     @Override
     public Set<Class<?>> getClasses() {
-        final Set<Class<?>> classes = new HashSet<>(2);
+        final Set<Class<?>> classes = new HashSet<>(); // TODO: [zodac] Set to correct initial capacity when done
         classes.add(HardwareEndpoint.class);
         classes.add(UserEndpoint.class);
+        classes.add(ManualEndpoint.class);
         return classes;
     }
 }
