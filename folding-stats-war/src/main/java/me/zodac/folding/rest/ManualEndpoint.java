@@ -115,7 +115,7 @@ public class ManualEndpoint {
                 ),
                 FoldingUser.createWithoutId(
                         "zodac",
-                        "fe4ad3d7c2360a8cda89eaeab2b541f2", // TODO: [zodac] Confirm invalid response, 502 returned
+                        "fe4ad3d7c2360a8cda89eaeab2b541f2", // Invalid result
                         5,
                         "Intel Pentium D"
                 )

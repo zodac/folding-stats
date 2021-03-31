@@ -1,6 +1,9 @@
 package me.zodac.folding.parsing;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import me.zodac.folding.api.FoldingUser;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.db.postgres.PostgresDbManager;
@@ -16,6 +19,7 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class FoldingStatsParser {
 
@@ -43,7 +47,9 @@ public class FoldingStatsParser {
 
     // TODO: [zodac] Move this somewhere else, keep the HTTP logic in a single place
 
-    private static final String STATS_URL_FORMAT = "https://stats.foldingathome.org/api/donors?name=%s&search_type=exact&passkey=%s&team=37726";
+    // TODO: [zodac] Team number hardcoded, set as env variable?
+    private static final String TEAM_NUMBER = "37726"; // OCN
+    private static final String STATS_URL_FORMAT = "https://stats.foldingathome.org/api/donors?name=%s&search_type=exact&passkey=%s&team=" + TEAM_NUMBER;
     private static final Gson GSON = new Gson();
     private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
             .version(HttpClient.Version.HTTP_1_1)
@@ -51,6 +57,7 @@ public class FoldingStatsParser {
             .build();
 
     private static long getTotalPointsForUser(final String userName, final String passkey) throws FoldingException {
+        LOGGER.info("Getting points for username/passkey '{}/{}' for team {}", userName, passkey, TEAM_NUMBER);
         final String statsRequestUrl = String.format(STATS_URL_FORMAT, userName, passkey);
 
         final HttpRequest request = HttpRequest.newBuilder()
@@ -62,39 +69,93 @@ public class FoldingStatsParser {
         try {
             final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
 
+            // All user searches return a 200 response, even if the user/passkey is invalid, we will need to parse and check it later
             if (response.statusCode() != HttpURLConnection.HTTP_OK) {
                 throw new FoldingException(String.format("Invalid response: %s", response));
             }
 
-            final StatsApiResponse statsApiResponse = GSON.fromJson(response.body(), StatsApiResponse.class);
+            final JsonObject httpResponse = JsonParser.parseString(response.body()).getAsJsonObject();
+            final JsonArray results = httpResponse.getAsJsonArray("results");
+
+            if (results.size() == 0) {
+                throw new FoldingException(String.format("Unable to find any result for username/passkey '%s/%s': %s", userName, passkey, response.body()));
+            }
+
+            if (results.size() > 1) {
+                // Don't believe this should happen with our current URL, there should only be one result for a user/passkey/team combo
+                throw new FoldingException(String.format("Too many results found for username/passkey '%s/%s': %s", userName, passkey, response.body()));
+            }
+
+            final StatsApiResult statsApiResponse = GSON.fromJson(results.get(0), StatsApiResult.class);
+            LOGGER.info("Found result: {}", statsApiResponse);
             return statsApiResponse.getCredit();
         } catch (final IOException | InterruptedException e) {
             throw new FoldingException("Unable to send HTTP request to F@H API", e.getCause());
         }
     }
 
-    // TODO: [zodac] Endpoint throwing 502 atm, clarify response when it's back up
-
     /**
+     * Invalid response:
      * <pre>
      *     {
-     *       "wus": 3,
-     *       "credit_cert": "https://apps.foldingathome.org/awards?user=2075&type=score",
-     *       "name": "zodac",
-     *       "rank": 8435,
-     *       "credit": 999999,
-     *       "team": 37726,
-     *       "wus_cert": "https://apps.foldingathome.org/awards?user=2075&type=wus",
-     *       "id": -1
+     *       "description": "No results",
+     *       "monthly": false,
+     *       "results": [],
+     *       "month": 3,
+     *       "year": 2021,
+     *       "query": "donor",
+     *       "path": "donors"
+     *     }
+     * </pre>
+     * <p>
+     * Valid response:
+     * <pre>
+     *     {
+     *       "description": "Name is 'zodac' -- Passkey 'fc7d6837269d86784d8bfd0b386d6bca' -- Team '37726'",
+     *       "monthly": false,
+     *       "results": [
+     *         {
+     *           "wus": 22023,
+     *           "credit_cert": "https://apps.foldingathome.org/awards?user=28431&type=score",
+     *           "name": "zodac",
+     *           "rank": 33481,
+     *           "credit": 39514566,
+     *           "team": 37726,
+     *           "wus_cert": "https://apps.foldingathome.org/awards?user=28431&type=wus",
+     *           "id": 28431
+     *         }
+     *       ],
+     *       "month": 3,
+     *       "year": 2021,
+     *       "query": "donor",
+     *       "path": "donors"
      *     }
      * </pre>
      */
-    private static class StatsApiResponse {
+    private static class StatsApiResult {
 
+        private String name;
+        private int team;
         private long credit;
 
-        public StatsApiResponse() {
+        public StatsApiResult() {
 
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(final String name) {
+            this.name = name;
+        }
+
+        public int getTeam() {
+            return team;
+        }
+
+        public void setTeam(final int team) {
+            this.team = team;
         }
 
         public long getCredit() {
@@ -103,6 +164,33 @@ public class FoldingStatsParser {
 
         public void setCredit(final long credit) {
             this.credit = credit;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            final StatsApiResult that = (StatsApiResult) o;
+            return team == that.team && credit == that.credit && Objects.equals(name, that.name);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(name, team, credit);
+        }
+
+        // TODO: [zodac] toString()
+        @Override
+        public String toString() {
+            return "StatsApiResult{" +
+                    "name='" + name + '\'' +
+                    ", team=" + team +
+                    ", credit=" + credit +
+                    '}';
         }
     }
 }
