@@ -111,7 +111,8 @@ public class PostgresDbManager implements DbManager {
             while (resultSet.next()) {
                 foldingUsers.add(FoldingUser.create(
                         resultSet.getInt("user_id"),
-                        resultSet.getString("user_name"),
+                        resultSet.getString("folding_username"),
+                        resultSet.getString("display_username"),
                         resultSet.getString("passkey"),
                         resultSet.getInt("hardware_id"),
                         resultSet.getString("hardware_name")
@@ -134,7 +135,8 @@ public class PostgresDbManager implements DbManager {
             if (resultSet.next()) {
                 return FoldingUser.create(
                         resultSet.getInt("user_id"),
-                        resultSet.getString("user_name"),
+                        resultSet.getString("folding_username"),
+                        resultSet.getString("display_username"),
                         resultSet.getString("passkey"),
                         resultSet.getInt("hardware_id"),
                         resultSet.getString("hardware_name")

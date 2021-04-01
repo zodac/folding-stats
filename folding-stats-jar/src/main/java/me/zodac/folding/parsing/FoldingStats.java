@@ -1,14 +1,16 @@
 package me.zodac.folding.parsing;
 
+import java.sql.Timestamp;
 import java.util.Objects;
 
 public class FoldingStats {
 
     private final int userId;
     private final long totalPoints;
-    private final long timestamp;
+    private final Timestamp timestamp;
 
-    public FoldingStats(final int userId, final long totalPoints, final long timestamp) {
+    // TODO: [zodac] Static constructor
+    public FoldingStats(final int userId, final long totalPoints, final Timestamp timestamp) {
         this.userId = userId;
         this.totalPoints = totalPoints;
         this.timestamp = timestamp;
@@ -22,7 +24,7 @@ public class FoldingStats {
         return totalPoints;
     }
 
-    public long getTimestamp() {
+    public Timestamp getTimestamp() {
         return timestamp;
     }
 
@@ -44,4 +46,13 @@ public class FoldingStats {
     }
 
     // TODO: [zodac] toString()
+
+    @Override
+    public String toString() {
+        return "FoldingStats{" +
+                "userId=" + userId +
+                ", totalPoints=" + totalPoints +
+                ", timestamp=" + timestamp +
+                '}';
+    }
 }

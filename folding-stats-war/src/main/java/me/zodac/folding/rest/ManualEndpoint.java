@@ -108,16 +108,18 @@ public class ManualEndpoint {
     private static void addFoldingUsers() {
         final List<FoldingUser> foldingUsers = List.of(
                 FoldingUser.createWithoutId(
-                        "zodac",
-                        "fc7d6837269d86784d8bfd0b386d6bca", // 39.5M
-                        1,
-                        "AMD X6"
+                        "BWG",
+                        "BWG",
+                        "8d10fbfda0813aa7288613e400484214",
+                        2,
+                        "nVidia 1070"
                 ),
                 FoldingUser.createWithoutId(
-                        "zodac",
-                        "fe4ad3d7c2360a8cda89eaeab2b541f2", // Invalid result
-                        5,
-                        "Intel Pentium D"
+                        "Bastiaan_NL",
+                        "Bastiaan_NL",
+                        "d1ed404fdb11570aa07d2294601ad292",
+                        1,
+                        "nVidia 3090"
                 )
         );
 

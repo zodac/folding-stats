@@ -16,7 +16,10 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.sql.Timestamp;
 import java.time.Duration;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -26,15 +29,15 @@ public class FoldingStatsParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(PostgresDbManager.class);
 
     public static void parseStats(final List<FoldingUser> foldingUsers) {
-        final long currentTime = System.currentTimeMillis();
+        final Timestamp currentUtcTime = new Timestamp(ZonedDateTime.now(ZoneId.of("UTC")).toInstant().toEpochMilli());
         final List<FoldingStats> stats = new ArrayList<>(foldingUsers.size());
 
         for (final FoldingUser foldingUser : foldingUsers) {
             try {
-                final long totalPointsForUser = getTotalPointsForUser(foldingUser.getUserName(), foldingUser.getPasskey());
-                stats.add(new FoldingStats(foldingUser.getId(), totalPointsForUser, currentTime));
+                final long totalPointsForUser = getTotalPointsForUser(foldingUser.getFoldingUserName(), foldingUser.getPasskey());
+                stats.add(new FoldingStats(foldingUser.getId(), totalPointsForUser, currentUtcTime));
             } catch (final FoldingException e) {
-                LOGGER.warn("Unable to get stats for user {}", foldingUser.getUserName(), e.getCause());
+                LOGGER.warn("Unable to get stats for user '{}/{}'", foldingUser.getFoldingUserName(), foldingUser.getPasskey(), e.getCause());
             }
         }
 
@@ -48,7 +51,7 @@ public class FoldingStatsParser {
     // TODO: [zodac] Move this somewhere else, keep the HTTP logic in a single place
 
     // TODO: [zodac] Team number hardcoded, set as env variable?
-    private static final String TEAM_NUMBER = "37726"; // OCN
+    private static final String TEAM_NUMBER = "239902"; // EHW
     private static final String STATS_URL_FORMAT = "https://stats.foldingathome.org/api/donors?name=%s&search_type=exact&passkey=%s&team=" + TEAM_NUMBER;
     private static final Gson GSON = new Gson();
     private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()

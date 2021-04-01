@@ -10,7 +10,8 @@ public class FoldingUser implements Serializable {
     private static final long serialVersionUID = -1919458037620452556L;
 
     private int id;
-    private String userName;
+    private String foldingUserName;
+    private String displayName;
     private String passkey;
     private int hardwareCategoryId;
     private String hardwareName;
@@ -19,30 +20,31 @@ public class FoldingUser implements Serializable {
 
     }
 
-    private FoldingUser(final int id, final String userName, final String passkey, final int hardwareCategoryId, final String hardwareName) {
+    private FoldingUser(final int id, final String foldingUserName, final String displayName, final String passkey, final int hardwareCategoryId, final String hardwareName) {
         this.id = id;
-        this.userName = userName;
+        this.foldingUserName = foldingUserName;
+        this.displayName = displayName;
         this.passkey = passkey;
         this.hardwareCategoryId = hardwareCategoryId;
         this.hardwareName = hardwareName;
     }
 
-    public static FoldingUser create(final int userId, final String userName, final String passkey, final int hardwareCategoryId, final String hardwareName) {
-        return new FoldingUser(userId, userName, passkey, hardwareCategoryId, hardwareName);
+    public static FoldingUser create(final int userId, final String userName, final String forumUserName, final String passkey, final int hardwareCategoryId, final String hardwareName) {
+        return new FoldingUser(userId, userName, forumUserName, passkey, hardwareCategoryId, hardwareName);
     }
 
-    public static FoldingUser createWithoutId(final String userName, final String passkey, final int hardwareCategoryId, final String hardwareName) {
-        return new FoldingUser(0, userName, passkey, hardwareCategoryId, hardwareName);
+    public static FoldingUser createWithoutId(final String userName, final String forumUserName, final String passkey, final int hardwareCategoryId, final String hardwareName) {
+        return new FoldingUser(0, userName, forumUserName, passkey, hardwareCategoryId, hardwareName);
     }
 
     public static FoldingUser updateFoldingUserWithId(final int userId, final FoldingUser foldingUser) {
-        return new FoldingUser(userId, foldingUser.getUserName(), foldingUser.getPasskey(), foldingUser.getHardwareCategoryId(), foldingUser.getHardwareName());
+        return new FoldingUser(userId, foldingUser.getFoldingUserName(), foldingUser.getDisplayName(), foldingUser.getPasskey(), foldingUser.getHardwareCategoryId(), foldingUser.getHardwareName());
     }
 
     // Quick function used for REST requests. Since a JSON payload may have a missing/incorrect field, we need to check
     // TODO: [zodac] hardwareCategoryId needs to be checked against DB (cache)
     public boolean isValid() {
-        return isNotBlank(userName) && isNotBlank(passkey) && isNotBlank(hardwareName);
+        return isNotBlank(foldingUserName) && isNotBlank(displayName) && isNotBlank(passkey) && isNotBlank(hardwareName);
     }
 
     public int getId() {
@@ -53,12 +55,20 @@ public class FoldingUser implements Serializable {
         this.id = id;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getFoldingUserName() {
+        return foldingUserName;
     }
 
-    public void setUserName(final String userName) {
-        this.userName = userName;
+    public void setFoldingUserName(final String foldingUserName) {
+        this.foldingUserName = foldingUserName;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(final String displayName) {
+        this.displayName = displayName;
     }
 
     public String getPasskey() {
@@ -94,16 +104,16 @@ public class FoldingUser implements Serializable {
             return false;
         }
         final FoldingUser that = (FoldingUser) o;
-        return id == that.id && hardwareCategoryId == that.hardwareCategoryId && Objects.equals(userName, that.userName) && Objects.equals(passkey, that.passkey) && Objects.equals(hardwareName, that.hardwareName);
+        return id == that.id && hardwareCategoryId == that.hardwareCategoryId && Objects.equals(foldingUserName, that.foldingUserName) && Objects.equals(displayName, that.displayName) && Objects.equals(passkey, that.passkey) && Objects.equals(hardwareName, that.hardwareName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, userName, passkey, hardwareCategoryId, hardwareName);
+        return Objects.hash(id, foldingUserName, displayName, passkey, hardwareCategoryId, hardwareName);
     }
 
     @Override
     public String toString() {
-        return String.format("%s::{id: '%s', userName: '%s', passkey: '%s', hardwareCategoryId: '%s', hardwareName: '%s'", this.getClass().getSimpleName(), id, userName, passkey, hardwareCategoryId, hardwareName);
+        return String.format("%s::{id: '%s', userName: '%s', forumUserNameL '%s', passkey: '%s', hardwareCategoryId: '%s', hardwareName: '%s'", this.getClass().getSimpleName(), id, foldingUserName, displayName, passkey, hardwareCategoryId, hardwareName);
     }
 }

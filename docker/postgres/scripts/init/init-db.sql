@@ -10,7 +10,8 @@ CREATE INDEX index_hardware_id
 
 CREATE TABLE folding_users (
     user_id SERIAL PRIMARY KEY,
-    user_name TEXT NOT NULL,
+    folding_username TEXT NOT NULL,
+    display_username TEXT NOT NULL,
     passkey TEXT NOT NULL,
     hardware_id INT NOT NULL,
     hardware_name TEXT NOT NULL,
