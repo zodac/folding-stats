@@ -114,6 +114,6 @@ public class FoldingUser implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("%s::{id: '%s', userName: '%s', forumUserNameL '%s', passkey: '%s', hardwareCategoryId: '%s', hardwareName: '%s'", this.getClass().getSimpleName(), id, foldingUserName, displayName, passkey, hardwareCategoryId, hardwareName);
+        return String.format("%s::{id: '%s', userName: '%s', forumUserName: '%s', passkey: '%s', hardwareCategoryId: '%s', hardwareName: '%s'", this.getClass().getSimpleName(), id, foldingUserName, displayName, passkey, hardwareCategoryId, hardwareName);
     }
 }

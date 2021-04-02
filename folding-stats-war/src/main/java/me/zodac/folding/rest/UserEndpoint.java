@@ -27,6 +27,8 @@ import java.util.NoSuchElementException;
  * REST endpoints for users for <code>folding-stats</code>.
  */
 // TODO: [zodac] Add a DELETE and PUT endpoint
+//   Also add a GET endpoint with query, so we can see all instances of a user
+//   Update caches on user change
 @Path("/user/")
 @RequestScoped
 public class UserEndpoint {

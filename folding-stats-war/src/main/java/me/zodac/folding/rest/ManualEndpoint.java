@@ -5,7 +5,6 @@ import me.zodac.folding.api.HardwareCategory;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.cache.FoldingUsersCache;
 import me.zodac.folding.db.postgres.PostgresDbManager;
-import me.zodac.folding.parsing.FoldingStatsParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,9 +47,7 @@ public class ManualEndpoint {
     public Response startStatsParsing() {
         LOGGER.info("GET request received to start parsing Folding stats at '{}'", this.uriContext.getAbsolutePath());
 
-        final FoldingUsersCache foldingUsersCache = FoldingUsersCache.getInstance();
-        FoldingStatsParser.parseStats(foldingUsersCache.getAllUsers());
-
+        
         return Response
                 .ok()
                 .build();

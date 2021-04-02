@@ -53,9 +53,10 @@ CREATE INDEX index_tc_team_id
     ON tc_teams(team_id);
 
 CREATE TABLE individual_points (
-    user_id INT PRIMARY KEY,
+    user_id INT,
     utc_timestamp TIMESTAMP,
     total_points BIGINT NOT NULL,
+    PRIMARY KEY(user_id, utc_timestamp),
     CONSTRAINT fk_user_id
         FOREIGN KEY(user_id)
             REFERENCES folding_users(user_id)
