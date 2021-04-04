@@ -1,5 +1,6 @@
 package me.zodac.folding.rest;
 
+import me.zodac.folding.api.FoldingTeam;
 import me.zodac.folding.api.FoldingUser;
 import me.zodac.folding.api.HardwareCategory;
 import me.zodac.folding.api.exception.FoldingException;
@@ -35,6 +36,18 @@ public class ManualEndpoint {
 
         addHardwareCategories();
         addFoldingUsers();
+        addFoldingTeams();
+
+        return Response
+                .ok()
+                .build();
+    }
+
+    @GET
+    @Path("/init_cache/")
+    public Response initialiseCaches() {
+        LOGGER.info("GET request received to initialise caches at '{}'", this.uriContext.getAbsolutePath());
+
         initCaches();
 
         return Response
@@ -47,7 +60,7 @@ public class ManualEndpoint {
     public Response startStatsParsing() {
         LOGGER.info("GET request received to start parsing Folding stats at '{}'", this.uriContext.getAbsolutePath());
 
-        
+
         return Response
                 .ok()
                 .build();
@@ -115,7 +128,21 @@ public class ManualEndpoint {
                         "Bastiaan_NL",
                         "Bastiaan_NL",
                         "d1ed404fdb11570aa07d2294601ad292",
-                        1,
+                        2,
+                        "nVidia 3090"
+                ),
+                FoldingUser.createWithoutId(
+                        "BWG",
+                        "BWG_With_Multiplier",
+                        "8d10fbfda0813aa7288613e400484214",
+                        4,
+                        "nVidia 1070"
+                ),
+                FoldingUser.createWithoutId(
+                        "Bastiaan_NL",
+                        "Bastiaan_NL_With_Multiplier",
+                        "d1ed404fdb11570aa07d2294601ad292",
+                        6,
                         "nVidia 3090"
                 )
         );
@@ -125,6 +152,40 @@ public class ManualEndpoint {
                 PostgresDbManager.createFoldingUser(foldingUser);
             } catch (final FoldingException e) {
                 LOGGER.warn("Error loading initial Folding user data", e.getCause());
+            }
+        }
+    }
+
+    private static void addFoldingTeams() {
+        final List<FoldingTeam> foldingTeams = List.of(
+                FoldingTeam.createWithoutId(
+                        "Furry Folders",
+                        2, // Bastiaan_NL
+                        2,
+                        FoldingTeam.EMPTY_POSITION,
+                        FoldingTeam.EMPTY_POSITION
+                ),
+                FoldingTeam.createWithoutId(
+                        "Freshly Waxed",
+                        1, // BWG
+                        1,
+                        FoldingTeam.EMPTY_POSITION,
+                        FoldingTeam.EMPTY_POSITION
+                ),
+                FoldingTeam.createWithoutId(
+                        "Test",
+                        3, // BWG_With_Multiplier
+                        3,
+                        4, // Bastiaan_NL_With_Multiplier
+                        FoldingTeam.EMPTY_POSITION
+                )
+        );
+
+        for (final FoldingTeam foldingTeam : foldingTeams) {
+            try {
+                PostgresDbManager.createFoldingTeam(foldingTeam);
+            } catch (final FoldingException e) {
+                LOGGER.warn("Error loading initial Folding team data", e.getCause());
             }
         }
     }

@@ -29,22 +29,22 @@ public class FoldingUser implements Serializable {
         this.hardwareName = hardwareName;
     }
 
-    public static FoldingUser create(final int userId, final String userName, final String forumUserName, final String passkey, final int hardwareCategoryId, final String hardwareName) {
-        return new FoldingUser(userId, userName, forumUserName, passkey, hardwareCategoryId, hardwareName);
+    public static FoldingUser create(final int userId, final String foldingUserName, final String displayName, final String passkey, final int hardwareCategoryId, final String hardwareName) {
+        return new FoldingUser(userId, foldingUserName, displayName, passkey, hardwareCategoryId, hardwareName);
     }
 
-    public static FoldingUser createWithoutId(final String userName, final String forumUserName, final String passkey, final int hardwareCategoryId, final String hardwareName) {
-        return new FoldingUser(0, userName, forumUserName, passkey, hardwareCategoryId, hardwareName);
+    public static FoldingUser createWithoutId(final String foldingUserName, final String displayName, final String passkey, final int hardwareCategoryId, final String hardwareName) {
+        return new FoldingUser(0, foldingUserName, displayName, passkey, hardwareCategoryId, hardwareName);
     }
 
-    public static FoldingUser updateFoldingUserWithId(final int userId, final FoldingUser foldingUser) {
+    public static FoldingUser updateWithId(final int userId, final FoldingUser foldingUser) {
         return new FoldingUser(userId, foldingUser.getFoldingUserName(), foldingUser.getDisplayName(), foldingUser.getPasskey(), foldingUser.getHardwareCategoryId(), foldingUser.getHardwareName());
     }
 
     // Quick function used for REST requests. Since a JSON payload may have a missing/incorrect field, we need to check
     // TODO: [zodac] hardwareCategoryId needs to be checked against DB (cache)
     public boolean isValid() {
-        return isNotBlank(foldingUserName) && isNotBlank(displayName) && isNotBlank(passkey) && isNotBlank(hardwareName);
+        return isNotBlank(foldingUserName) && isNotBlank(displayName) && isNotBlank(passkey) && isNotBlank(hardwareName) && hardwareCategoryId > 0;
     }
 
     public int getId() {
@@ -114,6 +114,6 @@ public class FoldingUser implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("%s::{id: '%s', userName: '%s', forumUserName: '%s', passkey: '%s', hardwareCategoryId: '%s', hardwareName: '%s'", this.getClass().getSimpleName(), id, foldingUserName, displayName, passkey, hardwareCategoryId, hardwareName);
+        return String.format("%s::{id: '%s', foldingUserName: '%s', displayName: '%s', passkey: '%s', hardwareCategoryId: '%s', hardwareName: '%s'", this.getClass().getSimpleName(), id, foldingUserName, displayName, passkey, hardwareCategoryId, hardwareName);
     }
 }

@@ -76,7 +76,7 @@ public class UserEndpoint {
 
         try {
             final List<FoldingUser> foldingUsers = PostgresDbManager.getAllFoldingUsers();
-            LOGGER.info("Found {} hardware categories", foldingUsers.size());
+            LOGGER.info("Found {} Folding users", foldingUsers.size());
             return Response
                     .ok()
                     .entity(GSON.toJson(foldingUsers))

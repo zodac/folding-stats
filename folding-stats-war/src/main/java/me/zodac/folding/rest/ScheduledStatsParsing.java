@@ -12,11 +12,12 @@ import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import java.util.List;
 
+// TODO: [zodac] Move this
 @Startup
 @Singleton
-public class SchedulesStatsParsing {
+public class ScheduledStatsParsing {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SchedulesStatsParsing.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScheduledStatsParsing.class);
 
     private final FoldingUsersCache foldingUsersCache = FoldingUsersCache.getInstance();
 
@@ -38,7 +39,7 @@ public class SchedulesStatsParsing {
         }
 
         FoldingStatsParser.parseStats(usersToParse);
-		LOGGER.info("Finished parsing");
-		LOGGER.info("");
+        LOGGER.info("Finished parsing");
+        LOGGER.info("");
     }
 }

@@ -24,33 +24,23 @@ CREATE INDEX index_folding_user_id
     ON folding_users(user_id);
 
 
-CREATE TABLE tc_teams (
+-- Cannot add a FK constraint on the users, since there is no guarantee the position is filled
+-- The value 0 is used for a position that is not filled
+-- The captain, however, must exist, so we can ensure that one
+CREATE TABLE folding_teams (
     team_id SERIAL PRIMARY KEY,
     team_name TEXT NOT NULL,
-    user_one INT NOT NULL,
-    user_two INT NOT NULL,
-    user_three INT NOT NULL,
-    user_four INT NOT NULL,
-    user_five INT NOT NULL,
-    CONSTRAINT fk_user_one
-        FOREIGN KEY(user_one)
-            REFERENCES folding_users(user_id),
-    CONSTRAINT fk_user_two
-        FOREIGN KEY(user_two)
-            REFERENCES folding_users(user_id),
-    CONSTRAINT fk_user_three
-        FOREIGN KEY(user_three)
-            REFERENCES folding_users(user_id),
-    CONSTRAINT fk_user_four
-        FOREIGN KEY(user_four)
-            REFERENCES folding_users(user_id),
-    CONSTRAINT fk_user_five
-        FOREIGN KEY(user_five)
+    captain_user_id INT NOT NULL,
+    nvidia_gpu_user_id INT NOT NULL,
+    amd_gpu_user_id INT NOT NULL,
+    wildcard_user_id INT NOT NULL,
+    CONSTRAINT fk_captain_user_id
+        FOREIGN KEY(captain_user_id)
             REFERENCES folding_users(user_id)
 );
 
 CREATE INDEX index_tc_team_id
-    ON tc_teams(team_id);
+    ON folding_teams(team_id);
 
 CREATE TABLE individual_points (
     user_id INT,

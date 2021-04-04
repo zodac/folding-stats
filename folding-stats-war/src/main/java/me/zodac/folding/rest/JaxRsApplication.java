@@ -18,7 +18,12 @@ public class JaxRsApplication extends Application {
         final Set<Class<?>> classes = new HashSet<>(); // TODO: [zodac] Set to correct initial capacity when done
         classes.add(HardwareEndpoint.class);
         classes.add(UserEndpoint.class);
+        classes.add(TeamEndpoint.class);
+        classes.add(TeamCompetitionStatsEndpoint.class);
+
+        // TODO: [zodac] Remove
         classes.add(ManualEndpoint.class);
         return classes;
     }
+
 }

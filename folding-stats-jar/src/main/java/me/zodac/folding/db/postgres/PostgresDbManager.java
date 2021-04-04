@@ -1,5 +1,6 @@
 package me.zodac.folding.db.postgres;
 
+import me.zodac.folding.api.FoldingTeam;
 import me.zodac.folding.api.FoldingUser;
 import me.zodac.folding.api.HardwareCategory;
 import me.zodac.folding.api.db.DbManager;
@@ -37,7 +38,7 @@ public class PostgresDbManager implements DbManager {
         try {
             final String insertSqlStatement = PostgresSqlQueryBuilder.insertHardwareCategory(hardwareCategory);
             final int hardwareId = executeInsertSqlWithReturnId(insertSqlStatement);
-            return HardwareCategory.updateHardwareCategoryWithId(hardwareId, hardwareCategory);
+            return HardwareCategory.updateWithId(hardwareId, hardwareCategory);
         } catch (final Exception e) {
             throw new FoldingException("Error persisting hardware category", e);
         }
@@ -80,9 +81,9 @@ public class PostgresDbManager implements DbManager {
                         resultSet.getString("category_name"),
                         resultSet.getDouble("multiplier")
                 );
-            } else {
-                throw new NoSuchElementException();
             }
+
+            throw new NoSuchElementException();
         } catch (final SQLException e) {
             throw new FoldingException("Error opening connection to the DB", e);
         }
@@ -92,7 +93,7 @@ public class PostgresDbManager implements DbManager {
         try {
             final String insertSqlStatement = PostgresSqlQueryBuilder.insertFoldingUser(foldingUser);
             final int foldingUserId = executeInsertSqlWithReturnId(insertSqlStatement);
-            return FoldingUser.updateFoldingUserWithId(foldingUserId, foldingUser);
+            return FoldingUser.updateWithId(foldingUserId, foldingUser);
         } catch (final Exception e) {
             throw new FoldingException("Error persisting Folding user", e);
         }
@@ -141,9 +142,70 @@ public class PostgresDbManager implements DbManager {
                         resultSet.getInt("hardware_id"),
                         resultSet.getString("hardware_name")
                 );
-            } else {
-                throw new NoSuchElementException();
             }
+
+            throw new NoSuchElementException();
+        } catch (final SQLException e) {
+            throw new FoldingException("Error opening connection to the DB", e);
+        }
+    }
+
+    public static FoldingTeam createFoldingTeam(final FoldingTeam foldingTeam) throws FoldingException {
+        try {
+            final String insertSqlStatement = PostgresSqlQueryBuilder.insertFoldingTeam(foldingTeam);
+            final int foldingTeamId = executeInsertSqlWithReturnId(insertSqlStatement);
+            return FoldingTeam.updateWithId(foldingTeamId, foldingTeam);
+        } catch (final Exception e) {
+            throw new FoldingException("Error persisting Folding team", e);
+        }
+    }
+
+    public static List<FoldingTeam> getAllFoldingTeams() throws FoldingException {
+        final String selectSqlStatement = PostgresSqlQueryBuilder.getFoldingTeams();
+        LOGGER.debug("Executing SQL statement '{}'", selectSqlStatement);
+
+        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+             final Statement statement = connection.createStatement();
+             final ResultSet resultSet = statement.executeQuery(selectSqlStatement)) {
+
+            final List<FoldingTeam> foldingTeams = new ArrayList<>();
+
+            while (resultSet.next()) {
+                foldingTeams.add(FoldingTeam.create(
+                        resultSet.getInt("team_id"),
+                        resultSet.getString("team_name"),
+                        resultSet.getInt("captain_user_id"),
+                        resultSet.getInt("nvidia_gpu_user_id"),
+                        resultSet.getInt("amd_gpu_user_id"),
+                        resultSet.getInt("wildcard_user_id")
+                ));
+            }
+
+            return foldingTeams;
+        } catch (final SQLException e) {
+            throw new FoldingException("Error opening connection to the DB", e);
+        }
+    }
+
+    public static FoldingTeam getFoldingTeam(final String foldingTeamId) throws FoldingException {
+        final String selectSqlStatement = PostgresSqlQueryBuilder.getFoldingTeam(foldingTeamId);
+        LOGGER.debug("Executing SQL statement '{}'", selectSqlStatement);
+
+        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+             final Statement statement = connection.createStatement();
+             final ResultSet resultSet = statement.executeQuery(selectSqlStatement)) {
+            if (resultSet.next()) {
+                return FoldingTeam.create(
+                        resultSet.getInt("team_id"),
+                        resultSet.getString("team_name"),
+                        resultSet.getInt("captain_user_id"),
+                        resultSet.getInt("nvidia_gpu_user_id"),
+                        resultSet.getInt("amd_gpu_user_id"),
+                        resultSet.getInt("wildcard_user_id")
+                );
+            }
+
+            throw new NoSuchElementException();
         } catch (final SQLException e) {
             throw new FoldingException("Error opening connection to the DB", e);
         }
