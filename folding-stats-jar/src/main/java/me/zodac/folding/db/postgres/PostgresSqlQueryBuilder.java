@@ -2,7 +2,7 @@ package me.zodac.folding.db.postgres;
 
 import me.zodac.folding.api.FoldingTeam;
 import me.zodac.folding.api.FoldingUser;
-import me.zodac.folding.api.HardwareCategory;
+import me.zodac.folding.api.Hardware;
 import me.zodac.folding.parsing.FoldingStats;
 
 import java.util.List;
@@ -15,20 +15,20 @@ class PostgresSqlQueryBuilder {
 
     }
 
-    public static String insertHardwareCategory(final HardwareCategory hardwareCategory) {
-        return String.format("INSERT INTO hardware_categories (category_name, multiplier) VALUES ('%s', %s) RETURNING hardware_id;", hardwareCategory.getCategoryName(), hardwareCategory.getMultiplier());
+    public static String insertHardware(final Hardware hardware) {
+        return String.format("INSERT INTO hardware (hardware_name, display_name, multiplier) VALUES ('%s', '%s', %s) RETURNING hardware_id;", hardware.getHardwareName(), hardware.getDisplayName(), hardware.getMultiplier());
     }
 
-    public static String getHardwareCategories() {
-        return "SELECT * FROM hardware_categories;";
+    public static String getHardware() {
+        return "SELECT * FROM hardware;";
     }
 
-    public static String getHardwareCategory(final String hardwareId) {
-        return String.format("SELECT * FROM hardware_categories WHERE hardware_id = '%s';", hardwareId);
+    public static String getHardware(final String hardwareId) {
+        return String.format("SELECT * FROM hardware WHERE hardware_id = '%s';", hardwareId);
     }
 
     public static String insertFoldingUser(final FoldingUser foldingUser) {
-        return String.format("INSERT INTO folding_users (folding_username, display_username, passkey, hardware_id, hardware_name) VALUES ('%s', '%s', '%s', %s, '%s') RETURNING user_id;", foldingUser.getFoldingUserName(), foldingUser.getDisplayName(), foldingUser.getPasskey(), foldingUser.getHardwareCategoryId(), foldingUser.getHardwareName());
+        return String.format("INSERT INTO folding_users (folding_username, display_username, passkey, hardware_id) VALUES ('%s', '%s', '%s', %s) RETURNING user_id;", foldingUser.getFoldingUserName(), foldingUser.getDisplayName(), foldingUser.getPasskey(), foldingUser.getHardwareId());
     }
 
     public static String getFoldingUsers() {

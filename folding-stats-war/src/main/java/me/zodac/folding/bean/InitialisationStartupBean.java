@@ -1,72 +1,45 @@
-package me.zodac.folding.rest;
+package me.zodac.folding.bean;
 
 import me.zodac.folding.api.FoldingTeam;
 import me.zodac.folding.api.FoldingUser;
-import me.zodac.folding.api.HardwareCategory;
+import me.zodac.folding.api.Hardware;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.cache.FoldingUsersCache;
 import me.zodac.folding.db.postgres.PostgresDbManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.RequestScoped;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+import javax.annotation.PostConstruct;
+import javax.ejb.Singleton;
+import javax.ejb.Startup;
 import java.util.List;
 
 
-// TODO: [zodac] Manual endpoint to trigger actions
-//   Replace with startup beans/Quartz scheduler
-@Path("/manual/")
-@RequestScoped
-public class ManualEndpoint {
+// TODO: [zodac] Move this to an EJB module?
+@Startup
+@Singleton
+public class InitialisationStartupBean {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ManualEndpoint.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(InitialisationStartupBean.class);
 
-    @Context
-    private UriInfo uriContext;
+    @PostConstruct
+    public void init() {
+        LOGGER.info("Started initialisation bean");
 
-    @GET
-    @Path("/load_db/")
-    public Response loadDataIntoDb() {
-        LOGGER.info("GET request received to load DB with initial data at '{}'", this.uriContext.getAbsolutePath());
+        loadDataIntoDb();
+        initCaches();
+    }
 
-        addHardwareCategories();
+    private static void loadDataIntoDb() {
+        LOGGER.warn("Adding initial data into DB (may fail if DB is already initialised)");
+
+        addHardware();
         addFoldingUsers();
         addFoldingTeams();
-
-        return Response
-                .ok()
-                .build();
-    }
-
-    @GET
-    @Path("/init_cache/")
-    public Response initialiseCaches() {
-        LOGGER.info("GET request received to initialise caches at '{}'", this.uriContext.getAbsolutePath());
-
-        initCaches();
-
-        return Response
-                .ok()
-                .build();
-    }
-
-    @GET
-    @Path("/start_stats/")
-    public Response startStatsParsing() {
-        LOGGER.info("GET request received to start parsing Folding stats at '{}'", this.uriContext.getAbsolutePath());
-
-
-        return Response
-                .ok()
-                .build();
     }
 
     private static void initCaches() {
+        LOGGER.debug("Initialising Folding user cache with DB data");
         final FoldingUsersCache foldingUsersCache = FoldingUsersCache.getInstance();
 
         try {
@@ -76,43 +49,43 @@ public class ManualEndpoint {
         } catch (final FoldingException e) {
             LOGGER.warn("Error initialising Folding user cache", e.getCause());
         }
+
+        LOGGER.info("Caches initialised");
     }
 
-    private static void addHardwareCategories() {
-        final List<HardwareCategory> hardwareCategories = List.of(
-                HardwareCategory.createWithoutId(
-                        "Standard CPU", // ID 1
+    private static void addHardware() {
+        final List<Hardware> allHardware = List.of(
+                Hardware.createWithoutId(
+                        "nVidia 1070", // ID 1
+                        "nVidia 1070",
                         1.0D
                 ),
-                HardwareCategory.createWithoutId(
-                        "Standard GPU", // ID 2
+                Hardware.createWithoutId(
+                        "nVidia 3090", // ID 2
+                        "nVidia 3090",
                         1.0D
                 ),
-                HardwareCategory.createWithoutId(
-                        "Amazing CPU", // ID 3
-                        0.8D
+                Hardware.createWithoutId(
+                        "nVidia 1070", // ID 3
+                        "nVidia 1070 (half)",
+                        0.5D
                 ),
-                HardwareCategory.createWithoutId(
-                        "Amazing GPU", // ID 4
-                        0.75D
-                ),
-                HardwareCategory.createWithoutId(
-                        "Horrible CPU", // ID 5
-                        1.2D
-                ),
-                HardwareCategory.createWithoutId(
-                        "Horrible GPU", // ID 6
-                        1.1D
+                Hardware.createWithoutId(
+                        "nVidia 3090", // ID 4
+                        "nVidia 3090 (double)",
+                        2.0D
                 )
         );
 
-        for (final HardwareCategory hardwareCategory : hardwareCategories) {
+        for (final Hardware hardware : allHardware) {
             try {
-                PostgresDbManager.createHardwareCategory(hardwareCategory);
+                PostgresDbManager.createHardware(hardware);
             } catch (final FoldingException e) {
-                LOGGER.warn("Error loading initial hardware category data", e.getCause());
+                LOGGER.warn("Error loading initial hardware data", e.getCause());
             }
         }
+
+        LOGGER.info("Initial hardware added to DB");
     }
 
     private static void addFoldingUsers() {
@@ -121,29 +94,25 @@ public class ManualEndpoint {
                         "BWG",
                         "BWG",
                         "8d10fbfda0813aa7288613e400484214",
-                        2,
-                        "nVidia 1070"
+                        1
                 ),
                 FoldingUser.createWithoutId(
                         "Bastiaan_NL",
                         "Bastiaan_NL",
                         "d1ed404fdb11570aa07d2294601ad292",
-                        2,
-                        "nVidia 3090"
+                        2
                 ),
                 FoldingUser.createWithoutId(
                         "BWG",
                         "BWG_With_Multiplier",
                         "8d10fbfda0813aa7288613e400484214",
-                        4,
-                        "nVidia 1070"
+                        3
                 ),
                 FoldingUser.createWithoutId(
                         "Bastiaan_NL",
                         "Bastiaan_NL_With_Multiplier",
                         "d1ed404fdb11570aa07d2294601ad292",
-                        6,
-                        "nVidia 3090"
+                        4
                 )
         );
 
@@ -154,6 +123,8 @@ public class ManualEndpoint {
                 LOGGER.warn("Error loading initial Folding user data", e.getCause());
             }
         }
+
+        LOGGER.info("Initial Folding users added to DB");
     }
 
     private static void addFoldingTeams() {
@@ -188,5 +159,7 @@ public class ManualEndpoint {
                 LOGGER.warn("Error loading initial Folding team data", e.getCause());
             }
         }
+
+        LOGGER.info("Initial Folding teams added to DB");
     }
 }

@@ -1,11 +1,12 @@
-CREATE TABLE hardware_categories (
+CREATE TABLE hardware (
     hardware_id SERIAL PRIMARY KEY,
-    category_name TEXT NOT NULL,
+    hardware_name TEXT NOT NULL,
+    display_name TEXT NOT NULL,
     multiplier NUMERIC NOT NULL
 );
 
 CREATE INDEX index_hardware_id
-    ON hardware_categories(hardware_id);
+    ON hardware(hardware_id);
 
 
 CREATE TABLE folding_users (
@@ -14,10 +15,9 @@ CREATE TABLE folding_users (
     display_username TEXT NOT NULL,
     passkey TEXT NOT NULL,
     hardware_id INT NOT NULL,
-    hardware_name TEXT NOT NULL,
     CONSTRAINT fk_hardware_id
         FOREIGN KEY(hardware_id)
-            REFERENCES hardware_categories(hardware_id)
+            REFERENCES hardware(hardware_id)
 );
 
 CREATE INDEX index_folding_user_id

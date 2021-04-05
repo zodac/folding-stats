@@ -1,5 +1,6 @@
 version: '2.3'
 
+# TODO: [zodac] Extract sensitive data to an env file, allow deployment to override with 'real' values
 services:
 
   builder_java:
@@ -10,7 +11,6 @@ services:
     hostname: builder_java
     volumes:
       - /opt/jboss/wildfly/standalone/deployments/
-      - m2:/root/.m2
 
   wildfly:
     build: ./docker/wildfly
@@ -34,6 +34,8 @@ services:
       - 8787:8787
       - 9990:9990
       - 9999:9999
+    volumes:
+      - wildfly_logs:/opt/jboss/wildfly/standalone/log
     volumes_from:
       - builder_java
 
@@ -65,5 +67,8 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
 volumes:
+  # Volume to save the PostgreSQL contents
+  # TODO: [zodac] Should we also set up a cron job on server to dump the DB every month? Talk to Axi
   postgres_data:
-  m2:
+  # Volume to save the Wildfly logs in case of a crash
+  wildfly_logs:

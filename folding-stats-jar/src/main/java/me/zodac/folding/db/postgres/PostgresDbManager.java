@@ -2,7 +2,7 @@ package me.zodac.folding.db.postgres;
 
 import me.zodac.folding.api.FoldingTeam;
 import me.zodac.folding.api.FoldingUser;
-import me.zodac.folding.api.HardwareCategory;
+import me.zodac.folding.api.Hardware;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.parsing.FoldingStats;
@@ -34,51 +34,53 @@ public class PostgresDbManager implements DbManager {
         JDBC_CONNECTION_PROPERTIES.setProperty("driver", getEnvironmentValue("JDBC_CONNECTION_DRIVER"));
     }
 
-    public static HardwareCategory createHardwareCategory(final HardwareCategory hardwareCategory) throws FoldingException {
+    public static Hardware createHardware(final Hardware hardware) throws FoldingException {
         try {
-            final String insertSqlStatement = PostgresSqlQueryBuilder.insertHardwareCategory(hardwareCategory);
+            final String insertSqlStatement = PostgresSqlQueryBuilder.insertHardware(hardware);
             final int hardwareId = executeInsertSqlWithReturnId(insertSqlStatement);
-            return HardwareCategory.updateWithId(hardwareId, hardwareCategory);
+            return Hardware.updateWithId(hardwareId, hardware);
         } catch (final Exception e) {
             throw new FoldingException("Error persisting hardware category", e);
         }
     }
 
-    public static List<HardwareCategory> getAllHardwareCategories() throws FoldingException {
-        final String selectSqlStatement = PostgresSqlQueryBuilder.getHardwareCategories();
+    public static List<Hardware> getAllHardware() throws FoldingException {
+        final String selectSqlStatement = PostgresSqlQueryBuilder.getHardware();
         LOGGER.debug("Executing SQL statement '{}'", selectSqlStatement);
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
              final Statement statement = connection.createStatement();
              final ResultSet resultSet = statement.executeQuery(selectSqlStatement)) {
 
-            final List<HardwareCategory> hardwareCategories = new ArrayList<>();
+            final List<Hardware> allHardware = new ArrayList<>();
 
             while (resultSet.next()) {
-                hardwareCategories.add(HardwareCategory.create(
+                allHardware.add(Hardware.create(
                         resultSet.getInt("hardware_id"),
-                        resultSet.getString("category_name"),
+                        resultSet.getString("hardware_name"),
+                        resultSet.getString("display_name"),
                         resultSet.getDouble("multiplier")
                 ));
             }
 
-            return hardwareCategories;
+            return allHardware;
         } catch (final SQLException e) {
             throw new FoldingException("Error opening connection to the DB", e);
         }
     }
 
-    public static HardwareCategory getHardwareCategory(final String hardwareCategoryId) throws FoldingException {
-        final String selectSqlStatement = PostgresSqlQueryBuilder.getHardwareCategory(hardwareCategoryId);
+    public static Hardware getHardware(final String hardwareId) throws FoldingException {
+        final String selectSqlStatement = PostgresSqlQueryBuilder.getHardware(hardwareId);
         LOGGER.debug("Executing SQL statement '{}'", selectSqlStatement);
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
              final Statement statement = connection.createStatement();
              final ResultSet resultSet = statement.executeQuery(selectSqlStatement)) {
             if (resultSet.next()) {
-                return HardwareCategory.create(
+                return Hardware.create(
                         resultSet.getInt("hardware_id"),
-                        resultSet.getString("category_name"),
+                        resultSet.getString("hardware_name"),
+                        resultSet.getString("display_name"),
                         resultSet.getDouble("multiplier")
                 );
             }
@@ -115,8 +117,7 @@ public class PostgresDbManager implements DbManager {
                         resultSet.getString("folding_username"),
                         resultSet.getString("display_username"),
                         resultSet.getString("passkey"),
-                        resultSet.getInt("hardware_id"),
-                        resultSet.getString("hardware_name")
+                        resultSet.getInt("hardware_id")
                 ));
             }
 
@@ -139,8 +140,7 @@ public class PostgresDbManager implements DbManager {
                         resultSet.getString("folding_username"),
                         resultSet.getString("display_username"),
                         resultSet.getString("passkey"),
-                        resultSet.getInt("hardware_id"),
-                        resultSet.getString("hardware_name")
+                        resultSet.getInt("hardware_id")
                 );
             }
 

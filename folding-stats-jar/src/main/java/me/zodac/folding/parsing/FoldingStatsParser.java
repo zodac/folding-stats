@@ -17,11 +17,13 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.sql.Timestamp;
+import java.text.NumberFormat;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 public class FoldingStatsParser {
@@ -50,7 +52,7 @@ public class FoldingStatsParser {
 
     // TODO: [zodac] Move this somewhere else, keep the HTTP logic in a single place
 
-    // TODO: [zodac] Team number hardcoded, set as env variable?
+    // TODO: [zodac] Team number hardcoded: set as env variable, set for each user?
     private static final String TEAM_NUMBER = "239902"; // EHW
     private static final String STATS_URL_FORMAT = "https://stats.foldingathome.org/api/donors?name=%s&search_type=exact&passkey=%s&team=" + TEAM_NUMBER;
     private static final Gson GSON = new Gson();
@@ -93,7 +95,7 @@ public class FoldingStatsParser {
             LOGGER.info("Found result: {}", statsApiResponse);
             return statsApiResponse.getCredit();
         } catch (final IOException | InterruptedException e) {
-            throw new FoldingException("Unable to send HTTP request to F@H API", e.getCause());
+            throw new FoldingException("Unable to send HTTP request to Folding@Home API", e.getCause());
         }
     }
 
@@ -192,7 +194,7 @@ public class FoldingStatsParser {
             return "StatsApiResult{" +
                     "name='" + name + '\'' +
                     ", team=" + team +
-                    ", credit=" + credit +
+                    ", credit=" + NumberFormat.getInstance(Locale.UK).format(credit) +
                     '}';
         }
     }
