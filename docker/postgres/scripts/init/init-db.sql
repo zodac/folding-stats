@@ -51,3 +51,5 @@ CREATE TABLE individual_points (
         FOREIGN KEY(user_id)
             REFERENCES folding_users(user_id)
 )
+
+-- TODO: [zodac] Add an index for the points table

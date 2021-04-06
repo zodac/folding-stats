@@ -9,7 +9,7 @@ import java.util.Set;
 
 import static me.zodac.folding.api.util.StringUtils.isNotBlank;
 
-public class FoldingTeam implements Serializable {
+public class FoldingTeam implements ObjectWithId, Serializable {
 
     public static final int EMPTY_POSITION = 0;
 
@@ -80,6 +80,7 @@ public class FoldingTeam implements Serializable {
         return validUsers.size() == uniqueValidUsers.size();
     }
 
+    @Override
     public int getId() {
         return id;
     }

@@ -5,7 +5,7 @@ import java.util.Objects;
 
 import static me.zodac.folding.api.util.StringUtils.isNotBlank;
 
-public class FoldingUser implements Serializable {
+public class FoldingUser implements ObjectWithId, Serializable {
 
     private static final long serialVersionUID = -1919458037620452556L;
 
@@ -45,6 +45,7 @@ public class FoldingUser implements Serializable {
         return isNotBlank(foldingUserName) && isNotBlank(displayName) && isNotBlank(passkey) && hardwareId > 0;
     }
 
+    @Override
     public int getId() {
         return id;
     }

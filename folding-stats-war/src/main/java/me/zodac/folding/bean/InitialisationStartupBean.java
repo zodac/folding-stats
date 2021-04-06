@@ -4,7 +4,7 @@ import me.zodac.folding.api.FoldingTeam;
 import me.zodac.folding.api.FoldingUser;
 import me.zodac.folding.api.Hardware;
 import me.zodac.folding.api.exception.FoldingException;
-import me.zodac.folding.cache.FoldingUsersCache;
+import me.zodac.folding.cache.FoldingUserCache;
 import me.zodac.folding.db.postgres.PostgresDbManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,15 +36,16 @@ public class InitialisationStartupBean {
         addHardware();
         addFoldingUsers();
         addFoldingTeams();
+        LOGGER.info("Initial data added to DB");
     }
 
     private static void initCaches() {
         LOGGER.debug("Initialising Folding user cache with DB data");
-        final FoldingUsersCache foldingUsersCache = FoldingUsersCache.getInstance();
+        final FoldingUserCache foldingUserCache = FoldingUserCache.getInstance();
 
         try {
             for (final FoldingUser foldingUser : PostgresDbManager.getAllFoldingUsers()) {
-                foldingUsersCache.addToCache(foldingUser);
+                foldingUserCache.add(foldingUser);
             }
         } catch (final FoldingException e) {
             LOGGER.warn("Error initialising Folding user cache", e.getCause());
@@ -85,7 +86,7 @@ public class InitialisationStartupBean {
             }
         }
 
-        LOGGER.info("Initial hardware added to DB");
+        LOGGER.debug("Initial hardware added to DB");
     }
 
     private static void addFoldingUsers() {
@@ -124,7 +125,7 @@ public class InitialisationStartupBean {
             }
         }
 
-        LOGGER.info("Initial Folding users added to DB");
+        LOGGER.debug("Initial Folding users added to DB");
     }
 
     private static void addFoldingTeams() {
@@ -160,6 +161,6 @@ public class InitialisationStartupBean {
             }
         }
 
-        LOGGER.info("Initial Folding teams added to DB");
+        LOGGER.debug("Initial Folding teams added to DB");
     }
 }

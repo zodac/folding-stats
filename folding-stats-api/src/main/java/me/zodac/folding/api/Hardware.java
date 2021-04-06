@@ -5,7 +5,7 @@ import java.util.Objects;
 
 import static me.zodac.folding.api.util.StringUtils.areNotBlank;
 
-public class Hardware implements Serializable {
+public class Hardware implements ObjectWithId, Serializable {
 
     private static final long serialVersionUID = 311666348626596899L;
 
@@ -43,6 +43,7 @@ public class Hardware implements Serializable {
         return areNotBlank(hardwareName, displayName) && multiplier > 0.0D;
     }
 
+    @Override
     public int getId() {
         return id;
     }

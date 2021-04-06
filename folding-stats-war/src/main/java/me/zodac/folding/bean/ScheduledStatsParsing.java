@@ -1,7 +1,7 @@
 package me.zodac.folding.bean;
 
 import me.zodac.folding.api.FoldingUser;
-import me.zodac.folding.cache.FoldingUsersCache;
+import me.zodac.folding.cache.FoldingUserCache;
 import me.zodac.folding.parsing.FoldingStatsParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +19,7 @@ public class ScheduledStatsParsing {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ScheduledStatsParsing.class);
 
-    private final FoldingUsersCache foldingUsersCache = FoldingUsersCache.getInstance();
+    private final FoldingUserCache foldingUserCache = FoldingUserCache.getInstance();
 
     @PostConstruct
     public void init() {
@@ -31,7 +31,7 @@ public class ScheduledStatsParsing {
     public void startStatsParsing() {
         LOGGER.info("Parsing Folding stats");
 
-        final List<FoldingUser> usersToParse = foldingUsersCache.getAllUsers();
+        final List<FoldingUser> usersToParse = foldingUserCache.getAll();
 
         if (usersToParse.isEmpty()) {
             LOGGER.warn("No Folding users configured in system!");

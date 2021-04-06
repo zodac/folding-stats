@@ -1,12 +1,13 @@
 package me.zodac.folding.rest;
 
 import com.google.gson.Gson;
+import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.Hardware;
 import me.zodac.folding.api.exception.FoldingException;
-import me.zodac.folding.db.postgres.PostgresDbManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ejb.EJB;
 import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -35,6 +36,9 @@ public class HardwareEndpoint {
     private static final Logger LOGGER = LoggerFactory.getLogger(HardwareEndpoint.class);
     private static final Gson GSON = new Gson();
 
+    @EJB
+    private StorageFacade storageFacade;
+
     @Context
     private UriInfo uriContext;
 
@@ -52,7 +56,7 @@ public class HardwareEndpoint {
         }
 
         try {
-            final Hardware hardwareWithId = PostgresDbManager.createHardware(hardware);
+            final Hardware hardwareWithId = storageFacade.createHardware(hardware);
 
             final UriBuilder builder = uriContext.getBaseUriBuilder()
                     .path(String.valueOf(hardwareWithId.getId()));
@@ -72,7 +76,7 @@ public class HardwareEndpoint {
         LOGGER.info("GET request received for all hardware at '{}'", this.uriContext.getAbsolutePath());
 
         try {
-            final List<Hardware> hardware = PostgresDbManager.getAllHardware();
+            final List<Hardware> hardware = storageFacade.getAllHardware();
             LOGGER.info("Found {} hardware", hardware.size());
             return Response
                     .ok()
@@ -95,7 +99,7 @@ public class HardwareEndpoint {
         LOGGER.info("GET request for hardware received at '{}'", this.uriContext.getAbsolutePath());
 
         try {
-            final Hardware hardware = PostgresDbManager.getHardware(hardwareId);
+            final Hardware hardware = storageFacade.getHardware(hardwareId);
             return Response
                     .ok()
                     .entity(hardware)
