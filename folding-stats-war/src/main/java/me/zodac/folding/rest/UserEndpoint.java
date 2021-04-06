@@ -3,6 +3,7 @@ package me.zodac.folding.rest;
 import com.google.gson.Gson;
 import me.zodac.folding.api.FoldingUser;
 import me.zodac.folding.api.exception.FoldingException;
+import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.db.postgres.PostgresDbManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +21,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 
 /**
@@ -103,7 +103,7 @@ public class UserEndpoint {
                     .ok()
                     .entity(foldingUser)
                     .build();
-        } catch (final NoSuchElementException e) {
+        } catch (final NotFoundException e) {
             LOGGER.debug("No Folding user found with ID: {}", foldingUserId, e);
             LOGGER.error("No Folding user found with ID: {}", foldingUserId);
             return Response.status(Response.Status.NOT_FOUND).build();

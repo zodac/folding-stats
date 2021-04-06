@@ -28,7 +28,7 @@ import java.util.Objects;
 
 public class FoldingStatsParser {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PostgresDbManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FoldingStatsParser.class);
 
     public static void parseStats(final List<FoldingUser> foldingUsers) {
         final Timestamp currentUtcTime = new Timestamp(ZonedDateTime.now(ZoneId.of("UTC")).toInstant().toEpochMilli());
@@ -92,7 +92,7 @@ public class FoldingStatsParser {
             }
 
             final StatsApiResult statsApiResponse = GSON.fromJson(results.get(0), StatsApiResult.class);
-            LOGGER.info("Found result: {}", statsApiResponse);
+            LOGGER.info("Found {}", statsApiResponse);
             return statsApiResponse.getCredit();
         } catch (final IOException | InterruptedException e) {
             throw new FoldingException("Unable to send HTTP request to Folding@Home API", e.getCause());

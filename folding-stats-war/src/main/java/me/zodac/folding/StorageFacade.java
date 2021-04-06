@@ -4,6 +4,7 @@ import me.zodac.folding.api.FoldingTeam;
 import me.zodac.folding.api.FoldingUser;
 import me.zodac.folding.api.Hardware;
 import me.zodac.folding.api.exception.FoldingException;
+import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.cache.FoldingTeamCache;
 import me.zodac.folding.cache.FoldingUserCache;
 import me.zodac.folding.cache.HardwareCache;
@@ -11,7 +12,6 @@ import me.zodac.folding.db.postgres.PostgresDbManager;
 
 import javax.ejb.Singleton;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * In order to decouple the REST layer from the storage/persistence, we use this {@link StorageFacade} instead.
@@ -24,9 +24,9 @@ public class StorageFacade {
 
     // TODO: [zodac] Dynamically inject/instantiate the PostgresDbManager
 
-    private final HardwareCache hardwareCache = HardwareCache.getInstance();
-    private final FoldingUserCache foldingUserCache = FoldingUserCache.getInstance();
     private final FoldingTeamCache foldingTeamCache = FoldingTeamCache.getInstance();
+    private final FoldingUserCache foldingUserCache = FoldingUserCache.getInstance();
+    private final HardwareCache hardwareCache = HardwareCache.getInstance();
 
     public Hardware createHardware(final Hardware hardware) throws FoldingException {
         final Hardware hardwareWithId = PostgresDbManager.createHardware(hardware);
@@ -34,12 +34,12 @@ public class StorageFacade {
         return hardwareWithId;
     }
 
-    public Hardware getHardware(final String hardwareId) throws FoldingException {
-        final Optional<Hardware> hardware = hardwareCache.get(hardwareId);
+    public Hardware getHardware(final int hardwareId) throws FoldingException, NotFoundException {
+        return getHardware(String.valueOf(hardwareId));
+    }
 
-        if (hardware.isPresent()) {
-            return hardware.get();
-        }
+    public Hardware getHardware(final String hardwareId) throws FoldingException, NotFoundException {
+        final Hardware hardware = hardwareCache.get(hardwareId);
 
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
@@ -69,12 +69,12 @@ public class StorageFacade {
         return foldingUserWithId;
     }
 
-    public FoldingUser getFoldingUser(final String foldingUserId) throws FoldingException {
-        final Optional<FoldingUser> foldingUser = foldingUserCache.get(foldingUserId);
+    public FoldingUser getFoldingUser(final int foldingUserId) throws FoldingException, NotFoundException {
+        return getFoldingUser(String.valueOf(foldingUserId));
+    }
 
-        if (foldingUser.isPresent()) {
-            return foldingUser.get();
-        }
+    public FoldingUser getFoldingUser(final String foldingUserId) throws FoldingException, NotFoundException {
+        final FoldingUser foldingUser = foldingUserCache.get(foldingUserId);
 
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
@@ -104,12 +104,12 @@ public class StorageFacade {
         return foldingTeamWithId;
     }
 
-    public FoldingTeam getFoldingTeam(final String foldingTeamId) throws FoldingException {
-        final Optional<FoldingTeam> foldingTeam = foldingTeamCache.get(foldingTeamId);
+    public FoldingTeam getFoldingTeam(final int foldingTeamId) throws FoldingException, NotFoundException {
+        return getFoldingTeam(String.valueOf(foldingTeamId));
+    }
 
-        if (foldingTeam.isPresent()) {
-            return foldingTeam.get();
-        }
+    public FoldingTeam getFoldingTeam(final String foldingTeamId) throws FoldingException, NotFoundException {
+        final FoldingTeam foldingTeam = foldingTeamCache.get(foldingTeamId);
 
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future

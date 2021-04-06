@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.Hardware;
 import me.zodac.folding.api.exception.FoldingException;
+import me.zodac.folding.api.exception.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +22,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 
 /**
@@ -104,7 +104,7 @@ public class HardwareEndpoint {
                     .ok()
                     .entity(hardware)
                     .build();
-        } catch (final NoSuchElementException e) {
+        } catch (final NotFoundException e) {
             LOGGER.debug("No hardware found with ID: {}", hardwareId, e);
             LOGGER.error("No hardware found with ID: {}", hardwareId);
             return Response.status(Response.Status.NOT_FOUND).build();

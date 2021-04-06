@@ -3,6 +3,7 @@ package me.zodac.folding.rest;
 import com.google.gson.Gson;
 import me.zodac.folding.api.FoldingTeam;
 import me.zodac.folding.api.exception.FoldingException;
+import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.db.postgres.PostgresDbManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +21,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 
 /**
@@ -102,7 +102,7 @@ public class TeamEndpoint {
                     .ok()
                     .entity(foldingTeam)
                     .build();
-        } catch (final NoSuchElementException e) {
+        } catch (final NotFoundException e) {
             LOGGER.debug("No Folding team found with ID: {}", foldingTeamId, e);
             LOGGER.error("No Folding team found with ID: {}", foldingTeamId);
             return Response.status(Response.Status.NOT_FOUND).build();

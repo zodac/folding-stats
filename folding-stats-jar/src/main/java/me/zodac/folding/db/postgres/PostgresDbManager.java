@@ -5,6 +5,7 @@ import me.zodac.folding.api.FoldingUser;
 import me.zodac.folding.api.Hardware;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.exception.FoldingException;
+import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.parsing.FoldingStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +17,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Properties;
 
 import static me.zodac.folding.util.EnvironmentUtils.getEnvironmentValue;
@@ -69,7 +69,7 @@ public class PostgresDbManager implements DbManager {
         }
     }
 
-    public static Hardware getHardware(final String hardwareId) throws FoldingException {
+    public static Hardware getHardware(final String hardwareId) throws FoldingException, NotFoundException {
         final String selectSqlStatement = PostgresSqlQueryBuilder.getHardware(hardwareId);
         LOGGER.debug("Executing SQL statement '{}'", selectSqlStatement);
 
@@ -85,7 +85,7 @@ public class PostgresDbManager implements DbManager {
                 );
             }
 
-            throw new NoSuchElementException();
+            throw new NotFoundException();
         } catch (final SQLException e) {
             throw new FoldingException("Error opening connection to the DB", e);
         }
@@ -127,7 +127,7 @@ public class PostgresDbManager implements DbManager {
         }
     }
 
-    public static FoldingUser getFoldingUser(final String foldingUserId) throws FoldingException {
+    public static FoldingUser getFoldingUser(final String foldingUserId) throws FoldingException, NotFoundException {
         final String selectSqlStatement = PostgresSqlQueryBuilder.getFoldingUser(foldingUserId);
         LOGGER.debug("Executing SQL statement '{}'", selectSqlStatement);
 
@@ -144,7 +144,7 @@ public class PostgresDbManager implements DbManager {
                 );
             }
 
-            throw new NoSuchElementException();
+            throw new NotFoundException();
         } catch (final SQLException e) {
             throw new FoldingException("Error opening connection to the DB", e);
         }
@@ -187,7 +187,7 @@ public class PostgresDbManager implements DbManager {
         }
     }
 
-    public static FoldingTeam getFoldingTeam(final String foldingTeamId) throws FoldingException {
+    public static FoldingTeam getFoldingTeam(final String foldingTeamId) throws FoldingException, NotFoundException {
         final String selectSqlStatement = PostgresSqlQueryBuilder.getFoldingTeam(foldingTeamId);
         LOGGER.debug("Executing SQL statement '{}'", selectSqlStatement);
 
@@ -205,7 +205,7 @@ public class PostgresDbManager implements DbManager {
                 );
             }
 
-            throw new NoSuchElementException();
+            throw new NotFoundException();
         } catch (final SQLException e) {
             throw new FoldingException("Error opening connection to the DB", e);
         }

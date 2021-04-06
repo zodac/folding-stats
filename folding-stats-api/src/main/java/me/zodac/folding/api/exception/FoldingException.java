@@ -6,6 +6,10 @@ public class FoldingException extends Exception {
 
     private static final long serialVersionUID = 2084075118178238910L;
 
+    public FoldingException() {
+        super();
+    }
+
     public FoldingException(final String message) {
         super(message);
     }

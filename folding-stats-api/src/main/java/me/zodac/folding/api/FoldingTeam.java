@@ -53,7 +53,16 @@ public class FoldingTeam implements ObjectWithId, Serializable {
     // User IDs less than 0 are invalid, but an ID of 0 means the position is empty
     // TODO: [zodac] Verify the user IDs against the user cache
     public boolean isValid() {
-        return isNotBlank(teamName) && captainUserId > EMPTY_POSITION && usersAreUniqueOrEmpty(nvidiaGpuUserId, amdGpuUserId, wildcardUserId);
+        return isNotBlank(teamName) && captainIsValid() && usersAreUniqueOrEmpty(nvidiaGpuUserId, amdGpuUserId, wildcardUserId);
+    }
+
+    // Captain must be a valid ID, and must be one of the nvidia/amd/wildcard users
+    private boolean captainIsValid() {
+        if (captainUserId <= EMPTY_POSITION) {
+            return false;
+        }
+
+        return captainUserId == nvidiaGpuUserId || captainUserId == amdGpuUserId || captainUserId == wildcardUserId;
     }
 
 

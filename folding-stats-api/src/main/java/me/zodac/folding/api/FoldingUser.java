@@ -9,6 +9,8 @@ public class FoldingUser implements ObjectWithId, Serializable {
 
     private static final long serialVersionUID = -1919458037620452556L;
 
+    public static final FoldingUser EMPTY_USER = FoldingUser.create(0, "", "", "", 0);
+
     private int id;
     private String foldingUserName;
     private String displayName;

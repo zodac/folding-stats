@@ -1,11 +1,11 @@
 package me.zodac.folding.cache;
 
 import me.zodac.folding.api.ObjectWithId;
+import me.zodac.folding.api.exception.NotFoundException;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 // TODO: [zodac] Caches are all singleton instances. Would be simpler to make them Singleton EJBs instead.
 //   No need for Tx support, but looks a bit cleaner.
@@ -39,12 +39,16 @@ abstract class AbstractCache<V extends ObjectWithId> {
         }
     }
 
-    public Optional<V> get(final String id) {
-        return Optional.ofNullable(elementsById.get(id));
+    public V get(final String id) throws NotFoundException {
+        final V element = elementsById.get(id);
+        if (element == null) {
+            throw new NotFoundException();
+        }
+        return element;
     }
 
-    public Optional<V> get(final int id) {
-        return Optional.ofNullable(elementsById.get(String.valueOf(id)));
+    public V get(final int id) throws NotFoundException {
+        return get(String.valueOf(id));
     }
 
     public List<V> getAll() {
