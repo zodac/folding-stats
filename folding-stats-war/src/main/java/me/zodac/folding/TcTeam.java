@@ -1,29 +1,52 @@
 package me.zodac.folding;
 
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.Objects;
 
 public class TcTeam {
 
     private String teamName;
     private String captainName;
-    private long teamPoints;
-    private long teamPointsWithoutMultipliers;
     private TcUser nvidiaGpuUser;
     private TcUser amdGpuUser;
     private TcUser wildcardUser;
+    private long teamWus;
+    private long teamPoints;
+    private long teamPointsWithoutMultipliers;
 
     public TcTeam() {
 
     }
 
-    public TcTeam(final String teamName, final String captainName, final long teamPoints, final long teamPointsWithoutMultipliers, final TcUser nvidiaGpuUser, final TcUser amdGpuUser, final TcUser wildcardUser) {
+    public TcTeam(final String teamName, final String captainName, final TcUser nvidiaGpuUser, final TcUser amdGpuUser, final TcUser wildcardUser) {
         this.teamName = teamName;
         this.captainName = captainName;
-        this.teamPoints = teamPoints;
-        this.teamPointsWithoutMultipliers = teamPointsWithoutMultipliers;
         this.nvidiaGpuUser = nvidiaGpuUser;
         this.amdGpuUser = amdGpuUser;
         this.wildcardUser = wildcardUser;
+
+        this.teamWus = 0L;
+        this.teamPoints = 0L;
+        this.teamPointsWithoutMultipliers = 0L;
+
+        if (nvidiaGpuUser != null) {
+            teamWus += nvidiaGpuUser.getWus();
+            teamPoints += nvidiaGpuUser.getPoints();
+            teamPointsWithoutMultipliers += nvidiaGpuUser.getPointsWithoutMultiplier();
+        }
+
+        if (amdGpuUser != null) {
+            teamWus += amdGpuUser.getWus();
+            teamPoints += amdGpuUser.getPoints();
+            teamPointsWithoutMultipliers += amdGpuUser.getPointsWithoutMultiplier();
+        }
+
+        if (wildcardUser != null) {
+            teamWus += wildcardUser.getWus();
+            teamPoints += wildcardUser.getPoints();
+            teamPointsWithoutMultipliers += wildcardUser.getPointsWithoutMultiplier();
+        }
     }
 
     public String getTeamName() {
@@ -40,22 +63,6 @@ public class TcTeam {
 
     public void setCaptainName(final String captainName) {
         this.captainName = captainName;
-    }
-
-    public long getTeamPoints() {
-        return teamPoints;
-    }
-
-    public void setTeamPoints(final long teamPoints) {
-        this.teamPoints = teamPoints;
-    }
-
-    public long getTeamPointsWithoutMultipliers() {
-        return teamPointsWithoutMultipliers;
-    }
-
-    public void setTeamPointsWithoutMultipliers(final long teamPointsWithoutMultipliers) {
-        this.teamPointsWithoutMultipliers = teamPointsWithoutMultipliers;
     }
 
     public TcUser getNvidiaGpuUser() {
@@ -82,6 +89,30 @@ public class TcTeam {
         this.wildcardUser = wildcardUser;
     }
 
+    public long getTeamWus() {
+        return teamWus;
+    }
+
+    public void setTeamWus(final long teamWus) {
+        this.teamWus = teamWus;
+    }
+
+    public long getTeamPoints() {
+        return teamPoints;
+    }
+
+    public void setTeamPoints(final long teamPoints) {
+        this.teamPoints = teamPoints;
+    }
+
+    public long getTeamPointsWithoutMultipliers() {
+        return teamPointsWithoutMultipliers;
+    }
+
+    public void setTeamPointsWithoutMultipliers(final long teamPointsWithoutMultipliers) {
+        this.teamPointsWithoutMultipliers = teamPointsWithoutMultipliers;
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (this == o) {
@@ -91,12 +122,12 @@ public class TcTeam {
             return false;
         }
         final TcTeam tcTeam = (TcTeam) o;
-        return teamName.equals(tcTeam.teamName) && captainName.equals(tcTeam.captainName) && teamPoints == tcTeam.teamPoints && teamPointsWithoutMultipliers == tcTeam.teamPointsWithoutMultipliers && Objects.equals(nvidiaGpuUser, tcTeam.nvidiaGpuUser) && Objects.equals(amdGpuUser, tcTeam.amdGpuUser) && Objects.equals(wildcardUser, tcTeam.wildcardUser);
+        return teamName.equals(tcTeam.teamName) && captainName.equals(tcTeam.captainName) && teamWus == tcTeam.teamWus && teamPoints == tcTeam.teamPoints && teamPointsWithoutMultipliers == tcTeam.teamPointsWithoutMultipliers && Objects.equals(nvidiaGpuUser, tcTeam.nvidiaGpuUser) && Objects.equals(amdGpuUser, tcTeam.amdGpuUser) && Objects.equals(wildcardUser, tcTeam.wildcardUser);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(teamName, captainName, teamPoints, teamPointsWithoutMultipliers, nvidiaGpuUser, amdGpuUser, wildcardUser);
+        return Objects.hash(teamName, captainName, teamWus, teamPoints, teamPointsWithoutMultipliers, nvidiaGpuUser, amdGpuUser, wildcardUser);
     }
 
     // TODO: [zodac] #toString()
@@ -104,12 +135,13 @@ public class TcTeam {
     public String toString() {
         return "TcTeam{" +
                 "teamName=" + teamName +
-                "captainName=" + captainName +
-                "teamPoints=" + teamPoints +
-                ", teamPointsWithoutMultipliers=" + teamPointsWithoutMultipliers +
+                ", captainName=" + captainName +
                 ", nvidiaGpuUser=" + nvidiaGpuUser +
                 ", amdGpuUser=" + amdGpuUser +
                 ", wildcardUser=" + wildcardUser +
+                ", teamWus=" + NumberFormat.getInstance(Locale.UK).format(teamWus) +
+                ", teamPoints=" + NumberFormat.getInstance(Locale.UK).format(teamPoints) +
+                ", teamPointsWithoutMultipliers=" + NumberFormat.getInstance(Locale.UK).format(teamPointsWithoutMultipliers) +
                 '}';
     }
 }

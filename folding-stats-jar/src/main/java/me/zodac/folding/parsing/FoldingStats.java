@@ -1,20 +1,20 @@
 package me.zodac.folding.parsing;
 
+import me.zodac.folding.api.UserStats;
+
 import java.sql.Timestamp;
-import java.text.NumberFormat;
-import java.util.Locale;
 import java.util.Objects;
 
 public class FoldingStats {
 
     private final int userId;
-    private final long totalPoints;
+    private final UserStats totalStats;
     private final Timestamp timestamp;
 
     // TODO: [zodac] Static constructor
-    public FoldingStats(final int userId, final long totalPoints, final Timestamp timestamp) {
+    public FoldingStats(final int userId, final UserStats totalStats, final Timestamp timestamp) {
         this.userId = userId;
-        this.totalPoints = totalPoints;
+        this.totalStats = totalStats;
         this.timestamp = timestamp;
     }
 
@@ -22,8 +22,8 @@ public class FoldingStats {
         return userId;
     }
 
-    public long getTotalPoints() {
-        return totalPoints;
+    public UserStats getTotalStats() {
+        return totalStats;
     }
 
     public Timestamp getTimestamp() {
@@ -39,21 +39,20 @@ public class FoldingStats {
             return false;
         }
         final FoldingStats that = (FoldingStats) o;
-        return userId == that.userId && totalPoints == that.totalPoints && timestamp == that.timestamp;
+        return userId == that.userId && Objects.equals(totalStats, that.totalStats) && timestamp == that.timestamp;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(userId, totalPoints, timestamp);
+        return Objects.hash(userId, totalStats, timestamp);
     }
 
     // TODO: [zodac] toString()
-
     @Override
     public String toString() {
         return "FoldingStats{" +
                 "userId=" + userId +
-                ", totalPoints=" + NumberFormat.getInstance(Locale.UK).format(totalPoints) +
+                ", totalStats=" + totalStats.toString() +
                 ", timestamp=" + timestamp +
                 '}';
     }

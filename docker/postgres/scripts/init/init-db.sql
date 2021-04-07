@@ -46,6 +46,7 @@ CREATE TABLE individual_points (
     user_id INT,
     utc_timestamp TIMESTAMP,
     total_points BIGINT NOT NULL,
+    total_wus BIGINT NOT NULL, -- TODO: [zodac] Is a BIGINT/long too much?
     PRIMARY KEY(user_id, utc_timestamp),
     CONSTRAINT fk_user_id
         FOREIGN KEY(user_id)

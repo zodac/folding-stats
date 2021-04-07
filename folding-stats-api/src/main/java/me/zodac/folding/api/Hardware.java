@@ -5,7 +5,7 @@ import java.util.Objects;
 
 import static me.zodac.folding.api.util.StringUtils.areNotBlank;
 
-public class Hardware implements ObjectWithId, Serializable {
+public class Hardware implements PojoWithId, Serializable {
 
     private static final long serialVersionUID = 311666348626596899L;
 
@@ -95,6 +95,6 @@ public class Hardware implements ObjectWithId, Serializable {
 
     @Override
     public String toString() {
-        return String.format("%s::{id: '%s', hardwareName: '%s', displayName: '%s', multiplier: '%s'", this.getClass().getSimpleName(), id, hardwareName, displayName, multiplier);
+        return String.format("%s::{id: '%s', hardwareName: '%s', displayName: '%s', multiplier: '%s'}", this.getClass().getSimpleName(), id, hardwareName, displayName, multiplier);
     }
 }

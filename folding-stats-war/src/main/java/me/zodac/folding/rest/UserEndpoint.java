@@ -1,13 +1,14 @@
 package me.zodac.folding.rest;
 
 import com.google.gson.Gson;
+import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.FoldingUser;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
-import me.zodac.folding.db.postgres.PostgresDbManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ejb.EJB;
 import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -36,6 +37,9 @@ public class UserEndpoint {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserEndpoint.class);
     private static final Gson GSON = new Gson();
 
+    @EJB
+    private StorageFacade storageFacade;
+
     @Context
     private UriInfo uriContext;
 
@@ -54,7 +58,7 @@ public class UserEndpoint {
         }
 
         try {
-            final FoldingUser foldingUserWithId = PostgresDbManager.createFoldingUser(foldingUser);
+            final FoldingUser foldingUserWithId = storageFacade.createFoldingUser(foldingUser);
 
             final UriBuilder builder = uriContext.getBaseUriBuilder()
                     .path(String.valueOf(foldingUserWithId.getId()));
@@ -75,7 +79,7 @@ public class UserEndpoint {
         LOGGER.info("GET request received for all Folding users at '{}'", this.uriContext.getAbsolutePath());
 
         try {
-            final List<FoldingUser> foldingUsers = PostgresDbManager.getAllFoldingUsers();
+            final List<FoldingUser> foldingUsers = storageFacade.getAllFoldingUsers();
             LOGGER.info("Found {} Folding users", foldingUsers.size());
             return Response
                     .ok()
@@ -98,7 +102,7 @@ public class UserEndpoint {
         LOGGER.info("GET request for Folding user received at '{}'", this.uriContext.getAbsolutePath());
 
         try {
-            final FoldingUser foldingUser = PostgresDbManager.getFoldingUser(foldingUserId);
+            final FoldingUser foldingUser = storageFacade.getFoldingUser(foldingUserId);
             return Response
                     .ok()
                     .entity(foldingUser)

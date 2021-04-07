@@ -1,6 +1,6 @@
 package me.zodac.folding.cache;
 
-import me.zodac.folding.api.ObjectWithId;
+import me.zodac.folding.api.PojoWithId;
 import me.zodac.folding.api.exception.NotFoundException;
 
 import java.util.HashMap;
@@ -10,11 +10,11 @@ import java.util.Map;
 // TODO: [zodac] Caches are all singleton instances. Would be simpler to make them Singleton EJBs instead.
 //   No need for Tx support, but looks a bit cleaner.
 //   Check for any non-CDI use of cache, if none, make into EJBs.
-abstract class AbstractCache<V extends ObjectWithId> {
+abstract class AbstractPojoCache<V extends PojoWithId> {
 
     private final Map<String, V> elementsById;
 
-    protected AbstractCache() {
+    protected AbstractPojoCache() {
         this.elementsById = new HashMap<>();
     }
 

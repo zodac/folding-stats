@@ -3,8 +3,13 @@ package me.zodac.folding.bean;
 import me.zodac.folding.api.FoldingTeam;
 import me.zodac.folding.api.FoldingUser;
 import me.zodac.folding.api.Hardware;
+import me.zodac.folding.api.UserStats;
 import me.zodac.folding.api.exception.FoldingException;
+import me.zodac.folding.api.exception.NotFoundException;
+import me.zodac.folding.cache.FoldingTeamCache;
 import me.zodac.folding.cache.FoldingUserCache;
+import me.zodac.folding.cache.HardwareCache;
+import me.zodac.folding.cache.tc.TcStatsCache;
 import me.zodac.folding.db.postgres.PostgresDbManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +17,12 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
+import java.text.NumberFormat;
+import java.time.Month;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Locale;
 
 
 // TODO: [zodac] Move this to an EJB module?
@@ -26,29 +36,77 @@ public class InitialisationStartupBean {
     public void init() {
         LOGGER.info("Started initialisation bean");
 
-        loadDataIntoDb();
-        initCaches();
+        loadDataIntoDb(); // TODO: [zodac] Remove this eventually
+        initPojoCaches();
+        initTcStatsCache(); // TODO: [zodac] Add bean to reset initial points cache at start of month
+    }
+
+    private static void initTcStatsCache() {
+        final List<FoldingUser> foldingUsers = FoldingUserCache.getInstance().getAll();
+        final Month currentMonth = ZonedDateTime.now(ZoneId.of("UTC")).toLocalDate().getMonth();
+
+        for (final FoldingUser foldingUser : foldingUsers) {
+            try {
+                final UserStats initialStatsForUser = PostgresDbManager.getFirstPointsForUserInMonth(foldingUser, currentMonth);
+                LOGGER.info("Found initial stats for {} for user {}: {}", currentMonth, foldingUser, NumberFormat.getInstance(Locale.UK).format(initialStatsForUser));
+                TcStatsCache.getInstance().addInitialStats(foldingUser.getId(), initialStatsForUser);
+            } catch (final NotFoundException e) {
+                LOGGER.debug("No initial stats in DB for {}", foldingUser, e);
+                LOGGER.warn("No initial stats in DB for {}", foldingUser);
+            } catch (final FoldingException e) {
+                LOGGER.warn("Unable to get initial stats for {} for user {}", currentMonth, foldingUser, e.getCause());
+            }
+
+            try {
+                final UserStats currentStatsForUser = PostgresDbManager.getCurrentPointsForUserInMonth(foldingUser, currentMonth);
+                LOGGER.info("Found current stats for {} for user {}: {}", currentMonth, foldingUser, NumberFormat.getInstance(Locale.UK).format(currentStatsForUser));
+                TcStatsCache.getInstance().addCurrentStats(foldingUser.getId(), currentStatsForUser);
+            } catch (final NotFoundException e) {
+                LOGGER.debug("No current stats in DB for {}", foldingUser, e);
+                LOGGER.warn("No current stats in DB for {}", foldingUser);
+            } catch (final FoldingException e) {
+                LOGGER.warn("Unable to get current stats for {} for user {}", currentMonth, foldingUser, e.getCause());
+            }
+        }
     }
 
     private static void loadDataIntoDb() {
-        LOGGER.warn("Adding initial data into DB (may fail if DB is already initialised)");
+        try {
+            if (!PostgresDbManager.getAllHardware().isEmpty()) {
+                LOGGER.warn("Initial data already exists in DB");
+                return;
+            }
+        } catch (final FoldingException e) {
+            LOGGER.warn("Unable to check DB state", e.getCause());
+        }
 
+        LOGGER.debug("Adding initial data into DB");
         addHardware();
         addFoldingUsers();
         addFoldingTeams();
         LOGGER.info("Initial data added to DB");
     }
 
-    private static void initCaches() {
-        LOGGER.debug("Initialising Folding user cache with DB data");
-        final FoldingUserCache foldingUserCache = FoldingUserCache.getInstance();
+    private static void initPojoCaches() {
+        try {
+            LOGGER.debug("Initialising hardware cache with DB data");
+            HardwareCache.getInstance().addAll(PostgresDbManager.getAllHardware());
+        } catch (final FoldingException e) {
+            LOGGER.warn("Error initialising hardware cache", e.getCause());
+        }
 
         try {
-            for (final FoldingUser foldingUser : PostgresDbManager.getAllFoldingUsers()) {
-                foldingUserCache.add(foldingUser);
-            }
+            LOGGER.debug("Initialising Folding user cache with DB data");
+            FoldingUserCache.getInstance().addAll(PostgresDbManager.getAllFoldingUsers());
         } catch (final FoldingException e) {
             LOGGER.warn("Error initialising Folding user cache", e.getCause());
+        }
+
+        try {
+            LOGGER.debug("Initialising Folding team cache with DB data");
+            FoldingTeamCache.getInstance().addAll(PostgresDbManager.getAllFoldingTeams());
+        } catch (final FoldingException e) {
+            LOGGER.warn("Error initialising Folding team cache", e.getCause());
         }
 
         LOGGER.info("Caches initialised");

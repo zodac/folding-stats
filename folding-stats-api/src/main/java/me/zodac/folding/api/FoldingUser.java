@@ -5,7 +5,7 @@ import java.util.Objects;
 
 import static me.zodac.folding.api.util.StringUtils.isNotBlank;
 
-public class FoldingUser implements ObjectWithId, Serializable {
+public class FoldingUser implements PojoWithId, Serializable {
 
     private static final long serialVersionUID = -1919458037620452556L;
 
@@ -107,6 +107,6 @@ public class FoldingUser implements ObjectWithId, Serializable {
 
     @Override
     public String toString() {
-        return String.format("%s::{id: '%s', foldingUserName: '%s', displayName: '%s', passkey: '%s', hardwareId: '%s'", this.getClass().getSimpleName(), id, foldingUserName, displayName, passkey, hardwareId);
+        return String.format("%s::{id: '%s', foldingUserName: '%s', displayName: '%s', passkey: '%s', hardwareId: '%s'}", this.getClass().getSimpleName(), id, foldingUserName, displayName, passkey, hardwareId);
     }
 }

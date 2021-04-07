@@ -53,8 +53,8 @@ class PostgresSqlQueryBuilder {
 
     public static List<String> insertFoldingStats(final List<FoldingStats> foldingStats) {
         return foldingStats.stream()
-                .map(foldingStatsForUser -> String.format("INSERT INTO individual_points (user_id, utc_timestamp, total_points) VALUES (%s, '%s', %s);",
-                        foldingStatsForUser.getUserId(), foldingStatsForUser.getTimestamp(), foldingStatsForUser.getTotalPoints()))
+                .map(foldingStatsForUser -> String.format("INSERT INTO individual_points (user_id, utc_timestamp, total_points, total_wus) VALUES (%s, '%s', %s, %s);",
+                        foldingStatsForUser.getUserId(), foldingStatsForUser.getTimestamp(), foldingStatsForUser.getTotalStats().getPoints(), foldingStatsForUser.getTotalStats().getWus()))
                 .collect(toList());
     }
 }

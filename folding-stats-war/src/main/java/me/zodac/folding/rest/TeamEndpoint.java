@@ -1,13 +1,14 @@
 package me.zodac.folding.rest;
 
 import com.google.gson.Gson;
+import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.FoldingTeam;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
-import me.zodac.folding.db.postgres.PostgresDbManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ejb.EJB;
 import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -36,6 +37,9 @@ public class TeamEndpoint {
     private static final Logger LOGGER = LoggerFactory.getLogger(TeamEndpoint.class);
     private static final Gson GSON = new Gson();
 
+    @EJB
+    private StorageFacade storageFacade;
+
     @Context
     private UriInfo uriContext;
 
@@ -54,7 +58,7 @@ public class TeamEndpoint {
         }
 
         try {
-            final FoldingTeam foldingTeamWithId = PostgresDbManager.createFoldingTeam(foldingTeam);
+            final FoldingTeam foldingTeamWithId = storageFacade.createFoldingTeam(foldingTeam);
 
             final UriBuilder builder = uriContext.getBaseUriBuilder()
                     .path(String.valueOf(foldingTeamWithId.getId()));
@@ -74,7 +78,7 @@ public class TeamEndpoint {
         LOGGER.info("GET request received for all Folding teams at '{}'", this.uriContext.getAbsolutePath());
 
         try {
-            final List<FoldingTeam> foldingTeams = PostgresDbManager.getAllFoldingTeams();
+            final List<FoldingTeam> foldingTeams = storageFacade.getAllFoldingTeams();
             LOGGER.info("Found {} Folding teams", foldingTeams.size());
             return Response
                     .ok()
@@ -97,7 +101,7 @@ public class TeamEndpoint {
         LOGGER.info("GET request for Folding team received at '{}'", this.uriContext.getAbsolutePath());
 
         try {
-            final FoldingTeam foldingTeam = PostgresDbManager.getFoldingTeam(foldingTeamId);
+            final FoldingTeam foldingTeam = storageFacade.getFoldingTeam(foldingTeamId);
             return Response
                     .ok()
                     .entity(foldingTeam)

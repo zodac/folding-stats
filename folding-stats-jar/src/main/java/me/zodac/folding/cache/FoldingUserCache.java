@@ -2,7 +2,7 @@ package me.zodac.folding.cache;
 
 import me.zodac.folding.api.FoldingUser;
 
-public class FoldingUserCache extends AbstractCache<FoldingUser> {
+public class FoldingUserCache extends AbstractPojoCache<FoldingUser> {
 
     private static FoldingUserCache INSTANCE = null;
 

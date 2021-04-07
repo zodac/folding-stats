@@ -30,7 +30,7 @@ public class ScheduledStatsParsing {
         LOGGER.info("Started stats parsing bean, running every hour");
     }
 
-    @Schedule(hour = "*/1", minute = "15", info = "Every hour, 15 minutes after the hour")
+    @Schedule(hour = "*/1", minute = "30", info = "Every hour, 30 minutes after the hour")
     public void startStatsParsing() {
         LOGGER.info("Parsing Folding stats");
 
@@ -42,7 +42,7 @@ public class ScheduledStatsParsing {
             return;
         }
 
-        FoldingStatsParser.parseStats(usersToParse);
+        FoldingStatsParser.parseStatsForAllUsers(usersToParse);
         LOGGER.info("Finished parsing");
 
         // TODO: [zodac] Stupid issue where my terminal won't print the last line of the docker console log

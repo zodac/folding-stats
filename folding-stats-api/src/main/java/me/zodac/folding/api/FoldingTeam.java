@@ -9,7 +9,7 @@ import java.util.Set;
 
 import static me.zodac.folding.api.util.StringUtils.isNotBlank;
 
-public class FoldingTeam implements ObjectWithId, Serializable {
+public class FoldingTeam implements PojoWithId, Serializable {
 
     public static final int EMPTY_POSITION = 0;
 
@@ -157,6 +157,6 @@ public class FoldingTeam implements ObjectWithId, Serializable {
 
     @Override
     public String toString() {
-        return String.format("%s::{id: '%s', teamName: '%s', captainUserId: '%s', nvidiaGpuUserId: '%s', amdGpuUserId: '%s', wildcardUserId: '%s'", this.getClass().getSimpleName(), id, teamName, captainUserId, nvidiaGpuUserId, amdGpuUserId, wildcardUserId);
+        return String.format("%s::{id: '%s', teamName: '%s', captainUserId: '%s', nvidiaGpuUserId: '%s', amdGpuUserId: '%s', wildcardUserId: '%s'}", this.getClass().getSimpleName(), id, teamName, captainUserId, nvidiaGpuUserId, amdGpuUserId, wildcardUserId);
     }
 }

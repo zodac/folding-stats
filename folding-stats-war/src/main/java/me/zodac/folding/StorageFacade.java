@@ -3,12 +3,17 @@ package me.zodac.folding;
 import me.zodac.folding.api.FoldingTeam;
 import me.zodac.folding.api.FoldingUser;
 import me.zodac.folding.api.Hardware;
+import me.zodac.folding.api.UserStats;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.cache.FoldingTeamCache;
 import me.zodac.folding.cache.FoldingUserCache;
 import me.zodac.folding.cache.HardwareCache;
+import me.zodac.folding.cache.tc.TcStatsCache;
 import me.zodac.folding.db.postgres.PostgresDbManager;
+import me.zodac.folding.parsing.FoldingStatsParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ejb.Singleton;
 import java.util.List;
@@ -22,11 +27,14 @@ import java.util.List;
 @Singleton
 public class StorageFacade {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(StorageFacade.class);
+
     // TODO: [zodac] Dynamically inject/instantiate the PostgresDbManager
 
     private final FoldingTeamCache foldingTeamCache = FoldingTeamCache.getInstance();
     private final FoldingUserCache foldingUserCache = FoldingUserCache.getInstance();
     private final HardwareCache hardwareCache = HardwareCache.getInstance();
+    private final TcStatsCache tcStatsCache = TcStatsCache.getInstance();
 
     public Hardware createHardware(final Hardware hardware) throws FoldingException {
         final Hardware hardwareWithId = PostgresDbManager.createHardware(hardware);
@@ -39,7 +47,11 @@ public class StorageFacade {
     }
 
     public Hardware getHardware(final String hardwareId) throws FoldingException, NotFoundException {
-        final Hardware hardware = hardwareCache.get(hardwareId);
+        try {
+            return hardwareCache.get(hardwareId);
+        } catch (final NotFoundException e) {
+            LOGGER.debug("Unable to find hardware with ID {} in cache", hardwareId, e);
+        }
 
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
@@ -66,6 +78,12 @@ public class StorageFacade {
     public FoldingUser createFoldingUser(final FoldingUser foldingUser) throws FoldingException {
         final FoldingUser foldingUserWithId = PostgresDbManager.createFoldingUser(foldingUser);
         foldingUserCache.add(foldingUserWithId);
+
+        // When adding a new user, we should also configure the TC stats cache
+        final UserStats currentStats = FoldingStatsParser.getTotalPointsForUser(foldingUser.getFoldingUserName(), foldingUser.getPasskey());
+        tcStatsCache.addInitialStats(foldingUserWithId.getId(), currentStats);
+
+
         return foldingUserWithId;
     }
 
@@ -74,7 +92,11 @@ public class StorageFacade {
     }
 
     public FoldingUser getFoldingUser(final String foldingUserId) throws FoldingException, NotFoundException {
-        final FoldingUser foldingUser = foldingUserCache.get(foldingUserId);
+        try {
+            return foldingUserCache.get(foldingUserId);
+        } catch (final NotFoundException e) {
+            LOGGER.debug("Unable to find Folding user with ID {} in cache", foldingUserId, e);
+        }
 
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
@@ -109,7 +131,11 @@ public class StorageFacade {
     }
 
     public FoldingTeam getFoldingTeam(final String foldingTeamId) throws FoldingException, NotFoundException {
-        final FoldingTeam foldingTeam = foldingTeamCache.get(foldingTeamId);
+        try {
+            return foldingTeamCache.get(foldingTeamId);
+        } catch (final NotFoundException e) {
+            LOGGER.debug("Unable to find Folding team with ID {} in cache", foldingTeamId, e);
+        }
 
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future

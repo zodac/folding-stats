@@ -5,7 +5,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import me.zodac.folding.api.FoldingUser;
+import me.zodac.folding.api.UserStats;
 import me.zodac.folding.api.exception.FoldingException;
+import me.zodac.folding.cache.tc.TcStatsCache;
 import me.zodac.folding.db.postgres.PostgresDbManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,18 +28,28 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
+// TODO: [zodac] Should not go straight to caches/DB, use StorageFacade
 public class FoldingStatsParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FoldingStatsParser.class);
 
-    public static void parseStats(final List<FoldingUser> foldingUsers) {
+    private static final TcStatsCache TC_STATS_CACHE = TcStatsCache.getInstance();
+
+    public static void parseStatsForAllUsers(final List<FoldingUser> foldingUsers) {
         final Timestamp currentUtcTime = new Timestamp(ZonedDateTime.now(ZoneId.of("UTC")).toInstant().toEpochMilli());
         final List<FoldingStats> stats = new ArrayList<>(foldingUsers.size());
 
         for (final FoldingUser foldingUser : foldingUsers) {
             try {
-                final long totalPointsForUser = getTotalPointsForUser(foldingUser.getFoldingUserName(), foldingUser.getPasskey());
-                stats.add(new FoldingStats(foldingUser.getId(), totalPointsForUser, currentUtcTime));
+                final UserStats totalStatsForUser = getTotalPointsForUser(foldingUser.getFoldingUserName(), foldingUser.getPasskey());
+                stats.add(new FoldingStats(foldingUser.getId(), totalStatsForUser, currentUtcTime));
+
+                // If no entry exists in the cache, first time we pull stats for the user is also the initial state
+                if (!TC_STATS_CACHE.haveInitialStatsForUser(foldingUser.getId())) {
+                    TC_STATS_CACHE.addInitialStats(foldingUser.getId(), totalStatsForUser);
+                }
+
+                TC_STATS_CACHE.addCurrentStats(foldingUser.getId(), totalStatsForUser);
             } catch (final FoldingException e) {
                 LOGGER.warn("Unable to get stats for user '{}/{}'", foldingUser.getFoldingUserName(), foldingUser.getPasskey(), e.getCause());
             }
@@ -61,7 +73,8 @@ public class FoldingStatsParser {
             .connectTimeout(Duration.ofSeconds(10))
             .build();
 
-    private static long getTotalPointsForUser(final String userName, final String passkey) throws FoldingException {
+    // TODO: [zodac] Would be nice to also have WUs per user?
+    public static UserStats getTotalPointsForUser(final String userName, final String passkey) throws FoldingException {
         LOGGER.info("Getting points for username/passkey '{}/{}' for team {}", userName, passkey, TEAM_NUMBER);
         final String statsRequestUrl = String.format(STATS_URL_FORMAT, userName, passkey);
 
@@ -93,7 +106,7 @@ public class FoldingStatsParser {
 
             final StatsApiResult statsApiResponse = GSON.fromJson(results.get(0), StatsApiResult.class);
             LOGGER.info("Found {}", statsApiResponse);
-            return statsApiResponse.getCredit();
+            return new UserStats(statsApiResponse.getCredit(), statsApiResponse.getWus());
         } catch (final IOException | InterruptedException e) {
             throw new FoldingException("Unable to send HTTP request to Folding@Home API", e.getCause());
         }
@@ -140,8 +153,8 @@ public class FoldingStatsParser {
     private static class StatsApiResult {
 
         private String name;
-        private int team;
         private long credit;
+        private long wus;
 
         public StatsApiResult() {
 
@@ -155,20 +168,20 @@ public class FoldingStatsParser {
             this.name = name;
         }
 
-        public int getTeam() {
-            return team;
-        }
-
-        public void setTeam(final int team) {
-            this.team = team;
-        }
-
         public long getCredit() {
             return credit;
         }
 
         public void setCredit(final long credit) {
             this.credit = credit;
+        }
+
+        public long getWus() {
+            return wus;
+        }
+
+        public void setWus(final long wus) {
+            this.wus = wus;
         }
 
         @Override
@@ -180,12 +193,12 @@ public class FoldingStatsParser {
                 return false;
             }
             final StatsApiResult that = (StatsApiResult) o;
-            return team == that.team && credit == that.credit && Objects.equals(name, that.name);
+            return credit == that.credit && wus == that.wus && Objects.equals(name, that.name);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(name, team, credit);
+            return Objects.hash(name, credit, wus);
         }
 
         // TODO: [zodac] toString()
@@ -193,8 +206,8 @@ public class FoldingStatsParser {
         public String toString() {
             return "StatsApiResult{" +
                     "name='" + name + '\'' +
-                    ", team=" + team +
                     ", credit=" + NumberFormat.getInstance(Locale.UK).format(credit) +
+                    ", wus=" + NumberFormat.getInstance(Locale.UK).format(wus) +
                     '}';
         }
     }
