@@ -23,6 +23,7 @@ public class TcStats {
         this.totalPoints = 0L;
         this.totalPointsWithoutMultipliers = 0L;
 
+        // TODO: [zodac] Rank the teams
         for (final TcTeam team : teams) {
             this.totalWus += team.getTeamWus();
             this.totalPoints += team.getTeamPoints();

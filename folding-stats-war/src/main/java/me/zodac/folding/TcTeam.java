@@ -8,6 +8,8 @@ public class TcTeam {
 
     private String teamName;
     private String captainName;
+
+    // TODO: [zodac] Rank the users
     private TcUser nvidiaGpuUser;
     private TcUser amdGpuUser;
     private TcUser wildcardUser;

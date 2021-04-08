@@ -21,8 +21,8 @@ import java.net.http.HttpResponse;
 import java.sql.Timestamp;
 import java.text.NumberFormat;
 import java.time.Duration;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -36,7 +36,7 @@ public class FoldingStatsParser {
     private static final TcStatsCache TC_STATS_CACHE = TcStatsCache.getInstance();
 
     public static void parseStatsForAllUsers(final List<FoldingUser> foldingUsers) {
-        final Timestamp currentUtcTime = new Timestamp(ZonedDateTime.now(ZoneId.of("UTC")).toInstant().toEpochMilli());
+        final Timestamp currentUtcTime = new Timestamp(OffsetDateTime.now(ZoneOffset.UTC).toInstant().toEpochMilli());
         final List<FoldingStats> stats = new ArrayList<>(foldingUsers.size());
 
         for (final FoldingUser foldingUser : foldingUsers) {
@@ -75,7 +75,7 @@ public class FoldingStatsParser {
 
     // TODO: [zodac] Would be nice to also have WUs per user?
     public static UserStats getTotalPointsForUser(final String userName, final String passkey) throws FoldingException {
-        LOGGER.info("Getting points for username/passkey '{}/{}' for team {}", userName, passkey, TEAM_NUMBER);
+        LOGGER.debug("Getting stats for username/passkey '{}/{}' for team {}", userName, passkey, TEAM_NUMBER);
         final String statsRequestUrl = String.format(STATS_URL_FORMAT, userName, passkey);
 
         final HttpRequest request = HttpRequest.newBuilder()

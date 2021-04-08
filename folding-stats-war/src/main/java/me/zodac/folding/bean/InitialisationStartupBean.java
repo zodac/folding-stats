@@ -17,12 +17,10 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
-import java.text.NumberFormat;
 import java.time.Month;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
-import java.util.Locale;
 
 
 // TODO: [zodac] Move this to an EJB module?
@@ -43,7 +41,7 @@ public class InitialisationStartupBean {
 
     private static void initTcStatsCache() {
         final List<FoldingUser> foldingUsers = FoldingUserCache.getInstance().getAll();
-        final Month currentMonth = ZonedDateTime.now(ZoneId.of("UTC")).toLocalDate().getMonth();
+        final Month currentMonth = OffsetDateTime.now(ZoneOffset.UTC).toLocalDate().getMonth();
 
         for (final FoldingUser foldingUser : foldingUsers) {
             try {

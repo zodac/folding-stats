@@ -21,12 +21,6 @@ public class TcStatsCache {
 
     }
 
-
-    public void print() {
-        LOGGER.info("Initial: {}", initialStatsByUserId);
-        LOGGER.info("Current: {}", currentStatsByUserId);
-    }
-
     public static TcStatsCache getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new TcStatsCache();

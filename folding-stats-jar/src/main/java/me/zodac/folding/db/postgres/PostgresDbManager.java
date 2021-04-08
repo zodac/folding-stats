@@ -260,7 +260,7 @@ public class PostgresDbManager implements DbManager {
     }
 
     public static UserStats getFirstPointsForUserInMonth(final FoldingUser foldingUser, final Month month) throws FoldingException, NotFoundException {
-        LOGGER.info("Getting first points in month {} for user {}", month, foldingUser);
+        LOGGER.debug("Getting first points in month {} for user {}", month, foldingUser);
         final String selectSqlStatement = getPointsForUserInMonthQuery(foldingUser, month, true);
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
@@ -278,7 +278,7 @@ public class PostgresDbManager implements DbManager {
     }
 
     public static UserStats getCurrentPointsForUserInMonth(final FoldingUser foldingUser, final Month month) throws FoldingException, NotFoundException {
-        LOGGER.info("Getting current points in month {} for user {}", month, foldingUser);
+        LOGGER.debug("Getting current points in month {} for user {}", month, foldingUser);
         final String selectSqlStatement = getPointsForUserInMonthQuery(foldingUser, month, false);
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);

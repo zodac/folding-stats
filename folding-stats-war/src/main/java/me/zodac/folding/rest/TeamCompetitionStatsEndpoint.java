@@ -46,9 +46,6 @@ public class TeamCompetitionStatsEndpoint {
     public Response getTeamCompetitionStats() {
         LOGGER.info("GET request received to show TC stats at '{}'", this.uriContext.getAbsolutePath());
 
-        LOGGER.info("TC stats cache contents:");
-        tcStatsCache.print();
-
         try {
             final List<TcTeam> tcTeams = getTeams();
             LOGGER.info("Found {} TC teams", tcTeams.size());
@@ -92,7 +89,7 @@ public class TeamCompetitionStatsEndpoint {
 
     private TcUser getTcUserOrNull(final int userId, final String userType) {
         if (userId == FoldingUser.EMPTY_USER.getId()) {
-            LOGGER.warn("No {} user for team", userType);
+            LOGGER.warn("No {} user", userType);
             return null;
         }
 
@@ -109,7 +106,7 @@ public class TeamCompetitionStatsEndpoint {
     }
 
     private TcTeam convertFoldingTeamToTcTeam(final FoldingTeam foldingTeam) throws FoldingException {
-        LOGGER.info("Converting team for TC stats: {}", foldingTeam);
+        LOGGER.info("Converting team {} for TC stats", foldingTeam.getTeamName());
 
         final TcUser nvidiaGpuTcUser = getTcUserOrNull(foldingTeam.getNvidiaGpuUserId(), "nVidia GPU");
         final TcUser amdGpuTcUser = getTcUserOrNull(foldingTeam.getAmdGpuUserId(), "AMD GPU");
@@ -143,7 +140,7 @@ public class TeamCompetitionStatsEndpoint {
                 return new TcUser(foldingUser.getDisplayName(), hardware.getDisplayName());
             }
 
-            LOGGER.info("Found initial stats {} and current stats {} for {}", initialStats.get(), currentStats.get(), foldingUser);
+            LOGGER.debug("Found initial stats {} and current stats {} for {}", initialStats.get(), currentStats.get(), foldingUser);
             final long tcWusForUser = currentStats.get().getWus() - initialStats.get().getWus();
             final long tcPointsForUser = currentStats.get().getPoints() - initialStats.get().getPoints();
             final long tcPointsForUserMultiplier = (long) (tcPointsForUser * hardware.getMultiplier());
