@@ -34,7 +34,6 @@ public class ScheduledStatsParsing {
     public void startStatsParsing() {
         LOGGER.info("Parsing Folding stats");
 
-
         final List<FoldingUser> usersToParse = getUsers();
 
         if (usersToParse.isEmpty()) {

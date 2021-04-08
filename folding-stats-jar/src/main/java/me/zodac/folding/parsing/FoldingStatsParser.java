@@ -85,6 +85,9 @@ public class FoldingStatsParser {
                 .build();
 
         try {
+            // The Folding@Home API seems to be caching the username+passkey stats. The first request will have the same result as the previous hour
+            // To get around this, we send a request, ignore it, then send another request and parse that one
+            HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
             final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
 
             // All user searches return a 200 response, even if the user/passkey is invalid, we will need to parse and check it later
@@ -93,6 +96,11 @@ public class FoldingStatsParser {
             }
 
             final JsonObject httpResponse = JsonParser.parseString(response.body()).getAsJsonObject();
+
+            if (!httpResponse.has("results")) {
+                throw new FoldingException(String.format("Unable to find any 'result' entry for username/passkey '%s/%s': %s", userName, passkey, response.body()));
+            }
+
             final JsonArray results = httpResponse.getAsJsonArray("results");
 
             if (results.size() == 0) {
@@ -100,7 +108,7 @@ public class FoldingStatsParser {
             }
 
             if (results.size() > 1) {
-                // Don't believe this should happen with our current URL, there should only be one result for a user/passkey/team combo
+                // Don't believe this should happen, since with our current URL, there should only be one result for a user/passkey/team combo
                 throw new FoldingException(String.format("Too many results found for username/passkey '%s/%s': %s", userName, passkey, response.body()));
             }
 
@@ -108,7 +116,9 @@ public class FoldingStatsParser {
             LOGGER.info("Found {}", statsApiResponse);
             return new UserStats(statsApiResponse.getCredit(), statsApiResponse.getWus());
         } catch (final IOException | InterruptedException e) {
-            throw new FoldingException("Unable to send HTTP request to Folding@Home API", e.getCause());
+            throw new FoldingException("Unable to send HTTP request to Folding@Home API", e);
+        } catch (final ClassCastException e) {
+            throw new FoldingException("Unable to parse HTTP response from Folding@Home API correctly", e);
         }
     }
 

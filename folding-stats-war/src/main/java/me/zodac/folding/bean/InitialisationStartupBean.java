@@ -48,7 +48,7 @@ public class InitialisationStartupBean {
         for (final FoldingUser foldingUser : foldingUsers) {
             try {
                 final UserStats initialStatsForUser = PostgresDbManager.getFirstPointsForUserInMonth(foldingUser, currentMonth);
-                LOGGER.info("Found initial stats for {} for user {}: {}", currentMonth, foldingUser, NumberFormat.getInstance(Locale.UK).format(initialStatsForUser));
+                LOGGER.info("Found initial stats for {} for user {}: {}", currentMonth, foldingUser, initialStatsForUser);
                 TcStatsCache.getInstance().addInitialStats(foldingUser.getId(), initialStatsForUser);
             } catch (final NotFoundException e) {
                 LOGGER.debug("No initial stats in DB for {}", foldingUser, e);
@@ -59,7 +59,7 @@ public class InitialisationStartupBean {
 
             try {
                 final UserStats currentStatsForUser = PostgresDbManager.getCurrentPointsForUserInMonth(foldingUser, currentMonth);
-                LOGGER.info("Found current stats for {} for user {}: {}", currentMonth, foldingUser, NumberFormat.getInstance(Locale.UK).format(currentStatsForUser));
+                LOGGER.info("Found current stats for {} for user {}: {}", currentMonth, foldingUser, currentStatsForUser);
                 TcStatsCache.getInstance().addCurrentStats(foldingUser.getId(), currentStatsForUser);
             } catch (final NotFoundException e) {
                 LOGGER.debug("No current stats in DB for {}", foldingUser, e);
