@@ -26,9 +26,9 @@ import java.util.List;
 // TODO: [zodac] Move this to an EJB module?
 @Startup
 @Singleton
-public class InitialisationStartupBean {
+public class InitialisationBean {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(InitialisationStartupBean.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(InitialisationBean.class);
 
     @PostConstruct
     public void init() {
@@ -151,25 +151,33 @@ public class InitialisationStartupBean {
                         "BWG",
                         "BWG",
                         "8d10fbfda0813aa7288613e400484214",
-                        1
+                        "nvidia_gpu",
+                        1,
+                        239902
                 ),
                 FoldingUser.createWithoutId(
                         "Bastiaan_NL",
                         "Bastiaan_NL",
                         "d1ed404fdb11570aa07d2294601ad292",
-                        2
+                        "amd_gpu",
+                        2,
+                        239902
                 ),
                 FoldingUser.createWithoutId(
                         "BWG",
                         "BWG_With_Multiplier",
                         "8d10fbfda0813aa7288613e400484214",
-                        3
+                        "nvidia_gpu",
+                        3,
+                        239902
                 ),
                 FoldingUser.createWithoutId(
                         "Bastiaan_NL",
                         "Bastiaan_NL_With_Multiplier",
                         "d1ed404fdb11570aa07d2294601ad292",
-                        4
+                        "amd_gpu",
+                        4,
+                        239902
                 )
         );
 

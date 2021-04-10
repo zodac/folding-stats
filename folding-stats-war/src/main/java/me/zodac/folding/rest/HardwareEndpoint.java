@@ -5,6 +5,8 @@ import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.Hardware;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
+import me.zodac.folding.validator.HardwareValidator;
+import me.zodac.folding.validator.ValidationResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,10 +50,11 @@ public class HardwareEndpoint {
     public Response createHardware(final Hardware hardware) {
         LOGGER.info("POST request received to create hardware at '{}' with request: {}", this.uriContext.getAbsolutePath(), hardware);
 
-        if (!hardware.isValid()) {
+        final ValidationResponse validationResponse = HardwareValidator.isValid(hardware);
+        if (!validationResponse.isValid()) {
             return Response
                     .status(Response.Status.BAD_REQUEST)
-                    .entity(GSON.toJson(hardware))
+                    .entity(GSON.toJson(validationResponse))
                     .build();
         }
 

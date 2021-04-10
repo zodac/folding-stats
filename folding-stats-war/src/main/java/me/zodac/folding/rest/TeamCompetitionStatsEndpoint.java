@@ -88,7 +88,7 @@ public class TeamCompetitionStatsEndpoint {
     }
 
     private TcUser getTcUserOrNull(final int userId, final String userType) {
-        if (userId == FoldingUser.EMPTY_USER.getId()) {
+        if (userId == FoldingUser.EMPTY_USER_ID) {
             LOGGER.warn("No {} user", userType);
             return null;
         }

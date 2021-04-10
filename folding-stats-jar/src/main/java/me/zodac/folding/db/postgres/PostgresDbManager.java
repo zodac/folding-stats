@@ -119,7 +119,9 @@ public class PostgresDbManager implements DbManager {
                         resultSet.getString("folding_username"),
                         resultSet.getString("display_username"),
                         resultSet.getString("passkey"),
-                        resultSet.getInt("hardware_id")
+                        resultSet.getString("category"),
+                        resultSet.getInt("hardware_id"),
+                        resultSet.getInt("folding_team_number")
                 ));
             }
 
@@ -142,7 +144,9 @@ public class PostgresDbManager implements DbManager {
                         resultSet.getString("folding_username"),
                         resultSet.getString("display_username"),
                         resultSet.getString("passkey"),
-                        resultSet.getInt("hardware_id")
+                        resultSet.getString("category"),
+                        resultSet.getInt("hardware_id"),
+                        resultSet.getInt("folding_team_number")
                 );
             }
 

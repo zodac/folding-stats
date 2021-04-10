@@ -1,6 +1,5 @@
 package me.zodac.folding.api;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -9,12 +8,11 @@ import java.util.Set;
 
 import static me.zodac.folding.api.util.StringUtils.isNotBlank;
 
-public class FoldingTeam implements PojoWithId, Serializable {
+public class FoldingTeam implements Identifiable {
 
     public static final int EMPTY_POSITION = 0;
 
     private static final long serialVersionUID = -8765213859473081036L;
-
 
     private int id;
     private String teamName;
@@ -22,8 +20,7 @@ public class FoldingTeam implements PojoWithId, Serializable {
     private int nvidiaGpuUserId;
     private int amdGpuUserId;
     private int wildcardUserId;
-
-
+    
     public FoldingTeam() {
 
     }

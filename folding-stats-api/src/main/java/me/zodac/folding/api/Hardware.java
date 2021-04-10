@@ -1,11 +1,8 @@
 package me.zodac.folding.api;
 
-import java.io.Serializable;
 import java.util.Objects;
 
-import static me.zodac.folding.api.util.StringUtils.areNotBlank;
-
-public class Hardware implements PojoWithId, Serializable {
+public class Hardware implements Identifiable {
 
     private static final long serialVersionUID = 311666348626596899L;
 
@@ -35,12 +32,6 @@ public class Hardware implements PojoWithId, Serializable {
 
     public static Hardware updateWithId(final int id, final Hardware hardware) {
         return new Hardware(id, hardware.getHardwareName(), hardware.getDisplayName(), hardware.getMultiplier());
-    }
-
-    // Quick function used for REST requests. Since a JSON payload may have a missing/incorrect field, we need to check
-    // I am assuming multiplier cannot be less than 0, also assuming we might want a 0.1/0.5 at some point with future hardware
-    public boolean isValid() {
-        return areNotBlank(hardwareName, displayName) && multiplier > 0.0D;
     }
 
     @Override

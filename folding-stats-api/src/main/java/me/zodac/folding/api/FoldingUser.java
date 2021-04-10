@@ -1,50 +1,45 @@
 package me.zodac.folding.api;
 
-import java.io.Serializable;
 import java.util.Objects;
 
-import static me.zodac.folding.api.util.StringUtils.isNotBlank;
-
-public class FoldingUser implements PojoWithId, Serializable {
+public class FoldingUser implements Identifiable {
 
     private static final long serialVersionUID = -1919458037620452556L;
 
-    public static final FoldingUser EMPTY_USER = FoldingUser.create(0, "", "", "", 0);
+    public static final int EMPTY_USER_ID = 0;
 
     private int id;
     private String foldingUserName;
     private String displayName;
     private String passkey;
+    private String category;
     private int hardwareId;
+    private int foldingTeamNumber;
 
     public FoldingUser() {
 
     }
 
-    private FoldingUser(final int id, final String foldingUserName, final String displayName, final String passkey, final int hardwareId) {
+    private FoldingUser(final int id, final String foldingUserName, final String displayName, final String passkey, final String category, final int hardwareId, final int foldingTeamNumber) {
         this.id = id;
         this.foldingUserName = foldingUserName;
         this.displayName = displayName;
         this.passkey = passkey;
+        this.category = category;
         this.hardwareId = hardwareId;
+        this.foldingTeamNumber = foldingTeamNumber;
     }
 
-    public static FoldingUser create(final int userId, final String foldingUserName, final String displayName, final String passkey, final int hardwareId) {
-        return new FoldingUser(userId, foldingUserName, displayName, passkey, hardwareId);
+    public static FoldingUser create(final int userId, final String foldingUserName, final String displayName, final String passkey, final String category, final int hardwareId, final int foldingTeamNumber) {
+        return new FoldingUser(userId, foldingUserName, displayName, passkey, category, hardwareId, foldingTeamNumber);
     }
 
-    public static FoldingUser createWithoutId(final String foldingUserName, final String displayName, final String passkey, final int hardwareId) {
-        return new FoldingUser(0, foldingUserName, displayName, passkey, hardwareId);
+    public static FoldingUser createWithoutId(final String foldingUserName, final String displayName, final String passkey, final String category, final int hardwareId, final int foldingTeamNumber) {
+        return new FoldingUser(0, foldingUserName, displayName, passkey, category, hardwareId, foldingTeamNumber);
     }
 
     public static FoldingUser updateWithId(final int userId, final FoldingUser foldingUser) {
-        return new FoldingUser(userId, foldingUser.getFoldingUserName(), foldingUser.getDisplayName(), foldingUser.getPasskey(), foldingUser.getHardwareId());
-    }
-
-    // Quick function used for REST requests. Since a JSON payload may have a missing/incorrect field, we need to check
-    // TODO: [zodac] hardwareId needs to be checked against DB (cache)
-    public boolean isValid() {
-        return isNotBlank(foldingUserName) && isNotBlank(displayName) && isNotBlank(passkey) && hardwareId > 0;
+        return new FoldingUser(userId, foldingUser.getFoldingUserName(), foldingUser.getDisplayName(), foldingUser.getPasskey(), foldingUser.getCategory(), foldingUser.getHardwareId(), foldingUser.getFoldingTeamNumber());
     }
 
     @Override
@@ -80,12 +75,28 @@ public class FoldingUser implements PojoWithId, Serializable {
         this.passkey = passkey;
     }
 
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(final String category) {
+        this.category = category;
+    }
+
     public int getHardwareId() {
         return hardwareId;
     }
 
     public void setHardwareId(final int hardwareId) {
         this.hardwareId = hardwareId;
+    }
+
+    public int getFoldingTeamNumber() {
+        return foldingTeamNumber;
+    }
+
+    public void setFoldingTeamNumber(final int foldingTeamNumber) {
+        this.foldingTeamNumber = foldingTeamNumber;
     }
 
     @Override
@@ -97,16 +108,16 @@ public class FoldingUser implements PojoWithId, Serializable {
             return false;
         }
         final FoldingUser that = (FoldingUser) o;
-        return id == that.id && hardwareId == that.hardwareId && Objects.equals(foldingUserName, that.foldingUserName) && Objects.equals(displayName, that.displayName) && Objects.equals(passkey, that.passkey);
+        return id == that.id && hardwareId == that.hardwareId && Objects.equals(category, that.category) && foldingTeamNumber == that.foldingTeamNumber && Objects.equals(foldingUserName, that.foldingUserName) && Objects.equals(displayName, that.displayName) && Objects.equals(passkey, that.passkey);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, foldingUserName, displayName, passkey, hardwareId);
+        return Objects.hash(id, foldingUserName, displayName, passkey, category, hardwareId, foldingTeamNumber);
     }
 
     @Override
     public String toString() {
-        return String.format("%s::{id: '%s', foldingUserName: '%s', displayName: '%s', passkey: '%s', hardwareId: '%s'}", this.getClass().getSimpleName(), id, foldingUserName, displayName, passkey, hardwareId);
+        return String.format("%s::{id: '%s', foldingUserName: '%s', displayName: '%s', passkey: '%s', category: '%s', hardwareId: '%s', foldingTeamNumber: '%s'}", this.getClass().getSimpleName(), id, foldingUserName, displayName, passkey, category, hardwareId, foldingTeamNumber);
     }
 }

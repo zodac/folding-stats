@@ -28,7 +28,7 @@ class PostgresSqlQueryBuilder {
     }
 
     public static String insertFoldingUser(final FoldingUser foldingUser) {
-        return String.format("INSERT INTO folding_users (folding_username, display_username, passkey, hardware_id) VALUES ('%s', '%s', '%s', %s) RETURNING user_id;", foldingUser.getFoldingUserName(), foldingUser.getDisplayName(), foldingUser.getPasskey(), foldingUser.getHardwareId());
+        return String.format("INSERT INTO folding_users (folding_username, display_username, passkey, category, hardware_id, folding_team_number) VALUES ('%s', '%s', '%s', '%s', %s, %s) RETURNING user_id;", foldingUser.getFoldingUserName(), foldingUser.getDisplayName(), foldingUser.getPasskey(), foldingUser.getCategory(), foldingUser.getHardwareId(), foldingUser.getFoldingTeamNumber());
     }
 
     public static String getFoldingUsers() {

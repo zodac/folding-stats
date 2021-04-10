@@ -14,7 +14,9 @@ CREATE TABLE folding_users (
     folding_username TEXT NOT NULL,
     display_username TEXT NOT NULL,
     passkey TEXT NOT NULL,
+    category TEXT NOT NULL,
     hardware_id INT NOT NULL,
+    folding_team_number INT NOT NULL,
     CONSTRAINT fk_hardware_id
         FOREIGN KEY(hardware_id)
             REFERENCES hardware(hardware_id)

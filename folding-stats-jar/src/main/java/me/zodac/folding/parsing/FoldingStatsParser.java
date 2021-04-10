@@ -41,7 +41,7 @@ public class FoldingStatsParser {
 
         for (final FoldingUser foldingUser : foldingUsers) {
             try {
-                final UserStats totalStatsForUser = getTotalPointsForUser(foldingUser.getFoldingUserName(), foldingUser.getPasskey());
+                final UserStats totalStatsForUser = getTotalPointsForUser(foldingUser.getFoldingUserName(), foldingUser.getPasskey(), foldingUser.getFoldingTeamNumber());
                 stats.add(new FoldingStats(foldingUser.getId(), totalStatsForUser, currentUtcTime));
 
                 // If no entry exists in the cache, first time we pull stats for the user is also the initial state
@@ -64,19 +64,16 @@ public class FoldingStatsParser {
 
     // TODO: [zodac] Move this somewhere else, keep the HTTP logic in a single place
 
-    // TODO: [zodac] Team number hardcoded: set as env variable, set for each user?
-    private static final String TEAM_NUMBER = "239902"; // EHW
-    private static final String STATS_URL_FORMAT = "https://stats.foldingathome.org/api/donors?name=%s&search_type=exact&passkey=%s&team=" + TEAM_NUMBER;
+    private static final String STATS_URL_FORMAT = "https://stats.foldingathome.org/api/donors?name=%s&search_type=exact&passkey=%s&team=%s";
     private static final Gson GSON = new Gson();
     private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
             .version(HttpClient.Version.HTTP_1_1)
             .connectTimeout(Duration.ofSeconds(10))
             .build();
 
-    // TODO: [zodac] Would be nice to also have WUs per user?
-    public static UserStats getTotalPointsForUser(final String userName, final String passkey) throws FoldingException {
-        LOGGER.debug("Getting stats for username/passkey '{}/{}' for team {}", userName, passkey, TEAM_NUMBER);
-        final String statsRequestUrl = String.format(STATS_URL_FORMAT, userName, passkey);
+    public static UserStats getTotalPointsForUser(final String userName, final String passkey, final int foldingTeamNumber) throws FoldingException {
+        LOGGER.debug("Getting stats for username/passkey '{}/{}' for team {}", userName, passkey, foldingTeamNumber);
+        final String statsRequestUrl = String.format(STATS_URL_FORMAT, userName, passkey, foldingTeamNumber);
 
         final HttpRequest request = HttpRequest.newBuilder()
                 .GET()
@@ -98,7 +95,7 @@ public class FoldingStatsParser {
             final JsonObject httpResponse = JsonParser.parseString(response.body()).getAsJsonObject();
 
             if (!httpResponse.has("results")) {
-                throw new FoldingException(String.format("Unable to find any 'result' entry for username/passkey '%s/%s': %s", userName, passkey, response.body()));
+                throw new FoldingException(String.format("Unable to find any 'results' entry for username/passkey '%s/%s': %s", userName, passkey, response.body()));
             }
 
             final JsonArray results = httpResponse.getAsJsonArray("results");

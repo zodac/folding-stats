@@ -5,6 +5,8 @@ import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.FoldingUser;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
+import me.zodac.folding.validator.FoldingUserValidator;
+import me.zodac.folding.validator.ValidationResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +31,6 @@ import java.util.List;
  */
 // TODO: [zodac] Add a DELETE and PUT endpoint
 //   Also add a GET endpoint with query, so we can see all instances of a user
-//   Update caches on user change
 @Path("/user/")
 @RequestScoped
 public class UserEndpoint {
@@ -49,11 +50,11 @@ public class UserEndpoint {
     public Response createFoldingUser(final FoldingUser foldingUser) {
         LOGGER.info("POST request received to create Folding user at '{}' with request: {}", this.uriContext.getAbsolutePath(), foldingUser);
 
-        // TODO: [zodac] Check that hardware category ID is valid, else will fail at persist and return a 500. Should clean and return a 400 instead.
-        if (!foldingUser.isValid()) {
+        final ValidationResponse validationResponse = FoldingUserValidator.isValid(foldingUser);
+        if (!validationResponse.isValid()) {
             return Response
                     .status(Response.Status.BAD_REQUEST)
-                    .entity(GSON.toJson(foldingUser))
+                    .entity(GSON.toJson(validationResponse))
                     .build();
         }
 
