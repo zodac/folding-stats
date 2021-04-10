@@ -5,11 +5,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
+import me.zodac.folding.api.FoldingStats;
 import me.zodac.folding.api.FoldingUser;
 import me.zodac.folding.api.UserStats;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.cache.tc.TcStatsCache;
-import me.zodac.folding.db.postgres.PostgresDbManager;
+import me.zodac.folding.db.DbManagerRetriever;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +35,7 @@ public class FoldingStatsParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FoldingStatsParser.class);
 
-    private static final TcStatsCache TC_STATS_CACHE = TcStatsCache.getInstance();
+    private static final TcStatsCache TC_STATS_CACHE = TcStatsCache.get();
 
     public static void parseStatsForAllUsers(final List<FoldingUser> foldingUsers) {
         final Timestamp currentUtcTime = new Timestamp(OffsetDateTime.now(ZoneOffset.UTC).toInstant().toEpochMilli());
@@ -52,12 +53,12 @@ public class FoldingStatsParser {
 
                 TC_STATS_CACHE.addCurrentStats(foldingUser.getId(), totalStatsForUser);
             } catch (final FoldingException e) {
-                LOGGER.warn("Unable to get stats for user '{}/{}'", foldingUser.getFoldingUserName(), foldingUser.getPasskey(), e.getCause());
+                LOGGER.warn("Unable to get stats for user '{}/{}/{}'", foldingUser.getFoldingUserName(), foldingUser.getPasskey(), foldingUser.getFoldingTeamNumber(), e.getCause());
             }
         }
 
         try {
-            PostgresDbManager.persistStats(stats);
+            DbManagerRetriever.get().persistStats(stats);
         } catch (final FoldingException e) {
             LOGGER.error("Error persisting stats", e.getCause());
         }
@@ -65,7 +66,7 @@ public class FoldingStatsParser {
 
     // TODO: [zodac] Move this somewhere else, keep the HTTP logic in a single place
 
-    private static final String STATS_URL_FORMAT = "https://stats.foldingathome.org/api/donors?name=%s&search_type=exact&passkey=%s&team=%s";
+    private static final String STATS_URL_FORMAT = "https://statsclassic.foldingathome.org/api/donors?name=%s&search_type=exact&passkey=%s&team=%s";
     private static final Gson GSON = new Gson();
     private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
             .version(HttpClient.Version.HTTP_1_1)
@@ -75,6 +76,7 @@ public class FoldingStatsParser {
     public static UserStats getTotalPointsForUser(final String userName, final String passkey, final int foldingTeamNumber) throws FoldingException {
         LOGGER.debug("Getting stats for username/passkey '{}/{}' for team {}", userName, passkey, foldingTeamNumber);
         final String statsRequestUrl = String.format(STATS_URL_FORMAT, userName, passkey, foldingTeamNumber);
+        LOGGER.info("Sending request to: {}", statsRequestUrl);
 
         final HttpRequest request = HttpRequest.newBuilder()
                 .GET()

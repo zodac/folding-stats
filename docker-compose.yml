@@ -11,8 +11,7 @@ services:
     hostname: builder_java
     volumes:
       - /opt/jboss/wildfly/standalone/deployments/
-      # Mount container maven m2 directory to local system's m2
-      - "${HOME}/.m2:/root/.m2"
+      - m2:/root/.m2
 
   wildfly:
     build: ./docker/wildfly
@@ -24,6 +23,7 @@ services:
       # Container configuration
       JAVA_OPTS: -Xms512m -Xmx2g -Djava.net.preferIPv4Stack=true
       # Database configuration
+      DEPLOYED_DATABASE: "postgres"
       JDBC_CONNECTION_URL: "jdbc:postgresql://postgres:5432/folding_db"
       JDBC_CONNECTION_USER: "folding_user"
       JDBC_CONNECTION_PASSWORD: "shroot"
@@ -74,3 +74,5 @@ volumes:
   postgres_data:
   # Volume to save the Wildfly logs in case of a crash
   wildfly_logs:
+  # Cache .m2 for faster building
+  m2:

@@ -4,13 +4,14 @@ import me.zodac.folding.api.FoldingTeam;
 import me.zodac.folding.api.FoldingUser;
 import me.zodac.folding.api.Hardware;
 import me.zodac.folding.api.UserStats;
+import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.cache.FoldingTeamCache;
 import me.zodac.folding.cache.FoldingUserCache;
 import me.zodac.folding.cache.HardwareCache;
 import me.zodac.folding.cache.tc.TcStatsCache;
-import me.zodac.folding.db.postgres.PostgresDbManager;
+import me.zodac.folding.db.DbManagerRetriever;
 import me.zodac.folding.parsing.FoldingStatsParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,15 +30,14 @@ public class StorageFacade {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StorageFacade.class);
 
-    // TODO: [zodac] Dynamically inject/instantiate the PostgresDbManager
-
-    private final FoldingTeamCache foldingTeamCache = FoldingTeamCache.getInstance();
-    private final FoldingUserCache foldingUserCache = FoldingUserCache.getInstance();
-    private final HardwareCache hardwareCache = HardwareCache.getInstance();
-    private final TcStatsCache tcStatsCache = TcStatsCache.getInstance();
+    private final DbManager dbManager = DbManagerRetriever.get();
+    private final FoldingTeamCache foldingTeamCache = FoldingTeamCache.get();
+    private final FoldingUserCache foldingUserCache = FoldingUserCache.get();
+    private final HardwareCache hardwareCache = HardwareCache.get();
+    private final TcStatsCache tcStatsCache = TcStatsCache.get();
 
     public Hardware createHardware(final Hardware hardware) throws FoldingException {
-        final Hardware hardwareWithId = PostgresDbManager.createHardware(hardware);
+        final Hardware hardwareWithId = dbManager.createHardware(hardware);
         hardwareCache.add(hardwareWithId);
         return hardwareWithId;
     }
@@ -55,7 +55,7 @@ public class StorageFacade {
 
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
-        final Hardware hardwareFromDb = PostgresDbManager.getHardware(hardwareId);
+        final Hardware hardwareFromDb = dbManager.getHardware(hardwareId);
         hardwareCache.add(hardwareFromDb);
 
         return hardwareFromDb;
@@ -70,13 +70,13 @@ public class StorageFacade {
 
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
-        final List<Hardware> allHardwareFromDb = PostgresDbManager.getAllHardware();
+        final List<Hardware> allHardwareFromDb = dbManager.getAllHardware();
         hardwareCache.addAll(allHardwareFromDb);
         return allHardwareFromDb;
     }
 
     public FoldingUser createFoldingUser(final FoldingUser foldingUser) throws FoldingException {
-        final FoldingUser foldingUserWithId = PostgresDbManager.createFoldingUser(foldingUser);
+        final FoldingUser foldingUserWithId = dbManager.createFoldingUser(foldingUser);
         foldingUserCache.add(foldingUserWithId);
 
         // When adding a new user, we should also configure the TC stats cache
@@ -100,7 +100,7 @@ public class StorageFacade {
 
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
-        final FoldingUser foldingUserFromDb = PostgresDbManager.getFoldingUser(foldingUserId);
+        final FoldingUser foldingUserFromDb = dbManager.getFoldingUser(foldingUserId);
         foldingUserCache.add(foldingUserFromDb);
 
         return foldingUserFromDb;
@@ -115,13 +115,13 @@ public class StorageFacade {
 
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
-        final List<FoldingUser> allFoldingUsersFromDb = PostgresDbManager.getAllFoldingUsers();
+        final List<FoldingUser> allFoldingUsersFromDb = dbManager.getAllFoldingUsers();
         foldingUserCache.addAll(allFoldingUsersFromDb);
         return allFoldingUsers;
     }
 
     public FoldingTeam createFoldingTeam(final FoldingTeam foldingTeam) throws FoldingException {
-        final FoldingTeam foldingTeamWithId = PostgresDbManager.createFoldingTeam(foldingTeam);
+        final FoldingTeam foldingTeamWithId = dbManager.createFoldingTeam(foldingTeam);
         foldingTeamCache.add(foldingTeamWithId);
         return foldingTeamWithId;
     }
@@ -139,7 +139,7 @@ public class StorageFacade {
 
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
-        final FoldingTeam foldingTeamFromDb = PostgresDbManager.getFoldingTeam(foldingTeamId);
+        final FoldingTeam foldingTeamFromDb = dbManager.getFoldingTeam(foldingTeamId);
         foldingTeamCache.add(foldingTeamFromDb);
 
         return foldingTeamFromDb;
@@ -154,7 +154,7 @@ public class StorageFacade {
 
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
-        final List<FoldingTeam> allFoldingTeamsFromDb = PostgresDbManager.getAllFoldingTeams();
+        final List<FoldingTeam> allFoldingTeamsFromDb = dbManager.getAllFoldingTeams();
         foldingTeamCache.addAll(allFoldingTeamsFromDb);
         return allFoldingTeamsFromDb;
     }

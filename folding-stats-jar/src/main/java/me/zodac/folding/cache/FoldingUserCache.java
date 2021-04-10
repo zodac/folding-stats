@@ -10,7 +10,7 @@ public class FoldingUserCache extends AbstractPojoCache<FoldingUser> {
         super();
     }
 
-    public static FoldingUserCache getInstance() {
+    public static FoldingUserCache get() {
         if (INSTANCE == null) {
             INSTANCE = new FoldingUserCache();
         }

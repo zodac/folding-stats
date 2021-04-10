@@ -43,10 +43,6 @@ public class ScheduledStatsParsing {
 
         FoldingStatsParser.parseStatsForAllUsers(usersToParse);
         LOGGER.info("Finished parsing");
-
-        // TODO: [zodac] Stupid issue where my terminal won't print the last line of the docker console log
-        //   Remove this eventually
-        LOGGER.info("");
     }
 
     private List<FoldingUser> getUsers() {

@@ -1,6 +1,4 @@
-package me.zodac.folding.parsing;
-
-import me.zodac.folding.api.UserStats;
+package me.zodac.folding.api;
 
 import java.sql.Timestamp;
 import java.util.Objects;

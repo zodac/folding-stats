@@ -28,8 +28,8 @@ public class FoldingTeamValidator {
             failureMessages.add("Attribute 'teamName' must not be empty");
         }
 
-        if (foldingTeam.getCaptainUserId() <= FoldingUser.EMPTY_USER_ID || !FoldingUserCache.getInstance().contains(foldingTeam.getCaptainUserId())) {
-            final List<String> availableUsers = FoldingUserCache.getInstance()
+        if (foldingTeam.getCaptainUserId() <= FoldingUser.EMPTY_USER_ID || !FoldingUserCache.get().contains(foldingTeam.getCaptainUserId())) {
+            final List<String> availableUsers = FoldingUserCache.get()
                     .getAll()
                     .stream()
                     .map(foldingUser -> String.format("%s: %s", foldingUser.getId(), foldingUser.getFoldingUserName()))
@@ -43,7 +43,7 @@ public class FoldingTeamValidator {
         }
 
         if (foldingTeam.getUserIds().isEmpty()) {
-            final List<String> availableUsers = FoldingUserCache.getInstance()
+            final List<String> availableUsers = FoldingUserCache.get()
                     .getAll()
                     .stream()
                     .map(foldingUser -> String.format("%s: %s", foldingUser.getId(), foldingUser.getFoldingUserName()))
@@ -54,13 +54,13 @@ public class FoldingTeamValidator {
 
         final List<Integer> invalidUserIds = new ArrayList<>(foldingTeam.getUserIds().size());
         for (final int userId : foldingTeam.getUserIds()) {
-            if (!FoldingUserCache.getInstance().contains(userId)) {
+            if (!FoldingUserCache.get().contains(userId)) {
                 invalidUserIds.add(userId);
             }
         }
 
         if (!invalidUserIds.isEmpty()) {
-            final List<String> availableUsers = FoldingUserCache.getInstance()
+            final List<String> availableUsers = FoldingUserCache.get()
                     .getAll()
                     .stream()
                     .map(foldingUser -> String.format("%s: %s", foldingUser.getId(), foldingUser.getFoldingUserName()))
@@ -74,7 +74,7 @@ public class FoldingTeamValidator {
         if (failureMessages.isEmpty()) {
             final Map<Category, Long> categoryCount = foldingTeam.getUserIds()
                     .stream()
-                    .map(userId -> FoldingUserCache.getInstance().getOrNull(userId))
+                    .map(userId -> FoldingUserCache.get().getOrNull(userId))
                     .filter(Objects::nonNull)
                     .map(FoldingUser::getCategory)
                     .map(Category::get)

@@ -1,9 +1,9 @@
 package me.zodac.folding.db.postgres;
 
+import me.zodac.folding.api.FoldingStats;
 import me.zodac.folding.api.FoldingTeam;
 import me.zodac.folding.api.FoldingUser;
 import me.zodac.folding.api.Hardware;
-import me.zodac.folding.parsing.FoldingStats;
 
 import java.util.List;
 

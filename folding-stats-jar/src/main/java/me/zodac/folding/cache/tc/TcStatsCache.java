@@ -21,7 +21,7 @@ public class TcStatsCache {
 
     }
 
-    public static TcStatsCache getInstance() {
+    public static TcStatsCache get() {
         if (INSTANCE == null) {
             INSTANCE = new TcStatsCache();
         }

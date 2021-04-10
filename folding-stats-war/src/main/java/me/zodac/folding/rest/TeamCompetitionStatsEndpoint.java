@@ -37,7 +37,7 @@ public class TeamCompetitionStatsEndpoint {
     private static final Logger LOGGER = LoggerFactory.getLogger(TeamCompetitionStatsEndpoint.class);
     private static final Gson GSON = new Gson();
 
-    private final TcStatsCache tcStatsCache = TcStatsCache.getInstance();
+    private final TcStatsCache tcStatsCache = TcStatsCache.get();
 
     @EJB
     private StorageFacade storageFacade;
@@ -52,7 +52,6 @@ public class TeamCompetitionStatsEndpoint {
         try {
             final List<TcTeam> tcTeams = getTeams();
             LOGGER.info("Found {} TC teams", tcTeams.size());
-            LOGGER.info("");
 
             if (tcTeams.isEmpty()) {
                 return Response
@@ -60,11 +59,9 @@ public class TeamCompetitionStatsEndpoint {
                         .build();
             }
 
-            final TcStats tcStats = new TcStats(tcTeams);
-
             return Response
                     .ok()
-                    .entity(GSON.toJson(tcStats))
+                    .entity(GSON.toJson(new TcStats(tcTeams)))
                     .build();
         } catch (final Exception e) {
             LOGGER.error("Unexpected error retrieving TC stats", e);

@@ -10,7 +10,7 @@ public class HardwareCache extends AbstractPojoCache<Hardware> {
         super();
     }
 
-    public static HardwareCache getInstance() {
+    public static HardwareCache get() {
         if (INSTANCE == null) {
             INSTANCE = new HardwareCache();
         }

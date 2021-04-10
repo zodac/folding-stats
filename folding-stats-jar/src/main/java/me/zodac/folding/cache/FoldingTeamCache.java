@@ -10,7 +10,7 @@ public class FoldingTeamCache extends AbstractPojoCache<FoldingTeam> {
         super();
     }
 
-    public static FoldingTeamCache getInstance() {
+    public static FoldingTeamCache get() {
         if (INSTANCE == null) {
             INSTANCE = new FoldingTeamCache();
         }

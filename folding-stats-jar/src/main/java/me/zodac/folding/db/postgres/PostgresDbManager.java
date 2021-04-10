@@ -1,5 +1,6 @@
 package me.zodac.folding.db.postgres;
 
+import me.zodac.folding.api.FoldingStats;
 import me.zodac.folding.api.FoldingTeam;
 import me.zodac.folding.api.FoldingUser;
 import me.zodac.folding.api.Hardware;
@@ -7,7 +8,6 @@ import me.zodac.folding.api.UserStats;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
-import me.zodac.folding.parsing.FoldingStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +36,8 @@ public class PostgresDbManager implements DbManager {
         JDBC_CONNECTION_PROPERTIES.setProperty("driver", getEnvironmentValue("JDBC_CONNECTION_DRIVER"));
     }
 
-    public static Hardware createHardware(final Hardware hardware) throws FoldingException {
+    @Override
+    public Hardware createHardware(final Hardware hardware) throws FoldingException {
         try {
             final String insertSqlStatement = PostgresSqlQueryBuilder.insertHardware(hardware);
             final int hardwareId = executeInsertSqlWithReturnId(insertSqlStatement);
@@ -46,7 +47,8 @@ public class PostgresDbManager implements DbManager {
         }
     }
 
-    public static List<Hardware> getAllHardware() throws FoldingException {
+    @Override
+    public List<Hardware> getAllHardware() throws FoldingException {
         final String selectSqlStatement = PostgresSqlQueryBuilder.getHardware();
         LOGGER.debug("Executing SQL statement '{}'", selectSqlStatement);
 
@@ -66,7 +68,8 @@ public class PostgresDbManager implements DbManager {
         }
     }
 
-    public static Hardware getHardware(final String hardwareId) throws FoldingException, NotFoundException {
+    @Override
+    public Hardware getHardware(final String hardwareId) throws FoldingException, NotFoundException {
         final String selectSqlStatement = PostgresSqlQueryBuilder.getHardware(hardwareId);
         LOGGER.debug("Executing SQL statement '{}'", selectSqlStatement);
 
@@ -83,7 +86,8 @@ public class PostgresDbManager implements DbManager {
         }
     }
 
-    public static FoldingUser createFoldingUser(final FoldingUser foldingUser) throws FoldingException {
+    @Override
+    public FoldingUser createFoldingUser(final FoldingUser foldingUser) throws FoldingException {
         try {
             final String insertSqlStatement = PostgresSqlQueryBuilder.insertFoldingUser(foldingUser);
             final int foldingUserId = executeInsertSqlWithReturnId(insertSqlStatement);
@@ -93,7 +97,8 @@ public class PostgresDbManager implements DbManager {
         }
     }
 
-    public static List<FoldingUser> getAllFoldingUsers() throws FoldingException {
+    @Override
+    public List<FoldingUser> getAllFoldingUsers() throws FoldingException {
         final String selectSqlStatement = PostgresSqlQueryBuilder.getFoldingUsers();
         LOGGER.debug("Executing SQL statement '{}'", selectSqlStatement);
 
@@ -113,7 +118,8 @@ public class PostgresDbManager implements DbManager {
         }
     }
 
-    public static FoldingUser getFoldingUser(final String foldingUserId) throws FoldingException, NotFoundException {
+    @Override
+    public FoldingUser getFoldingUser(final String foldingUserId) throws FoldingException, NotFoundException {
         final String selectSqlStatement = PostgresSqlQueryBuilder.getFoldingUser(foldingUserId);
         LOGGER.debug("Executing SQL statement '{}'", selectSqlStatement);
 
@@ -130,7 +136,8 @@ public class PostgresDbManager implements DbManager {
         }
     }
 
-    public static FoldingTeam createFoldingTeam(final FoldingTeam foldingTeam) throws FoldingException {
+    @Override
+    public FoldingTeam createFoldingTeam(final FoldingTeam foldingTeam) throws FoldingException {
         try {
             final String insertSqlStatement = PostgresSqlQueryBuilder.insertFoldingTeam(foldingTeam);
             final int foldingTeamId = executeInsertSqlWithReturnId(insertSqlStatement);
@@ -140,7 +147,8 @@ public class PostgresDbManager implements DbManager {
         }
     }
 
-    public static List<FoldingTeam> getAllFoldingTeams() throws FoldingException {
+    @Override
+    public List<FoldingTeam> getAllFoldingTeams() throws FoldingException {
         final String selectSqlStatement = PostgresSqlQueryBuilder.getFoldingTeams();
         LOGGER.debug("Executing SQL statement '{}'", selectSqlStatement);
 
@@ -160,7 +168,8 @@ public class PostgresDbManager implements DbManager {
         }
     }
 
-    public static FoldingTeam getFoldingTeam(final String foldingTeamId) throws FoldingException, NotFoundException {
+    @Override
+    public FoldingTeam getFoldingTeam(final String foldingTeamId) throws FoldingException, NotFoundException {
         final String selectSqlStatement = PostgresSqlQueryBuilder.getFoldingTeam(foldingTeamId);
         LOGGER.debug("Executing SQL statement '{}'", selectSqlStatement);
 
@@ -177,22 +186,8 @@ public class PostgresDbManager implements DbManager {
         }
     }
 
-    private static int executeInsertSqlWithReturnId(final String insertSqlWithReturnId) throws SQLException {
-        LOGGER.debug("Executing SQL statement '{}'", insertSqlWithReturnId);
-
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
-             final Statement statement = connection.createStatement();
-             final ResultSet resultSet = statement.executeQuery(insertSqlWithReturnId)) {
-
-            if (resultSet.next()) {
-                return resultSet.getInt(1);
-            }
-        }
-
-        throw new IllegalStateException("No ID was returned from the DB, but no exception was raised");
-    }
-
-    public static void persistStats(final List<FoldingStats> foldingStats) throws FoldingException {
+    @Override
+    public void persistStats(final List<FoldingStats> foldingStats) throws FoldingException {
         LOGGER.info("Inserting stats for {} Folding users to DB", foldingStats.size());
         final List<String> insertSqlStatements = PostgresSqlQueryBuilder.insertFoldingStats(foldingStats);
 
@@ -210,20 +205,8 @@ public class PostgresDbManager implements DbManager {
         }
     }
 
-    private static String getPointsForUserInMonthQuery(final FoldingUser foldingUser, final Month month, final boolean first) {
-        final String order = first ? "ASC" : "DESC";
-        return String.format(
-                "SELECT total_points AS points, total_wus AS wus " +
-                        "FROM individual_points " +
-                        "WHERE utc_timestamp BETWEEN '2021-%s-01' AND NOW() " +
-                        "AND user_id = '%s' " +
-                        "ORDER BY utc_timestamp %s " +
-                        "LIMIT 1;",
-                month.getValue(), foldingUser.getId(), order
-        );
-    }
-
-    public static UserStats getFirstPointsForUserInMonth(final FoldingUser foldingUser, final Month month) throws FoldingException, NotFoundException {
+    @Override
+    public UserStats getFirstPointsForUserInMonth(final FoldingUser foldingUser, final Month month) throws FoldingException, NotFoundException {
         LOGGER.debug("Getting first points in month {} for user {}", month, foldingUser);
         final String selectSqlStatement = getPointsForUserInMonthQuery(foldingUser, month, true);
 
@@ -241,7 +224,8 @@ public class PostgresDbManager implements DbManager {
         }
     }
 
-    public static UserStats getCurrentPointsForUserInMonth(final FoldingUser foldingUser, final Month month) throws FoldingException, NotFoundException {
+    @Override
+    public UserStats getCurrentPointsForUserInMonth(final FoldingUser foldingUser, final Month month) throws FoldingException, NotFoundException {
         LOGGER.debug("Getting current points in month {} for user {}", month, foldingUser);
         final String selectSqlStatement = getPointsForUserInMonthQuery(foldingUser, month, false);
 
@@ -287,5 +271,33 @@ public class PostgresDbManager implements DbManager {
                 .captainUserId(resultSet.getInt("captain_user_id"))
                 .userIds(List.of((Integer[]) resultSet.getArray("user_ids").getArray()))
                 .createTeam();
+    }
+
+    private static int executeInsertSqlWithReturnId(final String insertSqlWithReturnId) throws SQLException {
+        LOGGER.debug("Executing SQL statement '{}'", insertSqlWithReturnId);
+
+        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+             final Statement statement = connection.createStatement();
+             final ResultSet resultSet = statement.executeQuery(insertSqlWithReturnId)) {
+
+            if (resultSet.next()) {
+                return resultSet.getInt(1);
+            }
+        }
+
+        throw new IllegalStateException("No ID was returned from the DB, but no exception was raised");
+    }
+
+    private static String getPointsForUserInMonthQuery(final FoldingUser foldingUser, final Month month, final boolean first) {
+        final String order = first ? "ASC" : "DESC";
+        return String.format(
+                "SELECT total_points AS points, total_wus AS wus " +
+                        "FROM individual_points " +
+                        "WHERE utc_timestamp BETWEEN '2021-%s-01' AND NOW() " +
+                        "AND user_id = '%s' " +
+                        "ORDER BY utc_timestamp %s " +
+                        "LIMIT 1;",
+                month.getValue(), foldingUser.getId(), order
+        );
     }
 }
