@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import me.zodac.folding.api.FoldingUser;
 import me.zodac.folding.api.UserStats;
 import me.zodac.folding.api.exception.FoldingException;
@@ -28,7 +29,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-// TODO: [zodac] Should not go straight to caches/DB, use StorageFacade
+// TODO: [zodac] Should not go straight to TC stats caches or PostgresDB, use StorageFacade to call parsing logic, then do persistence from caller
 public class FoldingStatsParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FoldingStatsParser.class);
@@ -92,6 +93,21 @@ public class FoldingStatsParser {
                 throw new FoldingException(String.format("Invalid response: %s", response));
             }
 
+            final StatsApiResult statsApiResponse = parseHttpResponse(userName, passkey, response);
+            LOGGER.info("Found {}", statsApiResponse);
+            return new UserStats(statsApiResponse.getCredit(), statsApiResponse.getWus());
+        } catch (final IOException | InterruptedException e) {
+            throw new FoldingException("Unable to send HTTP request to Folding@Home API", e);
+        } catch (final ClassCastException e) {
+            throw new FoldingException("Unable to parse HTTP response from Folding@Home API correctly", e);
+        } catch (final Exception e) {
+            LOGGER.warn("Unexpected error parsing stats", e);
+            throw e;
+        }
+    }
+
+    private static StatsApiResult parseHttpResponse(final String userName, final String passkey, final HttpResponse<String> response) throws FoldingException {
+        try {
             final JsonObject httpResponse = JsonParser.parseString(response.body()).getAsJsonObject();
 
             if (!httpResponse.has("results")) {
@@ -109,13 +125,13 @@ public class FoldingStatsParser {
                 throw new FoldingException(String.format("Too many results found for username/passkey '%s/%s': %s", userName, passkey, response.body()));
             }
 
-            final StatsApiResult statsApiResponse = GSON.fromJson(results.get(0), StatsApiResult.class);
-            LOGGER.info("Found {}", statsApiResponse);
-            return new UserStats(statsApiResponse.getCredit(), statsApiResponse.getWus());
-        } catch (final IOException | InterruptedException e) {
-            throw new FoldingException("Unable to send HTTP request to Folding@Home API", e);
-        } catch (final ClassCastException e) {
-            throw new FoldingException("Unable to parse HTTP response from Folding@Home API correctly", e);
+            return GSON.fromJson(results.get(0), StatsApiResult.class);
+        } catch (final JsonSyntaxException e) {
+            LOGGER.warn("Error parsing the JSON response from the API: '{}'", response.body(), e);
+            throw e;
+        } catch (final Exception e) {
+            LOGGER.warn("Unexpected error parsing JSON response from the API with status code {}: '{}'", response.statusCode(), response.body(), e);
+            throw e;
         }
     }
 

@@ -1,89 +1,80 @@
 package me.zodac.folding.api;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import static me.zodac.folding.api.util.StringUtils.isNotBlank;
-
 public class FoldingTeam implements Identifiable {
-
-    public static final int EMPTY_POSITION = 0;
 
     private static final long serialVersionUID = -8765213859473081036L;
 
     private int id;
     private String teamName;
+    private String teamDescription;
     private int captainUserId;
-    private int nvidiaGpuUserId;
-    private int amdGpuUserId;
-    private int wildcardUserId;
-    
+    private Set<Integer> userIds;
+
     public FoldingTeam() {
 
     }
 
-    public FoldingTeam(final int id, final String teamName, final int captainUserId, final int nvidiaGpuUserId, final int amdGpuUserId, final int wildcardUserId) {
+
+    public FoldingTeam(final int id, final String teamName, final String teamDescription, final int captainUserId, final Set<Integer> userIds) {
         this.id = id;
         this.teamName = teamName;
+        this.teamDescription = teamDescription;
         this.captainUserId = captainUserId;
-        this.nvidiaGpuUserId = nvidiaGpuUserId;
-        this.amdGpuUserId = amdGpuUserId;
-        this.wildcardUserId = wildcardUserId;
+        this.userIds = userIds;
     }
 
-    public static FoldingTeam create(final int teamId, final String teamName, final int captainUserId, final int nvidiaGpuUserId, final int amdGpuUserId, final int wildcardUserId) {
-        return new FoldingTeam(teamId, teamName, captainUserId, nvidiaGpuUserId, amdGpuUserId, wildcardUserId);
-    }
+    public static class Builder {
 
-    public static FoldingTeam createWithoutId(final String teamName, final int captainUserId, final int nvidiaGpuUserId, final int amdGpuUserId, final int wildcardUserId) {
-        return new FoldingTeam(0, teamName, captainUserId, nvidiaGpuUserId, amdGpuUserId, wildcardUserId);
+        private final String teamName;
+        private final Set<Integer> userIds = new HashSet<>();
+
+        private int teamId = 0;
+        private int captainUserId = 0;
+        private String teamDescription = "";
+
+
+        public Builder(final String teamName) {
+            this.teamName = teamName;
+        }
+
+        public Builder teamId(final int id) {
+            this.teamId = id;
+            return this;
+        }
+
+        public Builder teamDescription(final String teamDescription) {
+            this.teamDescription = teamDescription;
+            return this;
+        }
+
+        public Builder captainUserId(final int captainUserId) {
+            this.captainUserId = captainUserId;
+            userIds.add(captainUserId);
+            return this;
+        }
+
+        public Builder userId(final int userId) {
+            this.userIds.add(userId);
+            return this;
+        }
+
+        public Builder userIds(final List<Integer> userIds) {
+            this.userIds.addAll(userIds);
+            return this;
+        }
+
+        public FoldingTeam createTeam() {
+            return new FoldingTeam(teamId, teamName, teamDescription, captainUserId, userIds);
+        }
     }
 
     public static FoldingTeam updateWithId(final int teamId, final FoldingTeam foldingTeam) {
-        return new FoldingTeam(teamId, foldingTeam.getTeamName(), foldingTeam.getCaptainUserId(), foldingTeam.getNvidiaGpuUserId(), foldingTeam.getAmdGpuUserId(), foldingTeam.getWildcardUserId());
-    }
-
-    // Quick function used for REST requests. Since a JSON payload may have a missing/incorrect field, we need to check
-    // User IDs less than 0 are invalid, but an ID of 0 means the position is empty
-    // TODO: [zodac] Verify the user IDs against the user cache
-    public boolean isValid() {
-        return isNotBlank(teamName) && captainIsValid() && usersAreUniqueOrEmpty(nvidiaGpuUserId, amdGpuUserId, wildcardUserId);
-    }
-
-    // Captain must be a valid ID, and must be one of the nvidia/amd/wildcard users
-    private boolean captainIsValid() {
-        if (captainUserId <= EMPTY_POSITION) {
-            return false;
-        }
-
-        return captainUserId == nvidiaGpuUserId || captainUserId == amdGpuUserId || captainUserId == wildcardUserId;
-    }
-
-
-    // TODO: [zodac] I'm aware this is probably shit, I'll get to it later. Maybe. Maths sucks.
-    private static boolean usersAreUniqueOrEmpty(final int... userIds) {
-        final List<Integer> validUsers = new ArrayList<>(userIds.length);
-
-        for (final int userId : userIds) {
-            if (userId > EMPTY_POSITION) {
-                validUsers.add(userId);
-            }
-        }
-
-        // No position filled, invalid team
-        if (validUsers.isEmpty()) {
-            return false;
-        }
-
-        // Team has at least one valid user, now confirm the same userId isn't being used multiple times
-        final Set<Integer> uniqueValidUsers = new HashSet<>(validUsers);
-
-        // If the list and set are not equal in size, then at least one duplicate userId exists
-        // Could possibly return the duplicate user IDs, help the 400 HTTP response
-        return validUsers.size() == uniqueValidUsers.size();
+        return new FoldingTeam(teamId, foldingTeam.getTeamName(), foldingTeam.getTeamDescription(), foldingTeam.getCaptainUserId(), foldingTeam.getUserIds());
     }
 
     @Override
@@ -103,6 +94,14 @@ public class FoldingTeam implements Identifiable {
         this.teamName = teamName;
     }
 
+    public String getTeamDescription() {
+        return teamDescription;
+    }
+
+    public void setTeamDescription(final String teamDescription) {
+        this.teamDescription = teamDescription;
+    }
+
     public int getCaptainUserId() {
         return captainUserId;
     }
@@ -111,28 +110,12 @@ public class FoldingTeam implements Identifiable {
         this.captainUserId = captainUserId;
     }
 
-    public int getNvidiaGpuUserId() {
-        return nvidiaGpuUserId;
+    public Set<Integer> getUserIds() {
+        return userIds;
     }
 
-    public void setNvidiaGpuUserId(final int nvidiaGpuUserId) {
-        this.nvidiaGpuUserId = nvidiaGpuUserId;
-    }
-
-    public int getAmdGpuUserId() {
-        return amdGpuUserId;
-    }
-
-    public void setAmdGpuUserId(final int amdGpuUserId) {
-        this.amdGpuUserId = amdGpuUserId;
-    }
-
-    public int getWildcardUserId() {
-        return wildcardUserId;
-    }
-
-    public void setWildcardUserId(final int wildcardUserId) {
-        this.wildcardUserId = wildcardUserId;
+    public void setUserIds(final Set<Integer> userIds) {
+        this.userIds = userIds;
     }
 
     @Override
@@ -143,17 +126,17 @@ public class FoldingTeam implements Identifiable {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final FoldingTeam foldingTeam = (FoldingTeam) o;
-        return id == foldingTeam.id && Objects.equals(teamName, foldingTeam.teamName) && Objects.equals(captainUserId, foldingTeam.captainUserId) && Objects.equals(nvidiaGpuUserId, foldingTeam.nvidiaGpuUserId) && Objects.equals(amdGpuUserId, foldingTeam.amdGpuUserId) && Objects.equals(wildcardUserId, foldingTeam.wildcardUserId);
+        final FoldingTeam that = (FoldingTeam) o;
+        return id == that.id && captainUserId == that.captainUserId && Objects.equals(teamDescription, that.teamDescription) && Objects.equals(teamName, that.teamName) && Objects.equals(userIds, that.userIds);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, teamName, captainUserId, nvidiaGpuUserId, amdGpuUserId, wildcardUserId);
+        return Objects.hash(id, teamName, teamDescription, captainUserId, userIds);
     }
 
     @Override
     public String toString() {
-        return String.format("%s::{id: '%s', teamName: '%s', captainUserId: '%s', nvidiaGpuUserId: '%s', amdGpuUserId: '%s', wildcardUserId: '%s'}", this.getClass().getSimpleName(), id, teamName, captainUserId, nvidiaGpuUserId, amdGpuUserId, wildcardUserId);
+        return String.format("%s::{id: '%s', teamName: '%s', teamDescription: '%s', captainUserId: '%s', userIds: '%s'}", this.getClass().getSimpleName(), id, teamName, teamDescription, captainUserId, userIds);
     }
 }

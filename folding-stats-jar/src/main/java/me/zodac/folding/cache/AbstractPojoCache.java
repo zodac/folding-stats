@@ -47,6 +47,14 @@ abstract class AbstractPojoCache<V extends Identifiable> {
         return element;
     }
 
+    public V getOrNull(final int id) {
+        try {
+            return get(String.valueOf(id));
+        } catch (final NotFoundException e) {
+            return null;
+        }
+    }
+
     public boolean contains(final String id) {
         return elementsById.containsKey(id);
     }

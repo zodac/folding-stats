@@ -27,15 +27,13 @@ CREATE INDEX index_folding_user_id
 
 
 -- Cannot add a FK constraint on the users, since there is no guarantee the position is filled
--- The value 0 is used for a position that is not filled
 -- The captain, however, must exist, so we can ensure that one
 CREATE TABLE folding_teams (
     team_id SERIAL PRIMARY KEY,
-    team_name TEXT NOT NULL,
+    team_name TEXT NOT NULL UNIQUE,
+    team_description TEXT,
     captain_user_id INT NOT NULL,
-    nvidia_gpu_user_id INT NOT NULL,
-    amd_gpu_user_id INT NOT NULL,
-    wildcard_user_id INT NOT NULL,
+    user_ids INT[] NOT NULL,
     CONSTRAINT fk_captain_user_id
         FOREIGN KEY(captain_user_id)
             REFERENCES folding_users(user_id)

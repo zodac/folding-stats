@@ -57,12 +57,7 @@ public class PostgresDbManager implements DbManager {
             final List<Hardware> allHardware = new ArrayList<>();
 
             while (resultSet.next()) {
-                allHardware.add(Hardware.create(
-                        resultSet.getInt("hardware_id"),
-                        resultSet.getString("hardware_name"),
-                        resultSet.getString("display_name"),
-                        resultSet.getDouble("multiplier")
-                ));
+                allHardware.add(createHardware(resultSet));
             }
 
             return allHardware;
@@ -79,12 +74,7 @@ public class PostgresDbManager implements DbManager {
              final Statement statement = connection.createStatement();
              final ResultSet resultSet = statement.executeQuery(selectSqlStatement)) {
             if (resultSet.next()) {
-                return Hardware.create(
-                        resultSet.getInt("hardware_id"),
-                        resultSet.getString("hardware_name"),
-                        resultSet.getString("display_name"),
-                        resultSet.getDouble("multiplier")
-                );
+                return createHardware(resultSet);
             }
 
             throw new NotFoundException();
@@ -114,15 +104,7 @@ public class PostgresDbManager implements DbManager {
             final List<FoldingUser> foldingUsers = new ArrayList<>();
 
             while (resultSet.next()) {
-                foldingUsers.add(FoldingUser.create(
-                        resultSet.getInt("user_id"),
-                        resultSet.getString("folding_username"),
-                        resultSet.getString("display_username"),
-                        resultSet.getString("passkey"),
-                        resultSet.getString("category"),
-                        resultSet.getInt("hardware_id"),
-                        resultSet.getInt("folding_team_number")
-                ));
+                foldingUsers.add(createFoldingUser(resultSet));
             }
 
             return foldingUsers;
@@ -139,15 +121,7 @@ public class PostgresDbManager implements DbManager {
              final Statement statement = connection.createStatement();
              final ResultSet resultSet = statement.executeQuery(selectSqlStatement)) {
             if (resultSet.next()) {
-                return FoldingUser.create(
-                        resultSet.getInt("user_id"),
-                        resultSet.getString("folding_username"),
-                        resultSet.getString("display_username"),
-                        resultSet.getString("passkey"),
-                        resultSet.getString("category"),
-                        resultSet.getInt("hardware_id"),
-                        resultSet.getInt("folding_team_number")
-                );
+                return createFoldingUser(resultSet);
             }
 
             throw new NotFoundException();
@@ -177,14 +151,7 @@ public class PostgresDbManager implements DbManager {
             final List<FoldingTeam> foldingTeams = new ArrayList<>();
 
             while (resultSet.next()) {
-                foldingTeams.add(FoldingTeam.create(
-                        resultSet.getInt("team_id"),
-                        resultSet.getString("team_name"),
-                        resultSet.getInt("captain_user_id"),
-                        resultSet.getInt("nvidia_gpu_user_id"),
-                        resultSet.getInt("amd_gpu_user_id"),
-                        resultSet.getInt("wildcard_user_id")
-                ));
+                foldingTeams.add(createFoldingTeam(resultSet));
             }
 
             return foldingTeams;
@@ -201,14 +168,7 @@ public class PostgresDbManager implements DbManager {
              final Statement statement = connection.createStatement();
              final ResultSet resultSet = statement.executeQuery(selectSqlStatement)) {
             if (resultSet.next()) {
-                return FoldingTeam.create(
-                        resultSet.getInt("team_id"),
-                        resultSet.getString("team_name"),
-                        resultSet.getInt("captain_user_id"),
-                        resultSet.getInt("nvidia_gpu_user_id"),
-                        resultSet.getInt("amd_gpu_user_id"),
-                        resultSet.getInt("wildcard_user_id")
-                );
+                return createFoldingTeam(resultSet);
             }
 
             throw new NotFoundException();
@@ -297,5 +257,35 @@ public class PostgresDbManager implements DbManager {
         } catch (final SQLException e) {
             throw new FoldingException("Error opening connection to the DB", e);
         }
+    }
+
+    private static Hardware createHardware(final ResultSet resultSet) throws SQLException {
+        return Hardware.create(
+                resultSet.getInt("hardware_id"),
+                resultSet.getString("hardware_name"),
+                resultSet.getString("display_name"),
+                resultSet.getDouble("multiplier")
+        );
+    }
+
+    private static FoldingUser createFoldingUser(final ResultSet resultSet) throws SQLException {
+        return FoldingUser.create(
+                resultSet.getInt("user_id"),
+                resultSet.getString("folding_username"),
+                resultSet.getString("display_username"),
+                resultSet.getString("passkey"),
+                resultSet.getString("category"),
+                resultSet.getInt("hardware_id"),
+                resultSet.getInt("folding_team_number")
+        );
+    }
+
+    private static FoldingTeam createFoldingTeam(final ResultSet resultSet) throws SQLException {
+        return new FoldingTeam.Builder(resultSet.getString("team_name"))
+                .teamId(resultSet.getInt("team_id"))
+                .teamDescription(resultSet.getString("team_description"))
+                .captainUserId(resultSet.getInt("captain_user_id"))
+                .userIds(List.of((Integer[]) resultSet.getArray("user_ids").getArray()))
+                .createTeam();
     }
 }

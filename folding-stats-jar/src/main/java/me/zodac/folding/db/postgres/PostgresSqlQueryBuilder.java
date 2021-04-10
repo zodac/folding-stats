@@ -7,8 +7,10 @@ import me.zodac.folding.parsing.FoldingStats;
 
 import java.util.List;
 
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
+// TODO: [zodac] Issues with escaping characters, should use PreparedStatements instead
 class PostgresSqlQueryBuilder {
 
     private PostgresSqlQueryBuilder() {
@@ -40,7 +42,8 @@ class PostgresSqlQueryBuilder {
     }
 
     public static String insertFoldingTeam(final FoldingTeam foldingTeam) {
-        return String.format("INSERT INTO folding_teams (team_name, captain_user_id, nvidia_gpu_user_id, amd_gpu_user_id, wildcard_user_id) VALUES ('%s', %s, %s, %s, %s) RETURNING team_id;", foldingTeam.getTeamName(), foldingTeam.getCaptainUserId(), foldingTeam.getNvidiaGpuUserId(), foldingTeam.getAmdGpuUserId(), foldingTeam.getWildcardUserId());
+        return String.format("INSERT INTO folding_teams (team_name, team_description, captain_user_id, user_ids) VALUES ('%s', '%s', %s, ARRAY[%s]) RETURNING team_id;", foldingTeam.getTeamName(), foldingTeam.getTeamDescription(), foldingTeam.getCaptainUserId(),
+                foldingTeam.getUserIds().stream().map(String::valueOf).collect(joining(", ")));
     }
 
     public static String getFoldingTeams() {

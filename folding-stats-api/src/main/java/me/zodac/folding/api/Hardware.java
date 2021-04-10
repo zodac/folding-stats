@@ -6,6 +6,8 @@ public class Hardware implements Identifiable {
 
     private static final long serialVersionUID = 311666348626596899L;
 
+    public static final int EMPTY_HARDWARE_ID = 0;
+
     private int id;
     private String hardwareName;
     private String displayName;

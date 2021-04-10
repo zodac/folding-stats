@@ -5,6 +5,7 @@ import me.zodac.folding.StorageFacade;
 import me.zodac.folding.TcStats;
 import me.zodac.folding.TcTeam;
 import me.zodac.folding.TcUser;
+import me.zodac.folding.api.Category;
 import me.zodac.folding.api.FoldingTeam;
 import me.zodac.folding.api.FoldingUser;
 import me.zodac.folding.api.Hardware;
@@ -26,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+import static java.util.stream.Collectors.toList;
 
 @Path("/tc_stats/")
 @RequestScoped
@@ -87,34 +90,19 @@ public class TeamCompetitionStatsEndpoint {
         }
     }
 
-    private TcUser getTcUserOrNull(final int userId, final String userType) {
-        if (userId == FoldingUser.EMPTY_USER_ID) {
-            LOGGER.warn("No {} user", userType);
-            return null;
-        }
-
-        try {
-            final FoldingUser foldingUser = storageFacade.getFoldingUser(userId);
-            return convertFoldingUserToTcUser(foldingUser);
-        } catch (final NotFoundException e) {
-            LOGGER.warn("Unable to find user ID: {}", userId, e);
-            return null;
-        } catch (final FoldingException e) {
-            LOGGER.warn("Error finding user ID: {}", userId, e.getCause());
-            return null;
-        }
-    }
-
     private TcTeam convertFoldingTeamToTcTeam(final FoldingTeam foldingTeam) throws FoldingException {
-        LOGGER.info("Converting team {} for TC stats", foldingTeam.getTeamName());
+        LOGGER.info("Converting team '{}' for TC stats", foldingTeam.getTeamName());
 
-        final TcUser nvidiaGpuTcUser = getTcUserOrNull(foldingTeam.getNvidiaGpuUserId(), "nVidia GPU");
-        final TcUser amdGpuTcUser = getTcUserOrNull(foldingTeam.getAmdGpuUserId(), "AMD GPU");
-        final TcUser wildcardTcUser = getTcUserOrNull(foldingTeam.getWildcardUserId(), "Wildcard");
+        final List<TcUser> tcUsers = foldingTeam.getUserIds()
+                .stream()
+                .map(this::getTcUser)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(toList());
 
         try {
             final FoldingUser captain = storageFacade.getFoldingUser(foldingTeam.getCaptainUserId());
-            return new TcTeam(foldingTeam.getTeamName(), captain.getDisplayName(), nvidiaGpuTcUser, amdGpuTcUser, wildcardTcUser);
+            return new TcTeam(foldingTeam.getTeamName(), captain.getDisplayName(), tcUsers);
         } catch (final FoldingException e) {
             LOGGER.warn("Unable to get details for team captain: {}", foldingTeam, e);
             throw e;
@@ -124,20 +112,38 @@ public class TeamCompetitionStatsEndpoint {
         }
     }
 
-    private TcUser convertFoldingUserToTcUser(final FoldingUser foldingUser) {
+    private Optional<TcUser> getTcUser(final int userId) {
+        if (userId == FoldingUser.EMPTY_USER_ID) {
+            LOGGER.warn("User had invalid ID");
+            return Optional.empty();
+        }
+
+        try {
+            final FoldingUser foldingUser = storageFacade.getFoldingUser(userId);
+            return convertFoldingUserToTcUser(foldingUser);
+        } catch (final NotFoundException e) {
+            LOGGER.warn("Unable to find user ID: {}", userId, e);
+            return Optional.empty();
+        } catch (final FoldingException e) {
+            LOGGER.warn("Error finding user ID: {}", userId, e.getCause());
+            return Optional.empty();
+        }
+    }
+
+    private Optional<TcUser> convertFoldingUserToTcUser(final FoldingUser foldingUser) {
         try {
             final Hardware hardware = storageFacade.getHardware(foldingUser.getHardwareId());
 
             final Optional<UserStats> initialStats = tcStatsCache.getInitialStatsForUser(foldingUser.getId());
             if (initialStats.isEmpty()) {
                 LOGGER.warn("Could not find initial stats for user: {}", foldingUser);
-                return new TcUser(foldingUser.getDisplayName(), hardware.getDisplayName());
+                return Optional.empty();
             }
 
             final Optional<UserStats> currentStats = tcStatsCache.getCurrentStatsForUser(foldingUser.getId());
             if (currentStats.isEmpty()) {
                 LOGGER.warn("Could not find current stats for user: {}", foldingUser);
-                return new TcUser(foldingUser.getDisplayName(), hardware.getDisplayName());
+                return Optional.empty();
             }
 
             LOGGER.debug("Found initial stats {} and current stats {} for {}", initialStats.get(), currentStats.get(), foldingUser);
@@ -145,13 +151,19 @@ public class TeamCompetitionStatsEndpoint {
             final long tcPointsForUser = currentStats.get().getPoints() - initialStats.get().getPoints();
             final long tcPointsForUserMultiplier = (long) (tcPointsForUser * hardware.getMultiplier());
 
-            return new TcUser(foldingUser.getDisplayName(), hardware.getDisplayName(), tcPointsForUserMultiplier, tcPointsForUser, tcWusForUser);
+            final Category category = Category.get(foldingUser.getCategory());
+            if (category == Category.INVALID) {
+                LOGGER.warn("Unexpectedly got an {} category for Folding user {}", category, foldingUser);
+                return Optional.empty();
+            }
+
+            return Optional.of(new TcUser(foldingUser.getDisplayName(), hardware.getDisplayName(), category, tcPointsForUserMultiplier, tcPointsForUser, tcWusForUser));
         } catch (final NotFoundException e) {
             LOGGER.warn("No hardware found for ID: {}", foldingUser.getHardwareId(), e);
-            return null;
+            return Optional.empty();
         } catch (final FoldingException e) {
             LOGGER.warn("Error getting hardware for user: {}", foldingUser, e.getCause());
-            return null;
+            return Optional.empty();
         }
     }
 }

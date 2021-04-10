@@ -194,27 +194,19 @@ public class InitialisationBean {
 
     private static void addFoldingTeams() {
         final List<FoldingTeam> foldingTeams = List.of(
-                FoldingTeam.createWithoutId(
-                        "Furry Folders",
-                        2, // Bastiaan_NL
-                        2,
-                        FoldingTeam.EMPTY_POSITION,
-                        FoldingTeam.EMPTY_POSITION
-                ),
-                FoldingTeam.createWithoutId(
-                        "Freshly Waxed",
-                        1, // BWG
-                        1,
-                        FoldingTeam.EMPTY_POSITION,
-                        FoldingTeam.EMPTY_POSITION
-                ),
-                FoldingTeam.createWithoutId(
-                        "Test",
-                        3, // BWG_With_Multiplier
-                        3,
-                        4, // Bastiaan_NL_With_Multiplier
-                        FoldingTeam.EMPTY_POSITION
-                )
+                new FoldingTeam.Builder("Freshly Waxed")
+                        .teamDescription("BWG team")
+                        .captainUserId(1)
+                        .createTeam(),
+                new FoldingTeam.Builder("Furry Folders")
+                        .teamDescription("Bastiaan_NL team")
+                        .captainUserId(2)
+                        .createTeam(),
+                new FoldingTeam.Builder("Test")
+                        .teamDescription("Test team to try out multipliers")
+                        .captainUserId(3) // BWG_With_Multiplier
+                        .userId(4) // Bastiaan_NL_With_Multiplier
+                        .createTeam()
         );
 
         for (final FoldingTeam foldingTeam : foldingTeams) {

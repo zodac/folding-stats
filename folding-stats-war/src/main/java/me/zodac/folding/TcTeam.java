@@ -1,6 +1,7 @@
 package me.zodac.folding;
 
 import java.text.NumberFormat;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -10,9 +11,7 @@ public class TcTeam {
     private String captainName;
 
     // TODO: [zodac] Rank the users
-    private TcUser nvidiaGpuUser;
-    private TcUser amdGpuUser;
-    private TcUser wildcardUser;
+    private List<TcUser> users;
     private long teamWus;
     private long teamPoints;
     private long teamPointsWithoutMultipliers;
@@ -21,33 +20,19 @@ public class TcTeam {
 
     }
 
-    public TcTeam(final String teamName, final String captainName, final TcUser nvidiaGpuUser, final TcUser amdGpuUser, final TcUser wildcardUser) {
+    public TcTeam(final String teamName, final String captainName, final List<TcUser> users) {
         this.teamName = teamName;
         this.captainName = captainName;
-        this.nvidiaGpuUser = nvidiaGpuUser;
-        this.amdGpuUser = amdGpuUser;
-        this.wildcardUser = wildcardUser;
+        this.users = users;
 
         this.teamWus = 0L;
         this.teamPoints = 0L;
         this.teamPointsWithoutMultipliers = 0L;
 
-        if (nvidiaGpuUser != null) {
-            teamWus += nvidiaGpuUser.getWus();
-            teamPoints += nvidiaGpuUser.getPoints();
-            teamPointsWithoutMultipliers += nvidiaGpuUser.getPointsWithoutMultiplier();
-        }
-
-        if (amdGpuUser != null) {
-            teamWus += amdGpuUser.getWus();
-            teamPoints += amdGpuUser.getPoints();
-            teamPointsWithoutMultipliers += amdGpuUser.getPointsWithoutMultiplier();
-        }
-
-        if (wildcardUser != null) {
-            teamWus += wildcardUser.getWus();
-            teamPoints += wildcardUser.getPoints();
-            teamPointsWithoutMultipliers += wildcardUser.getPointsWithoutMultiplier();
+        for (final TcUser user : users) {
+            teamWus += user.getWus();
+            teamPoints += user.getPoints();
+            teamPointsWithoutMultipliers += user.getPointsWithoutMultiplier();
         }
     }
 
@@ -67,28 +52,12 @@ public class TcTeam {
         this.captainName = captainName;
     }
 
-    public TcUser getNvidiaGpuUser() {
-        return nvidiaGpuUser;
+    public List<TcUser> getUsers() {
+        return users;
     }
 
-    public void setNvidiaGpuUser(final TcUser nvidiaGpuUser) {
-        this.nvidiaGpuUser = nvidiaGpuUser;
-    }
-
-    public TcUser getAmdGpuUser() {
-        return amdGpuUser;
-    }
-
-    public void setAmdGpuUser(final TcUser amdGpuUser) {
-        this.amdGpuUser = amdGpuUser;
-    }
-
-    public TcUser getWildcardUser() {
-        return wildcardUser;
-    }
-
-    public void setWildcardUser(final TcUser wildcardUser) {
-        this.wildcardUser = wildcardUser;
+    public void setUsers(final List<TcUser> users) {
+        this.users = users;
     }
 
     public long getTeamWus() {
@@ -124,12 +93,12 @@ public class TcTeam {
             return false;
         }
         final TcTeam tcTeam = (TcTeam) o;
-        return teamName.equals(tcTeam.teamName) && captainName.equals(tcTeam.captainName) && teamWus == tcTeam.teamWus && teamPoints == tcTeam.teamPoints && teamPointsWithoutMultipliers == tcTeam.teamPointsWithoutMultipliers && Objects.equals(nvidiaGpuUser, tcTeam.nvidiaGpuUser) && Objects.equals(amdGpuUser, tcTeam.amdGpuUser) && Objects.equals(wildcardUser, tcTeam.wildcardUser);
+        return teamName.equals(tcTeam.teamName) && captainName.equals(tcTeam.captainName) && teamWus == tcTeam.teamWus && teamPoints == tcTeam.teamPoints && teamPointsWithoutMultipliers == tcTeam.teamPointsWithoutMultipliers && Objects.equals(users, tcTeam.users);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(teamName, captainName, teamWus, teamPoints, teamPointsWithoutMultipliers, nvidiaGpuUser, amdGpuUser, wildcardUser);
+        return Objects.hash(teamName, captainName, teamWus, teamPoints, teamPointsWithoutMultipliers, users);
     }
 
     // TODO: [zodac] #toString()
@@ -138,9 +107,7 @@ public class TcTeam {
         return "TcTeam{" +
                 "teamName=" + teamName +
                 ", captainName=" + captainName +
-                ", nvidiaGpuUser=" + nvidiaGpuUser +
-                ", amdGpuUser=" + amdGpuUser +
-                ", wildcardUser=" + wildcardUser +
+                ", users=" + users +
                 ", teamWus=" + NumberFormat.getInstance(Locale.UK).format(teamWus) +
                 ", teamPoints=" + NumberFormat.getInstance(Locale.UK).format(teamPoints) +
                 ", teamPointsWithoutMultipliers=" + NumberFormat.getInstance(Locale.UK).format(teamPointsWithoutMultipliers) +

@@ -17,19 +17,19 @@ public enum Category {
             .collect(toUnmodifiableList());
 
     private final String displayName;
-    private final int numberAllowed;
+    private final int permittedAmount;
 
-    Category(final String displayName, final int numberAllowed) {
+    Category(final String displayName, final int permittedAmount) {
         this.displayName = displayName;
-        this.numberAllowed = numberAllowed;
+        this.permittedAmount = permittedAmount;
     }
 
     public String getDisplayName() {
         return displayName;
     }
 
-    public int getNumberAllowed() {
-        return numberAllowed;
+    public int getPermittedAmount() {
+        return permittedAmount;
     }
 
     public static List<Category> getValuesAsList() {

@@ -5,6 +5,8 @@ import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.FoldingTeam;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
+import me.zodac.folding.validator.FoldingTeamValidator;
+import me.zodac.folding.validator.ValidationResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,11 +51,11 @@ public class TeamEndpoint {
     public Response createTeam(final FoldingTeam foldingTeam) {
         LOGGER.info("POST request received to create Folding team at '{}' with request: {}", this.uriContext.getAbsolutePath(), foldingTeam);
 
-        // TODO: [zodac] Check that user IDs are valid, else will fail at persist and return a 500. Should clean and return a 400 instead.
-        if (!foldingTeam.isValid()) {
+        final ValidationResponse validationResponse = FoldingTeamValidator.isValid(foldingTeam);
+        if (!validationResponse.isValid()) {
             return Response
                     .status(Response.Status.BAD_REQUEST)
-                    .entity(GSON.toJson(foldingTeam))
+                    .entity(GSON.toJson(validationResponse))
                     .build();
         }
 

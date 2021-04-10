@@ -2,6 +2,7 @@ package me.zodac.folding.validator;
 
 import me.zodac.folding.api.Category;
 import me.zodac.folding.api.FoldingUser;
+import me.zodac.folding.api.Hardware;
 import me.zodac.folding.cache.HardwareCache;
 import org.apache.commons.lang3.StringUtils;
 
@@ -39,7 +40,7 @@ public class FoldingUserValidator {
             failureMessages.add("Attribute 'foldingTeamNumber' is invalid (EHW: 239902, OCN: 37726, etc)");
         }
 
-        if (foldingUser.getHardwareId() <= 0 || !HardwareCache.getInstance().contains(foldingUser.getHardwareId())) {
+        if (foldingUser.getHardwareId() <= Hardware.EMPTY_HARDWARE_ID || !HardwareCache.getInstance().contains(foldingUser.getHardwareId())) {
             final List<String> availableHardware = HardwareCache.getInstance()
                     .getAll()
                     .stream()
