@@ -1,30 +1,24 @@
 package me.zodac.folding;
 
-import me.zodac.folding.api.Category;
-
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.Objects;
 
 public class TcUser {
 
-    private String userName; // displayName
-    private String hardware; // displayName
-    private Category category;
+    private String userName;
+    private String hardware;
+    private String category;
 
-    // TODO: [zodac] Unsure if the below makes sense, now that we have made the users into a list, double check
-    // Using 'Long' rather than 'long' because we want to still list the user+hardware in the JSON output for a team even if
-    // an error occurs when retrieving points/WUs. This way, we can set the value to null, which will be excluded in the
-    // JSON output (when using Gson, other 3PPs may differ).
-    private Long points;
-    private Long pointsWithoutMultiplier;
-    private Long wus;
+    private long points;
+    private long pointsWithoutMultiplier;
+    private long wus;
 
     public TcUser() {
 
     }
 
-    public TcUser(final String userName, final String hardware, final Category category, final long points, final long pointsWithoutMultiplier, final long wus) {
+    public TcUser(final String userName, final String hardware, final String category, final long points, final long pointsWithoutMultiplier, final long wus) {
         this.userName = userName;
         this.hardware = hardware;
         this.category = category;
@@ -49,16 +43,16 @@ public class TcUser {
         this.hardware = hardware;
     }
 
-    public Category getCategory() {
+    public String getCategory() {
         return category;
     }
 
-    public void setCategory(final Category category) {
+    public void setCategory(final String category) {
         this.category = category;
     }
 
     public long getPoints() {
-        return points == null ? 0L : points;
+        return points;
     }
 
     public void setPoints(final long points) {
@@ -66,7 +60,7 @@ public class TcUser {
     }
 
     public long getPointsWithoutMultiplier() {
-        return pointsWithoutMultiplier == null ? 0L : pointsWithoutMultiplier;
+        return pointsWithoutMultiplier;
     }
 
     public void setPointsWithoutMultiplier(final long pointsWithoutMultiplier) {
@@ -74,7 +68,7 @@ public class TcUser {
     }
 
     public long getWus() {
-        return wus == null ? 0L : wus;
+        return wus;
     }
 
     public void setWus(final long wus) {

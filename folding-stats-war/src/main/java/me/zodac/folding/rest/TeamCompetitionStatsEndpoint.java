@@ -154,7 +154,7 @@ public class TeamCompetitionStatsEndpoint {
                 return Optional.empty();
             }
 
-            return Optional.of(new TcUser(foldingUser.getDisplayName(), hardware.getDisplayName(), category, tcPointsForUserMultiplier, tcPointsForUser, tcWusForUser));
+            return Optional.of(new TcUser(foldingUser.getDisplayName(), hardware.getDisplayName(), category.getDisplayName(), tcPointsForUserMultiplier, tcPointsForUser, tcWusForUser));
         } catch (final NotFoundException e) {
             LOGGER.warn("No hardware found for ID: {}", foldingUser.getHardwareId(), e);
             return Optional.empty();
