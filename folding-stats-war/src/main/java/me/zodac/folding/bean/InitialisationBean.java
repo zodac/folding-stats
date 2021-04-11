@@ -43,6 +43,16 @@ public class InitialisationBean {
     }
 
     private void initTcStatsCache() {
+        try {
+            if (!dbManager.doesTcStatsExist()) {
+                LOGGER.warn("No TC stats data exists in the DB");
+                return;
+            }
+        } catch (final FoldingException e) {
+            LOGGER.warn("Unable to check DB state", e.getCause());
+        }
+
+
         final List<FoldingUser> foldingUsers = FoldingUserCache.get().getAll();
         final Month currentMonth = OffsetDateTime.now(ZoneOffset.UTC).toLocalDate().getMonth();
 

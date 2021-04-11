@@ -11,6 +11,8 @@ import java.util.Locale;
  */
 public class DbManagerRetriever {
 
+    private static final String DATABASE_VARIABLE_NAME = "DEPLOYED_DATABASE";
+
     private DbManagerRetriever() {
 
     }
@@ -21,11 +23,11 @@ public class DbManagerRetriever {
      * @return the {@link DbManager} instance
      */
     public static DbManager get() {
-        final String deployedDatabase = EnvironmentUtils.getEnvironmentValue("DEPLOYED_DATABASE");
+        final String deployedDatabase = EnvironmentUtils.getEnvironmentValue(DATABASE_VARIABLE_NAME);
 
         if ("postgres".equals(deployedDatabase.toLowerCase(Locale.UK))) {
             return new PostgresDbManager();
         }
-        throw new IllegalStateException(String.format("Unable to find database of type: %s", deployedDatabase));
+        throw new IllegalStateException(String.format("Unable to find database of type using variable '%s': %s", DATABASE_VARIABLE_NAME, deployedDatabase));
     }
 }

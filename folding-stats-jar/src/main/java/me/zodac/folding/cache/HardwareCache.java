@@ -2,7 +2,7 @@ package me.zodac.folding.cache;
 
 import me.zodac.folding.api.Hardware;
 
-public class HardwareCache extends AbstractPojoCache<Hardware> {
+public class HardwareCache extends AbstractIdentifiableCache<Hardware> {
 
     private static HardwareCache INSTANCE = null;
 

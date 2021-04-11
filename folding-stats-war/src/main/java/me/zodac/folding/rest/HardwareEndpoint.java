@@ -102,10 +102,16 @@ public class HardwareEndpoint {
         LOGGER.info("GET request for hardware received at '{}'", this.uriContext.getAbsolutePath());
 
         try {
-            final Hardware hardware = storageFacade.getHardware(hardwareId);
+            final Hardware hardware = storageFacade.getHardware(Integer.parseInt(hardwareId));
             return Response
                     .ok()
                     .entity(hardware)
+                    .build();
+        } catch (final NumberFormatException e) {
+            LOGGER.error("Hardware ID '{}' is not a valid number", hardwareId, e);
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity(GSON.toJson(String.format("Hardware ID '%s' is invalid format", hardwareId)))
                     .build();
         } catch (final NotFoundException e) {
             LOGGER.debug("No hardware found with ID: {}", hardwareId, e);

@@ -2,7 +2,7 @@ package me.zodac.folding.cache;
 
 import me.zodac.folding.api.FoldingTeam;
 
-public class FoldingTeamCache extends AbstractPojoCache<FoldingTeam> {
+public class FoldingTeamCache extends AbstractIdentifiableCache<FoldingTeam> {
 
     private static FoldingTeamCache INSTANCE = null;
 

@@ -42,7 +42,7 @@ CREATE TABLE folding_teams (
 CREATE INDEX index_tc_team_id
     ON folding_teams(team_id);
 
-CREATE TABLE individual_points (
+CREATE TABLE individual_tc_points (
     user_id INT,
     utc_timestamp TIMESTAMP,
     total_points BIGINT NOT NULL,

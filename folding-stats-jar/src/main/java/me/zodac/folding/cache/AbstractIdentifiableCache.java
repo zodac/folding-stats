@@ -10,11 +10,11 @@ import java.util.Map;
 // TODO: [zodac] Caches are all singleton instances. Would be simpler to make them Singleton EJBs instead.
 //   No need for Tx support, but looks a bit cleaner.
 //   Check for any non-CDI use of cache, if none, make into EJBs.
-abstract class AbstractPojoCache<V extends Identifiable> {
+abstract class AbstractIdentifiableCache<V extends Identifiable> {
 
-    private final Map<String, V> elementsById;
+    private final Map<Integer, V> elementsById;
 
-    protected AbstractPojoCache() {
+    protected AbstractIdentifiableCache() {
         this.elementsById = new HashMap<>();
     }
 
@@ -27,10 +27,10 @@ abstract class AbstractPojoCache<V extends Identifiable> {
         final int elementId = element.getId();
 
         if (elementId == 0) {
-            throw new IllegalArgumentException(String.format("ID cannot be 0: %s", element.toString()));
+            throw new IllegalArgumentException(String.format("ID cannot be 0: %s", element));
         }
 
-        elementsById.put(String.valueOf(elementId), element);
+        elementsById.put(elementId, element);
     }
 
     public void addAll(final List<V> elements) {
@@ -39,7 +39,8 @@ abstract class AbstractPojoCache<V extends Identifiable> {
         }
     }
 
-    public V get(final String id) throws NotFoundException {
+
+    public V get(final int id) throws NotFoundException {
         final V element = elementsById.get(id);
         if (element == null) {
             throw new NotFoundException();
@@ -47,20 +48,20 @@ abstract class AbstractPojoCache<V extends Identifiable> {
         return element;
     }
 
+    public V get(final String id) throws NotFoundException {
+        return get(Integer.parseInt(id));
+    }
+
     public V getOrNull(final int id) {
         try {
-            return get(String.valueOf(id));
+            return get(id);
         } catch (final NotFoundException e) {
             return null;
         }
     }
 
-    public boolean contains(final String id) {
-        return elementsById.containsKey(id);
-    }
-
     public boolean contains(final int id) {
-        return contains(String.valueOf(id));
+        return elementsById.containsKey(id);
     }
 
     public List<V> getAll() {

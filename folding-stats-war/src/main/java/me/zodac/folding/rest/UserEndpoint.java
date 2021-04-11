@@ -103,10 +103,16 @@ public class UserEndpoint {
         LOGGER.info("GET request for Folding user received at '{}'", this.uriContext.getAbsolutePath());
 
         try {
-            final FoldingUser foldingUser = storageFacade.getFoldingUser(foldingUserId);
+            final FoldingUser foldingUser = storageFacade.getFoldingUser(Integer.parseInt(foldingUserId));
             return Response
                     .ok()
                     .entity(foldingUser)
+                    .build();
+        } catch (final NumberFormatException e) {
+            LOGGER.error("Folding user ID '{}' is not a valid number", foldingUserId, e);
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity(GSON.toJson(String.format("Folding user ID '%s' is invalid format", foldingUserId)))
                     .build();
         } catch (final NotFoundException e) {
             LOGGER.debug("No Folding user found with ID: {}", foldingUserId, e);

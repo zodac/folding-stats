@@ -58,7 +58,7 @@ public class FoldingStatsParser {
         }
 
         try {
-            DbManagerRetriever.get().persistStats(stats);
+            DbManagerRetriever.get().persistTcStats(stats);
         } catch (final FoldingException e) {
             LOGGER.error("Error persisting stats", e.getCause());
         }
@@ -76,7 +76,7 @@ public class FoldingStatsParser {
     public static UserStats getTotalPointsForUser(final String userName, final String passkey, final int foldingTeamNumber) throws FoldingException {
         LOGGER.debug("Getting stats for username/passkey '{}/{}' for team {}", userName, passkey, foldingTeamNumber);
         final String statsRequestUrl = String.format(STATS_URL_FORMAT, userName, passkey, foldingTeamNumber);
-        LOGGER.info("Sending request to: {}", statsRequestUrl);
+        LOGGER.debug("Sending request to: {}", statsRequestUrl);
 
         final HttpRequest request = HttpRequest.newBuilder()
                 .GET()

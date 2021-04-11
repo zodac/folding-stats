@@ -43,10 +43,6 @@ public class StorageFacade {
     }
 
     public Hardware getHardware(final int hardwareId) throws FoldingException, NotFoundException {
-        return getHardware(String.valueOf(hardwareId));
-    }
-
-    public Hardware getHardware(final String hardwareId) throws FoldingException, NotFoundException {
         try {
             return hardwareCache.get(hardwareId);
         } catch (final NotFoundException e) {
@@ -88,10 +84,6 @@ public class StorageFacade {
     }
 
     public FoldingUser getFoldingUser(final int foldingUserId) throws FoldingException, NotFoundException {
-        return getFoldingUser(String.valueOf(foldingUserId));
-    }
-
-    public FoldingUser getFoldingUser(final String foldingUserId) throws FoldingException, NotFoundException {
         try {
             return foldingUserCache.get(foldingUserId);
         } catch (final NotFoundException e) {
@@ -127,10 +119,6 @@ public class StorageFacade {
     }
 
     public FoldingTeam getFoldingTeam(final int foldingTeamId) throws FoldingException, NotFoundException {
-        return getFoldingTeam(String.valueOf(foldingTeamId));
-    }
-
-    public FoldingTeam getFoldingTeam(final String foldingTeamId) throws FoldingException, NotFoundException {
         try {
             return foldingTeamCache.get(foldingTeamId);
         } catch (final NotFoundException e) {

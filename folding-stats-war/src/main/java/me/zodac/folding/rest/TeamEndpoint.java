@@ -103,10 +103,16 @@ public class TeamEndpoint {
         LOGGER.info("GET request for Folding team received at '{}'", this.uriContext.getAbsolutePath());
 
         try {
-            final FoldingTeam foldingTeam = storageFacade.getFoldingTeam(foldingTeamId);
+            final FoldingTeam foldingTeam = storageFacade.getFoldingTeam(Integer.parseInt(foldingTeamId));
             return Response
                     .ok()
                     .entity(foldingTeam)
+                    .build();
+        } catch (final NumberFormatException e) {
+            LOGGER.error("Folding team ID '{}' is not a valid number", foldingTeamId, e);
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity(GSON.toJson(String.format("Folding team ID '%s' is invalid format", foldingTeamId)))
                     .build();
         } catch (final NotFoundException e) {
             LOGGER.debug("No Folding team found with ID: {}", foldingTeamId, e);
