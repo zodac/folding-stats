@@ -36,7 +36,6 @@ CREATE TABLE folding_teams (
     CONSTRAINT fk_captain_user_id
         FOREIGN KEY(captain_user_id)
         REFERENCES folding_users(user_id)
-        ON DELETE CASCADE
 );
 
 CREATE INDEX index_tc_team_id

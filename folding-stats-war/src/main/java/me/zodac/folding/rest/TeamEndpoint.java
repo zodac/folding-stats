@@ -32,7 +32,7 @@ import java.util.List;
 // TODO: [zodac] Add a DELETE and PUT endpoint
 //   Update caches on team change
 //   Explicit endpoints to add/remove/replace a single user in a team
-@Path("/team/")
+@Path("/teams/")
 @RequestScoped
 public class TeamEndpoint {
 

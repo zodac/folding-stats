@@ -150,7 +150,7 @@ public class TeamCompetitionStatsEndpoint {
 
             final Category category = Category.get(foldingUser.getCategory());
             if (category == Category.INVALID) {
-                LOGGER.warn("Unexpectedly got an {} category for Folding user {}", category, foldingUser);
+                LOGGER.warn("Unexpectedly got an {} category for Folding user {}", Category.INVALID.getDisplayName(), foldingUser);
                 return Optional.empty();
             }
 

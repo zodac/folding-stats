@@ -31,7 +31,7 @@ import java.util.List;
  */
 // TODO: [zodac] Add a DELETE and PUT endpoint
 //   Also add a GET endpoint with query, so we can see all instances of a user
-@Path("/user/")
+@Path("/users/")
 @RequestScoped
 public class UserEndpoint {
 
