@@ -109,7 +109,7 @@ public class StorageFacade {
         // But adding this just in case we decide to add some cache eviction in future
         final List<FoldingUser> allFoldingUsersFromDb = dbManager.getAllFoldingUsers();
         foldingUserCache.addAll(allFoldingUsersFromDb);
-        return allFoldingUsers;
+        return allFoldingUsersFromDb;
     }
 
     public FoldingTeam createFoldingTeam(final FoldingTeam foldingTeam) throws FoldingException {

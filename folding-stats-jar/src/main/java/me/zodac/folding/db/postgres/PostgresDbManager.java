@@ -308,7 +308,7 @@ public class PostgresDbManager implements DbManager {
              final ResultSet resultSet = statement.executeQuery(selectSqlStatement)) {
 
             if (resultSet.next()) {
-                return new UserStats(resultSet.getLong("points"), resultSet.getLong("wus"));
+                return new UserStats(resultSet.getLong("points"), resultSet.getInt("wus"));
             }
 
             throw new NotFoundException();
@@ -328,7 +328,7 @@ public class PostgresDbManager implements DbManager {
              final ResultSet resultSet = statement.executeQuery(selectSqlStatement)) {
 
             if (resultSet.next()) {
-                return new UserStats(resultSet.getLong("points"), resultSet.getLong("wus"));
+                return new UserStats(resultSet.getLong("points"), resultSet.getInt("wus"));
             }
 
             throw new NotFoundException();

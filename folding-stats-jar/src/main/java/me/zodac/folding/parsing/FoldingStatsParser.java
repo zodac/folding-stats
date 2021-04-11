@@ -179,7 +179,7 @@ public class FoldingStatsParser {
 
         private String name;
         private long credit;
-        private long wus;
+        private int wus;
 
         public StatsApiResult() {
 
@@ -201,11 +201,11 @@ public class FoldingStatsParser {
             this.credit = credit;
         }
 
-        public long getWus() {
+        public int getWus() {
             return wus;
         }
 
-        public void setWus(final long wus) {
+        public void setWus(final int wus) {
             this.wus = wus;
         }
 

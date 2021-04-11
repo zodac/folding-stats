@@ -8,9 +8,9 @@ import java.util.Objects;
 public class UserStats {
 
     private final long points;
-    private final long wus;
+    private final int wus;
 
-    public UserStats(final long points, final long wus) {
+    public UserStats(final long points, final int wus) {
         this.points = points;
         this.wus = wus;
     }
@@ -19,7 +19,7 @@ public class UserStats {
         return points;
     }
 
-    public long getWus() {
+    public int getWus() {
         return wus;
     }
 

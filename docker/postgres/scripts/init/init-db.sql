@@ -19,15 +19,14 @@ CREATE TABLE folding_users (
     folding_team_number INT NOT NULL,
     CONSTRAINT fk_hardware_id
         FOREIGN KEY(hardware_id)
-            REFERENCES hardware(hardware_id)
+        REFERENCES hardware(hardware_id)
+        ON DELETE CASCADE
 );
 
 CREATE INDEX index_folding_user_id
     ON folding_users(user_id);
 
 
--- Cannot add a FK constraint on the users, since there is no guarantee the position is filled
--- The captain, however, must exist, so we can ensure that one
 CREATE TABLE folding_teams (
     team_id SERIAL PRIMARY KEY,
     team_name TEXT NOT NULL UNIQUE,
@@ -36,7 +35,8 @@ CREATE TABLE folding_teams (
     user_ids INT[] NOT NULL,
     CONSTRAINT fk_captain_user_id
         FOREIGN KEY(captain_user_id)
-            REFERENCES folding_users(user_id)
+        REFERENCES folding_users(user_id)
+        ON DELETE CASCADE
 );
 
 CREATE INDEX index_tc_team_id
@@ -46,11 +46,12 @@ CREATE TABLE individual_tc_points (
     user_id INT,
     utc_timestamp TIMESTAMP,
     total_points BIGINT NOT NULL,
-    total_wus BIGINT NOT NULL, -- TODO: [zodac] Is a BIGINT/long too much?
+    total_wus INT NOT NULL,
     PRIMARY KEY(user_id, utc_timestamp),
     CONSTRAINT fk_user_id
         FOREIGN KEY(user_id)
-            REFERENCES folding_users(user_id)
+        REFERENCES folding_users(user_id)
+        ON DELETE CASCADE
 )
 
 -- TODO: [zodac] Add an index for the points table
