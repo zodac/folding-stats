@@ -77,7 +77,7 @@ public class TcStats {
 
     @Override
     public int hashCode() {
-        return Objects.hash(teams, totalPoints, totalPointsWithoutMultipliers);
+        return Objects.hash(teams, totalUnits, totalPoints, totalPointsWithoutMultipliers);
     }
 
     // TODO: [zodac] #toString()

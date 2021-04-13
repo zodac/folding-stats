@@ -1,17 +1,13 @@
 package me.zodac.folding.cache.tc;
 
 import me.zodac.folding.api.UserStats;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 public class TcStatsCache {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(TcStatsCache.class);
-
+    
     private static TcStatsCache INSTANCE = null;
 
     private final Map<Integer, UserStats> initialStatsByUserId = new HashMap<>();
@@ -42,14 +38,15 @@ public class TcStatsCache {
     }
 
     public void addCurrentStats(final int userId, final UserStats userCurrentStats) {
+        // If no entry exists in the cache, first time we pull stats for the user is also the initial state
+        if (!initialStatsByUserId.containsKey(userId)) {
+            initialStatsByUserId.put(userId, userCurrentStats);
+        }
+
         currentStatsByUserId.put(userId, userCurrentStats);
     }
 
     public Optional<UserStats> getCurrentStatsForUser(final int userId) {
         return Optional.ofNullable(currentStatsByUserId.get(userId));
-    }
-
-    public boolean haveCurrentStatsForUser(final int userId) {
-        return currentStatsByUserId.containsKey(userId);
     }
 }

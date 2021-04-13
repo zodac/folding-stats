@@ -1,6 +1,8 @@
 package me.zodac.folding.api;
 
 import java.sql.Timestamp;
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.Objects;
 
 public class FoldingStats {
@@ -54,8 +56,8 @@ public class FoldingStats {
     public String toString() {
         return "FoldingStats{" +
                 "userId=" + userId +
-                ", points=" + totalStats.getPoints() +
-                ", units=" + totalStats.getUnits() +
+                ", points=" + NumberFormat.getInstance(Locale.UK).format(totalStats.getPoints()) +
+                ", units=" + NumberFormat.getInstance(Locale.UK).format(totalStats.getUnits()) +
                 ", timestamp=" + timestamp +
                 '}';
     }

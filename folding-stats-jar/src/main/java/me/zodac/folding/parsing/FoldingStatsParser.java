@@ -24,7 +24,11 @@ import java.text.NumberFormat;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
 // TODO: [zodac] Should not go straight to TC stats caches or PostgresDB, use StorageFacade to call parsing logic, then do persistence from caller
 public class FoldingStatsParser {
@@ -227,7 +231,7 @@ public class FoldingStatsParser {
         @Override
         public String toString() {
             return "UnitsApiInstance{" +
-                    "finished=" + finished +
+                    "finishedUnits=" + finished +
                     ", expired=" + expired +
                     ", active=" + active +
                     '}';

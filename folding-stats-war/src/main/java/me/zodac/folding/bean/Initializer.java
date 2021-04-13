@@ -44,13 +44,13 @@ public class Initializer {
         loadDataIntoDb(); // TODO: [zodac] Remove this eventually
         initPojoCaches();
         initTcStatsCache(); // TODO: [zodac] Add bean to reset initial points cache at start of month
-        scheduledStatsParser.startStatsParsing(); // TODO: [zodac] Remove this eventually
     }
 
     private void initTcStatsCache() {
         try {
             if (!dbManager.doTcStatsExist()) {
                 LOGGER.warn("No TC stats data exists in the DB");
+                scheduledStatsParser.startStatsParsing(); // TODO: [zodac] Remove this eventually
                 return;
             }
         } catch (final FoldingException e) {
