@@ -4,9 +4,3 @@
 
 # Build
 target/
-
-# Terraform providers
-*.exe
-*.tfstate.backup
-.terraform/
-*.lock.info

@@ -25,7 +25,6 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
 
-
 /**
  * REST endpoints for hardware for <code>folding-stats</code>.
  */
@@ -61,7 +60,7 @@ public class HardwareEndpoint {
         try {
             final Hardware hardwareWithId = storageFacade.createHardware(hardware);
 
-            final UriBuilder builder = uriContext.getBaseUriBuilder()
+            final UriBuilder builder = uriContext.getRequestUriBuilder()
                     .path(String.valueOf(hardwareWithId.getId()));
             return Response.created(builder.build()).build();
         } catch (final FoldingException e) {

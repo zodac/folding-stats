@@ -45,7 +45,7 @@ CREATE TABLE individual_tc_points (
     user_id INT,
     utc_timestamp TIMESTAMP,
     total_points BIGINT NOT NULL,
-    total_wus INT NOT NULL,
+    total_units INT NOT NULL,
     PRIMARY KEY(user_id, utc_timestamp),
     CONSTRAINT fk_user_id
         FOREIGN KEY(user_id)

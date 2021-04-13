@@ -6,6 +6,7 @@ import me.zodac.folding.api.FoldingUser;
 import me.zodac.folding.api.Hardware;
 import me.zodac.folding.api.UserStats;
 import me.zodac.folding.api.db.DbManager;
+import me.zodac.folding.api.db.OrderBy;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
 import org.slf4j.Logger;
@@ -261,8 +262,8 @@ public class PostgresDbManager implements DbManager {
         LOGGER.info("Inserting stats for {} Folding users to DB", foldingStats.size());
         final List<String> insertSqlStatements = foldingStats
                 .stream()
-                .map(foldingStatsForUser -> String.format("INSERT INTO individual_tc_points (user_id, utc_timestamp, total_points, total_wus) VALUES (%s, '%s', %s, %s);",
-                        foldingStatsForUser.getUserId(), foldingStatsForUser.getTimestamp(), foldingStatsForUser.getTotalStats().getPoints(), foldingStatsForUser.getTotalStats().getWus()))
+                .map(foldingStatsForUser -> String.format("INSERT INTO individual_tc_points (user_id, utc_timestamp, total_points, total_units) VALUES (%s, '%s', %s, %s);",
+                        foldingStatsForUser.getUserId(), foldingStatsForUser.getTimestamp(), foldingStatsForUser.getPoints(), foldingStatsForUser.getUnits()))
                 .collect(toList());
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
@@ -280,7 +281,7 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public boolean doesTcStatsExist() throws FoldingException {
+    public boolean doTcStatsExist() throws FoldingException {
         LOGGER.debug("Checking if any TC stats exist in the DB");
         final String selectSqlStatement = "SELECT COUNT(*) AS count FROM individual_tc_points;";
 
@@ -301,34 +302,34 @@ public class PostgresDbManager implements DbManager {
     public UserStats getFirstPointsForUserInMonth(final FoldingUser foldingUser, final Month month) throws
             FoldingException, NotFoundException {
         LOGGER.debug("Getting first points in month {} for user {}", month, foldingUser);
-        final String selectSqlStatement = getPointsForUserInMonthQuery(foldingUser, month, true);
-
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
-             final Statement statement = connection.createStatement();
-             final ResultSet resultSet = statement.executeQuery(selectSqlStatement)) {
-
-            if (resultSet.next()) {
-                return new UserStats(resultSet.getLong("points"), resultSet.getInt("wus"));
-            }
-
-            throw new NotFoundException();
-        } catch (final SQLException e) {
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
+        return getPointsForUserInMonth(foldingUser, month, OrderBy.ASCENDING);
     }
 
     @Override
     public UserStats getCurrentPointsForUserInMonth(final FoldingUser foldingUser, final Month month) throws
             FoldingException, NotFoundException {
         LOGGER.debug("Getting current points in month {} for user {}", month, foldingUser);
-        final String selectSqlStatement = getPointsForUserInMonthQuery(foldingUser, month, false);
+        return getPointsForUserInMonth(foldingUser, month, OrderBy.DESCENDING);
+    }
+
+    public UserStats getPointsForUserInMonth(final FoldingUser foldingUser, final Month month, final OrderBy orderBy) throws
+            FoldingException, NotFoundException {
+        final String selectSqlStatement = String.format(
+                "SELECT total_points AS points, total_units AS units " +
+                        "FROM individual_tc_points " +
+                        "WHERE utc_timestamp BETWEEN '2021-%s-01' AND NOW() " +
+                        "AND user_id = '%s' " +
+                        "ORDER BY utc_timestamp %s " +
+                        "LIMIT 1;",
+                month.getValue(), foldingUser.getId(), orderBy.getSqlValue()
+        );
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
              final Statement statement = connection.createStatement();
              final ResultSet resultSet = statement.executeQuery(selectSqlStatement)) {
 
             if (resultSet.next()) {
-                return new UserStats(resultSet.getLong("points"), resultSet.getInt("wus"));
+                return new UserStats(resultSet.getLong("points"), resultSet.getInt("units"));
             }
 
             throw new NotFoundException();
@@ -336,6 +337,7 @@ public class PostgresDbManager implements DbManager {
             throw new FoldingException("Error opening connection to the DB", e);
         }
     }
+
 
     private static Hardware createHardware(final ResultSet resultSet) throws SQLException {
         return Hardware.create(
@@ -365,19 +367,5 @@ public class PostgresDbManager implements DbManager {
                 .captainUserId(resultSet.getInt("captain_user_id"))
                 .userIds(List.of((Integer[]) resultSet.getArray("user_ids").getArray()))
                 .createTeam();
-    }
-
-    private static String getPointsForUserInMonthQuery(final FoldingUser foldingUser, final Month month,
-                                                       final boolean first) {
-        final String order = first ? "ASC" : "DESC";
-        return String.format(
-                "SELECT total_points AS points, total_wus AS wus " +
-                        "FROM individual_tc_points " +
-                        "WHERE utc_timestamp BETWEEN '2021-%s-01' AND NOW() " +
-                        "AND user_id = '%s' " +
-                        "ORDER BY utc_timestamp %s " +
-                        "LIMIT 1;",
-                month.getValue(), foldingUser.getId(), order
-        );
     }
 }

@@ -8,19 +8,19 @@ import java.util.Objects;
 public class UserStats {
 
     private final long points;
-    private final int wus;
+    private final int units;
 
-    public UserStats(final long points, final int wus) {
+    public UserStats(final long points, final int units) {
         this.points = points;
-        this.wus = wus;
+        this.units = units;
     }
 
     public long getPoints() {
         return points;
     }
 
-    public int getWus() {
-        return wus;
+    public int getUnits() {
+        return units;
     }
 
     @Override
@@ -32,12 +32,12 @@ public class UserStats {
             return false;
         }
         final UserStats userStats = (UserStats) o;
-        return points == userStats.points && wus == userStats.wus;
+        return points == userStats.points && units == userStats.units;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(points, wus);
+        return Objects.hash(points, units);
     }
 
     // TODO: [zodac] #toString()
@@ -45,7 +45,7 @@ public class UserStats {
     public String toString() {
         return "UserStats{" +
                 "points=" + NumberFormat.getInstance(Locale.UK).format(points) +
-                ", wus=" + NumberFormat.getInstance(Locale.UK).format(wus) +
+                ", units=" + NumberFormat.getInstance(Locale.UK).format(units) +
                 '}';
     }
 }

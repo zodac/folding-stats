@@ -25,7 +25,6 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
 
-
 /**
  * REST endpoints for teams for <code>folding-stats</code>.
  */
@@ -62,7 +61,7 @@ public class TeamEndpoint {
         try {
             final FoldingTeam foldingTeamWithId = storageFacade.createFoldingTeam(foldingTeam);
 
-            final UriBuilder builder = uriContext.getBaseUriBuilder()
+            final UriBuilder builder = uriContext.getRequestUriBuilder()
                     .path(String.valueOf(foldingTeamWithId.getId()));
             return Response.created(builder.build()).build();
         } catch (final FoldingException e) {

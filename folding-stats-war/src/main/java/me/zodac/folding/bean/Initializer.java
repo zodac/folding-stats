@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
+import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import java.time.Month;
@@ -27,11 +28,14 @@ import java.util.List;
 // TODO: [zodac] Move this to an EJB module?
 @Startup
 @Singleton
-public class InitialisationBean {
+public class Initializer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(InitialisationBean.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Initializer.class);
 
     private final DbManager dbManager = DbManagerRetriever.get();
+
+    @EJB
+    private ScheduledStatsParser scheduledStatsParser;
 
     @PostConstruct
     public void init() {
@@ -40,11 +44,12 @@ public class InitialisationBean {
         loadDataIntoDb(); // TODO: [zodac] Remove this eventually
         initPojoCaches();
         initTcStatsCache(); // TODO: [zodac] Add bean to reset initial points cache at start of month
+        scheduledStatsParser.startStatsParsing(); // TODO: [zodac] Remove this eventually
     }
 
     private void initTcStatsCache() {
         try {
-            if (!dbManager.doesTcStatsExist()) {
+            if (!dbManager.doTcStatsExist()) {
                 LOGGER.warn("No TC stats data exists in the DB");
                 return;
             }

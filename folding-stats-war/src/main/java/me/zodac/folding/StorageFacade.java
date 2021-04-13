@@ -76,9 +76,8 @@ public class StorageFacade {
         foldingUserCache.add(foldingUserWithId);
 
         // When adding a new user, we should also configure the TC stats cache
-        final UserStats currentStats = FoldingStatsParser.getTotalPointsForUser(foldingUser.getFoldingUserName(), foldingUser.getPasskey(), foldingUser.getFoldingTeamNumber());
+        final UserStats currentStats = FoldingStatsParser.getStatsForUser(foldingUser.getFoldingUserName(), foldingUser.getPasskey(), foldingUser.getFoldingTeamNumber());
         tcStatsCache.addInitialStats(foldingUserWithId.getId(), currentStats);
-
 
         return foldingUserWithId;
     }

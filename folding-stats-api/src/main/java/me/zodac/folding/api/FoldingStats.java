@@ -20,8 +20,12 @@ public class FoldingStats {
         return userId;
     }
 
-    public UserStats getTotalStats() {
-        return totalStats;
+    public long getPoints() {
+        return totalStats.getPoints();
+    }
+
+    public int getUnits() {
+        return totalStats.getUnits();
     }
 
     public Timestamp getTimestamp() {
@@ -50,7 +54,8 @@ public class FoldingStats {
     public String toString() {
         return "FoldingStats{" +
                 "userId=" + userId +
-                ", totalStats=" + totalStats.toString() +
+                ", points=" + totalStats.getPoints() +
+                ", units=" + totalStats.getUnits() +
                 ", timestamp=" + timestamp +
                 '}';
     }

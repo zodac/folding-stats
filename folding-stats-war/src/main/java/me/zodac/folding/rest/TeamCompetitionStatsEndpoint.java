@@ -144,7 +144,7 @@ public class TeamCompetitionStatsEndpoint {
             }
 
             LOGGER.debug("Found initial stats {} and current stats {} for {}", initialStats.get(), currentStats.get(), foldingUser);
-            final long tcWusForUser = currentStats.get().getWus() - initialStats.get().getWus();
+            final long tcUnitsForUser = currentStats.get().getUnits() - initialStats.get().getUnits();
             final long tcPointsForUser = currentStats.get().getPoints() - initialStats.get().getPoints();
             final long tcPointsForUserMultiplier = (long) (tcPointsForUser * hardware.getMultiplier());
 
@@ -154,7 +154,7 @@ public class TeamCompetitionStatsEndpoint {
                 return Optional.empty();
             }
 
-            return Optional.of(new TcUser(foldingUser.getDisplayName(), hardware.getDisplayName(), category.getDisplayName(), tcPointsForUserMultiplier, tcPointsForUser, tcWusForUser));
+            return Optional.of(new TcUser(foldingUser.getDisplayName(), hardware.getDisplayName(), category.getDisplayName(), tcPointsForUserMultiplier, tcPointsForUser, tcUnitsForUser));
         } catch (final NotFoundException e) {
             LOGGER.warn("No hardware found for ID: {}", foldingUser.getHardwareId(), e);
             return Optional.empty();

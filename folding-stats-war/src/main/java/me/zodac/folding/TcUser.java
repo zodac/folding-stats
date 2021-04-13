@@ -12,19 +12,19 @@ public class TcUser {
 
     private long points;
     private long pointsWithoutMultiplier;
-    private long wus;
+    private long units;
 
     public TcUser() {
 
     }
 
-    public TcUser(final String userName, final String hardware, final String category, final long points, final long pointsWithoutMultiplier, final long wus) {
+    public TcUser(final String userName, final String hardware, final String category, final long points, final long pointsWithoutMultiplier, final long units) {
         this.userName = userName;
         this.hardware = hardware;
         this.category = category;
         this.points = points;
         this.pointsWithoutMultiplier = pointsWithoutMultiplier;
-        this.wus = wus;
+        this.units = units;
     }
 
     public String getUserName() {
@@ -67,12 +67,12 @@ public class TcUser {
         this.pointsWithoutMultiplier = pointsWithoutMultiplier;
     }
 
-    public long getWus() {
-        return wus;
+    public long getUnits() {
+        return units;
     }
 
-    public void setWus(final long wus) {
-        this.wus = wus;
+    public void setUnits(final long units) {
+        this.units = units;
     }
 
     @Override
@@ -84,12 +84,12 @@ public class TcUser {
             return false;
         }
         final TcUser tcUser = (TcUser) o;
-        return Objects.equals(points, tcUser.points) && Objects.equals(pointsWithoutMultiplier, tcUser.pointsWithoutMultiplier) && category == tcUser.category && Objects.equals(wus, tcUser.wus) && userName.equals(tcUser.userName) && hardware.equals(tcUser.hardware);
+        return Objects.equals(points, tcUser.points) && Objects.equals(pointsWithoutMultiplier, tcUser.pointsWithoutMultiplier) && category == tcUser.category && Objects.equals(units, tcUser.units) && userName.equals(tcUser.userName) && hardware.equals(tcUser.hardware);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(userName, hardware, category, points, pointsWithoutMultiplier, wus);
+        return Objects.hash(userName, hardware, category, points, pointsWithoutMultiplier, units);
     }
 
     // TODO: [zodac] #toString()
@@ -101,7 +101,7 @@ public class TcUser {
                 ", category='" + category + '\'' +
                 ", points=" + NumberFormat.getInstance(Locale.UK).format(points) +
                 ", pointsWithoutMultiplier=" + NumberFormat.getInstance(Locale.UK).format(pointsWithoutMultiplier) +
-                ", wus=" + NumberFormat.getInstance(Locale.UK).format(wus) +
+                ", units=" + NumberFormat.getInstance(Locale.UK).format(units) +
                 '}';
     }
 }

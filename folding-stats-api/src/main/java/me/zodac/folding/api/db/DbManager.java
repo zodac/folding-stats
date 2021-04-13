@@ -44,7 +44,7 @@ public interface DbManager {
     // TODO: [zodac] Needs a better name
     void persistTcStats(final List<FoldingStats> foldingStats) throws FoldingException;
 
-    boolean doesTcStatsExist() throws FoldingException;
+    boolean doTcStatsExist() throws FoldingException;
 
     UserStats getFirstPointsForUserInMonth(final FoldingUser foldingUser, final Month month) throws FoldingException, NotFoundException;
 

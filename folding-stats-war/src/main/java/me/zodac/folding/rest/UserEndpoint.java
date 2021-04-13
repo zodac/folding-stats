@@ -25,7 +25,6 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
 
-
 /**
  * REST endpoints for users for <code>folding-stats</code>.
  */
@@ -61,7 +60,7 @@ public class UserEndpoint {
         try {
             final FoldingUser foldingUserWithId = storageFacade.createFoldingUser(foldingUser);
 
-            final UriBuilder builder = uriContext.getBaseUriBuilder()
+            final UriBuilder builder = uriContext.getRequestUriBuilder()
                     .path(String.valueOf(foldingUserWithId.getId()));
             return Response.created(builder.build()).build();
         } catch (final FoldingException e) {
@@ -73,7 +72,7 @@ public class UserEndpoint {
         }
     }
 
-    // TODO: [zodac] Add queryParam to show/hide passkeys in public API
+    // TODO: [zodac] Add queryParam to show/hide passkeys in public API?
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllFoldingUsers() {

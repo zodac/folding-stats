@@ -9,7 +9,7 @@ import java.util.Objects;
 public class TcStats {
 
     private List<TcTeam> teams = new ArrayList<>();
-    private long totalWus = 0L;
+    private long totalUnits = 0L;
     private long totalPoints = 0L;
     private long totalPointsWithoutMultipliers = 0L;
 
@@ -19,13 +19,13 @@ public class TcStats {
 
     public TcStats(final List<TcTeam> teams) {
         this.teams = teams;
-        this.totalWus = 0L;
+        this.totalUnits = 0L;
         this.totalPoints = 0L;
         this.totalPointsWithoutMultipliers = 0L;
 
         // TODO: [zodac] Rank the teams
         for (final TcTeam team : teams) {
-            this.totalWus += team.getTeamWus();
+            this.totalUnits += team.getTeamUnits();
             this.totalPoints += team.getTeamPoints();
             this.totalPointsWithoutMultipliers += team.getTeamPointsWithoutMultipliers();
         }
@@ -39,12 +39,12 @@ public class TcStats {
         this.teams = teams;
     }
 
-    public long getTotalWus() {
-        return totalWus;
+    public long getTotalUnits() {
+        return totalUnits;
     }
 
-    public void setTotalWus(final long totalWus) {
-        this.totalWus = totalWus;
+    public void setTotalUnits(final long totalUnits) {
+        this.totalUnits = totalUnits;
     }
 
     public long getTotalPoints() {
@@ -85,7 +85,7 @@ public class TcStats {
     public String toString() {
         return "TcStats{" +
                 "teams=" + teams +
-                ", totalWus=" + NumberFormat.getInstance(Locale.UK).format(totalWus) +
+                ", totalUnits=" + NumberFormat.getInstance(Locale.UK).format(totalUnits) +
                 ", totalPoints=" + NumberFormat.getInstance(Locale.UK).format(totalPoints) +
                 ", totalPointsWithoutMultipliers=" + NumberFormat.getInstance(Locale.UK).format(totalPointsWithoutMultipliers) +
                 '}';

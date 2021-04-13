@@ -12,7 +12,7 @@ public class TcTeam {
 
     // TODO: [zodac] Rank the users
     private List<TcUser> users;
-    private long teamWus;
+    private long teamUnits;
     private long teamPoints;
     private long teamPointsWithoutMultipliers;
 
@@ -25,12 +25,12 @@ public class TcTeam {
         this.captainName = captainName;
         this.users = users;
 
-        this.teamWus = 0L;
+        this.teamUnits = 0L;
         this.teamPoints = 0L;
         this.teamPointsWithoutMultipliers = 0L;
 
         for (final TcUser user : users) {
-            teamWus += user.getWus();
+            teamUnits += user.getUnits();
             teamPoints += user.getPoints();
             teamPointsWithoutMultipliers += user.getPointsWithoutMultiplier();
         }
@@ -60,12 +60,12 @@ public class TcTeam {
         this.users = users;
     }
 
-    public long getTeamWus() {
-        return teamWus;
+    public long getTeamUnits() {
+        return teamUnits;
     }
 
-    public void setTeamWus(final long teamWus) {
-        this.teamWus = teamWus;
+    public void setTeamUnits(final long teamUnits) {
+        this.teamUnits = teamUnits;
     }
 
     public long getTeamPoints() {
@@ -93,12 +93,12 @@ public class TcTeam {
             return false;
         }
         final TcTeam tcTeam = (TcTeam) o;
-        return teamName.equals(tcTeam.teamName) && captainName.equals(tcTeam.captainName) && teamWus == tcTeam.teamWus && teamPoints == tcTeam.teamPoints && teamPointsWithoutMultipliers == tcTeam.teamPointsWithoutMultipliers && Objects.equals(users, tcTeam.users);
+        return teamName.equals(tcTeam.teamName) && captainName.equals(tcTeam.captainName) && teamUnits == tcTeam.teamUnits && teamPoints == tcTeam.teamPoints && teamPointsWithoutMultipliers == tcTeam.teamPointsWithoutMultipliers && Objects.equals(users, tcTeam.users);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(teamName, captainName, teamWus, teamPoints, teamPointsWithoutMultipliers, users);
+        return Objects.hash(teamName, captainName, teamUnits, teamPoints, teamPointsWithoutMultipliers, users);
     }
 
     // TODO: [zodac] #toString()
@@ -108,7 +108,7 @@ public class TcTeam {
                 "teamName=" + teamName +
                 ", captainName=" + captainName +
                 ", users=" + users +
-                ", teamWus=" + NumberFormat.getInstance(Locale.UK).format(teamWus) +
+                ", teamUnits=" + NumberFormat.getInstance(Locale.UK).format(teamUnits) +
                 ", teamPoints=" + NumberFormat.getInstance(Locale.UK).format(teamPoints) +
                 ", teamPointsWithoutMultipliers=" + NumberFormat.getInstance(Locale.UK).format(teamPointsWithoutMultipliers) +
                 '}';

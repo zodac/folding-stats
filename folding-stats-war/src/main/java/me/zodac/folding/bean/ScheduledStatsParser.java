@@ -18,9 +18,9 @@ import java.util.List;
 // TODO: [zodac] Move this to an EJB module?
 @Startup
 @Singleton
-public class ScheduledStatsParsing {
+public class ScheduledStatsParser {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ScheduledStatsParsing.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScheduledStatsParser.class);
 
     @EJB
     private StorageFacade storageFacade;
@@ -30,6 +30,7 @@ public class ScheduledStatsParsing {
         LOGGER.info("Started stats parsing bean, running every hour");
     }
 
+    // TODO: [zodac] Make this configurable through env variables using TimerService instead
     @Schedule(hour = "*/1", minute = "15", info = "Every hour, 15 minutes after the hour")
     public void startStatsParsing() {
         LOGGER.info("Parsing Folding stats");
