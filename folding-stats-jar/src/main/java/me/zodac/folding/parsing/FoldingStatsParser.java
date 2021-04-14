@@ -8,6 +8,7 @@ import me.zodac.folding.cache.tc.TcStatsCache;
 import me.zodac.folding.db.DbManagerRetriever;
 import me.zodac.folding.parsing.http.request.PointsUrlBuilder;
 import me.zodac.folding.parsing.http.request.UnitsUrlBuilder;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,12 +29,17 @@ public class FoldingStatsParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FoldingStatsParser.class);
 
-    // TODO: [zodac] This shouldn't be here anymore? Keep this class simple logic, move this elsewhere
-    public static void parseStatsForAllUsers(final List<FoldingUser> foldingUsers) {
+    // TODO: [zodac] This shouldn't be here anymore. Keep this class as simple logic, move this function elsewhere since it has TC-specific logic
+    public static void parseTcStatsForAllUsers(final List<FoldingUser> foldingUsers) {
         final Timestamp currentUtcTime = new Timestamp(OffsetDateTime.now(ZoneOffset.UTC).toInstant().toEpochMilli());
         final List<FoldingStats> stats = new ArrayList<>(foldingUsers.size());
 
         for (final FoldingUser foldingUser : foldingUsers) {
+            if (StringUtils.isBlank(foldingUser.getPasskey())) {
+                LOGGER.warn("Not parsing TC stats for user, missing passkey: {}", foldingUser);
+                continue;
+            }
+
             try {
                 final UserStats totalStatsForUser = getStatsForUser(foldingUser.getFoldingUserName(), foldingUser.getPasskey(), foldingUser.getFoldingTeamNumber());
                 final FoldingStats foldingStats = new FoldingStats(foldingUser.getId(), totalStatsForUser, currentUtcTime);

@@ -27,6 +27,10 @@ services:
     environment:
       # Container configuration
       JAVA_OPTS: -Xms512m -Xmx2g -Djava.net.preferIPv4Stack=true
+      # Stats parsing schedule configuration
+      STATS_PARSING_SCHEDULE_HOUR: "*"
+      STATS_PARSING_SCHEDULE_MINUTE: "20"
+      STATS_PARSING_SCHEDULE_SECOND: "0"
       # Database configuration
       DEPLOYED_DATABASE: "postgres"
       JDBC_CONNECTION_URL: "jdbc:postgresql://postgres:5432/folding_db"

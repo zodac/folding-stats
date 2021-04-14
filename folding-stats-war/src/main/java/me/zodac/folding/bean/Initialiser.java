@@ -35,22 +35,22 @@ public class Initialiser {
     private final DbManager dbManager = DbManagerRetriever.get();
 
     @EJB
-    private ScheduledStatsParser scheduledStatsParser;
+    private TeamCompetitionStatsParser teamCompetitionStatsParser;
 
     @PostConstruct
     public void init() {
-        LOGGER.info("Started initialisation bean");
-
         loadDataIntoDb(); // TODO: [zodac] Remove this eventually
         initPojoCaches();
         initTcStatsCache(); // TODO: [zodac] Add bean to reset initial points cache at start of month
+
+        LOGGER.info("System ready for requests");
     }
 
     private void initTcStatsCache() {
         try {
             if (!dbManager.doTcStatsExist()) {
                 LOGGER.warn("No TC stats data exists in the DB");
-                scheduledStatsParser.startStatsParsing(); // TODO: [zodac] Remove this eventually
+                teamCompetitionStatsParser.manualStatsParsing(); // TODO: [zodac] Remove this eventually
                 return;
             }
         } catch (final FoldingException e) {
@@ -85,24 +85,23 @@ public class Initialiser {
             }
         }
 
-        LOGGER.info("Initialised TC stats cache");
+        LOGGER.debug("Initialised TC stats cache");
     }
 
     private void loadDataIntoDb() {
         try {
             if (!dbManager.getAllHardware().isEmpty()) {
-                LOGGER.warn("Initial data already exists in DB");
+                LOGGER.debug("Initial data already exists in DB");
                 return;
             }
         } catch (final FoldingException e) {
             LOGGER.warn("Unable to check DB state", e.getCause());
         }
 
-        LOGGER.debug("Adding initial data into DB");
         addHardware();
         addFoldingUsers();
         addFoldingTeams();
-        LOGGER.info("Initial data added to DB");
+        LOGGER.warn("Empty DB, initial data added to DB");
     }
 
     private void initPojoCaches() {
@@ -127,7 +126,7 @@ public class Initialiser {
             LOGGER.warn("Error initialising Folding team cache", e.getCause());
         }
 
-        LOGGER.info("Caches initialised");
+        LOGGER.debug("Caches initialised");
     }
 
     private void addHardware() {

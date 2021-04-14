@@ -2,9 +2,6 @@ package me.zodac.folding.rest;
 
 import com.google.gson.Gson;
 import me.zodac.folding.StorageFacade;
-import me.zodac.folding.TcStats;
-import me.zodac.folding.TcTeam;
-import me.zodac.folding.TcUser;
 import me.zodac.folding.api.Category;
 import me.zodac.folding.api.FoldingTeam;
 import me.zodac.folding.api.FoldingUser;
@@ -13,6 +10,9 @@ import me.zodac.folding.api.UserStats;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.cache.tc.TcStatsCache;
+import me.zodac.folding.rest.tc.TcStats;
+import me.zodac.folding.rest.tc.TcTeam;
+import me.zodac.folding.rest.tc.TcUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

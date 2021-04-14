@@ -2,7 +2,7 @@ package me.zodac.folding.db;
 
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.db.postgres.PostgresDbManager;
-import me.zodac.folding.util.EnvironmentUtils;
+import me.zodac.folding.util.EnvironmentVariable;
 
 import java.util.Locale;
 
@@ -23,7 +23,7 @@ public class DbManagerRetriever {
      * @return the {@link DbManager} instance
      */
     public static DbManager get() {
-        final String deployedDatabase = EnvironmentUtils.getEnvironmentValue(DATABASE_VARIABLE_NAME);
+        final String deployedDatabase = EnvironmentVariable.get(DATABASE_VARIABLE_NAME);
 
         if ("postgres".equals(deployedDatabase.toLowerCase(Locale.UK))) {
             return new PostgresDbManager();

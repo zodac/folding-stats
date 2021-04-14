@@ -1,4 +1,4 @@
-package me.zodac.folding;
+package me.zodac.folding.rest.tc;
 
 import java.util.List;
 import java.util.Objects;

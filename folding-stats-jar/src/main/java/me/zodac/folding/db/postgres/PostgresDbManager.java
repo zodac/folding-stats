@@ -9,6 +9,7 @@ import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.db.OrderBy;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
+import me.zodac.folding.util.EnvironmentVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,19 +25,18 @@ import java.util.List;
 import java.util.Properties;
 
 import static java.util.stream.Collectors.toList;
-import static me.zodac.folding.util.EnvironmentUtils.getEnvironmentValue;
 
 public class PostgresDbManager implements DbManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PostgresDbManager.class);
 
-    private static final String JDBC_CONNECTION_URL = getEnvironmentValue("JDBC_CONNECTION_URL");
+    private static final String JDBC_CONNECTION_URL = EnvironmentVariable.get("JDBC_CONNECTION_URL");
     private static final Properties JDBC_CONNECTION_PROPERTIES = new Properties();
 
     static {
-        JDBC_CONNECTION_PROPERTIES.setProperty("user", getEnvironmentValue("JDBC_CONNECTION_USER"));
-        JDBC_CONNECTION_PROPERTIES.setProperty("password", getEnvironmentValue("JDBC_CONNECTION_PASSWORD"));
-        JDBC_CONNECTION_PROPERTIES.setProperty("driver", getEnvironmentValue("JDBC_CONNECTION_DRIVER"));
+        JDBC_CONNECTION_PROPERTIES.setProperty("user", EnvironmentVariable.get("JDBC_CONNECTION_USER"));
+        JDBC_CONNECTION_PROPERTIES.setProperty("password", EnvironmentVariable.get("JDBC_CONNECTION_PASSWORD"));
+        JDBC_CONNECTION_PROPERTIES.setProperty("driver", EnvironmentVariable.get("JDBC_CONNECTION_DRIVER"));
     }
 
     @Override
