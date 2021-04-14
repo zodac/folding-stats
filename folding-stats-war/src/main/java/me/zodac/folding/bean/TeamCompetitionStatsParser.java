@@ -44,12 +44,11 @@ public class TeamCompetitionStatsParser {
         schedule.hour(STATS_PARSING_SCHEDULE_HOUR);
         schedule.minute(STATS_PARSING_SCHEDULE_MINUTE);
         schedule.second(STATS_PARSING_SCHEDULE_SECOND);
+        schedule.timezone("UTC");
         final Timer timer = timerService.createCalendarTimer(schedule);
         LOGGER.info("Starting TC stats parser with schedule: {}", timer.getSchedule());
     }
-
-    // TODO: [zodac] Make this configurable through env variables using TimerService instead
-//    @Schedule(hour = "*/1", minute = "15", info = "Every hour, 15 minutes after the hour")
+    
     @Timeout
     public void scheduledStatsParsing(final Timer timer) {
         LOGGER.debug("Timer fired at: {}", timer.getInfo());
