@@ -1,8 +1,8 @@
 package me.zodac.folding;
 
-import java.text.NumberFormat;
-import java.util.Locale;
 import java.util.Objects;
+
+import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
 
 public class TcUser {
 
@@ -99,9 +99,9 @@ public class TcUser {
                 "userName='" + userName + '\'' +
                 ", hardware='" + hardware + '\'' +
                 ", category='" + category + '\'' +
-                ", points=" + NumberFormat.getInstance(Locale.UK).format(points) +
-                ", pointsWithoutMultiplier=" + NumberFormat.getInstance(Locale.UK).format(pointsWithoutMultiplier) +
-                ", units=" + NumberFormat.getInstance(Locale.UK).format(units) +
+                ", points=" + formatWithCommas(points) +
+                ", pointsWithoutMultiplier=" + formatWithCommas(pointsWithoutMultiplier) +
+                ", units=" + formatWithCommas(units) +
                 '}';
     }
 }

@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public class TcStatsCache {
-    
+
     private static TcStatsCache INSTANCE = null;
 
     private final Map<Integer, UserStats> initialStatsByUserId = new HashMap<>();
@@ -31,10 +31,6 @@ public class TcStatsCache {
 
     public Optional<UserStats> getInitialStatsForUser(final int userId) {
         return Optional.ofNullable(initialStatsByUserId.get(userId));
-    }
-
-    public boolean haveInitialStatsForUser(final int userId) {
-        return initialStatsByUserId.containsKey(userId);
     }
 
     public void addCurrentStats(final int userId, final UserStats userCurrentStats) {

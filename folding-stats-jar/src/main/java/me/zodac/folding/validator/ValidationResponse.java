@@ -41,10 +41,10 @@ public class ValidationResponse implements Serializable {
     }
 
     public List<String> getErrors() {
-        return errors;
+        return List.copyOf(errors);
     }
 
     public void setErrors(final List<String> errors) {
-        this.errors = errors;
+        this.errors = List.copyOf(errors);
     }
 }

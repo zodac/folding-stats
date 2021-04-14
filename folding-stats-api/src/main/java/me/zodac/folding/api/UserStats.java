@@ -1,8 +1,8 @@
 package me.zodac.folding.api;
 
-import java.text.NumberFormat;
-import java.util.Locale;
 import java.util.Objects;
+
+import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
 
 // TODO: [zodac] This and FoldingStats are pretty similar, combine them?
 public class UserStats {
@@ -44,8 +44,8 @@ public class UserStats {
     @Override
     public String toString() {
         return "UserStats{" +
-                "points=" + NumberFormat.getInstance(Locale.UK).format(points) +
-                ", units=" + NumberFormat.getInstance(Locale.UK).format(units) +
+                "points=" + formatWithCommas(points) +
+                ", units=" + formatWithCommas(units) +
                 '}';
     }
 }

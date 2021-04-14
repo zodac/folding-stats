@@ -1,9 +1,9 @@
 package me.zodac.folding;
 
-import java.text.NumberFormat;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
+
+import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
 
 public class TcTeam {
 
@@ -108,9 +108,9 @@ public class TcTeam {
                 "teamName=" + teamName +
                 ", captainName=" + captainName +
                 ", users=" + users +
-                ", teamUnits=" + NumberFormat.getInstance(Locale.UK).format(teamUnits) +
-                ", teamPoints=" + NumberFormat.getInstance(Locale.UK).format(teamPoints) +
-                ", teamPointsWithoutMultipliers=" + NumberFormat.getInstance(Locale.UK).format(teamPointsWithoutMultipliers) +
+                ", teamUnits=" + formatWithCommas(teamUnits) +
+                ", teamPoints=" + formatWithCommas(teamPoints) +
+                ", teamPointsWithoutMultipliers=" + formatWithCommas(teamPointsWithoutMultipliers) +
                 '}';
     }
 }

@@ -1,10 +1,10 @@
 package me.zodac.folding;
 
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
+
+import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
 
 public class TcStats {
 
@@ -85,9 +85,9 @@ public class TcStats {
     public String toString() {
         return "TcStats{" +
                 "teams=" + teams +
-                ", totalUnits=" + NumberFormat.getInstance(Locale.UK).format(totalUnits) +
-                ", totalPoints=" + NumberFormat.getInstance(Locale.UK).format(totalPoints) +
-                ", totalPointsWithoutMultipliers=" + NumberFormat.getInstance(Locale.UK).format(totalPointsWithoutMultipliers) +
+                ", totalUnits=" + formatWithCommas(totalUnits) +
+                ", totalPoints=" + formatWithCommas(totalPoints) +
+                ", totalPointsWithoutMultipliers=" + formatWithCommas(totalPointsWithoutMultipliers) +
                 '}';
     }
 }

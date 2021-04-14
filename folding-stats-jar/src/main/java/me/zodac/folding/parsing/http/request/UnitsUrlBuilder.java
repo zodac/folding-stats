@@ -1,4 +1,4 @@
-package me.zodac.folding.parsing;
+package me.zodac.folding.parsing.http.request;
 
 import org.apache.commons.lang3.StringUtils;
 
