@@ -1,5 +1,8 @@
 package me.zodac.folding.api.db;
 
+/**
+ * {@link Enum} defining the types of ordering possible within the DB.
+ */
 public enum OrderBy {
 
     ASCENDING("ASC"),
@@ -7,7 +10,7 @@ public enum OrderBy {
 
     private final String sqlValue;
 
-    OrderBy(String sqlValue) {
+    OrderBy(final String sqlValue) {
         this.sqlValue = sqlValue;
     }
 

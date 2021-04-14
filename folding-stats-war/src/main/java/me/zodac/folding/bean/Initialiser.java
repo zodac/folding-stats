@@ -28,9 +28,9 @@ import java.util.List;
 // TODO: [zodac] Move this to an EJB module?
 @Startup
 @Singleton
-public class Initializer {
+public class Initialiser {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Initializer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Initialiser.class);
 
     private final DbManager dbManager = DbManagerRetriever.get();
 
@@ -64,7 +64,7 @@ public class Initializer {
         for (final FoldingUser foldingUser : foldingUsers) {
             try {
                 final UserStats initialStatsForUser = dbManager.getFirstPointsForUserInMonth(foldingUser, currentMonth);
-                LOGGER.info("Found initial stats for {} for user {}: {}", currentMonth, foldingUser, initialStatsForUser);
+                LOGGER.debug("Found initial stats for {} for user {}: {}", currentMonth, foldingUser, initialStatsForUser);
                 TcStatsCache.get().addInitialStats(foldingUser.getId(), initialStatsForUser);
             } catch (final NotFoundException e) {
                 LOGGER.debug("No initial stats in DB for {}", foldingUser, e);
@@ -75,7 +75,7 @@ public class Initializer {
 
             try {
                 final UserStats currentStatsForUser = dbManager.getCurrentPointsForUserInMonth(foldingUser, currentMonth);
-                LOGGER.info("Found current stats for {} for user {}: {}", currentMonth, foldingUser, currentStatsForUser);
+                LOGGER.debug("Found current stats for {} for user {}: {}", currentMonth, foldingUser, currentStatsForUser);
                 TcStatsCache.get().addCurrentStats(foldingUser.getId(), currentStatsForUser);
             } catch (final NotFoundException e) {
                 LOGGER.debug("No current stats in DB for {}", foldingUser, e);
@@ -84,6 +84,8 @@ public class Initializer {
                 LOGGER.warn("Unable to get current stats for {} for user {}", currentMonth, foldingUser, e.getCause());
             }
         }
+
+        LOGGER.info("Initialised TC stats cache");
     }
 
     private void loadDataIntoDb() {

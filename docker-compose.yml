@@ -14,7 +14,12 @@ services:
       - m2:/root/.m2
 
   wildfly:
-    build: ./docker/wildfly
+    build:
+      context: .
+      dockerfile: docker/wildfly/Dockerfile
+      args:
+        ADMIN_USERNAME: "root"
+        ADMIN_PASSWORD: "shroot"
     container_name: wildfly
     hostname: wildfly
     depends_on:
@@ -42,19 +47,22 @@ services:
       - builder_java
 
   postgres:
-    build: ./docker/postgres
+    build:
+      context: .
+      dockerfile: docker/postgres/Dockerfile
     container_name: postgres
     hostname: postgres
     environment:
       # First 4 variables used to configure DB
-      - POSTGRES_DB=folding_db
-      - POSTGRES_USER=folding_user
-      - POSTGRES_PASSWORD=shroot
-      - POSTGRES_PORT=5432
+      POSTGRES_DB: "folding_db"
+      POSTGRES_USER: "folding_user"
+      POSTGRES_PASSWORD: "shroot"
+      POSTGRES_PORT: "5432"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
       # Next 3 variables needed to avoid "FATAL role 'root' does not exist" error
-      - PGDATABASE=folding_db
-      - PGUSER=folding_user
-      - PGPASSWORD=shroot
+      PGDATABASE: "folding_db"
+      PGUSER: "folding_user"
+      PGPASSWORD: "shroot"
     ports:
       - 5432:5432
     expose:
