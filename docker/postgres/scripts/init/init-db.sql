@@ -2,6 +2,7 @@ CREATE TABLE hardware (
     hardware_id SERIAL PRIMARY KEY,
     hardware_name TEXT NOT NULL,
     display_name TEXT NOT NULL,
+    operating_system TEXT NOT NULL,
     multiplier NUMERIC NOT NULL
 );
 

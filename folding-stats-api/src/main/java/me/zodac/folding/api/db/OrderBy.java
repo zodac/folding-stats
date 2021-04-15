@@ -1,7 +1,7 @@
 package me.zodac.folding.api.db;
 
 /**
- * {@link Enum} defining the types of ordering possible within the DB.
+ * Lists the types of ordering possible within the backend storage.
  */
 public enum OrderBy {
 

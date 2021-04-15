@@ -1,8 +1,10 @@
 package me.zodac.folding.bean;
 
+import me.zodac.folding.api.Category;
 import me.zodac.folding.api.FoldingTeam;
 import me.zodac.folding.api.FoldingUser;
 import me.zodac.folding.api.Hardware;
+import me.zodac.folding.api.OperatingSystem;
 import me.zodac.folding.api.UserStats;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.exception.FoldingException;
@@ -133,21 +135,25 @@ public class Initialiser {
                 Hardware.createWithoutId(
                         "nVidia 1070", // ID 1
                         "nVidia 1070",
+                        OperatingSystem.WINDOWS.toString(),
                         1.0D
                 ),
                 Hardware.createWithoutId(
                         "nVidia 3090", // ID 2
                         "nVidia 3090",
+                        OperatingSystem.WINDOWS.toString(),
                         1.0D
                 ),
                 Hardware.createWithoutId(
                         "nVidia 1070", // ID 3
                         "nVidia 1070 (half)",
+                        OperatingSystem.LINUX.toString(),
                         0.5D
                 ),
                 Hardware.createWithoutId(
                         "nVidia 3090", // ID 4
                         "nVidia 3090 (double)",
+                        OperatingSystem.LINUX.toString(),
                         2.0D
                 )
         );
@@ -169,7 +175,7 @@ public class Initialiser {
                         "BWG",
                         "BWG",
                         "8d10fbfda0813aa7288613e400484214",
-                        "nvidia_gpu",
+                        Category.NVIDIA_GPU.toString(),
                         1,
                         239902
                 ),
@@ -177,7 +183,7 @@ public class Initialiser {
                         "Bastiaan_NL",
                         "Bastiaan_NL",
                         "d1ed404fdb11570aa07d2294601ad292",
-                        "amd_gpu",
+                        Category.AMD_GPU.toString(),
                         2,
                         239902
                 ),
@@ -185,7 +191,7 @@ public class Initialiser {
                         "BWG",
                         "BWG_With_Multiplier",
                         "8d10fbfda0813aa7288613e400484214",
-                        "nvidia_gpu",
+                        Category.NVIDIA_GPU.toString(),
                         3,
                         239902
                 ),
@@ -193,7 +199,7 @@ public class Initialiser {
                         "Bastiaan_NL",
                         "Bastiaan_NL_With_Multiplier",
                         "d1ed404fdb11570aa07d2294601ad292",
-                        "amd_gpu",
+                        Category.AMD_GPU.toString(),
                         4,
                         239902
                 )

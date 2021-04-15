@@ -11,29 +11,31 @@ public class Hardware implements Identifiable {
     private int id;
     private String hardwareName;
     private String displayName;
+    private String operatingSystem;
     private double multiplier;
 
     public Hardware() {
 
     }
 
-    private Hardware(final int id, final String hardwareName, final String displayName, final double multiplier) {
+    private Hardware(final int id, final String hardwareName, final String displayName, final String operatingSystem, final double multiplier) {
         this.id = id;
         this.hardwareName = hardwareName;
         this.displayName = displayName;
+        this.operatingSystem = operatingSystem;
         this.multiplier = multiplier;
     }
 
-    public static Hardware create(final int id, final String hardwareName, final String displayName, final double multiplier) {
-        return new Hardware(id, hardwareName, displayName, multiplier);
+    public static Hardware create(final int id, final String hardwareName, final String displayName, final String os, final double multiplier) {
+        return new Hardware(id, hardwareName, displayName, os, multiplier);
     }
 
-    public static Hardware createWithoutId(final String hardwareName, final String displayName, final double multiplier) {
-        return new Hardware(0, hardwareName, displayName, multiplier);
+    public static Hardware createWithoutId(final String hardwareName, final String displayName, final String os, final double multiplier) {
+        return new Hardware(0, hardwareName, displayName, os, multiplier);
     }
 
     public static Hardware updateWithId(final int id, final Hardware hardware) {
-        return new Hardware(id, hardware.getHardwareName(), hardware.getDisplayName(), hardware.getMultiplier());
+        return new Hardware(id, hardware.getHardwareName(), hardware.getDisplayName(), hardware.getOperatingSystem(), hardware.getMultiplier());
     }
 
     @Override
@@ -61,6 +63,14 @@ public class Hardware implements Identifiable {
         this.displayName = displayName;
     }
 
+    public String getOperatingSystem() {
+        return operatingSystem;
+    }
+
+    public void setOperatingSystem(final String operatingSystem) {
+        this.operatingSystem = operatingSystem;
+    }
+
     public double getMultiplier() {
         return multiplier;
     }
@@ -78,16 +88,16 @@ public class Hardware implements Identifiable {
             return false;
         }
         final Hardware that = (Hardware) o;
-        return id == that.id && Double.compare(that.multiplier, multiplier) == 0 && hardwareName.equals(that.hardwareName) && displayName.equals(that.displayName);
+        return id == that.id && Double.compare(that.multiplier, multiplier) == 0 && hardwareName.equals(that.hardwareName) && displayName.equals(that.displayName) && operatingSystem.equals(that.operatingSystem);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, hardwareName, displayName, multiplier);
+        return Objects.hash(id, hardwareName, displayName, operatingSystem, multiplier);
     }
 
     @Override
     public String toString() {
-        return String.format("%s::{id: '%s', hardwareName: '%s', displayName: '%s', multiplier: '%s'}", this.getClass().getSimpleName(), id, hardwareName, displayName, multiplier);
+        return String.format("%s::{id: '%s', hardwareName: '%s', displayName: '%s', operatingSystem: '%s', multiplier: '%s'}", this.getClass().getSimpleName(), id, hardwareName, displayName, operatingSystem, multiplier);
     }
 }

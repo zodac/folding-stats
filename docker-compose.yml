@@ -28,6 +28,7 @@ services:
       # Container configuration
       JAVA_OPTS: -Xms512m -Xmx2g -Djava.net.preferIPv4Stack=true
       # Stats parsing schedule configuration
+      # NOTE: The monthly reset will always occur at 00:55 on the first of the month
       STATS_PARSING_SCHEDULE_HOUR: "*"
       STATS_PARSING_SCHEDULE_MINUTE: "15"
       STATS_PARSING_SCHEDULE_SECOND: "0"

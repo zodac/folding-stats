@@ -1,6 +1,8 @@
 package me.zodac.folding.validator;
 
+import me.zodac.folding.api.Category;
 import me.zodac.folding.api.Hardware;
+import me.zodac.folding.api.OperatingSystem;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -21,6 +23,10 @@ public class HardwareValidator {
 
         if (StringUtils.isBlank(hardware.getDisplayName())) {
             failureMessages.add("Attribute 'displayName' must not be empty");
+        }
+
+        if (OperatingSystem.INVALID == OperatingSystem.get(hardware.getOperatingSystem())) {
+            failureMessages.add(String.format("Attribute 'operatingSystem' must be one of: %s", OperatingSystem.getValuesAsList()));
         }
 
         // I am assuming multiplier cannot be less than 0, also assuming we might want a 0.1/0.5 at some point with future hardware

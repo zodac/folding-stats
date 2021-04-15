@@ -17,7 +17,7 @@ public enum Category {
     INVALID("Invalid", 0);
 
     private static final List<Category> VALUES_AS_LIST = Stream.of(values())
-            .filter(value -> !value.toString().equalsIgnoreCase("invalid"))
+            .filter(value -> value != INVALID)
             .collect(toUnmodifiableList());
 
     private final String displayName;
@@ -42,7 +42,7 @@ public enum Category {
 
     public static Category get(final String input) {
         for (final Category category : VALUES_AS_LIST) {
-            if (category.toString().equalsIgnoreCase(input)) {
+            if (category.toString().equalsIgnoreCase(input) || category.displayName.equalsIgnoreCase(input)) {
                 return category;
             }
         }

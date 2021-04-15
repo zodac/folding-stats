@@ -40,7 +40,7 @@ public class PostgresDbManager implements DbManager {
 
     @Override
     public Hardware createHardware(final Hardware hardware) throws FoldingException {
-        final String insertSqlWithReturnId = "INSERT INTO hardware (hardware_name, display_name, multiplier) VALUES (?, ?, ?) RETURNING hardware_id;";
+        final String insertSqlWithReturnId = "INSERT INTO hardware (hardware_name, display_name, operating_system, multiplier) VALUES (?, ?, ?, ?) RETURNING hardware_id;";
         LOGGER.debug("Executing SQL statement '{}'", insertSqlWithReturnId);
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
@@ -48,7 +48,8 @@ public class PostgresDbManager implements DbManager {
 
             preparedStatement.setString(1, hardware.getHardwareName());
             preparedStatement.setString(2, hardware.getDisplayName());
-            preparedStatement.setDouble(3, hardware.getMultiplier());
+            preparedStatement.setString(3, hardware.getOperatingSystem());
+            preparedStatement.setDouble(4, hardware.getMultiplier());
 
             try (final ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
@@ -418,6 +419,7 @@ public class PostgresDbManager implements DbManager {
                 resultSet.getInt("hardware_id"),
                 resultSet.getString("hardware_name"),
                 resultSet.getString("display_name"),
+                resultSet.getString("operating_system"),
                 resultSet.getDouble("multiplier")
         );
     }

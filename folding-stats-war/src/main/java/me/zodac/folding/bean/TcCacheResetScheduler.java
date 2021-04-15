@@ -13,7 +13,7 @@ import javax.ejb.Startup;
 public class TcCacheResetScheduler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TcCacheResetScheduler.class);
-
+    
     @Schedule(dayOfMonth = "1", minute = "55", info = "Monthly cache reset for TC teams")
     public void monthlyTcStatsReset() {
         LOGGER.info("Resetting TC caches for new month");
