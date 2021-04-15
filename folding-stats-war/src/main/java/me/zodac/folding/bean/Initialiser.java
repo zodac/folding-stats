@@ -7,6 +7,7 @@ import me.zodac.folding.api.UserStats;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
+import me.zodac.folding.api.utils.TimeUtils;
 import me.zodac.folding.cache.FoldingTeamCache;
 import me.zodac.folding.cache.FoldingUserCache;
 import me.zodac.folding.cache.HardwareCache;
@@ -20,8 +21,6 @@ import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import java.time.Month;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 
 
@@ -59,7 +58,7 @@ public class Initialiser {
 
 
         final List<FoldingUser> foldingUsers = FoldingUserCache.get().getAll();
-        final Month currentMonth = OffsetDateTime.now(ZoneOffset.UTC).toLocalDate().getMonth();
+        final Month currentMonth = TimeUtils.getCurrentUtcMonth();
 
         for (final FoldingUser foldingUser : foldingUsers) {
             try {

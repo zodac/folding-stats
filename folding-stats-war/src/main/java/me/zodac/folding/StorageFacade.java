@@ -1,8 +1,10 @@
 package me.zodac.folding;
 
+import me.zodac.folding.api.FoldingStats;
 import me.zodac.folding.api.FoldingTeam;
 import me.zodac.folding.api.FoldingUser;
 import me.zodac.folding.api.Hardware;
+import me.zodac.folding.api.TeamStats;
 import me.zodac.folding.api.UserStats;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.exception.FoldingException;
@@ -17,7 +19,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ejb.Singleton;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * In order to decouple the REST layer from the storage/persistence, we use this {@link StorageFacade} instead.
@@ -144,5 +151,59 @@ public class StorageFacade {
         final List<FoldingTeam> allFoldingTeamsFromDb = dbManager.getAllFoldingTeams();
         foldingTeamCache.addAll(allFoldingTeamsFromDb);
         return allFoldingTeamsFromDb;
+    }
+
+    public List<FoldingTeam> getTcTeams() {
+        try {
+            return getAllFoldingTeams();
+        } catch (final FoldingException e) {
+            LOGGER.warn("Error retrieving TC Folding teams", e.getCause());
+            return Collections.emptyList();
+        }
+    }
+
+    public List<FoldingUser> getTcUsers() {
+        try {
+            return getAllFoldingTeams()
+                    .stream()
+                    .map(FoldingTeam::getUserIds)
+                    .flatMap(Collection::stream)
+                    .map(userId -> FoldingUserCache.get().getOrNull(userId))
+                    .filter(Objects::nonNull)
+                    .collect(toList());
+        } catch (final FoldingException e) {
+            LOGGER.warn("Error retrieving TC Folding users", e.getCause());
+            return Collections.emptyList();
+        }
+    }
+
+    public void persistDailyUserTcStats(final List<FoldingStats> tcFoldingStats) {
+        try {
+            dbManager.persistDailyUserTcStats(tcFoldingStats);
+        } catch (final FoldingException e) {
+            LOGGER.error("Error persisting daily TC user stats", e.getCause());
+        } catch (final Exception e) {
+            LOGGER.error("Unexpected error persisting daily TC user stats", e);
+        }
+    }
+
+    public void persistDailyTeamTcStats(final List<TeamStats> tcTeamStats) {
+        try {
+            dbManager.persistDailyTeamTcStats(tcTeamStats);
+        } catch (final FoldingException e) {
+            LOGGER.error("Error persisting daily TC team stats", e.getCause());
+        } catch (final Exception e) {
+            LOGGER.error("Unexpected error persisting daily team TC stats", e);
+        }
+    }
+
+    public void persistMonthlyTeamTcStats(final List<TeamStats> tcTeamStats) {
+        try {
+            dbManager.persistMonthlyTeamTcStats(tcTeamStats);
+        } catch (final FoldingException e) {
+            LOGGER.error("Error persisting monthly TC team stats", e.getCause());
+        } catch (final Exception e) {
+            LOGGER.error("Unexpected error persisting monthly team TC stats", e);
+        }
     }
 }

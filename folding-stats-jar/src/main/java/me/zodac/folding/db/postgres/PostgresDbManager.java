@@ -4,6 +4,7 @@ import me.zodac.folding.api.FoldingStats;
 import me.zodac.folding.api.FoldingTeam;
 import me.zodac.folding.api.FoldingUser;
 import me.zodac.folding.api.Hardware;
+import me.zodac.folding.api.TeamStats;
 import me.zodac.folding.api.UserStats;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.db.OrderBy;
@@ -23,8 +24,6 @@ import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-
-import static java.util.stream.Collectors.toList;
 
 public class PostgresDbManager implements DbManager {
 
@@ -258,27 +257,101 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public void persistTcStats(final List<FoldingStats> foldingStats) throws FoldingException {
-        LOGGER.info("Inserting stats for {} Folding users to DB", foldingStats.size());
-        final List<String> insertSqlStatements = foldingStats
-                .stream()
-                .map(foldingStatsForUser -> String.format("INSERT INTO individual_tc_points (user_id, utc_timestamp, total_points, total_units) VALUES (%s, '%s', %s, %s);",
-                        foldingStatsForUser.getUserId(), foldingStatsForUser.getTimestamp(), foldingStatsForUser.getPoints(), foldingStatsForUser.getUnits()))
-                .collect(toList());
+    public void persistHourlyUserTcStats(final List<FoldingStats> tcUserStats) throws FoldingException {
+        LOGGER.info("Inserting TC stats for {} users to DB", tcUserStats.size());
+        final String preparedInsertSqlStatement = "INSERT INTO individual_tc_points (user_id, utc_timestamp, total_points, total_units) VALUES (?, ?, ?, ?);";
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
-             final Statement statement = connection.createStatement()) {
-            for (final String insertSqlStatement : insertSqlStatements) {
+             final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
+            for (final FoldingStats tcFoldingStatsForUser : tcUserStats) {
                 try {
-                    statement.execute(insertSqlStatement);
+                    preparedStatement.setInt(1, tcFoldingStatsForUser.getUserId());
+                    preparedStatement.setTimestamp(2, tcFoldingStatsForUser.getTimestamp());
+                    preparedStatement.setLong(3, tcFoldingStatsForUser.getPoints());
+                    preparedStatement.setInt(4, tcFoldingStatsForUser.getUnits());
+
+                    preparedStatement.execute();
                 } catch (final SQLException e) {
-                    LOGGER.warn("Unable to INSERT folding stats for user: {}", insertSqlStatement, e);
+                    LOGGER.warn("Unable to INSERT TC stats for user: {}", tcFoldingStatsForUser, e);
                 }
             }
         } catch (final SQLException e) {
             throw new FoldingException("Error opening connection to the DB", e);
         }
     }
+
+    @Override
+    public void persistDailyUserTcStats(final List<FoldingStats> tcFoldingStats) throws FoldingException {
+        LOGGER.info("Inserting daily TC stats for {} users to DB", tcFoldingStats.size());
+        final String preparedInsertSqlStatement = "INSERT INTO historic_stats_tc_user_daily (user_id, utc_timestamp, daily_points, daily_units) VALUES (%s, '%s', %s, %s);";
+
+        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+             final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
+            for (final FoldingStats tcFoldingStatsForUser : tcFoldingStats) {
+                try {
+                    preparedStatement.setInt(1, tcFoldingStatsForUser.getUserId());
+                    preparedStatement.setTimestamp(2, tcFoldingStatsForUser.getTimestamp());
+                    preparedStatement.setLong(3, tcFoldingStatsForUser.getPoints());
+                    preparedStatement.setInt(4, tcFoldingStatsForUser.getUnits());
+
+                    preparedStatement.execute();
+                } catch (final SQLException e) {
+                    LOGGER.warn("Unable to INSERT daily TC stats for user: {}", tcFoldingStatsForUser, e);
+                }
+            }
+        } catch (final SQLException e) {
+            throw new FoldingException("Error opening connection to the DB", e);
+        }
+    }
+
+    @Override
+    public void persistDailyTeamTcStats(final List<TeamStats> tcTeamStats) throws FoldingException {
+        LOGGER.info("Inserting daily TC stats for {} teams to DB", tcTeamStats.size());
+        final String preparedInsertSqlStatement = "INSERT INTO historic_stats_tc_team_daily (team_id, utc_timestamp, daily_team_points, daily_team_units) VALUES (%s, '%s', %s, %s);";
+
+        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+             final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
+            for (final TeamStats tcStatsForTeam : tcTeamStats) {
+                try {
+                    preparedStatement.setInt(1, tcStatsForTeam.getTeamId());
+                    preparedStatement.setTimestamp(2, tcStatsForTeam.getTimestamp());
+                    preparedStatement.setLong(3, tcStatsForTeam.getPoints());
+                    preparedStatement.setInt(4, tcStatsForTeam.getUnits());
+
+                    preparedStatement.execute();
+                } catch (final SQLException e) {
+                    LOGGER.warn("Unable to INSERT daily TC stats for team: {}", tcStatsForTeam, e);
+                }
+            }
+        } catch (final SQLException e) {
+            throw new FoldingException("Error opening connection to the DB", e);
+        }
+    }
+
+    @Override
+    public void persistMonthlyTeamTcStats(final List<TeamStats> tcTeamStats) throws FoldingException {
+        LOGGER.info("Inserting monthly TC stats for {} teams to DB", tcTeamStats.size());
+        final String preparedInsertSqlStatement = "INSERT INTO historic_stats_tc_team_monthly (team_id, utc_timestamp, daily_team_points, daily_team_units) VALUES (%s, '%s', %s, %s);";
+
+        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+             final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
+            for (final TeamStats tcStatsForTeam : tcTeamStats) {
+                try {
+                    preparedStatement.setInt(1, tcStatsForTeam.getTeamId());
+                    preparedStatement.setTimestamp(2, tcStatsForTeam.getTimestamp());
+                    preparedStatement.setLong(3, tcStatsForTeam.getPoints());
+                    preparedStatement.setInt(4, tcStatsForTeam.getUnits());
+
+                    preparedStatement.execute();
+                } catch (final SQLException e) {
+                    LOGGER.warn("Unable to INSERT monthly TC stats for team: {}", tcStatsForTeam, e);
+                }
+            }
+        } catch (final SQLException e) {
+            throw new FoldingException("Error opening connection to the DB", e);
+        }
+    }
+
 
     @Override
     public boolean doTcStatsExist() throws FoldingException {
@@ -312,6 +385,8 @@ public class PostgresDbManager implements DbManager {
         return getPointsForUserInMonth(foldingUser, month, OrderBy.DESCENDING);
     }
 
+
+    // TODO: [zodac] Can this be a PreparedStatement? Not sure about the timestamp check
     public UserStats getPointsForUserInMonth(final FoldingUser foldingUser, final Month month, final OrderBy orderBy) throws
             FoldingException, NotFoundException {
         final String selectSqlStatement = String.format(
@@ -337,7 +412,6 @@ public class PostgresDbManager implements DbManager {
             throw new FoldingException("Error opening connection to the DB", e);
         }
     }
-
 
     private static Hardware createHardware(final ResultSet resultSet) throws SQLException {
         return Hardware.create(

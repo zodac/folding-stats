@@ -4,6 +4,7 @@ import me.zodac.folding.api.FoldingStats;
 import me.zodac.folding.api.FoldingUser;
 import me.zodac.folding.api.UserStats;
 import me.zodac.folding.api.exception.FoldingException;
+import me.zodac.folding.api.utils.TimeUtils;
 import me.zodac.folding.cache.tc.TcStatsCache;
 import me.zodac.folding.db.DbManagerRetriever;
 import me.zodac.folding.parsing.http.request.PointsUrlBuilder;
@@ -14,8 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import java.net.http.HttpResponse;
 import java.sql.Timestamp;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +30,7 @@ public class FoldingStatsParser {
 
     // TODO: [zodac] This shouldn't be here anymore. Keep this class as simple logic, move this function elsewhere since it has TC-specific logic
     public static void parseTcStatsForAllUsers(final List<FoldingUser> foldingUsers) {
-        final Timestamp currentUtcTime = new Timestamp(OffsetDateTime.now(ZoneOffset.UTC).toInstant().toEpochMilli());
+        final Timestamp currentUtcTime = TimeUtils.getCurrentUtcTimestamp();
         final List<FoldingStats> stats = new ArrayList<>(foldingUsers.size());
 
         for (final FoldingUser foldingUser : foldingUsers) {
@@ -53,7 +52,7 @@ public class FoldingStatsParser {
         }
 
         try {
-            DbManagerRetriever.get().persistTcStats(stats);
+            DbManagerRetriever.get().persistHourlyUserTcStats(stats);
         } catch (final FoldingException e) {
             LOGGER.error("Error persisting stats", e.getCause());
         }

@@ -2,7 +2,6 @@ package me.zodac.folding.bean;
 
 import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.FoldingUser;
-import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.parsing.FoldingStatsParser;
 import me.zodac.folding.util.EnvironmentVariable;
 import org.slf4j.Logger;
@@ -17,7 +16,6 @@ import javax.ejb.Startup;
 import javax.ejb.Timeout;
 import javax.ejb.Timer;
 import javax.ejb.TimerService;
-import java.util.Collections;
 import java.util.List;
 
 // TODO: [zodac] Move this to an EJB module?
@@ -48,7 +46,7 @@ public class TeamCompetitionStatsParser {
         final Timer timer = timerService.createCalendarTimer(schedule);
         LOGGER.info("Starting TC stats parser with schedule: {}", timer.getSchedule());
     }
-    
+
     @Timeout
     public void scheduledStatsParsing(final Timer timer) {
         LOGGER.debug("Timer fired at: {}", timer.getInfo());
@@ -63,24 +61,15 @@ public class TeamCompetitionStatsParser {
     private void getTcStatsForFoldingUsers() {
         LOGGER.info("Parsing TC Folding stats");
 
-        final List<FoldingUser> usersToParse = getUsers();
+        final List<FoldingUser> tcUsers = storageFacade.getTcUsers();
 
-        if (usersToParse.isEmpty()) {
-            LOGGER.warn("No Folding users configured in system!");
+        if (tcUsers.isEmpty()) {
+            LOGGER.warn("No TC Folding users configured in system!");
             return;
         }
 
-        FoldingStatsParser.parseTcStatsForAllUsers(usersToParse);
+        FoldingStatsParser.parseTcStatsForAllUsers(tcUsers);
         LOGGER.info("Finished parsing");
-    }
-
-
-    private List<FoldingUser> getUsers() {
-        try {
-            return storageFacade.getAllFoldingUsers();
-        } catch (final FoldingException e) {
-            LOGGER.warn("Error retrieving Folding users", e.getCause());
-            return Collections.emptyList();
-        }
+        LOGGER.info("");
     }
 }

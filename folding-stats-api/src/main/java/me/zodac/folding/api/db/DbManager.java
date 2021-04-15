@@ -4,6 +4,7 @@ import me.zodac.folding.api.FoldingStats;
 import me.zodac.folding.api.FoldingTeam;
 import me.zodac.folding.api.FoldingUser;
 import me.zodac.folding.api.Hardware;
+import me.zodac.folding.api.TeamStats;
 import me.zodac.folding.api.UserStats;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
@@ -41,12 +42,18 @@ public interface DbManager {
 
     FoldingTeam getFoldingTeam(final int foldingTeamId) throws FoldingException, NotFoundException;
 
-    // TODO: [zodac] Needs a better name
-    void persistTcStats(final List<FoldingStats> foldingStats) throws FoldingException;
-
-    boolean doTcStatsExist() throws FoldingException;
-
     UserStats getFirstPointsForUserInMonth(final FoldingUser foldingUser, final Month month) throws FoldingException, NotFoundException;
 
     UserStats getCurrentPointsForUserInMonth(final FoldingUser foldingUser, final Month month) throws FoldingException, NotFoundException;
+
+    void persistHourlyUserTcStats(final List<FoldingStats> tcUserStats) throws FoldingException;
+
+    void persistDailyUserTcStats(final List<FoldingStats> tcUserStats) throws FoldingException;
+
+    void persistDailyTeamTcStats(final List<TeamStats> tcTeamStats) throws FoldingException;
+
+    void persistMonthlyTeamTcStats(final List<TeamStats> tcTeamStats) throws FoldingException;
+
+    // TODO: [zodac] To be removed
+    boolean doTcStatsExist() throws FoldingException;
 }
