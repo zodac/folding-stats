@@ -45,4 +45,17 @@ public class TcStatsCache {
     public Optional<UserStats> getCurrentStatsForUser(final int userId) {
         return Optional.ofNullable(currentStatsByUserId.get(userId));
     }
+
+    public void resetInitialCache() {
+        emptyInitialCache();
+        initialStatsByUserId.putAll(currentStatsByUserId);
+    }
+
+    public void emptyInitialCache() {
+        initialStatsByUserId.clear();
+    }
+
+    public void emptyCurrentCache() {
+        currentStatsByUserId.clear();
+    }
 }
