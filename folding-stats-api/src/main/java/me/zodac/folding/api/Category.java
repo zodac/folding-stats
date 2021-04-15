@@ -5,7 +5,6 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toUnmodifiableList;
 
-
 /**
  * Lists the possible team categories for a user taking part in the <code>Team Competition</code>.
  */

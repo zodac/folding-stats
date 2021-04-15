@@ -16,7 +16,7 @@ import java.util.List;
  * Interface used to interact with the storage backend and perform CRUD operations.
  */
 public interface DbManager {
-
+    
     /**
      * Creates a {@link Hardware} instance in the DB.
      *
