@@ -2,6 +2,8 @@ package me.zodac.folding.api;
 
 import java.util.Objects;
 
+// TODO: [zodac] This should really be a TcUser. I think there will be confusion between this and non-TC users (like for a Foldathon).
+//   Need to distinguish the names better, could be very confusing as is.
 public class FoldingUser implements Identifiable {
 
     private static final long serialVersionUID = -1919458037620452556L;

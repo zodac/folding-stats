@@ -331,7 +331,7 @@ public class PostgresDbManager implements DbManager {
     @Override
     public void persistMonthlyTeamTcStats(final List<TeamStats> tcTeamStats) throws FoldingException {
         LOGGER.info("Inserting monthly TC stats for {} teams to DB", tcTeamStats.size());
-        final String preparedInsertSqlStatement = "INSERT INTO historic_stats_tc_team_monthly (team_id, utc_timestamp, daily_team_points, daily_team_units) VALUES (%s, '%s', %s, %s);";
+        final String preparedInsertSqlStatement = "INSERT INTO historic_stats_tc_team_monthly (team_id, utc_timestamp, monthly_team_points, monthly_team_units) VALUES (%s, '%s', %s, %s);";
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
              final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
