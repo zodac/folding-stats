@@ -23,6 +23,7 @@ import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import java.time.Month;
+import java.time.Year;
 import java.util.List;
 
 
@@ -61,10 +62,11 @@ public class Initialiser {
 
         final List<FoldingUser> foldingUsers = FoldingUserCache.get().getAll();
         final Month currentMonth = TimeUtils.getCurrentUtcMonth();
+        final Year currentYear = TimeUtils.getCurrentUtcYear();
 
         for (final FoldingUser foldingUser : foldingUsers) {
             try {
-                final UserStats initialStatsForUser = dbManager.getFirstPointsForUserInMonth(foldingUser, currentMonth);
+                final UserStats initialStatsForUser = dbManager.getFirstPointsForUserInMonth(foldingUser, currentMonth, currentYear);
                 LOGGER.debug("Found initial stats for {} for user {}: {}", currentMonth, foldingUser, initialStatsForUser);
                 TcStatsCache.get().addInitialStats(foldingUser.getId(), initialStatsForUser);
             } catch (final NotFoundException e) {
@@ -75,7 +77,7 @@ public class Initialiser {
             }
 
             try {
-                final UserStats currentStatsForUser = dbManager.getCurrentPointsForUserInMonth(foldingUser, currentMonth);
+                final UserStats currentStatsForUser = dbManager.getCurrentPointsForUserInMonth(foldingUser, currentMonth, currentYear);
                 LOGGER.debug("Found current stats for {} for user {}: {}", currentMonth, foldingUser, currentStatsForUser);
                 TcStatsCache.get().addCurrentStats(foldingUser.getId(), currentStatsForUser);
             } catch (final NotFoundException e) {

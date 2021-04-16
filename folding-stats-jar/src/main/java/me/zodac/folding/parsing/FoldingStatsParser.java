@@ -43,7 +43,7 @@ public class FoldingStatsParser {
                 final UserStats totalStatsForUser = getStatsForUser(foldingUser.getFoldingUserName(), foldingUser.getPasskey(), foldingUser.getFoldingTeamNumber());
                 final FoldingStats foldingStats = new FoldingStats(foldingUser.getId(), totalStatsForUser, currentUtcTime);
                 stats.add(foldingStats);
-                LOGGER.info("{}: {} points, {} units", foldingUser.getFoldingUserName(), formatWithCommas(totalStatsForUser.getPoints()), formatWithCommas(totalStatsForUser.getUnits()));
+                LOGGER.info("{}: {} points | {} units", foldingUser.getFoldingUserName(), formatWithCommas(totalStatsForUser.getPoints()), formatWithCommas(totalStatsForUser.getUnits()));
 
                 TcStatsCache.get().addCurrentStats(foldingUser.getId(), totalStatsForUser);
             } catch (final FoldingException e) {

@@ -10,13 +10,14 @@ import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
 
 import java.time.Month;
+import java.time.Year;
 import java.util.List;
 
 /**
  * Interface used to interact with the storage backend and perform CRUD operations.
  */
 public interface DbManager {
-    
+
     /**
      * Creates a {@link Hardware} instance in the DB.
      *
@@ -42,9 +43,9 @@ public interface DbManager {
 
     FoldingTeam getFoldingTeam(final int foldingTeamId) throws FoldingException, NotFoundException;
 
-    UserStats getFirstPointsForUserInMonth(final FoldingUser foldingUser, final Month month) throws FoldingException, NotFoundException;
+    UserStats getFirstPointsForUserInMonth(final FoldingUser foldingUser, final Month month, final Year year) throws FoldingException, NotFoundException;
 
-    UserStats getCurrentPointsForUserInMonth(final FoldingUser foldingUser, final Month month) throws FoldingException, NotFoundException;
+    UserStats getCurrentPointsForUserInMonth(final FoldingUser foldingUser, final Month month, final Year year) throws FoldingException, NotFoundException;
 
     void persistHourlyUserTcStats(final List<FoldingStats> tcUserStats) throws FoldingException;
 

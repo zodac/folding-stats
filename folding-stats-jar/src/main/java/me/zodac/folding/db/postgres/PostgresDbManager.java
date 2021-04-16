@@ -15,12 +15,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.time.Month;
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -284,7 +287,7 @@ public class PostgresDbManager implements DbManager {
     @Override
     public void persistDailyUserTcStats(final List<FoldingStats> tcFoldingStats) throws FoldingException {
         LOGGER.info("Inserting daily TC stats for {} users to DB", tcFoldingStats.size());
-        final String preparedInsertSqlStatement = "INSERT INTO historic_stats_tc_user_daily (user_id, utc_timestamp, daily_points, daily_units) VALUES (%s, '%s', %s, %s);";
+        final String preparedInsertSqlStatement = "INSERT INTO historic_stats_tc_user_daily (user_id, utc_timestamp, daily_points, daily_units) VALUES (?, ?, ?, ?);";
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
              final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
@@ -308,7 +311,7 @@ public class PostgresDbManager implements DbManager {
     @Override
     public void persistDailyTeamTcStats(final List<TeamStats> tcTeamStats) throws FoldingException {
         LOGGER.info("Inserting daily TC stats for {} teams to DB", tcTeamStats.size());
-        final String preparedInsertSqlStatement = "INSERT INTO historic_stats_tc_team_daily (team_id, utc_timestamp, daily_team_points, daily_team_units) VALUES (%s, '%s', %s, %s);";
+        final String preparedInsertSqlStatement = "INSERT INTO historic_stats_tc_team_daily (team_id, utc_timestamp, daily_team_points, daily_team_units) VALUES (?, ?, ?, ?);";
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
              final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
@@ -332,7 +335,7 @@ public class PostgresDbManager implements DbManager {
     @Override
     public void persistMonthlyTeamTcStats(final List<TeamStats> tcTeamStats) throws FoldingException {
         LOGGER.info("Inserting monthly TC stats for {} teams to DB", tcTeamStats.size());
-        final String preparedInsertSqlStatement = "INSERT INTO historic_stats_tc_team_monthly (team_id, utc_timestamp, monthly_team_points, monthly_team_units) VALUES (%s, '%s', %s, %s);";
+        final String preparedInsertSqlStatement = "INSERT INTO historic_stats_tc_team_monthly (team_id, utc_timestamp, monthly_team_points, monthly_team_units) VALUES (?, ?, ?, ?);";
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
              final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
@@ -373,42 +376,46 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public UserStats getFirstPointsForUserInMonth(final FoldingUser foldingUser, final Month month) throws
+    public UserStats getFirstPointsForUserInMonth(final FoldingUser foldingUser, final Month month, final Year year) throws
             FoldingException, NotFoundException {
-        LOGGER.debug("Getting first points in month {} for user {}", month, foldingUser);
-        return getPointsForUserInMonth(foldingUser, month, OrderBy.ASCENDING);
+        LOGGER.debug("Getting first points in month/year {}/{} for user {}", month, year, foldingUser);
+        return getPointsForUserInMonth(foldingUser, month, year, OrderBy.ASCENDING);
     }
 
     @Override
-    public UserStats getCurrentPointsForUserInMonth(final FoldingUser foldingUser, final Month month) throws
+    public UserStats getCurrentPointsForUserInMonth(final FoldingUser foldingUser, final Month month, final Year year) throws
             FoldingException, NotFoundException {
-        LOGGER.debug("Getting current points in month {} for user {}", month, foldingUser);
-        return getPointsForUserInMonth(foldingUser, month, OrderBy.DESCENDING);
+        LOGGER.debug("Getting current points in month/year {}/{} for user {}", month, year, foldingUser);
+        return getPointsForUserInMonth(foldingUser, month, year, OrderBy.DESCENDING);
     }
 
 
-    // TODO: [zodac] Can this be a PreparedStatement? Not sure about the timestamp check
-    public UserStats getPointsForUserInMonth(final FoldingUser foldingUser, final Month month, final OrderBy orderBy) throws
+    public UserStats getPointsForUserInMonth(final FoldingUser foldingUser, final Month month, final Year year, final OrderBy orderBy) throws
             FoldingException, NotFoundException {
         final String selectSqlStatement = String.format(
                 "SELECT total_points AS points, total_units AS units " +
                         "FROM individual_tc_points " +
-                        "WHERE utc_timestamp BETWEEN '2021-%s-01' AND NOW() " +
-                        "AND user_id = '%s' " +
+                        "WHERE utc_timestamp BETWEEN ? AND NOW() " +
+                        "AND user_id = ? " +
                         "ORDER BY utc_timestamp %s " +
                         "LIMIT 1;",
-                month.getValue(), foldingUser.getId(), orderBy.getSqlValue()
+                orderBy.getSqlValue()
         );
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
-             final Statement statement = connection.createStatement();
-             final ResultSet resultSet = statement.executeQuery(selectSqlStatement)) {
+             final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
 
-            if (resultSet.next()) {
-                return new UserStats(resultSet.getLong("points"), resultSet.getInt("units"));
+            preparedStatement.setDate(1, Date.valueOf(LocalDate.of(year.getValue(), month.getValue(), 1)));
+            preparedStatement.setInt(2, foldingUser.getId());
+
+            try (final ResultSet resultSet = preparedStatement.executeQuery()) {
+
+                if (resultSet.next()) {
+                    return new UserStats(resultSet.getLong("points"), resultSet.getInt("units"));
+                }
+
+                throw new NotFoundException();
             }
-
-            throw new NotFoundException();
         } catch (final SQLException e) {
             throw new FoldingException("Error opening connection to the DB", e);
         }
