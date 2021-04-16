@@ -15,7 +15,7 @@ abstract class AbstractIdentifiableCache<V extends Identifiable> {
     private final Map<Integer, V> elementsById;
 
     protected AbstractIdentifiableCache() {
-        this.elementsById = new HashMap<>();
+        elementsById = new HashMap<>();
     }
 
     /**
@@ -39,7 +39,10 @@ abstract class AbstractIdentifiableCache<V extends Identifiable> {
         }
     }
 
-
+    public boolean remove(final int elementId) {
+        return elementsById.remove(elementId) != null;
+    }
+    
     public V get(final int id) throws NotFoundException {
         final V element = elementsById.get(id);
         if (element == null) {

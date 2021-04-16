@@ -1,8 +1,10 @@
 package me.zodac.folding.rest;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.FoldingUser;
+import me.zodac.folding.api.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.validator.FoldingUserValidator;
@@ -13,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import javax.ejb.EJB;
 import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -28,14 +31,14 @@ import java.util.List;
 /**
  * REST endpoints for users for <code>folding-stats</code>.
  */
-// TODO: [zodac] Add a DELETE and PUT endpoint
+// TODO: [zodac] Add a PUT endpoint
 //   Also add a GET endpoint with query, so we can see all instances of a user
 @Path("/users/")
 @RequestScoped
 public class UserEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserEndpoint.class);
-    private static final Gson GSON = new Gson();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     @EJB
     private StorageFacade storageFacade;
@@ -60,7 +63,8 @@ public class UserEndpoint {
         try {
             final FoldingUser foldingUserWithId = storageFacade.createFoldingUser(foldingUser);
 
-            final UriBuilder builder = uriContext.getRequestUriBuilder()
+            final UriBuilder builder = uriContext
+                    .getRequestUriBuilder()
                     .path(String.valueOf(foldingUserWithId.getId()));
             return Response
                     .created(builder.build())
@@ -68,10 +72,14 @@ public class UserEndpoint {
                     .build();
         } catch (final FoldingException e) {
             LOGGER.error("Error creating Folding user: {}", foldingUser, e.getCause());
-            return Response.serverError().build();
+            return Response
+                    .serverError()
+                    .build();
         } catch (final Exception e) {
             LOGGER.error("Unexpected error creating Folding user: {}", foldingUser, e);
-            return Response.serverError().build();
+            return Response
+                    .serverError()
+                    .build();
         }
     }
 
@@ -90,16 +98,19 @@ public class UserEndpoint {
                     .build();
         } catch (final FoldingException e) {
             LOGGER.error("Error getting all Folding users", e.getCause());
-            return Response.serverError().build();
+            return Response
+                    .serverError()
+                    .build();
         } catch (final Exception e) {
             LOGGER.error("Unexpected error getting all Folding users", e);
-            return Response.serverError().build();
+            return Response
+                    .serverError()
+                    .build();
         }
     }
 
     @GET
     @Path("/{foldingUserId}")
-    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getFoldingUserById(@PathParam("foldingUserId") final String foldingUserId) {
         LOGGER.info("GET request for Folding user received at '{}'", uriContext.getAbsolutePath());
@@ -111,21 +122,75 @@ public class UserEndpoint {
                     .entity(foldingUser)
                     .build();
         } catch (final NumberFormatException e) {
-            LOGGER.error("Folding user ID '{}' is not a valid number", foldingUserId, e);
+            final String errorMessage = String.format("Folding user ID '%s' is invalid format", foldingUserId);
+            final ErrorObject errorObject = new ErrorObject(errorMessage);
+
+            LOGGER.debug(errorMessage, e);
+            LOGGER.error(errorMessage);
             return Response
                     .status(Response.Status.BAD_REQUEST)
-                    .entity(GSON.toJson(String.format("Folding user ID '%s' is invalid format", foldingUserId)))
+                    .entity(GSON.toJson(errorObject, ErrorObject.class))
                     .build();
         } catch (final NotFoundException e) {
             LOGGER.debug("No Folding user found with ID: {}", foldingUserId, e);
             LOGGER.error("No Folding user found with ID: {}", foldingUserId);
-            return Response.status(Response.Status.NOT_FOUND).build();
+            return Response
+                    .status(Response.Status.NOT_FOUND)
+                    .build();
         } catch (final FoldingException e) {
             LOGGER.error("Error getting Folding user with ID: {}", foldingUserId, e.getCause());
-            return Response.serverError().build();
+            return Response
+                    .serverError()
+                    .build();
         } catch (final Exception e) {
             LOGGER.error("Unexpected error getting Folding user with ID: {}", foldingUserId, e);
-            return Response.serverError().build();
+            return Response
+                    .serverError()
+                    .build();
+        }
+    }
+
+    @DELETE
+    @Path("/{foldingUserId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteFoldingUserById(@PathParam("foldingUserId") final String foldingUserId) {
+        LOGGER.info("DELETE request for Folding user received at '{}'", uriContext.getAbsolutePath());
+
+        try {
+            storageFacade.deleteFoldingUser(Integer.parseInt(foldingUserId));
+            return Response
+                    .noContent()
+                    .build();
+        } catch (final NumberFormatException e) {
+            final String errorMessage = String.format("Folding user ID '%s' is invalid format", foldingUserId);
+            final ErrorObject errorObject = new ErrorObject(errorMessage);
+
+            LOGGER.debug(errorMessage, e);
+            LOGGER.error(errorMessage);
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity(GSON.toJson(errorObject, ErrorObject.class))
+                    .build();
+        } catch (final FoldingConflictException e) {
+            final String errorMessage = String.format("Folding user ID '%s' is in use, remove all usages before deleting", foldingUserId);
+            final ErrorObject errorObject = new ErrorObject(errorMessage);
+
+            LOGGER.debug(errorMessage, e);
+            LOGGER.error(errorMessage);
+            return Response
+                    .status(Response.Status.CONFLICT)
+                    .entity(GSON.toJson(errorObject, ErrorObject.class))
+                    .build();
+        } catch (final FoldingException e) {
+            LOGGER.error("Error deleting Folding user with ID: {}", foldingUserId, e.getCause());
+            return Response
+                    .serverError()
+                    .build();
+        } catch (final Exception e) {
+            LOGGER.error("Unexpected error deleting Folding user with ID: {}", foldingUserId, e);
+            return Response
+                    .serverError()
+                    .build();
         }
     }
 }

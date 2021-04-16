@@ -1,8 +1,10 @@
 package me.zodac.folding.rest;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.Hardware;
+import me.zodac.folding.api.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.validator.HardwareValidator;
@@ -13,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import javax.ejb.EJB;
 import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -28,14 +31,14 @@ import java.util.List;
 /**
  * REST endpoints for hardware for <code>folding-stats</code>.
  */
-// TODO: [zodac] Add a DELETE and PUT endpoint
+// TODO: [zodac] Add a PUT endpoint
 //   Add GET query endpoint to retrieve all hardware instances with same name
 @Path("/hardware/")
 @RequestScoped
 public class HardwareEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HardwareEndpoint.class);
-    private static final Gson GSON = new Gson();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     @EJB
     private StorageFacade storageFacade;
@@ -60,7 +63,8 @@ public class HardwareEndpoint {
         try {
             final Hardware hardwareWithId = storageFacade.createHardware(hardware);
 
-            final UriBuilder builder = uriContext.getRequestUriBuilder()
+            final UriBuilder builder = uriContext
+                    .getRequestUriBuilder()
                     .path(String.valueOf(hardwareWithId.getId()));
             return Response
                     .created(builder.build())
@@ -68,10 +72,14 @@ public class HardwareEndpoint {
                     .build();
         } catch (final FoldingException e) {
             LOGGER.error("Error creating hardware: {}", hardware, e.getCause());
-            return Response.serverError().build();
+            return Response
+                    .serverError()
+                    .build();
         } catch (final Exception e) {
             LOGGER.error("Unexpected error creating hardware: {}", hardware, e);
-            return Response.serverError().build();
+            return Response
+                    .serverError()
+                    .build();
         }
     }
 
@@ -89,16 +97,19 @@ public class HardwareEndpoint {
                     .build();
         } catch (final FoldingException e) {
             LOGGER.error("Error getting all hardware", e.getCause());
-            return Response.serverError().build();
+            return Response
+                    .serverError()
+                    .build();
         } catch (final Exception e) {
             LOGGER.error("Unexpected error getting all hardware", e);
-            return Response.serverError().build();
+            return Response
+                    .serverError()
+                    .build();
         }
     }
 
     @GET
     @Path("/{hardwareId}")
-    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getHardwareById(@PathParam("hardwareId") final String hardwareId) {
         LOGGER.info("GET request for hardware received at '{}'", uriContext.getAbsolutePath());
@@ -110,21 +121,76 @@ public class HardwareEndpoint {
                     .entity(hardware)
                     .build();
         } catch (final NumberFormatException e) {
-            LOGGER.error("Hardware ID '{}' is not a valid number", hardwareId, e);
+            final String errorMessage = String.format("Hardware ID '%s' is invalid format", hardwareId);
+            final ErrorObject errorObject = new ErrorObject(errorMessage);
+
+            LOGGER.debug(errorMessage, e);
+            LOGGER.error(errorMessage);
             return Response
                     .status(Response.Status.BAD_REQUEST)
-                    .entity(GSON.toJson(String.format("Hardware ID '%s' is invalid format", hardwareId)))
+                    .entity(GSON.toJson(errorObject, ErrorObject.class))
                     .build();
         } catch (final NotFoundException e) {
             LOGGER.debug("No hardware found with ID: {}", hardwareId, e);
             LOGGER.error("No hardware found with ID: {}", hardwareId);
-            return Response.status(Response.Status.NOT_FOUND).build();
+            return Response
+                    .status(Response.Status.NOT_FOUND)
+                    .build();
         } catch (final FoldingException e) {
             LOGGER.error("Error getting hardware with ID: {}", hardwareId, e.getCause());
-            return Response.serverError().build();
+            return Response
+                    .serverError()
+                    .build();
         } catch (final Exception e) {
             LOGGER.error("Unexpected error getting hardware with ID: {}", hardwareId, e);
-            return Response.serverError().build();
+            return Response
+                    .serverError()
+                    .build();
+        }
+    }
+
+    @DELETE
+    @Path("/{hardwareId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteHardwareById(@PathParam("hardwareId") final String hardwareId) {
+        LOGGER.info("DELETE request for hardware received at '{}'", uriContext.getAbsolutePath());
+
+
+        try {
+            storageFacade.deleteHardware(Integer.parseInt(hardwareId));
+            return Response
+                    .noContent()
+                    .build();
+        } catch (final NumberFormatException e) {
+            final String errorMessage = String.format("Hardware ID '%s' is invalid format", hardwareId);
+            final ErrorObject errorObject = new ErrorObject(errorMessage);
+
+            LOGGER.debug(errorMessage, e);
+            LOGGER.error(errorMessage);
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity(GSON.toJson(errorObject, ErrorObject.class))
+                    .build();
+        } catch (final FoldingConflictException e) {
+            final String errorMessage = String.format("Hardware ID '%s' is in use, remove all usages before deleting", hardwareId);
+            final ErrorObject errorObject = new ErrorObject(errorMessage);
+
+            LOGGER.debug(errorMessage, e);
+            LOGGER.error(errorMessage);
+            return Response
+                    .status(Response.Status.CONFLICT)
+                    .entity(GSON.toJson(errorObject, ErrorObject.class))
+                    .build();
+        } catch (final FoldingException e) {
+            LOGGER.error("Error deleting hardware with ID: {}", hardwareId, e.getCause());
+            return Response
+                    .serverError()
+                    .build();
+        } catch (final Exception e) {
+            LOGGER.error("Unexpected error deleting hardware with ID: {}", hardwareId, e);
+            return Response
+                    .serverError()
+                    .build();
         }
     }
 }

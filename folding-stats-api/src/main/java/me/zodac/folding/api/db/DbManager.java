@@ -6,6 +6,7 @@ import me.zodac.folding.api.FoldingUser;
 import me.zodac.folding.api.Hardware;
 import me.zodac.folding.api.TeamStats;
 import me.zodac.folding.api.UserStats;
+import me.zodac.folding.api.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
 
@@ -17,6 +18,8 @@ import java.util.List;
  * Interface used to interact with the storage backend and perform CRUD operations.
  */
 public interface DbManager {
+
+    // CRUD operations
 
     /**
      * Creates a {@link Hardware} instance in the DB.
@@ -31,17 +34,25 @@ public interface DbManager {
 
     Hardware getHardware(final int hardwareId) throws FoldingException, NotFoundException;
 
+    void deleteHardware(final int hardwareId) throws FoldingException, FoldingConflictException;
+
     FoldingUser createFoldingUser(final FoldingUser foldingUser) throws FoldingException;
 
     List<FoldingUser> getAllFoldingUsers() throws FoldingException;
 
     FoldingUser getFoldingUser(final int foldingUserId) throws FoldingException, NotFoundException;
 
+    void deleteFoldingUser(final int foldingUserId) throws FoldingException, FoldingConflictException;
+
     FoldingTeam createFoldingTeam(final FoldingTeam foldingTeam) throws FoldingException;
 
     List<FoldingTeam> getAllFoldingTeams() throws FoldingException;
 
     FoldingTeam getFoldingTeam(final int foldingTeamId) throws FoldingException, NotFoundException;
+
+    void deleteFoldingTeam(final int foldingTeamId) throws FoldingException, FoldingConflictException;
+
+    // TC operations
 
     UserStats getFirstPointsForUserInMonth(final FoldingUser foldingUser, final Month month, final Year year) throws FoldingException, NotFoundException;
 
@@ -57,4 +68,6 @@ public interface DbManager {
 
     // TODO: [zodac] To be removed
     boolean doTcStatsExist() throws FoldingException;
+
+
 }

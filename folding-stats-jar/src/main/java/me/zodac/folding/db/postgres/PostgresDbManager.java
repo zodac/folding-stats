@@ -8,6 +8,7 @@ import me.zodac.folding.api.TeamStats;
 import me.zodac.folding.api.UserStats;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.db.OrderBy;
+import me.zodac.folding.api.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.util.EnvironmentVariable;
@@ -34,6 +35,7 @@ public class PostgresDbManager implements DbManager {
 
     private static final String JDBC_CONNECTION_URL = EnvironmentVariable.get("JDBC_CONNECTION_URL");
     private static final Properties JDBC_CONNECTION_PROPERTIES = new Properties();
+    private static final String VIOLATES_FOREIGN_KEY_CONSTRAINT = "violates foreign key constraint";
 
     static {
         JDBC_CONNECTION_PROPERTIES.setProperty("user", EnvironmentVariable.get("JDBC_CONNECTION_USER"));
@@ -107,6 +109,24 @@ public class PostgresDbManager implements DbManager {
 
             throw new NotFoundException();
         } catch (final SQLException e) {
+            throw new FoldingException("Error opening connection to the DB", e);
+        }
+    }
+
+    @Override
+    public void deleteHardware(final int hardwareId) throws FoldingException, FoldingConflictException {
+        final String deleteSqlStatement = "DELETE FROM hardware WHERE hardware_id = ?;";
+        LOGGER.debug("Executing SQL statement '{}'", deleteSqlStatement);
+
+        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+             final PreparedStatement preparedStatement = connection.prepareStatement(deleteSqlStatement)) {
+
+            preparedStatement.setInt(1, hardwareId);
+            preparedStatement.executeUpdate();
+        } catch (final SQLException e) {
+            if (e.getMessage().contains(VIOLATES_FOREIGN_KEY_CONSTRAINT)) {
+                throw new FoldingConflictException();
+            }
             throw new FoldingException("Error opening connection to the DB", e);
         }
     }
@@ -186,10 +206,26 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
+    public void deleteFoldingUser(final int foldingUserId) throws FoldingException, FoldingConflictException {
+        final String deleteSqlStatement = "DELETE FROM folding_user WHERE user_id = ?;";
+        LOGGER.debug("Executing SQL statement '{}'", deleteSqlStatement);
+
+        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+             final PreparedStatement preparedStatement = connection.prepareStatement(deleteSqlStatement)) {
+
+            preparedStatement.setInt(1, foldingUserId);
+            preparedStatement.executeUpdate();
+        } catch (final SQLException e) {
+            if (e.getMessage().contains(VIOLATES_FOREIGN_KEY_CONSTRAINT)) {
+                throw new FoldingConflictException();
+            }
+            throw new FoldingException("Error opening connection to the DB", e);
+        }
+    }
+
+    @Override
     public FoldingTeam createFoldingTeam(final FoldingTeam foldingTeam) throws FoldingException {
         final String insertSqlWithReturnId = "INSERT INTO folding_teams (team_name, team_description, captain_user_id, user_ids) VALUES (?, ?, ?, ?) RETURNING team_id;";
-//                foldingTeam.getTeamName(), foldingTeam.getTeamDescription(), foldingTeam.getCaptainUserId(),
-//                foldingTeam.getUserIds().stream().map(String::valueOf).collect(joining(", ")));
         LOGGER.debug("Executing SQL statement '{}'", insertSqlWithReturnId);
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
@@ -256,6 +292,24 @@ public class PostgresDbManager implements DbManager {
                 throw new NotFoundException();
             }
         } catch (final SQLException e) {
+            throw new FoldingException("Error opening connection to the DB", e);
+        }
+    }
+
+    @Override
+    public void deleteFoldingTeam(final int foldingTeamId) throws FoldingException, FoldingConflictException {
+        final String deleteSqlStatement = "DELETE FROM folding_teams WHERE team_id = ?;";
+        LOGGER.debug("Executing SQL statement '{}'", deleteSqlStatement);
+
+        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+             final PreparedStatement preparedStatement = connection.prepareStatement(deleteSqlStatement)) {
+
+            preparedStatement.setInt(1, foldingTeamId);
+            preparedStatement.executeUpdate();
+        } catch (final SQLException e) {
+            if (e.getMessage().contains(VIOLATES_FOREIGN_KEY_CONSTRAINT)) {
+                throw new FoldingConflictException();
+            }
             throw new FoldingException("Error opening connection to the DB", e);
         }
     }
@@ -388,7 +442,7 @@ public class PostgresDbManager implements DbManager {
         LOGGER.debug("Getting current points in month/year {}/{} for user {}", month, year, foldingUser);
         return getPointsForUserInMonth(foldingUser, month, year, OrderBy.DESCENDING);
     }
-    
+
     public UserStats getPointsForUserInMonth(final FoldingUser foldingUser, final Month month, final Year year, final OrderBy orderBy) throws
             FoldingException, NotFoundException {
         final String selectSqlStatement = String.format(

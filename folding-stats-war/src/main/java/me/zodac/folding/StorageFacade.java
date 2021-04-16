@@ -7,6 +7,7 @@ import me.zodac.folding.api.Hardware;
 import me.zodac.folding.api.TeamStats;
 import me.zodac.folding.api.UserStats;
 import me.zodac.folding.api.db.DbManager;
+import me.zodac.folding.api.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.cache.FoldingTeamCache;
@@ -78,6 +79,11 @@ public class StorageFacade {
         return allHardwareFromDb;
     }
 
+    public void deleteHardware(final int hardwareId) throws FoldingException, FoldingConflictException {
+        hardwareCache.remove(hardwareId);
+        dbManager.deleteHardware(hardwareId);
+    }
+
     public FoldingUser createFoldingUser(final FoldingUser foldingUser) throws FoldingException {
         final FoldingUser foldingUserWithId = dbManager.createFoldingUser(foldingUser);
         foldingUserCache.add(foldingUserWithId);
@@ -118,6 +124,11 @@ public class StorageFacade {
         return allFoldingUsersFromDb;
     }
 
+    public void deleteFoldingUser(final int foldingUserId) throws FoldingException, FoldingConflictException {
+        hardwareCache.remove(foldingUserId);
+        dbManager.deleteFoldingUser(foldingUserId);
+    }
+
     public FoldingTeam createFoldingTeam(final FoldingTeam foldingTeam) throws FoldingException {
         final FoldingTeam foldingTeamWithId = dbManager.createFoldingTeam(foldingTeam);
         foldingTeamCache.add(foldingTeamWithId);
@@ -151,6 +162,11 @@ public class StorageFacade {
         final List<FoldingTeam> allFoldingTeamsFromDb = dbManager.getAllFoldingTeams();
         foldingTeamCache.addAll(allFoldingTeamsFromDb);
         return allFoldingTeamsFromDb;
+    }
+
+    public void deleteFoldingTeam(final int foldingTeamId) throws FoldingException, FoldingConflictException {
+        hardwareCache.remove(foldingTeamId);
+        dbManager.deleteFoldingTeam(foldingTeamId);
     }
 
     public List<FoldingTeam> getTcTeams() {

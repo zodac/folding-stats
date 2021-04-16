@@ -1,8 +1,10 @@
 package me.zodac.folding.rest;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.FoldingTeam;
+import me.zodac.folding.api.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.validator.FoldingTeamValidator;
@@ -13,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import javax.ejb.EJB;
 import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -28,15 +31,13 @@ import java.util.List;
 /**
  * REST endpoints for teams for <code>folding-stats</code>.
  */
-// TODO: [zodac] Add a DELETE and PUT endpoint
-//   Update caches on team change
-//   Explicit endpoints to add/remove/replace a single user in a team
+// TODO: [zodac] Add a PUT/PATCH endpoint
 @Path("/teams/")
 @RequestScoped
 public class TeamEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TeamEndpoint.class);
-    private static final Gson GSON = new Gson();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     @EJB
     private StorageFacade storageFacade;
@@ -61,7 +62,8 @@ public class TeamEndpoint {
         try {
             final FoldingTeam foldingTeamWithId = storageFacade.createFoldingTeam(foldingTeam);
 
-            final UriBuilder builder = uriContext.getRequestUriBuilder()
+            final UriBuilder builder = uriContext
+                    .getRequestUriBuilder()
                     .path(String.valueOf(foldingTeamWithId.getId()));
             return Response
                     .created(builder.build())
@@ -69,10 +71,14 @@ public class TeamEndpoint {
                     .build();
         } catch (final FoldingException e) {
             LOGGER.error("Error creating Folding team: {}", foldingTeam, e.getCause());
-            return Response.serverError().build();
+            return Response
+                    .serverError()
+                    .build();
         } catch (final Exception e) {
             LOGGER.error("Unexpected error creating Folding team: {}", foldingTeam, e);
-            return Response.serverError().build();
+            return Response
+                    .serverError()
+                    .build();
         }
     }
 
@@ -90,16 +96,19 @@ public class TeamEndpoint {
                     .build();
         } catch (final FoldingException e) {
             LOGGER.error("Error getting all Folding teams", e.getCause());
-            return Response.serverError().build();
+            return Response
+                    .serverError()
+                    .build();
         } catch (final Exception e) {
             LOGGER.error("Unexpected error getting all Folding teams", e);
-            return Response.serverError().build();
+            return Response
+                    .serverError()
+                    .build();
         }
     }
 
     @GET
     @Path("/{foldingTeamId}")
-    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getFoldingTeamById(@PathParam("foldingTeamId") final String foldingTeamId) {
         LOGGER.info("GET request for Folding team received at '{}'", uriContext.getAbsolutePath());
@@ -111,21 +120,75 @@ public class TeamEndpoint {
                     .entity(foldingTeam)
                     .build();
         } catch (final NumberFormatException e) {
-            LOGGER.error("Folding team ID '{}' is not a valid number", foldingTeamId, e);
+            final String errorMessage = String.format("Folding team ID '%s' is invalid format", foldingTeamId);
+            final ErrorObject errorObject = new ErrorObject(errorMessage);
+
+            LOGGER.debug(errorMessage, e);
+            LOGGER.error(errorMessage);
             return Response
                     .status(Response.Status.BAD_REQUEST)
-                    .entity(GSON.toJson(String.format("Folding team ID '%s' is invalid format", foldingTeamId)))
+                    .entity(GSON.toJson(errorObject, ErrorObject.class))
                     .build();
         } catch (final NotFoundException e) {
             LOGGER.debug("No Folding team found with ID: {}", foldingTeamId, e);
             LOGGER.error("No Folding team found with ID: {}", foldingTeamId);
-            return Response.status(Response.Status.NOT_FOUND).build();
+            return Response
+                    .status(Response.Status.NOT_FOUND)
+                    .build();
         } catch (final FoldingException e) {
             LOGGER.error("Error getting Folding team with ID: {}", foldingTeamId, e.getCause());
-            return Response.serverError().build();
+            return Response
+                    .serverError()
+                    .build();
         } catch (final Exception e) {
             LOGGER.error("Unexpected error getting Folding team with ID: {}", foldingTeamId, e);
-            return Response.serverError().build();
+            return Response
+                    .serverError()
+                    .build();
+        }
+    }
+
+    @DELETE
+    @Path("/{foldingTeamId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteFoldingTeamById(@PathParam("foldingTeamId") final String foldingTeamId) {
+        LOGGER.info("DELETE request for Folding team received at '{}'", uriContext.getAbsolutePath());
+
+        try {
+            storageFacade.deleteFoldingTeam(Integer.parseInt(foldingTeamId));
+            return Response
+                    .noContent()
+                    .build();
+        } catch (final NumberFormatException e) {
+            final String errorMessage = String.format("Folding team ID '%s' is invalid format", foldingTeamId);
+            final ErrorObject errorObject = new ErrorObject(errorMessage);
+
+            LOGGER.debug(errorMessage, e);
+            LOGGER.error(errorMessage);
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity(GSON.toJson(errorObject, ErrorObject.class))
+                    .build();
+        } catch (final FoldingConflictException e) {
+            final String errorMessage = String.format("Folding team ID '%s' is in use, remove all usages before deleting", foldingTeamId);
+            final ErrorObject errorObject = new ErrorObject(errorMessage);
+
+            LOGGER.debug(errorMessage, e);
+            LOGGER.error(errorMessage);
+            return Response
+                    .status(Response.Status.CONFLICT)
+                    .entity(GSON.toJson(errorObject, ErrorObject.class))
+                    .build();
+        } catch (final FoldingException e) {
+            LOGGER.error("Error deleting Folding team with ID: {}", foldingTeamId, e.getCause());
+            return Response
+                    .serverError()
+                    .build();
+        } catch (final Exception e) {
+            LOGGER.error("Unexpected error deleting Folding team with ID: {}", foldingTeamId, e);
+            return Response
+                    .serverError()
+                    .build();
         }
     }
 }

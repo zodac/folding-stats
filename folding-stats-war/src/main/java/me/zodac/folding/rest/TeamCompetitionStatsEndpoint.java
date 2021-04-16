@@ -1,6 +1,7 @@
 package me.zodac.folding.rest;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.Category;
 import me.zodac.folding.api.FoldingTeam;
@@ -37,7 +38,7 @@ import static java.util.stream.Collectors.toList;
 public class TeamCompetitionStatsEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TeamCompetitionStatsEndpoint.class);
-    private static final Gson GSON = new Gson();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     private final TcStatsCache tcStatsCache = TcStatsCache.get();
 
@@ -50,7 +51,7 @@ public class TeamCompetitionStatsEndpoint {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTeamCompetitionStats() {
-        LOGGER.info("GET request received to show TC stats at '{}'", this.uriContext.getAbsolutePath());
+        LOGGER.info("GET request received to show TC stats at '{}'", uriContext.getAbsolutePath());
 
         try {
             final List<TcTeam> tcTeams = getTeams();
