@@ -1,7 +1,5 @@
 package me.zodac.folding.rest;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.Hardware;
 import me.zodac.folding.api.exception.FoldingConflictException;
@@ -21,11 +19,8 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
 import java.util.List;
 
 /**
@@ -35,162 +30,72 @@ import java.util.List;
 //   Add GET query endpoint to retrieve all hardware instances with same name
 @Path("/hardware/")
 @RequestScoped
-public class HardwareEndpoint {
+public class HardwareEndpoint extends AbstractIdentifiableCrudEndpoint<Hardware> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HardwareEndpoint.class);
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     @EJB
     private StorageFacade storageFacade;
-
-    @Context
-    private UriInfo uriContext;
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createHardware(final Hardware hardware) {
-        LOGGER.info("POST request received to create hardware at '{}' with request: {}", uriContext.getAbsolutePath(), hardware);
-
-        final ValidationResponse validationResponse = HardwareValidator.isValid(hardware);
-        if (!validationResponse.isValid()) {
-            return Response
-                    .status(Response.Status.BAD_REQUEST)
-                    .entity(GSON.toJson(validationResponse))
-                    .build();
-        }
-
-        try {
-            final Hardware hardwareWithId = storageFacade.createHardware(hardware);
-
-            final UriBuilder builder = uriContext
-                    .getRequestUriBuilder()
-                    .path(String.valueOf(hardwareWithId.getId()));
-            return Response
-                    .created(builder.build())
-                    .entity(GSON.toJson(hardwareWithId))
-                    .build();
-        } catch (final FoldingException e) {
-            LOGGER.error("Error creating hardware: {}", hardware, e.getCause());
-            return Response
-                    .serverError()
-                    .build();
-        } catch (final Exception e) {
-            LOGGER.error("Unexpected error creating hardware: {}", hardware, e);
-            return Response
-                    .serverError()
-                    .build();
-        }
+        return super.create(hardware);
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllHardware() {
-        LOGGER.info("GET request received for all hardware at '{}'", uriContext.getAbsolutePath());
-
-        try {
-            final List<Hardware> hardware = storageFacade.getAllHardware();
-            LOGGER.info("Found {} hardware", hardware.size());
-            return Response
-                    .ok()
-                    .entity(GSON.toJson(hardware))
-                    .build();
-        } catch (final FoldingException e) {
-            LOGGER.error("Error getting all hardware", e.getCause());
-            return Response
-                    .serverError()
-                    .build();
-        } catch (final Exception e) {
-            LOGGER.error("Unexpected error getting all hardware", e);
-            return Response
-                    .serverError()
-                    .build();
-        }
+        return super.getAll();
     }
 
     @GET
     @Path("/{hardwareId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getHardwareById(@PathParam("hardwareId") final String hardwareId) {
-        LOGGER.info("GET request for hardware received at '{}'", uriContext.getAbsolutePath());
-
-        try {
-            final Hardware hardware = storageFacade.getHardware(Integer.parseInt(hardwareId));
-            return Response
-                    .ok()
-                    .entity(hardware)
-                    .build();
-        } catch (final NumberFormatException e) {
-            final String errorMessage = String.format("Hardware ID '%s' is invalid format", hardwareId);
-            final ErrorObject errorObject = new ErrorObject(errorMessage);
-
-            LOGGER.debug(errorMessage, e);
-            LOGGER.error(errorMessage);
-            return Response
-                    .status(Response.Status.BAD_REQUEST)
-                    .entity(GSON.toJson(errorObject, ErrorObject.class))
-                    .build();
-        } catch (final NotFoundException e) {
-            LOGGER.debug("No hardware found with ID: {}", hardwareId, e);
-            LOGGER.error("No hardware found with ID: {}", hardwareId);
-            return Response
-                    .status(Response.Status.NOT_FOUND)
-                    .build();
-        } catch (final FoldingException e) {
-            LOGGER.error("Error getting hardware with ID: {}", hardwareId, e.getCause());
-            return Response
-                    .serverError()
-                    .build();
-        } catch (final Exception e) {
-            LOGGER.error("Unexpected error getting hardware with ID: {}", hardwareId, e);
-            return Response
-                    .serverError()
-                    .build();
-        }
+        return super.getById(hardwareId);
     }
 
     @DELETE
     @Path("/{hardwareId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteHardwareById(@PathParam("hardwareId") final String hardwareId) {
-        LOGGER.info("DELETE request for hardware received at '{}'", uriContext.getAbsolutePath());
+        return super.deleteById(hardwareId);
+    }
 
+    @Override
+    protected Logger getLogger() {
+        return LOGGER;
+    }
 
-        try {
-            storageFacade.deleteHardware(Integer.parseInt(hardwareId));
-            return Response
-                    .noContent()
-                    .build();
-        } catch (final NumberFormatException e) {
-            final String errorMessage = String.format("Hardware ID '%s' is invalid format", hardwareId);
-            final ErrorObject errorObject = new ErrorObject(errorMessage);
+    @Override
+    protected String elementType() {
+        return "hardware";
+    }
 
-            LOGGER.debug(errorMessage, e);
-            LOGGER.error(errorMessage);
-            return Response
-                    .status(Response.Status.BAD_REQUEST)
-                    .entity(GSON.toJson(errorObject, ErrorObject.class))
-                    .build();
-        } catch (final FoldingConflictException e) {
-            final String errorMessage = String.format("Hardware ID '%s' is in use, remove all usages before deleting", hardwareId);
-            final ErrorObject errorObject = new ErrorObject(errorMessage);
+    @Override
+    protected ValidationResponse validate(final Hardware element) {
+        return HardwareValidator.isValid(element);
+    }
 
-            LOGGER.debug(errorMessage, e);
-            LOGGER.error(errorMessage);
-            return Response
-                    .status(Response.Status.CONFLICT)
-                    .entity(GSON.toJson(errorObject, ErrorObject.class))
-                    .build();
-        } catch (final FoldingException e) {
-            LOGGER.error("Error deleting hardware with ID: {}", hardwareId, e.getCause());
-            return Response
-                    .serverError()
-                    .build();
-        } catch (final Exception e) {
-            LOGGER.error("Unexpected error deleting hardware with ID: {}", hardwareId, e);
-            return Response
-                    .serverError()
-                    .build();
-        }
+    @Override
+    protected Hardware createElement(final Hardware element) throws FoldingException {
+        return storageFacade.createHardware(element);
+    }
+
+    @Override
+    protected List<Hardware> getAllElements() throws FoldingException {
+        return storageFacade.getAllHardware();
+    }
+
+    @Override
+    protected Hardware getElementById(final int elementId) throws FoldingException, NotFoundException {
+        return storageFacade.getHardware(elementId);
+    }
+
+    @Override
+    protected void deleteElementById(final int elementId) throws FoldingConflictException, FoldingException {
+        storageFacade.deleteHardware(elementId);
     }
 }

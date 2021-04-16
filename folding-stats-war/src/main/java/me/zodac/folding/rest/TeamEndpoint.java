@@ -1,7 +1,5 @@
 package me.zodac.folding.rest;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.FoldingTeam;
 import me.zodac.folding.api.exception.FoldingConflictException;
@@ -21,11 +19,8 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
 import java.util.List;
 
 /**
@@ -34,161 +29,72 @@ import java.util.List;
 // TODO: [zodac] Add a PUT/PATCH endpoint
 @Path("/teams/")
 @RequestScoped
-public class TeamEndpoint {
+public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<FoldingTeam> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TeamEndpoint.class);
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    private static final Logger LOGGER = LoggerFactory.getLogger(HardwareEndpoint.class);
 
     @EJB
     private StorageFacade storageFacade;
 
-    @Context
-    private UriInfo uriContext;
-
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createTeam(final FoldingTeam foldingTeam) {
-        LOGGER.info("POST request received to create Folding team at '{}' with request: {}", uriContext.getAbsolutePath(), foldingTeam);
-
-        final ValidationResponse validationResponse = FoldingTeamValidator.isValid(foldingTeam);
-        if (!validationResponse.isValid()) {
-            return Response
-                    .status(Response.Status.BAD_REQUEST)
-                    .entity(GSON.toJson(validationResponse))
-                    .build();
-        }
-
-        try {
-            final FoldingTeam foldingTeamWithId = storageFacade.createFoldingTeam(foldingTeam);
-
-            final UriBuilder builder = uriContext
-                    .getRequestUriBuilder()
-                    .path(String.valueOf(foldingTeamWithId.getId()));
-            return Response
-                    .created(builder.build())
-                    .entity(GSON.toJson(foldingTeamWithId))
-                    .build();
-        } catch (final FoldingException e) {
-            LOGGER.error("Error creating Folding team: {}", foldingTeam, e.getCause());
-            return Response
-                    .serverError()
-                    .build();
-        } catch (final Exception e) {
-            LOGGER.error("Unexpected error creating Folding team: {}", foldingTeam, e);
-            return Response
-                    .serverError()
-                    .build();
-        }
+    public Response createFoldingTeam(final FoldingTeam foldingTeam) {
+        return super.create(foldingTeam);
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllFoldingTeams() {
-        LOGGER.info("GET request received for all Folding teams at '{}'", uriContext.getAbsolutePath());
-
-        try {
-            final List<FoldingTeam> foldingTeams = storageFacade.getAllFoldingTeams();
-            LOGGER.info("Found {} Folding teams", foldingTeams.size());
-            return Response
-                    .ok()
-                    .entity(GSON.toJson(foldingTeams))
-                    .build();
-        } catch (final FoldingException e) {
-            LOGGER.error("Error getting all Folding teams", e.getCause());
-            return Response
-                    .serverError()
-                    .build();
-        } catch (final Exception e) {
-            LOGGER.error("Unexpected error getting all Folding teams", e);
-            return Response
-                    .serverError()
-                    .build();
-        }
+        return super.getAll();
     }
 
     @GET
     @Path("/{foldingTeamId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getFoldingTeamById(@PathParam("foldingTeamId") final String foldingTeamId) {
-        LOGGER.info("GET request for Folding team received at '{}'", uriContext.getAbsolutePath());
-
-        try {
-            final FoldingTeam foldingTeam = storageFacade.getFoldingTeam(Integer.parseInt(foldingTeamId));
-            return Response
-                    .ok()
-                    .entity(foldingTeam)
-                    .build();
-        } catch (final NumberFormatException e) {
-            final String errorMessage = String.format("Folding team ID '%s' is invalid format", foldingTeamId);
-            final ErrorObject errorObject = new ErrorObject(errorMessage);
-
-            LOGGER.debug(errorMessage, e);
-            LOGGER.error(errorMessage);
-            return Response
-                    .status(Response.Status.BAD_REQUEST)
-                    .entity(GSON.toJson(errorObject, ErrorObject.class))
-                    .build();
-        } catch (final NotFoundException e) {
-            LOGGER.debug("No Folding team found with ID: {}", foldingTeamId, e);
-            LOGGER.error("No Folding team found with ID: {}", foldingTeamId);
-            return Response
-                    .status(Response.Status.NOT_FOUND)
-                    .build();
-        } catch (final FoldingException e) {
-            LOGGER.error("Error getting Folding team with ID: {}", foldingTeamId, e.getCause());
-            return Response
-                    .serverError()
-                    .build();
-        } catch (final Exception e) {
-            LOGGER.error("Unexpected error getting Folding team with ID: {}", foldingTeamId, e);
-            return Response
-                    .serverError()
-                    .build();
-        }
+        return super.getById(foldingTeamId);
     }
 
     @DELETE
     @Path("/{foldingTeamId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteFoldingTeamById(@PathParam("foldingTeamId") final String foldingTeamId) {
-        LOGGER.info("DELETE request for Folding team received at '{}'", uriContext.getAbsolutePath());
+        return super.deleteById(foldingTeamId);
+    }
 
-        try {
-            storageFacade.deleteFoldingTeam(Integer.parseInt(foldingTeamId));
-            return Response
-                    .noContent()
-                    .build();
-        } catch (final NumberFormatException e) {
-            final String errorMessage = String.format("Folding team ID '%s' is invalid format", foldingTeamId);
-            final ErrorObject errorObject = new ErrorObject(errorMessage);
+    @Override
+    protected Logger getLogger() {
+        return LOGGER;
+    }
 
-            LOGGER.debug(errorMessage, e);
-            LOGGER.error(errorMessage);
-            return Response
-                    .status(Response.Status.BAD_REQUEST)
-                    .entity(GSON.toJson(errorObject, ErrorObject.class))
-                    .build();
-        } catch (final FoldingConflictException e) {
-            final String errorMessage = String.format("Folding team ID '%s' is in use, remove all usages before deleting", foldingTeamId);
-            final ErrorObject errorObject = new ErrorObject(errorMessage);
+    @Override
+    protected String elementType() {
+        return "Folding team";
+    }
 
-            LOGGER.debug(errorMessage, e);
-            LOGGER.error(errorMessage);
-            return Response
-                    .status(Response.Status.CONFLICT)
-                    .entity(GSON.toJson(errorObject, ErrorObject.class))
-                    .build();
-        } catch (final FoldingException e) {
-            LOGGER.error("Error deleting Folding team with ID: {}", foldingTeamId, e.getCause());
-            return Response
-                    .serverError()
-                    .build();
-        } catch (final Exception e) {
-            LOGGER.error("Unexpected error deleting Folding team with ID: {}", foldingTeamId, e);
-            return Response
-                    .serverError()
-                    .build();
-        }
+    @Override
+    protected ValidationResponse validate(final FoldingTeam element) {
+        return FoldingTeamValidator.isValid(element);
+    }
+
+    @Override
+    protected FoldingTeam createElement(final FoldingTeam element) throws FoldingException {
+        return storageFacade.createFoldingTeam(element);
+    }
+
+    @Override
+    protected List<FoldingTeam> getAllElements() throws FoldingException {
+        return storageFacade.getAllFoldingTeams();
+    }
+
+    @Override
+    protected FoldingTeam getElementById(final int elementId) throws FoldingException, NotFoundException {
+        return storageFacade.getFoldingTeam(elementId);
+    }
+
+    @Override
+    protected void deleteElementById(final int elementId) throws FoldingConflictException, FoldingException {
+        storageFacade.deleteFoldingTeam(elementId);
     }
 }
