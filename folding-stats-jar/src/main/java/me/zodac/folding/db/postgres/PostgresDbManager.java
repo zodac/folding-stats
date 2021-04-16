@@ -388,8 +388,7 @@ public class PostgresDbManager implements DbManager {
         LOGGER.debug("Getting current points in month/year {}/{} for user {}", month, year, foldingUser);
         return getPointsForUserInMonth(foldingUser, month, year, OrderBy.DESCENDING);
     }
-
-
+    
     public UserStats getPointsForUserInMonth(final FoldingUser foldingUser, final Month month, final Year year, final OrderBy orderBy) throws
             FoldingException, NotFoundException {
         final String selectSqlStatement = String.format(

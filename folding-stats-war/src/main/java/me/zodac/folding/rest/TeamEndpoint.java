@@ -48,7 +48,7 @@ public class TeamEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createTeam(final FoldingTeam foldingTeam) {
-        LOGGER.info("POST request received to create Folding team at '{}' with request: {}", this.uriContext.getAbsolutePath(), foldingTeam);
+        LOGGER.info("POST request received to create Folding team at '{}' with request: {}", uriContext.getAbsolutePath(), foldingTeam);
 
         final ValidationResponse validationResponse = FoldingTeamValidator.isValid(foldingTeam);
         if (!validationResponse.isValid()) {
@@ -63,7 +63,10 @@ public class TeamEndpoint {
 
             final UriBuilder builder = uriContext.getRequestUriBuilder()
                     .path(String.valueOf(foldingTeamWithId.getId()));
-            return Response.created(builder.build()).build();
+            return Response
+                    .created(builder.build())
+                    .entity(GSON.toJson(foldingTeamWithId))
+                    .build();
         } catch (final FoldingException e) {
             LOGGER.error("Error creating Folding team: {}", foldingTeam, e.getCause());
             return Response.serverError().build();
@@ -76,7 +79,7 @@ public class TeamEndpoint {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllFoldingTeams() {
-        LOGGER.info("GET request received for all Folding teams at '{}'", this.uriContext.getAbsolutePath());
+        LOGGER.info("GET request received for all Folding teams at '{}'", uriContext.getAbsolutePath());
 
         try {
             final List<FoldingTeam> foldingTeams = storageFacade.getAllFoldingTeams();
@@ -99,7 +102,7 @@ public class TeamEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getFoldingTeamById(@PathParam("foldingTeamId") final String foldingTeamId) {
-        LOGGER.info("GET request for Folding team received at '{}'", this.uriContext.getAbsolutePath());
+        LOGGER.info("GET request for Folding team received at '{}'", uriContext.getAbsolutePath());
 
         try {
             final FoldingTeam foldingTeam = storageFacade.getFoldingTeam(Integer.parseInt(foldingTeamId));

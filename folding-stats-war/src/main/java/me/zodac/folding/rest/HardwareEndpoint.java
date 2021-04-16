@@ -47,7 +47,7 @@ public class HardwareEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createHardware(final Hardware hardware) {
-        LOGGER.info("POST request received to create hardware at '{}' with request: {}", this.uriContext.getAbsolutePath(), hardware);
+        LOGGER.info("POST request received to create hardware at '{}' with request: {}", uriContext.getAbsolutePath(), hardware);
 
         final ValidationResponse validationResponse = HardwareValidator.isValid(hardware);
         if (!validationResponse.isValid()) {
@@ -62,7 +62,10 @@ public class HardwareEndpoint {
 
             final UriBuilder builder = uriContext.getRequestUriBuilder()
                     .path(String.valueOf(hardwareWithId.getId()));
-            return Response.created(builder.build()).build();
+            return Response
+                    .created(builder.build())
+                    .entity(GSON.toJson(hardwareWithId))
+                    .build();
         } catch (final FoldingException e) {
             LOGGER.error("Error creating hardware: {}", hardware, e.getCause());
             return Response.serverError().build();
@@ -75,7 +78,7 @@ public class HardwareEndpoint {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllHardware() {
-        LOGGER.info("GET request received for all hardware at '{}'", this.uriContext.getAbsolutePath());
+        LOGGER.info("GET request received for all hardware at '{}'", uriContext.getAbsolutePath());
 
         try {
             final List<Hardware> hardware = storageFacade.getAllHardware();
@@ -98,7 +101,7 @@ public class HardwareEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getHardwareById(@PathParam("hardwareId") final String hardwareId) {
-        LOGGER.info("GET request for hardware received at '{}'", this.uriContext.getAbsolutePath());
+        LOGGER.info("GET request for hardware received at '{}'", uriContext.getAbsolutePath());
 
         try {
             final Hardware hardware = storageFacade.getHardware(Integer.parseInt(hardwareId));

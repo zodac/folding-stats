@@ -47,7 +47,7 @@ public class UserEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createFoldingUser(final FoldingUser foldingUser) {
-        LOGGER.info("POST request received to create Folding user at '{}' with request: {}", this.uriContext.getAbsolutePath(), foldingUser);
+        LOGGER.info("POST request received to create Folding user at '{}' with request: {}", uriContext.getAbsolutePath(), foldingUser);
 
         final ValidationResponse validationResponse = FoldingUserValidator.isValid(foldingUser);
         if (!validationResponse.isValid()) {
@@ -62,7 +62,10 @@ public class UserEndpoint {
 
             final UriBuilder builder = uriContext.getRequestUriBuilder()
                     .path(String.valueOf(foldingUserWithId.getId()));
-            return Response.created(builder.build()).build();
+            return Response
+                    .created(builder.build())
+                    .entity(GSON.toJson(foldingUserWithId))
+                    .build();
         } catch (final FoldingException e) {
             LOGGER.error("Error creating Folding user: {}", foldingUser, e.getCause());
             return Response.serverError().build();
@@ -76,7 +79,7 @@ public class UserEndpoint {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllFoldingUsers() {
-        LOGGER.info("GET request received for all Folding users at '{}'", this.uriContext.getAbsolutePath());
+        LOGGER.info("GET request received for all Folding users at '{}'", uriContext.getAbsolutePath());
 
         try {
             final List<FoldingUser> foldingUsers = storageFacade.getAllFoldingUsers();
@@ -99,7 +102,7 @@ public class UserEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getFoldingUserById(@PathParam("foldingUserId") final String foldingUserId) {
-        LOGGER.info("GET request for Folding user received at '{}'", this.uriContext.getAbsolutePath());
+        LOGGER.info("GET request for Folding user received at '{}'", uriContext.getAbsolutePath());
 
         try {
             final FoldingUser foldingUser = storageFacade.getFoldingUser(Integer.parseInt(foldingUserId));
