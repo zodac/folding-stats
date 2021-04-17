@@ -20,9 +20,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ejb.Singleton;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.Year;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static java.util.stream.Collectors.toList;
@@ -236,5 +240,9 @@ public class StorageFacade {
         } catch (final Exception e) {
             LOGGER.error("Unexpected error persisting monthly team TC stats", e);
         }
+    }
+
+    public Map<LocalDate, UserStats> getDailyUserStats(final int foldingUserId, final Month month, final Year year) throws NotFoundException, FoldingException {
+        return dbManager.getDailyUserStats(foldingUserId, month, year);
     }
 }

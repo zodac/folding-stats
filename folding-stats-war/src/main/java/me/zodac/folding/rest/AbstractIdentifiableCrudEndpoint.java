@@ -107,13 +107,12 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
                     .build();
         } catch (final NumberFormatException e) {
             final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), elementId);
-            final ErrorObject errorObject = new ErrorObject(errorMessage);
 
             getLogger().debug(errorMessage, e);
             getLogger().error(errorMessage);
             return Response
                     .status(Response.Status.BAD_REQUEST)
-                    .entity(GSON.toJson(errorObject, ErrorObject.class))
+                    .entity(GSON.toJson(new ErrorObject(errorMessage), ErrorObject.class))
                     .build();
         } catch (final NotFoundException e) {
             getLogger().debug("No {} found with ID: {}", elementType(), elementId, e);
@@ -150,12 +149,11 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
             // If no ID is provided, the POJO will default to a value of 0, which is acceptable
             if (Integer.parseInt(elementId) != element.getId() && element.getId() != 0) {
                 final String errorMessage = String.format("Path ID '%s' does not match ID '%s' of payload", elementId, element.getId());
-                final ErrorObject errorObject = new ErrorObject(errorMessage);
 
                 getLogger().error(errorMessage);
                 return Response
                         .status(Response.Status.BAD_REQUEST)
-                        .entity(GSON.toJson(errorObject, ErrorObject.class))
+                        .entity(GSON.toJson(new ErrorObject(errorMessage), ErrorObject.class))
                         .build();
             }
 
@@ -179,13 +177,12 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
                     .build();
         } catch (final NumberFormatException e) {
             final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), elementId);
-            final ErrorObject errorObject = new ErrorObject(errorMessage);
 
             getLogger().debug(errorMessage, e);
             getLogger().error(errorMessage);
             return Response
                     .status(Response.Status.BAD_REQUEST)
-                    .entity(GSON.toJson(errorObject, ErrorObject.class))
+                    .entity(GSON.toJson(new ErrorObject(errorMessage), ErrorObject.class))
                     .build();
         } catch (final NotFoundException e) {
             getLogger().debug("No {} found with ID: {}", elementType(), elementId, e);
@@ -216,23 +213,21 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
                     .build();
         } catch (final NumberFormatException e) {
             final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), elementId);
-            final ErrorObject errorObject = new ErrorObject(errorMessage);
 
             getLogger().debug(errorMessage, e);
             getLogger().error(errorMessage);
             return Response
                     .status(Response.Status.BAD_REQUEST)
-                    .entity(GSON.toJson(errorObject, ErrorObject.class))
+                    .entity(GSON.toJson(new ErrorObject(errorMessage), ErrorObject.class))
                     .build();
         } catch (final FoldingConflictException e) {
             final String errorMessage = String.format("The %s ID '%s' is in use, remove all usages before deleting", elementType(), elementId);
-            final ErrorObject errorObject = new ErrorObject(errorMessage);
 
             getLogger().debug(errorMessage, e);
             getLogger().error(errorMessage);
             return Response
                     .status(Response.Status.CONFLICT)
-                    .entity(GSON.toJson(errorObject, ErrorObject.class))
+                    .entity(GSON.toJson(new ErrorObject(errorMessage), ErrorObject.class))
                     .build();
         } catch (final FoldingException e) {
             getLogger().error("Error deleting {} with ID: {}", elementType(), elementId, e.getCause());

@@ -3,10 +3,12 @@ package me.zodac.folding.rest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import me.zodac.folding.StorageFacade;
+import me.zodac.folding.api.FoldingUser;
+import me.zodac.folding.api.Hardware;
 import me.zodac.folding.api.UserStats;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
-import me.zodac.folding.db.postgres.PostgresDbManager;
+import me.zodac.folding.rest.tc.HistoricStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,8 +26,9 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 @Path("/historic/")
 @RequestScoped
@@ -48,34 +51,37 @@ public class HistoricStatsEndpoint {
 
 
         try {
-            // TODO: [zodac] StorageFacade
-            final Map<LocalDate, UserStats> dailyUserStats = new PostgresDbManager().getDailyUserStats(Integer.parseInt(foldingUserId), Month.of(Integer.parseInt(month)), Year.parse(year));
-            final Map<LocalDate, UserStats> diffDailyUserStats = new TreeMap<>();
-            
+            final FoldingUser foldingUser = storageFacade.getFoldingUser(Integer.parseInt(foldingUserId));
+            final Hardware hardware = storageFacade.getHardware(foldingUser.getHardwareId());
+
+            final Map<LocalDate, UserStats> dailyUserStats = storageFacade.getDailyUserStats(Integer.parseInt(foldingUserId), Month.of(Integer.parseInt(month)), Year.parse(year));
+            final List<HistoricStats> historicStats = new ArrayList<>(dailyUserStats.size());
+
+            for (final Map.Entry<LocalDate, UserStats> dailyUserStat : dailyUserStats.entrySet()) {
+                historicStats.add(new HistoricStats(dailyUserStat.getKey(), (long) (dailyUserStat.getValue().getPoints() * hardware.getMultiplier()), dailyUserStat.getValue().getPoints(), dailyUserStat.getValue().getUnits()));
+            }
 
             return Response
                     .ok()
-                    .entity(GSON.toJson(dailyUserStats))
+                    .entity(GSON.toJson(historicStats))
                     .build();
         } catch (final DateTimeParseException e) {
             final String errorMessage = String.format("The year '%s' is not a valid format", year);
-            final ErrorObject errorObject = new ErrorObject(errorMessage);
 
             LOGGER.debug(errorMessage, e);
             LOGGER.error(errorMessage);
             return Response
                     .status(Response.Status.BAD_REQUEST)
-                    .entity(GSON.toJson(errorObject, ErrorObject.class))
+                    .entity(GSON.toJson(new ErrorObject(errorMessage), ErrorObject.class))
                     .build();
         } catch (final NumberFormatException e) {
             final String errorMessage = String.format("The Folding user ID '%s' or month '%s' is not a valid format", foldingUserId, month);
-            final ErrorObject errorObject = new ErrorObject(errorMessage);
 
             LOGGER.debug(errorMessage, e);
             LOGGER.error(errorMessage);
             return Response
                     .status(Response.Status.BAD_REQUEST)
-                    .entity(GSON.toJson(errorObject, ErrorObject.class))
+                    .entity(GSON.toJson(new ErrorObject(errorMessage), ErrorObject.class))
                     .build();
         } catch (final NotFoundException e) {
             LOGGER.debug("No Folding user found with ID: {}", foldingUserId, e);
