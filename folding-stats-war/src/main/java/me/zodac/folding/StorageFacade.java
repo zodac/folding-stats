@@ -79,6 +79,11 @@ public class StorageFacade {
         return allHardwareFromDb;
     }
 
+    public void updateHardware(final Hardware hardware) throws FoldingException, NotFoundException {
+        dbManager.updateHardware(hardware);
+        hardwareCache.add(hardware);
+    }
+
     public void deleteHardware(final int hardwareId) throws FoldingException, FoldingConflictException {
         hardwareCache.remove(hardwareId);
         dbManager.deleteHardware(hardwareId);
@@ -124,6 +129,11 @@ public class StorageFacade {
         return allFoldingUsersFromDb;
     }
 
+    public void updateFoldingUser(final FoldingUser element) throws FoldingException, NotFoundException {
+        dbManager.updateFoldingUser(element);
+        foldingUserCache.add(element);
+    }
+
     public void deleteFoldingUser(final int foldingUserId) throws FoldingException, FoldingConflictException {
         hardwareCache.remove(foldingUserId);
         dbManager.deleteFoldingUser(foldingUserId);
@@ -162,6 +172,11 @@ public class StorageFacade {
         final List<FoldingTeam> allFoldingTeamsFromDb = dbManager.getAllFoldingTeams();
         foldingTeamCache.addAll(allFoldingTeamsFromDb);
         return allFoldingTeamsFromDb;
+    }
+
+    public void updateFoldingTeam(final FoldingTeam element) throws FoldingException, NotFoundException {
+        dbManager.updateFoldingTeam(element);
+        foldingTeamCache.add(element);
     }
 
     public void deleteFoldingTeam(final int foldingTeamId) throws FoldingException, FoldingConflictException {

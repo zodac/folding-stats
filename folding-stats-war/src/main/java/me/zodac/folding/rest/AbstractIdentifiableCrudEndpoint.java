@@ -18,7 +18,6 @@ import java.util.List;
 
 abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
 
-    //    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractCrudEndpoint.class);
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     @Context
@@ -35,6 +34,8 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
     protected abstract List<V> getAllElements() throws FoldingException;
 
     protected abstract V getElementById(final int elementId) throws FoldingException, NotFoundException;
+
+    protected abstract void updateElementById(final V element) throws FoldingException, NotFoundException;
 
     protected abstract void deleteElementById(final int elementId) throws FoldingConflictException, FoldingException;
 
@@ -127,6 +128,78 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
                     .build();
         } catch (final Exception e) {
             getLogger().error("Unexpected error getting {} with ID: {}", elementType(), elementId, e);
+            return Response
+                    .serverError()
+                    .build();
+        }
+    }
+
+    public Response updateById(final String elementId, final V element) {
+        getLogger().info("PUT request for {} received at '{}'", elementType(), uriContext.getAbsolutePath());
+
+        final ValidationResponse validationResponse = validate(element);
+        if (!validationResponse.isValid()) {
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity(GSON.toJson(validationResponse))
+                    .build();
+        }
+
+        try {
+            // We want to make sure the payload is not trying to change the ID of the element
+            // If no ID is provided, the POJO will default to a value of 0, which is acceptable
+            if (Integer.parseInt(elementId) != element.getId() && element.getId() != 0) {
+                final String errorMessage = String.format("Path ID '%s' does not match ID '%s' of payload", elementId, element.getId());
+                final ErrorObject errorObject = new ErrorObject(errorMessage);
+
+                getLogger().error(errorMessage);
+                return Response
+                        .status(Response.Status.BAD_REQUEST)
+                        .entity(GSON.toJson(errorObject, ErrorObject.class))
+                        .build();
+            }
+
+            final V existingElement = getElementById(Integer.parseInt(elementId));
+
+            if (existingElement.equals(element)) {
+                getLogger().debug("No change necessary");
+                return Response
+                        .noContent()
+                        .build();
+            }
+
+            updateElementById(element);
+
+            final UriBuilder builder = uriContext
+                    .getRequestUriBuilder()
+                    .path(String.valueOf(element.getId()));
+            return Response
+                    .ok(builder.build())
+                    .entity(GSON.toJson(element))
+                    .build();
+        } catch (final NumberFormatException e) {
+            final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), elementId);
+            final ErrorObject errorObject = new ErrorObject(errorMessage);
+
+            getLogger().debug(errorMessage, e);
+            getLogger().error(errorMessage);
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity(GSON.toJson(errorObject, ErrorObject.class))
+                    .build();
+        } catch (final NotFoundException e) {
+            getLogger().debug("No {} found with ID: {}", elementType(), elementId, e);
+            getLogger().error("No {} found with ID: {}", elementType(), elementId);
+            return Response
+                    .status(Response.Status.NOT_FOUND)
+                    .build();
+        } catch (final FoldingException e) {
+            getLogger().error("Error updating {} with ID: {}", elementType(), elementId, e.getCause());
+            return Response
+                    .serverError()
+                    .build();
+        } catch (final Exception e) {
+            getLogger().error("Unexpected error updating {} with ID: {}", elementType(), elementId, e);
             return Response
                     .serverError()
                     .build();

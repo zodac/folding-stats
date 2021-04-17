@@ -10,14 +10,24 @@ import me.zodac.folding.api.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
 
+import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Interface used to interact with the storage backend and perform CRUD operations.
  */
 public interface DbManager {
+
+    public static void main(final String[] args) {
+        final String year = "nope";
+        final String month = "4";
+
+        System.out.println(Year.parse(year));
+        System.out.println(Month.of(Integer.parseInt(month)));
+    }
 
     // CRUD operations
 
@@ -34,6 +44,8 @@ public interface DbManager {
 
     Hardware getHardware(final int hardwareId) throws FoldingException, NotFoundException;
 
+    void updateHardware(final Hardware hardware) throws FoldingException, NotFoundException;
+
     void deleteHardware(final int hardwareId) throws FoldingException, FoldingConflictException;
 
     FoldingUser createFoldingUser(final FoldingUser foldingUser) throws FoldingException;
@@ -42,6 +54,8 @@ public interface DbManager {
 
     FoldingUser getFoldingUser(final int foldingUserId) throws FoldingException, NotFoundException;
 
+    void updateFoldingUser(final FoldingUser foldingUser) throws FoldingException, NotFoundException;
+
     void deleteFoldingUser(final int foldingUserId) throws FoldingException, FoldingConflictException;
 
     FoldingTeam createFoldingTeam(final FoldingTeam foldingTeam) throws FoldingException;
@@ -49,6 +63,8 @@ public interface DbManager {
     List<FoldingTeam> getAllFoldingTeams() throws FoldingException;
 
     FoldingTeam getFoldingTeam(final int foldingTeamId) throws FoldingException, NotFoundException;
+
+    void updateFoldingTeam(final FoldingTeam foldingTeam) throws FoldingException, NotFoundException;
 
     void deleteFoldingTeam(final int foldingTeamId) throws FoldingException, FoldingConflictException;
 
@@ -69,5 +85,7 @@ public interface DbManager {
     // TODO: [zodac] To be removed
     boolean doTcStatsExist() throws FoldingException;
 
+    // Historic TC operations
 
+    Map<LocalDate, UserStats> getDailyUserStats(final int foldingUserId, final Month month, final Year year) throws FoldingException, NotFoundException;
 }

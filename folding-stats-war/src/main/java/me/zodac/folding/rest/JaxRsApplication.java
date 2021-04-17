@@ -15,11 +15,12 @@ public class JaxRsApplication extends Application {
 
     @Override
     public Set<Class<?>> getClasses() {
-        final Set<Class<?>> classes = new HashSet<>(4); // TODO: [zodac] Set to correct initial capacity when done
+        final Set<Class<?>> classes = new HashSet<>(5); // TODO: [zodac] Set to correct initial capacity when done
         classes.add(HardwareEndpoint.class);
         classes.add(UserEndpoint.class);
         classes.add(TeamEndpoint.class);
         classes.add(TeamCompetitionStatsEndpoint.class);
+        classes.add(HistoricStatsEndpoint.class);
 
         // TODO: [zodac] Add a Healthcheck endpoint for liveliness/readiness probes (though we probably won't ever be in K8S)?
         return classes;

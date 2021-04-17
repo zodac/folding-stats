@@ -30,6 +30,10 @@ public class FoldingStats {
         return totalStats.getUnits();
     }
 
+    public UserStats getUserStats() {
+        return totalStats;
+    }
+
     public Timestamp getTimestamp() {
         return timestamp;
     }

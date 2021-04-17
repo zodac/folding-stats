@@ -16,6 +16,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -56,6 +57,14 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<FoldingTeam> 
         return super.getById(foldingTeamId);
     }
 
+    @PUT
+    @Path("/{foldingTeamId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateFoldingTeamById(@PathParam("foldingTeamId") final String foldingTeamId, final FoldingTeam foldingTeam) {
+        return super.updateById(foldingTeamId, foldingTeam);
+    }
+
     @DELETE
     @Path("/{foldingTeamId}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -91,6 +100,11 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<FoldingTeam> 
     @Override
     protected FoldingTeam getElementById(final int elementId) throws FoldingException, NotFoundException {
         return storageFacade.getFoldingTeam(elementId);
+    }
+
+    @Override
+    protected void updateElementById(final FoldingTeam element) throws FoldingException, NotFoundException {
+        storageFacade.updateFoldingTeam(element);
     }
 
     @Override

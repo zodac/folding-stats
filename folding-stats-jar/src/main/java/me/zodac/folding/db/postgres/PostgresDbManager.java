@@ -21,13 +21,14 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
 
 public class PostgresDbManager implements DbManager {
 
@@ -110,6 +111,32 @@ public class PostgresDbManager implements DbManager {
             throw new NotFoundException();
         } catch (final SQLException e) {
             throw new FoldingException("Error opening connection to the DB", e);
+        }
+    }
+
+    @Override
+    public void updateHardware(final Hardware hardware) throws FoldingException, NotFoundException {
+        final String updateSqlStatement = "UPDATE hardware " +
+                "SET hardware_name = ?, display_name = ?, operating_system = ?, multiplier = ? " +
+                "WHERE hardware_id = ?;";
+        LOGGER.info("Executing SQL statement '{}'", updateSqlStatement);
+
+        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+             final PreparedStatement preparedStatement = connection.prepareStatement(updateSqlStatement)) {
+
+            preparedStatement.setString(1, hardware.getHardwareName());
+            preparedStatement.setString(2, hardware.getDisplayName());
+            preparedStatement.setString(3, hardware.getOperatingSystem());
+            preparedStatement.setDouble(4, hardware.getMultiplier());
+            preparedStatement.setInt(5, hardware.getId());
+
+            if (preparedStatement.executeUpdate() == 0) {
+                throw new NotFoundException();
+            }
+        } catch (final NotFoundException e) {
+            throw e;
+        } catch (final Exception e) {
+            throw new FoldingException("Error updating hardware", e);
         }
     }
 
@@ -206,6 +233,34 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
+    public void updateFoldingUser(final FoldingUser foldingUser) throws FoldingException, NotFoundException {
+        final String updateSqlStatement = "UPDATE folding_users " +
+                "SET folding_username = ?, display_username = ?, passkey = ?, category = ?, hardware_id = ?, folding_team_number = ? " +
+                "WHERE user_id = ?;";
+        LOGGER.info("Executing SQL statement '{}'", updateSqlStatement);
+
+        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+             final PreparedStatement preparedStatement = connection.prepareStatement(updateSqlStatement)) {
+
+            preparedStatement.setString(1, foldingUser.getFoldingUserName());
+            preparedStatement.setString(2, foldingUser.getDisplayName());
+            preparedStatement.setString(3, foldingUser.getPasskey());
+            preparedStatement.setString(4, foldingUser.getCategory());
+            preparedStatement.setInt(5, foldingUser.getHardwareId());
+            preparedStatement.setInt(6, foldingUser.getFoldingTeamNumber());
+            preparedStatement.setInt(7, foldingUser.getId());
+
+            if (preparedStatement.executeUpdate() == 0) {
+                throw new NotFoundException();
+            }
+        } catch (final NotFoundException e) {
+            throw e;
+        } catch (final Exception e) {
+            throw new FoldingException("Error persisting hardware", e);
+        }
+    }
+
+    @Override
     public void deleteFoldingUser(final int foldingUserId) throws FoldingException, FoldingConflictException {
         final String deleteSqlStatement = "DELETE FROM folding_user WHERE user_id = ?;";
         LOGGER.debug("Executing SQL statement '{}'", deleteSqlStatement);
@@ -293,6 +348,32 @@ public class PostgresDbManager implements DbManager {
             }
         } catch (final SQLException e) {
             throw new FoldingException("Error opening connection to the DB", e);
+        }
+    }
+
+    @Override
+    public void updateFoldingTeam(final FoldingTeam foldingTeam) throws FoldingException, NotFoundException {
+        final String updateSqlStatement = "UPDATE folding_teams " +
+                "SET team_name = ?, team_description = ?, captain_user_id = ?, user_ids = ? " +
+                "WHERE team_id = ?;";
+        LOGGER.info("Executing SQL statement '{}'", updateSqlStatement);
+
+        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+             final PreparedStatement preparedStatement = connection.prepareStatement(updateSqlStatement)) {
+
+            preparedStatement.setString(1, foldingTeam.getTeamName());
+            preparedStatement.setString(2, foldingTeam.getTeamDescription());
+            preparedStatement.setInt(3, foldingTeam.getCaptainUserId());
+            preparedStatement.setArray(4, connection.createArrayOf("INT", foldingTeam.getUserIds().toArray(new Integer[0])));
+            preparedStatement.setInt(5, foldingTeam.getId());
+
+            if (preparedStatement.executeUpdate() == 0) {
+                throw new NotFoundException();
+            }
+        } catch (final NotFoundException e) {
+            throw e;
+        } catch (final Exception e) {
+            throw new FoldingException("Error persisting Folding team", e);
         }
     }
 
@@ -417,33 +498,72 @@ public class PostgresDbManager implements DbManager {
         final String selectSqlStatement = "SELECT COUNT(*) AS count FROM individual_tc_points;";
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
-             final Statement statement = connection.createStatement();
-             final ResultSet resultSet = statement.executeQuery(selectSqlStatement)) {
-            if (resultSet.next()) {
-                return resultSet.getInt("count") > 0;
-            }
+             final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
 
-            return false;
+            try (final ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getInt("count") > 0;
+                }
+
+                return false;
+            }
         } catch (final SQLException e) {
             throw new FoldingException("Error opening connection to the DB", e);
         }
     }
 
     @Override
-    public UserStats getFirstPointsForUserInMonth(final FoldingUser foldingUser, final Month month, final Year year) throws
+    public Map<LocalDate, UserStats> getDailyUserStats(final int foldingUserId, final Month month, final Year year) throws FoldingException, NotFoundException {
+        LOGGER.debug("Getting historic daily user TC stats");
+
+        final String selectSqlStatement = String.format("SELECT CAST(utc_timestamp AS DATE) AS timestamp, MAX(total_points) AS points, MAX(total_units) AS units " +
+                "FROM individual_tc_points " +
+                "WHERE EXTRACT(MONTH FROM utc_timestamp) = %s AND EXTRACT(YEAR FROM utc_timestamp) = %s " +
+                "AND user_id = ? " +
+                "GROUP BY CAST(utc_timestamp AS DATE) " +
+                "ORDER BY CAST(utc_timestamp AS DATE);", month.getValue(), year.getValue());
+
+        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+             final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
+
+            preparedStatement.setInt(1, foldingUserId);
+
+            final Map<LocalDate, UserStats> userStatsByDate = new TreeMap<>();
+
+            try (final ResultSet resultSet = preparedStatement.executeQuery(selectSqlStatement)) {
+                while (resultSet.next()) {
+                    userStatsByDate.put(resultSet.getTimestamp("timestamp").toLocalDateTime().toLocalDate(), new UserStats(resultSet.getLong("points"), resultSet.getInt("units")));
+                }
+
+                if (userStatsByDate.isEmpty()) {
+                    throw new NotFoundException();
+                }
+
+                return userStatsByDate;
+            }
+        } catch (final SQLException e) {
+            throw new FoldingException("Error opening connection to the DB", e);
+        }
+    }
+
+    @Override
+    public UserStats getFirstPointsForUserInMonth(final FoldingUser foldingUser, final Month month,
+                                                  final Year year) throws
             FoldingException, NotFoundException {
         LOGGER.debug("Getting first points in month/year {}/{} for user {}", month, year, foldingUser);
         return getPointsForUserInMonth(foldingUser, month, year, OrderBy.ASCENDING);
     }
 
     @Override
-    public UserStats getCurrentPointsForUserInMonth(final FoldingUser foldingUser, final Month month, final Year year) throws
+    public UserStats getCurrentPointsForUserInMonth(final FoldingUser foldingUser, final Month month,
+                                                    final Year year) throws
             FoldingException, NotFoundException {
         LOGGER.debug("Getting current points in month/year {}/{} for user {}", month, year, foldingUser);
         return getPointsForUserInMonth(foldingUser, month, year, OrderBy.DESCENDING);
     }
 
-    public UserStats getPointsForUserInMonth(final FoldingUser foldingUser, final Month month, final Year year, final OrderBy orderBy) throws
+    public UserStats getPointsForUserInMonth(final FoldingUser foldingUser, final Month month, final Year year,
+                                             final OrderBy orderBy) throws
             FoldingException, NotFoundException {
         final String selectSqlStatement = String.format(
                 "SELECT total_points AS points, total_units AS units " +

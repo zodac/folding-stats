@@ -16,6 +16,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -57,6 +58,14 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<FoldingUser> 
         return super.getById(foldingUserId);
     }
 
+    @PUT
+    @Path("/{foldingUserId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateFoldingUserById(@PathParam("foldingUserId") final String foldingUserId, final FoldingUser foldingUser) {
+        return super.updateById(foldingUserId, foldingUser);
+    }
+
     @DELETE
     @Path("/{foldingUserId}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -92,6 +101,11 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<FoldingUser> 
     @Override
     protected FoldingUser getElementById(final int elementId) throws FoldingException, NotFoundException {
         return storageFacade.getFoldingUser(elementId);
+    }
+
+    @Override
+    protected void updateElementById(final FoldingUser element) throws FoldingException, NotFoundException {
+        storageFacade.updateFoldingUser(element);
     }
 
     @Override

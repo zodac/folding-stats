@@ -16,6 +16,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -57,6 +58,14 @@ public class HardwareEndpoint extends AbstractIdentifiableCrudEndpoint<Hardware>
         return super.getById(hardwareId);
     }
 
+    @PUT
+    @Path("/{hardwareId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateFoldingTeamById(@PathParam("hardwareId") final String hardwareId, final Hardware hardware) {
+        return super.updateById(hardwareId, hardware);
+    }
+
     @DELETE
     @Path("/{hardwareId}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -92,6 +101,11 @@ public class HardwareEndpoint extends AbstractIdentifiableCrudEndpoint<Hardware>
     @Override
     protected Hardware getElementById(final int elementId) throws FoldingException, NotFoundException {
         return storageFacade.getHardware(elementId);
+    }
+
+    @Override
+    protected void updateElementById(final Hardware element) throws FoldingException, NotFoundException {
+        storageFacade.updateHardware(element);
     }
 
     @Override
