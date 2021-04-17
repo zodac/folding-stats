@@ -45,14 +45,18 @@ public class HistoricStatsCollector {
         final List<FoldingStats> tcFoldingStats = new ArrayList<>(tcUsers.size());
 
         for (final FoldingUser tcUser : tcUsers) {
-            final Optional<UserStats> dailyStats = TcStatsCache.get().getCurrentStatsForUser(tcUser.getId());
+            final Optional<UserStats> initialStats =  TcStatsCache.get().getInitialStatsForUser(tcUser.getId());
+            final Optional<UserStats> currentStats = TcStatsCache.get().getCurrentStatsForUser(tcUser.getId());
 
-            if (dailyStats.isEmpty()) {
-                LOGGER.warn("No stats found for TC Folding user {}", tcUser);
+            if (initialStats.isEmpty() || currentStats.isEmpty()) {
+                LOGGER.warn("No stats found for TC Folding user {}", tcUser.getId());
                 continue;
             }
 
-            tcFoldingStats.add(new FoldingStats(tcUser.getId(), dailyStats.get(), currentUtcTimestamp));
+            final long userDailyPoints = currentStats.get().getPoints() - initialStats.get().getPoints();
+            final int userDailyUnits = currentStats.get().getUnits() -  initialStats.get().getUnits();
+
+            tcFoldingStats.add(new FoldingStats(tcUser.getId(), new UserStats(userDailyPoints, userDailyUnits), currentUtcTimestamp));
         }
 
         storageFacade.persistDailyUserTcStats(tcFoldingStats);
@@ -96,15 +100,16 @@ public class HistoricStatsCollector {
             int teamUnits = 0;
 
             for (final int userId : userIds) {
-                final Optional<UserStats> dailyStats = TcStatsCache.get().getCurrentStatsForUser(userId);
+                final Optional<UserStats> initialStats =  TcStatsCache.get().getInitialStatsForUser(userId);
+                final Optional<UserStats> currentStats = TcStatsCache.get().getCurrentStatsForUser(userId);
 
-                if (dailyStats.isEmpty()) {
+                if (initialStats.isEmpty() || currentStats.isEmpty()) {
                     LOGGER.warn("No stats found for TC Folding user {}", userId);
                     continue;
                 }
 
-                teamPoints += dailyStats.get().getPoints();
-                teamUnits += dailyStats.get().getUnits();
+                teamPoints += currentStats.get().getPoints() - initialStats.get().getPoints();
+                teamUnits += currentStats.get().getUnits() -  initialStats.get().getUnits();
             }
 
             tcTeamStats.add(new TeamStats(tcTeam.getId(), new UserStats(teamPoints, teamUnits), currentUtcTimestamp));
