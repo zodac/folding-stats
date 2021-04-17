@@ -21,14 +21,6 @@ import java.util.Map;
  */
 public interface DbManager {
 
-    public static void main(final String[] args) {
-        final String year = "nope";
-        final String month = "4";
-
-        System.out.println(Year.parse(year));
-        System.out.println(Month.of(Integer.parseInt(month)));
-    }
-
     // CRUD operations
 
     /**
@@ -70,9 +62,9 @@ public interface DbManager {
 
     // TC operations
 
-    UserStats getFirstPointsForUserInMonth(final FoldingUser foldingUser, final Month month, final Year year) throws FoldingException, NotFoundException;
+    UserStats getFirstStatsForUser(final int foldingUserId, final Month month, final Year year) throws FoldingException, NotFoundException;
 
-    UserStats getCurrentPointsForUserInMonth(final FoldingUser foldingUser, final Month month, final Year year) throws FoldingException, NotFoundException;
+    UserStats getLatestStatsForUser(final int foldingUserId, final Month month, final Year year) throws FoldingException, NotFoundException;
 
     void persistHourlyUserTcStats(final List<FoldingStats> tcUserStats) throws FoldingException;
 

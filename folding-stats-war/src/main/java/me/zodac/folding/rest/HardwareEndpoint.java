@@ -27,8 +27,7 @@ import java.util.List;
 /**
  * REST endpoints for hardware for <code>folding-stats</code>.
  */
-// TODO: [zodac] Add a PUT endpoint
-//   Add GET query endpoint to retrieve all hardware instances with same name
+// TODO: [zodac] Add GET query endpoint to retrieve all hardware instances with same name
 @Path("/hardware/")
 @RequestScoped
 public class HardwareEndpoint extends AbstractIdentifiableCrudEndpoint<Hardware> {

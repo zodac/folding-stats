@@ -12,11 +12,11 @@ import me.zodac.folding.api.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.util.EnvironmentVariable;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -26,6 +26,7 @@ import java.time.Month;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
@@ -514,25 +515,46 @@ public class PostgresDbManager implements DbManager {
 
     @Override
     public Map<LocalDate, UserStats> getDailyUserStats(final int foldingUserId, final Month month, final Year year) throws FoldingException, NotFoundException {
-        LOGGER.debug("Getting historic daily user TC stats");
+        LOGGER.debug("Getting historic daily user TC stats for {}/{} for user {}", StringUtils.capitalize(month.toString().toLowerCase(Locale.UK)), year, foldingUserId);
 
-        final String selectSqlStatement = String.format("SELECT CAST(utc_timestamp AS DATE) AS timestamp, MAX(total_points) AS points, MAX(total_units) AS units " +
+        final String selectSqlStatement = "SELECT CAST(utc_timestamp AS DATE) AS TIMESTAMP, " +
+                "COALESCE(MAX(total_points) - LAG(MAX(total_points)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points, " +
+                "COALESCE(MAX(total_units) - LAG(MAX(total_units)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_units " +
                 "FROM individual_tc_points " +
-                "WHERE EXTRACT(MONTH FROM utc_timestamp) = %s AND EXTRACT(YEAR FROM utc_timestamp) = %s " +
+                "WHERE EXTRACT(MONTH FROM utc_timestamp) = ? " +
+                "AND EXTRACT(YEAR FROM utc_timestamp) = ? " +
                 "AND user_id = ? " +
                 "GROUP BY CAST(utc_timestamp AS DATE) " +
-                "ORDER BY CAST(utc_timestamp AS DATE);", month.getValue(), year.getValue());
+                "ORDER BY CAST(utc_timestamp AS DATE) ASC;";
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
              final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
 
-            preparedStatement.setInt(1, foldingUserId);
+            preparedStatement.setInt(1, month.getValue());
+            preparedStatement.setInt(2, year.getValue());
+            preparedStatement.setInt(3, foldingUserId);
 
             final Map<LocalDate, UserStats> userStatsByDate = new TreeMap<>();
 
-            try (final ResultSet resultSet = preparedStatement.executeQuery(selectSqlStatement)) {
+            try (final ResultSet resultSet = preparedStatement.executeQuery()) {
+
+                // First entry will be (0, 0), so we need to manually get the first day's stats for the user
+                if (resultSet.next()) {
+                    final UserStats firstDayTotalStats = getTotalStatsForFirstDayForUser(foldingUserId, month, year);
+                    final UserStats initialStatsForMonth = getFirstStatsForUser(foldingUserId, month, year);
+                    userStatsByDate.put(resultSet.getTimestamp("timestamp").toLocalDateTime().toLocalDate(),
+                            new UserStats(firstDayTotalStats.getPoints() - initialStatsForMonth.getPoints(), firstDayTotalStats.getUnits() - initialStatsForMonth.getUnits())
+                    );
+                }
+
+                // All remaining stats will be diff-ed from the previous entry
                 while (resultSet.next()) {
-                    userStatsByDate.put(resultSet.getTimestamp("timestamp").toLocalDateTime().toLocalDate(), new UserStats(resultSet.getLong("points"), resultSet.getInt("units")));
+                    userStatsByDate.put(resultSet.getTimestamp("timestamp").toLocalDateTime().toLocalDate(),
+                            new UserStats(
+                                    resultSet.getLong("diff_points"),
+                                    resultSet.getInt("diff_units")
+                            )
+                    );
                 }
 
                 if (userStatsByDate.isEmpty()) {
@@ -541,45 +563,78 @@ public class PostgresDbManager implements DbManager {
 
                 return userStatsByDate;
             }
+        } catch (final FoldingException | NotFoundException e) {
+            LOGGER.warn("Unable to get the stats for the first day of {}/{} for user {}", StringUtils.capitalize(month.toString().toLowerCase(Locale.UK)), year, foldingUserId);
+            throw e;
+        } catch (final SQLException e) {
+            throw new FoldingException("Error opening connection to the DB", e);
+        }
+    }
+
+    private UserStats getTotalStatsForFirstDayForUser(final int foldingUserId, final Month month, final Year year) throws FoldingException, NotFoundException {
+        final String selectSqlStatement = "SELECT total_points AS points, total_units AS units " +
+                "FROM individual_tc_points " +
+                "WHERE CAST(utc_timestamp AS DATE) = (" +
+                "   SELECT CAST(MIN(utc_timestamp) AS DATE) " +
+                "   FROM individual_tc_points WHERE user_id = ? " +
+                "   AND EXTRACT(MONTH FROM utc_timestamp) = ? " +
+                "   AND EXTRACT(YEAR FROM utc_timestamp) = ? " +
+                ") " +
+                "AND user_id = ? " +
+                "ORDER BY utc_timestamp DESC " +
+                "LIMIT 1;";
+
+        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+             final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
+
+            preparedStatement.setInt(1, foldingUserId);
+            preparedStatement.setInt(2, month.getValue());
+            preparedStatement.setInt(3, year.getValue());
+            preparedStatement.setInt(4, foldingUserId);
+
+            try (final ResultSet resultSet = preparedStatement.executeQuery()) {
+
+                if (resultSet.next()) {
+                    return new UserStats(resultSet.getLong("points"), resultSet.getInt("units"));
+                }
+
+                throw new NotFoundException();
+            }
         } catch (final SQLException e) {
             throw new FoldingException("Error opening connection to the DB", e);
         }
     }
 
     @Override
-    public UserStats getFirstPointsForUserInMonth(final FoldingUser foldingUser, final Month month,
-                                                  final Year year) throws
-            FoldingException, NotFoundException {
-        LOGGER.debug("Getting first points in month/year {}/{} for user {}", month, year, foldingUser);
-        return getPointsForUserInMonth(foldingUser, month, year, OrderBy.ASCENDING);
+    public UserStats getFirstStatsForUser(final int foldingUserId, final Month month, final Year year) throws FoldingException, NotFoundException {
+        LOGGER.debug("Getting first points in {}/{} for user {}", StringUtils.capitalize(month.toString().toLowerCase(Locale.UK)), year, foldingUserId);
+        return getPointsForUser(foldingUserId, month, year, OrderBy.ASCENDING);
     }
 
     @Override
-    public UserStats getCurrentPointsForUserInMonth(final FoldingUser foldingUser, final Month month,
-                                                    final Year year) throws
-            FoldingException, NotFoundException {
-        LOGGER.debug("Getting current points in month/year {}/{} for user {}", month, year, foldingUser);
-        return getPointsForUserInMonth(foldingUser, month, year, OrderBy.DESCENDING);
+    public UserStats getLatestStatsForUser(final int foldingUserId, final Month month, final Year year) throws FoldingException, NotFoundException {
+        LOGGER.debug("Getting current points in {}/{} for user {}", StringUtils.capitalize(month.toString().toLowerCase(Locale.UK)), year, foldingUserId);
+        return getPointsForUser(foldingUserId, month, year, OrderBy.DESCENDING);
     }
 
-    public UserStats getPointsForUserInMonth(final FoldingUser foldingUser, final Month month, final Year year,
-                                             final OrderBy orderBy) throws
+    private UserStats getPointsForUser(final int foldingUserId, final Month month, final Year year,
+                                       final OrderBy orderBy) throws
             FoldingException, NotFoundException {
         final String selectSqlStatement = String.format(
                 "SELECT total_points AS points, total_units AS units " +
                         "FROM individual_tc_points " +
-                        "WHERE utc_timestamp BETWEEN ? AND NOW() " +
+                        "WHERE EXTRACT(MONTH FROM utc_timestamp) = ? AND EXTRACT(YEAR FROM utc_timestamp) = ? " +
                         "AND user_id = ? " +
                         "ORDER BY utc_timestamp %s " +
-                        "LIMIT 1;",
-                orderBy.getSqlValue()
+                        "LIMIT 1;", orderBy.getSqlValue()
         );
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
              final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
 
-            preparedStatement.setDate(1, Date.valueOf(LocalDate.of(year.getValue(), month.getValue(), 1)));
-            preparedStatement.setInt(2, foldingUser.getId());
+            preparedStatement.setInt(1, month.getValue());
+            preparedStatement.setInt(2, year.getValue());
+            preparedStatement.setInt(3, foldingUserId);
 
             try (final ResultSet resultSet = preparedStatement.executeQuery()) {
 

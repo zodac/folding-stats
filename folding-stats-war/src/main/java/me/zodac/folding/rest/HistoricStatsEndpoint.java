@@ -25,6 +25,7 @@ import java.time.Month;
 import java.time.Year;
 import java.time.format.DateTimeParseException;
 import java.util.Map;
+import java.util.TreeMap;
 
 @Path("/historic/")
 @RequestScoped
@@ -40,18 +41,17 @@ public class HistoricStatsEndpoint {
     private UriInfo uriContext;
 
     @GET
-    @Path("/foldingUserId}/{year}/{month}")
+    @Path("/users/{foldingUserId}/{year}/{month}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getDailyUserStats(@PathParam("foldingUserId") final String foldingUserId, @PathParam("year") final String year, @PathParam("month") final String month) {
         LOGGER.info("GET request received to show daily TC user stats at '{}'", uriContext.getAbsolutePath());
 
-//        return Response
-//                .status(Response.Status.NOT_IMPLEMENTED)
-//                .build();
 
         try {
             // TODO: [zodac] StorageFacade
             final Map<LocalDate, UserStats> dailyUserStats = new PostgresDbManager().getDailyUserStats(Integer.parseInt(foldingUserId), Month.of(Integer.parseInt(month)), Year.parse(year));
+            final Map<LocalDate, UserStats> diffDailyUserStats = new TreeMap<>();
+            
 
             return Response
                     .ok()
@@ -97,7 +97,7 @@ public class HistoricStatsEndpoint {
     }
 
     @GET
-    @Path("/daily/{foldingTeamId}")
+    @Path("/teams/{foldingTeamId}/{year}/{month}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getDailyTeamStats(@PathParam("foldingTeamId") final String foldingTeamId) {
         LOGGER.info("GET request received to show daily TC team stats at '{}'", uriContext.getAbsolutePath());
@@ -108,7 +108,7 @@ public class HistoricStatsEndpoint {
     }
 
     @GET
-    @Path("/monthly/{foldingTeamId}")
+    @Path("/teams/{foldingTeamId}/{year}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getMonthlyTeamStats(@PathParam("foldingTeamId") final String foldingTeamId) {
         LOGGER.info("GET request received to show monthly TC team stats at '{}'", uriContext.getAbsolutePath());

@@ -1,5 +1,15 @@
 # Folding Stats
 
+## Decisions
+
+### Historic Stats
+
+We're using a couple of queries to read the user stats from the `individual_tc_points`, but not persisting daily/monthly
+stats. If the historic pages are quite a bit, this might be a bit slow, so there is a potential for caching/persisting
+results. Could be persisted on a scheduled basis, or perhaps only persisted on the first call, then cache those results.
+Need to do more profiling on a live system, see how much it is being used. A good idea to bring in an ELK stack to
+instrument the system when we go live.
+
 ### How to extract Wildfly logs on container crash
 
 A volume `wildfly_logs` should exist. We cannot retrieve the file directly from the volume. Instead, we create a

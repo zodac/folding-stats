@@ -56,6 +56,9 @@ CREATE INDEX index_individual_tc_points
     ON individual_tc_points(user_id, utc_timestamp);
 
 
+
+-- TODO: [zodac] Not using the following tables yet, might do eventually
+
 CREATE TABLE historic_stats_tc_user_daily (
     user_id INT,
     utc_timestamp TIMESTAMP,

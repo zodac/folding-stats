@@ -27,8 +27,7 @@ import java.util.List;
 /**
  * REST endpoints for users for <code>folding-stats</code>.
  */
-// TODO: [zodac] Add a PUT endpoint
-//   Also add a GET endpoint with query, so we can see all instances of a user
+// TODO: [zodac] Add a GET endpoint with query, so we can see all instances of a user
 @Path("/users/")
 @RequestScoped
 public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<FoldingUser> {
