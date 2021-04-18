@@ -43,9 +43,7 @@ services:
       - postgres
     ports:
       - 8080:8080
-      - 8787:8787
       - 9990:9990
-      - 9999:9999
     volumes:
       - wildfly_logs:/opt/jboss/wildfly/standalone/log
     volumes_from:
@@ -70,8 +68,6 @@ services:
       PGPASSWORD: "shroot"
     ports:
       - 5432:5432
-    expose:
-      - 5432
     restart: always
     healthcheck:
       test: pg_isready --host localhost || exit 1

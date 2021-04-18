@@ -1,10 +1,13 @@
 package me.zodac.folding.parsing;
 
-import me.zodac.folding.api.FoldingStats;
 import me.zodac.folding.api.FoldingUser;
+import me.zodac.folding.api.Hardware;
+import me.zodac.folding.api.Stats;
 import me.zodac.folding.api.UserStats;
 import me.zodac.folding.api.exception.FoldingException;
+import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.api.utils.TimeUtils;
+import me.zodac.folding.cache.HardwareCache;
 import me.zodac.folding.cache.tc.TcStatsCache;
 import me.zodac.folding.db.DbManagerRetriever;
 import me.zodac.folding.parsing.http.request.PointsUrlBuilder;
@@ -31,21 +34,23 @@ public class FoldingStatsParser {
     // TODO: [zodac] This shouldn't be here anymore. Keep this class as simple logic, move this function elsewhere since it has TC-specific logic
     public static void parseTcStatsForAllUsers(final List<FoldingUser> foldingUsers) {
         final Timestamp currentUtcTime = TimeUtils.getCurrentUtcTimestamp();
-        final List<FoldingStats> stats = new ArrayList<>(foldingUsers.size());
+        final List<UserStats> stats = new ArrayList<>(foldingUsers.size());
 
         for (final FoldingUser foldingUser : foldingUsers) {
             if (StringUtils.isBlank(foldingUser.getPasskey())) {
                 LOGGER.warn("Not parsing TC stats for user, missing passkey: {}", foldingUser);
                 continue;
             }
-
+            
             try {
-                final UserStats totalStatsForUser = getStatsForUser(foldingUser.getFoldingUserName(), foldingUser.getPasskey(), foldingUser.getFoldingTeamNumber());
-                final FoldingStats foldingStats = new FoldingStats(foldingUser.getId(), totalStatsForUser, currentUtcTime);
-                stats.add(foldingStats);
-                LOGGER.info("{}: {} points | {} units", foldingUser.getFoldingUserName(), formatWithCommas(totalStatsForUser.getPoints()), formatWithCommas(totalStatsForUser.getUnits()));
+                final Hardware hardware = HardwareCache.get().get(foldingUser.getHardwareId());
+                final Stats totalStatsForUser = getStatsForUser(foldingUser.getFoldingUserName(), foldingUser.getPasskey(), foldingUser.getFoldingTeamNumber(), hardware.getMultiplier());
+                stats.add(new UserStats(foldingUser.getId(), totalStatsForUser, currentUtcTime));
+                LOGGER.info("{}: {} points | {} unmultiplied points | {} units", foldingUser.getFoldingUserName(), formatWithCommas(totalStatsForUser.getPoints()), formatWithCommas(totalStatsForUser.getUnmultipliedPoints()), formatWithCommas(totalStatsForUser.getUnits()));
 
                 TcStatsCache.get().addCurrentStats(foldingUser.getId(), totalStatsForUser);
+            } catch (final NotFoundException e) {
+                LOGGER.warn("Unable to find multiplied for user '{}/{}/{}'", foldingUser.getFoldingUserName(), foldingUser.getPasskey(), foldingUser.getFoldingTeamNumber(), e.getCause());
             } catch (final FoldingException e) {
                 LOGGER.warn("Unable to get stats for user '{}/{}/{}'", foldingUser.getFoldingUserName(), foldingUser.getPasskey(), foldingUser.getFoldingTeamNumber(), e.getCause());
             }
@@ -59,12 +64,12 @@ public class FoldingStatsParser {
     }
 
 
-    public static UserStats getStatsForUser(final String userName, final String passkey, final int foldingTeamNumber) throws FoldingException {
+    public static Stats getStatsForUser(final String userName, final String passkey, final int foldingTeamNumber, final double multiplier) throws FoldingException {
         LOGGER.debug("Getting stats for username/passkey '{}/{}' at team {}", userName, passkey, foldingTeamNumber);
         final long userPoints = getPointsForUser(userName, passkey, foldingTeamNumber);
         final int userUnits = getUnitsForUser(userName, passkey);
 
-        return new UserStats(userPoints, userUnits);
+        return new Stats(userPoints, userUnits, multiplier);
     }
 
     public static long getPointsForUser(final String userName, final String passkey, final int foldingTeamNumber) throws FoldingException {

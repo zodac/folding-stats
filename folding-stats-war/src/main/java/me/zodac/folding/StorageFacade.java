@@ -1,11 +1,9 @@
 package me.zodac.folding;
 
-import me.zodac.folding.api.FoldingStats;
 import me.zodac.folding.api.FoldingTeam;
 import me.zodac.folding.api.FoldingUser;
 import me.zodac.folding.api.Hardware;
-import me.zodac.folding.api.TeamStats;
-import me.zodac.folding.api.UserStats;
+import me.zodac.folding.api.Stats;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
@@ -93,12 +91,15 @@ public class StorageFacade {
         dbManager.deleteHardware(hardwareId);
     }
 
-    public FoldingUser createFoldingUser(final FoldingUser foldingUser) throws FoldingException {
+    public FoldingUser createFoldingUser(final FoldingUser foldingUser) throws FoldingException, NotFoundException {
         final FoldingUser foldingUserWithId = dbManager.createFoldingUser(foldingUser);
         foldingUserCache.add(foldingUserWithId);
 
         // When adding a new user, we should also configure the TC stats cache
-        final UserStats currentStats = FoldingStatsParser.getStatsForUser(foldingUser.getFoldingUserName(), foldingUser.getPasskey(), foldingUser.getFoldingTeamNumber());
+
+
+        final Hardware hardware = hardwareCache.get(foldingUser.getHardwareId());
+        final Stats currentStats = FoldingStatsParser.getStatsForUser(foldingUser.getFoldingUserName(), foldingUser.getPasskey(), foldingUser.getFoldingTeamNumber(), hardware.getMultiplier());
         tcStatsCache.addInitialStats(foldingUserWithId.getId(), currentStats);
 
         return foldingUserWithId;
@@ -188,15 +189,6 @@ public class StorageFacade {
         dbManager.deleteFoldingTeam(foldingTeamId);
     }
 
-    public List<FoldingTeam> getTcTeams() {
-        try {
-            return getAllFoldingTeams();
-        } catch (final FoldingException e) {
-            LOGGER.warn("Error retrieving TC Folding teams", e.getCause());
-            return Collections.emptyList();
-        }
-    }
-
     public List<FoldingUser> getTcUsers() {
         try {
             return getAllFoldingTeams()
@@ -212,37 +204,7 @@ public class StorageFacade {
         }
     }
 
-    public void persistDailyUserTcStats(final List<FoldingStats> tcFoldingStats) {
-        try {
-            dbManager.persistDailyUserTcStats(tcFoldingStats);
-        } catch (final FoldingException e) {
-            LOGGER.error("Error persisting daily TC user stats", e.getCause());
-        } catch (final Exception e) {
-            LOGGER.error("Unexpected error persisting daily TC user stats", e);
-        }
-    }
-
-    public void persistDailyTeamTcStats(final List<TeamStats> tcTeamStats) {
-        try {
-            dbManager.persistDailyTeamTcStats(tcTeamStats);
-        } catch (final FoldingException e) {
-            LOGGER.error("Error persisting daily TC team stats", e.getCause());
-        } catch (final Exception e) {
-            LOGGER.error("Unexpected error persisting daily team TC stats", e);
-        }
-    }
-
-    public void persistMonthlyTeamTcStats(final List<TeamStats> tcTeamStats) {
-        try {
-            dbManager.persistMonthlyTeamTcStats(tcTeamStats);
-        } catch (final FoldingException e) {
-            LOGGER.error("Error persisting monthly TC team stats", e.getCause());
-        } catch (final Exception e) {
-            LOGGER.error("Unexpected error persisting monthly team TC stats", e);
-        }
-    }
-
-    public Map<LocalDate, UserStats> getDailyUserStats(final int foldingUserId, final Month month, final Year year) throws NotFoundException, FoldingException {
+    public Map<LocalDate, Stats> getDailyUserStats(final int foldingUserId, final Month month, final Year year) throws NotFoundException, FoldingException {
         return dbManager.getDailyUserStats(foldingUserId, month, year);
     }
 }

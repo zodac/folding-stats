@@ -1,10 +1,9 @@
 package me.zodac.folding.db.postgres;
 
-import me.zodac.folding.api.FoldingStats;
 import me.zodac.folding.api.FoldingTeam;
 import me.zodac.folding.api.FoldingUser;
 import me.zodac.folding.api.Hardware;
-import me.zodac.folding.api.TeamStats;
+import me.zodac.folding.api.Stats;
 import me.zodac.folding.api.UserStats;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.db.OrderBy;
@@ -397,101 +396,29 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public void persistHourlyUserTcStats(final List<FoldingStats> tcUserStats) throws FoldingException {
+    public void persistHourlyUserTcStats(final List<UserStats> tcUserStats) throws FoldingException {
         LOGGER.info("Inserting TC stats for {} users to DB", tcUserStats.size());
-        final String preparedInsertSqlStatement = "INSERT INTO individual_tc_points (user_id, utc_timestamp, total_points, total_units) VALUES (?, ?, ?, ?);";
+        final String preparedInsertSqlStatement = "INSERT INTO individual_tc_points (user_id, utc_timestamp, total_points, total_unmultiplied_points, total_units) VALUES (?, ?, ?, ?, ?);";
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
              final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
-            for (final FoldingStats tcFoldingStatsForUser : tcUserStats) {
+            for (final UserStats tcUserStatsForUser : tcUserStats) {
                 try {
-                    preparedStatement.setInt(1, tcFoldingStatsForUser.getUserId());
-                    preparedStatement.setTimestamp(2, tcFoldingStatsForUser.getTimestamp());
-                    preparedStatement.setLong(3, tcFoldingStatsForUser.getPoints());
-                    preparedStatement.setInt(4, tcFoldingStatsForUser.getUnits());
+                    preparedStatement.setInt(1, tcUserStatsForUser.getUserId());
+                    preparedStatement.setTimestamp(2, tcUserStatsForUser.getTimestamp());
+                    preparedStatement.setLong(3, tcUserStatsForUser.getPoints());
+                    preparedStatement.setLong(4, tcUserStatsForUser.getUnmultipliedPoints());
+                    preparedStatement.setInt(5, tcUserStatsForUser.getUnits());
 
                     preparedStatement.execute();
                 } catch (final SQLException e) {
-                    LOGGER.warn("Unable to INSERT TC stats for user: {}", tcFoldingStatsForUser, e);
+                    LOGGER.warn("Unable to INSERT TC stats for user: {}", tcUserStatsForUser, e);
                 }
             }
         } catch (final SQLException e) {
             throw new FoldingException("Error opening connection to the DB", e);
         }
     }
-
-    @Override
-    public void persistDailyUserTcStats(final List<FoldingStats> tcFoldingStats) throws FoldingException {
-        LOGGER.info("Inserting daily TC stats for {} users to DB", tcFoldingStats.size());
-        final String preparedInsertSqlStatement = "INSERT INTO historic_stats_tc_user_daily (user_id, utc_timestamp, daily_points, daily_units) VALUES (?, ?, ?, ?);";
-
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
-             final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
-            for (final FoldingStats tcFoldingStatsForUser : tcFoldingStats) {
-                try {
-                    preparedStatement.setInt(1, tcFoldingStatsForUser.getUserId());
-                    preparedStatement.setTimestamp(2, tcFoldingStatsForUser.getTimestamp());
-                    preparedStatement.setLong(3, tcFoldingStatsForUser.getPoints());
-                    preparedStatement.setInt(4, tcFoldingStatsForUser.getUnits());
-
-                    preparedStatement.execute();
-                } catch (final SQLException e) {
-                    LOGGER.warn("Unable to INSERT daily TC stats for user: {}", tcFoldingStatsForUser, e);
-                }
-            }
-        } catch (final SQLException e) {
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
-    }
-
-    @Override
-    public void persistDailyTeamTcStats(final List<TeamStats> tcTeamStats) throws FoldingException {
-        LOGGER.info("Inserting daily TC stats for {} teams to DB", tcTeamStats.size());
-        final String preparedInsertSqlStatement = "INSERT INTO historic_stats_tc_team_daily (team_id, utc_timestamp, daily_team_points, daily_team_units) VALUES (?, ?, ?, ?);";
-
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
-             final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
-            for (final TeamStats tcStatsForTeam : tcTeamStats) {
-                try {
-                    preparedStatement.setInt(1, tcStatsForTeam.getTeamId());
-                    preparedStatement.setTimestamp(2, tcStatsForTeam.getTimestamp());
-                    preparedStatement.setLong(3, tcStatsForTeam.getPoints());
-                    preparedStatement.setInt(4, tcStatsForTeam.getUnits());
-
-                    preparedStatement.execute();
-                } catch (final SQLException e) {
-                    LOGGER.warn("Unable to INSERT daily TC stats for team: {}", tcStatsForTeam, e);
-                }
-            }
-        } catch (final SQLException e) {
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
-    }
-
-    @Override
-    public void persistMonthlyTeamTcStats(final List<TeamStats> tcTeamStats) throws FoldingException {
-        LOGGER.info("Inserting monthly TC stats for {} teams to DB", tcTeamStats.size());
-        final String preparedInsertSqlStatement = "INSERT INTO historic_stats_tc_team_monthly (team_id, utc_timestamp, monthly_team_points, monthly_team_units) VALUES (?, ?, ?, ?);";
-
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
-             final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
-            for (final TeamStats tcStatsForTeam : tcTeamStats) {
-                try {
-                    preparedStatement.setInt(1, tcStatsForTeam.getTeamId());
-                    preparedStatement.setTimestamp(2, tcStatsForTeam.getTimestamp());
-                    preparedStatement.setLong(3, tcStatsForTeam.getPoints());
-                    preparedStatement.setInt(4, tcStatsForTeam.getUnits());
-
-                    preparedStatement.execute();
-                } catch (final SQLException e) {
-                    LOGGER.warn("Unable to INSERT monthly TC stats for team: {}", tcStatsForTeam, e);
-                }
-            }
-        } catch (final SQLException e) {
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
-    }
-
 
     @Override
     public boolean doTcStatsExist() throws FoldingException {
@@ -514,11 +441,12 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public Map<LocalDate, UserStats> getDailyUserStats(final int foldingUserId, final Month month, final Year year) throws FoldingException, NotFoundException {
+    public Map<LocalDate, Stats> getDailyUserStats(final int foldingUserId, final Month month, final Year year) throws FoldingException, NotFoundException {
         LOGGER.debug("Getting historic daily user TC stats for {}/{} for user {}", StringUtils.capitalize(month.toString().toLowerCase(Locale.UK)), year, foldingUserId);
 
         final String selectSqlStatement = "SELECT CAST(utc_timestamp AS DATE) AS TIMESTAMP, " +
                 "COALESCE(MAX(total_points) - LAG(MAX(total_points)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points, " +
+                "COALESCE(MAX(total_unmultiplied_points) - LAG(MAX(total_unmultiplied_points)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_unmultiplied_points, " +
                 "COALESCE(MAX(total_units) - LAG(MAX(total_units)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_units " +
                 "FROM individual_tc_points " +
                 "WHERE EXTRACT(MONTH FROM utc_timestamp) = ? " +
@@ -534,24 +462,27 @@ public class PostgresDbManager implements DbManager {
             preparedStatement.setInt(2, year.getValue());
             preparedStatement.setInt(3, foldingUserId);
 
-            final Map<LocalDate, UserStats> userStatsByDate = new TreeMap<>();
+            final Map<LocalDate, Stats> userStatsByDate = new TreeMap<>();
 
             try (final ResultSet resultSet = preparedStatement.executeQuery()) {
 
                 // First entry will be (0, 0), so we need to manually get the first day's stats for the user
                 if (resultSet.next()) {
-                    final UserStats firstDayTotalStats = getTotalStatsForFirstDayForUser(foldingUserId, month, year);
-                    final UserStats initialStatsForMonth = getFirstStatsForUser(foldingUserId, month, year);
+                    final Stats firstDayTotalStats = getTotalStatsForFirstDayForUser(foldingUserId, month, year);
+                    final Stats initialStatsForMonth = getFirstStatsForUser(foldingUserId, month, year);
                     userStatsByDate.put(resultSet.getTimestamp("timestamp").toLocalDateTime().toLocalDate(),
-                            new UserStats(firstDayTotalStats.getPoints() - initialStatsForMonth.getPoints(), firstDayTotalStats.getUnits() - initialStatsForMonth.getUnits())
+                            new Stats(firstDayTotalStats.getPoints() - initialStatsForMonth.getPoints(),
+                                    firstDayTotalStats.getUnmultipliedPoints() - initialStatsForMonth.getUnmultipliedPoints(),
+                                    firstDayTotalStats.getUnits() - initialStatsForMonth.getUnits())
                     );
                 }
 
                 // All remaining stats will be diff-ed from the previous entry
                 while (resultSet.next()) {
                     userStatsByDate.put(resultSet.getTimestamp("timestamp").toLocalDateTime().toLocalDate(),
-                            new UserStats(
+                            new Stats(
                                     resultSet.getLong("diff_points"),
+                                    resultSet.getLong("diff_unmultiplied_points"),
                                     resultSet.getInt("diff_units")
                             )
                     );
@@ -571,8 +502,8 @@ public class PostgresDbManager implements DbManager {
         }
     }
 
-    private UserStats getTotalStatsForFirstDayForUser(final int foldingUserId, final Month month, final Year year) throws FoldingException, NotFoundException {
-        final String selectSqlStatement = "SELECT total_points AS points, total_units AS units " +
+    private Stats getTotalStatsForFirstDayForUser(final int foldingUserId, final Month month, final Year year) throws FoldingException, NotFoundException {
+        final String selectSqlStatement = "SELECT total_points AS points, total_unmultiplied_points AS unmultiplied_points, total_units AS units " +
                 "FROM individual_tc_points " +
                 "WHERE CAST(utc_timestamp AS DATE) = (" +
                 "   SELECT CAST(MIN(utc_timestamp) AS DATE) " +
@@ -595,7 +526,7 @@ public class PostgresDbManager implements DbManager {
             try (final ResultSet resultSet = preparedStatement.executeQuery()) {
 
                 if (resultSet.next()) {
-                    return new UserStats(resultSet.getLong("points"), resultSet.getInt("units"));
+                    return new Stats(resultSet.getLong("points"), resultSet.getLong("unmultiplied_points"), resultSet.getInt("units"));
                 }
 
                 throw new NotFoundException();
@@ -606,22 +537,22 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public UserStats getFirstStatsForUser(final int foldingUserId, final Month month, final Year year) throws FoldingException, NotFoundException {
+    public Stats getFirstStatsForUser(final int foldingUserId, final Month month, final Year year) throws FoldingException, NotFoundException {
         LOGGER.debug("Getting first points in {}/{} for user {}", StringUtils.capitalize(month.toString().toLowerCase(Locale.UK)), year, foldingUserId);
         return getPointsForUser(foldingUserId, month, year, OrderBy.ASCENDING);
     }
 
     @Override
-    public UserStats getLatestStatsForUser(final int foldingUserId, final Month month, final Year year) throws FoldingException, NotFoundException {
+    public Stats getLatestStatsForUser(final int foldingUserId, final Month month, final Year year) throws FoldingException, NotFoundException {
         LOGGER.debug("Getting current points in {}/{} for user {}", StringUtils.capitalize(month.toString().toLowerCase(Locale.UK)), year, foldingUserId);
         return getPointsForUser(foldingUserId, month, year, OrderBy.DESCENDING);
     }
 
-    private UserStats getPointsForUser(final int foldingUserId, final Month month, final Year year,
-                                       final OrderBy orderBy) throws
+    private Stats getPointsForUser(final int foldingUserId, final Month month, final Year year,
+                                   final OrderBy orderBy) throws
             FoldingException, NotFoundException {
         final String selectSqlStatement = String.format(
-                "SELECT total_points AS points, total_units AS units " +
+                "SELECT total_points AS points, total_unmultiplied_points AS unmultiplied_points, total_units AS units " +
                         "FROM individual_tc_points " +
                         "WHERE EXTRACT(MONTH FROM utc_timestamp) = ? AND EXTRACT(YEAR FROM utc_timestamp) = ? " +
                         "AND user_id = ? " +
@@ -639,7 +570,7 @@ public class PostgresDbManager implements DbManager {
             try (final ResultSet resultSet = preparedStatement.executeQuery()) {
 
                 if (resultSet.next()) {
-                    return new UserStats(resultSet.getLong("points"), resultSet.getInt("units"));
+                    return new Stats(resultSet.getLong("points"), resultSet.getLong("unmultiplied_points"), resultSet.getInt("units"));
                 }
 
                 throw new NotFoundException();

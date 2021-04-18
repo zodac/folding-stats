@@ -88,7 +88,7 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<FoldingUser> 
     }
 
     @Override
-    protected FoldingUser createElement(final FoldingUser element) throws FoldingException {
+    protected FoldingUser createElement(final FoldingUser element) throws FoldingException, NotFoundException {
         return storageFacade.createFoldingUser(element);
     }
 

@@ -5,7 +5,7 @@ import me.zodac.folding.api.FoldingTeam;
 import me.zodac.folding.api.FoldingUser;
 import me.zodac.folding.api.Hardware;
 import me.zodac.folding.api.OperatingSystem;
-import me.zodac.folding.api.UserStats;
+import me.zodac.folding.api.Stats;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
@@ -66,7 +66,7 @@ public class Initialiser {
 
         for (final FoldingUser foldingUser : foldingUsers) {
             try {
-                final UserStats initialStatsForUser = dbManager.getFirstStatsForUser(foldingUser.getId(), currentMonth, currentYear);
+                final Stats initialStatsForUser = dbManager.getFirstStatsForUser(foldingUser.getId(), currentMonth, currentYear);
                 LOGGER.debug("Found initial stats for {} for user {}: {}", currentMonth, foldingUser, initialStatsForUser);
                 TcStatsCache.get().addInitialStats(foldingUser.getId(), initialStatsForUser);
             } catch (final NotFoundException e) {
@@ -77,7 +77,7 @@ public class Initialiser {
             }
 
             try {
-                final UserStats currentStatsForUser = dbManager.getLatestStatsForUser(foldingUser.getId(), currentMonth, currentYear);
+                final Stats currentStatsForUser = dbManager.getLatestStatsForUser(foldingUser.getId(), currentMonth, currentYear);
                 LOGGER.debug("Found current stats for {} for user {}: {}", currentMonth, foldingUser, currentStatsForUser);
                 TcStatsCache.get().addCurrentStats(foldingUser.getId(), currentStatsForUser);
             } catch (final NotFoundException e) {

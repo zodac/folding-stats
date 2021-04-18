@@ -1,10 +1,9 @@
 package me.zodac.folding.api.db;
 
-import me.zodac.folding.api.FoldingStats;
 import me.zodac.folding.api.FoldingTeam;
 import me.zodac.folding.api.FoldingUser;
 import me.zodac.folding.api.Hardware;
-import me.zodac.folding.api.TeamStats;
+import me.zodac.folding.api.Stats;
 import me.zodac.folding.api.UserStats;
 import me.zodac.folding.api.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
@@ -62,22 +61,16 @@ public interface DbManager {
 
     // TC operations
 
-    UserStats getFirstStatsForUser(final int foldingUserId, final Month month, final Year year) throws FoldingException, NotFoundException;
+    Stats getFirstStatsForUser(final int foldingUserId, final Month month, final Year year) throws FoldingException, NotFoundException;
 
-    UserStats getLatestStatsForUser(final int foldingUserId, final Month month, final Year year) throws FoldingException, NotFoundException;
+    Stats getLatestStatsForUser(final int foldingUserId, final Month month, final Year year) throws FoldingException, NotFoundException;
 
-    void persistHourlyUserTcStats(final List<FoldingStats> tcUserStats) throws FoldingException;
-
-    void persistDailyUserTcStats(final List<FoldingStats> tcUserStats) throws FoldingException;
-
-    void persistDailyTeamTcStats(final List<TeamStats> tcTeamStats) throws FoldingException;
-
-    void persistMonthlyTeamTcStats(final List<TeamStats> tcTeamStats) throws FoldingException;
+    void persistHourlyUserTcStats(final List<UserStats> tcUserStats) throws FoldingException;
 
     // TODO: [zodac] To be removed
     boolean doTcStatsExist() throws FoldingException;
 
     // Historic TC operations
 
-    Map<LocalDate, UserStats> getDailyUserStats(final int foldingUserId, final Month month, final Year year) throws FoldingException, NotFoundException;
+    Map<LocalDate, Stats> getDailyUserStats(final int foldingUserId, final Month month, final Year year) throws FoldingException, NotFoundException;
 }

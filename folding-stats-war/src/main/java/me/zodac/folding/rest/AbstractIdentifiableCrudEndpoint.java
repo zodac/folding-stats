@@ -29,7 +29,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
 
     protected abstract ValidationResponse validate(final V element);
 
-    protected abstract V createElement(final V element) throws FoldingException;
+    protected abstract V createElement(final V element) throws FoldingException, NotFoundException;
 
     protected abstract List<V> getAllElements() throws FoldingException;
 
@@ -74,7 +74,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
     }
 
     public Response getAll() {
-        getLogger().info("GET request received for all {} at '{}'", elementType(), uriContext.getAbsolutePath());
+        getLogger().info("GET request received for all {}s at '{}'", elementType(), uriContext.getAbsolutePath());
 
         try {
             final List<V> elements = getAllElements();

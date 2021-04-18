@@ -7,7 +7,7 @@ import me.zodac.folding.api.Category;
 import me.zodac.folding.api.FoldingTeam;
 import me.zodac.folding.api.FoldingUser;
 import me.zodac.folding.api.Hardware;
-import me.zodac.folding.api.UserStats;
+import me.zodac.folding.api.Stats;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.cache.tc.TcStatsCache;
@@ -135,13 +135,13 @@ public class TeamCompetitionStatsEndpoint {
         try {
             final Hardware hardware = storageFacade.getHardware(foldingUser.getHardwareId());
 
-            final Optional<UserStats> initialStats = tcStatsCache.getInitialStatsForUser(foldingUser.getId());
+            final Optional<Stats> initialStats = tcStatsCache.getInitialStatsForUser(foldingUser.getId());
             if (initialStats.isEmpty()) {
                 LOGGER.warn("Could not find initial stats for user: {}", foldingUser);
                 return Optional.empty();
             }
 
-            final Optional<UserStats> currentStats = tcStatsCache.getCurrentStatsForUser(foldingUser.getId());
+            final Optional<Stats> currentStats = tcStatsCache.getCurrentStatsForUser(foldingUser.getId());
             if (currentStats.isEmpty()) {
                 LOGGER.warn("Could not find current stats for user: {}", foldingUser);
                 return Optional.empty();
@@ -150,7 +150,7 @@ public class TeamCompetitionStatsEndpoint {
             LOGGER.debug("Found initial stats {} and current stats {} for {}", initialStats.get(), currentStats.get(), foldingUser);
             final long tcUnitsForUser = currentStats.get().getUnits() - initialStats.get().getUnits();
             final long tcPointsForUser = currentStats.get().getPoints() - initialStats.get().getPoints();
-            final long tcPointsForUserMultiplier = (long) (tcPointsForUser * hardware.getMultiplier());
+            final long tcUnmultipliedPointsForUserMultiplier = currentStats.get().getUnmultipliedPoints() - initialStats.get().getUnmultipliedPoints();
 
             final Category category = Category.get(foldingUser.getCategory());
             if (category == Category.INVALID) {
@@ -158,7 +158,7 @@ public class TeamCompetitionStatsEndpoint {
                 return Optional.empty();
             }
 
-            return Optional.of(new TcUser(foldingUser.getDisplayName(), hardware.getDisplayName(), category.getDisplayName(), tcPointsForUserMultiplier, tcPointsForUser, tcUnitsForUser));
+            return Optional.of(new TcUser(foldingUser.getDisplayName(), hardware.getDisplayName(), category.getDisplayName(), tcPointsForUser, tcUnmultipliedPointsForUserMultiplier, tcUnitsForUser));
         } catch (final NotFoundException e) {
             LOGGER.warn("No hardware found for ID: {}", foldingUser.getHardwareId(), e);
             return Optional.empty();
