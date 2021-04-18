@@ -11,7 +11,7 @@ public class Stats {
     private final int units;
 
     public Stats(final long points, final int units, final double multiplier) {
-        this.points = (long) (points * multiplier);
+        this.points = Math.round(points * multiplier);
         this.unmultipliedPoints = points;
         this.units = units;
     }
