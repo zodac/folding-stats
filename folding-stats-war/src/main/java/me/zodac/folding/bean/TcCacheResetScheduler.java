@@ -1,6 +1,6 @@
 package me.zodac.folding.bean;
 
-import me.zodac.folding.cache.tc.TcStatsCache;
+import me.zodac.folding.cache.StatsCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +24,7 @@ public class TcCacheResetScheduler {
         //   in the previous month.
         //   It's a bit more work, and I don't really see the need for it unless we have a lot of failures. But if I get bored, it's
         //   something that could be valuable for resilience down the line.
-        TcStatsCache.get().resetInitialCache();
-        TcStatsCache.get().emptyCurrentCache();
+        StatsCache.get().resetInitialCache();
+        StatsCache.get().emptyCurrentCache();
     }
 }

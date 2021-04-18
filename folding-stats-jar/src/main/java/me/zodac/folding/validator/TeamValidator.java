@@ -1,9 +1,9 @@
 package me.zodac.folding.validator;
 
-import me.zodac.folding.api.Category;
-import me.zodac.folding.api.FoldingTeam;
-import me.zodac.folding.api.FoldingUser;
-import me.zodac.folding.cache.FoldingUserCache;
+import me.zodac.folding.api.tc.Category;
+import me.zodac.folding.api.tc.Team;
+import me.zodac.folding.api.tc.User;
+import me.zodac.folding.cache.UserCache;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -15,21 +15,21 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
-public class FoldingTeamValidator {
+public class TeamValidator {
 
-    private FoldingTeamValidator() {
+    private TeamValidator() {
 
     }
 
-    public static ValidationResponse isValid(final FoldingTeam foldingTeam) {
+    public static ValidationResponse isValid(final Team team) {
         final List<String> failureMessages = new ArrayList<>();
 
-        if (StringUtils.isBlank(foldingTeam.getTeamName())) {
+        if (StringUtils.isBlank(team.getTeamName())) {
             failureMessages.add("Attribute 'teamName' must not be empty");
         }
 
-        if (foldingTeam.getCaptainUserId() <= FoldingUser.EMPTY_USER_ID || !FoldingUserCache.get().contains(foldingTeam.getCaptainUserId())) {
-            final List<String> availableUsers = FoldingUserCache.get()
+        if (team.getCaptainUserId() <= User.EMPTY_USER_ID || !UserCache.get().contains(team.getCaptainUserId())) {
+            final List<String> availableUsers = UserCache.get()
                     .getAll()
                     .stream()
                     .map(foldingUser -> String.format("%s: %s", foldingUser.getId(), foldingUser.getFoldingUserName()))
@@ -38,12 +38,12 @@ public class FoldingTeamValidator {
             failureMessages.add(String.format("Attribute 'captainUserId' must be one of: %s", availableUsers));
         }
 
-        if (!foldingTeam.getUserIds().contains(foldingTeam.getCaptainUserId())) {
-            failureMessages.add(String.format("Attribute 'captainUserId' must be in the team, must be one of: %s", foldingTeam.getUserIds()));
+        if (!team.getUserIds().contains(team.getCaptainUserId())) {
+            failureMessages.add(String.format("Attribute 'captainUserId' must be in the team, must be one of: %s", team.getUserIds()));
         }
 
-        if (foldingTeam.getUserIds().isEmpty()) {
-            final List<String> availableUsers = FoldingUserCache.get()
+        if (team.getUserIds().isEmpty()) {
+            final List<String> availableUsers = UserCache.get()
                     .getAll()
                     .stream()
                     .map(foldingUser -> String.format("%s: %s", foldingUser.getId(), foldingUser.getFoldingUserName()))
@@ -52,15 +52,15 @@ public class FoldingTeamValidator {
             failureMessages.add(String.format("Attribute 'userIds' contain at least one of: %s", availableUsers));
         }
 
-        final List<Integer> invalidUserIds = new ArrayList<>(foldingTeam.getUserIds().size());
-        for (final int userId : foldingTeam.getUserIds()) {
-            if (!FoldingUserCache.get().contains(userId)) {
+        final List<Integer> invalidUserIds = new ArrayList<>(team.getUserIds().size());
+        for (final int userId : team.getUserIds()) {
+            if (!UserCache.get().contains(userId)) {
                 invalidUserIds.add(userId);
             }
         }
 
         if (!invalidUserIds.isEmpty()) {
-            final List<String> availableUsers = FoldingUserCache.get()
+            final List<String> availableUsers = UserCache.get()
                     .getAll()
                     .stream()
                     .map(foldingUser -> String.format("%s: %s", foldingUser.getId(), foldingUser.getFoldingUserName()))
@@ -72,11 +72,11 @@ public class FoldingTeamValidator {
 
         // No point checking the category count if the team is already invalid, perhaps none of the users are correct at this point
         if (failureMessages.isEmpty()) {
-            final Map<Category, Long> categoryCount = foldingTeam.getUserIds()
+            final Map<Category, Long> categoryCount = team.getUserIds()
                     .stream()
-                    .map(userId -> FoldingUserCache.get().getOrNull(userId))
+                    .map(userId -> UserCache.get().getOrNull(userId))
                     .filter(Objects::nonNull)
-                    .map(FoldingUser::getCategory)
+                    .map(User::getCategory)
                     .map(Category::get)
                     .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
@@ -91,6 +91,6 @@ public class FoldingTeamValidator {
             return ValidationResponse.success();
         }
 
-        return ValidationResponse.failure(foldingTeam, failureMessages);
+        return ValidationResponse.failure(team, failureMessages);
     }
 }

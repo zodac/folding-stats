@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
 
-public class TcUser {
+public class UserResult {
 
     private String userName;
     private String hardware;
@@ -14,11 +14,11 @@ public class TcUser {
     private long pointsWithoutMultiplier;
     private long units;
 
-    public TcUser() {
+    public UserResult() {
 
     }
 
-    public TcUser(final String userName, final String hardware, final String category, final long points, final long pointsWithoutMultiplier, final long units) {
+    public UserResult(final String userName, final String hardware, final String category, final long points, final long pointsWithoutMultiplier, final long units) {
         this.userName = userName;
         this.hardware = hardware;
         this.category = category;
@@ -83,8 +83,8 @@ public class TcUser {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final TcUser tcUser = (TcUser) o;
-        return Objects.equals(points, tcUser.points) && Objects.equals(pointsWithoutMultiplier, tcUser.pointsWithoutMultiplier) && category == tcUser.category && Objects.equals(units, tcUser.units) && userName.equals(tcUser.userName) && hardware.equals(tcUser.hardware);
+        final UserResult userResult = (UserResult) o;
+        return Objects.equals(points, userResult.points) && Objects.equals(pointsWithoutMultiplier, userResult.pointsWithoutMultiplier) && category == userResult.category && Objects.equals(units, userResult.units) && userName.equals(userResult.userName) && hardware.equals(userResult.hardware);
     }
 
     @Override

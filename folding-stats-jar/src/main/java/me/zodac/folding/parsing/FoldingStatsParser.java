@@ -1,14 +1,14 @@
 package me.zodac.folding.parsing;
 
-import me.zodac.folding.api.FoldingUser;
-import me.zodac.folding.api.Hardware;
-import me.zodac.folding.api.Stats;
-import me.zodac.folding.api.UserStats;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
+import me.zodac.folding.api.tc.Hardware;
+import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.stats.Stats;
+import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.utils.TimeUtils;
 import me.zodac.folding.cache.HardwareCache;
-import me.zodac.folding.cache.tc.TcStatsCache;
+import me.zodac.folding.cache.StatsCache;
 import me.zodac.folding.db.DbManagerRetriever;
 import me.zodac.folding.parsing.http.request.PointsUrlBuilder;
 import me.zodac.folding.parsing.http.request.UnitsUrlBuilder;
@@ -32,32 +32,32 @@ public class FoldingStatsParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(FoldingStatsParser.class);
 
     // TODO: [zodac] This shouldn't be here anymore. Keep this class as simple logic, move this function elsewhere since it has TC-specific logic
-    public static void parseTcStatsForAllUsers(final List<FoldingUser> foldingUsers) {
+    public static void parseTcStatsForAllUsers(final List<User> users) {
         final Timestamp currentUtcTime = TimeUtils.getCurrentUtcTimestamp();
-        final List<UserStats> stats = new ArrayList<>(foldingUsers.size());
+        final List<UserStats> stats = new ArrayList<>(users.size());
 
-        for (final FoldingUser foldingUser : foldingUsers) {
-            if (StringUtils.isBlank(foldingUser.getPasskey())) {
-                LOGGER.warn("Not parsing TC stats for user, missing passkey: {}", foldingUser);
+        for (final User user : users) {
+            if (StringUtils.isBlank(user.getPasskey())) {
+                LOGGER.warn("Not parsing TC stats for user, missing passkey: {}", user);
                 continue;
             }
-            
-            try {
-                final Hardware hardware = HardwareCache.get().get(foldingUser.getHardwareId());
-                final Stats totalStatsForUser = getStatsForUser(foldingUser.getFoldingUserName(), foldingUser.getPasskey(), foldingUser.getFoldingTeamNumber(), hardware.getMultiplier());
-                stats.add(new UserStats(foldingUser.getId(), totalStatsForUser, currentUtcTime));
-                LOGGER.info("{}: {} points | {} unmultiplied points | {} units", foldingUser.getFoldingUserName(), formatWithCommas(totalStatsForUser.getPoints()), formatWithCommas(totalStatsForUser.getUnmultipliedPoints()), formatWithCommas(totalStatsForUser.getUnits()));
 
-                TcStatsCache.get().addCurrentStats(foldingUser.getId(), totalStatsForUser);
+            try {
+                final Hardware hardware = HardwareCache.get().get(user.getHardwareId());
+                final Stats totalStatsForUser = getStatsForUser(user.getFoldingUserName(), user.getPasskey(), user.getFoldingTeamNumber(), hardware.getMultiplier());
+                stats.add(new UserStats(user.getId(), totalStatsForUser, currentUtcTime));
+                LOGGER.info("{}: {} points | {} unmultiplied points | {} units", user.getFoldingUserName(), formatWithCommas(totalStatsForUser.getPoints()), formatWithCommas(totalStatsForUser.getUnmultipliedPoints()), formatWithCommas(totalStatsForUser.getUnits()));
+
+                StatsCache.get().addCurrentStats(user.getId(), totalStatsForUser);
             } catch (final NotFoundException e) {
-                LOGGER.warn("Unable to find multiplied for user '{}/{}/{}'", foldingUser.getFoldingUserName(), foldingUser.getPasskey(), foldingUser.getFoldingTeamNumber(), e.getCause());
+                LOGGER.warn("Unable to find multiplied for user '{}/{}/{}'", user.getFoldingUserName(), user.getPasskey(), user.getFoldingTeamNumber(), e.getCause());
             } catch (final FoldingException e) {
-                LOGGER.warn("Unable to get stats for user '{}/{}/{}'", foldingUser.getFoldingUserName(), foldingUser.getPasskey(), foldingUser.getFoldingTeamNumber(), e.getCause());
+                LOGGER.warn("Unable to get stats for user '{}/{}/{}'", user.getFoldingUserName(), user.getPasskey(), user.getFoldingTeamNumber(), e.getCause());
             }
         }
 
         try {
-            DbManagerRetriever.get().persistHourlyUserTcStats(stats);
+            DbManagerRetriever.get().persistHourlyUserStats(stats);
         } catch (final FoldingException e) {
             LOGGER.error("Error persisting stats", e.getCause());
         }

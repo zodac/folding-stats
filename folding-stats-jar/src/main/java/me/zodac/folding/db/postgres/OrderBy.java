@@ -1,4 +1,4 @@
-package me.zodac.folding.api.db;
+package me.zodac.folding.db.postgres;
 
 /**
  * Lists the types of ordering possible within the backend storage.

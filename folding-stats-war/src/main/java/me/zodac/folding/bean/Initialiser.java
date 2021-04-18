@@ -1,19 +1,19 @@
 package me.zodac.folding.bean;
 
-import me.zodac.folding.api.Category;
-import me.zodac.folding.api.FoldingTeam;
-import me.zodac.folding.api.FoldingUser;
-import me.zodac.folding.api.Hardware;
-import me.zodac.folding.api.OperatingSystem;
-import me.zodac.folding.api.Stats;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
+import me.zodac.folding.api.tc.Category;
+import me.zodac.folding.api.tc.Hardware;
+import me.zodac.folding.api.tc.OperatingSystem;
+import me.zodac.folding.api.tc.Team;
+import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.utils.TimeUtils;
-import me.zodac.folding.cache.FoldingTeamCache;
-import me.zodac.folding.cache.FoldingUserCache;
 import me.zodac.folding.cache.HardwareCache;
-import me.zodac.folding.cache.tc.TcStatsCache;
+import me.zodac.folding.cache.StatsCache;
+import me.zodac.folding.cache.TeamCache;
+import me.zodac.folding.cache.UserCache;
 import me.zodac.folding.db.DbManagerRetriever;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +43,7 @@ public class Initialiser {
     public void init() {
         loadDataIntoDb(); // TODO: [zodac] Remove this eventually
         initPojoCaches();
-        initTcStatsCache(); // TODO: [zodac] Add bean to reset initial points cache at start of month
+        initTcStatsCache();
 
         LOGGER.info("System ready for requests");
     }
@@ -60,31 +60,31 @@ public class Initialiser {
         }
 
 
-        final List<FoldingUser> foldingUsers = FoldingUserCache.get().getAll();
+        final List<User> users = UserCache.get().getAll();
         final Month currentMonth = TimeUtils.getCurrentUtcMonth();
         final Year currentYear = TimeUtils.getCurrentUtcYear();
 
-        for (final FoldingUser foldingUser : foldingUsers) {
+        for (final User user : users) {
             try {
-                final Stats initialStatsForUser = dbManager.getFirstStatsForUser(foldingUser.getId(), currentMonth, currentYear);
-                LOGGER.debug("Found initial stats for {} for user {}: {}", currentMonth, foldingUser, initialStatsForUser);
-                TcStatsCache.get().addInitialStats(foldingUser.getId(), initialStatsForUser);
+                final Stats initialStatsForUser = dbManager.getFirstStatsForUser(user.getId(), currentMonth, currentYear);
+                LOGGER.debug("Found initial stats for {} for user {}: {}", currentMonth, user, initialStatsForUser);
+                StatsCache.get().addInitialStats(user.getId(), initialStatsForUser);
             } catch (final NotFoundException e) {
-                LOGGER.debug("No initial stats in DB for {}", foldingUser, e);
-                LOGGER.warn("No initial stats in DB for {}", foldingUser);
+                LOGGER.debug("No initial stats in DB for {}", user, e);
+                LOGGER.warn("No initial stats in DB for {}", user);
             } catch (final FoldingException e) {
-                LOGGER.warn("Unable to get initial stats for {} for user {}", currentMonth, foldingUser, e.getCause());
+                LOGGER.warn("Unable to get initial stats for {} for user {}", currentMonth, user, e.getCause());
             }
 
             try {
-                final Stats currentStatsForUser = dbManager.getLatestStatsForUser(foldingUser.getId(), currentMonth, currentYear);
-                LOGGER.debug("Found current stats for {} for user {}: {}", currentMonth, foldingUser, currentStatsForUser);
-                TcStatsCache.get().addCurrentStats(foldingUser.getId(), currentStatsForUser);
+                final Stats currentStatsForUser = dbManager.getLatestStatsForUser(user.getId(), currentMonth, currentYear);
+                LOGGER.debug("Found current stats for {} for user {}: {}", currentMonth, user, currentStatsForUser);
+                StatsCache.get().addCurrentStats(user.getId(), currentStatsForUser);
             } catch (final NotFoundException e) {
-                LOGGER.debug("No current stats in DB for {}", foldingUser, e);
-                LOGGER.warn("No current stats in DB for {}", foldingUser);
+                LOGGER.debug("No current stats in DB for {}", user, e);
+                LOGGER.warn("No current stats in DB for {}", user);
             } catch (final FoldingException e) {
-                LOGGER.warn("Unable to get current stats for {} for user {}", currentMonth, foldingUser, e.getCause());
+                LOGGER.warn("Unable to get current stats for {} for user {}", currentMonth, user, e.getCause());
             }
         }
 
@@ -117,14 +117,14 @@ public class Initialiser {
 
         try {
             LOGGER.debug("Initialising Folding user cache with DB data");
-            FoldingUserCache.get().addAll(dbManager.getAllFoldingUsers());
+            UserCache.get().addAll(dbManager.getAllUsers());
         } catch (final FoldingException e) {
             LOGGER.warn("Error initialising Folding user cache", e.getCause());
         }
 
         try {
             LOGGER.debug("Initialising Folding team cache with DB data");
-            FoldingTeamCache.get().addAll(dbManager.getAllFoldingTeams());
+            TeamCache.get().addAll(dbManager.getAllTeams());
         } catch (final FoldingException e) {
             LOGGER.warn("Error initialising Folding team cache", e.getCause());
         }
@@ -172,8 +172,8 @@ public class Initialiser {
     }
 
     private void addFoldingUsers() {
-        final List<FoldingUser> foldingUsers = List.of(
-                FoldingUser.createWithoutId(
+        final List<User> users = List.of(
+                User.createWithoutId(
                         "BWG",
                         "BWG",
                         "8d10fbfda0813aa7288613e400484214",
@@ -181,7 +181,7 @@ public class Initialiser {
                         1,
                         239902
                 ),
-                FoldingUser.createWithoutId(
+                User.createWithoutId(
                         "Bastiaan_NL",
                         "Bastiaan_NL",
                         "d1ed404fdb11570aa07d2294601ad292",
@@ -189,7 +189,7 @@ public class Initialiser {
                         2,
                         239902
                 ),
-                FoldingUser.createWithoutId(
+                User.createWithoutId(
                         "BWG",
                         "BWG_With_Multiplier",
                         "8d10fbfda0813aa7288613e400484214",
@@ -197,7 +197,7 @@ public class Initialiser {
                         3,
                         239902
                 ),
-                FoldingUser.createWithoutId(
+                User.createWithoutId(
                         "Bastiaan_NL",
                         "Bastiaan_NL_With_Multiplier",
                         "d1ed404fdb11570aa07d2294601ad292",
@@ -207,9 +207,9 @@ public class Initialiser {
                 )
         );
 
-        for (final FoldingUser foldingUser : foldingUsers) {
+        for (final User user : users) {
             try {
-                dbManager.createFoldingUser(foldingUser);
+                dbManager.createUser(user);
             } catch (final FoldingException e) {
                 LOGGER.warn("Error loading initial Folding user data", e.getCause());
             }
@@ -219,25 +219,25 @@ public class Initialiser {
     }
 
     private void addFoldingTeams() {
-        final List<FoldingTeam> foldingTeams = List.of(
-                new FoldingTeam.Builder("Freshly Waxed")
+        final List<Team> teams = List.of(
+                new Team.Builder("Freshly Waxed")
                         .teamDescription("BWG team")
                         .captainUserId(1)
                         .createTeam(),
-                new FoldingTeam.Builder("Furry Folders")
+                new Team.Builder("Furry Folders")
                         .teamDescription("Bastiaan_NL team")
                         .captainUserId(2)
                         .createTeam(),
-                new FoldingTeam.Builder("Test")
+                new Team.Builder("Test")
                         .teamDescription("Test team to try out multipliers")
                         .captainUserId(3) // BWG_With_Multiplier
                         .userId(4) // Bastiaan_NL_With_Multiplier
                         .createTeam()
         );
 
-        for (final FoldingTeam foldingTeam : foldingTeams) {
+        for (final Team team : teams) {
             try {
-                dbManager.createFoldingTeam(foldingTeam);
+                dbManager.createTeam(team);
             } catch (final FoldingException e) {
                 LOGGER.warn("Error loading initial Folding team data", e.getCause());
             }

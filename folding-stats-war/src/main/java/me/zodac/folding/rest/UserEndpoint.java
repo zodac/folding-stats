@@ -1,11 +1,11 @@
 package me.zodac.folding.rest;
 
 import me.zodac.folding.StorageFacade;
-import me.zodac.folding.api.FoldingUser;
 import me.zodac.folding.api.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
-import me.zodac.folding.validator.FoldingUserValidator;
+import me.zodac.folding.api.tc.User;
+import me.zodac.folding.validator.UserValidator;
 import me.zodac.folding.validator.ValidationResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +30,7 @@ import java.util.List;
 // TODO: [zodac] Add a GET endpoint with query, so we can see all instances of a user
 @Path("/users/")
 @RequestScoped
-public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<FoldingUser> {
+public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HardwareEndpoint.class);
 
@@ -40,36 +40,36 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<FoldingUser> 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createFoldingUser(final FoldingUser foldingUser) {
-        return super.create(foldingUser);
+    public Response createUser(final User user) {
+        return super.create(user);
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllFoldingUsers() {
+    public Response getAllUsers() {
         return super.getAll();
     }
 
     @GET
-    @Path("/{foldingUserId}")
+    @Path("/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getFoldingUserById(@PathParam("foldingUserId") final String foldingUserId) {
-        return super.getById(foldingUserId);
+    public Response getUserById(@PathParam("userId") final String userId) {
+        return super.getById(userId);
     }
 
     @PUT
-    @Path("/{foldingUserId}")
+    @Path("/{userId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateFoldingUserById(@PathParam("foldingUserId") final String foldingUserId, final FoldingUser foldingUser) {
-        return super.updateById(foldingUserId, foldingUser);
+    public Response updateUserById(@PathParam("userId") final String userId, final User user) {
+        return super.updateById(userId, user);
     }
 
     @DELETE
-    @Path("/{foldingUserId}")
+    @Path("/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteFoldingUserById(@PathParam("foldingUserId") final String foldingUserId) {
-        return super.deleteById(foldingUserId);
+    public Response deleteUserById(@PathParam("userId") final String userId) {
+        return super.deleteById(userId);
     }
 
     @Override
@@ -79,36 +79,36 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<FoldingUser> 
 
     @Override
     protected String elementType() {
-        return "Folding user";
+        return "user";
     }
 
     @Override
-    protected ValidationResponse validate(final FoldingUser element) {
-        return FoldingUserValidator.isValid(element);
+    protected ValidationResponse validate(final User element) {
+        return UserValidator.isValid(element);
     }
 
     @Override
-    protected FoldingUser createElement(final FoldingUser element) throws FoldingException, NotFoundException {
-        return storageFacade.createFoldingUser(element);
+    protected User createElement(final User user) throws FoldingException, NotFoundException {
+        return storageFacade.createUser(user);
     }
 
     @Override
-    protected List<FoldingUser> getAllElements() throws FoldingException {
-        return storageFacade.getAllFoldingUsers();
+    protected List<User> getAllElements() throws FoldingException {
+        return storageFacade.getAllUsers();
     }
 
     @Override
-    protected FoldingUser getElementById(final int elementId) throws FoldingException, NotFoundException {
-        return storageFacade.getFoldingUser(elementId);
+    protected User getElementById(final int userId) throws FoldingException, NotFoundException {
+        return storageFacade.getUser(userId);
     }
 
     @Override
-    protected void updateElementById(final FoldingUser element) throws FoldingException, NotFoundException {
-        storageFacade.updateFoldingUser(element);
+    protected void updateElementById(final User user) throws FoldingException, NotFoundException {
+        storageFacade.updateUser(user);
     }
 
     @Override
-    protected void deleteElementById(final int elementId) throws FoldingConflictException, FoldingException {
-        storageFacade.deleteFoldingUser(elementId);
+    protected void deleteElementById(final int user) throws FoldingConflictException, FoldingException {
+        storageFacade.deleteUser(user);
     }
 }

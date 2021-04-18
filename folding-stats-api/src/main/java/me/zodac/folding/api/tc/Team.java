@@ -1,11 +1,13 @@
-package me.zodac.folding.api;
+package me.zodac.folding.api.tc;
+
+import me.zodac.folding.api.Identifiable;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-public class FoldingTeam implements Identifiable {
+public class Team implements Identifiable {
 
     private static final long serialVersionUID = -8765213859473081036L;
 
@@ -15,12 +17,12 @@ public class FoldingTeam implements Identifiable {
     private int captainUserId;
     private Set<Integer> userIds;
 
-    public FoldingTeam() {
+    public Team() {
 
     }
 
 
-    public FoldingTeam(final int id, final String teamName, final String teamDescription, final int captainUserId, final Set<Integer> userIds) {
+    public Team(final int id, final String teamName, final String teamDescription, final int captainUserId, final Set<Integer> userIds) {
         this.id = id;
         this.teamName = teamName;
         this.teamDescription = teamDescription;
@@ -68,13 +70,13 @@ public class FoldingTeam implements Identifiable {
             return this;
         }
 
-        public FoldingTeam createTeam() {
-            return new FoldingTeam(teamId, teamName, teamDescription, captainUserId, userIds);
+        public Team createTeam() {
+            return new Team(teamId, teamName, teamDescription, captainUserId, userIds);
         }
     }
 
-    public static FoldingTeam updateWithId(final int teamId, final FoldingTeam foldingTeam) {
-        return new FoldingTeam(teamId, foldingTeam.getTeamName(), foldingTeam.getTeamDescription(), foldingTeam.getCaptainUserId(), foldingTeam.getUserIds());
+    public static Team updateWithId(final int teamId, final Team team) {
+        return new Team(teamId, team.getTeamName(), team.getTeamDescription(), team.getCaptainUserId(), team.getUserIds());
     }
 
     @Override
@@ -126,7 +128,7 @@ public class FoldingTeam implements Identifiable {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final FoldingTeam that = (FoldingTeam) o;
+        final Team that = (Team) o;
         return id == that.id && captainUserId == that.captainUserId && Objects.equals(teamDescription, that.teamDescription) && Objects.equals(teamName, that.teamName) && Objects.equals(userIds, that.userIds);
     }
 

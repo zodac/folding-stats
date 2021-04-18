@@ -1,10 +1,10 @@
-package me.zodac.folding.api;
+package me.zodac.folding.api.tc;
+
+import me.zodac.folding.api.Identifiable;
 
 import java.util.Objects;
 
-// TODO: [zodac] This should really be a TcUser. I think there will be confusion between this and non-TC users (like for a Foldathon).
-//   Need to distinguish the names better, could be very confusing as is.
-public class FoldingUser implements Identifiable {
+public class User implements Identifiable {
 
     private static final long serialVersionUID = -1919458037620452556L;
 
@@ -18,11 +18,11 @@ public class FoldingUser implements Identifiable {
     private int hardwareId;
     private int foldingTeamNumber;
 
-    public FoldingUser() {
+    public User() {
 
     }
 
-    private FoldingUser(final int id, final String foldingUserName, final String displayName, final String passkey, final String category, final int hardwareId, final int foldingTeamNumber) {
+    private User(final int id, final String foldingUserName, final String displayName, final String passkey, final String category, final int hardwareId, final int foldingTeamNumber) {
         this.id = id;
         this.foldingUserName = foldingUserName;
         this.displayName = displayName;
@@ -32,16 +32,16 @@ public class FoldingUser implements Identifiable {
         this.foldingTeamNumber = foldingTeamNumber;
     }
 
-    public static FoldingUser create(final int userId, final String foldingUserName, final String displayName, final String passkey, final String category, final int hardwareId, final int foldingTeamNumber) {
-        return new FoldingUser(userId, foldingUserName, displayName, passkey, category, hardwareId, foldingTeamNumber);
+    public static User create(final int userId, final String foldingUserName, final String displayName, final String passkey, final String category, final int hardwareId, final int foldingTeamNumber) {
+        return new User(userId, foldingUserName, displayName, passkey, category, hardwareId, foldingTeamNumber);
     }
 
-    public static FoldingUser createWithoutId(final String foldingUserName, final String displayName, final String passkey, final String category, final int hardwareId, final int foldingTeamNumber) {
-        return new FoldingUser(0, foldingUserName, displayName, passkey, category, hardwareId, foldingTeamNumber);
+    public static User createWithoutId(final String foldingUserName, final String displayName, final String passkey, final String category, final int hardwareId, final int foldingTeamNumber) {
+        return new User(0, foldingUserName, displayName, passkey, category, hardwareId, foldingTeamNumber);
     }
 
-    public static FoldingUser updateWithId(final int userId, final FoldingUser foldingUser) {
-        return new FoldingUser(userId, foldingUser.getFoldingUserName(), foldingUser.getDisplayName(), foldingUser.getPasskey(), foldingUser.getCategory(), foldingUser.getHardwareId(), foldingUser.getFoldingTeamNumber());
+    public static User updateWithId(final int userId, final User user) {
+        return new User(userId, user.getFoldingUserName(), user.getDisplayName(), user.getPasskey(), user.getCategory(), user.getHardwareId(), user.getFoldingTeamNumber());
     }
 
     @Override
@@ -109,7 +109,7 @@ public class FoldingUser implements Identifiable {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final FoldingUser that = (FoldingUser) o;
+        final User that = (User) o;
         return id == that.id && hardwareId == that.hardwareId && Objects.equals(category, that.category) && foldingTeamNumber == that.foldingTeamNumber && Objects.equals(foldingUserName, that.foldingUserName) && Objects.equals(displayName, that.displayName) && Objects.equals(passkey, that.passkey);
     }
 

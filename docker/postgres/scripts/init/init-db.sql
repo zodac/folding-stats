@@ -10,7 +10,7 @@ CREATE INDEX index_hardware_id
     ON hardware(hardware_id);
 
 
-CREATE TABLE folding_users (
+CREATE TABLE users (
     user_id SERIAL PRIMARY KEY,
     folding_username TEXT NOT NULL,
     display_username TEXT NOT NULL,
@@ -23,11 +23,11 @@ CREATE TABLE folding_users (
         REFERENCES hardware(hardware_id)
 );
 
-CREATE INDEX index_folding_user_id
-    ON folding_users(user_id);
+CREATE INDEX index_user_id
+    ON users(user_id);
 
 
-CREATE TABLE folding_teams (
+CREATE TABLE teams (
     team_id SERIAL PRIMARY KEY,
     team_name TEXT NOT NULL UNIQUE,
     team_description TEXT,
@@ -35,13 +35,14 @@ CREATE TABLE folding_teams (
     user_ids INT[] NOT NULL,
     CONSTRAINT fk_captain_user_id
         FOREIGN KEY(captain_user_id)
-        REFERENCES folding_users(user_id)
+        REFERENCES users(user_id)
 );
 
-CREATE INDEX index_tc_team_id
-    ON folding_teams(team_id);
+CREATE INDEX index_team_id
+    ON teams(team_id);
 
-CREATE TABLE individual_tc_points (
+
+CREATE TABLE tc_user_points (
     user_id INT,
     utc_timestamp TIMESTAMP,
     total_points BIGINT NOT NULL,
@@ -50,54 +51,8 @@ CREATE TABLE individual_tc_points (
     PRIMARY KEY(user_id, utc_timestamp),
     CONSTRAINT fk_user_id
         FOREIGN KEY(user_id)
-        REFERENCES folding_users(user_id)
+        REFERENCES users(user_id)
 );
 
-CREATE INDEX index_individual_tc_points
-    ON individual_tc_points(user_id, utc_timestamp);
-
-
-
--- TODO: [zodac] Not using the following tables yet, might do eventually
-
---CREATE TABLE historic_stats_tc_user_daily (
---    user_id INT,
---    utc_timestamp TIMESTAMP,
---    daily_points BIGINT NOT NULL,
---    daily_units INT NOT NULL,
---    PRIMARY KEY(user_id, utc_timestamp),
---    CONSTRAINT fk_user_id
---        FOREIGN KEY(user_id)
---        REFERENCES folding_users(user_id)
---);
---
---CREATE INDEX index_historic_stats_tc_user_daily
---    ON individual_tc_points(user_id, utc_timestamp);
---
---CREATE TABLE historic_stats_tc_team_daily (
---    team_id INT,
---    utc_timestamp TIMESTAMP,
---    daily_team_points BIGINT NOT NULL,
---    daily_team_units INT NOT NULL,
---    PRIMARY KEY(team_id, utc_timestamp),
---    CONSTRAINT fk_team_id
---        FOREIGN KEY(team_id)
---        REFERENCES folding_teams(team_id)
---);
---
---CREATE INDEX index_historic_stats_tc_team_daily
---    ON individual_tc_points(user_id, utc_timestamp);
---
---CREATE TABLE historic_stats_tc_team_monthly (
---    team_id INT,
---    utc_timestamp TIMESTAMP,
---    monthly_team_points BIGINT NOT NULL,
---    monthly_team_units INT NOT NULL,
---    PRIMARY KEY(team_id, utc_timestamp),
---    CONSTRAINT fk_team_id
---        FOREIGN KEY(team_id)
---        REFERENCES folding_teams(team_id)
---);
---
---CREATE INDEX index_historic_stats_tc_team_monthly
---    ON individual_tc_points(user_id, utc_timestamp);
+CREATE INDEX index_tc_user_points
+    ON tc_user_points(user_id, utc_timestamp);

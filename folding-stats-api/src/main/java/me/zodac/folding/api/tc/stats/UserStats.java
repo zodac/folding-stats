@@ -1,25 +1,25 @@
-package me.zodac.folding.api;
+package me.zodac.folding.api.tc.stats;
 
 import java.sql.Timestamp;
 import java.util.Objects;
 
 import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
 
-public class TeamStats {
+public class UserStats {
 
-    private final int teamId;
+    private final int userId;
     private final Stats totalStats;
     private final Timestamp timestamp;
 
     // TODO: [zodac] Static constructor
-    public TeamStats(final int teamId, final Stats totalStats, final Timestamp timestamp) {
-        this.teamId = teamId;
+    public UserStats(final int userId, final Stats totalStats, final Timestamp timestamp) {
+        this.userId = userId;
         this.totalStats = totalStats;
         this.timestamp = timestamp;
     }
 
-    public int getTeamId() {
-        return teamId;
+    public int getUserId() {
+        return userId;
     }
 
     public long getPoints() {
@@ -34,6 +34,10 @@ public class TeamStats {
         return totalStats.getUnits();
     }
 
+    public Stats getUserStats() {
+        return totalStats;
+    }
+
     public Timestamp getTimestamp() {
         return timestamp;
     }
@@ -46,20 +50,20 @@ public class TeamStats {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final TeamStats that = (TeamStats) o;
-        return teamId == that.teamId && Objects.equals(totalStats, that.totalStats) && timestamp == that.timestamp;
+        final UserStats that = (UserStats) o;
+        return userId == that.userId && Objects.equals(totalStats, that.totalStats) && timestamp == that.timestamp;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(teamId, totalStats, timestamp);
+        return Objects.hash(userId, totalStats, timestamp);
     }
 
     // TODO: [zodac] toString()
     @Override
     public String toString() {
         return "FoldingStats{" +
-                "teamId=" + teamId +
+                "userId=" + userId +
                 ", points=" + formatWithCommas(totalStats.getPoints()) +
                 ", unmultipliedPoints=" + formatWithCommas(totalStats.getUnmultipliedPoints()) +
                 ", units=" + formatWithCommas(totalStats.getUnits()) +

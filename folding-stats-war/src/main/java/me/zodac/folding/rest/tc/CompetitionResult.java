@@ -6,36 +6,36 @@ import java.util.Objects;
 
 import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
 
-public class TcStats {
+public class CompetitionResult {
 
-    private List<TcTeam> teams = new ArrayList<>();
+    private List<TeamResult> teams = new ArrayList<>();
     private long totalUnits = 0L;
     private long totalPoints = 0L;
     private long totalPointsWithoutMultipliers = 0L;
 
-    public TcStats() {
+    public CompetitionResult() {
 
     }
 
-    public TcStats(final List<TcTeam> teams) {
+    public CompetitionResult(final List<TeamResult> teams) {
         this.teams = teams;
         this.totalUnits = 0L;
         this.totalPoints = 0L;
         this.totalPointsWithoutMultipliers = 0L;
 
         // TODO: [zodac] Rank the teams
-        for (final TcTeam team : teams) {
+        for (final TeamResult team : teams) {
             this.totalUnits += team.getTeamUnits();
             this.totalPoints += team.getTeamPoints();
             this.totalPointsWithoutMultipliers += team.getTeamPointsWithoutMultipliers();
         }
     }
 
-    public List<TcTeam> getTeams() {
+    public List<TeamResult> getTeams() {
         return teams;
     }
 
-    public void setTeams(final List<TcTeam> teams) {
+    public void setTeams(final List<TeamResult> teams) {
         this.teams = teams;
     }
 
@@ -71,8 +71,8 @@ public class TcStats {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final TcStats tcStats = (TcStats) o;
-        return totalPoints == tcStats.totalPoints && totalPointsWithoutMultipliers == tcStats.totalPointsWithoutMultipliers && Objects.equals(teams, tcStats.teams);
+        final CompetitionResult competitionResult = (CompetitionResult) o;
+        return totalPoints == competitionResult.totalPoints && totalPointsWithoutMultipliers == competitionResult.totalPointsWithoutMultipliers && Objects.equals(teams, competitionResult.teams);
     }
 
     @Override

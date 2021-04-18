@@ -1,4 +1,4 @@
-package me.zodac.folding.api;
+package me.zodac.folding.api.tc;
 
 import java.util.List;
 import java.util.stream.Stream;

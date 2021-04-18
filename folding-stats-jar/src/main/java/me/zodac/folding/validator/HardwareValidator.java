@@ -1,8 +1,7 @@
 package me.zodac.folding.validator;
 
-import me.zodac.folding.api.Category;
-import me.zodac.folding.api.Hardware;
-import me.zodac.folding.api.OperatingSystem;
+import me.zodac.folding.api.tc.Hardware;
+import me.zodac.folding.api.tc.OperatingSystem;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;

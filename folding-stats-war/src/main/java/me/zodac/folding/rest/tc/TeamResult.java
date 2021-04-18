@@ -5,22 +5,22 @@ import java.util.Objects;
 
 import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
 
-public class TcTeam {
+public class TeamResult {
 
     private String teamName;
     private String captainName;
 
     // TODO: [zodac] Rank the users
-    private List<TcUser> users;
+    private List<UserResult> users;
     private long teamUnits;
     private long teamPoints;
     private long teamPointsWithoutMultipliers;
 
-    public TcTeam() {
+    public TeamResult() {
 
     }
 
-    public TcTeam(final String teamName, final String captainName, final List<TcUser> users) {
+    public TeamResult(final String teamName, final String captainName, final List<UserResult> users) {
         this.teamName = teamName;
         this.captainName = captainName;
         this.users = users;
@@ -29,7 +29,7 @@ public class TcTeam {
         this.teamPoints = 0L;
         this.teamPointsWithoutMultipliers = 0L;
 
-        for (final TcUser user : users) {
+        for (final UserResult user : users) {
             teamUnits += user.getUnits();
             teamPoints += user.getPoints();
             teamPointsWithoutMultipliers += user.getPointsWithoutMultiplier();
@@ -52,11 +52,11 @@ public class TcTeam {
         this.captainName = captainName;
     }
 
-    public List<TcUser> getUsers() {
+    public List<UserResult> getUsers() {
         return users;
     }
 
-    public void setUsers(final List<TcUser> users) {
+    public void setUsers(final List<UserResult> users) {
         this.users = users;
     }
 
@@ -92,8 +92,8 @@ public class TcTeam {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final TcTeam tcTeam = (TcTeam) o;
-        return teamName.equals(tcTeam.teamName) && captainName.equals(tcTeam.captainName) && teamUnits == tcTeam.teamUnits && teamPoints == tcTeam.teamPoints && teamPointsWithoutMultipliers == tcTeam.teamPointsWithoutMultipliers && Objects.equals(users, tcTeam.users);
+        final TeamResult teamResult = (TeamResult) o;
+        return teamName.equals(teamResult.teamName) && captainName.equals(teamResult.captainName) && teamUnits == teamResult.teamUnits && teamPoints == teamResult.teamPoints && teamPointsWithoutMultipliers == teamResult.teamPointsWithoutMultipliers && Objects.equals(users, teamResult.users);
     }
 
     @Override

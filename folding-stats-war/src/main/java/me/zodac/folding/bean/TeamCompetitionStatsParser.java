@@ -1,7 +1,7 @@
 package me.zodac.folding.bean;
 
 import me.zodac.folding.StorageFacade;
-import me.zodac.folding.api.FoldingUser;
+import me.zodac.folding.api.tc.User;
 import me.zodac.folding.parsing.FoldingStatsParser;
 import me.zodac.folding.util.EnvironmentVariable;
 import org.slf4j.Logger;
@@ -61,7 +61,7 @@ public class TeamCompetitionStatsParser {
     private void getTcStatsForFoldingUsers() {
         LOGGER.info("Parsing TC Folding stats");
 
-        final List<FoldingUser> tcUsers = storageFacade.getTcUsers();
+        final List<User> tcUsers = storageFacade.getUsersFromTeams();
 
         if (tcUsers.isEmpty()) {
             LOGGER.warn("No TC Folding users configured in system!");

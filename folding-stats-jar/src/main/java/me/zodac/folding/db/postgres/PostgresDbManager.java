@@ -1,15 +1,14 @@
 package me.zodac.folding.db.postgres;
 
-import me.zodac.folding.api.FoldingTeam;
-import me.zodac.folding.api.FoldingUser;
-import me.zodac.folding.api.Hardware;
-import me.zodac.folding.api.Stats;
-import me.zodac.folding.api.UserStats;
 import me.zodac.folding.api.db.DbManager;
-import me.zodac.folding.api.db.OrderBy;
 import me.zodac.folding.api.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
+import me.zodac.folding.api.tc.Hardware;
+import me.zodac.folding.api.tc.Team;
+import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.stats.Stats;
+import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.util.EnvironmentVariable;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -64,10 +63,8 @@ public class PostgresDbManager implements DbManager {
                 }
                 throw new IllegalStateException("No ID was returned from the DB, but no exception was raised");
             }
-        } catch (final IllegalStateException e) {
-            throw e;
-        } catch (final Exception e) {
-            throw new FoldingException("Error persisting hardware", e);
+        } catch (final SQLException e) {
+            throw new FoldingException("Error opening connection to the DB", e);
         }
     }
 
@@ -133,10 +130,8 @@ public class PostgresDbManager implements DbManager {
             if (preparedStatement.executeUpdate() == 0) {
                 throw new NotFoundException();
             }
-        } catch (final NotFoundException e) {
-            throw e;
-        } catch (final Exception e) {
-            throw new FoldingException("Error updating hardware", e);
+        } catch (final SQLException e) {
+            throw new FoldingException("Error opening connection to the DB", e);
         }
     }
 
@@ -159,51 +154,27 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public FoldingUser createFoldingUser(final FoldingUser foldingUser) throws FoldingException {
-        final String insertSqlWithReturnId = "INSERT INTO folding_users (folding_username, display_username, passkey, category, hardware_id, folding_team_number) VALUES (?, ?, ?, ?, ?, ?) RETURNING user_id;";
+    public User createUser(final User user) throws FoldingException {
+        final String insertSqlWithReturnId = "INSERT INTO users (folding_username, display_username, passkey, category, hardware_id, folding_team_number) VALUES (?, ?, ?, ?, ?, ?) RETURNING user_id;";
         LOGGER.debug("Executing SQL statement '{}'", insertSqlWithReturnId);
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
              final PreparedStatement preparedStatement = connection.prepareStatement(insertSqlWithReturnId)) {
 
-            preparedStatement.setString(1, foldingUser.getFoldingUserName());
-            preparedStatement.setString(2, foldingUser.getDisplayName());
-            preparedStatement.setString(3, foldingUser.getPasskey());
-            preparedStatement.setString(4, foldingUser.getCategory());
-            preparedStatement.setInt(5, foldingUser.getHardwareId());
-            preparedStatement.setInt(6, foldingUser.getFoldingTeamNumber());
+            preparedStatement.setString(1, user.getFoldingUserName());
+            preparedStatement.setString(2, user.getDisplayName());
+            preparedStatement.setString(3, user.getPasskey());
+            preparedStatement.setString(4, user.getCategory());
+            preparedStatement.setInt(5, user.getHardwareId());
+            preparedStatement.setInt(6, user.getFoldingTeamNumber());
 
             try (final ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     final int foldingUserId = resultSet.getInt("user_id");
-                    return FoldingUser.updateWithId(foldingUserId, foldingUser);
+                    return User.updateWithId(foldingUserId, user);
                 }
 
                 throw new IllegalStateException("No ID was returned from the DB, but no exception was raised");
-            }
-        } catch (final IllegalStateException e) {
-            throw e;
-        } catch (final Exception e) {
-            throw new FoldingException("Error persisting Folding user", e);
-        }
-    }
-
-    @Override
-    public List<FoldingUser> getAllFoldingUsers() throws FoldingException {
-        final String selectSqlStatement = "SELECT * FROM folding_users;";
-        LOGGER.debug("Executing SQL statement '{}'", selectSqlStatement);
-
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
-             final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
-
-            try (final ResultSet resultSet = preparedStatement.executeQuery()) {
-                final List<FoldingUser> foldingUsers = new ArrayList<>();
-
-                while (resultSet.next()) {
-                    foldingUsers.add(createFoldingUser(resultSet));
-                }
-
-                return foldingUsers;
             }
         } catch (final SQLException e) {
             throw new FoldingException("Error opening connection to the DB", e);
@@ -211,14 +182,36 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public FoldingUser getFoldingUser(final int foldingUserId) throws FoldingException, NotFoundException {
-        final String selectSqlStatement = "SELECT * FROM folding_users WHERE user_id = ?;";
+    public List<User> getAllUsers() throws FoldingException {
+        final String selectSqlStatement = "SELECT * FROM users;";
         LOGGER.debug("Executing SQL statement '{}'", selectSqlStatement);
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
              final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
 
-            preparedStatement.setInt(1, foldingUserId);
+            try (final ResultSet resultSet = preparedStatement.executeQuery()) {
+                final List<User> users = new ArrayList<>();
+
+                while (resultSet.next()) {
+                    users.add(createFoldingUser(resultSet));
+                }
+
+                return users;
+            }
+        } catch (final SQLException e) {
+            throw new FoldingException("Error opening connection to the DB", e);
+        }
+    }
+
+    @Override
+    public User getUser(final int userId) throws FoldingException, NotFoundException {
+        final String selectSqlStatement = "SELECT * FROM users WHERE user_id = ?;";
+        LOGGER.debug("Executing SQL statement '{}'", selectSqlStatement);
+
+        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+             final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
+
+            preparedStatement.setInt(1, userId);
 
             try (final ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
@@ -233,8 +226,8 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public void updateFoldingUser(final FoldingUser foldingUser) throws FoldingException, NotFoundException {
-        final String updateSqlStatement = "UPDATE folding_users " +
+    public void updateUser(final User user) throws FoldingException, NotFoundException {
+        final String updateSqlStatement = "UPDATE users " +
                 "SET folding_username = ?, display_username = ?, passkey = ?, category = ?, hardware_id = ?, folding_team_number = ? " +
                 "WHERE user_id = ?;";
         LOGGER.info("Executing SQL statement '{}'", updateSqlStatement);
@@ -242,33 +235,31 @@ public class PostgresDbManager implements DbManager {
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
              final PreparedStatement preparedStatement = connection.prepareStatement(updateSqlStatement)) {
 
-            preparedStatement.setString(1, foldingUser.getFoldingUserName());
-            preparedStatement.setString(2, foldingUser.getDisplayName());
-            preparedStatement.setString(3, foldingUser.getPasskey());
-            preparedStatement.setString(4, foldingUser.getCategory());
-            preparedStatement.setInt(5, foldingUser.getHardwareId());
-            preparedStatement.setInt(6, foldingUser.getFoldingTeamNumber());
-            preparedStatement.setInt(7, foldingUser.getId());
+            preparedStatement.setString(1, user.getFoldingUserName());
+            preparedStatement.setString(2, user.getDisplayName());
+            preparedStatement.setString(3, user.getPasskey());
+            preparedStatement.setString(4, user.getCategory());
+            preparedStatement.setInt(5, user.getHardwareId());
+            preparedStatement.setInt(6, user.getFoldingTeamNumber());
+            preparedStatement.setInt(7, user.getId());
 
             if (preparedStatement.executeUpdate() == 0) {
                 throw new NotFoundException();
             }
-        } catch (final NotFoundException e) {
-            throw e;
-        } catch (final Exception e) {
-            throw new FoldingException("Error persisting hardware", e);
+        } catch (final SQLException e) {
+            throw new FoldingException("Error opening connection to the DB", e);
         }
     }
 
     @Override
-    public void deleteFoldingUser(final int foldingUserId) throws FoldingException, FoldingConflictException {
+    public void deleteUser(final int userId) throws FoldingException, FoldingConflictException {
         final String deleteSqlStatement = "DELETE FROM folding_user WHERE user_id = ?;";
         LOGGER.debug("Executing SQL statement '{}'", deleteSqlStatement);
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
              final PreparedStatement preparedStatement = connection.prepareStatement(deleteSqlStatement)) {
 
-            preparedStatement.setInt(1, foldingUserId);
+            preparedStatement.setInt(1, userId);
             preparedStatement.executeUpdate();
         } catch (final SQLException e) {
             if (e.getMessage().contains(VIOLATES_FOREIGN_KEY_CONSTRAINT)) {
@@ -279,50 +270,25 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public FoldingTeam createFoldingTeam(final FoldingTeam foldingTeam) throws FoldingException {
-        final String insertSqlWithReturnId = "INSERT INTO folding_teams (team_name, team_description, captain_user_id, user_ids) VALUES (?, ?, ?, ?) RETURNING team_id;";
+    public Team createTeam(final Team team) throws FoldingException {
+        final String insertSqlWithReturnId = "INSERT INTO teams (team_name, team_description, captain_user_id, user_ids) VALUES (?, ?, ?, ?) RETURNING team_id;";
         LOGGER.debug("Executing SQL statement '{}'", insertSqlWithReturnId);
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
              final PreparedStatement preparedStatement = connection.prepareStatement(insertSqlWithReturnId)) {
 
-            preparedStatement.setString(1, foldingTeam.getTeamName());
-            preparedStatement.setString(2, foldingTeam.getTeamDescription());
-            preparedStatement.setInt(3, foldingTeam.getCaptainUserId());
-            preparedStatement.setArray(4, connection.createArrayOf("INT", foldingTeam.getUserIds().toArray(new Integer[0])));
+            preparedStatement.setString(1, team.getTeamName());
+            preparedStatement.setString(2, team.getTeamDescription());
+            preparedStatement.setInt(3, team.getCaptainUserId());
+            preparedStatement.setArray(4, connection.createArrayOf("INT", team.getUserIds().toArray(new Integer[0])));
 
             try (final ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     final int foldingTeamId = resultSet.getInt("team_id");
-                    return FoldingTeam.updateWithId(foldingTeamId, foldingTeam);
+                    return Team.updateWithId(foldingTeamId, team);
                 }
 
                 throw new IllegalStateException("No ID was returned from the DB, but no exception was raised");
-            }
-        } catch (final IllegalStateException e) {
-            throw e;
-        } catch (final Exception e) {
-            throw new FoldingException("Error persisting Folding team", e);
-        }
-    }
-
-    @Override
-    public List<FoldingTeam> getAllFoldingTeams() throws FoldingException {
-        final String selectSqlStatement = "SELECT * FROM folding_teams;";
-        LOGGER.debug("Executing SQL statement '{}'", selectSqlStatement);
-
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
-             final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
-
-            try (final ResultSet resultSet = preparedStatement.executeQuery()) {
-
-                final List<FoldingTeam> foldingTeams = new ArrayList<>();
-
-                while (resultSet.next()) {
-                    foldingTeams.add(createFoldingTeam(resultSet));
-                }
-
-                return foldingTeams;
             }
         } catch (final SQLException e) {
             throw new FoldingException("Error opening connection to the DB", e);
@@ -330,8 +296,31 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public FoldingTeam getFoldingTeam(final int foldingTeamId) throws FoldingException, NotFoundException {
-        final String selectSqlStatement = "SELECT * FROM folding_teams WHERE team_id = ?;";
+    public List<Team> getAllTeams() throws FoldingException {
+        final String selectSqlStatement = "SELECT * FROM teams;";
+        LOGGER.debug("Executing SQL statement '{}'", selectSqlStatement);
+
+        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+             final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
+
+            try (final ResultSet resultSet = preparedStatement.executeQuery()) {
+
+                final List<Team> teams = new ArrayList<>();
+
+                while (resultSet.next()) {
+                    teams.add(createFoldingTeam(resultSet));
+                }
+
+                return teams;
+            }
+        } catch (final SQLException e) {
+            throw new FoldingException("Error opening connection to the DB", e);
+        }
+    }
+
+    @Override
+    public Team getTeam(final int foldingTeamId) throws FoldingException, NotFoundException {
+        final String selectSqlStatement = "SELECT * FROM teams WHERE team_id = ?;";
         LOGGER.debug("Executing SQL statement '{}'", selectSqlStatement);
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
@@ -352,8 +341,8 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public void updateFoldingTeam(final FoldingTeam foldingTeam) throws FoldingException, NotFoundException {
-        final String updateSqlStatement = "UPDATE folding_teams " +
+    public void updateTeam(final Team team) throws FoldingException, NotFoundException {
+        final String updateSqlStatement = "UPDATE teams " +
                 "SET team_name = ?, team_description = ?, captain_user_id = ?, user_ids = ? " +
                 "WHERE team_id = ?;";
         LOGGER.info("Executing SQL statement '{}'", updateSqlStatement);
@@ -361,31 +350,29 @@ public class PostgresDbManager implements DbManager {
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
              final PreparedStatement preparedStatement = connection.prepareStatement(updateSqlStatement)) {
 
-            preparedStatement.setString(1, foldingTeam.getTeamName());
-            preparedStatement.setString(2, foldingTeam.getTeamDescription());
-            preparedStatement.setInt(3, foldingTeam.getCaptainUserId());
-            preparedStatement.setArray(4, connection.createArrayOf("INT", foldingTeam.getUserIds().toArray(new Integer[0])));
-            preparedStatement.setInt(5, foldingTeam.getId());
+            preparedStatement.setString(1, team.getTeamName());
+            preparedStatement.setString(2, team.getTeamDescription());
+            preparedStatement.setInt(3, team.getCaptainUserId());
+            preparedStatement.setArray(4, connection.createArrayOf("INT", team.getUserIds().toArray(new Integer[0])));
+            preparedStatement.setInt(5, team.getId());
 
             if (preparedStatement.executeUpdate() == 0) {
                 throw new NotFoundException();
             }
-        } catch (final NotFoundException e) {
-            throw e;
-        } catch (final Exception e) {
-            throw new FoldingException("Error persisting Folding team", e);
+        } catch (final SQLException e) {
+            throw new FoldingException("Error opening connection to the DB", e);
         }
     }
 
     @Override
-    public void deleteFoldingTeam(final int foldingTeamId) throws FoldingException, FoldingConflictException {
-        final String deleteSqlStatement = "DELETE FROM folding_teams WHERE team_id = ?;";
+    public void deleteTeam(final int teamId) throws FoldingException, FoldingConflictException {
+        final String deleteSqlStatement = "DELETE FROM teams WHERE team_id = ?;";
         LOGGER.debug("Executing SQL statement '{}'", deleteSqlStatement);
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
              final PreparedStatement preparedStatement = connection.prepareStatement(deleteSqlStatement)) {
 
-            preparedStatement.setInt(1, foldingTeamId);
+            preparedStatement.setInt(1, teamId);
             preparedStatement.executeUpdate();
         } catch (final SQLException e) {
             if (e.getMessage().contains(VIOLATES_FOREIGN_KEY_CONSTRAINT)) {
@@ -396,13 +383,13 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public void persistHourlyUserTcStats(final List<UserStats> tcUserStats) throws FoldingException {
-        LOGGER.info("Inserting TC stats for {} users to DB", tcUserStats.size());
-        final String preparedInsertSqlStatement = "INSERT INTO individual_tc_points (user_id, utc_timestamp, total_points, total_unmultiplied_points, total_units) VALUES (?, ?, ?, ?, ?);";
+    public void persistHourlyUserStats(final List<UserStats> userStats) throws FoldingException {
+        LOGGER.info("Inserting TC stats for {} users to DB", userStats.size());
+        final String preparedInsertSqlStatement = "INSERT INTO tc_user_points (user_id, utc_timestamp, total_points, total_unmultiplied_points, total_units) VALUES (?, ?, ?, ?, ?);";
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
              final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
-            for (final UserStats tcUserStatsForUser : tcUserStats) {
+            for (final UserStats tcUserStatsForUser : userStats) {
                 try {
                     preparedStatement.setInt(1, tcUserStatsForUser.getUserId());
                     preparedStatement.setTimestamp(2, tcUserStatsForUser.getTimestamp());
@@ -423,7 +410,7 @@ public class PostgresDbManager implements DbManager {
     @Override
     public boolean doTcStatsExist() throws FoldingException {
         LOGGER.debug("Checking if any TC stats exist in the DB");
-        final String selectSqlStatement = "SELECT COUNT(*) AS count FROM individual_tc_points;";
+        final String selectSqlStatement = "SELECT COUNT(*) AS count FROM tc_user_points;";
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
              final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
@@ -441,26 +428,26 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public Map<LocalDate, Stats> getDailyUserStats(final int foldingUserId, final Month month, final Year year) throws FoldingException, NotFoundException {
-        LOGGER.debug("Getting historic daily user TC stats for {}/{} for user {}", StringUtils.capitalize(month.toString().toLowerCase(Locale.UK)), year, foldingUserId);
+    public Map<LocalDate, Stats> getDailyUserStats(final int userId, final Month month, final Year year) throws FoldingException, NotFoundException {
+        LOGGER.debug("Getting historic daily user TC stats for {}/{} for user {}", StringUtils.capitalize(month.toString().toLowerCase(Locale.UK)), year, userId);
 
-        final String selectSqlStatement = "SELECT CAST(utc_timestamp AS DATE) AS TIMESTAMP, " +
+        final String selectSqlStatement = "SELECT utc_timestamp::DATE AS TIMESTAMP, " +
                 "COALESCE(MAX(total_points) - LAG(MAX(total_points)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points, " +
                 "COALESCE(MAX(total_unmultiplied_points) - LAG(MAX(total_unmultiplied_points)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_unmultiplied_points, " +
                 "COALESCE(MAX(total_units) - LAG(MAX(total_units)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_units " +
-                "FROM individual_tc_points " +
+                "FROM tc_user_points " +
                 "WHERE EXTRACT(MONTH FROM utc_timestamp) = ? " +
                 "AND EXTRACT(YEAR FROM utc_timestamp) = ? " +
                 "AND user_id = ? " +
-                "GROUP BY CAST(utc_timestamp AS DATE) " +
-                "ORDER BY CAST(utc_timestamp AS DATE) ASC;";
+                "GROUP BY utc_timestamp::DATE " +
+                "ORDER BY utc_timestamp::DATE ASC;";
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
              final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
 
             preparedStatement.setInt(1, month.getValue());
             preparedStatement.setInt(2, year.getValue());
-            preparedStatement.setInt(3, foldingUserId);
+            preparedStatement.setInt(3, userId);
 
             final Map<LocalDate, Stats> userStatsByDate = new TreeMap<>();
 
@@ -468,8 +455,8 @@ public class PostgresDbManager implements DbManager {
 
                 // First entry will be (0, 0), so we need to manually get the first day's stats for the user
                 if (resultSet.next()) {
-                    final Stats firstDayTotalStats = getTotalStatsForFirstDayForUser(foldingUserId, month, year);
-                    final Stats initialStatsForMonth = getFirstStatsForUser(foldingUserId, month, year);
+                    final Stats firstDayTotalStats = getTotalStatsForFirstDayForUser(userId, month, year);
+                    final Stats initialStatsForMonth = getFirstStatsForUser(userId, month, year);
                     userStatsByDate.put(resultSet.getTimestamp("timestamp").toLocalDateTime().toLocalDate(),
                             new Stats(firstDayTotalStats.getPoints() - initialStatsForMonth.getPoints(),
                                     firstDayTotalStats.getUnmultipliedPoints() - initialStatsForMonth.getUnmultipliedPoints(),
@@ -495,7 +482,7 @@ public class PostgresDbManager implements DbManager {
                 return userStatsByDate;
             }
         } catch (final FoldingException | NotFoundException e) {
-            LOGGER.warn("Unable to get the stats for the first day of {}/{} for user {}", StringUtils.capitalize(month.toString().toLowerCase(Locale.UK)), year, foldingUserId);
+            LOGGER.warn("Unable to get the stats for the first day of {}/{} for user {}", StringUtils.capitalize(month.toString().toLowerCase(Locale.UK)), year, userId);
             throw e;
         } catch (final SQLException e) {
             throw new FoldingException("Error opening connection to the DB", e);
@@ -504,10 +491,10 @@ public class PostgresDbManager implements DbManager {
 
     private Stats getTotalStatsForFirstDayForUser(final int foldingUserId, final Month month, final Year year) throws FoldingException, NotFoundException {
         final String selectSqlStatement = "SELECT total_points AS points, total_unmultiplied_points AS unmultiplied_points, total_units AS units " +
-                "FROM individual_tc_points " +
-                "WHERE CAST(utc_timestamp AS DATE) = (" +
-                "   SELECT CAST(MIN(utc_timestamp) AS DATE) " +
-                "   FROM individual_tc_points WHERE user_id = ? " +
+                "FROM tc_user_points " +
+                "WHERE utc_timestamp::DATE = (" +
+                "   SELECT MIN(utc_timestamp)::DATE " +
+                "   FROM tc_user_points WHERE user_id = ? " +
                 "   AND EXTRACT(MONTH FROM utc_timestamp) = ? " +
                 "   AND EXTRACT(YEAR FROM utc_timestamp) = ? " +
                 ") " +
@@ -537,15 +524,15 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public Stats getFirstStatsForUser(final int foldingUserId, final Month month, final Year year) throws FoldingException, NotFoundException {
-        LOGGER.debug("Getting first points in {}/{} for user {}", StringUtils.capitalize(month.toString().toLowerCase(Locale.UK)), year, foldingUserId);
-        return getPointsForUser(foldingUserId, month, year, OrderBy.ASCENDING);
+    public Stats getFirstStatsForUser(final int userId, final Month month, final Year year) throws FoldingException, NotFoundException {
+        LOGGER.debug("Getting first points in {}/{} for user {}", StringUtils.capitalize(month.toString().toLowerCase(Locale.UK)), year, userId);
+        return getPointsForUser(userId, month, year, OrderBy.ASCENDING);
     }
 
     @Override
-    public Stats getLatestStatsForUser(final int foldingUserId, final Month month, final Year year) throws FoldingException, NotFoundException {
-        LOGGER.debug("Getting current points in {}/{} for user {}", StringUtils.capitalize(month.toString().toLowerCase(Locale.UK)), year, foldingUserId);
-        return getPointsForUser(foldingUserId, month, year, OrderBy.DESCENDING);
+    public Stats getLatestStatsForUser(final int userId, final Month month, final Year year) throws FoldingException, NotFoundException {
+        LOGGER.debug("Getting current points in {}/{} for user {}", StringUtils.capitalize(month.toString().toLowerCase(Locale.UK)), year, userId);
+        return getPointsForUser(userId, month, year, OrderBy.DESCENDING);
     }
 
     private Stats getPointsForUser(final int foldingUserId, final Month month, final Year year,
@@ -553,7 +540,7 @@ public class PostgresDbManager implements DbManager {
             FoldingException, NotFoundException {
         final String selectSqlStatement = String.format(
                 "SELECT total_points AS points, total_unmultiplied_points AS unmultiplied_points, total_units AS units " +
-                        "FROM individual_tc_points " +
+                        "FROM tc_user_points " +
                         "WHERE EXTRACT(MONTH FROM utc_timestamp) = ? AND EXTRACT(YEAR FROM utc_timestamp) = ? " +
                         "AND user_id = ? " +
                         "ORDER BY utc_timestamp %s " +
@@ -590,8 +577,8 @@ public class PostgresDbManager implements DbManager {
         );
     }
 
-    private static FoldingUser createFoldingUser(final ResultSet resultSet) throws SQLException {
-        return FoldingUser.create(
+    private static User createFoldingUser(final ResultSet resultSet) throws SQLException {
+        return User.create(
                 resultSet.getInt("user_id"),
                 resultSet.getString("folding_username"),
                 resultSet.getString("display_username"),
@@ -602,8 +589,8 @@ public class PostgresDbManager implements DbManager {
         );
     }
 
-    private static FoldingTeam createFoldingTeam(final ResultSet resultSet) throws SQLException {
-        return new FoldingTeam.Builder(resultSet.getString("team_name"))
+    private static Team createFoldingTeam(final ResultSet resultSet) throws SQLException {
+        return new Team.Builder(resultSet.getString("team_name"))
                 .teamId(resultSet.getInt("team_id"))
                 .teamDescription(resultSet.getString("team_description"))
                 .captainUserId(resultSet.getInt("captain_user_id"))

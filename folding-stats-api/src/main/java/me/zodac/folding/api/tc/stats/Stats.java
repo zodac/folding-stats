@@ -1,4 +1,4 @@
-package me.zodac.folding.api;
+package me.zodac.folding.api.tc.stats;
 
 import java.util.Objects;
 

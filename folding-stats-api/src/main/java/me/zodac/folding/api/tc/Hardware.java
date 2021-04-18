@@ -1,4 +1,6 @@
-package me.zodac.folding.api;
+package me.zodac.folding.api.tc;
+
+import me.zodac.folding.api.Identifiable;
 
 import java.util.Objects;
 

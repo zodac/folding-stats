@@ -1,10 +1,10 @@
 package me.zodac.folding.rest;
 
 import me.zodac.folding.StorageFacade;
-import me.zodac.folding.api.Hardware;
 import me.zodac.folding.api.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
+import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.validator.HardwareValidator;
 import me.zodac.folding.validator.ValidationResponse;
 import org.slf4j.Logger;
@@ -83,13 +83,13 @@ public class HardwareEndpoint extends AbstractIdentifiableCrudEndpoint<Hardware>
     }
 
     @Override
-    protected ValidationResponse validate(final Hardware element) {
-        return HardwareValidator.isValid(element);
+    protected ValidationResponse validate(final Hardware hardware) {
+        return HardwareValidator.isValid(hardware);
     }
 
     @Override
-    protected Hardware createElement(final Hardware element) throws FoldingException {
-        return storageFacade.createHardware(element);
+    protected Hardware createElement(final Hardware hardware) throws FoldingException {
+        return storageFacade.createHardware(hardware);
     }
 
     @Override
@@ -98,17 +98,17 @@ public class HardwareEndpoint extends AbstractIdentifiableCrudEndpoint<Hardware>
     }
 
     @Override
-    protected Hardware getElementById(final int elementId) throws FoldingException, NotFoundException {
-        return storageFacade.getHardware(elementId);
+    protected Hardware getElementById(final int hardwareId) throws FoldingException, NotFoundException {
+        return storageFacade.getHardware(hardwareId);
     }
 
     @Override
-    protected void updateElementById(final Hardware element) throws FoldingException, NotFoundException {
-        storageFacade.updateHardware(element);
+    protected void updateElementById(final Hardware hardware) throws FoldingException, NotFoundException {
+        storageFacade.updateHardware(hardware);
     }
 
     @Override
-    protected void deleteElementById(final int elementId) throws FoldingConflictException, FoldingException {
-        storageFacade.deleteHardware(elementId);
+    protected void deleteElementById(final int hardwareId) throws FoldingConflictException, FoldingException {
+        storageFacade.deleteHardware(hardwareId);
     }
 }

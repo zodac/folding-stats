@@ -1,6 +1,6 @@
 package me.zodac.folding.cache;
 
-import me.zodac.folding.api.Hardware;
+import me.zodac.folding.api.tc.Hardware;
 
 public class HardwareCache extends AbstractIdentifiableCache<Hardware> {
 

@@ -1,4 +1,4 @@
-package me.zodac.folding.rest.tc;
+package me.zodac.folding.rest.tc.historic;
 
 import java.time.LocalDate;
 import java.util.Objects;

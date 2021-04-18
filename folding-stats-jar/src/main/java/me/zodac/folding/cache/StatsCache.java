@@ -1,25 +1,26 @@
-package me.zodac.folding.cache.tc;
+package me.zodac.folding.cache;
 
-import me.zodac.folding.api.Stats;
+
+import me.zodac.folding.api.tc.stats.Stats;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class TcStatsCache {
+public class StatsCache {
 
-    private static TcStatsCache INSTANCE = null;
+    private static StatsCache INSTANCE = null;
 
     private final Map<Integer, Stats> initialStatsByUserId = new HashMap<>();
     private final Map<Integer, Stats> currentStatsByUserId = new HashMap<>();
 
-    private TcStatsCache() {
+    private StatsCache() {
 
     }
 
-    public static TcStatsCache get() {
+    public static StatsCache get() {
         if (INSTANCE == null) {
-            INSTANCE = new TcStatsCache();
+            INSTANCE = new StatsCache();
         }
 
         return INSTANCE;

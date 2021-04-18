@@ -1,13 +1,13 @@
 package me.zodac.folding.api.db;
 
-import me.zodac.folding.api.FoldingTeam;
-import me.zodac.folding.api.FoldingUser;
-import me.zodac.folding.api.Hardware;
-import me.zodac.folding.api.Stats;
-import me.zodac.folding.api.UserStats;
 import me.zodac.folding.api.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
+import me.zodac.folding.api.tc.Hardware;
+import me.zodac.folding.api.tc.Team;
+import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.stats.Stats;
+import me.zodac.folding.api.tc.stats.UserStats;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -39,38 +39,38 @@ public interface DbManager {
 
     void deleteHardware(final int hardwareId) throws FoldingException, FoldingConflictException;
 
-    FoldingUser createFoldingUser(final FoldingUser foldingUser) throws FoldingException;
+    User createUser(final User user) throws FoldingException;
 
-    List<FoldingUser> getAllFoldingUsers() throws FoldingException;
+    List<User> getAllUsers() throws FoldingException;
 
-    FoldingUser getFoldingUser(final int foldingUserId) throws FoldingException, NotFoundException;
+    User getUser(final int userId) throws FoldingException, NotFoundException;
 
-    void updateFoldingUser(final FoldingUser foldingUser) throws FoldingException, NotFoundException;
+    void updateUser(final User user) throws FoldingException, NotFoundException;
 
-    void deleteFoldingUser(final int foldingUserId) throws FoldingException, FoldingConflictException;
+    void deleteUser(final int userId) throws FoldingException, FoldingConflictException;
 
-    FoldingTeam createFoldingTeam(final FoldingTeam foldingTeam) throws FoldingException;
+    Team createTeam(final Team team) throws FoldingException;
 
-    List<FoldingTeam> getAllFoldingTeams() throws FoldingException;
+    List<Team> getAllTeams() throws FoldingException;
 
-    FoldingTeam getFoldingTeam(final int foldingTeamId) throws FoldingException, NotFoundException;
+    Team getTeam(final int foldingTeamId) throws FoldingException, NotFoundException;
 
-    void updateFoldingTeam(final FoldingTeam foldingTeam) throws FoldingException, NotFoundException;
+    void updateTeam(final Team team) throws FoldingException, NotFoundException;
 
-    void deleteFoldingTeam(final int foldingTeamId) throws FoldingException, FoldingConflictException;
+    void deleteTeam(final int teamId) throws FoldingException, FoldingConflictException;
 
     // TC operations
 
-    Stats getFirstStatsForUser(final int foldingUserId, final Month month, final Year year) throws FoldingException, NotFoundException;
+    Stats getFirstStatsForUser(final int userId, final Month month, final Year year) throws FoldingException, NotFoundException;
 
-    Stats getLatestStatsForUser(final int foldingUserId, final Month month, final Year year) throws FoldingException, NotFoundException;
+    Stats getLatestStatsForUser(final int userId, final Month month, final Year year) throws FoldingException, NotFoundException;
 
-    void persistHourlyUserTcStats(final List<UserStats> tcUserStats) throws FoldingException;
+    void persistHourlyUserStats(final List<UserStats> userStats) throws FoldingException;
 
     // TODO: [zodac] To be removed
     boolean doTcStatsExist() throws FoldingException;
 
     // Historic TC operations
 
-    Map<LocalDate, Stats> getDailyUserStats(final int foldingUserId, final Month month, final Year year) throws FoldingException, NotFoundException;
+    Map<LocalDate, Stats> getDailyUserStats(final int userId, final Month month, final Year year) throws FoldingException, NotFoundException;
 }

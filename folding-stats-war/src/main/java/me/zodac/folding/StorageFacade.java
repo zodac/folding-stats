@@ -1,17 +1,18 @@
 package me.zodac.folding;
 
-import me.zodac.folding.api.FoldingTeam;
-import me.zodac.folding.api.FoldingUser;
-import me.zodac.folding.api.Hardware;
-import me.zodac.folding.api.Stats;
+
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
-import me.zodac.folding.cache.FoldingTeamCache;
-import me.zodac.folding.cache.FoldingUserCache;
+import me.zodac.folding.api.tc.Hardware;
+import me.zodac.folding.api.tc.Team;
+import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.cache.HardwareCache;
-import me.zodac.folding.cache.tc.TcStatsCache;
+import me.zodac.folding.cache.StatsCache;
+import me.zodac.folding.cache.TeamCache;
+import me.zodac.folding.cache.UserCache;
 import me.zodac.folding.db.DbManagerRetriever;
 import me.zodac.folding.parsing.FoldingStatsParser;
 import org.slf4j.Logger;
@@ -41,10 +42,10 @@ public class StorageFacade {
     private static final Logger LOGGER = LoggerFactory.getLogger(StorageFacade.class);
 
     private final DbManager dbManager = DbManagerRetriever.get();
-    private final FoldingTeamCache foldingTeamCache = FoldingTeamCache.get();
-    private final FoldingUserCache foldingUserCache = FoldingUserCache.get();
+    private final TeamCache teamCache = TeamCache.get();
+    private final UserCache userCache = UserCache.get();
     private final HardwareCache hardwareCache = HardwareCache.get();
-    private final TcStatsCache tcStatsCache = TcStatsCache.get();
+    private final StatsCache statsCache = StatsCache.get();
 
     public Hardware createHardware(final Hardware hardware) throws FoldingException {
         final Hardware hardwareWithId = dbManager.createHardware(hardware);
@@ -91,120 +92,118 @@ public class StorageFacade {
         dbManager.deleteHardware(hardwareId);
     }
 
-    public FoldingUser createFoldingUser(final FoldingUser foldingUser) throws FoldingException, NotFoundException {
-        final FoldingUser foldingUserWithId = dbManager.createFoldingUser(foldingUser);
-        foldingUserCache.add(foldingUserWithId);
+    public User createUser(final User user) throws FoldingException, NotFoundException {
+        final User userWithId = dbManager.createUser(user);
+        userCache.add(userWithId);
 
         // When adding a new user, we should also configure the TC stats cache
+        final Hardware hardware = hardwareCache.get(user.getHardwareId());
+        final Stats currentStats = FoldingStatsParser.getStatsForUser(user.getFoldingUserName(), user.getPasskey(), user.getFoldingTeamNumber(), hardware.getMultiplier());
+        statsCache.addInitialStats(userWithId.getId(), currentStats);
 
-
-        final Hardware hardware = hardwareCache.get(foldingUser.getHardwareId());
-        final Stats currentStats = FoldingStatsParser.getStatsForUser(foldingUser.getFoldingUserName(), foldingUser.getPasskey(), foldingUser.getFoldingTeamNumber(), hardware.getMultiplier());
-        tcStatsCache.addInitialStats(foldingUserWithId.getId(), currentStats);
-
-        return foldingUserWithId;
+        return userWithId;
     }
 
-    public FoldingUser getFoldingUser(final int foldingUserId) throws FoldingException, NotFoundException {
+    public User getUser(final int userId) throws FoldingException, NotFoundException {
         try {
-            return foldingUserCache.get(foldingUserId);
+            return userCache.get(userId);
         } catch (final NotFoundException e) {
-            LOGGER.debug("Unable to find Folding user with ID {} in cache", foldingUserId, e);
+            LOGGER.debug("Unable to find user with ID {} in cache", userId, e);
         }
 
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
-        final FoldingUser foldingUserFromDb = dbManager.getFoldingUser(foldingUserId);
-        foldingUserCache.add(foldingUserFromDb);
+        final User userFromDb = dbManager.getUser(userId);
+        userCache.add(userFromDb);
 
-        return foldingUserFromDb;
+        return userFromDb;
     }
 
-    public List<FoldingUser> getAllFoldingUsers() throws FoldingException {
-        final List<FoldingUser> allFoldingUsers = foldingUserCache.getAll();
+    public List<User> getAllUsers() throws FoldingException {
+        final List<User> allUsers = userCache.getAll();
 
-        if (!allFoldingUsers.isEmpty()) {
-            return allFoldingUsers;
+        if (!allUsers.isEmpty()) {
+            return allUsers;
         }
 
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
-        final List<FoldingUser> allFoldingUsersFromDb = dbManager.getAllFoldingUsers();
-        foldingUserCache.addAll(allFoldingUsersFromDb);
-        return allFoldingUsersFromDb;
+        final List<User> allUsersFromDb = dbManager.getAllUsers();
+        userCache.addAll(allUsersFromDb);
+        return allUsersFromDb;
     }
 
-    public void updateFoldingUser(final FoldingUser element) throws FoldingException, NotFoundException {
-        dbManager.updateFoldingUser(element);
-        foldingUserCache.add(element);
+    public void updateUser(final User user) throws FoldingException, NotFoundException {
+        dbManager.updateUser(user);
+        userCache.add(user);
     }
 
-    public void deleteFoldingUser(final int foldingUserId) throws FoldingException, FoldingConflictException {
-        hardwareCache.remove(foldingUserId);
-        dbManager.deleteFoldingUser(foldingUserId);
+    public void deleteUser(final int userId) throws FoldingException, FoldingConflictException {
+        hardwareCache.remove(userId);
+        dbManager.deleteUser(userId);
     }
 
-    public FoldingTeam createFoldingTeam(final FoldingTeam foldingTeam) throws FoldingException {
-        final FoldingTeam foldingTeamWithId = dbManager.createFoldingTeam(foldingTeam);
-        foldingTeamCache.add(foldingTeamWithId);
-        return foldingTeamWithId;
+    public Team createTeam(final Team team) throws FoldingException {
+        final Team teamWithId = dbManager.createTeam(team);
+        teamCache.add(teamWithId);
+        return teamWithId;
     }
 
-    public FoldingTeam getFoldingTeam(final int foldingTeamId) throws FoldingException, NotFoundException {
+    public Team getTeam(final int teamId) throws FoldingException, NotFoundException {
         try {
-            return foldingTeamCache.get(foldingTeamId);
+            return teamCache.get(teamId);
         } catch (final NotFoundException e) {
-            LOGGER.debug("Unable to find Folding team with ID {} in cache", foldingTeamId, e);
+            LOGGER.debug("Unable to find team with ID {} in cache", teamId, e);
         }
 
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
-        final FoldingTeam foldingTeamFromDb = dbManager.getFoldingTeam(foldingTeamId);
-        foldingTeamCache.add(foldingTeamFromDb);
+        final Team teamFromDb = dbManager.getTeam(teamId);
+        teamCache.add(teamFromDb);
 
-        return foldingTeamFromDb;
+        return teamFromDb;
     }
 
-    public List<FoldingTeam> getAllFoldingTeams() throws FoldingException {
-        final List<FoldingTeam> allFoldingTeams = foldingTeamCache.getAll();
+    public List<Team> getAllTeams() throws FoldingException {
+        final List<Team> allTeams = teamCache.getAll();
 
-        if (!allFoldingTeams.isEmpty()) {
-            return allFoldingTeams;
+        if (!allTeams.isEmpty()) {
+            return allTeams;
         }
 
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
-        final List<FoldingTeam> allFoldingTeamsFromDb = dbManager.getAllFoldingTeams();
-        foldingTeamCache.addAll(allFoldingTeamsFromDb);
-        return allFoldingTeamsFromDb;
+        final List<Team> allTeamsFromDb = dbManager.getAllTeams();
+        teamCache.addAll(allTeamsFromDb);
+        return allTeamsFromDb;
     }
 
-    public void updateFoldingTeam(final FoldingTeam element) throws FoldingException, NotFoundException {
-        dbManager.updateFoldingTeam(element);
-        foldingTeamCache.add(element);
+    public void updateTeam(final Team team) throws FoldingException, NotFoundException {
+        dbManager.updateTeam(team);
+        teamCache.add(team);
     }
 
-    public void deleteFoldingTeam(final int foldingTeamId) throws FoldingException, FoldingConflictException {
-        hardwareCache.remove(foldingTeamId);
-        dbManager.deleteFoldingTeam(foldingTeamId);
+    public void deleteTeam(final int teamId) throws FoldingException, FoldingConflictException {
+        hardwareCache.remove(teamId);
+        dbManager.deleteTeam(teamId);
     }
 
-    public List<FoldingUser> getTcUsers() {
+    public List<User> getUsersFromTeams() {
         try {
-            return getAllFoldingTeams()
+            return getAllTeams()
                     .stream()
-                    .map(FoldingTeam::getUserIds)
+                    .map(Team::getUserIds)
                     .flatMap(Collection::stream)
-                    .map(userId -> FoldingUserCache.get().getOrNull(userId))
+                    .map(userId -> UserCache.get().getOrNull(userId))
                     .filter(Objects::nonNull)
                     .collect(toList());
         } catch (final FoldingException e) {
-            LOGGER.warn("Error retrieving TC Folding users", e.getCause());
+            LOGGER.warn("Error retrieving users in teams", e.getCause());
             return Collections.emptyList();
         }
     }
 
-    public Map<LocalDate, Stats> getDailyUserStats(final int foldingUserId, final Month month, final Year year) throws NotFoundException, FoldingException {
-        return dbManager.getDailyUserStats(foldingUserId, month, year);
+    public Map<LocalDate, Stats> getDailyUserStats(final int userId, final Month month, final Year year) throws NotFoundException, FoldingException {
+        return dbManager.getDailyUserStats(userId, month, year);
     }
 }

@@ -3,10 +3,10 @@ package me.zodac.folding.rest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import me.zodac.folding.StorageFacade;
-import me.zodac.folding.api.Stats;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
-import me.zodac.folding.rest.tc.HistoricStats;
+import me.zodac.folding.api.tc.stats.Stats;
+import me.zodac.folding.rest.tc.historic.HistoricStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +46,7 @@ public class HistoricStatsEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getDailyUserStats(@PathParam("foldingUserId") final String foldingUserId, @PathParam("year") final String year, @PathParam("month") final String month) {
         LOGGER.info("GET request received to show daily TC user stats at '{}'", uriContext.getAbsolutePath());
-        
+
         try {
             final Map<LocalDate, Stats> dailyUserStats = storageFacade.getDailyUserStats(Integer.parseInt(foldingUserId), Month.of(Integer.parseInt(month)), Year.parse(year));
             final List<HistoricStats> historicStats = new ArrayList<>(dailyUserStats.size());
