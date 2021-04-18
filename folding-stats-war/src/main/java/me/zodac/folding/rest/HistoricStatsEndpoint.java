@@ -20,6 +20,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
@@ -61,6 +62,15 @@ public class HistoricStatsEndpoint {
                     .build();
         } catch (final DateTimeParseException e) {
             final String errorMessage = String.format("The year '%s' is not a valid format", year);
+
+            LOGGER.debug(errorMessage, e);
+            LOGGER.error(errorMessage);
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity(GSON.toJson(new ErrorObject(errorMessage), ErrorObject.class))
+                    .build();
+        } catch (final DateTimeException e) {
+            final String errorMessage = String.format("The month '%s' is not a valid format", month);
 
             LOGGER.debug(errorMessage, e);
             LOGGER.error(errorMessage);
