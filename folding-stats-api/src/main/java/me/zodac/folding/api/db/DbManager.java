@@ -67,7 +67,6 @@ public interface DbManager {
 
     void persistHourlyUserStats(final List<UserStats> userStats) throws FoldingException;
 
-    // TODO: [zodac] To be removed
     boolean doTcStatsExist() throws FoldingException;
 
     // Historic TC operations
