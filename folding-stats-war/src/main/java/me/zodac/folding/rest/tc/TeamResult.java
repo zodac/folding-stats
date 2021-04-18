@@ -1,5 +1,6 @@
 package me.zodac.folding.rest.tc;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -12,28 +13,52 @@ public class TeamResult {
 
     // TODO: [zodac] Rank the users
     private List<UserResult> users;
-    private long teamUnits;
+    private int teamUnits;
     private long teamPoints;
     private long teamPointsWithoutMultipliers;
+    private int rank; // Rank in 'division', but we only have one division so no need to be more explicit, yet
 
     public TeamResult() {
 
     }
 
-    public TeamResult(final String teamName, final String captainName, final List<UserResult> users) {
+    private TeamResult(final String teamName, final String captainName, final List<UserResult> users, final int teamUnits, final long teamPoints, final long teamPointsWithoutMultipliers, final int rank) {
         this.teamName = teamName;
         this.captainName = captainName;
         this.users = users;
+        this.teamUnits = teamUnits;
+        this.teamPoints = teamPoints;
+        this.teamPointsWithoutMultipliers = teamPointsWithoutMultipliers;
+        this.rank = rank;
+    }
 
-        this.teamUnits = 0L;
-        this.teamPoints = 0L;
-        this.teamPointsWithoutMultipliers = 0L;
+    public static TeamResult create(final String teamName, final String captainName, final List<UserResult> users) {
+        int teamUnits = 0;
+        long teamPoints = 0L;
+        long teamPointsWithoutMultipliers = 0L;
 
         for (final UserResult user : users) {
             teamUnits += user.getUnits();
             teamPoints += user.getPoints();
             teamPointsWithoutMultipliers += user.getPointsWithoutMultiplier();
         }
+
+        final List<UserResult> rankedUsers = users
+                .stream()
+                .sorted(Comparator.comparingLong(UserResult::getPoints).reversed())
+                .collect(new IntegerRankingCollector<>(
+                        Comparator.comparingLong(UserResult::getPoints),
+                        UserResult::getRankInTeam,
+                        UserResult::updateWithRankInTeam)
+                );
+
+        // Not ranked to begin with, will be updated by the calling class
+        return new TeamResult(teamName, captainName, rankedUsers, teamUnits, teamPoints, teamPointsWithoutMultipliers, 0);
+    }
+
+    public static TeamResult updateWithRank(final TeamResult teamResult, final int rank) {
+        return new TeamResult(teamResult.teamName, teamResult.captainName, teamResult.users, teamResult.teamUnits, teamResult.teamPoints,
+                teamResult.teamPointsWithoutMultipliers, rank);
     }
 
     public String getTeamName() {
@@ -60,11 +85,11 @@ public class TeamResult {
         this.users = users;
     }
 
-    public long getTeamUnits() {
+    public int getTeamUnits() {
         return teamUnits;
     }
 
-    public void setTeamUnits(final long teamUnits) {
+    public void setTeamUnits(final int teamUnits) {
         this.teamUnits = teamUnits;
     }
 
@@ -84,6 +109,14 @@ public class TeamResult {
         this.teamPointsWithoutMultipliers = teamPointsWithoutMultipliers;
     }
 
+    public int getRank() {
+        return rank;
+    }
+
+    public void setRank(final int rank) {
+        this.rank = rank;
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (this == o) {
@@ -93,12 +126,12 @@ public class TeamResult {
             return false;
         }
         final TeamResult teamResult = (TeamResult) o;
-        return teamName.equals(teamResult.teamName) && captainName.equals(teamResult.captainName) && teamUnits == teamResult.teamUnits && teamPoints == teamResult.teamPoints && teamPointsWithoutMultipliers == teamResult.teamPointsWithoutMultipliers && Objects.equals(users, teamResult.users);
+        return teamName.equals(teamResult.teamName) && captainName.equals(teamResult.captainName) && rank == teamResult.rank && teamUnits == teamResult.teamUnits && teamPoints == teamResult.teamPoints && teamPointsWithoutMultipliers == teamResult.teamPointsWithoutMultipliers && Objects.equals(users, teamResult.users);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(teamName, captainName, teamUnits, teamPoints, teamPointsWithoutMultipliers, users);
+        return Objects.hash(teamName, captainName, teamUnits, teamPoints, teamPointsWithoutMultipliers, rank, users);
     }
 
     // TODO: [zodac] #toString()
@@ -111,6 +144,7 @@ public class TeamResult {
                 ", teamUnits=" + formatWithCommas(teamUnits) +
                 ", teamPoints=" + formatWithCommas(teamPoints) +
                 ", teamPointsWithoutMultipliers=" + formatWithCommas(teamPointsWithoutMultipliers) +
+                ", rank=" + rank +
                 '}';
     }
 }

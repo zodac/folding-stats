@@ -1,6 +1,7 @@
 package me.zodac.folding.rest.tc;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -9,7 +10,7 @@ import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
 public class CompetitionResult {
 
     private List<TeamResult> teams = new ArrayList<>();
-    private long totalUnits = 0L;
+    private int totalUnits = 0;
     private long totalPoints = 0L;
     private long totalPointsWithoutMultipliers = 0L;
 
@@ -17,19 +18,36 @@ public class CompetitionResult {
 
     }
 
-    public CompetitionResult(final List<TeamResult> teams) {
+    private CompetitionResult(final List<TeamResult> teams, final int totalUnits, final long totalPoints, final long totalPointsWithoutMultipliers) {
         this.teams = teams;
-        this.totalUnits = 0L;
-        this.totalPoints = 0L;
-        this.totalPointsWithoutMultipliers = 0L;
-
-        // TODO: [zodac] Rank the teams
-        for (final TeamResult team : teams) {
-            this.totalUnits += team.getTeamUnits();
-            this.totalPoints += team.getTeamPoints();
-            this.totalPointsWithoutMultipliers += team.getTeamPointsWithoutMultipliers();
-        }
+        this.totalUnits = totalUnits;
+        this.totalPoints = totalPoints;
+        this.totalPointsWithoutMultipliers = totalPointsWithoutMultipliers;
     }
+
+    public static CompetitionResult create(final List<TeamResult> teams) {
+        int totalUnits = 0;
+        long totalPoints = 0L;
+        long totalPointsWithoutMultipliers = 0L;
+
+        for (final TeamResult team : teams) {
+            totalUnits += team.getTeamUnits();
+            totalPoints += team.getTeamPoints();
+            totalPointsWithoutMultipliers += team.getTeamPointsWithoutMultipliers();
+        }
+
+        final List<TeamResult> rankedTeams = teams
+                .stream()
+                .sorted(Comparator.comparingLong(TeamResult::getTeamPoints).reversed())
+                .collect(new IntegerRankingCollector<>(
+                        Comparator.comparingLong(TeamResult::getTeamPoints),
+                        TeamResult::getRank,
+                        TeamResult::updateWithRank)
+                );
+
+        return new CompetitionResult(rankedTeams, totalUnits, totalPoints, totalPointsWithoutMultipliers);
+    }
+
 
     public List<TeamResult> getTeams() {
         return teams;
@@ -39,11 +57,11 @@ public class CompetitionResult {
         this.teams = teams;
     }
 
-    public long getTotalUnits() {
+    public int getTotalUnits() {
         return totalUnits;
     }
 
-    public void setTotalUnits(final long totalUnits) {
+    public void setTotalUnits(final int totalUnits) {
         this.totalUnits = totalUnits;
     }
 

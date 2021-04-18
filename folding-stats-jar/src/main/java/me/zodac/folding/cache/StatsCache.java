@@ -2,12 +2,16 @@ package me.zodac.folding.cache;
 
 
 import me.zodac.folding.api.tc.stats.Stats;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 public class StatsCache {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(StatsCache.class);
 
     private static StatsCache INSTANCE = null;
 

@@ -385,7 +385,7 @@ public class PostgresDbManager implements DbManager {
     @Override
     public void persistHourlyUserStats(final List<UserStats> userStats) throws FoldingException {
         LOGGER.info("Inserting TC stats for {} users to DB", userStats.size());
-        final String preparedInsertSqlStatement = "INSERT INTO tc_user_points (user_id, utc_timestamp, total_points, total_unmultiplied_points, total_units) VALUES (?, ?, ?, ?, ?);";
+        final String preparedInsertSqlStatement = "INSERT INTO tc_user_stats (user_id, utc_timestamp, total_points, total_unmultiplied_points, total_units) VALUES (?, ?, ?, ?, ?);";
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
              final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
@@ -410,7 +410,7 @@ public class PostgresDbManager implements DbManager {
     @Override
     public boolean doTcStatsExist() throws FoldingException {
         LOGGER.debug("Checking if any TC stats exist in the DB");
-        final String selectSqlStatement = "SELECT COUNT(*) AS count FROM tc_user_points;";
+        final String selectSqlStatement = "SELECT COUNT(*) AS count FROM tc_user_stats;";
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
              final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
@@ -435,7 +435,7 @@ public class PostgresDbManager implements DbManager {
                 "COALESCE(MAX(total_points) - LAG(MAX(total_points)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points, " +
                 "COALESCE(MAX(total_unmultiplied_points) - LAG(MAX(total_unmultiplied_points)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_unmultiplied_points, " +
                 "COALESCE(MAX(total_units) - LAG(MAX(total_units)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_units " +
-                "FROM tc_user_points " +
+                "FROM tc_user_stats " +
                 "WHERE EXTRACT(MONTH FROM utc_timestamp) = ? " +
                 "AND EXTRACT(YEAR FROM utc_timestamp) = ? " +
                 "AND user_id = ? " +
@@ -491,10 +491,10 @@ public class PostgresDbManager implements DbManager {
 
     private Stats getTotalStatsForFirstDayForUser(final int foldingUserId, final Month month, final Year year) throws FoldingException, NotFoundException {
         final String selectSqlStatement = "SELECT total_points AS points, total_unmultiplied_points AS unmultiplied_points, total_units AS units " +
-                "FROM tc_user_points " +
+                "FROM tc_user_stats " +
                 "WHERE utc_timestamp::DATE = (" +
                 "   SELECT MIN(utc_timestamp)::DATE " +
-                "   FROM tc_user_points WHERE user_id = ? " +
+                "   FROM tc_user_stats WHERE user_id = ? " +
                 "   AND EXTRACT(MONTH FROM utc_timestamp) = ? " +
                 "   AND EXTRACT(YEAR FROM utc_timestamp) = ? " +
                 ") " +
@@ -540,7 +540,7 @@ public class PostgresDbManager implements DbManager {
             FoldingException, NotFoundException {
         final String selectSqlStatement = String.format(
                 "SELECT total_points AS points, total_unmultiplied_points AS unmultiplied_points, total_units AS units " +
-                        "FROM tc_user_points " +
+                        "FROM tc_user_stats " +
                         "WHERE EXTRACT(MONTH FROM utc_timestamp) = ? AND EXTRACT(YEAR FROM utc_timestamp) = ? " +
                         "AND user_id = ? " +
                         "ORDER BY utc_timestamp %s " +

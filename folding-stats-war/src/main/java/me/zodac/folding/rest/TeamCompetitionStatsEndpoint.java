@@ -65,7 +65,7 @@ public class TeamCompetitionStatsEndpoint {
 
             return Response
                     .ok()
-                    .entity(GSON.toJson(new CompetitionResult(teamResults)))
+                    .entity(GSON.toJson(CompetitionResult.create(teamResults)))
                     .build();
         } catch (final Exception e) {
             LOGGER.error("Unexpected error retrieving TC stats", e);
@@ -103,7 +103,7 @@ public class TeamCompetitionStatsEndpoint {
 
         try {
             final User captain = storageFacade.getUser(team.getCaptainUserId());
-            return new TeamResult(team.getTeamName(), captain.getDisplayName(), userResults);
+            return TeamResult.create(team.getTeamName(), captain.getDisplayName(), userResults);
         } catch (final FoldingException e) {
             LOGGER.warn("Unable to get details for team captain: {}", team, e);
             throw e;
@@ -158,7 +158,7 @@ public class TeamCompetitionStatsEndpoint {
                 return Optional.empty();
             }
 
-            return Optional.of(new UserResult(user.getDisplayName(), hardware.getDisplayName(), category.getDisplayName(), tcPointsForUser, tcUnmultipliedPointsForUserMultiplier, tcUnitsForUser));
+            return Optional.of(UserResult.create(user.getDisplayName(), hardware.getDisplayName(), category.getDisplayName(), tcPointsForUser, tcUnmultipliedPointsForUserMultiplier, tcUnitsForUser));
         } catch (final NotFoundException e) {
             LOGGER.warn("No hardware found for ID: {}", user.getHardwareId(), e);
             return Optional.empty();

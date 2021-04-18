@@ -42,7 +42,7 @@ CREATE INDEX index_team_id
     ON teams(team_id);
 
 
-CREATE TABLE tc_user_points (
+CREATE TABLE tc_user_stats (
     user_id INT,
     utc_timestamp TIMESTAMP,
     total_points BIGINT NOT NULL,
@@ -54,5 +54,5 @@ CREATE TABLE tc_user_points (
         REFERENCES users(user_id)
 );
 
-CREATE INDEX index_tc_user_points
-    ON tc_user_points(user_id, utc_timestamp);
+CREATE INDEX tc_user_stats
+    ON tc_user_stats(user_id, utc_timestamp);

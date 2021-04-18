@@ -65,7 +65,7 @@ public class FoldingStatsParser {
 
 
     public static Stats getStatsForUser(final String userName, final String passkey, final int foldingTeamNumber, final double multiplier) throws FoldingException {
-        LOGGER.debug("Getting stats for username/passkey '{}/{}' at team {}", userName, passkey, foldingTeamNumber);
+        LOGGER.info("Getting stats for username/passkey '{}/{}' at team {}", userName, passkey, foldingTeamNumber);
         final long userPoints = getPointsForUser(userName, passkey, foldingTeamNumber);
         final int userUnits = getUnitsForUser(userName, passkey);
 
@@ -79,9 +79,9 @@ public class FoldingStatsParser {
                 .atTeam(foldingTeamNumber)
                 .build();
 
-        LOGGER.debug("Sending points request to: {}", pointsRequestUrl);
+        LOGGER.info("Sending points request to: {}", pointsRequestUrl);
         final HttpResponse<String> response = sendFoldingRequest(pointsRequestUrl);
-        LOGGER.debug("Points response: {}", response.body());
+        LOGGER.info("Points response: {}", response.body());
 
         return getPointsFromResponse(response);
     }
@@ -92,9 +92,9 @@ public class FoldingStatsParser {
                 .withPasskey(passkey)
                 .build();
 
-        LOGGER.debug("Sending units request to: {}", unitsRequestUrl);
+        LOGGER.info("Sending units request to: {}", unitsRequestUrl);
         final HttpResponse<String> response = sendFoldingRequest(unitsRequestUrl);
-        LOGGER.debug("Units response: {}", response.body());
+        LOGGER.info("Units response: {}", response.body());
 
         return getUnitsFromResponse(response);
     }

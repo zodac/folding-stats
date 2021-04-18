@@ -11,6 +11,7 @@ import me.zodac.folding.cache.StatsCache;
 import me.zodac.folding.cache.TeamCache;
 import me.zodac.folding.cache.UserCache;
 import me.zodac.folding.db.DbManagerRetriever;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +22,7 @@ import javax.ejb.Startup;
 import java.time.Month;
 import java.time.Year;
 import java.util.List;
+import java.util.Locale;
 
 
 // TODO: [zodac] Move this to an EJB module?
@@ -62,24 +64,24 @@ public class Initialiser {
         for (final User user : users) {
             try {
                 final Stats initialStatsForUser = dbManager.getFirstStatsForUser(user.getId(), currentMonth, currentYear);
-                LOGGER.debug("Found initial stats for {} for user {}: {}", currentMonth, user, initialStatsForUser);
+                LOGGER.debug("Found initial stats for {}/{} for user {}: {}", StringUtils.capitalize(currentMonth.toString().toLowerCase(Locale.UK)), currentYear, user, initialStatsForUser);
                 StatsCache.get().addInitialStats(user.getId(), initialStatsForUser);
             } catch (final NotFoundException e) {
                 LOGGER.debug("No initial stats in DB for {}", user, e);
                 LOGGER.warn("No initial stats in DB for {}", user);
             } catch (final FoldingException e) {
-                LOGGER.warn("Unable to get initial stats for {} for user {}", currentMonth, user, e.getCause());
+                LOGGER.warn("Unable to get initial stats for {}/{} for user {}", StringUtils.capitalize(currentMonth.toString().toLowerCase(Locale.UK)), currentYear, user, e.getCause());
             }
 
             try {
                 final Stats currentStatsForUser = dbManager.getLatestStatsForUser(user.getId(), currentMonth, currentYear);
-                LOGGER.debug("Found current stats for {} for user {}: {}", currentMonth, user, currentStatsForUser);
+                LOGGER.debug("Found current stats for {}/{} for user {}: {}", StringUtils.capitalize(currentMonth.toString().toLowerCase(Locale.UK)), currentYear, user, currentStatsForUser);
                 StatsCache.get().addCurrentStats(user.getId(), currentStatsForUser);
             } catch (final NotFoundException e) {
                 LOGGER.debug("No current stats in DB for {}", user, e);
                 LOGGER.warn("No current stats in DB for {}", user);
             } catch (final FoldingException e) {
-                LOGGER.warn("Unable to get current stats for {} for user {}", currentMonth, user, e.getCause());
+                LOGGER.warn("Unable to get current stats for {}/{} for user {}", StringUtils.capitalize(currentMonth.toString().toLowerCase(Locale.UK)), currentYear, user, e.getCause());
             }
         }
 
