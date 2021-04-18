@@ -15,7 +15,7 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
 
-
+// TODO: [zodac] POST with List<V> elements?
 abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();

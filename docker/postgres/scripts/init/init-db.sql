@@ -54,5 +54,5 @@ CREATE TABLE tc_user_stats (
         REFERENCES users(user_id)
 );
 
-CREATE INDEX tc_user_stats
+CREATE INDEX index_tc_user_stats
     ON tc_user_stats(user_id, utc_timestamp);
