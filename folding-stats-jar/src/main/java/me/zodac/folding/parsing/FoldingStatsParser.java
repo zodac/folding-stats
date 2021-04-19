@@ -50,7 +50,7 @@ public class FoldingStatsParser {
 
                 StatsCache.get().addCurrentStats(user.getId(), totalStatsForUser);
             } catch (final NotFoundException e) {
-                LOGGER.warn("Unable to find multiplied for user '{}/{}/{}'", user.getFoldingUserName(), user.getPasskey(), user.getFoldingTeamNumber(), e.getCause());
+                LOGGER.warn("Unable to find hardware multiplier for user '{}/{}/{}'", user.getFoldingUserName(), user.getPasskey(), user.getFoldingTeamNumber(), e);
             } catch (final FoldingException e) {
                 LOGGER.warn("Unable to get stats for user '{}/{}/{}'", user.getFoldingUserName(), user.getPasskey(), user.getFoldingTeamNumber(), e.getCause());
             }

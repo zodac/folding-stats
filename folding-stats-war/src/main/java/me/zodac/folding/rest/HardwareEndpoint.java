@@ -103,8 +103,14 @@ public class HardwareEndpoint extends AbstractIdentifiableCrudEndpoint<Hardware>
     }
 
     @Override
-    protected void updateElementById(final Hardware hardware) throws FoldingException, NotFoundException {
-        storageFacade.updateHardware(hardware);
+    protected void updateElementById(final int hardwareId, final Hardware hardware) throws FoldingException, NotFoundException {
+        if (hardware.getId() == 0) {
+            // The payload 'should' have the ID, but it's not necessary if the correct URL is used
+            final Hardware hardwareWithId = Hardware.updateWithId(hardwareId, hardware);
+            storageFacade.updateHardware(hardwareWithId);
+        } else {
+            storageFacade.updateHardware(hardware);
+        }
     }
 
     @Override

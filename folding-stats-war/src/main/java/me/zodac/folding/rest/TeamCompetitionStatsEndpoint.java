@@ -4,7 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.exception.FoldingException;
-import me.zodac.folding.api.exception.NotFoundException;
+import me.zodac.folding.api.exception.HardwareNotFoundException;
+import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
@@ -107,7 +108,7 @@ public class TeamCompetitionStatsEndpoint {
         } catch (final FoldingException e) {
             LOGGER.warn("Unable to get details for team captain: {}", team, e);
             throw e;
-        } catch (final NotFoundException e) {
+        } catch (final UserNotFoundException e) {
             LOGGER.warn("Captain user ID not found, unexpected error: {}", team, e);
             throw new FoldingException(String.format("Captain user ID not found: %s", team), e);
         }
@@ -122,7 +123,7 @@ public class TeamCompetitionStatsEndpoint {
         try {
             final User user = storageFacade.getUser(userId);
             return convertFoldingUserToTcUser(user);
-        } catch (final NotFoundException e) {
+        } catch (final UserNotFoundException e) {
             LOGGER.warn("Unable to find user ID: {}", userId, e);
             return Optional.empty();
         } catch (final FoldingException e) {
@@ -159,7 +160,7 @@ public class TeamCompetitionStatsEndpoint {
             }
 
             return Optional.of(UserResult.create(user.getDisplayName(), hardware.getDisplayName(), category.getDisplayName(), tcPointsForUser, tcUnmultipliedPointsForUserMultiplier, tcUnitsForUser));
-        } catch (final NotFoundException e) {
+        } catch (final HardwareNotFoundException e) {
             LOGGER.warn("No hardware found for ID: {}", user.getHardwareId(), e);
             return Optional.empty();
         } catch (final FoldingException e) {

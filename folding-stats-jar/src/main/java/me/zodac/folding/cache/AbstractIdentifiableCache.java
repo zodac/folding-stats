@@ -17,6 +17,7 @@ abstract class AbstractIdentifiableCache<V extends Identifiable> {
     protected AbstractIdentifiableCache() {
         elementsById = new HashMap<>();
     }
+    
 
     /**
      * Add an element of type {@link V} to the cache.

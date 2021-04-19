@@ -32,7 +32,7 @@ import java.util.List;
 @RequestScoped
 public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(HardwareEndpoint.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserEndpoint.class);
 
     @EJB
     private StorageFacade storageFacade;
@@ -103,8 +103,14 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
     }
 
     @Override
-    protected void updateElementById(final User user) throws FoldingException, NotFoundException {
-        storageFacade.updateUser(user);
+    protected void updateElementById(final int userId, final User user) throws FoldingException, NotFoundException {
+        if (user.getId() == 0) {
+            // The payload 'should' have the ID, but it's not necessary if the correct URL is used
+            final User userWithId = User.updateWithId(userId, user);
+            storageFacade.updateUser(userWithId);
+        } else {
+            storageFacade.updateUser(user);
+        }
     }
 
     @Override

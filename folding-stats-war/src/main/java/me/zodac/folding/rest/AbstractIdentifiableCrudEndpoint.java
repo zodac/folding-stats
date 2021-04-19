@@ -35,7 +35,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
 
     protected abstract V getElementById(final int elementId) throws FoldingException, NotFoundException;
 
-    protected abstract void updateElementById(final V element) throws FoldingException, NotFoundException;
+    protected abstract void updateElementById(final int elementId, final V element) throws FoldingException, NotFoundException;
 
     protected abstract void deleteElementById(final int elementId) throws FoldingConflictException, FoldingException;
 
@@ -166,7 +166,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
                         .build();
             }
 
-            updateElementById(element);
+            updateElementById(Integer.parseInt(elementId), element);
 
             final UriBuilder builder = uriContext
                     .getRequestUriBuilder()
@@ -186,7 +186,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
                     .build();
         } catch (final NotFoundException e) {
             getLogger().debug("No {} found with ID: {}", elementType(), elementId, e);
-            getLogger().error("No {} found with ID: {}", elementType(), elementId);
+            getLogger().error("No {} found with ID: {}", elementType(), elementId, e);
             return Response
                     .status(Response.Status.NOT_FOUND)
                     .build();

@@ -32,7 +32,7 @@ import java.util.List;
 @RequestScoped
 public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(HardwareEndpoint.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TeamEndpoint.class);
 
     @EJB
     private StorageFacade storageFacade;
@@ -103,8 +103,14 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
     }
 
     @Override
-    protected void updateElementById(final Team team) throws FoldingException, NotFoundException {
-        storageFacade.updateTeam(team);
+    protected void updateElementById(final int teamId, final Team team) throws FoldingException, NotFoundException {
+        if (team.getId() == 0) {
+            // The payload 'should' have the ID, but it's not necessary if the correct URL is used
+            final Team teamWithId = Team.updateWithId(teamId, team);
+            storageFacade.updateTeam(teamWithId);
+        } else {
+            storageFacade.updateTeam(team);
+        }
     }
 
     @Override

@@ -4,7 +4,10 @@ package me.zodac.folding;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
+import me.zodac.folding.api.exception.HardwareNotFoundException;
 import me.zodac.folding.api.exception.NotFoundException;
+import me.zodac.folding.api.exception.TeamNotFoundException;
+import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
@@ -53,7 +56,7 @@ public class StorageFacade {
         return hardwareWithId;
     }
 
-    public Hardware getHardware(final int hardwareId) throws FoldingException, NotFoundException {
+    public Hardware getHardware(final int hardwareId) throws FoldingException, HardwareNotFoundException {
         try {
             return hardwareCache.get(hardwareId);
         } catch (final NotFoundException e) {
@@ -82,7 +85,7 @@ public class StorageFacade {
         return allHardwareFromDb;
     }
 
-    public void updateHardware(final Hardware hardware) throws FoldingException, NotFoundException {
+    public void updateHardware(final Hardware hardware) throws FoldingException, HardwareNotFoundException {
         dbManager.updateHardware(hardware);
         hardwareCache.add(hardware);
     }
@@ -104,7 +107,7 @@ public class StorageFacade {
         return userWithId;
     }
 
-    public User getUser(final int userId) throws FoldingException, NotFoundException {
+    public User getUser(final int userId) throws FoldingException, UserNotFoundException {
         try {
             return userCache.get(userId);
         } catch (final NotFoundException e) {
@@ -133,7 +136,7 @@ public class StorageFacade {
         return allUsersFromDb;
     }
 
-    public void updateUser(final User user) throws FoldingException, NotFoundException {
+    public void updateUser(final User user) throws FoldingException, UserNotFoundException {
         dbManager.updateUser(user);
         userCache.add(user);
     }
@@ -149,7 +152,7 @@ public class StorageFacade {
         return teamWithId;
     }
 
-    public Team getTeam(final int teamId) throws FoldingException, NotFoundException {
+    public Team getTeam(final int teamId) throws FoldingException, TeamNotFoundException {
         try {
             return teamCache.get(teamId);
         } catch (final NotFoundException e) {
@@ -178,7 +181,7 @@ public class StorageFacade {
         return allTeamsFromDb;
     }
 
-    public void updateTeam(final Team team) throws FoldingException, NotFoundException {
+    public void updateTeam(final Team team) throws FoldingException, TeamNotFoundException {
         dbManager.updateTeam(team);
         teamCache.add(team);
     }
@@ -203,7 +206,7 @@ public class StorageFacade {
         }
     }
 
-    public Map<LocalDate, Stats> getDailyUserStats(final int userId, final Month month, final Year year) throws NotFoundException, FoldingException {
+    public Map<LocalDate, Stats> getDailyUserStats(final int userId, final Month month, final Year year) throws FoldingException, UserNotFoundException {
         return dbManager.getDailyUserStats(userId, month, year);
     }
 }

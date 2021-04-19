@@ -2,7 +2,9 @@ package me.zodac.folding.api.db;
 
 import me.zodac.folding.api.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
-import me.zodac.folding.api.exception.NotFoundException;
+import me.zodac.folding.api.exception.HardwareNotFoundException;
+import me.zodac.folding.api.exception.TeamNotFoundException;
+import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
@@ -33,9 +35,9 @@ public interface DbManager {
 
     List<Hardware> getAllHardware() throws FoldingException;
 
-    Hardware getHardware(final int hardwareId) throws FoldingException, NotFoundException;
+    Hardware getHardware(final int hardwareId) throws FoldingException, HardwareNotFoundException;
 
-    void updateHardware(final Hardware hardware) throws FoldingException, NotFoundException;
+    void updateHardware(final Hardware hardware) throws FoldingException, HardwareNotFoundException;
 
     void deleteHardware(final int hardwareId) throws FoldingException, FoldingConflictException;
 
@@ -43,9 +45,9 @@ public interface DbManager {
 
     List<User> getAllUsers() throws FoldingException;
 
-    User getUser(final int userId) throws FoldingException, NotFoundException;
+    User getUser(final int userId) throws FoldingException, UserNotFoundException;
 
-    void updateUser(final User user) throws FoldingException, NotFoundException;
+    void updateUser(final User user) throws FoldingException, UserNotFoundException;
 
     void deleteUser(final int userId) throws FoldingException, FoldingConflictException;
 
@@ -53,17 +55,17 @@ public interface DbManager {
 
     List<Team> getAllTeams() throws FoldingException;
 
-    Team getTeam(final int foldingTeamId) throws FoldingException, NotFoundException;
+    Team getTeam(final int foldingTeamId) throws FoldingException, TeamNotFoundException;
 
-    void updateTeam(final Team team) throws FoldingException, NotFoundException;
+    void updateTeam(final Team team) throws FoldingException, TeamNotFoundException;
 
     void deleteTeam(final int teamId) throws FoldingException, FoldingConflictException;
 
     // TC operations
 
-    Stats getFirstStatsForUser(final int userId, final Month month, final Year year) throws FoldingException, NotFoundException;
+    Stats getFirstStatsForUser(final int userId, final Month month, final Year year) throws FoldingException, UserNotFoundException;
 
-    Stats getLatestStatsForUser(final int userId, final Month month, final Year year) throws FoldingException, NotFoundException;
+    Stats getLatestStatsForUser(final int userId, final Month month, final Year year) throws FoldingException, UserNotFoundException;
 
     void persistHourlyUserStats(final List<UserStats> userStats) throws FoldingException;
 
@@ -71,5 +73,5 @@ public interface DbManager {
 
     // Historic TC operations
 
-    Map<LocalDate, Stats> getDailyUserStats(final int userId, final Month month, final Year year) throws FoldingException, NotFoundException;
+    Map<LocalDate, Stats> getDailyUserStats(final int userId, final Month month, final Year year) throws FoldingException, UserNotFoundException;
 }
