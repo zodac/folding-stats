@@ -35,7 +35,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
 
     protected abstract V getElementById(final int elementId) throws FoldingException, NotFoundException;
 
-    protected abstract void updateElementById(final int elementId, final V element) throws FoldingException, NotFoundException;
+    protected abstract V updateElementById(final int elementId, final V element) throws FoldingException, NotFoundException;
 
     protected abstract void deleteElementById(final int elementId) throws FoldingConflictException, FoldingException;
 
@@ -166,14 +166,14 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
                         .build();
             }
 
-            updateElementById(Integer.parseInt(elementId), element);
+            final V updatedElementWithId = updateElementById(Integer.parseInt(elementId), element);
 
             final UriBuilder builder = uriContext
                     .getRequestUriBuilder()
                     .path(String.valueOf(element.getId()));
             return Response
                     .ok(builder.build())
-                    .entity(GSON.toJson(element))
+                    .entity(GSON.toJson(updatedElementWithId))
                     .build();
         } catch (final NumberFormatException e) {
             final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), elementId);

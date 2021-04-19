@@ -18,6 +18,7 @@ CREATE TABLE users (
     category TEXT NOT NULL,
     hardware_id INT NOT NULL,
     folding_team_number INT NOT NULL,
+    live_stats_link TEXT NULL,
     CONSTRAINT fk_hardware_id
         FOREIGN KEY(hardware_id)
         REFERENCES hardware(hardware_id)

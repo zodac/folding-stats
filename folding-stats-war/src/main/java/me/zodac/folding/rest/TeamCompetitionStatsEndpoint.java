@@ -159,7 +159,7 @@ public class TeamCompetitionStatsEndpoint {
                 return Optional.empty();
             }
 
-            return Optional.of(UserResult.create(user.getDisplayName(), hardware.getDisplayName(), category.getDisplayName(), tcPointsForUser, tcUnmultipliedPointsForUserMultiplier, tcUnitsForUser));
+            return Optional.of(UserResult.create(user.getDisplayName(), hardware.getDisplayName(), category.getDisplayName(), tcPointsForUser, tcUnmultipliedPointsForUserMultiplier, tcUnitsForUser, user.getLiveStatsLink()));
         } catch (final HardwareNotFoundException e) {
             LOGGER.warn("No hardware found for ID: {}", user.getHardwareId(), e);
             return Optional.empty();

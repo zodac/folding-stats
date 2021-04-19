@@ -17,12 +17,13 @@ public class User implements Identifiable {
     private String category;
     private int hardwareId;
     private int foldingTeamNumber;
+    private String liveStatsLink;
 
     public User() {
 
     }
 
-    private User(final int id, final String foldingUserName, final String displayName, final String passkey, final String category, final int hardwareId, final int foldingTeamNumber) {
+    private User(final int id, final String foldingUserName, final String displayName, final String passkey, final String category, final int hardwareId, final int foldingTeamNumber, final String liveStatsLink) {
         this.id = id;
         this.foldingUserName = foldingUserName;
         this.displayName = displayName;
@@ -30,18 +31,19 @@ public class User implements Identifiable {
         this.category = category;
         this.hardwareId = hardwareId;
         this.foldingTeamNumber = foldingTeamNumber;
+        this.liveStatsLink = liveStatsLink;
     }
 
-    public static User create(final int userId, final String foldingUserName, final String displayName, final String passkey, final String category, final int hardwareId, final int foldingTeamNumber) {
-        return new User(userId, foldingUserName, displayName, passkey, category, hardwareId, foldingTeamNumber);
+    public static User create(final int userId, final String foldingUserName, final String displayName, final String passkey, final String category, final int hardwareId, final int foldingTeamNumber, final String liveStatsLink) {
+        return new User(userId, foldingUserName, displayName, passkey, category, hardwareId, foldingTeamNumber, liveStatsLink);
     }
 
-    public static User createWithoutId(final String foldingUserName, final String displayName, final String passkey, final String category, final int hardwareId, final int foldingTeamNumber) {
-        return new User(0, foldingUserName, displayName, passkey, category, hardwareId, foldingTeamNumber);
+    public static User createWithoutId(final String foldingUserName, final String displayName, final String passkey, final String category, final int hardwareId, final int foldingTeamNumber, final String liveStatsLink) {
+        return new User(0, foldingUserName, displayName, passkey, category, hardwareId, foldingTeamNumber, liveStatsLink);
     }
 
     public static User updateWithId(final int userId, final User user) {
-        return new User(userId, user.getFoldingUserName(), user.getDisplayName(), user.getPasskey(), user.getCategory(), user.getHardwareId(), user.getFoldingTeamNumber());
+        return new User(userId, user.getFoldingUserName(), user.getDisplayName(), user.getPasskey(), user.getCategory(), user.getHardwareId(), user.getFoldingTeamNumber(), user.getLiveStatsLink());
     }
 
     @Override
@@ -101,6 +103,14 @@ public class User implements Identifiable {
         this.foldingTeamNumber = foldingTeamNumber;
     }
 
+    public String getLiveStatsLink() {
+        return liveStatsLink;
+    }
+
+    public void setLiveStatsLink(final String liveStatsLink) {
+        this.liveStatsLink = liveStatsLink;
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (this == o) {
@@ -110,16 +120,16 @@ public class User implements Identifiable {
             return false;
         }
         final User that = (User) o;
-        return id == that.id && hardwareId == that.hardwareId && Objects.equals(category, that.category) && foldingTeamNumber == that.foldingTeamNumber && Objects.equals(foldingUserName, that.foldingUserName) && Objects.equals(displayName, that.displayName) && Objects.equals(passkey, that.passkey);
+        return id == that.id && hardwareId == that.hardwareId && Objects.equals(category, that.category) && foldingTeamNumber == that.foldingTeamNumber && Objects.equals(foldingUserName, that.foldingUserName) && Objects.equals(displayName, that.displayName) && Objects.equals(passkey, that.passkey) && Objects.equals(liveStatsLink, that.liveStatsLink);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, foldingUserName, displayName, passkey, category, hardwareId, foldingTeamNumber);
+        return Objects.hash(id, foldingUserName, displayName, passkey, category, hardwareId, foldingTeamNumber, liveStatsLink);
     }
 
     @Override
     public String toString() {
-        return String.format("%s::{id: '%s', foldingUserName: '%s', displayName: '%s', passkey: '%s', category: '%s', hardwareId: '%s', foldingTeamNumber: '%s'}", this.getClass().getSimpleName(), id, foldingUserName, displayName, passkey, category, hardwareId, foldingTeamNumber);
+        return String.format("%s::{id: '%s', foldingUserName: '%s', displayName: '%s', passkey: '%s', category: '%s', hardwareId: '%s', foldingTeamNumber: '%s', liveStatsLink: '%s'}", this.getClass().getSimpleName(), id, foldingUserName, displayName, passkey, category, hardwareId, foldingTeamNumber, liveStatsLink);
     }
 }

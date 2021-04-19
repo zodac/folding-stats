@@ -103,14 +103,16 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
     }
 
     @Override
-    protected void updateElementById(final int userId, final User user) throws FoldingException, NotFoundException {
+    protected User updateElementById(final int userId, final User user) throws FoldingException, NotFoundException {
         if (user.getId() == 0) {
             // The payload 'should' have the ID, but it's not necessary if the correct URL is used
             final User userWithId = User.updateWithId(userId, user);
             storageFacade.updateUser(userWithId);
-        } else {
-            storageFacade.updateUser(user);
+            return userWithId;
         }
+        
+        storageFacade.updateUser(user);
+        return user;
     }
 
     @Override
