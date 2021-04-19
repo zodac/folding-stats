@@ -1,5 +1,6 @@
 package me.zodac.folding.parsing.http.response;
 
+import java.util.Comparator;
 import java.util.Objects;
 
 import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
@@ -12,11 +13,16 @@ import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
  *             "finished":21260, <-- Value we are interested in
  *             "expired":60,
  *             "active":1
+ *         },
+ *         {
+ *             "finished":512,
+ *             "expired":4,
+ *             "active":0
  *         }
  *     ]
  * </pre>
  */
-class UnitsApiInstance {
+class UnitsApiInstance implements Comparable<UnitsApiInstance> {
 
     private int finished;
     private int expired;
@@ -48,6 +54,14 @@ class UnitsApiInstance {
 
     public void setActive(final int active) {
         this.active = active;
+    }
+
+    @Override
+    public int compareTo(final UnitsApiInstance other) {
+        return Comparator.comparingInt(UnitsApiInstance::getFinished)
+                .thenComparingInt(UnitsApiInstance::getActive)
+                .thenComparingInt(UnitsApiInstance::getExpired)
+                .compare(other, this);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package me.zodac.folding.parsing.http.response;
 
+import java.util.Comparator;
 import java.util.Objects;
 
 import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
@@ -19,7 +20,7 @@ import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
  *      }
  * </pre>
  */
-class PointsApiResponse {
+class PointsApiResponse implements Comparable<PointsApiResponse> {
 
     private long contributed;
 
@@ -33,6 +34,12 @@ class PointsApiResponse {
 
     public void setContributed(final long contributed) {
         this.contributed = contributed;
+    }
+
+    @Override
+    public int compareTo(final PointsApiResponse other) {
+        return Comparator.comparingLong(PointsApiResponse::getContributed)
+                .compare(other, this);
     }
 
     @Override

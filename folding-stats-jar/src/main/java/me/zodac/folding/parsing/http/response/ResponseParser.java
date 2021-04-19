@@ -9,7 +9,10 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Type;
 import java.net.http.HttpResponse;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 public class ResponseParser {
 
@@ -43,11 +46,20 @@ public class ResponseParser {
             return 0;
         }
 
+
+        // If the username+passkey has been used on multiple teams, we will get multiple responses
+        // Unfortunately, there is no way to filter on team currently, but to be fair to the other users we will take
+        // the result with the lowest number of finished units.
+        final UnitsApiInstance firstEntry = unitsResponse
+                .stream()
+                .sorted(Collections.reverseOrder())
+                .collect(toList())
+                .get(0);
+
         if (unitsResponse.size() > 1) {
-            LOGGER.warn("Too many unit responses returned for user: {}", response.body());
-            return 0;
+            LOGGER.warn("Too many unit responses returned for user, using {} from response: {}", firstEntry, response.body());
         }
 
-        return unitsResponse.get(0).getFinished();
+        return firstEntry.getFinished();
     }
 }
