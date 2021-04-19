@@ -68,7 +68,7 @@ public class TeamCompetitionStatsParser {
             return;
         }
 
-        FoldingStatsParser.parseTcStatsForAllUsers(tcUsers);
+        FoldingStatsParser.getStatsForUsers(tcUsers);
         LOGGER.info("Finished parsing");
         LOGGER.info("");
     }

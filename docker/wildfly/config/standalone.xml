@@ -122,6 +122,9 @@
             <logger category="sun.rmi">
                 <level name="WARN"/>
             </logger>
+            <logger category="me.zodac.folding">
+                <level name="INFO"/>
+            </logger>
             <root-logger>
                 <level name="INFO"/>
                 <handlers>

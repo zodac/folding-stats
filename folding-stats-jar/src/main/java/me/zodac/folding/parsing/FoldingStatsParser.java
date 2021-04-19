@@ -32,7 +32,7 @@ public class FoldingStatsParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(FoldingStatsParser.class);
 
     // TODO: [zodac] This shouldn't be here anymore. Keep this class as simple logic, move this function elsewhere since it has TC-specific logic
-    public static void parseTcStatsForAllUsers(final List<User> users) {
+    public static void getStatsForUsers(final List<User> users) {
         final Timestamp currentUtcTime = TimeUtils.getCurrentUtcTimestamp();
         final List<UserStats> stats = new ArrayList<>(users.size());
 
@@ -62,7 +62,6 @@ public class FoldingStatsParser {
             LOGGER.error("Error persisting stats", e.getCause());
         }
     }
-
 
     public static Stats getStatsForUser(final String userName, final String passkey, final int foldingTeamNumber, final double multiplier) throws FoldingException {
         LOGGER.debug("Getting stats for username/passkey '{}/{}' at team {}", userName, passkey, foldingTeamNumber);
