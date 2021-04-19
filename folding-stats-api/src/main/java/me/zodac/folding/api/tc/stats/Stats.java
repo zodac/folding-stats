@@ -20,8 +20,8 @@ public class Stats {
         return new Stats(points, unmultipliedPoints, units);
     }
 
-    public static Stats createWithMultiplier(final long points, final int units, final double multiplier) {
-        return new Stats(points, Math.round(points * multiplier), units);
+    public static Stats createWithMultiplier(final long unmultipliedPoints, final int units, final double multiplier) {
+        return new Stats(Math.round(unmultipliedPoints * multiplier), unmultipliedPoints, units);
     }
 
     public long getPoints() {
