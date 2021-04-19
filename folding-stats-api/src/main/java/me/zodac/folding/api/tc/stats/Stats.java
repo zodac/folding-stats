@@ -10,16 +10,18 @@ public class Stats {
     private final long unmultipliedPoints;
     private final int units;
 
-    public Stats(final long points, final int units, final double multiplier) {
-        this.points = Math.round(points * multiplier);
-        this.unmultipliedPoints = points;
-        this.units = units;
-    }
-
-    public Stats(final long points, final long unmultipliedPoints, final int units) {
+    private Stats(final long points, final long unmultipliedPoints, final int units) {
         this.points = points;
         this.unmultipliedPoints = unmultipliedPoints;
         this.units = units;
+    }
+
+    public static Stats create(final long points, final long unmultipliedPoints, final int units) {
+        return new Stats(points, unmultipliedPoints, units);
+    }
+
+    public static Stats createWithMultiplier(final long points, final int units, final double multiplier) {
+        return new Stats(points, Math.round(points * multiplier), units);
     }
 
     public long getPoints() {

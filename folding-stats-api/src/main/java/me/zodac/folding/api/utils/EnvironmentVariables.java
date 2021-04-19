@@ -3,9 +3,9 @@ package me.zodac.folding.api.utils;
 /**
  * Utility class used to retrieve environment variables.
  */
-public final class EnvironmentVariable {
+public final class EnvironmentVariables {
 
-    private EnvironmentVariable() {
+    private EnvironmentVariables() {
 
     }
 

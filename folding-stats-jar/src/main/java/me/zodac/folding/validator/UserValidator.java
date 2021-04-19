@@ -45,7 +45,7 @@ public class UserValidator {
             failureMessages.add("Attribute 'foldingTeamNumber' is invalid (EHW: 239902, OCN: 37726, etc)");
         }
 
-        if (user.getHardwareId() <= Hardware.EMPTY_HARDWARE_ID || !HardwareCache.get().contains(user.getHardwareId())) {
+        if (user.getHardwareId() <= Hardware.EMPTY_HARDWARE_ID || HardwareCache.get().doesNotContain(user.getHardwareId())) {
             final List<String> availableHardware = HardwareCache.get()
                     .getAll()
                     .stream()

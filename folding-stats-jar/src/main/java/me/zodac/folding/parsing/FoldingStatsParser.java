@@ -45,7 +45,7 @@ public class FoldingStatsParser {
             try {
                 final Hardware hardware = HardwareCache.get().get(user.getHardwareId());
                 final Stats totalStatsForUser = getStatsForUser(user.getFoldingUserName(), user.getPasskey(), user.getFoldingTeamNumber(), hardware.getMultiplier());
-                stats.add(new UserStats(user.getId(), totalStatsForUser, currentUtcTime));
+                stats.add(UserStats.create(user.getId(), totalStatsForUser, currentUtcTime));
                 LOGGER.info("{}: {} points | {} unmultiplied points | {} units", user.getFoldingUserName(), formatWithCommas(totalStatsForUser.getPoints()), formatWithCommas(totalStatsForUser.getUnmultipliedPoints()), formatWithCommas(totalStatsForUser.getUnits()));
 
                 StatsCache.get().addCurrentStats(user.getId(), totalStatsForUser);
@@ -69,7 +69,7 @@ public class FoldingStatsParser {
         final long userPoints = getPointsForUser(userName, passkey, foldingTeamNumber);
         final int userUnits = getUnitsForUser(userName, passkey);
 
-        return new Stats(userPoints, userUnits, multiplier);
+        return Stats.createWithMultiplier(userPoints, userUnits, multiplier);
     }
 
     public static long getPointsForUser(final String userName, final String passkey, final int foldingTeamNumber) throws FoldingException {

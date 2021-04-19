@@ -28,7 +28,7 @@ public class TeamValidator {
             failureMessages.add("Attribute 'teamName' must not be empty");
         }
 
-        if (team.getCaptainUserId() <= User.EMPTY_USER_ID || !UserCache.get().contains(team.getCaptainUserId())) {
+        if (team.getCaptainUserId() <= User.EMPTY_USER_ID || UserCache.get().doesNotContain(team.getCaptainUserId())) {
             final List<String> availableUsers = UserCache.get()
                     .getAll()
                     .stream()
@@ -54,7 +54,7 @@ public class TeamValidator {
 
         final List<Integer> invalidUserIds = new ArrayList<>(team.getUserIds().size());
         for (final int userId : team.getUserIds()) {
-            if (!UserCache.get().contains(userId)) {
+            if (UserCache.get().doesNotContain(userId)) {
                 invalidUserIds.add(userId);
             }
         }

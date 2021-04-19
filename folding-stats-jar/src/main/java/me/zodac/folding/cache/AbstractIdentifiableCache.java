@@ -7,9 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-// TODO: [zodac] Caches are all singleton instances. Would be simpler to make them Singleton EJBs instead.
-//   No need for Tx support, but looks a bit cleaner.
-//   Check for any non-CDI use of cache, if none, make into EJBs.
 abstract class AbstractIdentifiableCache<V extends Identifiable> {
 
     private final Map<Integer, V> elementsById;
@@ -17,7 +14,7 @@ abstract class AbstractIdentifiableCache<V extends Identifiable> {
     protected AbstractIdentifiableCache() {
         elementsById = new HashMap<>();
     }
-    
+
 
     /**
      * Add an element of type {@link V} to the cache.
@@ -64,8 +61,8 @@ abstract class AbstractIdentifiableCache<V extends Identifiable> {
         }
     }
 
-    public boolean contains(final int id) {
-        return elementsById.containsKey(id);
+    public boolean doesNotContain(final int id) {
+        return !elementsById.containsKey(id);
     }
 
     public List<V> getAll() {

@@ -98,7 +98,6 @@ public class CompetitionResult {
         return Objects.hash(teams, totalUnits, totalPoints, totalPointsWithoutMultipliers);
     }
 
-
     @Override
     public String toString() {
         return "CompetitionResult::{" +

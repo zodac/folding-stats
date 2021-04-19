@@ -2,7 +2,7 @@ package me.zodac.folding.bean;
 
 import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.utils.EnvironmentVariable;
+import me.zodac.folding.api.utils.EnvironmentVariables;
 import me.zodac.folding.parsing.FoldingStatsParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,9 +26,9 @@ public class TeamCompetitionStatsParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(TeamCompetitionStatsParser.class);
 
     // Default is to run every hour at 15 minutes past the hour
-    private static final String STATS_PARSING_SCHEDULE_HOUR = EnvironmentVariable.get("STATS_PARSING_SCHEDULE_HOUR", "*");
-    private static final String STATS_PARSING_SCHEDULE_MINUTE = EnvironmentVariable.get("STATS_PARSING_SCHEDULE_MINUTE", "15");
-    private static final String STATS_PARSING_SCHEDULE_SECOND = EnvironmentVariable.get("STATS_PARSING_SCHEDULE_SECOND", "0");
+    private static final String STATS_PARSING_SCHEDULE_HOUR = EnvironmentVariables.get("STATS_PARSING_SCHEDULE_HOUR", "*");
+    private static final String STATS_PARSING_SCHEDULE_MINUTE = EnvironmentVariables.get("STATS_PARSING_SCHEDULE_MINUTE", "15");
+    private static final String STATS_PARSING_SCHEDULE_SECOND = EnvironmentVariables.get("STATS_PARSING_SCHEDULE_SECOND", "0");
 
     @EJB
     private StorageFacade storageFacade;

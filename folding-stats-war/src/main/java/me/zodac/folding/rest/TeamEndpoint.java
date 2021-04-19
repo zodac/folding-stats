@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * REST endpoints for teams for <code>folding-stats</code>.
  */
-// TODO: [zodac] Add a PUT/PATCH endpoint
+// TODO: [zodac] Update the PUT endpoint to retire team users
 @Path("/teams/")
 @RequestScoped
 public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {

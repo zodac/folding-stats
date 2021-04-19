@@ -11,11 +11,14 @@ public class UserStats {
     private final Stats totalStats;
     private final Timestamp timestamp;
 
-    // TODO: [zodac] Static constructor
-    public UserStats(final int userId, final Stats totalStats, final Timestamp timestamp) {
+    private UserStats(final int userId, final Stats totalStats, final Timestamp timestamp) {
         this.userId = userId;
         this.totalStats = totalStats;
         this.timestamp = timestamp;
+    }
+
+    public static UserStats create(final int userId, final Stats totalStats, final Timestamp timestamp) {
+        return new UserStats(userId, totalStats, timestamp);
     }
 
     public int getUserId() {
@@ -58,7 +61,7 @@ public class UserStats {
     public int hashCode() {
         return Objects.hash(userId, totalStats, timestamp);
     }
-    
+
     @Override
     public String toString() {
         return "UserStats::{" +

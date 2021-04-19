@@ -11,7 +11,7 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
-import me.zodac.folding.api.utils.EnvironmentVariable;
+import me.zodac.folding.api.utils.EnvironmentVariables;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,14 +35,14 @@ public class PostgresDbManager implements DbManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PostgresDbManager.class);
 
-    private static final String JDBC_CONNECTION_URL = EnvironmentVariable.get("JDBC_CONNECTION_URL");
+    private static final String JDBC_CONNECTION_URL = EnvironmentVariables.get("JDBC_CONNECTION_URL");
     private static final Properties JDBC_CONNECTION_PROPERTIES = new Properties();
     private static final String VIOLATES_FOREIGN_KEY_CONSTRAINT = "violates foreign key constraint";
 
     static {
-        JDBC_CONNECTION_PROPERTIES.setProperty("user", EnvironmentVariable.get("JDBC_CONNECTION_USER"));
-        JDBC_CONNECTION_PROPERTIES.setProperty("password", EnvironmentVariable.get("JDBC_CONNECTION_PASSWORD"));
-        JDBC_CONNECTION_PROPERTIES.setProperty("driver", EnvironmentVariable.get("JDBC_CONNECTION_DRIVER"));
+        JDBC_CONNECTION_PROPERTIES.setProperty("user", EnvironmentVariables.get("JDBC_CONNECTION_USER"));
+        JDBC_CONNECTION_PROPERTIES.setProperty("password", EnvironmentVariables.get("JDBC_CONNECTION_PASSWORD"));
+        JDBC_CONNECTION_PROPERTIES.setProperty("driver", EnvironmentVariables.get("JDBC_CONNECTION_DRIVER"));
     }
 
     @Override
@@ -462,7 +462,7 @@ public class PostgresDbManager implements DbManager {
                     final Stats firstDayTotalStats = getTotalStatsForFirstDayForUser(userId, month, year);
                     final Stats initialStatsForMonth = getFirstStatsForUser(userId, month, year);
                     userStatsByDate.put(resultSet.getTimestamp("timestamp").toLocalDateTime().toLocalDate(),
-                            new Stats(firstDayTotalStats.getPoints() - initialStatsForMonth.getPoints(),
+                            Stats.create(firstDayTotalStats.getPoints() - initialStatsForMonth.getPoints(),
                                     firstDayTotalStats.getUnmultipliedPoints() - initialStatsForMonth.getUnmultipliedPoints(),
                                     firstDayTotalStats.getUnits() - initialStatsForMonth.getUnits())
                     );
@@ -471,7 +471,7 @@ public class PostgresDbManager implements DbManager {
                 // All remaining stats will be diff-ed from the previous entry
                 while (resultSet.next()) {
                     userStatsByDate.put(resultSet.getTimestamp("timestamp").toLocalDateTime().toLocalDate(),
-                            new Stats(
+                            Stats.create(
                                     resultSet.getLong("diff_points"),
                                     resultSet.getLong("diff_unmultiplied_points"),
                                     resultSet.getInt("diff_units")
@@ -492,6 +492,7 @@ public class PostgresDbManager implements DbManager {
             throw new FoldingException("Error opening connection to the DB", e);
         }
     }
+
 
     private Stats getTotalStatsForFirstDayForUser(final int foldingUserId, final Month month, final Year year) throws FoldingException, UserNotFoundException {
         final String selectSqlStatement = "SELECT total_points AS points, total_unmultiplied_points AS unmultiplied_points, total_units AS units " +
@@ -517,7 +518,11 @@ public class PostgresDbManager implements DbManager {
             try (final ResultSet resultSet = preparedStatement.executeQuery()) {
 
                 if (resultSet.next()) {
-                    return new Stats(resultSet.getLong("points"), resultSet.getLong("unmultiplied_points"), resultSet.getInt("units"));
+                    return Stats.create(
+                            resultSet.getLong("points"),
+                            resultSet.getLong("unmultiplied_points"),
+                            resultSet.getInt("units")
+                    );
                 }
 
                 throw new UserNotFoundException();
@@ -561,7 +566,11 @@ public class PostgresDbManager implements DbManager {
             try (final ResultSet resultSet = preparedStatement.executeQuery()) {
 
                 if (resultSet.next()) {
-                    return new Stats(resultSet.getLong("points"), resultSet.getLong("unmultiplied_points"), resultSet.getInt("units"));
+                    return Stats.create(
+                            resultSet.getLong("points"),
+                            resultSet.getLong("unmultiplied_points"),
+                            resultSet.getInt("units")
+                    );
                 }
 
                 throw new UserNotFoundException();
