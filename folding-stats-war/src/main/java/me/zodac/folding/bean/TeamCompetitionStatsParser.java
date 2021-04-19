@@ -2,8 +2,8 @@ package me.zodac.folding.bean;
 
 import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.utils.EnvironmentVariable;
 import me.zodac.folding.parsing.FoldingStatsParser;
-import me.zodac.folding.util.EnvironmentVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

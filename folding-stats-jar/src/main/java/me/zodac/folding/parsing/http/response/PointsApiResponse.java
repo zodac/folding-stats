@@ -9,7 +9,7 @@ import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
  * <pre>
  *     {
  *         "earned": 97802740,
- *         "contributed": 76694831,
+ *         "contributed": 76694831, <-- Value we are interested in
  *         "team_total": 5526874925,
  *         "team_name": "ExtremeHW",
  *         "team_url": "https://extremehw.net/",
@@ -35,7 +35,6 @@ class PointsApiResponse {
         this.contributed = contributed;
     }
 
-
     @Override
     public boolean equals(final Object o) {
         if (this == o) {
@@ -53,11 +52,10 @@ class PointsApiResponse {
         return Objects.hash(contributed);
     }
 
-    // TODO: [zodac] toString()
     @Override
     public String toString() {
-        return "StatsApiResult{" +
-                "points=" + formatWithCommas(contributed) +
+        return "PointsApiResponse::{" +
+                "points: " + formatWithCommas(contributed) +
                 '}';
     }
 }

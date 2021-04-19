@@ -50,24 +50,23 @@ public class UserStats {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final UserStats that = (UserStats) o;
-        return userId == that.userId && Objects.equals(totalStats, that.totalStats) && timestamp == that.timestamp;
+        final UserStats userStats = (UserStats) o;
+        return userId == userStats.userId && Objects.equals(totalStats, userStats.totalStats) && Objects.equals(timestamp, userStats.timestamp);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(userId, totalStats, timestamp);
     }
-
-    // TODO: [zodac] toString()
+    
     @Override
     public String toString() {
-        return "FoldingStats{" +
-                "userId=" + userId +
-                ", points=" + formatWithCommas(totalStats.getPoints()) +
-                ", unmultipliedPoints=" + formatWithCommas(totalStats.getUnmultipliedPoints()) +
-                ", units=" + formatWithCommas(totalStats.getUnits()) +
-                ", timestamp=" + timestamp +
+        return "UserStats::{" +
+                "userId: " + userId +
+                ", points: " + formatWithCommas(totalStats.getPoints()) +
+                ", unmultipliedPoints: " + formatWithCommas(totalStats.getUnmultipliedPoints()) +
+                ", units: " + formatWithCommas(totalStats.getUnits()) +
+                ", timestamp: " + timestamp +
                 '}';
     }
 }

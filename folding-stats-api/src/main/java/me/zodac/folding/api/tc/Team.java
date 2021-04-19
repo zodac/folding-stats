@@ -128,8 +128,8 @@ public class Team implements Identifiable {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final Team that = (Team) o;
-        return id == that.id && captainUserId == that.captainUserId && Objects.equals(teamDescription, that.teamDescription) && Objects.equals(teamName, that.teamName) && Objects.equals(userIds, that.userIds);
+        final Team team = (Team) o;
+        return id == team.id && captainUserId == team.captainUserId && Objects.equals(teamName, team.teamName) && Objects.equals(teamDescription, team.teamDescription) && Objects.equals(userIds, team.userIds);
     }
 
     @Override
@@ -137,8 +137,15 @@ public class Team implements Identifiable {
         return Objects.hash(id, teamName, teamDescription, captainUserId, userIds);
     }
 
+
     @Override
     public String toString() {
-        return String.format("%s::{id: '%s', teamName: '%s', teamDescription: '%s', captainUserId: '%s', userIds: '%s'}", this.getClass().getSimpleName(), id, teamName, teamDescription, captainUserId, userIds);
+        return "Team::{" +
+                "id: " + id +
+                ", teamName: '" + teamName + "'" +
+                ", teamDescription: '" + teamDescription + "'" +
+                ", captainUserId: " + captainUserId +
+                ", userIds: " + userIds +
+                '}';
     }
 }

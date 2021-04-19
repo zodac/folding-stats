@@ -7,7 +7,7 @@ import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
 
 public class HistoricStats {
 
-    private LocalDate localDate;
+    private LocalDate date;
     private long points;
     private long pointsWithoutMultiplier;
     private int units;
@@ -16,19 +16,19 @@ public class HistoricStats {
 
     }
 
-    public HistoricStats(final LocalDate localDate, final long points, final long pointsWithoutMultiplier, final int units) {
-        this.localDate = localDate;
+    public HistoricStats(final LocalDate date, final long points, final long pointsWithoutMultiplier, final int units) {
+        this.date = date;
         this.points = points;
         this.pointsWithoutMultiplier = pointsWithoutMultiplier;
         this.units = units;
     }
 
-    public LocalDate getLocalDate() {
-        return localDate;
+    public LocalDate getDate() {
+        return date;
     }
 
-    public void setLocalDate(final LocalDate localDate) {
-        this.localDate = localDate;
+    public void setDate(final LocalDate date) {
+        this.date = date;
     }
 
     public long getPoints() {
@@ -64,21 +64,21 @@ public class HistoricStats {
             return false;
         }
         final HistoricStats that = (HistoricStats) o;
-        return points == that.points && pointsWithoutMultiplier == that.pointsWithoutMultiplier && units == that.units && Objects.equals(localDate, that.localDate);
+        return points == that.points && pointsWithoutMultiplier == that.pointsWithoutMultiplier && units == that.units && Objects.equals(date, that.date);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(localDate, points, pointsWithoutMultiplier, units);
+        return Objects.hash(date, points, pointsWithoutMultiplier, units);
     }
 
     @Override
     public String toString() {
-        return "HistoricStats{" +
-                "localDate=" + localDate +
-                ", points=" + formatWithCommas(points) +
-                ", pointsWithoutMultiplier=" + formatWithCommas(pointsWithoutMultiplier) +
-                ", units=" + formatWithCommas(units) +
+        return "HistoricStats::{" +
+                "date: " + date +
+                ", points: " + formatWithCommas(points) +
+                ", pointsWithoutMultiplier: " + formatWithCommas(pointsWithoutMultiplier) +
+                ", units: " + formatWithCommas(units) +
                 '}';
     }
 }

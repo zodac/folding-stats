@@ -35,17 +35,28 @@ public class Stats {
     }
 
     @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final Stats stats = (Stats) o;
+        return points == stats.points && unmultipliedPoints == stats.unmultipliedPoints && units == stats.units;
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hash(points, unmultipliedPoints, units);
     }
 
-    // TODO: [zodac] #toString()
     @Override
     public String toString() {
-        return "UserStats{" +
-                "points=" + formatWithCommas(points) +
-                ", unmultipliedPoints=" + formatWithCommas(unmultipliedPoints) +
-                ", units=" + formatWithCommas(units) +
+        return "Stats::{" +
+                "points: " + formatWithCommas(points) +
+                ", unmultipliedPoints: " + formatWithCommas(unmultipliedPoints) +
+                ", units: " + formatWithCommas(units) +
                 '}';
     }
 }

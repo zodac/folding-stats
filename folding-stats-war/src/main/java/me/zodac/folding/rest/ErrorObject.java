@@ -49,10 +49,11 @@ public class ErrorObject {
         return Objects.hash(error);
     }
 
+
     @Override
     public String toString() {
-        return "ErrorObject{" +
-                "error='" + error + '\'' +
+        return "ErrorObject::{" +
+                "error: '" + error + "'" +
                 '}';
     }
 }

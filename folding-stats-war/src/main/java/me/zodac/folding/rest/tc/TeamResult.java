@@ -11,7 +11,6 @@ public class TeamResult {
     private String teamName;
     private String captainName;
 
-    // TODO: [zodac] Rank the users
     private List<UserResult> users;
     private int teamUnits;
     private long teamPoints;
@@ -125,26 +124,25 @@ public class TeamResult {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final TeamResult teamResult = (TeamResult) o;
-        return teamName.equals(teamResult.teamName) && captainName.equals(teamResult.captainName) && rank == teamResult.rank && teamUnits == teamResult.teamUnits && teamPoints == teamResult.teamPoints && teamPointsWithoutMultipliers == teamResult.teamPointsWithoutMultipliers && Objects.equals(users, teamResult.users);
+        final TeamResult that = (TeamResult) o;
+        return teamUnits == that.teamUnits && teamPoints == that.teamPoints && teamPointsWithoutMultipliers == that.teamPointsWithoutMultipliers && rank == that.rank && Objects.equals(teamName, that.teamName) && Objects.equals(captainName, that.captainName) && Objects.equals(users, that.users);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(teamName, captainName, teamUnits, teamPoints, teamPointsWithoutMultipliers, rank, users);
+        return Objects.hash(teamName, captainName, users, teamUnits, teamPoints, teamPointsWithoutMultipliers, rank);
     }
 
-    // TODO: [zodac] #toString()
     @Override
     public String toString() {
-        return "TcTeam{" +
-                "teamName=" + teamName +
-                ", captainName=" + captainName +
-                ", users=" + users +
-                ", teamUnits=" + formatWithCommas(teamUnits) +
-                ", teamPoints=" + formatWithCommas(teamPoints) +
-                ", teamPointsWithoutMultipliers=" + formatWithCommas(teamPointsWithoutMultipliers) +
-                ", rank=" + rank +
+        return "TeamResult::{" +
+                "teamName: '" + teamName + "'" +
+                ", captainName: '" + captainName + "'" +
+                ", users: " + users +
+                ", teamUnits: " + formatWithCommas(teamUnits) +
+                ", teamPoints: " + formatWithCommas(teamPoints) +
+                ", teamPointsWithoutMultipliers: " + formatWithCommas(teamPointsWithoutMultipliers) +
+                ", rank: " + rank +
                 '}';
     }
 }

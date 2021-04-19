@@ -89,8 +89,8 @@ public class CompetitionResult {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final CompetitionResult competitionResult = (CompetitionResult) o;
-        return totalPoints == competitionResult.totalPoints && totalPointsWithoutMultipliers == competitionResult.totalPointsWithoutMultipliers && Objects.equals(teams, competitionResult.teams);
+        final CompetitionResult that = (CompetitionResult) o;
+        return totalUnits == that.totalUnits && totalPoints == that.totalPoints && totalPointsWithoutMultipliers == that.totalPointsWithoutMultipliers && Objects.equals(teams, that.teams);
     }
 
     @Override
@@ -98,14 +98,14 @@ public class CompetitionResult {
         return Objects.hash(teams, totalUnits, totalPoints, totalPointsWithoutMultipliers);
     }
 
-    // TODO: [zodac] #toString()
+
     @Override
     public String toString() {
-        return "TcStats{" +
-                "teams=" + teams +
-                ", totalUnits=" + formatWithCommas(totalUnits) +
-                ", totalPoints=" + formatWithCommas(totalPoints) +
-                ", totalPointsWithoutMultipliers=" + formatWithCommas(totalPointsWithoutMultipliers) +
+        return "CompetitionResult::{" +
+                "teams: " + teams +
+                ", totalUnits: " + formatWithCommas(totalUnits) +
+                ", totalPoints: " + formatWithCommas(totalPoints) +
+                ", totalPointsWithoutMultipliers: " + formatWithCommas(totalPointsWithoutMultipliers) +
                 '}';
     }
 }

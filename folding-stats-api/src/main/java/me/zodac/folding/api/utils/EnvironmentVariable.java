@@ -1,4 +1,4 @@
-package me.zodac.folding.util;
+package me.zodac.folding.api.utils;
 
 /**
  * Utility class used to retrieve environment variables.

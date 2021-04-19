@@ -119,8 +119,8 @@ public class User implements Identifiable {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final User that = (User) o;
-        return id == that.id && hardwareId == that.hardwareId && Objects.equals(category, that.category) && foldingTeamNumber == that.foldingTeamNumber && Objects.equals(foldingUserName, that.foldingUserName) && Objects.equals(displayName, that.displayName) && Objects.equals(passkey, that.passkey) && Objects.equals(liveStatsLink, that.liveStatsLink);
+        final User user = (User) o;
+        return id == user.id && hardwareId == user.hardwareId && foldingTeamNumber == user.foldingTeamNumber && Objects.equals(foldingUserName, user.foldingUserName) && Objects.equals(displayName, user.displayName) && Objects.equals(passkey, user.passkey) && Objects.equals(category, user.category) && Objects.equals(liveStatsLink, user.liveStatsLink);
     }
 
     @Override
@@ -128,8 +128,18 @@ public class User implements Identifiable {
         return Objects.hash(id, foldingUserName, displayName, passkey, category, hardwareId, foldingTeamNumber, liveStatsLink);
     }
 
+
     @Override
     public String toString() {
-        return String.format("%s::{id: '%s', foldingUserName: '%s', displayName: '%s', passkey: '%s', category: '%s', hardwareId: '%s', foldingTeamNumber: '%s', liveStatsLink: '%s'}", this.getClass().getSimpleName(), id, foldingUserName, displayName, passkey, category, hardwareId, foldingTeamNumber, liveStatsLink);
+        return "User::{" +
+                "id: " + id +
+                ", foldingUserName: '" + foldingUserName + "'" +
+                ", displayName: '" + displayName + "'" +
+                ", passkey: '" + passkey + "'" +
+                ", category: '" + category + "'" +
+                ", hardwareId: " + hardwareId +
+                ", foldingTeamNumber: " + foldingTeamNumber +
+                ", liveStatsLink: '" + liveStatsLink + "'" +
+                '}';
     }
 }

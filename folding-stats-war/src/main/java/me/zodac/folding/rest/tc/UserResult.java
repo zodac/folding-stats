@@ -113,8 +113,8 @@ public class UserResult {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final UserResult userResult = (UserResult) o;
-        return rankInTeam == userResult.rankInTeam && Objects.equals(points, userResult.points) && Objects.equals(pointsWithoutMultiplier, userResult.pointsWithoutMultiplier) && category == userResult.category && Objects.equals(units, userResult.units) && userName.equals(userResult.userName) && hardware.equals(userResult.hardware) && Objects.equals(liveStatsLink, userResult.liveStatsLink);
+        final UserResult that = (UserResult) o;
+        return points == that.points && pointsWithoutMultiplier == that.pointsWithoutMultiplier && units == that.units && rankInTeam == that.rankInTeam && Objects.equals(userName, that.userName) && Objects.equals(hardware, that.hardware) && Objects.equals(category, that.category) && Objects.equals(liveStatsLink, that.liveStatsLink);
     }
 
     @Override
@@ -122,18 +122,17 @@ public class UserResult {
         return Objects.hash(userName, hardware, category, points, pointsWithoutMultiplier, units, rankInTeam, liveStatsLink);
     }
 
-    // TODO: [zodac] #toString()
     @Override
     public String toString() {
-        return "TcUser{" +
-                "userName='" + userName + '\'' +
-                ", hardware='" + hardware + '\'' +
-                ", category='" + category + '\'' +
-                ", points=" + formatWithCommas(points) +
-                ", pointsWithoutMultiplier=" + formatWithCommas(pointsWithoutMultiplier) +
-                ", units=" + formatWithCommas(units) +
-                ", rankInTeam=" + rankInTeam +
-                ", liveStatsLink=" + liveStatsLink +
+        return "UserResult::{" +
+                "userName: '" + userName + "'" +
+                ", hardware: '" + hardware + "'" +
+                ", category: '" + category + "'" +
+                ", points: " + formatWithCommas(points) +
+                ", pointsWithoutMultiplier: " + formatWithCommas(pointsWithoutMultiplier) +
+                ", units: " + formatWithCommas(units) +
+                ", rankInTeam: " + rankInTeam +
+                ", liveStatsLink: '" + liveStatsLink + "'" +
                 '}';
     }
 }

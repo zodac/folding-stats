@@ -46,8 +46,8 @@ public class TeamStats {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final TeamStats that = (TeamStats) o;
-        return teamId == that.teamId && Objects.equals(totalStats, that.totalStats) && timestamp == that.timestamp;
+        final TeamStats teamStats = (TeamStats) o;
+        return teamId == teamStats.teamId && Objects.equals(totalStats, teamStats.totalStats) && Objects.equals(timestamp, teamStats.timestamp);
     }
 
     @Override
@@ -55,15 +55,14 @@ public class TeamStats {
         return Objects.hash(teamId, totalStats, timestamp);
     }
 
-    // TODO: [zodac] toString()
     @Override
     public String toString() {
-        return "FoldingStats{" +
-                "teamId=" + teamId +
-                ", points=" + formatWithCommas(totalStats.getPoints()) +
-                ", unmultipliedPoints=" + formatWithCommas(totalStats.getUnmultipliedPoints()) +
-                ", units=" + formatWithCommas(totalStats.getUnits()) +
-                ", timestamp=" + timestamp +
+        return "TeamStats::{" +
+                "teamId: " + teamId +
+                ", points: " + formatWithCommas(totalStats.getPoints()) +
+                ", unmultipliedPoints: " + formatWithCommas(totalStats.getUnmultipliedPoints()) +
+                ", units: " + formatWithCommas(totalStats.getUnits()) +
+                ", timestamp: " + timestamp +
                 '}';
     }
 }

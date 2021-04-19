@@ -89,8 +89,8 @@ public class Hardware implements Identifiable {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final Hardware that = (Hardware) o;
-        return id == that.id && Double.compare(that.multiplier, multiplier) == 0 && hardwareName.equals(that.hardwareName) && displayName.equals(that.displayName) && operatingSystem.equals(that.operatingSystem);
+        final Hardware hardware = (Hardware) o;
+        return id == hardware.id && Double.compare(hardware.multiplier, multiplier) == 0 && Objects.equals(hardwareName, hardware.hardwareName) && Objects.equals(displayName, hardware.displayName) && Objects.equals(operatingSystem, hardware.operatingSystem);
     }
 
     @Override
@@ -98,8 +98,15 @@ public class Hardware implements Identifiable {
         return Objects.hash(id, hardwareName, displayName, operatingSystem, multiplier);
     }
 
+
     @Override
     public String toString() {
-        return String.format("%s::{id: '%s', hardwareName: '%s', displayName: '%s', operatingSystem: '%s', multiplier: '%s'}", this.getClass().getSimpleName(), id, hardwareName, displayName, operatingSystem, multiplier);
+        return "Hardware::{" +
+                "id: " + id +
+                ", hardwareName: '" + hardwareName + "'" +
+                ", displayName: '" + displayName + "'" +
+                ", operatingSystem: '" + operatingSystem + "'" +
+                ", multiplier: " + multiplier +
+                '}';
     }
 }

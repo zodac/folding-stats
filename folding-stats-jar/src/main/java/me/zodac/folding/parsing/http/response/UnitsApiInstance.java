@@ -9,7 +9,7 @@ import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
  * <pre>
  *     [
  *         {
- *             "finished":21260,
+ *             "finished":21260, <-- Value we are interested in
  *             "expired":60,
  *             "active":1
  *         }
@@ -69,10 +69,10 @@ class UnitsApiInstance {
 
     @Override
     public String toString() {
-        return "UnitsApiInstance{" +
-                "finishedUnits=" + formatWithCommas(finished) +
-                ", expired=" + formatWithCommas(expired) +
-                ", active=" + formatWithCommas(active) +
+        return "UnitsApiInstance::{" +
+                "finishedUnits: " + formatWithCommas(finished) +
+                ", expired: " + formatWithCommas(expired) +
+                ", active: " + formatWithCommas(active) +
                 '}';
     }
 }
