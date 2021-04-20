@@ -36,13 +36,13 @@ public class ResponseParser {
         }
     }
 
-    public static int getUnitsFromResponse(final HttpResponse<String> response) {
+    public static int getUnitsFromResponse(final String userName, final String passkey, final HttpResponse<String> response) {
         final Type collectionType = new TypeToken<Collection<UnitsApiInstance>>() {
         }.getType();
         final List<UnitsApiInstance> unitsResponse = GSON.fromJson(response.body(), collectionType);
 
         if (unitsResponse.isEmpty()) {
-            LOGGER.warn("No valid units found for user: {}", response.body());
+            LOGGER.warn("No valid units found for user/passkey: '{}/{}'", userName, passkey);
             return 0;
         }
 

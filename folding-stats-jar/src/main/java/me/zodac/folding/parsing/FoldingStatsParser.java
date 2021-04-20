@@ -33,7 +33,6 @@ public class FoldingStatsParser {
 
     // TODO: [zodac] This shouldn't be here anymore. Keep this class as simple logic, move this function elsewhere since it has TC-specific logic
     public static void getStatsForUsers(final List<User> users) {
-        final Timestamp currentUtcTime = TimeUtils.getCurrentUtcTimestamp();
         final List<UserStats> stats = new ArrayList<>(users.size());
 
         for (final User user : users) {
@@ -44,6 +43,7 @@ public class FoldingStatsParser {
 
             try {
                 final Hardware hardware = HardwareCache.get().get(user.getHardwareId());
+                final Timestamp currentUtcTime = TimeUtils.getCurrentUtcTimestamp();
                 final Stats totalStatsForUser = getStatsForUser(user.getFoldingUserName(), user.getPasskey(), user.getFoldingTeamNumber(), hardware.getMultiplier());
                 stats.add(UserStats.create(user.getId(), totalStatsForUser, currentUtcTime));
                 LOGGER.info("{}: {} points | {} unmultiplied points | {} units", user.getFoldingUserName(), formatWithCommas(totalStatsForUser.getPoints()), formatWithCommas(totalStatsForUser.getUnmultipliedPoints()), formatWithCommas(totalStatsForUser.getUnits()));
@@ -95,6 +95,6 @@ public class FoldingStatsParser {
         final HttpResponse<String> response = sendFoldingRequest(unitsRequestUrl);
         LOGGER.debug("Units response: {}", response.body());
 
-        return getUnitsFromResponse(response);
+        return getUnitsFromResponse(userName, passkey, response);
     }
 }

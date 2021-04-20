@@ -102,6 +102,7 @@ public class StorageFacade {
         // When adding a new user, we should also configure the TC stats cache
         final Hardware hardware = hardwareCache.get(user.getHardwareId());
         final Stats currentStats = FoldingStatsParser.getStatsForUser(user.getFoldingUserName(), user.getPasskey(), user.getFoldingTeamNumber(), hardware.getMultiplier());
+        // TODO: [zodac] Why is this not being persisted in the DB?! Fucking idiot
         statsCache.addInitialStats(userWithId.getId(), currentStats);
 
         return userWithId;

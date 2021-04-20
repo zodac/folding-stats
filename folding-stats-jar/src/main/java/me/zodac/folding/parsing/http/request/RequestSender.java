@@ -34,8 +34,10 @@ public class RequestSender {
                     .header("Content-Type", "application/json")
                     .build();
 
-            HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            final HttpResponse<String> cachedResponse = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            LOGGER.debug("First response: {}", cachedResponse.body());
             final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            LOGGER.debug("Second response: {}", response.body());
 
             // All user searches return a 200 response, even if the user/passkey is invalid, we will need to parse and check it later
             if (response.statusCode() != HttpURLConnection.HTTP_OK) {
