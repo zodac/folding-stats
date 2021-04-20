@@ -48,7 +48,7 @@ public class PointsUrlBuilder {
         pointsUrl.append("?team=").append(team);
 
         if (StringUtils.isNotBlank(passkey)) {
-            pointsUrl.append("&?passkey=").append(passkey);
+            pointsUrl.append("&passkey=").append(passkey);
         }
 
         return pointsUrl.toString();
