@@ -148,10 +148,10 @@ public class TeamCompetitionStatsEndpoint {
                 return Optional.empty();
             }
 
-            LOGGER.debug("Found initial stats {} and current stats {} for {}", initialStats.get(), currentStats.get(), user);
-            final long tcUnitsForUser = currentStats.get().getUnits() - initialStats.get().getUnits();
-            final long tcPointsForUser = currentStats.get().getPoints() - initialStats.get().getPoints();
-            final long tcUnmultipliedPointsForUserMultiplier = currentStats.get().getUnmultipliedPoints() - initialStats.get().getUnmultipliedPoints();
+            LOGGER.trace("Found initial stats {} and current stats {} for {}", initialStats.get(), currentStats.get(), user);
+            final long tcUnits = currentStats.get().getUnits() - initialStats.get().getUnits();
+            final long tcPoints = currentStats.get().getPoints() - initialStats.get().getPoints();
+            final long tcUnmultipliedPoints = currentStats.get().getUnmultipliedPoints() - initialStats.get().getUnmultipliedPoints();
 
             final Category category = Category.get(user.getCategory());
             if (category == Category.INVALID) {
@@ -159,7 +159,8 @@ public class TeamCompetitionStatsEndpoint {
                 return Optional.empty();
             }
 
-            return Optional.of(UserResult.create(user.getDisplayName(), hardware.getDisplayName(), category.getDisplayName(), tcPointsForUser, tcUnmultipliedPointsForUserMultiplier, tcUnitsForUser, user.getLiveStatsLink()));
+            LOGGER.debug("Results for {}: {} points | {} unmultiplied points | {} units", user.getDisplayName(), tcPoints, tcUnmultipliedPoints, tcUnits);
+            return Optional.of(UserResult.create(user.getDisplayName(), hardware.getDisplayName(), category.getDisplayName(), tcPoints, tcUnmultipliedPoints, tcUnits, user.getLiveStatsLink()));
         } catch (final HardwareNotFoundException e) {
             LOGGER.warn("No hardware found for ID: {}", user.getHardwareId(), e);
             return Optional.empty();
