@@ -1,4 +1,4 @@
-package me.zodac.folding.rest;
+package me.zodac.folding.rest.response;
 
 import java.util.Objects;
 
@@ -12,16 +12,20 @@ import java.util.Objects;
  *     }
  * </pre>
  */
-public class ErrorObject {
+public class ErrorResponse {
 
     private String error;
 
-    public ErrorObject() {
+    public ErrorResponse() {
 
     }
 
-    public ErrorObject(final String error) {
+    private ErrorResponse(final String error) {
         this.error = error;
+    }
+
+    public static ErrorResponse create(final String error) {
+        return new ErrorResponse(error);
     }
 
     public String getError() {
@@ -40,7 +44,7 @@ public class ErrorObject {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final ErrorObject that = (ErrorObject) o;
+        final ErrorResponse that = (ErrorResponse) o;
         return Objects.equals(error, that.error);
     }
 

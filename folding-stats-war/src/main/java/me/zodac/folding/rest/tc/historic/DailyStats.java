@@ -5,22 +5,26 @@ import java.util.Objects;
 
 import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
 
-public class HistoricStats {
+public class DailyStats {
 
     private LocalDate date;
     private long points;
     private long pointsWithoutMultiplier;
     private int units;
 
-    public HistoricStats() {
+    public DailyStats() {
 
     }
 
-    public HistoricStats(final LocalDate date, final long points, final long pointsWithoutMultiplier, final int units) {
+    private DailyStats(final LocalDate date, final long points, final long pointsWithoutMultiplier, final int units) {
         this.date = date;
         this.points = points;
         this.pointsWithoutMultiplier = pointsWithoutMultiplier;
         this.units = units;
+    }
+
+    public static DailyStats create(final LocalDate date, final long points, final long pointsWithoutMultiplier, final int units) {
+        return new DailyStats(date, points, pointsWithoutMultiplier, units);
     }
 
     public LocalDate getDate() {
@@ -63,7 +67,7 @@ public class HistoricStats {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final HistoricStats that = (HistoricStats) o;
+        final DailyStats that = (DailyStats) o;
         return points == that.points && pointsWithoutMultiplier == that.pointsWithoutMultiplier && units == that.units && Objects.equals(date, that.date);
     }
 

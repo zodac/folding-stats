@@ -44,6 +44,14 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
         return super.create(team);
     }
 
+    @POST
+    @Path("/batch")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response createBatchOfTeams(final List<Team> teams) {
+        return super.createBatchOf(teams);
+    }
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllTeams() {

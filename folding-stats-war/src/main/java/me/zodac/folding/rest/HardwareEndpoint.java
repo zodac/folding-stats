@@ -44,6 +44,14 @@ public class HardwareEndpoint extends AbstractIdentifiableCrudEndpoint<Hardware>
         return super.create(hardware);
     }
 
+    @POST
+    @Path("/batch")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response createBatchOfHardware(final List<Hardware> hardware) {
+        return super.createBatchOf(hardware);
+    }
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllHardware() {

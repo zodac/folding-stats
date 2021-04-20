@@ -6,7 +6,8 @@ import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.api.tc.stats.Stats;
-import me.zodac.folding.rest.tc.historic.HistoricStats;
+import me.zodac.folding.rest.response.ErrorResponse;
+import me.zodac.folding.rest.tc.historic.DailyStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,15 +51,15 @@ public class HistoricStatsEndpoint {
 
         try {
             final Map<LocalDate, Stats> dailyUserStats = storageFacade.getDailyUserStats(Integer.parseInt(foldingUserId), Month.of(Integer.parseInt(month)), Year.parse(year));
-            final List<HistoricStats> historicStats = new ArrayList<>(dailyUserStats.size());
+            final List<DailyStats> dailyStats = new ArrayList<>(dailyUserStats.size());
 
             for (final Map.Entry<LocalDate, Stats> dailyUserStat : dailyUserStats.entrySet()) {
-                historicStats.add(new HistoricStats(dailyUserStat.getKey(), dailyUserStat.getValue().getPoints(), dailyUserStat.getValue().getUnmultipliedPoints(), dailyUserStat.getValue().getUnits()));
+                dailyStats.add(DailyStats.create(dailyUserStat.getKey(), dailyUserStat.getValue().getPoints(), dailyUserStat.getValue().getUnmultipliedPoints(), dailyUserStat.getValue().getUnits()));
             }
 
             return Response
                     .ok()
-                    .entity(GSON.toJson(historicStats))
+                    .entity(GSON.toJson(dailyStats))
                     .build();
         } catch (final DateTimeParseException e) {
             final String errorMessage = String.format("The year '%s' is not a valid format", year);
@@ -67,7 +68,7 @@ public class HistoricStatsEndpoint {
             LOGGER.error(errorMessage);
             return Response
                     .status(Response.Status.BAD_REQUEST)
-                    .entity(GSON.toJson(new ErrorObject(errorMessage), ErrorObject.class))
+                    .entity(GSON.toJson(ErrorResponse.create(errorMessage), ErrorResponse.class))
                     .build();
         } catch (final DateTimeException e) {
             final String errorMessage = String.format("The month '%s' is not a valid format", month);
@@ -76,7 +77,7 @@ public class HistoricStatsEndpoint {
             LOGGER.error(errorMessage);
             return Response
                     .status(Response.Status.BAD_REQUEST)
-                    .entity(GSON.toJson(new ErrorObject(errorMessage), ErrorObject.class))
+                    .entity(GSON.toJson(ErrorResponse.create(errorMessage), ErrorResponse.class))
                     .build();
         } catch (final NumberFormatException e) {
             final String errorMessage = String.format("The Folding user ID '%s' or month '%s' is not a valid format", foldingUserId, month);
@@ -85,7 +86,7 @@ public class HistoricStatsEndpoint {
             LOGGER.error(errorMessage);
             return Response
                     .status(Response.Status.BAD_REQUEST)
-                    .entity(GSON.toJson(new ErrorObject(errorMessage), ErrorObject.class))
+                    .entity(GSON.toJson(ErrorResponse.create(errorMessage), ErrorResponse.class))
                     .build();
         } catch (final NotFoundException e) {
             LOGGER.debug("No Folding user found with ID: {}", foldingUserId, e);

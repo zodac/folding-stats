@@ -44,6 +44,14 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
         return super.create(user);
     }
 
+    @POST
+    @Path("/batch")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response createBatchOfUsers(final List<User> users) {
+        return super.createBatchOf(users);
+    }
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllUsers() {
@@ -110,7 +118,7 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
             storageFacade.updateUser(userWithId);
             return userWithId;
         }
-        
+
         storageFacade.updateUser(user);
         return user;
     }

@@ -44,7 +44,7 @@ public class TeamCompetitionStatsParser {
         schedule.second(STATS_PARSING_SCHEDULE_SECOND);
         schedule.timezone("UTC");
         final Timer timer = timerService.createCalendarTimer(schedule);
-        LOGGER.info("Starting TC stats parser with schedule: {}", timer.getSchedule().getStart());
+        LOGGER.info("Starting TC stats parser with schedule: {}", timer.getSchedule());
     }
 
     @Timeout

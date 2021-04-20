@@ -6,6 +6,8 @@ import me.zodac.folding.api.Identifiable;
 import me.zodac.folding.api.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
+import me.zodac.folding.rest.response.BulkCreateResponse;
+import me.zodac.folding.rest.response.ErrorResponse;
 import me.zodac.folding.validator.ValidationResponse;
 import org.slf4j.Logger;
 
@@ -13,9 +15,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import java.util.ArrayList;
 import java.util.List;
 
-// TODO: [zodac] POST with List<V> elements?
 abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
@@ -39,7 +41,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
 
     protected abstract void deleteElementById(final int elementId) throws FoldingConflictException, FoldingException;
 
-    public Response create(final V element) {
+    protected Response create(final V element) {
         getLogger().info("POST request received to create {} at '{}' with request: {}", elementType(), uriContext.getAbsolutePath(), element);
 
         final ValidationResponse validationResponse = validate(element);
@@ -73,7 +75,67 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
         }
     }
 
-    public Response getAll() {
+    protected Response createBatchOf(final List<V> elements) {
+        getLogger().info("POST request received to create {} {}s at '{}' with request: {}", elements.size(), elementType(), uriContext.getAbsolutePath(), elements);
+
+        final List<ValidationResponse> failedValidationResponses = new ArrayList<>(elements.size() / 2);
+
+        for (final V element : elements) {
+            final ValidationResponse validationResponse = validate(element);
+            if (!validationResponse.isValid()) {
+                failedValidationResponses.add(validationResponse);
+            }
+        }
+
+        if (!failedValidationResponses.isEmpty()) {
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity(GSON.toJson(failedValidationResponses))
+                    .build();
+        }
+
+        final List<Identifiable> successful = new ArrayList<>(elements.size() / 2);
+        final List<Identifiable> unsuccessful = new ArrayList<>(elements.size() / 2);
+
+        for (final V element : elements) {
+            try {
+                final V elementWithId = createElement(element);
+                successful.add(elementWithId);
+            } catch (final FoldingException e) {
+                getLogger().error("Error creating {}: {}", elementType(), element, e.getCause());
+                unsuccessful.add(element);
+            } catch (final Exception e) {
+                getLogger().error("Unexpected error creating {}: {}", elementType(), element, e);
+                unsuccessful.add(element);
+            }
+        }
+
+        final BulkCreateResponse bulkCreateResponse = BulkCreateResponse.create(successful, unsuccessful);
+
+        if (successful.isEmpty()) {
+            getLogger().error("No {}s successfully created", elementType());
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity(GSON.toJson(bulkCreateResponse))
+                    .build();
+        }
+
+        if (!unsuccessful.isEmpty()) {
+            getLogger().error("{} {}s successfully created, {} {}s unsuccessful", successful.size(), elementType(), unsuccessful.size(), elementType());
+            return Response
+                    .ok()
+                    .entity(GSON.toJson(bulkCreateResponse))
+                    .build();
+        }
+
+        getLogger().debug("{} {}s successfully created", successful.size(), elementType());
+        return Response
+                .ok()
+                .entity(GSON.toJson(bulkCreateResponse.getSuccessful()))
+                .build();
+    }
+
+    protected Response getAll() {
         getLogger().info("GET request received for all {}s at '{}'", elementType(), uriContext.getAbsolutePath());
 
         try {
@@ -96,7 +158,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
         }
     }
 
-    public Response getById(final String elementId) {
+    protected Response getById(final String elementId) {
         getLogger().info("GET request for {} received at '{}'", elementType(), uriContext.getAbsolutePath());
 
         try {
@@ -112,7 +174,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
             getLogger().error(errorMessage);
             return Response
                     .status(Response.Status.BAD_REQUEST)
-                    .entity(GSON.toJson(new ErrorObject(errorMessage), ErrorObject.class))
+                    .entity(GSON.toJson(ErrorResponse.create(errorMessage), ErrorResponse.class))
                     .build();
         } catch (final NotFoundException e) {
             getLogger().debug("No {} found with ID: {}", elementType(), elementId, e);
@@ -133,7 +195,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
         }
     }
 
-    public Response updateById(final String elementId, final V element) {
+    protected Response updateById(final String elementId, final V element) {
         getLogger().info("PUT request for {} received at '{}'", elementType(), uriContext.getAbsolutePath());
 
         final ValidationResponse validationResponse = validate(element);
@@ -153,7 +215,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
                 getLogger().error(errorMessage);
                 return Response
                         .status(Response.Status.BAD_REQUEST)
-                        .entity(GSON.toJson(new ErrorObject(errorMessage), ErrorObject.class))
+                        .entity(GSON.toJson(ErrorResponse.create(errorMessage), ErrorResponse.class))
                         .build();
             }
 
@@ -182,7 +244,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
             getLogger().error(errorMessage);
             return Response
                     .status(Response.Status.BAD_REQUEST)
-                    .entity(GSON.toJson(new ErrorObject(errorMessage), ErrorObject.class))
+                    .entity(GSON.toJson(ErrorResponse.create(errorMessage), ErrorResponse.class))
                     .build();
         } catch (final NotFoundException e) {
             getLogger().debug("No {} found with ID: {}", elementType(), elementId, e);
@@ -203,7 +265,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
         }
     }
 
-    public Response deleteById(final String elementId) {
+    protected Response deleteById(final String elementId) {
         getLogger().info("DELETE request for {} received at '{}'", elementType(), uriContext.getAbsolutePath());
 
         try {
@@ -218,7 +280,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
             getLogger().error(errorMessage);
             return Response
                     .status(Response.Status.BAD_REQUEST)
-                    .entity(GSON.toJson(new ErrorObject(errorMessage), ErrorObject.class))
+                    .entity(GSON.toJson(ErrorResponse.create(errorMessage), ErrorResponse.class))
                     .build();
         } catch (final FoldingConflictException e) {
             final String errorMessage = String.format("The %s ID '%s' is in use, remove all usages before deleting", elementType(), elementId);
@@ -227,7 +289,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
             getLogger().error(errorMessage);
             return Response
                     .status(Response.Status.CONFLICT)
-                    .entity(GSON.toJson(new ErrorObject(errorMessage), ErrorObject.class))
+                    .entity(GSON.toJson(ErrorResponse.create(errorMessage), ErrorResponse.class))
                     .build();
         } catch (final FoldingException e) {
             getLogger().error("Error deleting {} with ID: {}", elementType(), elementId, e.getCause());
