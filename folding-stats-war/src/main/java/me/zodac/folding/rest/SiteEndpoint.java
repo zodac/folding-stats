@@ -33,6 +33,7 @@ public class SiteEndpoint {
         }
     }
 
+
     private static String readFile(final File file) throws IOException {
         final StringBuilder stringBuilder = new StringBuilder();
         try (final InputStream fileInputStream = new FileInputStream(file);

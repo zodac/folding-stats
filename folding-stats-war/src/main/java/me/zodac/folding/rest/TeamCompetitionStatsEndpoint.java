@@ -1,7 +1,5 @@
 package me.zodac.folding.rest;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.HardwareNotFoundException;
@@ -33,13 +31,15 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
+import static me.zodac.folding.rest.response.Responses.noContent;
+import static me.zodac.folding.rest.response.Responses.ok;
+import static me.zodac.folding.rest.response.Responses.serverError;
 
 @Path("/tc_stats/")
 @RequestScoped
 public class TeamCompetitionStatsEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TeamCompetitionStatsEndpoint.class);
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     private final StatsCache statsCache = StatsCache.get();
 
@@ -59,20 +59,13 @@ public class TeamCompetitionStatsEndpoint {
             LOGGER.info("Found {} TC teams", teamResults.size());
 
             if (teamResults.isEmpty()) {
-                return Response
-                        .serverError()
-                        .build();
+                return noContent();
             }
 
-            return Response
-                    .ok()
-                    .entity(GSON.toJson(CompetitionResult.create(teamResults)))
-                    .build();
+            return ok(CompetitionResult.create(teamResults));
         } catch (final Exception e) {
             LOGGER.error("Unexpected error retrieving TC stats", e);
-            return Response
-                    .serverError()
-                    .build();
+            return serverError();
         }
     }
 

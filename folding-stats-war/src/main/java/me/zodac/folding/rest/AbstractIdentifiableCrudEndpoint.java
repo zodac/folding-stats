@@ -1,13 +1,10 @@
 package me.zodac.folding.rest;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import me.zodac.folding.api.Identifiable;
 import me.zodac.folding.api.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.rest.response.BulkCreateResponse;
-import me.zodac.folding.rest.response.ErrorResponse;
 import me.zodac.folding.validator.ValidationResponse;
 import org.slf4j.Logger;
 
@@ -18,10 +15,14 @@ import javax.ws.rs.core.UriInfo;
 import java.util.ArrayList;
 import java.util.List;
 
+import static me.zodac.folding.rest.response.Responses.badRequest;
+import static me.zodac.folding.rest.response.Responses.created;
+import static me.zodac.folding.rest.response.Responses.noContent;
+import static me.zodac.folding.rest.response.Responses.notFound;
+import static me.zodac.folding.rest.response.Responses.ok;
+import static me.zodac.folding.rest.response.Responses.serverError;
+
 abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
-
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-
     @Context
     private UriInfo uriContext;
 
@@ -46,32 +47,22 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
 
         final ValidationResponse validationResponse = validate(element);
         if (!validationResponse.isValid()) {
-            return Response
-                    .status(Response.Status.BAD_REQUEST)
-                    .entity(GSON.toJson(validationResponse))
-                    .build();
+            return badRequest(validationResponse);
         }
 
         try {
             final V elementWithId = createElement(element);
 
-            final UriBuilder builder = uriContext
+            final UriBuilder elementLocationBuilder = uriContext
                     .getRequestUriBuilder()
                     .path(String.valueOf(elementWithId.getId()));
-            return Response
-                    .created(builder.build())
-                    .entity(GSON.toJson(elementWithId))
-                    .build();
+            return created(elementWithId, elementLocationBuilder);
         } catch (final FoldingException e) {
             getLogger().error("Error creating {}: {}", elementType(), element, e.getCause());
-            return Response
-                    .serverError()
-                    .build();
+            return serverError();
         } catch (final Exception e) {
             getLogger().error("Unexpected error creating {}: {}", elementType(), element, e);
-            return Response
-                    .serverError()
-                    .build();
+            return serverError();
         }
     }
 
@@ -88,10 +79,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
         }
 
         if (!failedValidationResponses.isEmpty()) {
-            return Response
-                    .status(Response.Status.BAD_REQUEST)
-                    .entity(GSON.toJson(failedValidationResponses))
-                    .build();
+            return badRequest(failedValidationResponses);
         }
 
         final List<Identifiable> successful = new ArrayList<>(elements.size() / 2);
@@ -114,25 +102,16 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
 
         if (successful.isEmpty()) {
             getLogger().error("No {}s successfully created", elementType());
-            return Response
-                    .status(Response.Status.BAD_REQUEST)
-                    .entity(GSON.toJson(bulkCreateResponse))
-                    .build();
+            return badRequest(bulkCreateResponse);
         }
 
         if (!unsuccessful.isEmpty()) {
             getLogger().error("{} {}s successfully created, {} {}s unsuccessful", successful.size(), elementType(), unsuccessful.size(), elementType());
-            return Response
-                    .ok()
-                    .entity(GSON.toJson(bulkCreateResponse))
-                    .build();
+            return ok(bulkCreateResponse);
         }
 
         getLogger().debug("{} {}s successfully created", successful.size(), elementType());
-        return Response
-                .ok()
-                .entity(GSON.toJson(bulkCreateResponse.getSuccessful()))
-                .build();
+        return ok(bulkCreateResponse.getSuccessful());
     }
 
     protected Response getAll() {
@@ -141,20 +120,13 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
         try {
             final List<V> elements = getAllElements();
             getLogger().info("Found {} {}s", elements.size(), elementType());
-            return Response
-                    .ok()
-                    .entity(GSON.toJson(elements))
-                    .build();
+            return ok(elements);
         } catch (final FoldingException e) {
             getLogger().error("Error getting all {}s", elementType(), e.getCause());
-            return Response
-                    .serverError()
-                    .build();
+            return serverError();
         } catch (final Exception e) {
             getLogger().error("Unexpected error getting all {}s", elementType(), e);
-            return Response
-                    .serverError()
-                    .build();
+            return serverError();
         }
     }
 
@@ -163,35 +135,22 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
 
         try {
             final V element = getElementById(Integer.parseInt(elementId));
-            return Response
-                    .ok()
-                    .entity(element)
-                    .build();
+            return ok(element);
         } catch (final NumberFormatException e) {
             final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), elementId);
-
             getLogger().debug(errorMessage, e);
             getLogger().error(errorMessage);
-            return Response
-                    .status(Response.Status.BAD_REQUEST)
-                    .entity(GSON.toJson(ErrorResponse.create(errorMessage), ErrorResponse.class))
-                    .build();
+            return badRequest(errorMessage);
         } catch (final NotFoundException e) {
             getLogger().debug("No {} found with ID: {}", elementType(), elementId, e);
             getLogger().error("No {} found with ID: {}", elementType(), elementId);
-            return Response
-                    .status(Response.Status.NOT_FOUND)
-                    .build();
+            return notFound();
         } catch (final FoldingException e) {
             getLogger().error("Error getting {} with ID: {}", elementType(), elementId, e.getCause());
-            return Response
-                    .serverError()
-                    .build();
+            return serverError();
         } catch (final Exception e) {
             getLogger().error("Unexpected error getting {} with ID: {}", elementType(), elementId, e);
-            return Response
-                    .serverError()
-                    .build();
+            return serverError();
         }
     }
 
@@ -200,10 +159,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
 
         final ValidationResponse validationResponse = validate(element);
         if (!validationResponse.isValid()) {
-            return Response
-                    .status(Response.Status.BAD_REQUEST)
-                    .entity(GSON.toJson(validationResponse))
-                    .build();
+            return badRequest(validationResponse);
         }
 
         try {
@@ -211,57 +167,38 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
             // If no ID is provided, the POJO will default to a value of 0, which is acceptable
             if (Integer.parseInt(elementId) != element.getId() && element.getId() != 0) {
                 final String errorMessage = String.format("Path ID '%s' does not match ID '%s' of payload", elementId, element.getId());
-
                 getLogger().error(errorMessage);
-                return Response
-                        .status(Response.Status.BAD_REQUEST)
-                        .entity(GSON.toJson(ErrorResponse.create(errorMessage), ErrorResponse.class))
-                        .build();
+                return badRequest(errorMessage);
             }
 
             final V existingElement = getElementById(Integer.parseInt(elementId));
 
             if (existingElement.equals(element)) {
                 getLogger().debug("No change necessary");
-                return Response
-                        .noContent()
-                        .build();
+                return noContent();
             }
 
             final V updatedElementWithId = updateElementById(Integer.parseInt(elementId), element);
 
-            final UriBuilder builder = uriContext
+            final UriBuilder elementLocationBuilder = uriContext
                     .getRequestUriBuilder()
                     .path(String.valueOf(element.getId()));
-            return Response
-                    .ok(builder.build())
-                    .entity(GSON.toJson(updatedElementWithId))
-                    .build();
+            return ok(updatedElementWithId, elementLocationBuilder);
         } catch (final NumberFormatException e) {
             final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), elementId);
-
             getLogger().debug(errorMessage, e);
             getLogger().error(errorMessage);
-            return Response
-                    .status(Response.Status.BAD_REQUEST)
-                    .entity(GSON.toJson(ErrorResponse.create(errorMessage), ErrorResponse.class))
-                    .build();
+            return badRequest(errorMessage);
         } catch (final NotFoundException e) {
             getLogger().debug("No {} found with ID: {}", elementType(), elementId, e);
             getLogger().error("No {} found with ID: {}", elementType(), elementId, e);
-            return Response
-                    .status(Response.Status.NOT_FOUND)
-                    .build();
+            return notFound();
         } catch (final FoldingException e) {
             getLogger().error("Error updating {} with ID: {}", elementType(), elementId, e.getCause());
-            return Response
-                    .serverError()
-                    .build();
+            return serverError();
         } catch (final Exception e) {
             getLogger().error("Unexpected error updating {} with ID: {}", elementType(), elementId, e);
-            return Response
-                    .serverError()
-                    .build();
+            return serverError();
         }
     }
 
@@ -270,37 +207,23 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
 
         try {
             deleteElementById(Integer.parseInt(elementId));
-            return Response
-                    .noContent()
-                    .build();
+            return noContent();
         } catch (final NumberFormatException e) {
             final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), elementId);
-
             getLogger().debug(errorMessage, e);
             getLogger().error(errorMessage);
-            return Response
-                    .status(Response.Status.BAD_REQUEST)
-                    .entity(GSON.toJson(ErrorResponse.create(errorMessage), ErrorResponse.class))
-                    .build();
+            return badRequest(errorMessage);
         } catch (final FoldingConflictException e) {
             final String errorMessage = String.format("The %s ID '%s' is in use, remove all usages before deleting", elementType(), elementId);
-
             getLogger().debug(errorMessage, e);
             getLogger().error(errorMessage);
-            return Response
-                    .status(Response.Status.CONFLICT)
-                    .entity(GSON.toJson(ErrorResponse.create(errorMessage), ErrorResponse.class))
-                    .build();
+            return badRequest(errorMessage);
         } catch (final FoldingException e) {
             getLogger().error("Error deleting {} with ID: {}", elementType(), elementId, e.getCause());
-            return Response
-                    .serverError()
-                    .build();
+            return serverError();
         } catch (final Exception e) {
             getLogger().error("Unexpected error deleting {} with ID: {}", elementType(), elementId, e);
-            return Response
-                    .serverError()
-                    .build();
+            return serverError();
         }
     }
 }

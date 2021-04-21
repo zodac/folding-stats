@@ -166,7 +166,7 @@ public class PostgresDbManager implements DbManager {
             preparedStatement.setString(1, user.getFoldingUserName());
             preparedStatement.setString(2, user.getDisplayName());
             preparedStatement.setString(3, user.getPasskey());
-            preparedStatement.setString(4, user.getCategory());
+            preparedStatement.setString(4, user.getCategoryDisplayName());
             preparedStatement.setInt(5, user.getHardwareId());
             preparedStatement.setInt(6, user.getFoldingTeamNumber());
             preparedStatement.setString(7, user.getLiveStatsLink());
@@ -196,7 +196,7 @@ public class PostgresDbManager implements DbManager {
                 final List<User> users = new ArrayList<>();
 
                 while (resultSet.next()) {
-                    users.add(createFoldingUser(resultSet));
+                    users.add(createUser(resultSet));
                 }
 
                 return users;
@@ -218,7 +218,7 @@ public class PostgresDbManager implements DbManager {
 
             try (final ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    return createFoldingUser(resultSet);
+                    return createUser(resultSet);
                 }
 
                 throw new UserNotFoundException();
@@ -312,7 +312,7 @@ public class PostgresDbManager implements DbManager {
                 final List<Team> teams = new ArrayList<>();
 
                 while (resultSet.next()) {
-                    teams.add(createFoldingTeam(resultSet));
+                    teams.add(createTeam(resultSet));
                 }
 
                 return teams;
@@ -334,7 +334,7 @@ public class PostgresDbManager implements DbManager {
 
             try (final ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    return createFoldingTeam(resultSet);
+                    return createTeam(resultSet);
                 }
 
                 throw new TeamNotFoundException();
@@ -590,7 +590,7 @@ public class PostgresDbManager implements DbManager {
         );
     }
 
-    private static User createFoldingUser(final ResultSet resultSet) throws SQLException {
+    private static User createUser(final ResultSet resultSet) throws SQLException {
         return User.create(
                 resultSet.getInt("user_id"),
                 resultSet.getString("folding_username"),
@@ -603,7 +603,7 @@ public class PostgresDbManager implements DbManager {
         );
     }
 
-    private static Team createFoldingTeam(final ResultSet resultSet) throws SQLException {
+    private static Team createTeam(final ResultSet resultSet) throws SQLException {
         return new Team.Builder(resultSet.getString("team_name"))
                 .teamId(resultSet.getInt("team_id"))
                 .teamDescription(resultSet.getString("team_description"))

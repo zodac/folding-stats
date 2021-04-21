@@ -2,10 +2,594 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>JBOSS application</title>
+    <title>Extreme Team Folding</title>
+
+    <!-- TODO: [zodac] Can't figure out how to link to these resources, probably because I'm serving the main page from JAX-RS -->
+    <!-- Rather than try and expose more static content through REST, look into moving this to a NodeJS/React container later -->
+    <link rel="shortcut icon" type="image/x-icon"
+          href="https://extremehw-forums.s3.eu-west-2.amazonaws.com/monthly_2020_09/EHW_152x152.png.b3f456e5c0204c6622cc5be26178da26.png">
+    <link rel="stylesheet" href="https://getbootstrap.com/docs/4.0/dist/css/bootstrap.min.css">
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+    <style>
+        body {
+          background-color: #282424;
+          color: #F2FCFF;
+          margin:10px;
+          padding:5px;
+        }
+
+
+    </style>
 </head>
 
+<script>
+    // Using code from https://github.com/fabianomiranda/miranda-js
+    // Can't link to the JS file directly (some strict MIME-type error), so copy/pasting the source for now
+    // miranda-js START
+    $.fn.mirandajs = function(data, options) {
+        var settings = $.extend({
+                jsonNode:[''],
+                containers:[this.attr('id')],
+                effect:'show',
+                delay:1000,
+                nodeDelay:500,
+                ajaxMethod:'GET',
+                postData:{},
+                noCache: false
+        }, options);
+
+        /* Tratamento de erros na passagem de parâmetros */
+        if(!$.isArray(settings.jsonNode)){
+            alert('ERRO: jsonNode needs to be a array. Ex: ["'+settings.jsonNode+'"]');
+            return;
+        }
+        if(settings.jsonNode.length != settings.containers.length){
+            alert('ERRO: The length of jsonNode and containers must be equal.');
+            return;
+        }
+
+        /* Pega a lista correta do JSON e interage com o destino */
+        function mirandaParse(JSON, jsonNode){
+            var HTML_SAIDA = '';
+            var JSON_NODE = JSON;
+            if(jsonNode != ''){
+                JSON_NODE = eval('JSON.'+jsonNode);
+            }
+            if($.isArray(JSON_NODE)){
+                for(var k in JSON_NODE) {
+                    HTML_SAIDA += mirandaReplace(JSON_NODE[k]);
+                }
+            }else{
+                HTML_SAIDA += mirandaReplace(JSON_NODE);
+            }
+            HTML_OBJ.html(HTML_SAIDA);
+            if(settings.delay == 0){
+                eval('HTML_OBJ.'+settings.effect+'()');
+            }else{
+                eval('HTML_OBJ.'+settings.effect+'("'+settings.delay+'")');
+            }
+
+            /* Se ainda tiver nodes para processar, faz a recursividade passando para o próximo índice */
+            if((JSON_NODE_INDEX+1) < JSON_NODE_TOTAL){
+                JSON_NODE_INDEX++;
+                HTML_OBJ = $('#'+settings.containers[JSON_NODE_INDEX]);
+                HTML_BASE = HTML_OBJ.html();
+                setTimeout(function(){
+                    mirandaParse(JSON, settings.jsonNode[JSON_NODE_INDEX]);
+                }, settings.nodeDelay);
+            }
+        }
+
+        /* Subistitui as chaves pelos valores */
+        function mirandaReplace(obj){
+            var HTML_TEMP = HTML_BASE;
+            keys = $.map(obj, function(v, i){
+                HTML_TEMP = HTML_TEMP.split('[['+i+']]').join(v);
+            });
+            return HTML_TEMP;
+        }
+
+        /* Início */
+        var HTML_OBJ = $('#'+settings.containers[0]);
+        var HTML_BASE = HTML_OBJ.html();
+        var JSON_NODE_INDEX = 0;
+        var JSON_NODE_TOTAL = settings.jsonNode.length;
+
+        if(typeof data == 'string'){
+            if(settings.noCache){
+                var concatUrl = '?';
+                if(data.indexOf(concatUrl) != -1) {
+                    concatUrl = '&';
+                }
+                data += concatUrl + 'nocache=' + $.now();
+            }
+            if(settings.ajaxMethod.toUpperCase() == 'GET'){
+                $.get( data, function( data ) {
+                    mirandaParse(data, settings.jsonNode[JSON_NODE_INDEX]);
+                });
+            }else{
+                $.post(data, settings.postData, function(retorno) {
+                    data = retorno;
+                    mirandaParse(data, settings.jsonNode[JSON_NODE_INDEX]);
+                }, 'json');
+            }
+        }else{
+            mirandaParse(data, settings.jsonNode[JSON_NODE_INDEX]);
+        }
+    };
+    // miranda-js END
+
+
+    // Straight lifted this code from W3 Schools: https://www.w3schools.com/howto/howto_js_sort_table.asp
+    function sortTable(columnIndex, tableId) {
+      var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+      table = document.getElementById(tableId);
+      switching = true;
+      // Set the sorting direction to ascending:
+      dir = "asc";
+      /* Make a loop that will continue until
+      no switching has been done: */
+      while (switching) {
+        // Start by saying: no switching is done:
+        switching = false;
+        rows = table.rows;
+        /* Loop through all table rows (except the
+        first, which contains table headers): */
+        for (i = 1; i < (rows.length - 1); i++) {
+          // Start by saying there should be no switching:
+          shouldSwitch = false;
+          /* Get the two elements you want to compare,
+          one from current row and one from the next: */
+          x = rows[i].getElementsByTagName("TD")[columnIndex];
+          y = rows[i + 1].getElementsByTagName("TD")[columnIndex];
+          /* Check if the two rows should switch place,
+          based on the direction, asc or desc: */
+          if (dir == "asc") {
+            if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+              // If so, mark as a switch and break the loop:
+              shouldSwitch = true;
+              break;
+            }
+          } else if (dir == "desc") {
+            if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+              // If so, mark as a switch and break the loop:
+              shouldSwitch = true;
+              break;
+            }
+          }
+        }
+        if (shouldSwitch) {
+          /* If a switch has been marked, make the switch
+          and mark that a switch has been done: */
+          rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+          switching = true;
+          // Each time a switch is done, increase this count by 1:
+          switchcount ++;
+        } else {
+          /* If no switching has been done AND the direction is "asc",
+          set the direction to "desc" and run the while loop again. */
+          if (switchcount == 0 && dir == "asc") {
+            dir = "desc";
+            switching = true;
+          }
+        }
+      }
+    }
+
+    // Pull the TC stats, then manually update each of the numeric fields to be formatted with commas
+    function loadTcStats() {
+        const url='http://localhost:8080/folding/tc_stats';
+
+        fetch(url)
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(jsonResponse) {
+          $("#competition_points").mirandajs(jsonResponse);
+          $("#competition_units").mirandajs(jsonResponse);
+
+          var points = document.getElementById("competition_points");
+          $("#competition_points").text(parseInt(points.innerHTML).toLocaleString());
+
+          var units = document.getElementById("competition_units");
+          $("#competition_units").text(parseInt(units.innerHTML).toLocaleString());
+
+          return jsonResponse['teams'];
+        })
+        .then(function(jsonResponseTeams) {
+            var numberOfTeams = 3;
+
+            for (i = 1; i <= numberOfTeams; i++) {
+                $("#team_"+i+"_metadata").mirandajs(jsonResponseTeams[i-1]);
+                $("#team_"+i+"_stats").mirandajs(jsonResponseTeams[i-1]);
+                $("#team_"+i+"_user_data").mirandajs(jsonResponseTeams[i-1]['users']);
+
+                var points = document.getElementById("team_"+i+"_points");
+                $("#team_"+i+"_points").text(parseInt(points.innerHTML).toLocaleString());
+                var units = document.getElementById("team_"+i+"_units");
+                $("#team_"+i+"_units").text(parseInt(units.innerHTML).toLocaleString());
+                var units = document.getElementById("team_"+i+"_units");
+            }
+
+            return jsonResponseTeams;
+        })
+        .then(function(jsonResponseTeams){
+            var user_points = document.getElementsByClassName("team_user_points");
+            for(j = 0; j < user_points.length; j++){
+                user_points[j].innerHTML = parseInt(user_points[j].innerHTML).toLocaleString();
+            }
+
+            var user_units = document.getElementsByClassName("team_user_units");
+            for(j = 0; j < user_units.length; j++){
+                user_units[j].innerHTML = parseInt(user_units[j].innerHTML).toLocaleString();
+            }
+        })
+    };
+
+    function loadHardware() {
+        const url='http://localhost:8080/folding/hardware';
+
+        fetch(url)
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(jsonResponse) {
+          $("#hardware_data").mirandajs(jsonResponse);
+        });
+    };
+
+    function loadUsers() {
+        const url='http://localhost:8080/folding/users';
+
+        fetch(url)
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(jsonResponse) {
+          $("#users_data").mirandajs(jsonResponse);
+          return jsonResponse
+        })
+        .then(function(jsonResponse){
+            var links = document.getElementsByClassName("live_stats_link");
+            for(i = 0; i < links.length; i++){
+                if(links[i].innerHTML.includes("[[")) {
+                    links[i].innerHTML = "";
+                }
+            }
+        })
+    };
+
+    function loadTeams() {
+        const url='http://localhost:8080/folding/teams';
+
+        fetch(url)
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(jsonResponse) {
+          $("#teams_data").mirandajs(jsonResponse);
+        });
+    };
+
+    $(document).ready(function() {
+        loadTcStats();
+        loadHardware();
+        loadUsers();
+        loadTeams();
+    });
+
+    // The 'toggle' functions below simply change the colour of the buttons. There must be a smarter way to do this...
+    function toggleStats() {
+        if($("#stats_div").is(":visible")){
+            $("#stats_button").addClass("btn-primary");
+            $("#stats_button").removeClass("btn-success");
+        } else {
+            $("#stats_button").removeClass("btn-primary");
+            $("#stats_button").addClass("btn-success");
+        }
+    }
+    
+    function toggleHardware() {
+        if($("#hardware_div").is(":visible")){
+            $("#hardware_button").addClass("btn-primary");
+            $("#hardware_button").removeClass("btn-success");
+        } else {
+            $("#hardware_button").removeClass("btn-primary");
+            $("#hardware_button").addClass("btn-success");
+        }
+    }
+
+    function toggleUsers() {
+        if($("#users_div").is(":visible")){
+            $("#users_button").addClass("btn-primary");
+            $("#users_button").removeClass("btn-success");
+        } else {
+            $("#users_button").removeClass("btn-primary");
+            $("#users_button").addClass("btn-success");
+        }
+    }
+
+    function toggleTeams() {
+        if($("#teams_div").is(":visible")){
+            $("#teams_button").addClass("btn-primary");
+            $("#teams_button").removeClass("btn-success");
+        } else {
+            $("#teams_button").removeClass("btn-primary");
+            $("#teams_button").addClass("btn-success");
+        }
+    }
+
+    function toggleTeam(teamNumber) {
+        if($("#team_"+teamNumber+"_subdiv").is(":visible")){
+            $("#team_"+teamNumber+"_button").addClass("btn-primary");
+            $("#team_"+teamNumber+"_button").removeClass("btn-success");
+        } else {
+            $("#team_"+teamNumber+"_button").removeClass("btn-primary");
+            $("#team_"+teamNumber+"_button").addClass("btn-success");
+        }
+    }
+
+
+</script>
+
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">Extreme Team Folding</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="#">TC Stats</a>
+            </li>
+            <!--            <li class="nav-item dropdown">-->
+            <!--                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"-->
+            <!--                   data-toggle="dropdown"-->
+            <!--                   aria-haspopup="true" aria-expanded="false">Folding Data</a>-->
+            <!--                <div class="dropdown-menu" aria-labelledby="navbarDropdown">-->
+            <!--                    <a class="dropdown-item" href="./index2.html">Hardware</a>-->
+            <!--                    <a class="dropdown-item" href="#index2.html">Users</a>-->
+            <!--                    <a class="dropdown-item" href="/media/frontend/index2.html">Teams</a>-->
+            <!--                </div>-->
+            <!--            </li>-->
+            <li class="nav-item">
+                <a class="nav-link disabled" href="#">Admin</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+
 <body>
-<h1>JBOSS JEE6 application</h1>
+<button onclick="toggleStats()" class="btn btn-success" id="stats_button" href="#stats_div"
+        data-toggle="collapse" role="button">Team Competition
+    Stats
+</button>
+<button onclick="toggleHardware()" class="btn btn-primary" id="hardware_button" href="#hardware_div"
+        data-toggle="collapse" role="button">List of Hardware
+</button>
+<button onclick="toggleUsers()" class="btn btn-primary" id="users_button" href="#users_div"
+        data-toggle="collapse" role="button">List of Users
+</button>
+<button onclick="toggleTeams()" class="btn btn-primary" id="teams_button" href="#teams_div"
+        data-toggle="collapse" role="button">List of Teams
+</button>
+
+<div class="collapse" id="hardware_div">
+    <h2 class="navbar-brand">Hardware</h2>
+    <table class="table table-striped table-hover" id="hardware">
+        <thead>
+        <tr>
+            <th onclick="sortTable(0, 'hardware')" style="cursor:pointer" scope="col">ID</th>
+            <th onclick="sortTable(1, 'hardware')" style="cursor:pointer" scope="col">Hardware Name</th>
+            <th onclick="sortTable(2, 'hardware')" style="cursor:pointer" scope="col">Display Name</th>
+            <th onclick="sortTable(3, 'hardware')" style="cursor:pointer" scope="col">Operating System</th>
+            <th onclick="sortTable(4, 'hardware')" style="cursor:pointer" scope="col">Multiplier</th>
+        </tr>
+        </thead>
+        <tbody id="hardware_data">
+        <tr>
+            <td>[[id]]</td>
+            <td>[[hardwareName]]</td>
+            <td>[[displayName]]</td>
+            <td>[[operatingSystem]]</td>
+            <td>[[multiplier]]</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="collapse" id="users_div">
+    <h2 class="navbar-brand">Users</h2>
+    <table class="table table-striped table-hover" id="users" border="1">
+        <thead>
+        <tr>
+            <th onclick="sortTable(0, 'users')" style="cursor:pointer" scope="col">ID</th>
+            <th onclick="sortTable(1, 'users')" style="cursor:pointer" scope="col">Folding User Name</th>
+            <th onclick="sortTable(2, 'users')" style="cursor:pointer" scope="col">Display Name</th>
+            <th onclick="sortTable(3, 'users')" style="cursor:pointer" scope="col">Passkey</th>
+            <th onclick="sortTable(4, 'users')" style="cursor:pointer" scope="col">Category</th>
+            <th onclick="sortTable(5, 'users')" style="cursor:pointer" scope="col">Hardware ID</th>
+            <th onclick="sortTable(6, 'users')" style="cursor:pointer" scope="col">Folding Team Number</th>
+            <th onclick="sortTable(7, 'users')" style="cursor:pointer" scope="col">Live Stats Link</th>
+        </tr>
+        </thead>
+        <tbody id="users_data">
+        <tr>
+            <td>[[id]]</td>
+            <td>[[foldingUserName]]</td>
+            <td>[[displayName]]</td>
+            <td>[[passkey]]</td>
+            <td>[[category]]</td>
+            <td>[[hardwareId]]</td>
+            <td>[[foldingTeamNumber]]</td>
+            <td class="live_stats_link"><a href="[[liveStatsLink]]">[[liveStatsLink]]</a></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div class="collapse" id="teams_div">
+    <h2 class="navbar-brand">Teams</h2>
+    <table class="table table-striped table-hover" id="teams" border="1">
+        <thead>
+        <tr>
+            <th onclick="sortTable(0, 'teams')" style="cursor:pointer" scope="col">ID</th>
+            <th onclick="sortTable(1, 'teams')" style="cursor:pointer" scope="col">Team Name</th>
+            <th onclick="sortTable(2, 'teams')" style="cursor:pointer" scope="col">Description</th>
+            <th onclick="sortTable(3, 'teams')" style="cursor:pointer" scope="col">Captain User ID</th>
+            <th onclick="sortTable(4, 'teams')" style="cursor:pointer" scope="col">User IDs</th>
+        </tr>
+        </thead>
+        <tbody id="teams_data">
+        <tr>
+            <td>[[id]]</td>
+            <td>[[teamName]]</td>
+            <td>[[teamDescription]]</td>
+            <td>[[captainUserId]]</td>
+            <td>[[userIds]]</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Copy/pasting the same div/table structure for each team, since I don't know how to dynamically generate them based -->
+<!-- off the miranda-js output. I'm sure there's a way, but fucked if I know it... -->
+<div class="collapse show" id="stats_div">
+    <table class="table table-striped table-hover" id="stats" border="1">
+        <thead>
+        <tr>
+            <th onclick="sortTable(0, 'stats')" style="cursor:pointer" scope="col">Total Points</th>
+            <th onclick="sortTable(1, 'stats')" style="cursor:pointer" scope="col">Total Units</th>
+        </tr>
+        </thead>
+        <tbody id="stats_data">
+        <tr>
+            <td id="competition_points">[[totalPoints]]</td>
+            <td class="test" id="competition_units">[[totalUnits]]</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div id="team_1_div">
+        <div id="team_1_metadata">
+            <h2>Rank #[[rank]]: [[teamName]] (Captain: [[captainName]])</h2>
+            <button onclick="toggleTeam(1)" class="ui-btn btn btn-success" id="team_1_button" href="#team_1_subdiv"
+                    data-toggle="collapse" role="button">Show/Hide
+            </button>
+        </div>
+        <div id="team_1_subdiv" class="collapse">
+            <div id="team_1_stats">
+                <h4><span id="team_1_points">[[teamPoints]]</span> points | <span
+                        id="team_1_units">[[teamUnits]]</span> units</h4>
+            </div>
+            <table class="table table-striped table-hover" id="team_1" border="1">
+                <thead>
+                <tr>
+                    <th onclick="sortTable(0, 'team_1')" style="cursor:pointer" scope="col">Rank</th>
+                    <th onclick="sortTable(1, 'team_1')" style="cursor:pointer" scope="col">User Name</th>
+                    <th onclick="sortTable(2, 'team_1')" style="cursor:pointer" scope="col">Category</th>
+                    <th onclick="sortTable(3, 'team_1')" style="cursor:pointer" scope="col">Hardware</th>
+                    <th onclick="sortTable(4, 'team_1')" style="cursor:pointer" scope="col">Points</th>
+                    <th onclick="sortTable(5, 'team_1')" style="cursor:pointer" scope="col">Units</th>
+                </tr>
+                </thead>
+                <tbody id="team_1_user_data">
+                <tr>
+                    <td>[[rankInTeam]]</td>
+                    <td>[[userName]]</td>
+                    <td>[[category]]</td>
+                    <td>[[hardware]]</td>
+                    <td class="team_user_points">[[points]]</td>
+                    <td class="team_user_units">[[units]]</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <br/>
+
+    <div id="team_2_div">
+        <div id="team_2_metadata">
+            <h2>Rank #[[rank]]: [[teamName]] (Captain: [[captainName]])</h2>
+            <button onclick="toggleTeam(2)" class="ui-btn btn btn-success" id="team_2_button" href="#team_2_subdiv"
+                    data-toggle="collapse" role="button">Show/Hide
+            </button>
+        </div>
+        <div id="team_2_subdiv" class="collapse">
+            <div id="team_2_stats">
+                <h4><span id="team_2_points">[[teamPoints]]</span> points | <span
+                        id="team_2_units">[[teamUnits]]</span> units</h4>
+            </div>
+            <table class="table table-striped table-hover" id="team_2" border="1">
+                <thead>
+                <tr>
+                    <th onclick="sortTable(0, 'team_2')" style="cursor:pointer" scope="col">Rank</th>
+                    <th onclick="sortTable(1, 'team_2')" style="cursor:pointer" scope="col">User Name</th>
+                    <th onclick="sortTable(2, 'team_2')" style="cursor:pointer" scope="col">Category</th>
+                    <th onclick="sortTable(3, 'team_2')" style="cursor:pointer" scope="col">Hardware</th>
+                    <th onclick="sortTable(4, 'team_2')" style="cursor:pointer" scope="col">Points</th>
+                    <th onclick="sortTable(5, 'team_2')" style="cursor:pointer" scope="col">Units</th>
+                </tr>
+                </thead>
+                <tbody id="team_2_user_data">
+                <tr>
+                    <td>[[rankInTeam]]</td>
+                    <td>[[userName]]</td>
+                    <td>[[category]]</td>
+                    <td>[[hardware]]</td>
+                    <td class="team_user_points">[[points]]</td>
+                    <td class="team_user_units">[[units]]</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <br/>
+
+    <div id="team_3_div">
+        <div id="team_3_metadata">
+            <h2>Rank #[[rank]]: [[teamName]] (Captain: [[captainName]])</h2>
+            <button onclick="toggleTeam(3)" class="ui-btn btn btn-success" id="team_3_button" href="#team_3_subdiv"
+                    data-toggle="collapse" role="button">Show/Hide
+            </button>
+        </div>
+        <div id="team_3_subdiv" class="collapse">
+            <div id="team_3_stats">
+                <h4><span id="team_3_points">[[teamPoints]]</span> points | <span
+                        id="team_3_units">[[teamUnits]]</span> units</h4>
+            </div>
+            <table class="table table-striped table-hover" id="team_3" border="1">
+                <thead>
+                <tr>
+                    <th onclick="sortTable(0, 'team_3')" style="cursor:pointer" scope="col">Rank</th>
+                    <th onclick="sortTable(1, 'team_3')" style="cursor:pointer" scope="col">User Name</th>
+                    <th onclick="sortTable(2, 'team_3')" style="cursor:pointer" scope="col">Category</th>
+                    <th onclick="sortTable(3, 'team_3')" style="cursor:pointer" scope="col">Hardware</th>
+                    <th onclick="sortTable(4, 'team_3')" style="cursor:pointer" scope="col">Points</th>
+                    <th onclick="sortTable(5, 'team_3')" style="cursor:pointer" scope="col">Units</th>
+                </tr>
+                </thead>
+                <tbody id="team_3_user_data">
+                <tr>
+                    <td>[[rankInTeam]]</td>
+                    <td>[[userName]]</td>
+                    <td>[[category]]</td>
+                    <td>[[hardware]]</td>
+                    <td class="team_user_points">[[points]]</td>
+                    <td class="team_user_units">[[units]]</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <br/>
+</div>
 </body>
 </html>

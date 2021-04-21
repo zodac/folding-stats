@@ -83,6 +83,10 @@ public class User implements Identifiable {
         return category;
     }
 
+    public String getCategoryDisplayName() {
+        return Category.get(category).getDisplayName();
+    }
+
     public void setCategory(final String category) {
         this.category = category;
     }

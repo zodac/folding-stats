@@ -1,12 +1,9 @@
 package me.zodac.folding.rest;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.api.tc.stats.Stats;
-import me.zodac.folding.rest.response.ErrorResponse;
 import me.zodac.folding.rest.tc.historic.DailyStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,12 +27,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static me.zodac.folding.rest.response.Responses.badRequest;
+import static me.zodac.folding.rest.response.Responses.notFound;
+import static me.zodac.folding.rest.response.Responses.notImplemented;
+import static me.zodac.folding.rest.response.Responses.ok;
+import static me.zodac.folding.rest.response.Responses.serverError;
+
 @Path("/historic/")
 @RequestScoped
 public class HistoricStatsEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HistoricStatsEndpoint.class);
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     @EJB
     private StorageFacade storageFacade;
@@ -48,10 +50,7 @@ public class HistoricStatsEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getHourlyUserStats(@PathParam("userId") final String userId) {
         LOGGER.info("GET request received to show hourly TC user stats at '{}'", uriContext.getAbsolutePath());
-
-        return Response
-                .status(Response.Status.NOT_IMPLEMENTED)
-                .build();
+        return notImplemented();
     }
 
     @GET
@@ -68,53 +67,32 @@ public class HistoricStatsEndpoint {
                     .map(entry -> DailyStats.createFromStats(entry.getKey(), entry.getValue()))
                     .collect(Collectors.toList());
 
-            return Response
-                    .ok()
-                    .entity(GSON.toJson(dailyStats))
-                    .build();
+            return ok(dailyStats);
         } catch (final DateTimeParseException e) {
             final String errorMessage = String.format("The year '%s' is not a valid format", year);
-
             LOGGER.debug(errorMessage, e);
             LOGGER.error(errorMessage);
-            return Response
-                    .status(Response.Status.BAD_REQUEST)
-                    .entity(GSON.toJson(ErrorResponse.create(errorMessage), ErrorResponse.class))
-                    .build();
+            return badRequest(errorMessage);
         } catch (final DateTimeException e) {
             final String errorMessage = String.format("The month '%s' is not a valid format", month);
-
             LOGGER.debug(errorMessage, e);
             LOGGER.error(errorMessage);
-            return Response
-                    .status(Response.Status.BAD_REQUEST)
-                    .entity(GSON.toJson(ErrorResponse.create(errorMessage), ErrorResponse.class))
-                    .build();
+            return badRequest(errorMessage);
         } catch (final NumberFormatException e) {
             final String errorMessage = String.format("The user ID '%s' or month '%s' is not a valid format", userId, month);
-
             LOGGER.debug(errorMessage, e);
             LOGGER.error(errorMessage);
-            return Response
-                    .status(Response.Status.BAD_REQUEST)
-                    .entity(GSON.toJson(ErrorResponse.create(errorMessage), ErrorResponse.class))
-                    .build();
+            return badRequest(errorMessage);
         } catch (final NotFoundException e) {
             LOGGER.debug("No user found with ID: {}", userId, e);
             LOGGER.error("No user found with ID: {}", userId);
-            return Response
-                    .status(Response.Status.NOT_FOUND)
-                    .build();
+            return notFound();
         } catch (final FoldingException e) {
             LOGGER.error("Error getting user with ID: {}", userId, e.getCause());
-            return Response
-                    .serverError()
-                    .build();
+            return serverError();
         } catch (final Exception e) {
             LOGGER.error("Unexpected error getting user with ID: {}", userId, e);
-            return Response
-                    .serverError()
-                    .build();
+            return serverError();
         }
     }
 
@@ -123,10 +101,7 @@ public class HistoricStatsEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getMonthlyUserStats(@PathParam("userId") final String userId) {
         LOGGER.info("GET request received to show monthly TC user stats at '{}'", uriContext.getAbsolutePath());
-
-        return Response
-                .status(Response.Status.NOT_IMPLEMENTED)
-                .build();
+        return notImplemented();
     }
 
     @GET
@@ -134,10 +109,7 @@ public class HistoricStatsEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getHourlyTeamStats(@PathParam("teamId") final String teamId) {
         LOGGER.info("GET request received to show hourly TC team stats at '{}'", uriContext.getAbsolutePath());
-
-        return Response
-                .status(Response.Status.NOT_IMPLEMENTED)
-                .build();
+        return notImplemented();
     }
 
     @GET
@@ -145,10 +117,7 @@ public class HistoricStatsEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getDailyTeamStats(@PathParam("teamId") final String teamId) {
         LOGGER.info("GET request received to show daily TC team stats at '{}'", uriContext.getAbsolutePath());
-
-        return Response
-                .status(Response.Status.NOT_IMPLEMENTED)
-                .build();
+        return notImplemented();
     }
 
     @GET
@@ -156,9 +125,6 @@ public class HistoricStatsEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getMonthlyTeamStats(@PathParam("teamId") final String teamId) {
         LOGGER.info("GET request received to show monthly TC team stats at '{}'", uriContext.getAbsolutePath());
-
-        return Response
-                .status(Response.Status.NOT_IMPLEMENTED)
-                .build();
+        return notImplemented();
     }
 }
