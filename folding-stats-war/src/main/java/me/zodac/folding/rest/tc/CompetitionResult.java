@@ -9,20 +9,20 @@ import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
 
 public class CompetitionResult {
 
-    private List<TeamResult> teams = new ArrayList<>();
     private int totalUnits = 0;
     private long totalPoints = 0L;
     private long totalPointsWithoutMultipliers = 0L;
+    private List<TeamResult> teams = new ArrayList<>();
 
     public CompetitionResult() {
 
     }
 
-    private CompetitionResult(final List<TeamResult> teams, final int totalUnits, final long totalPoints, final long totalPointsWithoutMultipliers) {
-        this.teams = teams;
+    private CompetitionResult(final int totalUnits, final long totalPoints, final long totalPointsWithoutMultipliers, final List<TeamResult> teams) {
         this.totalUnits = totalUnits;
         this.totalPoints = totalPoints;
         this.totalPointsWithoutMultipliers = totalPointsWithoutMultipliers;
+        this.teams = teams;
     }
 
     public static CompetitionResult create(final List<TeamResult> teams) {
@@ -45,16 +45,7 @@ public class CompetitionResult {
                         TeamResult::updateWithRank)
                 );
 
-        return new CompetitionResult(rankedTeams, totalUnits, totalPoints, totalPointsWithoutMultipliers);
-    }
-
-
-    public List<TeamResult> getTeams() {
-        return teams;
-    }
-
-    public void setTeams(final List<TeamResult> teams) {
-        this.teams = teams;
+        return new CompetitionResult(totalUnits, totalPoints, totalPointsWithoutMultipliers, rankedTeams);
     }
 
     public int getTotalUnits() {
@@ -81,6 +72,14 @@ public class CompetitionResult {
         this.totalPointsWithoutMultipliers = totalPointsWithoutMultipliers;
     }
 
+    public List<TeamResult> getTeams() {
+        return teams;
+    }
+
+    public void setTeams(final List<TeamResult> teams) {
+        this.teams = teams;
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (this == o) {
@@ -101,10 +100,10 @@ public class CompetitionResult {
     @Override
     public String toString() {
         return "CompetitionResult::{" +
-                "teams: " + teams +
-                ", totalUnits: " + formatWithCommas(totalUnits) +
+                "totalUnits: " + formatWithCommas(totalUnits) +
                 ", totalPoints: " + formatWithCommas(totalPoints) +
                 ", totalPointsWithoutMultipliers: " + formatWithCommas(totalPointsWithoutMultipliers) +
+                ", teams: " + teams +
                 '}';
     }
 }

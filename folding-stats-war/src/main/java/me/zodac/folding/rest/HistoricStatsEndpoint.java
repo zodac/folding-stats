@@ -26,9 +26,9 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Path("/historic/")
 @RequestScoped
@@ -44,18 +44,29 @@ public class HistoricStatsEndpoint {
     private UriInfo uriContext;
 
     @GET
-    @Path("/users/{foldingUserId}/{year}/{month}")
+    @Path("/users/{userId}/{year}/{month}/{day}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getDailyUserStats(@PathParam("foldingUserId") final String foldingUserId, @PathParam("year") final String year, @PathParam("month") final String month) {
+    public Response getHourlyUserStats(@PathParam("userId") final String userId) {
+        LOGGER.info("GET request received to show hourly TC user stats at '{}'", uriContext.getAbsolutePath());
+
+        return Response
+                .status(Response.Status.NOT_IMPLEMENTED)
+                .build();
+    }
+
+    @GET
+    @Path("/users/{userId}/{year}/{month}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getDailyUserStats(@PathParam("userId") final String userId, @PathParam("year") final String year, @PathParam("month") final String month) {
         LOGGER.info("GET request received to show daily TC user stats at '{}'", uriContext.getAbsolutePath());
 
         try {
-            final Map<LocalDate, Stats> dailyUserStats = storageFacade.getDailyUserStats(Integer.parseInt(foldingUserId), Month.of(Integer.parseInt(month)), Year.parse(year));
-            final List<DailyStats> dailyStats = new ArrayList<>(dailyUserStats.size());
+            final Map<LocalDate, Stats> dailyUserStats = storageFacade.getDailyUserStats(Integer.parseInt(userId), Month.of(Integer.parseInt(month)), Year.parse(year));
 
-            for (final Map.Entry<LocalDate, Stats> dailyUserStat : dailyUserStats.entrySet()) {
-                dailyStats.add(DailyStats.create(dailyUserStat.getKey(), dailyUserStat.getValue().getPoints(), dailyUserStat.getValue().getUnmultipliedPoints(), dailyUserStat.getValue().getUnits()));
-            }
+            final List<DailyStats> dailyStats = dailyUserStats.entrySet()
+                    .stream()
+                    .map(entry -> DailyStats.createFromStats(entry.getKey(), entry.getValue()))
+                    .collect(Collectors.toList());
 
             return Response
                     .ok()
@@ -80,7 +91,7 @@ public class HistoricStatsEndpoint {
                     .entity(GSON.toJson(ErrorResponse.create(errorMessage), ErrorResponse.class))
                     .build();
         } catch (final NumberFormatException e) {
-            final String errorMessage = String.format("The Folding user ID '%s' or month '%s' is not a valid format", foldingUserId, month);
+            final String errorMessage = String.format("The user ID '%s' or month '%s' is not a valid format", userId, month);
 
             LOGGER.debug(errorMessage, e);
             LOGGER.error(errorMessage);
@@ -89,18 +100,18 @@ public class HistoricStatsEndpoint {
                     .entity(GSON.toJson(ErrorResponse.create(errorMessage), ErrorResponse.class))
                     .build();
         } catch (final NotFoundException e) {
-            LOGGER.debug("No Folding user found with ID: {}", foldingUserId, e);
-            LOGGER.error("No Folding user found with ID: {}", foldingUserId);
+            LOGGER.debug("No user found with ID: {}", userId, e);
+            LOGGER.error("No user found with ID: {}", userId);
             return Response
                     .status(Response.Status.NOT_FOUND)
                     .build();
         } catch (final FoldingException e) {
-            LOGGER.error("Error getting Folding user with ID: {}", foldingUserId, e.getCause());
+            LOGGER.error("Error getting user with ID: {}", userId, e.getCause());
             return Response
                     .serverError()
                     .build();
         } catch (final Exception e) {
-            LOGGER.error("Unexpected error getting Folding user with ID: {}", foldingUserId, e);
+            LOGGER.error("Unexpected error getting user with ID: {}", userId, e);
             return Response
                     .serverError()
                     .build();
@@ -108,9 +119,31 @@ public class HistoricStatsEndpoint {
     }
 
     @GET
-    @Path("/teams/{foldingTeamId}/{year}/{month}")
+    @Path("/users/{userId}/{year}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getDailyTeamStats(@PathParam("foldingTeamId") final String foldingTeamId) {
+    public Response getMonthlyUserStats(@PathParam("userId") final String userId) {
+        LOGGER.info("GET request received to show monthly TC user stats at '{}'", uriContext.getAbsolutePath());
+
+        return Response
+                .status(Response.Status.NOT_IMPLEMENTED)
+                .build();
+    }
+
+    @GET
+    @Path("/teams/{teamId}/{year}/{month}/{day}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getHourlyTeamStats(@PathParam("teamId") final String teamId) {
+        LOGGER.info("GET request received to show hourly TC team stats at '{}'", uriContext.getAbsolutePath());
+
+        return Response
+                .status(Response.Status.NOT_IMPLEMENTED)
+                .build();
+    }
+
+    @GET
+    @Path("/teams/{teamId}/{year}/{month}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getDailyTeamStats(@PathParam("teamId") final String teamId) {
         LOGGER.info("GET request received to show daily TC team stats at '{}'", uriContext.getAbsolutePath());
 
         return Response
@@ -119,9 +152,9 @@ public class HistoricStatsEndpoint {
     }
 
     @GET
-    @Path("/teams/{foldingTeamId}/{year}")
+    @Path("/teams/{teamId}/{year}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getMonthlyTeamStats(@PathParam("foldingTeamId") final String foldingTeamId) {
+    public Response getMonthlyTeamStats(@PathParam("teamId") final String teamId) {
         LOGGER.info("GET request received to show monthly TC team stats at '{}'", uriContext.getAbsolutePath());
 
         return Response

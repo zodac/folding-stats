@@ -1,5 +1,7 @@
 package me.zodac.folding.rest.tc.historic;
 
+import me.zodac.folding.api.tc.stats.Stats;
+
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -25,6 +27,10 @@ public class DailyStats {
 
     public static DailyStats create(final LocalDate date, final long points, final long pointsWithoutMultiplier, final int units) {
         return new DailyStats(date, points, pointsWithoutMultiplier, units);
+    }
+
+    public static DailyStats createFromStats(final LocalDate date, final Stats stats) {
+        return new DailyStats(date, stats.getPoints(), stats.getUnmultipliedPoints(), stats.getUnits());
     }
 
     public LocalDate getDate() {
