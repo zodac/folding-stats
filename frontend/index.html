@@ -23,6 +23,10 @@
         }
 
 
+
+
+
+
     </style>
 </head>
 
@@ -182,7 +186,7 @@
 
     // Pull the TC stats, then manually update each of the numeric fields to be formatted with commas
     function loadTcStats() {
-        const url='http://localhost:8080/folding/tc_stats';
+        const url='../tc_stats';
 
         fetch(url)
         .then(function(response) {
@@ -231,7 +235,7 @@
     };
 
     function loadHardware() {
-        const url='http://localhost:8080/folding/hardware';
+        const url='../hardware';
 
         fetch(url)
         .then(function(response) {
@@ -243,7 +247,7 @@
     };
 
     function loadUsers() {
-        const url='http://localhost:8080/folding/users';
+        const url='../users';
 
         fetch(url)
         .then(function(response) {
@@ -264,7 +268,7 @@
     };
 
     function loadTeams() {
-        const url='http://localhost:8080/folding/teams';
+        const url='../teams';
 
         fetch(url)
         .then(function(response) {
@@ -332,6 +336,10 @@
             $("#team_"+teamNumber+"_button").addClass("btn-success");
         }
     }
+
+
+
+
 
 
 </script>
@@ -480,7 +488,7 @@
     <div id="team_1_div">
         <div id="team_1_metadata">
             <h2>Rank #[[rank]]: [[teamName]] (Captain: [[captainName]])</h2>
-            <button onclick="toggleTeam(1)" class="ui-btn btn btn-success" id="team_1_button" href="#team_1_subdiv"
+            <button onclick="toggleTeam(1)" class="ui-btn btn btn-primary" id="team_1_button" href="#team_1_subdiv"
                     data-toggle="collapse" role="button">Show/Hide
             </button>
         </div>
@@ -518,7 +526,7 @@
     <div id="team_2_div">
         <div id="team_2_metadata">
             <h2>Rank #[[rank]]: [[teamName]] (Captain: [[captainName]])</h2>
-            <button onclick="toggleTeam(2)" class="ui-btn btn btn-success" id="team_2_button" href="#team_2_subdiv"
+            <button onclick="toggleTeam(2)" class="ui-btn btn btn-primary" id="team_2_button" href="#team_2_subdiv"
                     data-toggle="collapse" role="button">Show/Hide
             </button>
         </div>
@@ -556,7 +564,7 @@
     <div id="team_3_div">
         <div id="team_3_metadata">
             <h2>Rank #[[rank]]: [[teamName]] (Captain: [[captainName]])</h2>
-            <button onclick="toggleTeam(3)" class="ui-btn btn btn-success" id="team_3_button" href="#team_3_subdiv"
+            <button onclick="toggleTeam(3)" class="ui-btn btn btn-primary" id="team_3_button" href="#team_3_subdiv"
                     data-toggle="collapse" role="button">Show/Hide
             </button>
         </div>
