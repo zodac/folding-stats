@@ -22,15 +22,24 @@
           padding:5px;
         }
 
-
-
-
-
-
     </style>
 </head>
 
 <script>
+      // Stolen code, again: https://stackoverflow.com/questions/37179899/countdown-timer-every-hour-but-on-30-minute-marks
+
+      function updateTime() {
+        const zeroPad = (num, places) => String(num).padStart(places, '0')
+        var time = new Date(),
+        secsRemaining = 3600 - (time.getUTCMinutes()-15)%60 * 60 - time.getUTCSeconds();
+        mins = Math.floor(secsRemaining / 60);
+        secs = secsRemaining % 60;
+        $("#min-part").text(mins);
+        $("#sec-part").text(zeroPad(secs, 2));
+
+        setTimeout( updateTime, 1000 - (new Date()).getUTCMilliseconds() );
+      }
+
     // Using code from https://github.com/fabianomiranda/miranda-js
     // Can't link to the JS file directly (some strict MIME-type error), so copy/pasting the source for now
     // miranda-js START
@@ -284,6 +293,7 @@
         loadHardware();
         loadUsers();
         loadTeams();
+        updateTime();
     });
 
     // The 'toggle' functions below simply change the colour of the buttons. There must be a smarter way to do this...
@@ -337,11 +347,6 @@
         }
     }
 
-
-
-
-
-
 </script>
 
 
@@ -357,20 +362,12 @@
             <li class="nav-item active">
                 <a class="nav-link" href="#">TC Stats</a>
             </li>
-            <!--            <li class="nav-item dropdown">-->
-            <!--                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"-->
-            <!--                   data-toggle="dropdown"-->
-            <!--                   aria-haspopup="true" aria-expanded="false">Folding Data</a>-->
-            <!--                <div class="dropdown-menu" aria-labelledby="navbarDropdown">-->
-            <!--                    <a class="dropdown-item" href="./index2.html">Hardware</a>-->
-            <!--                    <a class="dropdown-item" href="#index2.html">Users</a>-->
-            <!--                    <a class="dropdown-item" href="/media/frontend/index2.html">Teams</a>-->
-            <!--                </div>-->
-            <!--            </li>-->
             <li class="nav-item">
                 <a class="nav-link disabled" href="#">Admin</a>
             </li>
         </ul>
+    </div>
+    <div style="position: relative; right: 0px;">Next update: <span id="min-part"></span>:<span id="sec-part"></span>
     </div>
 </nav>
 

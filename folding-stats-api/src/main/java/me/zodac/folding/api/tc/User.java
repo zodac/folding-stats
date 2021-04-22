@@ -38,10 +38,6 @@ public class User implements Identifiable {
         return new User(userId, foldingUserName, displayName, passkey, category, hardwareId, foldingTeamNumber, liveStatsLink);
     }
 
-    public static User createWithoutId(final String foldingUserName, final String displayName, final String passkey, final String category, final int hardwareId, final int foldingTeamNumber, final String liveStatsLink) {
-        return new User(0, foldingUserName, displayName, passkey, category, hardwareId, foldingTeamNumber, liveStatsLink);
-    }
-
     public static User updateWithId(final int userId, final User user) {
         return new User(userId, user.getFoldingUserName(), user.getDisplayName(), user.getPasskey(), user.getCategory(), user.getHardwareId(), user.getFoldingTeamNumber(), user.getLiveStatsLink());
     }

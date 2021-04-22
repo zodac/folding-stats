@@ -16,6 +16,7 @@ public class Hardware implements Identifiable {
     private String operatingSystem;
     private double multiplier;
 
+    
     public Hardware() {
 
     }
@@ -30,10 +31,6 @@ public class Hardware implements Identifiable {
 
     public static Hardware create(final int id, final String hardwareName, final String displayName, final String os, final double multiplier) {
         return new Hardware(id, hardwareName, displayName, os, multiplier);
-    }
-
-    public static Hardware createWithoutId(final String hardwareName, final String displayName, final String os, final double multiplier) {
-        return new Hardware(0, hardwareName, displayName, os, multiplier);
     }
 
     public static Hardware updateWithId(final int id, final Hardware hardware) {
