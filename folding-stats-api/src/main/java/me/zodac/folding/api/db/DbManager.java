@@ -78,7 +78,6 @@ public interface DbManager {
 
     Map<LocalDate, UserTcStats> getDailyUserTcStats(final int userId, final Month month, final Year year) throws FoldingException, UserNotFoundException;
 
-
     void persistInitialUserStats(final UserStats userStats) throws FoldingException;
 
     UserTcStats getCurrentTcStats(final int userId) throws FoldingException, UserNotFoundException;

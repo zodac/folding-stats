@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public class StatsCache {
-    
+
     private static StatsCache INSTANCE = null;
 
     private final Map<Integer, Stats> initialStatsByUserId = new HashMap<>();
@@ -45,18 +45,5 @@ public class StatsCache {
 
     public Optional<Stats> getCurrentStatsForUser(final int userId) {
         return Optional.ofNullable(currentStatsByUserId.get(userId));
-    }
-
-    public void resetInitialCache() {
-        emptyInitialCache();
-        initialStatsByUserId.putAll(currentStatsByUserId);
-    }
-
-    public void emptyInitialCache() {
-        initialStatsByUserId.clear();
-    }
-
-    public void emptyCurrentCache() {
-        currentStatsByUserId.clear();
     }
 }

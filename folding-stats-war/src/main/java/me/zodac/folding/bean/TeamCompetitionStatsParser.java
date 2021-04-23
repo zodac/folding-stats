@@ -70,7 +70,7 @@ public class TeamCompetitionStatsParser {
         getTcStatsForFoldingUsers();
     }
 
-    public void manualStatsParsing() {
+    public void manualTcStatsParsing() {
         LOGGER.debug("Manual stats parsing execution");
         getTcStatsForFoldingUsers();
     }
@@ -118,7 +118,7 @@ public class TeamCompetitionStatsParser {
         }
 
 
-        final Map<Integer, Stats> initialStatsByUserId = storageFacade.getInitialUserStats(users.stream().map(User::getId).collect(toList()));
+        final Map<Integer, Stats> initialStatsByUserId = storageFacade.getInitialStatsForUsers(users.stream().map(User::getId).collect(toList()));
 
 
         // TODO: [zodac] Streams?

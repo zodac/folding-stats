@@ -9,6 +9,7 @@ import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.UserTcStats;
+import me.zodac.folding.bean.TcCacheResetScheduler;
 import me.zodac.folding.bean.TeamCompetitionStatsParser;
 import me.zodac.folding.rest.tc.CompetitionResult;
 import me.zodac.folding.rest.tc.TeamResult;
@@ -45,6 +46,9 @@ public class TeamCompetitionStatsEndpoint {
     private StorageFacade storageFacade;
 
     @EJB
+    private TcCacheResetScheduler tcCacheResetScheduler;
+
+    @EJB
     private TeamCompetitionStatsParser teamCompetitionStatsParser;
 
 
@@ -55,7 +59,15 @@ public class TeamCompetitionStatsEndpoint {
     @Path("/manual/")
     public Response manualStats() {
         LOGGER.info("GET request received to manually parse TC stats at '{}'", uriContext.getAbsolutePath());
-        teamCompetitionStatsParser.manualStatsParsing();
+        teamCompetitionStatsParser.manualTcStatsParsing();
+        return ok();
+    }
+
+    @GET
+    @Path("/reset/")
+    public Response resetStats() {
+        LOGGER.info("GET request received to manually reset TC stats at '{}'", uriContext.getAbsolutePath());
+        tcCacheResetScheduler.manualTcStatsReset();
         return ok();
     }
 

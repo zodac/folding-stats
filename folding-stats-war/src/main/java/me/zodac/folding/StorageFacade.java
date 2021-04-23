@@ -113,11 +113,19 @@ public class StorageFacade {
 
     public void persistInitialUserStats(final User user) throws FoldingException {
         final UserStats currentUserStats = FoldingStatsParser.getStatsForUser(user);
-        dbManager.persistInitialUserStats(currentUserStats);
-        statsCache.addInitialStats(user.getId(), currentUserStats.getStats());
+        persistInitialUserStats(currentUserStats);
     }
 
-    public Map<Integer, Stats> getInitialUserStats(final List<Integer> userIds) throws FoldingException {
+    public void persistInitialUserStats(final UserStats userStats) throws FoldingException {
+        dbManager.persistInitialUserStats(userStats);
+        statsCache.addInitialStats(userStats.getUserId(), userStats.getStats());
+    }
+
+    public Stats getInitialStatsForUser(final int userId) throws UserNotFoundException, FoldingException {
+        return dbManager.getInitialUserStats(userId);
+    }
+
+    public Map<Integer, Stats> getInitialStatsForUsers(final List<Integer> userIds) throws FoldingException {
         final Map<Integer, Stats> cachedInitialStats = new HashMap<>(userIds.size());
         for (final int userId : userIds) {
             final Optional<Stats> optionalStats = statsCache.getInitialStatsForUser(userId);

@@ -56,7 +56,7 @@ public class Initialiser {
         try {
             if (!dbManager.doTcStatsExist()) {
                 LOGGER.warn("No TC stats data exists in the DB");
-                teamCompetitionStatsParser.manualStatsParsing();
+                teamCompetitionStatsParser.manualTcStatsParsing();
                 return;
             }
         } catch (final FoldingException e) {
@@ -81,6 +81,8 @@ public class Initialiser {
             try {
                 final Stats currentStatsForUser = dbManager.getCurrentUserStats(user.getId());
                 LOGGER.debug("Found current stats for user {}: {}", user, currentStatsForUser);
+
+                // TODO: [zodac] Why do we do this? Do we query the cache?
                 StatsCache.get().addCurrentStats(user.getId(), currentStatsForUser);
             } catch (final UserNotFoundException e) {
                 LOGGER.debug("No current stats in DB for {}", user, e);
