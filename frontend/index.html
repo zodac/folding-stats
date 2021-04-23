@@ -28,6 +28,7 @@
 
 
 
+
     </style>
 </head>
 
@@ -220,7 +221,7 @@
           return jsonResponse['teams'];
         })
         .then(function(jsonResponseTeams) {
-            var numberOfTeams = 3;
+            var numberOfTeams = 4;
 
             for (i = 1; i <= numberOfTeams; i++) {
                 $("#team_"+i+"_metadata").mirandajs(jsonResponseTeams[i-1]);
@@ -352,6 +353,7 @@
             $("#team_"+teamNumber+"_button").addClass("btn-success");
         }
     }
+
 
 
 
@@ -599,6 +601,44 @@
                 </tr>
                 </thead>
                 <tbody id="team_3_user_data">
+                <tr>
+                    <td>[[rankInTeam]]</td>
+                    <td>[[userName]]</td>
+                    <td>[[category]]</td>
+                    <td>[[hardware]]</td>
+                    <td class="team_user_points">[[multipliedPoints]]</td>
+                    <td class="team_user_units">[[units]]</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <br/>
+
+    <div id="team_4_div">
+        <div id="team_4_metadata">
+            <h2>Rank #[[rank]]: [[teamName]] (Captain: [[captainName]])</h2>
+            <div id="team_4_stats">
+                <h5><span id="team_4_points">[[teamMultipliedPoints]]</span> points | <span
+                        id="team_4_units">[[teamUnits]]</span> units</h5>
+            </div>
+            <button onclick="toggleTeam(4)" class="ui-btn btn btn-primary" id="team_4_button" href="#team_4_subdiv"
+                    data-toggle="collapse" role="button">Show/Hide
+            </button>
+        </div>
+        <div id="team_4_subdiv" class="collapse">
+            <table class="table table-striped table-hover" id="team_4" border="1">
+                <thead>
+                <tr>
+                    <th onclick="sortTable(0, 'team_4')" style="cursor:pointer" scope="col">Rank</th>
+                    <th onclick="sortTable(1, 'team_4')" style="cursor:pointer" scope="col">User Name</th>
+                    <th onclick="sortTable(2, 'team_4')" style="cursor:pointer" scope="col">Category</th>
+                    <th onclick="sortTable(3, 'team_4')" style="cursor:pointer" scope="col">Hardware</th>
+                    <th onclick="sortTable(4, 'team_4')" style="cursor:pointer" scope="col">Points</th>
+                    <th onclick="sortTable(5, 'team_4')" style="cursor:pointer" scope="col">Units</th>
+                </tr>
+                </thead>
+                <tbody id="team_4_user_data">
                 <tr>
                     <td>[[rankInTeam]]</td>
                     <td>[[userName]]</td>
