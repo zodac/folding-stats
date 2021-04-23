@@ -57,6 +57,7 @@ CREATE TABLE user_initial_stats (
     CONSTRAINT fk_user_id
         FOREIGN KEY(user_id)
         REFERENCES users(user_id)
+        ON DELETE CASCADE
 );
 
 -- Table which is populated each update with the latest stats of a user
@@ -69,6 +70,7 @@ CREATE TABLE user_total_stats (
     CONSTRAINT fk_user_id
         FOREIGN KEY(user_id)
         REFERENCES users(user_id)
+        ON DELETE CASCADE
 );
 
 
@@ -85,4 +87,5 @@ CREATE TABLE user_tc_stats_hourly (
     CONSTRAINT fk_user_id
         FOREIGN KEY(user_id)
         REFERENCES users(user_id)
+        ON DELETE CASCADE
 );
