@@ -39,6 +39,12 @@ public enum Category {
         return VALUES_AS_LIST;
     }
 
+    public static int maximumPermittedAmount() {
+        return VALUES_AS_LIST.stream()
+                .mapToInt(value -> value.permittedAmount)
+                .sum();
+    }
+
     public static Category get(final String input) {
         for (final Category category : VALUES_AS_LIST) {
             if (category.toString().equalsIgnoreCase(input) || category.displayName.equalsIgnoreCase(input)) {

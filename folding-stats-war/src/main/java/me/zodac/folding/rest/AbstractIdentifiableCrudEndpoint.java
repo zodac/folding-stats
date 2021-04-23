@@ -225,7 +225,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
             getLogger().error(errorMessage);
             return badRequest(errorMessage);
         } catch (final FoldingConflictException e) {
-            final String errorMessage = String.format("The %1$s conflicts with an existing %1$s", elementType());
+            final String errorMessage = String.format("The %s ID '%s' is in use, remove all usages before deleting", elementType(), elementId);
             getLogger().debug(errorMessage, e);
             getLogger().error(errorMessage);
             return conflict(errorMessage);

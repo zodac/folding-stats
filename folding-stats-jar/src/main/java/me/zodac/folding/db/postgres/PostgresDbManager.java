@@ -275,7 +275,7 @@ public class PostgresDbManager implements DbManager {
 
     @Override
     public void deleteUser(final int userId) throws FoldingException, FoldingConflictException {
-        final String deleteSqlStatement = "DELETE FROM folding_user WHERE user_id = ?;";
+        final String deleteSqlStatement = "DELETE FROM users WHERE user_id = ?;";
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
              final PreparedStatement preparedStatement = connection.prepareStatement(deleteSqlStatement)) {
@@ -627,8 +627,8 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public UserTcStats getTcStats(final int userId) throws FoldingException, UserNotFoundException {
-        LOGGER.debug("Getting TC stats for user {}", userId);
+    public UserTcStats getCurrentTcStats(final int userId) throws FoldingException, UserNotFoundException {
+        LOGGER.debug("Getting current TC stats for user {}", userId);
         final String preparedSelectSqlStatement = "SELECT utc_timestamp, tc_points, tc_points_multiplied, tc_units " +
                 "FROM user_tc_stats_hourly " +
                 "WHERE user_id = ? " +

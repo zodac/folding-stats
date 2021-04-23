@@ -42,6 +42,10 @@ public class TeamValidator {
             failureMessages.add(String.format("Attribute 'captainUserId' must be in the team, must be one of: %s", team.getUserIds()));
         }
 
+        if (team.getUserIds().size() > Category.maximumPermittedAmount()) {
+            failureMessages.add(String.format("Attribute 'userIds' has %s users, maximum permitted is %s", team.getUserIds().size(), Category.maximumPermittedAmount()));
+        }
+
         if (team.getUserIds().isEmpty()) {
             final List<String> availableUsers = UserCache.get()
                     .getAll()
@@ -49,7 +53,7 @@ public class TeamValidator {
                     .map(foldingUser -> String.format("%s: %s", foldingUser.getId(), foldingUser.getFoldingUserName()))
                     .collect(toList());
 
-            failureMessages.add(String.format("Attribute 'userIds' contain at least one of: %s", availableUsers));
+            failureMessages.add(String.format("Attribute 'userIds' must contain at least one of: %s", availableUsers));
         }
 
         final List<Integer> invalidUserIds = new ArrayList<>(team.getUserIds().size());

@@ -164,9 +164,27 @@ public class StorageFacade {
         return allUsersFromDb;
     }
 
-    public void updateUser(final User user) throws FoldingException, UserNotFoundException, FoldingConflictException {
-        dbManager.updateUser(user);
-        userCache.add(user);
+    public void updateUser(final User updatedUser) throws FoldingException, UserNotFoundException, FoldingConflictException {
+        final User existingUser = getUser(updatedUser.getId());
+        dbManager.updateUser(updatedUser);
+        userCache.add(updatedUser);
+
+        // If a user is updated and their team, Folding username, hardware ID or passkey is changed, we need to update their initial offset again
+        // The value should be: (new user info points - current TC points)
+        // If the user had an offset, it should also be re-applied here, to negate the impact it has on current TC points
+        // TODO: [zodac] When updating a user, KEEP the offsets. The offsets should be reset at the end of the month anyway, but should be incremented on update, not removed
+        if (!existingUser.getPasskey().equalsIgnoreCase(updatedUser.getPasskey()) || !existingUser.getFoldingUserName().equalsIgnoreCase(updatedUser.getFoldingUserName())
+                || existingUser.getFoldingTeamNumber() != updatedUser.getFoldingTeamNumber() || existingUser.getHardwareId() != updatedUser.getHardwareId()) {
+            LOGGER.debug("User had state changes, recalculating initial stats");
+            final UserStats updatedUserStats = FoldingStatsParser.getStatsForUser(updatedUser);
+            final UserTcStats currentUserTcStats = getTcStatsForUser(updatedUser.getId());
+            final UserStats newUserInitialStats = UserStats.create(updatedUser.getId(), updatedUserStats.getTimestamp(),
+                    Stats.create(updatedUserStats.getPoints() - currentUserTcStats.getMultipliedPoints() - existingUser.getPointsOffset(), updatedUserStats.getUnits() - currentUserTcStats.getUnits() - existingUser.getUnitsOffset())
+            );
+
+            dbManager.persistInitialUserStats(newUserInitialStats);
+            statsCache.addInitialStats(updatedUser.getId(), newUserInitialStats.getStats());
+        }
     }
 
     public void deleteUser(final int userId) throws FoldingException, FoldingConflictException {
@@ -232,7 +250,7 @@ public class StorageFacade {
     }
 
     public UserTcStats getTcStatsForUser(final int userId) throws UserNotFoundException, FoldingException {
-        return dbManager.getTcStats(userId);
+        return dbManager.getCurrentTcStats(userId);
     }
 
     public Map<LocalDate, UserTcStats> getDailyUserTcStats(final int userId, final Month month, final Year year) throws FoldingException, UserNotFoundException {

@@ -81,7 +81,7 @@ public interface DbManager {
 
     void persistInitialUserStats(final UserStats userStats) throws FoldingException;
 
-    UserTcStats getTcStats(final int userId) throws FoldingException, UserNotFoundException;
+    UserTcStats getCurrentTcStats(final int userId) throws FoldingException, UserNotFoundException;
 
     void persistTotalUserStats(final List<UserStats> stats) throws FoldingException;
 }
