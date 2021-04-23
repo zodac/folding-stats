@@ -177,7 +177,7 @@ public class PostgresDbManager implements DbManager {
             preparedStatement.setString(1, user.getFoldingUserName());
             preparedStatement.setString(2, user.getDisplayName());
             preparedStatement.setString(3, user.getPasskey());
-            preparedStatement.setString(4, user.getCategoryDisplayName());
+            preparedStatement.setString(4, user.getCategory());
             preparedStatement.setInt(5, user.getHardwareId());
             preparedStatement.setInt(6, user.getFoldingTeamNumber());
             preparedStatement.setString(7, user.getLiveStatsLink());

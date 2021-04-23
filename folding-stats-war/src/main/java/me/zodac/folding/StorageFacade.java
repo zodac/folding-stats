@@ -8,7 +8,9 @@ import me.zodac.folding.api.exception.HardwareNotFoundException;
 import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.api.exception.TeamNotFoundException;
 import me.zodac.folding.api.exception.UserNotFoundException;
+import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
+import me.zodac.folding.api.tc.OperatingSystem;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.Stats;
@@ -55,6 +57,8 @@ public class StorageFacade {
     private final StatsCache statsCache = StatsCache.get();
 
     public Hardware createHardware(final Hardware hardware) throws FoldingException, FoldingConflictException {
+        // The REST input may not use the correct format for the ENUM, so we normalise it here
+        hardware.setOperatingSystem(OperatingSystem.get(hardware.getOperatingSystem()).getDisplayName());
         final Hardware hardwareWithId = dbManager.createHardware(hardware);
         hardwareCache.add(hardwareWithId);
         return hardwareWithId;
@@ -97,11 +101,13 @@ public class StorageFacade {
     }
 
     public void deleteHardware(final int hardwareId) throws FoldingException, FoldingConflictException {
-        hardwareCache.remove(hardwareId);
         dbManager.deleteHardware(hardwareId);
+        hardwareCache.remove(hardwareId);
     }
 
     public User createUser(final User user) throws FoldingException, FoldingConflictException {
+        // The REST input may not use the correct format for the ENUM, so we normalise it here
+        user.setCategory(Category.get(user.getCategory()).getDisplayName());
         final User userWithId = dbManager.createUser(user);
         userCache.add(userWithId);
 
@@ -196,8 +202,8 @@ public class StorageFacade {
     }
 
     public void deleteUser(final int userId) throws FoldingException, FoldingConflictException {
-        hardwareCache.remove(userId);
         dbManager.deleteUser(userId);
+        hardwareCache.remove(userId);
     }
 
     public Team createTeam(final Team team) throws FoldingException, FoldingConflictException {
@@ -243,8 +249,8 @@ public class StorageFacade {
     }
 
     public void deleteTeam(final int teamId) throws FoldingException, FoldingConflictException {
-        hardwareCache.remove(teamId);
         dbManager.deleteTeam(teamId);
+        hardwareCache.remove(teamId);
     }
 
     public List<User> getUsersFromTeams(final List<Team> teams) {
