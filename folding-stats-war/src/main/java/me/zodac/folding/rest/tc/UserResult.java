@@ -36,6 +36,10 @@ public class UserResult {
         return new UserResult(userName, hardware, category, points, pointsWithoutMultiplier, units, 0, liveStatsLink);
     }
 
+    public static UserResult createWithNoPoints(final String userName, final String hardware, final String category, final String liveStatsLink) {
+        return new UserResult(userName, hardware, category, 0L, 0L, 0, 0, liveStatsLink);
+    }
+
     public static UserResult updateWithRankInTeam(final UserResult userResult, final int teamRank) {
         return new UserResult(userResult.userName, userResult.hardware, userResult.category, userResult.points, userResult.multipliedPoints,
                 userResult.units, teamRank, userResult.liveStatsLink);

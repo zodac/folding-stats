@@ -148,25 +148,35 @@ public class TeamCompetitionStatsEndpoint {
     }
 
     private Optional<UserResult> getTcStatsForUser(final User user) {
-        try {
-            final Hardware hardware = storageFacade.getHardware(user.getHardwareId());
-            final UserTcStats userTcStats = storageFacade.getTcStatsForUser(user.getId());
-            final Category category = Category.get(user.getCategory());
-            if (category == Category.INVALID) {
-                LOGGER.warn("Unexpectedly got an {} category for Folding user {}", Category.INVALID.getDisplayName(), user);
-                return Optional.empty();
-            }
+        final Hardware hardware;
 
-            LOGGER.debug("Results for {}: {} points | {} multiplied points | {} units", user.getDisplayName(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits());
-            return Optional.of(UserResult.create(user.getDisplayName(), hardware.getDisplayName(), category.getDisplayName(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits(), user.getLiveStatsLink()));
+        try {
+            hardware = storageFacade.getHardware(user.getHardwareId());
         } catch (final HardwareNotFoundException e) {
             LOGGER.debug("No hardware found for ID: {}", user.getHardwareId(), e);
             LOGGER.warn("No hardware found for ID: {}", user.getHardwareId());
             return Optional.empty();
-        } catch (final UserNotFoundException e) {
-            LOGGER.debug("No user found for ID: {}", user.getId(), e);
-            LOGGER.warn("No user found for ID: {}", user.getId());
+        } catch (final FoldingException e) {
+            LOGGER.warn("Error getting TC stats for user: {}", user, e.getCause());
             return Optional.empty();
+        }
+
+
+        final Category category = Category.get(user.getCategory());
+        if (category == Category.INVALID) {
+            LOGGER.warn("Unexpectedly got an invalid category '{}' for Folding user: {}", user.getCategory(), user.getDisplayName());
+            return Optional.empty();
+        }
+
+
+        try {
+            final UserTcStats userTcStats = storageFacade.getTcStatsForUser(user.getId());
+            LOGGER.debug("Results for {}: {} points | {} multiplied points | {} units", user.getDisplayName(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits());
+            return Optional.of(UserResult.create(user.getDisplayName(), hardware.getDisplayName(), category.getDisplayName(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits(), user.getLiveStatsLink()));
+        } catch (final UserNotFoundException e) {
+            LOGGER.debug("No stats found for user ID: {}", user.getId(), e);
+            LOGGER.warn("No stats found for user ID: {}", user.getId());
+            return Optional.of(UserResult.createWithNoPoints(user.getDisplayName(), hardware.getDisplayName(), category.getDisplayName(), user.getLiveStatsLink()));
         } catch (final FoldingException e) {
             LOGGER.warn("Error getting TC stats for user: {}", user, e.getCause());
             return Optional.empty();
