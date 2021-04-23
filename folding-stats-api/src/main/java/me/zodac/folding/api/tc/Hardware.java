@@ -34,7 +34,7 @@ public class Hardware implements Identifiable {
     }
 
     public static Hardware updateWithId(final int id, final Hardware hardware) {
-        return new Hardware(id, hardware.getHardwareName(), hardware.getDisplayName(), hardware.getOperatingSystem(), hardware.getMultiplier());
+        return new Hardware(id, hardware.hardwareName, hardware.displayName, hardware.operatingSystem, hardware.multiplier);
     }
 
     @Override

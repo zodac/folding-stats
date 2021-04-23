@@ -49,6 +49,10 @@ public class User implements Identifiable {
         return new User(userId, user.foldingUserName, user.displayName, user.passkey, user.category, user.hardwareId, user.foldingTeamNumber, user.liveStatsLink, user.pointsOffset, user.unitsOffset);
     }
 
+    public static User updateWithNoOffsets(final User user) {
+        return new User(user.id, user.foldingUserName, user.displayName, user.passkey, user.category, user.hardwareId, user.foldingTeamNumber, user.liveStatsLink, 0L, 0);
+    }
+
     @Override
     public int getId() {
         return id;

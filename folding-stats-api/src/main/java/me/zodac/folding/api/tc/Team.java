@@ -76,7 +76,7 @@ public class Team implements Identifiable {
     }
 
     public static Team updateWithId(final int teamId, final Team team) {
-        return new Team(teamId, team.getTeamName(), team.getTeamDescription(), team.getCaptainUserId(), team.getUserIds());
+        return new Team(teamId, team.teamName, team.teamDescription, team.captainUserId, team.userIds);
     }
 
     @Override
