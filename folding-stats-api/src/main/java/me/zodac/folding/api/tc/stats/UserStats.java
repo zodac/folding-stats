@@ -8,41 +8,37 @@ import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
 public class UserStats {
 
     private final int userId;
-    private final Stats totalStats;
     private final Timestamp timestamp;
+    private final Stats totalStats;
 
-    private UserStats(final int userId, final Stats totalStats, final Timestamp timestamp) {
+    private UserStats(final int userId, final Timestamp timestamp, final Stats totalStats) {
         this.userId = userId;
-        this.totalStats = totalStats;
         this.timestamp = timestamp;
+        this.totalStats = totalStats;
     }
 
-    public static UserStats create(final int userId, final Stats totalStats, final Timestamp timestamp) {
-        return new UserStats(userId, totalStats, timestamp);
+    public static UserStats create(final int userId, final Timestamp timestamp, final Stats totalStats) {
+        return new UserStats(userId, timestamp, totalStats);
     }
 
     public int getUserId() {
         return userId;
     }
 
-    public long getPoints() {
-        return totalStats.getPoints();
+    public Timestamp getTimestamp() {
+        return timestamp;
     }
 
-    public long getUnmultipliedPoints() {
-        return totalStats.getUnmultipliedPoints();
+    public long getPoints() {
+        return totalStats.getPoints();
     }
 
     public int getUnits() {
         return totalStats.getUnits();
     }
 
-    public Stats getUserStats() {
+    public Stats getStats() {
         return totalStats;
-    }
-
-    public Timestamp getTimestamp() {
-        return timestamp;
     }
 
     @Override
@@ -66,10 +62,9 @@ public class UserStats {
     public String toString() {
         return "UserStats::{" +
                 "userId: " + userId +
-                ", points: " + formatWithCommas(totalStats.getPoints()) +
-                ", unmultipliedPoints: " + formatWithCommas(totalStats.getUnmultipliedPoints()) +
-                ", units: " + formatWithCommas(totalStats.getUnits()) +
                 ", timestamp: " + timestamp +
+                ", points: " + formatWithCommas(totalStats.getPoints()) +
+                ", units: " + formatWithCommas(totalStats.getUnits()) +
                 '}';
     }
 }

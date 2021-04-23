@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static me.zodac.folding.rest.response.Responses.badRequest;
+import static me.zodac.folding.rest.response.Responses.conflict;
 import static me.zodac.folding.rest.response.Responses.created;
 import static me.zodac.folding.rest.response.Responses.noContent;
 import static me.zodac.folding.rest.response.Responses.notFound;
@@ -32,13 +33,13 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
 
     protected abstract ValidationResponse validate(final V element);
 
-    protected abstract V createElement(final V element) throws FoldingException, NotFoundException;
+    protected abstract V createElement(final V element) throws FoldingException, NotFoundException, FoldingConflictException;
 
     protected abstract List<V> getAllElements() throws FoldingException;
 
     protected abstract V getElementById(final int elementId) throws FoldingException, NotFoundException;
 
-    protected abstract V updateElementById(final int elementId, final V element) throws FoldingException, NotFoundException;
+    protected abstract V updateElementById(final int elementId, final V element) throws FoldingException, NotFoundException, FoldingConflictException;
 
     protected abstract void deleteElementById(final int elementId) throws FoldingConflictException, FoldingException;
 
@@ -57,6 +58,11 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
                     .getRequestUriBuilder()
                     .path(String.valueOf(elementWithId.getId()));
             return created(elementWithId, elementLocationBuilder);
+        } catch (final FoldingConflictException e) {
+            final String errorMessage = String.format("The %1$s conflicts with an existing %1$s", elementType());
+            getLogger().debug(errorMessage, e);
+            getLogger().error(errorMessage);
+            return conflict(errorMessage);
         } catch (final FoldingException e) {
             getLogger().error("Error creating {}: {}", elementType(), element, e.getCause());
             return serverError();
@@ -89,7 +95,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
             try {
                 final V elementWithId = createElement(element);
                 successful.add(elementWithId);
-            } catch (final FoldingException e) {
+            } catch (final FoldingConflictException | FoldingException e) {
                 getLogger().error("Error creating {}: {}", elementType(), element, e.getCause());
                 unsuccessful.add(element);
             } catch (final Exception e) {
@@ -189,6 +195,11 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
             getLogger().debug(errorMessage, e);
             getLogger().error(errorMessage);
             return badRequest(errorMessage);
+        } catch (final FoldingConflictException e) {
+            final String errorMessage = String.format("The %1$s conflicts with an existing %1$s", elementType());
+            getLogger().debug(errorMessage, e);
+            getLogger().error(errorMessage);
+            return conflict(errorMessage);
         } catch (final NotFoundException e) {
             getLogger().debug("No {} found with ID: {}", elementType(), elementId, e);
             getLogger().error("No {} found with ID: {}", elementType(), elementId, e);
@@ -214,10 +225,10 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
             getLogger().error(errorMessage);
             return badRequest(errorMessage);
         } catch (final FoldingConflictException e) {
-            final String errorMessage = String.format("The %s ID '%s' is in use, remove all usages before deleting", elementType(), elementId);
+            final String errorMessage = String.format("The %1$s conflicts with an existing %1$s", elementType());
             getLogger().debug(errorMessage, e);
             getLogger().error(errorMessage);
-            return badRequest(errorMessage);
+            return conflict(errorMessage);
         } catch (final FoldingException e) {
             getLogger().error("Error deleting {} with ID: {}", elementType(), elementId, e.getCause());
             return serverError();

@@ -19,6 +19,9 @@ CREATE TABLE users (
     hardware_id INT NOT NULL,
     folding_team_number INT NOT NULL,
     live_stats_link TEXT NULL,
+    points_offset BIGINT DEFAULT(0),
+    units_offset INT DEFAULT(0),
+    CONSTRAINT uni_user UNIQUE(folding_username, passkey),
     CONSTRAINT fk_hardware_id
         FOREIGN KEY(hardware_id)
         REFERENCES hardware(hardware_id)
@@ -43,11 +46,24 @@ CREATE INDEX index_team_id
     ON teams(team_id);
 
 
-CREATE TABLE tc_user_stats (
+-- Table which is populated with latest stats of a user when first added
+-- Also modified in the case where the user has their folding_username, team or passkey updated
+CREATE TABLE user_initial_stats (
+    user_id INT,
+    utc_timestamp TIMESTAMP,
+    initial_points BIGINT NOT NULL,
+    initial_units INT NOT NULL,
+    PRIMARY KEY(user_id, utc_timestamp),
+    CONSTRAINT fk_user_id
+        FOREIGN KEY(user_id)
+        REFERENCES users(user_id)
+);
+
+-- Table which is populated each update with the latest stats of a user
+CREATE TABLE user_total_stats (
     user_id INT,
     utc_timestamp TIMESTAMP,
     total_points BIGINT NOT NULL,
-    total_unmultiplied_points BIGINT NOT NULL,
     total_units INT NOT NULL,
     PRIMARY KEY(user_id, utc_timestamp),
     CONSTRAINT fk_user_id
@@ -55,5 +71,18 @@ CREATE TABLE tc_user_stats (
         REFERENCES users(user_id)
 );
 
-CREATE INDEX index_tc_user_stats
-    ON tc_user_stats(user_id, utc_timestamp);
+
+-- Table which is populated each update with the latest stats of a user, as a running total for the TC (reset each month)
+-- The total stats are offset by the initial values (and any manual offset for a user)
+-- The unmultiplied_points are then multiplied by the hardware multiplier
+CREATE TABLE user_tc_stats_hourly (
+    user_id INT,
+    utc_timestamp TIMESTAMP,
+    tc_points BIGINT NOT NULL,
+    tc_points_multiplied BIGINT NOT NULL,
+    tc_units INT NOT NULL,
+    PRIMARY KEY(user_id, utc_timestamp),
+    CONSTRAINT fk_user_id
+        FOREIGN KEY(user_id)
+        REFERENCES users(user_id)
+);

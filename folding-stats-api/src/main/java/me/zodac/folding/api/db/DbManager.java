@@ -10,6 +10,7 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
+import me.zodac.folding.api.tc.stats.UserTcStats;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -31,47 +32,56 @@ public interface DbManager {
      * @return the {@link Hardware} updated with an ID
      * @throws FoldingException thrown on error persisting the {@link Hardware}
      */
-    Hardware createHardware(final Hardware hardware) throws FoldingException;
+    Hardware createHardware(final Hardware hardware) throws FoldingException, FoldingConflictException;
 
     List<Hardware> getAllHardware() throws FoldingException;
 
     Hardware getHardware(final int hardwareId) throws FoldingException, HardwareNotFoundException;
 
-    void updateHardware(final Hardware hardware) throws FoldingException, HardwareNotFoundException;
+    void updateHardware(final Hardware hardware) throws FoldingException, HardwareNotFoundException, FoldingConflictException;
 
     void deleteHardware(final int hardwareId) throws FoldingException, FoldingConflictException;
 
-    User createUser(final User user) throws FoldingException;
+    User createUser(final User user) throws FoldingException, FoldingConflictException;
 
     List<User> getAllUsers() throws FoldingException;
 
     User getUser(final int userId) throws FoldingException, UserNotFoundException;
 
-    void updateUser(final User user) throws FoldingException, UserNotFoundException;
+    void updateUser(final User user) throws FoldingException, UserNotFoundException, FoldingConflictException;
 
     void deleteUser(final int userId) throws FoldingException, FoldingConflictException;
 
-    Team createTeam(final Team team) throws FoldingException;
+    Team createTeam(final Team team) throws FoldingException, FoldingConflictException;
 
     List<Team> getAllTeams() throws FoldingException;
 
     Team getTeam(final int foldingTeamId) throws FoldingException, TeamNotFoundException;
 
-    void updateTeam(final Team team) throws FoldingException, TeamNotFoundException;
+    void updateTeam(final Team team) throws FoldingException, TeamNotFoundException, FoldingConflictException;
 
     void deleteTeam(final int teamId) throws FoldingException, FoldingConflictException;
 
     // TC operations
 
-    Stats getFirstStatsForUser(final int userId, final Month month, final Year year) throws FoldingException, UserNotFoundException;
+    Stats getInitialUserStats(final int userId) throws FoldingException, UserNotFoundException;
 
-    Stats getLatestStatsForUser(final int userId, final Month month, final Year year) throws FoldingException, UserNotFoundException;
+    Map<Integer, Stats> getInitialUserStats(final List<Integer> userIds) throws FoldingException;
 
-    void persistHourlyUserStats(final List<UserStats> userStats) throws FoldingException;
+    Stats getCurrentUserStats(final int userId) throws FoldingException, UserNotFoundException;
+
+    void persistHourlyTcUserStats(final List<UserTcStats> userStats) throws FoldingException;
 
     boolean doTcStatsExist() throws FoldingException;
 
     // Historic TC operations
 
-    Map<LocalDate, Stats> getDailyUserStats(final int userId, final Month month, final Year year) throws FoldingException, UserNotFoundException;
+    Map<LocalDate, UserTcStats> getDailyUserTcStats(final int userId, final Month month, final Year year) throws FoldingException, UserNotFoundException;
+
+
+    void persistInitialUserStats(final UserStats userStats) throws FoldingException;
+
+    UserTcStats getTcStats(final int userId) throws FoldingException, UserNotFoundException;
+
+    void persistTotalUserStats(final List<UserStats> stats) throws FoldingException;
 }

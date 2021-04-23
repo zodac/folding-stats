@@ -96,7 +96,7 @@ public class HardwareEndpoint extends AbstractIdentifiableCrudEndpoint<Hardware>
     }
 
     @Override
-    protected Hardware createElement(final Hardware hardware) throws FoldingException {
+    protected Hardware createElement(final Hardware hardware) throws FoldingException, FoldingConflictException {
         return storageFacade.createHardware(hardware);
     }
 
@@ -111,7 +111,7 @@ public class HardwareEndpoint extends AbstractIdentifiableCrudEndpoint<Hardware>
     }
 
     @Override
-    protected Hardware updateElementById(final int hardwareId, final Hardware hardware) throws FoldingException, NotFoundException {
+    protected Hardware updateElementById(final int hardwareId, final Hardware hardware) throws FoldingException, NotFoundException, FoldingConflictException {
         if (hardware.getId() == 0) {
             // The payload 'should' have the ID, but it's not necessary if the correct URL is used
             final Hardware hardwareWithId = Hardware.updateWithId(hardwareId, hardware);

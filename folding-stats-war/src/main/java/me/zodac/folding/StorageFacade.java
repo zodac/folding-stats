@@ -12,6 +12,8 @@ import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.Stats;
+import me.zodac.folding.api.tc.stats.UserStats;
+import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.cache.HardwareCache;
 import me.zodac.folding.cache.StatsCache;
 import me.zodac.folding.cache.TeamCache;
@@ -26,10 +28,11 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 
@@ -50,7 +53,7 @@ public class StorageFacade {
     private final HardwareCache hardwareCache = HardwareCache.get();
     private final StatsCache statsCache = StatsCache.get();
 
-    public Hardware createHardware(final Hardware hardware) throws FoldingException {
+    public Hardware createHardware(final Hardware hardware) throws FoldingException, FoldingConflictException {
         final Hardware hardwareWithId = dbManager.createHardware(hardware);
         hardwareCache.add(hardwareWithId);
         return hardwareWithId;
@@ -85,7 +88,7 @@ public class StorageFacade {
         return allHardwareFromDb;
     }
 
-    public void updateHardware(final Hardware hardware) throws FoldingException, HardwareNotFoundException {
+    public void updateHardware(final Hardware hardware) throws FoldingException, HardwareNotFoundException, FoldingConflictException {
         dbManager.updateHardware(hardware);
         hardwareCache.add(hardware);
     }
@@ -95,18 +98,37 @@ public class StorageFacade {
         dbManager.deleteHardware(hardwareId);
     }
 
-    public User createUser(final User user) throws FoldingException, NotFoundException {
+    public User createUser(final User user) throws FoldingException, FoldingConflictException {
         final User userWithId = dbManager.createUser(user);
         userCache.add(userWithId);
 
-        // When adding a new user, we should also configure the TC stats cache
-        final Hardware hardware = hardwareCache.get(user.getHardwareId());
-        final Stats currentStats = FoldingStatsParser.getStatsForUser(user.getFoldingUserName(), user.getPasskey(), user.getFoldingTeamNumber(), hardware.getMultiplier());
-        // TODO: [zodac] Why is this not being persisted in the DB?! Fucking idiot
-        statsCache.addInitialStats(userWithId.getId(), currentStats);
+        // When adding a new user, we should also configure the initial stats cache
+        persistInitialUserStats(userWithId);
 
         return userWithId;
     }
+
+    public void persistInitialUserStats(final User user) throws FoldingException {
+        final UserStats currentUserStats = FoldingStatsParser.getStatsForUser(user);
+        dbManager.persistInitialUserStats(currentUserStats);
+        statsCache.addInitialStats(user.getId(), currentUserStats.getStats());
+    }
+
+    public Map<Integer, Stats> getInitialUserStats(final List<Integer> userIds) throws FoldingException {
+        final Map<Integer, Stats> cachedInitialStats = new HashMap<>(userIds.size());
+        for (final int userId : userIds) {
+            final Optional<Stats> optionalStats = statsCache.getInitialStatsForUser(userId);
+            optionalStats.ifPresent(stats -> cachedInitialStats.put(userId, stats));
+        }
+
+        if (cachedInitialStats.size() == userIds.size()) {
+            return cachedInitialStats;
+        }
+
+        LOGGER.debug("Found {} cached initial stats for {} user IDs, checking DB instead", cachedInitialStats.size(), userIds.size());
+        return dbManager.getInitialUserStats(userIds);
+    }
+
 
     public User getUser(final int userId) throws FoldingException, UserNotFoundException {
         try {
@@ -137,7 +159,7 @@ public class StorageFacade {
         return allUsersFromDb;
     }
 
-    public void updateUser(final User user) throws FoldingException, UserNotFoundException {
+    public void updateUser(final User user) throws FoldingException, UserNotFoundException, FoldingConflictException {
         dbManager.updateUser(user);
         userCache.add(user);
     }
@@ -147,7 +169,7 @@ public class StorageFacade {
         dbManager.deleteUser(userId);
     }
 
-    public Team createTeam(final Team team) throws FoldingException {
+    public Team createTeam(final Team team) throws FoldingException, FoldingConflictException {
         final Team teamWithId = dbManager.createTeam(team);
         teamCache.add(teamWithId);
         return teamWithId;
@@ -182,7 +204,7 @@ public class StorageFacade {
         return allTeamsFromDb;
     }
 
-    public void updateTeam(final Team team) throws FoldingException, TeamNotFoundException {
+    public void updateTeam(final Team team) throws FoldingException, TeamNotFoundException, FoldingConflictException {
         dbManager.updateTeam(team);
         teamCache.add(team);
     }
@@ -192,22 +214,21 @@ public class StorageFacade {
         dbManager.deleteTeam(teamId);
     }
 
-    public List<User> getUsersFromTeams() {
-        try {
-            return getAllTeams()
-                    .stream()
-                    .map(Team::getUserIds)
-                    .flatMap(Collection::stream)
-                    .map(userId -> UserCache.get().getOrNull(userId))
-                    .filter(Objects::nonNull)
-                    .collect(toList());
-        } catch (final FoldingException e) {
-            LOGGER.warn("Error retrieving users in teams", e.getCause());
-            return Collections.emptyList();
-        }
+    public List<User> getUsersFromTeams(final List<Team> teams) {
+        return teams
+                .stream()
+                .map(Team::getUserIds)
+                .flatMap(Collection::stream)
+                .map(userId -> UserCache.get().getOrNull(userId))
+                .filter(Objects::nonNull)
+                .collect(toList());
     }
 
-    public Map<LocalDate, Stats> getDailyUserStats(final int userId, final Month month, final Year year) throws FoldingException, UserNotFoundException {
-        return dbManager.getDailyUserStats(userId, month, year);
+    public UserTcStats getTcStatsForUser(final int userId) throws UserNotFoundException, FoldingException {
+        return dbManager.getTcStats(userId);
+    }
+
+    public Map<LocalDate, UserTcStats> getDailyUserTcStats(final int userId, final Month month, final Year year) throws FoldingException, UserNotFoundException {
+        return dbManager.getDailyUserTcStats(userId, month, year);
     }
 }

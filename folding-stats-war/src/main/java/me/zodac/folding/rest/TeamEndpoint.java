@@ -96,7 +96,7 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
     }
 
     @Override
-    protected Team createElement(final Team team) throws FoldingException {
+    protected Team createElement(final Team team) throws FoldingException, FoldingConflictException {
         return storageFacade.createTeam(team);
     }
 
@@ -111,7 +111,7 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
     }
 
     @Override
-    protected Team updateElementById(final int teamId, final Team team) throws FoldingException, NotFoundException {
+    protected Team updateElementById(final int teamId, final Team team) throws FoldingException, NotFoundException, FoldingConflictException {
         if (team.getId() == 0) {
             // The payload 'should' have the ID, but it's not necessary if the correct URL is used
             final Team teamWithId = Team.updateWithId(teamId, team);

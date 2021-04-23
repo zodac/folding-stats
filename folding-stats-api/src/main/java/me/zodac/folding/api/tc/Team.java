@@ -41,7 +41,7 @@ public class Team implements Identifiable {
 
 
         public Builder(final String teamName) {
-            this.teamName = teamName;
+            this.teamName = teamName == null ? "" : teamName.trim();
         }
 
         public Builder teamId(final int id) {
@@ -50,7 +50,7 @@ public class Team implements Identifiable {
         }
 
         public Builder teamDescription(final String teamDescription) {
-            this.teamDescription = teamDescription;
+            this.teamDescription = teamDescription == null ? "" : teamDescription.trim();
             return this;
         }
 
@@ -93,7 +93,7 @@ public class Team implements Identifiable {
     }
 
     public void setTeamName(final String teamName) {
-        this.teamName = teamName;
+        this.teamName = teamName == null ? "" : teamName.trim();
     }
 
     public String getTeamDescription() {
@@ -101,7 +101,7 @@ public class Team implements Identifiable {
     }
 
     public void setTeamDescription(final String teamDescription) {
-        this.teamDescription = teamDescription;
+        this.teamDescription = teamDescription == null ? "" : teamDescription.trim();
     }
 
     public int getCaptainUserId() {

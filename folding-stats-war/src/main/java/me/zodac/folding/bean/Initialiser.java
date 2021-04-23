@@ -5,13 +5,11 @@ import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.Stats;
-import me.zodac.folding.api.utils.TimeUtils;
 import me.zodac.folding.cache.HardwareCache;
 import me.zodac.folding.cache.StatsCache;
 import me.zodac.folding.cache.TeamCache;
 import me.zodac.folding.cache.UserCache;
 import me.zodac.folding.db.DbManagerRetriever;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,10 +17,7 @@ import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
-import java.time.Month;
-import java.time.Year;
 import java.util.List;
-import java.util.Locale;
 
 
 // TODO: [zodac] Move this to an EJB module?
@@ -58,30 +53,28 @@ public class Initialiser {
 
 
         final List<User> users = UserCache.get().getAll();
-        final Month currentMonth = TimeUtils.getCurrentUtcMonth();
-        final Year currentYear = TimeUtils.getCurrentUtcYear();
 
         for (final User user : users) {
             try {
-                final Stats initialStatsForUser = dbManager.getFirstStatsForUser(user.getId(), currentMonth, currentYear);
-                LOGGER.debug("Found initial stats for {}/{} for user {}: {}", StringUtils.capitalize(currentMonth.toString().toLowerCase(Locale.UK)), currentYear, user, initialStatsForUser);
+                final Stats initialStatsForUser = dbManager.getInitialUserStats(user.getId());
+                LOGGER.debug("Found initial stats for user {}: {}", user, initialStatsForUser);
                 StatsCache.get().addInitialStats(user.getId(), initialStatsForUser);
             } catch (final UserNotFoundException e) {
                 LOGGER.debug("No initial stats in DB for {}", user, e);
                 LOGGER.warn("No initial stats in DB for {}", user);
             } catch (final FoldingException e) {
-                LOGGER.warn("Unable to get initial stats for {}/{} for user {}", StringUtils.capitalize(currentMonth.toString().toLowerCase(Locale.UK)), currentYear, user, e.getCause());
+                LOGGER.warn("Unable to get initial stats for user {}", user, e.getCause());
             }
 
             try {
-                final Stats currentStatsForUser = dbManager.getLatestStatsForUser(user.getId(), currentMonth, currentYear);
-                LOGGER.debug("Found current stats for {}/{} for user {}: {}", StringUtils.capitalize(currentMonth.toString().toLowerCase(Locale.UK)), currentYear, user, currentStatsForUser);
+                final Stats currentStatsForUser = dbManager.getCurrentUserStats(user.getId());
+                LOGGER.debug("Found current stats for user {}: {}", user, currentStatsForUser);
                 StatsCache.get().addCurrentStats(user.getId(), currentStatsForUser);
             } catch (final UserNotFoundException e) {
                 LOGGER.debug("No current stats in DB for {}", user, e);
                 LOGGER.warn("No current stats in DB for {}", user);
             } catch (final FoldingException e) {
-                LOGGER.warn("Unable to get current stats for {}/{} for user {}", StringUtils.capitalize(currentMonth.toString().toLowerCase(Locale.UK)), currentYear, user, e.getCause());
+                LOGGER.warn("Unable to get current stats for user {}", user, e.getCause());
             }
         }
 
@@ -97,17 +90,17 @@ public class Initialiser {
         }
 
         try {
-            LOGGER.debug("Initialising Folding user cache with DB data");
+            LOGGER.debug("Initialising user cache with DB data");
             UserCache.get().addAll(dbManager.getAllUsers());
         } catch (final FoldingException e) {
-            LOGGER.warn("Error initialising Folding user cache", e.getCause());
+            LOGGER.warn("Error initialising user cache", e.getCause());
         }
 
         try {
-            LOGGER.debug("Initialising Folding team cache with DB data");
+            LOGGER.debug("Initialising team cache with DB data");
             TeamCache.get().addAll(dbManager.getAllTeams());
         } catch (final FoldingException e) {
-            LOGGER.warn("Error initialising Folding team cache", e.getCause());
+            LOGGER.warn("Error initialising team cache", e.getCause());
         }
 
         LOGGER.debug("Caches initialised");

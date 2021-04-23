@@ -11,17 +11,17 @@ public class CompetitionResult {
 
     private int totalUnits = 0;
     private long totalPoints = 0L;
-    private long totalPointsWithoutMultipliers = 0L;
+    private long totalMultipliedPoints = 0L;
     private List<TeamResult> teams = new ArrayList<>();
 
     public CompetitionResult() {
 
     }
 
-    private CompetitionResult(final int totalUnits, final long totalPoints, final long totalPointsWithoutMultipliers, final List<TeamResult> teams) {
+    private CompetitionResult(final int totalUnits, final long totalPoints, final long totalMultipliedPoints, final List<TeamResult> teams) {
         this.totalUnits = totalUnits;
         this.totalPoints = totalPoints;
-        this.totalPointsWithoutMultipliers = totalPointsWithoutMultipliers;
+        this.totalMultipliedPoints = totalMultipliedPoints;
         this.teams = teams;
     }
 
@@ -33,7 +33,7 @@ public class CompetitionResult {
         for (final TeamResult team : teams) {
             totalUnits += team.getTeamUnits();
             totalPoints += team.getTeamPoints();
-            totalPointsWithoutMultipliers += team.getTeamPointsWithoutMultipliers();
+            totalPointsWithoutMultipliers += team.getTeamMultipliedPoints();
         }
 
         final List<TeamResult> rankedTeams = teams
@@ -64,12 +64,12 @@ public class CompetitionResult {
         this.totalPoints = totalPoints;
     }
 
-    public long getTotalPointsWithoutMultipliers() {
-        return totalPointsWithoutMultipliers;
+    public long getTotalMultipliedPoints() {
+        return totalMultipliedPoints;
     }
 
-    public void setTotalPointsWithoutMultipliers(final long totalPointsWithoutMultipliers) {
-        this.totalPointsWithoutMultipliers = totalPointsWithoutMultipliers;
+    public void setTotalMultipliedPoints(final long totalMultipliedPoints) {
+        this.totalMultipliedPoints = totalMultipliedPoints;
     }
 
     public List<TeamResult> getTeams() {
@@ -89,12 +89,12 @@ public class CompetitionResult {
             return false;
         }
         final CompetitionResult that = (CompetitionResult) o;
-        return totalUnits == that.totalUnits && totalPoints == that.totalPoints && totalPointsWithoutMultipliers == that.totalPointsWithoutMultipliers && Objects.equals(teams, that.teams);
+        return totalUnits == that.totalUnits && totalPoints == that.totalPoints && totalMultipliedPoints == that.totalMultipliedPoints && Objects.equals(teams, that.teams);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(teams, totalUnits, totalPoints, totalPointsWithoutMultipliers);
+        return Objects.hash(teams, totalUnits, totalPoints, totalMultipliedPoints);
     }
 
     @Override
@@ -102,7 +102,7 @@ public class CompetitionResult {
         return "CompetitionResult::{" +
                 "totalUnits: " + formatWithCommas(totalUnits) +
                 ", totalPoints: " + formatWithCommas(totalPoints) +
-                ", totalPointsWithoutMultipliers: " + formatWithCommas(totalPointsWithoutMultipliers) +
+                ", totalMultipliedPoints: " + formatWithCommas(totalMultipliedPoints) +
                 ", teams: " + teams +
                 '}';
     }

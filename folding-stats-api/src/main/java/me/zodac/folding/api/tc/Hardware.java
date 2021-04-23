@@ -16,16 +16,16 @@ public class Hardware implements Identifiable {
     private String operatingSystem;
     private double multiplier;
 
-    
+
     public Hardware() {
 
     }
 
     private Hardware(final int id, final String hardwareName, final String displayName, final String operatingSystem, final double multiplier) {
         this.id = id;
-        this.hardwareName = hardwareName;
-        this.displayName = displayName;
-        this.operatingSystem = operatingSystem;
+        this.hardwareName = hardwareName == null ? null : hardwareName.trim();
+        this.displayName = displayName == null ? null : displayName.trim();
+        this.operatingSystem = operatingSystem == null ? null : operatingSystem.trim();
         this.multiplier = multiplier;
     }
 
@@ -51,7 +51,7 @@ public class Hardware implements Identifiable {
     }
 
     public void setHardwareName(final String hardwareName) {
-        this.hardwareName = hardwareName;
+        this.hardwareName = hardwareName == null ? null : hardwareName.trim();
     }
 
     public String getDisplayName() {
@@ -59,7 +59,7 @@ public class Hardware implements Identifiable {
     }
 
     public void setDisplayName(final String displayName) {
-        this.displayName = displayName;
+        this.displayName = displayName == null ? null : displayName.trim();
     }
 
     public String getOperatingSystem() {
@@ -67,7 +67,7 @@ public class Hardware implements Identifiable {
     }
 
     public void setOperatingSystem(final String operatingSystem) {
-        this.operatingSystem = operatingSystem;
+        this.operatingSystem = operatingSystem == null ? null : operatingSystem.trim();
     }
 
     public double getMultiplier() {

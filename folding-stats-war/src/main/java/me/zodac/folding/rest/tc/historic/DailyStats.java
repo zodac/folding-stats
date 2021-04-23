@@ -1,36 +1,30 @@
 package me.zodac.folding.rest.tc.historic;
 
-import me.zodac.folding.api.tc.stats.Stats;
+import me.zodac.folding.api.tc.stats.UserTcStats;
 
 import java.time.LocalDate;
 import java.util.Objects;
-
-import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
 
 public class DailyStats {
 
     private LocalDate date;
     private long points;
-    private long pointsWithoutMultiplier;
+    private long multipliedPoints;
     private int units;
 
     public DailyStats() {
 
     }
 
-    private DailyStats(final LocalDate date, final long points, final long pointsWithoutMultiplier, final int units) {
+    private DailyStats(final LocalDate date, final long points, final long multipliedPoints, final int units) {
         this.date = date;
         this.points = points;
-        this.pointsWithoutMultiplier = pointsWithoutMultiplier;
+        this.multipliedPoints = multipliedPoints;
         this.units = units;
     }
 
-    public static DailyStats create(final LocalDate date, final long points, final long pointsWithoutMultiplier, final int units) {
-        return new DailyStats(date, points, pointsWithoutMultiplier, units);
-    }
-
-    public static DailyStats createFromStats(final LocalDate date, final Stats stats) {
-        return new DailyStats(date, stats.getPoints(), stats.getUnmultipliedPoints(), stats.getUnits());
+    public static DailyStats createFromTcStats(final LocalDate date, final UserTcStats userTcStats) {
+        return new DailyStats(date, userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits());
     }
 
     public LocalDate getDate() {
@@ -49,12 +43,12 @@ public class DailyStats {
         this.points = points;
     }
 
-    public long getPointsWithoutMultiplier() {
-        return pointsWithoutMultiplier;
+    public long getMultipliedPoints() {
+        return multipliedPoints;
     }
 
-    public void setPointsWithoutMultiplier(final long pointsWithoutMultiplier) {
-        this.pointsWithoutMultiplier = pointsWithoutMultiplier;
+    public void setMultipliedPoints(final long multipliedPoints) {
+        this.multipliedPoints = multipliedPoints;
     }
 
     public int getUnits() {
@@ -74,21 +68,22 @@ public class DailyStats {
             return false;
         }
         final DailyStats that = (DailyStats) o;
-        return points == that.points && pointsWithoutMultiplier == that.pointsWithoutMultiplier && units == that.units && Objects.equals(date, that.date);
+        return points == that.points && multipliedPoints == that.multipliedPoints && units == that.units && Objects.equals(date, that.date);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(date, points, pointsWithoutMultiplier, units);
+        return Objects.hash(date, points, multipliedPoints, units);
     }
+
 
     @Override
     public String toString() {
-        return "HistoricStats::{" +
+        return "DailyStats::{" +
                 "date: " + date +
-                ", points: " + formatWithCommas(points) +
-                ", pointsWithoutMultiplier: " + formatWithCommas(pointsWithoutMultiplier) +
-                ", units: " + formatWithCommas(units) +
+                ", points: " + points +
+                ", multipliedPoints: " + multipliedPoints +
+                ", units: " + units +
                 '}';
     }
 }

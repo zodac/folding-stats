@@ -11,35 +11,35 @@ public class TeamResult {
     private String teamName;
     private String captainName;
 
-    private List<UserResult> users;
+    private int rank; // Rank in 'division', but we only have one division so no need to be more explicit, yet
     private int teamUnits;
     private long teamPoints;
-    private long teamPointsWithoutMultipliers;
-    private int rank; // Rank in 'division', but we only have one division so no need to be more explicit, yet
+    private long teamMultipliedPoints;
+    private List<UserResult> users;
 
     public TeamResult() {
 
     }
 
-    private TeamResult(final String teamName, final String captainName, final List<UserResult> users, final int teamUnits, final long teamPoints, final long teamPointsWithoutMultipliers, final int rank) {
+    private TeamResult(final String teamName, final String captainName, final List<UserResult> users, final int teamUnits, final long teamPoints, final long teamMultipliedPoints, final int rank) {
         this.teamName = teamName;
         this.captainName = captainName;
         this.users = users;
         this.teamUnits = teamUnits;
         this.teamPoints = teamPoints;
-        this.teamPointsWithoutMultipliers = teamPointsWithoutMultipliers;
+        this.teamMultipliedPoints = teamMultipliedPoints;
         this.rank = rank;
     }
 
     public static TeamResult create(final String teamName, final String captainName, final List<UserResult> users) {
         int teamUnits = 0;
         long teamPoints = 0L;
-        long teamPointsWithoutMultipliers = 0L;
+        long teamMultipliedPoints = 0L;
 
         for (final UserResult user : users) {
             teamUnits += user.getUnits();
             teamPoints += user.getPoints();
-            teamPointsWithoutMultipliers += user.getPointsWithoutMultiplier();
+            teamMultipliedPoints += user.getMultipliedPoints();
         }
 
         final List<UserResult> rankedUsers = users
@@ -52,12 +52,12 @@ public class TeamResult {
                 );
 
         // Not ranked to begin with, will be updated by the calling class
-        return new TeamResult(teamName, captainName, rankedUsers, teamUnits, teamPoints, teamPointsWithoutMultipliers, 0);
+        return new TeamResult(teamName, captainName, rankedUsers, teamUnits, teamPoints, teamMultipliedPoints, 0);
     }
 
     public static TeamResult updateWithRank(final TeamResult teamResult, final int rank) {
         return new TeamResult(teamResult.teamName, teamResult.captainName, teamResult.users, teamResult.teamUnits, teamResult.teamPoints,
-                teamResult.teamPointsWithoutMultipliers, rank);
+                teamResult.teamMultipliedPoints, rank);
     }
 
     public String getTeamName() {
@@ -100,12 +100,12 @@ public class TeamResult {
         this.teamPoints = teamPoints;
     }
 
-    public long getTeamPointsWithoutMultipliers() {
-        return teamPointsWithoutMultipliers;
+    public long getTeamMultipliedPoints() {
+        return teamMultipliedPoints;
     }
 
-    public void setTeamPointsWithoutMultipliers(final long teamPointsWithoutMultipliers) {
-        this.teamPointsWithoutMultipliers = teamPointsWithoutMultipliers;
+    public void setTeamMultipliedPoints(final long teamMultipliedPoints) {
+        this.teamMultipliedPoints = teamMultipliedPoints;
     }
 
     public int getRank() {
@@ -125,12 +125,12 @@ public class TeamResult {
             return false;
         }
         final TeamResult that = (TeamResult) o;
-        return teamUnits == that.teamUnits && teamPoints == that.teamPoints && teamPointsWithoutMultipliers == that.teamPointsWithoutMultipliers && rank == that.rank && Objects.equals(teamName, that.teamName) && Objects.equals(captainName, that.captainName) && Objects.equals(users, that.users);
+        return teamUnits == that.teamUnits && teamPoints == that.teamPoints && teamMultipliedPoints == that.teamMultipliedPoints && rank == that.rank && Objects.equals(teamName, that.teamName) && Objects.equals(captainName, that.captainName) && Objects.equals(users, that.users);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(teamName, captainName, users, teamUnits, teamPoints, teamPointsWithoutMultipliers, rank);
+        return Objects.hash(teamName, captainName, users, teamUnits, teamPoints, teamMultipliedPoints, rank);
     }
 
     @Override
@@ -141,7 +141,7 @@ public class TeamResult {
                 ", users: " + users +
                 ", teamUnits: " + formatWithCommas(teamUnits) +
                 ", teamPoints: " + formatWithCommas(teamPoints) +
-                ", teamPointsWithoutMultipliers: " + formatWithCommas(teamPointsWithoutMultipliers) +
+                ", teamMultipliedPoints: " + formatWithCommas(teamMultipliedPoints) +
                 ", rank: " + rank +
                 '}';
     }

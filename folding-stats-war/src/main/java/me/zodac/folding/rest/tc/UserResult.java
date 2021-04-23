@@ -11,7 +11,7 @@ public class UserResult {
     private String category;
 
     private long points;
-    private long pointsWithoutMultiplier;
+    private long multipliedPoints;
     private long units;
     private int rankInTeam;
     private String liveStatsLink;
@@ -20,12 +20,12 @@ public class UserResult {
 
     }
 
-    private UserResult(final String userName, final String hardware, final String category, final long points, final long pointsWithoutMultiplier, final long units, final int rankInTeam, final String liveStatsLink) {
+    private UserResult(final String userName, final String hardware, final String category, final long points, final long multipliedPoints, final long units, final int rankInTeam, final String liveStatsLink) {
         this.userName = userName;
         this.hardware = hardware;
         this.category = category;
         this.points = points;
-        this.pointsWithoutMultiplier = pointsWithoutMultiplier;
+        this.multipliedPoints = multipliedPoints;
         this.units = units;
         this.rankInTeam = rankInTeam;
         this.liveStatsLink = liveStatsLink;
@@ -37,7 +37,7 @@ public class UserResult {
     }
 
     public static UserResult updateWithRankInTeam(final UserResult userResult, final int teamRank) {
-        return new UserResult(userResult.userName, userResult.hardware, userResult.category, userResult.points, userResult.pointsWithoutMultiplier,
+        return new UserResult(userResult.userName, userResult.hardware, userResult.category, userResult.points, userResult.multipliedPoints,
                 userResult.units, teamRank, userResult.getLiveStatsLink());
     }
 
@@ -73,12 +73,12 @@ public class UserResult {
         this.points = points;
     }
 
-    public long getPointsWithoutMultiplier() {
-        return pointsWithoutMultiplier;
+    public long getMultipliedPoints() {
+        return multipliedPoints;
     }
 
-    public void setPointsWithoutMultiplier(final long pointsWithoutMultiplier) {
-        this.pointsWithoutMultiplier = pointsWithoutMultiplier;
+    public void setMultipliedPoints(final long multipliedPoints) {
+        this.multipliedPoints = multipliedPoints;
     }
 
     public long getUnits() {
@@ -114,12 +114,12 @@ public class UserResult {
             return false;
         }
         final UserResult that = (UserResult) o;
-        return points == that.points && pointsWithoutMultiplier == that.pointsWithoutMultiplier && units == that.units && rankInTeam == that.rankInTeam && Objects.equals(userName, that.userName) && Objects.equals(hardware, that.hardware) && Objects.equals(category, that.category) && Objects.equals(liveStatsLink, that.liveStatsLink);
+        return points == that.points && multipliedPoints == that.multipliedPoints && units == that.units && rankInTeam == that.rankInTeam && Objects.equals(userName, that.userName) && Objects.equals(hardware, that.hardware) && Objects.equals(category, that.category) && Objects.equals(liveStatsLink, that.liveStatsLink);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(userName, hardware, category, points, pointsWithoutMultiplier, units, rankInTeam, liveStatsLink);
+        return Objects.hash(userName, hardware, category, points, multipliedPoints, units, rankInTeam, liveStatsLink);
     }
 
     @Override
@@ -129,7 +129,7 @@ public class UserResult {
                 ", hardware: '" + hardware + "'" +
                 ", category: '" + category + "'" +
                 ", points: " + formatWithCommas(points) +
-                ", pointsWithoutMultiplier: " + formatWithCommas(pointsWithoutMultiplier) +
+                ", multipliedPoints: " + formatWithCommas(multipliedPoints) +
                 ", units: " + formatWithCommas(units) +
                 ", rankInTeam: " + rankInTeam +
                 ", liveStatsLink: '" + liveStatsLink + "'" +

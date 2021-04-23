@@ -51,6 +51,13 @@ public class Responses {
                 .build();
     }
 
+    public static Response conflict(final String errorMessage) {
+        return Response
+                .status(Response.Status.CONFLICT)
+                .entity(GSON.toJson(ErrorResponse.create(errorMessage), ErrorResponse.class))
+                .build();
+    }
+
     public static Response badRequest(final Object entity) {
         return Response
                 .status(Response.Status.BAD_REQUEST)

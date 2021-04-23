@@ -4,6 +4,9 @@ import me.zodac.folding.api.Identifiable;
 
 import java.util.Objects;
 
+import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
+
+
 public class User implements Identifiable {
 
     private static final long serialVersionUID = -1919458037620452556L;
@@ -18,28 +21,32 @@ public class User implements Identifiable {
     private int hardwareId;
     private int foldingTeamNumber;
     private String liveStatsLink;
+    private long pointsOffset;
+    private int unitsOffset;
 
     public User() {
 
     }
 
-    private User(final int id, final String foldingUserName, final String displayName, final String passkey, final String category, final int hardwareId, final int foldingTeamNumber, final String liveStatsLink) {
+    private User(final int id, final String foldingUserName, final String displayName, final String passkey, final String category, final int hardwareId, final int foldingTeamNumber, final String liveStatsLink, final long pointsOffset, final int unitsOffset) {
         this.id = id;
-        this.foldingUserName = foldingUserName;
-        this.displayName = displayName;
-        this.passkey = passkey;
-        this.category = category;
+        this.foldingUserName = foldingUserName == null ? null : foldingUserName.trim();
+        this.displayName = displayName == null ? null : displayName.trim();
+        this.passkey = passkey == null ? null : passkey.trim();
+        this.category = category == null ? null : category.trim();
         this.hardwareId = hardwareId;
         this.foldingTeamNumber = foldingTeamNumber;
-        this.liveStatsLink = liveStatsLink;
+        this.liveStatsLink = liveStatsLink == null ? null : liveStatsLink.trim();
+        this.pointsOffset = pointsOffset;
+        this.unitsOffset = unitsOffset;
     }
 
-    public static User create(final int userId, final String foldingUserName, final String displayName, final String passkey, final String category, final int hardwareId, final int foldingTeamNumber, final String liveStatsLink) {
-        return new User(userId, foldingUserName, displayName, passkey, category, hardwareId, foldingTeamNumber, liveStatsLink);
+    public static User create(final int userId, final String foldingUserName, final String displayName, final String passkey, final String category, final int hardwareId, final int foldingTeamNumber, final String liveStatsLink, final long pointsOffset, final int unitsOffset) {
+        return new User(userId, foldingUserName, displayName, passkey, category, hardwareId, foldingTeamNumber, liveStatsLink, pointsOffset, unitsOffset);
     }
 
     public static User updateWithId(final int userId, final User user) {
-        return new User(userId, user.getFoldingUserName(), user.getDisplayName(), user.getPasskey(), user.getCategory(), user.getHardwareId(), user.getFoldingTeamNumber(), user.getLiveStatsLink());
+        return new User(userId, user.foldingUserName, user.displayName, user.passkey, user.category, user.hardwareId, user.foldingTeamNumber, user.liveStatsLink, user.pointsOffset, user.unitsOffset);
     }
 
     @Override
@@ -56,7 +63,7 @@ public class User implements Identifiable {
     }
 
     public void setFoldingUserName(final String foldingUserName) {
-        this.foldingUserName = foldingUserName;
+        this.foldingUserName = foldingUserName == null ? null : foldingUserName.trim();
     }
 
     public String getDisplayName() {
@@ -64,7 +71,7 @@ public class User implements Identifiable {
     }
 
     public void setDisplayName(final String displayName) {
-        this.displayName = displayName;
+        this.displayName = displayName == null ? null : displayName.trim();
     }
 
     public String getPasskey() {
@@ -72,7 +79,7 @@ public class User implements Identifiable {
     }
 
     public void setPasskey(final String passkey) {
-        this.passkey = passkey;
+        this.passkey = passkey == null ? null : passkey.trim();
     }
 
     public String getCategory() {
@@ -108,7 +115,23 @@ public class User implements Identifiable {
     }
 
     public void setLiveStatsLink(final String liveStatsLink) {
-        this.liveStatsLink = liveStatsLink;
+        this.liveStatsLink = liveStatsLink == null ? null : liveStatsLink.trim();
+    }
+
+    public long getPointsOffset() {
+        return pointsOffset;
+    }
+
+    public void setPointsOffset(final long pointsOffset) {
+        this.pointsOffset = pointsOffset;
+    }
+
+    public int getUnitsOffset() {
+        return unitsOffset;
+    }
+
+    public void setUnitsOffset(final int unitsOffset) {
+        this.unitsOffset = unitsOffset;
     }
 
     @Override
@@ -120,12 +143,13 @@ public class User implements Identifiable {
             return false;
         }
         final User user = (User) o;
-        return id == user.id && hardwareId == user.hardwareId && foldingTeamNumber == user.foldingTeamNumber && Objects.equals(foldingUserName, user.foldingUserName) && Objects.equals(displayName, user.displayName) && Objects.equals(passkey, user.passkey) && Objects.equals(category, user.category) && Objects.equals(liveStatsLink, user.liveStatsLink);
+        return id == user.id && hardwareId == user.hardwareId && foldingTeamNumber == user.foldingTeamNumber && pointsOffset == user.pointsOffset && unitsOffset == user.unitsOffset &&
+                Objects.equals(foldingUserName, user.foldingUserName) && Objects.equals(displayName, user.displayName) && Objects.equals(passkey, user.passkey) && Objects.equals(category, user.category) && Objects.equals(liveStatsLink, user.liveStatsLink);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, foldingUserName, displayName, passkey, category, hardwareId, foldingTeamNumber, liveStatsLink);
+        return Objects.hash(id, foldingUserName, displayName, passkey, category, hardwareId, foldingTeamNumber, liveStatsLink, pointsOffset, unitsOffset);
     }
 
 
@@ -140,6 +164,8 @@ public class User implements Identifiable {
                 ", hardwareId: " + hardwareId +
                 ", foldingTeamNumber: " + foldingTeamNumber +
                 ", liveStatsLink: '" + liveStatsLink + "'" +
+                ", pointsOffset: " + formatWithCommas(pointsOffset) +
+                ", unitsOffset: " + formatWithCommas(unitsOffset) +
                 '}';
     }
 }

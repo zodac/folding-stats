@@ -96,7 +96,7 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
     }
 
     @Override
-    protected User createElement(final User user) throws FoldingException, NotFoundException {
+    protected User createElement(final User user) throws FoldingException, FoldingConflictException {
         return storageFacade.createUser(user);
     }
 
@@ -111,7 +111,7 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
     }
 
     @Override
-    protected User updateElementById(final int userId, final User user) throws FoldingException, NotFoundException {
+    protected User updateElementById(final int userId, final User user) throws FoldingException, NotFoundException, FoldingConflictException {
         if (user.getId() == 0) {
             // The payload 'should' have the ID, but it's not necessary if the correct URL is used
             final User userWithId = User.updateWithId(userId, user);

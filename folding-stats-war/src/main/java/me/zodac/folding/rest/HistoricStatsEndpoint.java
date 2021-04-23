@@ -3,7 +3,7 @@ package me.zodac.folding.rest;
 import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
-import me.zodac.folding.api.tc.stats.Stats;
+import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.rest.tc.historic.DailyStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,11 +60,11 @@ public class HistoricStatsEndpoint {
         LOGGER.info("GET request received to show daily TC user stats at '{}'", uriContext.getAbsolutePath());
 
         try {
-            final Map<LocalDate, Stats> dailyUserStats = storageFacade.getDailyUserStats(Integer.parseInt(userId), Month.of(Integer.parseInt(month)), Year.parse(year));
+            final Map<LocalDate, UserTcStats> dailyUserTcStats = storageFacade.getDailyUserTcStats(Integer.parseInt(userId), Month.of(Integer.parseInt(month)), Year.parse(year));
 
-            final List<DailyStats> dailyStats = dailyUserStats.entrySet()
+            final List<DailyStats> dailyStats = dailyUserTcStats.entrySet()
                     .stream()
-                    .map(entry -> DailyStats.createFromStats(entry.getKey(), entry.getValue()))
+                    .map(entry -> DailyStats.createFromTcStats(entry.getKey(), entry.getValue()))
                     .collect(Collectors.toList());
 
             return ok(dailyStats);
