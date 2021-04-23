@@ -42,6 +42,7 @@ import static java.util.stream.Collectors.toList;
  * This way the {@link StorageFacade} is aware of caches or any other internal implementation, while the REST layer
  * does not need to know about them or any DBs being used.
  */
+// TODO: [zodac] Should replace the cache miss warnings with some metrics instead?
 @Singleton
 public class StorageFacade {
 
@@ -66,6 +67,7 @@ public class StorageFacade {
             LOGGER.debug("Unable to find hardware with ID {} in cache", hardwareId, e);
         }
 
+        LOGGER.debug("Cache miss! Get hardware");
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
         final Hardware hardwareFromDb = dbManager.getHardware(hardwareId);
@@ -81,6 +83,7 @@ public class StorageFacade {
             return allHardware;
         }
 
+        LOGGER.debug("Cache miss! Get all hardware");
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
         final List<Hardware> allHardwareFromDb = dbManager.getAllHardware();
@@ -137,6 +140,7 @@ public class StorageFacade {
             LOGGER.debug("Unable to find user with ID {} in cache", userId, e);
         }
 
+        LOGGER.debug("Cache miss! Get user");
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
         final User userFromDb = dbManager.getUser(userId);
@@ -152,6 +156,7 @@ public class StorageFacade {
             return allUsers;
         }
 
+        LOGGER.debug("Cache miss! Get all users");
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
         final List<User> allUsersFromDb = dbManager.getAllUsers();
@@ -182,6 +187,7 @@ public class StorageFacade {
             LOGGER.debug("Unable to find team with ID {} in cache", teamId, e);
         }
 
+        LOGGER.debug("Cache miss! Get team");
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
         final Team teamFromDb = dbManager.getTeam(teamId);
@@ -197,6 +203,7 @@ public class StorageFacade {
             return allTeams;
         }
 
+        LOGGER.debug("Cache miss! Get all teams");
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
         final List<Team> allTeamsFromDb = dbManager.getAllTeams();

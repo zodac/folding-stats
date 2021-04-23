@@ -1,13 +1,12 @@
 package me.zodac.folding.bean;
 
+import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.Stats;
-import me.zodac.folding.cache.HardwareCache;
 import me.zodac.folding.cache.StatsCache;
-import me.zodac.folding.cache.TeamCache;
 import me.zodac.folding.cache.UserCache;
 import me.zodac.folding.db.DbManagerRetriever;
 import org.slf4j.Logger;
@@ -30,14 +29,27 @@ public class Initialiser {
     private final DbManager dbManager = DbManagerRetriever.get();
 
     @EJB
+    private StorageFacade storageFacade;
+
+    @EJB
     private TeamCompetitionStatsParser teamCompetitionStatsParser;
 
     @PostConstruct
     public void init() {
-        initPojoCaches();
+        initCaches();
         initTcStatsCache();
 
         LOGGER.info("System ready for requests");
+    }
+
+    private void initCaches() {
+        try {
+            storageFacade.getAllHardware();
+            storageFacade.getAllUsers();
+            storageFacade.getAllTeams();
+        } catch (final FoldingException e) {
+            LOGGER.warn("Error intialising caches", e.getCause());
+        }
     }
 
     private void initTcStatsCache() {
@@ -79,30 +91,5 @@ public class Initialiser {
         }
 
         LOGGER.debug("Initialised TC stats cache");
-    }
-
-    private void initPojoCaches() {
-        try {
-            LOGGER.debug("Initialising hardware cache with DB data");
-            HardwareCache.get().addAll(dbManager.getAllHardware());
-        } catch (final FoldingException e) {
-            LOGGER.warn("Error initialising hardware cache", e.getCause());
-        }
-
-        try {
-            LOGGER.debug("Initialising user cache with DB data");
-            UserCache.get().addAll(dbManager.getAllUsers());
-        } catch (final FoldingException e) {
-            LOGGER.warn("Error initialising user cache", e.getCause());
-        }
-
-        try {
-            LOGGER.debug("Initialising team cache with DB data");
-            TeamCache.get().addAll(dbManager.getAllTeams());
-        } catch (final FoldingException e) {
-            LOGGER.warn("Error initialising team cache", e.getCause());
-        }
-
-        LOGGER.debug("Caches initialised");
     }
 }
