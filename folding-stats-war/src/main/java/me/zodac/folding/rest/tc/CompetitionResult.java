@@ -28,24 +28,24 @@ public class CompetitionResult {
     public static CompetitionResult create(final List<TeamResult> teams) {
         int totalUnits = 0;
         long totalPoints = 0L;
-        long totalPointsWithoutMultipliers = 0L;
+        long totalMultipliedPoints = 0L;
 
         for (final TeamResult team : teams) {
             totalUnits += team.getTeamUnits();
             totalPoints += team.getTeamPoints();
-            totalPointsWithoutMultipliers += team.getTeamMultipliedPoints();
+            totalMultipliedPoints += team.getTeamMultipliedPoints();
         }
 
         final List<TeamResult> rankedTeams = teams
                 .stream()
-                .sorted(Comparator.comparingLong(TeamResult::getTeamPoints).reversed())
+                .sorted(Comparator.comparingLong(TeamResult::getTeamMultipliedPoints).reversed())
                 .collect(new IntegerRankingCollector<>(
-                        Comparator.comparingLong(TeamResult::getTeamPoints),
+                        Comparator.comparingLong(TeamResult::getTeamMultipliedPoints),
                         TeamResult::getRank,
                         TeamResult::updateWithRank)
                 );
 
-        return new CompetitionResult(totalUnits, totalPoints, totalPointsWithoutMultipliers, rankedTeams);
+        return new CompetitionResult(totalUnits, totalPoints, totalMultipliedPoints, rankedTeams);
     }
 
     public int getTotalUnits() {

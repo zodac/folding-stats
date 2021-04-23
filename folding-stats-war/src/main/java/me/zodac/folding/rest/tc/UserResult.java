@@ -38,7 +38,7 @@ public class UserResult {
 
     public static UserResult updateWithRankInTeam(final UserResult userResult, final int teamRank) {
         return new UserResult(userResult.userName, userResult.hardware, userResult.category, userResult.points, userResult.multipliedPoints,
-                userResult.units, teamRank, userResult.getLiveStatsLink());
+                userResult.units, teamRank, userResult.liveStatsLink);
     }
 
     public String getUserName() {

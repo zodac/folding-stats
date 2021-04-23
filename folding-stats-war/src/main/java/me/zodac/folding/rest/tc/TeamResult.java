@@ -44,9 +44,9 @@ public class TeamResult {
 
         final List<UserResult> rankedUsers = users
                 .stream()
-                .sorted(Comparator.comparingLong(UserResult::getPoints).reversed())
+                .sorted(Comparator.comparingLong(UserResult::getMultipliedPoints).reversed())
                 .collect(new IntegerRankingCollector<>(
-                        Comparator.comparingLong(UserResult::getPoints),
+                        Comparator.comparingLong(UserResult::getMultipliedPoints),
                         UserResult::getRankInTeam,
                         UserResult::updateWithRankInTeam)
                 );
