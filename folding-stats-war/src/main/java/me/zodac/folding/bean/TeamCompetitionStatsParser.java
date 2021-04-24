@@ -163,8 +163,7 @@ public class TeamCompetitionStatsParser {
             final UserTcStats tcStatsForUser = UserTcStats.createWithMultiplier(userId, timestamp, statsForUser, hardwareMultiplier);
             LOGGER.debug("{}: {} TC points (pre-offset) | {} TC units (pre-offset)", user.getFoldingUserName(), formatWithCommas(tcStatsForUser.getMultipliedPoints()), formatWithCommas(tcStatsForUser.getUnits()));
 
-            final double defaultMultiplier = 1.0D;  // Currently not offsetting (based on multiplied points/multiplier), but testing now...
-            final UserTcStats tcStatsForUserWithOffset = UserTcStats.updateWithOffsets(tcStatsForUser, statsOffsetsByUserId.get(userId), defaultMultiplier);
+            final UserTcStats tcStatsForUserWithOffset = UserTcStats.updateWithOffsets(tcStatsForUser, statsOffsetsByUserId.get(userId), hardwareMultiplier);
             LOGGER.info("{}: {} TC points | {} TC units", user.getFoldingUserName(), formatWithCommas(tcStatsForUserWithOffset.getMultipliedPoints()), formatWithCommas(tcStatsForUserWithOffset.getUnits()));
             hourlyTcStatsForUsers.add(tcStatsForUserWithOffset);
         }
