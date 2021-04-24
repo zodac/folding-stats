@@ -715,7 +715,7 @@ public class PostgresDbManager implements DbManager {
     @Override
     public Map<Integer, UserStatsOffset> getOffsetStats(final List<Integer> userIds) throws FoldingException {
         LOGGER.debug("Getting offset stats for {} users", userIds.size());
-        final String preparedInsertSqlStatement = "SELECT (offset_multiplied_points, offset_units) " +
+        final String preparedInsertSqlStatement = "SELECT offset_multiplied_points, offset_units " +
                 "FROM user_offset_tc_stats " +
                 "WHERE user_id = ? " +
                 "ORDER BY utc_timestamp DESC " +
