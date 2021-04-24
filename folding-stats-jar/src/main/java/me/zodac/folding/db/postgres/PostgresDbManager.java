@@ -736,7 +736,7 @@ public class PostgresDbManager implements DbManager {
                         offsetsByUserId.put(userId, UserStatsOffset.empty());
                     }
                 } catch (final SQLException e) {
-                    LOGGER.warn("Error getting offset stats for user: {}", userId);
+                    LOGGER.warn("Error getting offset stats for user: {}", userId, e);
                     offsetsByUserId.put(userId, UserStatsOffset.empty());
                 }
             }
