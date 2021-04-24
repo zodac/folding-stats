@@ -680,6 +680,32 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
+    public Stats getTotalStats(final int userId) throws FoldingException {
+        LOGGER.debug("Getting total stats for user ID: {}", userId);
+        final String preparedSqlStatement = "SELECT (total_points, total_units) " +
+                "FROM user_total_stats " +
+                "WHERE user_id = ? " +
+                "ORDER BY utc_timestamp DESC " +
+                "LIMIT 1;";
+
+        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+             final PreparedStatement preparedStatement = connection.prepareStatement(preparedSqlStatement)) {
+            preparedStatement.setInt(1, userId);
+
+            LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
+            preparedStatement.execute();
+            try (final ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return Stats.create(resultSet.getLong("total_points"), resultSet.getInt("total_units"));
+                }
+                throw new FoldingException("Error inserting to offset stats");
+            }
+        } catch (final SQLException e) {
+            throw new FoldingException("Error opening connection to the DB", e);
+        }
+    }
+
+    @Override
     public UserStatsOffset addOffsetStats(final int userId, final UserStatsOffset userStatsOffset) throws FoldingException {
         LOGGER.debug("Adding offset stats for user {}", userId);
         final String preparedInsertSqlStatement = "INSERT INTO user_offset_tc_stats (user_id, utc_timestamp, offset_multiplied_points, offset_units) VALUES (?, ?, ?, ?) " +

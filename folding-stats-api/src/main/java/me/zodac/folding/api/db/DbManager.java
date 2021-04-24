@@ -83,6 +83,8 @@ public interface DbManager {
 
     void persistTotalUserStats(final List<UserStats> stats) throws FoldingException;
 
+    Stats getTotalStats(final int userId) throws FoldingException;
+
     UserStatsOffset addOffsetStats(final int userId, final UserStatsOffset userStatsOffset) throws FoldingException;
 
     Map<Integer, UserStatsOffset> getOffsetStats(final List<Integer> userIds) throws FoldingException;

@@ -82,6 +82,7 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateUserById(@PathParam("userId") final String userId, final User user) {
+        LOGGER.info("Received user for update: {}", user);
         return super.updateById(userId, user);
     }
 

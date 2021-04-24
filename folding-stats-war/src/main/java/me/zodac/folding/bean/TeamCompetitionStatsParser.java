@@ -11,7 +11,6 @@ import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.api.utils.EnvironmentVariables;
-import me.zodac.folding.db.DbManagerRetriever;
 import me.zodac.folding.parsing.FoldingStatsParser;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -85,7 +84,7 @@ public class TeamCompetitionStatsParser {
                 return;
             }
 
-            final List<User> tcUsers = storageFacade.getUsersFromTeams(tcTeams);
+            final List<User> tcUsers = storageFacade.getActiveTcUsers(tcTeams);
 
             if (tcUsers.isEmpty()) {
                 LOGGER.warn("No TC users configured in system!");
@@ -125,7 +124,7 @@ public class TeamCompetitionStatsParser {
         final List<UserStats> stats = getTotalStatsForUsers(users);
 
         try {
-            DbManagerRetriever.get().persistTotalUserStats(stats);
+            storageFacade.persistTotalUserStats(stats);
         } catch (final FoldingException e) {
             LOGGER.error("Error persisting total user stats", e.getCause());
             return;

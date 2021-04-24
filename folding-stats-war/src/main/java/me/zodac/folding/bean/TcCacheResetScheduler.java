@@ -39,7 +39,7 @@ public class TcCacheResetScheduler {
 
         for (final User user : usersToReset) {
             try {
-                LOGGER.debug("Resetting stats for {}", user.getDisplayName());
+                LOGGER.info("Resetting stats for {}", user.getDisplayName());
                 updateInitialStatsForUser(user);
             } catch (final UserNotFoundException e) {
                 LOGGER.warn("No user found to reset stats: {}", user);
@@ -63,10 +63,20 @@ public class TcCacheResetScheduler {
     // Retrieve the initial stats for the user, and the current month's TC stats. We need both because if the user started
     // the competition but earned no points, we cannot simply use the current month's TC stats (which would both be 0).
     private void updateInitialStatsForUser(final User user) throws UserNotFoundException, FoldingException {
+        LOGGER.info("Updating initial stats for user: {}", user);
+        LOGGER.info("Current method (initial_stats+tc_stats)");
         final Stats initialStats = storageFacade.getInitialStatsForUser(user.getId());
         final UserTcStats currentTcStats = storageFacade.getTcStatsForUser(user.getId());
         final Stats currentAndInitialStats = Stats.create(initialStats.getPoints() + currentTcStats.getPoints(), initialStats.getUnits() + currentTcStats.getUnits());
+        LOGGER.info("Finished current method (initial_stats+tc_stats): {}", currentAndInitialStats);
+
+        // TODO: [zodac] Couldn't I just use the total stats, instead of adding initial+tc (two DB calls)?
+        LOGGER.info("Potential method (total_stats)");
+        final Stats totalStats = storageFacade.getTotalStatsForUser(user.getId());
+        LOGGER.info("Finished new method (total_stats: {}", totalStats);
+        
         storageFacade.persistInitialUserStats(UserStats.create(user.getId(), TimeUtils.getCurrentUtcTimestamp(), currentAndInitialStats));
+        LOGGER.info("Done updating");
     }
 
     private List<User> getTcUsers() {
@@ -77,7 +87,7 @@ public class TcCacheResetScheduler {
                 return Collections.emptyList();
             }
 
-            final List<User> tcUsers = storageFacade.getUsersFromTeams(tcTeams);
+            final List<User> tcUsers = storageFacade.getActiveTcUsers(tcTeams);
 
             if (tcUsers.isEmpty()) {
                 LOGGER.warn("No TC users configured in system!");

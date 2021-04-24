@@ -22,6 +22,7 @@ import me.zodac.folding.cache.InitialStatsCache;
 import me.zodac.folding.cache.OffsetStatsCache;
 import me.zodac.folding.cache.TcStatsCache;
 import me.zodac.folding.cache.TeamCache;
+import me.zodac.folding.cache.TotalStatsCache;
 import me.zodac.folding.cache.UserCache;
 import me.zodac.folding.db.DbManagerRetriever;
 import me.zodac.folding.parsing.FoldingStatsParser;
@@ -61,6 +62,7 @@ public class StorageFacade {
     private final InitialStatsCache initialStatsCache = InitialStatsCache.get();
     private final OffsetStatsCache offsetStatsCache = OffsetStatsCache.get();
     private final TcStatsCache tcStatsCache = TcStatsCache.get();
+    private final TotalStatsCache totalStatsCache = TotalStatsCache.get();
 
     public Hardware createHardware(final Hardware hardware) throws FoldingException, FoldingConflictException {
         // The REST input may not use the correct format for the ENUM, so we normalise it here
@@ -258,7 +260,7 @@ public class StorageFacade {
         teamCache.remove(teamId);
     }
 
-    public List<User> getUsersFromTeams(final List<Team> teams) {
+    public List<User> getActiveTcUsers(final List<Team> teams) {
         return teams
                 .stream()
                 .map(Team::getUserIds)
@@ -325,5 +327,25 @@ public class StorageFacade {
     public void clearOffsetStats() throws FoldingConflictException, FoldingException {
         dbManager.clearOffsetStats();
         offsetStatsCache.clearOffsets();
+    }
+
+    public void persistTotalUserStats(final List<UserStats> stats) throws FoldingException {
+        dbManager.persistTotalUserStats(stats);
+        totalStatsCache.addAll(stats);
+    }
+
+    public Stats getTotalStatsForUser(final int userId) throws FoldingException {
+        final Optional<Stats> optionalTotalStats = totalStatsCache.get(userId);
+
+        if (optionalTotalStats.isPresent()) {
+            return optionalTotalStats.get();
+        }
+
+        LOGGER.debug("Cache miss! Total stats");
+        // Should be no need to get anything from the DB (since it should have been added to the cache when created)
+        // But adding this just in case we decide to add some cache eviction in future
+        final Stats userTotalStatsFromDb = dbManager.getTotalStats(userId);
+        totalStatsCache.add(userId, userTotalStatsFromDb);
+        return userTotalStatsFromDb;
     }
 }
