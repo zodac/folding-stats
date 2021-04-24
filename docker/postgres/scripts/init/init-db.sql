@@ -18,9 +18,7 @@ CREATE TABLE users (
     category TEXT NOT NULL,
     hardware_id INT NOT NULL,
     folding_team_number INT NOT NULL,
-    live_stats_link TEXT NULL,
-    points_offset BIGINT DEFAULT(0),
-    units_offset INT DEFAULT(0),
+    live_stats_link TEXT NULL
     CONSTRAINT uni_user UNIQUE(folding_username, passkey),
     CONSTRAINT fk_hardware_id
         FOREIGN KEY(hardware_id)
@@ -47,12 +45,25 @@ CREATE INDEX index_team_id
 
 
 -- Table which is populated with latest stats of a user when first added
--- Also modified in the case where the user has their folding_username, team or passkey updated
+-- Also modified in the case where the user has their folding_username, hardware, team or passkey updated
 CREATE TABLE user_initial_stats (
     user_id INT,
     utc_timestamp TIMESTAMP,
     initial_points BIGINT NOT NULL,
     initial_units INT NOT NULL,
+    PRIMARY KEY(user_id, utc_timestamp),
+    CONSTRAINT fk_user_id
+        FOREIGN KEY(user_id)
+        REFERENCES users(user_id)
+        ON DELETE CASCADE
+);
+
+-- Table which is populated with manual offset stats of a user, to be added manually
+CREATE TABLE user_offset_tc_stats (
+    user_id INT UNIQUE,
+    utc_timestamp TIMESTAMP,
+    offset_multiplied_points BIGINT NOT NULL,
+    offset_units INT NOT NULL,
     PRIMARY KEY(user_id, utc_timestamp),
     CONSTRAINT fk_user_id
         FOREIGN KEY(user_id)
@@ -89,3 +100,4 @@ CREATE TABLE user_tc_stats_hourly (
         REFERENCES users(user_id)
         ON DELETE CASCADE
 );
+

@@ -10,6 +10,11 @@ public class UserCache extends AbstractIdentifiableCache<User> {
         super();
     }
 
+    @Override
+    protected String elementType() {
+        return "user";
+    }
+
     public static UserCache get() {
         if (INSTANCE == null) {
             INSTANCE = new UserCache();

@@ -8,6 +8,8 @@ import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
 
 public class TeamResult {
 
+    private static final int DEFAULT_TEAM_RANK = 0;
+
     private String teamName;
     private String captainName;
 
@@ -52,12 +54,11 @@ public class TeamResult {
                 );
 
         // Not ranked to begin with, will be updated by the calling class
-        return new TeamResult(teamName, captainName, rankedUsers, teamUnits, teamPoints, teamMultipliedPoints, 0);
+        return new TeamResult(teamName, captainName, rankedUsers, teamUnits, teamPoints, teamMultipliedPoints, DEFAULT_TEAM_RANK);
     }
 
     public static TeamResult updateWithRank(final TeamResult teamResult, final int rank) {
-        return new TeamResult(teamResult.teamName, teamResult.captainName, teamResult.users, teamResult.teamUnits, teamResult.teamPoints,
-                teamResult.teamMultipliedPoints, rank);
+        return new TeamResult(teamResult.teamName, teamResult.captainName, teamResult.users, teamResult.teamUnits, teamResult.teamPoints, teamResult.teamMultipliedPoints, rank);
     }
 
     public String getTeamName() {

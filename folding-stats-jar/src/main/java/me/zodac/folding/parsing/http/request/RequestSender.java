@@ -39,6 +39,11 @@ public class RequestSender {
             final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
             LOGGER.trace("Second response: {}", response.body());
 
+            if (!cachedResponse.body().equalsIgnoreCase(response.body())) {
+                LOGGER.debug("Found mismatch between first response and second response to Stanford: '{}' vs '{}'", cachedResponse.body(), response.body());
+            }
+
+
             // All user searches return a 200 response, even if the user/passkey is invalid, we will need to parse and check it later
             if (response.statusCode() != HttpURLConnection.HTTP_OK) {
                 throw new FoldingException(String.format("Invalid response: %s", response));

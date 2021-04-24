@@ -1,7 +1,6 @@
 package me.zodac.folding.bean;
 
 import me.zodac.folding.StorageFacade;
-import me.zodac.folding.api.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.Team;
@@ -42,16 +41,21 @@ public class TcCacheResetScheduler {
             try {
                 LOGGER.debug("Resetting stats for {}", user.getDisplayName());
                 updateInitialStatsForUser(user);
-                removeOffsetForUser(user);
             } catch (final UserNotFoundException e) {
                 LOGGER.warn("No user found to reset stats: {}", user);
             } catch (final FoldingException e) {
                 LOGGER.warn("Error resetting stats for user: {}", user);
-            } catch (final FoldingConflictException e) {
-                LOGGER.warn("Error removing offset stats for user: {}", user);
             } catch (final Exception e) {
                 LOGGER.warn("Unexpected error resetting stats for user: {}", user);
             }
+        }
+
+        try {
+            storageFacade.clearOffsetStats();
+        } catch (final FoldingException e) {
+            LOGGER.warn("Error clearing offset stats for users", e.getCause());
+        } catch (final Exception e) {
+            LOGGER.warn("Unexpected error clearing offset stats for users", e);
         }
     }
 
@@ -63,15 +67,6 @@ public class TcCacheResetScheduler {
         final UserTcStats currentTcStats = storageFacade.getTcStatsForUser(user.getId());
         final Stats currentAndInitialStats = Stats.create(initialStats.getPoints() + currentTcStats.getPoints(), initialStats.getUnits() + currentTcStats.getUnits());
         storageFacade.persistInitialUserStats(UserStats.create(user.getId(), TimeUtils.getCurrentUtcTimestamp(), currentAndInitialStats));
-    }
-
-    // Now that the initial stats have been updated based on the current month's TC stats, the offsets are already applied, and can
-    // be removed
-    // TODO: [zodac] Why don't we do this always? Rather than keep offsets as part of the user, have an endpoint that simply updates
-    //   a user's initial stats with an offset? Should be cleaner...
-    private void removeOffsetForUser(final User user) throws UserNotFoundException, FoldingConflictException, FoldingException {
-        final User userWithNoOffsets = User.updateWithNoOffsets(user);
-        storageFacade.updateUser(userWithNoOffsets);
     }
 
     private List<User> getTcUsers() {

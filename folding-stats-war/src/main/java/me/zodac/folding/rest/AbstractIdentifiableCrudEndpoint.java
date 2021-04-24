@@ -24,8 +24,9 @@ import static me.zodac.folding.rest.response.Responses.ok;
 import static me.zodac.folding.rest.response.Responses.serverError;
 
 abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
+
     @Context
-    private UriInfo uriContext;
+    protected UriInfo uriContext;
 
     protected abstract Logger getLogger();
 
@@ -63,6 +64,10 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
             getLogger().debug(errorMessage, e);
             getLogger().error(errorMessage);
             return conflict(errorMessage);
+        } catch (final NotFoundException e) {
+            getLogger().debug("Error creating {}, could not find {} with ID {}", elementType(), e.getType(), e.getId(), e);
+            getLogger().error("Error creating {}, could not find {} with ID {}", elementType(), e.getType(), e.getId());
+            return serverError();
         } catch (final FoldingException e) {
             getLogger().error("Error creating {}: {}", elementType(), element, e.getCause());
             return serverError();

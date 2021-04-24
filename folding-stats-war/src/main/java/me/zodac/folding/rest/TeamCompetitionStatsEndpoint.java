@@ -51,7 +51,6 @@ public class TeamCompetitionStatsEndpoint {
     @EJB
     private TeamCompetitionStatsParser teamCompetitionStatsParser;
 
-
     @Context
     private UriInfo uriContext;
 

@@ -11,6 +11,11 @@ public class TeamCache extends AbstractIdentifiableCache<Team> {
         super();
     }
 
+    @Override
+    protected String elementType() {
+        return "team";
+    }
+
     public static TeamCache get() {
         if (INSTANCE == null) {
             INSTANCE = new TeamCache();

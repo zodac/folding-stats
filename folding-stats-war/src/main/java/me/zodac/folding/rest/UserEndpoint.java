@@ -4,7 +4,10 @@ import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
+import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.UserStatsOffset;
+import me.zodac.folding.bean.TeamCompetitionStatsParser;
 import me.zodac.folding.validator.UserValidator;
 import me.zodac.folding.validator.ValidationResponse;
 import org.slf4j.Logger;
@@ -15,6 +18,7 @@ import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -23,6 +27,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
+
+import static me.zodac.folding.rest.response.Responses.badRequest;
+import static me.zodac.folding.rest.response.Responses.notFound;
+import static me.zodac.folding.rest.response.Responses.ok;
+import static me.zodac.folding.rest.response.Responses.serverError;
 
 /**
  * REST endpoints for users for <code>folding-stats</code>.
@@ -36,6 +45,9 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
 
     @EJB
     private StorageFacade storageFacade;
+
+    @EJB
+    private TeamCompetitionStatsParser teamCompetitionStatsParser;
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -78,6 +90,34 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteUserById(@PathParam("userId") final String userId) {
         return super.deleteById(userId);
+    }
+
+    @PATCH
+    @Path("/{userId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateUserWithOffset(@PathParam("userId") final String userId, final UserStatsOffset userStatsOffset) {
+        getLogger().info("PATCH request for {} received at '{}': {}", elementType(), uriContext.getAbsolutePath(), userStatsOffset);
+
+        try {
+            storageFacade.addOffsetStats(Integer.parseInt(userId), userStatsOffset);
+            teamCompetitionStatsParser.updateTcStatsForUser(Integer.parseInt(userId));
+            return ok();
+        } catch (final NumberFormatException e) {
+            final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), userId);
+            getLogger().debug(errorMessage, e);
+            getLogger().error(errorMessage);
+            return badRequest(errorMessage);
+        } catch (final UserNotFoundException e) {
+            getLogger().error("Error finding {} with ID: {}", elementType(), userId, e.getCause());
+            return notFound();
+        } catch (final FoldingException e) {
+            getLogger().error("Error updating {} with ID: {}", elementType(), userId, e.getCause());
+            return serverError();
+        } catch (final Exception e) {
+            getLogger().error("Unexpected error updating {} with ID: {}", elementType(), userId, e);
+            return serverError();
+        }
     }
 
     @Override

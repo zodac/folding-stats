@@ -27,7 +27,7 @@ public class TeamValidator {
         if (StringUtils.isBlank(team.getTeamName())) {
             failureMessages.add("Attribute 'teamName' must not be empty");
         }
-
+        
         if (team.getCaptainUserId() <= User.EMPTY_USER_ID || UserCache.get().doesNotContain(team.getCaptainUserId())) {
             final List<String> availableUsers = UserCache.get()
                     .getAll()

@@ -6,6 +6,8 @@ import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
 
 public class UserResult {
 
+    private static final int DEFAULT_USER_RANK = 0;
+
     private String userName;
     private String hardware;
     private String category;
@@ -33,11 +35,11 @@ public class UserResult {
 
     // Not ranked to begin with, will be updated by the calling class
     public static UserResult create(final String userName, final String hardware, final String category, final long points, final long pointsWithoutMultiplier, final long units, final String liveStatsLink) {
-        return new UserResult(userName, hardware, category, points, pointsWithoutMultiplier, units, 0, liveStatsLink);
+        return new UserResult(userName, hardware, category, points, pointsWithoutMultiplier, units, DEFAULT_USER_RANK, liveStatsLink);
     }
 
     public static UserResult createWithNoPoints(final String userName, final String hardware, final String category, final String liveStatsLink) {
-        return new UserResult(userName, hardware, category, 0L, 0L, 0, 0, liveStatsLink);
+        return new UserResult(userName, hardware, category, 0L, 0L, 0, DEFAULT_USER_RANK, liveStatsLink);
     }
 
     public static UserResult updateWithRankInTeam(final UserResult userResult, final int teamRank) {

@@ -8,6 +8,7 @@ import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.UserStatsOffset;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
@@ -68,8 +69,6 @@ public interface DbManager {
 
     Map<Integer, Stats> getInitialUserStats(final List<Integer> userIds) throws FoldingException;
 
-    Stats getCurrentUserStats(final int userId) throws FoldingException, UserNotFoundException;
-
     void persistHourlyTcUserStats(final List<UserTcStats> userStats) throws FoldingException;
 
     boolean doTcStatsExist() throws FoldingException;
@@ -83,4 +82,10 @@ public interface DbManager {
     UserTcStats getCurrentTcStats(final int userId) throws FoldingException, UserNotFoundException;
 
     void persistTotalUserStats(final List<UserStats> stats) throws FoldingException;
+
+    UserStatsOffset addOffsetStats(final int userId, final UserStatsOffset userStatsOffset) throws FoldingException;
+
+    Map<Integer, UserStatsOffset> getOffsetStats(final List<Integer> userIds) throws FoldingException;
+
+    void clearOffsetStats() throws FoldingConflictException, FoldingException;
 }

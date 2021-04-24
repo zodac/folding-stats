@@ -10,6 +10,11 @@ public class HardwareCache extends AbstractIdentifiableCache<Hardware> {
         super();
     }
 
+    @Override
+    protected String elementType() {
+        return "hardware";
+    }
+
     public static HardwareCache get() {
         if (INSTANCE == null) {
             INSTANCE = new HardwareCache();

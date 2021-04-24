@@ -9,10 +9,12 @@ import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.UserStatsOffset;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.api.utils.EnvironmentVariables;
+import me.zodac.folding.api.utils.TimeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,7 +117,7 @@ public class PostgresDbManager implements DbManager {
                 }
             }
 
-            throw new HardwareNotFoundException();
+            throw new HardwareNotFoundException(hardwareId);
         } catch (final SQLException e) {
             throw new FoldingException("Error opening connection to the DB", e);
         }
@@ -236,7 +238,7 @@ public class PostgresDbManager implements DbManager {
                     return createUser(resultSet);
                 }
 
-                throw new UserNotFoundException();
+                throw new UserNotFoundException(userId);
             }
         } catch (final SQLException e) {
             throw new FoldingException("Error opening connection to the DB", e);
@@ -342,13 +344,13 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public Team getTeam(final int foldingTeamId) throws FoldingException, TeamNotFoundException {
+    public Team getTeam(final int teamId) throws FoldingException, TeamNotFoundException {
         final String selectSqlStatement = "SELECT * FROM teams WHERE team_id = ?;";
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
              final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
 
-            preparedStatement.setInt(1, foldingTeamId);
+            preparedStatement.setInt(1, teamId);
 
             LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
             try (final ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -356,7 +358,7 @@ public class PostgresDbManager implements DbManager {
                     return createTeam(resultSet);
                 }
 
-                throw new TeamNotFoundException();
+                throw new TeamNotFoundException(teamId);
             }
         } catch (final SQLException e) {
             throw new FoldingException("Error opening connection to the DB", e);
@@ -514,7 +516,7 @@ public class PostgresDbManager implements DbManager {
                 }
 
                 if (userStatsByDate.isEmpty()) {
-                    throw new UserNotFoundException();
+                    throw new UserNotFoundException(userId);
                 }
 
                 return userStatsByDate;
@@ -554,7 +556,7 @@ public class PostgresDbManager implements DbManager {
             } catch (final SQLException e) {
                 LOGGER.warn("Unable to get TC stats for user: {}", userId, e);
             }
-            throw new UserNotFoundException();
+            throw new UserNotFoundException(userId);
         } catch (final SQLException e) {
             throw new FoldingException("Error opening connection to the DB", e);
         }
@@ -589,7 +591,7 @@ public class PostgresDbManager implements DbManager {
         final Map<Integer, Stats> initialUserStats = getInitialUserStats(List.of(userId));
 
         if (initialUserStats.isEmpty() || !initialUserStats.containsKey(userId)) {
-            throw new UserNotFoundException();
+            throw new UserNotFoundException(userId);
         }
 
         return initialUserStats.get(userId);
@@ -648,7 +650,7 @@ public class PostgresDbManager implements DbManager {
             } catch (final SQLException e) {
                 LOGGER.warn("Unable to get TC stats for user: {}", userId, e);
             }
-            throw new UserNotFoundException();
+            throw new UserNotFoundException(userId);
         } catch (final SQLException e) {
             throw new FoldingException("Error opening connection to the DB", e);
         }
@@ -680,30 +682,86 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public Stats getCurrentUserStats(final int userId) throws FoldingException, UserNotFoundException {
-        LOGGER.debug("Getting current points for user {}", userId);
-        final String selectSqlStatement = String.format("SELECT total_points, total_units " +
-                "FROM user_total_stats " +
-                "WHERE user_id = ? " +
-                "ORDER BY utc_timestamp %s " +
-                "LIMIT 1;", OrderBy.DESCENDING.getSqlValue());
+    public UserStatsOffset addOffsetStats(final int userId, final UserStatsOffset userStatsOffset) throws FoldingException {
+        LOGGER.debug("Adding offset stats for user {}", userId);
+        final String preparedInsertSqlStatement = "INSERT INTO user_offset_tc_stats (user_id, utc_timestamp, offset_multiplied_points, offset_units) VALUES (?, ?, ?, ?) " +
+                "ON CONFLICT (user_id) " +
+                "DO UPDATE " +
+                "SET utc_timestamp = ?, offset_multiplied_points = user_offset_tc_stats.offset_multiplied_points + ?, offset_units = user_offset_tc_stats.offset_units + ? " +
+                "RETURNING offset_multiplied_points, offset_units;";
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
-             final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
+             final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
+            final Timestamp currentUtcTimestamp = TimeUtils.getCurrentUtcTimestamp();
 
             preparedStatement.setInt(1, userId);
+            preparedStatement.setTimestamp(2, currentUtcTimestamp);
+            preparedStatement.setLong(3, userStatsOffset.getPointsOffset());
+            preparedStatement.setInt(4, userStatsOffset.getUnitsOffset());
+            preparedStatement.setTimestamp(5, currentUtcTimestamp);
+            preparedStatement.setLong(6, userStatsOffset.getPointsOffset());
+            preparedStatement.setInt(7, userStatsOffset.getUnitsOffset());
 
             LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
             try (final ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    return Stats.create(
-                            resultSet.getLong("total_points"),
-                            resultSet.getInt("total_units")
-                    );
+                    return UserStatsOffset.create(resultSet.getLong("offset_multiplied_points"), resultSet.getInt("offset_units"));
+                }
+                throw new FoldingException("Error inserting to offset stats");
+            }
+        } catch (final SQLException e) {
+            throw new FoldingException("Error opening connection to the DB", e);
+        }
+    }
+
+    @Override
+    public Map<Integer, UserStatsOffset> getOffsetStats(final List<Integer> userIds) throws FoldingException {
+        LOGGER.debug("Getting offset stats for {} users", userIds.size());
+        final String preparedInsertSqlStatement = "SELECT (offset_multiplied_points, offset_units) " +
+                "FROM user_offset_tc_stats " +
+                "WHERE user_id = ? " +
+                "ORDER BY utc_timestamp DESC " +
+                "LIMIT 1";
+
+        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+             final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
+            final Map<Integer, UserStatsOffset> offsetsByUserId = new HashMap<>(userIds.size());
+
+            for (final int userId : userIds) {
+                preparedStatement.setInt(1, userId);
+
+                LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
+                try (final ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        offsetsByUserId.put(userId, UserStatsOffset.create(resultSet.getLong("offset_multiplied_points"), resultSet.getInt("offset_units")));
+                    } else {
+                        offsetsByUserId.put(userId, UserStatsOffset.empty());
+                    }
+                } catch (final SQLException e) {
+                    LOGGER.warn("Error getting offset stats for user: {}", userId);
+                    offsetsByUserId.put(userId, UserStatsOffset.empty());
                 }
             }
-            throw new UserNotFoundException();
+            return offsetsByUserId;
         } catch (final SQLException e) {
+            throw new FoldingException("Error opening connection to the DB", e);
+        }
+    }
+
+    @Override
+    public void clearOffsetStats() throws FoldingConflictException, FoldingException {
+        LOGGER.debug("Clearing offset stats for all users");
+        final String preparedInsertSqlStatement = "DELETE FROM user_offset_tc_stats;";
+        LOGGER.debug("Executing prepared statement: '{}'", preparedInsertSqlStatement);
+
+        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+             final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
+            preparedStatement.executeUpdate();
+
+        } catch (final SQLException e) {
+            if (e.getMessage().contains(VIOLATES_FOREIGN_KEY_CONSTRAINT)) {
+                throw new FoldingConflictException();
+            }
             throw new FoldingException("Error opening connection to the DB", e);
         }
     }
@@ -727,9 +785,7 @@ public class PostgresDbManager implements DbManager {
                 resultSet.getString("category"),
                 resultSet.getInt("hardware_id"),
                 resultSet.getInt("folding_team_number"),
-                resultSet.getString("live_stats_link"),
-                resultSet.getLong("points_offset"),
-                resultSet.getInt("units_offset")
+                resultSet.getString("live_stats_link")
         );
     }
 

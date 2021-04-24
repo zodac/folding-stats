@@ -4,8 +4,6 @@ import me.zodac.folding.api.Identifiable;
 
 import java.util.Objects;
 
-import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
-
 
 public class User implements Identifiable {
 
@@ -21,14 +19,12 @@ public class User implements Identifiable {
     private int hardwareId;
     private int foldingTeamNumber;
     private String liveStatsLink;
-    private long pointsOffset;
-    private int unitsOffset;
 
     public User() {
 
     }
 
-    private User(final int id, final String foldingUserName, final String displayName, final String passkey, final String category, final int hardwareId, final int foldingTeamNumber, final String liveStatsLink, final long pointsOffset, final int unitsOffset) {
+    private User(final int id, final String foldingUserName, final String displayName, final String passkey, final String category, final int hardwareId, final int foldingTeamNumber, final String liveStatsLink) {
         this.id = id;
         this.foldingUserName = foldingUserName == null ? null : foldingUserName.trim();
         this.displayName = displayName == null ? null : displayName.trim();
@@ -37,20 +33,14 @@ public class User implements Identifiable {
         this.hardwareId = hardwareId;
         this.foldingTeamNumber = foldingTeamNumber;
         this.liveStatsLink = liveStatsLink == null ? null : liveStatsLink.trim();
-        this.pointsOffset = pointsOffset;
-        this.unitsOffset = unitsOffset;
     }
 
-    public static User create(final int userId, final String foldingUserName, final String displayName, final String passkey, final String category, final int hardwareId, final int foldingTeamNumber, final String liveStatsLink, final long pointsOffset, final int unitsOffset) {
-        return new User(userId, foldingUserName, displayName, passkey, category, hardwareId, foldingTeamNumber, liveStatsLink, pointsOffset, unitsOffset);
+    public static User create(final int userId, final String foldingUserName, final String displayName, final String passkey, final String category, final int hardwareId, final int foldingTeamNumber, final String liveStatsLink) {
+        return new User(userId, foldingUserName, displayName, passkey, category, hardwareId, foldingTeamNumber, liveStatsLink);
     }
 
     public static User updateWithId(final int userId, final User user) {
-        return new User(userId, user.foldingUserName, user.displayName, user.passkey, user.category, user.hardwareId, user.foldingTeamNumber, user.liveStatsLink, user.pointsOffset, user.unitsOffset);
-    }
-
-    public static User updateWithNoOffsets(final User user) {
-        return new User(user.id, user.foldingUserName, user.displayName, user.passkey, user.category, user.hardwareId, user.foldingTeamNumber, user.liveStatsLink, 0L, 0);
+        return new User(userId, user.foldingUserName, user.displayName, user.passkey, user.category, user.hardwareId, user.foldingTeamNumber, user.liveStatsLink);
     }
 
     @Override
@@ -118,21 +108,6 @@ public class User implements Identifiable {
         this.liveStatsLink = liveStatsLink == null ? null : liveStatsLink.trim();
     }
 
-    public long getPointsOffset() {
-        return pointsOffset;
-    }
-
-    public void setPointsOffset(final long pointsOffset) {
-        this.pointsOffset = pointsOffset;
-    }
-
-    public int getUnitsOffset() {
-        return unitsOffset;
-    }
-
-    public void setUnitsOffset(final int unitsOffset) {
-        this.unitsOffset = unitsOffset;
-    }
 
     @Override
     public boolean equals(final Object o) {
@@ -143,13 +118,13 @@ public class User implements Identifiable {
             return false;
         }
         final User user = (User) o;
-        return id == user.id && hardwareId == user.hardwareId && foldingTeamNumber == user.foldingTeamNumber && pointsOffset == user.pointsOffset && unitsOffset == user.unitsOffset &&
+        return id == user.id && hardwareId == user.hardwareId && foldingTeamNumber == user.foldingTeamNumber &&
                 Objects.equals(foldingUserName, user.foldingUserName) && Objects.equals(displayName, user.displayName) && Objects.equals(passkey, user.passkey) && Objects.equals(category, user.category) && Objects.equals(liveStatsLink, user.liveStatsLink);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, foldingUserName, displayName, passkey, category, hardwareId, foldingTeamNumber, liveStatsLink, pointsOffset, unitsOffset);
+        return Objects.hash(id, foldingUserName, displayName, passkey, category, hardwareId, foldingTeamNumber, liveStatsLink);
     }
 
 
@@ -164,8 +139,6 @@ public class User implements Identifiable {
                 ", hardwareId: " + hardwareId +
                 ", foldingTeamNumber: " + foldingTeamNumber +
                 ", liveStatsLink: '" + liveStatsLink + "'" +
-                ", pointsOffset: " + formatWithCommas(pointsOffset) +
-                ", unitsOffset: " + formatWithCommas(unitsOffset) +
                 '}';
     }
 }

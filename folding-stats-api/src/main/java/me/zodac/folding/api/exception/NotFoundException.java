@@ -4,15 +4,20 @@ public class NotFoundException extends Exception {
 
     private static final long serialVersionUID = 4515679320571283490L;
 
-    public NotFoundException() {
+    private final String type;
+    private final int id;
+
+    public NotFoundException(final String type, final int id) {
         super();
+        this.type = type;
+        this.id = id;
     }
 
-    public NotFoundException(final String message) {
-        super(message);
+    public String getType() {
+        return type;
     }
 
-    public NotFoundException(final String message, final Throwable throwable) {
-        super(message, throwable);
+    public int getId() {
+        return id;
     }
 }
