@@ -163,7 +163,8 @@ public class TeamCompetitionStatsParser {
             final UserTcStats tcStatsForUser = UserTcStats.createWithMultiplier(userId, timestamp, statsForUser, hardwareMultiplier);
             LOGGER.debug("{}: {} TC points (pre-offset) | {} TC units (pre-offset)", user.getFoldingUserName(), formatWithCommas(tcStatsForUser.getMultipliedPoints()), formatWithCommas(tcStatsForUser.getUnits()));
 
-            final UserTcStats tcStatsForUserWithOffset = UserTcStats.updateWithOffsets(tcStatsForUser, statsOffsetsByUserId.get(userId));
+            final double defaultMultiplier = 1.0D;  // Currently not offsetting (based on multiplied points/multiplier), but testing now...
+            final UserTcStats tcStatsForUserWithOffset = UserTcStats.updateWithOffsets(tcStatsForUser, statsOffsetsByUserId.get(userId), defaultMultiplier);
             LOGGER.info("{}: {} TC points | {} TC units", user.getFoldingUserName(), formatWithCommas(tcStatsForUserWithOffset.getMultipliedPoints()), formatWithCommas(tcStatsForUserWithOffset.getUnits()));
             hourlyTcStatsForUsers.add(tcStatsForUserWithOffset);
         }
@@ -189,7 +190,7 @@ public class TeamCompetitionStatsParser {
                 stats.add(userStats);
                 LOGGER.debug("{}: {} total points (unmultiplied) | {} total units", user.getFoldingUserName(), formatWithCommas(userStats.getPoints()), formatWithCommas(userStats.getUnits()));
             } catch (final FoldingException e) {
-                LOGGER.warn("Unable to get stats for user '{}/{}/{}'", user.getFoldingUserName(), user.getPasskey(), user.getFoldingTeamNumber(), e.getCause());
+                LOGGER.warn("Unable to get stats for user '{}/{}'", user.getFoldingUserName(), user.getPasskey(), e.getCause());
             }
         }
         return stats;

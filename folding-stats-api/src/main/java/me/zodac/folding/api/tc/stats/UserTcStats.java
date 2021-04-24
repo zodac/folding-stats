@@ -32,10 +32,11 @@ public class UserTcStats {
         return new UserTcStats(userId, timestamp, stats.getPoints(), multipliedPoints, stats.getUnits());
     }
 
-    public static UserTcStats updateWithOffsets(final UserTcStats tcStatsForUser, final UserStatsOffset userStatsOffset) {
+    public static UserTcStats updateWithOffsets(final UserTcStats tcStatsForUser, final UserStatsOffset userStatsOffset, final double multiplier) {
+        final long offsetPoints = Math.max(Math.round(tcStatsForUser.getPoints() / multiplier), 0);
         final long offsetMultipliedPoints = Math.max(tcStatsForUser.getMultipliedPoints() + userStatsOffset.getPointsOffset(), 0);
         final int offsetUnits = Math.max(tcStatsForUser.getUnits() + userStatsOffset.getUnitsOffset(), 0);
-        return new UserTcStats(tcStatsForUser.getUserId(), tcStatsForUser.getTimestamp(), tcStatsForUser.getPoints(), offsetMultipliedPoints, offsetUnits);
+        return new UserTcStats(tcStatsForUser.getUserId(), tcStatsForUser.getTimestamp(), offsetPoints, offsetMultipliedPoints, offsetUnits);
     }
 
     public int getUserId() {

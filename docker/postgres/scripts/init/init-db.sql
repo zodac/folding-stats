@@ -17,9 +17,8 @@ CREATE TABLE users (
     passkey TEXT NOT NULL,
     category TEXT NOT NULL,
     hardware_id INT NOT NULL,
-    folding_team_number INT NOT NULL,
-    live_stats_link TEXT NULL
-    CONSTRAINT uni_user UNIQUE(folding_username, passkey),
+    live_stats_link TEXT NULL,
+    CONSTRAINT unique_user UNIQUE(folding_username, passkey),
     CONSTRAINT fk_hardware_id
         FOREIGN KEY(hardware_id)
         REFERENCES hardware(hardware_id)
@@ -58,6 +57,10 @@ CREATE TABLE user_initial_stats (
         ON DELETE CASCADE
 );
 
+CREATE INDEX index_user_initial_stats
+    ON user_initial_stats(user_id, utc_timestamp);
+
+
 -- Table which is populated with manual offset stats of a user, to be added manually
 CREATE TABLE user_offset_tc_stats (
     user_id INT UNIQUE,
@@ -71,6 +74,10 @@ CREATE TABLE user_offset_tc_stats (
         ON DELETE CASCADE
 );
 
+CREATE INDEX index_user_offset_tc_stats
+    ON user_offset_tc_stats(user_id, utc_timestamp);
+
+
 -- Table which is populated each update with the latest stats of a user
 CREATE TABLE user_total_stats (
     user_id INT,
@@ -83,6 +90,9 @@ CREATE TABLE user_total_stats (
         REFERENCES users(user_id)
         ON DELETE CASCADE
 );
+
+CREATE INDEX index_user_total_stats
+    ON user_total_stats(user_id, utc_timestamp);
 
 
 -- Table which is populated each update with the latest stats of a user, as a running total for the TC (reset each month)
@@ -100,4 +110,7 @@ CREATE TABLE user_tc_stats_hourly (
         REFERENCES users(user_id)
         ON DELETE CASCADE
 );
+
+CREATE INDEX index_user_tc_stats_hourly
+    ON user_tc_stats_hourly(user_id, utc_timestamp);
 

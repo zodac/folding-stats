@@ -41,10 +41,6 @@ public class UserValidator {
             failureMessages.add("Attribute 'passkey' must not be empty");
         }
 
-        if (user.getFoldingTeamNumber() <= 0) {
-            failureMessages.add("Attribute 'foldingTeamNumber' is invalid (EHW: 239902, OCN: 37726, etc)");
-        }
-
         if (user.getHardwareId() <= Hardware.EMPTY_HARDWARE_ID || HardwareCache.get().doesNotContain(user.getHardwareId())) {
             final List<String> availableHardware = HardwareCache.get()
                     .getAll()

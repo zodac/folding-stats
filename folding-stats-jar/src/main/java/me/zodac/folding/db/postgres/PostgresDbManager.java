@@ -171,7 +171,7 @@ public class PostgresDbManager implements DbManager {
 
     @Override
     public User createUser(final User user) throws FoldingException, FoldingConflictException {
-        final String insertSqlWithReturnId = "INSERT INTO users (folding_username, display_username, passkey, category, hardware_id, folding_team_number, live_stats_link) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING user_id;";
+        final String insertSqlWithReturnId = "INSERT INTO users (folding_username, display_username, passkey, category, hardware_id, live_stats_link) VALUES (?, ?, ?, ?, ?, ?) RETURNING user_id;";
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
              final PreparedStatement preparedStatement = connection.prepareStatement(insertSqlWithReturnId)) {
@@ -181,8 +181,7 @@ public class PostgresDbManager implements DbManager {
             preparedStatement.setString(3, user.getPasskey());
             preparedStatement.setString(4, user.getCategory());
             preparedStatement.setInt(5, user.getHardwareId());
-            preparedStatement.setInt(6, user.getFoldingTeamNumber());
-            preparedStatement.setString(7, user.getLiveStatsLink());
+            preparedStatement.setString(6, user.getLiveStatsLink());
 
             LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
             try (final ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -248,7 +247,7 @@ public class PostgresDbManager implements DbManager {
     @Override
     public void updateUser(final User user) throws FoldingException, FoldingConflictException {
         final String updateSqlStatement = "UPDATE users " +
-                "SET folding_username = ?, display_username = ?, passkey = ?, category = ?, hardware_id = ?, folding_team_number = ?, live_stats_link = ? " +
+                "SET folding_username = ?, display_username = ?, passkey = ?, category = ?, hardware_id = ?, live_stats_link = ? " +
                 "WHERE user_id = ?;";
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
@@ -259,9 +258,8 @@ public class PostgresDbManager implements DbManager {
             preparedStatement.setString(3, user.getPasskey());
             preparedStatement.setString(4, user.getCategory());
             preparedStatement.setInt(5, user.getHardwareId());
-            preparedStatement.setInt(6, user.getFoldingTeamNumber());
-            preparedStatement.setString(7, user.getLiveStatsLink());
-            preparedStatement.setInt(8, user.getId());
+            preparedStatement.setString(6, user.getLiveStatsLink());
+            preparedStatement.setInt(7, user.getId());
 
             LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
             if (preparedStatement.executeUpdate() == 0) {
@@ -784,7 +782,6 @@ public class PostgresDbManager implements DbManager {
                 resultSet.getString("passkey"),
                 resultSet.getString("category"),
                 resultSet.getInt("hardware_id"),
-                resultSet.getInt("folding_team_number"),
                 resultSet.getString("live_stats_link")
         );
     }

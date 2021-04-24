@@ -29,7 +29,7 @@ import javax.ws.rs.core.UriInfo;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 
 import static java.util.stream.Collectors.toList;
 import static me.zodac.folding.rest.response.Responses.noContent;
@@ -112,8 +112,7 @@ public class TeamCompetitionStatsEndpoint {
         final List<UserResult> userResults = team.getUserIds()
                 .stream()
                 .map(this::getTcUser)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+                .filter(Objects::nonNull)
                 .collect(toList());
 
         try {
@@ -128,10 +127,10 @@ public class TeamCompetitionStatsEndpoint {
         }
     }
 
-    private Optional<UserResult> getTcUser(final int userId) {
+    private UserResult getTcUser(final int userId) {
         if (userId == User.EMPTY_USER_ID) {
             LOGGER.warn("User had invalid ID");
-            return Optional.empty();
+            return null;
         }
 
         try {
@@ -139,14 +138,14 @@ public class TeamCompetitionStatsEndpoint {
             return getTcStatsForUser(user);
         } catch (final UserNotFoundException e) {
             LOGGER.warn("Unable to find user ID: {}", userId, e);
-            return Optional.empty();
+            return null;
         } catch (final FoldingException e) {
             LOGGER.warn("Error finding user ID: {}", userId, e.getCause());
-            return Optional.empty();
+            return null;
         }
     }
 
-    private Optional<UserResult> getTcStatsForUser(final User user) {
+    private UserResult getTcStatsForUser(final User user) {
         final Hardware hardware;
 
         try {
@@ -154,31 +153,31 @@ public class TeamCompetitionStatsEndpoint {
         } catch (final HardwareNotFoundException e) {
             LOGGER.debug("No hardware found for ID: {}", user.getHardwareId(), e);
             LOGGER.warn("No hardware found for ID: {}", user.getHardwareId());
-            return Optional.empty();
+            return null;
         } catch (final FoldingException e) {
             LOGGER.warn("Error getting TC stats for user: {}", user, e.getCause());
-            return Optional.empty();
+            return null;
         }
 
 
         final Category category = Category.get(user.getCategory());
         if (category == Category.INVALID) {
             LOGGER.warn("Unexpectedly got an invalid category '{}' for Folding user: {}", user.getCategory(), user.getDisplayName());
-            return Optional.empty();
+            return null;
         }
 
 
         try {
             final UserTcStats userTcStats = storageFacade.getTcStatsForUser(user.getId());
             LOGGER.debug("Results for {}: {} points | {} multiplied points | {} units", user.getDisplayName(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits());
-            return Optional.of(UserResult.create(user.getDisplayName(), hardware.getDisplayName(), category.getDisplayName(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits(), user.getLiveStatsLink()));
+            return UserResult.create(user.getDisplayName(), hardware.getDisplayName(), category.getDisplayName(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits(), user.getLiveStatsLink());
         } catch (final UserNotFoundException e) {
             LOGGER.debug("No stats found for user ID: {}", user.getId(), e);
             LOGGER.warn("No stats found for user ID: {}", user.getId());
-            return Optional.of(UserResult.createWithNoPoints(user.getDisplayName(), hardware.getDisplayName(), category.getDisplayName(), user.getLiveStatsLink()));
+            return UserResult.empty(user.getDisplayName(), hardware.getDisplayName(), category.getDisplayName(), user.getLiveStatsLink());
         } catch (final FoldingException e) {
             LOGGER.warn("Error getting TC stats for user: {}", user, e.getCause());
-            return Optional.empty();
+            return null;
         }
     }
 }

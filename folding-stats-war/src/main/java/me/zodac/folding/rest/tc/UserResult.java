@@ -38,7 +38,7 @@ public class UserResult {
         return new UserResult(userName, hardware, category, points, pointsWithoutMultiplier, units, DEFAULT_USER_RANK, liveStatsLink);
     }
 
-    public static UserResult createWithNoPoints(final String userName, final String hardware, final String category, final String liveStatsLink) {
+    public static UserResult empty(final String userName, final String hardware, final String category, final String liveStatsLink) {
         return new UserResult(userName, hardware, category, 0L, 0L, 0, DEFAULT_USER_RANK, liveStatsLink);
     }
 

@@ -26,7 +26,7 @@ public class ResponseParser {
     public static long getPointsFromResponse(final HttpResponse<String> response) {
         try {
             final PointsApiResponse pointsApiResponse = GSON.fromJson(response.body(), PointsApiResponse.class);
-            return pointsApiResponse.getContributed();
+            return pointsApiResponse.getEarned();
         } catch (final JsonSyntaxException e) {
             LOGGER.warn("Error parsing the JSON response from the API: '{}'", response.body(), e);
             throw e;

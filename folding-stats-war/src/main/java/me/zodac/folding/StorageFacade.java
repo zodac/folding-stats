@@ -194,7 +194,7 @@ public class StorageFacade {
         // If a user is updated and their team, Folding username, hardware ID or passkey is changed, we need to update their initial offset again
         // The value should be: (new user info points - current TC points)
         if (!existingUser.getPasskey().equalsIgnoreCase(updatedUser.getPasskey()) || !existingUser.getFoldingUserName().equalsIgnoreCase(updatedUser.getFoldingUserName())
-                || existingUser.getFoldingTeamNumber() != updatedUser.getFoldingTeamNumber() || existingUser.getHardwareId() != updatedUser.getHardwareId()) {
+                || existingUser.getHardwareId() != updatedUser.getHardwareId()) {
             LOGGER.debug("User had state changes, recalculating initial stats");
             final UserStats updatedUserStats = FoldingStatsParser.getStatsForUser(updatedUser);
             final UserTcStats currentUserTcStats = getTcStatsForUser(updatedUser.getId());

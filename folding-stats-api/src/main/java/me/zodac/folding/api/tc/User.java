@@ -17,30 +17,28 @@ public class User implements Identifiable {
     private String passkey;
     private String category;
     private int hardwareId;
-    private int foldingTeamNumber;
     private String liveStatsLink;
 
     public User() {
 
     }
 
-    private User(final int id, final String foldingUserName, final String displayName, final String passkey, final String category, final int hardwareId, final int foldingTeamNumber, final String liveStatsLink) {
+    private User(final int id, final String foldingUserName, final String displayName, final String passkey, final String category, final int hardwareId, final String liveStatsLink) {
         this.id = id;
         this.foldingUserName = foldingUserName == null ? null : foldingUserName.trim();
         this.displayName = displayName == null ? null : displayName.trim();
         this.passkey = passkey == null ? null : passkey.trim();
         this.category = category == null ? null : category.trim();
         this.hardwareId = hardwareId;
-        this.foldingTeamNumber = foldingTeamNumber;
         this.liveStatsLink = liveStatsLink == null ? null : liveStatsLink.trim();
     }
 
-    public static User create(final int userId, final String foldingUserName, final String displayName, final String passkey, final String category, final int hardwareId, final int foldingTeamNumber, final String liveStatsLink) {
-        return new User(userId, foldingUserName, displayName, passkey, category, hardwareId, foldingTeamNumber, liveStatsLink);
+    public static User create(final int userId, final String foldingUserName, final String displayName, final String passkey, final String category, final int hardwareId, final String liveStatsLink) {
+        return new User(userId, foldingUserName, displayName, passkey, category, hardwareId, liveStatsLink);
     }
 
     public static User updateWithId(final int userId, final User user) {
-        return new User(userId, user.foldingUserName, user.displayName, user.passkey, user.category, user.hardwareId, user.foldingTeamNumber, user.liveStatsLink);
+        return new User(userId, user.foldingUserName, user.displayName, user.passkey, user.category, user.hardwareId, user.liveStatsLink);
     }
 
     @Override
@@ -92,14 +90,6 @@ public class User implements Identifiable {
         this.hardwareId = hardwareId;
     }
 
-    public int getFoldingTeamNumber() {
-        return foldingTeamNumber;
-    }
-
-    public void setFoldingTeamNumber(final int foldingTeamNumber) {
-        this.foldingTeamNumber = foldingTeamNumber;
-    }
-
     public String getLiveStatsLink() {
         return liveStatsLink;
     }
@@ -118,13 +108,12 @@ public class User implements Identifiable {
             return false;
         }
         final User user = (User) o;
-        return id == user.id && hardwareId == user.hardwareId && foldingTeamNumber == user.foldingTeamNumber &&
-                Objects.equals(foldingUserName, user.foldingUserName) && Objects.equals(displayName, user.displayName) && Objects.equals(passkey, user.passkey) && Objects.equals(category, user.category) && Objects.equals(liveStatsLink, user.liveStatsLink);
+        return id == user.id && hardwareId == user.hardwareId && Objects.equals(foldingUserName, user.foldingUserName) && Objects.equals(displayName, user.displayName) && Objects.equals(passkey, user.passkey) && Objects.equals(category, user.category) && Objects.equals(liveStatsLink, user.liveStatsLink);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, foldingUserName, displayName, passkey, category, hardwareId, foldingTeamNumber, liveStatsLink);
+        return Objects.hash(id, foldingUserName, displayName, passkey, category, hardwareId, liveStatsLink);
     }
 
 
@@ -137,7 +126,6 @@ public class User implements Identifiable {
                 ", passkey: '" + passkey + "'" +
                 ", category: '" + category + "'" +
                 ", hardwareId: " + hardwareId +
-                ", foldingTeamNumber: " + foldingTeamNumber +
                 ", liveStatsLink: '" + liveStatsLink + "'" +
                 '}';
     }

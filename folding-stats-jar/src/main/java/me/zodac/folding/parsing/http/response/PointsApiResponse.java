@@ -9,8 +9,8 @@ import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
  * Valid response:
  * <pre>
  *     {
- *         "earned": 97802740,
- *         "contributed": 76694831, <-- Value we are interested in
+ *         "earned": 97802740,      <-- This is the total points earned by the user+passkey combo, for all teams, which is what we want
+ *         "contributed": 76694831, <-- This is the total points earned by the user+passkey combo, but only for the specified team (can be null)
  *         "team_total": 5526874925,
  *         "team_name": "ExtremeHW",
  *         "team_url": "https://extremehw.net/",
@@ -22,23 +22,23 @@ import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
  */
 class PointsApiResponse implements Comparable<PointsApiResponse> {
 
-    private long contributed;
+    private long earned;
 
     public PointsApiResponse() {
 
     }
 
-    public long getContributed() {
-        return contributed;
+    public long getEarned() {
+        return earned;
     }
 
-    public void setContributed(final long contributed) {
-        this.contributed = contributed;
+    public void setEarned(final long earned) {
+        this.earned = earned;
     }
 
     @Override
     public int compareTo(final PointsApiResponse other) {
-        return Comparator.comparingLong(PointsApiResponse::getContributed)
+        return Comparator.comparingLong(PointsApiResponse::getEarned)
                 .compare(other, this);
     }
 
@@ -51,18 +51,18 @@ class PointsApiResponse implements Comparable<PointsApiResponse> {
             return false;
         }
         final PointsApiResponse that = (PointsApiResponse) o;
-        return contributed == that.contributed;
+        return earned == that.earned;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(contributed);
+        return Objects.hash(earned);
     }
 
     @Override
     public String toString() {
         return "PointsApiResponse::{" +
-                "points: " + formatWithCommas(contributed) +
+                "points: " + formatWithCommas(earned) +
                 '}';
     }
 }

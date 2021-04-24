@@ -17,24 +17,22 @@ import static me.zodac.folding.parsing.http.request.RequestSender.sendFoldingReq
 import static me.zodac.folding.parsing.http.response.ResponseParser.getPointsFromResponse;
 import static me.zodac.folding.parsing.http.response.ResponseParser.getUnitsFromResponse;
 
-// TODO: [zodac] Should not go straight to TC stats caches or PostgresDB, use StorageFacade to call parsing logic, then do persistence from caller
 public class FoldingStatsParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FoldingStatsParser.class);
 
     public static UserStats getStatsForUser(final User user) throws FoldingException {
-        LOGGER.debug("Getting stats for username/passkey '{}/{}' at team {}", user.getFoldingUserName(), user.getPasskey(), user.getFoldingTeamNumber());
+        LOGGER.debug("Getting stats for username/passkey '{}/{}'", user.getFoldingUserName(), user.getPasskey());
         final Timestamp currentUtcTime = TimeUtils.getCurrentUtcTimestamp();
-        final long userPoints = getPointsForUser(user.getFoldingUserName(), user.getPasskey(), user.getFoldingTeamNumber());
+        final long userPoints = getPointsForUser(user.getFoldingUserName(), user.getPasskey());
         final int userUnits = getUnitsForUser(user.getFoldingUserName(), user.getPasskey());
         return UserStats.create(user.getId(), currentUtcTime, Stats.create(userPoints, userUnits));
     }
 
-    public static long getPointsForUser(final String userName, final String passkey, final int foldingTeamNumber) throws FoldingException {
+    public static long getPointsForUser(final String userName, final String passkey) throws FoldingException {
         final String pointsRequestUrl = new PointsUrlBuilder()
                 .forUser(userName)
                 .withPasskey(passkey)
-                .atTeam(foldingTeamNumber)
                 .build();
 
         LOGGER.debug("Sending points request to: {}", pointsRequestUrl);
