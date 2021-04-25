@@ -1,11 +1,13 @@
-package me.zodac.folding.api.tc;
+package me.zodac.folding.api.tc.stats;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
 
-public class UserStatsOffset {
+public class UserStatsOffset implements Serializable {
 
+    private static final long serialVersionUID = 2093276973835873285L;
 
     private long pointsOffset;
     private int unitsOffset;

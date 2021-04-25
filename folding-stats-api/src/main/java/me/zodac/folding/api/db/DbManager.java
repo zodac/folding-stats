@@ -8,9 +8,10 @@ import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.tc.UserStatsOffset;
+import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
+import me.zodac.folding.api.tc.stats.UserStatsOffset;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 
 import java.time.LocalDate;
@@ -90,4 +91,8 @@ public interface DbManager {
     Map<Integer, UserStatsOffset> getOffsetStats(final List<Integer> userIds) throws FoldingException;
 
     void clearOffsetStats() throws FoldingConflictException, FoldingException;
+
+    int persistRetiredUserStats(final int teamId, final String displayUserName, final UserTcStats retiredUserStats) throws FoldingException;
+
+    RetiredUserTcStats getRetiredUserStats(final int retiredUserId) throws FoldingException;
 }

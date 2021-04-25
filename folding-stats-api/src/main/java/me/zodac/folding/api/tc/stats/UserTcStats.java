@@ -1,7 +1,5 @@
 package me.zodac.folding.api.tc.stats;
 
-import me.zodac.folding.api.tc.UserStatsOffset;
-
 import java.sql.Timestamp;
 import java.util.Objects;
 
@@ -36,7 +34,7 @@ public class UserTcStats {
         final long offsetPoints = Math.max(Math.round(tcStatsForUser.getMultipliedPoints() / multiplier), 0);
         final long offsetMultipliedPoints = Math.max(tcStatsForUser.getMultipliedPoints() + userStatsOffset.getPointsOffset(), 0);
         final int offsetUnits = Math.max(tcStatsForUser.getUnits() + userStatsOffset.getUnitsOffset(), 0);
-        
+
         return new UserTcStats(tcStatsForUser.getUserId(), tcStatsForUser.getTimestamp(), offsetPoints, offsetMultipliedPoints, offsetUnits);
     }
 

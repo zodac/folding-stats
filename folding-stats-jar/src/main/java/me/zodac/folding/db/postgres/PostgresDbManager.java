@@ -9,9 +9,10 @@ import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.tc.UserStatsOffset;
+import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
+import me.zodac.folding.api.tc.stats.UserStatsOffset;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.api.utils.EnvironmentVariables;
 import me.zodac.folding.api.utils.TimeUtils;
@@ -34,6 +35,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.TreeMap;
 
 public class PostgresDbManager implements DbManager {
@@ -182,7 +184,7 @@ public class PostgresDbManager implements DbManager {
             preparedStatement.setString(4, user.getCategory());
             preparedStatement.setInt(5, user.getHardwareId());
             preparedStatement.setString(6, user.getLiveStatsLink());
-            preparedStatement.setBoolean(6, user.isRetired());
+            preparedStatement.setBoolean(7, user.isRetired());
 
             LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
             try (final ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -190,9 +192,8 @@ public class PostgresDbManager implements DbManager {
                     final int foldingUserId = resultSet.getInt("user_id");
                     return User.updateWithId(foldingUserId, user);
                 }
-
-                throw new IllegalStateException("No ID was returned from the DB, but no exception was raised");
             }
+            throw new IllegalStateException("No ID was returned from the DB, but no exception was raised");
         } catch (final SQLException e) {
             if (e.getMessage().contains(VIOLATES_UNIQUE_CONSTRAINT)) {
                 throw new FoldingConflictException();
@@ -296,7 +297,7 @@ public class PostgresDbManager implements DbManager {
 
     @Override
     public Team createTeam(final Team team) throws FoldingException, FoldingConflictException {
-        final String insertSqlWithReturnId = "INSERT INTO teams (team_name, team_description, captain_user_id, user_ids) VALUES (?, ?, ?, ?) RETURNING team_id;";
+        final String insertSqlWithReturnId = "INSERT INTO teams (team_name, team_description, captain_user_id, user_ids, retired_user_ids) VALUES (?, ?, ?, ?, ?) RETURNING team_id;";
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
              final PreparedStatement preparedStatement = connection.prepareStatement(insertSqlWithReturnId)) {
@@ -305,6 +306,7 @@ public class PostgresDbManager implements DbManager {
             preparedStatement.setString(2, team.getTeamDescription());
             preparedStatement.setInt(3, team.getCaptainUserId());
             preparedStatement.setArray(4, connection.createArrayOf("INT", team.getUserIds().toArray(new Integer[0])));
+            preparedStatement.setArray(5, connection.createArrayOf("INT", team.getRetiredUserIds().toArray(new Integer[0])));
 
             LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
             try (final ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -368,7 +370,7 @@ public class PostgresDbManager implements DbManager {
     @Override
     public void updateTeam(final Team team) throws FoldingException, FoldingConflictException {
         final String updateSqlStatement = "UPDATE teams " +
-                "SET team_name = ?, team_description = ?, captain_user_id = ?, user_ids = ? " +
+                "SET team_name = ?, team_description = ?, captain_user_id = ?, user_ids = ?, retired_user_ids = ? " +
                 "WHERE team_id = ?;";
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
@@ -378,7 +380,8 @@ public class PostgresDbManager implements DbManager {
             preparedStatement.setString(2, team.getTeamDescription());
             preparedStatement.setInt(3, team.getCaptainUserId());
             preparedStatement.setArray(4, connection.createArrayOf("INT", team.getUserIds().toArray(new Integer[0])));
-            preparedStatement.setInt(5, team.getId());
+            preparedStatement.setArray(5, connection.createArrayOf("INT", team.getRetiredUserIds().toArray(new Integer[0])));
+            preparedStatement.setInt(6, team.getId());
 
             LOGGER.debug("Executing SQL statement '{}'", preparedStatement);
             if (preparedStatement.executeUpdate() == 0) {
@@ -684,7 +687,7 @@ public class PostgresDbManager implements DbManager {
     @Override
     public Stats getTotalStats(final int userId) throws FoldingException {
         LOGGER.debug("Getting total stats for user ID: {}", userId);
-        final String preparedSqlStatement = "SELECT (total_points, total_units) " +
+        final String preparedSqlStatement = "SELECT total_points, total_units " +
                 "FROM user_total_stats " +
                 "WHERE user_id = ? " +
                 "ORDER BY utc_timestamp DESC " +
@@ -792,6 +795,78 @@ public class PostgresDbManager implements DbManager {
         }
     }
 
+    @Override
+    public int persistRetiredUserStats(final int teamId, final String displayUserName, final UserTcStats retiredUserStats) throws FoldingException {
+        LOGGER.debug("Persisting retired user ID {} for team ID {}", retiredUserStats.getUserId(), teamId);
+        final String preparedInsertSqlStatement = "INSERT INTO retired_user_stats (user_id, team_id, display_username, utc_timestamp, final_points, final_multiplied_points, final_units) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id;";
+
+        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+             final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
+            try {
+                preparedStatement.setInt(1, retiredUserStats.getUserId());
+                preparedStatement.setInt(2, teamId);
+                preparedStatement.setString(3, displayUserName);
+                preparedStatement.setTimestamp(4, TimeUtils.getCurrentUtcTimestamp());
+                preparedStatement.setLong(5, retiredUserStats.getPoints());
+                preparedStatement.setLong(6, retiredUserStats.getMultipliedPoints());
+                preparedStatement.setInt(7, retiredUserStats.getUnits());
+
+                LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
+                try (final ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        return resultSet.getInt("id");
+                    }
+                }
+                throw new IllegalStateException("No ID was returned from the DB, but no exception was raised");
+            } catch (final SQLException e) {
+                LOGGER.warn("Unable to persist retired stats for user ID {} for team ID {}", retiredUserStats.getUserId(), teamId, e);
+                throw new FoldingException("Error persisting retired stats", e);
+            }
+        } catch (final SQLException e) {
+            throw new FoldingException("Error opening connection to the DB", e);
+        }
+    }
+
+    @Override
+    public RetiredUserTcStats getRetiredUserStats(final int retiredUserId) throws FoldingException {
+        LOGGER.debug("Getting retired user with ID: {} ", retiredUserId);
+        final String preparedInsertSqlStatement = "SELECT id, user_id, display_username, utc_timestamp, final_points, final_multiplied_points, final_units " +
+                "FROM retired_user_stats " +
+                "WHERE id = ? " +
+                "ORDER BY utc_timestamp DESC " +
+                "LIMIT 1;";
+
+        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+             final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
+            try {
+                preparedStatement.setInt(1, retiredUserId);
+
+                LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
+                try (final ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        return RetiredUserTcStats.create(
+                                resultSet.getInt("id"),
+                                resultSet.getString("display_username"),
+                                UserTcStats.create(
+                                        resultSet.getInt("user_id"),
+                                        resultSet.getTimestamp("utc_timestamp"),
+                                        resultSet.getLong("final_points"),
+                                        resultSet.getLong("final_multiplied_points"),
+                                        resultSet.getInt("final_units")
+                                )
+                        );
+                    }
+                }
+                throw new IllegalStateException("No ID was returned from the DB, but no exception was raised");
+            } catch (final SQLException e) {
+                LOGGER.warn("Unable to get retired stats for retired user ID {}", retiredUserId, e);
+                throw new FoldingException("Error persisting retired stats", e);
+            }
+        } catch (final SQLException e) {
+            throw new FoldingException("Error opening connection to the DB", e);
+        }
+    }
+
     private static Hardware createHardware(final ResultSet resultSet) throws SQLException {
         return Hardware.create(
                 resultSet.getInt("hardware_id"),
@@ -816,11 +891,13 @@ public class PostgresDbManager implements DbManager {
     }
 
     private static Team createTeam(final ResultSet resultSet) throws SQLException {
-        return new Team.Builder(resultSet.getString("team_name"))
-                .teamId(resultSet.getInt("team_id"))
-                .teamDescription(resultSet.getString("team_description"))
-                .captainUserId(resultSet.getInt("captain_user_id"))
-                .userIds(List.of((Integer[]) resultSet.getArray("user_ids").getArray()))
-                .createTeam();
+        return Team.create(
+                resultSet.getInt("team_id"),
+                resultSet.getString("team_name"),
+                resultSet.getString("team_description"),
+                resultSet.getInt("captain_user_id"),
+                Set.of((Integer[]) resultSet.getArray("user_ids").getArray()),
+                Set.of((Integer[]) resultSet.getArray("retired_user_ids").getArray())
+        );
     }
 }

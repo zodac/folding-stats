@@ -5,6 +5,8 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.cache.UserCache;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +19,8 @@ import static java.util.stream.Collectors.toList;
 
 public class TeamValidator {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(TeamValidator.class);
+
     private TeamValidator() {
 
     }
@@ -27,7 +31,7 @@ public class TeamValidator {
         if (StringUtils.isBlank(team.getTeamName())) {
             failureMessages.add("Attribute 'teamName' must not be empty");
         }
-        
+
         if (team.getCaptainUserId() <= User.EMPTY_USER_ID || UserCache.get().doesNotContain(team.getCaptainUserId())) {
             final List<String> availableUsers = UserCache.get()
                     .getAll()
@@ -89,6 +93,24 @@ public class TeamValidator {
                     failureMessages.add(String.format("Found %s users of category %s, only %s permitted", categoryAndCount.getValue(), categoryAndCount.getKey(), categoryAndCount.getKey().getPermittedAmount()));
                 }
             }
+        }
+
+        if (failureMessages.isEmpty()) {
+            return ValidationResponse.success();
+        }
+
+        return ValidationResponse.failure(team, failureMessages);
+    }
+
+    public static ValidationResponse isValidRetirement(final Team team, final int userId) {
+        final List<String> failureMessages = new ArrayList<>();
+
+        if (team.getCaptainUserId() == userId) {
+            failureMessages.add(String.format("Cannot retire captain (user ID: %s), update captain first", userId));
+        }
+
+        if (!team.getUserIds().contains(userId)) {
+            failureMessages.add(String.format("Cannot retire user ID %s, must be: %s", userId, team.getUserIds()));
         }
 
         if (failureMessages.isEmpty()) {

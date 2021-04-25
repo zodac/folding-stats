@@ -3,7 +3,6 @@ package me.zodac.folding.api.tc;
 import me.zodac.folding.api.Identifiable;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -15,68 +14,40 @@ public class Team implements Identifiable {
     private String teamName;
     private String teamDescription;
     private int captainUserId;
-    private Set<Integer> userIds;
+    private Set<Integer> userIds = new HashSet<>(0);
+    private Set<Integer> retiredUserIds = new HashSet<>(0);
 
     public Team() {
 
     }
 
 
-    public Team(final int id, final String teamName, final String teamDescription, final int captainUserId, final Set<Integer> userIds) {
+    public Team(final int id, final String teamName, final String teamDescription, final int captainUserId, final Set<Integer> userIds, final Set<Integer> retiredUserIds) {
         this.id = id;
         this.teamName = teamName;
         this.teamDescription = teamDescription;
         this.captainUserId = captainUserId;
         this.userIds = userIds;
+        this.retiredUserIds = retiredUserIds;
     }
 
-    public static class Builder {
-
-        private final String teamName;
-        private final Set<Integer> userIds = new HashSet<>();
-
-        private int teamId = 0;
-        private int captainUserId = 0;
-        private String teamDescription = "";
-
-
-        public Builder(final String teamName) {
-            this.teamName = teamName == null ? "" : teamName.trim();
-        }
-
-        public Builder teamId(final int id) {
-            this.teamId = id;
-            return this;
-        }
-
-        public Builder teamDescription(final String teamDescription) {
-            this.teamDescription = teamDescription == null ? "" : teamDescription.trim();
-            return this;
-        }
-
-        public Builder captainUserId(final int captainUserId) {
-            this.captainUserId = captainUserId;
-            userIds.add(captainUserId);
-            return this;
-        }
-
-        public Builder userId(final int userId) {
-            this.userIds.add(userId);
-            return this;
-        }
-
-        public Builder userIds(final List<Integer> userIds) {
-            this.userIds.addAll(userIds);
-            return this;
-        }
-
-        public Team createTeam() {
-            return new Team(teamId, teamName, teamDescription, captainUserId, userIds);
-        }
+    public static Team create(final int id, final String teamName, final String teamDescription, final int captainUserId, final Set<Integer> userIds, final Set<Integer> retiredUserStats) {
+        return new Team(id, teamName, teamDescription, captainUserId, userIds, retiredUserStats);
     }
 
     public static Team updateWithId(final int teamId, final Team team) {
-        return new Team(teamId, team.teamName, team.teamDescription, team.captainUserId, team.userIds);
+        return new Team(teamId, team.teamName, team.teamDescription, team.captainUserId, team.userIds, team.retiredUserIds);
+    }
+
+
+    public static Team retireUser(final Team team, final int userId, final int retiredUserId) {
+        final Set<Integer> updateUserIds = new HashSet<>(team.getUserIds());
+        updateUserIds.remove(userId);
+
+        final Set<Integer> retiredUserStats = new HashSet<>(team.getRetiredUserIds());
+        retiredUserStats.add(retiredUserId);
+
+        return new Team(team.id, team.teamName, team.teamDescription, team.captainUserId, updateUserIds, retiredUserStats);
     }
 
     @Override
@@ -120,6 +91,10 @@ public class Team implements Identifiable {
         this.userIds = userIds;
     }
 
+    public Set<Integer> getRetiredUserIds() {
+        return retiredUserIds;
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (this == o) {
@@ -129,12 +104,12 @@ public class Team implements Identifiable {
             return false;
         }
         final Team team = (Team) o;
-        return id == team.id && captainUserId == team.captainUserId && Objects.equals(teamName, team.teamName) && Objects.equals(teamDescription, team.teamDescription) && Objects.equals(userIds, team.userIds);
+        return id == team.id && captainUserId == team.captainUserId && Objects.equals(teamName, team.teamName) && Objects.equals(teamDescription, team.teamDescription) && Objects.equals(userIds, team.userIds) && Objects.equals(retiredUserIds, team.retiredUserIds);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, teamName, teamDescription, captainUserId, userIds);
+        return Objects.hash(id, teamName, teamDescription, captainUserId, userIds, retiredUserIds);
     }
 
 
@@ -146,6 +121,7 @@ public class Team implements Identifiable {
                 ", teamDescription: '" + teamDescription + "'" +
                 ", captainUserId: " + captainUserId +
                 ", userIds: " + userIds +
+                ", retiredUserIds: " + retiredUserIds +
                 '}';
     }
 }

@@ -13,13 +13,16 @@ import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.OperatingSystem;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.tc.UserStatsOffset;
+import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
+import me.zodac.folding.api.tc.stats.UserStatsOffset;
 import me.zodac.folding.api.tc.stats.UserTcStats;
+import me.zodac.folding.api.utils.TimeUtils;
 import me.zodac.folding.cache.HardwareCache;
 import me.zodac.folding.cache.InitialStatsCache;
 import me.zodac.folding.cache.OffsetStatsCache;
+import me.zodac.folding.cache.RetiredTcStatsCache;
 import me.zodac.folding.cache.TcStatsCache;
 import me.zodac.folding.cache.TeamCache;
 import me.zodac.folding.cache.TotalStatsCache;
@@ -40,7 +43,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * In order to decouple the REST layer from the storage/persistence, we use this {@link StorageFacade} instead.
@@ -49,6 +52,7 @@ import static java.util.stream.Collectors.toList;
  * does not need to know about them or any DBs being used.
  */
 // TODO: [zodac] Should replace the cache miss warnings with some metrics instead?
+// TODO: [zodac] Split into one Facade for POJOs and one for stats?
 @Singleton
 public class StorageFacade {
 
@@ -61,6 +65,7 @@ public class StorageFacade {
 
     private final InitialStatsCache initialStatsCache = InitialStatsCache.get();
     private final OffsetStatsCache offsetStatsCache = OffsetStatsCache.get();
+    private final RetiredTcStatsCache retiredStatsCache = RetiredTcStatsCache.get();
     private final TcStatsCache tcStatsCache = TcStatsCache.get();
     private final TotalStatsCache totalStatsCache = TotalStatsCache.get();
 
@@ -125,35 +130,6 @@ public class StorageFacade {
         offsetStatsCache.add(userWithId.getId(), UserStatsOffset.empty());
 
         return userWithId;
-    }
-
-    public void persistInitialUserStats(final User user) throws FoldingException {
-        final UserStats currentUserStats = FoldingStatsParser.getStatsForUser(user);
-        persistInitialUserStats(currentUserStats);
-    }
-
-    public void persistInitialUserStats(final UserStats userStats) throws FoldingException {
-        dbManager.persistInitialUserStats(userStats);
-        initialStatsCache.add(userStats.getUserId(), userStats.getStats());
-    }
-
-    public Stats getInitialStatsForUser(final int userId) throws UserNotFoundException, FoldingException {
-        return dbManager.getInitialUserStats(userId);
-    }
-
-    public Map<Integer, Stats> getInitialStatsForUsers(final List<Integer> userIds) throws FoldingException {
-        final Map<Integer, Stats> cachedInitialStats = new HashMap<>(userIds.size());
-        for (final int userId : userIds) {
-            final Optional<Stats> optionalStats = initialStatsCache.get(userId);
-            optionalStats.ifPresent(stats -> cachedInitialStats.put(userId, stats));
-        }
-
-        if (cachedInitialStats.size() == userIds.size()) {
-            return cachedInitialStats;
-        }
-
-        LOGGER.debug("Found {} cached initial stats for {} user IDs, checking DB instead", cachedInitialStats.size(), userIds.size());
-        return dbManager.getInitialUserStats(userIds);
     }
 
 
@@ -260,14 +236,74 @@ public class StorageFacade {
         teamCache.remove(teamId);
     }
 
-    public List<User> getActiveTcUsers(final List<Team> teams) {
+    public RetiredUserTcStats getRetiredUser(final int retiredUserId) throws FoldingException {
+        final Optional<RetiredUserTcStats> optionalRetiredUserStats = retiredStatsCache.get(retiredUserId);
+
+        if (optionalRetiredUserStats.isPresent()) {
+            return optionalRetiredUserStats.get();
+        }
+
+        LOGGER.debug("Cache miss! Retired user TC stats");
+        // Should be no need to get anything from the DB (since it should have been added to the cache when created)
+        // But adding this just in case we decide to add some cache eviction in future
+        final RetiredUserTcStats retiredUserTcStatsFromDb = dbManager.getRetiredUserStats(retiredUserId);
+        retiredStatsCache.add(retiredUserTcStatsFromDb);
+        return retiredUserTcStatsFromDb;
+    }
+
+    public void persistRetiredUser(final int teamId, final int userId) throws FoldingConflictException, UserNotFoundException, FoldingException, TeamNotFoundException {
+        final User retiredUser = User.retireUser(getUser(userId));
+        dbManager.updateUser(retiredUser);
+        userCache.add(retiredUser);
+
+        final UserTcStats userStats = getTcStatsForUser(retiredUser.getId());
+        final int retiredUserId = dbManager.persistRetiredUserStats(teamId, retiredUser.getDisplayName(), userStats);
+        retiredStatsCache.add(RetiredUserTcStats.create(retiredUserId, retiredUser.getDisplayName(), userStats));
+        updateInitialStatsForUser(retiredUser);
+
+        final Team team = getTeam(teamId);
+        final Team updatedTeam = Team.retireUser(team, userStats.getUserId(), retiredUserId);
+        dbManager.updateTeam(team);
+        teamCache.add(updatedTeam);
+    }
+
+    public void persistInitialUserStats(final User user) throws FoldingException {
+        final UserStats currentUserStats = FoldingStatsParser.getStatsForUser(user);
+        persistInitialUserStats(currentUserStats);
+    }
+
+    public void persistInitialUserStats(final UserStats userStats) throws FoldingException {
+        dbManager.persistInitialUserStats(userStats);
+        initialStatsCache.add(userStats.getUserId(), userStats.getStats());
+    }
+
+    public Stats getInitialStatsForUser(final int userId) throws UserNotFoundException, FoldingException {
+        return dbManager.getInitialUserStats(userId);
+    }
+
+    public Map<Integer, Stats> getInitialStatsForUsers(final List<Integer> userIds) throws FoldingException {
+        final Map<Integer, Stats> cachedInitialStats = new HashMap<>(userIds.size());
+        for (final int userId : userIds) {
+            final Optional<Stats> optionalStats = initialStatsCache.get(userId);
+            optionalStats.ifPresent(stats -> cachedInitialStats.put(userId, stats));
+        }
+
+        if (cachedInitialStats.size() == userIds.size()) {
+            return cachedInitialStats;
+        }
+
+        LOGGER.debug("Found {} cached initial stats for {} user IDs, checking DB instead", cachedInitialStats.size(), userIds.size());
+        return dbManager.getInitialUserStats(userIds);
+    }
+
+    public Map<Integer, User> getActiveTcUsers(final List<Team> teams) {
         return teams
                 .stream()
                 .map(Team::getUserIds)
                 .flatMap(Collection::stream)
                 .map(userId -> UserCache.get().getOrNull(userId))
                 .filter(user -> Objects.nonNull(user) && !user.isRetired())
-                .collect(toList());
+                .collect(toMap(User::getId, user -> user));
     }
 
     public void persistHourlyTcUserStats(final List<UserTcStats> tcStatsForUsers) throws FoldingException {
@@ -347,5 +383,24 @@ public class StorageFacade {
         final Stats userTotalStatsFromDb = dbManager.getTotalStats(userId);
         totalStatsCache.add(userId, userTotalStatsFromDb);
         return userTotalStatsFromDb;
+    }
+
+    public void updateInitialStatsForUser(final User user) throws UserNotFoundException, FoldingException {
+        // Retrieve the initial stats for the user, and the current month's TC stats. We need both because if the user started
+        // the competition but earned no points, we cannot simply use the current month's TC stats (which would both be 0).
+        LOGGER.info("Updating initial stats for user: {}", user);
+        LOGGER.info("Current method (initial_stats+tc_stats)");
+        final Stats initialStats = getInitialStatsForUser(user.getId());
+        final UserTcStats currentTcStats = getTcStatsForUser(user.getId());
+        final Stats currentAndInitialStats = Stats.create(initialStats.getPoints() + currentTcStats.getPoints(), initialStats.getUnits() + currentTcStats.getUnits());
+        LOGGER.info("Finished current method (initial_stats+tc_stats): {}", currentAndInitialStats);
+
+        // TODO: [zodac] Couldn't I just use the total stats, instead of adding initial+tc (two DB calls)?
+        LOGGER.info("Potential method (total_stats)");
+        final Stats totalStats = getTotalStatsForUser(user.getId());
+        LOGGER.info("Finished new method (total_stats: {}", totalStats);
+
+        persistInitialUserStats(UserStats.create(user.getId(), TimeUtils.getCurrentUtcTimestamp(), currentAndInitialStats));
+        LOGGER.info("Done updating");
     }
 }

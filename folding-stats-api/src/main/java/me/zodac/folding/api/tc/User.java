@@ -43,6 +43,10 @@ public class User implements Identifiable {
         return new User(userId, user.foldingUserName, user.displayName, user.passkey, user.category, user.hardwareId, user.liveStatsLink, user.isRetired);
     }
 
+    public static User retireUser(final User user) {
+        return new User(user.id, user.foldingUserName, user.displayName, user.passkey, user.category, user.hardwareId, user.liveStatsLink, true);
+    }
+
     @Override
     public int getId() {
         return id;
@@ -98,6 +102,10 @@ public class User implements Identifiable {
 
     public void setLiveStatsLink(final String liveStatsLink) {
         this.liveStatsLink = liveStatsLink == null ? null : liveStatsLink.trim();
+    }
+
+    public boolean isActive() {
+        return !isRetired();
     }
 
     public boolean isRetired() {

@@ -1,7 +1,7 @@
 package me.zodac.folding.cache;
 
 
-import me.zodac.folding.api.tc.UserStatsOffset;
+import me.zodac.folding.api.tc.stats.UserStatsOffset;
 
 import java.util.HashMap;
 import java.util.Map;

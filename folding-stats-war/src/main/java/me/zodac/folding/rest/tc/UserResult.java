@@ -1,5 +1,10 @@
 package me.zodac.folding.rest.tc;
 
+import me.zodac.folding.api.tc.Category;
+import me.zodac.folding.api.tc.Hardware;
+import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
+
 import java.util.Objects;
 
 import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
@@ -17,12 +22,13 @@ public class UserResult {
     private long units;
     private int rankInTeam;
     private String liveStatsLink;
+    private boolean isRetired;
 
     public UserResult() {
 
     }
 
-    private UserResult(final String userName, final String hardware, final String category, final long points, final long multipliedPoints, final long units, final int rankInTeam, final String liveStatsLink) {
+    private UserResult(final String userName, final String hardware, final String category, final long points, final long multipliedPoints, final long units, final int rankInTeam, final String liveStatsLink, final boolean isRetired) {
         this.userName = userName;
         this.hardware = hardware;
         this.category = category;
@@ -31,21 +37,26 @@ public class UserResult {
         this.units = units;
         this.rankInTeam = rankInTeam;
         this.liveStatsLink = liveStatsLink;
+        this.isRetired = isRetired;
     }
 
     // Not ranked to begin with, will be updated by the calling class
-    public static UserResult create(final String userName, final String hardware, final String category, final long points, final long pointsWithoutMultiplier, final long units, final String liveStatsLink) {
-        return new UserResult(userName, hardware, category, points, pointsWithoutMultiplier, units, DEFAULT_USER_RANK, liveStatsLink);
+    public static UserResult create(final String userName, final String hardware, final String category, final long points, final long pointsWithoutMultiplier, final long units, final String liveStatsLink, final boolean isRetired) {
+        return new UserResult(userName, hardware, category, points, pointsWithoutMultiplier, units, DEFAULT_USER_RANK, liveStatsLink, isRetired);
     }
 
     public static UserResult empty(final String userName, final String hardware, final String category, final String liveStatsLink) {
-        return new UserResult(userName, hardware, category, 0L, 0L, 0, DEFAULT_USER_RANK, liveStatsLink);
+        return new UserResult(userName, hardware, category, 0L, 0L, 0, DEFAULT_USER_RANK, liveStatsLink, false);
     }
 
     public static UserResult updateWithRankInTeam(final UserResult userResult, final int teamRank) {
-        return new UserResult(userResult.userName, userResult.hardware, userResult.category, userResult.points, userResult.multipliedPoints,
-                userResult.units, teamRank, userResult.liveStatsLink);
+        return new UserResult(userResult.userName, userResult.hardware, userResult.category, userResult.points, userResult.multipliedPoints, userResult.units, teamRank, userResult.liveStatsLink, userResult.isRetired);
     }
+
+    public static UserResult createForRetiredUser(final User retiredUser, final Hardware retiredUserHardware, final RetiredUserTcStats retiredUserTcStats) {
+        return new UserResult(retiredUserTcStats.getDisplayUserName(), retiredUserHardware.getDisplayName(), Category.get(retiredUser.getCategory()).getDisplayName(), retiredUserTcStats.getPoints(), retiredUserTcStats.getMultipliedPoints(), retiredUserTcStats.getUnits(), DEFAULT_USER_RANK, retiredUser.getLiveStatsLink(), true);
+    }
+
 
     public String getUserName() {
         return userName;
@@ -111,6 +122,18 @@ public class UserResult {
         this.liveStatsLink = liveStatsLink;
     }
 
+    public boolean isActive() {
+        return !isRetired();
+    }
+
+    public boolean isRetired() {
+        return isRetired;
+    }
+
+    public void setIsRetired(final boolean isRetired) {
+        this.isRetired = isRetired;
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (this == o) {
@@ -120,12 +143,12 @@ public class UserResult {
             return false;
         }
         final UserResult that = (UserResult) o;
-        return points == that.points && multipliedPoints == that.multipliedPoints && units == that.units && rankInTeam == that.rankInTeam && Objects.equals(userName, that.userName) && Objects.equals(hardware, that.hardware) && Objects.equals(category, that.category) && Objects.equals(liveStatsLink, that.liveStatsLink);
+        return points == that.points && multipliedPoints == that.multipliedPoints && units == that.units && rankInTeam == that.rankInTeam && Objects.equals(userName, that.userName) && Objects.equals(hardware, that.hardware) && Objects.equals(category, that.category) && Objects.equals(liveStatsLink, that.liveStatsLink) && isRetired == that.isRetired;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(userName, hardware, category, points, multipliedPoints, units, rankInTeam, liveStatsLink);
+        return Objects.hash(userName, hardware, category, points, multipliedPoints, units, rankInTeam, liveStatsLink, isRetired);
     }
 
     @Override
@@ -139,6 +162,7 @@ public class UserResult {
                 ", units: " + formatWithCommas(units) +
                 ", rankInTeam: " + rankInTeam +
                 ", liveStatsLink: '" + liveStatsLink + "'" +
+                ", isRetired: " + isRetired +
                 '}';
     }
 }

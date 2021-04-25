@@ -24,13 +24,6 @@
 
 
 
-
-
-
-
-
-
-
     </style>
 </head>
 
@@ -228,13 +221,13 @@
             for (i = 1; i <= numberOfTeams; i++) {
                 $("#team_"+i+"_metadata").mirandajs(jsonResponseTeams[i-1]);
                 $("#team_"+i+"_stats").mirandajs(jsonResponseTeams[i-1]);
-                $("#team_"+i+"_user_data").mirandajs(jsonResponseTeams[i-1]['users']);
+                $("#team_"+i+"_user_data").mirandajs(jsonResponseTeams[i-1]['activeUsers']);
+                $("#team_"+i+"_retired_user_data").mirandajs(jsonResponseTeams[i-1]['retiredUsers']);
 
                 var points = document.getElementById("team_"+i+"_points");
                 $("#team_"+i+"_points").text(parseInt(points.innerHTML).toLocaleString());
                 var units = document.getElementById("team_"+i+"_units");
                 $("#team_"+i+"_units").text(parseInt(units.innerHTML).toLocaleString());
-                var units = document.getElementById("team_"+i+"_units");
             }
 
             return jsonResponseTeams;
@@ -358,13 +351,6 @@
 
 
 
-
-
-
-
-
-
-
 </script>
 
 
@@ -471,6 +457,7 @@
             <th onclick="sortTable(2, 'teams')" style="cursor:pointer" scope="col">Description</th>
             <th onclick="sortTable(3, 'teams')" style="cursor:pointer" scope="col">Captain User ID</th>
             <th onclick="sortTable(4, 'teams')" style="cursor:pointer" scope="col">User IDs</th>
+            <th onclick="sortTable(5, 'teams')" style="cursor:pointer" scope="col">Retired User IDs</th>
         </tr>
         </thead>
         <tbody id="teams_data">
@@ -480,6 +467,7 @@
             <td>[[teamDescription]]</td>
             <td>[[captainUserId]]</td>
             <td>[[userIds]]</td>
+            <td>[[retiredUserIds]]</td>
         </tr>
         </tbody>
     </table>
@@ -488,6 +476,7 @@
 <!-- Copy/pasting the same div/table structure for each team, since I don't know how to dynamically generate them based -->
 <!-- off the miranda-js output. I'm sure there's a way, but fucked if I know it... -->
 <div class="collapse show" id="stats_div">
+    <h2 class="navbar-brand">Overall Stats</h2>
     <table class="table table-striped table-hover" id="stats" border="1">
         <thead>
         <tr>
@@ -536,6 +525,16 @@
                     <td class="team_user_units">[[units]]</td>
                 </tr>
                 </tbody>
+                <tbody id="team_1_retired_user_data">
+                <tr>
+                    <td>[[rankInTeam]]</td>
+                    <td>[[userName]] (retired)</td>
+                    <td>[[category]]</td>
+                    <td>[[hardware]]</td>
+                    <td class="team_user_points">[[multipliedPoints]]</td>
+                    <td class="team_user_units">[[units]]</td>
+                </tr>
+                </tbody>
             </table>
         </div>
     </div>
@@ -568,6 +567,16 @@
                 <tr>
                     <td>[[rankInTeam]]</td>
                     <td>[[userName]]</td>
+                    <td>[[category]]</td>
+                    <td>[[hardware]]</td>
+                    <td class="team_user_points">[[multipliedPoints]]</td>
+                    <td class="team_user_units">[[units]]</td>
+                </tr>
+                </tbody>
+                <tbody id="team_2_retired_user_data">
+                <tr>
+                    <td>[[rankInTeam]]</td>
+                    <td>[[userName]] (retired)</td>
                     <td>[[category]]</td>
                     <td>[[hardware]]</td>
                     <td class="team_user_points">[[multipliedPoints]]</td>
@@ -612,6 +621,16 @@
                     <td class="team_user_units">[[units]]</td>
                 </tr>
                 </tbody>
+                <tbody id="team_3_retired_user_data">
+                <tr>
+                    <td>[[rankInTeam]]</td>
+                    <td>[[userName]] (retired)</td>
+                    <td>[[category]]</td>
+                    <td>[[hardware]]</td>
+                    <td class="team_user_points">[[multipliedPoints]]</td>
+                    <td class="team_user_units">[[units]]</td>
+                </tr>
+                </tbody>
             </table>
         </div>
     </div>
@@ -644,6 +663,16 @@
                 <tr>
                     <td>[[rankInTeam]]</td>
                     <td>[[userName]]</td>
+                    <td>[[category]]</td>
+                    <td>[[hardware]]</td>
+                    <td class="team_user_points">[[multipliedPoints]]</td>
+                    <td class="team_user_units">[[units]]</td>
+                </tr>
+                </tbody>
+                <tbody id="team_4_retired_user_data">
+                <tr>
+                    <td>[[rankInTeam]]</td>
+                    <td>[[userName]] (retired)</td>
                     <td>[[category]]</td>
                     <td>[[hardware]]</td>
                     <td class="team_user_points">[[multipliedPoints]]</td>

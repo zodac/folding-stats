@@ -6,7 +6,7 @@ import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.tc.UserStatsOffset;
+import me.zodac.folding.api.tc.stats.UserStatsOffset;
 import me.zodac.folding.bean.TeamCompetitionStatsParser;
 import me.zodac.folding.validator.UserValidator;
 import me.zodac.folding.validator.ValidationResponse;
@@ -82,7 +82,6 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateUserById(@PathParam("userId") final String userId, final User user) {
-        LOGGER.info("Received user for update: {}", user);
         return super.updateById(userId, user);
     }
 
@@ -98,7 +97,7 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateUserWithOffset(@PathParam("userId") final String userId, final UserStatsOffset userStatsOffset) {
-        getLogger().info("PATCH request for {} received at '{}': {}", elementType(), uriContext.getAbsolutePath(), userStatsOffset);
+        getLogger().info("PATCH request to update offset for user received at '{}': {}", uriContext.getAbsolutePath(), userStatsOffset);
 
         try {
             storageFacade.addOffsetStats(Integer.parseInt(userId), userStatsOffset);
@@ -110,13 +109,13 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
             getLogger().error(errorMessage);
             return badRequest(errorMessage);
         } catch (final UserNotFoundException e) {
-            getLogger().error("Error finding {} with ID: {}", elementType(), userId, e.getCause());
+            getLogger().error("Error finding user with ID: {}", userId, e.getCause());
             return notFound();
         } catch (final FoldingException e) {
-            getLogger().error("Error updating {} with ID: {}", elementType(), userId, e.getCause());
+            getLogger().error("Error updating user with ID: {}", userId, e.getCause());
             return serverError();
         } catch (final Exception e) {
-            getLogger().error("Unexpected error updating {} with ID: {}", elementType(), userId, e);
+            getLogger().error("Unexpected error updating user with ID: {}", userId, e);
             return serverError();
         }
     }

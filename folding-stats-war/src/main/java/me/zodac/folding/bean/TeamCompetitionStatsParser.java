@@ -6,9 +6,9 @@ import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.tc.UserStatsOffset;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
+import me.zodac.folding.api.tc.stats.UserStatsOffset;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.api.utils.EnvironmentVariables;
 import me.zodac.folding.parsing.FoldingStatsParser;
@@ -27,6 +27,7 @@ import javax.ejb.Timer;
 import javax.ejb.TimerService;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -84,15 +85,16 @@ public class TeamCompetitionStatsParser {
                 return;
             }
 
-            final List<User> tcUsers = storageFacade.getActiveTcUsers(tcTeams);
+            final Map<Integer, User> tcUserById = storageFacade.getActiveTcUsers(tcTeams);
 
-            if (tcUsers.isEmpty()) {
+            if (tcUserById.isEmpty()) {
                 LOGGER.warn("No TC users configured in system!");
                 return;
             }
 
             try {
-                updateTcStatsForUsers(tcUsers);
+                // TODO: [zodac] Scaling up, this should probably be done in separate threads (and async)
+                updateTcStatsForUsers(tcUserById.values());
                 LOGGER.info("Finished parsing");
                 LOGGER.info("");
             } catch (final FoldingException e) {
@@ -118,7 +120,7 @@ public class TeamCompetitionStatsParser {
         updateTcStatsForUsers(users);
     }
 
-    private void updateTcStatsForUsers(final List<User> users) throws FoldingException {
+    private void updateTcStatsForUsers(final Collection<User> users) throws FoldingException {
         final Map<Integer, User> userById = users.stream().collect(toMap(User::getId, user -> user));
         final Map<Integer, Double> hardwareMultiplierById = storageFacade.getAllHardware().stream().collect(toMap(Hardware::getId, Hardware::getMultiplier));
         final List<UserStats> stats = getTotalStatsForUsers(users);
@@ -174,7 +176,7 @@ public class TeamCompetitionStatsParser {
         }
     }
 
-    private List<UserStats> getTotalStatsForUsers(final List<User> users) {
+    private List<UserStats> getTotalStatsForUsers(final Collection<User> users) {
         final List<UserStats> stats = new ArrayList<>(users.size());
 
         for (final User user : users) {

@@ -17,34 +17,42 @@ public class TeamResult {
     private int teamUnits;
     private long teamPoints;
     private long teamMultipliedPoints;
-    private List<UserResult> users;
+    private List<UserResult> activeUsers;
+    private List<UserResult> retiredUsers;
 
     public TeamResult() {
 
     }
 
-    private TeamResult(final String teamName, final String captainName, final List<UserResult> users, final int teamUnits, final long teamPoints, final long teamMultipliedPoints, final int rank) {
+    private TeamResult(final String teamName, final String captainName, final List<UserResult> activeUsers, final List<UserResult> retiredUsers, final int teamUnits, final long teamPoints, final long teamMultipliedPoints, final int rank) {
         this.teamName = teamName;
         this.captainName = captainName;
-        this.users = users;
+        this.activeUsers = activeUsers;
+        this.retiredUsers = retiredUsers;
         this.teamUnits = teamUnits;
         this.teamPoints = teamPoints;
         this.teamMultipliedPoints = teamMultipliedPoints;
         this.rank = rank;
     }
 
-    public static TeamResult create(final String teamName, final String captainName, final List<UserResult> users) {
+    public static TeamResult create(final String teamName, final String captainName, final List<UserResult> activeUsers, final List<UserResult> retiredUsers) {
         int teamUnits = 0;
         long teamPoints = 0L;
         long teamMultipliedPoints = 0L;
 
-        for (final UserResult user : users) {
-            teamUnits += user.getUnits();
-            teamPoints += user.getPoints();
-            teamMultipliedPoints += user.getMultipliedPoints();
+        for (final UserResult activeUser : activeUsers) {
+            teamUnits += activeUser.getUnits();
+            teamPoints += activeUser.getPoints();
+            teamMultipliedPoints += activeUser.getMultipliedPoints();
         }
 
-        final List<UserResult> rankedUsers = users
+        for (final UserResult retired : retiredUsers) {
+            teamUnits += retired.getUnits();
+            teamPoints += retired.getPoints();
+            teamMultipliedPoints += retired.getMultipliedPoints();
+        }
+
+        final List<UserResult> rankedActiveUsers = activeUsers
                 .stream()
                 .sorted(Comparator.comparingLong(UserResult::getMultipliedPoints).reversed())
                 .collect(new IntegerRankingCollector<>(
@@ -53,12 +61,23 @@ public class TeamResult {
                         UserResult::updateWithRankInTeam)
                 );
 
+        final List<UserResult> rankedRetiredUsers = retiredUsers
+                .stream()
+                .sorted(Comparator.comparingLong(UserResult::getMultipliedPoints).reversed())
+                .collect(new IntegerRankingCollector<>(
+                        Comparator.comparingLong(UserResult::getMultipliedPoints),
+                        UserResult::getRankInTeam,
+                        // TODO: [zodac] This isn't working as planned, look into it
+                        (userResult, teamRank) -> UserResult.updateWithRankInTeam(userResult, (teamRank + activeUsers.size())))  // Offset the retired user ranks so they are after the active users
+                );
+
         // Not ranked to begin with, will be updated by the calling class
-        return new TeamResult(teamName, captainName, rankedUsers, teamUnits, teamPoints, teamMultipliedPoints, DEFAULT_TEAM_RANK);
+        return new TeamResult(teamName, captainName, rankedActiveUsers, rankedRetiredUsers, teamUnits, teamPoints, teamMultipliedPoints, DEFAULT_TEAM_RANK);
     }
 
+
     public static TeamResult updateWithRank(final TeamResult teamResult, final int rank) {
-        return new TeamResult(teamResult.teamName, teamResult.captainName, teamResult.users, teamResult.teamUnits, teamResult.teamPoints, teamResult.teamMultipliedPoints, rank);
+        return new TeamResult(teamResult.teamName, teamResult.captainName, teamResult.activeUsers, teamResult.retiredUsers, teamResult.teamUnits, teamResult.teamPoints, teamResult.teamMultipliedPoints, rank);
     }
 
     public String getTeamName() {
@@ -77,12 +96,20 @@ public class TeamResult {
         this.captainName = captainName;
     }
 
-    public List<UserResult> getUsers() {
-        return users;
+    public List<UserResult> getActiveUsers() {
+        return activeUsers;
     }
 
-    public void setUsers(final List<UserResult> users) {
-        this.users = users;
+    public void setActiveUsers(final List<UserResult> activeUsers) {
+        this.activeUsers = activeUsers;
+    }
+
+    public List<UserResult> getRetiredUsers() {
+        return retiredUsers;
+    }
+
+    public void setRetiredUsers(final List<UserResult> retiredUsers) {
+        this.retiredUsers = retiredUsers;
     }
 
     public int getTeamUnits() {
@@ -126,12 +153,12 @@ public class TeamResult {
             return false;
         }
         final TeamResult that = (TeamResult) o;
-        return teamUnits == that.teamUnits && teamPoints == that.teamPoints && teamMultipliedPoints == that.teamMultipliedPoints && rank == that.rank && Objects.equals(teamName, that.teamName) && Objects.equals(captainName, that.captainName) && Objects.equals(users, that.users);
+        return teamUnits == that.teamUnits && teamPoints == that.teamPoints && teamMultipliedPoints == that.teamMultipliedPoints && rank == that.rank && Objects.equals(teamName, that.teamName) && Objects.equals(captainName, that.captainName) && Objects.equals(activeUsers, that.activeUsers) && Objects.equals(retiredUsers, that.retiredUsers);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(teamName, captainName, users, teamUnits, teamPoints, teamMultipliedPoints, rank);
+        return Objects.hash(teamName, captainName, activeUsers, retiredUsers, teamUnits, teamPoints, teamMultipliedPoints, rank);
     }
 
     @Override
@@ -139,7 +166,8 @@ public class TeamResult {
         return "TeamResult::{" +
                 "teamName: '" + teamName + "'" +
                 ", captainName: '" + captainName + "'" +
-                ", users: " + users +
+                ", activeUsers: " + activeUsers +
+                ", retiredUsers: " + retiredUsers +
                 ", teamUnits: " + formatWithCommas(teamUnits) +
                 ", teamPoints: " + formatWithCommas(teamPoints) +
                 ", teamMultipliedPoints: " + formatWithCommas(teamMultipliedPoints) +

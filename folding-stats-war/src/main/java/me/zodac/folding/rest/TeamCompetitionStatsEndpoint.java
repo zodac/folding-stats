@@ -8,6 +8,7 @@ import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.bean.TcCacheResetScheduler;
 import me.zodac.folding.bean.TeamCompetitionStatsParser;
@@ -30,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import static java.util.stream.Collectors.toList;
 import static me.zodac.folding.rest.response.Responses.noContent;
@@ -96,7 +98,7 @@ public class TeamCompetitionStatsEndpoint {
             final List<TeamResult> teamResults = new ArrayList<>(teams.size());
 
             for (final Team team : teams) {
-                teamResults.add(convertFoldingTeamToTcTeam(team));
+                teamResults.add(getTcTeamResult(team));
             }
 
             return teamResults;
@@ -106,7 +108,7 @@ public class TeamCompetitionStatsEndpoint {
         }
     }
 
-    private TeamResult convertFoldingTeamToTcTeam(final Team team) throws FoldingException {
+    private TeamResult getTcTeamResult(final Team team) throws FoldingException {
         LOGGER.info("Converting team '{}' for TC stats", team.getTeamName());
 
         final List<UserResult> userResults = team.getUserIds()
@@ -117,13 +119,27 @@ public class TeamCompetitionStatsEndpoint {
 
         try {
             final User captain = storageFacade.getUser(team.getCaptainUserId());
-            return TeamResult.create(team.getTeamName(), captain.getDisplayName(), userResults);
+            final Set<Integer> retiredUserIds = team.getRetiredUserIds();
+
+            final List<UserResult> retiredUserResults = new ArrayList<>(retiredUserIds.size());
+
+            for (final int retiredUserId : retiredUserIds) {
+                final RetiredUserTcStats retiredUserTcStats = storageFacade.getRetiredUser(retiredUserId);
+                final User retiredUser = storageFacade.getUser(retiredUserTcStats.getUserId());
+                final Hardware retiredUserHardware = storageFacade.getHardware(retiredUser.getHardwareId());
+                retiredUserResults.add(UserResult.createForRetiredUser(retiredUser, retiredUserHardware, retiredUserTcStats));
+            }
+            
+            return TeamResult.create(team.getTeamName(), captain.getDisplayName(), userResults, retiredUserResults);
         } catch (final FoldingException e) {
             LOGGER.warn("Unable to get details for team captain: {}", team, e);
             throw e;
         } catch (final UserNotFoundException e) {
-            LOGGER.warn("Captain user ID not found, unexpected error: {}", team, e);
-            throw new FoldingException(String.format("Captain user ID not found: %s", team), e);
+            LOGGER.warn("User ID not found, unexpected error: {}", team, e);
+            throw new FoldingException(String.format("User ID not found: %s", team), e);
+        } catch (final HardwareNotFoundException e) {
+            LOGGER.warn("Hardware ID not found for retired user, unexpected error: {}", team, e);
+            throw new FoldingException(String.format("Hardware ID not found for retired user: %s", team), e);
         }
     }
 
@@ -170,7 +186,7 @@ public class TeamCompetitionStatsEndpoint {
         try {
             final UserTcStats userTcStats = storageFacade.getTcStatsForUser(user.getId());
             LOGGER.debug("Results for {}: {} points | {} multiplied points | {} units", user.getDisplayName(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits());
-            return UserResult.create(user.getDisplayName(), hardware.getDisplayName(), category.getDisplayName(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits(), user.getLiveStatsLink());
+            return UserResult.create(user.getDisplayName(), hardware.getDisplayName(), category.getDisplayName(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits(), user.getLiveStatsLink(), user.isRetired());
         } catch (final UserNotFoundException e) {
             LOGGER.debug("No stats found for user ID: {}", user.getId(), e);
             LOGGER.warn("No stats found for user ID: {}", user.getId());
