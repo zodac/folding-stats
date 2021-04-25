@@ -266,7 +266,7 @@ public class StorageFacade {
                 .map(Team::getUserIds)
                 .flatMap(Collection::stream)
                 .map(userId -> UserCache.get().getOrNull(userId))
-                .filter(Objects::nonNull)
+                .filter(user -> Objects.nonNull(user) && !user.isRetired())
                 .collect(toList());
     }
 

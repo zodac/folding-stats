@@ -18,6 +18,7 @@ CREATE TABLE users (
     category TEXT NOT NULL,
     hardware_id INT NOT NULL,
     live_stats_link TEXT NULL,
+    is_retired BOOLEAN DEFAULT(false),
     CONSTRAINT unique_user UNIQUE(folding_username, passkey),
     CONSTRAINT fk_hardware_id
         FOREIGN KEY(hardware_id)
