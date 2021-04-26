@@ -6,21 +6,27 @@ import java.util.Objects;
 public class RetiredUserTcStats {
 
     private final int retiredUserId;
+    private final int teamId;
     private final String displayUserName;
     private final UserTcStats retiredUserTcStats;
 
-    private RetiredUserTcStats(final int retiredUserId, final String displayUserName, final UserTcStats retiredUserTcStats) {
+    private RetiredUserTcStats(final int retiredUserId, final int teamId, final String displayUserName, final UserTcStats retiredUserTcStats) {
         this.retiredUserId = retiredUserId;
+        this.teamId = teamId;
         this.displayUserName = displayUserName;
         this.retiredUserTcStats = retiredUserTcStats;
     }
 
-    public static RetiredUserTcStats create(final int retiredUserId, final String displayUserName, final UserTcStats retiredUserTcStats) {
-        return new RetiredUserTcStats(retiredUserId, displayUserName, retiredUserTcStats);
+    public static RetiredUserTcStats create(final int retiredUserId, final int teamId, final String displayUserName, final UserTcStats retiredUserTcStats) {
+        return new RetiredUserTcStats(retiredUserId, teamId, displayUserName, retiredUserTcStats);
     }
 
     public int getRetiredUserId() {
         return retiredUserId;
+    }
+
+    public int getTeamId() {
+        return teamId;
     }
 
     public int getUserId() {
@@ -56,18 +62,19 @@ public class RetiredUserTcStats {
             return false;
         }
         final RetiredUserTcStats that = (RetiredUserTcStats) o;
-        return retiredUserId == that.retiredUserId && Objects.equals(displayUserName, that.displayUserName) && Objects.equals(retiredUserTcStats, that.retiredUserTcStats);
+        return retiredUserId == that.retiredUserId && teamId == that.teamId && Objects.equals(displayUserName, that.displayUserName) && Objects.equals(retiredUserTcStats, that.retiredUserTcStats);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(retiredUserId, displayUserName, retiredUserTcStats);
+        return Objects.hash(retiredUserId, teamId, displayUserName, retiredUserTcStats);
     }
 
     @Override
     public String toString() {
         return "RetiredUserTcStats::{" +
                 "retiredUserId: " + retiredUserId +
+                ", teamId: " + teamId +
                 ", displayUserName: '" + displayUserName + "'" +
                 ", retiredUserTcStats: " + retiredUserTcStats +
                 '}';

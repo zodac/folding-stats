@@ -100,7 +100,7 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
         getLogger().info("PATCH request to update offset for user received at '{}': {}", uriContext.getAbsolutePath(), userStatsOffset);
 
         try {
-            storageFacade.addOffsetStats(Integer.parseInt(userId), userStatsOffset);
+            storageFacade.addOrUpdateOffsetStats(Integer.parseInt(userId), userStatsOffset);
             teamCompetitionStatsParser.updateTcStatsForUser(Integer.parseInt(userId));
             return ok();
         } catch (final NumberFormatException e) {

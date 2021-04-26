@@ -119,4 +119,28 @@ public class TeamValidator {
 
         return ValidationResponse.failure(team, failureMessages);
     }
+
+
+    public static ValidationResponse isValidUnretirement(final Team team, final int retiredUserId) {
+        final List<String> failureMessages = new ArrayList<>();
+
+        // TODO: [zodac] I dunno... can't unretire a user twice, should retired users have a 'still_retired' flag? Seems stupid
+        //   Maybe a retiredUserCache is better? With the new retiredUserId?
+//        if (!UserCache.get().getRetired().containsKey(retiredUserId)) {
+//            failureMessages.add(String.format("Attribute 'retiredUserId' must be a retired user", UserCache.get().getRetired().values()));
+//        }
+
+        // TODO: [zodac] If adding the user exceeds max team/category size, reject it
+
+
+        // TODO: [zodac] What if I add a user that was previously retired, unretired, then retired again?
+        //   With no 'still_retired' flag, it's possible to add it back to its original team by mistake
+
+
+        if (failureMessages.isEmpty()) {
+            return ValidationResponse.success();
+        }
+
+        return ValidationResponse.failure(team, failureMessages);
+    }
 }

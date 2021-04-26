@@ -23,6 +23,7 @@ import java.util.Map;
 /**
  * Interface used to interact with the storage backend and perform CRUD operations.
  */
+// TODO: [zodac] A lot of lists being used here (and other places I'm sure), many could be collections, update them
 public interface DbManager {
 
     // CRUD operations
@@ -66,9 +67,6 @@ public interface DbManager {
 
     // TC operations
 
-    Stats getInitialUserStats(final int userId) throws FoldingException, UserNotFoundException;
-
-    Map<Integer, Stats> getInitialUserStats(final List<Integer> userIds) throws FoldingException;
 
     void persistHourlyTcUserStats(final List<UserTcStats> userStats) throws FoldingException;
 
@@ -80,13 +78,20 @@ public interface DbManager {
 
     void persistInitialUserStats(final UserStats userStats) throws FoldingException;
 
+    Stats getInitialUserStats(final int userId) throws FoldingException, UserNotFoundException;
+
+    // TODO: [zodac] Remove this, force callers to wrap their own IDs in a list
+    Map<Integer, Stats> getInitialUserStats(final List<Integer> userIds) throws FoldingException;
+
     UserTcStats getCurrentTcStats(final int userId) throws FoldingException, UserNotFoundException;
 
     void persistTotalUserStats(final List<UserStats> stats) throws FoldingException;
 
     Stats getTotalStats(final int userId) throws FoldingException;
 
-    UserStatsOffset addOffsetStats(final int userId, final UserStatsOffset userStatsOffset) throws FoldingException;
+    void addOffsetStats(int userId, UserStatsOffset userStatsOffset) throws FoldingException;
+
+    UserStatsOffset addOrUpdateOffsetStats(final int userId, final UserStatsOffset userStatsOffset) throws FoldingException;
 
     Map<Integer, UserStatsOffset> getOffsetStats(final List<Integer> userIds) throws FoldingException;
 

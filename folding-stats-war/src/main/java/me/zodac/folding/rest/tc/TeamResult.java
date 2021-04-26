@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
+import static java.util.stream.Collectors.toList;
 import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
 
 public class TeamResult {
@@ -11,6 +12,7 @@ public class TeamResult {
     private static final int DEFAULT_TEAM_RANK = 0;
 
     private String teamName;
+    private String teamDescription;
     private String captainName;
 
     private int rank; // Rank in 'division', but we only have one division so no need to be more explicit, yet
@@ -24,8 +26,9 @@ public class TeamResult {
 
     }
 
-    private TeamResult(final String teamName, final String captainName, final List<UserResult> activeUsers, final List<UserResult> retiredUsers, final int teamUnits, final long teamPoints, final long teamMultipliedPoints, final int rank) {
+    private TeamResult(final String teamName, final String teamDescription, final String captainName, final List<UserResult> activeUsers, final List<UserResult> retiredUsers, final int teamUnits, final long teamPoints, final long teamMultipliedPoints, final int rank) {
         this.teamName = teamName;
+        this.teamDescription = teamDescription;
         this.captainName = captainName;
         this.activeUsers = activeUsers;
         this.retiredUsers = retiredUsers;
@@ -35,10 +38,11 @@ public class TeamResult {
         this.rank = rank;
     }
 
-    public static TeamResult create(final String teamName, final String captainName, final List<UserResult> activeUsers, final List<UserResult> retiredUsers) {
+    public static TeamResult create(final String teamName, final String teamDescription, final String captainName, final List<UserResult> activeUsers, final List<UserResult> retiredUsers) {
         int teamUnits = 0;
         long teamPoints = 0L;
         long teamMultipliedPoints = 0L;
+
 
         for (final UserResult activeUser : activeUsers) {
             teamUnits += activeUser.getUnits();
@@ -67,21 +71,34 @@ public class TeamResult {
                 .collect(new IntegerRankingCollector<>(
                         Comparator.comparingLong(UserResult::getMultipliedPoints),
                         UserResult::getRankInTeam,
-                        // TODO: [zodac] This isn't working as planned, look into it
-                        (userResult, teamRank) -> UserResult.updateWithRankInTeam(userResult, (teamRank + activeUsers.size())))  // Offset the retired user ranks so they are after the active users
-                );
+                        UserResult::updateWithRankInTeam)
+                )
+                // We need to offset the ranks of the retired users, so they are ranked below active users
+                // Annoyingly, we cannot simply add an offset to the #updateWithRankInTeam call above, since the collector applies it multiple times
+                // Instead, we now iterate over the retired users again and manually offset them
+                .stream()
+                .map(rankedRetiredUser -> UserResult.updateWithRankInTeam(rankedRetiredUser, rankedRetiredUser.getRankInTeam() + activeUsers.size()))
+                .collect(toList());
 
         // Not ranked to begin with, will be updated by the calling class
-        return new TeamResult(teamName, captainName, rankedActiveUsers, rankedRetiredUsers, teamUnits, teamPoints, teamMultipliedPoints, DEFAULT_TEAM_RANK);
+        return new TeamResult(teamName, teamDescription, captainName, rankedActiveUsers, rankedRetiredUsers, teamUnits, teamPoints, teamMultipliedPoints, DEFAULT_TEAM_RANK);
     }
 
 
     public static TeamResult updateWithRank(final TeamResult teamResult, final int rank) {
-        return new TeamResult(teamResult.teamName, teamResult.captainName, teamResult.activeUsers, teamResult.retiredUsers, teamResult.teamUnits, teamResult.teamPoints, teamResult.teamMultipliedPoints, rank);
+        return new TeamResult(teamResult.teamName, teamResult.teamDescription, teamResult.captainName, teamResult.activeUsers, teamResult.retiredUsers, teamResult.teamUnits, teamResult.teamPoints, teamResult.teamMultipliedPoints, rank);
     }
 
     public String getTeamName() {
         return teamName;
+    }
+
+    public String getTeamDescription() {
+        return teamDescription;
+    }
+
+    public void setTeamDescription(final String teamDescription) {
+        this.teamDescription = teamDescription;
     }
 
     public void setTeamName(final String teamName) {
@@ -153,18 +170,19 @@ public class TeamResult {
             return false;
         }
         final TeamResult that = (TeamResult) o;
-        return teamUnits == that.teamUnits && teamPoints == that.teamPoints && teamMultipliedPoints == that.teamMultipliedPoints && rank == that.rank && Objects.equals(teamName, that.teamName) && Objects.equals(captainName, that.captainName) && Objects.equals(activeUsers, that.activeUsers) && Objects.equals(retiredUsers, that.retiredUsers);
+        return teamUnits == that.teamUnits && teamPoints == that.teamPoints && teamMultipliedPoints == that.teamMultipliedPoints && rank == that.rank && Objects.equals(teamDescription, that.teamDescription) && Objects.equals(teamName, that.teamName) && Objects.equals(captainName, that.captainName) && Objects.equals(activeUsers, that.activeUsers) && Objects.equals(retiredUsers, that.retiredUsers);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(teamName, captainName, activeUsers, retiredUsers, teamUnits, teamPoints, teamMultipliedPoints, rank);
+        return Objects.hash(teamName, teamDescription, captainName, activeUsers, retiredUsers, teamUnits, teamPoints, teamMultipliedPoints, rank);
     }
 
     @Override
     public String toString() {
         return "TeamResult::{" +
                 "teamName: '" + teamName + "'" +
+                ", teamDescription: '" + teamDescription + "'" +
                 ", captainName: '" + captainName + "'" +
                 ", activeUsers: " + activeUsers +
                 ", retiredUsers: " + retiredUsers +

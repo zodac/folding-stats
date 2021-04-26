@@ -251,19 +251,54 @@ public class StorageFacade {
         return retiredUserTcStatsFromDb;
     }
 
-    public void persistRetiredUser(final int teamId, final int userId) throws FoldingConflictException, UserNotFoundException, FoldingException, TeamNotFoundException {
+    public void retireUser(final int teamId, final int userId) throws FoldingConflictException, UserNotFoundException, FoldingException, TeamNotFoundException {
         final User retiredUser = User.retireUser(getUser(userId));
         dbManager.updateUser(retiredUser);
         userCache.add(retiredUser);
 
         final UserTcStats userStats = getTcStatsForUser(retiredUser.getId());
         final int retiredUserId = dbManager.persistRetiredUserStats(teamId, retiredUser.getDisplayName(), userStats);
-        retiredStatsCache.add(RetiredUserTcStats.create(retiredUserId, retiredUser.getDisplayName(), userStats));
-        updateInitialStatsForUser(retiredUser);
+        retiredStatsCache.add(RetiredUserTcStats.create(retiredUserId, teamId, retiredUser.getDisplayName(), userStats));
+//        updateInitialStatsForUser(retiredUser);
 
         final Team team = getTeam(teamId);
         final Team updatedTeam = Team.retireUser(team, userStats.getUserId(), retiredUserId);
-        dbManager.updateTeam(team);
+        dbManager.updateTeam(updatedTeam);
+        teamCache.add(updatedTeam);
+    }
+
+    public void unretireUser(final int teamId, final int retiredUserId) throws UserNotFoundException, FoldingException, FoldingConflictException, TeamNotFoundException {
+        // Get the original user ID
+        final RetiredUserTcStats retiredUserStats = dbManager.getRetiredUserStats(retiredUserId); // TODO: [zodac] Add another cache? I like caches :)
+        final int userId = retiredUserStats.getUserId();
+
+        // Update the user to no longer be retired
+        final User user = getUser(userId);
+        final User unretiredUser = User.unretireUser(user);
+        dbManager.updateUser(unretiredUser);
+        userCache.add(unretiredUser);
+
+        // Update the user's initial stats to their current total
+        persistInitialUserStats(unretiredUser);
+
+        final Team team = getTeam(teamId);
+
+        // If retired user is from this team, AND still listed as retired (meaning the monthly reset has not removed this user from the team),
+        // we want to allow them to keep their points pre-retirement
+        // We add an offset for the user based on their retired stats
+        if (teamId == retiredUserStats.getTeamId() && team.getRetiredUserIds().contains(retiredUserId)) {
+            LOGGER.debug("Un-retiring user for original team, adding offset: {}", retiredUserStats);
+            addOffsetStats(unretiredUser.getId(), UserStatsOffset.create(retiredUserStats.getMultipliedPoints(), retiredUserStats.getUnits()));
+        } else {
+            LOGGER.debug("User {} was not previously a member {} of this team {}, resetting offset", retiredUserStats, team.getRetiredUserIds(), teamId);
+            addOffsetStats(unretiredUser.getId(), UserStatsOffset.empty());
+        }
+
+        // Update the team with the new user
+        // Team may not be the original team the user retired from, so may not exist in this team
+        // But we do not remove the retired user from the original team, unless it is the same team
+        final Team updatedTeam = Team.unretireUser(team, userId, retiredUserId);
+        dbManager.updateTeam(updatedTeam);
         teamCache.add(updatedTeam);
     }
 
@@ -334,7 +369,12 @@ public class StorageFacade {
     }
 
     public void addOffsetStats(final int userId, final UserStatsOffset userStatsOffset) throws FoldingException {
-        final UserStatsOffset userStatsOffsetFromDb = dbManager.addOffsetStats(userId, userStatsOffset);
+        dbManager.addOffsetStats(userId, userStatsOffset);
+        offsetStatsCache.add(userId, userStatsOffset);
+    }
+
+    public void addOrUpdateOffsetStats(final int userId, final UserStatsOffset userStatsOffset) throws FoldingException {
+        final UserStatsOffset userStatsOffsetFromDb = dbManager.addOrUpdateOffsetStats(userId, userStatsOffset);
         offsetStatsCache.add(userId, userStatsOffsetFromDb);
     }
 
@@ -403,4 +443,6 @@ public class StorageFacade {
         persistInitialUserStats(UserStats.create(user.getId(), TimeUtils.getCurrentUtcTimestamp(), currentAndInitialStats));
         LOGGER.info("Done updating");
     }
+
+
 }

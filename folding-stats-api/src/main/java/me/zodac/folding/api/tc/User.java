@@ -43,6 +43,10 @@ public class User implements Identifiable {
         return new User(userId, user.foldingUserName, user.displayName, user.passkey, user.category, user.hardwareId, user.liveStatsLink, user.isRetired);
     }
 
+    public static User unretireUser(final User user) {
+        return new User(user.id, user.foldingUserName, user.displayName, user.passkey, user.category, user.hardwareId, user.liveStatsLink, false);
+    }
+
     public static User retireUser(final User user) {
         return new User(user.id, user.foldingUserName, user.displayName, user.passkey, user.category, user.hardwareId, user.liveStatsLink, true);
     }

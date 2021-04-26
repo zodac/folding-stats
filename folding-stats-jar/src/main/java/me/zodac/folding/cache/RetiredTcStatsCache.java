@@ -11,7 +11,7 @@ public class RetiredTcStatsCache {
 
     private static RetiredTcStatsCache INSTANCE = null;
 
-    private final Map<Integer, RetiredUserTcStats> retiredTcStatsByUserId = new HashMap<>();
+    private final Map<Integer, RetiredUserTcStats> retiredTcStatsByRetiredUserId = new HashMap<>();
 
     private RetiredTcStatsCache() {
 
@@ -26,10 +26,10 @@ public class RetiredTcStatsCache {
     }
 
     public void add(final RetiredUserTcStats retiredTcStats) {
-        retiredTcStatsByUserId.put(retiredTcStats.getRetiredUserId(), retiredTcStats);
+        retiredTcStatsByRetiredUserId.put(retiredTcStats.getRetiredUserId(), retiredTcStats);
     }
 
     public Optional<RetiredUserTcStats> get(final int retiredUserId) {
-        return Optional.ofNullable(retiredTcStatsByUserId.get(retiredUserId));
+        return Optional.ofNullable(retiredTcStatsByRetiredUserId.get(retiredUserId));
     }
 }

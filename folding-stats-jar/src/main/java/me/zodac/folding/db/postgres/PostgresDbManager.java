@@ -38,6 +38,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 
+// TODO: [zodac] Add some DB pooling here, can be made a bit less shit
 public class PostgresDbManager implements DbManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PostgresDbManager.class);
@@ -711,8 +712,37 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public UserStatsOffset addOffsetStats(final int userId, final UserStatsOffset userStatsOffset) throws FoldingException {
+    public void addOffsetStats(final int userId, final UserStatsOffset userStatsOffset) throws FoldingException {
         LOGGER.debug("Adding offset stats for user {}", userId);
+        final String preparedInsertSqlStatement = "INSERT INTO user_offset_tc_stats (user_id, utc_timestamp, offset_multiplied_points, offset_units) VALUES (?, ?, ?, ?) " +
+                "ON CONFLICT (user_id) " +
+                "DO UPDATE " +
+                "SET utc_timestamp = ?, offset_multiplied_points = ?, offset_units = ? " +
+                "RETURNING offset_multiplied_points, offset_units;";
+
+        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+             final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
+            final Timestamp currentUtcTimestamp = TimeUtils.getCurrentUtcTimestamp();
+
+            preparedStatement.setInt(1, userId);
+            preparedStatement.setTimestamp(2, currentUtcTimestamp);
+            preparedStatement.setLong(3, userStatsOffset.getPointsOffset());
+            preparedStatement.setInt(4, userStatsOffset.getUnitsOffset());
+            preparedStatement.setTimestamp(5, currentUtcTimestamp);
+            preparedStatement.setLong(6, userStatsOffset.getPointsOffset());
+            preparedStatement.setInt(7, userStatsOffset.getUnitsOffset());
+
+            LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
+            preparedStatement.execute();
+        } catch (final SQLException e) {
+            throw new FoldingException("Error opening connection to the DB", e);
+        }
+    }
+
+
+    @Override
+    public UserStatsOffset addOrUpdateOffsetStats(final int userId, final UserStatsOffset userStatsOffset) throws FoldingException {
+        LOGGER.debug("Adding/updating offset stats for user {}", userId);
         final String preparedInsertSqlStatement = "INSERT INTO user_offset_tc_stats (user_id, utc_timestamp, offset_multiplied_points, offset_units) VALUES (?, ?, ?, ?) " +
                 "ON CONFLICT (user_id) " +
                 "DO UPDATE " +
@@ -830,7 +860,7 @@ public class PostgresDbManager implements DbManager {
     @Override
     public RetiredUserTcStats getRetiredUserStats(final int retiredUserId) throws FoldingException {
         LOGGER.debug("Getting retired user with ID: {} ", retiredUserId);
-        final String preparedInsertSqlStatement = "SELECT id, user_id, display_username, utc_timestamp, final_points, final_multiplied_points, final_units " +
+        final String preparedInsertSqlStatement = "SELECT id, user_id, team_id, display_username, utc_timestamp, final_points, final_multiplied_points, final_units " +
                 "FROM retired_user_stats " +
                 "WHERE id = ? " +
                 "ORDER BY utc_timestamp DESC " +
@@ -846,6 +876,7 @@ public class PostgresDbManager implements DbManager {
                     if (resultSet.next()) {
                         return RetiredUserTcStats.create(
                                 resultSet.getInt("id"),
+                                resultSet.getInt("team_id"),
                                 resultSet.getString("display_username"),
                                 UserTcStats.create(
                                         resultSet.getInt("user_id"),

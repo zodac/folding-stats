@@ -98,6 +98,7 @@ CREATE INDEX index_user_total_stats
 
 
 -- Table which is populated whenever a user is retired from a team
+-- Do not cascade delete, as even if a user is deleted, a team may be referencing it for the rest of the month
 CREATE TABLE retired_user_stats (
     id SERIAL,
     user_id INT NOT NULL,
@@ -111,7 +112,6 @@ CREATE TABLE retired_user_stats (
     CONSTRAINT fk_user_id
         FOREIGN KEY(user_id)
         REFERENCES users(user_id)
-        ON DELETE CASCADE
 );
 
 CREATE INDEX index_retired_user_stats

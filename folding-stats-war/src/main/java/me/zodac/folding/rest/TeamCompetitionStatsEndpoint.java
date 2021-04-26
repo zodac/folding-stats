@@ -85,6 +85,8 @@ public class TeamCompetitionStatsEndpoint {
                 return noContent();
             }
 
+            // TODO: [zodac] Cache this CompetitionResult, and invalidate cache on scheduled/manual update, scheduled/manual reset, user create/update, team create/update
+            //   Can't simply invalidate on stats update, because what if a hardware display is changed? Should invalidate on ALL changes
             return ok(CompetitionResult.create(teamResults));
         } catch (final Exception e) {
             LOGGER.error("Unexpected error retrieving TC stats", e);
@@ -125,12 +127,19 @@ public class TeamCompetitionStatsEndpoint {
 
             for (final int retiredUserId : retiredUserIds) {
                 final RetiredUserTcStats retiredUserTcStats = storageFacade.getRetiredUser(retiredUserId);
-                final User retiredUser = storageFacade.getUser(retiredUserTcStats.getUserId());
-                final Hardware retiredUserHardware = storageFacade.getHardware(retiredUser.getHardwareId());
-                retiredUserResults.add(UserResult.createForRetiredUser(retiredUser, retiredUserHardware, retiredUserTcStats));
+
+                try {
+                    final User retiredUser = storageFacade.getUser(retiredUserTcStats.getUserId());
+                    final Hardware retiredUserHardware = storageFacade.getHardware(retiredUser.getHardwareId());
+                    retiredUserResults.add(UserResult.createForRetiredUser(retiredUser, retiredUserHardware, retiredUserTcStats));
+                } catch (final UserNotFoundException e) {
+                    LOGGER.debug("Unable to find retired user ID {} with original user ID: {}", retiredUserId, retiredUserTcStats.getUserId(), e);
+                    LOGGER.warn("Unable to find retired user ID {} with original user ID: {}", retiredUserId, retiredUserTcStats.getUserId());
+                    retiredUserResults.add(UserResult.empty(retiredUserTcStats.getDisplayUserName()));
+                }
             }
-            
-            return TeamResult.create(team.getTeamName(), captain.getDisplayName(), userResults, retiredUserResults);
+
+            return TeamResult.create(team.getTeamName(), team.getTeamDescription(), captain.getDisplayName(), userResults, retiredUserResults);
         } catch (final FoldingException e) {
             LOGGER.warn("Unable to get details for team captain: {}", team, e);
             throw e;
@@ -175,22 +184,20 @@ public class TeamCompetitionStatsEndpoint {
             return null;
         }
 
-
         final Category category = Category.get(user.getCategory());
         if (category == Category.INVALID) {
             LOGGER.warn("Unexpectedly got an invalid category '{}' for Folding user: {}", user.getCategory(), user.getDisplayName());
             return null;
         }
 
-
         try {
             final UserTcStats userTcStats = storageFacade.getTcStatsForUser(user.getId());
             LOGGER.debug("Results for {}: {} points | {} multiplied points | {} units", user.getDisplayName(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits());
-            return UserResult.create(user.getDisplayName(), hardware.getDisplayName(), category.getDisplayName(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits(), user.getLiveStatsLink(), user.isRetired());
+            return UserResult.createWithNoRank(user.getDisplayName(), hardware.getDisplayName(), category.getDisplayName(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits(), user.getLiveStatsLink(), user.isRetired());
         } catch (final UserNotFoundException e) {
             LOGGER.debug("No stats found for user ID: {}", user.getId(), e);
             LOGGER.warn("No stats found for user ID: {}", user.getId());
-            return UserResult.empty(user.getDisplayName(), hardware.getDisplayName(), category.getDisplayName(), user.getLiveStatsLink());
+            return UserResult.empty(user.getDisplayName());
         } catch (final FoldingException e) {
             LOGGER.warn("Error getting TC stats for user: {}", user, e.getCause());
             return null;

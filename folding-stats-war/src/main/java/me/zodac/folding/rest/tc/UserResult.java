@@ -12,6 +12,9 @@ import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
 public class UserResult {
 
     private static final int DEFAULT_USER_RANK = 0;
+    private static final long DEFAULT_POINTS = 0L;
+    private static final long DEFAULT_MULTIPLIED_POINTS = 0L;
+    private static final int DEFAULT_UNITS = 0;
 
     private String userName;
     private String hardware;
@@ -41,12 +44,12 @@ public class UserResult {
     }
 
     // Not ranked to begin with, will be updated by the calling class
-    public static UserResult create(final String userName, final String hardware, final String category, final long points, final long pointsWithoutMultiplier, final long units, final String liveStatsLink, final boolean isRetired) {
+    public static UserResult createWithNoRank(final String userName, final String hardware, final String category, final long points, final long pointsWithoutMultiplier, final long units, final String liveStatsLink, final boolean isRetired) {
         return new UserResult(userName, hardware, category, points, pointsWithoutMultiplier, units, DEFAULT_USER_RANK, liveStatsLink, isRetired);
     }
 
-    public static UserResult empty(final String userName, final String hardware, final String category, final String liveStatsLink) {
-        return new UserResult(userName, hardware, category, 0L, 0L, 0, DEFAULT_USER_RANK, liveStatsLink, false);
+    public static UserResult empty(final String userName) {
+        return new UserResult(userName, "", "", DEFAULT_POINTS, DEFAULT_MULTIPLIED_POINTS, DEFAULT_UNITS, DEFAULT_USER_RANK, "", false);
     }
 
     public static UserResult updateWithRankInTeam(final UserResult userResult, final int teamRank) {
@@ -56,7 +59,6 @@ public class UserResult {
     public static UserResult createForRetiredUser(final User retiredUser, final Hardware retiredUserHardware, final RetiredUserTcStats retiredUserTcStats) {
         return new UserResult(retiredUserTcStats.getDisplayUserName(), retiredUserHardware.getDisplayName(), Category.get(retiredUser.getCategory()).getDisplayName(), retiredUserTcStats.getPoints(), retiredUserTcStats.getMultipliedPoints(), retiredUserTcStats.getUnits(), DEFAULT_USER_RANK, retiredUser.getLiveStatsLink(), true);
     }
-
 
     public String getUserName() {
         return userName;

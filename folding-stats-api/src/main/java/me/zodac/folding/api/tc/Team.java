@@ -39,13 +39,22 @@ public class Team implements Identifiable {
         return new Team(teamId, team.teamName, team.teamDescription, team.captainUserId, team.userIds, team.retiredUserIds);
     }
 
-
     public static Team retireUser(final Team team, final int userId, final int retiredUserId) {
         final Set<Integer> updateUserIds = new HashSet<>(team.getUserIds());
         updateUserIds.remove(userId);
 
         final Set<Integer> retiredUserStats = new HashSet<>(team.getRetiredUserIds());
         retiredUserStats.add(retiredUserId);
+
+        return new Team(team.id, team.teamName, team.teamDescription, team.captainUserId, updateUserIds, retiredUserStats);
+    }
+
+    public static Team unretireUser(final Team team, final int userId, final int retiredUserId) {
+        final Set<Integer> updateUserIds = new HashSet<>(team.getUserIds());
+        updateUserIds.add(userId);
+
+        final Set<Integer> retiredUserStats = new HashSet<>(team.getRetiredUserIds());
+        retiredUserStats.remove(retiredUserId);
 
         return new Team(team.id, team.teamName, team.teamDescription, team.captainUserId, updateUserIds, retiredUserStats);
     }
@@ -93,6 +102,10 @@ public class Team implements Identifiable {
 
     public Set<Integer> getRetiredUserIds() {
         return retiredUserIds;
+    }
+
+    public void setRetiredUserIds(final Set<Integer> retiredUserIds) {
+        this.retiredUserIds = retiredUserIds;
     }
 
     @Override

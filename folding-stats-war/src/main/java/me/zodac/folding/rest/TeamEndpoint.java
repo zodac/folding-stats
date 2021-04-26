@@ -98,7 +98,7 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
     @Produces(MediaType.APPLICATION_JSON)
     public Response retireUserFromTeam(@PathParam("teamId") final String teamId, @PathParam("userId") final String userId) {
         getLogger().info("PATCH request to retire user from team received at '{}'", uriContext.getAbsolutePath());
-        
+
         try {
             final Team team = storageFacade.getTeam(Integer.parseInt(teamId));
             final ValidationResponse validationResponse = TeamValidator.isValidRetirement(team, Integer.parseInt(userId));
@@ -106,7 +106,7 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
                 return badRequest(validationResponse);
             }
 
-            storageFacade.persistRetiredUser(Integer.parseInt(teamId), Integer.parseInt(userId));
+            storageFacade.retireUser(Integer.parseInt(teamId), Integer.parseInt(userId));
             return ok();
         } catch (final NumberFormatException e) {
             final String errorMessage = String.format("The team ID '%s' or user ID '%s' is not a valid format", teamId, userId);
@@ -115,6 +115,45 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
             return badRequest(errorMessage);
         } catch (final UserNotFoundException e) {
             getLogger().error("Error finding user with ID: {}", userId, e.getCause());
+            return notFound();
+        } catch (final TeamNotFoundException e) {
+            getLogger().error("Error finding team with ID: {}", teamId, e.getCause());
+            return notFound();
+        } catch (final FoldingException e) {
+            getLogger().error("Error updating team with ID: {}", teamId, e.getCause());
+            return serverError();
+        } catch (final FoldingConflictException e) {
+            getLogger().error("Error updating team with ID: {}", teamId, e);
+            return serverError();
+        } catch (final Exception e) {
+            getLogger().error("Unexpected error updating team with ID: {}", teamId, e);
+            return serverError();
+        }
+    }
+
+    @PATCH
+    @Path("/{teamId}/unretire/{retiredUserId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response unretireUserFromTeam(@PathParam("teamId") final String teamId, @PathParam("retiredUserId") final String retiredUserId) {
+        getLogger().info("PATCH request to un-retire user from team received at '{}'", uriContext.getAbsolutePath());
+
+        try {
+            final Team team = storageFacade.getTeam(Integer.parseInt(teamId));
+            final ValidationResponse validationResponse = TeamValidator.isValidUnretirement(team, Integer.parseInt(retiredUserId));
+            if (!validationResponse.isValid()) {
+                return badRequest(validationResponse);
+            }
+
+            storageFacade.unretireUser(Integer.parseInt(teamId), Integer.parseInt(retiredUserId));
+            return ok();
+        } catch (final NumberFormatException e) {
+            final String errorMessage = String.format("The team ID '%s' or retired user ID '%s' is not a valid format", teamId, retiredUserId);
+            getLogger().debug(errorMessage, e);
+            getLogger().error(errorMessage);
+            return badRequest(errorMessage);
+        } catch (final UserNotFoundException e) {
+            getLogger().error("Error finding retired user with ID: {}", retiredUserId, e.getCause());
             return notFound();
         } catch (final TeamNotFoundException e) {
             getLogger().error("Error finding team with ID: {}", teamId, e.getCause());
