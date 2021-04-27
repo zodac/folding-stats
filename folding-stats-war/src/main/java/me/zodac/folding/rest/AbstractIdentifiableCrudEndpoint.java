@@ -48,7 +48,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
         getLogger().info("POST request received to create {} at '{}' with request: {}", elementType(), uriContext.getAbsolutePath(), element);
 
         final ValidationResponse validationResponse = validate(element);
-        if (!validationResponse.isValid()) {
+        if (validationResponse.isInvalid()) {
             return badRequest(validationResponse);
         }
 
@@ -84,7 +84,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
 
         for (final V element : elements) {
             final ValidationResponse validationResponse = validate(element);
-            if (!validationResponse.isValid()) {
+            if (validationResponse.isInvalid()) {
                 failedValidationResponses.add(validationResponse);
             }
         }
@@ -169,7 +169,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
         getLogger().info("PUT request for {} received at '{}'", elementType(), uriContext.getAbsolutePath());
 
         final ValidationResponse validationResponse = validate(element);
-        if (!validationResponse.isValid()) {
+        if (validationResponse.isInvalid()) {
             return badRequest(validationResponse);
         }
 

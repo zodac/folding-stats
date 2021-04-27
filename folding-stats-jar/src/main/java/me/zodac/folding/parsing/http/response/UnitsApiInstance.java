@@ -1,9 +1,12 @@
 package me.zodac.folding.parsing.http.response;
 
-import java.util.Comparator;
-import java.util.Objects;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
-import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
+import java.util.Comparator;
 
 /**
  * Valid response:
@@ -22,39 +25,16 @@ import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
  *     ]
  * </pre>
  */
+@NoArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString(doNotUseGetters = true)
 class UnitsApiInstance implements Comparable<UnitsApiInstance> {
 
     private int finished;
     private int expired;
     private int active;
-
-    public UnitsApiInstance() {
-
-    }
-
-    public int getFinished() {
-        return finished;
-    }
-
-    public void setFinished(final int finished) {
-        this.finished = finished;
-    }
-
-    public int getExpired() {
-        return expired;
-    }
-
-    public void setExpired(final int expired) {
-        this.expired = expired;
-    }
-
-    public int getActive() {
-        return active;
-    }
-
-    public void setActive(final int active) {
-        this.active = active;
-    }
 
     @Override
     public int compareTo(final UnitsApiInstance other) {
@@ -62,31 +42,5 @@ class UnitsApiInstance implements Comparable<UnitsApiInstance> {
                 .thenComparingInt(UnitsApiInstance::getActive)
                 .thenComparingInt(UnitsApiInstance::getExpired)
                 .compare(other, this);
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        final UnitsApiInstance that = (UnitsApiInstance) o;
-        return finished == that.finished && expired == that.expired && active == that.active;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(finished, expired, active);
-    }
-
-    @Override
-    public String toString() {
-        return "UnitsApiInstance::{" +
-                "finishedUnits: " + formatWithCommas(finished) +
-                ", expired: " + formatWithCommas(expired) +
-                ", active: " + formatWithCommas(active) +
-                '}';
     }
 }

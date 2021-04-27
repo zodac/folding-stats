@@ -29,6 +29,7 @@
         <gson.version>2.8.6</gson.version>
         <javaee-web-api.version>8.0.1</javaee-web-api.version>
         <jersey.version>2.17</jersey.version>
+        <lombok.version>1.18.20</lombok.version>
         <postgresql-driver.version>42.2.19</postgresql-driver.version>
         <slf4j.version>1.7.30</slf4j.version>
 
@@ -100,6 +101,12 @@
                 <groupId>org.glassfish.jersey.media</groupId>
                 <artifactId>jersey-media-multipart</artifactId>
                 <version>${jersey.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.postgresql</groupId>

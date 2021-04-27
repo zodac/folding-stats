@@ -102,7 +102,7 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
         try {
             final Team team = storageFacade.getTeam(Integer.parseInt(teamId));
             final ValidationResponse validationResponse = TeamValidator.isValidRetirement(team, Integer.parseInt(userId));
-            if (!validationResponse.isValid()) {
+            if (validationResponse.isInvalid()) {
                 return badRequest(validationResponse);
             }
 
@@ -141,7 +141,7 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
         try {
             final Team team = storageFacade.getTeam(Integer.parseInt(teamId));
             final ValidationResponse validationResponse = TeamValidator.isValidUnretirement(team, Integer.parseInt(retiredUserId));
-            if (!validationResponse.isValid()) {
+            if (validationResponse.isInvalid()) {
                 return badRequest(validationResponse);
             }
 

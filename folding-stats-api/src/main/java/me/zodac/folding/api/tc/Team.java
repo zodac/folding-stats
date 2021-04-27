@@ -1,11 +1,23 @@
 package me.zodac.folding.api.tc;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import me.zodac.folding.api.Identifiable;
 
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString(doNotUseGetters = true)
 public class Team implements Identifiable {
 
     private static final long serialVersionUID = -8765213859473081036L;
@@ -16,20 +28,6 @@ public class Team implements Identifiable {
     private int captainUserId;
     private Set<Integer> userIds = new HashSet<>(0);
     private Set<Integer> retiredUserIds = new HashSet<>(0);
-
-    public Team() {
-
-    }
-
-
-    public Team(final int id, final String teamName, final String teamDescription, final int captainUserId, final Set<Integer> userIds, final Set<Integer> retiredUserIds) {
-        this.id = id;
-        this.teamName = teamName;
-        this.teamDescription = teamDescription;
-        this.captainUserId = captainUserId;
-        this.userIds = userIds;
-        this.retiredUserIds = retiredUserIds;
-    }
 
     public static Team create(final int id, final String teamName, final String teamDescription, final int captainUserId, final Set<Integer> userIds, final Set<Integer> retiredUserStats) {
         return new Team(id, teamName, teamDescription, captainUserId, userIds, retiredUserStats);
@@ -57,84 +55,5 @@ public class Team implements Identifiable {
         retiredUserStats.remove(retiredUserId);
 
         return new Team(team.id, team.teamName, team.teamDescription, team.captainUserId, updateUserIds, retiredUserStats);
-    }
-
-    @Override
-    public int getId() {
-        return id;
-    }
-
-    public void setId(final int id) {
-        this.id = id;
-    }
-
-    public String getTeamName() {
-        return teamName;
-    }
-
-    public void setTeamName(final String teamName) {
-        this.teamName = teamName == null ? "" : teamName.trim();
-    }
-
-    public String getTeamDescription() {
-        return teamDescription;
-    }
-
-    public void setTeamDescription(final String teamDescription) {
-        this.teamDescription = teamDescription == null ? "" : teamDescription.trim();
-    }
-
-    public int getCaptainUserId() {
-        return captainUserId;
-    }
-
-    public void setCaptainUserId(final int captainUserId) {
-        this.captainUserId = captainUserId;
-    }
-
-    public Set<Integer> getUserIds() {
-        return userIds;
-    }
-
-    public void setUserIds(final Set<Integer> userIds) {
-        this.userIds = userIds;
-    }
-
-    public Set<Integer> getRetiredUserIds() {
-        return retiredUserIds;
-    }
-
-    public void setRetiredUserIds(final Set<Integer> retiredUserIds) {
-        this.retiredUserIds = retiredUserIds;
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        final Team team = (Team) o;
-        return id == team.id && captainUserId == team.captainUserId && Objects.equals(teamName, team.teamName) && Objects.equals(teamDescription, team.teamDescription) && Objects.equals(userIds, team.userIds) && Objects.equals(retiredUserIds, team.retiredUserIds);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, teamName, teamDescription, captainUserId, userIds, retiredUserIds);
-    }
-
-
-    @Override
-    public String toString() {
-        return "Team::{" +
-                "id: " + id +
-                ", teamName: '" + teamName + "'" +
-                ", teamDescription: '" + teamDescription + "'" +
-                ", captainUserId: " + captainUserId +
-                ", userIds: " + userIds +
-                ", retiredUserIds: " + retiredUserIds +
-                '}';
     }
 }

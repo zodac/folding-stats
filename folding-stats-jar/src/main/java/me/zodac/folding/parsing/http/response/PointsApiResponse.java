@@ -1,9 +1,12 @@
 package me.zodac.folding.parsing.http.response;
 
-import java.util.Comparator;
-import java.util.Objects;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
-import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
+import java.util.Comparator;
 
 /**
  * Valid response:
@@ -20,49 +23,18 @@ import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
  *      }
  * </pre>
  */
+@NoArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString(doNotUseGetters = true)
 class PointsApiResponse implements Comparable<PointsApiResponse> {
 
     private long earned;
-
-    public PointsApiResponse() {
-
-    }
-
-    public long getEarned() {
-        return earned;
-    }
-
-    public void setEarned(final long earned) {
-        this.earned = earned;
-    }
 
     @Override
     public int compareTo(final PointsApiResponse other) {
         return Comparator.comparingLong(PointsApiResponse::getEarned)
                 .compare(other, this);
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || this.getClass() != o.getClass()) {
-            return false;
-        }
-        final PointsApiResponse that = (PointsApiResponse) o;
-        return earned == that.earned;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(earned);
-    }
-
-    @Override
-    public String toString() {
-        return "PointsApiResponse::{" +
-                "points: " + formatWithCommas(earned) +
-                '}';
     }
 }
