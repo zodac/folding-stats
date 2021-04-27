@@ -3,62 +3,60 @@ version: '2.3'
 # TODO: [zodac] Extract sensitive data to an env file, allow deployment to override with 'real' values
 services:
 
-  builder_java:
+  builder_java_dev:
     build:
       context: .
       dockerfile: docker/builder/java/Dockerfile
-    container_name: builder_java
-    hostname: builder_java
+    container_name: builder_java_dev
+    hostname: builder_java_dev
     networks:
-      - prod
+      - dev
     volumes:
       - /opt/jboss/wildfly/standalone/deployments/
 
-  wildfly:
+  wildfly_dev:
     build:
       context: .
       dockerfile: docker/wildfly/Dockerfile
       args:
         ADMIN_USERNAME: "root"
         ADMIN_PASSWORD: "shroot"
-    container_name: wildfly
-    hostname: wildfly
+    container_name: wildfly_dev
+    hostname: wildfly_dev
     depends_on:
-      - builder_java
+      - builder_java_dev
     environment:
       # Container configuration
       JAVA_OPTS: -Xms512m -Xmx2g -Djava.net.preferIPv4Stack=true
       # Stats parsing configuration
-      STATS_URL_ROOT: "https://api2.foldingathome.org"
+      STATS_URL_ROOT: "http://192.168.99.100:8081"
       # NOTE: The monthly reset will always occur at 00:55 on the first of the month
       STATS_PARSING_SCHEDULE_HOUR: "*"
       STATS_PARSING_SCHEDULE_MINUTE: "15"
       STATS_PARSING_SCHEDULE_SECOND: "0"
       # Database configuration
       DEPLOYED_DATABASE: "postgres"
-      JDBC_CONNECTION_URL: "jdbc:postgresql://postgres:5432/folding_db"
+      JDBC_CONNECTION_URL: "jdbc:postgresql://192.168.99.100:5433/folding_db" # TODO: [zodac] Not working with 'postgres_dev' as host
       JDBC_CONNECTION_USER: "folding_user"
       JDBC_CONNECTION_PASSWORD: "shroot"
       JDBC_CONNECTION_DRIVER: "org.postgresql.Driver"
     links:
-      - builder_java
-      - postgres
+      - builder_java_dev
+      - postgres_dev
     networks:
-      - prod
+      - dev
     ports:
-      - 8080:8080
-      - 9990:9990
-    volumes:
-      - wildfly_logs:/opt/jboss/wildfly/standalone/log
+      - 8081:8080
+      - 9991:9990
     volumes_from:
-      - builder_java
+      - builder_java_dev
 
-  postgres:
+  postgres_dev:
     build:
       context: .
       dockerfile: docker/postgres/Dockerfile
-    container_name: postgres
-    hostname: postgres
+    container_name: postgres_dev
+    hostname: postgres_dev
     environment:
       # First 4 variables used to configure DB
       POSTGRES_DB: "folding_db"
@@ -76,19 +74,10 @@ services:
       timeout: 10s
       retries: 30
     networks:
-      - prod
+      - dev
     ports:
-      - 5432:5432
+      - 5433:5432
     restart: always
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-volumes:
-  # Volume to save the PostgreSQL contents
-  # TODO: [zodac] Should we also set up a cron job on server to dump the DB every month? Talk to Axi
-  postgres_data:
-  # Volume to save the Wildfly logs in case of a crash
-  wildfly_logs:
 
 networks:
-  prod:
+  dev:

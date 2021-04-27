@@ -313,7 +313,9 @@ public class StorageFacade {
     }
 
     public Stats getInitialStatsForUser(final int userId) throws UserNotFoundException, FoldingException {
-        return dbManager.getInitialUserStats(userId);
+        final Stats initialUserStats = dbManager.getInitialUserStats(userId);
+        initialStatsCache.add(userId, initialUserStats);
+        return initialUserStats;
     }
 
     public Map<Integer, Stats> getInitialStatsForUsers(final List<Integer> userIds) throws FoldingException {

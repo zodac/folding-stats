@@ -17,6 +17,7 @@ COPY ./folding-stats-api/pom.xml ./folding-stats-api/pom.xml
 COPY ./folding-stats-ear/pom.xml ./folding-stats-ear/pom.xml
 COPY ./folding-stats-jar/pom.xml ./folding-stats-jar/pom.xml
 COPY ./folding-stats-war/pom.xml ./folding-stats-war/pom.xml
+COPY ./testsuite/pom.xml ./testsuite/pom.xml
 
 RUN mvn verify clean --fail-never -DskipTests
 
