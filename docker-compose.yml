@@ -27,7 +27,8 @@ services:
     environment:
       # Container configuration
       JAVA_OPTS: -Xms512m -Xmx2g -Djava.net.preferIPv4Stack=true
-      # Stats parsing schedule configuration
+      # Stats parsing configuration
+      STATS_URL_ROOT: "https://api2.foldingathome.org"
       # NOTE: The monthly reset will always occur at 00:55 on the first of the month
       STATS_PARSING_SCHEDULE_HOUR: "*"
       STATS_PARSING_SCHEDULE_MINUTE: "15"

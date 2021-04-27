@@ -4,8 +4,6 @@ import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.utils.EnvironmentVariables;
 import me.zodac.folding.db.postgres.PostgresDbManager;
 
-import java.util.Locale;
-
 /**
  * Utility class used to retrieve an instance of {@link DbManager} for the system.
  */
@@ -25,7 +23,7 @@ public class DbManagerRetriever {
     public static DbManager get() {
         final String deployedDatabase = EnvironmentVariables.get(DATABASE_VARIABLE_NAME);
 
-        if ("postgres".equals(deployedDatabase.toLowerCase(Locale.UK))) {
+        if ("postgres".equalsIgnoreCase(deployedDatabase)) {
             return new PostgresDbManager();
         }
         throw new IllegalStateException(String.format("Unable to find database of type using variable '%s': %s", DATABASE_VARIABLE_NAME, deployedDatabase));

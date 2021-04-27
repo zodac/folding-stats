@@ -1,16 +1,18 @@
 package me.zodac.folding.parsing.http.request;
 
+import me.zodac.folding.api.utils.EnvironmentVariables;
 import org.apache.commons.lang3.StringUtils;
 
 /**
  * Utility class used to build the URL to request Folding points for a user from the Stanford Folding@Home API.
  */
 public class PointsUrlBuilder {
-    
+
     // We do not care about the team number, as we want the points for user+passkey on all teams
     // However, the API call requires a team number to be specified, so we'll stick to OCN. :)
     private static final int TEAM_NUMBER = 37726;
-    private static final String POINTS_URL_ROOT_FORMAT = "https://api2.foldingathome.org/user/%s/stats";
+    private static final String STATS_URL_ROOT = EnvironmentVariables.get("STATS_URL_ROOT", "https://api2.foldingathome.org");
+    private static final String POINTS_URL_ROOT_FORMAT = STATS_URL_ROOT + "/user/%s/stats";
 
     private String user;
     private String passkey;

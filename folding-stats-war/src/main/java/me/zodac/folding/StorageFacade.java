@@ -443,6 +443,4 @@ public class StorageFacade {
         persistInitialUserStats(UserStats.create(user.getId(), TimeUtils.getCurrentUtcTimestamp(), currentAndInitialStats));
         LOGGER.info("Done updating");
     }
-
-
 }

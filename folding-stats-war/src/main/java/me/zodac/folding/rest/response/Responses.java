@@ -9,8 +9,11 @@ import javax.ws.rs.core.UriBuilder;
 public class Responses {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-    private static final String DEFAULT_ACCESS_CONTROL_ORIGIN = "*";
-    private static final String DEFAULT_ACCESS_CONTROL_METHODS = "GET, PUT, POST, PATCH, DELETE, HEAD";
+
+    private static final String ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_NAME = "Access-Control-Allow-Origin";
+    private static final String ACCESS_CONTROL_ALLOW_METHODS_HEADER_NAME = "Access-Control-Allow-Methods";
+    private static final String ACCESS_CONTROL_ALLOW_ORIGIN_DEFAULT_VALUE = "*";
+    private static final String ACCESS_CONTROL_ALLOW_METHODS_DEFAULT_VALUE = "GET, PUT, POST, PATCH, DELETE, HEAD";
 
     private Responses() {
 
@@ -19,8 +22,8 @@ public class Responses {
     public static Response notImplemented() {
         return Response
                 .status(Response.Status.NOT_IMPLEMENTED)
-                .header("Access-Control-Allow-Origin", DEFAULT_ACCESS_CONTROL_ORIGIN)
-                .header("Access-Control-Allow-Methods", DEFAULT_ACCESS_CONTROL_METHODS)
+                .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_NAME, ACCESS_CONTROL_ALLOW_ORIGIN_DEFAULT_VALUE)
+                .header(ACCESS_CONTROL_ALLOW_METHODS_HEADER_NAME, ACCESS_CONTROL_ALLOW_METHODS_DEFAULT_VALUE)
                 .build();
     }
 
@@ -39,8 +42,8 @@ public class Responses {
     public static Response noContent() {
         return Response
                 .noContent()
-                .header("Access-Control-Allow-Origin", DEFAULT_ACCESS_CONTROL_ORIGIN)
-                .header("Access-Control-Allow-Methods", DEFAULT_ACCESS_CONTROL_METHODS)
+                .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_NAME, ACCESS_CONTROL_ALLOW_ORIGIN_DEFAULT_VALUE)
+                .header(ACCESS_CONTROL_ALLOW_METHODS_HEADER_NAME, ACCESS_CONTROL_ALLOW_METHODS_DEFAULT_VALUE)
                 .build();
     }
 
@@ -68,16 +71,16 @@ public class Responses {
     public static Response ok() {
         return Response
                 .ok()
-                .header("Access-Control-Allow-Origin", DEFAULT_ACCESS_CONTROL_ORIGIN)
-                .header("Access-Control-Allow-Methods", DEFAULT_ACCESS_CONTROL_METHODS)
+                .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_NAME, ACCESS_CONTROL_ALLOW_ORIGIN_DEFAULT_VALUE)
+                .header(ACCESS_CONTROL_ALLOW_METHODS_HEADER_NAME, ACCESS_CONTROL_ALLOW_METHODS_DEFAULT_VALUE)
                 .build();
     }
 
     public static Response ok(final Object entity) {
         return Response
                 .ok()
-                .header("Access-Control-Allow-Origin", DEFAULT_ACCESS_CONTROL_ORIGIN)
-                .header("Access-Control-Allow-Methods", DEFAULT_ACCESS_CONTROL_METHODS)
+                .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_NAME, ACCESS_CONTROL_ALLOW_ORIGIN_DEFAULT_VALUE)
+                .header(ACCESS_CONTROL_ALLOW_METHODS_HEADER_NAME, ACCESS_CONTROL_ALLOW_METHODS_DEFAULT_VALUE)
                 .entity(GSON.toJson(entity))
                 .build();
     }
@@ -85,8 +88,8 @@ public class Responses {
     public static Response ok(final Object entity, final UriBuilder entityLocationBuilder) {
         return Response
                 .ok(entityLocationBuilder.build())
-                .header("Access-Control-Allow-Origin", DEFAULT_ACCESS_CONTROL_ORIGIN)
-                .header("Access-Control-Allow-Methods", DEFAULT_ACCESS_CONTROL_METHODS)
+                .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_NAME, ACCESS_CONTROL_ALLOW_ORIGIN_DEFAULT_VALUE)
+                .header(ACCESS_CONTROL_ALLOW_METHODS_HEADER_NAME, ACCESS_CONTROL_ALLOW_METHODS_DEFAULT_VALUE)
                 .entity(GSON.toJson(entity))
                 .build();
     }
@@ -94,8 +97,8 @@ public class Responses {
     public static Response created(final Object entity, final UriBuilder entityLocationBuilder) {
         return Response
                 .created(entityLocationBuilder.build())
-                .header("Access-Control-Allow-Origin", DEFAULT_ACCESS_CONTROL_ORIGIN)
-                .header("Access-Control-Allow-Methods", DEFAULT_ACCESS_CONTROL_METHODS)
+                .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_NAME, ACCESS_CONTROL_ALLOW_ORIGIN_DEFAULT_VALUE)
+                .header(ACCESS_CONTROL_ALLOW_METHODS_HEADER_NAME, ACCESS_CONTROL_ALLOW_METHODS_DEFAULT_VALUE)
                 .entity(GSON.toJson(entity))
                 .build();
     }

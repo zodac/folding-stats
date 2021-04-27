@@ -1,5 +1,6 @@
 package me.zodac.folding.parsing.http.request;
 
+import me.zodac.folding.api.utils.EnvironmentVariables;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -7,7 +8,8 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class UnitsUrlBuilder {
 
-    private static final String UNITS_URL_ROOT = "https://api2.foldingathome.org/bonus";
+    private static final String STATS_URL_ROOT = EnvironmentVariables.get("STATS_URL_ROOT", "https://api2.foldingathome.org");
+    private static final String UNITS_URL_ROOT = STATS_URL_ROOT + "/bonus";
 
     private String user;
     private String passkey;

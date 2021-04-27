@@ -6,7 +6,6 @@ import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.Stats;
-import me.zodac.folding.cache.InitialStatsCache;
 import me.zodac.folding.db.DbManagerRetriever;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,9 +52,8 @@ public class Initialiser {
 
             for (final User user : users) {
                 try {
-                    final Stats initialStatsForUser = dbManager.getInitialUserStats(user.getId());
+                    final Stats initialStatsForUser = storageFacade.getInitialStatsForUser(user.getId());
                     LOGGER.debug("Found initial stats for user {}: {}", user, initialStatsForUser);
-                    InitialStatsCache.get().add(user.getId(), initialStatsForUser);
                 } catch (final UserNotFoundException e) {
                     LOGGER.debug("No initial stats in DB for {}", user, e);
                     LOGGER.warn("No initial stats in DB for {}", user);
