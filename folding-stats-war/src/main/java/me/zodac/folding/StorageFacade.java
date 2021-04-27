@@ -85,7 +85,7 @@ public class StorageFacade {
             LOGGER.debug("Unable to find hardware with ID {} in cache", hardwareId, e);
         }
 
-        LOGGER.debug("Cache miss! Get hardware");
+        LOGGER.trace("Cache miss! Get hardware");
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
         final Hardware hardwareFromDb = dbManager.getHardware(hardwareId);
@@ -101,7 +101,7 @@ public class StorageFacade {
             return allHardware;
         }
 
-        LOGGER.debug("Cache miss! Get all hardware");
+        LOGGER.trace("Cache miss! Get all hardware");
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
         final List<Hardware> allHardwareFromDb = dbManager.getAllHardware();
@@ -145,7 +145,7 @@ public class StorageFacade {
             LOGGER.debug("Unable to find user with ID {} in cache", userId, e);
         }
 
-        LOGGER.debug("Cache miss! Get user");
+        LOGGER.trace("Cache miss! Get user");
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
         final User userFromDb = dbManager.getUser(userId);
@@ -171,7 +171,7 @@ public class StorageFacade {
                     .collect(toList());
         }
 
-        LOGGER.debug("Cache miss! Get all users");
+        LOGGER.trace("Cache miss! Get all users");
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
         final List<User> allUsersFromDb = dbManager.getAllUsers();
@@ -225,7 +225,7 @@ public class StorageFacade {
             LOGGER.debug("Unable to find team with ID {} in cache", teamId, e);
         }
 
-        LOGGER.debug("Cache miss! Get team");
+        LOGGER.trace("Cache miss! Get team");
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
         final Team teamFromDb = dbManager.getTeam(teamId);
@@ -240,7 +240,7 @@ public class StorageFacade {
             return allTeams;
         }
 
-        LOGGER.debug("Cache miss! Get all teams");
+        LOGGER.trace("Cache miss! Get all teams");
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
         final List<Team> allTeamsFromDb = dbManager.getAllTeams();
@@ -265,7 +265,7 @@ public class StorageFacade {
             return optionalRetiredUserStats.get();
         }
 
-        LOGGER.debug("Cache miss! Retired user TC stats");
+        LOGGER.trace("Cache miss! Retired user TC stats");
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
         final RetiredUserTcStats retiredUserTcStatsFromDb = dbManager.getRetiredUserStats(retiredUserId);
@@ -380,7 +380,7 @@ public class StorageFacade {
             return optionalUserTcStats.get();
         }
 
-        LOGGER.debug("Cache miss! Current TC stats");
+        LOGGER.trace("Cache miss! Current TC stats");
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
         final UserTcStats userTcStatsFromDb = dbManager.getCurrentTcStats(userId);
@@ -416,7 +416,7 @@ public class StorageFacade {
             }
         }
 
-        LOGGER.debug("Cache miss! All user offset stats");
+        LOGGER.trace("Cache miss! All user offset stats");
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
         final Map<Integer, UserStatsOffset> offsetStatsByUserIdFromDb = dbManager.getOffsetStats(userIds);
@@ -441,7 +441,7 @@ public class StorageFacade {
             return optionalTotalStats.get();
         }
 
-        LOGGER.debug("Cache miss! Total stats");
+        LOGGER.trace("Cache miss! Total stats");
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
         final Stats userTotalStatsFromDb = dbManager.getTotalStats(userId);
@@ -465,6 +465,7 @@ public class StorageFacade {
         LOGGER.info("Finished new method (total_stats: {}", totalStats);
 
         persistInitialUserStats(UserStats.create(user.getId(), TimeUtils.getCurrentUtcTimestamp(), currentAndInitialStats));
+        initialStatsCache.add(user.getId(), currentAndInitialStats);
         LOGGER.info("Done updating");
     }
 }
