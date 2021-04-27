@@ -84,7 +84,7 @@ public class PostgresDbManager implements DbManager {
 
     @Override
     public List<Hardware> getAllHardware() throws FoldingException {
-        final String selectSqlStatement = "SELECT * FROM hardware;";
+        final String selectSqlStatement = "SELECT * FROM hardware ORDER BY hardware_id ASC;";
         LOGGER.debug("Executing SQL statement '{}'", selectSqlStatement);
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
@@ -206,7 +206,7 @@ public class PostgresDbManager implements DbManager {
 
     @Override
     public List<User> getAllUsers() throws FoldingException {
-        final String selectSqlStatement = "SELECT * FROM users;";
+        final String selectSqlStatement = "SELECT * FROM users ORDER BY user_id ASC;";
         LOGGER.debug("Executing SQL statement: '{}'", selectSqlStatement);
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
@@ -328,7 +328,7 @@ public class PostgresDbManager implements DbManager {
 
     @Override
     public List<Team> getAllTeams() throws FoldingException {
-        final String selectSqlStatement = "SELECT * FROM teams;";
+        final String selectSqlStatement = "SELECT * FROM teams ORDER BY team_id ASC;";
         LOGGER.debug("Executing SQL statement '{}'", selectSqlStatement);
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
