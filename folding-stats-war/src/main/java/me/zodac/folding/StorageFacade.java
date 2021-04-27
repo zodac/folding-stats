@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 /**
@@ -132,10 +133,14 @@ public class StorageFacade {
         return userWithId;
     }
 
-
     public User getUser(final int userId) throws FoldingException, UserNotFoundException {
+        return getUserWithPasskey(userId, true);
+    }
+
+    public User getUserWithPasskey(final int userId, final boolean showFullPasskeys) throws FoldingException, UserNotFoundException {
         try {
-            return userCache.get(userId);
+            final User user = userCache.get(userId);
+            return showFullPasskeys ? user : User.hidePasskey(user);
         } catch (final NotFoundException e) {
             LOGGER.debug("Unable to find user with ID {} in cache", userId, e);
         }
@@ -146,14 +151,24 @@ public class StorageFacade {
         final User userFromDb = dbManager.getUser(userId);
         userCache.add(userFromDb);
 
-        return userFromDb;
+        return showFullPasskeys ? userFromDb : User.hidePasskey(userFromDb);
     }
 
     public List<User> getAllUsers() throws FoldingException {
+        return getAllUsersWithPasskeys(true);
+    }
+
+    public List<User> getAllUsersWithPasskeys(final boolean showFullPasskeys) throws FoldingException {
         final List<User> allUsers = userCache.getAll();
 
         if (!allUsers.isEmpty()) {
-            return allUsers;
+            if (showFullPasskeys) {
+                return allUsers;
+            }
+
+            return allUsers.stream()
+                    .map(User::hidePasskey)
+                    .collect(toList());
         }
 
         LOGGER.debug("Cache miss! Get all users");
@@ -161,7 +176,14 @@ public class StorageFacade {
         // But adding this just in case we decide to add some cache eviction in future
         final List<User> allUsersFromDb = dbManager.getAllUsers();
         userCache.addAll(allUsersFromDb);
-        return allUsersFromDb;
+
+        if (showFullPasskeys) {
+            return allUsersFromDb;
+        }
+
+        return allUsersFromDb.stream()
+                .map(User::hidePasskey)
+                .collect(toList());
     }
 
     public void updateUser(final User updatedUser) throws FoldingException, UserNotFoundException, FoldingConflictException {

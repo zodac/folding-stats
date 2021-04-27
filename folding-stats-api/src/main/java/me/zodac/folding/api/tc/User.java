@@ -17,8 +17,9 @@ import me.zodac.folding.api.Identifiable;
 @EqualsAndHashCode
 @ToString(doNotUseGetters = true)
 public class User implements Identifiable {
-    
+
     public static final int EMPTY_USER_ID = 0;
+    private static final String PASSKEY_MASK = new String(new char[24]).replace('\0', '*');
 
     private int id;
     private String foldingUserName;
@@ -45,7 +46,15 @@ public class User implements Identifiable {
         return new User(user.id, user.foldingUserName, user.displayName, user.passkey, user.category, user.hardwareId, user.liveStatsLink, true);
     }
 
+    public static User hidePasskey(final User user) {
+        return new User(user.id, user.foldingUserName, user.displayName, hidePasskey(user.passkey), user.category, user.hardwareId, user.liveStatsLink, user.isRetired);
+    }
+
     public boolean isActive() {
         return !isRetired;
+    }
+
+    private static String hidePasskey(final String passkey) {
+        return passkey.substring(0, 8).concat(PASSKEY_MASK);
     }
 }

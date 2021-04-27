@@ -26,6 +26,7 @@ import java.util.Map;
 // TODO: [zodac] A lot of lists being used here (and other places I'm sure), many could be collections, update them
 public interface DbManager {
 
+
     // CRUD operations
 
     /**

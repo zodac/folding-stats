@@ -142,12 +142,12 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
 
     @Override
     protected List<User> getAllElements() throws FoldingException {
-        return storageFacade.getAllUsers();
+        return storageFacade.getAllUsersWithPasskeys(false);
     }
 
     @Override
     protected User getElementById(final int userId) throws FoldingException, NotFoundException {
-        return storageFacade.getUser(userId);
+        return storageFacade.getUserWithPasskey(userId, false);
     }
 
     @Override
