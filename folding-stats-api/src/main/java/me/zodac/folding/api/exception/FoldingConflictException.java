@@ -8,12 +8,4 @@ public class FoldingConflictException extends Exception {
     public FoldingConflictException() {
         super();
     }
-
-    public FoldingConflictException(final String message) {
-        super(message);
-    }
-
-    public FoldingConflictException(final String message, final Throwable throwable) {
-        super(message, throwable);
-    }
 }

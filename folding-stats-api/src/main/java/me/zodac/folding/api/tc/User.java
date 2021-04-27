@@ -17,9 +17,7 @@ import me.zodac.folding.api.Identifiable;
 @EqualsAndHashCode
 @ToString(doNotUseGetters = true)
 public class User implements Identifiable {
-
-    private static final long serialVersionUID = -1919458037620452556L;
-
+    
     public static final int EMPTY_USER_ID = 0;
 
     private int id;

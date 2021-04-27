@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
@@ -18,10 +17,8 @@ import java.util.List;
 @Setter
 @EqualsAndHashCode
 @ToString(doNotUseGetters = true)
-public class ValidationResponse implements Serializable {
-
-    private static final long serialVersionUID = -8159619110977167992L;
-
+public class ValidationResponse {
+    
     private Object invalidObject;
     private List<String> errors;
 

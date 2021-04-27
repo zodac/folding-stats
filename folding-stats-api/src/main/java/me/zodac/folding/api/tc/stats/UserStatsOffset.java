@@ -8,18 +8,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.io.Serializable;
-
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @Setter
 @EqualsAndHashCode
 @ToString(doNotUseGetters = true)
-public class UserStatsOffset implements Serializable {
-
-    private static final long serialVersionUID = 2093276973835873285L;
-
+public class UserStatsOffset {
+    
     private static final long DEFAULT_POINTS = 0L;
     private static final int DEFAULT_UNITS = 0;
 

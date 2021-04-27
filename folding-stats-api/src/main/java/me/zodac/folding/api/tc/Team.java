@@ -19,9 +19,7 @@ import java.util.Set;
 @EqualsAndHashCode
 @ToString(doNotUseGetters = true)
 public class Team implements Identifiable {
-
-    private static final long serialVersionUID = -8765213859473081036L;
-
+    
     private int id;
     private String teamName;
     private String teamDescription;

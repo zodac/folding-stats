@@ -6,17 +6,14 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.io.Serializable;
 import java.sql.Timestamp;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @EqualsAndHashCode
 @ToString(doNotUseGetters = true)
-public class UserTcStats implements Serializable {
-
-    private static final long serialVersionUID = 2580704030277763093L;
-
+public class UserTcStats {
+    
     private final int userId;
     private final Timestamp timestamp;
     private final long points;
