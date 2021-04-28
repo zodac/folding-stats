@@ -3,6 +3,8 @@ package me.zodac.folding.rest;
 import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
+import me.zodac.folding.api.exception.FoldingIdInvalidException;
+import me.zodac.folding.api.exception.FoldingIdOutOfRangeException;
 import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.api.exception.TeamNotFoundException;
 import me.zodac.folding.api.exception.UserNotFoundException;
@@ -100,16 +102,25 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
         getLogger().info("PATCH request to retire user from team received at '{}'", uriContext.getAbsolutePath());
 
         try {
-            final Team team = storageFacade.getTeam(Integer.parseInt(teamId));
-            final ValidationResponse validationResponse = TeamValidator.isValidRetirement(team, Integer.parseInt(userId));
+            final int parsedTeamId = super.parseId(teamId);
+            final int parsedUnitId = super.parseId(userId);
+
+
+            final Team team = storageFacade.getTeam(parsedTeamId);
+            final ValidationResponse validationResponse = TeamValidator.isValidRetirement(team, parsedUnitId);
             if (validationResponse.isInvalid()) {
                 return badRequest(validationResponse);
             }
 
-            storageFacade.retireUser(Integer.parseInt(teamId), Integer.parseInt(userId));
+            storageFacade.retireUser(parsedTeamId, parsedUnitId);
             return ok();
-        } catch (final NumberFormatException e) {
-            final String errorMessage = String.format("The team ID '%s' or user ID '%s' is not a valid format", teamId, userId);
+        } catch (final FoldingIdInvalidException e) {
+            final String errorMessage = String.format("The ID '%s' is not a valid format", e.getId());
+            getLogger().debug(errorMessage, e);
+            getLogger().error(errorMessage);
+            return badRequest(errorMessage);
+        } catch (final FoldingIdOutOfRangeException e) {
+            final String errorMessage = String.format("The ID '%s' is out of range", e.getId());
             getLogger().debug(errorMessage, e);
             getLogger().error(errorMessage);
             return badRequest(errorMessage);
@@ -139,16 +150,24 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
         getLogger().info("PATCH request to un-retire user from team received at '{}'", uriContext.getAbsolutePath());
 
         try {
-            final Team team = storageFacade.getTeam(Integer.parseInt(teamId));
-            final ValidationResponse validationResponse = TeamValidator.isValidUnretirement(team, Integer.parseInt(retiredUserId));
+            final int parsedTeamId = super.parseId(teamId);
+            final int parsedRetiredUserId = super.parseId(retiredUserId);
+            
+            final Team team = storageFacade.getTeam(parsedTeamId);
+            final ValidationResponse validationResponse = TeamValidator.isValidUnretirement(team, parsedRetiredUserId);
             if (validationResponse.isInvalid()) {
                 return badRequest(validationResponse);
             }
 
-            storageFacade.unretireUser(Integer.parseInt(teamId), Integer.parseInt(retiredUserId));
+            storageFacade.unretireUser(parsedTeamId, parsedRetiredUserId);
             return ok();
-        } catch (final NumberFormatException e) {
-            final String errorMessage = String.format("The team ID '%s' or retired user ID '%s' is not a valid format", teamId, retiredUserId);
+        } catch (final FoldingIdInvalidException e) {
+            final String errorMessage = String.format("The ID '%s' is not a valid format", e.getId());
+            getLogger().debug(errorMessage, e);
+            getLogger().error(errorMessage);
+            return badRequest(errorMessage);
+        } catch (final FoldingIdOutOfRangeException e) {
+            final String errorMessage = String.format("The ID '%s' is out of range", e.getId());
             getLogger().debug(errorMessage, e);
             getLogger().error(errorMessage);
             return badRequest(errorMessage);

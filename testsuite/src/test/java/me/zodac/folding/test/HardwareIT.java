@@ -172,8 +172,8 @@ public class HardwareIT {
     @Test
     @RunAsClient
     @InSequence(7)
-    public void whenGettingHardware_givenAnInvalidHardwareId_thenNoJsonResponseIsReturned_andHasA404Status() throws IOException, InterruptedException {
-        final int invalidId = -1;
+    public void whenGettingHardware_givenANonExistingHardwareId_thenNoJsonResponseIsReturned_andHasA404Status() throws IOException, InterruptedException {
+        final int invalidId = 99;
         final HttpResponse<String> response = HardwareUtils.RequestSender.get(invalidId);
 
         assertThat(response.statusCode())
@@ -188,8 +188,8 @@ public class HardwareIT {
     @Test
     @RunAsClient
     @InSequence(8)
-    public void whenUpdatingHardware_givenAnInvalidHardwareId_thenNoJsonResponseIsReturned_andHasA404Status() throws IOException, InterruptedException {
-        final int invalidId = -1;
+    public void whenUpdatingHardware_givenANonExistingHardwareId_thenNoJsonResponseIsReturned_andHasA404Status() throws IOException, InterruptedException {
+        final int invalidId = 99;
         final Hardware updatedHardware = Hardware.create(invalidId, "Test GPU", "Base GPU", OperatingSystem.WINDOWS, 1.0D);
 
         final HttpResponse<String> response = HardwareUtils.RequestSender.update(updatedHardware);
@@ -205,8 +205,8 @@ public class HardwareIT {
     @Test
     @RunAsClient
     @InSequence(9)
-    public void whenDeletingHardware_givenAnInvalidHardwareId_thenNoJsonResponseIsReturned_andHasA204Status() throws IOException, InterruptedException {
-        final int invalidId = -1;
+    public void whenDeletingHardware_givenANonExistingHardwareId_thenNoJsonResponseIsReturned_andHasA204Status() throws IOException, InterruptedException {
+        final int invalidId = 99;
         final HttpResponse<String> response = HardwareUtils.RequestSender.delete(invalidId);
 
         assertThat(response.statusCode())

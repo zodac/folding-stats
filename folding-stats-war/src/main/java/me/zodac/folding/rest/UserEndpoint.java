@@ -3,6 +3,8 @@ package me.zodac.folding.rest;
 import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
+import me.zodac.folding.api.exception.FoldingIdInvalidException;
+import me.zodac.folding.api.exception.FoldingIdOutOfRangeException;
 import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.User;
@@ -100,11 +102,17 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
         getLogger().info("PATCH request to update offset for user received at '{}': {}", uriContext.getAbsolutePath(), userStatsOffset);
 
         try {
-            storageFacade.addOrUpdateOffsetStats(Integer.parseInt(userId), userStatsOffset);
-            teamCompetitionStatsParser.updateTcStatsForUser(Integer.parseInt(userId));
+            final int parsedId = super.parseId(userId);
+            storageFacade.addOrUpdateOffsetStats(parsedId, userStatsOffset);
+            teamCompetitionStatsParser.updateTcStatsForUser(parsedId);
             return ok();
-        } catch (final NumberFormatException e) {
-            final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), userId);
+        } catch (final FoldingIdInvalidException e) {
+            final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), e.getId());
+            getLogger().debug(errorMessage, e);
+            getLogger().error(errorMessage);
+            return badRequest(errorMessage);
+        } catch (final FoldingIdOutOfRangeException e) {
+            final String errorMessage = String.format("The %s ID '%s' is out of range", elementType(), e.getId());
             getLogger().debug(errorMessage, e);
             getLogger().error(errorMessage);
             return badRequest(errorMessage);

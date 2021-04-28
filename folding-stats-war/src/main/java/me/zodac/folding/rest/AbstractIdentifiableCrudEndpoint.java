@@ -3,6 +3,8 @@ package me.zodac.folding.rest;
 import me.zodac.folding.api.Identifiable;
 import me.zodac.folding.api.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
+import me.zodac.folding.api.exception.FoldingIdInvalidException;
+import me.zodac.folding.api.exception.FoldingIdOutOfRangeException;
 import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.rest.response.BulkCreateResponse;
 import me.zodac.folding.validator.ValidationResponse;
@@ -145,10 +147,15 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
         getLogger().info("GET request for {} received at '{}'", elementType(), uriContext.getAbsolutePath());
 
         try {
-            final V element = getElementById(Integer.parseInt(elementId));
+            final V element = getElementById(parseId(elementId));
             return ok(element);
-        } catch (final NumberFormatException e) {
-            final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), elementId);
+        } catch (final FoldingIdInvalidException e) {
+            final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), e.getId());
+            getLogger().debug(errorMessage, e);
+            getLogger().error(errorMessage);
+            return badRequest(errorMessage);
+        } catch (final FoldingIdOutOfRangeException e) {
+            final String errorMessage = String.format("The %s ID '%s' is out of range", elementType(), e.getId());
             getLogger().debug(errorMessage, e);
             getLogger().error(errorMessage);
             return badRequest(errorMessage);
@@ -174,29 +181,35 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
         }
 
         try {
+            final int parsedId = parseId(elementId);
             // We want to make sure the payload is not trying to change the ID of the element
             // If no ID is provided, the POJO will default to a value of 0, which is acceptable
-            if (Integer.parseInt(elementId) != element.getId() && element.getId() != 0) {
+            if (parsedId != element.getId() && element.getId() != 0) {
                 final String errorMessage = String.format("Path ID '%s' does not match ID '%s' of payload", elementId, element.getId());
                 getLogger().error(errorMessage);
                 return badRequest(errorMessage);
             }
 
-            final V existingElement = getElementById(Integer.parseInt(elementId));
+            final V existingElement = getElementById(parsedId);
 
             if (existingElement.equals(element)) {
                 getLogger().debug("No change necessary");
                 return noContent();
             }
 
-            final V updatedElementWithId = updateElementById(Integer.parseInt(elementId), element);
+            final V updatedElementWithId = updateElementById(parsedId, element);
 
             final UriBuilder elementLocationBuilder = uriContext
                     .getRequestUriBuilder()
                     .path(String.valueOf(element.getId()));
             return ok(updatedElementWithId, elementLocationBuilder);
-        } catch (final NumberFormatException e) {
-            final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), elementId);
+        } catch (final FoldingIdInvalidException e) {
+            final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), e.getId());
+            getLogger().debug(errorMessage, e);
+            getLogger().error(errorMessage);
+            return badRequest(errorMessage);
+        } catch (final FoldingIdOutOfRangeException e) {
+            final String errorMessage = String.format("The %s ID '%s' is out of range", elementType(), e.getId());
             getLogger().debug(errorMessage, e);
             getLogger().error(errorMessage);
             return badRequest(errorMessage);
@@ -222,11 +235,17 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
         getLogger().info("DELETE request for {} received at '{}'", elementType(), uriContext.getAbsolutePath());
 
         try {
-            getElementById(Integer.parseInt(elementId));
-            deleteElementById(Integer.parseInt(elementId));
+            final int parsedId = parseId(elementId);
+            getElementById(parsedId);
+            deleteElementById(parsedId);
             return noContent();
-        } catch (final NumberFormatException e) {
-            final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), elementId);
+        } catch (final FoldingIdInvalidException e) {
+            final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), e.getId());
+            getLogger().debug(errorMessage, e);
+            getLogger().error(errorMessage);
+            return badRequest(errorMessage);
+        } catch (final FoldingIdOutOfRangeException e) {
+            final String errorMessage = String.format("The %s ID '%s' is out of range", elementType(), e.getId());
             getLogger().debug(errorMessage, e);
             getLogger().error(errorMessage);
             return badRequest(errorMessage);
@@ -248,5 +267,15 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
         }
     }
 
-    // TODO: [zodac] Add a function #parseId(), to handle invalid and negative ints
+    protected int parseId(final String id) throws FoldingIdInvalidException, FoldingIdOutOfRangeException {
+        try {
+            final int parsedId = Integer.parseInt(id);
+            if (parsedId < 0) {
+                throw new FoldingIdOutOfRangeException(parsedId);
+            }
+            return parsedId;
+        } catch (final NumberFormatException e) {
+            throw new FoldingIdInvalidException(id, e);
+        }
+    }
 }
