@@ -2,9 +2,11 @@ package me.zodac.folding.rest.response;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import me.zodac.folding.api.Identifiable;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
+import java.util.List;
 
 public class Responses {
 
@@ -73,6 +75,16 @@ public class Responses {
                 .ok()
                 .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_NAME, ACCESS_CONTROL_ALLOW_ORIGIN_DEFAULT_VALUE)
                 .header(ACCESS_CONTROL_ALLOW_METHODS_HEADER_NAME, ACCESS_CONTROL_ALLOW_METHODS_DEFAULT_VALUE)
+                .build();
+    }
+
+    public static Response ok(final List<? extends Identifiable> entities) {
+        return Response
+                .ok()
+                .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_NAME, ACCESS_CONTROL_ALLOW_ORIGIN_DEFAULT_VALUE)
+                .header(ACCESS_CONTROL_ALLOW_METHODS_HEADER_NAME, ACCESS_CONTROL_ALLOW_METHODS_DEFAULT_VALUE)
+                .header("X-Total-Count", entities.size())
+                .entity(GSON.toJson(entities))
                 .build();
     }
 

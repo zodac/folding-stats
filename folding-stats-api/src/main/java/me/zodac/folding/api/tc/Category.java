@@ -27,11 +27,11 @@ public enum Category {
         this.permittedAmount = permittedAmount;
     }
 
-    public String getDisplayName() {
+    public String displayName() {
         return displayName;
     }
 
-    public int getPermittedAmount() {
+    public int permittedAmount() {
         return permittedAmount;
     }
 

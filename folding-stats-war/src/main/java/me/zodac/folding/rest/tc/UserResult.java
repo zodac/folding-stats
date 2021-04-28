@@ -50,6 +50,6 @@ public class UserResult {
     }
 
     public static UserResult createForRetiredUser(final User retiredUser, final Hardware retiredUserHardware, final RetiredUserTcStats retiredUserTcStats) {
-        return new UserResult(retiredUserTcStats.getDisplayUserName(), retiredUserHardware.getDisplayName(), Category.get(retiredUser.getCategory()).getDisplayName(), retiredUserTcStats.getPoints(), retiredUserTcStats.getMultipliedPoints(), retiredUserTcStats.getUnits(), DEFAULT_USER_RANK, retiredUser.getLiveStatsLink(), true);
+        return new UserResult(retiredUserTcStats.getDisplayUserName(), retiredUserHardware.getDisplayName(), Category.get(retiredUser.getCategory()).displayName(), retiredUserTcStats.getPoints(), retiredUserTcStats.getMultipliedPoints(), retiredUserTcStats.getUnits(), DEFAULT_USER_RANK, retiredUser.getLiveStatsLink(), true);
     }
 }

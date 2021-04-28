@@ -72,7 +72,7 @@ public class StorageFacade {
 
     public Hardware createHardware(final Hardware hardware) throws FoldingException, FoldingConflictException {
         // The REST input may not use the correct format for the ENUM, so we normalise it here
-        hardware.setOperatingSystem(OperatingSystem.get(hardware.getOperatingSystem()).getDisplayName());
+        hardware.setOperatingSystem(OperatingSystem.get(hardware.getOperatingSystem()).displayName());
         final Hardware hardwareWithId = dbManager.createHardware(hardware);
         hardwareCache.add(hardwareWithId);
         return hardwareWithId;
@@ -90,7 +90,6 @@ public class StorageFacade {
         // But adding this just in case we decide to add some cache eviction in future
         final Hardware hardwareFromDb = dbManager.getHardware(hardwareId);
         hardwareCache.add(hardwareFromDb);
-
         return hardwareFromDb;
     }
 
@@ -121,7 +120,7 @@ public class StorageFacade {
 
     public User createUser(final User user) throws FoldingException, FoldingConflictException {
         // The REST input may not use the correct format for the ENUM, so we normalise it here
-        user.setCategory(Category.get(user.getCategory()).getDisplayName());
+        user.setCategory(Category.get(user.getCategory()).displayName());
         final User userWithId = dbManager.createUser(user);
         userCache.add(userWithId);
 

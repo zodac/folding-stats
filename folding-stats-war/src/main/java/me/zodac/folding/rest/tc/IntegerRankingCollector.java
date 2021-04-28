@@ -15,6 +15,8 @@ import java.util.function.Supplier;
 import java.util.stream.Collector;
 
 /**
+ * Ranking logic for teams/users to rank by a specified function (getting points, or units, etc).
+ *
  * @see <a href="https://stackoverflow.com/a/41608187/2000246">How to rank collection of objects</a>
  */
 class IntegerRankingCollector<T> implements Collector<T, List<T>, List<T>> {
@@ -33,7 +35,7 @@ class IntegerRankingCollector<T> implements Collector<T, List<T>, List<T>> {
     @Override
     public BiConsumer<List<T>, T> accumulator() {
         return (list, current) -> {
-            final ArrayList<T> right = new ArrayList<>();
+            final List<T> right = new ArrayList<>();
             right.add(creator.apply(current, 1));
             combiner().apply(list, right);
         };

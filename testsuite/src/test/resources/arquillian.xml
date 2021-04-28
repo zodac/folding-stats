@@ -15,7 +15,7 @@
     <container qualifier="wildfly" default="true">
         <configuration>
             <property name="managementAddress">192.168.99.100</property>
-            <property name="managementPort">9990</property>
+            <property name="managementPort">9991</property>
             <property name="username">root</property>
             <property name="password">shroot</property>
         </configuration>

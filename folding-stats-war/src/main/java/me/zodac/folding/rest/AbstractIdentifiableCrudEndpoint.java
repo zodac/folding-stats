@@ -222,6 +222,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
         getLogger().info("DELETE request for {} received at '{}'", elementType(), uriContext.getAbsolutePath());
 
         try {
+            getElementById(Integer.parseInt(elementId));
             deleteElementById(Integer.parseInt(elementId));
             return noContent();
         } catch (final NumberFormatException e) {
@@ -229,6 +230,10 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
             getLogger().debug(errorMessage, e);
             getLogger().error(errorMessage);
             return badRequest(errorMessage);
+        } catch (final NotFoundException e) {
+            getLogger().debug("No {} found with ID: {}", elementType(), elementId, e);
+            getLogger().error("No {} found with ID: {}", elementType(), elementId);
+            return noContent();
         } catch (final FoldingConflictException e) {
             final String errorMessage = String.format("The %s ID '%s' is in use, remove all usages before deleting", elementType(), elementId);
             getLogger().debug(errorMessage, e);
@@ -242,4 +247,6 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
             return serverError();
         }
     }
+
+    // TODO: [zodac] Add a function #parseId(), to handle invalid and negative ints
 }

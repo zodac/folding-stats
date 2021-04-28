@@ -89,8 +89,8 @@ public class TeamValidator {
                     .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
             for (final Map.Entry<Category, Long> categoryAndCount : categoryCount.entrySet()) {
-                if (categoryAndCount.getValue() > categoryAndCount.getKey().getPermittedAmount()) {
-                    failureMessages.add(String.format("Found %s users of category %s, only %s permitted", categoryAndCount.getValue(), categoryAndCount.getKey(), categoryAndCount.getKey().getPermittedAmount()));
+                if (categoryAndCount.getValue() > categoryAndCount.getKey().permittedAmount()) {
+                    failureMessages.add(String.format("Found %s users of category %s, only %s permitted", categoryAndCount.getValue(), categoryAndCount.getKey(), categoryAndCount.getKey().permittedAmount()));
                 }
             }
         }

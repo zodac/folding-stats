@@ -35,6 +35,7 @@ public final class Deployments {
         return ShrinkWrap.create(EnterpriseArchive.class, "FoldingStatsTestEar.ear")
                 .addAsLibraries(resolveLocalJars("me.zodac", "folding-stats-api"))
                 .addAsLibraries(resolveLocalJars("com.google.code.gson", "gson"))
+                .addAsLibraries(resolveLocalJars("org.postgresql", "postgresql"))
                 .addAsModule(ejbJar);
     }
 

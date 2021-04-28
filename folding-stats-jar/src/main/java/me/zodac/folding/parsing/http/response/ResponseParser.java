@@ -45,8 +45,7 @@ public class ResponseParser {
             LOGGER.warn("No valid units found for user/passkey: '{}/{}'", userName, passkey);
             return 0;
         }
-
-
+        
         // If the username+passkey has been used on multiple teams, we will get multiple responses
         // Unfortunately, there is no way to filter on team currently, but to be fair to the other users we will take
         // the result with the lowest number of finished units.

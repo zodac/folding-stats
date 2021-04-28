@@ -7,6 +7,7 @@ import me.zodac.folding.api.exception.HardwareNotFoundException;
 import me.zodac.folding.api.exception.TeamNotFoundException;
 import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.Hardware;
+import me.zodac.folding.api.tc.OperatingSystem;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
@@ -903,7 +904,7 @@ public class PostgresDbManager implements DbManager {
                 resultSet.getInt("hardware_id"),
                 resultSet.getString("hardware_name"),
                 resultSet.getString("display_name"),
-                resultSet.getString("operating_system"),
+                OperatingSystem.get(resultSet.getString("operating_system")),
                 resultSet.getDouble("multiplier")
         );
     }

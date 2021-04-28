@@ -25,7 +25,7 @@ public enum OperatingSystem {
         this.displayName = displayName;
     }
 
-    public String getDisplayName() {
+    public String displayName() {
         return displayName;
     }
 
