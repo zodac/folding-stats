@@ -2,6 +2,7 @@ package me.zodac.folding.bean;
 
 import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.exception.FoldingException;
+import me.zodac.folding.api.exception.FoldingExternalServiceException;
 import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
@@ -189,7 +190,7 @@ public class TeamCompetitionStatsParser {
                 final UserStats userStats = FoldingStatsParser.getStatsForUser(user);
                 stats.add(userStats);
                 LOGGER.debug("{}: {} total points (unmultiplied) | {} total units", user.getFoldingUserName(), formatWithCommas(userStats.getPoints()), formatWithCommas(userStats.getUnits()));
-            } catch (final FoldingException e) {
+            } catch (final FoldingException | FoldingExternalServiceException e) {
                 LOGGER.warn("Unable to get stats for user '{}/{}'", user.getFoldingUserName(), user.getPasskey(), e.getCause());
             }
         }

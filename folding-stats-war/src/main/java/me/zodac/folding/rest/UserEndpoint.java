@@ -3,6 +3,7 @@ package me.zodac.folding.rest;
 import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
+import me.zodac.folding.api.exception.FoldingExternalServiceException;
 import me.zodac.folding.api.exception.FoldingIdInvalidException;
 import me.zodac.folding.api.exception.FoldingIdOutOfRangeException;
 import me.zodac.folding.api.exception.NotFoundException;
@@ -144,7 +145,7 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
     }
 
     @Override
-    protected User createElement(final User user) throws FoldingException, FoldingConflictException {
+    protected User createElement(final User user) throws FoldingException, FoldingConflictException, FoldingExternalServiceException {
         return storageFacade.createUser(user);
     }
 
@@ -159,7 +160,7 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
     }
 
     @Override
-    protected User updateElementById(final int userId, final User user) throws FoldingException, NotFoundException, FoldingConflictException {
+    protected User updateElementById(final int userId, final User user) throws FoldingException, NotFoundException, FoldingConflictException, FoldingExternalServiceException {
         if (user.getId() == 0) {
             // The payload 'should' have the ID, but it's not necessary if the correct URL is used
             final User userWithId = User.updateWithId(userId, user);

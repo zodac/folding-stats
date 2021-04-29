@@ -27,7 +27,7 @@ public final class Deployments {
      * @return the test EAR
      */
     static EnterpriseArchive getTestEar() {
-        final WebArchive ejbJar = ShrinkWrap.create(WebArchive.class, "FoldingStatsTestWar.war")
+        final WebArchive webArchive = ShrinkWrap.create(WebArchive.class, "FoldingStatsTestWar.war")
                 .addPackages(true, Deployments.class.getPackage())
                 .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml")
                 .addAsResource("log4j.properties");
@@ -36,7 +36,7 @@ public final class Deployments {
                 .addAsLibraries(resolveLocalJars("me.zodac", "folding-stats-api"))
                 .addAsLibraries(resolveLocalJars("com.google.code.gson", "gson"))
                 .addAsLibraries(resolveLocalJars("org.postgresql", "postgresql"))
-                .addAsModule(ejbJar);
+                .addAsModule(webArchive);
     }
 
     private static File[] resolveLocalJars(final String groupId, final String artifactId) {

@@ -25,17 +25,19 @@ public final class DatabaseCleaner {
     }
 
     /**
-     * Deletes all entries in the given {@code tableName} and resets the serial count for the identity to 0.
+     * Deletes all entries in the given {@code tableNames} and resets the serial count for the identity to 0.
      *
-     * @param tableName the table to clean/truncate
+     * @param tableNames the tables to clean/truncate
      * @throws SQLException thrown if there was an error connecting to the DB
      */
-    public static void truncateTableAndResetId(final String tableName) throws SQLException {
-        final String truncateQuery = String.format("TRUNCATE TABLE %s RESTART IDENTITY CASCADE;", tableName);
+    public static void truncateTableAndResetId(final String... tableNames) throws SQLException {
+        for (final String tableName : tableNames) {
+            final String truncateQuery = String.format("TRUNCATE TABLE %s RESTART IDENTITY CASCADE;", tableName);
 
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
-             final PreparedStatement preparedStatement = connection.prepareStatement(truncateQuery)) {
-            preparedStatement.execute();
+            try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+                 final PreparedStatement preparedStatement = connection.prepareStatement(truncateQuery)) {
+                preparedStatement.execute();
+            }
         }
     }
 }

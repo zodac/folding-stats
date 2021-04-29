@@ -15,6 +15,8 @@
         <module>${project.artifactId}-ear</module>
         <module>${project.artifactId}-jar</module>
         <module>${project.artifactId}-war</module>
+        <module>stubbed-folding-endpoints-ear</module>
+        <module>stubbed-folding-endpoints-war</module>
         <module>testsuite</module>
     </modules>
 
@@ -63,6 +65,12 @@
             <dependency>
                 <groupId>me.zodac</groupId>
                 <artifactId>folding-stats-war</artifactId>
+                <version>${project.version}</version>
+                <type>war</type>
+            </dependency>
+            <dependency>
+                <groupId>me.zodac</groupId>
+                <artifactId>stubbed-folding-endpoints-war</artifactId>
                 <version>${project.version}</version>
                 <type>war</type>
             </dependency>

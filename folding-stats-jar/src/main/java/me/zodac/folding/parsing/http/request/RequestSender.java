@@ -1,10 +1,12 @@
 package me.zodac.folding.parsing.http.request;
 
 import me.zodac.folding.api.exception.FoldingException;
+import me.zodac.folding.api.exception.FoldingExternalServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -26,7 +28,7 @@ public class RequestSender {
 
     // The Folding@Home API seems to be caching the username+passkey stats. The first request will have the same result as the previous hour
     // To get around this, we send a request, ignore it, then send another request and parse that one
-    public static HttpResponse<String> sendFoldingRequest(final String requestUrl) throws FoldingException {
+    public static HttpResponse<String> sendFoldingRequest(final String requestUrl) throws FoldingException, FoldingExternalServiceException {
         try {
             final HttpRequest request = HttpRequest.newBuilder()
                     .GET()
@@ -50,6 +52,10 @@ public class RequestSender {
             }
 
             return response;
+        } catch (final ConnectException e) {
+            LOGGER.debug("Connection error retrieving stats for user", e);
+            LOGGER.warn("Connection error retrieving stats for user");
+            throw new FoldingExternalServiceException("Unable to connect to Folding@Home API");
         } catch (final IOException | InterruptedException e) {
             throw new FoldingException("Unable to send HTTP request to Folding@Home API", e);
         } catch (final ClassCastException e) {

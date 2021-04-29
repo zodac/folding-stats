@@ -6,6 +6,7 @@ import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.HardwareNotFoundException;
 import me.zodac.folding.api.exception.TeamNotFoundException;
 import me.zodac.folding.api.exception.UserNotFoundException;
+import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.OperatingSystem;
 import me.zodac.folding.api.tc.Team;
@@ -915,7 +916,7 @@ public class PostgresDbManager implements DbManager {
                 resultSet.getString("folding_username"),
                 resultSet.getString("display_username"),
                 resultSet.getString("passkey"),
-                resultSet.getString("category"),
+                Category.get(resultSet.getString("category")),
                 resultSet.getInt("hardware_id"),
                 resultSet.getString("live_stats_link"),
                 resultSet.getBoolean("is_retired")

@@ -4,6 +4,7 @@ package me.zodac.folding;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
+import me.zodac.folding.api.exception.FoldingExternalServiceException;
 import me.zodac.folding.api.exception.HardwareNotFoundException;
 import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.api.exception.TeamNotFoundException;
@@ -118,12 +119,13 @@ public class StorageFacade {
         hardwareCache.remove(hardwareId);
     }
 
-    public User createUser(final User user) throws FoldingException, FoldingConflictException {
+    public User createUser(final User user) throws FoldingException, FoldingConflictException, FoldingExternalServiceException {
         // The REST input may not use the correct format for the ENUM, so we normalise it here
         user.setCategory(Category.get(user.getCategory()).displayName());
         final User userWithId = dbManager.createUser(user);
         userCache.add(userWithId);
 
+        // TODO: [zodac] Should the StorageFacade be responsible for making this stats call? Or should it be the caller requesting it?
         // When adding a new user, we configure the initial stats DB/cache
         persistInitialUserStats(userWithId);
         // When adding a new user, we give an empty offset to the offset cache
@@ -185,7 +187,7 @@ public class StorageFacade {
                 .collect(toList());
     }
 
-    public void updateUser(final User updatedUser) throws FoldingException, UserNotFoundException, FoldingConflictException {
+    public void updateUser(final User updatedUser) throws FoldingException, UserNotFoundException, FoldingConflictException, FoldingExternalServiceException {
         final User existingUser = getUser(updatedUser.getId());
         dbManager.updateUser(updatedUser);
         userCache.add(updatedUser);
@@ -288,7 +290,7 @@ public class StorageFacade {
         teamCache.add(updatedTeam);
     }
 
-    public void unretireUser(final int teamId, final int retiredUserId) throws UserNotFoundException, FoldingException, FoldingConflictException, TeamNotFoundException {
+    public void unretireUser(final int teamId, final int retiredUserId) throws UserNotFoundException, FoldingException, FoldingConflictException, TeamNotFoundException, FoldingExternalServiceException {
         // Get the original user ID
         final RetiredUserTcStats retiredUserStats = dbManager.getRetiredUserStats(retiredUserId); // TODO: [zodac] Add another cache? I like caches :)
         final int userId = retiredUserStats.getUserId();
@@ -323,7 +325,7 @@ public class StorageFacade {
         teamCache.add(updatedTeam);
     }
 
-    public void persistInitialUserStats(final User user) throws FoldingException {
+    public void persistInitialUserStats(final User user) throws FoldingException, FoldingExternalServiceException {
         final UserStats currentUserStats = FoldingStatsParser.getStatsForUser(user);
         persistInitialUserStats(currentUserStats);
     }

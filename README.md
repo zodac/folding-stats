@@ -4,11 +4,11 @@
 
 ### Historic Stats
 
-We're using a couple of queries to read the user stats from the `tc_user_stats` table, but not persisting daily/monthly
-stats. If the historic pages are used quite a bit, this might be a bit slow, so there is a potential for
+We're using a couple of queries to read the user stats from the `user_tc_stats_hourly` table, but not persisting
+daily/monthly stats. If the historic pages are used quite a bit, this might be a bit slow, so there is a potential for
 caching/persisting results. Could be persisted on a scheduled basis, or perhaps only persisted on the first call, then
-cache those results. Need to do more profiling on a live system, see how much it is being used. A good idea to bring in
-an ELK stack to instrument the system when we go live.
+cache those results. Need to do more profiling on a live system, see how much it is being used. (A good idea to bring in
+an ELK stack to instrument the system when we go live.)
 
 ## Troubleshooting
 

@@ -30,8 +30,12 @@ public class User implements Identifiable {
     private String liveStatsLink;
     private boolean isRetired;
 
-    public static User create(final int userId, final String foldingUserName, final String displayName, final String passkey, final String category, final int hardwareId, final String liveStatsLink, final boolean isRetired) {
-        return new User(userId, foldingUserName, displayName, passkey, category, hardwareId, liveStatsLink, isRetired);
+    public static User create(final int userId, final String foldingUserName, final String displayName, final String passkey, final Category category, final int hardwareId, final String liveStatsLink, final boolean isRetired) {
+        return new User(userId, foldingUserName, displayName, passkey, category.displayName(), hardwareId, liveStatsLink, isRetired);
+    }
+
+    public static User createWithoutId(final String foldingUserName, final String displayName, final String passkey, final Category category, final int hardwareId, final String liveStatsLink, final boolean isRetired) {
+        return new User(EMPTY_USER_ID, foldingUserName, displayName, passkey, category.displayName(), hardwareId, liveStatsLink, isRetired);
     }
 
     public static User updateWithId(final int userId, final User user) {
@@ -55,6 +59,7 @@ public class User implements Identifiable {
     }
 
     private static String hidePasskey(final String passkey) {
-        return passkey.substring(0, 8).concat(PASSKEY_MASK);
+        final int endIndex = Math.min(8, passkey.length()); // In case passkey has fewer than 8 characters
+        return passkey.substring(0, endIndex).concat(PASSKEY_MASK);
     }
 }

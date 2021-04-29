@@ -3,6 +3,8 @@ package me.zodac.folding.parsing.http.response;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
+import me.zodac.folding.api.exception.FoldingExternalServiceException;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +25,11 @@ public class ResponseParser {
 
     }
 
-    public static long getPointsFromResponse(final HttpResponse<String> response) {
+    public static long getPointsFromResponse(final HttpResponse<String> response) throws FoldingExternalServiceException {
+        if (StringUtils.isBlank(response.body())) {
+            throw new FoldingExternalServiceException("Empty Folding points response");
+        }
+
         try {
             final PointsApiResponse pointsApiResponse = GSON.fromJson(response.body(), PointsApiResponse.class);
             return pointsApiResponse.getEarned();
@@ -36,7 +42,11 @@ public class ResponseParser {
         }
     }
 
-    public static int getUnitsFromResponse(final String userName, final String passkey, final HttpResponse<String> response) {
+    public static int getUnitsFromResponse(final String userName, final String passkey, final HttpResponse<String> response) throws FoldingExternalServiceException {
+        if (StringUtils.isBlank(response.body())) {
+            throw new FoldingExternalServiceException("Empty Folding units response");
+        }
+
         final Type collectionType = new TypeToken<Collection<UnitsApiInstance>>() {
         }.getType();
         final List<UnitsApiInstance> unitsResponse = GSON.fromJson(response.body(), collectionType);
@@ -45,7 +55,7 @@ public class ResponseParser {
             LOGGER.warn("No valid units found for user/passkey: '{}/{}'", userName, passkey);
             return 0;
         }
-        
+
         // If the username+passkey has been used on multiple teams, we will get multiple responses
         // Unfortunately, there is no way to filter on team currently, but to be fair to the other users we will take
         // the result with the lowest number of finished units.

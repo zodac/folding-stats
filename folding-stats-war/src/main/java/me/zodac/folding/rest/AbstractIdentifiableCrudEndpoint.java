@@ -3,6 +3,7 @@ package me.zodac.folding.rest;
 import me.zodac.folding.api.Identifiable;
 import me.zodac.folding.api.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
+import me.zodac.folding.api.exception.FoldingExternalServiceException;
 import me.zodac.folding.api.exception.FoldingIdInvalidException;
 import me.zodac.folding.api.exception.FoldingIdOutOfRangeException;
 import me.zodac.folding.api.exception.NotFoundException;
@@ -17,6 +18,7 @@ import javax.ws.rs.core.UriInfo;
 import java.util.ArrayList;
 import java.util.List;
 
+import static me.zodac.folding.rest.response.Responses.badGateway;
 import static me.zodac.folding.rest.response.Responses.badRequest;
 import static me.zodac.folding.rest.response.Responses.conflict;
 import static me.zodac.folding.rest.response.Responses.created;
@@ -36,13 +38,13 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
 
     protected abstract ValidationResponse validate(final V element);
 
-    protected abstract V createElement(final V element) throws FoldingException, NotFoundException, FoldingConflictException;
+    protected abstract V createElement(final V element) throws FoldingException, NotFoundException, FoldingConflictException, FoldingExternalServiceException;
 
     protected abstract List<V> getAllElements() throws FoldingException;
 
     protected abstract V getElementById(final int elementId) throws FoldingException, NotFoundException;
 
-    protected abstract V updateElementById(final int elementId, final V element) throws FoldingException, NotFoundException, FoldingConflictException;
+    protected abstract V updateElementById(final int elementId, final V element) throws FoldingException, NotFoundException, FoldingConflictException, FoldingExternalServiceException;
 
     protected abstract void deleteElementById(final int elementId) throws FoldingConflictException, FoldingException;
 
@@ -66,6 +68,11 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
             getLogger().debug(errorMessage, e);
             getLogger().error(errorMessage);
             return conflict(errorMessage);
+        } catch (final FoldingExternalServiceException e) {
+            final String errorMessage = String.format("Error connecting to external service: %s", e.getMessage());
+            getLogger().debug(errorMessage, e);
+            getLogger().error(errorMessage);
+            return badGateway();
         } catch (final NotFoundException e) {
             getLogger().debug("Error creating {}, could not find {} with ID {}", elementType(), e.getType(), e.getId(), e);
             getLogger().error("Error creating {}, could not find {} with ID {}", elementType(), e.getType(), e.getId());
@@ -107,7 +114,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
             try {
                 final V elementWithId = createElement(element);
                 successful.add(elementWithId);
-            } catch (final FoldingConflictException | FoldingException e) {
+            } catch (final FoldingConflictException | FoldingException | FoldingExternalServiceException e) {
                 getLogger().error("Error creating {}: {}", elementType(), element, e.getCause());
                 unsuccessful.add(element);
             } catch (final Exception e) {
@@ -223,6 +230,11 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
             getLogger().debug(errorMessage, e);
             getLogger().error(errorMessage);
             return conflict(errorMessage);
+        } catch (final FoldingExternalServiceException e) {
+            final String errorMessage = String.format("Error connecting to external service: %s", e.getMessage());
+            getLogger().debug(errorMessage, e);
+            getLogger().error(errorMessage);
+            return badGateway();
         } catch (final NotFoundException e) {
             getLogger().debug("No {} found with ID: {}", elementType(), elementId, e);
             getLogger().error("No {} found with ID: {}", elementType(), elementId, e);

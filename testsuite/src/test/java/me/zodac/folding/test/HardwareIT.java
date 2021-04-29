@@ -1,9 +1,12 @@
 package me.zodac.folding.test;
 
+import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.OperatingSystem;
+import me.zodac.folding.api.tc.User;
 import me.zodac.folding.test.utils.DatabaseCleaner;
 import me.zodac.folding.test.utils.HardwareUtils;
+import me.zodac.folding.test.utils.UserUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
@@ -28,9 +31,16 @@ public class HardwareIT {
 
     private static final Hardware DEFAULT_HARDWARE = Hardware.createWithoutId("Test GPU", "Base GPU", OperatingSystem.WINDOWS, 1.0D);
 
-    @Deployment(order = 1)
+    @Deployment(order = 0, name = "IntegrationTests")
     public static EnterpriseArchive getTestEar() {
         return Deployments.getTestEar();
+    }
+
+    @Test
+    @RunAsClient
+    @InSequence()
+    public void setUp() throws SQLException, IOException, InterruptedException {
+        cleanSystemForHardwareTests();
     }
 
     @Test
@@ -312,18 +322,47 @@ public class HardwareIT {
                 .isEqualTo(initialHardwareSize);
     }
 
-    // TODO: [zodac] If hardware is linked to a user when deleted, test for a 409_CONFLICT, but need UserUtils first
+    @Test
+    @RunAsClient
+    @InSequence(14)
+    public void whenDeletingHardware_givenTheHardwareIsLinkedToAUser_thenResponseHasA409Status() throws IOException, InterruptedException {
+        final HttpResponse<String> createHardwareResponse = HardwareUtils.RequestSender.create(DEFAULT_HARDWARE);
+        assertThat(createHardwareResponse.statusCode())
+                .as("Was not able to create hardware")
+                .isEqualTo(HttpURLConnection.HTTP_CREATED);
+
+        final int hardwareId = HardwareUtils.ResponseParser.create(createHardwareResponse).getId();
+
+        final User user = User.createWithoutId("user", "user", "passkey", Category.AMD_GPU, hardwareId, "", false);
+        final HttpResponse<String> createUserResponse = UserUtils.RequestSender.create(user);
+        assertThat(createUserResponse.statusCode())
+                .as("Was not able to create user")
+                .isEqualTo(HttpURLConnection.HTTP_CREATED);
+
+        final HttpResponse<String> deleteHardwareResponse = HardwareUtils.RequestSender.delete(hardwareId);
+        assertThat(deleteHardwareResponse.statusCode())
+                .as("Expected to fail due to a 409_CONFLICT")
+                .isEqualTo(HttpURLConnection.HTTP_CONFLICT);
+    }
 
     @Test
     @RunAsClient
     @InSequence(99)
     public void tearDown() throws SQLException, IOException, InterruptedException {
-        final Collection<Hardware> allHardware = HardwareUtils.ResponseParser.getAll(HardwareUtils.RequestSender.getAll());
+        cleanSystemForHardwareTests();
+    }
 
+    private void cleanSystemForHardwareTests() throws IOException, InterruptedException, SQLException {
+        final Collection<Hardware> allHardware = HardwareUtils.ResponseParser.getAll(HardwareUtils.RequestSender.getAll());
         for (final Hardware hardware : allHardware) {
             HardwareUtils.RequestSender.delete(hardware.getId());
         }
 
-        DatabaseCleaner.truncateTableAndResetId("hardware");
+        final Collection<User> allUsers = UserUtils.ResponseParser.getAll(UserUtils.RequestSender.getAll());
+        for (final User user : allUsers) {
+            UserUtils.RequestSender.delete(user.getId());
+        }
+
+        DatabaseCleaner.truncateTableAndResetId("hardware", "users");
     }
 }

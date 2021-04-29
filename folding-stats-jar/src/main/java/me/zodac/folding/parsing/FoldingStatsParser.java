@@ -1,6 +1,7 @@
 package me.zodac.folding.parsing;
 
 import me.zodac.folding.api.exception.FoldingException;
+import me.zodac.folding.api.exception.FoldingExternalServiceException;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
@@ -21,7 +22,7 @@ public class FoldingStatsParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FoldingStatsParser.class);
 
-    public static UserStats getStatsForUser(final User user) throws FoldingException {
+    public static UserStats getStatsForUser(final User user) throws FoldingException, FoldingExternalServiceException {
         LOGGER.debug("Getting stats for username/passkey '{}/{}'", user.getFoldingUserName(), user.getPasskey());
         final Timestamp currentUtcTime = TimeUtils.getCurrentUtcTimestamp();
         final long userPoints = getPointsForUser(user.getFoldingUserName(), user.getPasskey());
@@ -29,7 +30,7 @@ public class FoldingStatsParser {
         return UserStats.create(user.getId(), currentUtcTime, Stats.create(userPoints, userUnits));
     }
 
-    public static long getPointsForUser(final String userName, final String passkey) throws FoldingException {
+    public static long getPointsForUser(final String userName, final String passkey) throws FoldingException, FoldingExternalServiceException {
         final String pointsRequestUrl = new PointsUrlBuilder()
                 .forUser(userName)
                 .withPasskey(passkey)
@@ -42,7 +43,7 @@ public class FoldingStatsParser {
         return getPointsFromResponse(response);
     }
 
-    public static int getUnitsForUser(final String userName, final String passkey) throws FoldingException {
+    public static int getUnitsForUser(final String userName, final String passkey) throws FoldingException, FoldingExternalServiceException {
         final String unitsRequestUrl = new UnitsUrlBuilder()
                 .forUser(userName)
                 .withPasskey(passkey)

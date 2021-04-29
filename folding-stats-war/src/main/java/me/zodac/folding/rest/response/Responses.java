@@ -49,6 +49,12 @@ public class Responses {
                 .build();
     }
 
+    public static Response badGateway() {
+        return Response
+                .status(Response.Status.BAD_GATEWAY)
+                .build();
+    }
+
     public static Response badRequest(final String errorMessage) {
         return Response
                 .status(Response.Status.BAD_REQUEST)

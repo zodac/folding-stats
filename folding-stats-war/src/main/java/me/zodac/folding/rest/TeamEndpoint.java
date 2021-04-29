@@ -3,6 +3,7 @@ package me.zodac.folding.rest;
 import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
+import me.zodac.folding.api.exception.FoldingExternalServiceException;
 import me.zodac.folding.api.exception.FoldingIdInvalidException;
 import me.zodac.folding.api.exception.FoldingIdOutOfRangeException;
 import me.zodac.folding.api.exception.NotFoundException;
@@ -30,6 +31,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
+import static me.zodac.folding.rest.response.Responses.badGateway;
 import static me.zodac.folding.rest.response.Responses.badRequest;
 import static me.zodac.folding.rest.response.Responses.notFound;
 import static me.zodac.folding.rest.response.Responses.ok;
@@ -152,7 +154,7 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
         try {
             final int parsedTeamId = super.parseId(teamId);
             final int parsedRetiredUserId = super.parseId(retiredUserId);
-            
+
             final Team team = storageFacade.getTeam(parsedTeamId);
             final ValidationResponse validationResponse = TeamValidator.isValidUnretirement(team, parsedRetiredUserId);
             if (validationResponse.isInvalid()) {
@@ -171,6 +173,11 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
             getLogger().debug(errorMessage, e);
             getLogger().error(errorMessage);
             return badRequest(errorMessage);
+        } catch (final FoldingExternalServiceException e) {
+            final String errorMessage = String.format("Error connecting to external service: %s", e.getMessage());
+            getLogger().debug(errorMessage, e);
+            getLogger().error(errorMessage);
+            return badGateway();
         } catch (final UserNotFoundException e) {
             getLogger().error("Error finding retired user with ID: {}", retiredUserId, e.getCause());
             return notFound();
