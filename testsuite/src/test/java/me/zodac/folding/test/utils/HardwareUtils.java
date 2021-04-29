@@ -13,6 +13,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.Collection;
+import java.util.List;
 
 // TODO: [zodac] Should move these to a client-library module later
 public class HardwareUtils {
@@ -58,6 +59,16 @@ public class HardwareUtils {
             final HttpRequest createRequest = HttpRequest.newBuilder()
                     .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(hardware)))
                     .uri(URI.create(BASE_FOLDING_URL + "/hardware"))
+                    .header("Content-Type", "application/json")
+                    .build();
+
+            return HTTP_CLIENT.send(createRequest, HttpResponse.BodyHandlers.ofString());
+        }
+
+        public static HttpResponse<String> createBatchOf(final List<Hardware> batchOfHardware) throws IOException, InterruptedException {
+            final HttpRequest createRequest = HttpRequest.newBuilder()
+                    .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(batchOfHardware)))
+                    .uri(URI.create(BASE_FOLDING_URL + "/hardware/batch"))
                     .header("Content-Type", "application/json")
                     .build();
 

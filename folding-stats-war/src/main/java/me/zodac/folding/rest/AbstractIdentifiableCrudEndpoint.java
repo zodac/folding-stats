@@ -79,26 +79,31 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
         }
     }
 
-    protected Response createBatchOf(final List<V> elements) {
-        getLogger().info("POST request received to create {} {}s at '{}' with request: {}", elements.size(), elementType(), uriContext.getAbsolutePath(), elements);
+    protected Response createBatchOf(final List<V> batchOfElements) {
+        getLogger().info("POST request received to create {} {}s at '{}' with request: {}", batchOfElements.size(), elementType(), uriContext.getAbsolutePath(), batchOfElements);
 
-        final List<ValidationResponse> failedValidationResponses = new ArrayList<>(elements.size() / 2);
+        final List<V> validElements = new ArrayList<>(batchOfElements.size() / 2);
+        final List<ValidationResponse> failedValidationResponses = new ArrayList<>(batchOfElements.size() / 2);
 
-        for (final V element : elements) {
+        for (final V element : batchOfElements) {
             final ValidationResponse validationResponse = validate(element);
             if (validationResponse.isInvalid()) {
+                getLogger().error("Found validation error for {}: {}", element, validationResponse);
                 failedValidationResponses.add(validationResponse);
+            } else {
+                validElements.add(element);
             }
         }
 
-        if (!failedValidationResponses.isEmpty()) {
+        if (validElements.isEmpty()) {
+            getLogger().error("All {}s contain validation errors: {}", elementType(), failedValidationResponses);
             return badRequest(failedValidationResponses);
         }
 
-        final List<Identifiable> successful = new ArrayList<>(elements.size() / 2);
-        final List<Identifiable> unsuccessful = new ArrayList<>(elements.size() / 2);
+        final List<V> successful = new ArrayList<>(batchOfElements.size() / 2);
+        final List<V> unsuccessful = new ArrayList<>(batchOfElements.size() / 2);
 
-        for (final V element : elements) {
+        for (final V element : validElements) {
             try {
                 final V elementWithId = createElement(element);
                 successful.add(elementWithId);

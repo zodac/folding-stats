@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+// TODO: [zodac] Move validators to WAR/EJB module, use StorageFacade instead of caches, then add unit tests
 public class HardwareValidator {
 
     private HardwareValidator() {

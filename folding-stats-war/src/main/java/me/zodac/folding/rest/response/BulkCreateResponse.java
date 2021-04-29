@@ -19,10 +19,10 @@ import java.util.List;
 @ToString(doNotUseGetters = true)
 public class BulkCreateResponse {
 
-    private List<Identifiable> successful;
-    private List<Identifiable> unsuccessful;
+    private List<? extends Identifiable> successful;
+    private List<? extends Identifiable> unsuccessful;
 
-    public static BulkCreateResponse create(final List<Identifiable> successful, final List<Identifiable> unsuccessful) {
+    public static BulkCreateResponse create(final List<? extends Identifiable> successful, final List<? extends Identifiable> unsuccessful) {
         return new BulkCreateResponse(successful, unsuccessful);
     }
 }
