@@ -1,3 +1,5 @@
+const ROOT_URL='http://teamcomp.axihub.ca';
+let usersJson=null;
 // The 'toggle' functions below simply change the colour of the buttons. There must be a smarter way to do this...
 function toggleStats() {
     if($("#stats_div").is(":visible")){
@@ -51,7 +53,7 @@ function toggleTeam(teamNumber) {
 
 // Pull the TC stats, then manually update each of the numeric fields to be formatted with commas
 function loadTcStats() {
-    const prodUrl='http://teamcomp.axihub.ca/tc_stats';
+    const prodUrl=ROOT_URL+'/tc_stats';
 
     fetch(prodUrl)
     .then(response => {
@@ -204,9 +206,7 @@ function loadTcStats() {
 };
 
 function loadHardware() {
-    const prodUrl='http://teamcomp.axihub.ca/hardware';
-
-    fetch(prodUrl)
+    fetch(ROOT_URL+'/hardware')
     .then(response => {
         return response.json();
     })
@@ -265,13 +265,13 @@ function loadHardware() {
         hardwareDiv.append(hardwareTable);
 
         document.body.appendChild(hardwareDiv);
+
+        hardwareJson=jsonResponse;
     })
 };
 
 function loadUsers() {
-    const prodUrl='http://teamcomp.axihub.ca/users';
-
-    fetch(prodUrl)
+    fetch(ROOT_URL+'/users')
     .then(response => {
         return response.json();
     })
@@ -335,13 +335,13 @@ function loadUsers() {
         usersDiv.append(usersTable);
 
         document.body.appendChild(usersDiv);
+
+        usersJson=jsonResponse;
     })
 };
 
 function loadTeams() {
-    const prodUrl='http://teamcomp.axihub.ca/teams';
-
-    fetch(prodUrl)
+    fetch(ROOT_URL+'/teams')
     .then(response => {
         return response.json();
     })
@@ -404,6 +404,8 @@ function loadTeams() {
         teamsDiv.append(teamsTable);
 
         document.body.appendChild(teamsDiv);
+
+        teamsJson=jsonResponse;
     })
 };
 
