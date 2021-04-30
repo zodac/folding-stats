@@ -22,6 +22,17 @@
           padding:5px;
         }
 
+        th {
+            cursor: pointer;
+        }
+
+
+
+
+
+
+
+
 
 
 
@@ -98,6 +109,57 @@
 </head>
 
 <script>
+    // The 'toggle' functions below simply change the colour of the buttons. There must be a smarter way to do this...
+    function toggleStats() {
+        if($("#stats_div").is(":visible")){
+            $("#stats_button").addClass("btn-primary");
+            $("#stats_button").removeClass("btn-success");
+        } else {
+            $("#stats_button").removeClass("btn-primary");
+            $("#stats_button").addClass("btn-success");
+        }
+    }
+
+    function toggleHardware() {
+        if($("#hardware_div").is(":visible")){
+            $("#hardware_button").addClass("btn-primary");
+            $("#hardware_button").removeClass("btn-success");
+        } else {
+            $("#hardware_button").removeClass("btn-primary");
+            $("#hardware_button").addClass("btn-success");
+        }
+    }
+
+    function toggleUsers() {
+        if($("#users_div").is(":visible")){
+            $("#users_button").addClass("btn-primary");
+            $("#users_button").removeClass("btn-success");
+        } else {
+            $("#users_button").removeClass("btn-primary");
+            $("#users_button").addClass("btn-success");
+        }
+    }
+
+    function toggleTeams() {
+        if($("#teams_div").is(":visible")){
+            $("#teams_button").addClass("btn-primary");
+            $("#teams_button").removeClass("btn-success");
+        } else {
+            $("#teams_button").removeClass("btn-primary");
+            $("#teams_button").addClass("btn-success");
+        }
+    }
+
+    function toggleTeam(teamNumber) {
+        if($("#team_"+teamNumber+"_subdiv").is(":visible")){
+            $("#team_"+teamNumber+"_button").addClass("btn-primary");
+            $("#team_"+teamNumber+"_button").removeClass("btn-success");
+        } else {
+            $("#team_"+teamNumber+"_button").removeClass("btn-primary");
+            $("#team_"+teamNumber+"_button").addClass("btn-success");
+        }
+    }
+
     // Straight lifted/stole this code from W3 Schools: https://www.w3schools.com/howto/howto_js_sort_table.asp
     function sortTable(columnIndex, tableId) {
       var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
@@ -175,7 +237,7 @@
         const zeroPad = (num, places) => String(num).padStart(places, '0')
         var time = new Date(),
         secsRemaining = 3600 - (time.getUTCMinutes()-15)%60 * 60 - time.getUTCSeconds();
-        mins = Math.floor(secsRemaining / 60);
+        mins = Math.floor(secsRemaining / 60) % 60;
         secs = secsRemaining % 60;
         $("#min-part").text(mins);
         $("#sec-part").text(zeroPad(secs, 2));
@@ -196,7 +258,7 @@
     }
 
     // Pull the TC stats, then manually update each of the numeric fields to be formatted with commas
-    function loadTcStats() {
+    async function loadTcStats() {
         const publicUrl='../tc_stats';
         const localUrl='http://127.0.0.1:8080/folding/tc_stats';
 
@@ -234,7 +296,6 @@
             statsTableHeaders.forEach(function (header, i) {
                 statsTableHeader = document.createElement("th");
                 statsTableHeader.setAttribute("onclick", "sortTable("+i+", 'stats')");
-                statsTableHeader.setAttribute("style", "cursor:pointer");
                 statsTableHeader.setAttribute("scope", "col");
                 statsTableHeader.innerHTML = header;
 
@@ -307,7 +368,6 @@
                 teamTableHeaders.forEach(function (header, i) {
                     teamTableHeaderCell = document.createElement("th");
                     teamTableHeaderCell.setAttribute("onclick", "sortTable("+i+", 'team_"+teamNumber+"')");
-                    teamTableHeaderCell.setAttribute("style", "cursor:pointer");
                     teamTableHeaderCell.setAttribute("scope", "col");
                     teamTableHeaderCell.innerHTML = header;
 
@@ -359,7 +419,7 @@
         })
     };
 
-    function loadHardware() {
+    async function loadHardware() {
         const publicUrl='../hardware';
         const localUrl='http://127.0.0.1:8080/folding/hardware';
 
@@ -398,7 +458,6 @@
             hardwareHeaders.forEach(function (header, i) {
                 hardwareTableHeader = document.createElement("th");
                 hardwareTableHeader.setAttribute("onclick", "sortTable("+i+", 'hardware')");
-                hardwareTableHeader.setAttribute("style", "cursor:pointer");
                 hardwareTableHeader.setAttribute("scope", "col");
                 hardwareTableHeader.innerHTML = header;
 
@@ -433,7 +492,7 @@
         })
     };
 
-    function loadUsers() {
+    async function loadUsers() {
         const publicUrl='../users';
         const localUrl='http://127.0.0.1:8080/folding/users';
 
@@ -472,7 +531,6 @@
             usersHeaders.forEach(function (header, i) {
                 usersTableHeader = document.createElement("th");
                 usersTableHeader.setAttribute("onclick", "sortTable("+i+", 'users')");
-                usersTableHeader.setAttribute("style", "cursor:pointer");
                 usersTableHeader.setAttribute("scope", "col");
                 usersTableHeader.innerHTML = header;
 
@@ -512,7 +570,7 @@
         })
     };
 
-    function loadTeams() {
+    async function loadTeams() {
         const publicUrl='../teams';
         const localUrl='http://127.0.0.1:8080/folding/teams';
 
@@ -551,7 +609,6 @@
             teamsHeaders.forEach(function (header, i) {
                 teamsTableHeader = document.createElement("th");
                 teamsTableHeader.setAttribute("onclick", "sortTable("+i+", 'teams')");
-                teamsTableHeader.setAttribute("style", "cursor:pointer");
                 teamsTableHeader.setAttribute("scope", "col");
                 teamsTableHeader.innerHTML = header;
 
@@ -592,63 +649,21 @@
     };
 
     $(document).ready(function() {
+        loadTcStats();
         loadHardware();
         loadUsers();
         loadTeams();
-        loadTcStats();
         updateTime();
     });
 
-    // The 'toggle' functions below simply change the colour of the buttons. There must be a smarter way to do this...
-    function toggleStats() {
-        if($("#stats_div").is(":visible")){
-            $("#stats_button").addClass("btn-primary");
-            $("#stats_button").removeClass("btn-success");
-        } else {
-            $("#stats_button").removeClass("btn-primary");
-            $("#stats_button").addClass("btn-success");
-        }
-    }
-    
-    function toggleHardware() {
-        if($("#hardware_div").is(":visible")){
-            $("#hardware_button").addClass("btn-primary");
-            $("#hardware_button").removeClass("btn-success");
-        } else {
-            $("#hardware_button").removeClass("btn-primary");
-            $("#hardware_button").addClass("btn-success");
-        }
-    }
 
-    function toggleUsers() {
-        if($("#users_div").is(":visible")){
-            $("#users_button").addClass("btn-primary");
-            $("#users_button").removeClass("btn-success");
-        } else {
-            $("#users_button").removeClass("btn-primary");
-            $("#users_button").addClass("btn-success");
-        }
-    }
 
-    function toggleTeams() {
-        if($("#teams_div").is(":visible")){
-            $("#teams_button").addClass("btn-primary");
-            $("#teams_button").removeClass("btn-success");
-        } else {
-            $("#teams_button").removeClass("btn-primary");
-            $("#teams_button").addClass("btn-success");
-        }
-    }
 
-    function toggleTeam(teamNumber) {
-        if($("#team_"+teamNumber+"_subdiv").is(":visible")){
-            $("#team_"+teamNumber+"_button").addClass("btn-primary");
-            $("#team_"+teamNumber+"_button").removeClass("btn-success");
-        } else {
-            $("#team_"+teamNumber+"_button").removeClass("btn-primary");
-            $("#team_"+teamNumber+"_button").addClass("btn-success");
-        }
-    }
+
+
+
+
+
 
 
 

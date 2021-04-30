@@ -1,0 +1,10 @@
+body {
+    background-color: #282424;
+    color: #F2FCFF;
+    margin:10px;
+    padding:5px;
+}
+
+th {
+    cursor: pointer;
+}

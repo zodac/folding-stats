@@ -1,7 +1,21 @@
 version: '2.3'
 
-# TODO: [zodac] Extract sensitive data to an env file, allow deployment to override with 'real' values
 services:
+
+  frontend_dev:
+    build:
+      context: .
+      dockerfile: docker/frontend/Dockerfile
+    container_name: frontend_dev
+    hostname: frontend_dev
+    depends_on:
+      - wildfly_dev
+    links:
+      - wildfly_dev
+    networks:
+      - dev
+    ports:
+      - 86:80
 
   builder_java_dev:
     build:

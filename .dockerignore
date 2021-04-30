@@ -1,3 +1,8 @@
-.dockerignore
+node_modules
+npm-debug.log
+build
 Dockerfile
-target/
+.dockerignore
+**/.git
+**/.DS_Store
+**/node_modules
