@@ -41,14 +41,6 @@ public class Responses {
                 .build();
     }
 
-    public static Response noContent() {
-        return Response
-                .noContent()
-                .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_NAME, ACCESS_CONTROL_ALLOW_ORIGIN_DEFAULT_VALUE)
-                .header(ACCESS_CONTROL_ALLOW_METHODS_HEADER_NAME, ACCESS_CONTROL_ALLOW_METHODS_DEFAULT_VALUE)
-                .build();
-    }
-
     public static Response badGateway() {
         return Response
                 .status(Response.Status.BAD_GATEWAY)

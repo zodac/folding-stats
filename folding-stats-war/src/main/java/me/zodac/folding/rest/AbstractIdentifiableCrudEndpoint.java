@@ -22,7 +22,6 @@ import static me.zodac.folding.rest.response.Responses.badGateway;
 import static me.zodac.folding.rest.response.Responses.badRequest;
 import static me.zodac.folding.rest.response.Responses.conflict;
 import static me.zodac.folding.rest.response.Responses.created;
-import static me.zodac.folding.rest.response.Responses.noContent;
 import static me.zodac.folding.rest.response.Responses.notFound;
 import static me.zodac.folding.rest.response.Responses.ok;
 import static me.zodac.folding.rest.response.Responses.serverError;
@@ -206,7 +205,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
 
             if (existingElement.equals(element)) {
                 getLogger().debug("No change necessary");
-                return noContent();
+                return ok(existingElement);
             }
 
             final V updatedElementWithId = updateElementById(parsedId, element);
@@ -255,7 +254,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
             final int parsedId = parseId(elementId);
             getElementById(parsedId);
             deleteElementById(parsedId);
-            return noContent();
+            return ok();
         } catch (final FoldingIdInvalidException e) {
             final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), e.getId());
             getLogger().debug(errorMessage, e);
@@ -269,7 +268,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
         } catch (final NotFoundException e) {
             getLogger().debug("Error deleting {}, could not find {} with ID {}", elementType(), e.getType(), e.getId(), e);
             getLogger().error("Error deleting {}, could not find {} with ID {}", elementType(), e.getType(), e.getId());
-            return noContent();
+            return notFound();
         } catch (final FoldingConflictException e) {
             final String errorMessage = String.format("The %s ID '%s' is in use, remove all usages before deleting", elementType(), elementId);
             getLogger().debug(errorMessage, e);

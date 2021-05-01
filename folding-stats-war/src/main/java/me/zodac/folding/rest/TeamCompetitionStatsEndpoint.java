@@ -34,7 +34,6 @@ import java.util.Objects;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toList;
-import static me.zodac.folding.rest.response.Responses.noContent;
 import static me.zodac.folding.rest.response.Responses.ok;
 import static me.zodac.folding.rest.response.Responses.serverError;
 
@@ -82,7 +81,7 @@ public class TeamCompetitionStatsEndpoint {
             LOGGER.info("Found {} TC teams", teamResults.size());
 
             if (teamResults.isEmpty()) {
-                return noContent();
+                LOGGER.debug("No teams to show!");
             }
 
             // TODO: [zodac] Cache this CompetitionResult, and invalidate cache on scheduled/manual update, scheduled/manual reset, user create/update, team create/update

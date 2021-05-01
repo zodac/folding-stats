@@ -31,7 +31,8 @@ public class HardwareTest {
     }
 
     @Test
-    public void whenGettingAllHardware_givenNoHardwareHasBeenCreated_thenAnEmptyJsonResponseIsReturned_andHasA200Status() throws IOException, InterruptedException {
+    public void whenGettingAllHardware_givenNoHardwareHasBeenCreated_thenAnEmptyJsonResponseIsReturned_andHasA200Status() throws IOException, InterruptedException, SQLException {
+        cleanSystemForHardwareTests(); // No guarantee that this test runs first, so we need to clean the system again
         final HttpResponse<String> response = HardwareUtils.RequestSender.getAll();
         assertThat(response.statusCode())
                 .as("Did not receive a 200_OK HTTP response")
@@ -158,7 +159,7 @@ public class HardwareTest {
         final int newSize = HardwareUtils.ResponseParser.getAll(HardwareUtils.RequestSender.getAll()).size();
         assertThat(newSize)
                 .as("Get all response did not return the initial hardware - deleted hardware")
-                .isEqualTo(allHardware.size() - 1);
+                .isEqualTo(hardwareId - 1);
     }
 
     // Negative/alternative test cases
