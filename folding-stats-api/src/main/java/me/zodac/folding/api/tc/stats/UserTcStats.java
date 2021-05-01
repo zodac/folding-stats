@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import me.zodac.folding.api.utils.TimeUtils;
 
 import java.sql.Timestamp;
 
@@ -13,7 +14,11 @@ import java.sql.Timestamp;
 @EqualsAndHashCode
 @ToString(doNotUseGetters = true)
 public class UserTcStats {
-    
+
+    private static final long DEFAULT_POINTS = 0L;
+    private static final long DEFAULT_MULTIPLIED_POINTS = 0L;
+    private static final int DEFAULT_UNITS = 0;
+
     private final int userId;
     private final Timestamp timestamp;
     private final long points;
@@ -27,6 +32,10 @@ public class UserTcStats {
     public static UserTcStats createWithMultiplier(final int userId, final Timestamp timestamp, final Stats stats, final double multiplier) {
         final long multipliedPoints = Math.round(stats.getPoints() * multiplier);
         return new UserTcStats(userId, timestamp, stats.getPoints(), multipliedPoints, stats.getUnits());
+    }
+
+    public static UserTcStats empty(final int userId) {
+        return new UserTcStats(userId, TimeUtils.getCurrentUtcTimestamp(), DEFAULT_POINTS, DEFAULT_MULTIPLIED_POINTS, DEFAULT_UNITS);
     }
 
     public static UserTcStats updateWithOffsets(final UserTcStats tcStatsForUser, final UserStatsOffset userStatsOffset, final double multiplier) {

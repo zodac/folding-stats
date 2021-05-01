@@ -32,7 +32,8 @@ public class UserTest {
     }
 
     @Test
-    public void whenGettingAllUsers_givenNoUserHasBeenCreated_thenAnEmptyJsonResponseIsReturned_andHasA200Status() throws IOException, InterruptedException {
+    public void whenGettingAllUsers_givenNoUserHasBeenCreated_thenAnEmptyJsonResponseIsReturned_andHasA200Status() throws IOException, InterruptedException, SQLException {
+        cleanSystemOfUsers(); // No guarantee that this test runs first, so we need to clean the system of users again
         final HttpResponse<String> response = UserUtils.RequestSender.getAll();
         assertThat(response.statusCode())
                 .as("Did not receive a 200_OK HTTP response")
@@ -52,13 +53,14 @@ public class UserTest {
 
     @Test
     public void whenCreatingUser_givenPayloadIsValid_thenTheCreatedUserIsReturnedInResponse_andHasId_andResponseHasA201StatusCode() throws IOException, InterruptedException {
-        final HttpResponse<String> response = UserUtils.RequestSender.create(DUMMY_USER);
+        final User userToCreate = User.createWithoutId("Dummy_User", "Dummy User", "DummyPasskey1", Category.NVIDIA_GPU, 1, "", false);
+        final HttpResponse<String> response = UserUtils.RequestSender.create(userToCreate);
         assertThat(response.statusCode())
                 .as("Did not receive a 201_CREATED HTTP response")
                 .isEqualTo(HttpURLConnection.HTTP_CREATED);
 
         final User actual = UserUtils.ResponseParser.create(response);
-        final User expected = User.updateWithId(actual.getId(), DUMMY_USER);
+        final User expected = User.updateWithId(actual.getId(), userToCreate);
         assertThat(actual)
                 .as("Did not receive created object as JSON response")
                 .isEqualTo(expected);
@@ -91,8 +93,7 @@ public class UserTest {
         int userId = allUsers.size();
 
         if (allUsers.isEmpty()) {
-            UserUtils.RequestSender.create(DUMMY_USER);
-            userId = 1;
+            userId = UserUtils.ResponseParser.create(UserUtils.RequestSender.create(DUMMY_USER)).getId();
         }
 
         final HttpResponse<String> response = UserUtils.RequestSender.get(userId);
@@ -113,11 +114,10 @@ public class UserTest {
         int userId = allUsers.size();
 
         if (allUsers.isEmpty()) {
-            UserUtils.RequestSender.create(DUMMY_USER);
-            userId = 1;
+            userId = UserUtils.ResponseParser.create(UserUtils.RequestSender.create(DUMMY_USER)).getId();
         }
 
-        final User updatedUser = User.create(userId, "Dummy_User", "Dummy User", "DummyPasskey5", Category.AMD_GPU, 1, "", false);
+        final User updatedUser = User.create(userId, "Dummy_User", "Dummy User", "DummyPasskey", Category.AMD_GPU, 1, "", false);
         final HttpResponse<String> response = UserUtils.RequestSender.update(updatedUser);
         assertThat(response.statusCode())
                 .as("Did not receive a 200_OK HTTP response")
@@ -136,20 +136,18 @@ public class UserTest {
     }
 
     @Test
-    public void whenDeletingUser_givenAValidUserId_thenUserIsDeleted_andHasA204Status_andUserCountIsReduced_andUserCannotBeRetrievedAgain() throws IOException, InterruptedException {
+    public void whenDeletingUser_givenAValidUserId_thenUserIsDeleted_andHasA200Status_andUserCountIsReduced_andUserCannotBeRetrievedAgain() throws IOException, InterruptedException {
         final Collection<User> allUsers = UserUtils.ResponseParser.getAll(UserUtils.RequestSender.getAll());
         int userId = allUsers.size();
 
         if (allUsers.isEmpty()) {
-            UserUtils.RequestSender.create(DUMMY_USER);
-            userId = 1;
+            userId = UserUtils.ResponseParser.create(UserUtils.RequestSender.create(DUMMY_USER)).getId();
         }
 
         final HttpResponse<String> response = UserUtils.RequestSender.delete(userId);
         assertThat(response.statusCode())
-                .as("Did not receive a 204_NO_CONTENT HTTP response")
-                .isEqualTo(HttpURLConnection.HTTP_NO_CONTENT);
-
+                .as("Did not receive a 200_OK HTTP response")
+                .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final HttpResponse<String> getResponse = UserUtils.RequestSender.get(userId);
         assertThat(getResponse.statusCode())
@@ -159,10 +157,12 @@ public class UserTest {
         final int newSize = UserUtils.ResponseParser.getAll(UserUtils.RequestSender.getAll()).size();
         assertThat(newSize)
                 .as("Get all response did not return the initial users - deleted user")
-                .isEqualTo(allUsers.size() - 1);
+                .isEqualTo(userId - 1);
     }
 
     // Negative/alternative test cases
+
+    // TODO: [zodac] Update a user with new hardware, stats will need to be updated, will cause a problem since they won't have any stats to begin with! Do in TcStatsTest
 
 //    @Test
 //    public void whenCreatingHardware_givenAnInvalidHardware_thenJsonResponseWithErrorsIsReturned_andHasA400Status() throws IOException, InterruptedException {
@@ -315,15 +315,24 @@ public class UserTest {
         cleanSystemForUserTests();
     }
 
-    private static void cleanSystemForUserTests() throws IOException, InterruptedException, SQLException {
-        final Collection<Hardware> allHardware = HardwareUtils.ResponseParser.getAll(HardwareUtils.RequestSender.getAll());
-        for (final Hardware hardware : allHardware) {
-            HardwareUtils.RequestSender.delete(hardware.getId());
-        }
-
+    private static void cleanSystemOfUsers() throws SQLException, IOException, InterruptedException {
         final Collection<User> allUsers = UserUtils.ResponseParser.getAll(UserUtils.RequestSender.getAll());
         for (final User user : allUsers) {
             UserUtils.RequestSender.delete(user.getId());
+        }
+
+        DatabaseCleaner.truncateTableAndResetId("users");
+    }
+
+    private static void cleanSystemForUserTests() throws IOException, InterruptedException, SQLException {
+        final Collection<User> allUsers = UserUtils.ResponseParser.getAll(UserUtils.RequestSender.getAll());
+        for (final User user : allUsers) {
+            UserUtils.RequestSender.delete(user.getId());
+        }
+
+        final Collection<Hardware> allHardware = HardwareUtils.ResponseParser.getAll(HardwareUtils.RequestSender.getAll());
+        for (final Hardware hardware : allHardware) {
+            HardwareUtils.RequestSender.delete(hardware.getId());
         }
 
         DatabaseCleaner.truncateTableAndResetId("hardware", "users");

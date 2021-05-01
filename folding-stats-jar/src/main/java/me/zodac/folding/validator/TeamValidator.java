@@ -60,6 +60,8 @@ public class TeamValidator {
             failureMessages.add(String.format("Attribute 'userIds' must contain at least one of: %s", availableUsers));
         }
 
+        // TODO: [zodac] Validate that the user is not already on another team
+
         final List<Integer> invalidUserIds = new ArrayList<>(team.getUserIds().size());
         for (final int userId : team.getUserIds()) {
             if (UserCache.get().doesNotContain(userId)) {

@@ -91,8 +91,7 @@ public class HardwareTest {
         int hardwareId = allHardware.size();
 
         if (allHardware.isEmpty()) {
-            HardwareUtils.RequestSender.create(DUMMY_HARDWARE);
-            hardwareId = 1;
+            hardwareId = HardwareUtils.ResponseParser.create(HardwareUtils.RequestSender.create(DUMMY_HARDWARE)).getId();
         }
 
         final HttpResponse<String> response = HardwareUtils.RequestSender.get(hardwareId);
@@ -113,8 +112,7 @@ public class HardwareTest {
         int hardwareId = allHardware.size();
 
         if (allHardware.isEmpty()) {
-            HardwareUtils.RequestSender.create(DUMMY_HARDWARE);
-            hardwareId = 1;
+            hardwareId = HardwareUtils.ResponseParser.create(HardwareUtils.RequestSender.create(DUMMY_HARDWARE)).getId();
         }
 
         final Hardware updatedHardware = Hardware.create(hardwareId, "Dummy_Hardware5", "Dummy Hardware5", OperatingSystem.LINUX, 1.0D);
@@ -136,19 +134,18 @@ public class HardwareTest {
     }
 
     @Test
-    public void whenDeletingHardware_givenAValidHardwareId_thenHardwareIsDeleted_andHasA204Status_andHardwareCountIsReduced_andHardwareCannotBeRetrievedAgain() throws IOException, InterruptedException {
+    public void whenDeletingHardware_givenAValidHardwareId_thenHardwareIsDeleted_andHasA200Status_andHardwareCountIsReduced_andHardwareCannotBeRetrievedAgain() throws IOException, InterruptedException {
         final Collection<Hardware> allHardware = HardwareUtils.ResponseParser.getAll(HardwareUtils.RequestSender.getAll());
         int hardwareId = allHardware.size();
 
         if (allHardware.isEmpty()) {
-            HardwareUtils.RequestSender.create(DUMMY_HARDWARE);
-            hardwareId = 1;
+            hardwareId = HardwareUtils.ResponseParser.create(HardwareUtils.RequestSender.create(DUMMY_HARDWARE)).getId();
         }
 
         final HttpResponse<String> response = HardwareUtils.RequestSender.delete(hardwareId);
         assertThat(response.statusCode())
-                .as("Did not receive a 204_NO_CONTENT HTTP response")
-                .isEqualTo(HttpURLConnection.HTTP_NO_CONTENT);
+                .as("Did not receive a 200_OK HTTP response")
+                .isEqualTo(HttpURLConnection.HTTP_OK);
 
 
         final HttpResponse<String> getResponse = HardwareUtils.RequestSender.get(hardwareId);
@@ -206,13 +203,13 @@ public class HardwareTest {
     }
 
     @Test
-    public void whenDeletingHardware_givenANonExistingHardwareId_thenNoJsonResponseIsReturned_andHasA204Status() throws IOException, InterruptedException {
+    public void whenDeletingHardware_givenANonExistingHardwareId_thenNoJsonResponseIsReturned_andHasA404Status() throws IOException, InterruptedException {
         final int invalidId = 99;
         final HttpResponse<String> response = HardwareUtils.RequestSender.delete(invalidId);
 
         assertThat(response.statusCode())
-                .as("Did not receive a 204_NO_CONTENT HTTP response")
-                .isEqualTo(HttpURLConnection.HTTP_NO_CONTENT);
+                .as("Did not receive a 404_NOT_FOUND HTTP response")
+                .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
 
         assertThat(response.body())
                 .as("Did not receive an empty JSON response")
@@ -220,7 +217,7 @@ public class HardwareTest {
     }
 
     @Test
-    public void whenUpdatingHardware_givenAValidHardwareId_andPayloadHasNoChanges_thenOriginalHardwareIsReturned_andHasA204Status() throws IOException, InterruptedException {
+    public void whenUpdatingHardware_givenAValidHardwareId_andPayloadHasNoChanges_thenOriginalHardwareIsReturned_andHasA200Status() throws IOException, InterruptedException {
         final Hardware hardware = Hardware.createWithoutId("Test GPU", "Base GPU", OperatingSystem.WINDOWS, 1.0D);
 
         final HttpResponse<String> createResponse = HardwareUtils.RequestSender.create(hardware);
@@ -234,12 +231,14 @@ public class HardwareTest {
         final HttpResponse<String> updateResponse = HardwareUtils.RequestSender.update(hardwareWithId);
 
         assertThat(updateResponse.statusCode())
-                .as("Did not receive a 204_NO_CONTENT HTTP response")
-                .isEqualTo(HttpURLConnection.HTTP_NO_CONTENT);
+                .as("Did not receive a 200_OK HTTP response")
+                .isEqualTo(HttpURLConnection.HTTP_OK);
 
-        assertThat(updateResponse.body())
+        final Hardware actual = HardwareUtils.ResponseParser.update(updateResponse);
+
+        assertThat(actual)
                 .as("Did not receive an empty JSON response")
-                .isEmpty();
+                .isEqualTo(hardwareWithId);
     }
 
     @Test
@@ -315,20 +314,16 @@ public class HardwareTest {
     }
 
     private static void cleanSystemForHardwareTests() throws IOException, InterruptedException, SQLException {
-        final Collection<Hardware> allHardware = HardwareUtils.ResponseParser.getAll(HardwareUtils.RequestSender.getAll());
-        System.out.println("Deleting " + allHardware.size() + " hardware");
-        for (final Hardware hardware : allHardware) {
-            HardwareUtils.RequestSender.delete(hardware.getId());
-        }
-
         final Collection<User> allUsers = UserUtils.ResponseParser.getAll(UserUtils.RequestSender.getAll());
-        System.out.println("Deleting " + allUsers.size() + " users");
         for (final User user : allUsers) {
             UserUtils.RequestSender.delete(user.getId());
         }
 
-        System.out.println("Cleaning DB");
-        DatabaseCleaner.truncateTableAndResetId("hardware", "users");
-        System.out.println("Done!");
+        final Collection<Hardware> allHardware = HardwareUtils.ResponseParser.getAll(HardwareUtils.RequestSender.getAll());
+        for (final Hardware hardware : allHardware) {
+            HardwareUtils.RequestSender.delete(hardware.getId());
+        }
+
+        DatabaseCleaner.truncateTableAndResetId("users", "hardware");
     }
 }

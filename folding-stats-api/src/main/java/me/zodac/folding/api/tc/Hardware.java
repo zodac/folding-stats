@@ -46,15 +46,15 @@ public class Hardware implements Identifiable {
      * <p>
      * Since the DB auto-generates the ID, this function should be used when creating a {@link Hardware} from the DB response.
      *
-     * @param id              the ID
+     * @param hardwareId      the ID
      * @param hardwareName    the LARS DB name
      * @param displayName     the display name for the <code>Team Competition</code>
      * @param operatingSystem the {@link OperatingSystem} the {@link Hardware} is running on
      * @param multiplier      the calculated multiplier
      * @return the created {@link Hardware}
      */
-    public static Hardware create(final int id, final String hardwareName, final String displayName, final OperatingSystem operatingSystem, final double multiplier) {
-        return new Hardware(id, hardwareName, displayName, operatingSystem.displayName(), multiplier);
+    public static Hardware create(final int hardwareId, final String hardwareName, final String displayName, final OperatingSystem operatingSystem, final double multiplier) {
+        return new Hardware(hardwareId, hardwareName, displayName, operatingSystem.displayName(), multiplier);
     }
 
     /**
@@ -78,11 +78,11 @@ public class Hardware implements Identifiable {
      * Once the {@link Hardware} has been persisted in the DB, we will know its ID. We create a new {@link Hardware} instance with this ID,
      * which can be used to retrieval/referencing later.
      *
-     * @param id       the DB-generated ID
-     * @param hardware the {@link Hardware} to be updated with the ID
+     * @param hardwareId the DB-generated ID
+     * @param hardware   the {@link Hardware} to be updated with the ID
      * @return the updated {@link Hardware}
      */
-    public static Hardware updateWithId(final int id, final Hardware hardware) {
-        return new Hardware(id, hardware.hardwareName, hardware.displayName, hardware.operatingSystem, hardware.multiplier);
+    public static Hardware updateWithId(final int hardwareId, final Hardware hardware) {
+        return new Hardware(hardwareId, hardware.hardwareName, hardware.displayName, hardware.operatingSystem, hardware.multiplier);
     }
 }

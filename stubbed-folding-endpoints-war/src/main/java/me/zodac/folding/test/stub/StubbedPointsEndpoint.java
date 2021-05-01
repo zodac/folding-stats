@@ -1,7 +1,6 @@
 package me.zodac.folding.test.stub;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -24,7 +23,7 @@ import javax.ws.rs.core.Response;
 @RequestScoped
 public class StubbedPointsEndpoint {
 
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    private static final Gson GSON = new Gson();
 
     @GET
     @Path("/{foldingUserName}/stats")

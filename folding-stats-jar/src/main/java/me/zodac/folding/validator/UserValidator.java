@@ -51,6 +51,8 @@ public class UserValidator {
             failureMessages.add(String.format("Attribute 'hardwareId' must be one of: %s", availableHardware));
         }
 
+        // TODO: [zodac] If liveStatsLink != null, verify it is a valid link
+
         // Since this is a heavy validation check, only do it if the rest of the user is valid
         if (failureMessages.isEmpty()) {
             try {

@@ -194,19 +194,39 @@ public class StorageFacade {
         dbManager.updateUser(updatedUser);
         userCache.add(updatedUser);
 
-        // If a user is updated and their team, Folding username, hardware ID or passkey is changed, we need to update their initial offset again
-        // The value should be: (new user info points - current TC points)
-        if (!existingUser.getPasskey().equalsIgnoreCase(updatedUser.getPasskey()) || !existingUser.getFoldingUserName().equalsIgnoreCase(updatedUser.getFoldingUserName())
-                || existingUser.getHardwareId() != updatedUser.getHardwareId()) {
-            LOGGER.debug("User had state changes, recalculating initial stats");
-            final UserStats updatedUserStats = FoldingStatsParser.getStatsForUser(updatedUser);
-            final UserTcStats currentUserTcStats = getTcStatsForUser(updatedUser.getId());
-            final UserStats newUserInitialStats = UserStats.create(updatedUser.getId(), updatedUserStats.getTimestamp(),
-                    Stats.create(updatedUserStats.getPoints() - currentUserTcStats.getMultipliedPoints(), updatedUserStats.getUnits() - currentUserTcStats.getUnits())
-            );
 
-            dbManager.persistInitialUserStats(newUserInitialStats);
-            initialStatsCache.add(updatedUser.getId(), newUserInitialStats.getStats());
+        if (!existingUser.getFoldingUserName().equalsIgnoreCase(updatedUser.getFoldingUserName())) {
+            LOGGER.debug("User had state changes to Folding username {} -> {}, recalculating initial stats", existingUser.getFoldingUserName(), updatedUser.getFoldingUserName());
+            handleStateChangeForUserUpdate(updatedUser);
+        } else if (!existingUser.getPasskey().equalsIgnoreCase(updatedUser.getPasskey())) {
+            LOGGER.debug("User had state changes to passkey {} -> {}, recalculating initial stats", existingUser.getPasskey(), updatedUser.getPasskey());
+            handleStateChangeForUserUpdate(updatedUser);
+        } else if (existingUser.getHardwareId() != updatedUser.getHardwareId()) {
+            LOGGER.debug("User had state changes to hardware ID {} -> {}, recalculating initial stats", existingUser.getHardwareId(), updatedUser.getHardwareId());
+            handleStateChangeForUserUpdate(updatedUser);
+        }
+    }
+
+    // If a user is updated and their Folding username, hardware ID or passkey is changed, we need to update their initial offset again
+    // The value should be: (new user info points - current TC points)
+    private void handleStateChangeForUserUpdate(final User updatedUser) throws FoldingException, FoldingExternalServiceException {
+        final UserStats updatedUserStats = FoldingStatsParser.getStatsForUser(updatedUser);
+        final UserTcStats currentUserTcStats = getCurrentTcStatsForUserOrDefault(updatedUser);
+
+        final UserStats newUserInitialStats = UserStats.create(updatedUser.getId(), updatedUserStats.getTimestamp(),
+                Stats.create(updatedUserStats.getPoints() - currentUserTcStats.getMultipliedPoints(), updatedUserStats.getUnits() - currentUserTcStats.getUnits())
+        );
+
+        dbManager.persistInitialUserStats(newUserInitialStats);
+        initialStatsCache.add(updatedUser.getId(), newUserInitialStats.getStats());
+    }
+
+    private UserTcStats getCurrentTcStatsForUserOrDefault(final User updatedUser) throws FoldingException {
+        try {
+            return getTcStatsForUser(updatedUser.getId());
+        } catch (final UserNotFoundException e) {
+            LOGGER.debug("Unable to find user with ID: {}, using 0 values", e.getId(), e);
+            return UserTcStats.empty(updatedUser.getId());
         }
     }
 
