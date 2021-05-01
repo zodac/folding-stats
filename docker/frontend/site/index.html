@@ -45,8 +45,7 @@
 
 <body>
 <button onclick="toggleStats()" class="btn btn-success" id="stats_button" href="#stats_div"
-        data-toggle="collapse" role="button">Team Competition
-    Stats
+        data-toggle="collapse" role="button">Team Competition Stats
 </button>
 <button onclick="toggleHardware()" class="btn btn-primary" id="hardware_button" href="#hardware_div"
         data-toggle="collapse" role="button">List of Hardware
@@ -54,23 +53,15 @@
 <button onclick="toggleUsers()" class="btn btn-primary" id="users_button" href="#users_div"
         data-toggle="collapse" role="button">List of Users
 </button>
-<button onclick="toggleTeams()" class="btn btn-primary" id="teams_button" href="#teams_div"
-        data-toggle="collapse" role="button">List of Teams
+<button onclick="toggleTeams()" class="btn btn-primary" id="teams_button" href="#teams_div" data-toggle="collapse"
+        role="button">List of Teams
 </button>
 
 <!-- These divs will be populated by main.js -->
-<div id="hardware_div" class="collapse">
-
-</div>
-<div id="users_div" class="collapse">
-
-</div>
-<div id="teams_div" class="collapse">
-
-</div>
-<div id="stats_div" class="collapse show">
-
-</div>
+<div id="hardware_div" class="collapse"></div>
+<div id="users_div" class="collapse"></div>
+<div id="teams_div" class="collapse"></div>
+<div id="stats_div" class="collapse show"></div>
 
 </body>
 </html>

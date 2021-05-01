@@ -1,5 +1,5 @@
 const ROOT_URL='http://teamcomp.axihub.ca';
-let usersJson=null;
+
 // The 'toggle' functions below simply change the colour of the buttons. There must be a smarter way to do this...
 function toggleStats() {
     if($("#stats_div").is(":visible")){
@@ -169,6 +169,14 @@ function loadTcStats() {
 
                 teamTableUserProperties.forEach(function (userProperty, i) {
                     teamTableUserCell = document.createElement("td");
+
+                    if(userProperty === "multipliedPoints"){
+                        teamTableUserCell.setAttribute("data-toggle", "tooltip");
+                        teamTableUserCell.setAttribute("data-placement", "left");
+                        teamTableUserCell.setAttribute("title", "Unmultiplied: " + activeUser["points"].toLocaleString());
+                        $('[data-toggle="tooltip"]').tooltip();
+                    }
+
                     teamTableUserCell.innerHTML = activeUser[userProperty].toLocaleString();
                     teamTableBodyRow.append(teamTableUserCell);
                 });
@@ -185,6 +193,13 @@ function loadTcStats() {
                     if(userProperty === "userName"){
                         teamTableUserRow.innerHTML = retiredUser[userProperty] + " (retired)";
                     } else {
+                        if(userProperty === "multipliedPoints"){
+                            teamTableUserCell.setAttribute("data-toggle", "tooltip");
+                            teamTableUserCell.setAttribute("data-placement", "left");
+                            teamTableUserCell.setAttribute("title", "Unmultiplied: " + retiredUser["points"].toLocaleString());
+                            $('[data-toggle="tooltip"]').tooltip();
+                        }
+
                         teamTableUserRow.innerHTML = retiredUser[userProperty].toLocaleString();
                     }
                     teamTableBodyRow.append(teamTableUserRow);

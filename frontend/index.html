@@ -106,6 +106,8 @@
 
 
 
+
+
     </style>
 </head>
 
@@ -386,6 +388,14 @@
 
                     teamTableUserProperties.forEach(function (userProperty, i) {
                         teamTableUserCell = document.createElement("td");
+
+                        if(userProperty === "multipliedPoints"){
+                            teamTableUserCell.setAttribute("data-toggle", "tooltip");
+                            teamTableUserCell.setAttribute("data-placement", "left");
+                            teamTableUserCell.setAttribute("title", "Unmultiplied: " + activeUser["points"].toLocaleString());
+                            $('[data-toggle="tooltip"]').tooltip();
+                        }
+
                         teamTableUserCell.innerHTML = activeUser[userProperty].toLocaleString();
                         teamTableBodyRow.append(teamTableUserCell);
                     });
@@ -401,6 +411,13 @@
                         if(userProperty === "userName"){
                             teamTableUserRow.innerHTML = retiredUser[userProperty] + " (retired)";
                         } else {
+                            if(userProperty === "multipliedPoints"){
+                                teamTableUserCell.setAttribute("data-toggle", "tooltip");
+                                teamTableUserCell.setAttribute("data-placement", "left");
+                                teamTableUserCell.setAttribute("title", "Unmultiplied: " + retiredUser["points"].toLocaleString());
+                                $('[data-toggle="tooltip"]').tooltip();
+                            }
+
                             teamTableUserRow.innerHTML = retiredUser[userProperty].toLocaleString();
                         }
                         teamTableBodyRow.append(teamTableUserRow);
@@ -656,6 +673,8 @@
         loadTeams();
         updateTime();
     });
+
+
 
 
 
