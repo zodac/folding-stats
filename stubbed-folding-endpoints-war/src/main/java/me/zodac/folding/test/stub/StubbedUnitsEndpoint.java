@@ -17,11 +17,12 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.Locale;
 
 
 @Path("/bonus/")
 @RequestScoped
-public class UnitsEndpoint {
+public class StubbedUnitsEndpoint {
 
     private static final Gson GSON = new Gson();
 
@@ -35,7 +36,12 @@ public class UnitsEndpoint {
     }
 
     private Object createResponse(final String foldingUserName, final String passkey) {
-        return GSON.toJson(List.of(UnitsResponse.create(1)));
+        switch (foldingUserName.toLowerCase(Locale.ROOT)) {
+            case "dummy_user":
+                return GSON.toJson(List.of(UnitsResponse.create(1)));
+            default:
+                return GSON.toJson(List.of(UnitsResponse.create(0)));
+        }
     }
 
     @NoArgsConstructor

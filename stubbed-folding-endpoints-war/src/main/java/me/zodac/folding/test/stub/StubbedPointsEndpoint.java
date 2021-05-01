@@ -22,7 +22,7 @@ import javax.ws.rs.core.Response;
 
 @Path("/user/")
 @RequestScoped
-public class PointsEndpoint {
+public class StubbedPointsEndpoint {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 

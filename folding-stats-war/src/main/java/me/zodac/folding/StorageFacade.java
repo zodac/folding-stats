@@ -55,6 +55,8 @@ import static java.util.stream.Collectors.toMap;
  */
 // TODO: [zodac] Should replace the cache miss warnings with some metrics instead?
 // TODO: [zodac] Split into one Facade for POJOs and one for stats?
+// TODO: [zodac] I really don't like how much logic is in here now, originally I planned for this just to avoid needing to specify
+//  both DB and cache in the REST/EJB layer. I think it's gotten too big and needs to be scaled back...
 @Singleton
 public class StorageFacade {
 

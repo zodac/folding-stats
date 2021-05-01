@@ -172,8 +172,8 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
             getLogger().error(errorMessage);
             return badRequest(errorMessage);
         } catch (final NotFoundException e) {
-            getLogger().debug("No {} found with ID: {}", elementType(), elementId, e);
-            getLogger().error("No {} found with ID: {}", elementType(), elementId);
+            getLogger().debug("Error getting {}, could not find {} with ID {}", elementType(), e.getType(), e.getId(), e);
+            getLogger().error("Error getting {}, could not find {} with ID {}", elementType(), e.getType(), e.getId());
             return notFound();
         } catch (final FoldingException e) {
             getLogger().error("Error getting {} with ID: {}", elementType(), elementId, e.getCause());
@@ -236,8 +236,8 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
             getLogger().error(errorMessage);
             return badGateway();
         } catch (final NotFoundException e) {
-            getLogger().debug("No {} found with ID: {}", elementType(), elementId, e);
-            getLogger().error("No {} found with ID: {}", elementType(), elementId, e);
+            getLogger().debug("Error updating {}, could not find {} with ID {}", elementType(), e.getType(), e.getId(), e);
+            getLogger().error("Error updating {}, could not find {} with ID {}", elementType(), e.getType(), e.getId());
             return notFound();
         } catch (final FoldingException e) {
             getLogger().error("Error updating {} with ID: {}", elementType(), elementId, e.getCause());
@@ -267,8 +267,8 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
             getLogger().error(errorMessage);
             return badRequest(errorMessage);
         } catch (final NotFoundException e) {
-            getLogger().debug("No {} found with ID: {}", elementType(), elementId, e);
-            getLogger().error("No {} found with ID: {}", elementType(), elementId);
+            getLogger().debug("Error deleting {}, could not find {} with ID {}", elementType(), e.getType(), e.getId(), e);
+            getLogger().error("Error deleting {}, could not find {} with ID {}", elementType(), e.getType(), e.getId());
             return noContent();
         } catch (final FoldingConflictException e) {
             final String errorMessage = String.format("The %s ID '%s' is in use, remove all usages before deleting", elementType(), elementId);

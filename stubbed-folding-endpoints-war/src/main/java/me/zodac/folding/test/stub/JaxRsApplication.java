@@ -16,8 +16,8 @@ public class JaxRsApplication extends Application {
     @Override
     public Set<Class<?>> getClasses() {
         final Set<Class<?>> classes = new HashSet<>(2);
-        classes.add(PointsEndpoint.class);
-        classes.add(UnitsEndpoint.class);
+        classes.add(StubbedPointsEndpoint.class);
+        classes.add(StubbedUnitsEndpoint.class);
         return classes;
     }
 }
