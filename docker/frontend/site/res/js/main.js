@@ -93,8 +93,15 @@ function loadTcStats() {
         statsTableBodyRow = document.createElement('tr');
         statsTableTeamProperties.forEach(function (teamProperty, i) {
             statsTableBodyCell = document.createElement("td");
-            statsTableBodyCell.innerHTML = jsonResponse[teamProperty].toLocaleString();
 
+            if(teamProperty === "totalMultipliedPoints"){
+                statsTableBodyCell.setAttribute("data-toggle", "tooltip");
+                statsTableBodyCell.setAttribute("data-placement", "top");
+                statsTableBodyCell.setAttribute("title", "Unmultiplied: " + jsonResponse["totalPoints"].toLocaleString());
+                $('[data-toggle="tooltip"]').tooltip();
+            }
+
+            statsTableBodyCell.innerHTML = jsonResponse[teamProperty].toLocaleString();
             statsTableBodyRow.append(statsTableBodyCell);
         });
         statsTableBody.append(statsTableBodyRow);
