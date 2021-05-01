@@ -64,9 +64,7 @@ function loadTcStats() {
         const statsTableHeaders = ["Total Points", "Total Units"];
         const statsTableTeamProperties = ["totalMultipliedPoints", "totalUnits"];
 
-        statsDiv = document.createElement('div');
-        statsDiv.setAttribute("id", "stats_div");
-        statsDiv.setAttribute("class", "collapse show");
+        statsDiv = document.getElementById("stats_div");
 
         statsTitle = document.createElement('h2');
         statsTitle.setAttribute("class", "navbar-brand");
@@ -183,10 +181,11 @@ function loadTcStats() {
 
                 teamTableUserProperties.forEach(function (userProperty, i) {
                     teamTableUserRow = document.createElement("td");
+
                     if(userProperty === "userName"){
-                        teamTableUserRow.innerHTML = activeUser[userProperty] + " (retired)";
+                        teamTableUserRow.innerHTML = retiredUser[userProperty] + " (retired)";
                     } else {
-                        teamTableUserRow.innerHTML = activeUser[userProperty].toLocaleString();
+                        teamTableUserRow.innerHTML = retiredUser[userProperty].toLocaleString();
                     }
                     teamTableBodyRow.append(teamTableUserRow);
                 });
@@ -199,8 +198,6 @@ function loadTcStats() {
 
             statsDiv.append(teamDiv);
             statsDiv.append(document.createElement('br'));
-
-            document.body.appendChild(statsDiv);
         });
     })
 };
@@ -216,9 +213,7 @@ function loadHardware() {
         const hardwareHeaders = ["ID", "Name", "Operating System", "Multiplier"];
         const hardwareProperties = ["id", "displayName", "operatingSystem", "multiplier"];
 
-        hardwareDiv = document.createElement('div');
-        hardwareDiv.setAttribute("id", "hardware_div");
-        hardwareDiv.setAttribute("class", "collapse");
+        hardwareDiv = document.getElementById("hardware_div");
 
         hardwareTitle = document.createElement('h2');
         hardwareTitle.setAttribute("class", "navbar-brand");
@@ -263,10 +258,6 @@ function loadHardware() {
         hardwareTable.append(hardwareTableBody);
 
         hardwareDiv.append(hardwareTable);
-
-        document.body.appendChild(hardwareDiv);
-
-        hardwareJson=jsonResponse;
     })
 };
 
@@ -281,9 +272,7 @@ function loadUsers() {
         const usersHeaders = ["ID", "User", "Passkey", "Category", "Hardware ID", "Live Stats Link"];
         const usersProperties = ["id", "displayName", "passkey", "category", "hardwareId", "liveStatsLink"];
 
-        usersDiv = document.createElement('div');
-        usersDiv.setAttribute("id", "users_div");
-        usersDiv.setAttribute("class", "collapse");
+        usersDiv = document.getElementById("users_div");
 
         usersTitle = document.createElement('h2');
         usersTitle.setAttribute("class", "navbar-brand");
@@ -333,10 +322,6 @@ function loadUsers() {
         usersTable.append(usersTableBody);
 
         usersDiv.append(usersTable);
-
-        document.body.appendChild(usersDiv);
-
-        usersJson=jsonResponse;
     })
 };
 
@@ -351,9 +336,7 @@ function loadTeams() {
         const teamsHeaders = ["ID", "Name", "Description", "Captain ID", "User IDs", "Retired User IDs"];
         const teamsProperties = ["id", "teamName", "teamDescription", "captainUserId", "userIds", "retiredUserIds"];
 
-        teamsDiv = document.createElement('div');
-        teamsDiv.setAttribute("id", "teams_div");
-        teamsDiv.setAttribute("class", "collapse");
+        teamsDiv = document.getElementById("teams_div");
 
         teamsTitle = document.createElement('h2');
         teamsTitle.setAttribute("class", "navbar-brand");
@@ -402,10 +385,6 @@ function loadTeams() {
         teamsTable.append(teamsTableBody);
 
         teamsDiv.append(teamsTable);
-
-        document.body.appendChild(teamsDiv);
-
-        teamsJson=jsonResponse;
     })
 };
 

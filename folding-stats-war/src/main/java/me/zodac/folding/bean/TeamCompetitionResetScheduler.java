@@ -23,9 +23,9 @@ import static java.util.stream.Collectors.toSet;
 
 @Startup
 @Singleton
-public class TcCacheResetScheduler {
+public class TeamCompetitionResetScheduler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TcCacheResetScheduler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TeamCompetitionResetScheduler.class);
 
     @EJB
     private StorageFacade storageFacade;
@@ -33,10 +33,10 @@ public class TcCacheResetScheduler {
     @Schedule(dayOfMonth = "1", minute = "55", info = "Monthly cache reset for TC teams")
     public void monthlyTcStatsReset() {
         LOGGER.info("Resetting TC caches for new month");
-        manualTcStatsReset();
+        manualTeamCompetitionStatsReset();
     }
 
-    public void manualTcStatsReset() {
+    public void manualTeamCompetitionStatsReset() {
         final List<Team> teams;
         try {
             teams = storageFacade.getAllTeams();
@@ -48,8 +48,7 @@ public class TcCacheResetScheduler {
             LOGGER.error("Unable to get teams!");
             return;
         }
-
-
+        
         final Map<Integer, User> usersById = storageFacade.getActiveTcUsers(teams);
         if (usersById.isEmpty()) {
             LOGGER.error("No TC users configured in system!");
