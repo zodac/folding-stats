@@ -105,6 +105,7 @@
 
 
 
+
     </style>
 </head>
 
@@ -398,9 +399,9 @@
                     teamTableUserProperties.forEach(function (userProperty, i) {
                         teamTableUserRow = document.createElement("td");
                         if(userProperty === "userName"){
-                            teamTableUserRow.innerHTML = activeUser[userProperty] + " (retired)";
+                            teamTableUserRow.innerHTML = retiredUser[userProperty] + " (retired)";
                         } else {
-                            teamTableUserRow.innerHTML = activeUser[userProperty].toLocaleString();
+                            teamTableUserRow.innerHTML = retiredUser[userProperty].toLocaleString();
                         }
                         teamTableBodyRow.append(teamTableUserRow);
                     });
@@ -655,6 +656,7 @@
         loadTeams();
         updateTime();
     });
+
 
 
 

@@ -9,6 +9,7 @@ import lombok.Setter;
 import lombok.ToString;
 import me.zodac.folding.api.Identifiable;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,7 +20,7 @@ import java.util.Set;
 @EqualsAndHashCode
 @ToString(doNotUseGetters = true)
 public class Team implements Identifiable {
-    
+
     private int id;
     private String teamName;
     private String teamDescription;
@@ -53,5 +54,9 @@ public class Team implements Identifiable {
         retiredUserStats.remove(retiredUserId);
 
         return new Team(team.id, team.teamName, team.teamDescription, team.captainUserId, updateUserIds, retiredUserStats);
+    }
+
+    public static Team removeRetiredUsers(final Team team) {
+        return new Team(team.id, team.teamName, team.teamDescription, team.captainUserId, team.userIds, Collections.emptySet());
     }
 }

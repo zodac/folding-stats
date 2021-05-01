@@ -453,22 +453,9 @@ public class StorageFacade {
     }
 
     public void updateInitialStatsForUser(final User user) throws UserNotFoundException, FoldingException {
-        // Retrieve the initial stats for the user, and the current month's TC stats. We need both because if the user started
-        // the competition but earned no points, we cannot simply use the current month's TC stats (which would both be 0).
         LOGGER.info("Updating initial stats for user: {}", user);
-        LOGGER.info("Current method (initial_stats+tc_stats)");
-        final Stats initialStats = getInitialStatsForUser(user.getId());
-        final UserTcStats currentTcStats = getTcStatsForUser(user.getId());
-        final Stats currentAndInitialStats = Stats.create(initialStats.getPoints() + currentTcStats.getPoints(), initialStats.getUnits() + currentTcStats.getUnits());
-        LOGGER.info("Finished current method (initial_stats+tc_stats): {}", currentAndInitialStats);
-
-        // TODO: [zodac] Couldn't I just use the total stats, instead of adding initial+tc (two DB calls)?
-        LOGGER.info("Potential method (total_stats)");
         final Stats totalStats = getTotalStatsForUser(user.getId());
-        LOGGER.info("Finished new method (total_stats: {}", totalStats);
-
-        persistInitialUserStats(UserStats.create(user.getId(), TimeUtils.getCurrentUtcTimestamp(), currentAndInitialStats));
-        initialStatsCache.add(user.getId(), currentAndInitialStats);
-        LOGGER.info("Done updating");
+        persistInitialUserStats(UserStats.create(user.getId(), TimeUtils.getCurrentUtcTimestamp(), totalStats));
+        initialStatsCache.add(user.getId(), totalStats);
     }
 }

@@ -17,9 +17,6 @@ import javax.ejb.Startup;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import static java.util.stream.Collectors.toSet;
 
 @Startup
 @Singleton
@@ -48,7 +45,7 @@ public class TeamCompetitionResetScheduler {
             LOGGER.error("Unable to get teams!");
             return;
         }
-        
+
         final Map<Integer, User> usersById = storageFacade.getActiveTcUsers(teams);
         if (usersById.isEmpty()) {
             LOGGER.error("No TC users configured in system!");
@@ -57,21 +54,21 @@ public class TeamCompetitionResetScheduler {
 
         resetStats(usersById.values());
         clearOffsets();
-        removeRetiredUsersFromTeams(teams, usersById);
+        removeRetiredUsersFromTeams(teams);
     }
 
-    private void removeRetiredUsersFromTeams(final List<Team> teams, final Map<Integer, User> usersById) {
+    private void removeRetiredUsersFromTeams(final List<Team> teams) {
+        LOGGER.debug("Removing retired users from teams");
         for (final Team team : teams) {
-            try {
-                final Set<Integer> activeUserIds = team.getUserIds()
-                        .stream()
-                        .map(usersById::get)
-                        .filter(User::isActive)
-                        .map(User::getId)
-                        .collect(toSet());
+            if (team.getRetiredUserIds().isEmpty()) {
+                LOGGER.debug("No retired users in team '{}'", team.getTeamName());
+                continue;
+            }
 
-                team.setUserIds(activeUserIds);
-                storageFacade.updateTeam(team);
+            try {
+                LOGGER.debug("Removing retired users from team '{}'", team.getTeamName());
+                final Team teamWithoutRetiredUsers = Team.removeRetiredUsers(team);
+                storageFacade.updateTeam(teamWithoutRetiredUsers);
             } catch (final TeamNotFoundException e) {
                 LOGGER.debug("Error removing retired users from team, no team found with ID: {}", team.getId(), e);
                 LOGGER.warn("Error removing retired users from team, no team found with ID: {}", team.getId());
