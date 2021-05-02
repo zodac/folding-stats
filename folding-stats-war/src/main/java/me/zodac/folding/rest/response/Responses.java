@@ -8,6 +8,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.util.List;
 
+// TODO: [zodac] Look into Cache-Control/Expires headers, good start point: https://devcenter.heroku.com/articles/jax-rs-http-caching
 public class Responses {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();

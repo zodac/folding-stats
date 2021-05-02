@@ -17,9 +17,9 @@ COPY ./folding-stats-api/pom.xml ./folding-stats-api/pom.xml
 COPY ./folding-stats-ear/pom.xml ./folding-stats-ear/pom.xml
 COPY ./folding-stats-jar/pom.xml ./folding-stats-jar/pom.xml
 COPY ./folding-stats-war/pom.xml ./folding-stats-war/pom.xml
-# Test poms must also be added, or else 'mvn verify' will not even start
+# Non-code poms must also be added, or else 'mvn verify' will not even start
+COPY ./docker/pom.xml ./docker/pom.xml
 COPY ./testsuite/pom.xml ./testsuite/pom.xml
-COPY ./stubbed-folding-endpoints-ear/pom.xml ./stubbed-folding-endpoints-ear/pom.xml
 COPY ./stubbed-folding-endpoints-war/pom.xml ./stubbed-folding-endpoints-war/pom.xml
 
 RUN mvn verify clean --fail-never -DskipTests
@@ -31,7 +31,6 @@ COPY ./folding-stats-jar ./folding-stats-jar
 COPY ./folding-stats-war ./folding-stats-war
 # Test logic must be added, or else the 'mvn install' will fail
 COPY ./testsuite ./testsuite
-COPY ./stubbed-folding-endpoints-ear ./stubbed-folding-endpoints-ear
 COPY ./stubbed-folding-endpoints-war ./stubbed-folding-endpoints-war
 
 # Build artifacts

@@ -98,7 +98,6 @@ function loadTcStats() {
                 statsTableBodyCell.setAttribute("data-toggle", "tooltip");
                 statsTableBodyCell.setAttribute("data-placement", "top");
                 statsTableBodyCell.setAttribute("title", "Unmultiplied: " + jsonResponse["totalPoints"].toLocaleString());
-                $('[data-toggle="tooltip"]').tooltip();
             }
 
             statsTableBodyCell.innerHTML = jsonResponse[teamProperty].toLocaleString();
@@ -132,6 +131,9 @@ function loadTcStats() {
 
             teamStats = document.createElement('h5');
             teamStats.setAttribute("id", "team_"+teamNumber+"_stats");
+            teamStats.setAttribute("data-toggle", "tooltip");
+            teamStats.setAttribute("data-placement", "top");
+            teamStats.setAttribute("title", "Unmultiplied: " + team["teamPoints"].toLocaleString());
             teamStats.innerHTML = team['teamMultipliedPoints'].toLocaleString() + " points | " + team['teamUnits'].toLocaleString() + " units";
             metadataDiv.append(teamStats);
 
@@ -181,7 +183,6 @@ function loadTcStats() {
                         teamTableUserCell.setAttribute("data-toggle", "tooltip");
                         teamTableUserCell.setAttribute("data-placement", "left");
                         teamTableUserCell.setAttribute("title", "Unmultiplied: " + activeUser["points"].toLocaleString());
-                        $('[data-toggle="tooltip"]').tooltip();
                     }
 
                     teamTableUserCell.innerHTML = activeUser[userProperty].toLocaleString();
@@ -204,7 +205,6 @@ function loadTcStats() {
                             teamTableUserCell.setAttribute("data-toggle", "tooltip");
                             teamTableUserCell.setAttribute("data-placement", "left");
                             teamTableUserCell.setAttribute("title", "Unmultiplied: " + retiredUser["points"].toLocaleString());
-                            $('[data-toggle="tooltip"]').tooltip();
                         }
 
                         teamTableUserRow.innerHTML = retiredUser[userProperty].toLocaleString();
@@ -221,6 +221,7 @@ function loadTcStats() {
             statsDiv.append(teamDiv);
             statsDiv.append(document.createElement('br'));
         });
+        $('[data-toggle="tooltip"]').tooltip();
     })
 };
 

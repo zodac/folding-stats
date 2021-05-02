@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>me.zodac</groupId>
+        <artifactId>folding-stats</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>docker</artifactId>
+    <name>[${project.parent.artifactId}] docker module</name>
+
+    <properties>
+        <!-- Do not merge or minify JS/CSS by default -->
+        <skip-minify>true</skip-minify>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.samaxes.maven</groupId>
+                <artifactId>minify-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-minify</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <charset>UTF-8</charset>
+                            <webappSourceDir>${project.basedir}/frontend/src</webappSourceDir>
+                            <webappTargetDir>${project.basedir}/frontend/site/res</webappTargetDir>
+
+                            <!-- CSS files -->
+                            <cssSourceDir>css</cssSourceDir>
+                            <cssSourceFiles>
+                                <cssSourceFile>main.css</cssSourceFile>
+                            </cssSourceFiles>
+                            <cssFinalFile>main.css</cssFinalFile>
+
+                            <!-- JS files -->
+                            <jsSourceDir>js</jsSourceDir>
+                            <jsSourceFiles>
+                                <jsSourceFile>jsonsorter.js</jsSourceFile>
+                                <jsSourceFile>main.js</jsSourceFile>
+                                <jsSourceFile>tablesort.js</jsSourceFile>
+                                <jsSourceFile>timer.js</jsSourceFile>
+                            </jsSourceFiles>
+                            <jsFinalFile>main.js</jsFinalFile>
+                            <jsEngine>CLOSURE</jsEngine>
+
+                            <skipMerge>${skip-minify}</skipMerge>
+                            <skipMinify>${skip-minify}</skipMinify>
+                        </configuration>
+                        <goals>
+                            <goal>minify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <!-- Profile used to enable the minify-maven-plugin -->
+        <profile>
+            <id>enable_minify</id>
+            <activation>
+                <property>
+                    <name>minify</name>
+                </property>
+            </activation>
+            <properties>
+                <skip-minify>false</skip-minify>
+            </properties>
+        </profile>
+    </profiles>
+</project>

@@ -83,7 +83,7 @@ public class TeamCompetitionStatsEndpoint {
             if (teamResults.isEmpty()) {
                 LOGGER.debug("No teams to show!");
             }
-
+            
             // TODO: [zodac] Cache this CompetitionResult, and invalidate cache on scheduled/manual update, scheduled/manual reset, user create/update, team create/update
             //   Can't simply invalidate on stats update, because what if a hardware display is changed? Should invalidate on ALL changes
             return ok(CompetitionResult.create(teamResults));

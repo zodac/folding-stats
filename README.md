@@ -1,5 +1,17 @@
 # Folding Stats
 
+## Development
+
+### JS/CSS updates
+
+The JS scripts and CSS stylesheets are stored in `docker/frontend/src`. They are then minified and merged by a maven
+plugin, which copies them into the 'live' folder `docker/frontend/site/res`. This is done by running the following
+command on the root directory:
+
+    maven package -Dminify
+
+If this command is not run, changes will not be pushed to the frontend docker container.
+
 ## Decisions
 
 ### Historic Stats

@@ -11,11 +11,11 @@
     <name>[${project.artifactId}] project</name>
 
     <modules>
+        <module>docker</module>
         <module>${project.artifactId}-api</module>
         <module>${project.artifactId}-ear</module>
         <module>${project.artifactId}-jar</module>
         <module>${project.artifactId}-war</module>
-        <module>stubbed-folding-endpoints-ear</module>
         <module>stubbed-folding-endpoints-war</module>
         <module>testsuite</module>
     </modules>
@@ -47,6 +47,7 @@
         <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <maven-war-plugin.version>3.3.1</maven-war-plugin.version>
+        <minify-maven-plugin.version>1.7.6</minify-maven-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -65,12 +66,6 @@
             <dependency>
                 <groupId>me.zodac</groupId>
                 <artifactId>folding-stats-war</artifactId>
-                <version>${project.version}</version>
-                <type>war</type>
-            </dependency>
-            <dependency>
-                <groupId>me.zodac</groupId>
-                <artifactId>stubbed-folding-endpoints-war</artifactId>
                 <version>${project.version}</version>
                 <type>war</type>
             </dependency>
@@ -183,6 +178,11 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
                     <version>${maven-war-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>com.samaxes.maven</groupId>
+                    <artifactId>minify-maven-plugin</artifactId>
+                    <version>${minify-maven-plugin.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>

@@ -17,7 +17,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
-import java.util.Locale;
 
 
 @Path("/bonus/")
@@ -36,8 +35,8 @@ public class StubbedUnitsEndpoint {
     }
 
     private Object createResponse(final String foldingUserName, final String passkey) {
-        switch (foldingUserName.toLowerCase(Locale.ROOT)) {
-            case "dummy_user":
+        switch (foldingUserName) {
+            case "Dummy_User":
                 return GSON.toJson(List.of(UnitsResponse.create(1)));
             default:
                 return GSON.toJson(List.of(UnitsResponse.create(0)));
