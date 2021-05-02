@@ -15,11 +15,10 @@ public class JaxRsApplication extends Application {
 
     @Override
     public Set<Class<?>> getClasses() {
-        final Set<Class<?>> classes = new HashSet<>(6);
+        final Set<Class<?>> classes = new HashSet<>(5);
         classes.add(HardwareEndpoint.class);
         classes.add(HistoricStatsEndpoint.class);
         classes.add(UserEndpoint.class);
-        classes.add(SiteEndpoint.class);
         classes.add(TeamEndpoint.class);
         classes.add(TeamCompetitionStatsEndpoint.class);
 

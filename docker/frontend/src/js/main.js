@@ -1,4 +1,4 @@
-const ROOT_URL='http://teamcomp.axihub.ca';
+const ROOT_URL='http://internal.axihub.ca/folding';
 
 // The 'toggle' functions below simply change the colour of the buttons. There must be a smarter way to do this...
 function toggleStats() {
