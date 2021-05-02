@@ -1,43 +1,13 @@
 const ROOT_URL='http://internal.axihub.ca/folding';
 
 // The 'toggle' functions below simply change the colour of the buttons. There must be a smarter way to do this...
-function toggleStats() {
-    if($("#stats_div").is(":visible")){
-        $("#stats_button").addClass("btn-primary");
-        $("#stats_button").removeClass("btn-success");
+function toggleMainButtonStyle(type){
+    if($("#"+type+"_div").is(":visible")){
+        $("#"+type+"_button").addClass("btn-primary");
+        $("#"+type+"_button").removeClass("btn-success");
     } else {
-        $("#stats_button").removeClass("btn-primary");
-        $("#stats_button").addClass("btn-success");
-    }
-}
-
-function toggleHardware() {
-    if($("#hardware_div").is(":visible")){
-        $("#hardware_button").addClass("btn-primary");
-        $("#hardware_button").removeClass("btn-success");
-    } else {
-        $("#hardware_button").removeClass("btn-primary");
-        $("#hardware_button").addClass("btn-success");
-    }
-}
-
-function toggleUsers() {
-    if($("#users_div").is(":visible")){
-        $("#users_button").addClass("btn-primary");
-        $("#users_button").removeClass("btn-success");
-    } else {
-        $("#users_button").removeClass("btn-primary");
-        $("#users_button").addClass("btn-success");
-    }
-}
-
-function toggleTeams() {
-    if($("#teams_div").is(":visible")){
-        $("#teams_button").addClass("btn-primary");
-        $("#teams_button").removeClass("btn-success");
-    } else {
-        $("#teams_button").removeClass("btn-primary");
-        $("#teams_button").addClass("btn-success");
+        $("#"+type+"_button").removeClass("btn-primary");
+        $("#"+type+"_button").addClass("btn-success");
     }
 }
 
@@ -118,6 +88,7 @@ function loadTcStats() {
         jsonResponseTeams.sort(sortJsonByKey("rank"));
         $.each(jsonResponseTeams, function(i, team) {
             var teamNumber = (i+1);
+            var captainName = team['captainName'];
 
             teamDiv = document.createElement('div');
             teamDiv.setAttribute("id", "team_"+teamNumber+"_div");
@@ -126,7 +97,7 @@ function loadTcStats() {
             metadataDiv.setAttribute("id", "team_"+teamNumber+"_metadata")
 
             teamTitle = document.createElement('h2');
-            teamTitle.innerHTML = "Rank #" + team['rank'] + ": " + team['teamName'] + " (Captain: " + team['captainName'] + ")";
+            teamTitle.innerHTML = "Rank #" + team['rank'] + ": " + team['teamName'];
             metadataDiv.append(teamTitle);
 
             teamStats = document.createElement('h5');
@@ -183,9 +154,13 @@ function loadTcStats() {
                         teamTableUserCell.setAttribute("data-toggle", "tooltip");
                         teamTableUserCell.setAttribute("data-placement", "left");
                         teamTableUserCell.setAttribute("title", "Unmultiplied: " + activeUser["points"].toLocaleString());
+                        teamTableUserCell.innerHTML = activeUser[userProperty].toLocaleString();
+                    } else if (userProperty === "userName" && activeUser[userProperty] === captainName) {
+                        teamTableUserCell.innerHTML = activeUser[userProperty].toLocaleString() + " (Captain)";
+                    } else {
+                        teamTableUserCell.innerHTML = activeUser[userProperty].toLocaleString();
                     }
 
-                    teamTableUserCell.innerHTML = activeUser[userProperty].toLocaleString();
                     teamTableBodyRow.append(teamTableUserCell);
                 });
                 teamTableBody.append(teamTableBodyRow);
