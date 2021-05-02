@@ -15,14 +15,18 @@ public class JaxRsApplication extends Application {
 
     @Override
     public Set<Class<?>> getClasses() {
-        final Set<Class<?>> classes = new HashSet<>(5);
-        classes.add(HardwareEndpoint.class);
-        classes.add(HistoricStatsEndpoint.class);
-        classes.add(UserEndpoint.class);
-        classes.add(TeamEndpoint.class);
-        classes.add(TeamCompetitionStatsEndpoint.class);
+        final Set<Class<?>> services = new HashSet<>(6);
+        // REST endpoints
+        services.add(HardwareEndpoint.class);
+        services.add(HistoricStatsEndpoint.class);
+        services.add(UserEndpoint.class);
+        services.add(TeamEndpoint.class);
+        services.add(TeamCompetitionStatsEndpoint.class);
+
+        // REST providers
+        services.add(InvalidUrlHandler.class);
 
         // TODO: [zodac] Add a Healthcheck endpoint for liveliness/readiness probes (though we probably won't ever be in K8S)?
-        return classes;
+        return services;
     }
 }
