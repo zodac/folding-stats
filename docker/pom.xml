@@ -41,9 +41,10 @@
                             <!-- JS files -->
                             <jsSourceDir>js</jsSourceDir>
                             <jsSourceFiles>
-                                <jsSourceFile>jsonsorter.js</jsSourceFile>
+                                <jsSourceFile>google_analytics.js</jsSourceFile>
+                                <jsSourceFile>json_sorter.js</jsSourceFile>
                                 <jsSourceFile>main.js</jsSourceFile>
-                                <jsSourceFile>tablesort.js</jsSourceFile>
+                                <jsSourceFile>table_sort.js</jsSourceFile>
                                 <jsSourceFile>timer.js</jsSourceFile>
                             </jsSourceFiles>
                             <jsFinalFile>main.js</jsFinalFile>

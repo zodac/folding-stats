@@ -122,6 +122,7 @@
             <logger category="sun.rmi">
                 <level name="WARN"/>
             </logger>
+            <!-- [zodac] Added own logging category -->
             <logger category="me.zodac.folding">
                 <level name="INFO"/>
             </logger>
