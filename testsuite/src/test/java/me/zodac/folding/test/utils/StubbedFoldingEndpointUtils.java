@@ -21,21 +21,25 @@ public class StubbedFoldingEndpointUtils {
 
     }
 
-    public static void enableUser(final User user) throws IOException, InterruptedException {
+    public static void enableUser(final User user) {
         setUnits(user, 1);
     }
 
-    public static void disableUser(final User user) throws IOException, InterruptedException {
+    public static void disableUser(final User user) {
         setUnits(user, 0);
     }
 
-    public static void setUnits(final User user, final int units) throws IOException, InterruptedException {
+    public static void setUnits(final User user, final int units) {
         final HttpRequest unitsRequest = HttpRequest.newBuilder()
                 .POST(HttpRequest.BodyPublishers.noBody())
                 .uri(URI.create(String.format(UNIT_URL_FORMAT, user.getFoldingUserName(), user.getPasskey(), units)))
                 .header("Content-Type", "application/json")
                 .build();
 
-        HTTP_CLIENT.send(unitsRequest, HttpResponse.BodyHandlers.discarding());
+        try {
+            HTTP_CLIENT.send(unitsRequest, HttpResponse.BodyHandlers.discarding());
+        } catch (final IOException | InterruptedException e) {
+            throw new AssertionError(String.format("Error setting unit count of user %s/%s to %s", user.getFoldingUserName(), user.getPasskey(), units));
+        }
     }
 }

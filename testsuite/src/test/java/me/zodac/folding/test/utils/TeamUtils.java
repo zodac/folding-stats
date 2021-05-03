@@ -3,7 +3,6 @@ package me.zodac.folding.test.utils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 
 import java.io.IOException;
@@ -36,63 +35,88 @@ public class TeamUtils {
 
         }
 
-        public static HttpResponse<String> getAll() throws IOException, InterruptedException {
-            final HttpRequest getAllRequest = HttpRequest.newBuilder()
+        public static HttpResponse<String> getAll() {
+            final HttpRequest request = HttpRequest.newBuilder()
                     .GET()
                     .uri(URI.create(BASE_FOLDING_URL + "/teams"))
                     .header("Content-Type", "application/json")
                     .build();
 
-            return HTTP_CLIENT.send(getAllRequest, HttpResponse.BodyHandlers.ofString());
+            try {
+                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            } catch (final IOException | InterruptedException e) {
+                throw new AssertionError("Error sending HTTP request to get all teams", e);
+            }
         }
 
-        public static HttpResponse<String> get(final int teamId) throws IOException, InterruptedException {
-            final HttpRequest getRequest = HttpRequest.newBuilder()
+        public static HttpResponse<String> get(final int teamId) {
+            final HttpRequest request = HttpRequest.newBuilder()
                     .GET()
                     .uri(URI.create(BASE_FOLDING_URL + "/teams/" + teamId))
                     .header("Content-Type", "application/json")
                     .build();
 
-            return HTTP_CLIENT.send(getRequest, HttpResponse.BodyHandlers.ofString());
+            try {
+                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            } catch (final IOException | InterruptedException e) {
+                throw new AssertionError("Error sending HTTP request to get team", e);
+            }
         }
 
-        public static HttpResponse<String> create(final Team team) throws IOException, InterruptedException {
-            final HttpRequest createRequest = HttpRequest.newBuilder()
+        public static HttpResponse<String> create(final Team team) {
+            final HttpRequest request = HttpRequest.newBuilder()
                     .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(team)))
                     .uri(URI.create(BASE_FOLDING_URL + "/teams"))
                     .header("Content-Type", "application/json")
                     .build();
 
-            return HTTP_CLIENT.send(createRequest, HttpResponse.BodyHandlers.ofString());
+            try {
+                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            } catch (final IOException | InterruptedException e) {
+                throw new AssertionError("Error sending HTTP request to create team", e);
+            }
         }
 
-        public static HttpResponse<String> createBatchOf(final List<Team> batchOfTeams) throws IOException, InterruptedException {
-            final HttpRequest createRequest = HttpRequest.newBuilder()
+        public static HttpResponse<String> createBatchOf(final List<Team> batchOfTeams) {
+            final HttpRequest request = HttpRequest.newBuilder()
                     .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(batchOfTeams)))
                     .uri(URI.create(BASE_FOLDING_URL + "/teams/batch"))
                     .header("Content-Type", "application/json")
                     .build();
 
-            return HTTP_CLIENT.send(createRequest, HttpResponse.BodyHandlers.ofString());
+            try {
+                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            } catch (final IOException | InterruptedException e) {
+                throw new AssertionError("Error sending HTTP request to create batch of teams", e);
+            }
         }
 
-        public static HttpResponse<String> update(final Team team) throws IOException, InterruptedException {
-            final HttpRequest updateRequest = HttpRequest.newBuilder()
+        public static HttpResponse<String> update(final Team team) {
+            final HttpRequest request = HttpRequest.newBuilder()
                     .PUT(HttpRequest.BodyPublishers.ofString(GSON.toJson(team)))
                     .uri(URI.create(BASE_FOLDING_URL + "/teams/" + team.getId()))
                     .header("Content-Type", "application/json")
                     .build();
-            return HTTP_CLIENT.send(updateRequest, HttpResponse.BodyHandlers.ofString());
+
+            try {
+                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            } catch (final IOException | InterruptedException e) {
+                throw new AssertionError("Error sending HTTP request to update team", e);
+            }
         }
 
-        public static HttpResponse<String> delete(final int teamId) throws IOException, InterruptedException {
-            final HttpRequest deleteRequest = HttpRequest.newBuilder()
+        public static HttpResponse<String> delete(final int teamId) {
+            final HttpRequest request = HttpRequest.newBuilder()
                     .DELETE()
                     .uri(URI.create(BASE_FOLDING_URL + "/teams/" + teamId))
                     .header("Content-Type", "application/json")
                     .build();
 
-            return HTTP_CLIENT.send(deleteRequest, HttpResponse.BodyHandlers.ofString());
+            try {
+                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            } catch (final IOException | InterruptedException e) {
+                throw new AssertionError("Error sending HTTP request to delete team", e);
+            }
         }
     }
 
@@ -102,7 +126,7 @@ public class TeamUtils {
 
         }
 
-        public static Collection<Hardware> getAll(final HttpResponse<String> response) {
+        public static Collection<Team> getAll(final HttpResponse<String> response) {
             final Type collectionType = new TypeToken<Collection<Team>>() {
             }.getType();
             return GSON.fromJson(response.body(), collectionType);

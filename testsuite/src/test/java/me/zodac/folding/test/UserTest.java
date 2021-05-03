@@ -1,40 +1,45 @@
 package me.zodac.folding.test;
 
 import me.zodac.folding.api.tc.Category;
-import me.zodac.folding.api.tc.Hardware;
+import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.test.utils.DatabaseCleaner;
 import me.zodac.folding.test.utils.HardwareUtils;
 import me.zodac.folding.test.utils.StubbedFoldingEndpointUtils;
+import me.zodac.folding.test.utils.TeamUtils;
 import me.zodac.folding.test.utils.UserUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.http.HttpResponse;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForTests;
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * Tests for the {@link User} REST endpoint at <code>/folding/users</code>.
+ */
 public class UserTest {
 
     public static final User DUMMY_USER = User.createWithoutId("Dummy_User", "Dummy User", "DummyPasskey", Category.NVIDIA_GPU, 1, "", false);
 
     @BeforeClass
-    public static void setUp() throws SQLException, IOException, InterruptedException {
-        cleanSystemForUserTests();
+    public static void setUp() {
+        cleanSystemForTests();
         HardwareUtils.RequestSender.create(HardwareTest.DUMMY_HARDWARE);
     }
 
     @Test
-    public void whenGettingAllUsers_givenNoUserHasBeenCreated_thenAnEmptyJsonResponseIsReturned_andHasA200Status() throws IOException, InterruptedException, SQLException {
-        cleanSystemOfUsers(); // No guarantee that this test runs first, so we need to clean the system of users again
+    public void whenGettingAllUsers_givenNoUserHasBeenCreated_thenAnEmptyJsonResponseIsReturned_andHasA200Status() {
+        cleanSystemOfUsers(); // No guarantee that this test runs first, so we need to clean the system of users again, but not any hardware
         final HttpResponse<String> response = UserUtils.RequestSender.getAll();
         assertThat(response.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + response.body())
@@ -53,7 +58,7 @@ public class UserTest {
     }
 
     @Test
-    public void whenCreatingUser_givenPayloadIsValid_thenTheCreatedUserIsReturnedInResponse_andHasId_andResponseHasA201StatusCode() throws IOException, InterruptedException {
+    public void whenCreatingUser_givenPayloadIsValid_thenTheCreatedUserIsReturnedInResponse_andHasId_andResponseHasA201StatusCode() {
         final User userToCreate = User.createWithoutId("Dummy_User1", "Dummy User", "DummyPasskey1", Category.NVIDIA_GPU, 1, "", false);
         StubbedFoldingEndpointUtils.enableUser(userToCreate);
 
@@ -70,7 +75,7 @@ public class UserTest {
     }
 
     @Test
-    public void whenCreatingBatchOfUsers_givenPayloadIsValid_thenTheUsersAreCreated_andResponseHasA200Status() throws IOException, InterruptedException {
+    public void whenCreatingBatchOfUsers_givenPayloadIsValid_thenTheUsersAreCreated_andResponseHasA200Status() {
         final int initialSize = UserUtils.ResponseParser.getAll(UserUtils.RequestSender.getAll()).size();
 
         final List<User> batchOfUsers = List.of(
@@ -96,7 +101,7 @@ public class UserTest {
     }
 
     @Test
-    public void whenGettingUser_givenAValidUserId_thenUserIsReturned_andHasA200Status() throws IOException, InterruptedException {
+    public void whenGettingUser_givenAValidUserId_thenUserIsReturned_andHasA200Status() {
         final Collection<User> allUsers = UserUtils.ResponseParser.getAll(UserUtils.RequestSender.getAll());
         int userId = allUsers.size();
 
@@ -118,7 +123,7 @@ public class UserTest {
     }
 
     @Test
-    public void whenUpdatingUser_givenAValidUserId_andAValidPayload_thenUpdatedUserIsReturned_andNoNewUserIsCreated_andHasA200Status() throws IOException, InterruptedException {
+    public void whenUpdatingUser_givenAValidUserId_andAValidPayload_thenUpdatedUserIsReturned_andNoNewUserIsCreated_andHasA200Status() {
         final Collection<User> allUsers = UserUtils.ResponseParser.getAll(UserUtils.RequestSender.getAll());
         int userId = allUsers.size();
 
@@ -146,7 +151,7 @@ public class UserTest {
     }
 
     @Test
-    public void whenDeletingUser_givenAValidUserId_thenUserIsDeleted_andHasA200Status_andUserCountIsReduced_andUserCannotBeRetrievedAgain() throws IOException, InterruptedException {
+    public void whenDeletingUser_givenAValidUserId_thenUserIsDeleted_andHasA200Status_andUserCountIsReduced_andUserCannotBeRetrievedAgain() {
         final Collection<User> allUsers = UserUtils.ResponseParser.getAll(UserUtils.RequestSender.getAll());
         int userId = allUsers.size();
 
@@ -173,10 +178,8 @@ public class UserTest {
 
     // Negative/alternative test cases
 
-    // TODO: [zodac] Update a user with new hardware, stats will need to be updated, will cause a problem since they won't have any stats to begin with! Do in TcStatsTest
-
     @Test
-    public void whenCreatingUser_givenAUserWithInvalidHardwareId_thenJsonResponseWithErrorIsReturned_andHasA400Status() throws IOException, InterruptedException {
+    public void whenCreatingUser_givenAUserWithInvalidHardwareId_thenJsonResponseWithErrorIsReturned_andHasA400Status() {
         final User user = User.createWithoutId("Invalid_User", "Invalid User", "InvalidPasskey", Category.NVIDIA_GPU, 0, "", false);
 
         final HttpResponse<String> response = UserUtils.RequestSender.create(user);
@@ -191,7 +194,7 @@ public class UserTest {
     }
 
     @Test
-    public void whenCreatingUser_givenUserHasNoUnitsCompleted_thenUserIsNotCreated_andHasA400Stats() throws IOException, InterruptedException {
+    public void whenCreatingUser_givenUserHasNoUnitsCompleted_thenUserIsNotCreated_andHasA400Stats() {
         final User user = User.createWithoutId("Invalid_User", "Invalid User", "InvalidPasskey", Category.NVIDIA_GPU, 0, "", false);
         StubbedFoldingEndpointUtils.disableUser(user);
 
@@ -203,7 +206,7 @@ public class UserTest {
     }
 
     @Test
-    public void whenCreatingUser_givenUserWithTheSameFoldingNameAndPasskeyAlreadyExists_thenA409ResponseIsReturned() throws IOException, InterruptedException {
+    public void whenCreatingUser_givenUserWithTheSameFoldingNameAndPasskeyAlreadyExists_thenA409ResponseIsReturned() {
         if (UserUtils.RequestSender.get(DUMMY_USER.getId()).statusCode() == HttpURLConnection.HTTP_NOT_FOUND) {
             UserUtils.RequestSender.create(DUMMY_USER);
         }
@@ -215,7 +218,7 @@ public class UserTest {
     }
 
     @Test
-    public void whenGettingUser_givenANonExistingUserId_thenNoJsonResponseIsReturned_andHasA404Status() throws IOException, InterruptedException {
+    public void whenGettingUser_givenANonExistingUserId_thenNoJsonResponseIsReturned_andHasA404Status() {
         final int invalidId = 99;
         final HttpResponse<String> response = UserUtils.RequestSender.get(invalidId);
 
@@ -229,7 +232,7 @@ public class UserTest {
     }
 
     @Test
-    public void whenUpdatingUser_givenANonExistingUserId_thenNoJsonResponseIsReturned_andHasA404Status() throws IOException, InterruptedException {
+    public void whenUpdatingUser_givenANonExistingUserId_thenNoJsonResponseIsReturned_andHasA404Status() {
         final int invalidId = 99;
         final User updatedUser = User.create(invalidId, "Invalid_User", "Invalid User", "InvalidPasskey", Category.NVIDIA_GPU, 1, "", false);
         StubbedFoldingEndpointUtils.enableUser(updatedUser);
@@ -245,7 +248,7 @@ public class UserTest {
     }
 
     @Test
-    public void whenDeletingUser_givenANonExistingUserId_thenNoJsonResponseIsReturned_andHasA404Status() throws IOException, InterruptedException {
+    public void whenDeletingUser_givenANonExistingUserId_thenNoJsonResponseIsReturned_andHasA404Status() {
         final int invalidId = 99;
         final HttpResponse<String> response = UserUtils.RequestSender.delete(invalidId);
 
@@ -259,7 +262,7 @@ public class UserTest {
     }
 
     @Test
-    public void whenUpdatingUser_givenAValidUserId_andPayloadHasNoChanges_thenOriginalUserIsReturned_andHasA200Status() throws IOException, InterruptedException {
+    public void whenUpdatingUser_givenAValidUserId_andPayloadHasNoChanges_thenOriginalUserIsReturned_andHasA200Status() {
         final User user = User.createWithoutId("Dummy_User6", "Dummy User6", "DummyPasskey6", Category.NVIDIA_GPU, 1, "", false);
         StubbedFoldingEndpointUtils.enableUser(user);
 
@@ -285,7 +288,7 @@ public class UserTest {
     }
 
     @Test
-    public void whenCreatingBatchOfUsers_givenPayloadIsPartiallyValid_thenOnlyValidUsersAreCreated_andResponseHasA200Status() throws IOException, InterruptedException {
+    public void whenCreatingBatchOfUsers_givenPayloadIsPartiallyValid_thenOnlyValidUsersAreCreated_andResponseHasA200Status() {
         final int initialUsersSize = UserUtils.ResponseParser.getAll(UserUtils.RequestSender.getAll()).size();
 
         final List<User> batchOfValidUsers = List.of(
@@ -317,12 +320,12 @@ public class UserTest {
     }
 
     @Test
-    public void whenCreatingBatchOfUsers_givenPayloadIsInvalid_thenResponseHasA400Status() throws IOException, InterruptedException {
+    public void whenCreatingBatchOfUsers_givenPayloadIsInvalid_thenResponseHasA400Status() {
         final int initialUsersSize = UserUtils.ResponseParser.getAll(UserUtils.RequestSender.getAll()).size();
 
         final List<User> batchOfInvalidUsers = List.of(
                 User.createWithoutId("Dummy_User11", "Dummy User11", "DummyPasskey11", Category.NVIDIA_GPU, 0, "", false),
-                User.createWithoutId("Dummy_User11", "Dummy User11", "DummyPasskey11", Category.NVIDIA_GPU, 0, "", false)
+                User.createWithoutId("Dummy_User12", "Dummy User12", "DummyPasskey12", Category.NVIDIA_GPU, 0, "", false)
         );
 
         final HttpResponse<String> response = UserUtils.RequestSender.createBatchOf(batchOfInvalidUsers);
@@ -336,53 +339,48 @@ public class UserTest {
                 .isEqualTo(initialUsersSize);
     }
 
-    // TODO: [zodac] When team tests are complete
-//    @Test
-//    public void whenDeletingUser_givenTheUserIsLinkedToTeam_thenResponseHasA409Status() throws IOException, InterruptedException {
-//        final HttpResponse<String> createHardwareResponse = UserUtils.RequestSender.create(DEFAULT_HARDWARE);
-//        assertThat(createHardwareResponse.statusCode())
-//                .as("Was not able to create hardware: " + createHardwareResponse.body())
-//                .isEqualTo(HttpURLConnection.HTTP_CREATED);
-//
-//        final int hardwareId = UserUtils.ResponseParser.create(createHardwareResponse).getId();
-//
-//        final User user = User.createWithoutId("user", "user", "passkey", Category.AMD_GPU, hardwareId, "", false);
-//        final HttpResponse<String> createUserResponse = UserUtils.RequestSender.create(user);
-//        assertThat(createUserResponse.statusCode())
-//                .as("Was not able to create user: " + createUserResponse.body())
-//                .isEqualTo(HttpURLConnection.HTTP_CREATED);
-//
-//        final HttpResponse<String> deleteHardwareResponse = UserUtils.RequestSender.delete(hardwareId);
-//        assertThat(deleteHardwareResponse.statusCode())
-//                .as("Expected to fail due to a 409_CONFLICT: " + deleteHardwareResponse.body())
-//                .isEqualTo(HttpURLConnection.HTTP_CONFLICT);
-//    }
+    @Test
+    public void whenDeletingUser_givenTheUserIsLinkedToTeam_thenResponseHasA409Status() {
+        final User user = User.createWithoutId("Dummy_User13", "Dummy User13", "DummyPasskey13", Category.NVIDIA_GPU, 1, "", false);
+        StubbedFoldingEndpointUtils.enableUser(user);
+
+        final HttpResponse<String> createUserResponse = UserUtils.RequestSender.create(user);
+        assertThat(createUserResponse.statusCode())
+                .as("Was not able to create user: " + createUserResponse.body())
+                .isEqualTo(HttpURLConnection.HTTP_CREATED);
+
+        final int userId = UserUtils.ResponseParser.create(createUserResponse).getId();
+
+        final Team team = Team.createWithoutId("DummyTeam", "Dummy team", userId, Set.of(userId), Collections.emptySet());
+        final HttpResponse<String> createTeamResponse = TeamUtils.RequestSender.create(team);
+        assertThat(createUserResponse.statusCode())
+                .as("Was not able to create team: " + createTeamResponse.body())
+                .isEqualTo(HttpURLConnection.HTTP_CREATED);
+
+        final HttpResponse<String> deleteUserResponse = UserUtils.RequestSender.delete(userId);
+        assertThat(deleteUserResponse.statusCode())
+                .as("Expected to fail due to a 409_CONFLICT: " + deleteUserResponse.body())
+                .isEqualTo(HttpURLConnection.HTTP_CONFLICT);
+    }
+
+    // TODO: [zodac] Add tests for PATCH endpoint (where we verify stats) in stats tests
 
     @AfterClass
-    public static void tearDown() throws SQLException, IOException, InterruptedException {
-        cleanSystemForUserTests();
+    public static void tearDown() {
+        cleanSystemForTests();
     }
 
-    private static void cleanSystemOfUsers() throws SQLException, IOException, InterruptedException {
+    private static void cleanSystemOfUsers() {
+        final Collection<Team> allTeams = TeamUtils.ResponseParser.getAll(TeamUtils.RequestSender.getAll());
+        for (final Team team : allTeams) {
+            TeamUtils.RequestSender.delete(team.getId());
+        }
+
         final Collection<User> allUsers = UserUtils.ResponseParser.getAll(UserUtils.RequestSender.getAll());
         for (final User user : allUsers) {
             UserUtils.RequestSender.delete(user.getId());
         }
 
-        DatabaseCleaner.truncateTableAndResetId("users");
-    }
-
-    private static void cleanSystemForUserTests() throws IOException, InterruptedException, SQLException {
-        final Collection<User> allUsers = UserUtils.ResponseParser.getAll(UserUtils.RequestSender.getAll());
-        for (final User user : allUsers) {
-            UserUtils.RequestSender.delete(user.getId());
-        }
-
-        final Collection<Hardware> allHardware = HardwareUtils.ResponseParser.getAll(HardwareUtils.RequestSender.getAll());
-        for (final Hardware hardware : allHardware) {
-            HardwareUtils.RequestSender.delete(hardware.getId());
-        }
-
-        DatabaseCleaner.truncateTableAndResetId("hardware", "users");
+        DatabaseCleaner.truncateTableAndResetId("users", "teams");
     }
 }

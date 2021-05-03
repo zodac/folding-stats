@@ -35,63 +35,88 @@ public class HardwareUtils {
 
         }
 
-        public static HttpResponse<String> getAll() throws IOException, InterruptedException {
-            final HttpRequest getAllRequest = HttpRequest.newBuilder()
+        public static HttpResponse<String> getAll() {
+            final HttpRequest request = HttpRequest.newBuilder()
                     .GET()
                     .uri(URI.create(BASE_FOLDING_URL + "/hardware"))
                     .header("Content-Type", "application/json")
                     .build();
 
-            return HTTP_CLIENT.send(getAllRequest, HttpResponse.BodyHandlers.ofString());
+            try {
+                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            } catch (final IOException | InterruptedException e) {
+                throw new AssertionError("Error sending HTTP request to get all hardware", e);
+            }
         }
 
-        public static HttpResponse<String> get(final int hardwareId) throws IOException, InterruptedException {
-            final HttpRequest getRequest = HttpRequest.newBuilder()
+        public static HttpResponse<String> get(final int hardwareId) {
+            final HttpRequest request = HttpRequest.newBuilder()
                     .GET()
                     .uri(URI.create(BASE_FOLDING_URL + "/hardware/" + hardwareId))
                     .header("Content-Type", "application/json")
                     .build();
 
-            return HTTP_CLIENT.send(getRequest, HttpResponse.BodyHandlers.ofString());
+            try {
+                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            } catch (final IOException | InterruptedException e) {
+                throw new AssertionError("Error sending HTTP request to get hardware", e);
+            }
         }
 
-        public static HttpResponse<String> create(final Hardware hardware) throws IOException, InterruptedException {
-            final HttpRequest createRequest = HttpRequest.newBuilder()
+        public static HttpResponse<String> create(final Hardware hardware) {
+            final HttpRequest request = HttpRequest.newBuilder()
                     .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(hardware)))
                     .uri(URI.create(BASE_FOLDING_URL + "/hardware"))
                     .header("Content-Type", "application/json")
                     .build();
 
-            return HTTP_CLIENT.send(createRequest, HttpResponse.BodyHandlers.ofString());
+            try {
+                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            } catch (final IOException | InterruptedException e) {
+                throw new AssertionError("Error sending HTTP request to create hardware", e);
+            }
         }
 
-        public static HttpResponse<String> createBatchOf(final List<Hardware> batchOfHardware) throws IOException, InterruptedException {
-            final HttpRequest createRequest = HttpRequest.newBuilder()
+        public static HttpResponse<String> createBatchOf(final List<Hardware> batchOfHardware) {
+            final HttpRequest request = HttpRequest.newBuilder()
                     .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(batchOfHardware)))
                     .uri(URI.create(BASE_FOLDING_URL + "/hardware/batch"))
                     .header("Content-Type", "application/json")
                     .build();
 
-            return HTTP_CLIENT.send(createRequest, HttpResponse.BodyHandlers.ofString());
+            try {
+                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            } catch (final IOException | InterruptedException e) {
+                throw new AssertionError("Error sending HTTP request to create batch of hardware", e);
+            }
         }
 
-        public static HttpResponse<String> update(final Hardware hardware) throws IOException, InterruptedException {
-            final HttpRequest updateRequest = HttpRequest.newBuilder()
+        public static HttpResponse<String> update(final Hardware hardware) {
+            final HttpRequest request = HttpRequest.newBuilder()
                     .PUT(HttpRequest.BodyPublishers.ofString(GSON.toJson(hardware)))
                     .uri(URI.create(BASE_FOLDING_URL + "/hardware/" + hardware.getId()))
                     .header("Content-Type", "application/json")
                     .build();
-            return HTTP_CLIENT.send(updateRequest, HttpResponse.BodyHandlers.ofString());
+
+            try {
+                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            } catch (final IOException | InterruptedException e) {
+                throw new AssertionError("Error sending HTTP request to update hardware", e);
+            }
         }
 
-        public static HttpResponse<String> delete(final int hardwareId) throws IOException, InterruptedException {
-            final HttpRequest deleteRequest = HttpRequest.newBuilder()
+        public static HttpResponse<String> delete(final int hardwareId) {
+            final HttpRequest request = HttpRequest.newBuilder()
                     .DELETE()
                     .uri(URI.create(BASE_FOLDING_URL + "/hardware/" + hardwareId))
                     .header("Content-Type", "application/json")
                     .build();
 
-            return HTTP_CLIENT.send(deleteRequest, HttpResponse.BodyHandlers.ofString());
+            try {
+                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            } catch (final IOException | InterruptedException e) {
+                throw new AssertionError("Error sending HTTP request to delete hardware", e);
+            }
         }
     }
 

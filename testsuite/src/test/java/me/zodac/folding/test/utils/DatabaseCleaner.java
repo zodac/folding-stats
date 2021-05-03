@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 /**
- * Utility class for cleaning database tables for integration tests.
+ * Utility class for cleaning database tables for tests.
  */
 public final class DatabaseCleaner {
 
@@ -28,15 +28,16 @@ public final class DatabaseCleaner {
      * Deletes all entries in the given {@code tableNames} and resets the serial count for the identity to 0.
      *
      * @param tableNames the tables to clean/truncate
-     * @throws SQLException thrown if there was an error connecting to the DB
      */
-    public static void truncateTableAndResetId(final String... tableNames) throws SQLException {
+    public static void truncateTableAndResetId(final String... tableNames) {
         for (final String tableName : tableNames) {
             final String truncateQuery = String.format("TRUNCATE TABLE %s RESTART IDENTITY CASCADE;", tableName);
 
             try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
                  final PreparedStatement preparedStatement = connection.prepareStatement(truncateQuery)) {
                 preparedStatement.execute();
+            } catch (final SQLException e) {
+                throw new AssertionError(String.format("Error cleaning table: '%s'", tableName), e);
             }
         }
     }

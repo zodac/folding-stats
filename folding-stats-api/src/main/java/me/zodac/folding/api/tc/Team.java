@@ -21,6 +21,12 @@ import java.util.Set;
 @ToString(doNotUseGetters = true)
 public class Team implements Identifiable {
 
+    /**
+     * The default {@link Team} ID. Since the REST request would not know the ID until the DB has created the object,
+     * we use this and update the ID later.
+     */
+    public static final int EMPTY_TEAM_ID = 0;
+
     private int id;
     private String teamName;
     private String teamDescription;
@@ -30,6 +36,10 @@ public class Team implements Identifiable {
 
     public static Team create(final int id, final String teamName, final String teamDescription, final int captainUserId, final Set<Integer> userIds, final Set<Integer> retiredUserStats) {
         return new Team(id, teamName, teamDescription, captainUserId, userIds, retiredUserStats);
+    }
+
+    public static Team createWithoutId(final String teamName, final String teamDescription, final int captainUserId, final Set<Integer> userIds, final Set<Integer> retiredUserStats) {
+        return new Team(EMPTY_TEAM_ID, teamName, teamDescription, captainUserId, userIds, retiredUserStats);
     }
 
     public static Team updateWithId(final int teamId, final Team team) {

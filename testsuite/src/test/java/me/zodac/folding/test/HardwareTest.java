@@ -2,8 +2,6 @@ package me.zodac.folding.test;
 
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.OperatingSystem;
-import me.zodac.folding.api.tc.User;
-import me.zodac.folding.test.utils.DatabaseCleaner;
 import me.zodac.folding.test.utils.HardwareUtils;
 import me.zodac.folding.test.utils.StubbedFoldingEndpointUtils;
 import me.zodac.folding.test.utils.UserUtils;
@@ -11,29 +9,32 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.http.HttpResponse;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForTests;
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * Tests for the {@link Hardware} REST endpoint at <code>/folding/hardware</code>.
+ */
 public class HardwareTest {
 
     public static final Hardware DUMMY_HARDWARE = Hardware.createWithoutId("Dummy_Hardware", "Dummy Hardware", OperatingSystem.WINDOWS, 1.0D);
 
     @BeforeClass
-    public static void setUp() throws SQLException, IOException, InterruptedException {
-        cleanSystemForHardwareTests();
+    public static void setUp() {
+        cleanSystemForTests();
     }
 
     @Test
-    public void whenGettingAllHardware_givenNoHardwareHasBeenCreated_thenAnEmptyJsonResponseIsReturned_andHasA200Status() throws IOException, InterruptedException, SQLException {
-        cleanSystemForHardwareTests(); // No guarantee that this test runs first, so we need to clean the system again
+    public void whenGettingAllHardware_givenNoHardwareHasBeenCreated_thenAnEmptyJsonResponseIsReturned_andHasA200Status() {
+        cleanSystemForTests();
+
         final HttpResponse<String> response = HardwareUtils.RequestSender.getAll();
         assertThat(response.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + response.body())
@@ -52,7 +53,7 @@ public class HardwareTest {
     }
 
     @Test
-    public void whenCreatingHardware_givenPayloadIsValid_thenTheCreatedHardwareIsReturnedInResponse_andHasId_andResponseHasA201StatusCode() throws IOException, InterruptedException {
+    public void whenCreatingHardware_givenPayloadIsValid_thenTheCreatedHardwareIsReturnedInResponse_andHasId_andResponseHasA201StatusCode() {
         final Hardware hardwareToCreate = Hardware.createWithoutId("Dummy_Hardware1", "Dummy Hardware1", OperatingSystem.WINDOWS, 1.0D);
         final HttpResponse<String> response = HardwareUtils.RequestSender.create(hardwareToCreate);
         assertThat(response.statusCode())
@@ -67,7 +68,7 @@ public class HardwareTest {
     }
 
     @Test
-    public void whenCreatingBatchOfHardware_givenPayloadIsValid_thenTheHardwareIsCreated_andResponseHasA200Status() throws IOException, InterruptedException {
+    public void whenCreatingBatchOfHardware_givenPayloadIsValid_thenTheHardwareIsCreated_andResponseHasA200Status() {
         final int initialSize = HardwareUtils.ResponseParser.getAll(HardwareUtils.RequestSender.getAll()).size();
 
         final List<Hardware> batchOfHardware = List.of(
@@ -88,7 +89,7 @@ public class HardwareTest {
     }
 
     @Test
-    public void whenGettingHardware_givenAValidHardwareId_thenHardwareIsReturned_andHasA200Status() throws IOException, InterruptedException {
+    public void whenGettingHardware_givenAValidHardwareId_thenHardwareIsReturned_andHasA200Status() {
         final Collection<Hardware> allHardware = HardwareUtils.ResponseParser.getAll(HardwareUtils.RequestSender.getAll());
         int hardwareId = allHardware.size();
 
@@ -109,7 +110,7 @@ public class HardwareTest {
     }
 
     @Test
-    public void whenUpdatingHardware_givenAValidHardwareId_andAValidPayload_thenUpdatedHardwareIsReturned_andNoNewHardwareIsCreated_andHasA200Status() throws IOException, InterruptedException {
+    public void whenUpdatingHardware_givenAValidHardwareId_andAValidPayload_thenUpdatedHardwareIsReturned_andNoNewHardwareIsCreated_andHasA200Status() {
         final Collection<Hardware> allHardware = HardwareUtils.ResponseParser.getAll(HardwareUtils.RequestSender.getAll());
         int hardwareId = allHardware.size();
 
@@ -137,7 +138,7 @@ public class HardwareTest {
     }
 
     @Test
-    public void whenDeletingHardware_givenAValidHardwareId_thenHardwareIsDeleted_andHasA200Status_andHardwareCountIsReduced_andHardwareCannotBeRetrievedAgain() throws IOException, InterruptedException {
+    public void whenDeletingHardware_givenAValidHardwareId_thenHardwareIsDeleted_andHasA200Status_andHardwareCountIsReduced_andHardwareCannotBeRetrievedAgain() {
         final Collection<Hardware> allHardware = HardwareUtils.ResponseParser.getAll(HardwareUtils.RequestSender.getAll());
         int hardwareId = allHardware.size();
 
@@ -165,7 +166,7 @@ public class HardwareTest {
     // Negative/alternative test cases
 
     @Test
-    public void whenCreatingHardware_givenAHardwareWithInvalidOperatingSystem_thenJsonResponseWithErrorIsReturned_andHasA400Status() throws IOException, InterruptedException {
+    public void whenCreatingHardware_givenAHardwareWithInvalidOperatingSystem_thenJsonResponseWithErrorIsReturned_andHasA400Status() {
         final Hardware hardware = Hardware.createWithoutId("Test GPU", "Base GPU", OperatingSystem.INVALID, 1.0D);
 
         final HttpResponse<String> response = HardwareUtils.RequestSender.create(hardware);
@@ -176,7 +177,7 @@ public class HardwareTest {
     }
 
     @Test
-    public void whenCreatingHardware_givenHardwareWithTheSameNameAndOperatingSystemAlreadyExists_thenA409ResponseIsReturned() throws IOException, InterruptedException {
+    public void whenCreatingHardware_givenHardwareWithTheSameNameAndOperatingSystemAlreadyExists_thenA409ResponseIsReturned() {
         if (HardwareUtils.RequestSender.get(DUMMY_HARDWARE.getId()).statusCode() == HttpURLConnection.HTTP_NOT_FOUND) {
             HardwareUtils.RequestSender.create(DUMMY_HARDWARE);
         }
@@ -188,7 +189,7 @@ public class HardwareTest {
     }
 
     @Test
-    public void whenGettingHardware_givenANonExistingHardwareId_thenNoJsonResponseIsReturned_andHasA404Status() throws IOException, InterruptedException {
+    public void whenGettingHardware_givenANonExistingHardwareId_thenNoJsonResponseIsReturned_andHasA404Status() {
         final int invalidId = 99;
         final HttpResponse<String> response = HardwareUtils.RequestSender.get(invalidId);
 
@@ -202,7 +203,7 @@ public class HardwareTest {
     }
 
     @Test
-    public void whenUpdatingHardware_givenANonExistingHardwareId_thenNoJsonResponseIsReturned_andHasA404Status() throws IOException, InterruptedException {
+    public void whenUpdatingHardware_givenANonExistingHardwareId_thenNoJsonResponseIsReturned_andHasA404Status() {
         final int invalidId = 99;
         final Hardware updatedHardware = Hardware.create(invalidId, "Test GPU", "Base GPU", OperatingSystem.WINDOWS, 1.0D);
 
@@ -217,7 +218,7 @@ public class HardwareTest {
     }
 
     @Test
-    public void whenDeletingHardware_givenANonExistingHardwareId_thenNoJsonResponseIsReturned_andHasA404Status() throws IOException, InterruptedException {
+    public void whenDeletingHardware_givenANonExistingHardwareId_thenNoJsonResponseIsReturned_andHasA404Status() {
         final int invalidId = 99;
         final HttpResponse<String> response = HardwareUtils.RequestSender.delete(invalidId);
 
@@ -231,7 +232,7 @@ public class HardwareTest {
     }
 
     @Test
-    public void whenUpdatingHardware_givenAValidHardwareId_andPayloadHasNoChanges_thenOriginalHardwareIsReturned_andHasA200Status() throws IOException, InterruptedException {
+    public void whenUpdatingHardware_givenAValidHardwareId_andPayloadHasNoChanges_thenOriginalHardwareIsReturned_andHasA200Status() {
         final Hardware hardware = Hardware.createWithoutId("Test GPU", "Base GPU", OperatingSystem.WINDOWS, 1.0D);
 
         final HttpResponse<String> createResponse = HardwareUtils.RequestSender.create(hardware);
@@ -256,7 +257,7 @@ public class HardwareTest {
     }
 
     @Test
-    public void whenCreatingBatchOfHardware_givenPayloadIsPartiallyValid_thenOnlyValidHardwareIsCreated_andResponseHasA200Status() throws IOException, InterruptedException {
+    public void whenCreatingBatchOfHardware_givenPayloadIsPartiallyValid_thenOnlyValidHardwareIsCreated_andResponseHasA200Status() {
         final int initialHardwareSize = HardwareUtils.ResponseParser.getAll(HardwareUtils.RequestSender.getAll()).size();
 
         final List<Hardware> batchOfValidHardware = List.of(
@@ -283,7 +284,7 @@ public class HardwareTest {
     }
 
     @Test
-    public void whenCreatingBatchOfHardware_givenPayloadIsInvalid_thenResponseHasA400Status() throws IOException, InterruptedException {
+    public void whenCreatingBatchOfHardware_givenPayloadIsInvalid_thenResponseHasA400Status() {
         final int initialHardwareSize = HardwareUtils.ResponseParser.getAll(HardwareUtils.RequestSender.getAll()).size();
 
         final List<Hardware> batchOfInvalidHardware = List.of(
@@ -303,7 +304,7 @@ public class HardwareTest {
     }
 
     @Test
-    public void whenDeletingHardware_givenTheHardwareIsLinkedToAUser_thenResponseHasA409Status() throws IOException, InterruptedException {
+    public void whenDeletingHardware_givenTheHardwareIsLinkedToAUser_thenResponseHasA409Status() {
         final HttpResponse<String> createHardwareResponse = HardwareUtils.RequestSender.create(DUMMY_HARDWARE);
         assertThat(createHardwareResponse.statusCode())
                 .as("Was not able to create hardware: " + createHardwareResponse.body())
@@ -325,21 +326,7 @@ public class HardwareTest {
     }
 
     @AfterClass
-    public static void tearDown() throws SQLException, IOException, InterruptedException {
-        cleanSystemForHardwareTests();
-    }
-
-    private static void cleanSystemForHardwareTests() throws IOException, InterruptedException, SQLException {
-        final Collection<User> allUsers = UserUtils.ResponseParser.getAll(UserUtils.RequestSender.getAll());
-        for (final User user : allUsers) {
-            UserUtils.RequestSender.delete(user.getId());
-        }
-
-        final Collection<Hardware> allHardware = HardwareUtils.ResponseParser.getAll(HardwareUtils.RequestSender.getAll());
-        for (final Hardware hardware : allHardware) {
-            HardwareUtils.RequestSender.delete(hardware.getId());
-        }
-
-        DatabaseCleaner.truncateTableAndResetId("users", "hardware");
+    public static void tearDown() {
+        cleanSystemForTests();
     }
 }
