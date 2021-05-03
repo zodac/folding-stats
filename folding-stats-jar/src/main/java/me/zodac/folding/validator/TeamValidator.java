@@ -3,6 +3,8 @@ package me.zodac.folding.validator;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
+import me.zodac.folding.cache.RetiredTcStatsCache;
 import me.zodac.folding.cache.UserCache;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -46,8 +48,8 @@ public class TeamValidator {
             failureMessages.add(String.format("Attribute 'captainUserId' must be in the team, must be one of: %s", team.getUserIds()));
         }
 
-        if (team.getUserIds().size() > Category.maximumPermittedAmount()) {
-            failureMessages.add(String.format("Attribute 'userIds' has %s users, maximum permitted is %s", team.getUserIds().size(), Category.maximumPermittedAmount()));
+        if (team.getUserIds().size() > Category.maximumPermittedAmountForAllCategories()) {
+            failureMessages.add(String.format("Attribute 'userIds' has %s users, maximum permitted is %s", team.getUserIds().size(), Category.maximumPermittedAmountForAllCategories()));
         }
 
         if (team.getUserIds().isEmpty()) {
@@ -92,7 +94,7 @@ public class TeamValidator {
 
             for (final Map.Entry<Category, Long> categoryAndCount : categoryCount.entrySet()) {
                 if (categoryAndCount.getValue() > categoryAndCount.getKey().permittedAmount()) {
-                    failureMessages.add(String.format("Found %s users of category %s, only %s permitted", categoryAndCount.getValue(), categoryAndCount.getKey(), categoryAndCount.getKey().permittedAmount()));
+                    failureMessages.add(String.format("Found %s users of category %s, only %s permitted", categoryAndCount.getValue(), categoryAndCount.getKey().displayName(), categoryAndCount.getKey().permittedAmount()));
                 }
             }
         }
@@ -126,6 +128,21 @@ public class TeamValidator {
     public static ValidationResponse isValidUnretirement(final Team team, final int retiredUserId) {
         final List<String> failureMessages = new ArrayList<>();
 
+        if (team.getUserIds().size() == Category.maximumPermittedAmountForAllCategories()) {
+            failureMessages.add(String.format("Unable to add retired user ID %s to team %s, %s users already on the team", retiredUserId, team, team.getUserIds().size()));
+        }
+
+        if (!RetiredTcStatsCache.get().contains(retiredUserId)) {
+            final List<Integer> availableRetiredUsers = RetiredTcStatsCache.get()
+                    .getAll()
+                    .stream()
+                    .mapToInt(RetiredUserTcStats::getRetiredUserId)
+                    .boxed()
+                    .collect(toList());
+
+            failureMessages.add(String.format("Invalid retired user ID %s, must be one of: %s", retiredUserId, availableRetiredUsers));
+        }
+
         // TODO: [zodac] I dunno... can't unretire a user twice, should retired users have a 'still_retired' flag? Seems stupid
         //   Maybe a retiredUserCache is better? With the new retiredUserId?
 //        if (!UserCache.get().getRetired().containsKey(retiredUserId)) {
@@ -139,8 +156,10 @@ public class TeamValidator {
         //   With no 'still_retired' flag, it's possible to add it back to its original team by mistake
 
 
-        if (failureMessages.isEmpty()) {
-            return ValidationResponse.success();
+        {
+            if (failureMessages.isEmpty()) {
+                return ValidationResponse.success();
+            }
         }
 
         return ValidationResponse.failure(team, failureMessages);

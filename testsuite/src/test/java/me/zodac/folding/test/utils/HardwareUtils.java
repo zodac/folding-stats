@@ -105,7 +105,7 @@ public class HardwareUtils {
             }
         }
 
-        public static HttpResponse<String> delete(final int hardwareId) {
+        public static HttpResponse<Void> delete(final int hardwareId) {
             final HttpRequest request = HttpRequest.newBuilder()
                     .DELETE()
                     .uri(URI.create(BASE_FOLDING_URL + "/hardware/" + hardwareId))
@@ -113,7 +113,7 @@ public class HardwareUtils {
                     .build();
 
             try {
-                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
             } catch (final IOException | InterruptedException e) {
                 throw new AssertionError("Error sending HTTP request to delete hardware", e);
             }

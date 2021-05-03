@@ -114,8 +114,8 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
                 return badRequest(validationResponse);
             }
 
-            storageFacade.retireUser(parsedTeamId, parsedUnitId);
-            return ok();
+            final Team updatedTeam = storageFacade.retireUser(parsedTeamId, parsedUnitId);
+            return ok(updatedTeam);
         } catch (final FoldingIdInvalidException e) {
             final String errorMessage = String.format("The ID '%s' is not a valid format", e.getId());
             getLogger().debug(errorMessage, e);
@@ -161,8 +161,8 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
                 return badRequest(validationResponse);
             }
 
-            storageFacade.unretireUser(parsedTeamId, parsedRetiredUserId);
-            return ok();
+            final Team updatedTeam = storageFacade.unretireUser(parsedTeamId, parsedRetiredUserId);
+            return ok(updatedTeam);
         } catch (final FoldingIdInvalidException e) {
             final String errorMessage = String.format("The ID '%s' is not a valid format", e.getId());
             getLogger().debug(errorMessage, e);

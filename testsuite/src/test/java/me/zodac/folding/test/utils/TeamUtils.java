@@ -105,7 +105,7 @@ public class TeamUtils {
             }
         }
 
-        public static HttpResponse<String> delete(final int teamId) {
+        public static HttpResponse<Void> delete(final int teamId) {
             final HttpRequest request = HttpRequest.newBuilder()
                     .DELETE()
                     .uri(URI.create(BASE_FOLDING_URL + "/teams/" + teamId))
@@ -113,9 +113,37 @@ public class TeamUtils {
                     .build();
 
             try {
-                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
             } catch (final IOException | InterruptedException e) {
                 throw new AssertionError("Error sending HTTP request to delete team", e);
+            }
+        }
+
+        public static HttpResponse<String> retireUser(final int teamId, final int userId) {
+            final HttpRequest request = HttpRequest.newBuilder()
+                    .method("PATCH", HttpRequest.BodyPublishers.noBody())
+                    .uri(URI.create(BASE_FOLDING_URL + "/teams/" + teamId + "/retire/" + userId))
+                    .header("Content-Type", "application/json")
+                    .build();
+
+            try {
+                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            } catch (final IOException | InterruptedException e) {
+                throw new AssertionError("Error sending HTTP request to retire user", e);
+            }
+        }
+
+        public static HttpResponse<String> unretireUser(final int teamId, final int retiredUserId) {
+            final HttpRequest request = HttpRequest.newBuilder()
+                    .method("PATCH", HttpRequest.BodyPublishers.noBody())
+                    .uri(URI.create(BASE_FOLDING_URL + "/teams/" + teamId + "/unretire/" + retiredUserId))
+                    .header("Content-Type", "application/json")
+                    .build();
+
+            try {
+                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            } catch (final IOException | InterruptedException e) {
+                throw new AssertionError("Error sending HTTP request to unretire user", e);
             }
         }
     }
@@ -141,6 +169,14 @@ public class TeamUtils {
         }
 
         public static Team update(final HttpResponse<String> response) {
+            return GSON.fromJson(response.body(), Team.class);
+        }
+
+        public static Team retireUser(final HttpResponse<String> response) {
+            return GSON.fromJson(response.body(), Team.class);
+        }
+
+        public static Team unretireUser(final HttpResponse<String> response) {
             return GSON.fromJson(response.body(), Team.class);
         }
     }

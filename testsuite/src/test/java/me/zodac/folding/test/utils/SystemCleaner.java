@@ -22,6 +22,8 @@ public final class SystemCleaner {
      * <p> We delete through the REST endpoint rather than simply the DB because we need to clear the caches in the system.
      */
     public static void cleanSystemForTests() {
+        DatabaseCleaner.truncateTableAndResetId("retired_user_stats");
+
         final Collection<Team> allTeams = TeamUtils.ResponseParser.getAll(TeamUtils.RequestSender.getAll());
         for (final Team team : allTeams) {
             TeamUtils.RequestSender.delete(team.getId());
@@ -34,7 +36,6 @@ public final class SystemCleaner {
 
         final Collection<Hardware> allHardware = HardwareUtils.ResponseParser.getAll(HardwareUtils.RequestSender.getAll());
         for (final Hardware hardware : allHardware) {
-
             HardwareUtils.RequestSender.delete(hardware.getId());
         }
 

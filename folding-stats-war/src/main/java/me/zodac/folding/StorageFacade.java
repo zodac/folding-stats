@@ -196,13 +196,13 @@ public class StorageFacade {
 
 
         if (!existingUser.getFoldingUserName().equalsIgnoreCase(updatedUser.getFoldingUserName())) {
-            LOGGER.debug("User had state changes to Folding username {} -> {}, recalculating initial stats", existingUser.getFoldingUserName(), updatedUser.getFoldingUserName());
+            LOGGER.debug("User had state change to Folding username {} -> {}, recalculating initial stats", existingUser.getFoldingUserName(), updatedUser.getFoldingUserName());
             handleStateChangeForUserUpdate(updatedUser);
         } else if (!existingUser.getPasskey().equalsIgnoreCase(updatedUser.getPasskey())) {
-            LOGGER.debug("User had state changes to passkey {} -> {}, recalculating initial stats", existingUser.getPasskey(), updatedUser.getPasskey());
+            LOGGER.debug("User had state change to passkey {} -> {}, recalculating initial stats", existingUser.getPasskey(), updatedUser.getPasskey());
             handleStateChangeForUserUpdate(updatedUser);
         } else if (existingUser.getHardwareId() != updatedUser.getHardwareId()) {
-            LOGGER.debug("User had state changes to hardware ID {} -> {}, recalculating initial stats", existingUser.getHardwareId(), updatedUser.getHardwareId());
+            LOGGER.debug("User had state change to hardware ID {} -> {}, recalculating initial stats", existingUser.getHardwareId(), updatedUser.getHardwareId());
             handleStateChangeForUserUpdate(updatedUser);
         }
     }
@@ -296,7 +296,7 @@ public class StorageFacade {
         return retiredUserTcStatsFromDb;
     }
 
-    public void retireUser(final int teamId, final int userId) throws FoldingConflictException, UserNotFoundException, FoldingException, TeamNotFoundException {
+    public Team retireUser(final int teamId, final int userId) throws FoldingConflictException, UserNotFoundException, FoldingException, TeamNotFoundException {
         final User retiredUser = User.retireUser(getUser(userId));
         dbManager.updateUser(retiredUser);
         userCache.add(retiredUser);
@@ -304,15 +304,15 @@ public class StorageFacade {
         final UserTcStats userStats = getTcStatsForUser(retiredUser.getId());
         final int retiredUserId = dbManager.persistRetiredUserStats(teamId, retiredUser.getDisplayName(), userStats);
         retiredStatsCache.add(RetiredUserTcStats.create(retiredUserId, teamId, retiredUser.getDisplayName(), userStats));
-//        updateInitialStatsForUser(retiredUser);
 
         final Team team = getTeam(teamId);
         final Team updatedTeam = Team.retireUser(team, userStats.getUserId(), retiredUserId);
         dbManager.updateTeam(updatedTeam);
         teamCache.add(updatedTeam);
+        return updatedTeam;
     }
 
-    public void unretireUser(final int teamId, final int retiredUserId) throws UserNotFoundException, FoldingException, FoldingConflictException, TeamNotFoundException, FoldingExternalServiceException {
+    public Team unretireUser(final int teamId, final int retiredUserId) throws UserNotFoundException, FoldingException, FoldingConflictException, TeamNotFoundException, FoldingExternalServiceException {
         // Get the original user ID
         final RetiredUserTcStats retiredUserStats = dbManager.getRetiredUserStats(retiredUserId); // TODO: [zodac] Add another cache? I like caches :)
         final int userId = retiredUserStats.getUserId();
@@ -345,6 +345,7 @@ public class StorageFacade {
         final Team updatedTeam = Team.unretireUser(team, userId, retiredUserId);
         dbManager.updateTeam(updatedTeam);
         teamCache.add(updatedTeam);
+        return updatedTeam;
     }
 
     public void persistInitialUserStats(final User user) throws FoldingException, FoldingExternalServiceException {

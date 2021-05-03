@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.stats.UserStatsOffset;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -105,7 +106,7 @@ public class UserUtils {
             }
         }
 
-        public static HttpResponse<String> delete(final int userId) {
+        public static HttpResponse<Void> delete(final int userId) {
             final HttpRequest request = HttpRequest.newBuilder()
                     .DELETE()
                     .uri(URI.create(BASE_FOLDING_URL + "/users/" + userId))
@@ -113,9 +114,25 @@ public class UserUtils {
                     .build();
 
             try {
-                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
             } catch (final IOException | InterruptedException e) {
                 throw new AssertionError("Error sending HTTP request to delete user", e);
+            }
+        }
+
+        public static HttpResponse<Void> offset(final int userId, final long pointsOffset, final int unitsOffset) {
+            final UserStatsOffset userStatsOffset = UserStatsOffset.create(pointsOffset, unitsOffset);
+
+            final HttpRequest request = HttpRequest.newBuilder()
+                    .method("PATCH", HttpRequest.BodyPublishers.ofString(GSON.toJson(userStatsOffset)))
+                    .uri(URI.create(BASE_FOLDING_URL + "/users/" + userId))
+                    .header("Content-Type", "application/json")
+                    .build();
+
+            try {
+                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
+            } catch (final IOException | InterruptedException e) {
+                throw new AssertionError("Error sending HTTP request to offset user stats", e);
             }
         }
     }

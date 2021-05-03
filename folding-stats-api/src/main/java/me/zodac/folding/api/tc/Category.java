@@ -39,7 +39,7 @@ public enum Category {
         return VALUES_AS_LIST;
     }
 
-    public static int maximumPermittedAmount() {
+    public static int maximumPermittedAmountForAllCategories() {
         return VALUES_AS_LIST.stream()
                 .mapToInt(value -> value.permittedAmount)
                 .sum();

@@ -39,7 +39,7 @@ public class UserTest {
 
     @Test
     public void whenGettingAllUsers_givenNoUserHasBeenCreated_thenAnEmptyJsonResponseIsReturned_andHasA200Status() {
-        cleanSystemOfUsers(); // No guarantee that this test runs first, so we need to clean the system of users again, but not any hardware
+        cleanSystemOfUsers(); // No guarantee that this test runs first, so we need to clean the system of users again, but not hardware/teams
         final HttpResponse<String> response = UserUtils.RequestSender.getAll();
         assertThat(response.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + response.body())
@@ -132,7 +132,9 @@ public class UserTest {
             userId = UserUtils.ResponseParser.create(UserUtils.RequestSender.create(DUMMY_USER)).getId();
         }
 
-        final User updatedUser = User.create(userId, "Dummy_User", "Dummy User", "DummyPasskey", Category.AMD_GPU, 1, "", false);
+        final User updatedUser = User.updateWithId(userId, DUMMY_USER);
+        updatedUser.setCategory(Category.AMD_GPU.displayName());
+
         final HttpResponse<String> response = UserUtils.RequestSender.update(updatedUser);
         assertThat(response.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + response.body())
@@ -144,10 +146,10 @@ public class UserTest {
                 .isEqualTo(updatedUser);
 
 
-        final Collection<User> allHardwareAfterUpdate = UserUtils.ResponseParser.getAll(UserUtils.RequestSender.getAll());
-        assertThat(allHardwareAfterUpdate)
+        final Collection<User> allUsersAfterUpdate = UserUtils.ResponseParser.getAll(UserUtils.RequestSender.getAll());
+        assertThat(allUsersAfterUpdate)
                 .as("Expected no new user instances to be created")
-                .hasSize(allUsers.size());
+                .hasSize(userId);
     }
 
     @Test
@@ -160,7 +162,7 @@ public class UserTest {
             userId = UserUtils.ResponseParser.create(UserUtils.RequestSender.create(DUMMY_USER)).getId();
         }
 
-        final HttpResponse<String> response = UserUtils.RequestSender.delete(userId);
+        final HttpResponse<Void> response = UserUtils.RequestSender.delete(userId);
         assertThat(response.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -175,6 +177,25 @@ public class UserTest {
                 .as("Get all response did not return the initial users - deleted user")
                 .isEqualTo(userId - 1);
     }
+
+    @Test
+    public void whenPatchingAUserWithPointsOffsets_givenThePayloadIsValid_thenResponseHasA200Status() {
+        final User user = User.createWithoutId("Dummy_User14", "Dummy User14", "DummyPasskey14", Category.NVIDIA_GPU, 1, "", false);
+        StubbedFoldingEndpointUtils.enableUser(user);
+
+        final HttpResponse<String> createUserResponse = UserUtils.RequestSender.create(user);
+        assertThat(createUserResponse.statusCode())
+                .as("Was not able to create user: " + createUserResponse.body())
+                .isEqualTo(HttpURLConnection.HTTP_CREATED);
+
+        final int userId = UserUtils.ResponseParser.create(createUserResponse).getId();
+        final HttpResponse<Void> patchResponse = UserUtils.RequestSender.offset(userId, 100L, 10);
+        assertThat(patchResponse.statusCode())
+                .as("Was not able to patch user: " + patchResponse.body())
+                .isEqualTo(HttpURLConnection.HTTP_OK);
+    }
+
+    // TODO: [zodac] Add tests for PATCH endpoint (where we verify stats) in stats tests
 
     // Negative/alternative test cases
 
@@ -207,9 +228,7 @@ public class UserTest {
 
     @Test
     public void whenCreatingUser_givenUserWithTheSameFoldingNameAndPasskeyAlreadyExists_thenA409ResponseIsReturned() {
-        if (UserUtils.RequestSender.get(DUMMY_USER.getId()).statusCode() == HttpURLConnection.HTTP_NOT_FOUND) {
-            UserUtils.RequestSender.create(DUMMY_USER);
-        }
+        UserUtils.RequestSender.create(DUMMY_USER);
         final HttpResponse<String> response = UserUtils.RequestSender.create(DUMMY_USER);
 
         assertThat(response.statusCode())
@@ -248,17 +267,13 @@ public class UserTest {
     }
 
     @Test
-    public void whenDeletingUser_givenANonExistingUserId_thenNoJsonResponseIsReturned_andHasA404Status() {
+    public void whenDeletingUser_givenANonExistingUserId_thenResponseHasA404Status() {
         final int invalidId = 99;
-        final HttpResponse<String> response = UserUtils.RequestSender.delete(invalidId);
+        final HttpResponse<Void> response = UserUtils.RequestSender.delete(invalidId);
 
         assertThat(response.statusCode())
                 .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
-
-        assertThat(response.body())
-                .as("Did not receive an empty JSON response: " + response.body())
-                .isEmpty();
     }
 
     @Test
@@ -333,8 +348,8 @@ public class UserTest {
                 .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
 
-        final int newHardwareSize = UserUtils.ResponseParser.getAll(UserUtils.RequestSender.getAll()).size();
-        assertThat(newHardwareSize)
+        final int newUsersSize = UserUtils.ResponseParser.getAll(UserUtils.RequestSender.getAll()).size();
+        assertThat(newUsersSize)
                 .as("Get all response did not return only the initial users")
                 .isEqualTo(initialUsersSize);
     }
@@ -357,13 +372,11 @@ public class UserTest {
                 .as("Was not able to create team: " + createTeamResponse.body())
                 .isEqualTo(HttpURLConnection.HTTP_CREATED);
 
-        final HttpResponse<String> deleteUserResponse = UserUtils.RequestSender.delete(userId);
+        final HttpResponse<Void> deleteUserResponse = UserUtils.RequestSender.delete(userId);
         assertThat(deleteUserResponse.statusCode())
                 .as("Expected to fail due to a 409_CONFLICT: " + deleteUserResponse.body())
                 .isEqualTo(HttpURLConnection.HTTP_CONFLICT);
     }
-
-    // TODO: [zodac] Add tests for PATCH endpoint (where we verify stats) in stats tests
 
     @AfterClass
     public static void tearDown() {

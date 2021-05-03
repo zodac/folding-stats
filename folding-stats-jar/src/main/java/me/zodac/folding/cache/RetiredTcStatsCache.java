@@ -3,6 +3,7 @@ package me.zodac.folding.cache;
 
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -31,5 +32,13 @@ public class RetiredTcStatsCache {
 
     public Optional<RetiredUserTcStats> get(final int retiredUserId) {
         return Optional.ofNullable(retiredTcStatsByRetiredUserId.get(retiredUserId));
+    }
+
+    public boolean contains(final int retiredUserId) {
+        return retiredTcStatsByRetiredUserId.containsKey(retiredUserId);
+    }
+
+    public Collection<RetiredUserTcStats> getAll() {
+        return retiredTcStatsByRetiredUserId.values();
     }
 }

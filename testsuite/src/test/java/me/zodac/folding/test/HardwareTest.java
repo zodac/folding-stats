@@ -115,11 +115,12 @@ public class HardwareTest {
         int hardwareId = allHardware.size();
 
         if (allHardware.isEmpty()) {
-            final Hardware hardwareToCreate = Hardware.createWithoutId("Dummy_Hardware5", "Dummy Hardware5", OperatingSystem.WINDOWS, 1.0D);
-            hardwareId = HardwareUtils.ResponseParser.create(HardwareUtils.RequestSender.create(hardwareToCreate)).getId();
+            hardwareId = HardwareUtils.ResponseParser.create(HardwareUtils.RequestSender.create(DUMMY_HARDWARE)).getId();
         }
 
-        final Hardware updatedHardware = Hardware.create(hardwareId, "Dummy_Hardware5", "Dummy Hardware5", OperatingSystem.LINUX, 1.0D);
+        final Hardware updatedHardware = Hardware.updateWithId(hardwareId, DUMMY_HARDWARE);
+        updatedHardware.setOperatingSystem(OperatingSystem.LINUX.displayName());
+
         final HttpResponse<String> response = HardwareUtils.RequestSender.update(updatedHardware);
         assertThat(response.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + response.body())
@@ -134,7 +135,7 @@ public class HardwareTest {
         final Collection<Hardware> allHardwareAfterUpdate = HardwareUtils.ResponseParser.getAll(HardwareUtils.RequestSender.getAll());
         assertThat(allHardwareAfterUpdate)
                 .as("Expected no new hardware instances to be created")
-                .hasSize(allHardware.size());
+                .hasSize(hardwareId);
     }
 
     @Test
@@ -146,7 +147,7 @@ public class HardwareTest {
             hardwareId = HardwareUtils.ResponseParser.create(HardwareUtils.RequestSender.create(DUMMY_HARDWARE)).getId();
         }
 
-        final HttpResponse<String> response = HardwareUtils.RequestSender.delete(hardwareId);
+        final HttpResponse<Void> response = HardwareUtils.RequestSender.delete(hardwareId);
         assertThat(response.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -178,9 +179,7 @@ public class HardwareTest {
 
     @Test
     public void whenCreatingHardware_givenHardwareWithTheSameNameAndOperatingSystemAlreadyExists_thenA409ResponseIsReturned() {
-        if (HardwareUtils.RequestSender.get(DUMMY_HARDWARE.getId()).statusCode() == HttpURLConnection.HTTP_NOT_FOUND) {
-            HardwareUtils.RequestSender.create(DUMMY_HARDWARE);
-        }
+        HardwareUtils.RequestSender.create(DUMMY_HARDWARE);
         final HttpResponse<String> response = HardwareUtils.RequestSender.create(DUMMY_HARDWARE);
 
         assertThat(response.statusCode())
@@ -218,17 +217,13 @@ public class HardwareTest {
     }
 
     @Test
-    public void whenDeletingHardware_givenANonExistingHardwareId_thenNoJsonResponseIsReturned_andHasA404Status() {
+    public void whenDeletingHardware_givenANonExistingHardwareId_thenResponseHasA404Status() {
         final int invalidId = 99;
-        final HttpResponse<String> response = HardwareUtils.RequestSender.delete(invalidId);
+        final HttpResponse<Void> response = HardwareUtils.RequestSender.delete(invalidId);
 
         assertThat(response.statusCode())
                 .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
-
-        assertThat(response.body())
-                .as("Did not receive an empty JSON response: " + response.body())
-                .isEmpty();
     }
 
     @Test
@@ -319,7 +314,7 @@ public class HardwareTest {
                 .isEqualTo(HttpURLConnection.HTTP_CREATED);
 
 
-        final HttpResponse<String> deleteHardwareResponse = HardwareUtils.RequestSender.delete(hardwareId);
+        final HttpResponse<Void> deleteHardwareResponse = HardwareUtils.RequestSender.delete(hardwareId);
         assertThat(deleteHardwareResponse.statusCode())
                 .as("Expected to fail due to a 409_CONFLICT: " + deleteHardwareResponse.body())
                 .isEqualTo(HttpURLConnection.HTTP_CONFLICT);
