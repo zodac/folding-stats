@@ -5,6 +5,7 @@ import me.zodac.folding.api.tc.OperatingSystem;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.test.utils.DatabaseCleaner;
 import me.zodac.folding.test.utils.HardwareUtils;
+import me.zodac.folding.test.utils.StubbedFoldingEndpointUtils;
 import me.zodac.folding.test.utils.UserUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -35,7 +36,7 @@ public class HardwareTest {
         cleanSystemForHardwareTests(); // No guarantee that this test runs first, so we need to clean the system again
         final HttpResponse<String> response = HardwareUtils.RequestSender.getAll();
         assertThat(response.statusCode())
-                .as("Did not receive a 200_OK HTTP response")
+                .as("Did not receive a 200_OK HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Collection<Hardware> allHardware = HardwareUtils.ResponseParser.getAll(response);
@@ -52,15 +53,16 @@ public class HardwareTest {
 
     @Test
     public void whenCreatingHardware_givenPayloadIsValid_thenTheCreatedHardwareIsReturnedInResponse_andHasId_andResponseHasA201StatusCode() throws IOException, InterruptedException {
-        final HttpResponse<String> response = HardwareUtils.RequestSender.create(DUMMY_HARDWARE);
+        final Hardware hardwareToCreate = Hardware.createWithoutId("Dummy_Hardware1", "Dummy Hardware1", OperatingSystem.WINDOWS, 1.0D);
+        final HttpResponse<String> response = HardwareUtils.RequestSender.create(hardwareToCreate);
         assertThat(response.statusCode())
-                .as("Did not receive a 201_CREATED HTTP response")
+                .as("Did not receive a 201_CREATED HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_CREATED);
 
         final Hardware actual = HardwareUtils.ResponseParser.create(response);
-        final Hardware expected = Hardware.updateWithId(actual.getId(), DUMMY_HARDWARE);
+        final Hardware expected = Hardware.updateWithId(actual.getId(), hardwareToCreate);
         assertThat(actual)
-                .as("Did not receive created object as JSON response")
+                .as("Did not receive created object as JSON response: " + response.body())
                 .isEqualTo(expected);
     }
 
@@ -76,12 +78,12 @@ public class HardwareTest {
 
         final HttpResponse<String> response = HardwareUtils.RequestSender.createBatchOf(batchOfHardware);
         assertThat(response.statusCode())
-                .as("Did not receive a 200_OK HTTP response")
+                .as("Did not receive a 200_OK HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final int newSize = HardwareUtils.ResponseParser.getAll(HardwareUtils.RequestSender.getAll()).size();
         assertThat(newSize)
-                .as("Get all response did not return the initial hardware + new hardware")
+                .as("Get all response did not return the initial hardware + new hardware: " + response.body())
                 .isEqualTo(initialSize + batchOfHardware.size());
     }
 
@@ -96,12 +98,12 @@ public class HardwareTest {
 
         final HttpResponse<String> response = HardwareUtils.RequestSender.get(hardwareId);
         assertThat(response.statusCode())
-                .as("Did not receive a 200_OK HTTP response")
+                .as("Did not receive a 200_OK HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Hardware hardware = HardwareUtils.ResponseParser.get(response);
         assertThat(hardware)
-                .as("Did not receive a valid hardware")
+                .as("Did not receive the expected hardware: " + response.body())
                 .extracting("id")
                 .isEqualTo(hardwareId);
     }
@@ -112,18 +114,19 @@ public class HardwareTest {
         int hardwareId = allHardware.size();
 
         if (allHardware.isEmpty()) {
-            hardwareId = HardwareUtils.ResponseParser.create(HardwareUtils.RequestSender.create(DUMMY_HARDWARE)).getId();
+            final Hardware hardwareToCreate = Hardware.createWithoutId("Dummy_Hardware5", "Dummy Hardware5", OperatingSystem.WINDOWS, 1.0D);
+            hardwareId = HardwareUtils.ResponseParser.create(HardwareUtils.RequestSender.create(hardwareToCreate)).getId();
         }
 
         final Hardware updatedHardware = Hardware.create(hardwareId, "Dummy_Hardware5", "Dummy Hardware5", OperatingSystem.LINUX, 1.0D);
         final HttpResponse<String> response = HardwareUtils.RequestSender.update(updatedHardware);
         assertThat(response.statusCode())
-                .as("Did not receive a 200_OK HTTP response")
+                .as("Did not receive a 200_OK HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Hardware actual = HardwareUtils.ResponseParser.update(response);
         assertThat(actual)
-                .as("Did not receive created object as JSON response")
+                .as("Did not receive created object as JSON response: " + response.body())
                 .isEqualTo(updatedHardware);
 
 
@@ -144,7 +147,7 @@ public class HardwareTest {
 
         final HttpResponse<String> response = HardwareUtils.RequestSender.delete(hardwareId);
         assertThat(response.statusCode())
-                .as("Did not receive a 200_OK HTTP response")
+                .as("Did not receive a 200_OK HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_OK);
 
 
@@ -162,16 +165,27 @@ public class HardwareTest {
     // Negative/alternative test cases
 
     @Test
-    public void whenCreatingHardware_givenAnInvalidHardware_thenJsonResponseWithErrorsIsReturned_andHasA400Status() throws IOException, InterruptedException {
+    public void whenCreatingHardware_givenAHardwareWithInvalidOperatingSystem_thenJsonResponseWithErrorIsReturned_andHasA400Status() throws IOException, InterruptedException {
         final Hardware hardware = Hardware.createWithoutId("Test GPU", "Base GPU", OperatingSystem.INVALID, 1.0D);
 
         final HttpResponse<String> response = HardwareUtils.RequestSender.create(hardware);
 
         assertThat(response.statusCode())
-                .as("Did not receive a 400_BAD_REQUEST HTTP response")
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
+    @Test
+    public void whenCreatingHardware_givenHardwareWithTheSameNameAndOperatingSystemAlreadyExists_thenA409ResponseIsReturned() throws IOException, InterruptedException {
+        if (HardwareUtils.RequestSender.get(DUMMY_HARDWARE.getId()).statusCode() == HttpURLConnection.HTTP_NOT_FOUND) {
+            HardwareUtils.RequestSender.create(DUMMY_HARDWARE);
+        }
+        final HttpResponse<String> response = HardwareUtils.RequestSender.create(DUMMY_HARDWARE);
+
+        assertThat(response.statusCode())
+                .as("Did not receive a 409_CONFLICT HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_CONFLICT);
+    }
 
     @Test
     public void whenGettingHardware_givenANonExistingHardwareId_thenNoJsonResponseIsReturned_andHasA404Status() throws IOException, InterruptedException {
@@ -179,11 +193,11 @@ public class HardwareTest {
         final HttpResponse<String> response = HardwareUtils.RequestSender.get(invalidId);
 
         assertThat(response.statusCode())
-                .as("Did not receive a 404_NOT_FOUND HTTP response")
+                .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
 
         assertThat(response.body())
-                .as("Did not receive an empty JSON response")
+                .as("Did not receive an empty JSON response: " + response.body())
                 .isEmpty();
     }
 
@@ -194,11 +208,11 @@ public class HardwareTest {
 
         final HttpResponse<String> response = HardwareUtils.RequestSender.update(updatedHardware);
         assertThat(response.statusCode())
-                .as("Did not receive a 404_NOT_FOUND HTTP response")
+                .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
 
         assertThat(response.body())
-                .as("Did not receive an empty JSON response")
+                .as("Did not receive an empty JSON response: " + response.body())
                 .isEmpty();
     }
 
@@ -208,11 +222,11 @@ public class HardwareTest {
         final HttpResponse<String> response = HardwareUtils.RequestSender.delete(invalidId);
 
         assertThat(response.statusCode())
-                .as("Did not receive a 404_NOT_FOUND HTTP response")
+                .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
 
         assertThat(response.body())
-                .as("Did not receive an empty JSON response")
+                .as("Did not receive an empty JSON response: " + response.body())
                 .isEmpty();
     }
 
@@ -222,7 +236,7 @@ public class HardwareTest {
 
         final HttpResponse<String> createResponse = HardwareUtils.RequestSender.create(hardware);
         assertThat(createResponse.statusCode())
-                .as("Did not receive a 201_CREATED HTTP response")
+                .as("Did not receive a 201_CREATED HTTP response: " + createResponse.body())
                 .isEqualTo(HttpURLConnection.HTTP_CREATED);
 
         final int createdHardwareId = HardwareUtils.ResponseParser.create(createResponse).getId();
@@ -231,13 +245,13 @@ public class HardwareTest {
         final HttpResponse<String> updateResponse = HardwareUtils.RequestSender.update(hardwareWithId);
 
         assertThat(updateResponse.statusCode())
-                .as("Did not receive a 200_OK HTTP response")
+                .as("Did not receive a 200_OK HTTP response: " + updateResponse.body())
                 .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Hardware actual = HardwareUtils.ResponseParser.update(updateResponse);
 
         assertThat(actual)
-                .as("Did not receive an empty JSON response")
+                .as("Did not receive the original hardware in response")
                 .isEqualTo(hardwareWithId);
     }
 
@@ -259,7 +273,7 @@ public class HardwareTest {
 
         final HttpResponse<String> response = HardwareUtils.RequestSender.createBatchOf(batchOfHardware);
         assertThat(response.statusCode())
-                .as("Did not receive a 200_OK HTTP response")
+                .as("Did not receive a 200_OK HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final int newHardwareSize = HardwareUtils.ResponseParser.getAll(HardwareUtils.RequestSender.getAll()).size();
@@ -279,7 +293,7 @@ public class HardwareTest {
 
         final HttpResponse<String> response = HardwareUtils.RequestSender.createBatchOf(batchOfInvalidHardware);
         assertThat(response.statusCode())
-                .as("Did not receive a 400_BAD_REQUEST HTTP response")
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
 
         final int newHardwareSize = HardwareUtils.ResponseParser.getAll(HardwareUtils.RequestSender.getAll()).size();
@@ -292,19 +306,21 @@ public class HardwareTest {
     public void whenDeletingHardware_givenTheHardwareIsLinkedToAUser_thenResponseHasA409Status() throws IOException, InterruptedException {
         final HttpResponse<String> createHardwareResponse = HardwareUtils.RequestSender.create(DUMMY_HARDWARE);
         assertThat(createHardwareResponse.statusCode())
-                .as("Was not able to create hardware")
+                .as("Was not able to create hardware: " + createHardwareResponse.body())
                 .isEqualTo(HttpURLConnection.HTTP_CREATED);
 
         final int hardwareId = HardwareUtils.ResponseParser.create(createHardwareResponse).getId();
 
+        StubbedFoldingEndpointUtils.enableUser(UserTest.DUMMY_USER);
         final HttpResponse<String> createUserResponse = UserUtils.RequestSender.create(UserTest.DUMMY_USER);
         assertThat(createUserResponse.statusCode())
-                .as("Was not able to create user: " + createUserResponse.statusCode() + ": " + createUserResponse.body())
+                .as("Was not able to create user: " + createUserResponse.body())
                 .isEqualTo(HttpURLConnection.HTTP_CREATED);
+
 
         final HttpResponse<String> deleteHardwareResponse = HardwareUtils.RequestSender.delete(hardwareId);
         assertThat(deleteHardwareResponse.statusCode())
-                .as("Expected to fail due to a 409_CONFLICT")
+                .as("Expected to fail due to a 409_CONFLICT: " + deleteHardwareResponse.body())
                 .isEqualTo(HttpURLConnection.HTTP_CONFLICT);
     }
 

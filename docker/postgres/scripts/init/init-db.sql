@@ -3,7 +3,8 @@ CREATE TABLE hardware (
     hardware_name TEXT NOT NULL,
     display_name TEXT NOT NULL,
     operating_system TEXT NOT NULL,
-    multiplier NUMERIC NOT NULL
+    multiplier NUMERIC NOT NULL,
+    CONSTRAINT unique_hardware UNIQUE(hardware_name, operating_system)
 );
 
 CREATE INDEX index_hardware_id
