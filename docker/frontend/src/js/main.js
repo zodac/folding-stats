@@ -197,6 +197,7 @@ function loadTcStats() {
             statsDiv.append(document.createElement('br'));
         });
         $('[data-toggle="tooltip"]').tooltip();
+        hideLoader();
     })
 };
 
@@ -385,6 +386,10 @@ function loadTeams() {
         teamsDiv.append(teamsTable);
     })
 };
+
+function hideLoader() {
+    $("#loader").hide();
+}
 
 $(document).ready(function() {
     loadTcStats();
