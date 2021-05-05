@@ -12,9 +12,9 @@ import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.bean.TeamCompetitionResetScheduler;
 import me.zodac.folding.bean.TeamCompetitionStatsParser;
-import me.zodac.folding.rest.tc.CompetitionResult;
-import me.zodac.folding.rest.tc.TeamResult;
-import me.zodac.folding.rest.tc.UserResult;
+import me.zodac.folding.rest.api.tc.CompetitionResult;
+import me.zodac.folding.rest.api.tc.TeamResult;
+import me.zodac.folding.rest.api.tc.UserResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,7 +83,7 @@ public class TeamCompetitionStatsEndpoint {
             if (teamResults.isEmpty()) {
                 LOGGER.debug("No teams to show!");
             }
-            
+
             // TODO: [zodac] Cache this CompetitionResult, and invalidate cache on scheduled/manual update, scheduled/manual reset, user create/update, team create/update
             //   Can't simply invalidate on stats update, because what if a hardware display is changed? Should invalidate on ALL changes
             return ok(CompetitionResult.create(teamResults));

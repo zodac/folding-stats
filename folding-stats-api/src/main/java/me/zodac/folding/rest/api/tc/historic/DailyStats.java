@@ -1,4 +1,4 @@
-package me.zodac.folding.rest.tc.historic;
+package me.zodac.folding.rest.api.tc.historic;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

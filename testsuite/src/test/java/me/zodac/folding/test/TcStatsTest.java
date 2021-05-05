@@ -1,8 +1,13 @@
 package me.zodac.folding.test;
 
+import me.zodac.folding.rest.api.tc.CompetitionResult;
+import me.zodac.folding.test.utils.TcStatsUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.net.HttpURLConnection;
+import java.net.http.HttpResponse;
 
 import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForComplexTests;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,9 +23,32 @@ public class TcStatsTest {
     }
 
     @Test
-    public void test() {
-        assertThat(true)
-                .isTrue();
+    public void whenGetTcStats_givenNoTeamsExistInTheSystem_thenResponseIsReturnedWithNoStats_andNoTeams() {
+        cleanSystemForComplexTests();
+
+        final HttpResponse<String> response = TcStatsUtils.RequestSender.get();
+
+        assertThat(response.statusCode())
+                .as("Did not receive a 200_OK HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_OK);
+
+        final CompetitionResult result = TcStatsUtils.ResponseParser.get(response);
+
+        assertThat(result.getTeams())
+                .as("Expected no teams: " + result)
+                .isEmpty();
+
+        assertThat(result.getTotalPoints())
+                .as("Expected no points: " + result)
+                .isEqualTo(0L);
+
+        assertThat(result.getTotalMultipliedPoints())
+                .as("Expected no multiplied points: " + result)
+                .isEqualTo(0L);
+
+        assertThat(result.getTotalUnits())
+                .as("Expected no unit: " + result)
+                .isEqualTo(0);
     }
 
     // TODO: [zodac] Required tests:
@@ -45,7 +73,7 @@ public class TcStatsTest {
     //  - Team does not lose their points, but no new points are added to the team
     //  - Retired user is unretired to same team, stats during retirement are not counted, old stats are retained, and new stats start being added to team again
     //  - Retired user is unretired to new team, user starts from 0 for the team, old team retains points, new stats are added to new team only
-    
+
     @AfterClass
     public static void tearDown() {
         cleanSystemForComplexTests();

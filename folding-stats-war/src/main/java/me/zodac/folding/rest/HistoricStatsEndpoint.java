@@ -4,7 +4,7 @@ import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.api.tc.stats.UserTcStats;
-import me.zodac.folding.rest.tc.historic.DailyStats;
+import me.zodac.folding.rest.api.tc.historic.DailyStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

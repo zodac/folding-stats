@@ -1,4 +1,4 @@
-package me.zodac.folding.rest.tc;
+package me.zodac.folding.rest.api.tc;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
