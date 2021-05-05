@@ -3,14 +3,16 @@ package me.zodac.folding.test;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.test.utils.DatabaseCleaner;
 import me.zodac.folding.test.utils.HardwareUtils;
 import me.zodac.folding.test.utils.StubbedFoldingEndpointUtils;
 import me.zodac.folding.test.utils.TeamUtils;
 import me.zodac.folding.test.utils.UserUtils;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import java.net.HttpURLConnection;
 import java.net.http.HttpResponse;
@@ -27,11 +29,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests for the {@link Team} REST endpoint at <code>/folding/teams</code>.
  */
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TeamTest {
 
     public static final Team DUMMY_TEAM = Team.createWithoutId("Dummy_Team", "Dummy Team", 1, Set.of(1), Collections.emptySet());
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp() {
         cleanSystemForSimpleTests();
         HardwareUtils.RequestSender.create(HardwareTest.DUMMY_HARDWARE);
@@ -40,8 +43,8 @@ public class TeamTest {
     }
 
     @Test
+    @Order(1)
     public void whenGettingAllTeams_givenNoTeamHasBeenCreated_thenAnEmptyJsonResponseIsReturned_andHasA200Status() {
-        cleanSystemOfTeams(); // No guarantee that this test runs first, so we need to clean the system of teams again, but not users/hardware
         final HttpResponse<String> response = TeamUtils.RequestSender.getAll();
         assertThat(response.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + response.body())
@@ -599,17 +602,8 @@ public class TeamTest {
     }
 
 
-    @AfterClass
+    @AfterAll
     public static void tearDown() {
         cleanSystemForSimpleTests();
-    }
-
-    private static void cleanSystemOfTeams() {
-        final Collection<Team> allTeams = TeamUtils.ResponseParser.getAll(TeamUtils.RequestSender.getAll());
-        for (final Team team : allTeams) {
-            TeamUtils.RequestSender.delete(team.getId());
-        }
-
-        DatabaseCleaner.truncateTableAndResetId("teams");
     }
 }

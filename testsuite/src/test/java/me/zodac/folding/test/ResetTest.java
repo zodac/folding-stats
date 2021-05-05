@@ -1,8 +1,8 @@
 package me.zodac.folding.test;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForComplexTests;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class ResetTest {
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp() {
         cleanSystemForComplexTests();
     }
@@ -30,7 +30,7 @@ public class ResetTest {
     // On reset, all users have points reset
     // On reset, if no team exists, no error occurs
 
-    @AfterClass
+    @AfterAll
     public static void tearDown() {
         cleanSystemForComplexTests();
     }

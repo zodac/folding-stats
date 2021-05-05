@@ -38,14 +38,14 @@
 
         <!-- Test 3PP Versions -->
         <assertj-core.version>3.19.0</assertj-core.version>
-        <junit.version>4.13.2</junit.version>
+        <junit.version>5.7.1</junit.version>
 
         <!-- Plugin Versions -->
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-ear-plugin.version>3.2.0</maven-ear-plugin.version>
         <maven-ejb-plugin.version>3.1.0</maven-ejb-plugin.version>
         <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
-        <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
+        <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
         <maven-war-plugin.version>3.3.1</maven-war-plugin.version>
         <minify-maven-plugin.version>1.7.6</minify-maven-plugin.version>
     </properties>
@@ -131,8 +131,8 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
                 <version>${junit.version}</version>
                 <scope>test</scope>
             </dependency>

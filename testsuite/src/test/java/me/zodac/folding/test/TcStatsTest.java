@@ -2,9 +2,12 @@ package me.zodac.folding.test;
 
 import me.zodac.folding.rest.api.tc.CompetitionResult;
 import me.zodac.folding.test.utils.TcStatsUtils;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import java.net.HttpURLConnection;
 import java.net.http.HttpResponse;
@@ -15,14 +18,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests for the <code>Team Competition</code> stats calculation.
  */
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TcStatsTest {
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp() {
         cleanSystemForComplexTests();
     }
 
     @Test
+    @Order(1)
     public void whenGetTcStats_givenNoTeamsExistInTheSystem_thenResponseIsReturnedWithNoStats_andNoTeams() {
         cleanSystemForComplexTests();
 
@@ -74,7 +79,7 @@ public class TcStatsTest {
     //  - Retired user is unretired to same team, stats during retirement are not counted, old stats are retained, and new stats start being added to team again
     //  - Retired user is unretired to new team, user starts from 0 for the team, old team retains points, new stats are added to new team only
 
-    @AfterClass
+    @AfterAll
     public static void tearDown() {
         cleanSystemForComplexTests();
     }

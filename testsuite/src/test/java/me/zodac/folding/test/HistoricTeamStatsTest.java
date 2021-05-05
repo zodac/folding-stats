@@ -1,9 +1,9 @@
 package me.zodac.folding.test;
 
 import me.zodac.folding.api.tc.Team;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForComplexTests;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class HistoricTeamStatsTest {
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp() {
         cleanSystemForComplexTests();
     }
@@ -27,7 +27,7 @@ public class HistoricTeamStatsTest {
     // TODO: [zodac] Required tests:
     //   Implement historic stats for teams first
 
-    @AfterClass
+    @AfterAll
     public static void tearDown() {
         cleanSystemForComplexTests();
     }

@@ -5,9 +5,12 @@ import me.zodac.folding.api.tc.OperatingSystem;
 import me.zodac.folding.test.utils.HardwareUtils;
 import me.zodac.folding.test.utils.StubbedFoldingEndpointUtils;
 import me.zodac.folding.test.utils.UserUtils;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import java.net.HttpURLConnection;
 import java.net.http.HttpResponse;
@@ -22,19 +25,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests for the {@link Hardware} REST endpoint at <code>/folding/hardware</code>.
  */
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class HardwareTest {
 
     public static final Hardware DUMMY_HARDWARE = Hardware.createWithoutId("Dummy_Hardware", "Dummy Hardware", OperatingSystem.WINDOWS, 1.0D);
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp() {
         cleanSystemForSimpleTests();
     }
 
     @Test
+    @Order(1)
     public void whenGettingAllHardware_givenNoHardwareHasBeenCreated_thenAnEmptyJsonResponseIsReturned_andHasA200Status() {
-        cleanSystemForSimpleTests();
-
         final HttpResponse<String> response = HardwareUtils.RequestSender.getAll();
         assertThat(response.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + response.body())
@@ -320,7 +323,7 @@ public class HardwareTest {
                 .isEqualTo(HttpURLConnection.HTTP_CONFLICT);
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDown() {
         cleanSystemForSimpleTests();
     }

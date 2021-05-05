@@ -3,14 +3,16 @@ package me.zodac.folding.test;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.test.utils.DatabaseCleaner;
 import me.zodac.folding.test.utils.HardwareUtils;
 import me.zodac.folding.test.utils.StubbedFoldingEndpointUtils;
 import me.zodac.folding.test.utils.TeamUtils;
 import me.zodac.folding.test.utils.UserUtils;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import java.net.HttpURLConnection;
 import java.net.http.HttpResponse;
@@ -27,19 +29,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests for the {@link User} REST endpoint at <code>/folding/users</code>.
  */
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UserTest {
 
     public static final User DUMMY_USER = User.createWithoutId("Dummy_User", "Dummy User", "DummyPasskey", Category.NVIDIA_GPU, 1, "", false);
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp() {
         cleanSystemForSimpleTests();
         HardwareUtils.RequestSender.create(HardwareTest.DUMMY_HARDWARE);
     }
 
     @Test
+    @Order(1)
     public void whenGettingAllUsers_givenNoUserHasBeenCreated_thenAnEmptyJsonResponseIsReturned_andHasA200Status() {
-        cleanSystemOfUsers(); // No guarantee that this test runs first, so we need to clean the system of users again, but not hardware/teams
         final HttpResponse<String> response = UserUtils.RequestSender.getAll();
         assertThat(response.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + response.body())
@@ -133,7 +136,8 @@ public class UserTest {
         }
 
         final User updatedUser = User.updateWithId(userId, DUMMY_USER);
-        updatedUser.setCategory(Category.AMD_GPU.displayName());
+        updatedUser.setPasskey("updatedPasskey");
+        StubbedFoldingEndpointUtils.enableUser(updatedUser);
 
         final HttpResponse<String> response = UserUtils.RequestSender.update(updatedUser);
         assertThat(response.statusCode())
@@ -378,22 +382,8 @@ public class UserTest {
                 .isEqualTo(HttpURLConnection.HTTP_CONFLICT);
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDown() {
         cleanSystemForSimpleTests();
-    }
-
-    private static void cleanSystemOfUsers() {
-        final Collection<Team> allTeams = TeamUtils.ResponseParser.getAll(TeamUtils.RequestSender.getAll());
-        for (final Team team : allTeams) {
-            TeamUtils.RequestSender.delete(team.getId());
-        }
-
-        final Collection<User> allUsers = UserUtils.ResponseParser.getAll(UserUtils.RequestSender.getAll());
-        for (final User user : allUsers) {
-            UserUtils.RequestSender.delete(user.getId());
-        }
-
-        DatabaseCleaner.truncateTableAndResetId("users", "teams");
     }
 }
