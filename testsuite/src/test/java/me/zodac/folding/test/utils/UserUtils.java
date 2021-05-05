@@ -120,8 +120,8 @@ public class UserUtils {
             }
         }
 
-        public static HttpResponse<Void> offset(final int userId, final long pointsOffset, final int unitsOffset) {
-            final UserStatsOffset userStatsOffset = UserStatsOffset.create(pointsOffset, unitsOffset);
+        public static HttpResponse<Void> offset(final int userId, final long pointsOffset, final long multipliedPointsOffset, final int unitsOffset) {
+            final UserStatsOffset userStatsOffset = UserStatsOffset.create(pointsOffset, multipliedPointsOffset, unitsOffset);
 
             final HttpRequest request = HttpRequest.newBuilder()
                     .method("PATCH", HttpRequest.BodyPublishers.ofString(GSON.toJson(userStatsOffset)))

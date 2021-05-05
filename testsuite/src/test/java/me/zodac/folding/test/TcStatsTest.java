@@ -15,7 +15,6 @@ import me.zodac.folding.test.utils.TeamUtils;
 import me.zodac.folding.test.utils.UserUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -354,7 +353,7 @@ public class TcStatsTest {
 
 
         assertThat(userResult.getMultipliedPoints())
-                .as("Expected user multiplier points to be new points * hardware multiplier: " + userResult)
+                .as("Expected user multiplied points to be new points * hardware multiplier: " + userResult)
                 .isEqualTo(Math.round(newPoints * hardware.getMultiplier()));
 
         assertThat(userResult.getPoints())
@@ -367,7 +366,6 @@ public class TcStatsTest {
     }
 
     @Test
-    @Disabled("Error with points (since the user offset only offsets multiplied points)")
     public void whenTeamExistsWithOneUser_andUserIsUpdatedWithANewHardwareMultiplier_thenOriginalPointsAreNotChanged_andNewPointsAreMultipliedCorrectly() {
         final Hardware hardware = HardwareUtils.ResponseParser.create(HardwareUtils.RequestSender.create(Hardware.createWithoutId("HardwareWithNoMultiplier", "Hardware With No Multiplier", OperatingSystem.WINDOWS, 1.0D)));
         final User user = User.createWithoutId("User7", "User7", "Passkey7", Category.NVIDIA_GPU, hardware.getId(), "", false);
@@ -377,9 +375,7 @@ public class TcStatsTest {
         TeamUtils.ResponseParser.create(TeamUtils.RequestSender.create(team));
 
         final long firstPoints = 10_000L;
-        final int firstUnits = 10;
         StubbedFoldingEndpointUtils.setPoints(user, firstPoints);
-        StubbedFoldingEndpointUtils.setUnits(user, firstUnits);
         TcStatsUtils.RequestSender.manualUpdate();
 
         final CompetitionResult result = TcStatsUtils.get();
@@ -387,25 +383,19 @@ public class TcStatsTest {
         final UserResult userResult = getActiveUserFromTeam(teamResult, user.getDisplayName());
 
         assertThat(userResult.getMultipliedPoints())
-                .as("Expected user multiplier points to not be multiplied: " + userResult)
+                .as("Expected user multiplied points to not be multiplied: " + userResult)
                 .isEqualTo(firstPoints);
 
         assertThat(userResult.getPoints())
                 .as("Expected user points to not be multiplied: " + userResult)
                 .isEqualTo(firstPoints);
 
-        assertThat(userResult.getUnits())
-                .as("Expected user units to not be multiplied: " + userResult)
-                .isEqualTo(firstUnits);
-
         // Change the multiplier on the hardware, no need to update the user
         hardware.setMultiplier(2.0D);
         HardwareUtils.RequestSender.update(hardware);
 
-        final long secondPoints = 10_000L;
-        final int secondUnits = 10;
+        final long secondPoints = 5_000L;
         StubbedFoldingEndpointUtils.setPoints(user, secondPoints);
-        StubbedFoldingEndpointUtils.setUnits(user, secondUnits);
         TcStatsUtils.RequestSender.manualUpdate();
 
         final CompetitionResult resultAfterUpdate = TcStatsUtils.get();
@@ -413,16 +403,12 @@ public class TcStatsTest {
         final UserResult userResultAfterUpdate = getActiveUserFromTeam(teamResultAfterUpdate, user.getDisplayName());
 
         assertThat(userResultAfterUpdate.getMultipliedPoints())
-                .as("Expected user multiplier points to be multiplied only after the second update: " + userResultAfterUpdate)
+                .as("Expected user multiplied points to be multiplied only after the second update: " + userResultAfterUpdate)
                 .isEqualTo(firstPoints + (Math.round(secondPoints * hardware.getMultiplier())));
 
         assertThat(userResultAfterUpdate.getPoints())
                 .as("Expected user points to not be multiplied: " + userResultAfterUpdate)
                 .isEqualTo(firstPoints + secondPoints);
-
-        assertThat(userResultAfterUpdate.getUnits())
-                .as("Expected user units to not be multiplied: " + userResultAfterUpdate)
-                .isEqualTo(firstUnits + secondUnits);
     }
 
     @Test
@@ -542,7 +528,6 @@ public class TcStatsTest {
         StubbedFoldingEndpointUtils.setPoints(userToRetire, firstPoints);
         TcStatsUtils.RequestSender.manualUpdate();
 
-
         final CompetitionResult result = TcStatsUtils.get();
         final TeamResult originalTeamResult = getTeamFromCompetition(result, originalTeam.getTeamName());
         final TeamResult newTeamResult = getTeamFromCompetition(result, newTeam.getTeamName());
@@ -613,7 +598,38 @@ public class TcStatsTest {
         assertThat(activeUserResultAfterUnretirement.getMultipliedPoints())
                 .as("Expected unretired user to have points from after unretirement only: " + activeUserResultAfterUnretirement)
                 .isEqualTo(thirdPoints);
+    }
 
+    @Test
+    public void whenOneTeamHasOneUser_andUserHasOffsetApplied_thenUserOffsetIsAppendedToStats() {
+        HardwareUtils.RequestSender.create(HardwareTest.DUMMY_HARDWARE);
+
+        final User user = User.createWithoutId("User13", "User13", "Passkey13", Category.NVIDIA_GPU, 1, "", false);
+        StubbedFoldingEndpointUtils.enableUser(user);
+        final int userId = UserUtils.ResponseParser.create(UserUtils.RequestSender.create(user)).getId();
+        final Team team = Team.createWithoutId("Team10", "", userId, Set.of(userId), Collections.emptySet());
+        TeamUtils.ResponseParser.create(TeamUtils.RequestSender.create(team));
+
+        final long firstPoints = 2_500L;
+        StubbedFoldingEndpointUtils.setPoints(user, firstPoints);
+        TcStatsUtils.RequestSender.manualUpdate();
+
+        final long pointsOffset = 1_000L;
+        final long multipliedPointsOffset = Math.round(pointsOffset * HardwareTest.DUMMY_HARDWARE.getMultiplier());
+        UserUtils.RequestSender.offset(userId, pointsOffset, multipliedPointsOffset, 0);
+        TcStatsUtils.RequestSender.manualUpdate();
+
+        final CompetitionResult result = TcStatsUtils.get();
+        final TeamResult teamResult = getTeamFromCompetition(result, team.getTeamName());
+        final UserResult userResult = getActiveUserFromTeam(teamResult, user.getDisplayName());
+
+        assertThat(userResult.getPoints())
+                .as("Expected user points to be stats + offset: " + userResult)
+                .isEqualTo(firstPoints + pointsOffset);
+
+        assertThat(userResult.getMultipliedPoints())
+                .as("Expected user multiplied points to be stats + offset: " + userResult)
+                .isEqualTo(multipliedPointsOffset + Math.round(firstPoints * HardwareTest.DUMMY_HARDWARE.getMultiplier()));
     }
 
     @AfterAll

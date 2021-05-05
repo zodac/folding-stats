@@ -61,7 +61,7 @@ public class TeamCompetitionStatsParser {
             LOGGER.warn("Scheduled TC stats parsing not enabled");
             return;
         }
-        
+
         final ScheduleExpression schedule = new ScheduleExpression();
         schedule.hour(STATS_PARSING_SCHEDULE_HOUR);
         schedule.minute(STATS_PARSING_SCHEDULE_MINUTE);
@@ -171,7 +171,7 @@ public class TeamCompetitionStatsParser {
             final UserTcStats tcStatsForUser = UserTcStats.createWithMultiplier(userId, timestamp, statsForUser, hardwareMultiplier);
             LOGGER.debug("{}: {} TC points (pre-offset) | {} TC units (pre-offset)", user.getFoldingUserName(), formatWithCommas(tcStatsForUser.getMultipliedPoints()), formatWithCommas(tcStatsForUser.getUnits()));
 
-            final UserTcStats tcStatsForUserWithOffset = UserTcStats.updateWithOffsets(tcStatsForUser, statsOffsetsByUserId.get(userId), hardwareMultiplier);
+            final UserTcStats tcStatsForUserWithOffset = UserTcStats.updateWithOffsets(tcStatsForUser, statsOffsetsByUserId.get(userId));
             LOGGER.info("{}: {} TC points | {} TC units", user.getFoldingUserName(), formatWithCommas(tcStatsForUserWithOffset.getMultipliedPoints()), formatWithCommas(tcStatsForUserWithOffset.getUnits()));
             hourlyTcStatsForUsers.add(tcStatsForUserWithOffset);
         }

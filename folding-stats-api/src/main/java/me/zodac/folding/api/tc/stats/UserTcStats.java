@@ -38,9 +38,9 @@ public class UserTcStats {
         return new UserTcStats(userId, TimeUtils.getCurrentUtcTimestamp(), DEFAULT_POINTS, DEFAULT_MULTIPLIED_POINTS, DEFAULT_UNITS);
     }
 
-    public static UserTcStats updateWithOffsets(final UserTcStats tcStatsForUser, final UserStatsOffset userStatsOffset, final double multiplier) {
-        final long offsetPoints = Math.max(Math.round(tcStatsForUser.getMultipliedPoints() / multiplier), 0);
-        final long offsetMultipliedPoints = Math.max(tcStatsForUser.getMultipliedPoints() + userStatsOffset.getPointsOffset(), 0);
+    public static UserTcStats updateWithOffsets(final UserTcStats tcStatsForUser, final UserStatsOffset userStatsOffset) {
+        final long offsetPoints = Math.max(tcStatsForUser.getPoints() + userStatsOffset.getPointsOffset(), 0);
+        final long offsetMultipliedPoints = Math.max(tcStatsForUser.getMultipliedPoints() + userStatsOffset.getMultipliedPointsOffset(), 0);
         final int offsetUnits = Math.max(tcStatsForUser.getUnits() + userStatsOffset.getUnitsOffset(), 0);
 
         return new UserTcStats(tcStatsForUser.getUserId(), tcStatsForUser.getTimestamp(), offsetPoints, offsetMultipliedPoints, offsetUnits);

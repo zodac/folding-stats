@@ -193,13 +193,11 @@ public class UserTest {
                 .isEqualTo(HttpURLConnection.HTTP_CREATED);
 
         final int userId = UserUtils.ResponseParser.create(createUserResponse).getId();
-        final HttpResponse<Void> patchResponse = UserUtils.RequestSender.offset(userId, 100L, 10);
+        final HttpResponse<Void> patchResponse = UserUtils.RequestSender.offset(userId, 100L, Math.round(100L * HardwareTest.DUMMY_HARDWARE.getMultiplier()), 10);
         assertThat(patchResponse.statusCode())
                 .as("Was not able to patch user: " + patchResponse.body())
                 .isEqualTo(HttpURLConnection.HTTP_OK);
     }
-
-    // TODO: [zodac] Add tests for PATCH endpoint (where we verify stats) in stats tests
 
     // Negative/alternative test cases
 

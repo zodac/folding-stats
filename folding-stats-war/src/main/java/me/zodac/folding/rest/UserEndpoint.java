@@ -6,8 +6,10 @@ import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.FoldingExternalServiceException;
 import me.zodac.folding.api.exception.FoldingIdInvalidException;
 import me.zodac.folding.api.exception.FoldingIdOutOfRangeException;
+import me.zodac.folding.api.exception.HardwareNotFoundException;
 import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.api.exception.UserNotFoundException;
+import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.UserStatsOffset;
 import me.zodac.folding.bean.TeamCompetitionStatsParser;
@@ -104,7 +106,8 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
 
         try {
             final int parsedId = super.parseId(userId);
-            storageFacade.addOrUpdateOffsetStats(parsedId, userStatsOffset);
+            final UserStatsOffset statsOffsetToUse = getValidUserStatsOffset(userStatsOffset, parsedId);
+            storageFacade.addOrUpdateOffsetStats(parsedId, statsOffsetToUse);
             teamCompetitionStatsParser.updateTcStatsForUser(parsedId);
             return ok();
         } catch (final FoldingIdInvalidException e) {
@@ -127,6 +130,16 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
             getLogger().error("Unexpected error updating user with ID: {}", userId, e);
             return serverError();
         }
+    }
+
+    private UserStatsOffset getValidUserStatsOffset(final UserStatsOffset userStatsOffset, final int parsedId) throws FoldingException, UserNotFoundException, HardwareNotFoundException {
+        if (!userStatsOffset.isMissingPointsOrMultipliedPoints()) {
+            return userStatsOffset;
+        }
+
+        final User user = storageFacade.getUser(parsedId);
+        final Hardware hardware = storageFacade.getHardware(user.getHardwareId());
+        return UserStatsOffset.updateWithHardwareMultiplier(userStatsOffset, hardware.getMultiplier());
     }
 
     @Override

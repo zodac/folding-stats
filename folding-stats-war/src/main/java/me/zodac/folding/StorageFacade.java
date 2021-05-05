@@ -232,7 +232,7 @@ public class StorageFacade {
         dbManager.persistInitialUserStats(userTotalStats);
         initialStatsCache.add(updatedUser.getId(), userTotalStats.getStats());
 
-        final UserStatsOffset userStatsOffset = UserStatsOffset.create(currentUserTcStats.getMultipliedPoints(), currentUserTcStats.getUnits());
+        final UserStatsOffset userStatsOffset = UserStatsOffset.create(currentUserTcStats.getPoints(), currentUserTcStats.getMultipliedPoints(), currentUserTcStats.getUnits());
         LOGGER.debug("Adding offset stats of: {}", userStatsOffset);
         addOffsetStats(updatedUser.getId(), userStatsOffset);
     }
@@ -349,7 +349,7 @@ public class StorageFacade {
         // We add an offset for the user based on their retired stats
         if (teamId == retiredUserStats.getTeamId() && team.getRetiredUserIds().contains(retiredUserId)) {
             LOGGER.debug("Un-retiring user for original team, adding offset: {}", retiredUserStats);
-            addOffsetStats(unretiredUser.getId(), UserStatsOffset.create(retiredUserStats.getMultipliedPoints(), retiredUserStats.getUnits()));
+            addOffsetStats(unretiredUser.getId(), UserStatsOffset.create(retiredUserStats.getPoints(), retiredUserStats.getMultipliedPoints(), retiredUserStats.getUnits()));
         } else {
             LOGGER.debug("User {} was not previously a member {} of this team {}, resetting offset", retiredUserStats, team.getRetiredUserIds(), teamId);
             addOffsetStats(unretiredUser.getId(), UserStatsOffset.empty());

@@ -68,6 +68,7 @@ CREATE INDEX index_user_initial_stats
 CREATE TABLE user_offset_tc_stats (
     user_id INT UNIQUE NOT NULL,
     utc_timestamp TIMESTAMP NOT NULL,
+    offset_points BIGINT NOT NULL,
     offset_multiplied_points BIGINT NOT NULL,
     offset_units INT NOT NULL,
     PRIMARY KEY(user_id, utc_timestamp),
