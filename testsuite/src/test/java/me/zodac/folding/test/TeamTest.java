@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForTests;
+import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForSimpleTests;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -33,7 +33,7 @@ public class TeamTest {
 
     @BeforeClass
     public static void setUp() {
-        cleanSystemForTests();
+        cleanSystemForSimpleTests();
         HardwareUtils.RequestSender.create(HardwareTest.DUMMY_HARDWARE);
         StubbedFoldingEndpointUtils.enableUser(UserTest.DUMMY_USER);
         UserUtils.RequestSender.create(UserTest.DUMMY_USER);
@@ -601,7 +601,7 @@ public class TeamTest {
 
     @AfterClass
     public static void tearDown() {
-        cleanSystemForTests();
+        cleanSystemForSimpleTests();
     }
 
     private static void cleanSystemOfTeams() {

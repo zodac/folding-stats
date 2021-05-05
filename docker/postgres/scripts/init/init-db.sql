@@ -112,7 +112,10 @@ CREATE TABLE retired_user_stats (
     PRIMARY KEY(user_id, team_id, utc_timestamp),
     CONSTRAINT fk_user_id
         FOREIGN KEY(user_id)
-        REFERENCES users(user_id)
+        REFERENCES users(user_id),
+    CONSTRAINT fk_team_id
+            FOREIGN KEY(team_id)
+            REFERENCES teams(team_id)
 );
 
 CREATE INDEX index_retired_user_stats

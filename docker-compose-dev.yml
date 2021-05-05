@@ -13,7 +13,7 @@ services:
     links:
       - wildfly_dev
     networks:
-      - dev
+      - development
     ports:
       - 86:80
 
@@ -24,9 +24,10 @@ services:
     container_name: builder_java_dev
     hostname: builder_java_dev
     networks:
-      - dev
+      - development
     volumes:
       - /opt/jboss/wildfly/standalone/deployments/
+      - m2:/root/.m2
 
   wildfly_dev:
     build:
@@ -58,7 +59,7 @@ services:
       - builder_java_dev
       - postgres_dev
     networks:
-      - dev
+      - development
     ports:
       - 8081:8080
       - 9991:9990
@@ -88,10 +89,14 @@ services:
       timeout: 10s
       retries: 30
     networks:
-      - dev
+      - development
     ports:
       - 5433:5432
     restart: always
 
 networks:
-  dev:
+  development:
+
+volumes:
+  # Volume to save maven .m2 for subsequent builds
+  m2:

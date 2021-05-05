@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForTests;
+import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForSimpleTests;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -28,12 +28,12 @@ public class HardwareTest {
 
     @BeforeClass
     public static void setUp() {
-        cleanSystemForTests();
+        cleanSystemForSimpleTests();
     }
 
     @Test
     public void whenGettingAllHardware_givenNoHardwareHasBeenCreated_thenAnEmptyJsonResponseIsReturned_andHasA200Status() {
-        cleanSystemForTests();
+        cleanSystemForSimpleTests();
 
         final HttpResponse<String> response = HardwareUtils.RequestSender.getAll();
         assertThat(response.statusCode())
@@ -322,6 +322,6 @@ public class HardwareTest {
 
     @AfterClass
     public static void tearDown() {
-        cleanSystemForTests();
+        cleanSystemForSimpleTests();
     }
 }

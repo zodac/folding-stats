@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForTests;
+import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForSimpleTests;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -33,7 +33,7 @@ public class UserTest {
 
     @BeforeClass
     public static void setUp() {
-        cleanSystemForTests();
+        cleanSystemForSimpleTests();
         HardwareUtils.RequestSender.create(HardwareTest.DUMMY_HARDWARE);
     }
 
@@ -380,7 +380,7 @@ public class UserTest {
 
     @AfterClass
     public static void tearDown() {
-        cleanSystemForTests();
+        cleanSystemForSimpleTests();
     }
 
     private static void cleanSystemOfUsers() {

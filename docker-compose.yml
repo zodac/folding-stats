@@ -14,7 +14,7 @@ services:
     links:
       - wildfly
     networks:
-      - prod
+      - production
     ports:
       - 85:80
 
@@ -25,9 +25,10 @@ services:
     container_name: builder_java
     hostname: builder_java
     networks:
-      - prod
+      - production
     volumes:
       - /opt/jboss/wildfly/standalone/deployments/
+      - m2:/root/.m2
 
   wildfly:
     build:
@@ -59,7 +60,7 @@ services:
       - builder_java
       - postgres
     networks:
-      - prod
+      - production
     ports:
       - 8080:8080
       - 9990:9990
@@ -91,19 +92,21 @@ services:
       timeout: 10s
       retries: 30
     networks:
-      - prod
+      - production
     ports:
       - 5432:5432
     restart: always
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+networks:
+  production:
+
 volumes:
+  # Volume to save maven .m2 for subsequent builds
+  m2:
   # Volume to save the PostgreSQL contents
   # TODO: [zodac] Should we also set up a cron job on server to dump the DB every month? Talk to Axi
   postgres_data:
   # Volume to save the Wildfly logs in case of a crash
   wildfly_logs:
-
-networks:
-  prod:
