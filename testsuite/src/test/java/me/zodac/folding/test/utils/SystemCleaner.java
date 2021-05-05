@@ -57,7 +57,7 @@ public final class SystemCleaner {
     /**
      * Utility function that cleans the system for complex <code>Team Competition</code> stats-based tests to be executed.
      * <p>
-     * Cleans the stats DB tables, then executes the {@link #cleanSystemForSimpleTests()}. The order of the DB cleanup is:
+     * Cleans the stats DB tables, resets the stubbed Folding endpoints for units and points, then executes the {@link #cleanSystemForSimpleTests()}. The order of the DB cleanup is:
      * <ol>
      *     <li>user_initial_stats</li>
      *     <li>user_offset_tc_stats</li>
@@ -68,6 +68,8 @@ public final class SystemCleaner {
      * @see #cleanSystemForSimpleTests()
      */
     public static void cleanSystemForComplexTests() {
+        StubbedFoldingEndpointUtils.deletePoints();
+        StubbedFoldingEndpointUtils.deleteUnits();
         DatabaseCleaner.truncateTableAndResetId("user_initial_stats", "user_offset_tc_stats", "user_tc_stats_hourly", "user_total_stats");
         cleanSystemForSimpleTests();
     }

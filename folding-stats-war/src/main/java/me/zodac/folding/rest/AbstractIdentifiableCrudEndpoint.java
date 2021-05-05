@@ -48,7 +48,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
     protected abstract void deleteElementById(final int elementId) throws FoldingConflictException, FoldingException;
 
     protected Response create(final V element) {
-        getLogger().info("POST request received to create {} at '{}' with request: {}", elementType(), uriContext.getAbsolutePath(), element);
+        getLogger().debug("POST request received to create {} at '{}' with request: {}", elementType(), uriContext.getAbsolutePath(), element);
 
         final ValidationResponse validationResponse = validate(element);
         if (validationResponse.isInvalid()) {
@@ -86,7 +86,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
     }
 
     protected Response createBatchOf(final List<V> batchOfElements) {
-        getLogger().info("POST request received to create {} {}s at '{}' with request: {}", batchOfElements.size(), elementType(), uriContext.getAbsolutePath(), batchOfElements);
+        getLogger().debug("POST request received to create {} {}s at '{}' with request: {}", batchOfElements.size(), elementType(), uriContext.getAbsolutePath(), batchOfElements);
 
         final List<V> validElements = new ArrayList<>(batchOfElements.size() / 2);
         final List<ValidationResponse> failedValidationResponses = new ArrayList<>(batchOfElements.size() / 2);
@@ -139,11 +139,11 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
     }
 
     protected Response getAll() {
-        getLogger().info("GET request received for all {}s at '{}'", elementType(), uriContext.getAbsolutePath());
+        getLogger().debug("GET request received for all {}s at '{}'", elementType(), uriContext.getAbsolutePath());
 
         try {
             final List<V> elements = getAllElements();
-            getLogger().info("Found {} {}s", elements.size(), elementType());
+            getLogger().debug("Found {} {}s", elements.size(), elementType());
             return ok(elements);
         } catch (final FoldingException e) {
             getLogger().error("Error getting all {}s", elementType(), e.getCause());
@@ -155,7 +155,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
     }
 
     protected Response getById(final String elementId) {
-        getLogger().info("GET request for {} received at '{}'", elementType(), uriContext.getAbsolutePath());
+        getLogger().debug("GET request for {} received at '{}'", elementType(), uriContext.getAbsolutePath());
 
         try {
             final V element = getElementById(parseId(elementId));
@@ -184,7 +184,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
     }
 
     protected Response updateById(final String elementId, final V element) {
-        getLogger().info("PUT request for {} received at '{}'", elementType(), uriContext.getAbsolutePath());
+        getLogger().debug("PUT request for {} received at '{}'", elementType(), uriContext.getAbsolutePath());
 
         final ValidationResponse validationResponse = validate(element);
         if (validationResponse.isInvalid()) {
@@ -248,7 +248,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
     }
 
     protected Response deleteById(final String elementId) {
-        getLogger().info("DELETE request for {} received at '{}'", elementType(), uriContext.getAbsolutePath());
+        getLogger().debug("DELETE request for {} received at '{}'", elementType(), uriContext.getAbsolutePath());
 
         try {
             final int parsedId = parseId(elementId);

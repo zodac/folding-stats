@@ -58,7 +58,7 @@ public class TeamCompetitionStatsEndpoint {
     @GET
     @Path("/manual/")
     public Response manualStats() {
-        LOGGER.info("GET request received to manually parse TC stats at '{}'", uriContext.getAbsolutePath());
+        LOGGER.info("GET request received to manually parse TC stats");
         teamCompetitionStatsParser.manualTcStatsParsing();
         return ok();
     }
@@ -66,7 +66,7 @@ public class TeamCompetitionStatsEndpoint {
     @GET
     @Path("/reset/")
     public Response resetStats() {
-        LOGGER.info("GET request received to manually reset TC stats at '{}'", uriContext.getAbsolutePath());
+        LOGGER.info("GET request received to manually reset TC stats");
         teamCompetitionResetScheduler.manualTeamCompetitionStatsReset();
         return ok();
     }
@@ -74,14 +74,14 @@ public class TeamCompetitionStatsEndpoint {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTeamCompetitionStats() {
-        LOGGER.info("GET request received to show TC stats at '{}'", uriContext.getAbsolutePath());
+        LOGGER.debug("GET request received to show TC stats");
 
         try {
             final List<TeamResult> teamResults = getTeams();
-            LOGGER.info("Found {} TC teams", teamResults.size());
+            LOGGER.debug("Found {} TC teams", teamResults.size());
 
             if (teamResults.isEmpty()) {
-                LOGGER.debug("No teams to show!");
+                LOGGER.warn("No TC teams to show");
             }
 
             // TODO: [zodac] Cache this CompetitionResult, and invalidate cache on scheduled/manual update, scheduled/manual reset, user create/update, team create/update
@@ -110,7 +110,7 @@ public class TeamCompetitionStatsEndpoint {
     }
 
     private TeamResult getTcTeamResult(final Team team) throws FoldingException {
-        LOGGER.info("Converting team '{}' for TC stats", team.getTeamName());
+        LOGGER.debug("Converting team '{}' for TC stats", team.getTeamName());
 
         final List<UserResult> userResults = team.getUserIds()
                 .stream()

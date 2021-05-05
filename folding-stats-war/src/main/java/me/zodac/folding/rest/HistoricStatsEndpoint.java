@@ -57,7 +57,7 @@ public class HistoricStatsEndpoint {
     @Path("/users/{userId}/{year}/{month}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getDailyUserStats(@PathParam("userId") final String userId, @PathParam("year") final String year, @PathParam("month") final String month) {
-        LOGGER.info("GET request received to show daily TC user stats at '{}'", uriContext.getAbsolutePath());
+        LOGGER.debug("GET request received to show daily TC user stats at '{}'", uriContext.getAbsolutePath());
 
         try {
             final Map<LocalDate, UserTcStats> dailyUserTcStats = storageFacade.getDailyUserTcStats(Integer.parseInt(userId), Month.of(Integer.parseInt(month)), Year.parse(year));

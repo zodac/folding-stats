@@ -111,9 +111,24 @@ public class StorageFacade {
         return allHardwareFromDb;
     }
 
-    public void updateHardware(final Hardware hardware) throws FoldingException, HardwareNotFoundException, FoldingConflictException {
-        dbManager.updateHardware(hardware);
-        hardwareCache.add(hardware);
+    public void updateHardware(final Hardware updatedHardware) throws FoldingException, HardwareNotFoundException, FoldingConflictException, FoldingExternalServiceException {
+        final Hardware existingHardware = getHardware(updatedHardware.getId());
+        dbManager.updateHardware(updatedHardware);
+        hardwareCache.add(updatedHardware);
+
+        // If the multiplier is changed then any users that use this hardware must have their initial stats updated
+        if (existingHardware.getMultiplier() != updatedHardware.getMultiplier()) {
+            final List<User> usersWithUpdatedHardware = getAllUsers()
+                    .stream()
+                    .filter(user -> user.getHardwareId() == updatedHardware.getId())
+                    .collect(toList());
+            LOGGER.debug("Hardware had state change to multiplier {} -> {}, recalculating initial stats for {} users", existingHardware.getMultiplier(), existingHardware.getMultiplier(), usersWithUpdatedHardware.size());
+
+            for (final User user : usersWithUpdatedHardware) {
+                LOGGER.debug("User {} had state change to hardware multiplier", user.getFoldingUserName());
+                handleStateChangeForUser(user);
+            }
+        }
     }
 
     public void deleteHardware(final int hardwareId) throws FoldingException, FoldingConflictException {
@@ -194,31 +209,32 @@ public class StorageFacade {
         dbManager.updateUser(updatedUser);
         userCache.add(updatedUser);
 
-
         if (!existingUser.getFoldingUserName().equalsIgnoreCase(updatedUser.getFoldingUserName())) {
             LOGGER.debug("User had state change to Folding username {} -> {}, recalculating initial stats", existingUser.getFoldingUserName(), updatedUser.getFoldingUserName());
-            handleStateChangeForUserUpdate(updatedUser);
+            handleStateChangeForUser(updatedUser);
         } else if (!existingUser.getPasskey().equalsIgnoreCase(updatedUser.getPasskey())) {
             LOGGER.debug("User had state change to passkey {} -> {}, recalculating initial stats", existingUser.getPasskey(), updatedUser.getPasskey());
-            handleStateChangeForUserUpdate(updatedUser);
+            handleStateChangeForUser(updatedUser);
         } else if (existingUser.getHardwareId() != updatedUser.getHardwareId()) {
             LOGGER.debug("User had state change to hardware ID {} -> {}, recalculating initial stats", existingUser.getHardwareId(), updatedUser.getHardwareId());
-            handleStateChangeForUserUpdate(updatedUser);
+            handleStateChangeForUser(updatedUser);
         }
     }
 
     // If a user is updated and their Folding username, hardware ID or passkey is changed, we need to update their initial offset again
-    // The value should be: (new user info points - current TC points)
-    private void handleStateChangeForUserUpdate(final User updatedUser) throws FoldingException, FoldingExternalServiceException {
-        final UserStats updatedUserStats = FoldingStatsParser.getStatsForUser(updatedUser);
+    // Also occurs if the hardware multiplier for a hardware used by a user is changed
+    // We set the new initial stats to the user's current total stats, then give an offset of their current TC stats (multiplied)
+    private void handleStateChangeForUser(final User updatedUser) throws FoldingException, FoldingExternalServiceException {
+        final UserStats userTotalStats = FoldingStatsParser.getStatsForUser(updatedUser);
         final UserTcStats currentUserTcStats = getCurrentTcStatsForUserOrDefault(updatedUser);
 
-        final UserStats newUserInitialStats = UserStats.create(updatedUser.getId(), updatedUserStats.getTimestamp(),
-                Stats.create(updatedUserStats.getPoints() - currentUserTcStats.getMultipliedPoints(), updatedUserStats.getUnits() - currentUserTcStats.getUnits())
-        );
+        LOGGER.debug("Setting initial stats to: {}", userTotalStats);
+        dbManager.persistInitialUserStats(userTotalStats);
+        initialStatsCache.add(updatedUser.getId(), userTotalStats.getStats());
 
-        dbManager.persistInitialUserStats(newUserInitialStats);
-        initialStatsCache.add(updatedUser.getId(), newUserInitialStats.getStats());
+        final UserStatsOffset userStatsOffset = UserStatsOffset.create(currentUserTcStats.getMultipliedPoints(), currentUserTcStats.getUnits());
+        LOGGER.debug("Adding offset stats of: {}", userStatsOffset);
+        addOffsetStats(updatedUser.getId(), userStatsOffset);
     }
 
     private UserTcStats getCurrentTcStatsForUserOrDefault(final User updatedUser) throws FoldingException {

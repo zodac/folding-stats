@@ -32,7 +32,9 @@ public class TeamCompetitionResetScheduler {
 
     @PostConstruct
     public void init() {
-        LOGGER.info("Is monthly reset is enabled: {}", IS_MONTHLY_RESET_ENABLED);
+        if (!IS_MONTHLY_RESET_ENABLED) {
+            LOGGER.warn("Monthly TC stats reset not enabled");
+        }
     }
 
     @Schedule(dayOfMonth = "1", minute = "55", info = "Monthly cache reset for TC teams")

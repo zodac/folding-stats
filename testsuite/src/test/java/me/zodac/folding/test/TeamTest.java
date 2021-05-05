@@ -294,9 +294,7 @@ public class TeamTest {
                 .as("Original team should still have retried user ID")
                 .isNotEmpty();
     }
-
-    // TODO: [zodac] More complex retire/unretire with stats for teams
-
+    
     // Negative/alternative test cases
 
     @Test

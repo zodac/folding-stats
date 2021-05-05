@@ -48,6 +48,34 @@ public class TcStatsUtils {
                 throw new AssertionError("Error sending HTTP request to get TC stats", e);
             }
         }
+
+        public static HttpResponse<Void> manualUpdate() {
+            final HttpRequest request = HttpRequest.newBuilder()
+                    .GET()
+                    .uri(URI.create(BASE_STATS_URL + "/manual"))
+                    .header("Content-Type", "application/json")
+                    .build();
+
+            try {
+                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
+            } catch (final IOException | InterruptedException e) {
+                throw new AssertionError("Error sending HTTP request to manually trigger update of TC stats", e);
+            }
+        }
+
+        public static HttpResponse<Void> manualReset() {
+            final HttpRequest request = HttpRequest.newBuilder()
+                    .GET()
+                    .uri(URI.create(BASE_STATS_URL + "/reset"))
+                    .header("Content-Type", "application/json")
+                    .build();
+
+            try {
+                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
+            } catch (final IOException | InterruptedException e) {
+                throw new AssertionError("Error sending HTTP request to manually trigger monthly reset of TC stats", e);
+            }
+        }
     }
 
     public static class ResponseParser {

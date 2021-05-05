@@ -11,6 +11,7 @@ import lombok.ToString;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -30,7 +31,7 @@ import java.util.Map;
  * We expose additional endpoints to allow the tests to set the WUs for a given user. The endpoint is {@link ApplicationScoped} so we can store updates across multiple
  * HTTP requests and tests.
  *
- * @see <a href="https://api2.foldingathome.org/#GET-/bonus">Real API</a>
+ * @see <a href="https://api2.foldingathome.org/#GET-/bonus">Real bonus API</a>
  */
 @Path("/bonus/")
 @ApplicationScoped
@@ -43,7 +44,6 @@ public class StubbedUnitsEndpoint {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUserUnits(@QueryParam("user") final String foldingUserName, @QueryParam("passkey") final String passkey) {
-
         return Response
                 .ok()
                 .entity(GSON.toJson(createResponse(foldingUserName, passkey)))
@@ -55,7 +55,18 @@ public class StubbedUnitsEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response setUserUnits(@QueryParam("user") final String foldingUserName, @QueryParam("passkey") final String passkey, @QueryParam("units") final int units) {
         final String key = foldingUserName + passkey;
-        unitsByUserAndPasskey.put(key, units);
+        unitsByUserAndPasskey.put(key, unitsByUserAndPasskey.getOrDefault(key, 0) + units);
+
+        return Response
+                .ok()
+                .build();
+    }
+
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response deleteUserUnits() {
+        unitsByUserAndPasskey.clear();
 
         return Response
                 .ok()

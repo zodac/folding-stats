@@ -101,7 +101,7 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response retireUserFromTeam(@PathParam("teamId") final String teamId, @PathParam("userId") final String userId) {
-        getLogger().info("PATCH request to retire user from team received at '{}'", uriContext.getAbsolutePath());
+        getLogger().debug("PATCH request to retire user from team received at '{}'", uriContext.getAbsolutePath());
 
         try {
             final int parsedTeamId = super.parseId(teamId);
@@ -149,7 +149,7 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response unretireUserFromTeam(@PathParam("teamId") final String teamId, @PathParam("retiredUserId") final String retiredUserId) {
-        getLogger().info("PATCH request to un-retire user from team received at '{}'", uriContext.getAbsolutePath());
+        getLogger().debug("PATCH request to un-retire user from team received at '{}'", uriContext.getAbsolutePath());
 
         try {
             final int parsedTeamId = super.parseId(teamId);

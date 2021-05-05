@@ -100,7 +100,7 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateUserWithOffset(@PathParam("userId") final String userId, final UserStatsOffset userStatsOffset) {
-        getLogger().info("PATCH request to update offset for user received at '{}': {}", uriContext.getAbsolutePath(), userStatsOffset);
+        getLogger().debug("PATCH request to update offset for user received at '{}': {}", uriContext.getAbsolutePath(), userStatsOffset);
 
         try {
             final int parsedId = super.parseId(userId);

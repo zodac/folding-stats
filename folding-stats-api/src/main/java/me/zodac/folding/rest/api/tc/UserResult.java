@@ -31,13 +31,13 @@ public class UserResult {
 
     private long points;
     private long multipliedPoints;
-    private long units;
+    private int units;
     private int rankInTeam;
     private String liveStatsLink;
     private boolean isRetired;
 
     // Not ranked to begin with, will be updated by the calling class
-    public static UserResult createWithNoRank(final String userName, final String hardware, final String category, final long points, final long pointsWithoutMultiplier, final long units, final String liveStatsLink, final boolean isRetired) {
+    public static UserResult createWithNoRank(final String userName, final String hardware, final String category, final long points, final long pointsWithoutMultiplier, final int units, final String liveStatsLink, final boolean isRetired) {
         return new UserResult(userName, hardware, category, points, pointsWithoutMultiplier, units, DEFAULT_USER_RANK, liveStatsLink, isRetired);
     }
 

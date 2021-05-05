@@ -3,6 +3,7 @@ package me.zodac.folding.rest;
 import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
+import me.zodac.folding.api.exception.FoldingExternalServiceException;
 import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.validator.HardwareValidator;
@@ -111,7 +112,7 @@ public class HardwareEndpoint extends AbstractIdentifiableCrudEndpoint<Hardware>
     }
 
     @Override
-    protected Hardware updateElementById(final int hardwareId, final Hardware hardware) throws FoldingException, NotFoundException, FoldingConflictException {
+    protected Hardware updateElementById(final int hardwareId, final Hardware hardware) throws FoldingException, NotFoundException, FoldingConflictException, FoldingExternalServiceException {
         if (hardware.getId() == 0) {
             // The payload 'should' have the ID, but it's not necessary if the correct URL is used
             final Hardware hardwareWithId = Hardware.updateWithId(hardwareId, hardware);
