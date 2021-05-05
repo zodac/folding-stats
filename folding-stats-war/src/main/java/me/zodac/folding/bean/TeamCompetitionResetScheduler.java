@@ -7,9 +7,11 @@ import me.zodac.folding.api.exception.TeamNotFoundException;
 import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.utils.EnvironmentVariables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Schedule;
 import javax.ejb.Singleton;
@@ -23,13 +25,24 @@ import java.util.Map;
 public class TeamCompetitionResetScheduler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TeamCompetitionResetScheduler.class);
+    private static final boolean IS_MONTHLY_RESET_ENABLED = Boolean.parseBoolean(EnvironmentVariables.get("ENABLE_STATS_MONTHLY_RESET", "false"));
 
     @EJB
     private StorageFacade storageFacade;
 
+    @PostConstruct
+    public void init() {
+        LOGGER.info("Is monthly reset is enabled: {}", IS_MONTHLY_RESET_ENABLED);
+    }
+
     @Schedule(dayOfMonth = "1", minute = "55", info = "Monthly cache reset for TC teams")
     public void monthlyTcStatsReset() {
-        LOGGER.info("Resetting TC caches for new month");
+        if (!IS_MONTHLY_RESET_ENABLED) {
+            LOGGER.warn("Monthly TC stats reset not enabled");
+            return;
+        }
+
+        LOGGER.info("Resetting TC stats for new month");
         manualTeamCompetitionStatsReset();
     }
 

@@ -42,6 +42,7 @@ import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
 public class TeamCompetitionStatsParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TeamCompetitionStatsParser.class);
+    private static final boolean IS_STATS_SCHEDULED_PARSING_ENABLED = Boolean.parseBoolean(EnvironmentVariables.get("ENABLE_STATS_SCHEDULED_PARSING", "false"));
 
     // Default is to run every hour at 15 minutes past the hour
     private static final String STATS_PARSING_SCHEDULE_HOUR = EnvironmentVariables.get("STATS_PARSING_SCHEDULE_HOUR", "*");
@@ -56,6 +57,11 @@ public class TeamCompetitionStatsParser {
 
     @PostConstruct
     public void init() {
+        if (!IS_STATS_SCHEDULED_PARSING_ENABLED) {
+            LOGGER.warn("Scheduled TC stats parsing not enabled");
+            return;
+        }
+        
         final ScheduleExpression schedule = new ScheduleExpression();
         schedule.hour(STATS_PARSING_SCHEDULE_HOUR);
         schedule.minute(STATS_PARSING_SCHEDULE_MINUTE);
