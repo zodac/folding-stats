@@ -56,7 +56,13 @@ public class StubbedPointsEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response setUserPoints(@PathParam("foldingUserName") final String foldingUserName, @QueryParam("passkey") final String passkey, @QueryParam("points") final long points) {
         final String key = foldingUserName + passkey;
-        pointsByUserAndPasskey.put(key, pointsByUserAndPasskey.getOrDefault(key, 0L) + points);
+
+        if (points == 0) {
+            // Remove all points from the user
+            pointsByUserAndPasskey.put(key, points);
+        } else {
+            pointsByUserAndPasskey.put(key, pointsByUserAndPasskey.getOrDefault(key, 0L) + points);
+        }
 
         return Response
                 .ok()

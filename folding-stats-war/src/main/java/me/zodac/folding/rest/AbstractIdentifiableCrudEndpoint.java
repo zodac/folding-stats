@@ -47,6 +47,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
 
     protected abstract void deleteElementById(final int elementId) throws FoldingConflictException, FoldingException;
 
+
     protected Response create(final V element) {
         getLogger().debug("POST request received to create {} at '{}' with request: {}", elementType(), uriContext.getAbsolutePath(), element);
 
@@ -63,6 +64,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
                     .path(String.valueOf(elementWithId.getId()));
             return created(elementWithId, elementLocationBuilder);
         } catch (final FoldingConflictException e) {
+            // TODO: [zodac] For conflict exceptions, return the ID conflicted against
             final String errorMessage = String.format("The %1$s conflicts with an existing %1$s", elementType());
             getLogger().debug(errorMessage, e);
             getLogger().error(errorMessage);

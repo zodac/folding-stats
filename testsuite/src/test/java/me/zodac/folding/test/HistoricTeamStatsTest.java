@@ -1,6 +1,7 @@
 package me.zodac.folding.test;
 
 import me.zodac.folding.api.tc.Team;
+import me.zodac.folding.rest.api.exception.FoldingRestException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -14,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class HistoricTeamStatsTest {
 
     @BeforeAll
-    public static void setUp() {
+    public static void setUp() throws FoldingRestException {
         cleanSystemForComplexTests();
     }
 
@@ -28,7 +29,7 @@ public class HistoricTeamStatsTest {
     //   Implement historic stats for teams first
 
     @AfterAll
-    public static void tearDown() {
+    public static void tearDown() throws FoldingRestException {
         cleanSystemForComplexTests();
     }
 }

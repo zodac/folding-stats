@@ -1,147 +1,97 @@
 package me.zodac.folding.test.utils;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import me.zodac.folding.api.tc.Hardware;
+import me.zodac.folding.client.java.request.HardwareRequestSender;
+import me.zodac.folding.client.java.response.HardwareResponseParser;
+import me.zodac.folding.rest.api.exception.FoldingRestException;
 
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
+import java.net.HttpURLConnection;
 import java.net.http.HttpResponse;
-import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
-// TODO: [zodac] Should move these to a client-library module later?
+/**
+ * Utility class for {@link Hardware}-based tests.
+ */
 public class HardwareUtils {
 
-    private static final String BASE_FOLDING_URL = "http://192.168.99.100:8081/folding"; // TODO: [zodac] Use a hostname instead?
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-    private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
-            .version(HttpClient.Version.HTTP_1_1)
-            .connectTimeout(Duration.ofSeconds(10))
-            .build();
+    public static final HardwareRequestSender HARDWARE_REQUEST_SENDER = HardwareRequestSender.create("http://192.168.99.100:8081/folding");
 
     private HardwareUtils() {
 
     }
 
-    public static class RequestSender {
-
-        private RequestSender() {
-
+    /**
+     * Creates the given {@link Hardware}, or if it already exists, returns the existing one.
+     *
+     * @param hardware the {@link Hardware} to create/retrieve
+     * @return the created {@link Hardware} or existing {@link Hardware}
+     * @throws FoldingRestException thrown if an error occurs creating/retrieving the {@link Hardware}
+     */
+    public static Hardware createOrConflict(final Hardware hardware) throws FoldingRestException {
+        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.create(hardware);
+        if (response.statusCode() == HttpURLConnection.HTTP_CREATED) {
+            return HardwareResponseParser.create(response);
         }
 
-        public static HttpResponse<String> getAll() {
-            final HttpRequest request = HttpRequest.newBuilder()
-                    .GET()
-                    .uri(URI.create(BASE_FOLDING_URL + "/hardware"))
-                    .header("Content-Type", "application/json")
-                    .build();
-
-            try {
-                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-            } catch (final IOException | InterruptedException e) {
-                throw new AssertionError("Error sending HTTP request to get all hardware", e);
-            }
+        if (response.statusCode() == HttpURLConnection.HTTP_CONFLICT) {
+            return get(hardware.getId());
         }
 
-        public static HttpResponse<String> get(final int hardwareId) {
-            final HttpRequest request = HttpRequest.newBuilder()
-                    .GET()
-                    .uri(URI.create(BASE_FOLDING_URL + "/hardware/" + hardwareId))
-                    .header("Content-Type", "application/json")
-                    .build();
-
-            try {
-                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-            } catch (final IOException | InterruptedException e) {
-                throw new AssertionError("Error sending HTTP request to get hardware", e);
-            }
-        }
-
-        public static HttpResponse<String> create(final Hardware hardware) {
-            final HttpRequest request = HttpRequest.newBuilder()
-                    .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(hardware)))
-                    .uri(URI.create(BASE_FOLDING_URL + "/hardware"))
-                    .header("Content-Type", "application/json")
-                    .build();
-
-            try {
-                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-            } catch (final IOException | InterruptedException e) {
-                throw new AssertionError("Error sending HTTP request to create hardware", e);
-            }
-        }
-
-        public static HttpResponse<String> createBatchOf(final List<Hardware> batchOfHardware) {
-            final HttpRequest request = HttpRequest.newBuilder()
-                    .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(batchOfHardware)))
-                    .uri(URI.create(BASE_FOLDING_URL + "/hardware/batch"))
-                    .header("Content-Type", "application/json")
-                    .build();
-
-            try {
-                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-            } catch (final IOException | InterruptedException e) {
-                throw new AssertionError("Error sending HTTP request to create batch of hardware", e);
-            }
-        }
-
-        public static HttpResponse<String> update(final Hardware hardware) {
-            final HttpRequest request = HttpRequest.newBuilder()
-                    .PUT(HttpRequest.BodyPublishers.ofString(GSON.toJson(hardware)))
-                    .uri(URI.create(BASE_FOLDING_URL + "/hardware/" + hardware.getId()))
-                    .header("Content-Type", "application/json")
-                    .build();
-
-            try {
-                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-            } catch (final IOException | InterruptedException e) {
-                throw new AssertionError("Error sending HTTP request to update hardware", e);
-            }
-        }
-
-        public static HttpResponse<Void> delete(final int hardwareId) {
-            final HttpRequest request = HttpRequest.newBuilder()
-                    .DELETE()
-                    .uri(URI.create(BASE_FOLDING_URL + "/hardware/" + hardwareId))
-                    .header("Content-Type", "application/json")
-                    .build();
-
-            try {
-                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
-            } catch (final IOException | InterruptedException e) {
-                throw new AssertionError("Error sending HTTP request to delete hardware", e);
-            }
-        }
+        throw new FoldingRestException(String.format("Invalid response (%s) when creating hardware: %s", response.statusCode(), response.body()));
     }
 
-    public static class ResponseParser {
 
-        private ResponseParser() {
-
+    /**
+     * Retrieves all {@link Hardware}s.
+     *
+     * @return the {@link Hardware}s
+     * @throws FoldingRestException thrown if an error occurs retrieving the {@link Hardware}s
+     */
+    public static Collection<Hardware> getAll() throws FoldingRestException {
+        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.getAll();
+        if (response.statusCode() == HttpURLConnection.HTTP_OK) {
+            return HardwareResponseParser.getAll(response);
         }
 
-        public static Collection<Hardware> getAll(final HttpResponse<String> response) {
-            final Type collectionType = new TypeToken<Collection<Hardware>>() {
-            }.getType();
-            return GSON.fromJson(response.body(), collectionType);
+        throw new FoldingRestException(String.format("Invalid response (%s) when getting all hardware with: %s", response.statusCode(), response.body()));
+    }
+
+    /**
+     * Retrieves the number of {@link Hardware}s.
+     *
+     * @return the number of {@link Hardware}s
+     * @throws FoldingRestException thrown if an error occurs retrieving the {@link Hardware} count
+     */
+    public static int getNumberOfHardware() throws FoldingRestException {
+        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.getAll();
+        final Map<String, List<String>> headers = response.headers().map();
+        if (headers.containsKey("X-Total-Count")) {
+            final String firstHeaderValue = headers.get("X-Total-Count").get(0);
+
+            try {
+                return Integer.parseInt(firstHeaderValue);
+            } catch (final NumberFormatException e) {
+                throw new FoldingRestException(String.format("Error parsing 'X-Total-Count' header %s", firstHeaderValue), e);
+            }
+        }
+        throw new FoldingRestException(String.format("Unable to find 'X-Total-Count' header: %s", headers));
+    }
+
+    /**
+     * Retrieves a {@link Hardware} with the given ID.
+     *
+     * @param hardwareId the ID of the {@link Hardware} to retrieve
+     * @return the {@link Hardware}
+     * @throws FoldingRestException thrown if an error occurs retrieving the {@link Hardware}
+     */
+    public static Hardware get(final int hardwareId) throws FoldingRestException {
+        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get(hardwareId);
+        if (response.statusCode() == HttpURLConnection.HTTP_OK) {
+            return HardwareResponseParser.get(response);
         }
 
-        public static Hardware get(final HttpResponse<String> response) {
-            return GSON.fromJson(response.body(), Hardware.class);
-        }
-
-        public static Hardware create(final HttpResponse<String> response) {
-            return GSON.fromJson(response.body(), Hardware.class);
-        }
-
-        public static Hardware update(final HttpResponse<String> response) {
-            return GSON.fromJson(response.body(), Hardware.class);
-        }
+        throw new FoldingRestException(String.format("Invalid response (%s) when getting hardware with ID %s: %s", response.statusCode(), hardwareId, response.body()));
     }
 }

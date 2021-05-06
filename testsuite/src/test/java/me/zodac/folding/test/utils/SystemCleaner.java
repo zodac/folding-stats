@@ -3,8 +3,11 @@ package me.zodac.folding.test.utils;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.rest.api.exception.FoldingRestException;
 
-import java.util.Collection;
+import static me.zodac.folding.test.utils.HardwareUtils.HARDWARE_REQUEST_SENDER;
+import static me.zodac.folding.test.utils.TeamUtils.TEAM_REQUEST_SENDER;
+import static me.zodac.folding.test.utils.UserUtils.USER_REQUEST_SENDER;
 
 /**
  * Utility class to clean the system for tests.
@@ -31,24 +34,22 @@ public final class SystemCleaner {
      *     <li>Clean the <b>teams</b>, <b>users</b> and <b>hardware</b> DB tables to reset the IDs</li>
      * </ol>
      *
+     * @throws FoldingRestException thrown if an error occurs during cleanup
      * @see DatabaseCleaner#truncateTableAndResetId(String...)
      */
-    public static void cleanSystemForSimpleTests() {
+    public static void cleanSystemForSimpleTests() throws FoldingRestException {
         DatabaseCleaner.truncateTableAndResetId("retired_user_stats");
 
-        final Collection<Team> allTeams = TeamUtils.ResponseParser.getAll(TeamUtils.RequestSender.getAll());
-        for (final Team team : allTeams) {
-            TeamUtils.RequestSender.delete(team.getId());
+        for (final Team team : TeamUtils.getAll()) {
+            TEAM_REQUEST_SENDER.delete(team.getId());
         }
 
-        final Collection<User> allUsers = UserUtils.ResponseParser.getAll(UserUtils.RequestSender.getAll());
-        for (final User user : allUsers) {
-            UserUtils.RequestSender.delete(user.getId());
+        for (final User user : UserUtils.getAll()) {
+            USER_REQUEST_SENDER.delete(user.getId());
         }
 
-        final Collection<Hardware> allHardware = HardwareUtils.ResponseParser.getAll(HardwareUtils.RequestSender.getAll());
-        for (final Hardware hardware : allHardware) {
-            HardwareUtils.RequestSender.delete(hardware.getId());
+        for (final Hardware hardware : HardwareUtils.getAll()) {
+            HARDWARE_REQUEST_SENDER.delete(hardware.getId());
         }
 
         DatabaseCleaner.truncateTableAndResetId("hardware", "users", "teams");
@@ -65,9 +66,10 @@ public final class SystemCleaner {
      *     <li>user_total_stats</li>
      * </ol>
      *
+     * @throws FoldingRestException thrown if an error occurs during cleanup
      * @see #cleanSystemForSimpleTests()
      */
-    public static void cleanSystemForComplexTests() {
+    public static void cleanSystemForComplexTests() throws FoldingRestException {
         StubbedFoldingEndpointUtils.deletePoints();
         StubbedFoldingEndpointUtils.deleteUnits();
         DatabaseCleaner.truncateTableAndResetId("user_initial_stats", "user_offset_tc_stats", "user_tc_stats_hourly", "user_total_stats");

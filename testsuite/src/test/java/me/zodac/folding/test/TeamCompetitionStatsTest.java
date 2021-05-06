@@ -5,14 +5,15 @@ import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.OperatingSystem;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.client.java.response.TeamCompetitionResponseParser;
+import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.tc.CompetitionResult;
 import me.zodac.folding.rest.api.tc.TeamResult;
 import me.zodac.folding.rest.api.tc.UserResult;
 import me.zodac.folding.test.utils.HardwareUtils;
 import me.zodac.folding.test.utils.StubbedFoldingEndpointUtils;
-import me.zodac.folding.test.utils.TcStatsUtils;
+import me.zodac.folding.test.utils.TeamCompetitionStatsUtils;
 import me.zodac.folding.test.utils.TeamUtils;
-import me.zodac.folding.test.utils.UserUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
@@ -26,10 +27,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import static me.zodac.folding.test.utils.HardwareUtils.HARDWARE_REQUEST_SENDER;
 import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForComplexTests;
-import static me.zodac.folding.test.utils.TcStatsUtils.getActiveUserFromTeam;
-import static me.zodac.folding.test.utils.TcStatsUtils.getRetiredUserFromTeam;
-import static me.zodac.folding.test.utils.TcStatsUtils.getTeamFromCompetition;
+import static me.zodac.folding.test.utils.TeamCompetitionStatsUtils.TEAM_COMPETITION_REQUEST_SENDER;
+import static me.zodac.folding.test.utils.TeamCompetitionStatsUtils.getActiveUserFromTeam;
+import static me.zodac.folding.test.utils.TeamCompetitionStatsUtils.getRetiredUserFromTeam;
+import static me.zodac.folding.test.utils.TeamCompetitionStatsUtils.getTeamFromCompetition;
+import static me.zodac.folding.test.utils.UserUtils.USER_REQUEST_SENDER;
+import static me.zodac.folding.test.utils.UserUtils.createOrConflict;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -38,23 +43,23 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Since the TC stats are done on the full system (meaning all {@link Team}s), we wipe the system before each test with a {@link BeforeEach} method.
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class TcStatsTest {
+public class TeamCompetitionStatsTest {
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws FoldingRestException {
         cleanSystemForComplexTests();
     }
 
     @Test
     @Order(1)
-    public void whenNoTeamsExistInTheSystem_thenResponseIsReturnedWithNoStats_andNoTeams() {
-        final HttpResponse<String> response = TcStatsUtils.RequestSender.get();
+    public void whenNoTeamsExistInTheSystem_thenResponseIsReturnedWithNoStats_andNoTeams() throws FoldingRestException {
+        final HttpResponse<String> response = TEAM_COMPETITION_REQUEST_SENDER.get();
 
         assertThat(response.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_OK);
 
-        final CompetitionResult result = TcStatsUtils.ResponseParser.get(response);
+        final CompetitionResult result = TeamCompetitionResponseParser.get(response);
 
         assertThat(result.getTeams())
                 .as("Expected no teams: " + result)
@@ -74,16 +79,16 @@ public class TcStatsTest {
     }
 
     @Test
-    public void whenOneTeamExistsWithOneUser_andUserEarnsStats_thenUserAndTeamAndOverallStartWithNoStats_thenAllIncrementAsUserPointsIncrease() {
-        HardwareUtils.RequestSender.create(HardwareTest.DUMMY_HARDWARE);
+    public void whenOneTeamExistsWithOneUser_andUserEarnsStats_thenUserAndTeamAndOverallStartWithNoStats_thenAllIncrementAsUserPointsIncrease() throws FoldingRestException {
+        HardwareUtils.createOrConflict(HardwareTest.DUMMY_HARDWARE);
         final User user = User.createWithoutId("User1", "User1", "Passkey1", Category.NVIDIA_GPU, 1, "", false);
         StubbedFoldingEndpointUtils.enableUser(user);
-        final int userId = UserUtils.ResponseParser.create(UserUtils.RequestSender.create(user)).getId();
+        final int userId = createOrConflict(user).getId();
 
         final Team team = Team.createWithoutId("Team1", "", userId, Set.of(userId), Collections.emptySet());
-        TeamUtils.ResponseParser.create(TeamUtils.RequestSender.create(team));
+        TeamUtils.createOrConflict(team);
 
-        final CompetitionResult resultBeforeStats = TcStatsUtils.get();
+        final CompetitionResult resultBeforeStats = TeamCompetitionStatsUtils.get();
 
         assertThat(resultBeforeStats.getTotalPoints())
                 .as("Expected no points: " + resultBeforeStats)
@@ -143,12 +148,12 @@ public class TcStatsTest {
         final int newUnits = 5;
         StubbedFoldingEndpointUtils.setUnits(user, newUnits);
 
-        final HttpResponse<Void> response = TcStatsUtils.RequestSender.manualUpdate();
+        final HttpResponse<Void> response = TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
         assertThat(response.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_OK);
 
-        final CompetitionResult resultAfterStats = TcStatsUtils.get();
+        final CompetitionResult resultAfterStats = TeamCompetitionStatsUtils.get();
 
         assertThat(resultAfterStats.getTotalPoints())
                 .as("Expected updated points: " + resultAfterStats)
@@ -204,19 +209,19 @@ public class TcStatsTest {
     }
 
     @Test
-    public void whenOneTeamExistsWithTwoUser_andUserEarnsStats_thenBothUsersStartAtRank1_thenRanksUpdateCorrectlyAsUsersEarnStats() {
-        HardwareUtils.RequestSender.create(HardwareTest.DUMMY_HARDWARE);
+    public void whenOneTeamExistsWithTwoUser_andUserEarnsStats_thenBothUsersStartAtRank1_thenRanksUpdateCorrectlyAsUsersEarnStats() throws FoldingRestException {
+        HardwareUtils.createOrConflict(HardwareTest.DUMMY_HARDWARE);
         final User firstUser = User.createWithoutId("User2", "User2", "Passkey2", Category.NVIDIA_GPU, 1, "", false);
         final User secondUser = User.createWithoutId("User3", "User3", "Passkey3", Category.AMD_GPU, 1, "", false);
         StubbedFoldingEndpointUtils.enableUser(firstUser);
         StubbedFoldingEndpointUtils.enableUser(secondUser);
-        final int firstUserId = UserUtils.ResponseParser.create(UserUtils.RequestSender.create(firstUser)).getId();
-        final int secondUserId = UserUtils.ResponseParser.create(UserUtils.RequestSender.create(secondUser)).getId();
+        final int firstUserId = createOrConflict(firstUser).getId();
+        final int secondUserId = createOrConflict(secondUser).getId();
 
         final Team team = Team.createWithoutId("Team2", "", firstUserId, Set.of(firstUserId, secondUserId), Collections.emptySet());
-        TeamUtils.ResponseParser.create(TeamUtils.RequestSender.create(team));
+        TeamUtils.createOrConflict(team);
 
-        final CompetitionResult result = TcStatsUtils.get();
+        final CompetitionResult result = TeamCompetitionStatsUtils.get();
         final TeamResult teamResult = getTeamFromCompetition(result, team.getTeamName());
         final List<UserResult> activeUserResults = teamResult.getActiveUsers();
 
@@ -237,9 +242,9 @@ public class TcStatsTest {
 
         StubbedFoldingEndpointUtils.setPoints(firstUser, 10_000L);
         StubbedFoldingEndpointUtils.setUnits(firstUser, 10);
-        TcStatsUtils.RequestSender.manualUpdate();
+        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
-        final CompetitionResult resultAfterFirstUpdate = TcStatsUtils.get();
+        final CompetitionResult resultAfterFirstUpdate = TeamCompetitionStatsUtils.get();
         final TeamResult teamResultAfterFirstUpdate = getTeamFromCompetition(resultAfterFirstUpdate, team.getTeamName());
         final UserResult firstUserResultAfterFirstUpdate = getActiveUserFromTeam(teamResultAfterFirstUpdate, firstUser.getDisplayName());
         final UserResult secondUserResultAfterFirstUpdate = getActiveUserFromTeam(teamResultAfterFirstUpdate, secondUser.getDisplayName());
@@ -254,9 +259,9 @@ public class TcStatsTest {
 
         StubbedFoldingEndpointUtils.setPoints(secondUser, 20_000L);
         StubbedFoldingEndpointUtils.setUnits(secondUser, 20);
-        TcStatsUtils.RequestSender.manualUpdate();
+        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
-        final CompetitionResult resultAfterSecondUpdate = TcStatsUtils.get();
+        final CompetitionResult resultAfterSecondUpdate = TeamCompetitionStatsUtils.get();
         final TeamResult teamResultAfterSecondUpdate = getTeamFromCompetition(resultAfterSecondUpdate, team.getTeamName());
         final UserResult firstUserResultAfterSecondUpdate = getActiveUserFromTeam(teamResultAfterSecondUpdate, firstUser.getDisplayName());
         final UserResult secondUserResultAfterSecondUpdate = getActiveUserFromTeam(teamResultAfterSecondUpdate, secondUser.getDisplayName());
@@ -271,22 +276,22 @@ public class TcStatsTest {
     }
 
     @Test
-    public void whenTwoTeamsExistsWithOneUserEach_andUserEarnsStats_thenBothTeamsStartAtRank1_thenTeamRanksUpdateCorrectlyAsUsersEarnStats() {
-        HardwareUtils.RequestSender.create(HardwareTest.DUMMY_HARDWARE);
+    public void whenTwoTeamsExistsWithOneUserEach_andUserEarnsStats_thenBothTeamsStartAtRank1_thenTeamRanksUpdateCorrectlyAsUsersEarnStats() throws FoldingRestException {
+        HardwareUtils.createOrConflict(HardwareTest.DUMMY_HARDWARE);
 
         final User firstUser = User.createWithoutId("User4", "User4", "Passkey4", Category.NVIDIA_GPU, 1, "", false);
         StubbedFoldingEndpointUtils.enableUser(firstUser);
-        final int firstUserId = UserUtils.ResponseParser.create(UserUtils.RequestSender.create(firstUser)).getId();
+        final int firstUserId = createOrConflict(firstUser).getId();
         final Team firstTeam = Team.createWithoutId("Team3", "", firstUserId, Set.of(firstUserId), Collections.emptySet());
-        TeamUtils.ResponseParser.create(TeamUtils.RequestSender.create(firstTeam));
+        TeamUtils.createOrConflict(firstTeam);
 
         final User secondUser = User.createWithoutId("User5", "User5", "Passkey5", Category.NVIDIA_GPU, 1, "", false);
         StubbedFoldingEndpointUtils.enableUser(secondUser);
-        final int secondUserId = UserUtils.ResponseParser.create(UserUtils.RequestSender.create(secondUser)).getId();
+        final int secondUserId = createOrConflict(secondUser).getId();
         final Team secondTeam = Team.createWithoutId("Team4", "", secondUserId, Set.of(secondUserId), Collections.emptySet());
-        TeamUtils.ResponseParser.create(TeamUtils.RequestSender.create(secondTeam));
+        TeamUtils.createOrConflict(secondTeam);
 
-        final CompetitionResult result = TcStatsUtils.get();
+        final CompetitionResult result = TeamCompetitionStatsUtils.get();
         assertThat(result.getTeams())
                 .as("Expected exactly 2 teams: " + result)
                 .hasSize(2);
@@ -304,9 +309,9 @@ public class TcStatsTest {
 
         StubbedFoldingEndpointUtils.setPoints(firstUser, 10_000L);
         StubbedFoldingEndpointUtils.setUnits(firstUser, 10);
-        TcStatsUtils.RequestSender.manualUpdate();
+        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
-        final CompetitionResult resultAfterFirstUpdate = TcStatsUtils.get();
+        final CompetitionResult resultAfterFirstUpdate = TeamCompetitionStatsUtils.get();
         final TeamResult firstTeamResultAfterFirstUpdate = getTeamFromCompetition(resultAfterFirstUpdate, firstTeam.getTeamName());
         final TeamResult secondTeamResultAfterFirstUpdate = getTeamFromCompetition(resultAfterFirstUpdate, secondTeam.getTeamName());
 
@@ -320,9 +325,9 @@ public class TcStatsTest {
 
         StubbedFoldingEndpointUtils.setPoints(secondUser, 20_000L);
         StubbedFoldingEndpointUtils.setUnits(secondUser, 20);
-        TcStatsUtils.RequestSender.manualUpdate();
+        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
-        final CompetitionResult resultAfterSecondUpdate = TcStatsUtils.get();
+        final CompetitionResult resultAfterSecondUpdate = TeamCompetitionStatsUtils.get();
         final TeamResult firstTeamResultAfterSecondUpdate = getTeamFromCompetition(resultAfterSecondUpdate, firstTeam.getTeamName());
         final TeamResult secondTeamResultAfterSecondUpdate = getTeamFromCompetition(resultAfterSecondUpdate, secondTeam.getTeamName());
 
@@ -336,25 +341,24 @@ public class TcStatsTest {
     }
 
     @Test
-    public void whenTeamExistsWithOneUser_andUserHasAHardwareMultiplier_thenUserPointsAreMultipliedCorrectly_andUserUnitsAreNotImpacted() {
-        final Hardware hardware = HardwareUtils.ResponseParser.create(HardwareUtils.RequestSender.create(Hardware.createWithoutId("HardwareWithMultiplier", "Hardware With Multiplier", OperatingSystem.WINDOWS, 2.0D)));
+    public void whenTeamExistsWithOneUser_andUserHasAHardwareMultiplier_thenUserPointsAreMultipliedCorrectly_andUserUnitsAreNotImpacted() throws FoldingRestException {
+        final Hardware hardware = HardwareUtils.createOrConflict(HardwareTest.DUMMY_HARDWARE);
         final User user = User.createWithoutId("User6", "User6", "Passkey6", Category.NVIDIA_GPU, hardware.getId(), "", false);
         StubbedFoldingEndpointUtils.enableUser(user);
-        final int userId = UserUtils.ResponseParser.create(UserUtils.RequestSender.create(user)).getId();
+        final int userId = createOrConflict(user).getId();
 
         final Team team = Team.createWithoutId("Team5", "", userId, Set.of(userId), Collections.emptySet());
-        TeamUtils.ResponseParser.create(TeamUtils.RequestSender.create(team));
+        TeamUtils.createOrConflict(team);
 
         final long newPoints = 20_000L;
         final int newUnits = 20;
         StubbedFoldingEndpointUtils.setPoints(user, newPoints);
         StubbedFoldingEndpointUtils.setUnits(user, newUnits);
-        TcStatsUtils.RequestSender.manualUpdate();
+        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
-        final CompetitionResult result = TcStatsUtils.get();
+        final CompetitionResult result = TeamCompetitionStatsUtils.get();
         final TeamResult teamResult = getTeamFromCompetition(result, team.getTeamName());
         final UserResult userResult = getActiveUserFromTeam(teamResult, user.getDisplayName());
-
 
         assertThat(userResult.getMultipliedPoints())
                 .as("Expected user multiplied points to be new points * hardware multiplier: " + userResult)
@@ -370,19 +374,19 @@ public class TcStatsTest {
     }
 
     @Test
-    public void whenTeamExistsWithOneUser_andUserIsUpdatedWithANewHardwareMultiplier_thenOriginalPointsAreNotChanged_andNewPointsAreMultipliedCorrectly() {
-        final Hardware hardware = HardwareUtils.ResponseParser.create(HardwareUtils.RequestSender.create(Hardware.createWithoutId("HardwareWithNoMultiplier", "Hardware With No Multiplier", OperatingSystem.WINDOWS, 1.0D)));
+    public void whenTeamExistsWithOneUser_andUserIsUpdatedWithANewHardwareMultiplier_thenOriginalPointsAreNotChanged_andNewPointsAreMultipliedCorrectly() throws FoldingRestException {
+        final Hardware hardware = HardwareUtils.createOrConflict(Hardware.createWithoutId("HardwareWithNoMultiplier", "Hardware With No Multiplier", OperatingSystem.WINDOWS, 1.0D));
         final User user = User.createWithoutId("User7", "User7", "Passkey7", Category.NVIDIA_GPU, hardware.getId(), "", false);
         StubbedFoldingEndpointUtils.enableUser(user);
-        final int userId = UserUtils.ResponseParser.create(UserUtils.RequestSender.create(user)).getId();
+        final int userId = createOrConflict(user).getId();
         final Team team = Team.createWithoutId("Team6", "", userId, Set.of(userId), Collections.emptySet());
-        TeamUtils.ResponseParser.create(TeamUtils.RequestSender.create(team));
+        TeamUtils.createOrConflict(team);
 
         final long firstPoints = 10_000L;
         StubbedFoldingEndpointUtils.setPoints(user, firstPoints);
-        TcStatsUtils.RequestSender.manualUpdate();
+        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
-        final CompetitionResult result = TcStatsUtils.get();
+        final CompetitionResult result = TeamCompetitionStatsUtils.get();
         final TeamResult teamResult = getTeamFromCompetition(result, team.getTeamName());
         final UserResult userResult = getActiveUserFromTeam(teamResult, user.getDisplayName());
 
@@ -396,13 +400,13 @@ public class TcStatsTest {
 
         // Change the multiplier on the hardware, no need to update the user
         hardware.setMultiplier(2.0D);
-        HardwareUtils.RequestSender.update(hardware);
+        HARDWARE_REQUEST_SENDER.update(hardware);
 
         final long secondPoints = 5_000L;
         StubbedFoldingEndpointUtils.setPoints(user, secondPoints);
-        TcStatsUtils.RequestSender.manualUpdate();
+        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
-        final CompetitionResult resultAfterUpdate = TcStatsUtils.get();
+        final CompetitionResult resultAfterUpdate = TeamCompetitionStatsUtils.get();
         final TeamResult teamResultAfterUpdate = getTeamFromCompetition(resultAfterUpdate, team.getTeamName());
         final UserResult userResultAfterUpdate = getActiveUserFromTeam(teamResultAfterUpdate, user.getDisplayName());
 
@@ -416,24 +420,24 @@ public class TcStatsTest {
     }
 
     @Test
-    public void whenTeamExistsWithTwoUsers_andOneUserRetires_andUserUnretired_thenOriginalStatsAreNotLostFromTeam_andNewStatsWhileRetiredAreNotAddedToTeam_andStatsAfterUnretirementAreCounted() {
-        final Hardware hardware = HardwareUtils.ResponseParser.create(HardwareUtils.RequestSender.create(HardwareTest.DUMMY_HARDWARE));
+    public void whenTeamExistsWithTwoUsers_andOneUserRetires_andUserUnretired_thenOriginalStatsAreNotLostFromTeam_andNewStatsWhileRetiredAreNotAddedToTeam_andStatsAfterUnretirementAreCounted() throws FoldingRestException {
+        final Hardware hardware = HardwareUtils.createOrConflict(HardwareTest.DUMMY_HARDWARE);
         final User firstUser = User.createWithoutId("User8", "User8", "Passkey8", Category.NVIDIA_GPU, hardware.getId(), "", false);
         final User secondUser = User.createWithoutId("User9", "User9", "Passkey9", Category.AMD_GPU, hardware.getId(), "", false);
         StubbedFoldingEndpointUtils.enableUser(firstUser);
         StubbedFoldingEndpointUtils.enableUser(secondUser);
-        final int firstUserId = UserUtils.ResponseParser.create(UserUtils.RequestSender.create(firstUser)).getId();
-        final int secondUserId = UserUtils.ResponseParser.create(UserUtils.RequestSender.create(secondUser)).getId();
+        final int firstUserId = createOrConflict(firstUser).getId();
+        final int secondUserId = createOrConflict(secondUser).getId();
 
         final Team team = Team.createWithoutId("Team7", "", firstUserId, Set.of(firstUserId, secondUserId), Collections.emptySet());
-        final int teamId = TeamUtils.ResponseParser.create(TeamUtils.RequestSender.create(team)).getId();
+        final int teamId = TeamUtils.createOrConflict(team).getId();
 
         final long firstPoints = 10_000L;
         StubbedFoldingEndpointUtils.setPoints(firstUser, firstPoints);
         StubbedFoldingEndpointUtils.setPoints(secondUser, firstPoints);
-        TcStatsUtils.RequestSender.manualUpdate();
+        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
-        final CompetitionResult result = TcStatsUtils.get();
+        final CompetitionResult result = TeamCompetitionStatsUtils.get();
         final TeamResult teamResult = getTeamFromCompetition(result, team.getTeamName());
 
         assertThat(teamResult.getActiveUsers())
@@ -444,13 +448,13 @@ public class TcStatsTest {
                 .as("Expected team to have no retired user for first update: " + teamResult)
                 .isEmpty();
 
-        final int retiredUserId = TeamUtils.ResponseParser.retireUser(TeamUtils.RequestSender.retireUser(teamId, secondUserId)).getRetiredUserIds().iterator().next();
+        final int retiredUserId = TeamUtils.retireUser(teamId, secondUserId);
         final long secondPoints = 8_000L;
         StubbedFoldingEndpointUtils.setPoints(firstUser, secondPoints);
         StubbedFoldingEndpointUtils.setPoints(secondUser, secondPoints);
-        TcStatsUtils.RequestSender.manualUpdate();
+        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
-        final CompetitionResult resultAfterRetirement = TcStatsUtils.get();
+        final CompetitionResult resultAfterRetirement = TeamCompetitionStatsUtils.get();
         final TeamResult teamResultAfterRetirement = getTeamFromCompetition(resultAfterRetirement, team.getTeamName());
 
         assertThat(teamResultAfterRetirement.getTeamMultipliedPoints())
@@ -476,13 +480,13 @@ public class TcStatsTest {
                 .as("Expected user to have points from first update only: " + secondUserResult)
                 .isEqualTo(firstPoints);
 
-        TeamUtils.RequestSender.unretireUser(teamId, retiredUserId);
+        TeamUtils.unretireUser(teamId, retiredUserId);
         final long thirdPoints = 14_000L;
         StubbedFoldingEndpointUtils.setPoints(firstUser, thirdPoints);
         StubbedFoldingEndpointUtils.setPoints(secondUser, thirdPoints);
-        TcStatsUtils.RequestSender.manualUpdate();
+        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
-        final CompetitionResult resultAfterUnretirement = TcStatsUtils.get();
+        final CompetitionResult resultAfterUnretirement = TeamCompetitionStatsUtils.get();
         final TeamResult teamResultAfterUnretirement = getTeamFromCompetition(resultAfterUnretirement, team.getTeamName());
 
         assertThat(teamResultAfterUnretirement.getTeamMultipliedPoints())
@@ -510,29 +514,29 @@ public class TcStatsTest {
     }
 
     @Test
-    public void whenTeamExistsWithTwoUsers_andOneUserRetires_andUserUnretiredToANewTeam_thenOriginalStatsAreNotLostFromOriginalTeam_andNewTeamGetsStatsAfterUnretirement_andStatsDuringRetirementAreNotCounted() {
-        final Hardware hardware = HardwareUtils.ResponseParser.create(HardwareUtils.RequestSender.create(HardwareTest.DUMMY_HARDWARE));
+    public void whenTeamExistsWithTwoUsers_andOneUserRetires_andUserUnretiredToANewTeam_thenOriginalStatsAreNotLostFromOriginalTeam_andNewTeamGetsStatsAfterUnretirement_andStatsDuringRetirementAreNotCounted() throws FoldingRestException {
+        final Hardware hardware = HardwareUtils.createOrConflict(HardwareTest.DUMMY_HARDWARE);
         final User originalTeamCaptain = User.createWithoutId("User10", "User10", "Passkey10", Category.NVIDIA_GPU, hardware.getId(), "", false);
         final User userToRetire = User.createWithoutId("User11", "User11", "Passkey11", Category.AMD_GPU, hardware.getId(), "", false);
         StubbedFoldingEndpointUtils.enableUser(originalTeamCaptain);
         StubbedFoldingEndpointUtils.enableUser(userToRetire);
-        final int originalTeamCaptainId = UserUtils.ResponseParser.create(UserUtils.RequestSender.create(originalTeamCaptain)).getId();
-        final int userToRetireId = UserUtils.ResponseParser.create(UserUtils.RequestSender.create(userToRetire)).getId();
+        final int originalTeamCaptainId = createOrConflict(originalTeamCaptain).getId();
+        final int userToRetireId = createOrConflict(userToRetire).getId();
 
         final Team originalTeam = Team.createWithoutId("Team8", "", originalTeamCaptainId, Set.of(originalTeamCaptainId, userToRetireId), Collections.emptySet());
-        final int originalTeamId = TeamUtils.ResponseParser.create(TeamUtils.RequestSender.create(originalTeam)).getId();
+        final int originalTeamId = TeamUtils.createOrConflict(originalTeam).getId();
 
         final User newTeamCaptain = User.createWithoutId("User12", "User12", "Passkey12", Category.NVIDIA_GPU, hardware.getId(), "", false);
         StubbedFoldingEndpointUtils.enableUser(newTeamCaptain);
-        final int newTeamCaptainId = UserUtils.ResponseParser.create(UserUtils.RequestSender.create(newTeamCaptain)).getId();
+        final int newTeamCaptainId = createOrConflict(newTeamCaptain).getId();
         final Team newTeam = Team.createWithoutId("Team9", "", newTeamCaptainId, Set.of(newTeamCaptainId), Collections.emptySet());
-        final int newTeamId = TeamUtils.ResponseParser.create(TeamUtils.RequestSender.create(newTeam)).getId();
+        final int newTeamId = TeamUtils.createOrConflict(newTeam).getId();
 
         final long firstPoints = 10_000L;
         StubbedFoldingEndpointUtils.setPoints(userToRetire, firstPoints);
-        TcStatsUtils.RequestSender.manualUpdate();
+        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
-        final CompetitionResult result = TcStatsUtils.get();
+        final CompetitionResult result = TeamCompetitionStatsUtils.get();
         final TeamResult originalTeamResult = getTeamFromCompetition(result, originalTeam.getTeamName());
         final TeamResult newTeamResult = getTeamFromCompetition(result, newTeam.getTeamName());
 
@@ -553,18 +557,18 @@ public class TcStatsTest {
                 .isEmpty();
 
 
-        final int retiredUserId = TeamUtils.ResponseParser.retireUser(TeamUtils.RequestSender.retireUser(originalTeamId, userToRetireId)).getRetiredUserIds().iterator().next();
+        final int retiredUserId = TeamUtils.retireUser(originalTeamId, userToRetireId);
 
         final long secondPoints = 8_000L;
         StubbedFoldingEndpointUtils.setPoints(userToRetire, secondPoints);
-        TcStatsUtils.RequestSender.manualUpdate();
+        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
-        TeamUtils.RequestSender.unretireUser(newTeamId, retiredUserId);
+        TeamUtils.unretireUser(newTeamId, retiredUserId);
         final long thirdPoints = 14_000L;
         StubbedFoldingEndpointUtils.setPoints(userToRetire, thirdPoints);
-        TcStatsUtils.RequestSender.manualUpdate();
+        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
-        final CompetitionResult resultAfterUnretirement = TcStatsUtils.get();
+        final CompetitionResult resultAfterUnretirement = TeamCompetitionStatsUtils.get();
         final TeamResult originalTeamResultAfterUnretirement = getTeamFromCompetition(resultAfterUnretirement, originalTeam.getTeamName());
         final TeamResult newTeamResultAfterUnretirement = getTeamFromCompetition(resultAfterUnretirement, newTeam.getTeamName());
 
@@ -605,25 +609,25 @@ public class TcStatsTest {
     }
 
     @Test
-    public void whenOneTeamHasOneUser_andUserHasOffsetApplied_thenUserOffsetIsAppendedToStats() {
-        HardwareUtils.RequestSender.create(HardwareTest.DUMMY_HARDWARE);
+    public void whenOneTeamHasOneUser_andUserHasOffsetApplied_thenUserOffsetIsAppendedToStats() throws FoldingRestException {
+        HardwareUtils.createOrConflict(HardwareTest.DUMMY_HARDWARE);
 
         final User user = User.createWithoutId("User13", "User13", "Passkey13", Category.NVIDIA_GPU, 1, "", false);
         StubbedFoldingEndpointUtils.enableUser(user);
-        final int userId = UserUtils.ResponseParser.create(UserUtils.RequestSender.create(user)).getId();
+        final int userId = createOrConflict(user).getId();
         final Team team = Team.createWithoutId("Team10", "", userId, Set.of(userId), Collections.emptySet());
-        TeamUtils.ResponseParser.create(TeamUtils.RequestSender.create(team));
+        TeamUtils.createOrConflict(team);
 
         final long firstPoints = 2_500L;
         StubbedFoldingEndpointUtils.setPoints(user, firstPoints);
-        TcStatsUtils.RequestSender.manualUpdate();
+        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
         final long pointsOffset = 1_000L;
         final long multipliedPointsOffset = Math.round(pointsOffset * HardwareTest.DUMMY_HARDWARE.getMultiplier());
-        UserUtils.RequestSender.offset(userId, pointsOffset, multipliedPointsOffset, 0);
-        TcStatsUtils.RequestSender.manualUpdate();
+        USER_REQUEST_SENDER.offset(userId, pointsOffset, multipliedPointsOffset, 0);
+        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
-        final CompetitionResult result = TcStatsUtils.get();
+        final CompetitionResult result = TeamCompetitionStatsUtils.get();
         final TeamResult teamResult = getTeamFromCompetition(result, team.getTeamName());
         final UserResult userResult = getActiveUserFromTeam(teamResult, user.getDisplayName());
 
@@ -636,8 +640,47 @@ public class TcStatsTest {
                 .isEqualTo(multipliedPointsOffset + Math.round(firstPoints * HardwareTest.DUMMY_HARDWARE.getMultiplier()));
     }
 
+    @Test
+    public void whenOneTeamHasOneUser_andUserHasOffsetApplied_andOffsetIsNegative_andOffsetIsGreaterThanCurrentUserStats_thenUserHasZeroStats() throws FoldingRestException {
+        HardwareUtils.createOrConflict(HardwareTest.DUMMY_HARDWARE);
+
+        final User user = User.createWithoutId("User14", "User14", "Passkey14", Category.NVIDIA_GPU, 1, "", false);
+        StubbedFoldingEndpointUtils.enableUser(user);
+        final int userId = createOrConflict(user).getId();
+        final Team team = Team.createWithoutId("Team11", "", userId, Set.of(userId), Collections.emptySet());
+        TeamUtils.createOrConflict(team);
+
+        final long firstPoints = 2_500L;
+        final int firstUnits = 25;
+        StubbedFoldingEndpointUtils.setPoints(user, firstPoints);
+        StubbedFoldingEndpointUtils.setUnits(user, firstUnits);
+        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+
+        final long pointsOffset = -20_000L;
+        final long multipliedPointsOffset = Math.round(pointsOffset * HardwareTest.DUMMY_HARDWARE.getMultiplier());
+        final int unitsOffset = -400;
+        USER_REQUEST_SENDER.offset(userId, pointsOffset, multipliedPointsOffset, unitsOffset);
+        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+
+        final CompetitionResult result = TeamCompetitionStatsUtils.get();
+        final TeamResult teamResult = getTeamFromCompetition(result, team.getTeamName());
+        final UserResult userResult = getActiveUserFromTeam(teamResult, user.getDisplayName());
+
+        assertThat(userResult.getPoints())
+                .as("Expected user points to be 0: " + userResult)
+                .isEqualTo(0L);
+
+        assertThat(userResult.getMultipliedPoints())
+                .as("Expected user multiplied points to be 0: " + userResult)
+                .isEqualTo(0L);
+
+        assertThat(userResult.getUnits())
+                .as("Expected user units to be 0: " + userResult)
+                .isEqualTo(0);
+    }
+
     @AfterAll
-    public static void tearDown() {
+    public static void tearDown() throws FoldingRestException {
         cleanSystemForComplexTests();
     }
 }

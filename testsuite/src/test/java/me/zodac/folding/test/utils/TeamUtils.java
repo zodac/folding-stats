@@ -1,183 +1,130 @@
 package me.zodac.folding.test.utils;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import me.zodac.folding.api.tc.Team;
+import me.zodac.folding.client.java.request.TeamRequestSender;
+import me.zodac.folding.client.java.response.TeamResponseParser;
+import me.zodac.folding.rest.api.exception.FoldingRestException;
 
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
+import java.net.HttpURLConnection;
 import java.net.http.HttpResponse;
-import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
-// TODO: [zodac] Should move these to a client-library module later?
+/**
+ * Utility class for {@link Team}-based tests.
+ */
 public class TeamUtils {
 
-    private static final String BASE_FOLDING_URL = "http://192.168.99.100:8081/folding"; // TODO: [zodac] Use a hostname instead?
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-    private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
-            .version(HttpClient.Version.HTTP_1_1)
-            .connectTimeout(Duration.ofSeconds(10))
-            .build();
+    public static final TeamRequestSender TEAM_REQUEST_SENDER = TeamRequestSender.create("http://192.168.99.100:8081/folding");
 
     private TeamUtils() {
 
     }
 
-    public static class RequestSender {
-
-        private RequestSender() {
-
+    /**
+     * Creates the given {@link Team}, or if it already exists, returns the existing one.
+     *
+     * @param team the {@link Team} to create/retrieve
+     * @return the created {@link Team} or existing {@link Team}
+     * @throws FoldingRestException thrown if an error occurs creating/retrieving the {@link Team}
+     */
+    public static Team createOrConflict(final Team team) throws FoldingRestException {
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(team);
+        if (response.statusCode() == HttpURLConnection.HTTP_CREATED) {
+            return TeamResponseParser.create(response);
         }
 
-        public static HttpResponse<String> getAll() {
-            final HttpRequest request = HttpRequest.newBuilder()
-                    .GET()
-                    .uri(URI.create(BASE_FOLDING_URL + "/teams"))
-                    .header("Content-Type", "application/json")
-                    .build();
-
-            try {
-                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-            } catch (final IOException | InterruptedException e) {
-                throw new AssertionError("Error sending HTTP request to get all teams", e);
-            }
+        if (response.statusCode() == HttpURLConnection.HTTP_CONFLICT) {
+            return get(team.getId());
         }
 
-        public static HttpResponse<String> get(final int teamId) {
-            final HttpRequest request = HttpRequest.newBuilder()
-                    .GET()
-                    .uri(URI.create(BASE_FOLDING_URL + "/teams/" + teamId))
-                    .header("Content-Type", "application/json")
-                    .build();
-
-            try {
-                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-            } catch (final IOException | InterruptedException e) {
-                throw new AssertionError("Error sending HTTP request to get team", e);
-            }
-        }
-
-        public static HttpResponse<String> create(final Team team) {
-            final HttpRequest request = HttpRequest.newBuilder()
-                    .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(team)))
-                    .uri(URI.create(BASE_FOLDING_URL + "/teams"))
-                    .header("Content-Type", "application/json")
-                    .build();
-
-            try {
-                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-            } catch (final IOException | InterruptedException e) {
-                throw new AssertionError("Error sending HTTP request to create team", e);
-            }
-        }
-
-        public static HttpResponse<String> createBatchOf(final List<Team> batchOfTeams) {
-            final HttpRequest request = HttpRequest.newBuilder()
-                    .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(batchOfTeams)))
-                    .uri(URI.create(BASE_FOLDING_URL + "/teams/batch"))
-                    .header("Content-Type", "application/json")
-                    .build();
-
-            try {
-                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-            } catch (final IOException | InterruptedException e) {
-                throw new AssertionError("Error sending HTTP request to create batch of teams", e);
-            }
-        }
-
-        public static HttpResponse<String> update(final Team team) {
-            final HttpRequest request = HttpRequest.newBuilder()
-                    .PUT(HttpRequest.BodyPublishers.ofString(GSON.toJson(team)))
-                    .uri(URI.create(BASE_FOLDING_URL + "/teams/" + team.getId()))
-                    .header("Content-Type", "application/json")
-                    .build();
-
-            try {
-                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-            } catch (final IOException | InterruptedException e) {
-                throw new AssertionError("Error sending HTTP request to update team", e);
-            }
-        }
-
-        public static HttpResponse<Void> delete(final int teamId) {
-            final HttpRequest request = HttpRequest.newBuilder()
-                    .DELETE()
-                    .uri(URI.create(BASE_FOLDING_URL + "/teams/" + teamId))
-                    .header("Content-Type", "application/json")
-                    .build();
-
-            try {
-                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
-            } catch (final IOException | InterruptedException e) {
-                throw new AssertionError("Error sending HTTP request to delete team", e);
-            }
-        }
-
-        public static HttpResponse<String> retireUser(final int teamId, final int userId) {
-            final HttpRequest request = HttpRequest.newBuilder()
-                    .method("PATCH", HttpRequest.BodyPublishers.noBody())
-                    .uri(URI.create(BASE_FOLDING_URL + "/teams/" + teamId + "/retire/" + userId))
-                    .header("Content-Type", "application/json")
-                    .build();
-
-            try {
-                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-            } catch (final IOException | InterruptedException e) {
-                throw new AssertionError("Error sending HTTP request to retire user", e);
-            }
-        }
-
-        public static HttpResponse<String> unretireUser(final int teamId, final int retiredUserId) {
-            final HttpRequest request = HttpRequest.newBuilder()
-                    .method("PATCH", HttpRequest.BodyPublishers.noBody())
-                    .uri(URI.create(BASE_FOLDING_URL + "/teams/" + teamId + "/unretire/" + retiredUserId))
-                    .header("Content-Type", "application/json")
-                    .build();
-
-            try {
-                return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-            } catch (final IOException | InterruptedException e) {
-                throw new AssertionError("Error sending HTTP request to unretire user", e);
-            }
-        }
+        throw new FoldingRestException(String.format("Invalid response (%s) when creating team: %s", response.statusCode(), response.body()));
     }
 
-    public static class ResponseParser {
 
-        private ResponseParser() {
-
+    /**
+     * Retrieves all {@link Team}s.
+     *
+     * @return the {@link Team}s
+     * @throws FoldingRestException thrown if an error occurs retrieving the {@link Team}s
+     */
+    public static Collection<Team> getAll() throws FoldingRestException {
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.getAll();
+        if (response.statusCode() == HttpURLConnection.HTTP_OK) {
+            return TeamResponseParser.getAll(response);
         }
 
-        public static Collection<Team> getAll(final HttpResponse<String> response) {
-            final Type collectionType = new TypeToken<Collection<Team>>() {
-            }.getType();
-            return GSON.fromJson(response.body(), collectionType);
+        throw new FoldingRestException(String.format("Invalid response (%s) when getting all teams with: %s", response.statusCode(), response.body()));
+    }
+
+    /**
+     * Retrieves the number of {@link Team}s.
+     *
+     * @return the number of {@link Team}s
+     * @throws FoldingRestException thrown if an error occurs retrieving the {@link Team} count
+     */
+    public static int getNumberOfTeams() throws FoldingRestException {
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.getAll();
+        final Map<String, List<String>> headers = response.headers().map();
+        if (headers.containsKey("X-Total-Count")) {
+            final String firstHeaderValue = headers.get("X-Total-Count").get(0);
+
+            try {
+                return Integer.parseInt(firstHeaderValue);
+            } catch (final NumberFormatException e) {
+                throw new FoldingRestException(String.format("Error parsing 'X-Total-Count' header %s", firstHeaderValue), e);
+            }
+        }
+        throw new FoldingRestException(String.format("Unable to find 'X-Total-Count' header: %s", headers));
+    }
+
+    /**
+     * Retrieves a {@link Team} with the given ID.
+     *
+     * @param teamId the ID of the {@link Team} to retrieve
+     * @return the {@link Team}
+     * @throws FoldingRestException thrown if an error occurs retrieving the {@link Team}
+     */
+    public static Team get(final int teamId) throws FoldingRestException {
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.get(teamId);
+        if (response.statusCode() == HttpURLConnection.HTTP_OK) {
+            return TeamResponseParser.get(response);
         }
 
-        public static Team get(final HttpResponse<String> response) {
-            return GSON.fromJson(response.body(), Team.class);
+        throw new FoldingRestException(String.format("Invalid response (%s) when getting team with ID %s: %s", response.statusCode(), teamId, response.body()));
+    }
+
+    /**
+     * Retires a {@link me.zodac.folding.api.tc.User} from a {@link Team}.
+     *
+     * @param teamId the ID of the {@link Team}
+     * @param userId the ID of the {@link me.zodac.folding.api.tc.User} to retire
+     * @return the retired {@link me.zodac.folding.api.tc.User} ID
+     * @throws FoldingRestException thrown if an error occurs retiring the {@link me.zodac.folding.api.tc.User}
+     */
+    public static int retireUser(final int teamId, final int userId) throws FoldingRestException {
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.retireUser(teamId, userId);
+        if (response.statusCode() == HttpURLConnection.HTTP_OK) {
+            return TeamResponseParser.retireUser(response).getRetiredUserIds().iterator().next();
         }
 
-        public static Team create(final HttpResponse<String> response) {
-            return GSON.fromJson(response.body(), Team.class);
-        }
+        throw new FoldingRestException(String.format("Invalid response (%s) when retiring user with ID %s from team with ID %s: %s", response.statusCode(), userId, teamId, response.body()));
+    }
 
-        public static Team update(final HttpResponse<String> response) {
-            return GSON.fromJson(response.body(), Team.class);
+    /**
+     * Un-retires a {@link me.zodac.folding.api.tc.User}, and adds them to a {@link Team}.
+     *
+     * @param teamId        the ID of the {@link Team}
+     * @param retiredUserId the ID of the retired{@link me.zodac.folding.api.tc.User} to un-retire
+     * @return the updated {@link Team}
+     * @throws FoldingRestException thrown if an error occurs un-retiring the {@link me.zodac.folding.api.tc.User}
+     */
+    public static Team unretireUser(final int teamId, final int retiredUserId) throws FoldingRestException {
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.unretireUser(teamId, retiredUserId);
+        if (response.statusCode() == HttpURLConnection.HTTP_OK) {
+            return TeamResponseParser.unretireUser(response);
         }
-
-        public static Team retireUser(final HttpResponse<String> response) {
-            return GSON.fromJson(response.body(), Team.class);
-        }
-
-        public static Team unretireUser(final HttpResponse<String> response) {
-            return GSON.fromJson(response.body(), Team.class);
-        }
+        throw new FoldingRestException(String.format("Invalid response (%s) when un-retiring user with ID %s from team with ID %s: %s", response.statusCode(), retiredUserId, teamId, response.body()));
     }
 }

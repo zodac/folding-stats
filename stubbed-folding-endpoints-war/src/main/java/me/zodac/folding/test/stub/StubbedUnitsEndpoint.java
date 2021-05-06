@@ -55,7 +55,13 @@ public class StubbedUnitsEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response setUserUnits(@QueryParam("user") final String foldingUserName, @QueryParam("passkey") final String passkey, @QueryParam("units") final int units) {
         final String key = foldingUserName + passkey;
-        unitsByUserAndPasskey.put(key, unitsByUserAndPasskey.getOrDefault(key, 0) + units);
+
+        if (units == 0) {
+            // Remove all units from the user
+            unitsByUserAndPasskey.put(key, units);
+        } else {
+            unitsByUserAndPasskey.put(key, unitsByUserAndPasskey.getOrDefault(key, 0) + units);
+        }
 
         return Response
                 .ok()
