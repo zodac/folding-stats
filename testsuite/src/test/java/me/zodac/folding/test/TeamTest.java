@@ -294,7 +294,7 @@ public class TeamTest {
                 .as("Original team should still have retried user ID")
                 .isNotEmpty();
     }
-    
+
     // Negative/alternative test cases
 
     @Test
@@ -598,7 +598,6 @@ public class TeamTest {
                 .as("Did not receive a 400_BAD_REQUEST HTTP response: " + unretireResponse.body())
                 .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
-
 
     @AfterAll
     public static void tearDown() {

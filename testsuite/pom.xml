@@ -24,6 +24,11 @@
             <artifactId>folding-stats-api</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>me.zodac</groupId>
+            <artifactId>folding-stats-client-library-java</artifactId>
+            <scope>test</scope>
+        </dependency>
 
         <!-- 3PP Dependencies -->
         <dependency>

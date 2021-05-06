@@ -14,6 +14,7 @@ WORKDIR /folding-stats/
 # some test container in a CICD flow, to leverage the local .m2 on the Jenkins server.
 COPY ./pom.xml ./pom.xml
 COPY ./folding-stats-api/pom.xml ./folding-stats-api/pom.xml
+COPY ./folding-stats-client-library-java/pom.xml ./folding-stats-client-library-java/pom.xml
 COPY ./folding-stats-ear/pom.xml ./folding-stats-ear/pom.xml
 COPY ./folding-stats-jar/pom.xml ./folding-stats-jar/pom.xml
 COPY ./folding-stats-war/pom.xml ./folding-stats-war/pom.xml
@@ -26,6 +27,7 @@ RUN mvn verify clean --fail-never -DskipTests
 
 # Copy source code
 COPY ./folding-stats-api ./folding-stats-api
+COPY ./folding-stats-client-library-java ./folding-stats-client-library-java
 COPY ./folding-stats-ear ./folding-stats-ear
 COPY ./folding-stats-jar ./folding-stats-jar
 COPY ./folding-stats-war ./folding-stats-war

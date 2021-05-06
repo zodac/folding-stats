@@ -13,6 +13,7 @@
     <modules>
         <module>docker</module>
         <module>${project.artifactId}-api</module>
+        <module>${project.artifactId}-client-library-java</module>
         <module>${project.artifactId}-ear</module>
         <module>${project.artifactId}-jar</module>
         <module>${project.artifactId}-war</module>
@@ -56,6 +57,11 @@
             <dependency>
                 <groupId>me.zodac</groupId>
                 <artifactId>folding-stats-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>me.zodac</groupId>
+                <artifactId>folding-stats-client-library-java</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

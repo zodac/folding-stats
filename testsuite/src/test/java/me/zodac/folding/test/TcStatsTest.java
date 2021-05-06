@@ -27,6 +27,9 @@ import java.util.List;
 import java.util.Set;
 
 import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForComplexTests;
+import static me.zodac.folding.test.utils.TcStatsUtils.getActiveUserFromTeam;
+import static me.zodac.folding.test.utils.TcStatsUtils.getRetiredUserFromTeam;
+import static me.zodac.folding.test.utils.TcStatsUtils.getTeamFromCompetition;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -140,7 +143,10 @@ public class TcStatsTest {
         final int newUnits = 5;
         StubbedFoldingEndpointUtils.setUnits(user, newUnits);
 
-        TcStatsUtils.RequestSender.manualUpdate();
+        final HttpResponse<Void> response = TcStatsUtils.RequestSender.manualUpdate();
+        assertThat(response.statusCode())
+                .as("Did not receive a 200_OK HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final CompetitionResult resultAfterStats = TcStatsUtils.get();
 
@@ -274,13 +280,11 @@ public class TcStatsTest {
         final Team firstTeam = Team.createWithoutId("Team3", "", firstUserId, Set.of(firstUserId), Collections.emptySet());
         TeamUtils.ResponseParser.create(TeamUtils.RequestSender.create(firstTeam));
 
-
         final User secondUser = User.createWithoutId("User5", "User5", "Passkey5", Category.NVIDIA_GPU, 1, "", false);
         StubbedFoldingEndpointUtils.enableUser(secondUser);
         final int secondUserId = UserUtils.ResponseParser.create(UserUtils.RequestSender.create(secondUser)).getId();
         final Team secondTeam = Team.createWithoutId("Team4", "", secondUserId, Set.of(secondUserId), Collections.emptySet());
         TeamUtils.ResponseParser.create(TeamUtils.RequestSender.create(secondTeam));
-
 
         final CompetitionResult result = TcStatsUtils.get();
         assertThat(result.getTeams())
@@ -635,32 +639,5 @@ public class TcStatsTest {
     @AfterAll
     public static void tearDown() {
         cleanSystemForComplexTests();
-    }
-
-    private static TeamResult getTeamFromCompetition(final CompetitionResult competitionResult, final String teamName) {
-        for (final TeamResult teamResult : competitionResult.getTeams()) {
-            if (teamResult.getTeamName().equalsIgnoreCase(teamName)) {
-                return teamResult;
-            }
-        }
-        throw new AssertionError(String.format("Unable to find team '%s' in competition teams: %s", teamName, competitionResult.getTeams()));
-    }
-
-    private static UserResult getActiveUserFromTeam(final TeamResult teamResult, final String userName) {
-        for (final UserResult userResult : teamResult.getActiveUsers()) {
-            if (userResult.getUserName().equalsIgnoreCase(userName)) {
-                return userResult;
-            }
-        }
-        throw new AssertionError(String.format("Unable to find user '%s' in active users: %s", userName, teamResult.getActiveUsers()));
-    }
-
-    private static UserResult getRetiredUserFromTeam(final TeamResult teamResult, final String userName) {
-        for (final UserResult userResult : teamResult.getRetiredUsers()) {
-            if (userResult.getUserName().equalsIgnoreCase(userName)) {
-                return userResult;
-            }
-        }
-        throw new AssertionError(String.format("Unable to find user '%s' in retired users: %s", userName, teamResult.getRetiredUsers()));
     }
 }

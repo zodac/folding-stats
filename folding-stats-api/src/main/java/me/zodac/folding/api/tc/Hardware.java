@@ -14,9 +14,9 @@ import me.zodac.folding.api.Identifiable;
  * POJO defining a piece of {@link Hardware} for use in the <code>Team Competition</code>.
  * <p>
  * Each {@link Hardware} will have a multiplier which is calculated from the LARS PPD database, where the best piece of {@link Hardware} has a multiplier
- * of <b>1.0</b>, and each other piece of hardware's multiplier is:
+ * of <b>1.0</b>, and each other piece of {@link Hardware}'s multiplier is:
  * <pre>
- *     Best PPD / PPD for given {@link Hardware} on specified operating system (to 2 decimal places)
+ *     Best PPD / PPD for given {@link Hardware} on specified {@link OperatingSystem} (to 2 decimal places)
  * </pre>
  *
  * @see <a href="https://https://folding.lar.systems/">LARS PPD database</a>

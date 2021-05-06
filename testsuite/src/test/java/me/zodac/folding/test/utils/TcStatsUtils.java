@@ -3,6 +3,8 @@ package me.zodac.folding.test.utils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import me.zodac.folding.rest.api.tc.CompetitionResult;
+import me.zodac.folding.rest.api.tc.TeamResult;
+import me.zodac.folding.rest.api.tc.UserResult;
 
 import java.io.IOException;
 import java.net.URI;
@@ -27,6 +29,33 @@ public class TcStatsUtils {
 
     public static CompetitionResult get() {
         return ResponseParser.get(RequestSender.get());
+    }
+
+    public static TeamResult getTeamFromCompetition(final CompetitionResult competitionResult, final String teamName) {
+        for (final TeamResult teamResult : competitionResult.getTeams()) {
+            if (teamResult.getTeamName().equalsIgnoreCase(teamName)) {
+                return teamResult;
+            }
+        }
+        throw new AssertionError(String.format("Unable to find team '%s' in competition teams: %s", teamName, competitionResult.getTeams()));
+    }
+
+    public static UserResult getActiveUserFromTeam(final TeamResult teamResult, final String userName) {
+        for (final UserResult userResult : teamResult.getActiveUsers()) {
+            if (userResult.getUserName().equalsIgnoreCase(userName)) {
+                return userResult;
+            }
+        }
+        throw new AssertionError(String.format("Unable to find user '%s' in active users: %s", userName, teamResult.getActiveUsers()));
+    }
+
+    public static UserResult getRetiredUserFromTeam(final TeamResult teamResult, final String userName) {
+        for (final UserResult userResult : teamResult.getRetiredUsers()) {
+            if (userResult.getUserName().equalsIgnoreCase(userName)) {
+                return userResult;
+            }
+        }
+        throw new AssertionError(String.format("Unable to find user '%s' in retired users: %s", userName, teamResult.getRetiredUsers()));
     }
 
     public static class RequestSender {
