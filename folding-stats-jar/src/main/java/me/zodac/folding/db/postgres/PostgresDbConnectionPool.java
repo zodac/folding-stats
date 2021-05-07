@@ -20,6 +20,7 @@ public final class PostgresDbConnectionPool {
         DATA_SOURCE_CONFIG.setUsername(EnvironmentVariables.get("JDBC_CONNECTION_USER"));
         DATA_SOURCE_CONFIG.setPassword(EnvironmentVariables.get("JDBC_CONNECTION_PASSWORD"));
         DATA_SOURCE_CONFIG.setDriverClassName(EnvironmentVariables.get("JDBC_CONNECTION_DRIVER"));
+
         DATA_SOURCE_CONFIG.addDataSourceProperty("cachePrepStmts", "true");
         DATA_SOURCE_CONFIG.addDataSourceProperty("prepStmtCacheSize", "250");
         DATA_SOURCE_CONFIG.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");

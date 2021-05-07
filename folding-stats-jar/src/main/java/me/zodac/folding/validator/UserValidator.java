@@ -6,6 +6,7 @@ import me.zodac.folding.api.tc.User;
 import me.zodac.folding.cache.HardwareCache;
 import me.zodac.folding.parsing.FoldingStatsParser;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.validator.routines.UrlValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +18,7 @@ import static java.util.stream.Collectors.toList;
 public class UserValidator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserValidator.class);
+    private static final UrlValidator URL_VALIDATOR = new UrlValidator();
 
     private UserValidator() {
 
@@ -41,6 +43,12 @@ public class UserValidator {
             failureMessages.add("Attribute 'passkey' must not be empty");
         }
 
+        if (StringUtils.isNotEmpty(user.getLiveStatsLink())) {
+            if (!URL_VALIDATOR.isValid(user.getLiveStatsLink())) {
+                failureMessages.add(String.format("Attribute 'liveStatsLink' is not a valid link: '%s'", user.getLiveStatsLink()));
+            }
+        }
+
         if (user.getHardwareId() <= Hardware.EMPTY_HARDWARE_ID || HardwareCache.get().doesNotContain(user.getHardwareId())) {
             final List<String> availableHardware = HardwareCache.get()
                     .getAll()
@@ -50,8 +58,6 @@ public class UserValidator {
 
             failureMessages.add(String.format("Attribute 'hardwareId' must be one of: %s", availableHardware));
         }
-
-        // TODO: [zodac] If liveStatsLink != null, verify it is a valid link
 
         // Since this is a heavy validation check, only do it if the rest of the user is valid
         if (failureMessages.isEmpty()) {

@@ -5,15 +5,15 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.cache.RetiredTcStatsCache;
+import me.zodac.folding.cache.TeamCache;
 import me.zodac.folding.cache.UserCache;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -21,7 +21,6 @@ import static java.util.stream.Collectors.toList;
 
 public class TeamValidator {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TeamValidator.class);
 
     private TeamValidator() {
 
@@ -62,8 +61,6 @@ public class TeamValidator {
             failureMessages.add(String.format("Attribute 'userIds' must contain at least one of: %s", availableUsers));
         }
 
-        // TODO: [zodac] Validate that the user is not already on another team
-
         final List<Integer> invalidUserIds = new ArrayList<>(team.getUserIds().size());
         for (final int userId : team.getUserIds()) {
             if (UserCache.get().doesNotContain(userId)) {
@@ -81,6 +78,15 @@ public class TeamValidator {
             failureMessages.add(String.format("Attribute 'userIds' contains invalid IDs %s, must be: %s", invalidUserIds, availableUsers));
         }
 
+        for (final Team existingTeam : TeamCache.get().getAll()) {
+            final Set<Integer> existingTeamUserIds = existingTeam.getUserIds();
+            final Set<Integer> newTeamUserIds = team.getUserIds();
+            existingTeamUserIds.retainAll(newTeamUserIds);
+
+            if (!existingTeamUserIds.isEmpty()) {
+                failureMessages.add(String.format("User %s already exists in team %s", existingTeamUserIds, team.getTeamName()));
+            }
+        }
 
         // No point checking the category count if the team is already invalid, perhaps none of the users are correct at this point
         if (failureMessages.isEmpty()) {
@@ -149,18 +155,13 @@ public class TeamValidator {
 //            failureMessages.add(String.format("Attribute 'retiredUserId' must be a retired user", UserCache.get().getRetired().values()));
 //        }
 
-        // TODO: [zodac] If adding the user exceeds max team/category size, reject it
-
-
         // TODO: [zodac] What if I add a user that was previously retired, unretired, then retired again?
         //   With no 'still_retired' flag, it's possible to add it back to its original team by mistake
 
-
-        {
-            if (failureMessages.isEmpty()) {
-                return ValidationResponse.success();
-            }
+        if (failureMessages.isEmpty()) {
+            return ValidationResponse.success();
         }
+
 
         return ValidationResponse.failure(team, failureMessages);
     }

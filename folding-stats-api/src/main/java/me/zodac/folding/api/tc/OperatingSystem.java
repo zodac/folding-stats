@@ -7,7 +7,7 @@ import static java.util.stream.Collectors.toUnmodifiableList;
 
 
 /**
- * Lists the supported operating systems for hardware taking part in the <code>Team Competition</code>.
+ * Lists the supported operating systems for {@link Hardware} permitted in the <code>Team Competition</code>.
  */
 public enum OperatingSystem {
 
