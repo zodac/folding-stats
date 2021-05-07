@@ -40,7 +40,6 @@ import static me.zodac.folding.rest.response.Responses.serverError;
 /**
  * REST endpoints for teams for <code>folding-stats</code>.
  */
-// TODO: [zodac] Update the PUT endpoint to retire team users
 @Path("/teams/")
 @RequestScoped
 public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {

@@ -1,6 +1,6 @@
 package me.zodac.folding.test;
 
-import me.zodac.folding.api.tc.Category;
+import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.client.java.response.UserResponseParser;
@@ -26,6 +26,10 @@ import java.util.Map;
 import java.util.Set;
 
 import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForSimpleTests;
+import static me.zodac.folding.test.utils.TestGenerator.generateHardware;
+import static me.zodac.folding.test.utils.TestGenerator.generateUser;
+import static me.zodac.folding.test.utils.TestGenerator.generateUserWithHardwareId;
+import static me.zodac.folding.test.utils.TestGenerator.generateUserWithUserId;
 import static me.zodac.folding.test.utils.UserUtils.USER_REQUEST_SENDER;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -35,12 +39,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UserTest {
 
-    public static final User DUMMY_USER = User.createWithoutId("Dummy_User", "Dummy User", "DummyPasskey", Category.NVIDIA_GPU, 1, "", false);
-
     @BeforeAll
     public static void setUp() throws FoldingRestException {
         cleanSystemForSimpleTests();
-        HardwareUtils.createOrConflict(HardwareTest.DUMMY_HARDWARE);
     }
 
     @Test
@@ -65,7 +66,7 @@ public class UserTest {
 
     @Test
     public void whenCreatingUser_givenPayloadIsValid_thenTheCreatedUserIsReturnedInResponse_andHasId_andResponseHasA201StatusCode() throws FoldingRestException {
-        final User userToCreate = User.createWithoutId("Dummy_User1", "Dummy User", "DummyPasskey1", Category.NVIDIA_GPU, 1, "", false);
+        final User userToCreate = generateUser();
         StubbedFoldingEndpointUtils.enableUser(userToCreate);
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.create(userToCreate);
@@ -85,15 +86,14 @@ public class UserTest {
         final int initialSize = UserUtils.getNumberOfUsers();
 
         final List<User> batchOfUsers = List.of(
-                User.createWithoutId("Dummy_User2", "Dummy User", "DummyPasskey2", Category.NVIDIA_GPU, 1, "", false),
-                User.createWithoutId("Dummy_User3", "Dummy User", "DummyPasskey3", Category.NVIDIA_GPU, 1, "", false),
-                User.createWithoutId("Dummy_User4", "Dummy User", "DummyPasskey4", Category.NVIDIA_GPU, 1, "", false)
+                generateUser(),
+                generateUser(),
+                generateUser()
         );
 
         for (final User user : batchOfUsers) {
             StubbedFoldingEndpointUtils.enableUser(user);
         }
-
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.createBatchOf(batchOfUsers);
         assertThat(response.statusCode())
@@ -112,8 +112,8 @@ public class UserTest {
         int userId = allUsers.size();
 
         if (allUsers.isEmpty()) {
-            StubbedFoldingEndpointUtils.enableUser(UserTest.DUMMY_USER);
-            userId = UserUtils.createOrConflict(DUMMY_USER).getId();
+            final User userToCreate = generateUser();
+            userId = UserUtils.createOrConflict(userToCreate).getId();
         }
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.get(userId);
@@ -134,11 +134,11 @@ public class UserTest {
         int userId = allUsers.size();
 
         if (allUsers.isEmpty()) {
-            StubbedFoldingEndpointUtils.enableUser(UserTest.DUMMY_USER);
-            userId = UserUtils.createOrConflict(DUMMY_USER).getId();
+            final User userToCreate = generateUser();
+            userId = UserUtils.createOrConflict(userToCreate).getId();
         }
 
-        final User updatedUser = User.updateWithId(userId, DUMMY_USER);
+        final User updatedUser = User.updateWithId(userId, UserUtils.get(userId));
         updatedUser.setPasskey("updatedPasskey");
         StubbedFoldingEndpointUtils.enableUser(updatedUser);
 
@@ -165,8 +165,8 @@ public class UserTest {
         int userId = allUsers.size();
 
         if (allUsers.isEmpty()) {
-            StubbedFoldingEndpointUtils.enableUser(UserTest.DUMMY_USER);
-            userId = UserUtils.createOrConflict(DUMMY_USER).getId();
+            final User userToCreate = generateUser();
+            userId = UserUtils.createOrConflict(userToCreate).getId();
         }
 
         final HttpResponse<Void> response = USER_REQUEST_SENDER.delete(userId);
@@ -187,11 +187,11 @@ public class UserTest {
 
     @Test
     public void whenPatchingAUserWithPointsOffsets_givenThePayloadIsValid_thenResponseHasA200Status() throws FoldingRestException {
-        final User user = User.createWithoutId("Dummy_User14", "Dummy User14", "DummyPasskey14", Category.NVIDIA_GPU, 1, "", false);
-        StubbedFoldingEndpointUtils.enableUser(user);
+        final Hardware hardware = HardwareUtils.createOrConflict(generateHardware());
+        final User user = generateUserWithUserId(hardware.getId());
 
         final int userId = UserUtils.createOrConflict(user).getId();
-        final HttpResponse<Void> patchResponse = USER_REQUEST_SENDER.offset(userId, 100L, Math.round(100L * HardwareTest.DUMMY_HARDWARE.getMultiplier()), 10);
+        final HttpResponse<Void> patchResponse = USER_REQUEST_SENDER.offset(userId, 100L, Math.round(100L * hardware.getMultiplier()), 10);
         assertThat(patchResponse.statusCode())
                 .as("Was not able to patch user: " + patchResponse.body())
                 .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -201,7 +201,8 @@ public class UserTest {
 
     @Test
     public void whenCreatingUser_givenAUserWithInvalidHardwareId_thenJsonResponseWithErrorIsReturned_andHasA400Status() throws FoldingRestException {
-        final User user = User.createWithoutId("Invalid_User", "Invalid User", "InvalidPasskey", Category.NVIDIA_GPU, 0, "", false);
+        final int invalidHardwareId = 0;
+        final User user = generateUserWithHardwareId(invalidHardwareId);
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.create(user);
 
@@ -216,7 +217,7 @@ public class UserTest {
 
     @Test
     public void whenCreatingUser_givenUserHasNoUnitsCompleted_thenUserIsNotCreated_andHasA400Stats() throws FoldingRestException {
-        final User user = User.createWithoutId("Invalid_User", "Invalid User", "InvalidPasskey", Category.NVIDIA_GPU, 0, "", false);
+        final User user = generateUser();
         StubbedFoldingEndpointUtils.disableUser(user);
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.create(user);
@@ -228,8 +229,11 @@ public class UserTest {
 
     @Test
     public void whenCreatingUser_givenUserWithTheSameFoldingNameAndPasskeyAlreadyExists_thenA409ResponseIsReturned() throws FoldingRestException {
-        USER_REQUEST_SENDER.create(DUMMY_USER); // Send one request and ignore it (even if the user already exists, we can verify the conflict with the next one)
-        final HttpResponse<String> response = USER_REQUEST_SENDER.create(DUMMY_USER);
+        final User userToCreate = generateUser();
+        StubbedFoldingEndpointUtils.enableUser(userToCreate);
+
+        USER_REQUEST_SENDER.create(userToCreate); // Send one request and ignore it (even if the user already exists, we can verify the conflict with the next one)
+        final HttpResponse<String> response = USER_REQUEST_SENDER.create(userToCreate);
 
         assertThat(response.statusCode())
                 .as("Did not receive a 409_CONFLICT HTTP response: " + response.body())
@@ -253,7 +257,7 @@ public class UserTest {
     @Test
     public void whenUpdatingUser_givenANonExistingUserId_thenNoJsonResponseIsReturned_andHasA404Status() throws FoldingRestException {
         final int invalidId = 99;
-        final User updatedUser = User.create(invalidId, "Invalid_User", "Invalid User", "InvalidPasskey", Category.NVIDIA_GPU, 1, "", false);
+        final User updatedUser = generateUserWithUserId(invalidId);
         StubbedFoldingEndpointUtils.enableUser(updatedUser);
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.update(updatedUser);
@@ -278,9 +282,7 @@ public class UserTest {
 
     @Test
     public void whenUpdatingUser_givenAValidUserId_andPayloadHasNoChanges_thenOriginalUserIsReturned_andHasA200Status() throws FoldingRestException {
-        final User user = User.createWithoutId("Dummy_User6", "Dummy User6", "DummyPasskey6", Category.NVIDIA_GPU, 1, "", false);
-        StubbedFoldingEndpointUtils.enableUser(user);
-
+        final User user = generateUser();
         final int createdUserId = UserUtils.createOrConflict(user).getId();
         final User userWithId = User.updateWithId(createdUserId, user);
 
@@ -302,12 +304,12 @@ public class UserTest {
         final int initialUsersSize = UserUtils.getNumberOfUsers();
 
         final List<User> batchOfValidUsers = List.of(
-                User.createWithoutId("Dummy_User7", "Dummy User7", "DummyPasskey7", Category.NVIDIA_GPU, 1, "", false),
-                User.createWithoutId("Dummy_User8", "Dummy User8", "DummyPasskey8", Category.NVIDIA_GPU, 1, "", false)
+                generateUser(),
+                generateUser()
         );
         final List<User> batchOfInvalidUsers = List.of(
-                User.createWithoutId("Dummy_User9", "Dummy User9", "DummyPasskey9", Category.NVIDIA_GPU, 0, "", false),
-                User.createWithoutId("Dummy_User10", "Dummy User10", "DummyPasskey10", Category.NVIDIA_GPU, 0, "", false)
+                generateUserWithHardwareId(0),
+                generateUserWithHardwareId(0)
         );
         final List<User> batchOfUsers = new ArrayList<>(batchOfValidUsers.size() + batchOfInvalidUsers.size());
         batchOfUsers.addAll(batchOfValidUsers);
@@ -332,8 +334,8 @@ public class UserTest {
     public void whenCreatingBatchOfUsers_givenPayloadIsInvalid_thenResponseHasA400Status() throws FoldingRestException {
         final int initialUsersSize = UserUtils.getNumberOfUsers();
         final List<User> batchOfInvalidUsers = List.of(
-                User.createWithoutId("Dummy_User11", "Dummy User11", "DummyPasskey11", Category.NVIDIA_GPU, 0, "", false),
-                User.createWithoutId("Dummy_User12", "Dummy User12", "DummyPasskey12", Category.NVIDIA_GPU, 0, "", false)
+                generateUserWithHardwareId(0),
+                generateUserWithHardwareId(0)
         );
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.createBatchOf(batchOfInvalidUsers);
@@ -349,8 +351,7 @@ public class UserTest {
 
     @Test
     public void whenDeletingUser_givenTheUserIsLinkedToTeam_thenResponseHasA409Status() throws FoldingRestException {
-        final User user = User.createWithoutId("Dummy_User13", "Dummy User13", "DummyPasskey13", Category.NVIDIA_GPU, 1, "", false);
-        StubbedFoldingEndpointUtils.enableUser(user);
+        final User user = generateUser();
         final int userId = UserUtils.createOrConflict(user).getId();
 
         final Team team = Team.createWithoutId("DummyTeam", "Dummy team", userId, Set.of(userId), Collections.emptySet());

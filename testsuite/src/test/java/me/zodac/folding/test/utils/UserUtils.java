@@ -25,12 +25,16 @@ public final class UserUtils {
 
     /**
      * Creates the given {@link User}, or if it already exists, returns the existing one.
+     * <p>
+     * Will also call {@link StubbedFoldingEndpointUtils#enableUser(User)}, so if you wish to test an invalid number of
+     * units, you must set that explicitly.
      *
      * @param user the {@link User} to create/retrieve
      * @return the created {@link User} or existing {@link User}
      * @throws FoldingRestException thrown if an error occurs creating/retrieving the {@link User}
      */
     public static User createOrConflict(final User user) throws FoldingRestException {
+        StubbedFoldingEndpointUtils.enableUser(user);
         final HttpResponse<String> response = USER_REQUEST_SENDER.create(user);
         if (response.statusCode() == HttpURLConnection.HTTP_CREATED) {
             return UserResponseParser.create(response);

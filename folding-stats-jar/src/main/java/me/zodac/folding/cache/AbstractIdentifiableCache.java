@@ -28,7 +28,6 @@ abstract class AbstractIdentifiableCache<V extends Identifiable> {
         if (elementId == 0) {
             throw new IllegalArgumentException(String.format("ID cannot be 0: %s", element));
         }
-
         elementsById.put(elementId, element);
     }
 

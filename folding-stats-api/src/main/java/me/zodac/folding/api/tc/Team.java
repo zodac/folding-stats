@@ -105,10 +105,10 @@ public class Team implements Identifiable {
         final Set<Integer> updateUserIds = new HashSet<>(team.getUserIds());
         updateUserIds.remove(userId);
 
-        final Set<Integer> retiredUserStats = new HashSet<>(team.getRetiredUserIds());
-        retiredUserStats.add(retiredUserId);
+        final Set<Integer> retiredUserIds = new HashSet<>(team.getRetiredUserIds());
+        retiredUserIds.add(retiredUserId);
 
-        return new Team(team.id, team.teamName, team.teamDescription, team.captainUserId, updateUserIds, retiredUserStats);
+        return new Team(team.id, team.teamName, team.teamDescription, team.captainUserId, updateUserIds, retiredUserIds);
     }
 
     /**

@@ -7,7 +7,6 @@ import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.tc.CompetitionResult;
 import me.zodac.folding.rest.api.tc.TeamResult;
 import me.zodac.folding.rest.api.tc.UserResult;
-import me.zodac.folding.test.utils.HardwareUtils;
 import me.zodac.folding.test.utils.StubbedFoldingEndpointUtils;
 import me.zodac.folding.test.utils.TeamCompetitionStatsUtils;
 import me.zodac.folding.test.utils.TeamUtils;
@@ -28,6 +27,8 @@ import static me.zodac.folding.test.utils.TeamCompetitionStatsUtils.TEAM_COMPETI
 import static me.zodac.folding.test.utils.TeamCompetitionStatsUtils.getActiveUserFromTeam;
 import static me.zodac.folding.test.utils.TeamCompetitionStatsUtils.getTeamFromCompetition;
 import static me.zodac.folding.test.utils.TeamUtils.TEAM_REQUEST_SENDER;
+import static me.zodac.folding.test.utils.TestGenerator.generateTeamWithUserIds;
+import static me.zodac.folding.test.utils.TestGenerator.generateUserWithCategory;
 import static me.zodac.folding.test.utils.UserUtils.createOrConflict;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,7 +41,6 @@ public class ResetTest {
     @BeforeAll
     public static void setUp() throws FoldingRestException {
         cleanSystemForComplexTests();
-        HardwareUtils.createOrConflict(HardwareTest.DUMMY_HARDWARE);
     }
 
     @Test
@@ -54,14 +54,12 @@ public class ResetTest {
 
     @Test
     public void whenResetOccurs_andTeamHasRetiredUsers_thenRetiredUsersAreRemovedOnReset() throws FoldingRestException {
-        final User captainUser = User.createWithoutId("User1", "User1", "Passkey1", Category.NVIDIA_GPU, 1, "", false);
-        final User userToRetire = User.createWithoutId("User2", "User2", "Passkey2", Category.AMD_GPU, 1, "", false);
-        StubbedFoldingEndpointUtils.enableUser(captainUser);
-        StubbedFoldingEndpointUtils.enableUser(userToRetire);
+        final User captainUser = generateUserWithCategory(Category.NVIDIA_GPU);
+        final User userToRetire = generateUserWithCategory(Category.AMD_GPU);
         final int captainUserId = createOrConflict(captainUser).getId();
         final int userToRetireId = createOrConflict(userToRetire).getId();
 
-        final Team team = Team.createWithoutId("Team1", "", captainUserId, Set.of(captainUserId, userToRetireId), Collections.emptySet());
+        final Team team = generateTeamWithUserIds(captainUserId, userToRetireId);
         final int teamId = TeamUtils.createOrConflict(team).getId();
 
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();

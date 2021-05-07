@@ -2,10 +2,13 @@ package me.zodac.folding.test;
 
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.OperatingSystem;
+import me.zodac.folding.api.tc.User;
 import me.zodac.folding.client.java.response.HardwareResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.test.utils.HardwareUtils;
 import me.zodac.folding.test.utils.StubbedFoldingEndpointUtils;
+import me.zodac.folding.test.utils.TestGenerator;
+import me.zodac.folding.test.utils.UserUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
@@ -22,7 +25,7 @@ import java.util.Map;
 
 import static me.zodac.folding.test.utils.HardwareUtils.HARDWARE_REQUEST_SENDER;
 import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForSimpleTests;
-import static me.zodac.folding.test.utils.UserUtils.createOrConflict;
+import static me.zodac.folding.test.utils.TestGenerator.generateHardware;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -30,8 +33,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class HardwareTest {
-
-    public static final Hardware DUMMY_HARDWARE = Hardware.createWithoutId("Dummy_Hardware", "Dummy Hardware", OperatingSystem.WINDOWS, 1.0D);
 
     @BeforeAll
     public static void setUp() throws FoldingRestException {
@@ -60,7 +61,7 @@ public class HardwareTest {
 
     @Test
     public void whenCreatingHardware_givenPayloadIsValid_thenTheCreatedHardwareIsReturnedInResponse_andHasId_andResponseHasA201StatusCode() throws FoldingRestException {
-        final Hardware hardwareToCreate = Hardware.createWithoutId("Dummy_Hardware1", "Dummy Hardware1", OperatingSystem.WINDOWS, 1.0D);
+        final Hardware hardwareToCreate = generateHardware();
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.create(hardwareToCreate);
         assertThat(response.statusCode())
                 .as("Did not receive a 201_CREATED HTTP response: " + response.body())
@@ -78,9 +79,9 @@ public class HardwareTest {
         final int initialSize = HardwareUtils.getNumberOfHardware();
 
         final List<Hardware> batchOfHardware = List.of(
-                Hardware.createWithoutId("Dummy_Hardware2", "Dummy Hardware2", OperatingSystem.WINDOWS, 1.0D),
-                Hardware.createWithoutId("Dummy_Hardware3", "Dummy Hardware3", OperatingSystem.WINDOWS, 1.0D),
-                Hardware.createWithoutId("Dummy_Hardware4", "Dummy Hardware4", OperatingSystem.WINDOWS, 1.0D)
+                generateHardware(),
+                generateHardware(),
+                generateHardware()
         );
 
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.createBatchOf(batchOfHardware);
@@ -100,7 +101,7 @@ public class HardwareTest {
         int hardwareId = allHardware.size();
 
         if (allHardware.isEmpty()) {
-            hardwareId = HardwareUtils.createOrConflict(DUMMY_HARDWARE).getId();
+            hardwareId = HardwareUtils.createOrConflict(generateHardware()).getId();
         }
 
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get(hardwareId);
@@ -121,10 +122,10 @@ public class HardwareTest {
         int hardwareId = allHardware.size();
 
         if (allHardware.isEmpty()) {
-            hardwareId = HardwareUtils.createOrConflict(DUMMY_HARDWARE).getId();
+            hardwareId = HardwareUtils.createOrConflict(generateHardware()).getId();
         }
 
-        final Hardware updatedHardware = Hardware.updateWithId(hardwareId, DUMMY_HARDWARE);
+        final Hardware updatedHardware = Hardware.updateWithId(hardwareId, HardwareUtils.get(hardwareId));
         updatedHardware.setOperatingSystem(OperatingSystem.LINUX.displayName());
 
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.update(updatedHardware);
@@ -150,7 +151,7 @@ public class HardwareTest {
         int hardwareId = allHardware.size();
 
         if (allHardware.isEmpty()) {
-            hardwareId = HardwareUtils.createOrConflict(DUMMY_HARDWARE).getId();
+            hardwareId = HardwareUtils.createOrConflict(generateHardware()).getId();
         }
 
         final HttpResponse<Void> response = HARDWARE_REQUEST_SENDER.delete(hardwareId);
@@ -174,7 +175,7 @@ public class HardwareTest {
 
     @Test
     public void whenCreatingHardware_givenAHardwareWithInvalidOperatingSystem_thenJsonResponseWithErrorIsReturned_andHasA400Status() throws FoldingRestException {
-        final Hardware hardware = Hardware.createWithoutId("Test GPU", "Base GPU", OperatingSystem.INVALID, 1.0D);
+        final Hardware hardware = TestGenerator.generateHardwareWithOperatingSystem(OperatingSystem.INVALID);
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.create(hardware);
 
         assertThat(response.statusCode())
@@ -184,8 +185,9 @@ public class HardwareTest {
 
     @Test
     public void whenCreatingHardware_givenHardwareWithTheSameNameAndOperatingSystemAlreadyExists_thenA409ResponseIsReturned() throws FoldingRestException {
-        HARDWARE_REQUEST_SENDER.create(DUMMY_HARDWARE); // Send one request and ignore it (even if the user already exists, we can verify the conflict with the next one)
-        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.create(DUMMY_HARDWARE);
+        final Hardware hardwareToCreate = generateHardware();
+        HARDWARE_REQUEST_SENDER.create(hardwareToCreate); // Send one request and ignore it (even if the user already exists, we can verify the conflict with the next one)
+        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.create(hardwareToCreate);
 
         assertThat(response.statusCode())
                 .as("Did not receive a 409_CONFLICT HTTP response: " + response.body())
@@ -209,7 +211,7 @@ public class HardwareTest {
     @Test
     public void whenUpdatingHardware_givenANonExistingHardwareId_thenNoJsonResponseIsReturned_andHasA404Status() throws FoldingRestException {
         final int invalidId = 99;
-        final Hardware updatedHardware = Hardware.create(invalidId, "Test GPU", "Base GPU", OperatingSystem.WINDOWS, 1.0D);
+        final Hardware updatedHardware = TestGenerator.generateHardwareWithId(invalidId);
 
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.update(updatedHardware);
         assertThat(response.statusCode())
@@ -233,7 +235,7 @@ public class HardwareTest {
 
     @Test
     public void whenUpdatingHardware_givenAValidHardwareId_andPayloadHasNoChanges_thenOriginalHardwareIsReturned_andHasA200Status() throws FoldingRestException {
-        final Hardware hardware = Hardware.createWithoutId("Test GPU", "Base GPU", OperatingSystem.WINDOWS, 1.0D);
+        final Hardware hardware = generateHardware();
         final int createdHardwareId = HardwareUtils.createOrConflict(hardware).getId();
 
         final Hardware hardwareWithId = Hardware.updateWithId(createdHardwareId, hardware);
@@ -254,12 +256,12 @@ public class HardwareTest {
         final int initialHardwareSize = HardwareUtils.getNumberOfHardware();
 
         final List<Hardware> batchOfValidHardware = List.of(
-                Hardware.createWithoutId("Hardware1", "Hardware1", OperatingSystem.WINDOWS, 1.0D),
-                Hardware.createWithoutId("Hardware2", "Hardware2", OperatingSystem.WINDOWS, 1.0D)
+                generateHardware(),
+                generateHardware()
         );
         final List<Hardware> batchOfInvalidHardware = List.of(
-                Hardware.createWithoutId("Hardware1", "Hardware1", OperatingSystem.INVALID, 1.0D),
-                Hardware.createWithoutId("Hardware2", "Hardware2", OperatingSystem.INVALID, 1.0D)
+                TestGenerator.generateHardwareWithOperatingSystem(OperatingSystem.INVALID),
+                TestGenerator.generateHardwareWithOperatingSystem(OperatingSystem.INVALID)
         );
         final List<Hardware> batchOfHardware = new ArrayList<>(batchOfValidHardware.size() + batchOfInvalidHardware.size());
         batchOfHardware.addAll(batchOfValidHardware);
@@ -281,8 +283,8 @@ public class HardwareTest {
         final int initialHardwareSize = HardwareUtils.getNumberOfHardware();
 
         final List<Hardware> batchOfInvalidHardware = List.of(
-                Hardware.createWithoutId("Hardware1", "Hardware1", OperatingSystem.INVALID, 1.0D),
-                Hardware.createWithoutId("Hardware2", "Hardware2", OperatingSystem.INVALID, 1.0D)
+                TestGenerator.generateHardwareWithOperatingSystem(OperatingSystem.INVALID),
+                TestGenerator.generateHardwareWithOperatingSystem(OperatingSystem.INVALID)
         );
 
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.createBatchOf(batchOfInvalidHardware);
@@ -298,9 +300,10 @@ public class HardwareTest {
 
     @Test
     public void whenDeletingHardware_givenTheHardwareIsLinkedToAUser_thenResponseHasA409Status() throws FoldingRestException {
-        final int hardwareId = HardwareUtils.createOrConflict(DUMMY_HARDWARE).getId();
-        StubbedFoldingEndpointUtils.enableUser(UserTest.DUMMY_USER);
-        createOrConflict(UserTest.DUMMY_USER);
+        final int hardwareId = HardwareUtils.createOrConflict(generateHardware()).getId();
+        final User user = TestGenerator.generateUserWithHardwareId(hardwareId);
+        StubbedFoldingEndpointUtils.enableUser(user);
+        UserUtils.createOrConflict(user);
 
         final HttpResponse<Void> deleteHardwareResponse = HARDWARE_REQUEST_SENDER.delete(hardwareId);
         assertThat(deleteHardwareResponse.statusCode())

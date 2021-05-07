@@ -5,8 +5,6 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.client.java.response.TeamResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
-import me.zodac.folding.test.utils.HardwareUtils;
-import me.zodac.folding.test.utils.StubbedFoldingEndpointUtils;
 import me.zodac.folding.test.utils.TeamUtils;
 import me.zodac.folding.test.utils.UserUtils;
 import org.junit.jupiter.api.AfterAll;
@@ -20,13 +18,17 @@ import java.net.HttpURLConnection;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForSimpleTests;
 import static me.zodac.folding.test.utils.TeamUtils.TEAM_REQUEST_SENDER;
+import static me.zodac.folding.test.utils.TeamUtils.createOrConflict;
+import static me.zodac.folding.test.utils.TestGenerator.generateTeam;
+import static me.zodac.folding.test.utils.TestGenerator.generateTeamWithId;
+import static me.zodac.folding.test.utils.TestGenerator.generateTeamWithUserIds;
+import static me.zodac.folding.test.utils.TestGenerator.generateUser;
+import static me.zodac.folding.test.utils.TestGenerator.generateUserWithCategory;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -35,14 +37,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TeamTest {
 
-    public static final Team DUMMY_TEAM = Team.createWithoutId("Dummy_Team", "Dummy Team", 1, Set.of(1), Collections.emptySet());
-
     @BeforeAll
     public static void setUp() throws FoldingRestException {
         cleanSystemForSimpleTests();
-        HardwareUtils.createOrConflict(HardwareTest.DUMMY_HARDWARE);
-        StubbedFoldingEndpointUtils.enableUser(UserTest.DUMMY_USER);
-        UserUtils.createOrConflict(UserTest.DUMMY_USER);
     }
 
     @Test
@@ -67,7 +64,7 @@ public class TeamTest {
 
     @Test
     public void whenCreatingTeam_givenPayloadIsValid_thenTheCreatedTeamIsReturnedInResponse_andHasId_andResponseHasA201StatusCode() throws FoldingRestException {
-        final Team teamToCreate = Team.createWithoutId("Dummy_Team1", "Dummy Team", 1, Set.of(1), Collections.emptySet());
+        final Team teamToCreate = generateTeam();
 
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(teamToCreate);
         assertThat(response.statusCode())
@@ -86,9 +83,9 @@ public class TeamTest {
         final int initialSize = TeamUtils.getNumberOfTeams();
 
         final List<Team> batchOfTeams = List.of(
-                Team.createWithoutId("Dummy_Team2", "Dummy Team", 1, Set.of(1), Collections.emptySet()),
-                Team.createWithoutId("Dummy_Team3", "Dummy Team", 1, Set.of(1), Collections.emptySet()),
-                Team.createWithoutId("Dummy_Team4", "Dummy Team", 1, Set.of(1), Collections.emptySet())
+                generateTeam(),
+                generateTeam(),
+                generateTeam()
         );
 
 
@@ -109,7 +106,8 @@ public class TeamTest {
         int teamId = allTeams.size();
 
         if (allTeams.isEmpty()) {
-            teamId = TeamUtils.createOrConflict(DUMMY_TEAM).getId();
+            final Team team = generateTeam();
+            teamId = TeamUtils.createOrConflict(team).getId();
         }
 
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.get(teamId);
@@ -130,10 +128,11 @@ public class TeamTest {
         int teamId = allTeams.size();
 
         if (allTeams.isEmpty()) {
-            teamId = TeamUtils.createOrConflict(DUMMY_TEAM).getId();
+            final Team team = generateTeam();
+            teamId = TeamUtils.createOrConflict(team).getId();
         }
 
-        final Team updatedTeam = Team.updateWithId(teamId, DUMMY_TEAM);
+        final Team updatedTeam = Team.updateWithId(teamId, TeamUtils.get(teamId));
         updatedTeam.setTeamDescription("Updated description");
 
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.update(updatedTeam);
@@ -159,7 +158,8 @@ public class TeamTest {
         int teamId = allTeams.size();
 
         if (allTeams.isEmpty()) {
-            teamId = TeamUtils.createOrConflict(DUMMY_TEAM).getId();
+            final Team team = generateTeam();
+            teamId = TeamUtils.createOrConflict(team).getId();
         }
 
         final HttpResponse<Void> response = TEAM_REQUEST_SENDER.delete(teamId);
@@ -180,15 +180,12 @@ public class TeamTest {
 
     @Test
     public void whenRetiringAUserFromATeam_givenValidUserId_thenTeamActiveAndRetiredUsersAreUpdated_andResponseHasA200Status() throws FoldingRestException {
-        final User captainUser = User.createWithoutId("Dummy_User1", "Dummy User1", "DummyPasskey1", Category.NVIDIA_GPU, 1, "", false);
-        final User userToRetired = User.createWithoutId("Dummy_User2", "Dummy User2", "DummyPasskey2", Category.AMD_GPU, 1, "", false);
-        StubbedFoldingEndpointUtils.enableUser(captainUser);
-        StubbedFoldingEndpointUtils.enableUser(userToRetired);
-
+        final User captainUser = generateUserWithCategory(Category.NVIDIA_GPU);
+        final User userToRetire = generateUserWithCategory(Category.AMD_GPU);
         final int captainUserId = UserUtils.createOrConflict(captainUser).getId();
-        final int userToRetireId = UserUtils.createOrConflict(userToRetired).getId();
+        final int userToRetireId = UserUtils.createOrConflict(userToRetire).getId();
 
-        final Team team = Team.createWithoutId("Dummy_Team12", "Dummy Team", captainUserId, Set.of(captainUserId, userToRetireId), Collections.emptySet());
+        final Team team = generateTeamWithUserIds(captainUserId, userToRetireId);
         final int teamId = TeamUtils.createOrConflict(team).getId();
 
         final HttpResponse<String> retireResponse = TEAM_REQUEST_SENDER.retireUser(teamId, userToRetireId);
@@ -211,16 +208,14 @@ public class TeamTest {
 
     @Test
     public void whenUnRetiringAUserToATeam_givenTheTeamIsTheOriginalTeamOfTheUser_thenTeamActiveAndRetiredUsersAreUpdated_andResponseHasA200Status() throws FoldingRestException {
-        final User captainUser = User.createWithoutId("Dummy_User15", "Dummy User15", "DummyPasskey15", Category.NVIDIA_GPU, 1, "", false);
-        final User userToRetired = User.createWithoutId("Dummy_User16", "Dummy User16", "DummyPasskey16", Category.AMD_GPU, 1, "", false);
-        StubbedFoldingEndpointUtils.enableUser(captainUser);
-        StubbedFoldingEndpointUtils.enableUser(userToRetired);
-
+        final User captainUser = generateUserWithCategory(Category.NVIDIA_GPU);
+        final User userToRetire = generateUserWithCategory(Category.AMD_GPU);
         final int captainUserId = UserUtils.createOrConflict(captainUser).getId();
-        final int userToRetireId = UserUtils.createOrConflict(userToRetired).getId();
+        final int userToRetireId = UserUtils.createOrConflict(userToRetire).getId();
 
-        final Team team = Team.createWithoutId("Dummy_Team13", "Dummy Team", captainUserId, Set.of(captainUserId, userToRetireId), Collections.emptySet());
+        final Team team = generateTeamWithUserIds(captainUserId, userToRetireId);
         final int teamId = TeamUtils.createOrConflict(team).getId();
+
         final int retiredUserId = TeamUtils.retireUser(teamId, userToRetireId);
 
         final HttpResponse<String> unretireResponse = TEAM_REQUEST_SENDER.unretireUser(teamId, retiredUserId);
@@ -241,25 +236,24 @@ public class TeamTest {
 
     @Test
     public void whenUnRetiringAUserToATeam_givenTheTeamIsNotTheOriginalTeamOfTheUser_thenNewTeamActiveUsersAreUpdated_andOriginalTeamRetiredUsersAreNotUpdated_andResponseHasA200Status() throws FoldingRestException {
-        final User captainUser = User.createWithoutId("Dummy_User5", "Dummy User5", "DummyPasskey5", Category.NVIDIA_GPU, 1, "", false);
-        final User userToRetired = User.createWithoutId("Dummy_User6", "Dummy User6", "DummyPasskey6", Category.AMD_GPU, 1, "", false);
-        StubbedFoldingEndpointUtils.enableUser(captainUser);
-        StubbedFoldingEndpointUtils.enableUser(userToRetired);
-
+        final User captainUser = generateUserWithCategory(Category.NVIDIA_GPU);
+        final User userToRetire = generateUserWithCategory(Category.AMD_GPU);
         final int captainUserId = UserUtils.createOrConflict(captainUser).getId();
-        final int userToRetireId = UserUtils.createOrConflict(userToRetired).getId();
-        final Team originalTeam = Team.createWithoutId("Dummy_Team14", "Dummy Team", captainUserId, Set.of(captainUserId, userToRetireId), Collections.emptySet());
+        final int userToRetireId = UserUtils.createOrConflict(userToRetire).getId();
+
+        final Team originalTeam = generateTeamWithUserIds(captainUserId, userToRetireId);
         final int originalTeamId = TeamUtils.createOrConflict(originalTeam).getId();
 
         final int retiredUserId = TeamUtils.retireUser(originalTeamId, userToRetireId);
 
-        final User secondCaptainUser = User.createWithoutId("Dummy_User7", "Dummy User7", "DummyPasskey7", Category.NVIDIA_GPU, 1, "", false);
-        StubbedFoldingEndpointUtils.enableUser(secondCaptainUser);
+        final User secondCaptainUser = generateUser();
         final int secondCaptainUserId = UserUtils.createOrConflict(secondCaptainUser).getId();
-        final Team newTeam = Team.createWithoutId("Dummy_Team15", "Dummy Team", secondCaptainUserId, Set.of(secondCaptainUserId), Collections.emptySet());
+        final Team newTeam = generateTeamWithUserIds(secondCaptainUserId);
         final int newTeamId = TeamUtils.createOrConflict(newTeam).getId();
 
+
         final Team updatedNewTeam = TeamUtils.unretireUser(newTeamId, retiredUserId);
+
         assertThat(updatedNewTeam.getUserIds())
                 .as("New team user IDs should contain previously retired user ID")
                 .contains(secondCaptainUserId, userToRetireId);
@@ -271,11 +265,11 @@ public class TeamTest {
         final Team originalTeamAfterUnretire = TeamUtils.get(originalTeamId);
 
         assertThat(originalTeamAfterUnretire.getUserIds())
-                .as("Original team user IDs should only contain captain")
+                .as("Original team user IDs should only contain captain: " + originalTeamAfterUnretire)
                 .contains(captainUserId);
 
         assertThat(originalTeamAfterUnretire.getRetiredUserIds())
-                .as("Original team should still have retried user ID")
+                .as("Original team should still have retried user ID: " + originalTeamAfterUnretire)
                 .isNotEmpty();
     }
 
@@ -283,7 +277,7 @@ public class TeamTest {
 
     @Test
     public void whenCreatingTeam_givenATeamWithInvalidCaptainUserId_thenJsonResponseWithErrorIsReturned_andHasA400Status() throws FoldingRestException {
-        final Team team = Team.createWithoutId("Dummy_Team5", "Dummy Team", 0, Set.of(1), Collections.emptySet());
+        final Team team = generateTeamWithUserIds(0);
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(team);
 
         assertThat(response.statusCode())
@@ -297,8 +291,12 @@ public class TeamTest {
 
     @Test
     public void whenCreatingTeam_givenTeamWithTheNameAlreadyExists_thenA409ResponseIsReturned() throws FoldingRestException {
-        TEAM_REQUEST_SENDER.create(DUMMY_TEAM); // Send one request and ignore it (even if the user already exists, we can verify the conflict with the next one)
-        final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(DUMMY_TEAM);
+        final Team teamToCreate = generateTeam();
+        final Team teamWithSameName = generateTeam();
+        teamWithSameName.setTeamName(teamToCreate.getTeamName());
+
+        TEAM_REQUEST_SENDER.create(teamToCreate);
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(teamWithSameName);
 
         assertThat(response.statusCode())
                 .as("Did not receive a 409_CONFLICT HTTP response: " + response.body())
@@ -322,7 +320,7 @@ public class TeamTest {
     @Test
     public void whenUpdatingTeam_givenANonExistingTeamId_thenNoJsonResponseIsReturned_andHasA404Status() throws FoldingRestException {
         final int invalidId = 99;
-        final Team updatedTeam = Team.create(invalidId, "Dummy_Team6", "Dummy Team", 1, Set.of(1), Collections.emptySet());
+        final Team updatedTeam = generateTeamWithId(invalidId);
 
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.update(updatedTeam);
         assertThat(response.statusCode())
@@ -346,9 +344,8 @@ public class TeamTest {
 
     @Test
     public void whenUpdatingTeam_givenAValidTeamId_andPayloadHasNoChanges_thenOriginalTeamIsReturned_andHasA200Status() throws FoldingRestException {
-        final Team team = Team.createWithoutId("Dummy_Team6", "Dummy Team", 1, Set.of(1), Collections.emptySet());
-
-        final int createdTeamId = TeamUtils.createOrConflict(team).getId();
+        final Team team = generateTeam();
+        final int createdTeamId = createOrConflict(team).getId();
         final Team teamWithId = Team.updateWithId(createdTeamId, team);
 
         final HttpResponse<String> updateResponse = TEAM_REQUEST_SENDER.update(teamWithId);
@@ -369,12 +366,12 @@ public class TeamTest {
         final int initialTeamsSize = TeamUtils.getNumberOfTeams();
 
         final List<Team> batchOfValidTeams = List.of(
-                Team.createWithoutId("Dummy_Team7", "Dummy Team", 1, Set.of(1), Collections.emptySet()),
-                Team.createWithoutId("Dummy_Team8", "Dummy Team", 1, Set.of(1), Collections.emptySet())
+                generateTeam(),
+                generateTeam()
         );
         final List<Team> batchOfInvalidTeams = List.of(
-                Team.createWithoutId("Dummy_Team9", "Dummy Team", 0, Set.of(1), Collections.emptySet()),
-                Team.createWithoutId("Dummy_Team10", "Dummy Team", 0, Set.of(1), Collections.emptySet())
+                generateTeamWithUserIds(0),
+                generateTeamWithUserIds(0)
         );
         final List<Team> batchOfTeams = new ArrayList<>(batchOfValidTeams.size() + batchOfInvalidTeams.size());
         batchOfTeams.addAll(batchOfValidTeams);
@@ -397,8 +394,8 @@ public class TeamTest {
         final int initialTeamsSize = TeamUtils.getNumberOfTeams();
 
         final List<Team> batchOfInvalidTeams = List.of(
-                Team.createWithoutId("Dummy_Team11", "Dummy Team", 0, Set.of(1), Collections.emptySet()),
-                Team.createWithoutId("Dummy_Team12", "Dummy Team", 0, Set.of(1), Collections.emptySet())
+                generateTeamWithUserIds(0),
+                generateTeamWithUserIds(0)
         );
 
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.createBatchOf(batchOfInvalidTeams);
@@ -414,15 +411,12 @@ public class TeamTest {
 
     @Test
     public void whenCreatingTeam_givenUsersExceedingPermittedAmountForACategory_thenTeamIsNotCreated_andResponseHasA400Status() throws FoldingRestException {
-        final User firstUser = User.createWithoutId("Dummy_User17", "Dummy User17", "DummyPasskey17", Category.NVIDIA_GPU, 1, "", false);
-        final User secondUser = User.createWithoutId("Dummy_User18", "Dummy User18", "DummyPasskey18", Category.NVIDIA_GPU, 1, "", false);
-        StubbedFoldingEndpointUtils.enableUser(firstUser);
-        StubbedFoldingEndpointUtils.enableUser(secondUser);
-
+        final User firstUser = generateUserWithCategory(Category.NVIDIA_GPU);
+        final User secondUser = generateUserWithCategory(Category.NVIDIA_GPU);
         final int firstUserId = UserUtils.createOrConflict(firstUser).getId();
         final int secondUserId = UserUtils.createOrConflict(secondUser).getId();
 
-        final Team team = Team.createWithoutId("Dummy_Team13", "Dummy Team", firstUserId, Set.of(firstUserId, secondUserId), Collections.emptySet());
+        final Team team = generateTeamWithUserIds(firstUserId, secondUserId);
 
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(team);
         assertThat(response.statusCode())
@@ -436,21 +430,16 @@ public class TeamTest {
 
     @Test
     public void whenCreatingTeam_givenUsersExceedingTotalPermittedAmountForATeam_thenTeamIsNotCreated_andResponseHasA400Status() throws FoldingRestException {
-        final User firstUser = User.createWithoutId("Dummy_User3", "Dummy User3", "DummyPasskey3", Category.NVIDIA_GPU, 1, "", false);
-        final User secondUser = User.createWithoutId("Dummy_User4", "Dummy User4", "DummyPasskey4", Category.WILDCARD, 1, "", false);
-        final User thirdUser = User.createWithoutId("Dummy_User5", "Dummy User5", "DummyPasskey4", Category.AMD_GPU, 1, "", false);
-        final User fourthUser = User.createWithoutId("Dummy_User6", "Dummy User6", "DummyPasskey4", Category.NVIDIA_GPU, 1, "", false);
-        StubbedFoldingEndpointUtils.enableUser(firstUser);
-        StubbedFoldingEndpointUtils.enableUser(secondUser);
-        StubbedFoldingEndpointUtils.enableUser(thirdUser);
-        StubbedFoldingEndpointUtils.enableUser(fourthUser);
-
+        final User firstUser = generateUserWithCategory(Category.NVIDIA_GPU);
+        final User secondUser = generateUserWithCategory(Category.WILDCARD);
+        final User thirdUser = generateUserWithCategory(Category.AMD_GPU);
+        final User fourthUser = generateUserWithCategory(Category.NVIDIA_GPU);
         final int firstUserId = UserUtils.createOrConflict(firstUser).getId();
         final int secondUserId = UserUtils.createOrConflict(secondUser).getId();
         final int thirdUserId = UserUtils.createOrConflict(thirdUser).getId();
         final int fourthUserId = UserUtils.createOrConflict(fourthUser).getId();
 
-        final Team team = Team.createWithoutId("Dummy_Team13", "Dummy Team", firstUserId, Set.of(firstUserId, secondUserId, thirdUserId, fourthUserId), Collections.emptySet());
+        final Team team = generateTeamWithUserIds(firstUserId, secondUserId, thirdUserId, fourthUserId);
 
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(team);
         assertThat(response.statusCode())
@@ -465,16 +454,12 @@ public class TeamTest {
 
     @Test
     public void whenRetiringAUserFromATeam_givenTheUserIsTheCaptain_thenUserCannotBeRetired_andResponseHasA400Status() throws FoldingRestException {
-        final User captainUser = User.createWithoutId("Dummy_User8", "Dummy User8", "DummyPasskey8", Category.NVIDIA_GPU, 1, "", false);
-        final User userToRetired = User.createWithoutId("Dummy_User9", "Dummy User9", "DummyPasskey9", Category.AMD_GPU, 1, "", false);
-        StubbedFoldingEndpointUtils.enableUser(captainUser);
-        StubbedFoldingEndpointUtils.enableUser(userToRetired);
-
+        final User captainUser = generateUserWithCategory(Category.NVIDIA_GPU);
+        final User userToRetire = generateUserWithCategory(Category.AMD_GPU);
         final int captainUserId = UserUtils.createOrConflict(captainUser).getId();
-        final int userToRetireId = UserUtils.createOrConflict(userToRetired).getId();
+        final int userToRetireId = UserUtils.createOrConflict(userToRetire).getId();
 
-        final Team team = Team.createWithoutId("Dummy_Team16", "Dummy Team", captainUserId, Set.of(captainUserId, userToRetireId), Collections.emptySet());
-
+        final Team team = generateTeamWithUserIds(captainUserId, userToRetireId);
         final int teamId = TeamUtils.createOrConflict(team).getId();
 
         final HttpResponse<String> retireResponse = TEAM_REQUEST_SENDER.retireUser(teamId, captainUserId);
@@ -494,8 +479,7 @@ public class TeamTest {
 
     @Test
     public void whenRetiringAUserFromATeam_givenTheUserIdIsInvalid_thenResponseHasA400Status() throws FoldingRestException {
-        final Team team = Team.createWithoutId("Dummy_Team17", "Dummy Team", 1, Set.of(1), Collections.emptySet());
-
+        final Team team = generateTeam();
         final int teamId = TeamUtils.createOrConflict(team).getId();
         final int invalidUserId = 99;
 
@@ -516,8 +500,7 @@ public class TeamTest {
 
     @Test
     public void whenUnRetiringAUserFromATeam_givenTheUserIdIsInvalid_thenResponseHasA400Status() throws FoldingRestException {
-        final Team team = Team.createWithoutId("Dummy_Team18", "Dummy Team", 1, Set.of(1), Collections.emptySet());
-
+        final Team team = generateTeam();
         final int teamId = TeamUtils.createOrConflict(team).getId();
         final int invalidUserId = 99;
 
@@ -529,29 +512,24 @@ public class TeamTest {
 
     @Test
     public void whenUnRetiringAUserToATeam_givenTheTeamIsNotTheOriginalTeamOfTheUser_andTheNewTeamIsFull_thenTheUnRetirementShouldFail_andResponseHasA400Status() throws FoldingRestException {
-        final User captainUser = User.createWithoutId("Dummy_User10", "Dummy User10", "DummyPasskey10", Category.NVIDIA_GPU, 1, "", false);
-        final User userToRetired = User.createWithoutId("Dummy_User11", "Dummy User11", "DummyPasskey11", Category.AMD_GPU, 1, "", false);
-        StubbedFoldingEndpointUtils.enableUser(captainUser);
-        StubbedFoldingEndpointUtils.enableUser(userToRetired);
-
+        final User captainUser = generateUserWithCategory(Category.NVIDIA_GPU);
+        final User userToRetire = generateUserWithCategory(Category.AMD_GPU);
         final int captainUserId = UserUtils.createOrConflict(captainUser).getId();
-        final int userToRetireId = UserUtils.createOrConflict(userToRetired).getId();
-        final Team originalTeam = Team.createWithoutId("Dummy_Team18", "Dummy Team", captainUserId, Set.of(captainUserId, userToRetireId), Collections.emptySet());
+        final int userToRetireId = UserUtils.createOrConflict(userToRetire).getId();
+
+        final Team originalTeam = generateTeamWithUserIds(captainUserId, userToRetireId);
         final int originalTeamId = TeamUtils.createOrConflict(originalTeam).getId();
 
         final int retiredUserId = TeamUtils.retireUser(originalTeamId, userToRetireId);
 
-        final User secondCaptainUser = User.createWithoutId("Dummy_User12", "Dummy User12", "DummyPasskey12", Category.WILDCARD, 1, "", false);
-        final User secondNVidiaUser = User.createWithoutId("Dummy_User13", "Dummy User13", "DummyPasskey13", Category.NVIDIA_GPU, 1, "", false);
-        final User secondAmdUser = User.createWithoutId("Dummy_User14", "Dummy User14", "DummyPasskey14", Category.AMD_GPU, 1, "", false);
-        StubbedFoldingEndpointUtils.enableUser(secondCaptainUser);
-        StubbedFoldingEndpointUtils.enableUser(secondNVidiaUser);
-        StubbedFoldingEndpointUtils.enableUser(secondAmdUser);
-        final int secondCaptainUserId = UserUtils.createOrConflict(secondCaptainUser).getId();
-        final int secondNVidiaUserId = UserUtils.createOrConflict(secondNVidiaUser).getId();
-        final int secondAmdUserId = UserUtils.createOrConflict(secondAmdUser).getId();
+        final User secondTeamCaptain = generateUserWithCategory(Category.NVIDIA_GPU);
+        final User secondTeamFirstUser = generateUserWithCategory(Category.AMD_GPU);
+        final User secondTeamSecondUser = generateUserWithCategory(Category.WILDCARD);
+        final int secondTeamCaptainId = UserUtils.createOrConflict(secondTeamCaptain).getId();
+        final int secondTeamFirstUserId = UserUtils.createOrConflict(secondTeamFirstUser).getId();
+        final int secondTeamSecondUserId = UserUtils.createOrConflict(secondTeamSecondUser).getId();
 
-        final Team newTeam = Team.createWithoutId("Dummy_Team19", "Dummy Team", secondCaptainUserId, Set.of(secondCaptainUserId, secondNVidiaUserId, secondAmdUserId), Collections.emptySet());
+        final Team newTeam = generateTeamWithUserIds(secondTeamCaptainId, secondTeamFirstUserId, secondTeamSecondUserId);
         final int newTeamId = TeamUtils.createOrConflict(newTeam).getId();
 
         final HttpResponse<String> unretireResponse = TEAM_REQUEST_SENDER.unretireUser(newTeamId, retiredUserId);

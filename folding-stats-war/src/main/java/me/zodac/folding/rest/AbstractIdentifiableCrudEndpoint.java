@@ -188,11 +188,6 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
     protected Response updateById(final String elementId, final V element) {
         getLogger().debug("PUT request for {} received at '{}'", elementType(), uriContext.getAbsolutePath());
 
-        final ValidationResponse validationResponse = validate(element);
-        if (validationResponse.isInvalid()) {
-            return badRequest(validationResponse);
-        }
-
         try {
             final int parsedId = parseId(elementId);
             // We want to make sure the payload is not trying to change the ID of the element
@@ -208,6 +203,11 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
             if (existingElement.equals(element)) {
                 getLogger().debug("No change necessary");
                 return ok(existingElement);
+            }
+
+            final ValidationResponse validationResponse = validate(element);
+            if (validationResponse.isInvalid()) {
+                return badRequest(validationResponse);
             }
 
             final V updatedElementWithId = updateElementById(parsedId, element);

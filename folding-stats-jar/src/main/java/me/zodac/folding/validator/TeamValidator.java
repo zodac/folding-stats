@@ -10,6 +10,7 @@ import me.zodac.folding.cache.UserCache;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -79,8 +80,12 @@ public class TeamValidator {
         }
 
         for (final Team existingTeam : TeamCache.get().getAll()) {
-            final Set<Integer> existingTeamUserIds = existingTeam.getUserIds();
-            final Set<Integer> newTeamUserIds = team.getUserIds();
+            if (existingTeam.getTeamName().equalsIgnoreCase(team.getTeamName())) {
+                continue;
+            }
+
+            final Set<Integer> existingTeamUserIds = new HashSet<>(existingTeam.getUserIds());
+            final Set<Integer> newTeamUserIds = new HashSet<>(team.getUserIds());
             existingTeamUserIds.retainAll(newTeamUserIds);
 
             if (!existingTeamUserIds.isEmpty()) {
