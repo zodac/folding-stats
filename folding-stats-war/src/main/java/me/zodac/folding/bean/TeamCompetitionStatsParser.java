@@ -83,7 +83,7 @@ public class TeamCompetitionStatsParser {
     }
 
     private void getTcStatsForFoldingUsers() {
-        LOGGER.info("Parsing TC Folding stats");
+        LOGGER.info("Parsing TC Folding stats:");
 
         try {
             final List<Team> tcTeams = storageFacade.getAllTeams();
@@ -100,7 +100,7 @@ public class TeamCompetitionStatsParser {
             }
 
             try {
-                // TODO: [zodac] Scaling up, this should probably be done in separate threads (and async)
+                // TODO: [zodac] Scaling up, this should probably be done in separate threads (and async?)
                 updateTcStatsForUsers(tcUserById.values());
                 LOGGER.info("Finished parsing");
                 LOGGER.info("");

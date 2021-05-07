@@ -16,14 +16,12 @@ import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserStatsOffset;
 import me.zodac.folding.api.tc.stats.UserTcStats;
-import me.zodac.folding.api.utils.EnvironmentVariables;
 import me.zodac.folding.api.utils.TimeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -36,31 +34,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 
-// TODO: [zodac] Add some DB pooling here, can be made a bit less shit
 public class PostgresDbManager implements DbManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PostgresDbManager.class);
 
-    private static final String JDBC_CONNECTION_URL = EnvironmentVariables.get("JDBC_CONNECTION_URL");
-    private static final Properties JDBC_CONNECTION_PROPERTIES = new Properties();
     private static final String VIOLATES_FOREIGN_KEY_CONSTRAINT = "violates foreign key constraint";
     private static final String VIOLATES_UNIQUE_CONSTRAINT = "violates unique constraint";
-
-    static {
-        JDBC_CONNECTION_PROPERTIES.setProperty("user", EnvironmentVariables.get("JDBC_CONNECTION_USER"));
-        JDBC_CONNECTION_PROPERTIES.setProperty("password", EnvironmentVariables.get("JDBC_CONNECTION_PASSWORD"));
-        JDBC_CONNECTION_PROPERTIES.setProperty("driver", EnvironmentVariables.get("JDBC_CONNECTION_DRIVER"));
-    }
 
     @Override
     public Hardware createHardware(final Hardware hardware) throws FoldingException, FoldingConflictException {
         final String insertSqlWithReturnId = "INSERT INTO hardware (hardware_name, display_name, operating_system, multiplier) VALUES (?, ?, ?, ?) RETURNING hardware_id;";
 
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+        try (final Connection connection = PostgresDbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(insertSqlWithReturnId)) {
 
             preparedStatement.setString(1, hardware.getHardwareName());
@@ -89,7 +77,7 @@ public class PostgresDbManager implements DbManager {
         final String selectSqlStatement = "SELECT * FROM hardware ORDER BY hardware_id ASC;";
         LOGGER.debug("Executing SQL statement '{}'", selectSqlStatement);
 
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+        try (final Connection connection = PostgresDbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement);
              final ResultSet resultSet = preparedStatement.executeQuery()) {
 
@@ -110,7 +98,7 @@ public class PostgresDbManager implements DbManager {
         final String selectSqlStatement = "SELECT * FROM hardware WHERE hardware_id = ?;";
         LOGGER.debug("Executing SQL statement '{}'", selectSqlStatement);
 
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+        try (final Connection connection = PostgresDbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
 
             preparedStatement.setInt(1, hardwareId);
@@ -134,7 +122,7 @@ public class PostgresDbManager implements DbManager {
                 "SET hardware_name = ?, display_name = ?, operating_system = ?, multiplier = ? " +
                 "WHERE hardware_id = ?;";
 
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+        try (final Connection connection = PostgresDbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(updateSqlStatement)) {
 
             preparedStatement.setString(1, hardware.getHardwareName());
@@ -159,7 +147,7 @@ public class PostgresDbManager implements DbManager {
     public void deleteHardware(final int hardwareId) throws FoldingException, FoldingConflictException {
         final String deleteSqlStatement = "DELETE FROM hardware WHERE hardware_id = ?;";
 
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+        try (final Connection connection = PostgresDbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(deleteSqlStatement)) {
 
             preparedStatement.setInt(1, hardwareId);
@@ -178,7 +166,7 @@ public class PostgresDbManager implements DbManager {
     public User createUser(final User user) throws FoldingException, FoldingConflictException {
         final String insertSqlWithReturnId = "INSERT INTO users (folding_username, display_username, passkey, category, hardware_id, live_stats_link, is_retired) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING user_id;";
 
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+        try (final Connection connection = PostgresDbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(insertSqlWithReturnId)) {
 
             preparedStatement.setString(1, user.getFoldingUserName());
@@ -211,7 +199,7 @@ public class PostgresDbManager implements DbManager {
         final String selectSqlStatement = "SELECT * FROM users ORDER BY user_id ASC;";
         LOGGER.debug("Executing SQL statement: '{}'", selectSqlStatement);
 
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+        try (final Connection connection = PostgresDbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement);
              final ResultSet resultSet = preparedStatement.executeQuery()) {
 
@@ -231,7 +219,7 @@ public class PostgresDbManager implements DbManager {
     public User getUser(final int userId) throws FoldingException, UserNotFoundException {
         final String selectSqlStatement = "SELECT * FROM users WHERE user_id = ?;";
 
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+        try (final Connection connection = PostgresDbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
 
             preparedStatement.setInt(1, userId);
@@ -255,7 +243,7 @@ public class PostgresDbManager implements DbManager {
                 "SET folding_username = ?, display_username = ?, passkey = ?, category = ?, hardware_id = ?, live_stats_link = ?, is_retired = ? " +
                 "WHERE user_id = ?;";
 
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+        try (final Connection connection = PostgresDbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(updateSqlStatement)) {
 
             preparedStatement.setString(1, user.getFoldingUserName());
@@ -283,7 +271,7 @@ public class PostgresDbManager implements DbManager {
     public void deleteUser(final int userId) throws FoldingException, FoldingConflictException {
         final String deleteSqlStatement = "DELETE FROM users WHERE user_id = ?;";
 
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+        try (final Connection connection = PostgresDbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(deleteSqlStatement)) {
 
             preparedStatement.setInt(1, userId);
@@ -302,7 +290,7 @@ public class PostgresDbManager implements DbManager {
     public Team createTeam(final Team team) throws FoldingException, FoldingConflictException {
         final String insertSqlWithReturnId = "INSERT INTO teams (team_name, team_description, captain_user_id, user_ids, retired_user_ids) VALUES (?, ?, ?, ?, ?) RETURNING team_id;";
 
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+        try (final Connection connection = PostgresDbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(insertSqlWithReturnId)) {
 
             preparedStatement.setString(1, team.getTeamName());
@@ -333,7 +321,7 @@ public class PostgresDbManager implements DbManager {
         final String selectSqlStatement = "SELECT * FROM teams ORDER BY team_id ASC;";
         LOGGER.debug("Executing SQL statement '{}'", selectSqlStatement);
 
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+        try (final Connection connection = PostgresDbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement); final ResultSet resultSet = preparedStatement.executeQuery()) {
 
             final List<Team> allTeams = new ArrayList<>();
@@ -352,7 +340,7 @@ public class PostgresDbManager implements DbManager {
     public Team getTeam(final int teamId) throws FoldingException, TeamNotFoundException {
         final String selectSqlStatement = "SELECT * FROM teams WHERE team_id = ?;";
 
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+        try (final Connection connection = PostgresDbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
 
             preparedStatement.setInt(1, teamId);
@@ -376,7 +364,7 @@ public class PostgresDbManager implements DbManager {
                 "SET team_name = ?, team_description = ?, captain_user_id = ?, user_ids = ?, retired_user_ids = ? " +
                 "WHERE team_id = ?;";
 
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+        try (final Connection connection = PostgresDbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(updateSqlStatement)) {
 
             preparedStatement.setString(1, team.getTeamName());
@@ -403,7 +391,7 @@ public class PostgresDbManager implements DbManager {
         LOGGER.debug("Deleting team {} from DB", teamId);
         final String deleteSqlStatement = "DELETE FROM teams WHERE team_id = ?;";
 
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+        try (final Connection connection = PostgresDbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(deleteSqlStatement)) {
 
             preparedStatement.setInt(1, teamId);
@@ -423,7 +411,7 @@ public class PostgresDbManager implements DbManager {
         LOGGER.debug("Inserting TC stats for {} users to DB", userStats.size());
         final String preparedInsertSqlStatement = "INSERT INTO user_tc_stats_hourly (user_id, utc_timestamp, tc_points, tc_points_multiplied, tc_units) VALUES (?, ?, ?, ?, ?);";
 
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+        try (final Connection connection = PostgresDbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
             for (final UserTcStats tcUserStatsForUser : userStats) {
                 try {
@@ -449,7 +437,7 @@ public class PostgresDbManager implements DbManager {
         LOGGER.debug("Checking if any TC stats exist in the DB");
         final String selectSqlStatement = "SELECT COUNT(*) AS count FROM user_tc_stats_hourly;";
 
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+        try (final Connection connection = PostgresDbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
 
             LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
@@ -480,7 +468,7 @@ public class PostgresDbManager implements DbManager {
                 "GROUP BY utc_timestamp::DATE " +
                 "ORDER BY utc_timestamp::DATE ASC;";
 
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+        try (final Connection connection = PostgresDbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
 
             preparedStatement.setInt(1, month.getValue());
@@ -546,7 +534,7 @@ public class PostgresDbManager implements DbManager {
                 "ORDER BY utc_timestamp DESC " +
                 "LIMIT 1;";
 
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+        try (final Connection connection = PostgresDbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(preparedSelectSqlStatement)) {
 
             preparedStatement.setInt(1, localDate.getDayOfMonth());
@@ -573,7 +561,7 @@ public class PostgresDbManager implements DbManager {
         LOGGER.debug("Inserting initial stats for user {} to DB", userStats.getUserId());
         final String preparedInsertSqlStatement = "INSERT INTO user_initial_stats (user_id, utc_timestamp, initial_points, initial_units) VALUES (?, ?, ?, ?);";
 
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+        try (final Connection connection = PostgresDbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
             try {
                 preparedStatement.setInt(1, userStats.getUserId());
@@ -612,7 +600,7 @@ public class PostgresDbManager implements DbManager {
                 "ORDER BY utc_timestamp DESC " +
                 "LIMIT 1;";
 
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+        try (final Connection connection = PostgresDbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
             final Map<Integer, Stats> initialStats = new HashMap<>(userIds.size());
 
@@ -643,7 +631,7 @@ public class PostgresDbManager implements DbManager {
                 "ORDER BY utc_timestamp DESC " +
                 "LIMIT 1;";
 
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+        try (final Connection connection = PostgresDbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(preparedSelectSqlStatement)) {
 
             preparedStatement.setInt(1, userId);
@@ -667,7 +655,7 @@ public class PostgresDbManager implements DbManager {
         LOGGER.debug("Inserting total stats for {} users to DB", totalUserStats.size());
         final String preparedInsertSqlStatement = "INSERT INTO user_total_stats (user_id, utc_timestamp, total_points, total_units) VALUES (?, ?, ?, ?);";
 
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+        try (final Connection connection = PostgresDbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
             for (final UserStats totalStatsForUser : totalUserStats) {
                 try {
@@ -696,7 +684,7 @@ public class PostgresDbManager implements DbManager {
                 "ORDER BY utc_timestamp DESC " +
                 "LIMIT 1;";
 
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+        try (final Connection connection = PostgresDbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(preparedSqlStatement)) {
             preparedStatement.setInt(1, userId);
 
@@ -721,7 +709,7 @@ public class PostgresDbManager implements DbManager {
                 "DO UPDATE " +
                 "SET utc_timestamp = ?, offset_points = ?, offset_multiplied_points = ?, offset_units = ?;";
 
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+        try (final Connection connection = PostgresDbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
             final Timestamp currentUtcTimestamp = TimeUtils.getCurrentUtcTimestamp();
 
@@ -752,7 +740,7 @@ public class PostgresDbManager implements DbManager {
                 "SET utc_timestamp = ?, offset_points = user_offset_tc_stats.offset_points + ?, offset_multiplied_points = user_offset_tc_stats.offset_multiplied_points + ?, offset_units = user_offset_tc_stats.offset_units + ? " +
                 "RETURNING offset_points, offset_multiplied_points, offset_units;";
 
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+        try (final Connection connection = PostgresDbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
             final Timestamp currentUtcTimestamp = TimeUtils.getCurrentUtcTimestamp();
 
@@ -787,7 +775,7 @@ public class PostgresDbManager implements DbManager {
                 "ORDER BY utc_timestamp DESC " +
                 "LIMIT 1;";
 
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+        try (final Connection connection = PostgresDbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
             final Map<Integer, UserStatsOffset> offsetsByUserId = new HashMap<>(userIds.size());
 
@@ -818,7 +806,7 @@ public class PostgresDbManager implements DbManager {
         final String preparedInsertSqlStatement = "DELETE FROM user_offset_tc_stats;";
         LOGGER.debug("Executing prepared statement: '{}'", preparedInsertSqlStatement);
 
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+        try (final Connection connection = PostgresDbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
             preparedStatement.executeUpdate();
 
@@ -835,7 +823,7 @@ public class PostgresDbManager implements DbManager {
         LOGGER.debug("Persisting retired user ID {} for team ID {}", retiredUserStats.getUserId(), teamId);
         final String preparedInsertSqlStatement = "INSERT INTO retired_user_stats (user_id, team_id, display_username, utc_timestamp, final_points, final_multiplied_points, final_units) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id;";
 
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+        try (final Connection connection = PostgresDbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
             try {
                 preparedStatement.setInt(1, retiredUserStats.getUserId());
@@ -871,7 +859,7 @@ public class PostgresDbManager implements DbManager {
                 "ORDER BY utc_timestamp DESC " +
                 "LIMIT 1;";
 
-        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+        try (final Connection connection = PostgresDbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
             try {
                 preparedStatement.setInt(1, retiredUserId);

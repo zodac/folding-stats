@@ -77,7 +77,7 @@ public class TeamCompetitionStatsEndpoint {
         LOGGER.debug("GET request received to show TC stats");
 
         try {
-            final List<TeamResult> teamResults = getTeams();
+            final List<TeamResult> teamResults = getStatsForTeams();
             LOGGER.debug("Found {} TC teams", teamResults.size());
 
             if (teamResults.isEmpty()) {
@@ -93,7 +93,7 @@ public class TeamCompetitionStatsEndpoint {
         }
     }
 
-    private List<TeamResult> getTeams() {
+    private List<TeamResult> getStatsForTeams() {
         try {
             final List<Team> teams = storageFacade.getAllTeams();
             final List<TeamResult> teamResults = new ArrayList<>(teams.size());
