@@ -7,4 +7,5 @@ target/
 
 # Merged JS/CSS files
 docker/frontend/site/res/css/main.css
-docker/frontend/site/res/js/main.js
+docker/frontend/site/res/js/index.js
+docker/frontend/site/res/js/historic.js

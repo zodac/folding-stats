@@ -24,7 +24,7 @@
                 <artifactId>minify-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>default-minify</id>
+                        <id>minify-css</id>
                         <phase>package</phase>
                         <configuration>
                             <charset>UTF-8</charset>
@@ -38,16 +38,59 @@
                             </cssSourceFiles>
                             <cssFinalFile>main.css</cssFinalFile>
 
+                            <skipMerge>${skip-minify}</skipMerge>
+                            <skipMinify>${skip-minify}</skipMinify>
+                        </configuration>
+                        <goals>
+                            <goal>minify</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>minify-index-js</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <charset>UTF-8</charset>
+                            <webappSourceDir>${project.basedir}/frontend/src</webappSourceDir>
+                            <webappTargetDir>${project.basedir}/frontend/site/res</webappTargetDir>
+
                             <!-- JS files -->
                             <jsSourceDir>js</jsSourceDir>
                             <jsSourceFiles>
+                                <jsSourceFile>base.js</jsSourceFile>
                                 <jsSourceFile>google_analytics.js</jsSourceFile>
                                 <jsSourceFile>json_sorter.js</jsSourceFile>
-                                <jsSourceFile>main.js</jsSourceFile>
+                                <jsSourceFile>index.js</jsSourceFile>
                                 <jsSourceFile>table_sort.js</jsSourceFile>
                                 <jsSourceFile>timer.js</jsSourceFile>
                             </jsSourceFiles>
-                            <jsFinalFile>main.js</jsFinalFile>
+                            <jsFinalFile>index.js</jsFinalFile>
+                            <jsEngine>CLOSURE</jsEngine>
+
+                            <skipMerge>${skip-minify}</skipMerge>
+                            <skipMinify>${skip-minify}</skipMinify>
+                        </configuration>
+                        <goals>
+                            <goal>minify</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>minify-historic-js</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <charset>UTF-8</charset>
+                            <webappSourceDir>${project.basedir}/frontend/src</webappSourceDir>
+                            <webappTargetDir>${project.basedir}/frontend/site/res</webappTargetDir>
+
+                            <!-- JS files -->
+                            <jsSourceDir>js</jsSourceDir>
+                            <jsSourceFiles>
+                                <jsSourceFile>base.js</jsSourceFile>
+                                <jsSourceFile>json_sorter.js</jsSourceFile>
+                                <jsSourceFile>historic.js</jsSourceFile>
+                                <jsSourceFile>table_sort.js</jsSourceFile>
+                                <jsSourceFile>timer.js</jsSourceFile>
+                            </jsSourceFiles>
+                            <jsFinalFile>historic.js</jsFinalFile>
                             <jsEngine>CLOSURE</jsEngine>
 
                             <skipMerge>${skip-minify}</skipMerge>

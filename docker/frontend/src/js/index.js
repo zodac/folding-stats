@@ -1,5 +1,3 @@
-const ROOT_URL='http://internal.axihub.ca/folding';
-
 // The 'toggle' functions below simply change the colour of the buttons. There must be a smarter way to do this...
 function toggleMainButtonStyle(type){
     if($("#"+type+"_div").is(":visible")){
@@ -171,10 +169,10 @@ function loadTcStats() {
                 teamTableBodyRow = document.createElement("tr");
 
                 teamTableUserProperties.forEach(function (userProperty, i) {
-                    teamTableUserRow = document.createElement("td");
+                    teamTableUserCell = document.createElement("td");
 
                     if(userProperty === "userName"){
-                        teamTableUserRow.innerHTML = retiredUser[userProperty] + " (retired)";
+                        teamTableUserCell.innerHTML = retiredUser[userProperty] + " (retired)";
                     } else {
                         if(userProperty === "multipliedPoints"){
                             teamTableUserCell.setAttribute("data-toggle", "tooltip");
@@ -182,7 +180,7 @@ function loadTcStats() {
                             teamTableUserCell.setAttribute("title", "Unmultiplied: " + retiredUser["points"].toLocaleString());
                         }
 
-                        teamTableUserRow.innerHTML = retiredUser[userProperty].toLocaleString();
+                        teamTableUserCell.innerHTML = retiredUser[userProperty].toLocaleString();
                     }
                     teamTableBodyRow.append(teamTableUserRow);
                 });
@@ -197,7 +195,7 @@ function loadTcStats() {
             statsDiv.append(document.createElement('br'));
         });
         $('[data-toggle="tooltip"]').tooltip();
-        hideLoader();
+        $("#loader").hide();
     })
 };
 
@@ -386,10 +384,6 @@ function loadTeams() {
         teamsDiv.append(teamsTable);
     })
 };
-
-function hideLoader() {
-    $("#loader").hide();
-}
 
 $(document).ready(function() {
     loadTcStats();
