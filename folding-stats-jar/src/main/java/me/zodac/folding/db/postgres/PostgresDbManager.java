@@ -457,7 +457,7 @@ public class PostgresDbManager implements DbManager {
     public Map<LocalDate, UserTcStats> getDailyUserTcStats(final int userId, final Month month, final Year year) throws FoldingException, UserNotFoundException {
         LOGGER.debug("Getting historic daily user TC stats for {}/{} for user {}", StringUtils.capitalize(month.toString().toLowerCase(Locale.UK)), year, userId);
 
-        final String selectSqlStatement = "SELECT utc_timestamp::DATE AS TIMESTAMP, " +
+        final String selectSqlStatement = "SELECT utc_timestamp::DATE AS daily_timestamp, " +
                 "COALESCE(MAX(tc_points) - LAG(MAX(tc_points)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points, " +
                 "COALESCE(MAX(tc_points_multiplied) - LAG(MAX(tc_points_multiplied)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points_multiplied, " +
                 "COALESCE(MAX(tc_units) - LAG(MAX(tc_units)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_units " +
@@ -482,7 +482,7 @@ public class PostgresDbManager implements DbManager {
 
                 // First entry will be zeroed, so we need to manually get the first day's stats for the user
                 if (resultSet.next()) {
-                    final Timestamp timestamp = resultSet.getTimestamp("timestamp");
+                    final Timestamp timestamp = resultSet.getTimestamp("daily_timestamp");
                     final LocalDate localDate = timestamp.toLocalDateTime().toLocalDate();
                     final UserTcStats userTcStats = getTcStatsForDay(localDate, userId);
 
@@ -496,9 +496,9 @@ public class PostgresDbManager implements DbManager {
                     );
                 }
 
-                // All remaining stats will be diff-ed from the previous entry
+                // All remaining entries will be diff-ed from the previous entry
                 while (resultSet.next()) {
-                    final Timestamp timestamp = resultSet.getTimestamp("timestamp");
+                    final Timestamp timestamp = resultSet.getTimestamp("daily_timestamp");
                     userStatsByDate.put(timestamp.toLocalDateTime().toLocalDate(),
                             UserTcStats.create(
                                     userId, timestamp,
@@ -518,6 +518,54 @@ public class PostgresDbManager implements DbManager {
         } catch (final FoldingException | UserNotFoundException e) {
             LOGGER.warn("Unable to get the stats for the first day of {}/{} for user {}", StringUtils.capitalize(month.toString().toLowerCase(Locale.UK)), year, userId);
             throw e;
+        } catch (final SQLException e) {
+            throw new FoldingException("Error opening connection to the DB", e);
+        }
+    }
+
+    @Override
+    public Map<LocalDate, UserTcStats> getMonthlyUserTcStats(final int userId, final Year year) throws FoldingException, UserNotFoundException {
+        LOGGER.debug("Getting historic monthly user TC stats for {} for user {}", year, userId);
+
+        final String selectSqlStatement = "SELECT MAX(utc_timestamp) AS month_timestamp, " +
+                "MAX(tc_points) AS diff_points, " +
+                "MAX(tc_points_multiplied) AS diff_points_multiplied, " +
+                "MAX(tc_units) AS diff_units " +
+                "FROM user_tc_stats_hourly " +
+                "WHERE EXTRACT(YEAR FROM utc_timestamp) = ? " +
+                "AND user_id = ? " +
+                "GROUP BY EXTRACT(MONTH FROM utc_timestamp)::INT " +
+                "ORDER BY EXTRACT(MONTH FROM utc_timestamp)::INT ASC;";
+
+        try (final Connection connection = PostgresDbConnectionPool.getConnection();
+             final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
+
+            preparedStatement.setInt(1, year.getValue());
+            preparedStatement.setInt(2, userId);
+
+            final Map<LocalDate, UserTcStats> userStatsByDate = new TreeMap<>();
+
+            LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
+            try (final ResultSet resultSet = preparedStatement.executeQuery()) {
+
+                while (resultSet.next()) {
+                    final Timestamp timestamp = resultSet.getTimestamp("month_timestamp");
+                    userStatsByDate.put(timestamp.toLocalDateTime().toLocalDate(),
+                            UserTcStats.create(
+                                    userId, timestamp,
+                                    resultSet.getLong("diff_points"),
+                                    resultSet.getLong("diff_points_multiplied"),
+                                    resultSet.getInt("diff_units")
+                            )
+                    );
+                }
+
+                if (userStatsByDate.isEmpty()) {
+                    throw new UserNotFoundException(userId);
+                }
+
+                return userStatsByDate;
+            }
         } catch (final SQLException e) {
             throw new FoldingException("Error opening connection to the DB", e);
         }

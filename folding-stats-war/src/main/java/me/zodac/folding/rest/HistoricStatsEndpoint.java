@@ -5,6 +5,7 @@ import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.rest.api.tc.historic.DailyStats;
+import me.zodac.folding.rest.api.tc.historic.MonthlyStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,9 +100,39 @@ public class HistoricStatsEndpoint {
     @GET
     @Path("/users/{userId}/{year}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getMonthlyUserStats(@PathParam("userId") final String userId) {
-        LOGGER.info("GET request received to show monthly TC user stats at '{}'", uriContext.getAbsolutePath());
-        return notImplemented();
+    public Response getMonthlyUserStats(@PathParam("userId") final String userId, @PathParam("year") final String year) {
+        LOGGER.debug("GET request received to show monthly TC user stats at '{}'", uriContext.getAbsolutePath());
+
+        try {
+            final Map<LocalDate, UserTcStats> monthlyUserTcStats = storageFacade.getMonthlyUserTcStats(Integer.parseInt(userId), Year.parse(year));
+
+            final List<MonthlyStats> dailyStats = monthlyUserTcStats.entrySet()
+                    .stream()
+                    .map(entry -> MonthlyStats.createFromTcStats(entry.getKey(), entry.getValue()))
+                    .collect(Collectors.toList());
+
+            return ok(dailyStats);
+        } catch (final DateTimeParseException e) {
+            final String errorMessage = String.format("The year '%s' is not a valid format", year);
+            LOGGER.debug(errorMessage, e);
+            LOGGER.error(errorMessage);
+            return badRequest(errorMessage);
+        } catch (final NumberFormatException e) {
+            final String errorMessage = String.format("The user ID '%s' is not a valid format", userId);
+            LOGGER.debug(errorMessage, e);
+            LOGGER.error(errorMessage);
+            return badRequest(errorMessage);
+        } catch (final NotFoundException e) {
+            LOGGER.debug("No user found with ID: {}", userId, e);
+            LOGGER.error("No user found with ID: {}", userId);
+            return notFound();
+        } catch (final FoldingException e) {
+            LOGGER.error("Error getting user with ID: {}", userId, e.getCause());
+            return serverError();
+        } catch (final Exception e) {
+            LOGGER.error("Unexpected error getting user with ID: {}", userId, e);
+            return serverError();
+        }
     }
 
     @GET

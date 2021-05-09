@@ -432,6 +432,10 @@ public class StorageFacade {
         return dbManager.getDailyUserTcStats(userId, month, year);
     }
 
+    public Map<LocalDate, UserTcStats> getMonthlyUserTcStats(final int userId, final Year year) throws FoldingException, UserNotFoundException {
+        return dbManager.getMonthlyUserTcStats(userId, year);
+    }
+
     public void addOffsetStats(final int userId, final UserStatsOffset userStatsOffset) throws FoldingException {
         dbManager.addOffsetStats(userId, userStatsOffset);
         offsetStatsCache.add(userId, userStatsOffset);
