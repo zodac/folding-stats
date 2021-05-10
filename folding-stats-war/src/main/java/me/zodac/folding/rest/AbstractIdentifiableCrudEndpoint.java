@@ -1,12 +1,12 @@
 package me.zodac.folding.rest;
 
 import me.zodac.folding.api.Identifiable;
-import me.zodac.folding.api.exception.FoldingConflictException;
+import me.zodac.folding.api.db.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.FoldingExternalServiceException;
-import me.zodac.folding.api.exception.FoldingIdInvalidException;
-import me.zodac.folding.api.exception.FoldingIdOutOfRangeException;
-import me.zodac.folding.api.exception.NotFoundException;
+import me.zodac.folding.api.tc.exception.FoldingIdInvalidException;
+import me.zodac.folding.api.tc.exception.FoldingIdOutOfRangeException;
+import me.zodac.folding.api.tc.exception.NotFoundException;
 import me.zodac.folding.rest.response.BulkCreateResponse;
 import me.zodac.folding.validator.ValidationResponse;
 import org.slf4j.Logger;

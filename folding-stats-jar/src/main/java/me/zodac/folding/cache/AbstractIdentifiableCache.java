@@ -1,7 +1,7 @@
 package me.zodac.folding.cache;
 
 import me.zodac.folding.api.Identifiable;
-import me.zodac.folding.api.exception.NotFoundException;
+import me.zodac.folding.api.tc.exception.NotFoundException;
 
 import java.util.HashMap;
 import java.util.List;

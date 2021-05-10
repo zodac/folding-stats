@@ -76,6 +76,7 @@ public class TeamCompetitionStatsScheduler {
     }
 
     private void parseTeamCompetitionStats(final ExecutionType executionType) {
+        LOGGER.info("");
         LOGGER.info("Parsing TC Folding stats:");
 
         final List<Team> tcTeams = getTcTeams();

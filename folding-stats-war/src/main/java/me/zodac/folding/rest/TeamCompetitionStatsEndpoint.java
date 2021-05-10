@@ -2,12 +2,12 @@ package me.zodac.folding.rest;
 
 import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.exception.FoldingException;
-import me.zodac.folding.api.exception.HardwareNotFoundException;
-import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.exception.HardwareNotFoundException;
+import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.api.utils.ExecutionType;

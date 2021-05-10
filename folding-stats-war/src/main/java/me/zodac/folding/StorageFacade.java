@@ -2,18 +2,18 @@ package me.zodac.folding;
 
 
 import me.zodac.folding.api.db.DbManager;
-import me.zodac.folding.api.exception.FoldingConflictException;
+import me.zodac.folding.api.db.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.FoldingExternalServiceException;
-import me.zodac.folding.api.exception.HardwareNotFoundException;
-import me.zodac.folding.api.exception.NotFoundException;
-import me.zodac.folding.api.exception.TeamNotFoundException;
-import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.OperatingSystem;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.exception.HardwareNotFoundException;
+import me.zodac.folding.api.tc.exception.NotFoundException;
+import me.zodac.folding.api.tc.exception.TeamNotFoundException;
+import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;

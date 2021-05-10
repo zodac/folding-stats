@@ -1,15 +1,15 @@
 package me.zodac.folding.rest;
 
 import me.zodac.folding.StorageFacade;
-import me.zodac.folding.api.exception.FoldingConflictException;
+import me.zodac.folding.api.db.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.FoldingExternalServiceException;
-import me.zodac.folding.api.exception.FoldingIdInvalidException;
-import me.zodac.folding.api.exception.FoldingIdOutOfRangeException;
-import me.zodac.folding.api.exception.NotFoundException;
-import me.zodac.folding.api.exception.TeamNotFoundException;
-import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.Team;
+import me.zodac.folding.api.tc.exception.FoldingIdInvalidException;
+import me.zodac.folding.api.tc.exception.FoldingIdOutOfRangeException;
+import me.zodac.folding.api.tc.exception.NotFoundException;
+import me.zodac.folding.api.tc.exception.TeamNotFoundException;
+import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.utils.ExecutionType;
 import me.zodac.folding.bean.TeamCompetitionStatsScheduler;
 import me.zodac.folding.validator.TeamValidator;

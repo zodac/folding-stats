@@ -1,4 +1,4 @@
-package me.zodac.folding.api.exception;
+package me.zodac.folding.api.db.exception;
 
 // TODO: [zodac] Anything throwing a conflict should also contain links to the things using them, ideally
 public class FoldingConflictException extends Exception {

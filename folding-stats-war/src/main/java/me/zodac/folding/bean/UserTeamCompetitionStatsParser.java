@@ -93,7 +93,11 @@ public class UserTeamCompetitionStatsParser {
             return;
         }
 
-        final double hardwareMultiplier = hardware.get().getMultiplier();
+        calculateAndPersistTcStats(user, initialStats, statsOffset, totalStats, hardware.get());
+    }
+
+    private void calculateAndPersistTcStats(final User user, final Stats initialStats, final UserStatsOffset statsOffset, final UserStats totalStats, final Hardware hardware) {
+        final double hardwareMultiplier = hardware.getMultiplier();
         final long points = Math.max(0, totalStats.getPoints() - initialStats.getPoints());
         final long multipliedPoints = Math.round(points * hardwareMultiplier);
         final int units = Math.max(0, totalStats.getUnits() - initialStats.getUnits());

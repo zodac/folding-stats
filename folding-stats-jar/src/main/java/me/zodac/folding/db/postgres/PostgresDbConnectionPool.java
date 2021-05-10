@@ -38,7 +38,6 @@ public final class PostgresDbConnectionPool {
      * @return a DB {@link Connection}
      * @throws SQLException thrown if an error accessing the {@link Connection} occurs
      */
-    // TODO: [zodac] Wrap this SQLException with a FoldingConnectionException, remove the connection CATCH block in PostgresDbManager
     public static Connection getConnection() throws SQLException {
         return DATA_SOURCE_POOL.getConnection();
     }

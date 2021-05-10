@@ -1,16 +1,16 @@
 package me.zodac.folding.rest;
 
 import me.zodac.folding.StorageFacade;
-import me.zodac.folding.api.exception.FoldingConflictException;
+import me.zodac.folding.api.db.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.FoldingExternalServiceException;
-import me.zodac.folding.api.exception.FoldingIdInvalidException;
-import me.zodac.folding.api.exception.FoldingIdOutOfRangeException;
-import me.zodac.folding.api.exception.HardwareNotFoundException;
-import me.zodac.folding.api.exception.NotFoundException;
-import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.exception.FoldingIdInvalidException;
+import me.zodac.folding.api.tc.exception.FoldingIdOutOfRangeException;
+import me.zodac.folding.api.tc.exception.HardwareNotFoundException;
+import me.zodac.folding.api.tc.exception.NotFoundException;
+import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.stats.UserStatsOffset;
 import me.zodac.folding.bean.UserTeamCompetitionStatsParser;
 import me.zodac.folding.validator.UserValidator;

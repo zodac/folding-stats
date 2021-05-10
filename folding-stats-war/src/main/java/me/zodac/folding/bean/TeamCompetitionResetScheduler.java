@@ -1,12 +1,12 @@
 package me.zodac.folding.bean;
 
 import me.zodac.folding.StorageFacade;
-import me.zodac.folding.api.exception.FoldingConflictException;
+import me.zodac.folding.api.db.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
-import me.zodac.folding.api.exception.TeamNotFoundException;
-import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.exception.TeamNotFoundException;
+import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.utils.EnvironmentVariables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
