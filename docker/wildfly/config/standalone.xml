@@ -126,7 +126,7 @@
             <logger category="me.zodac.folding">
                 <level name="INFO"/>
             </logger>
-            <!-- [zodac] Added logging category to suppress INFO logs-->
+            <!-- [zodac] Added logging category to suppress INFO logs -->
             <logger category="com.zaxxer.hikari">
                 <level name="WARN"/>
             </logger>

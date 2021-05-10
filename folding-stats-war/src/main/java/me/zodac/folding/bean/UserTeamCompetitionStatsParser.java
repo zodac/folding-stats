@@ -22,19 +22,36 @@ import java.util.Optional;
 
 import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
 
+/**
+ * Class that parses stats for <code>Team Competition</code> {@link User}s.
+ */
 @LocalBean
 @Stateless
-public class UserStatsParser {
+public class UserTeamCompetitionStatsParser {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserStatsParser.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserTeamCompetitionStatsParser.class);
 
     @EJB
     private StorageFacade storageFacade;
 
+    /**
+     * Parses the latest TC stats for the given {@link User}.
+     * <p>
+     * Method blocks until the stats have been parsed, calculated and persisted.
+     *
+     * @param user the {@link User} whose TC stats are to be parsed
+     */
     public void parseTcStatsForUserAndWait(final User user) {
         parseTcStatsForUser(user);
     }
 
+    /**
+     * Parses the latest TC stats for the given {@link User}.
+     * <p>
+     * Method runs {@link Asynchronous}, so returns immediately and processes the {@link User} stats in a separate/background thread.
+     *
+     * @param user the {@link User} whose TC stats are to be parsed
+     */
     @Asynchronous
     public void parseTcStatsForUser(final User user) {
         updateTcStatsForUser(user);

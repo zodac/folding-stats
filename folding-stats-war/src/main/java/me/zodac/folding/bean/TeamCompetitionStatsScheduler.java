@@ -39,7 +39,7 @@ public class TeamCompetitionStatsScheduler {
     private StorageFacade storageFacade;
 
     @EJB
-    private UserStatsParser userStatsParser;
+    private UserTeamCompetitionStatsParser userTeamCompetitionStatsParser;
 
     @Resource
     private TimerService timerService;
@@ -101,9 +101,9 @@ public class TeamCompetitionStatsScheduler {
             }
 
             if (executionType == ExecutionType.ASYNCHRONOUS) {
-                userStatsParser.parseTcStatsForUser(user.get());
+                userTeamCompetitionStatsParser.parseTcStatsForUser(user.get());
             } else {
-                userStatsParser.parseTcStatsForUserAndWait(user.get());
+                userTeamCompetitionStatsParser.parseTcStatsForUserAndWait(user.get());
             }
         }
     }

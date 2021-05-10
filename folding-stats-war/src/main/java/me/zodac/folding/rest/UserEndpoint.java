@@ -12,7 +12,7 @@ import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.UserStatsOffset;
-import me.zodac.folding.bean.UserStatsParser;
+import me.zodac.folding.bean.UserTeamCompetitionStatsParser;
 import me.zodac.folding.validator.UserValidator;
 import me.zodac.folding.validator.ValidationResponse;
 import org.slf4j.Logger;
@@ -52,7 +52,7 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
     private StorageFacade storageFacade;
 
     @EJB
-    private UserStatsParser userStatsParser;
+    private UserTeamCompetitionStatsParser userTeamCompetitionStatsParser;
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -108,7 +108,7 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
             final int parsedId = super.parseId(userId);
             final UserStatsOffset statsOffsetToUse = getValidUserStatsOffset(userStatsOffset, parsedId);
             storageFacade.addOrUpdateOffsetStats(parsedId, statsOffsetToUse);
-            userStatsParser.parseTcStatsForUserAndWait(storageFacade.getUser(parsedId));
+            userTeamCompetitionStatsParser.parseTcStatsForUserAndWait(storageFacade.getUser(parsedId));
             return ok();
         } catch (final FoldingIdInvalidException e) {
             final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), e.getId());

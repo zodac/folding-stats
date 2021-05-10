@@ -27,7 +27,6 @@ services:
       - development
     volumes:
       - /opt/jboss/wildfly/standalone/deployments/
-      - m2:/root/.m2
 
   wildfly_dev:
     build:
@@ -99,7 +98,3 @@ services:
 
 networks:
   development:
-
-volumes:
-  # Volume to save maven .m2 for subsequent builds
-  m2:
