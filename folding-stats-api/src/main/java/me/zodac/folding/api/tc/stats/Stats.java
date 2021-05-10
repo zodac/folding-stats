@@ -18,4 +18,13 @@ public class Stats {
     public static Stats create(final long points, final int units) {
         return new Stats(points, units);
     }
+
+    public static Stats empty() {
+        return new Stats(0L, 0);
+    }
+
+
+    public boolean isEmpty() {
+        return points == 0L && units == 0;
+    }
 }

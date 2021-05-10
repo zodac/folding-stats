@@ -3,9 +3,9 @@ package me.zodac.folding.bean;
 import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.exception.FoldingException;
-import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.Stats;
+import me.zodac.folding.api.utils.ExecutionType;
 import me.zodac.folding.db.DbManagerRetriever;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,8 +15,6 @@ import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import java.util.List;
-
-import static java.util.stream.Collectors.toList;
 
 
 // TODO: [zodac] Move this to an EJB module?
@@ -32,7 +30,7 @@ public class Initialiser {
     private StorageFacade storageFacade;
 
     @EJB
-    private TeamCompetitionStatsParser teamCompetitionStatsParser;
+    private TeamCompetitionStatsScheduler teamCompetitionStatsScheduler;
 
     @PostConstruct
     public void init() {
@@ -48,15 +46,12 @@ public class Initialiser {
             storageFacade.getAllTeams();
 
             final List<User> users = storageFacade.getAllUsers();
-            storageFacade.getOffsetStatsForUsers(users.stream().map(User::getId).collect(toList()));
+            storageFacade.initialiseOffsetStats();
 
             for (final User user : users) {
                 try {
                     final Stats initialStatsForUser = storageFacade.getInitialStatsForUser(user.getId());
                     LOGGER.debug("Found initial stats for user {}: {}", user, initialStatsForUser);
-                } catch (final UserNotFoundException e) {
-                    LOGGER.debug("No initial stats in DB for {}", user, e);
-                    LOGGER.warn("No initial stats in DB for {}", user);
                 } catch (final FoldingException e) {
                     LOGGER.warn("Unable to get initial stats for user {}", user, e.getCause());
                 }
@@ -72,7 +67,7 @@ public class Initialiser {
         try {
             if (!dbManager.doTcStatsExist()) {
                 LOGGER.warn("No TC stats data exists in the DB");
-                teamCompetitionStatsParser.manualTcStatsParsing();
+                teamCompetitionStatsScheduler.manualTeamCompetitionStatsParsing(ExecutionType.ASYNCHRONOUS);
             }
         } catch (final FoldingException e) {
             LOGGER.warn("Unable to check DB state", e.getCause());

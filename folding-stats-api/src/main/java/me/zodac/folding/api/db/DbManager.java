@@ -66,9 +66,8 @@ public interface DbManager {
     void deleteTeam(final int teamId) throws FoldingException, FoldingConflictException;
 
     // TC operations
-
-
-    void persistHourlyTcUserStats(final List<UserTcStats> userStats) throws FoldingException;
+    
+    void persistHourlyTcStatsForUser(final UserTcStats userTcStats) throws FoldingException;
 
     boolean doTcStatsExist() throws FoldingException;
 
@@ -80,14 +79,11 @@ public interface DbManager {
 
     void persistInitialUserStats(final UserStats userStats) throws FoldingException;
 
-    Stats getInitialUserStats(final int userId) throws FoldingException, UserNotFoundException;
-
-    // TODO: [zodac] Remove this, force callers to wrap their own IDs in a list
-    Map<Integer, Stats> getInitialUserStats(final List<Integer> userIds) throws FoldingException;
+    Stats getInitialStatsForUser(final int userId) throws FoldingException;
 
     UserTcStats getCurrentTcStats(final int userId) throws FoldingException, UserNotFoundException;
 
-    void persistTotalUserStats(final List<UserStats> stats) throws FoldingException;
+    void persistTotalStatsForUser(final UserStats stats) throws FoldingException;
 
     Stats getTotalStats(final int userId) throws FoldingException;
 
@@ -95,7 +91,7 @@ public interface DbManager {
 
     UserStatsOffset addOrUpdateOffsetStats(final int userId, final UserStatsOffset userStatsOffset) throws FoldingException;
 
-    Map<Integer, UserStatsOffset> getOffsetStats(final List<Integer> userIds) throws FoldingException;
+    UserStatsOffset getOffsetStatsForUser(final int userId) throws FoldingException;
 
     void clearOffsetStats() throws FoldingConflictException, FoldingException;
 

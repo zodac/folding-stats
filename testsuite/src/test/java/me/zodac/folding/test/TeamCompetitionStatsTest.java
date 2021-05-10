@@ -149,6 +149,7 @@ public class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.setUnits(user, newUnits);
 
         final HttpResponse<Void> response = TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+
         assertThat(response.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -241,6 +242,7 @@ public class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.setUnits(firstUser, 10);
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
+
         final CompetitionResult resultAfterFirstUpdate = TeamCompetitionStatsUtils.get();
         final TeamResult teamResultAfterFirstUpdate = getTeamFromCompetition(resultAfterFirstUpdate, team.getTeamName());
         final UserResult firstUserResultAfterFirstUpdate = getActiveUserFromTeam(teamResultAfterFirstUpdate, firstUser.getDisplayName());
@@ -257,6 +259,7 @@ public class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.setPoints(secondUser, 20_000L);
         StubbedFoldingEndpointUtils.setUnits(secondUser, 20);
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+
 
         final CompetitionResult resultAfterSecondUpdate = TeamCompetitionStatsUtils.get();
         final TeamResult teamResultAfterSecondUpdate = getTeamFromCompetition(resultAfterSecondUpdate, team.getTeamName());
@@ -304,6 +307,7 @@ public class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.setUnits(firstUser, 10);
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
+
         final CompetitionResult resultAfterFirstUpdate = TeamCompetitionStatsUtils.get();
         final TeamResult firstTeamResultAfterFirstUpdate = getTeamFromCompetition(resultAfterFirstUpdate, firstTeam.getTeamName());
         final TeamResult secondTeamResultAfterFirstUpdate = getTeamFromCompetition(resultAfterFirstUpdate, secondTeam.getTeamName());
@@ -319,6 +323,7 @@ public class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.setPoints(secondUser, 20_000L);
         StubbedFoldingEndpointUtils.setUnits(secondUser, 20);
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+
 
         final CompetitionResult resultAfterSecondUpdate = TeamCompetitionStatsUtils.get();
         final TeamResult firstTeamResultAfterSecondUpdate = getTeamFromCompetition(resultAfterSecondUpdate, firstTeam.getTeamName());
@@ -347,6 +352,7 @@ public class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.setPoints(user, newPoints);
         StubbedFoldingEndpointUtils.setUnits(user, newUnits);
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+
 
         final CompetitionResult result = TeamCompetitionStatsUtils.get();
         final TeamResult teamResult = getTeamFromCompetition(result, team.getTeamName());
@@ -379,6 +385,7 @@ public class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.setPoints(user, firstPoints);
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
+
         final CompetitionResult result = TeamCompetitionStatsUtils.get();
         final TeamResult teamResult = getTeamFromCompetition(result, team.getTeamName());
         final UserResult userResult = getActiveUserFromTeam(teamResult, user.getDisplayName());
@@ -399,6 +406,7 @@ public class TeamCompetitionStatsTest {
         final long secondPoints = 5_000L;
         StubbedFoldingEndpointUtils.setPoints(user, secondPoints);
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+
 
         final CompetitionResult resultAfterUpdate = TeamCompetitionStatsUtils.get();
         final TeamResult teamResultAfterUpdate = getTeamFromCompetition(resultAfterUpdate, team.getTeamName());
@@ -427,6 +435,7 @@ public class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.setPoints(user, firstPoints);
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
+
         final CompetitionResult result = TeamCompetitionStatsUtils.get();
         final TeamResult teamResult = getTeamFromCompetition(result, team.getTeamName());
         final UserResult userResult = getActiveUserFromTeam(teamResult, user.getDisplayName());
@@ -449,6 +458,7 @@ public class TeamCompetitionStatsTest {
         final long secondPoints = 5_000L;
         StubbedFoldingEndpointUtils.setPoints(user, secondPoints);
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+
 
         final CompetitionResult resultAfterUpdate = TeamCompetitionStatsUtils.get();
         final TeamResult teamResultAfterUpdate = getTeamFromCompetition(resultAfterUpdate, team.getTeamName());
@@ -478,6 +488,7 @@ public class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.setPoints(secondUser, firstPoints);
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
+
         final CompetitionResult result = TeamCompetitionStatsUtils.get();
         final TeamResult teamResult = getTeamFromCompetition(result, team.getTeamName());
 
@@ -494,6 +505,7 @@ public class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.setPoints(firstUser, secondPoints);
         StubbedFoldingEndpointUtils.setPoints(secondUser, secondPoints);
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+
 
         final CompetitionResult resultAfterRetirement = TeamCompetitionStatsUtils.get();
         final TeamResult teamResultAfterRetirement = getTeamFromCompetition(resultAfterRetirement, team.getTeamName());
@@ -526,6 +538,7 @@ public class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.setPoints(firstUser, thirdPoints);
         StubbedFoldingEndpointUtils.setPoints(secondUser, thirdPoints);
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+
 
         final CompetitionResult resultAfterUnretirement = TeamCompetitionStatsUtils.get();
         final TeamResult teamResultAfterUnretirement = getTeamFromCompetition(resultAfterUnretirement, team.getTeamName());
@@ -573,6 +586,7 @@ public class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.setPoints(userToRetire, firstPoints);
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
+
         final CompetitionResult result = TeamCompetitionStatsUtils.get();
         final TeamResult originalTeamResult = getTeamFromCompetition(result, originalTeam.getTeamName());
         final TeamResult newTeamResult = getTeamFromCompetition(result, newTeam.getTeamName());
@@ -600,10 +614,12 @@ public class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.setPoints(userToRetire, secondPoints);
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
+
         TeamUtils.unretireUser(newTeamId, retiredUserId);
         final long thirdPoints = 14_000L;
         StubbedFoldingEndpointUtils.setPoints(userToRetire, thirdPoints);
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+
 
         final CompetitionResult resultAfterUnretirement = TeamCompetitionStatsUtils.get();
         final TeamResult originalTeamResultAfterUnretirement = getTeamFromCompetition(resultAfterUnretirement, originalTeam.getTeamName());
@@ -656,9 +672,11 @@ public class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.setPoints(user, firstPoints);
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
+
         final long pointsOffset = 1_000L;
         USER_REQUEST_SENDER.offset(userId, pointsOffset, pointsOffset, 0);
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+
 
         final CompetitionResult result = TeamCompetitionStatsUtils.get();
         final TeamResult teamResult = getTeamFromCompetition(result, team.getTeamName());
@@ -686,10 +704,12 @@ public class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.setUnits(user, firstUnits);
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
+
         final long pointsOffset = -20_000L;
         final int unitsOffset = -400;
         USER_REQUEST_SENDER.offset(userId, pointsOffset, pointsOffset, unitsOffset);
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+
 
         final CompetitionResult result = TeamCompetitionStatsUtils.get();
         final TeamResult teamResult = getTeamFromCompetition(result, team.getTeamName());

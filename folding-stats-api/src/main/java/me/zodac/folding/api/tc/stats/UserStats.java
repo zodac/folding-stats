@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.utils.DateTimeUtils;
 
 import java.sql.Timestamp;
 
@@ -20,6 +22,14 @@ public class UserStats {
 
     public static UserStats create(final int userId, final Timestamp timestamp, final Stats totalStats) {
         return new UserStats(userId, timestamp, totalStats);
+    }
+
+    public static UserStats empty() {
+        return new UserStats(User.EMPTY_USER_ID, DateTimeUtils.getCurrentUtcTimestamp(), Stats.empty());
+    }
+
+    public boolean isEmpty() {
+        return userId == 0 && stats.isEmpty();
     }
 
     public long getPoints() {

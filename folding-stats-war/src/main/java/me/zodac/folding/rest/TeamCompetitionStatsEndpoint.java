@@ -10,8 +10,9 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
+import me.zodac.folding.api.utils.ExecutionType;
 import me.zodac.folding.bean.TeamCompetitionResetScheduler;
-import me.zodac.folding.bean.TeamCompetitionStatsParser;
+import me.zodac.folding.bean.TeamCompetitionStatsScheduler;
 import me.zodac.folding.rest.api.tc.CompetitionResult;
 import me.zodac.folding.rest.api.tc.TeamResult;
 import me.zodac.folding.rest.api.tc.UserResult;
@@ -23,6 +24,7 @@ import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -50,16 +52,18 @@ public class TeamCompetitionStatsEndpoint {
     private TeamCompetitionResetScheduler teamCompetitionResetScheduler;
 
     @EJB
-    private TeamCompetitionStatsParser teamCompetitionStatsParser;
+    private TeamCompetitionStatsScheduler teamCompetitionStatsScheduler;
 
     @Context
     private UriInfo uriContext;
 
     @GET
     @Path("/manual/")
-    public Response manualStats() {
+    public Response manualStats(@QueryParam("async") final boolean async) {
         LOGGER.info("GET request received to manually parse TC stats");
-        teamCompetitionStatsParser.manualTcStatsParsing();
+
+        final ExecutionType executionType = async ? ExecutionType.ASYNCHRONOUS : ExecutionType.SYNCHRONOUS;
+        teamCompetitionStatsScheduler.manualTeamCompetitionStatsParsing(executionType);
         return ok();
     }
 

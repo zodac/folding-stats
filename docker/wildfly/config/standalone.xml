@@ -122,9 +122,13 @@
             <logger category="sun.rmi">
                 <level name="WARN"/>
             </logger>
-            <!-- [zodac] Added own logging category -->
+            <!-- [zodac] Added logging category for service code -->
             <logger category="me.zodac.folding">
                 <level name="INFO"/>
+            </logger>
+            <!-- [zodac] Added logging category to suppress INFO logs-->
+            <logger category="com.zaxxer.hikari">
+                <level name="WARN"/>
             </logger>
             <root-logger>
                 <level name="INFO"/>

@@ -48,4 +48,8 @@ public class UserStatsOffset {
     public boolean isMissingPointsOrMultipliedPoints() {
         return (pointsOffset == DEFAULT_POINTS) != (multipliedPointsOffset == DEFAULT_MULTIPLIED_POINTS);
     }
+
+    public boolean isEmpty() {
+        return pointsOffset == DEFAULT_POINTS && multipliedPointsOffset == DEFAULT_MULTIPLIED_POINTS && unitsOffset == DEFAULT_UNITS;
+    }
 }

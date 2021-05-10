@@ -63,6 +63,7 @@ public class ResetTest {
         final int teamId = TeamUtils.createOrConflict(team).getId();
 
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+
         final CompetitionResult result = TeamCompetitionStatsUtils.get();
         final TeamResult teamResult = getTeamFromCompetition(result, team.getTeamName());
 
@@ -76,6 +77,7 @@ public class ResetTest {
 
         TEAM_REQUEST_SENDER.retireUser(teamId, userToRetireId);
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+
         final CompetitionResult resultAfterRetirement = TeamCompetitionStatsUtils.get();
         final TeamResult teamResultAfterRetirement = getTeamFromCompetition(resultAfterRetirement, team.getTeamName());
 
@@ -89,6 +91,7 @@ public class ResetTest {
 
         TEAM_COMPETITION_REQUEST_SENDER.manualReset();
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+
         final CompetitionResult resultAfterReset = TeamCompetitionStatsUtils.get();
         final TeamResult teamResultAfterReset = getTeamFromCompetition(resultAfterReset, team.getTeamName());
 
@@ -124,6 +127,7 @@ public class ResetTest {
         StubbedFoldingEndpointUtils.setPoints(thirdUser, thirdUserPoints);
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
+
         final CompetitionResult result = TeamCompetitionStatsUtils.get();
         assertThat(result.getTotalPoints())
                 .as("Expected points from all three users: " + result)
@@ -158,6 +162,7 @@ public class ResetTest {
 
         TEAM_COMPETITION_REQUEST_SENDER.manualReset();
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+
 
         final CompetitionResult resultAfterReset = TeamCompetitionStatsUtils.get();
         assertThat(resultAfterReset.getTotalPoints())

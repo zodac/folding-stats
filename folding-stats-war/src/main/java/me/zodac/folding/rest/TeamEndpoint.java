@@ -10,7 +10,8 @@ import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.api.exception.TeamNotFoundException;
 import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.Team;
-import me.zodac.folding.bean.TeamCompetitionStatsParser;
+import me.zodac.folding.api.utils.ExecutionType;
+import me.zodac.folding.bean.TeamCompetitionStatsScheduler;
 import me.zodac.folding.validator.TeamValidator;
 import me.zodac.folding.validator.ValidationResponse;
 import org.slf4j.Logger;
@@ -50,7 +51,7 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
     private StorageFacade storageFacade;
 
     @EJB
-    private TeamCompetitionStatsParser teamCompetitionStatsParser;
+    private TeamCompetitionStatsScheduler teamCompetitionStatsScheduler;
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -211,9 +212,9 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
     }
 
     @Override
-    protected Team createElement(final Team team) throws FoldingException, FoldingConflictException, UserNotFoundException {
+    protected Team createElement(final Team team) throws FoldingException, FoldingConflictException {
         final Team teamWithId = storageFacade.createTeam(team);
-        teamCompetitionStatsParser.updateTcStatsForTeam(team);
+        teamCompetitionStatsScheduler.parseTcStatsForTeam(team, ExecutionType.SYNCHRONOUS);
         return teamWithId;
     }
 

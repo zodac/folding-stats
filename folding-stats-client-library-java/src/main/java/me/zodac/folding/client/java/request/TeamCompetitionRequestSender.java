@@ -57,14 +57,27 @@ public final class TeamCompetitionRequestSender {
 
     /**
      * Sends a <b>GET</b> request to manually trigger an update of the <code>Team Competition</code> stats for all {@link me.zodac.folding.api.tc.User}s and {@link me.zodac.folding.api.tc.Team}s.
+     * <p>
+     * Request will be sent and only return when the update is complete. If an asynchronous update is required, look at {@link #manualUpdate(boolean)}.
      *
      * @return the {@link HttpResponse} from the request
      * @throws FoldingRestException thrown if an error occurs sending the HTTP request
      */
     public HttpResponse<Void> manualUpdate() throws FoldingRestException {
+        return manualUpdate(false);
+    }
+
+    /**
+     * Sends a <b>GET</b> request to manually trigger an update of the <code>Team Competition</code> stats for all {@link me.zodac.folding.api.tc.User}s and {@link me.zodac.folding.api.tc.Team}s.
+     *
+     * @param async should the update be performed asynchronously, or wait for the result
+     * @return the {@link HttpResponse} from the request
+     * @throws FoldingRestException thrown if an error occurs sending the HTTP request
+     */
+    public HttpResponse<Void> manualUpdate(final boolean async) throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
                 .GET()
-                .uri(URI.create(foldingUrl + "/tc_stats/manual"))
+                .uri(URI.create(foldingUrl + "/tc_stats/manual?async=" + async))
                 .header("Content-Type", "application/json")
                 .build();
 

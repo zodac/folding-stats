@@ -5,7 +5,7 @@ import me.zodac.folding.api.exception.FoldingExternalServiceException;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
-import me.zodac.folding.api.utils.TimeUtils;
+import me.zodac.folding.api.utils.DateTimeUtils;
 import me.zodac.folding.parsing.http.request.PointsUrlBuilder;
 import me.zodac.folding.parsing.http.request.UnitsUrlBuilder;
 import org.slf4j.Logger;
@@ -22,9 +22,9 @@ public class FoldingStatsParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FoldingStatsParser.class);
 
-    public static UserStats getStatsForUser(final User user) throws FoldingException, FoldingExternalServiceException {
+    public static UserStats getTotalStatsForUser(final User user) throws FoldingException, FoldingExternalServiceException {
         LOGGER.debug("Getting stats for username/passkey '{}/{}'", user.getFoldingUserName(), user.getPasskey());
-        final Timestamp currentUtcTime = TimeUtils.getCurrentUtcTimestamp();
+        final Timestamp currentUtcTime = DateTimeUtils.getCurrentUtcTimestamp();
         final long userPoints = getPointsForUser(user.getFoldingUserName(), user.getPasskey());
         final int userUnits = getUnitsForUser(user.getFoldingUserName(), user.getPasskey());
         return UserStats.create(user.getId(), currentUtcTime, Stats.create(userPoints, userUnits));
