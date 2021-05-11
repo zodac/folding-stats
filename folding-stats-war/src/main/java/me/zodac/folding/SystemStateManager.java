@@ -38,7 +38,7 @@ public final class SystemStateManager {
         }
 
         // TODO: [zodac] Define permitted state transitions here, and validate them?
-        LOGGER.info("Transitioning system state from {} to {}", currentState, nextState);
+        LOGGER.debug("Transitioning system state from {} to {}", currentState, nextState);
         currentState = nextState;
     }
 }

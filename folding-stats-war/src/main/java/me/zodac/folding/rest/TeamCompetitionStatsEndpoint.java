@@ -15,6 +15,7 @@ import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.api.utils.ExecutionType;
 import me.zodac.folding.bean.TeamCompetitionResetScheduler;
 import me.zodac.folding.bean.TeamCompetitionStatsScheduler;
+import me.zodac.folding.cache.CompetitionResultCache;
 import me.zodac.folding.rest.api.tc.CompetitionResult;
 import me.zodac.folding.rest.api.tc.TeamResult;
 import me.zodac.folding.rest.api.tc.UserResult;
@@ -35,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toList;
@@ -101,6 +103,19 @@ public class TeamCompetitionStatsEndpoint {
             return serviceUnavailable();
         }
 
+        if (SystemStateManager.current() != SystemState.WRITE_EXECUTED && CompetitionResultCache.hasCachedResult()) {
+            LOGGER.debug("System is not in state {} and has a cached TC result, using cache", SystemState.WRITE_EXECUTED);
+
+            final Optional<CompetitionResult> cachedCompetitionResult = CompetitionResultCache.get();
+            if (cachedCompetitionResult.isPresent()) {
+                return ok(cachedCompetitionResult.get());
+            } else {
+                LOGGER.warn("Cache said it had TC result, but none was returned! Calculating new TC result");
+            }
+        }
+
+        LOGGER.debug("Calculating latest TC result, system state: {}, TC cache populated: {}", SystemStateManager.current(), CompetitionResultCache.hasCachedResult());
+
         try {
             final List<TeamResult> teamResults = getStatsForTeams();
             LOGGER.debug("Found {} TC teams", teamResults.size());
@@ -109,18 +124,11 @@ public class TeamCompetitionStatsEndpoint {
                 LOGGER.warn("No TC teams to show");
             }
 
-            if (SystemStateManager.current() == SystemState.WRITE_EXECUTED) {
-                LOGGER.info("System in state {}, recalculating TC result", SystemStateManager.current());
-                // TODO: [zodac] Cache this CompetitionResult, and invalidate cache on scheduled/manual update, scheduled/manual reset, user create/update, team create/update
-                //   Can't simply invalidate on stats update, because what if a hardware display is changed? Should invalidate on ALL changes
-                final CompetitionResult competitionResult = CompetitionResult.create(teamResults);
-                SystemStateManager.next(SystemState.AVAILABLE);
-                return ok(competitionResult);
-            } else {
-                LOGGER.info("System in state {}, using cached TC result", SystemStateManager.current());
-                // TODO: [zodac] Get from cache eventually
-                return ok(CompetitionResult.create(teamResults));
-            }
+
+            final CompetitionResult competitionResult = CompetitionResult.create(teamResults);
+            CompetitionResultCache.add(competitionResult);
+            SystemStateManager.next(SystemState.AVAILABLE);
+            return ok(competitionResult);
         } catch (final Exception e) {
             LOGGER.error("Unexpected error retrieving TC stats", e);
             return serverError();
