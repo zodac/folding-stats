@@ -1,21 +1,25 @@
 // The 'toggle' functions below simply change the colour of the buttons. There must be a smarter way to do this...
-function toggleMainButtonStyle(type){
-    if($("#"+type+"_div").is(":visible")){
-        $("#"+type+"_button").addClass("btn-primary");
-        $("#"+type+"_button").removeClass("btn-success");
+function toggleMainButtonStyle(type, classList){
+    var button = document.getElementById(type+"_button");
+
+    if(classList.contains("collapsed")){
+        button.classList.add("btn-primary");
+        button.classList.remove("btn-success");
     } else {
-        $("#"+type+"_button").removeClass("btn-primary");
-        $("#"+type+"_button").addClass("btn-success");
+        button.classList.add("btn-success");
+        button.classList.remove("btn-primary");
     }
 }
 
-function toggleTeam(teamNumber) {
-    if($("#team_"+teamNumber+"_subdiv").is(":visible")){
-        $("#team_"+teamNumber+"_button").addClass("btn-primary");
-        $("#team_"+teamNumber+"_button").removeClass("btn-success");
+function toggleTeam(teamNumber, classList) {
+    var button = document.getElementById("team_"+teamNumber+"_button");
+
+    if(classList.contains("collapsed")){
+        button.classList.add("btn-primary");
+        button.classList.remove("btn-success");
     } else {
-        $("#team_"+teamNumber+"_button").removeClass("btn-primary");
-        $("#team_"+teamNumber+"_button").addClass("btn-success");
+        button.classList.add("btn-success");
+        button.classList.remove("btn-primary");
     }
 }
 
@@ -41,7 +45,7 @@ function loadTcStats() {
 
         statsTable = document.createElement('table');
         statsTable.setAttribute("id", "stats");
-        statsTable.setAttribute("class", "table table-striped table-hover");
+        statsTable.setAttribute("class", "table table-dark table-striped table-hover");
 
         statsTableHead = document.createElement('thead');
         statsTableHeaderRow = document.createElement('tr');
@@ -55,7 +59,6 @@ function loadTcStats() {
         });
         statsTableHead.append(statsTableHeaderRow);
         statsTable.append(statsTableHead);
-
 
         statsTableBody = document.createElement('tbody');
         statsTableBodyRow = document.createElement('tr');
@@ -74,9 +77,7 @@ function loadTcStats() {
         statsTableBody.append(statsTableBodyRow);
         statsTable.append(statsTableBody);
 
-
         statsDiv.append(statsTable);
-
 
         // Build team tables
         const teamTableHeaders = ["Rank", "User", "Category", "Hardware", "Points", "Units"];
@@ -110,8 +111,8 @@ function loadTcStats() {
             teamButton.setAttribute("id", "team_"+teamNumber+"_button");
             teamButton.setAttribute("class", "btn ui-btn btn-primary");
             teamButton.setAttribute("href", "#team_"+teamNumber+"_subdiv");
-            teamButton.setAttribute("onclick", "toggleTeam("+teamNumber+")");
-            teamButton.setAttribute("data-toggle", "collapse");
+            teamButton.setAttribute("onclick", "toggleTeam("+teamNumber+", this.classList)");
+            teamButton.setAttribute("data-bs-toggle", "collapse");
             teamButton.setAttribute("role", "button");
             teamButton.innerHTML = "Show/Hide";
             metadataDiv.append(teamButton);
@@ -123,7 +124,7 @@ function loadTcStats() {
 
             teamTable = document.createElement('table');
             teamTable.setAttribute("id", "team_"+teamNumber);
-            teamTable.setAttribute("class", "table table-striped table-hover");
+            teamTable.setAttribute("class", "table table-dark table-striped table-hover");
 
             teamTableHead = document.createElement("thead");
             teamTableHeaderRow = document.createElement("tr");
@@ -219,7 +220,7 @@ function loadHardware() {
 
         hardwareTable = document.createElement('table');
         hardwareTable.setAttribute("id", "hardware");
-        hardwareTable.setAttribute("class", "table table-striped table-hover");
+        hardwareTable.setAttribute("class", "table table-dark table-striped table-hover");
 
         hardwareTableHead = document.createElement('thead');
         hardwareTableHeaderRow = document.createElement('tr');
@@ -278,7 +279,7 @@ function loadUsers() {
 
         usersTable = document.createElement('table');
         usersTable.setAttribute("id", "users");
-        usersTable.setAttribute("class", "table table-striped table-hover");
+        usersTable.setAttribute("class", "table table-dark table-striped table-hover");
 
         usersTableHead = document.createElement('thead');
         usersTableHeaderRow = document.createElement('tr');
@@ -342,7 +343,7 @@ function loadTeams() {
 
         teamsTable = document.createElement('table');
         teamsTable.setAttribute("id", "teams");
-        teamsTable.setAttribute("class", "table table-striped table-hover");
+        teamsTable.setAttribute("class", "table table-dark table-striped table-hover");
 
         teamsTableHead = document.createElement('thead');
         teamsTableHeaderRow = document.createElement('tr');

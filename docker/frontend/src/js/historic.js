@@ -50,9 +50,6 @@ function getUserHistoricStats(userId, userName) {
         return response.json();
     })
     .then(function(jsonResponse) {
-        console.log(jsonResponse);
-
-        user_dropdown_root
         dropDownTitle = document.getElementById("user_dropdown_root");
         dropDownTitle.innerHTML = userName;
 
@@ -70,7 +67,7 @@ function getUserHistoricStats(userId, userName) {
         const headers = ["Date", "Points", "Units"];
         historicTable = document.createElement('table');
         historicTable.setAttribute("id", "historic_table");
-        historicTable.setAttribute("class", "table table-striped table-hover");
+        historicTable.setAttribute("class", "table table-dark table-striped table-hover");
 
         tableHead = document.createElement('thead');
         tableHeaderRow = document.createElement('tr');
@@ -88,7 +85,6 @@ function getUserHistoricStats(userId, userName) {
 
         tableBody = document.createElement("tbody");
         jsonResponse.forEach(function(statsEntry, i){
-            console.log(statsEntry);
             tableRow = document.createElement("tr");
 
             dateCell = document.createElement("td");
