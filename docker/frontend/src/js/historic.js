@@ -1,22 +1,10 @@
-// https://stackoverflow.com/a/13627586
-function ordinalSuffixOf(i) {
-    var j = i % 10,
-        k = i % 100;
-    if (j == 1 && k != 11) {
-        return i + "st";
-    }
-    if (j == 2 && k != 12) {
-        return i + "nd";
-    }
-    if (j == 3 && k != 13) {
-        return i + "rd";
-    }
-    return i + "th";
-}
+const ROOT_URL='http://internal.axihub.ca/folding';
 
 function populateDropdown() {
-    let dropdown = $('#user_dropdown');
-    dropdown.empty();
+    var dropdown = document.getElementById('user_dropdown');
+    while (dropdown.firstChild) {
+        dropdown.removeChild(dropdown.lastChild);
+    }
 
     fetch(ROOT_URL+'/users')
     .then(response => {
@@ -25,7 +13,7 @@ function populateDropdown() {
     .then(function(jsonResponse) {
         dropdown_div = document.getElementById("user_dropdown");
 
-        $.each(jsonResponse, function(i, userItem) {
+        jsonResponse.forEach(function(userItem, i){
             userButton = document.createElement("button");
             userButton.setAttribute("class", "dropdown-item");
             userButton.setAttribute("type", "button");
@@ -38,8 +26,9 @@ function populateDropdown() {
 }
 
 function getUserHistoricStats(userId, userName) {
-    $("#loader").show();
-    $("#historic_stats").hide();
+    show("loader");
+    hide("historic_stats");
+
     var currentDate = new Date();
     var year = currentDate.getFullYear();
     var month = (currentDate.getMonth()+1);
@@ -93,10 +82,11 @@ function getUserHistoricStats(userId, userName) {
 
 
             pointsCell = document.createElement("td");
-            pointsCell.setAttribute("data-toggle", "tooltip");
+            pointsCell.setAttribute("data-bs-toggle", "tooltip");
             pointsCell.setAttribute("data-placement", "top");
             pointsCell.setAttribute("title", "Unmultiplied: " + statsEntry["points"].toLocaleString());
             pointsCell.innerHTML = statsEntry["multipliedPoints"].toLocaleString();
+            new bootstrap.Tooltip(pointsCell);
             tableRow.append(pointsCell);
 
             unitsCell = document.createElement("td");
@@ -106,16 +96,14 @@ function getUserHistoricStats(userId, userName) {
         });
 
         historicTable.append(tableBody);
-
         historicDiv.append(historicTable);
 
-        $('[data-toggle="tooltip"]').tooltip();
-        $("#loader").hide();
-        $("#historic_stats").show();
+        hide("loader");
+        show("historic_stats");
     });
 }
 
-$(document).ready(function() {
+document.addEventListener("DOMContentLoaded", function(event) {
     populateDropdown();
-    updateTime();
+    updateTimer();
 });

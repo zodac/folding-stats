@@ -1,3 +1,5 @@
+const ROOT_URL='http://internal.axihub.ca/folding';
+
 // The 'toggle' functions below simply change the colour of the buttons. There must be a smarter way to do this...
 function toggleMainButtonStyle(type, classList){
     var button = document.getElementById(type+"_button");
@@ -23,11 +25,8 @@ function toggleTeam(teamNumber, classList) {
     }
 }
 
-// Pull the TC stats, then manually update each of the numeric fields to be formatted with commas
 function loadTcStats() {
-    const prodUrl=ROOT_URL+'/tc_stats';
-
-    fetch(prodUrl)
+    fetch(ROOT_URL+'/tc_stats')
     .then(response => {
         return response.json();
     })
@@ -66,9 +65,10 @@ function loadTcStats() {
             statsTableBodyCell = document.createElement("td");
 
             if(teamProperty === "totalMultipliedPoints"){
-                statsTableBodyCell.setAttribute("data-toggle", "tooltip");
+                statsTableBodyCell.setAttribute("data-bs-toggle", "tooltip");
                 statsTableBodyCell.setAttribute("data-placement", "top");
                 statsTableBodyCell.setAttribute("title", "Unmultiplied: " + jsonResponse["totalPoints"].toLocaleString());
+                new bootstrap.Tooltip(statsTableBodyCell);
             }
 
             statsTableBodyCell.innerHTML = jsonResponse[teamProperty].toLocaleString();
@@ -85,7 +85,7 @@ function loadTcStats() {
 
         var jsonResponseTeams = jsonResponse['teams'];
         jsonResponseTeams.sort(sortJsonByKey("rank"));
-        $.each(jsonResponseTeams, function(i, team) {
+        jsonResponseTeams.forEach(function(team, i) {
             var teamNumber = (i+1);
             var captainName = team['captainName'];
 
@@ -101,10 +101,11 @@ function loadTcStats() {
 
             teamStats = document.createElement('h5');
             teamStats.setAttribute("id", "team_"+teamNumber+"_stats");
-            teamStats.setAttribute("data-toggle", "tooltip");
+            teamStats.setAttribute("data-bs-toggle", "tooltip");
             teamStats.setAttribute("data-placement", "top");
             teamStats.setAttribute("title", "Unmultiplied: " + team["teamPoints"].toLocaleString());
             teamStats.innerHTML = team['teamMultipliedPoints'].toLocaleString() + " points | " + team['teamUnits'].toLocaleString() + " units";
+            new bootstrap.Tooltip(teamStats);
             metadataDiv.append(teamStats);
 
             teamButton = document.createElement('button');
@@ -150,10 +151,11 @@ function loadTcStats() {
                     teamTableUserCell = document.createElement("td");
 
                     if(userProperty === "multipliedPoints"){
-                        teamTableUserCell.setAttribute("data-toggle", "tooltip");
+                        teamTableUserCell.setAttribute("data-bs-toggle", "tooltip");
                         teamTableUserCell.setAttribute("data-placement", "left");
                         teamTableUserCell.setAttribute("title", "Unmultiplied: " + activeUser["points"].toLocaleString());
                         teamTableUserCell.innerHTML = activeUser[userProperty].toLocaleString();
+                        new bootstrap.Tooltip(teamTableUserCell);
                     } else if (userProperty === "userName" && activeUser[userProperty] === captainName) {
                         teamTableUserCell.innerHTML = activeUser[userProperty].toLocaleString() + " (Captain)";
                     } else {
@@ -176,9 +178,10 @@ function loadTcStats() {
                         teamTableUserCell.innerHTML = retiredUser[userProperty] + " (retired)";
                     } else {
                         if(userProperty === "multipliedPoints"){
-                            teamTableUserCell.setAttribute("data-toggle", "tooltip");
+                            teamTableUserCell.setAttribute("data-bs-toggle", "tooltip");
                             teamTableUserCell.setAttribute("data-placement", "left");
                             teamTableUserCell.setAttribute("title", "Unmultiplied: " + retiredUser["points"].toLocaleString());
+                            new bootstrap.Tooltip(teamTableUserCell);
                         }
 
                         teamTableUserCell.innerHTML = retiredUser[userProperty].toLocaleString();
@@ -195,8 +198,8 @@ function loadTcStats() {
             statsDiv.append(teamDiv);
             statsDiv.append(document.createElement('br'));
         });
-        $('[data-toggle="tooltip"]').tooltip();
-        $("#loader").hide();
+
+        hide("loader");
     })
 };
 
@@ -238,7 +241,7 @@ function loadHardware() {
 
         hardwareTableBody = document.createElement('tbody');
 
-        $.each(jsonResponse, function(i, hardwareItem) {
+        jsonResponse.forEach(function(hardwareItem, i) {
             hardwareTableBodyRow = document.createElement('tr');
             hardwareProperties.forEach(function (hardwareProperty, i) {
                 hardwareTableBodyCell = document.createElement("td");
@@ -297,7 +300,7 @@ function loadUsers() {
 
         usersTableBody = document.createElement('tbody');
 
-        $.each(jsonResponse, function(i, usersItem) {
+        jsonResponse.forEach(function(usersItem, i) {
             usersTableBodyRow = document.createElement('tr');
             usersProperties.forEach(function (usersProperty, i) {
                 usersTableBodyCell = document.createElement("td");
@@ -360,7 +363,7 @@ function loadTeams() {
 
         teamsTableBody = document.createElement('tbody');
 
-        $.each(jsonResponse, function(i, teamsItem) {
+        jsonResponse.forEach(function(teamsItem, i) {
             teamsTableBodyRow = document.createElement('tr');
             teamsProperties.forEach(function (teamsProperty, i) {
                 teamsTableBodyCell = document.createElement("td");
@@ -386,10 +389,10 @@ function loadTeams() {
     })
 };
 
-$(document).ready(function() {
+document.addEventListener("DOMContentLoaded", function(event) {
     loadTcStats();
     loadHardware();
     loadUsers();
     loadTeams();
-    updateTime();
+    updateTimer();
 });

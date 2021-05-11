@@ -56,7 +56,7 @@
                             <!-- JS files -->
                             <jsSourceDir>js</jsSourceDir>
                             <jsSourceFiles>
-                                <jsSourceFile>base.js</jsSourceFile>
+                                <jsSourceFile>display_toggle.js</jsSourceFile>
                                 <jsSourceFile>google_analytics.js</jsSourceFile>
                                 <jsSourceFile>json_sorter.js</jsSourceFile>
                                 <jsSourceFile>index.js</jsSourceFile>
@@ -84,9 +84,10 @@
                             <!-- JS files -->
                             <jsSourceDir>js</jsSourceDir>
                             <jsSourceFiles>
-                                <jsSourceFile>base.js</jsSourceFile>
+                                <jsSourceFile>display_toggle.js</jsSourceFile>
                                 <jsSourceFile>json_sorter.js</jsSourceFile>
                                 <jsSourceFile>historic.js</jsSourceFile>
+                                <jsSourceFile>ordinal_suffix.js</jsSourceFile>
                                 <jsSourceFile>table_sort.js</jsSourceFile>
                                 <jsSourceFile>timer.js</jsSourceFile>
                             </jsSourceFiles>
