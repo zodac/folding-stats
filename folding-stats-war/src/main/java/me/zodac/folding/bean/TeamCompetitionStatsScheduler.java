@@ -1,6 +1,8 @@
 package me.zodac.folding.bean;
 
 import me.zodac.folding.StorageFacade;
+import me.zodac.folding.SystemStateManager;
+import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
@@ -64,7 +66,9 @@ public class TeamCompetitionStatsScheduler {
     public void scheduledTeamCompetitionStatsParsing(final Timer timer) {
         LOGGER.trace("Timer fired at: {}", timer);
         try {
+            SystemStateManager.next(SystemState.UPDATING_STATS);
             parseTeamCompetitionStats(ExecutionType.ASYNCHRONOUS);
+            SystemStateManager.next(SystemState.WRITE_EXECUTED);
         } catch (final Exception e) {
             LOGGER.error("Unexpected error updating TC stats", e);
         }
@@ -72,7 +76,9 @@ public class TeamCompetitionStatsScheduler {
 
     public void manualTeamCompetitionStatsParsing(final ExecutionType executionType) {
         LOGGER.debug("Manual stats parsing execution");
+        SystemStateManager.next(SystemState.UPDATING_STATS);
         parseTeamCompetitionStats(executionType);
+        SystemStateManager.next(SystemState.WRITE_EXECUTED);
     }
 
     private void parseTeamCompetitionStats(final ExecutionType executionType) {

@@ -36,6 +36,12 @@ public class Responses {
                 .build();
     }
 
+    public static Response serviceUnavailable() {
+        return Response
+                .status(Response.Status.SERVICE_UNAVAILABLE)
+                .build();
+    }
+
     public static Response notFound() {
         return Response
                 .status(Response.Status.NOT_FOUND)

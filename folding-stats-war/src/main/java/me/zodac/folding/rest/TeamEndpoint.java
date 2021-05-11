@@ -1,6 +1,8 @@
 package me.zodac.folding.rest;
 
 import me.zodac.folding.StorageFacade;
+import me.zodac.folding.SystemStateManager;
+import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.db.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.FoldingExternalServiceException;
@@ -37,6 +39,7 @@ import static me.zodac.folding.rest.response.Responses.badRequest;
 import static me.zodac.folding.rest.response.Responses.notFound;
 import static me.zodac.folding.rest.response.Responses.ok;
 import static me.zodac.folding.rest.response.Responses.serverError;
+import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
 
 /**
  * REST endpoints for teams for <code>folding-stats</code>.
@@ -103,10 +106,14 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
     public Response retireUserFromTeam(@PathParam("teamId") final String teamId, @PathParam("userId") final String userId) {
         getLogger().debug("PATCH request to retire user from team received at '{}'", uriContext.getAbsolutePath());
 
+        if (SystemStateManager.current().isWriteBlocked()) {
+            getLogger().warn("System state {} does not allow write requests", SystemStateManager.current());
+            return serviceUnavailable();
+        }
+
         try {
             final int parsedTeamId = super.parseId(teamId);
             final int parsedUnitId = super.parseId(userId);
-
 
             final Team team = storageFacade.getTeam(parsedTeamId);
             final ValidationResponse validationResponse = TeamValidator.isValidRetirement(team, parsedUnitId);
@@ -115,6 +122,7 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
             }
 
             final Team updatedTeam = storageFacade.retireUser(parsedTeamId, parsedUnitId);
+            SystemStateManager.next(SystemState.WRITE_EXECUTED);
             return ok(updatedTeam);
         } catch (final FoldingIdInvalidException e) {
             final String errorMessage = String.format("The ID '%s' is not a valid format", e.getId());
@@ -150,6 +158,11 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
     @Produces(MediaType.APPLICATION_JSON)
     public Response unretireUserFromTeam(@PathParam("teamId") final String teamId, @PathParam("retiredUserId") final String retiredUserId) {
         getLogger().debug("PATCH request to un-retire user from team received at '{}'", uriContext.getAbsolutePath());
+
+        if (SystemStateManager.current().isWriteBlocked()) {
+            getLogger().warn("System state {} does not allow write requests", SystemStateManager.current());
+            return serviceUnavailable();
+        }
 
         try {
             final int parsedTeamId = super.parseId(teamId);

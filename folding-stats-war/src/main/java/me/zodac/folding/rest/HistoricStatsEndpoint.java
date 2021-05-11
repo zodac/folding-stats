@@ -1,6 +1,7 @@
 package me.zodac.folding.rest;
 
 import me.zodac.folding.StorageFacade;
+import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.tc.exception.NotFoundException;
 import me.zodac.folding.api.tc.stats.UserTcStats;
@@ -33,6 +34,7 @@ import static me.zodac.folding.rest.response.Responses.notFound;
 import static me.zodac.folding.rest.response.Responses.notImplemented;
 import static me.zodac.folding.rest.response.Responses.ok;
 import static me.zodac.folding.rest.response.Responses.serverError;
+import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
 
 @Path("/historic/")
 @RequestScoped
@@ -51,6 +53,12 @@ public class HistoricStatsEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getHourlyUserStats(@PathParam("userId") final String userId) {
         LOGGER.info("GET request received to show hourly TC user stats at '{}'", uriContext.getAbsolutePath());
+
+        if (SystemStateManager.current().isReadBlocked()) {
+            LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
+            return serviceUnavailable();
+        }
+
         return notImplemented();
     }
 
@@ -59,6 +67,11 @@ public class HistoricStatsEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getDailyUserStats(@PathParam("userId") final String userId, @PathParam("year") final String year, @PathParam("month") final String month) {
         LOGGER.debug("GET request received to show daily TC user stats at '{}'", uriContext.getAbsolutePath());
+
+        if (SystemStateManager.current().isReadBlocked()) {
+            LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
+            return serviceUnavailable();
+        }
 
         try {
             final Map<LocalDate, UserTcStats> dailyUserTcStats = storageFacade.getDailyUserTcStats(Integer.parseInt(userId), Month.of(Integer.parseInt(month)), Year.parse(year));
@@ -103,6 +116,11 @@ public class HistoricStatsEndpoint {
     public Response getMonthlyUserStats(@PathParam("userId") final String userId, @PathParam("year") final String year) {
         LOGGER.debug("GET request received to show monthly TC user stats at '{}'", uriContext.getAbsolutePath());
 
+        if (SystemStateManager.current().isReadBlocked()) {
+            LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
+            return serviceUnavailable();
+        }
+
         try {
             final Map<LocalDate, UserTcStats> monthlyUserTcStats = storageFacade.getMonthlyUserTcStats(Integer.parseInt(userId), Year.parse(year));
 
@@ -140,6 +158,12 @@ public class HistoricStatsEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getHourlyTeamStats(@PathParam("teamId") final String teamId) {
         LOGGER.info("GET request received to show hourly TC team stats at '{}'", uriContext.getAbsolutePath());
+
+        if (SystemStateManager.current().isReadBlocked()) {
+            LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
+            return serviceUnavailable();
+        }
+
         return notImplemented();
     }
 
@@ -148,6 +172,12 @@ public class HistoricStatsEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getDailyTeamStats(@PathParam("teamId") final String teamId) {
         LOGGER.info("GET request received to show daily TC team stats at '{}'", uriContext.getAbsolutePath());
+
+        if (SystemStateManager.current().isReadBlocked()) {
+            LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
+            return serviceUnavailable();
+        }
+
         return notImplemented();
     }
 
@@ -156,6 +186,12 @@ public class HistoricStatsEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getMonthlyTeamStats(@PathParam("teamId") final String teamId) {
         LOGGER.info("GET request received to show monthly TC team stats at '{}'", uriContext.getAbsolutePath());
+
+        if (SystemStateManager.current().isReadBlocked()) {
+            LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
+            return serviceUnavailable();
+        }
+
         return notImplemented();
     }
 }

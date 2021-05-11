@@ -1,6 +1,8 @@
 package me.zodac.folding.bean;
 
 import me.zodac.folding.StorageFacade;
+import me.zodac.folding.SystemStateManager;
+import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.tc.User;
@@ -37,6 +39,7 @@ public class Initialiser {
         initCaches();
         initTcStats();
 
+        SystemStateManager.next(SystemState.AVAILABLE);
         LOGGER.info("System ready for requests");
     }
 

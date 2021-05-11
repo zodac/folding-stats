@@ -1,6 +1,8 @@
 package me.zodac.folding.rest;
 
 import me.zodac.folding.StorageFacade;
+import me.zodac.folding.SystemStateManager;
+import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.db.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.FoldingExternalServiceException;
@@ -37,6 +39,7 @@ import static me.zodac.folding.rest.response.Responses.badRequest;
 import static me.zodac.folding.rest.response.Responses.notFound;
 import static me.zodac.folding.rest.response.Responses.ok;
 import static me.zodac.folding.rest.response.Responses.serverError;
+import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
 
 /**
  * REST endpoints for users for <code>folding-stats</code>.
@@ -104,11 +107,18 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
     public Response updateUserWithOffset(@PathParam("userId") final String userId, final UserStatsOffset userStatsOffset) {
         getLogger().debug("PATCH request to update offset for user received at '{}': {}", uriContext.getAbsolutePath(), userStatsOffset);
 
+        if (SystemStateManager.current().isWriteBlocked()) {
+            getLogger().warn("System state {} does not allow write requests", SystemStateManager.current());
+            return serviceUnavailable();
+        }
+
         try {
             final int parsedId = super.parseId(userId);
             final UserStatsOffset statsOffsetToUse = getValidUserStatsOffset(userStatsOffset, parsedId);
             storageFacade.addOrUpdateOffsetStats(parsedId, statsOffsetToUse);
+            SystemStateManager.next(SystemState.UPDATING_STATS);
             userTeamCompetitionStatsParser.parseTcStatsForUserAndWait(storageFacade.getUser(parsedId));
+            SystemStateManager.next(SystemState.WRITE_EXECUTED);
             return ok();
         } catch (final FoldingIdInvalidException e) {
             final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), e.getId());

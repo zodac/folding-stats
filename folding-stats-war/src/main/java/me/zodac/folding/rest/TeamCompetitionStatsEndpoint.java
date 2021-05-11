@@ -1,6 +1,8 @@
 package me.zodac.folding.rest;
 
 import me.zodac.folding.StorageFacade;
+import me.zodac.folding.SystemStateManager;
+import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
@@ -38,6 +40,7 @@ import java.util.Set;
 import static java.util.stream.Collectors.toList;
 import static me.zodac.folding.rest.response.Responses.ok;
 import static me.zodac.folding.rest.response.Responses.serverError;
+import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
 
 @Path("/tc_stats/")
 @RequestScoped
@@ -62,6 +65,11 @@ public class TeamCompetitionStatsEndpoint {
     public Response manualStats(@QueryParam("async") final boolean async) {
         LOGGER.info("GET request received to manually parse TC stats");
 
+        if (SystemStateManager.current().isReadBlocked()) {
+            LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
+            return serviceUnavailable();
+        }
+
         final ExecutionType executionType = async ? ExecutionType.ASYNCHRONOUS : ExecutionType.SYNCHRONOUS;
         teamCompetitionStatsScheduler.manualTeamCompetitionStatsParsing(executionType);
         return ok();
@@ -71,7 +79,15 @@ public class TeamCompetitionStatsEndpoint {
     @Path("/reset/")
     public Response resetStats() {
         LOGGER.info("GET request received to manually reset TC stats");
-        teamCompetitionResetScheduler.manualTeamCompetitionStatsReset();
+
+        if (SystemStateManager.current().isReadBlocked()) {
+            LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
+            return serviceUnavailable();
+        }
+
+        SystemStateManager.next(SystemState.RESETTING_STATS);
+        teamCompetitionResetScheduler.manualResetTeamCompetitionStats();
+        SystemStateManager.next(SystemState.WRITE_EXECUTED);
         return ok();
     }
 
@@ -79,6 +95,11 @@ public class TeamCompetitionStatsEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTeamCompetitionStats() {
         LOGGER.debug("GET request received to show TC stats");
+
+        if (SystemStateManager.current().isReadBlocked()) {
+            LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
+            return serviceUnavailable();
+        }
 
         try {
             final List<TeamResult> teamResults = getStatsForTeams();
@@ -88,9 +109,18 @@ public class TeamCompetitionStatsEndpoint {
                 LOGGER.warn("No TC teams to show");
             }
 
-            // TODO: [zodac] Cache this CompetitionResult, and invalidate cache on scheduled/manual update, scheduled/manual reset, user create/update, team create/update
-            //   Can't simply invalidate on stats update, because what if a hardware display is changed? Should invalidate on ALL changes
-            return ok(CompetitionResult.create(teamResults));
+            if (SystemStateManager.current() == SystemState.WRITE_EXECUTED) {
+                LOGGER.info("System in state {}, recalculating TC result", SystemStateManager.current());
+                // TODO: [zodac] Cache this CompetitionResult, and invalidate cache on scheduled/manual update, scheduled/manual reset, user create/update, team create/update
+                //   Can't simply invalidate on stats update, because what if a hardware display is changed? Should invalidate on ALL changes
+                final CompetitionResult competitionResult = CompetitionResult.create(teamResults);
+                SystemStateManager.next(SystemState.AVAILABLE);
+                return ok(competitionResult);
+            } else {
+                LOGGER.info("System in state {}, using cached TC result", SystemStateManager.current());
+                // TODO: [zodac] Get from cache eventually
+                return ok(CompetitionResult.create(teamResults));
+            }
         } catch (final Exception e) {
             LOGGER.error("Unexpected error retrieving TC stats", e);
             return serverError();

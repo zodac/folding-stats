@@ -1,6 +1,8 @@
 package me.zodac.folding.bean;
 
 import me.zodac.folding.StorageFacade;
+import me.zodac.folding.SystemStateManager;
+import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.db.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.tc.Team;
@@ -38,17 +40,20 @@ public class TeamCompetitionResetScheduler {
     }
 
     @Schedule(dayOfMonth = "1", minute = "55", info = "Monthly cache reset for TC teams")
-    public void monthlyTcStatsReset() {
+    public void resetTeamCompetitionStats() {
         if (!IS_MONTHLY_RESET_ENABLED) {
             LOGGER.warn("Monthly TC stats reset not enabled");
             return;
         }
 
         LOGGER.info("Resetting TC stats for new month");
-        manualTeamCompetitionStatsReset();
+
+        SystemStateManager.next(SystemState.RESETTING_STATS);
+        manualResetTeamCompetitionStats();
+        SystemStateManager.next(SystemState.WRITE_EXECUTED);
     }
 
-    public void manualTeamCompetitionStatsReset() {
+    public void manualResetTeamCompetitionStats() {
         final List<Team> teams;
         try {
             teams = storageFacade.getAllTeams();

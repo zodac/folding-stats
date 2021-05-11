@@ -1,6 +1,8 @@
 package me.zodac.folding.rest;
 
+import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.Identifiable;
+import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.db.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.FoldingExternalServiceException;
@@ -25,6 +27,7 @@ import static me.zodac.folding.rest.response.Responses.created;
 import static me.zodac.folding.rest.response.Responses.notFound;
 import static me.zodac.folding.rest.response.Responses.ok;
 import static me.zodac.folding.rest.response.Responses.serverError;
+import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
 
 abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
 
@@ -51,6 +54,11 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
     protected Response create(final V element) {
         getLogger().debug("POST request received to create {} at '{}' with request: {}", elementType(), uriContext.getAbsolutePath(), element);
 
+        if (SystemStateManager.current().isWriteBlocked()) {
+            getLogger().warn("System state {} does not allow write requests", SystemStateManager.current());
+            return serviceUnavailable();
+        }
+
         final ValidationResponse validationResponse = validate(element);
         if (validationResponse.isInvalid()) {
             return badRequest(validationResponse);
@@ -62,6 +70,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
             final UriBuilder elementLocationBuilder = uriContext
                     .getRequestUriBuilder()
                     .path(String.valueOf(elementWithId.getId()));
+            SystemStateManager.next(SystemState.WRITE_EXECUTED);
             return created(elementWithId, elementLocationBuilder);
         } catch (final FoldingConflictException e) {
             // TODO: [zodac] For conflict exceptions, return the ID conflicted against
@@ -89,6 +98,11 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
 
     protected Response createBatchOf(final List<V> batchOfElements) {
         getLogger().debug("POST request received to create {} {}s at '{}' with request: {}", batchOfElements.size(), elementType(), uriContext.getAbsolutePath(), batchOfElements);
+
+        if (SystemStateManager.current().isWriteBlocked()) {
+            getLogger().warn("System state {} does not allow write requests", SystemStateManager.current());
+            return serviceUnavailable();
+        }
 
         final List<V> validElements = new ArrayList<>(batchOfElements.size() / 2);
         final List<ValidationResponse> failedValidationResponses = new ArrayList<>(batchOfElements.size() / 2);
@@ -133,15 +147,22 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
 
         if (!unsuccessful.isEmpty()) {
             getLogger().error("{} {}s successfully created, {} {}s unsuccessful", successful.size(), elementType(), unsuccessful.size(), elementType());
+            SystemStateManager.next(SystemState.WRITE_EXECUTED);
             return ok(bulkCreateResponse);
         }
 
         getLogger().debug("{} {}s successfully created", successful.size(), elementType());
+        SystemStateManager.next(SystemState.WRITE_EXECUTED);
         return ok(bulkCreateResponse.getSuccessful());
     }
 
     protected Response getAll() {
         getLogger().debug("GET request received for all {}s at '{}'", elementType(), uriContext.getAbsolutePath());
+
+        if (SystemStateManager.current().isReadBlocked()) {
+            getLogger().warn("System state {} does not allow read requests", SystemStateManager.current());
+            return serviceUnavailable();
+        }
 
         try {
             final List<V> elements = getAllElements();
@@ -158,6 +179,11 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
 
     protected Response getById(final String elementId) {
         getLogger().debug("GET request for {} received at '{}'", elementType(), uriContext.getAbsolutePath());
+
+        if (SystemStateManager.current().isReadBlocked()) {
+            getLogger().warn("System state {} does not allow read requests", SystemStateManager.current());
+            return serviceUnavailable();
+        }
 
         try {
             final V element = getElementById(parseId(elementId));
@@ -188,6 +214,11 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
     protected Response updateById(final String elementId, final V element) {
         getLogger().debug("PUT request for {} received at '{}'", elementType(), uriContext.getAbsolutePath());
 
+        if (SystemStateManager.current().isWriteBlocked()) {
+            getLogger().warn("System state {} does not allow write requests", SystemStateManager.current());
+            return serviceUnavailable();
+        }
+
         try {
             final int parsedId = parseId(elementId);
             // We want to make sure the payload is not trying to change the ID of the element
@@ -215,6 +246,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
             final UriBuilder elementLocationBuilder = uriContext
                     .getRequestUriBuilder()
                     .path(String.valueOf(element.getId()));
+            SystemStateManager.next(SystemState.WRITE_EXECUTED);
             return ok(updatedElementWithId, elementLocationBuilder);
         } catch (final FoldingIdInvalidException e) {
             final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), e.getId());
@@ -252,10 +284,16 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
     protected Response deleteById(final String elementId) {
         getLogger().debug("DELETE request for {} received at '{}'", elementType(), uriContext.getAbsolutePath());
 
+        if (SystemStateManager.current().isWriteBlocked()) {
+            getLogger().warn("System state {} does not allow write requests", SystemStateManager.current());
+            return serviceUnavailable();
+        }
+
         try {
             final int parsedId = parseId(elementId);
-            getElementById(parsedId);
+            getElementById(parsedId); // We call this so if the value does not exist, we can fail with a NOT_FOUND response
             deleteElementById(parsedId);
+            SystemStateManager.next(SystemState.WRITE_EXECUTED);
             return ok();
         } catch (final FoldingIdInvalidException e) {
             final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), e.getId());
