@@ -21,7 +21,9 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
@@ -55,15 +57,15 @@ public class HardwareEndpoint extends AbstractIdentifiableCrudEndpoint<Hardware>
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllHardware() {
-        return super.getAll();
+    public Response getAllHardware(@Context final Request request) {
+        return super.getAll(request);
     }
 
     @GET
     @Path("/{hardwareId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getHardwareById(@PathParam("hardwareId") final String hardwareId) {
-        return super.getById(hardwareId);
+    public Response getHardwareById(@PathParam("hardwareId") final String hardwareId, @Context final Request request) {
+        return super.getById(hardwareId, request);
     }
 
     @PUT

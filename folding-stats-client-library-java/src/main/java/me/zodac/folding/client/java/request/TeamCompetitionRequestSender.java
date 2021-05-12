@@ -3,6 +3,7 @@ package me.zodac.folding.client.java.request;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.net.URI;
@@ -38,15 +39,36 @@ public final class TeamCompetitionRequestSender {
     /**
      * Send a <b>GET</b> request to retrieve the overall <code>Team Competition</code> {@link me.zodac.folding.rest.api.tc.CompetitionResult}.
      *
-     * @return the {@link HttpResponse} from the request
-     * @throws FoldingRestException thrown if an error occurs sending the HTTP request
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     * @see #get(String)
      */
     public HttpResponse<String> get() throws FoldingRestException {
-        final HttpRequest request = HttpRequest.newBuilder()
+        return get(null);
+    }
+
+    /**
+     * Send a <b>GET</b> request to retrieve the overall <code>Team Competition</code> {@link me.zodac.folding.rest.api.tc.CompetitionResult}.
+     *
+     * <p>
+     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.rest.api.tc.CompetitionResult} based on the <code>ETag</code>, an empty {@link HttpResponse#body()} is returned.
+     *
+     * @param eTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached {@link me.zodac.folding.rest.api.tc.CompetitionResult}
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     * @see #get()
+     */
+    public HttpResponse<String> get(final String eTag) throws FoldingRestException {
+        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .GET()
                 .uri(URI.create(foldingUrl + "/tc_stats"))
-                .header("Content-Type", "application/json")
-                .build();
+                .header("Content-Type", "application/json");
+
+        if (StringUtils.isNotBlank(eTag)) {
+            requestBuilder.header("If-None-Match", eTag);
+        }
+
+        final HttpRequest request = requestBuilder.build();
 
         try {
             return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -60,8 +82,8 @@ public final class TeamCompetitionRequestSender {
      * <p>
      * Request will be sent and only return when the update is complete. If an asynchronous update is required, look at {@link #manualUpdate(boolean)}.
      *
-     * @return the {@link HttpResponse} from the request
-     * @throws FoldingRestException thrown if an error occurs sending the HTTP request
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<Void> manualUpdate() throws FoldingRestException {
         return manualUpdate(false);
@@ -71,8 +93,8 @@ public final class TeamCompetitionRequestSender {
      * Sends a <b>GET</b> request to manually trigger an update of the <code>Team Competition</code> stats for all {@link me.zodac.folding.api.tc.User}s and {@link me.zodac.folding.api.tc.Team}s.
      *
      * @param async should the update be performed asynchronously, or wait for the result
-     * @return the {@link HttpResponse} from the request
-     * @throws FoldingRestException thrown if an error occurs sending the HTTP request
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<Void> manualUpdate(final boolean async) throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
@@ -91,8 +113,8 @@ public final class TeamCompetitionRequestSender {
     /**
      * Sends a <b>GET</b> request to manually reset the <code>Team Competition</code> stats for all {@link me.zodac.folding.api.tc.User}s and {@link me.zodac.folding.api.tc.Team}s.
      *
-     * @return the {@link HttpResponse} from the request
-     * @throws FoldingRestException thrown if an error occurs sending the HTTP request
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<Void> manualReset() throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()

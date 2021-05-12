@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.net.URI;
@@ -43,15 +44,35 @@ public final class HardwareRequestSender {
     /**
      * Send a <b>GET</b> request to retrieve all {@link Hardware}s in the system.
      *
-     * @return the {@link HttpResponse} from the request
-     * @throws FoldingRestException thrown if an error occurs sending the HTTP request
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     * @see #getAll(String)
      */
     public HttpResponse<String> getAll() throws FoldingRestException {
-        final HttpRequest request = HttpRequest.newBuilder()
+        return getAll(null);
+    }
+
+    /**
+     * Send a <b>GET</b> request to retrieve all {@link Hardware}s in the system.
+     * <p>
+     * <b>NOTE:</b> If the server has a cached {@link Hardware} based on the <code>ETag</code>, an empty {@link HttpResponse#body()} is returned.
+     *
+     * @param eTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve cached {@link Hardware}
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     * @see #getAll()
+     */
+    public HttpResponse<String> getAll(final String eTag) throws FoldingRestException {
+        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .GET()
                 .uri(URI.create(foldingUrl + "/hardware"))
-                .header("Content-Type", "application/json")
-                .build();
+                .header("Content-Type", "application/json");
+
+        if (StringUtils.isNotBlank(eTag)) {
+            requestBuilder.header("If-None-Match", eTag);
+        }
+
+        final HttpRequest request = requestBuilder.build();
 
         try {
             return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -64,15 +85,36 @@ public final class HardwareRequestSender {
      * Send a <b>GET</b> request to retrieve a single {@link Hardware} with the given {@code hardwareId}.
      *
      * @param hardwareId the ID of the {@link Hardware} to be retrieved
-     * @return the {@link HttpResponse} from the request
-     * @throws FoldingRestException thrown if an error occurs sending the HTTP request
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     * @see #get(int, String)
      */
     public HttpResponse<String> get(final int hardwareId) throws FoldingRestException {
-        final HttpRequest request = HttpRequest.newBuilder()
+        return get(hardwareId, null);
+    }
+
+    /**
+     * Send a <b>GET</b> request to retrieve a single {@link Hardware} with the given {@code hardwareId}.
+     * <p>
+     * <b>NOTE:</b> If the server has a cached {@link Hardware} based on the <code>ETag</code>, an empty {@link HttpResponse#body()} is returned.
+     *
+     * @param hardwareId the ID of the {@link Hardware} to be retrieved
+     * @param eTag       the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached {@link Hardware}
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     * @see #get(int)
+     */
+    public HttpResponse<String> get(final int hardwareId, final String eTag) throws FoldingRestException {
+        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .GET()
                 .uri(URI.create(foldingUrl + "/hardware/" + hardwareId))
-                .header("Content-Type", "application/json")
-                .build();
+                .header("Content-Type", "application/json");
+
+        if (StringUtils.isNotBlank(eTag)) {
+            requestBuilder.header("If-None-Match", eTag);
+        }
+
+        final HttpRequest request = requestBuilder.build();
 
         try {
             return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -85,8 +127,8 @@ public final class HardwareRequestSender {
      * Send a <b>POST</b> request to create the given {@link Hardware} in the system.
      *
      * @param hardware the {@link Hardware} to create
-     * @return the {@link HttpResponse} from the request
-     * @throws FoldingRestException thrown if an error occurs sending the HTTP request
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<String> create(final Hardware hardware) throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
@@ -106,8 +148,8 @@ public final class HardwareRequestSender {
      * Send a <b>POST</b> request to create the given {@link Hardware}s in the system.
      *
      * @param batchOfHardware the {@link List} of {@link Hardware}s to create
-     * @return the {@link HttpResponse} from the request
-     * @throws FoldingRestException thrown if an error occurs sending the HTTP request
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<String> createBatchOf(final List<Hardware> batchOfHardware) throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
@@ -127,8 +169,8 @@ public final class HardwareRequestSender {
      * Send a <b>PUT</b> request to update the given {@link Hardware} in the system.
      *
      * @param hardware the {@link Hardware} to update
-     * @return the {@link HttpResponse} from the request
-     * @throws FoldingRestException thrown if an error occurs sending the HTTP request
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<String> update(final Hardware hardware) throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
@@ -148,8 +190,8 @@ public final class HardwareRequestSender {
      * Send a <b>DELETE</b> request to remove a {@link Hardware} with the given {@code hardwareId}.
      *
      * @param hardwareId the ID of the {@link Hardware} to remove
-     * @return the {@link HttpResponse} from the request
-     * @throws FoldingRestException thrown if an error occurs sending the HTTP request
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<Void> delete(final int hardwareId) throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()

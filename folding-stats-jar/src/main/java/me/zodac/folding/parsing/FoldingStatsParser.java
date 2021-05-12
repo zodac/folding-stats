@@ -23,12 +23,12 @@ public final class FoldingStatsParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(FoldingStatsParser.class);
 
     private FoldingStatsParser() {
-        
+
     }
 
     public static UserStats getTotalStatsForUser(final User user) throws FoldingException, FoldingExternalServiceException {
         LOGGER.debug("Getting stats for username/passkey '{}/{}'", user.getFoldingUserName(), user.getPasskey());
-        final Timestamp currentUtcTime = DateTimeUtils.getCurrentUtcTimestamp();
+        final Timestamp currentUtcTime = DateTimeUtils.currentUtcTimestamp();
         final long userPoints = getPointsForUser(user.getFoldingUserName(), user.getPasskey());
         final int userUnits = getUnitsForUser(user.getFoldingUserName(), user.getPasskey());
         return UserStats.create(user.getId(), currentUtcTime, Stats.create(userPoints, userUnits));

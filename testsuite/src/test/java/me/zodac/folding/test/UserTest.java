@@ -22,9 +22,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
+import static me.zodac.folding.test.utils.HttpResponseHeaderUtils.getETag;
+import static me.zodac.folding.test.utils.HttpResponseHeaderUtils.getXTotalCount;
 import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForSimpleTests;
 import static me.zodac.folding.test.utils.TestGenerator.generateHardware;
 import static me.zodac.folding.test.utils.TestGenerator.generateUser;
@@ -53,12 +54,10 @@ public class UserTest {
                 .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Collection<User> allUsers = UserResponseParser.getAll(response);
-        final Map<String, List<String>> headers = response.headers().map();
-        assertThat(headers)
-                .containsKey("X-Total-Count");
+        final int xTotalCount = getXTotalCount(response);
 
-        assertThat(headers.get("X-Total-Count").get(0))
-                .isEqualTo(String.valueOf(allUsers.size()));
+        assertThat(xTotalCount)
+                .isEqualTo(allUsers.size());
 
         assertThat(allUsers)
                 .isEmpty();
@@ -361,6 +360,48 @@ public class UserTest {
         assertThat(deleteUserResponse.statusCode())
                 .as("Expected to fail due to a 409_CONFLICT: " + deleteUserResponse.body())
                 .isEqualTo(HttpURLConnection.HTTP_CONFLICT);
+    }
+
+    @Test
+    public void whenGettingUserById_givenRequestHasIfNoMatchHeader_andUserHasNotChanged_thenResponseHasA304Status_andNoBody() throws FoldingRestException {
+        final int userId = UserUtils.createOrConflict(generateUser()).getId();
+
+        final HttpResponse<String> response = USER_REQUEST_SENDER.get(userId);
+        assertThat(response.statusCode())
+                .as("Expected first request to have a 200_OK HTTP response")
+                .isEqualTo(HttpURLConnection.HTTP_OK);
+
+        final String eTag = getETag(response);
+
+        final HttpResponse<String> cachedResponse = USER_REQUEST_SENDER.get(userId, eTag);
+        assertThat(cachedResponse.statusCode())
+                .as("Expected second request to have a 304_NOT_MODIFIED HTTP response")
+                .isEqualTo(HttpURLConnection.HTTP_NOT_MODIFIED);
+
+        assertThat(UserResponseParser.get(cachedResponse))
+                .as("Expected cached response to have the same content as the non-cached response")
+                .isNull();
+    }
+
+    @Test
+    public void whenGettingAllUsers_givenRequestHasIfNoMatchHeader_andUsersHaveNotChanged_thenResponseHasA304Status_andNoBody() throws FoldingRestException {
+        UserUtils.createOrConflict(generateUser());
+
+        final HttpResponse<String> response = USER_REQUEST_SENDER.getAll();
+        assertThat(response.statusCode())
+                .as("Expected first GET request to have a 200_OK HTTP response")
+                .isEqualTo(HttpURLConnection.HTTP_OK);
+
+        final String eTag = getETag(response);
+
+        final HttpResponse<String> cachedResponse = USER_REQUEST_SENDER.getAll(eTag);
+        assertThat(cachedResponse.statusCode())
+                .as("Expected second request to have a 304_NOT_MODIFIED HTTP response")
+                .isEqualTo(HttpURLConnection.HTTP_NOT_MODIFIED);
+
+        assertThat(UserResponseParser.getAll(cachedResponse))
+                .as("Expected cached response to have the same content as the non-cached response")
+                .isNull();
     }
 
     @AfterAll

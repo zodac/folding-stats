@@ -83,22 +83,30 @@ public class Responses {
                 .build();
     }
 
-    public static Response ok(final List<? extends Identifiable> entities) {
+    public static Response.ResponseBuilder okBuilder(final List<? extends Identifiable> entities) {
         return Response
                 .ok()
                 .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_NAME, ACCESS_CONTROL_ALLOW_ORIGIN_DEFAULT_VALUE)
                 .header(ACCESS_CONTROL_ALLOW_METHODS_HEADER_NAME, ACCESS_CONTROL_ALLOW_METHODS_DEFAULT_VALUE)
                 .header("X-Total-Count", entities.size())
-                .entity(GSON.toJson(entities))
+                .entity(GSON.toJson(entities));
+    }
+
+    public static Response ok(final List<? extends Identifiable> entities) {
+        return okBuilder(entities)
                 .build();
     }
 
-    public static Response ok(final Object entity) {
+    public static Response.ResponseBuilder okBuilder(final Object entity) {
         return Response
                 .ok()
                 .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_NAME, ACCESS_CONTROL_ALLOW_ORIGIN_DEFAULT_VALUE)
                 .header(ACCESS_CONTROL_ALLOW_METHODS_HEADER_NAME, ACCESS_CONTROL_ALLOW_METHODS_DEFAULT_VALUE)
-                .entity(GSON.toJson(entity))
+                .entity(GSON.toJson(entity));
+    }
+
+    public static Response ok(final Object entity) {
+        return okBuilder(entity)
                 .build();
     }
 

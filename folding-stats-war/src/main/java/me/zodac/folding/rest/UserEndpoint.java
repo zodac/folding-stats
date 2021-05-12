@@ -31,7 +31,9 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
@@ -74,15 +76,15 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllUsers() {
-        return super.getAll();
+    public Response getAllUsers(@Context final Request request) {
+        return super.getAll(request);
     }
 
     @GET
     @Path("/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getUserById(@PathParam("userId") final String userId) {
-        return super.getById(userId);
+    public Response getUserById(@PathParam("userId") final String userId, @Context final Request request) {
+        return super.getById(userId, request);
     }
 
     @PUT

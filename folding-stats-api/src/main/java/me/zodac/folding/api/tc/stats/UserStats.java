@@ -25,7 +25,7 @@ public class UserStats {
     }
 
     public static UserStats empty() {
-        return new UserStats(User.EMPTY_USER_ID, DateTimeUtils.getCurrentUtcTimestamp(), Stats.empty());
+        return new UserStats(User.EMPTY_USER_ID, DateTimeUtils.currentUtcTimestamp(), Stats.empty());
     }
 
     public boolean isEmpty() {

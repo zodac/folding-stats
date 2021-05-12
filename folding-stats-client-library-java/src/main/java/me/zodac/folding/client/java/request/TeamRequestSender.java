@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.net.URI;
@@ -43,15 +44,35 @@ public final class TeamRequestSender {
     /**
      * Send a <b>GET</b> request to retrieve all {@link Team}s in the system.
      *
-     * @return the {@link HttpResponse} from the request
-     * @throws FoldingRestException thrown if an error occurs sending the HTTP request
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     * @see #getAll(String)
      */
     public HttpResponse<String> getAll() throws FoldingRestException {
-        final HttpRequest request = HttpRequest.newBuilder()
+        return getAll(null);
+    }
+
+    /**
+     * Send a <b>GET</b> request to retrieve all {@link Team}s in the system.
+     * <p>
+     * <b>NOTE:</b> If the server has a cached {@link Team} based on the <code>ETag</code>, an empty {@link HttpResponse#body()} is returned.
+     *
+     * @param eTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve cached {@link Team}s
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     * @see #getAll()
+     */
+    public HttpResponse<String> getAll(final String eTag) throws FoldingRestException {
+        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .GET()
                 .uri(URI.create(foldingUrl + "/teams"))
-                .header("Content-Type", "application/json")
-                .build();
+                .header("Content-Type", "application/json");
+
+        if (StringUtils.isNotBlank(eTag)) {
+            requestBuilder.header("If-None-Match", eTag);
+        }
+
+        final HttpRequest request = requestBuilder.build();
 
         try {
             return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -64,15 +85,36 @@ public final class TeamRequestSender {
      * Send a <b>GET</b> request to retrieve a single {@link Team} with the given {@code teamId}.
      *
      * @param teamId the ID of the {@link Team} to be retrieved
-     * @return the {@link HttpResponse} from the request
-     * @throws FoldingRestException thrown if an error occurs sending the HTTP request
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     * @see #get(int, String)
      */
     public HttpResponse<String> get(final int teamId) throws FoldingRestException {
-        final HttpRequest request = HttpRequest.newBuilder()
+        return get(teamId, null);
+    }
+
+    /**
+     * Send a <b>GET</b> request to retrieve a single {@link Team} with the given {@code teamId}.
+     * <p>
+     * <b>NOTE:</b> If the server has a cached {@link Team} based on the <code>ETag</code>, an empty {@link HttpResponse#body()} is returned.
+     *
+     * @param teamId the ID of the {@link Team} to be retrieved
+     * @param eTag   the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached {@link Team}
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     * @see #get(int)
+     */
+    public HttpResponse<String> get(final int teamId, final String eTag) throws FoldingRestException {
+        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .GET()
                 .uri(URI.create(foldingUrl + "/teams/" + teamId))
-                .header("Content-Type", "application/json")
-                .build();
+                .header("Content-Type", "application/json");
+
+        if (StringUtils.isNotBlank(eTag)) {
+            requestBuilder.header("If-None-Match", eTag);
+        }
+
+        final HttpRequest request = requestBuilder.build();
 
         try {
             return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -85,8 +127,8 @@ public final class TeamRequestSender {
      * Send a <b>POST</b> request to create the given {@link Team} in the system.
      *
      * @param team the {@link Team} to create
-     * @return the {@link HttpResponse} from the request
-     * @throws FoldingRestException thrown if an error occurs sending the HTTP request
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<String> create(final Team team) throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
@@ -106,8 +148,8 @@ public final class TeamRequestSender {
      * Send a <b>POST</b> request to create the given {@link Team}s in the system.
      *
      * @param batchOfTeams the {@link List} of {@link Team}s to create
-     * @return the {@link HttpResponse} from the request
-     * @throws FoldingRestException thrown if an error occurs sending the HTTP request
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<String> createBatchOf(final List<Team> batchOfTeams) throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
@@ -127,8 +169,8 @@ public final class TeamRequestSender {
      * Send a <b>PUT</b> request to update the given {@link Team} in the system.
      *
      * @param team the {@link Team} to update
-     * @return the {@link HttpResponse} from the request
-     * @throws FoldingRestException thrown if an error occurs sending the HTTP request
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<String> update(final Team team) throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
@@ -148,8 +190,8 @@ public final class TeamRequestSender {
      * Send a <b>DELETE</b> request to remove a {@link Team} with the given {@code teamId}.
      *
      * @param teamId the ID of the {@link Team} to remove
-     * @return the {@link HttpResponse} from the request
-     * @throws FoldingRestException thrown if an error occurs sending the HTTP request
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<Void> delete(final int teamId) throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
@@ -170,8 +212,8 @@ public final class TeamRequestSender {
      *
      * @param teamId the ID of the {@link Team}
      * @param userId the ID of the {@link me.zodac.folding.api.tc.User} to retire
-     * @return the {@link HttpResponse} from the request
-     * @throws FoldingRestException thrown if an error occurs sending the HTTP request
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<String> retireUser(final int teamId, final int userId) throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
@@ -192,8 +234,8 @@ public final class TeamRequestSender {
      *
      * @param teamId        the ID of the {@link Team} to un-retire the {@link me.zodac.folding.api.tc.User} to
      * @param retiredUserId the ID of the retired {@link me.zodac.folding.api.tc.User} to un-retire
-     * @return the {@link HttpResponse} from the request
-     * @throws FoldingRestException thrown if an error occurs sending the HTTP request
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<String> unretireUser(final int teamId, final int retiredUserId) throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()

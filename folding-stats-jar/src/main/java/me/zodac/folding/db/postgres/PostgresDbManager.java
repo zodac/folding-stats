@@ -738,7 +738,7 @@ public class PostgresDbManager implements DbManager {
 
         try (final Connection connection = PostgresDbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
-            final Timestamp currentUtcTimestamp = DateTimeUtils.getCurrentUtcTimestamp();
+            final Timestamp currentUtcTimestamp = DateTimeUtils.currentUtcTimestamp();
 
             preparedStatement.setInt(1, userId);
             preparedStatement.setTimestamp(2, currentUtcTimestamp);
@@ -769,7 +769,7 @@ public class PostgresDbManager implements DbManager {
 
         try (final Connection connection = PostgresDbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
-            final Timestamp currentUtcTimestamp = DateTimeUtils.getCurrentUtcTimestamp();
+            final Timestamp currentUtcTimestamp = DateTimeUtils.currentUtcTimestamp();
 
             preparedStatement.setInt(1, userId);
             preparedStatement.setTimestamp(2, currentUtcTimestamp);
@@ -852,7 +852,7 @@ public class PostgresDbManager implements DbManager {
                 preparedStatement.setInt(1, retiredUserStats.getUserId());
                 preparedStatement.setInt(2, teamId);
                 preparedStatement.setString(3, displayUserName);
-                preparedStatement.setTimestamp(4, DateTimeUtils.getCurrentUtcTimestamp());
+                preparedStatement.setTimestamp(4, DateTimeUtils.currentUtcTimestamp());
                 preparedStatement.setLong(5, retiredUserStats.getPoints());
                 preparedStatement.setLong(6, retiredUserStats.getMultipliedPoints());
                 preparedStatement.setInt(7, retiredUserStats.getUnits());

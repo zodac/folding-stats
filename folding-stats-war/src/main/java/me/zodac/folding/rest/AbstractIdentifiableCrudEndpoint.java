@@ -13,23 +13,32 @@ import me.zodac.folding.rest.response.BulkCreateResponse;
 import me.zodac.folding.validator.ValidationResponse;
 import org.slf4j.Logger;
 
+import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.EntityTag;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
+import static me.zodac.folding.api.utils.DateTimeUtils.untilNextMonthUtc;
 import static me.zodac.folding.rest.response.Responses.badGateway;
 import static me.zodac.folding.rest.response.Responses.badRequest;
 import static me.zodac.folding.rest.response.Responses.conflict;
 import static me.zodac.folding.rest.response.Responses.created;
 import static me.zodac.folding.rest.response.Responses.notFound;
 import static me.zodac.folding.rest.response.Responses.ok;
+import static me.zodac.folding.rest.response.Responses.okBuilder;
 import static me.zodac.folding.rest.response.Responses.serverError;
 import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
 
 abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
+
+    // Expecting most changes to be at the monthly reset, so counting number of seconds until then
+    private static final int CACHE_EXPIRATION_TIME = untilNextMonthUtc(ChronoUnit.SECONDS);
 
     @Context
     protected UriInfo uriContext;
@@ -49,7 +58,6 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
     protected abstract V updateElementById(final int elementId, final V element) throws FoldingException, NotFoundException, FoldingConflictException, FoldingExternalServiceException;
 
     protected abstract void deleteElementById(final int elementId) throws FoldingConflictException, FoldingException;
-
 
     protected Response create(final V element) {
         getLogger().debug("POST request received to create {} at '{}' with request: {}", elementType(), uriContext.getAbsolutePath(), element);
@@ -156,7 +164,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
         return ok(bulkCreateResponse.getSuccessful());
     }
 
-    protected Response getAll() {
+    protected Response getAll(final Request request) {
         getLogger().debug("GET request received for all {}s at '{}'", elementType(), uriContext.getAbsolutePath());
 
         if (SystemStateManager.current().isReadBlocked()) {
@@ -167,7 +175,21 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
         try {
             final List<V> elements = getAllElements();
             getLogger().debug("Found {} {}s", elements.size(), elementType());
-            return ok(elements);
+
+            final CacheControl cacheControl = new CacheControl();
+            cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);
+
+            final EntityTag entityTag = new EntityTag(String.valueOf(elements.hashCode()));
+            Response.ResponseBuilder builder = request.evaluatePreconditions(entityTag);
+
+            if (builder == null) {
+                getLogger().debug("Cached resources have changed");
+                builder = okBuilder(elements);
+                builder.tag(entityTag);
+            }
+
+            builder.cacheControl(cacheControl);
+            return builder.build();
         } catch (final FoldingException e) {
             getLogger().error("Error getting all {}s", elementType(), e.getCause());
             return serverError();
@@ -177,7 +199,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
         }
     }
 
-    protected Response getById(final String elementId) {
+    protected Response getById(final String elementId, final Request request) {
         getLogger().debug("GET request for {} received at '{}'", elementType(), uriContext.getAbsolutePath());
 
         if (SystemStateManager.current().isReadBlocked()) {
@@ -187,7 +209,21 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
 
         try {
             final V element = getElementById(parseId(elementId));
-            return ok(element);
+
+            final CacheControl cacheControl = new CacheControl();
+            cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);
+
+            final EntityTag entityTag = new EntityTag(String.valueOf(element.hashCode()));
+            Response.ResponseBuilder builder = request.evaluatePreconditions(entityTag);
+
+            if (builder == null) {
+                getLogger().debug("Cached resource has changed");
+                builder = okBuilder(element);
+                builder.tag(entityTag);
+            }
+
+            builder.cacheControl(cacheControl);
+            return builder.build();
         } catch (final FoldingIdInvalidException e) {
             final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), e.getId());
             getLogger().debug(errorMessage, e);

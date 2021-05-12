@@ -30,7 +30,7 @@ public class UserTcStats {
     }
 
     public static UserTcStats empty(final int userId) {
-        return new UserTcStats(userId, DateTimeUtils.getCurrentUtcTimestamp(), DEFAULT_POINTS, DEFAULT_MULTIPLIED_POINTS, DEFAULT_UNITS);
+        return new UserTcStats(userId, DateTimeUtils.currentUtcTimestamp(), DEFAULT_POINTS, DEFAULT_MULTIPLIED_POINTS, DEFAULT_UNITS);
     }
 
     public static UserTcStats updateWithOffsets(final UserTcStats tcStatsForUser, final UserStatsOffset userStatsOffset) {

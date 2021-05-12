@@ -16,8 +16,11 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.time.DateTimeException;
@@ -27,12 +30,13 @@ import java.time.Year;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static me.zodac.folding.rest.response.Responses.badRequest;
 import static me.zodac.folding.rest.response.Responses.notFound;
 import static me.zodac.folding.rest.response.Responses.notImplemented;
-import static me.zodac.folding.rest.response.Responses.ok;
+import static me.zodac.folding.rest.response.Responses.okBuilder;
 import static me.zodac.folding.rest.response.Responses.serverError;
 import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
 
@@ -41,6 +45,9 @@ import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
 public class HistoricStatsEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HistoricStatsEndpoint.class);
+
+    // Stats updates occur every hour, so we must invalidate responses every hour
+    private static final int CACHE_EXPIRATION_TIME = (int) TimeUnit.HOURS.toSeconds(1);
 
     @EJB
     private StorageFacade storageFacade;
@@ -65,7 +72,7 @@ public class HistoricStatsEndpoint {
     @GET
     @Path("/users/{userId}/{year}/{month}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getDailyUserStats(@PathParam("userId") final String userId, @PathParam("year") final String year, @PathParam("month") final String month) {
+    public Response getDailyUserStats(@PathParam("userId") final String userId, @PathParam("year") final String year, @PathParam("month") final String month, @Context final Request request) {
         LOGGER.debug("GET request received to show daily TC user stats at '{}'", uriContext.getAbsolutePath());
 
         if (SystemStateManager.current().isReadBlocked()) {
@@ -76,12 +83,25 @@ public class HistoricStatsEndpoint {
         try {
             final Map<LocalDate, UserTcStats> dailyUserTcStats = storageFacade.getDailyUserTcStats(Integer.parseInt(userId), Month.of(Integer.parseInt(month)), Year.parse(year));
 
-            final List<DailyStats> dailyStats = dailyUserTcStats.entrySet()
-                    .stream()
-                    .map(entry -> DailyStats.createFromTcStats(entry.getKey(), entry.getValue()))
-                    .collect(Collectors.toList());
+            final CacheControl cacheControl = new CacheControl();
+            cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);
 
-            return ok(dailyStats);
+            final EntityTag entityTag = new EntityTag(String.valueOf(dailyUserTcStats.hashCode()));
+            Response.ResponseBuilder builder = request.evaluatePreconditions(entityTag);
+
+            if (builder == null) {
+                LOGGER.debug("Cached resources have changed");
+
+                final List<DailyStats> dailyStats = dailyUserTcStats.entrySet()
+                        .stream()
+                        .map(entry -> DailyStats.createFromTcStats(entry.getKey(), entry.getValue()))
+                        .collect(Collectors.toList());
+                builder = okBuilder(dailyStats);
+                builder.tag(entityTag);
+            }
+
+            builder.cacheControl(cacheControl);
+            return builder.build();
         } catch (final DateTimeParseException e) {
             final String errorMessage = String.format("The year '%s' is not a valid format", year);
             LOGGER.debug(errorMessage, e);
@@ -113,7 +133,7 @@ public class HistoricStatsEndpoint {
     @GET
     @Path("/users/{userId}/{year}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getMonthlyUserStats(@PathParam("userId") final String userId, @PathParam("year") final String year) {
+    public Response getMonthlyUserStats(@PathParam("userId") final String userId, @PathParam("year") final String year, @Context final Request request) {
         LOGGER.debug("GET request received to show monthly TC user stats at '{}'", uriContext.getAbsolutePath());
 
         if (SystemStateManager.current().isReadBlocked()) {
@@ -124,12 +144,25 @@ public class HistoricStatsEndpoint {
         try {
             final Map<LocalDate, UserTcStats> monthlyUserTcStats = storageFacade.getMonthlyUserTcStats(Integer.parseInt(userId), Year.parse(year));
 
-            final List<MonthlyStats> dailyStats = monthlyUserTcStats.entrySet()
-                    .stream()
-                    .map(entry -> MonthlyStats.createFromTcStats(entry.getKey(), entry.getValue()))
-                    .collect(Collectors.toList());
+            final CacheControl cacheControl = new CacheControl();
+            cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);
 
-            return ok(dailyStats);
+            final EntityTag entityTag = new EntityTag(String.valueOf(monthlyUserTcStats.hashCode()));
+            Response.ResponseBuilder builder = request.evaluatePreconditions(entityTag);
+
+            if (builder == null) {
+                LOGGER.debug("Cached resources have changed");
+
+                final List<MonthlyStats> monthlyStats = monthlyUserTcStats.entrySet()
+                        .stream()
+                        .map(entry -> MonthlyStats.createFromTcStats(entry.getKey(), entry.getValue()))
+                        .collect(Collectors.toList());
+                builder = okBuilder(monthlyStats);
+                builder.tag(entityTag);
+            }
+
+            builder.cacheControl(cacheControl);
+            return builder.build();
         } catch (final DateTimeParseException e) {
             final String errorMessage = String.format("The year '%s' is not a valid format", year);
             LOGGER.debug(errorMessage, e);

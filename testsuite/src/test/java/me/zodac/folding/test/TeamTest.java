@@ -19,8 +19,9 @@ import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
+import static me.zodac.folding.test.utils.HttpResponseHeaderUtils.getETag;
+import static me.zodac.folding.test.utils.HttpResponseHeaderUtils.getXTotalCount;
 import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForSimpleTests;
 import static me.zodac.folding.test.utils.TeamUtils.TEAM_REQUEST_SENDER;
 import static me.zodac.folding.test.utils.TeamUtils.createOrConflict;
@@ -51,12 +52,10 @@ public class TeamTest {
                 .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Collection<Team> allTeams = TeamResponseParser.getAll(response);
-        final Map<String, List<String>> headers = response.headers().map();
-        assertThat(headers)
-                .containsKey("X-Total-Count");
+        final int xTotalCount = getXTotalCount(response);
 
-        assertThat(headers.get("X-Total-Count").get(0))
-                .isEqualTo(String.valueOf(allTeams.size()));
+        assertThat(xTotalCount)
+                .isEqualTo(allTeams.size());
 
         assertThat(allTeams)
                 .isEmpty();
@@ -536,6 +535,48 @@ public class TeamTest {
         assertThat(unretireResponse.statusCode())
                 .as("Did not receive a 400_BAD_REQUEST HTTP response: " + unretireResponse.body())
                 .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+    }
+
+    @Test
+    public void whenGettingTeamById_givenRequestHasIfNoMatchHeader_andTeamHasNotChanged_thenResponseHasA304Status_andNoBody() throws FoldingRestException {
+        final int teamId = TeamUtils.createOrConflict(generateTeam()).getId();
+
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.get(teamId);
+        assertThat(response.statusCode())
+                .as("Expected first request to have a 200_OK HTTP response")
+                .isEqualTo(HttpURLConnection.HTTP_OK);
+
+        final String eTag = getETag(response);
+
+        final HttpResponse<String> cachedResponse = TEAM_REQUEST_SENDER.get(teamId, eTag);
+        assertThat(cachedResponse.statusCode())
+                .as("Expected second request to have a 304_NOT_MODIFIED HTTP response")
+                .isEqualTo(HttpURLConnection.HTTP_NOT_MODIFIED);
+
+        assertThat(TeamResponseParser.get(cachedResponse))
+                .as("Expected cached response to have the same content as the non-cached response")
+                .isNull();
+    }
+
+    @Test
+    public void whenGettingAllTeams_givenRequestHasIfNoMatchHeader_andTeamsHaveNotChanged_thenResponseHasA304Status_andNoBody() throws FoldingRestException {
+        TeamUtils.createOrConflict(generateTeam());
+
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.getAll();
+        assertThat(response.statusCode())
+                .as("Expected first GET request to have a 200_OK HTTP response")
+                .isEqualTo(HttpURLConnection.HTTP_OK);
+
+        final String eTag = getETag(response);
+
+        final HttpResponse<String> cachedResponse = TEAM_REQUEST_SENDER.getAll(eTag);
+        assertThat(cachedResponse.statusCode())
+                .as("Expected second request to have a 304_NOT_MODIFIED HTTP response")
+                .isEqualTo(HttpURLConnection.HTTP_NOT_MODIFIED);
+
+        assertThat(TeamResponseParser.getAll(cachedResponse))
+                .as("Expected cached response to have the same content as the non-cached response")
+                .isNull();
     }
 
     @AfterAll

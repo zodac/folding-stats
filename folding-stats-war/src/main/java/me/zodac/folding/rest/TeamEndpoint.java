@@ -30,7 +30,9 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
@@ -73,15 +75,15 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllTeams() {
-        return super.getAll();
+    public Response getAllTeams(@Context final Request request) {
+        return super.getAll(request);
     }
 
     @GET
     @Path("/{teamId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getTeamById(@PathParam("teamId") final String teamId) {
-        return super.getById(teamId);
+    public Response getTeamById(@PathParam("teamId") final String teamId, @Context final Request request) {
+        return super.getById(teamId, request);
     }
 
     @PUT

@@ -21,9 +21,10 @@ import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import static me.zodac.folding.test.utils.HardwareUtils.HARDWARE_REQUEST_SENDER;
+import static me.zodac.folding.test.utils.HttpResponseHeaderUtils.getETag;
+import static me.zodac.folding.test.utils.HttpResponseHeaderUtils.getXTotalCount;
 import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForSimpleTests;
 import static me.zodac.folding.test.utils.TestGenerator.generateHardware;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,12 +49,10 @@ public class HardwareTest {
                 .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Collection<Hardware> allHardware = HardwareResponseParser.getAll(response);
-        final Map<String, List<String>> headers = response.headers().map();
-        assertThat(headers)
-                .containsKey("X-Total-Count");
+        final int xTotalCount = getXTotalCount(response);
 
-        assertThat(headers.get("X-Total-Count").get(0))
-                .isEqualTo(String.valueOf(allHardware.size()));
+        assertThat(xTotalCount)
+                .isEqualTo(allHardware.size());
 
         assertThat(allHardware)
                 .isEmpty();
@@ -309,6 +308,48 @@ public class HardwareTest {
         assertThat(deleteHardwareResponse.statusCode())
                 .as("Expected to fail due to a 409_CONFLICT: " + deleteHardwareResponse.body())
                 .isEqualTo(HttpURLConnection.HTTP_CONFLICT);
+    }
+
+    @Test
+    public void whenGettingHardwareById_givenRequestHasIfNoMatchHeader_andHardwareHasNotChanged_thenResponseHasA304Status_andNoBody() throws FoldingRestException {
+        final int hardwareId = HardwareUtils.createOrConflict(generateHardware()).getId();
+
+        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get(hardwareId);
+        assertThat(response.statusCode())
+                .as("Expected first request to have a 200_OK HTTP response")
+                .isEqualTo(HttpURLConnection.HTTP_OK);
+
+        final String eTag = getETag(response);
+
+        final HttpResponse<String> cachedResponse = HARDWARE_REQUEST_SENDER.get(hardwareId, eTag);
+        assertThat(cachedResponse.statusCode())
+                .as("Expected second request to have a 304_NOT_MODIFIED HTTP response")
+                .isEqualTo(HttpURLConnection.HTTP_NOT_MODIFIED);
+
+        assertThat(HardwareResponseParser.get(cachedResponse))
+                .as("Expected cached response to have the same content as the non-cached response")
+                .isNull();
+    }
+
+    @Test
+    public void whenGettingAllHardware_givenRequestHasIfNoMatchHeader_andHardwareHasNotChanged_thenResponseHasA304Status_andNoBody() throws FoldingRestException {
+        HardwareUtils.createOrConflict(generateHardware());
+
+        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.getAll();
+        assertThat(response.statusCode())
+                .as("Expected first GET request to have a 200_OK HTTP response")
+                .isEqualTo(HttpURLConnection.HTTP_OK);
+
+        final String eTag = getETag(response);
+
+        final HttpResponse<String> cachedResponse = HARDWARE_REQUEST_SENDER.getAll(eTag);
+        assertThat(cachedResponse.statusCode())
+                .as("Expected second request to have a 304_NOT_MODIFIED HTTP response")
+                .isEqualTo(HttpURLConnection.HTTP_NOT_MODIFIED);
+
+        assertThat(HardwareResponseParser.getAll(cachedResponse))
+                .as("Expected cached response to have the same content as the non-cached response")
+                .isNull();
     }
 
     @AfterAll

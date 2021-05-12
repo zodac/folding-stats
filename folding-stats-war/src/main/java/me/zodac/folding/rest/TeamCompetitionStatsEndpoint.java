@@ -28,8 +28,11 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.util.ArrayList;
@@ -38,9 +41,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import static java.util.stream.Collectors.toList;
 import static me.zodac.folding.rest.response.Responses.ok;
+import static me.zodac.folding.rest.response.Responses.okBuilder;
 import static me.zodac.folding.rest.response.Responses.serverError;
 import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
 
@@ -49,6 +54,9 @@ import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
 public class TeamCompetitionStatsEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TeamCompetitionStatsEndpoint.class);
+
+    // Stats updates occur every hour, so we must invalidate responses every hour
+    private static final int CACHE_EXPIRATION_TIME = (int) TimeUnit.HOURS.toSeconds(1);
 
     @EJB
     private StorageFacade storageFacade;
@@ -95,7 +103,7 @@ public class TeamCompetitionStatsEndpoint {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getTeamCompetitionStats() {
+    public Response getTeamCompetitionStats(@Context final Request request) {
         LOGGER.debug("GET request received to show TC stats");
 
         if (SystemStateManager.current().isReadBlocked()) {
@@ -108,7 +116,8 @@ public class TeamCompetitionStatsEndpoint {
 
             final Optional<CompetitionResult> cachedCompetitionResult = CompetitionResultCache.get();
             if (cachedCompetitionResult.isPresent()) {
-                return ok(cachedCompetitionResult.get());
+                final CompetitionResult cachedResult = cachedCompetitionResult.get();
+                return ok(cachedResult);
             } else {
                 LOGGER.warn("Cache said it had TC result, but none was returned! Calculating new TC result");
             }
@@ -124,11 +133,25 @@ public class TeamCompetitionStatsEndpoint {
                 LOGGER.warn("No TC teams to show");
             }
 
+            final CacheControl cacheControl = new CacheControl();
+            cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);
 
-            final CompetitionResult competitionResult = CompetitionResult.create(teamResults);
-            CompetitionResultCache.add(competitionResult);
-            SystemStateManager.next(SystemState.AVAILABLE);
-            return ok(competitionResult);
+            final EntityTag entityTag = new EntityTag(String.valueOf(teamResults.hashCode()));
+            Response.ResponseBuilder builder = request.evaluatePreconditions(entityTag);
+
+            if (builder == null) {
+                LOGGER.debug("Cached resources have changed");
+
+                final CompetitionResult competitionResult = CompetitionResult.create(teamResults);
+                CompetitionResultCache.add(competitionResult);
+                SystemStateManager.next(SystemState.AVAILABLE);
+
+                builder = okBuilder(competitionResult);
+                builder.tag(entityTag);
+            }
+
+            builder.cacheControl(cacheControl);
+            return builder.build();
         } catch (final Exception e) {
             LOGGER.error("Unexpected error retrieving TC stats", e);
             return serverError();
