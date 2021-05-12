@@ -36,12 +36,4 @@ public class OffsetStatsCache {
     public void clearOffsets() {
         offsetStatsByUserId.clear();
     }
-
-    public boolean isNotEmpty() {
-        return !offsetStatsByUserId.isEmpty();
-    }
-
-    public void addAll(final Map<Integer, UserStatsOffset> offsetStatsByUserId) {
-        this.offsetStatsByUserId.putAll(offsetStatsByUserId);
-    }
 }

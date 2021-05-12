@@ -72,6 +72,8 @@ public class UserTeamCompetitionStatsParser {
         final UserStatsOffset statsOffset = getOffsetStatsForUserOrEmpty(user);
         if (statsOffset.isEmpty()) {
             LOGGER.trace("Retrieved empty stat offset for user: {}", user);
+        } else {
+            LOGGER.debug("{}: {} offset points | {} offset units", user.getFoldingUserName(), formatWithCommas(statsOffset.getMultipliedPointsOffset()), formatWithCommas(statsOffset.getUnitsOffset()));
         }
 
         final UserStats totalStats = getTotalStatsForUserOrEmpty(user);

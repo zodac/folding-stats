@@ -809,7 +809,7 @@ public class PostgresDbManager implements DbManager {
             LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
             try (final ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    UserStatsOffset.create(
+                    return UserStatsOffset.create(
                             resultSet.getLong("offset_points"),
                             resultSet.getLong("offset_multiplied_points"),
                             resultSet.getInt("offset_units"));
@@ -817,6 +817,8 @@ public class PostgresDbManager implements DbManager {
             } catch (final SQLException e) {
                 LOGGER.warn("Error getting offset stats for user: {}", userId, e);
             }
+
+            LOGGER.debug("No result found for user ID {}, returning empty", userId);
             return UserStatsOffset.empty();
         } catch (final SQLException e) {
             throw new FoldingException("Error opening connection to the DB", e);
