@@ -30,7 +30,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.util.ArrayList;
@@ -100,7 +99,7 @@ public class TeamCompetitionStatsEndpoint {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getTeamCompetitionStats(@Context final Request request) {
+    public Response getTeamCompetitionStats() {
         LOGGER.debug("GET request received to show TC stats");
 
         if (SystemStateManager.current().isReadBlocked()) {

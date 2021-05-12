@@ -116,6 +116,8 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
 
         try {
             final int parsedId = super.parseId(userId);
+            getElementById(parsedId); // We call this so if the value does not exist, we can fail with a NOT_FOUND response
+            
             final UserStatsOffset statsOffsetToUse = getValidUserStatsOffset(userStatsOffset, parsedId);
             storageFacade.addOrUpdateOffsetStats(parsedId, statsOffsetToUse);
             SystemStateManager.next(SystemState.UPDATING_STATS);

@@ -404,6 +404,15 @@ public class UserTest {
                 .isNull();
     }
 
+    @Test
+    public void whenPatchingAUserWithPointsOffsets_AndUserDoesNotExist_thenResponseHasA404Status() throws FoldingRestException {
+        final int invalidId = 99;
+        final HttpResponse<Void> patchResponse = USER_REQUEST_SENDER.offset(invalidId, 100L, 1_000L, 10);
+        assertThat(patchResponse.statusCode())
+                .as("Was able to patch user, was expected user to not be found: " + patchResponse.body())
+                .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
+    }
+
     @AfterAll
     public static void tearDown() throws FoldingRestException {
         cleanSystemForSimpleTests();
