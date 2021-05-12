@@ -158,6 +158,14 @@ function loadTcStats() {
                         new bootstrap.Tooltip(teamTableUserCell);
                     } else if (userProperty === "userName" && activeUser[userProperty] === captainName) {
                         teamTableUserCell.innerHTML = activeUser[userProperty].toLocaleString() + " (Captain)";
+                    } else if (userProperty === "hardware") {
+                    console.log("Found: " + activeUser["hardware"]);
+                    console.log("Want: " + activeUser["hardware"]["multiplier"])
+                        teamTableUserCell.setAttribute("data-bs-toggle", "tooltip");
+                        teamTableUserCell.setAttribute("data-placement", "left");
+                        teamTableUserCell.setAttribute("title", "Multiplier: x" + activeUser["hardware"]["multiplier"].toLocaleString());
+                        teamTableUserCell.innerHTML = activeUser[userProperty]["displayName"].toLocaleString();
+                        new bootstrap.Tooltip(teamTableUserCell);
                     } else {
                         teamTableUserCell.innerHTML = activeUser[userProperty].toLocaleString();
                     }
@@ -174,18 +182,24 @@ function loadTcStats() {
                 teamTableUserProperties.forEach(function (userProperty, i) {
                     teamTableUserCell = document.createElement("td");
 
-                    if(userProperty === "userName"){
+                    if(userProperty === "multipliedPoints"){
+                        teamTableUserCell.setAttribute("data-bs-toggle", "tooltip");
+                        teamTableUserCell.setAttribute("data-placement", "left");
+                        teamTableUserCell.setAttribute("title", "Unmultiplied: " + retiredUser["points"].toLocaleString());
+                        teamTableUserCell.innerHTML = retiredUser[userProperty].toLocaleString();
+                        new bootstrap.Tooltip(teamTableUserCell);
+                    } else if (userProperty === "userName") {
                         teamTableUserCell.innerHTML = retiredUser[userProperty] + " (retired)";
+                    } else if (userProperty === "hardware") {
+                        teamTableUserCell.setAttribute("data-bs-toggle", "tooltip");
+                        teamTableUserCell.setAttribute("data-placement", "left");
+                        teamTableUserCell.setAttribute("title", "Multiplier: x" + retiredUser["hardware"]["multiplier"].toLocaleString());
+                        teamTableUserCell.innerHTML = retiredUser[userProperty]["displayName"].toLocaleString();
+                        new bootstrap.Tooltip(teamTableUserCell);
                     } else {
-                        if(userProperty === "multipliedPoints"){
-                            teamTableUserCell.setAttribute("data-bs-toggle", "tooltip");
-                            teamTableUserCell.setAttribute("data-placement", "left");
-                            teamTableUserCell.setAttribute("title", "Unmultiplied: " + retiredUser["points"].toLocaleString());
-                            new bootstrap.Tooltip(teamTableUserCell);
-                        }
-
                         teamTableUserCell.innerHTML = retiredUser[userProperty].toLocaleString();
                     }
+
                     teamTableBodyRow.append(teamTableUserRow);
                 });
                 teamTableBody.append(teamTableBodyRow);

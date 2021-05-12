@@ -234,7 +234,7 @@ public class TeamCompetitionStatsEndpoint {
         try {
             final UserTcStats userTcStats = storageFacade.getTcStatsForUser(user.getId());
             LOGGER.debug("Results for {}: {} points | {} multiplied points | {} units", user.getDisplayName(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits());
-            return UserResult.createWithNoRank(user.getDisplayName(), hardware.getDisplayName(), category.displayName(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits(), user.getLiveStatsLink(), user.isRetired());
+            return UserResult.createWithNoRank(user.getDisplayName(), hardware, category.displayName(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits(), user.getLiveStatsLink(), user.isRetired());
         } catch (final UserNotFoundException e) {
             LOGGER.debug("No stats found for user ID: {}", user.getId(), e);
             LOGGER.warn("No stats found for user ID: {}", user.getId());
