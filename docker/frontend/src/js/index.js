@@ -159,8 +159,6 @@ function loadTcStats() {
                     } else if (userProperty === "userName" && activeUser[userProperty] === captainName) {
                         teamTableUserCell.innerHTML = activeUser[userProperty].toLocaleString() + " (Captain)";
                     } else if (userProperty === "hardware") {
-                    console.log("Found: " + activeUser["hardware"]);
-                    console.log("Want: " + activeUser["hardware"]["multiplier"])
                         teamTableUserCell.setAttribute("data-bs-toggle", "tooltip");
                         teamTableUserCell.setAttribute("data-placement", "left");
                         teamTableUserCell.setAttribute("title", "Multiplier: x" + activeUser["hardware"]["multiplier"].toLocaleString());
