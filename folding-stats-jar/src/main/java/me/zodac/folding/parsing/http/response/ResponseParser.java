@@ -16,7 +16,7 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-public class ResponseParser {
+public final class ResponseParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ResponseParser.class);
     private static final Gson GSON = new Gson();

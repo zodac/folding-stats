@@ -3,14 +3,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>me.zodac</groupId>
-        <artifactId>folding-stats</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
-    </parent>
-
-    <artifactId>docker</artifactId>
-    <name>[${project.parent.artifactId}] docker module</name>
+    <groupId>me.zodac</groupId>
+    <artifactId>folding-stats-docker</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <name>[folding-stats] docker module</name>
 
     <properties>
         <!-- Do not merge or minify JS/CSS by default -->

@@ -133,7 +133,7 @@ public class StorageFacade {
                     .stream()
                     .filter(user -> user.getHardwareId() == updatedHardware.getId())
                     .collect(toList());
-            LOGGER.debug("Hardware had state change to multiplier {} -> {}, recalculating initial stats for {} users", existingHardware.getMultiplier(), existingHardware.getMultiplier(), usersWithUpdatedHardware.size());
+            LOGGER.debug("Hardware had state change to multiplier {} -> {}, recalculating initial stats for {} users", existingHardware.getMultiplier(), updatedHardware.getMultiplier(), usersWithUpdatedHardware.size());
 
             for (final User user : usersWithUpdatedHardware) {
                 LOGGER.debug("User {} had state change to hardware multiplier", user.getFoldingUserName());

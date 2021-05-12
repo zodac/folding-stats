@@ -19,7 +19,6 @@ COPY ./folding-stats-jar/pom.xml ./folding-stats-jar/pom.xml
 COPY ./folding-stats-war/pom.xml ./folding-stats-war/pom.xml
 COPY ./folding-stats-ear/pom.xml ./folding-stats-ear/pom.xml
 # Non-code poms must also be added, or else 'mvn verify' will not even start
-COPY ./docker/pom.xml ./docker/pom.xml
 COPY ./stubbed-folding-endpoints-war/pom.xml ./stubbed-folding-endpoints-war/pom.xml
 COPY ./testsuite/pom.xml ./testsuite/pom.xml
 

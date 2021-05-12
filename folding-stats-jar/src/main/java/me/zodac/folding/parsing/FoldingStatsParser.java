@@ -18,9 +18,13 @@ import static me.zodac.folding.parsing.http.request.RequestSender.sendFoldingReq
 import static me.zodac.folding.parsing.http.response.ResponseParser.getPointsFromResponse;
 import static me.zodac.folding.parsing.http.response.ResponseParser.getUnitsFromResponse;
 
-public class FoldingStatsParser {
+public final class FoldingStatsParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FoldingStatsParser.class);
+
+    private FoldingStatsParser() {
+        
+    }
 
     public static UserStats getTotalStatsForUser(final User user) throws FoldingException, FoldingExternalServiceException {
         LOGGER.debug("Getting stats for username/passkey '{}/{}'", user.getFoldingUserName(), user.getPasskey());

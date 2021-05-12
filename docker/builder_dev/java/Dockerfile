@@ -18,7 +18,6 @@ COPY ./folding-stats-client-library-java/pom.xml ./folding-stats-client-library-
 COPY ./folding-stats-jar/pom.xml ./folding-stats-jar/pom.xml
 COPY ./folding-stats-war/pom.xml ./folding-stats-war/pom.xml
 COPY ./folding-stats-ear/pom.xml ./folding-stats-ear/pom.xml
-COPY ./docker/pom.xml ./docker/pom.xml
 COPY ./stubbed-folding-endpoints-war/pom.xml ./stubbed-folding-endpoints-war/pom.xml
 COPY ./testsuite/pom.xml ./testsuite/pom.xml
 
@@ -26,25 +25,25 @@ RUN mvn verify clean --fail-never -DskipTests
 
 # Copy source code
 COPY ./folding-stats-api ./folding-stats-api
-RUN cd ./folding-stats-api && mvn clean install; cd ..
+RUN mvn clean install --fail-never -DskipTests
 
 COPY ./folding-stats-client-library-java ./folding-stats-client-library-java
-RUN cd ./folding-stats-client-library-java && mvn clean install; cd ..
+RUN mvn clean install --fail-never -DskipTests
 
 COPY ./folding-stats-jar ./folding-stats-jar
-RUN cd ./folding-stats-jar && mvn clean install; cd ..
+RUN mvn clean install --fail-never -DskipTests
 
 COPY ./folding-stats-war ./folding-stats-war
-RUN cd ./folding-stats-war && mvn clean install; cd ..
+RUN mvn clean install --fail-never -DskipTests
 
 COPY ./folding-stats-ear ./folding-stats-ear
-RUN cd ./folding-stats-ear && mvn clean install; cd ..
+RUN mvn clean install --fail-never -DskipTests
 
 COPY ./stubbed-folding-endpoints-war ./stubbed-folding-endpoints-war
-RUN cd ./stubbed-folding-endpoints-war && mvn clean install; cd ..
+RUN mvn clean install --fail-never -DskipTests
 
 COPY ./testsuite ./testsuite
-RUN cd ./testsuite && mvn clean install; cd ..
+RUN mvn clean install --fail-never -DskipTests
 
 # Build artifacts
 RUN mvn clean install

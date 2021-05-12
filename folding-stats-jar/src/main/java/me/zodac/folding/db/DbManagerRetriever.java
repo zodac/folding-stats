@@ -7,7 +7,7 @@ import me.zodac.folding.db.postgres.PostgresDbManager;
 /**
  * Utility class used to retrieve an instance of {@link DbManager} for the system.
  */
-public class DbManagerRetriever {
+public final class DbManagerRetriever {
 
     private static final String DATABASE_VARIABLE_NAME = "DEPLOYED_DATABASE";
 

@@ -14,7 +14,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 
-public class RequestSender {
+public final class RequestSender {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RequestSender.class);
     private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
