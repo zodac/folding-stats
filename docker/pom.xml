@@ -111,12 +111,38 @@
                                 <jsSourceFile>historic-user-daily.js</jsSourceFile>
                                 <!-- Util files -->
                                 <jsSourceFile>util/display_toggle.js</jsSourceFile>
-                                <jsSourceFile>util/json_sorter.js</jsSourceFile>
                                 <jsSourceFile>util/ordinal_suffix.js</jsSourceFile>
                                 <jsSourceFile>util/table_sort.js</jsSourceFile>
                                 <jsSourceFile>util/timer.js</jsSourceFile>
                             </jsSourceFiles>
                             <jsFinalFile>historic-user-daily.js</jsFinalFile>
+                            <jsEngine>CLOSURE</jsEngine>
+
+                            <skipMerge>${skip-minify}</skipMerge>
+                            <skipMinify>${skip-minify}</skipMinify>
+                        </configuration>
+                        <goals>
+                            <goal>minify</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>minify-historic-user-monthly-js</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <charset>UTF-8</charset>
+                            <webappSourceDir>${project.basedir}/frontend/src</webappSourceDir>
+                            <webappTargetDir>${project.basedir}/frontend/site/res</webappTargetDir>
+
+                            <jsSourceDir>js</jsSourceDir>
+                            <jsSourceFiles>
+                                <!-- Main JS file -->
+                                <jsSourceFile>historic-user-monthly.js</jsSourceFile>
+                                <!-- Util files -->
+                                <jsSourceFile>util/display_toggle.js</jsSourceFile>
+                                <jsSourceFile>util/table_sort.js</jsSourceFile>
+                                <jsSourceFile>util/timer.js</jsSourceFile>
+                            </jsSourceFiles>
+                            <jsFinalFile>historic-user-monthly.js</jsFinalFile>
                             <jsEngine>CLOSURE</jsEngine>
 
                             <skipMerge>${skip-minify}</skipMerge>

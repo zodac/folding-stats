@@ -59,6 +59,21 @@
 </nav>
 <h1>User Monthly Stats</h1>
 
+<div class="dropdown">
+    <button class="btn btn-secondary dropdown-toggle" type="button" id="user_dropdown_root" data-bs-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+        Select User
+    </button>
+    <div id="user_dropdown" class="dropdown-menu" aria-labelledby="user_dropdown">
+        <!-- Will be populated on document load -->
+    </div>
+</div>
+
+<div id="loader" class="loader" style="display: none;"></div>
+
+<!-- Will be populated when user is selected -->
+<div id="historic_stats">
+</div>
 
 </body>
 </html>
