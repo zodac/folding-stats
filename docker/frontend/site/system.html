@@ -9,10 +9,8 @@
     <link rel="stylesheet" href="./res/css/main.min.css">
 
     <script src="./res/js/bootstrap-5.0.0.bundle.min.js" type="text/javascript"></script>
-    <script src="./res/js/index.min.js" type="text/javascript"></script>
-    <script async src="./res/js/google_tag_manager.min.js" type="text/javascript"></script>
+    <script src="./res/js/system.min.js" type="text/javascript"></script>
 </head>
-
 
 <body>
 <nav class="navbar navbar-expand navbar-dark bg-dark">
@@ -62,14 +60,20 @@
 
 <br/>
 
-<button onclick="toggleMainButtonStyle('stats', this.classList)" class="btn btn-success" id="stats_button"
-        href="#stats_div" data-bs-toggle="collapse" role="button">Team Competition Stats
+<button onclick="toggleMainButtonStyle('hardware', this.classList)" class="btn btn-primary" id="hardware_button"
+        href="#hardware_div" data-bs-toggle="collapse" role="button">List of Hardware
+</button>
+<button onclick="toggleMainButtonStyle('users', this.classList)" class="btn btn-primary" id="users_button"
+        href="#users_div" data-bs-toggle="collapse" role="button">List of Users
+</button>
+<button onclick="toggleMainButtonStyle('teams', this.classList)" class="btn btn-primary" id="teams_button"
+        href="#teams_div" data-bs-toggle="collapse" role="button">List of Teams
 </button>
 
-<div id="loader" class="loader"></div>
-
-<!-- This will be populated by index.js -->
-<div id="stats_div" class="collapse show"></div>
+<!-- These divs will be populated by index.js -->
+<div id="hardware_div" class="collapse"></div>
+<div id="users_div" class="collapse"></div>
+<div id="teams_div" class="collapse"></div>
 
 </body>
 </html>

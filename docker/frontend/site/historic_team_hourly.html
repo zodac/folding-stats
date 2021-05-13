@@ -1,5 +1,5 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
+
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Extreme Team Folding</title>
@@ -9,10 +9,8 @@
     <link rel="stylesheet" href="./res/css/main.min.css">
 
     <script src="./res/js/bootstrap-5.0.0.bundle.min.js" type="text/javascript"></script>
-    <script src="./res/js/index.min.js" type="text/javascript"></script>
-    <script async src="./res/js/google_tag_manager.min.js" type="text/javascript"></script>
+    <script src="./res/js/historic-team-hourly.min.js" type="text/javascript"></script>
 </head>
-
 
 <body>
 <nav class="navbar navbar-expand navbar-dark bg-dark">
@@ -59,17 +57,8 @@
     <div style="position: absolute; right: 5px;">Next update: <span id="min-part"></span>:<span id="sec-part"></span>
     </div>
 </nav>
+<h1>Team Hourly Stats</h1>
 
-<br/>
-
-<button onclick="toggleMainButtonStyle('stats', this.classList)" class="btn btn-success" id="stats_button"
-        href="#stats_div" data-bs-toggle="collapse" role="button">Team Competition Stats
-</button>
-
-<div id="loader" class="loader"></div>
-
-<!-- This will be populated by index.js -->
-<div id="stats_div" class="collapse show"></div>
 
 </body>
 </html>

@@ -5,7 +5,8 @@
 # Build
 target/
 
-# Merged JS/CSS files
-docker/frontend/site/res/css/main.css
-docker/frontend/site/res/js/index.js
-docker/frontend/site/res/js/historic.js
+# Merged JS/CSS files (ignore full files, keep minified files)
+docker/frontend/site/res/css/*.css
+!docker/frontend/site/res/css/*.min.css
+docker/frontend/site/res/js/*.js
+!docker/frontend/site/res/js/*.min.js

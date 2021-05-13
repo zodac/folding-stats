@@ -709,8 +709,7 @@ public class TeamCompetitionStatsTest {
         final int unitsOffset = -400;
         USER_REQUEST_SENDER.offset(userId, pointsOffset, pointsOffset, unitsOffset);
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
-
-
+        
         final CompetitionResult result = TeamCompetitionStatsUtils.get();
         final TeamResult teamResult = getTeamFromCompetition(result, team.getTeamName());
         final UserResult userResult = getActiveUserFromTeam(teamResult, user.getDisplayName());

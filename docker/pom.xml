@@ -49,15 +49,16 @@
                             <webappSourceDir>${project.basedir}/frontend/src</webappSourceDir>
                             <webappTargetDir>${project.basedir}/frontend/site/res</webappTargetDir>
 
-                            <!-- JS files -->
                             <jsSourceDir>js</jsSourceDir>
                             <jsSourceFiles>
-                                <jsSourceFile>display_toggle.js</jsSourceFile>
-                                <jsSourceFile>google_analytics.js</jsSourceFile>
-                                <jsSourceFile>json_sorter.js</jsSourceFile>
+                                <!-- Main JS file -->
                                 <jsSourceFile>index.js</jsSourceFile>
-                                <jsSourceFile>table_sort.js</jsSourceFile>
-                                <jsSourceFile>timer.js</jsSourceFile>
+                                <!-- Util files -->
+                                <jsSourceFile>util/display_toggle.js</jsSourceFile>
+                                <jsSourceFile>util/google_analytics.js</jsSourceFile>
+                                <jsSourceFile>util/json_sorter.js</jsSourceFile>
+                                <jsSourceFile>util/table_sort.js</jsSourceFile>
+                                <jsSourceFile>util/timer.js</jsSourceFile>
                             </jsSourceFiles>
                             <jsFinalFile>index.js</jsFinalFile>
                             <jsEngine>CLOSURE</jsEngine>
@@ -70,24 +71,52 @@
                         </goals>
                     </execution>
                     <execution>
-                        <id>minify-historic-js</id>
+                        <id>minify-system-js</id>
                         <phase>package</phase>
                         <configuration>
                             <charset>UTF-8</charset>
                             <webappSourceDir>${project.basedir}/frontend/src</webappSourceDir>
                             <webappTargetDir>${project.basedir}/frontend/site/res</webappTargetDir>
 
-                            <!-- JS files -->
                             <jsSourceDir>js</jsSourceDir>
                             <jsSourceFiles>
-                                <jsSourceFile>display_toggle.js</jsSourceFile>
-                                <jsSourceFile>json_sorter.js</jsSourceFile>
-                                <jsSourceFile>historic.js</jsSourceFile>
-                                <jsSourceFile>ordinal_suffix.js</jsSourceFile>
-                                <jsSourceFile>table_sort.js</jsSourceFile>
-                                <jsSourceFile>timer.js</jsSourceFile>
+                                <!-- Main JS file -->
+                                <jsSourceFile>system.js</jsSourceFile>
+                                <!-- Util files -->
+                                <jsSourceFile>util/json_sorter.js</jsSourceFile>
+                                <jsSourceFile>util/table_sort.js</jsSourceFile>
+                                <jsSourceFile>util/timer.js</jsSourceFile>
                             </jsSourceFiles>
-                            <jsFinalFile>historic.js</jsFinalFile>
+                            <jsFinalFile>system.js</jsFinalFile>
+                            <jsEngine>CLOSURE</jsEngine>
+
+                            <skipMerge>${skip-minify}</skipMerge>
+                            <skipMinify>${skip-minify}</skipMinify>
+                        </configuration>
+                        <goals>
+                            <goal>minify</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>minify-historic-user-daily-js</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <charset>UTF-8</charset>
+                            <webappSourceDir>${project.basedir}/frontend/src</webappSourceDir>
+                            <webappTargetDir>${project.basedir}/frontend/site/res</webappTargetDir>
+
+                            <jsSourceDir>js</jsSourceDir>
+                            <jsSourceFiles>
+                                <!-- Main JS file -->
+                                <jsSourceFile>historic-user-daily.js</jsSourceFile>
+                                <!-- Util files -->
+                                <jsSourceFile>util/display_toggle.js</jsSourceFile>
+                                <jsSourceFile>util/json_sorter.js</jsSourceFile>
+                                <jsSourceFile>util/ordinal_suffix.js</jsSourceFile>
+                                <jsSourceFile>util/table_sort.js</jsSourceFile>
+                                <jsSourceFile>util/timer.js</jsSourceFile>
+                            </jsSourceFiles>
+                            <jsFinalFile>historic-user-daily.js</jsFinalFile>
                             <jsEngine>CLOSURE</jsEngine>
 
                             <skipMerge>${skip-minify}</skipMerge>
