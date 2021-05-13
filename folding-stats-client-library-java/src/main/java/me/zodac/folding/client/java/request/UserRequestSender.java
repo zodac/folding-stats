@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.tc.stats.UserStatsOffset;
+import me.zodac.folding.api.tc.stats.OffsetStats;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import org.apache.commons.lang3.StringUtils;
 
@@ -222,10 +222,10 @@ public final class UserRequestSender {
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<Void> offset(final int userId, final long pointsOffset, final long multipliedPointsOffset, final int unitsOffset) throws FoldingRestException {
-        final UserStatsOffset userStatsOffset = UserStatsOffset.create(pointsOffset, multipliedPointsOffset, unitsOffset);
+        final OffsetStats offsetStats = OffsetStats.create(pointsOffset, multipliedPointsOffset, unitsOffset);
 
         final HttpRequest request = HttpRequest.newBuilder()
-                .method("PATCH", HttpRequest.BodyPublishers.ofString(GSON.toJson(userStatsOffset)))
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(GSON.toJson(offsetStats)))
                 .uri(URI.create(foldingUrl + "/users/" + userId))
                 .header("Content-Type", "application/json")
                 .build();

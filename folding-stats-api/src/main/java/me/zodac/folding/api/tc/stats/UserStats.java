@@ -20,8 +20,16 @@ public class UserStats {
     private final Timestamp timestamp;
     private final Stats stats;
 
-    public static UserStats create(final int userId, final Timestamp timestamp, final Stats totalStats) {
-        return new UserStats(userId, timestamp, totalStats);
+    public static UserStats create(final int userId, final Timestamp timestamp, final Stats stats) {
+        return new UserStats(userId, timestamp, stats);
+    }
+
+    public static UserStats createWithPointsAndUnits(final int userId, final Timestamp timestamp, final long points, final int units) {
+        return new UserStats(userId, timestamp, Stats.create(points, units));
+    }
+
+    public static UserStats createWithoutTimestamp(final int userId, final Stats totalStats) {
+        return new UserStats(userId, DateTimeUtils.currentUtcTimestamp(), totalStats);
     }
 
     public static UserStats empty() {

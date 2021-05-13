@@ -25,28 +25,15 @@ RUN mvn verify clean --fail-never -DskipTests
 
 # Copy source code
 COPY ./folding-stats-api ./folding-stats-api
-RUN mvn clean install --fail-never -DskipTests
-
 COPY ./folding-stats-client-library-java ./folding-stats-client-library-java
-RUN mvn clean install --fail-never -DskipTests
-
 COPY ./folding-stats-jar ./folding-stats-jar
-RUN mvn clean install --fail-never -DskipTests
-
 COPY ./folding-stats-war ./folding-stats-war
-RUN mvn clean install --fail-never -DskipTests
-
 COPY ./folding-stats-ear ./folding-stats-ear
-RUN mvn clean install --fail-never -DskipTests
-
 COPY ./stubbed-folding-endpoints-war ./stubbed-folding-endpoints-war
-RUN mvn clean install --fail-never -DskipTests
-
 COPY ./testsuite ./testsuite
-RUN mvn clean install --fail-never -DskipTests
 
 # Build artifacts
-RUN mvn clean install
+RUN mvn clean install -DskipTests
 
 # Output
 RUN mkdir --parents /opt/jboss/wildfly/standalone/deployments/

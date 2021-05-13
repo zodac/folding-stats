@@ -8,10 +8,9 @@ import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.exception.HardwareNotFoundException;
 import me.zodac.folding.api.tc.exception.TeamNotFoundException;
 import me.zodac.folding.api.tc.exception.UserNotFoundException;
+import me.zodac.folding.api.tc.stats.OffsetStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
-import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
-import me.zodac.folding.api.tc.stats.UserStatsOffset;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 
 import java.time.LocalDate;
@@ -67,9 +66,9 @@ public interface DbManager {
 
     // TC operations
 
-    void persistHourlyTcStatsForUser(final UserTcStats userTcStats) throws FoldingException;
+    void persistHourlyTcStats(final UserTcStats userTcStats) throws FoldingException;
 
-    boolean doTcStatsExist() throws FoldingException;
+    boolean isAnyHourlyTcStats() throws FoldingException;
 
     // Historic TC operations
 
@@ -77,23 +76,23 @@ public interface DbManager {
 
     Map<LocalDate, UserTcStats> getMonthlyUserTcStats(final int userId, final Year year) throws FoldingException, UserNotFoundException;
 
-    void persistInitialUserStats(final UserStats userStats) throws FoldingException;
+    void persistInitialStats(final UserStats userStats) throws FoldingException;
 
-    Stats getInitialStatsForUser(final int userId) throws FoldingException;
+    UserStats getInitialStats(final int userId) throws FoldingException;
 
-    UserTcStats getCurrentTcStats(final int userId) throws FoldingException, UserNotFoundException;
+    UserTcStats getHourlyTcStats(final int userId) throws FoldingException, UserNotFoundException;
 
-    void persistTotalStatsForUser(final UserStats stats) throws FoldingException;
+    void persistTotalStats(final UserStats stats) throws FoldingException;
 
-    Stats getTotalStats(final int userId) throws FoldingException;
+    UserStats getTotalStats(final int userId) throws FoldingException;
 
-    void addOffsetStats(int userId, UserStatsOffset userStatsOffset) throws FoldingException;
+    void addOffsetStats(int userId, OffsetStats offsetStats) throws FoldingException;
 
-    UserStatsOffset addOrUpdateOffsetStats(final int userId, final UserStatsOffset userStatsOffset) throws FoldingException;
+    OffsetStats addOrUpdateOffsetStats(final int userId, final OffsetStats offsetStats) throws FoldingException;
 
-    UserStatsOffset getOffsetStatsForUser(final int userId) throws FoldingException;
+    OffsetStats getOffsetStats(final int userId) throws FoldingException;
 
-    void clearOffsetStats() throws FoldingConflictException, FoldingException;
+    void clearAllOffsetStats() throws FoldingConflictException, FoldingException;
 
     int persistRetiredUserStats(final int teamId, final String displayUserName, final UserTcStats retiredUserStats) throws FoldingException;
 

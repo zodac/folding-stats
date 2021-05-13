@@ -13,7 +13,7 @@ import me.zodac.folding.api.tc.exception.FoldingIdOutOfRangeException;
 import me.zodac.folding.api.tc.exception.HardwareNotFoundException;
 import me.zodac.folding.api.tc.exception.NotFoundException;
 import me.zodac.folding.api.tc.exception.UserNotFoundException;
-import me.zodac.folding.api.tc.stats.UserStatsOffset;
+import me.zodac.folding.api.tc.stats.OffsetStats;
 import me.zodac.folding.bean.UserTeamCompetitionStatsParser;
 import me.zodac.folding.validator.UserValidator;
 import me.zodac.folding.validator.ValidationResponse;
@@ -106,8 +106,8 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
     @Path("/{userId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateUserWithOffset(@PathParam("userId") final String userId, final UserStatsOffset userStatsOffset) {
-        getLogger().debug("PATCH request to update offset for user received at '{}': {}", uriContext.getAbsolutePath(), userStatsOffset);
+    public Response updateUserWithOffset(@PathParam("userId") final String userId, final OffsetStats offsetStats) {
+        getLogger().debug("PATCH request to update offset for user received at '{}': {}", uriContext.getAbsolutePath(), offsetStats);
 
         if (SystemStateManager.current().isWriteBlocked()) {
             getLogger().warn("System state {} does not allow write requests", SystemStateManager.current());
@@ -117,9 +117,9 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
         try {
             final int parsedId = super.parseId(userId);
             getElementById(parsedId); // We call this so if the value does not exist, we can fail with a NOT_FOUND response
-            
-            final UserStatsOffset statsOffsetToUse = getValidUserStatsOffset(userStatsOffset, parsedId);
-            storageFacade.addOrUpdateOffsetStats(parsedId, statsOffsetToUse);
+
+            final OffsetStats offsetStatsToUse = getValidUserStatsOffset(offsetStats, parsedId);
+            storageFacade.addOrUpdateOffsetStats(parsedId, offsetStatsToUse);
             SystemStateManager.next(SystemState.UPDATING_STATS);
             userTeamCompetitionStatsParser.parseTcStatsForUserAndWait(storageFacade.getUser(parsedId));
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
@@ -146,14 +146,14 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
         }
     }
 
-    private UserStatsOffset getValidUserStatsOffset(final UserStatsOffset userStatsOffset, final int parsedId) throws FoldingException, UserNotFoundException, HardwareNotFoundException {
-        if (!userStatsOffset.isMissingPointsOrMultipliedPoints()) {
-            return userStatsOffset;
+    private OffsetStats getValidUserStatsOffset(final OffsetStats offsetStats, final int parsedId) throws FoldingException, UserNotFoundException, HardwareNotFoundException {
+        if (!offsetStats.isMissingPointsOrMultipliedPoints()) {
+            return offsetStats;
         }
 
         final User user = storageFacade.getUser(parsedId);
         final Hardware hardware = storageFacade.getHardware(user.getHardwareId());
-        return UserStatsOffset.updateWithHardwareMultiplier(userStatsOffset, hardware.getMultiplier());
+        return OffsetStats.updateWithHardwareMultiplier(offsetStats, hardware.getMultiplier());
     }
 
     @Override

@@ -29,14 +29,18 @@ public class UserTcStats {
         return new UserTcStats(userId, timestamp, points, multipliedPoints, units);
     }
 
+    public static UserTcStats createWithoutTimestamp(final int userId, final long points, final long multipliedPoints, final int units) {
+        return new UserTcStats(userId, DateTimeUtils.currentUtcTimestamp(), points, multipliedPoints, units);
+    }
+
     public static UserTcStats empty(final int userId) {
         return new UserTcStats(userId, DateTimeUtils.currentUtcTimestamp(), DEFAULT_POINTS, DEFAULT_MULTIPLIED_POINTS, DEFAULT_UNITS);
     }
 
-    public static UserTcStats updateWithOffsets(final UserTcStats tcStatsForUser, final UserStatsOffset userStatsOffset) {
-        final long offsetPoints = Math.max(tcStatsForUser.getPoints() + userStatsOffset.getPointsOffset(), 0);
-        final long offsetMultipliedPoints = Math.max(tcStatsForUser.getMultipliedPoints() + userStatsOffset.getMultipliedPointsOffset(), 0);
-        final int offsetUnits = Math.max(tcStatsForUser.getUnits() + userStatsOffset.getUnitsOffset(), 0);
+    public static UserTcStats updateWithOffsets(final UserTcStats tcStatsForUser, final OffsetStats offsetStats) {
+        final long offsetPoints = Math.max(tcStatsForUser.getPoints() + offsetStats.getPointsOffset(), 0);
+        final long offsetMultipliedPoints = Math.max(tcStatsForUser.getMultipliedPoints() + offsetStats.getMultipliedPointsOffset(), 0);
+        final int offsetUnits = Math.max(tcStatsForUser.getUnits() + offsetStats.getUnitsOffset(), 0);
 
         return new UserTcStats(tcStatsForUser.getUserId(), tcStatsForUser.getTimestamp(), offsetPoints, offsetMultipliedPoints, offsetUnits);
     }

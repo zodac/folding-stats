@@ -40,6 +40,10 @@
 
         <!-- Test 3PP Versions -->
         <assertj-core.version>3.19.0</assertj-core.version>
+        <embredded-postgres.version>1.2.6</embredded-postgres.version>
+        <!-- Version should be the same as the postgres docker image version -->
+        <embredded-postgres-binaries-bom.version>13.2.0</embredded-postgres-binaries-bom.version>
+        <flyway-core>6.5.1</flyway-core>
         <junit.version>5.7.1</junit.version>
 
         <!-- Plugin Versions -->
@@ -145,6 +149,25 @@
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
                 <version>${assertj-core.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.zonky.test</groupId>
+                <artifactId>embedded-postgres</artifactId>
+                <version>${embredded-postgres.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.zonky.test.postgres</groupId>
+                <artifactId>embedded-postgres-binaries-bom</artifactId>
+                <version>${embredded-postgres-binaries-bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-core</artifactId>
+                <version>${flyway-core}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>

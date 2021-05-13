@@ -68,7 +68,7 @@ public class Initialiser {
 
     private void initTcStats() {
         try {
-            if (!dbManager.doTcStatsExist()) {
+            if (!dbManager.isAnyHourlyTcStats()) {
                 LOGGER.warn("No TC stats data exists in the DB");
                 teamCompetitionStatsScheduler.manualTeamCompetitionStatsParsing(ExecutionType.ASYNCHRONOUS);
             }

@@ -5,9 +5,9 @@ import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.FoldingExternalServiceException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.stats.OffsetStats;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
-import me.zodac.folding.api.tc.stats.UserStatsOffset;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.parsing.FoldingStatsParser;
 import org.apache.commons.lang3.StringUtils;
@@ -69,11 +69,11 @@ public class UserTeamCompetitionStatsParser {
             return;
         }
 
-        final UserStatsOffset statsOffset = getOffsetStatsForUserOrEmpty(user);
-        if (statsOffset.isEmpty()) {
+        final OffsetStats offsetStats = getOffsetStatsForUserOrEmpty(user);
+        if (offsetStats.isEmpty()) {
             LOGGER.trace("Retrieved empty stat offset for user: {}", user);
         } else {
-            LOGGER.debug("{}: {} offset points | {} offset units", user.getFoldingUserName(), formatWithCommas(statsOffset.getMultipliedPointsOffset()), formatWithCommas(statsOffset.getUnitsOffset()));
+            LOGGER.debug("{}: {} offset points | {} offset units", user.getFoldingUserName(), formatWithCommas(offsetStats.getMultipliedPointsOffset()), formatWithCommas(offsetStats.getUnitsOffset()));
         }
 
         final UserStats totalStats = getTotalStatsForUserOrEmpty(user);
@@ -95,17 +95,17 @@ public class UserTeamCompetitionStatsParser {
             return;
         }
 
-        calculateAndPersistTcStats(user, initialStats, statsOffset, totalStats, hardware.get());
+        calculateAndPersistTcStats(user, initialStats, offsetStats, totalStats, hardware.get());
     }
 
-    private void calculateAndPersistTcStats(final User user, final Stats initialStats, final UserStatsOffset statsOffset, final UserStats totalStats, final Hardware hardware) {
+    private void calculateAndPersistTcStats(final User user, final Stats initialStats, final OffsetStats offsetStats, final UserStats totalStats, final Hardware hardware) {
         final double hardwareMultiplier = hardware.getMultiplier();
         final long points = Math.max(0, totalStats.getPoints() - initialStats.getPoints());
         final long multipliedPoints = Math.round(points * hardwareMultiplier);
         final int units = Math.max(0, totalStats.getUnits() - initialStats.getUnits());
         final UserTcStats statsBeforeOffset = UserTcStats.create(user.getId(), totalStats.getTimestamp(), points, multipliedPoints, units);
 
-        final UserTcStats hourlyUserTcStats = UserTcStats.updateWithOffsets(statsBeforeOffset, statsOffset);
+        final UserTcStats hourlyUserTcStats = UserTcStats.updateWithOffsets(statsBeforeOffset, offsetStats);
         LOGGER.debug("{}: {} total points (unmultiplied) | {} total units", user.getDisplayName(), formatWithCommas(totalStats.getPoints()), formatWithCommas(totalStats.getUnits()));
         LOGGER.debug("{}: {} TC points (pre-offset) | {} TC units (pre-offset)", user.getFoldingUserName(), formatWithCommas(multipliedPoints), formatWithCommas(units));
         LOGGER.info("{}: {} TC points | {} TC units", user.getFoldingUserName(), formatWithCommas(hourlyUserTcStats.getMultipliedPoints()), formatWithCommas(hourlyUserTcStats.getUnits()));
@@ -139,13 +139,13 @@ public class UserTeamCompetitionStatsParser {
         return Stats.empty();
     }
 
-    private UserStatsOffset getOffsetStatsForUserOrEmpty(final User user) {
+    private OffsetStats getOffsetStatsForUserOrEmpty(final User user) {
         try {
             return storageFacade.getOffsetStatsForUser(user.getId());
         } catch (final FoldingException e) {
             LOGGER.warn("Error getting user offset stats for user: {}", user, e.getCause());
         }
 
-        return UserStatsOffset.empty();
+        return OffsetStats.empty();
     }
 }

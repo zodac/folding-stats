@@ -14,10 +14,10 @@ import me.zodac.folding.api.tc.exception.HardwareNotFoundException;
 import me.zodac.folding.api.tc.exception.NotFoundException;
 import me.zodac.folding.api.tc.exception.TeamNotFoundException;
 import me.zodac.folding.api.tc.exception.UserNotFoundException;
+import me.zodac.folding.api.tc.stats.OffsetStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
-import me.zodac.folding.api.tc.stats.UserStatsOffset;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.api.utils.DateTimeUtils;
 import me.zodac.folding.cache.HardwareCache;
@@ -157,7 +157,7 @@ public class StorageFacade {
         // When adding a new user, we configure the initial stats DB/cache
         persistInitialUserStats(userWithId);
         // When adding a new user, we give an empty offset to the offset cache
-        offsetStatsCache.add(userWithId.getId(), UserStatsOffset.empty());
+        offsetStatsCache.add(userWithId.getId(), OffsetStats.empty());
 
         return userWithId;
     }
@@ -240,12 +240,12 @@ public class StorageFacade {
         final UserTcStats currentUserTcStats = getCurrentTcStatsForUserOrDefault(updatedUser);
 
         LOGGER.debug("Setting initial stats to: {}", userTotalStats);
-        dbManager.persistInitialUserStats(userTotalStats);
+        dbManager.persistInitialStats(userTotalStats);
         initialStatsCache.add(updatedUser.getId(), userTotalStats.getStats());
 
-        final UserStatsOffset userStatsOffset = UserStatsOffset.create(currentUserTcStats.getPoints(), currentUserTcStats.getMultipliedPoints(), currentUserTcStats.getUnits());
-        LOGGER.debug("Adding offset stats of: {}", userStatsOffset);
-        addOffsetStats(updatedUser.getId(), userStatsOffset);
+        final OffsetStats offsetStats = OffsetStats.create(currentUserTcStats.getPoints(), currentUserTcStats.getMultipliedPoints(), currentUserTcStats.getUnits());
+        LOGGER.debug("Adding offset stats of: {}", offsetStats);
+        addOffsetStats(updatedUser.getId(), offsetStats);
     }
 
     private UserTcStats getCurrentTcStatsForUserOrDefault(final User updatedUser) throws FoldingException {
@@ -360,10 +360,10 @@ public class StorageFacade {
         // We add an offset for the user based on their retired stats
         if (teamId == retiredUserStats.getTeamId() && team.getRetiredUserIds().contains(retiredUserId)) {
             LOGGER.debug("Un-retiring user for original team, adding offset: {}", retiredUserStats);
-            addOffsetStats(unretiredUser.getId(), UserStatsOffset.create(retiredUserStats.getPoints(), retiredUserStats.getMultipliedPoints(), retiredUserStats.getUnits()));
+            addOffsetStats(unretiredUser.getId(), OffsetStats.create(retiredUserStats.getPoints(), retiredUserStats.getMultipliedPoints(), retiredUserStats.getUnits()));
         } else {
             LOGGER.debug("User {} was not previously a member {} of this team {}, resetting offset", retiredUserStats, team.getRetiredUserIds(), teamId);
-            addOffsetStats(unretiredUser.getId(), UserStatsOffset.empty());
+            addOffsetStats(unretiredUser.getId(), OffsetStats.empty());
         }
 
         // Update the team with the new user
@@ -381,7 +381,7 @@ public class StorageFacade {
     }
 
     public void persistInitialUserStats(final UserStats userStats) throws FoldingException {
-        dbManager.persistInitialUserStats(userStats);
+        dbManager.persistInitialStats(userStats);
         initialStatsCache.add(userStats.getUserId(), userStats.getStats());
     }
 
@@ -394,7 +394,7 @@ public class StorageFacade {
         LOGGER.trace("Cache miss! getInitialStatsForUser");
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
-        final Stats initialStatsFromDb = dbManager.getInitialStatsForUser(userId);
+        final Stats initialStatsFromDb = dbManager.getInitialStats(userId).getStats();
         initialStatsCache.add(userId, initialStatsFromDb);
         return initialStatsFromDb;
     }
@@ -410,7 +410,7 @@ public class StorageFacade {
     }
 
     public void persistHourlyTcStatsForUser(final UserTcStats userTcStats) throws FoldingException {
-        dbManager.persistHourlyTcStatsForUser(userTcStats);
+        dbManager.persistHourlyTcStats(userTcStats);
         tcStatsCache.add(userTcStats.getUserId(), userTcStats);
     }
 
@@ -424,7 +424,7 @@ public class StorageFacade {
         LOGGER.trace("Cache miss! Current TC stats");
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
-        final UserTcStats userTcStatsFromDb = dbManager.getCurrentTcStats(userId);
+        final UserTcStats userTcStatsFromDb = dbManager.getHourlyTcStats(userId);
         tcStatsCache.add(userId, userTcStatsFromDb);
         return userTcStatsFromDb;
     }
@@ -437,18 +437,18 @@ public class StorageFacade {
         return dbManager.getMonthlyUserTcStats(userId, year);
     }
 
-    public void addOffsetStats(final int userId, final UserStatsOffset userStatsOffset) throws FoldingException {
-        dbManager.addOffsetStats(userId, userStatsOffset);
-        offsetStatsCache.add(userId, userStatsOffset);
+    public void addOffsetStats(final int userId, final OffsetStats offsetStats) throws FoldingException {
+        dbManager.addOffsetStats(userId, offsetStats);
+        offsetStatsCache.add(userId, offsetStats);
     }
 
-    public void addOrUpdateOffsetStats(final int userId, final UserStatsOffset userStatsOffset) throws FoldingException {
-        final UserStatsOffset userStatsOffsetFromDb = dbManager.addOrUpdateOffsetStats(userId, userStatsOffset);
-        offsetStatsCache.add(userId, userStatsOffsetFromDb);
+    public void addOrUpdateOffsetStats(final int userId, final OffsetStats offsetStats) throws FoldingException {
+        final OffsetStats offsetStatsFromDb = dbManager.addOrUpdateOffsetStats(userId, offsetStats);
+        offsetStatsCache.add(userId, offsetStatsFromDb);
     }
 
-    public UserStatsOffset getOffsetStatsForUser(final int userId) throws FoldingException {
-        final Optional<UserStatsOffset> offsetStats = offsetStatsCache.get(userId);
+    public OffsetStats getOffsetStatsForUser(final int userId) throws FoldingException {
+        final Optional<OffsetStats> offsetStats = offsetStatsCache.get(userId);
         if (offsetStats.isPresent()) {
             return offsetStats.get();
         }
@@ -456,7 +456,7 @@ public class StorageFacade {
         LOGGER.trace("Cache miss! getOffsetStatsForUser");
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
-        final UserStatsOffset offsetStatsFromDb = dbManager.getOffsetStatsForUser(userId);
+        final OffsetStats offsetStatsFromDb = dbManager.getOffsetStats(userId);
         offsetStatsCache.add(userId, offsetStatsFromDb);
         return offsetStatsFromDb;
     }
@@ -464,18 +464,18 @@ public class StorageFacade {
 
     public void initialiseOffsetStats() throws FoldingException {
         for (final User user : getAllUsers()) {
-            final UserStatsOffset userStatsOffset = dbManager.getOffsetStatsForUser(user.getId());
-            offsetStatsCache.add(user.getId(), userStatsOffset);
+            final OffsetStats offsetStats = dbManager.getOffsetStats(user.getId());
+            offsetStatsCache.add(user.getId(), offsetStats);
         }
     }
 
     public void clearOffsetStats() throws FoldingConflictException, FoldingException {
-        dbManager.clearOffsetStats();
+        dbManager.clearAllOffsetStats();
         offsetStatsCache.clearOffsets();
     }
 
     public void persistTotalStatsForUser(final UserStats stats) throws FoldingException {
-        dbManager.persistTotalStatsForUser(stats);
+        dbManager.persistTotalStats(stats);
         totalStatsCache.add(stats.getUserId(), stats.getStats());
     }
 
@@ -489,7 +489,7 @@ public class StorageFacade {
         LOGGER.trace("Cache miss! Total stats");
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
-        final Stats userTotalStatsFromDb = dbManager.getTotalStats(userId);
+        final Stats userTotalStatsFromDb = dbManager.getTotalStats(userId).getStats();
         totalStatsCache.add(userId, userTotalStatsFromDb);
         return userTotalStatsFromDb;
     }

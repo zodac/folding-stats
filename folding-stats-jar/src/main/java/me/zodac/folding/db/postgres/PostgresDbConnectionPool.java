@@ -2,15 +2,16 @@ package me.zodac.folding.db.postgres;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import me.zodac.folding.api.db.DbConnectionPool;
 import me.zodac.folding.api.utils.EnvironmentVariables;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * Pool of PostgreSQL DB {@link Connection}s.
+ * {@link DbConnectionPool} for PostgreSQL DB {@link Connection}s.
  */
-public final class PostgresDbConnectionPool {
+public class PostgresDbConnectionPool implements DbConnectionPool {
 
     private static final HikariConfig DATA_SOURCE_CONFIG = new HikariConfig();
     private static final HikariDataSource DATA_SOURCE_POOL;
@@ -32,13 +33,12 @@ public final class PostgresDbConnectionPool {
 
     }
 
-    /**
-     * Retrieve a DB {@link Connection} from the pool.
-     *
-     * @return a DB {@link Connection}
-     * @throws SQLException thrown if an error accessing the {@link Connection} occurs
-     */
-    public static Connection getConnection() throws SQLException {
+    public static PostgresDbConnectionPool create() {
+        return new PostgresDbConnectionPool();
+    }
+
+    @Override
+    public Connection getConnection() throws SQLException {
         return DATA_SOURCE_POOL.getConnection();
     }
 }

@@ -2,6 +2,7 @@ package me.zodac.folding.db;
 
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.utils.EnvironmentVariables;
+import me.zodac.folding.db.postgres.PostgresDbConnectionPool;
 import me.zodac.folding.db.postgres.PostgresDbManager;
 
 /**
@@ -24,7 +25,7 @@ public final class DbManagerRetriever {
         final String deployedDatabase = EnvironmentVariables.get(DATABASE_VARIABLE_NAME);
 
         if ("postgres".equalsIgnoreCase(deployedDatabase)) {
-            return new PostgresDbManager();
+            return PostgresDbManager.create(PostgresDbConnectionPool.create());
         }
         throw new IllegalStateException(String.format("Unable to find database of type using variable '%s': %s", DATABASE_VARIABLE_NAME, deployedDatabase));
     }
