@@ -46,12 +46,12 @@ services:
       JAVA_OPTS: -Xms512m -Xmx2g -Djava.net.preferIPv4Stack=true
       # Stats parsing configuration
       STATS_URL_ROOT: "https://api2.foldingathome.org"
-      # NOTE: The monthly reset will always occur at 00:55 on the first of the month
+      # NOTE: The monthly reset will always occur at 00:15 on the first of the month
       ENABLE_STATS_MONTHLY_RESET: "true"
       # Scheduled stats parsing configuration
       ENABLE_STATS_SCHEDULED_PARSING: "true"
       STATS_PARSING_SCHEDULE_HOUR: "*"
-      STATS_PARSING_SCHEDULE_MINUTE: "15"
+      STATS_PARSING_SCHEDULE_MINUTE: "55"
       STATS_PARSING_SCHEDULE_SECOND: "0"
       # Database configuration
       DEPLOYED_DATABASE: "postgres"

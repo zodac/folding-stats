@@ -32,9 +32,9 @@ public class TeamCompetitionStatsScheduler {
     private static final Logger LOGGER = LoggerFactory.getLogger(TeamCompetitionStatsScheduler.class);
     private static final boolean IS_STATS_SCHEDULED_PARSING_ENABLED = Boolean.parseBoolean(EnvironmentVariables.get("ENABLE_STATS_SCHEDULED_PARSING", "false"));
 
-    // Default is to run every hour at 15 minutes past the hour
+    // Default is to run every hour at 55 minutes past the hour
     private static final String STATS_PARSING_SCHEDULE_HOUR = EnvironmentVariables.get("STATS_PARSING_SCHEDULE_HOUR", "*");
-    private static final String STATS_PARSING_SCHEDULE_MINUTE = EnvironmentVariables.get("STATS_PARSING_SCHEDULE_MINUTE", "15");
+    private static final String STATS_PARSING_SCHEDULE_MINUTE = EnvironmentVariables.get("STATS_PARSING_SCHEDULE_MINUTE", "55");
     private static final String STATS_PARSING_SCHEDULE_SECOND = EnvironmentVariables.get("STATS_PARSING_SCHEDULE_SECOND", "0");
 
     @EJB

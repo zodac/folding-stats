@@ -81,21 +81,16 @@ public class HistoricStatsEndpoint {
         }
 
         try {
-            final Map<LocalDate, UserTcStats> dailyUserTcStats = storageFacade.getDailyUserTcStats(Integer.parseInt(userId), Month.of(Integer.parseInt(month)), Year.parse(year));
+            final List<DailyStats> dailyStats = storageFacade.getTcUserStatsByDay(Integer.parseInt(userId), Month.of(Integer.parseInt(month)), Year.parse(year));
 
             final CacheControl cacheControl = new CacheControl();
             cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);
 
-            final EntityTag entityTag = new EntityTag(String.valueOf(dailyUserTcStats.hashCode()));
+            final EntityTag entityTag = new EntityTag(String.valueOf(dailyStats.hashCode()));
             Response.ResponseBuilder builder = request.evaluatePreconditions(entityTag);
 
             if (builder == null) {
                 LOGGER.debug("Cached resources have changed");
-
-                final List<DailyStats> dailyStats = dailyUserTcStats.entrySet()
-                        .stream()
-                        .map(entry -> DailyStats.createFromTcStats(entry.getKey(), entry.getValue()))
-                        .collect(Collectors.toList());
                 builder = okBuilder(dailyStats);
                 builder.tag(entityTag);
             }
@@ -142,7 +137,7 @@ public class HistoricStatsEndpoint {
         }
 
         try {
-            final Map<LocalDate, UserTcStats> monthlyUserTcStats = storageFacade.getMonthlyUserTcStats(Integer.parseInt(userId), Year.parse(year));
+            final Map<LocalDate, UserTcStats> monthlyUserTcStats = storageFacade.getTcUserStatsByMonth(Integer.parseInt(userId), Year.parse(year));
 
             final CacheControl cacheControl = new CacheControl();
             cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);

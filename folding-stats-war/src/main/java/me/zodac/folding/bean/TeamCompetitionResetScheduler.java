@@ -39,7 +39,7 @@ public class TeamCompetitionResetScheduler {
         }
     }
 
-    @Schedule(dayOfMonth = "1", minute = "55", info = "Monthly cache reset for TC teams")
+    @Schedule(dayOfMonth = "1", minute = "15", info = "Monthly cache reset for TC teams")
     public void resetTeamCompetitionStats() {
         if (!IS_MONTHLY_RESET_ENABLED) {
             LOGGER.warn("Monthly TC stats reset not enabled");

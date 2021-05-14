@@ -1,8 +1,8 @@
 package me.zodac.folding.api.tc.exception;
 
 public class NotFoundException extends Exception {
-
-    private static final long serialVersionUID = 4515679320571283490L;
+    
+    private static final long serialVersionUID = 4925691536809868407L;
 
     private final String type;
     private final int id;

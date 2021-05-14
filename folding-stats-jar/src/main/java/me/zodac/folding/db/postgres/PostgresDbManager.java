@@ -17,6 +17,7 @@ import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.api.utils.DateTimeUtils;
+import me.zodac.folding.rest.api.tc.historic.DailyStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -485,7 +486,7 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public Map<LocalDate, UserTcStats> getDailyUserTcStats(final int userId, final Month month, final Year year) throws FoldingException, UserNotFoundException {
+    public List<DailyStats> getTcUserStatsByDay(final int userId, final Month month, final Year year) throws FoldingException, UserNotFoundException {
         LOGGER.debug("Getting historic daily user TC stats for {}/{} for user {}", DateTimeUtils.formatMonth(month), year, userId);
 
         final String selectSqlStatement = "SELECT utc_timestamp::DATE AS daily_timestamp, " +
@@ -506,7 +507,7 @@ public class PostgresDbManager implements DbManager {
             preparedStatement.setInt(2, year.getValue());
             preparedStatement.setInt(3, userId);
 
-            final Map<LocalDate, UserTcStats> userStatsByDate = new TreeMap<>();
+            final List<DailyStats> userStats = new ArrayList<>();
 
             LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
             try (final ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -517,12 +518,11 @@ public class PostgresDbManager implements DbManager {
                     final LocalDate localDate = timestamp.toLocalDateTime().toLocalDate();
                     final UserTcStats userTcStats = getTcStatsForDay(localDate, userId);
 
-                    userStatsByDate.put(timestamp.toLocalDateTime().toLocalDate(),
-                            UserTcStats.create(
-                                    userId, timestamp,
-                                    userTcStats.getPoints(),
-                                    userTcStats.getMultipliedPoints(),
-                                    userTcStats.getUnits()
+                    userStats.add(DailyStats.create(
+                            timestamp.toLocalDateTime().toLocalDate(),
+                            userTcStats.getPoints(),
+                            userTcStats.getMultipliedPoints(),
+                            userTcStats.getUnits()
                             )
                     );
                 }
@@ -530,21 +530,20 @@ public class PostgresDbManager implements DbManager {
                 // All remaining entries will be diff-ed from the previous entry
                 while (resultSet.next()) {
                     final Timestamp timestamp = resultSet.getTimestamp("daily_timestamp");
-                    userStatsByDate.put(timestamp.toLocalDateTime().toLocalDate(),
-                            UserTcStats.create(
-                                    userId, timestamp,
-                                    resultSet.getLong("diff_points"),
-                                    resultSet.getLong("diff_points_multiplied"),
-                                    resultSet.getInt("diff_units")
+                    userStats.add(DailyStats.create(
+                            timestamp.toLocalDateTime().toLocalDate(),
+                            resultSet.getLong("diff_points"),
+                            resultSet.getLong("diff_points_multiplied"),
+                            resultSet.getInt("diff_units")
                             )
                     );
                 }
 
-                if (userStatsByDate.isEmpty()) {
+                if (userStats.isEmpty()) {
                     throw new UserNotFoundException(userId);
                 }
 
-                return userStatsByDate;
+                return userStats;
             }
         } catch (final FoldingException | UserNotFoundException e) {
             LOGGER.warn("Unable to get the stats for the first day of {}/{} for user {}", DateTimeUtils.formatMonth(month), year, userId);
@@ -555,7 +554,7 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public Map<LocalDate, UserTcStats> getMonthlyUserTcStats(final int userId, final Year year) throws FoldingException, UserNotFoundException {
+    public Map<LocalDate, UserTcStats> getTcUserStatsByMonth(final int userId, final Year year) throws FoldingException, UserNotFoundException {
         LOGGER.debug("Getting historic monthly user TC stats for {} for user {}", year, userId);
 
         final String selectSqlStatement = "SELECT MAX(utc_timestamp) AS month_timestamp, " +

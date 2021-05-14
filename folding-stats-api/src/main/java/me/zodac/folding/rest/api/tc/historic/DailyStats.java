@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import me.zodac.folding.api.tc.stats.UserTcStats;
 
 import java.time.LocalDate;
 
@@ -24,7 +23,7 @@ public class DailyStats {
     private long multipliedPoints;
     private int units;
 
-    public static DailyStats createFromTcStats(final LocalDate date, final UserTcStats userTcStats) {
-        return new DailyStats(date, userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits());
+    public static DailyStats create(final LocalDate date, final long points, final long multipliedPoints, final int units) {
+        return new DailyStats(date, points, multipliedPoints, units);
     }
 }

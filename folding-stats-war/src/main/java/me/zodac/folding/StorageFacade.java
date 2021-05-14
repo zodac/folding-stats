@@ -30,6 +30,7 @@ import me.zodac.folding.cache.TotalStatsCache;
 import me.zodac.folding.cache.UserCache;
 import me.zodac.folding.db.DbManagerRetriever;
 import me.zodac.folding.parsing.FoldingStatsParser;
+import me.zodac.folding.rest.api.tc.historic.DailyStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -429,12 +430,12 @@ public class StorageFacade {
         return userTcStatsFromDb;
     }
 
-    public Map<LocalDate, UserTcStats> getDailyUserTcStats(final int userId, final Month month, final Year year) throws FoldingException, UserNotFoundException {
-        return dbManager.getDailyUserTcStats(userId, month, year);
+    public List<DailyStats> getTcUserStatsByDay(final int userId, final Month month, final Year year) throws FoldingException, UserNotFoundException {
+        return dbManager.getTcUserStatsByDay(userId, month, year);
     }
 
-    public Map<LocalDate, UserTcStats> getMonthlyUserTcStats(final int userId, final Year year) throws FoldingException, UserNotFoundException {
-        return dbManager.getMonthlyUserTcStats(userId, year);
+    public Map<LocalDate, UserTcStats> getTcUserStatsByMonth(final int userId, final Year year) throws FoldingException, UserNotFoundException {
+        return dbManager.getTcUserStatsByMonth(userId, year);
     }
 
     public void addOffsetStats(final int userId, final OffsetStats offsetStats) throws FoldingException {
