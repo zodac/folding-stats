@@ -17,7 +17,7 @@ import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.api.utils.DateTimeUtils;
-import me.zodac.folding.rest.api.tc.historic.DailyStats;
+import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +26,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.Year;
 import java.util.ArrayList;
@@ -487,7 +487,7 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public List<DailyStats> getTcUserStatsByDay(final int userId, final Month month, final Year year) throws FoldingException, UserNotFoundException {
+    public Map<LocalDateTime, HistoricStats> getHistoricStatsDaily(final int userId, final Month month, final Year year) throws FoldingException, UserNotFoundException {
         LOGGER.debug("Getting historic daily user TC stats for {}/{} for user {}", DateTimeUtils.formatMonth(month), year, userId);
 
         final String selectSqlStatement = "SELECT utc_timestamp::DATE AS daily_timestamp, " +
@@ -507,44 +507,42 @@ public class PostgresDbManager implements DbManager {
             preparedStatement.setInt(1, month.getValue());
             preparedStatement.setInt(2, year.getValue());
             preparedStatement.setInt(3, userId);
-
-            final List<DailyStats> userStats = new ArrayList<>();
-
+            
             LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
             try (final ResultSet resultSet = preparedStatement.executeQuery()) {
 
+                final Map<LocalDateTime, HistoricStats> userStatsByDate = new TreeMap<>();
+
                 // First entry will be zeroed, so we need to manually get the first day's stats for the user
                 if (resultSet.next()) {
-                    final Timestamp timestamp = resultSet.getTimestamp("daily_timestamp");
-                    final LocalDate localDate = timestamp.toLocalDateTime().toLocalDate();
-                    final UserTcStats userTcStats = getTcStatsForDay(localDate, userId);
+                    final LocalDateTime localDateTime = resultSet.getTimestamp("daily_timestamp").toLocalDateTime();
+                    final UserTcStats userTcStats = getTcStatsForDay(localDateTime, userId);
 
-                    userStats.add(DailyStats.create(
-                            timestamp.toLocalDateTime().toLocalDate(),
+                    final HistoricStats historicStats = HistoricStats.create(
+                            localDateTime,
                             userTcStats.getPoints(),
                             userTcStats.getMultipliedPoints(),
                             userTcStats.getUnits()
-                            )
                     );
+                    userStatsByDate.put(historicStats.getDateTime(), historicStats);
                 }
 
                 // All remaining entries will be diff-ed from the previous entry
                 while (resultSet.next()) {
-                    final Timestamp timestamp = resultSet.getTimestamp("daily_timestamp");
-                    userStats.add(DailyStats.create(
-                            timestamp.toLocalDateTime().toLocalDate(),
+                    final HistoricStats historicStats = HistoricStats.create(
+                            resultSet.getTimestamp("daily_timestamp").toLocalDateTime(),
                             resultSet.getLong("diff_points"),
                             resultSet.getLong("diff_points_multiplied"),
                             resultSet.getInt("diff_units")
-                            )
                     );
+                    userStatsByDate.put(historicStats.getDateTime(), historicStats);
                 }
 
-                if (userStats.isEmpty()) {
+                if (userStatsByDate.isEmpty()) {
                     throw new UserNotFoundException(userId);
                 }
 
-                return userStats;
+                return userStatsByDate;
             }
         } catch (final FoldingException | UserNotFoundException e) {
             LOGGER.warn("Unable to get the stats for the first day of {}/{} for user {}", DateTimeUtils.formatMonth(month), year, userId);
@@ -555,7 +553,7 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public Map<LocalDate, UserTcStats> getTcUserStatsByMonth(final int userId, final Year year) throws FoldingException, UserNotFoundException {
+    public Map<LocalDateTime, HistoricStats> getHistoricStatsMonthly(final int userId, final Year year) throws FoldingException, UserNotFoundException {
         LOGGER.debug("Getting historic monthly user TC stats for {} for user {}", year, userId);
 
         final String selectSqlStatement = "SELECT MAX(utc_timestamp) AS month_timestamp, " +
@@ -574,21 +572,19 @@ public class PostgresDbManager implements DbManager {
             preparedStatement.setInt(1, year.getValue());
             preparedStatement.setInt(2, userId);
 
-            final Map<LocalDate, UserTcStats> userStatsByDate = new TreeMap<>();
-
             LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
             try (final ResultSet resultSet = preparedStatement.executeQuery()) {
 
+                final Map<LocalDateTime, HistoricStats> userStatsByDate = new TreeMap<>();
+
                 while (resultSet.next()) {
-                    final Timestamp timestamp = resultSet.getTimestamp("month_timestamp");
-                    userStatsByDate.put(timestamp.toLocalDateTime().toLocalDate(),
-                            UserTcStats.create(
-                                    userId, timestamp,
-                                    resultSet.getLong("diff_points"),
-                                    resultSet.getLong("diff_points_multiplied"),
-                                    resultSet.getInt("diff_units")
-                            )
+                    final HistoricStats historicStats = HistoricStats.create(
+                            resultSet.getTimestamp("month_timestamp").toLocalDateTime(),
+                            resultSet.getLong("diff_points"),
+                            resultSet.getLong("diff_points_multiplied"),
+                            resultSet.getInt("diff_units")
                     );
+                    userStatsByDate.put(historicStats.getDateTime(), historicStats);
                 }
 
                 if (userStatsByDate.isEmpty()) {
@@ -602,8 +598,8 @@ public class PostgresDbManager implements DbManager {
         }
     }
 
-    private UserTcStats getTcStatsForDay(final LocalDate localDate, final int userId) throws UserNotFoundException, FoldingException {
-        LOGGER.debug("Getting TC stats for user {} on {}", userId, localDate);
+    private UserTcStats getTcStatsForDay(final LocalDateTime localDateTime, final int userId) throws UserNotFoundException, FoldingException {
+        LOGGER.debug("Getting TC stats for user {} on {}", userId, localDateTime);
         final String preparedSelectSqlStatement = "SELECT utc_timestamp, tc_points, tc_points_multiplied, tc_units " +
                 "FROM user_tc_stats_hourly " +
                 "WHERE EXTRACT(DAY FROM utc_timestamp) = ? " +
@@ -616,9 +612,9 @@ public class PostgresDbManager implements DbManager {
         try (final Connection connection = dbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(preparedSelectSqlStatement)) {
 
-            preparedStatement.setInt(1, localDate.getDayOfMonth());
-            preparedStatement.setInt(2, localDate.getMonth().getValue());
-            preparedStatement.setInt(3, localDate.getYear());
+            preparedStatement.setInt(1, localDateTime.getDayOfMonth());
+            preparedStatement.setInt(2, localDateTime.getMonth().getValue());
+            preparedStatement.setInt(3, localDateTime.getYear());
             preparedStatement.setInt(4, userId);
 
             LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);

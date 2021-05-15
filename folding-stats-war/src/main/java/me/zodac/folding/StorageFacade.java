@@ -30,13 +30,13 @@ import me.zodac.folding.cache.TeamCache;
 import me.zodac.folding.cache.TotalStatsCache;
 import me.zodac.folding.cache.UserCache;
 import me.zodac.folding.db.DbManagerRetriever;
-import me.zodac.folding.rest.api.tc.historic.DailyStats;
+import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ejb.Singleton;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
@@ -461,12 +461,12 @@ public class StorageFacade {
         return userTcStatsFromDb;
     }
 
-    public List<DailyStats> getTcUserStatsByDay(final int userId, final Month month, final Year year) throws FoldingException, UserNotFoundException {
-        return dbManager.getTcUserStatsByDay(userId, month, year);
+    public Map<LocalDateTime, HistoricStats> getHistoricStatsDaily(final int userId, final Month month, final Year year) throws FoldingException, UserNotFoundException {
+        return dbManager.getHistoricStatsDaily(userId, month, year);
     }
 
-    public Map<LocalDate, UserTcStats> getTcUserStatsByMonth(final int userId, final Year year) throws FoldingException, UserNotFoundException {
-        return dbManager.getTcUserStatsByMonth(userId, year);
+    public Map<LocalDateTime, HistoricStats> getHistoricStatsMonthly(final int userId, final Year year) throws FoldingException, UserNotFoundException {
+        return dbManager.getHistoricStatsMonthly(userId, year);
     }
 
     public void addOffsetStats(final int userId, final OffsetStats offsetStats) throws FoldingException {

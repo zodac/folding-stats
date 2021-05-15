@@ -12,13 +12,12 @@ import me.zodac.folding.api.tc.stats.OffsetStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
-import me.zodac.folding.rest.api.tc.historic.DailyStats;
+import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -73,9 +72,9 @@ public interface DbManager {
 
     // Historic TC operations
 
-    List<DailyStats> getTcUserStatsByDay(final int userId, final Month month, final Year year) throws FoldingException, UserNotFoundException;
+    Map<LocalDateTime, HistoricStats> getHistoricStatsDaily(final int userId, final Month month, final Year year) throws FoldingException, UserNotFoundException;
 
-    Map<LocalDate, UserTcStats> getTcUserStatsByMonth(final int userId, final Year year) throws FoldingException, UserNotFoundException;
+    Map<LocalDateTime, HistoricStats> getHistoricStatsMonthly(final int userId, final Year year) throws FoldingException, UserNotFoundException;
 
     void persistInitialStats(final UserStats userStats) throws FoldingException;
 

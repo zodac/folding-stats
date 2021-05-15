@@ -4,9 +4,7 @@ import me.zodac.folding.StorageFacade;
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.tc.exception.NotFoundException;
-import me.zodac.folding.api.tc.stats.UserTcStats;
-import me.zodac.folding.rest.api.tc.historic.DailyStats;
-import me.zodac.folding.rest.api.tc.historic.MonthlyStats;
+import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,14 +22,12 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.time.DateTimeException;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.Year;
 import java.time.format.DateTimeParseException;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static me.zodac.folding.rest.response.Responses.badRequest;
 import static me.zodac.folding.rest.response.Responses.notFound;
@@ -81,17 +77,17 @@ public class HistoricStatsEndpoint {
         }
 
         try {
-            final List<DailyStats> dailyStats = storageFacade.getTcUserStatsByDay(Integer.parseInt(userId), Month.of(Integer.parseInt(month)), Year.parse(year));
+            final Map<LocalDateTime, HistoricStats> dailyStatsByDate = storageFacade.getHistoricStatsDaily(Integer.parseInt(userId), Month.of(Integer.parseInt(month)), Year.parse(year));
 
             final CacheControl cacheControl = new CacheControl();
             cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);
 
-            final EntityTag entityTag = new EntityTag(String.valueOf(dailyStats.hashCode()));
+            final EntityTag entityTag = new EntityTag(String.valueOf(dailyStatsByDate.hashCode()));
             Response.ResponseBuilder builder = request.evaluatePreconditions(entityTag);
 
             if (builder == null) {
                 LOGGER.debug("Cached resources have changed");
-                builder = okBuilder(dailyStats);
+                builder = okBuilder(dailyStatsByDate.values());
                 builder.tag(entityTag);
             }
 
@@ -137,22 +133,17 @@ public class HistoricStatsEndpoint {
         }
 
         try {
-            final Map<LocalDate, UserTcStats> monthlyUserTcStats = storageFacade.getTcUserStatsByMonth(Integer.parseInt(userId), Year.parse(year));
+            final Map<LocalDateTime, HistoricStats> monthlyStatsByDate = storageFacade.getHistoricStatsMonthly(Integer.parseInt(userId), Year.parse(year));
 
             final CacheControl cacheControl = new CacheControl();
             cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);
 
-            final EntityTag entityTag = new EntityTag(String.valueOf(monthlyUserTcStats.hashCode()));
+            final EntityTag entityTag = new EntityTag(String.valueOf(monthlyStatsByDate.hashCode()));
             Response.ResponseBuilder builder = request.evaluatePreconditions(entityTag);
 
             if (builder == null) {
                 LOGGER.debug("Cached resources have changed");
-
-                final List<MonthlyStats> monthlyStats = monthlyUserTcStats.entrySet()
-                        .stream()
-                        .map(entry -> MonthlyStats.createFromTcStats(entry.getKey(), entry.getValue()))
-                        .collect(Collectors.toList());
-                builder = okBuilder(monthlyStats);
+                builder = okBuilder(monthlyStatsByDate.values());
                 builder.tag(entityTag);
             }
 
@@ -199,7 +190,7 @@ public class HistoricStatsEndpoint {
     @Path("/teams/{teamId}/{year}/{month}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getDailyTeamStats(@PathParam("teamId") final String teamId) {
-        LOGGER.info("GET request received to show daily TC team stats at '{}'", uriContext.getAbsolutePath());
+        LOGGER.debug("GET request received to show daily TC team stats at '{}'", uriContext.getAbsolutePath());
 
         if (SystemStateManager.current().isReadBlocked()) {
             LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
