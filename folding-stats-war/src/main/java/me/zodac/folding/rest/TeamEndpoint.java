@@ -13,9 +13,9 @@ import me.zodac.folding.api.tc.exception.NotFoundException;
 import me.zodac.folding.api.tc.exception.TeamNotFoundException;
 import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.utils.ExecutionType;
+import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.bean.TeamCompetitionStatsScheduler;
-import me.zodac.folding.validator.TeamValidator;
-import me.zodac.folding.validator.ValidationResponse;
+import me.zodac.folding.rest.validator.TeamValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,7 +118,8 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
             final int parsedUnitId = super.parseId(userId);
 
             final Team team = storageFacade.getTeam(parsedTeamId);
-            final ValidationResponse validationResponse = TeamValidator.isValidRetirement(team, parsedUnitId);
+            final TeamValidator teamValidator = TeamValidator.create(storageFacade);
+            final ValidationResponse validationResponse = teamValidator.isValidRetirement(team, parsedUnitId);
             if (validationResponse.isInvalid()) {
                 return badRequest(validationResponse);
             }
@@ -171,7 +172,8 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
             final int parsedRetiredUserId = super.parseId(retiredUserId);
 
             final Team team = storageFacade.getTeam(parsedTeamId);
-            final ValidationResponse validationResponse = TeamValidator.isValidUnretirement(team, parsedRetiredUserId);
+            final TeamValidator teamValidator = TeamValidator.create(storageFacade);
+            final ValidationResponse validationResponse = teamValidator.isValidUnretirement(team, parsedRetiredUserId);
             if (validationResponse.isInvalid()) {
                 return badRequest(validationResponse);
             }
@@ -223,7 +225,8 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
 
     @Override
     protected ValidationResponse validate(final Team element) {
-        return TeamValidator.isValid(element);
+        final TeamValidator teamValidator = TeamValidator.create(storageFacade);
+        return teamValidator.isValid(element);
     }
 
     @Override
@@ -244,7 +247,7 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
     }
 
     @Override
-    protected Team updateElementById(final int teamId, final Team team) throws FoldingException, NotFoundException, FoldingConflictException {
+    protected Team updateElementById(final int teamId, final Team team) throws FoldingException, FoldingConflictException {
         if (team.getId() == 0) {
             // The payload 'should' have the ID, but it's not necessary if the correct URL is used
             final Team teamWithId = Team.updateWithId(teamId, team);

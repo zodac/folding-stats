@@ -62,13 +62,6 @@ abstract class AbstractIdentifiableCache<V extends Identifiable> {
         }
     }
 
-    // This is used in the validators to ensure a user's hardware or a team's user exists.
-    // However, if no #getAll() request has been made for hardware/users, the cache is not populated.
-    // We get around this by hitting the cache in the Initialiser, so that should not be removed.
-    public boolean doesNotContain(final int id) {
-        return !elementsById.containsKey(id);
-    }
-
     public Collection<V> getAll() {
         return Collections.unmodifiableCollection(elementsById.values());
     }

@@ -14,9 +14,10 @@ import me.zodac.folding.api.tc.exception.HardwareNotFoundException;
 import me.zodac.folding.api.tc.exception.NotFoundException;
 import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.stats.OffsetStats;
+import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.bean.UserTeamCompetitionStatsParser;
-import me.zodac.folding.validator.UserValidator;
-import me.zodac.folding.validator.ValidationResponse;
+import me.zodac.folding.rest.validator.UserValidator;
+import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -168,7 +169,8 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
 
     @Override
     protected ValidationResponse validate(final User element) {
-        return UserValidator.isValid(element);
+        final UserValidator userValidator = UserValidator.create(storageFacade, HttpFoldingStatsRetriever.create());
+        return userValidator.isValid(element);
     }
 
     @Override

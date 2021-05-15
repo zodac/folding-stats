@@ -5,6 +5,7 @@ import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.db.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.FoldingExternalServiceException;
+import me.zodac.folding.api.stats.FoldingStatsRetriever;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.OperatingSystem;
@@ -29,8 +30,8 @@ import me.zodac.folding.cache.TeamCache;
 import me.zodac.folding.cache.TotalStatsCache;
 import me.zodac.folding.cache.UserCache;
 import me.zodac.folding.db.DbManagerRetriever;
-import me.zodac.folding.parsing.FoldingStatsParser;
 import me.zodac.folding.rest.api.tc.historic.DailyStats;
+import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +40,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -57,10 +59,12 @@ import static java.util.stream.Collectors.toMap;
 // TODO: [zodac] Split into one Facade for POJOs and one for stats?
 // TODO: [zodac] I really don't like how much logic is in here now, originally I planned for this just to avoid needing to specify
 //  both DB and cache in the REST/EJB layer. I think it's gotten too big and needs to be scaled back...
+// TODO: [zodac] Also don't like how the #get() methods don't use Optional, why am I relying on *NotFoundException?
 @Singleton
 public class StorageFacade {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StorageFacade.class);
+    private static final FoldingStatsRetriever FOLDING_STATS_RETRIEVER = HttpFoldingStatsRetriever.create();
 
     private final DbManager dbManager = DbManagerRetriever.get();
     private final TeamCache teamCache = TeamCache.get();
@@ -167,6 +171,15 @@ public class StorageFacade {
         return getUserWithPasskey(userId, true);
     }
 
+    public User getUserOrNull(final int userId) {
+        try {
+            return getUserWithPasskey(userId, true);
+        } catch (final FoldingException | UserNotFoundException e) {
+            LOGGER.debug("Unable to find user with ID {}, returning null", userId, e);
+            return null;
+        }
+    }
+
     public User getUserWithPasskey(final int userId, final boolean showFullPasskeys) throws FoldingException, UserNotFoundException {
         try {
             final User user = userCache.get(userId);
@@ -186,6 +199,15 @@ public class StorageFacade {
 
     public Collection<User> getAllUsers() throws FoldingException {
         return getAllUsersWithPasskeys(true);
+    }
+
+    public Collection<User> getAllUsersOrEmpty() {
+        try {
+            return getAllUsersWithPasskeys(true);
+        } catch (final FoldingException e) {
+            LOGGER.debug("Error getting all users, returning empty collection", e);
+            return Collections.emptyList();
+        }
     }
 
     public Collection<User> getAllUsersWithPasskeys(final boolean showFullPasskeys) throws FoldingException {
@@ -237,7 +259,7 @@ public class StorageFacade {
     // Also occurs if the hardware multiplier for a hardware used by a user is changed
     // We set the new initial stats to the user's current total stats, then give an offset of their current TC stats (multiplied)
     private void handleStateChangeForUser(final User updatedUser) throws FoldingException, FoldingExternalServiceException {
-        final UserStats userTotalStats = FoldingStatsParser.getTotalStatsForUser(updatedUser);
+        final UserStats userTotalStats = FOLDING_STATS_RETRIEVER.getTotalStats(updatedUser);
         final UserTcStats currentUserTcStats = getCurrentTcStatsForUserOrDefault(updatedUser);
 
         LOGGER.debug("Setting initial stats to: {}", userTotalStats);
@@ -297,6 +319,15 @@ public class StorageFacade {
         final Collection<Team> allTeamsFromDb = dbManager.getAllTeams();
         teamCache.addAll(allTeamsFromDb);
         return allTeamsFromDb;
+    }
+
+    public Collection<Team> getAllTeamsOrEmpty() {
+        try {
+            return getAllTeams();
+        } catch (final FoldingException e) {
+            LOGGER.debug("Error getting all teams, returning empty", e);
+            return Collections.emptyList();
+        }
     }
 
     public void updateTeam(final Team team) throws FoldingException, FoldingConflictException {
@@ -377,7 +408,7 @@ public class StorageFacade {
     }
 
     public void persistInitialUserStats(final User user) throws FoldingException, FoldingExternalServiceException {
-        final UserStats currentUserStats = FoldingStatsParser.getTotalStatsForUser(user);
+        final UserStats currentUserStats = FOLDING_STATS_RETRIEVER.getTotalStats(user);
         persistInitialUserStats(currentUserStats);
     }
 
@@ -500,5 +531,35 @@ public class StorageFacade {
         final Stats totalStats = getTotalStatsForUser(user.getId());
         persistInitialUserStats(UserStats.create(user.getId(), DateTimeUtils.currentUtcTimestamp(), totalStats));
         initialStatsCache.add(user.getId(), totalStats);
+    }
+
+    public boolean doesNotContainHardware(final int hardwareId) {
+        try {
+            getHardware(hardwareId);
+            return false;
+        } catch (final FoldingException | HardwareNotFoundException e) {
+            LOGGER.debug("Unable to find hardware with ID: {}", hardwareId, e);
+            return true;
+        }
+    }
+
+    public boolean doesNotContainUser(final int userId) {
+        try {
+            getUser(userId);
+            return false;
+        } catch (final FoldingException | UserNotFoundException e) {
+            LOGGER.debug("Unable to find user with ID: {}", userId, e);
+            return true;
+        }
+    }
+
+    public boolean doesNotContainRetiredUser(final int retiredUserId) {
+        // TODO: [zodac] Needs to check DB if cache miss
+        return !retiredStatsCache.contains(retiredUserId);
+    }
+
+    public Collection<RetiredUserTcStats> getAllRetiredUserStats() {
+        // TODO: [zodac] Needs to check DB if cache miss
+        return retiredStatsCache.getAll();
     }
 }

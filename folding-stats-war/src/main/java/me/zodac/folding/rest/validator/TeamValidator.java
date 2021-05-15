@@ -1,12 +1,11 @@
-package me.zodac.folding.validator;
+package me.zodac.folding.rest.validator;
 
+import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
-import me.zodac.folding.cache.RetiredTcStatsCache;
-import me.zodac.folding.cache.TeamCache;
-import me.zodac.folding.cache.UserCache;
+import me.zodac.folding.api.validator.ValidationResponse;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -22,21 +21,27 @@ import static java.util.stream.Collectors.toList;
 
 public class TeamValidator {
 
+    private final StorageFacade storageFacade;
 
-    private TeamValidator() {
-
+    private TeamValidator(final StorageFacade storageFacade) {
+        this.storageFacade = storageFacade;
     }
 
-    public static ValidationResponse isValid(final Team team) {
+    public static TeamValidator create(final StorageFacade storageFacade) {
+        return new TeamValidator(storageFacade);
+    }
+
+
+    public ValidationResponse isValid(final Team team) {
         final List<String> failureMessages = new ArrayList<>();
 
         if (StringUtils.isBlank(team.getTeamName())) {
             failureMessages.add("Attribute 'teamName' must not be empty");
         }
 
-        if (team.getCaptainUserId() <= User.EMPTY_USER_ID || UserCache.get().doesNotContain(team.getCaptainUserId())) {
-            final List<String> availableUsers = UserCache.get()
-                    .getAll()
+        if (team.getCaptainUserId() <= User.EMPTY_USER_ID || storageFacade.doesNotContainUser(team.getCaptainUserId())) {
+            final List<String> availableUsers = storageFacade
+                    .getAllUsersOrEmpty()
                     .stream()
                     .map(foldingUser -> String.format("%s: %s", foldingUser.getId(), foldingUser.getFoldingUserName()))
                     .collect(toList());
@@ -53,8 +58,8 @@ public class TeamValidator {
         }
 
         if (team.getUserIds().isEmpty()) {
-            final List<String> availableUsers = UserCache.get()
-                    .getAll()
+            final List<String> availableUsers = storageFacade
+                    .getAllUsersOrEmpty()
                     .stream()
                     .map(foldingUser -> String.format("%s: %s", foldingUser.getId(), foldingUser.getFoldingUserName()))
                     .collect(toList());
@@ -64,14 +69,14 @@ public class TeamValidator {
 
         final List<Integer> invalidUserIds = new ArrayList<>(team.getUserIds().size());
         for (final int userId : team.getUserIds()) {
-            if (UserCache.get().doesNotContain(userId)) {
+            if (storageFacade.doesNotContainUser(userId)) {
                 invalidUserIds.add(userId);
             }
         }
 
         if (!invalidUserIds.isEmpty()) {
-            final List<String> availableUsers = UserCache.get()
-                    .getAll()
+            final List<String> availableUsers = storageFacade
+                    .getAllUsersOrEmpty()
                     .stream()
                     .map(foldingUser -> String.format("%s: %s", foldingUser.getId(), foldingUser.getFoldingUserName()))
                     .collect(toList());
@@ -79,7 +84,7 @@ public class TeamValidator {
             failureMessages.add(String.format("Attribute 'userIds' contains invalid IDs %s, must be: %s", invalidUserIds, availableUsers));
         }
 
-        for (final Team existingTeam : TeamCache.get().getAll()) {
+        for (final Team existingTeam : storageFacade.getAllTeamsOrEmpty()) {
             if (existingTeam.getTeamName().equalsIgnoreCase(team.getTeamName())) {
                 continue;
             }
@@ -97,7 +102,7 @@ public class TeamValidator {
         if (failureMessages.isEmpty()) {
             final Map<Category, Long> categoryCount = team.getUserIds()
                     .stream()
-                    .map(userId -> UserCache.get().getOrNull(userId))
+                    .map(storageFacade::getUserOrNull)
                     .filter(Objects::nonNull)
                     .map(User::getCategory)
                     .map(Category::get)
@@ -117,7 +122,7 @@ public class TeamValidator {
         return ValidationResponse.failure(team, failureMessages);
     }
 
-    public static ValidationResponse isValidRetirement(final Team team, final int userId) {
+    public ValidationResponse isValidRetirement(final Team team, final int userId) {
         final List<String> failureMessages = new ArrayList<>();
 
         if (team.getCaptainUserId() == userId) {
@@ -136,16 +141,16 @@ public class TeamValidator {
     }
 
 
-    public static ValidationResponse isValidUnretirement(final Team team, final int retiredUserId) {
+    public ValidationResponse isValidUnretirement(final Team team, final int retiredUserId) {
         final List<String> failureMessages = new ArrayList<>();
 
         if (team.getUserIds().size() == Category.maximumPermittedAmountForAllCategories()) {
             failureMessages.add(String.format("Unable to add retired user ID %s to team %s, %s users already on the team", retiredUserId, team, team.getUserIds().size()));
         }
 
-        if (!RetiredTcStatsCache.get().contains(retiredUserId)) {
-            final List<Integer> availableRetiredUsers = RetiredTcStatsCache.get()
-                    .getAll()
+        if (storageFacade.doesNotContainRetiredUser(retiredUserId)) {
+            final List<Integer> availableRetiredUsers = storageFacade
+                    .getAllRetiredUserStats()
                     .stream()
                     .mapToInt(RetiredUserTcStats::getRetiredUserId)
                     .boxed()

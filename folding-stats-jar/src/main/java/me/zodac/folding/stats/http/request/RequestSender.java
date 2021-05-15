@@ -1,4 +1,4 @@
-package me.zodac.folding.parsing.http.request;
+package me.zodac.folding.stats.http.request;
 
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.FoldingExternalServiceException;

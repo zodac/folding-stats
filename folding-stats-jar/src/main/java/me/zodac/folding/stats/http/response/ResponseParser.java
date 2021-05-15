@@ -1,4 +1,4 @@
-package me.zodac.folding.parsing.http.response;
+package me.zodac.folding.stats.http.response;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;

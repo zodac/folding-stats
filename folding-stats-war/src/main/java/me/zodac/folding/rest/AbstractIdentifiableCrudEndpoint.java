@@ -9,8 +9,8 @@ import me.zodac.folding.api.exception.FoldingExternalServiceException;
 import me.zodac.folding.api.tc.exception.FoldingIdInvalidException;
 import me.zodac.folding.api.tc.exception.FoldingIdOutOfRangeException;
 import me.zodac.folding.api.tc.exception.NotFoundException;
+import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.rest.response.BulkCreateResponse;
-import me.zodac.folding.validator.ValidationResponse;
 import org.slf4j.Logger;
 
 import javax.ws.rs.core.CacheControl;
@@ -175,12 +175,11 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
 
         try {
             final Collection<V> elements = getAllElements();
-            getLogger().debug("Found {} {}s", elements.size(), elementType());
 
             final CacheControl cacheControl = new CacheControl();
             cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);
 
-            final EntityTag entityTag = new EntityTag(String.valueOf(elements.hashCode()));
+            final EntityTag entityTag = new EntityTag(String.valueOf(elements.stream().mapToInt(V::hashCode).sum()));
             Response.ResponseBuilder builder = request.evaluatePreconditions(entityTag);
 
             if (builder == null) {
@@ -188,7 +187,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
                 builder = okBuilder(elements);
                 builder.tag(entityTag);
             }
-
+            
             builder.cacheControl(cacheControl);
             return builder.build();
         } catch (final FoldingException e) {

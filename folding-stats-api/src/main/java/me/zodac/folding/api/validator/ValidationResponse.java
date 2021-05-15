@@ -1,4 +1,4 @@
-package me.zodac.folding.validator;
+package me.zodac.folding.api.validator;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -11,6 +11,9 @@ import lombok.ToString;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Simple POJO defining the result of a validation check.
+ */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
@@ -18,7 +21,7 @@ import java.util.List;
 @EqualsAndHashCode
 @ToString(doNotUseGetters = true)
 public class ValidationResponse {
-    
+
     private Object invalidObject;
     private List<String> errors;
 

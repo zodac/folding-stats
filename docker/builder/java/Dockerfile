@@ -22,7 +22,7 @@ COPY ./folding-stats-ear/pom.xml ./folding-stats-ear/pom.xml
 COPY ./stubbed-folding-endpoints-war/pom.xml ./stubbed-folding-endpoints-war/pom.xml
 COPY ./testsuite/pom.xml ./testsuite/pom.xml
 
-RUN mvn verify clean --fail-never -DskipTests
+RUN mvn verify clean --fail-never
 
 # Copy source code
 COPY ./folding-stats-api ./folding-stats-api
@@ -35,7 +35,7 @@ COPY ./testsuite ./testsuite
 COPY ./stubbed-folding-endpoints-war ./stubbed-folding-endpoints-war
 
 # Build artifacts
-RUN mvn clean install -DskipTests
+RUN mvn clean install
 
 # Output
 RUN mkdir --parents /opt/jboss/wildfly/standalone/deployments/

@@ -6,8 +6,8 @@ import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.FoldingExternalServiceException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.exception.NotFoundException;
-import me.zodac.folding.validator.HardwareValidator;
-import me.zodac.folding.validator.ValidationResponse;
+import me.zodac.folding.api.validator.ValidationResponse;
+import me.zodac.folding.rest.validator.HardwareValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,7 +95,8 @@ public class HardwareEndpoint extends AbstractIdentifiableCrudEndpoint<Hardware>
 
     @Override
     protected ValidationResponse validate(final Hardware hardware) {
-        return HardwareValidator.isValid(hardware);
+        final HardwareValidator hardwareValidator = HardwareValidator.create();
+        return hardwareValidator.isValid(hardware);
     }
 
     @Override

@@ -1,20 +1,21 @@
-package me.zodac.folding.validator;
+package me.zodac.folding.rest.validator;
 
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.OperatingSystem;
+import me.zodac.folding.api.validator.ValidationResponse;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-// TODO: [zodac] Move validators to WAR/EJB module, use StorageFacade instead of caches, then add unit tests
 public class HardwareValidator {
 
-    private HardwareValidator() {
 
+    public static HardwareValidator create() {
+        return new HardwareValidator();
     }
 
-    public static ValidationResponse isValid(final Hardware hardware) {
+    public ValidationResponse isValid(final Hardware hardware) {
         final List<String> failureMessages = new ArrayList<>();
 
         if (StringUtils.isBlank(hardware.getHardwareName())) {

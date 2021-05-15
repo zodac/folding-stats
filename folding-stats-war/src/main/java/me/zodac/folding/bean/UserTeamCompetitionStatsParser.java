@@ -3,13 +3,14 @@ package me.zodac.folding.bean;
 import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.FoldingExternalServiceException;
+import me.zodac.folding.api.stats.FoldingStatsRetriever;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.OffsetStats;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
-import me.zodac.folding.parsing.FoldingStatsParser;
+import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,7 @@ import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
 public class UserTeamCompetitionStatsParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserTeamCompetitionStatsParser.class);
+    private static final FoldingStatsRetriever FOLDING_STATS_RETRIEVER = HttpFoldingStatsRetriever.create();
 
     @EJB
     private StorageFacade storageFacade;
@@ -119,7 +121,7 @@ public class UserTeamCompetitionStatsParser {
 
     private static UserStats getTotalStatsForUserOrEmpty(final User user) {
         try {
-            return FoldingStatsParser.getTotalStatsForUser(user);
+            return FOLDING_STATS_RETRIEVER.getTotalStats(user);
         } catch (final FoldingExternalServiceException e) {
             LOGGER.warn("Error connecting to Folding@Home API at '{}'", e.getUrl(), e);
         } catch (final FoldingException e) {

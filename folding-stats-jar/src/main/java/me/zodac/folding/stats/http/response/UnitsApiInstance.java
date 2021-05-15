@@ -1,4 +1,4 @@
-package me.zodac.folding.parsing.http.response;
+package me.zodac.folding.stats.http.response;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

@@ -12,11 +12,6 @@
     <artifactId>testsuite</artifactId>
     <name>[${project.parent.artifactId}] TestSuite module</name>
 
-    <properties>
-        <!-- Do not run ITs by default -->
-        <skip-tests>true</skip-tests>
-    </properties>
-
     <dependencies>
         <!-- Project Dependencies -->
         <dependency>
@@ -69,19 +64,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <!-- Profile used to enable to maven-surefire-plugin and execute the testsuite -->
-        <profile>
-            <id>activate_testsuite</id>
-            <activation>
-                <property>
-                    <name>ts</name>
-                </property>
-            </activation>
-            <properties>
-                <skip-tests>false</skip-tests>
-            </properties>
-        </profile>
-    </profiles>
 </project>
