@@ -16,7 +16,7 @@ import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
-import java.util.List;
+import java.util.Collection;
 
 
 // TODO: [zodac] Move this to an EJB module?
@@ -48,7 +48,7 @@ public class Initialiser {
             storageFacade.getAllHardware();
             storageFacade.getAllTeams();
 
-            final List<User> users = storageFacade.getAllUsers();
+            final Collection<User> users = storageFacade.getAllUsers();
             storageFacade.initialiseOffsetStats();
 
             for (final User user : users) {

@@ -1,7 +1,7 @@
 package me.zodac.folding.api.utils;
 
 /**
- * Lists the possible types of executions for long-running tasks.
+ * Defines the possible types of executions for long-running tasks.
  */
 public enum ExecutionType {
 

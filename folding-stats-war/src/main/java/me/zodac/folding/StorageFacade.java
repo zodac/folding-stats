@@ -96,8 +96,8 @@ public class StorageFacade {
         return hardwareFromDb;
     }
 
-    public List<Hardware> getAllHardware() throws FoldingException {
-        final List<Hardware> allHardware = hardwareCache.getAll();
+    public Collection<Hardware> getAllHardware() throws FoldingException {
+        final Collection<Hardware> allHardware = hardwareCache.getAll();
 
         if (!allHardware.isEmpty()) {
             return allHardware;
@@ -106,7 +106,7 @@ public class StorageFacade {
         LOGGER.trace("Cache miss! Get all hardware");
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
-        final List<Hardware> allHardwareFromDb = dbManager.getAllHardware();
+        final Collection<Hardware> allHardwareFromDb = dbManager.getAllHardware();
         hardwareCache.addAll(allHardwareFromDb);
         return allHardwareFromDb;
     }
@@ -184,12 +184,12 @@ public class StorageFacade {
         return showFullPasskeys ? userFromDb : User.hidePasskey(userFromDb);
     }
 
-    public List<User> getAllUsers() throws FoldingException {
+    public Collection<User> getAllUsers() throws FoldingException {
         return getAllUsersWithPasskeys(true);
     }
 
-    public List<User> getAllUsersWithPasskeys(final boolean showFullPasskeys) throws FoldingException {
-        final List<User> allUsers = userCache.getAll();
+    public Collection<User> getAllUsersWithPasskeys(final boolean showFullPasskeys) throws FoldingException {
+        final Collection<User> allUsers = userCache.getAll();
 
         if (!allUsers.isEmpty()) {
             if (showFullPasskeys) {
@@ -204,7 +204,7 @@ public class StorageFacade {
         LOGGER.trace("Cache miss! Get all users");
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
-        final List<User> allUsersFromDb = dbManager.getAllUsers();
+        final Collection<User> allUsersFromDb = dbManager.getAllUsers();
         userCache.addAll(allUsersFromDb);
 
         if (showFullPasskeys) {
@@ -284,8 +284,8 @@ public class StorageFacade {
         return teamFromDb;
     }
 
-    public List<Team> getAllTeams() throws FoldingException {
-        final List<Team> allTeams = teamCache.getAll();
+    public Collection<Team> getAllTeams() throws FoldingException {
+        final Collection<Team> allTeams = teamCache.getAll();
 
         if (!allTeams.isEmpty()) {
             return allTeams;
@@ -294,12 +294,12 @@ public class StorageFacade {
         LOGGER.trace("Cache miss! Get all teams");
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
-        final List<Team> allTeamsFromDb = dbManager.getAllTeams();
+        final Collection<Team> allTeamsFromDb = dbManager.getAllTeams();
         teamCache.addAll(allTeamsFromDb);
         return allTeamsFromDb;
     }
 
-    public void updateTeam(final Team team) throws FoldingException, TeamNotFoundException, FoldingConflictException {
+    public void updateTeam(final Team team) throws FoldingException, FoldingConflictException {
         dbManager.updateTeam(team);
         teamCache.add(team);
     }
@@ -400,7 +400,7 @@ public class StorageFacade {
         return initialStatsFromDb;
     }
 
-    public Map<Integer, User> getActiveTcUsers(final List<Team> teams) {
+    public Map<Integer, User> getActiveTcUsers(final Collection<Team> teams) {
         return teams
                 .stream()
                 .map(Team::getUserIds)

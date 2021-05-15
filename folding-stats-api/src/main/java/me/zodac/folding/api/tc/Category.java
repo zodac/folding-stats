@@ -1,6 +1,6 @@
 package me.zodac.folding.api.tc;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toUnmodifiableList;
@@ -15,7 +15,7 @@ public enum Category {
     WILDCARD("Wildcard", 1),
     INVALID("Invalid", 0);
 
-    private static final List<Category> VALUES_AS_LIST = Stream.of(values())
+    private static final Collection<Category> ALL_VALUES = Stream.of(values())
             .filter(value -> value != INVALID)
             .collect(toUnmodifiableList());
 
@@ -35,18 +35,18 @@ public enum Category {
         return permittedAmount;
     }
 
-    public static List<Category> getValuesAsList() {
-        return VALUES_AS_LIST;
+    public static Collection<Category> getAllValues() {
+        return ALL_VALUES;
     }
 
     public static int maximumPermittedAmountForAllCategories() {
-        return VALUES_AS_LIST.stream()
+        return ALL_VALUES.stream()
                 .mapToInt(value -> value.permittedAmount)
                 .sum();
     }
 
     public static Category get(final String input) {
-        for (final Category category : VALUES_AS_LIST) {
+        for (final Category category : ALL_VALUES) {
             if (category.toString().equalsIgnoreCase(input) || category.displayName.equalsIgnoreCase(input)) {
                 return category;
             }

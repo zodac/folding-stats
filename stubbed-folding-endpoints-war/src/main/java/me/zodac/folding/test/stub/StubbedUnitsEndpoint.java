@@ -19,6 +19,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -79,7 +80,7 @@ public class StubbedUnitsEndpoint {
                 .build();
     }
 
-    private List<UnitsResponse> createResponse(final String foldingUserName, final String passkey) {
+    private Collection<UnitsResponse> createResponse(final String foldingUserName, final String passkey) {
         final String key = foldingUserName + passkey;
         if (unitsByUserAndPasskey.containsKey(key)) {
             return List.of(UnitsResponse.create(unitsByUserAndPasskey.get(key)));

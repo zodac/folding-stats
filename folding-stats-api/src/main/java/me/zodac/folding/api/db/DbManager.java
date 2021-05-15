@@ -17,13 +17,13 @@ import me.zodac.folding.rest.api.tc.historic.DailyStats;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Interface used to interact with the storage backend and perform CRUD operations.
  */
-// TODO: [zodac] A lot of lists being used here (and other places I'm sure), many could be collections, update them
 public interface DbManager {
 
     // CRUD operations
@@ -37,7 +37,7 @@ public interface DbManager {
      */
     Hardware createHardware(final Hardware hardware) throws FoldingException, FoldingConflictException;
 
-    List<Hardware> getAllHardware() throws FoldingException;
+    Collection<Hardware> getAllHardware() throws FoldingException;
 
     Hardware getHardware(final int hardwareId) throws FoldingException, HardwareNotFoundException;
 
@@ -47,7 +47,7 @@ public interface DbManager {
 
     User createUser(final User user) throws FoldingException, FoldingConflictException;
 
-    List<User> getAllUsers() throws FoldingException;
+    Collection<User> getAllUsers() throws FoldingException;
 
     User getUser(final int userId) throws FoldingException, UserNotFoundException;
 
@@ -57,11 +57,11 @@ public interface DbManager {
 
     Team createTeam(final Team team) throws FoldingException, FoldingConflictException;
 
-    List<Team> getAllTeams() throws FoldingException;
+    Collection<Team> getAllTeams() throws FoldingException;
 
     Team getTeam(final int foldingTeamId) throws FoldingException, TeamNotFoundException;
 
-    void updateTeam(final Team team) throws FoldingException, TeamNotFoundException, FoldingConflictException;
+    void updateTeam(final Team team) throws FoldingException, FoldingConflictException;
 
     void deleteTeam(final int teamId) throws FoldingException, FoldingConflictException;
 

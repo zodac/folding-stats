@@ -9,6 +9,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class CompetitionResult {
     private long totalPoints = 0L;
     private long totalMultipliedPoints = 0L;
     private int totalUnits = 0;
-    private List<TeamResult> teams = new ArrayList<>();
+    private Collection<TeamResult> teams = new ArrayList<>();
 
     public static CompetitionResult create(final List<TeamResult> teams) {
         int totalUnits = 0;

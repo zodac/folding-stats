@@ -27,7 +27,7 @@ public final class ResponseParser {
 
     public static long getPointsFromResponse(final HttpResponse<String> response) throws FoldingExternalServiceException {
         if (StringUtils.isBlank(response.body())) {
-            throw new FoldingExternalServiceException("Empty Folding points response");
+            throw new FoldingExternalServiceException(response.uri().toString(), "Empty Folding points response");
         }
 
         try {
@@ -44,7 +44,7 @@ public final class ResponseParser {
 
     public static int getUnitsFromResponse(final String userName, final String passkey, final HttpResponse<String> response) throws FoldingExternalServiceException {
         if (StringUtils.isBlank(response.body())) {
-            throw new FoldingExternalServiceException("Empty Folding units response");
+            throw new FoldingExternalServiceException(response.uri().toString(), "Empty Folding units response");
         }
 
         final Type collectionType = new TypeToken<Collection<UnitsApiInstance>>() {

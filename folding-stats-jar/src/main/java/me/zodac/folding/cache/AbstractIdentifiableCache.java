@@ -3,8 +3,9 @@ package me.zodac.folding.cache;
 import me.zodac.folding.api.Identifiable;
 import me.zodac.folding.api.tc.exception.NotFoundException;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 abstract class AbstractIdentifiableCache<V extends Identifiable> {
@@ -31,7 +32,7 @@ abstract class AbstractIdentifiableCache<V extends Identifiable> {
         elementsById.put(elementId, element);
     }
 
-    public void addAll(final List<V> elements) {
+    public void addAll(final Collection<V> elements) {
         for (final V element : elements) {
             add(element);
         }
@@ -68,7 +69,7 @@ abstract class AbstractIdentifiableCache<V extends Identifiable> {
         return !elementsById.containsKey(id);
     }
 
-    public List<V> getAll() {
-        return List.copyOf(elementsById.values());
+    public Collection<V> getAll() {
+        return Collections.unmodifiableCollection(elementsById.values());
     }
 }

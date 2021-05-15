@@ -33,6 +33,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -141,7 +142,7 @@ public class TeamCompetitionStatsEndpoint {
 
     private List<TeamResult> getStatsForTeams() {
         try {
-            final List<Team> teams = storageFacade.getAllTeams();
+            final Collection<Team> teams = storageFacade.getAllTeams();
             final List<TeamResult> teamResults = new ArrayList<>(teams.size());
 
             for (final Team team : teams) {

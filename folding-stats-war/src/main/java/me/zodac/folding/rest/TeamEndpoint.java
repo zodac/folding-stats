@@ -34,7 +34,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
-import java.util.List;
+import java.util.Collection;
 
 import static me.zodac.folding.rest.response.Responses.badGateway;
 import static me.zodac.folding.rest.response.Responses.badRequest;
@@ -69,7 +69,7 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
     @Path("/batch")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createBatchOfTeams(final List<Team> teams) {
+    public Response createBatchOfTeams(final Collection<Team> teams) {
         return super.createBatchOf(teams);
     }
 
@@ -189,7 +189,7 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
             getLogger().error(errorMessage);
             return badRequest(errorMessage);
         } catch (final FoldingExternalServiceException e) {
-            final String errorMessage = String.format("Error connecting to external service: %s", e.getMessage());
+            final String errorMessage = String.format("Error connecting to external service at '%s': %s", e.getUrl(), e.getMessage());
             getLogger().debug(errorMessage, e);
             getLogger().error(errorMessage);
             return badGateway();
@@ -234,7 +234,7 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
     }
 
     @Override
-    protected List<Team> getAllElements() throws FoldingException {
+    protected Collection<Team> getAllElements() throws FoldingException {
         return storageFacade.getAllTeams();
     }
 

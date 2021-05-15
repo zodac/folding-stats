@@ -22,6 +22,7 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static me.zodac.folding.api.utils.DateTimeUtils.untilNextMonthUtc;
@@ -51,7 +52,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
 
     protected abstract V createElement(final V element) throws FoldingException, NotFoundException, FoldingConflictException, FoldingExternalServiceException;
 
-    protected abstract List<V> getAllElements() throws FoldingException;
+    protected abstract Collection<V> getAllElements() throws FoldingException;
 
     protected abstract V getElementById(final int elementId) throws FoldingException, NotFoundException;
 
@@ -87,7 +88,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
             getLogger().error(errorMessage);
             return conflict(errorMessage);
         } catch (final FoldingExternalServiceException e) {
-            final String errorMessage = String.format("Error connecting to external service: %s", e.getMessage());
+            final String errorMessage = String.format("Error connecting to external service at '%s': %s", e.getUrl(), e.getMessage());
             getLogger().debug(errorMessage, e);
             getLogger().error(errorMessage);
             return badGateway();
@@ -104,7 +105,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
         }
     }
 
-    protected Response createBatchOf(final List<V> batchOfElements) {
+    protected Response createBatchOf(final Collection<V> batchOfElements) {
         getLogger().debug("POST request received to create {} {}s at '{}' with request: {}", batchOfElements.size(), elementType(), uriContext.getAbsolutePath(), batchOfElements);
 
         if (SystemStateManager.current().isWriteBlocked()) {
@@ -173,7 +174,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
         }
 
         try {
-            final List<V> elements = getAllElements();
+            final Collection<V> elements = getAllElements();
             getLogger().debug("Found {} {}s", elements.size(), elementType());
 
             final CacheControl cacheControl = new CacheControl();
@@ -300,7 +301,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
             getLogger().error(errorMessage);
             return conflict(errorMessage);
         } catch (final FoldingExternalServiceException e) {
-            final String errorMessage = String.format("Error connecting to external service: %s", e.getMessage());
+            final String errorMessage = String.format("Error connecting to external service at '%s': %s", e.getUrl(), e.getMessage());
             getLogger().debug(errorMessage, e);
             getLogger().error(errorMessage);
             return badGateway();

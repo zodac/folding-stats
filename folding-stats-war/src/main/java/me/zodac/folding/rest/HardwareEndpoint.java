@@ -25,7 +25,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * REST endpoints for hardware for <code>folding-stats</code>.
@@ -51,7 +51,7 @@ public class HardwareEndpoint extends AbstractIdentifiableCrudEndpoint<Hardware>
     @Path("/batch")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createBatchOfHardware(final List<Hardware> hardware) {
+    public Response createBatchOfHardware(final Collection<Hardware> hardware) {
         return super.createBatchOf(hardware);
     }
 
@@ -104,7 +104,7 @@ public class HardwareEndpoint extends AbstractIdentifiableCrudEndpoint<Hardware>
     }
 
     @Override
-    protected List<Hardware> getAllElements() throws FoldingException {
+    protected Collection<Hardware> getAllElements() throws FoldingException {
         return storageFacade.getAllHardware();
     }
 

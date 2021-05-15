@@ -55,7 +55,7 @@ public final class RequestSender {
         } catch (final ConnectException e) {
             LOGGER.debug("Connection error retrieving stats for user", e);
             LOGGER.warn("Connection error retrieving stats for user");
-            throw new FoldingExternalServiceException("Unable to connect to Folding@Home API");
+            throw new FoldingExternalServiceException(requestUrl, "Unable to connect to Folding@Home API");
         } catch (final IOException | InterruptedException e) {
             throw new FoldingException("Unable to send HTTP request to Folding@Home API", e);
         } catch (final ClassCastException e) {

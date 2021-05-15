@@ -9,7 +9,7 @@ import lombok.Setter;
 import lombok.ToString;
 import me.zodac.folding.api.Identifiable;
 
-import java.util.List;
+import java.util.Collection;
 
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -19,10 +19,10 @@ import java.util.List;
 @ToString(doNotUseGetters = true)
 public class BulkCreateResponse {
 
-    private List<? extends Identifiable> successful;
-    private List<? extends Identifiable> unsuccessful;
+    private Collection<? extends Identifiable> successful;
+    private Collection<? extends Identifiable> unsuccessful;
 
-    public static BulkCreateResponse create(final List<? extends Identifiable> successful, final List<? extends Identifiable> unsuccessful) {
+    public static BulkCreateResponse create(final Collection<? extends Identifiable> successful, final Collection<? extends Identifiable> unsuccessful) {
         return new BulkCreateResponse(successful, unsuccessful);
     }
 }

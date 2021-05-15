@@ -19,7 +19,6 @@ import javax.ejb.Schedule;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 @Startup
@@ -54,7 +53,7 @@ public class TeamCompetitionResetScheduler {
     }
 
     public void manualResetTeamCompetitionStats() {
-        final List<Team> teams;
+        final Collection<Team> teams;
         try {
             teams = storageFacade.getAllTeams();
             if (teams.isEmpty()) {
@@ -77,15 +76,17 @@ public class TeamCompetitionResetScheduler {
         removeRetiredUsersFromTeams(teams);
     }
 
-    private void removeRetiredUsersFromTeams(final List<Team> teams) {
+    private void removeRetiredUsersFromTeams(final Collection<Team> teams) {
         LOGGER.debug("Removing retired users from teams");
         for (final Team team : teams) {
-            if (team.getRetiredUserIds().isEmpty()) {
-                LOGGER.debug("No retired users in team '{}'", team.getTeamName());
-                continue;
-            }
-
             try {
+                storageFacade.getTeam(team.getId());
+
+                if (team.getRetiredUserIds().isEmpty()) {
+                    LOGGER.debug("No retired users in team '{}'", team.getTeamName());
+                    continue;
+                }
+
                 LOGGER.debug("Removing retired users from team '{}'", team.getTeamName());
                 final Team teamWithoutRetiredUsers = Team.removeRetiredUsers(team);
                 storageFacade.updateTeam(teamWithoutRetiredUsers);

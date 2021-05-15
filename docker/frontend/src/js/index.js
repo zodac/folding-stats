@@ -144,6 +144,7 @@ function loadTcStats() {
             teamTableBody = document.createElement("tbody");
 
             activeUsers = team['activeUsers'];
+            activeUsers.sort(sortJsonByKey("rankInTeam"));
             activeUsers.forEach(function (activeUser, i) {
                 teamTableBodyRow = document.createElement("tr");
 
@@ -174,6 +175,7 @@ function loadTcStats() {
             });
 
             retiredUsers = team['retiredUsers'];
+            retiredUsers.sort(sortJsonByKey("rankInTeam"));
             retiredUsers.forEach(function (retiredUser, i) {
                 teamTableBodyRow = document.createElement("tr");
 

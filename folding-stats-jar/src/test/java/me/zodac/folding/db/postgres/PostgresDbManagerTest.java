@@ -1,5 +1,6 @@
 package me.zodac.folding.db.postgres;
 
+import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.db.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.tc.Category;
@@ -20,9 +21,9 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import static me.zodac.folding.db.postgres.TestGenerator.nextHardwareName;
@@ -37,7 +38,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class PostgresDbManagerTest {
 
-    private static final PostgresDbManager POSTGRES_DB_MANAGER = PostgresDbManager.create(new TestDbConnectionPool());
+    private static final DbManager POSTGRES_DB_MANAGER = PostgresDbManager.create(new TestDbConnectionPool());
 
     @Test
     @Order(1)
@@ -47,7 +48,7 @@ public class PostgresDbManagerTest {
         assertThat(createdHardware.getId())
                 .isNotEqualTo(Hardware.EMPTY_HARDWARE_ID);
 
-        final List<Hardware> allHardware = POSTGRES_DB_MANAGER.getAllHardware();
+        final Collection<Hardware> allHardware = POSTGRES_DB_MANAGER.getAllHardware();
         assertThat(allHardware)
                 .hasSize(1);
 
@@ -64,7 +65,7 @@ public class PostgresDbManagerTest {
 
         POSTGRES_DB_MANAGER.deleteHardware(createdHardware.getId());
 
-        final List<Hardware> allHardwareAfterDelete = POSTGRES_DB_MANAGER.getAllHardware();
+        final Collection<Hardware> allHardwareAfterDelete = POSTGRES_DB_MANAGER.getAllHardware();
         assertThat(allHardwareAfterDelete)
                 .isEmpty();
     }
@@ -78,7 +79,7 @@ public class PostgresDbManagerTest {
         assertThat(createdUser.getId())
                 .isNotEqualTo(User.EMPTY_USER_ID);
 
-        final List<User> allUsers = POSTGRES_DB_MANAGER.getAllUsers();
+        final Collection<User> allUsers = POSTGRES_DB_MANAGER.getAllUsers();
         assertThat(allUsers)
                 .hasSize(1);
 
@@ -95,7 +96,7 @@ public class PostgresDbManagerTest {
 
         POSTGRES_DB_MANAGER.deleteUser(createdUser.getId());
 
-        final List<User> allUsersAfterDelete = POSTGRES_DB_MANAGER.getAllUsers();
+        final Collection<User> allUsersAfterDelete = POSTGRES_DB_MANAGER.getAllUsers();
         assertThat(allUsersAfterDelete)
                 .isEmpty();
     }
@@ -109,7 +110,7 @@ public class PostgresDbManagerTest {
         assertThat(createdTeam.getId())
                 .isNotEqualTo(Team.EMPTY_TEAM_ID);
 
-        final List<Team> allTeams = POSTGRES_DB_MANAGER.getAllTeams();
+        final Collection<Team> allTeams = POSTGRES_DB_MANAGER.getAllTeams();
         assertThat(allTeams)
                 .hasSize(1);
 
@@ -126,7 +127,7 @@ public class PostgresDbManagerTest {
 
         POSTGRES_DB_MANAGER.deleteTeam(createdTeam.getId());
 
-        final List<Team> allTeamsAfterDelete = POSTGRES_DB_MANAGER.getAllTeams();
+        final Collection<Team> allTeamsAfterDelete = POSTGRES_DB_MANAGER.getAllTeams();
         assertThat(allTeamsAfterDelete)
                 .isEmpty();
     }

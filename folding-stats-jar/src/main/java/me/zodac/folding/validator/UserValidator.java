@@ -28,7 +28,7 @@ public class UserValidator {
         final List<String> failureMessages = new ArrayList<>(6);
 
         if (Category.INVALID == Category.get(user.getCategory())) {
-            failureMessages.add(String.format("Attribute 'category' must be one of: %s", Category.getValuesAsList()));
+            failureMessages.add(String.format("Attribute 'category' must be one of: %s", Category.getAllValues()));
         }
 
         if (StringUtils.isBlank(user.getFoldingUserName())) {

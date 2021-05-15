@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
@@ -31,8 +32,8 @@ public class TeamResult {
     private long teamMultipliedPoints;
     private int teamUnits;
     private int rank; // Rank in 'division', but we only have one division so no need to be more explicit, yet
-    private List<UserResult> activeUsers;
-    private List<UserResult> retiredUsers;
+    private Collection<UserResult> activeUsers;
+    private Collection<UserResult> retiredUsers;
 
     public static TeamResult create(final String teamName, final String teamDescription, final String captainName, final List<UserResult> activeUsers, final List<UserResult> retiredUsers) {
         int teamUnits = 0;

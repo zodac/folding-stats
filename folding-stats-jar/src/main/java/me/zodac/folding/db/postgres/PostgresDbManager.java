@@ -30,6 +30,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -80,7 +81,7 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public List<Hardware> getAllHardware() throws FoldingException {
+    public Collection<Hardware> getAllHardware() throws FoldingException {
         final String selectSqlStatement = "SELECT * FROM hardware ORDER BY hardware_id ASC;";
         LOGGER.debug("Executing SQL statement '{}'", selectSqlStatement);
 
@@ -201,7 +202,7 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public List<User> getAllUsers() throws FoldingException {
+    public Collection<User> getAllUsers() throws FoldingException {
         final String selectSqlStatement = "SELECT * FROM users ORDER BY user_id ASC;";
         LOGGER.debug("Executing SQL statement: '{}'", selectSqlStatement);
 
@@ -323,7 +324,7 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public List<Team> getAllTeams() throws FoldingException {
+    public Collection<Team> getAllTeams() throws FoldingException {
         final String selectSqlStatement = "SELECT * FROM teams ORDER BY team_id ASC;";
         LOGGER.debug("Executing SQL statement '{}'", selectSqlStatement);
 

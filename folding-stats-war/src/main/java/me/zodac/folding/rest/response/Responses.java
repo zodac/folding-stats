@@ -6,7 +6,7 @@ import me.zodac.folding.api.Identifiable;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
-import java.util.List;
+import java.util.Collection;
 
 // TODO: [zodac] Look into Cache-Control/Expires headers, good start point: https://devcenter.heroku.com/articles/jax-rs-http-caching
 public class Responses {
@@ -83,7 +83,7 @@ public class Responses {
                 .build();
     }
 
-    public static Response.ResponseBuilder okBuilder(final List<? extends Identifiable> entities) {
+    public static Response.ResponseBuilder okBuilder(final Collection<? extends Identifiable> entities) {
         return Response
                 .ok()
                 .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_NAME, ACCESS_CONTROL_ALLOW_ORIGIN_DEFAULT_VALUE)
@@ -92,7 +92,7 @@ public class Responses {
                 .entity(GSON.toJson(entities));
     }
 
-    public static Response ok(final List<? extends Identifiable> entities) {
+    public static Response ok(final Collection<? extends Identifiable> entities) {
         return okBuilder(entities)
                 .build();
     }

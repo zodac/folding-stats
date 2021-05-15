@@ -23,7 +23,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import java.net.HttpURLConnection;
 import java.net.http.HttpResponse;
-import java.util.List;
+import java.util.Collection;
 
 import static me.zodac.folding.test.utils.HardwareUtils.HARDWARE_REQUEST_SENDER;
 import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForComplexTests;
@@ -221,7 +221,7 @@ public class TeamCompetitionStatsTest {
 
         final CompetitionResult result = TeamCompetitionStatsUtils.get();
         final TeamResult teamResult = getTeamFromCompetition(result, team.getTeamName());
-        final List<UserResult> activeUserResults = teamResult.getActiveUsers();
+        final Collection<UserResult> activeUserResults = teamResult.getActiveUsers();
 
         assertThat(activeUserResults)
                 .as("Expected exactly 2 active users: " + teamResult)
@@ -709,7 +709,7 @@ public class TeamCompetitionStatsTest {
         final int unitsOffset = -400;
         USER_REQUEST_SENDER.offset(userId, pointsOffset, pointsOffset, unitsOffset);
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
-        
+
         final CompetitionResult result = TeamCompetitionStatsUtils.get();
         final TeamResult teamResult = getTeamFromCompetition(result, team.getTeamName());
         final UserResult userResult = getActiveUserFromTeam(teamResult, user.getDisplayName());

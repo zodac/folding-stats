@@ -26,7 +26,7 @@ public class HardwareValidator {
         }
 
         if (OperatingSystem.INVALID == OperatingSystem.get(hardware.getOperatingSystem())) {
-            failureMessages.add(String.format("Attribute 'operatingSystem' must be one of: %s", OperatingSystem.getValuesAsList()));
+            failureMessages.add(String.format("Attribute 'operatingSystem' must be one of: %s", OperatingSystem.getAllValues()));
         }
 
         // I am assuming multiplier cannot be less than 0, also assuming we might want a 0.1/0.5 at some point with future hardware

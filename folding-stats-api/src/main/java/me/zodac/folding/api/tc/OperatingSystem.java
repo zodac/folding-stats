@@ -1,6 +1,6 @@
 package me.zodac.folding.api.tc;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toUnmodifiableList;
@@ -15,7 +15,7 @@ public enum OperatingSystem {
     LINUX("Linux"),
     INVALID("Invalid");
 
-    private static final List<OperatingSystem> VALUES_AS_LIST = Stream.of(values())
+    private static final Collection<OperatingSystem> ALL_VALUES = Stream.of(values())
             .filter(value -> value != INVALID)
             .collect(toUnmodifiableList());
 
@@ -29,12 +29,12 @@ public enum OperatingSystem {
         return displayName;
     }
 
-    public static List<OperatingSystem> getValuesAsList() {
-        return VALUES_AS_LIST;
+    public static Collection<OperatingSystem> getAllValues() {
+        return ALL_VALUES;
     }
 
     public static OperatingSystem get(final String input) {
-        for (final OperatingSystem category : VALUES_AS_LIST) {
+        for (final OperatingSystem category : ALL_VALUES) {
             if (category.toString().equalsIgnoreCase(input)) {
                 return category;
             }

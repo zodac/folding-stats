@@ -20,8 +20,8 @@ import javax.ejb.Startup;
 import javax.ejb.Timeout;
 import javax.ejb.Timer;
 import javax.ejb.TimerService;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 // TODO: [zodac] Move this to an EJB module?
@@ -85,7 +85,7 @@ public class TeamCompetitionStatsScheduler {
         LOGGER.info("");
         LOGGER.info("Parsing TC Folding stats:");
 
-        final List<Team> tcTeams = getTcTeams();
+        final Collection<Team> tcTeams = getTcTeams();
         if (tcTeams.isEmpty()) {
             LOGGER.warn("No TC teams configured in system!");
             return;
@@ -130,7 +130,7 @@ public class TeamCompetitionStatsScheduler {
         }
     }
 
-    private List<Team> getTcTeams() {
+    private Collection<Team> getTcTeams() {
         try {
             return storageFacade.getAllTeams();
         } catch (final FoldingException e) {

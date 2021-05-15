@@ -35,7 +35,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
-import java.util.List;
+import java.util.Collection;
 
 import static me.zodac.folding.rest.response.Responses.badRequest;
 import static me.zodac.folding.rest.response.Responses.notFound;
@@ -70,7 +70,7 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
     @Path("/batch")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createBatchOfUsers(final List<User> users) {
+    public Response createBatchOfUsers(final Collection<User> users) {
         return super.createBatchOf(users);
     }
 
@@ -177,7 +177,7 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
     }
 
     @Override
-    protected List<User> getAllElements() throws FoldingException {
+    protected Collection<User> getAllElements() throws FoldingException {
         return storageFacade.getAllUsersWithPasskeys(false);
     }
 

@@ -1,11 +1,20 @@
 package me.zodac.folding.api.exception;
 
-// TODO: [zodac] Anything throwing a conflict should also contain links to the things using them, ideally
+/**
+ * {@link Exception} for errors when connecting to an external service, or when an unexpected response is returned.
+ */
 public class FoldingExternalServiceException extends Exception {
 
     private static final long serialVersionUID = 2084075114898438910L;
 
-    public FoldingExternalServiceException(final String message) {
+    private final String url;
+
+    public FoldingExternalServiceException(final String url, final String message) {
         super(message);
+        this.url = url;
+    }
+
+    public String getUrl() {
+        return url;
     }
 }
