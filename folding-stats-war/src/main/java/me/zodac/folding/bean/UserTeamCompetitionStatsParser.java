@@ -75,7 +75,7 @@ public class UserTeamCompetitionStatsParser {
         if (offsetStats.isEmpty()) {
             LOGGER.trace("Retrieved empty stat offset for user: {}", user);
         } else {
-            LOGGER.debug("{}: {} offset points | {} offset units", user.getFoldingUserName(), formatWithCommas(offsetStats.getMultipliedPointsOffset()), formatWithCommas(offsetStats.getUnitsOffset()));
+            LOGGER.debug("{}: {} offset points | {} offset units", user.getDisplayName(), formatWithCommas(offsetStats.getMultipliedPointsOffset()), formatWithCommas(offsetStats.getUnitsOffset()));
         }
 
         final UserStats totalStats = getTotalStatsForUserOrEmpty(user);
@@ -109,8 +109,8 @@ public class UserTeamCompetitionStatsParser {
 
         final UserTcStats hourlyUserTcStats = UserTcStats.updateWithOffsets(statsBeforeOffset, offsetStats);
         LOGGER.debug("{}: {} total points (unmultiplied) | {} total units", user.getDisplayName(), formatWithCommas(totalStats.getPoints()), formatWithCommas(totalStats.getUnits()));
-        LOGGER.debug("{}: {} TC points (pre-offset) | {} TC units (pre-offset)", user.getFoldingUserName(), formatWithCommas(multipliedPoints), formatWithCommas(units));
-        LOGGER.info("{}: {} TC points | {} TC units", user.getFoldingUserName(), formatWithCommas(hourlyUserTcStats.getMultipliedPoints()), formatWithCommas(hourlyUserTcStats.getUnits()));
+        LOGGER.debug("{}: {} TC points (pre-offset) | {} TC units (pre-offset)", user.getDisplayName(), formatWithCommas(multipliedPoints), formatWithCommas(units));
+        LOGGER.info("{}: {} TC points | {} TC units", user.getDisplayName(), formatWithCommas(hourlyUserTcStats.getMultipliedPoints()), formatWithCommas(hourlyUserTcStats.getUnits()));
 
         try {
             storageFacade.persistHourlyTcStatsForUser(hourlyUserTcStats);

@@ -77,7 +77,7 @@ function getUserHistoricStats(userId, userName) {
             tableRow = document.createElement("tr");
 
             dateCell = document.createElement("td");
-            dateCell.innerHTML = ordinalSuffixOf(statsEntry["date"]["day"]);
+            dateCell.innerHTML = ordinalSuffixOf(statsEntry["dateTime"]["date"]["day"]);
             tableRow.append(dateCell);
 
 

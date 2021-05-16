@@ -36,7 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ejb.Singleton;
-import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
@@ -461,11 +460,11 @@ public class StorageFacade {
         return userTcStatsFromDb;
     }
 
-    public Map<LocalDateTime, HistoricStats> getHistoricStatsDaily(final int userId, final Month month, final Year year) throws FoldingException, UserNotFoundException {
+    public Collection<HistoricStats> getHistoricStatsDaily(final int userId, final Month month, final Year year) throws FoldingException, UserNotFoundException {
         return dbManager.getHistoricStatsDaily(userId, month, year);
     }
 
-    public Map<LocalDateTime, HistoricStats> getHistoricStatsMonthly(final int userId, final Year year) throws FoldingException, UserNotFoundException {
+    public Collection<HistoricStats> getHistoricStatsMonthly(final int userId, final Year year) throws FoldingException, UserNotFoundException {
         return dbManager.getHistoricStatsMonthly(userId, year);
     }
 

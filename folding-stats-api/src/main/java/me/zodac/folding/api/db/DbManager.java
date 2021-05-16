@@ -14,11 +14,9 @@ import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 
-import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
-import java.util.Map;
 
 /**
  * Interface used to interact with the storage backend and perform CRUD operations.
@@ -72,9 +70,9 @@ public interface DbManager {
 
     // Historic TC operations
 
-    Map<LocalDateTime, HistoricStats> getHistoricStatsDaily(final int userId, final Month month, final Year year) throws FoldingException, UserNotFoundException;
+    Collection<HistoricStats> getHistoricStatsDaily(final int userId, final Month month, final Year year) throws FoldingException, UserNotFoundException;
 
-    Map<LocalDateTime, HistoricStats> getHistoricStatsMonthly(final int userId, final Year year) throws FoldingException, UserNotFoundException;
+    Collection<HistoricStats> getHistoricStatsMonthly(final int userId, final Year year) throws FoldingException, UserNotFoundException;
 
     void persistInitialStats(final UserStats userStats) throws FoldingException;
 

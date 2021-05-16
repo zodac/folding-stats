@@ -75,7 +75,7 @@ function getUserHistoricStats(userId, userName) {
             tableRow = document.createElement("tr");
 
             dateCell = document.createElement("td");
-            dateCell.innerHTML = new Date(year, (statsEntry["monthNumber"]-1), "01").toLocaleString('default', { month: 'long' });
+            dateCell.innerHTML = new Date(year, (statsEntry["dateTime"]["date"]["month"]-1), "01").toLocaleString('default', { month: 'long' });
             tableRow.append(dateCell);
 
             pointsCell = document.createElement("td");

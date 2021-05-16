@@ -32,9 +32,7 @@ import java.time.Year;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 public class PostgresDbManager implements DbManager {
 
@@ -487,7 +485,7 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public Map<LocalDateTime, HistoricStats> getHistoricStatsDaily(final int userId, final Month month, final Year year) throws FoldingException, UserNotFoundException {
+    public List<HistoricStats> getHistoricStatsDaily(final int userId, final Month month, final Year year) throws FoldingException, UserNotFoundException {
         LOGGER.debug("Getting historic daily user TC stats for {}/{} for user {}", DateTimeUtils.formatMonth(month), year, userId);
 
         final String selectSqlStatement = "SELECT utc_timestamp::DATE AS daily_timestamp, " +
@@ -507,42 +505,44 @@ public class PostgresDbManager implements DbManager {
             preparedStatement.setInt(1, month.getValue());
             preparedStatement.setInt(2, year.getValue());
             preparedStatement.setInt(3, userId);
-            
+
             LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
             try (final ResultSet resultSet = preparedStatement.executeQuery()) {
 
-                final Map<LocalDateTime, HistoricStats> userStatsByDate = new TreeMap<>();
+                final List<HistoricStats> userStats = new ArrayList<>();
 
                 // First entry will be zeroed, so we need to manually get the first day's stats for the user
                 if (resultSet.next()) {
                     final LocalDateTime localDateTime = resultSet.getTimestamp("daily_timestamp").toLocalDateTime();
                     final UserTcStats userTcStats = getTcStatsForDay(localDateTime, userId);
 
-                    final HistoricStats historicStats = HistoricStats.create(
-                            localDateTime,
-                            userTcStats.getPoints(),
-                            userTcStats.getMultipliedPoints(),
-                            userTcStats.getUnits()
+                    userStats.add(
+                            HistoricStats.create(
+                                    localDateTime,
+                                    userTcStats.getPoints(),
+                                    userTcStats.getMultipliedPoints(),
+                                    userTcStats.getUnits()
+                            )
                     );
-                    userStatsByDate.put(historicStats.getDateTime(), historicStats);
                 }
 
                 // All remaining entries will be diff-ed from the previous entry
                 while (resultSet.next()) {
-                    final HistoricStats historicStats = HistoricStats.create(
-                            resultSet.getTimestamp("daily_timestamp").toLocalDateTime(),
-                            resultSet.getLong("diff_points"),
-                            resultSet.getLong("diff_points_multiplied"),
-                            resultSet.getInt("diff_units")
+                    userStats.add(
+                            HistoricStats.create(
+                                    resultSet.getTimestamp("daily_timestamp").toLocalDateTime(),
+                                    resultSet.getLong("diff_points"),
+                                    resultSet.getLong("diff_points_multiplied"),
+                                    resultSet.getInt("diff_units")
+                            )
                     );
-                    userStatsByDate.put(historicStats.getDateTime(), historicStats);
                 }
 
-                if (userStatsByDate.isEmpty()) {
+                if (userStats.isEmpty()) {
                     throw new UserNotFoundException(userId);
                 }
 
-                return userStatsByDate;
+                return userStats;
             }
         } catch (final FoldingException | UserNotFoundException e) {
             LOGGER.warn("Unable to get the stats for the first day of {}/{} for user {}", DateTimeUtils.formatMonth(month), year, userId);
@@ -553,7 +553,7 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public Map<LocalDateTime, HistoricStats> getHistoricStatsMonthly(final int userId, final Year year) throws FoldingException, UserNotFoundException {
+    public List<HistoricStats> getHistoricStatsMonthly(final int userId, final Year year) throws FoldingException, UserNotFoundException {
         LOGGER.debug("Getting historic monthly user TC stats for {} for user {}", year, userId);
 
         final String selectSqlStatement = "SELECT MAX(utc_timestamp) AS month_timestamp, " +
@@ -575,23 +575,24 @@ public class PostgresDbManager implements DbManager {
             LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
             try (final ResultSet resultSet = preparedStatement.executeQuery()) {
 
-                final Map<LocalDateTime, HistoricStats> userStatsByDate = new TreeMap<>();
+                final List<HistoricStats> userStats = new ArrayList<>();
 
                 while (resultSet.next()) {
-                    final HistoricStats historicStats = HistoricStats.create(
-                            resultSet.getTimestamp("month_timestamp").toLocalDateTime(),
-                            resultSet.getLong("diff_points"),
-                            resultSet.getLong("diff_points_multiplied"),
-                            resultSet.getInt("diff_units")
+                    userStats.add(
+                            HistoricStats.create(
+                                    resultSet.getTimestamp("month_timestamp").toLocalDateTime(),
+                                    resultSet.getLong("diff_points"),
+                                    resultSet.getLong("diff_points_multiplied"),
+                                    resultSet.getInt("diff_units")
+                            )
                     );
-                    userStatsByDate.put(historicStats.getDateTime(), historicStats);
                 }
 
-                if (userStatsByDate.isEmpty()) {
+                if (userStats.isEmpty()) {
                     throw new UserNotFoundException(userId);
                 }
 
-                return userStatsByDate;
+                return userStats;
             }
         } catch (final SQLException e) {
             throw new FoldingException("Error opening connection to the DB", e);
