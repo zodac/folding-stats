@@ -1,6 +1,6 @@
 const ROOT_URL='http://internal.axihub.ca/folding';
 
-function populateDropdown() {
+function populateUserDropdown() {
     var dropdown = document.getElementById('user_dropdown');
     while (dropdown.firstChild) {
         dropdown.removeChild(dropdown.lastChild);
@@ -11,7 +11,7 @@ function populateDropdown() {
         return response.json();
     })
     .then(function(jsonResponse) {
-        dropdown_div = document.getElementById("user_dropdown");
+        userDropdownDiv = document.getElementById("user_dropdown");
 
         jsonResponse.forEach(function(userItem, i){
             userButton = document.createElement("button");
@@ -20,7 +20,7 @@ function populateDropdown() {
             userButton.setAttribute("onclick", "getUserHistoricStats("+userItem["id"]+",'"+userItem["displayName"]+"')");
             userButton.innerHTML = userItem["displayName"];
 
-            dropdown_div.append(userButton);
+            userDropdownDiv.append(userButton);
         });
     });
 }
@@ -101,6 +101,6 @@ function getUserHistoricStats(userId, userName) {
 }
 
 document.addEventListener("DOMContentLoaded", function(event) {
-    populateDropdown();
+    populateUserDropdown();
     updateTimer();
 });

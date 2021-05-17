@@ -1,31 +1,31 @@
 const ROOT_URL='http://internal.axihub.ca/folding';
 
-function populateUserDropdown() {
-    var dropdown = document.getElementById('user_dropdown');
+function populateTeamDropdown() {
+    var dropdown = document.getElementById('team_dropdown');
     while (dropdown.firstChild) {
         dropdown.removeChild(dropdown.lastChild);
     }
 
-    fetch(ROOT_URL+'/users')
+    fetch(ROOT_URL+'/teams')
     .then(response => {
         return response.json();
     })
     .then(function(jsonResponse) {
-        userDropdownDiv = document.getElementById("user_dropdown");
+        teamDropDownDiv = document.getElementById("team_dropdown");
 
-        jsonResponse.forEach(function(userItem, i){
-            userButton = document.createElement("button");
-            userButton.setAttribute("class", "dropdown-item");
-            userButton.setAttribute("type", "button");
-            userButton.setAttribute("onclick", "getUserHistoricStats("+userItem["id"]+",'"+userItem["displayName"]+"')");
-            userButton.innerHTML = userItem["displayName"];
+        jsonResponse.forEach(function(teamItem, i){
+            teamButton = document.createElement("button");
+            teamButton.setAttribute("class", "dropdown-item");
+            teamButton.setAttribute("type", "button");
+            teamButton.setAttribute("onclick", "getTeamHistoricStats("+teamItem["id"]+",'"+teamItem["teamName"]+"')");
+            teamButton.innerHTML = teamItem["teamName"];
 
-            userDropdownDiv.append(userButton);
+            teamDropDownDiv.append(teamButton);
         });
     });
 }
 
-function getUserHistoricStats(userId, userName) {
+function getTeamHistoricStats(teamId, teamName) {
     show("loader");
     hide("historic_stats");
 
@@ -33,14 +33,15 @@ function getUserHistoricStats(userId, userName) {
     var year = currentDate.getFullYear();
     var month = (currentDate.getMonth()+1);
     var monthName = currentDate.toLocaleString('default', { month: 'long' });
+    var dayOfMonth = currentDate.getDate();
 
-    fetch(ROOT_URL+'/historic/users/' + userId + '/' + year + '/' + month)
+    fetch(ROOT_URL+'/historic/teams/' + teamId + '/' + year + '/' + month + '/' + dayOfMonth)
     .then(response => {
         return response.json();
     })
     .then(function(jsonResponse) {
-        dropDownTitle = document.getElementById("user_dropdown_root");
-        dropDownTitle.innerHTML = userName;
+        dropDownTitle = document.getElementById("team_dropdown_root");
+        dropDownTitle.innerHTML = teamName;
 
         // Clear existing entries in div
         historicDiv = document.getElementById("historic_stats");
@@ -48,12 +49,12 @@ function getUserHistoricStats(userId, userName) {
             historicDiv.removeChild(historicDiv.lastChild);
         }
 
-        userTitle = document.createElement("h1");
-        userTitle.setAttribute("class", "navbar-brand");
-        userTitle.innerHTML = userName + " ("+monthName+" "+year+")";
-        historicDiv.append(userTitle);
+        teamTitle = document.createElement("h1");
+        teamTitle.setAttribute("class", "navbar-brand");
+        teamTitle.innerHTML = teamName + " ("+ordinalSuffixOf(dayOfMonth)+" "+monthName+" "+year+")";
+        historicDiv.append(teamTitle);
 
-        const headers = ["Date", "Points", "Units"];
+        const headers = ["Hour", "Points", "Units"];
         historicTable = document.createElement('table');
         historicTable.setAttribute("id", "historic_table");
         historicTable.setAttribute("class", "table table-dark table-striped table-hover");
@@ -77,7 +78,7 @@ function getUserHistoricStats(userId, userName) {
             tableRow = document.createElement("tr");
 
             dateCell = document.createElement("td");
-            dateCell.innerHTML = ordinalSuffixOf(statsEntry["dateTime"]["date"]["day"]);
+            dateCell.innerHTML = leftPad(statsEntry["dateTime"]["time"]["hour"], 2, '0') + ":00";
             tableRow.append(dateCell);
 
             pointsCell = document.createElement("td");
@@ -103,6 +104,6 @@ function getUserHistoricStats(userId, userName) {
 }
 
 document.addEventListener("DOMContentLoaded", function(event) {
-    populateUserDropdown();
+    populateTeamDropdown();
     updateTimer();
 });

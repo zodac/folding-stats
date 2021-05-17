@@ -33,8 +33,9 @@ function getUserHistoricStats(userId, userName) {
     var year = currentDate.getFullYear();
     var month = (currentDate.getMonth()+1);
     var monthName = currentDate.toLocaleString('default', { month: 'long' });
+    var dayOfMonth = currentDate.getDate();
 
-    fetch(ROOT_URL+'/historic/users/' + userId + '/' + year + '/' + month)
+    fetch(ROOT_URL+'/historic/users/' + userId + '/' + year + '/' + month + '/' + dayOfMonth)
     .then(response => {
         return response.json();
     })
@@ -50,10 +51,10 @@ function getUserHistoricStats(userId, userName) {
 
         userTitle = document.createElement("h1");
         userTitle.setAttribute("class", "navbar-brand");
-        userTitle.innerHTML = userName + " ("+monthName+" "+year+")";
+        userTitle.innerHTML = userName + " ("+ordinalSuffixOf(dayOfMonth)+" "+monthName+" "+year+")";
         historicDiv.append(userTitle);
 
-        const headers = ["Date", "Points", "Units"];
+        const headers = ["Hour", "Points", "Units"];
         historicTable = document.createElement('table');
         historicTable.setAttribute("id", "historic_table");
         historicTable.setAttribute("class", "table table-dark table-striped table-hover");
@@ -77,7 +78,7 @@ function getUserHistoricStats(userId, userName) {
             tableRow = document.createElement("tr");
 
             dateCell = document.createElement("td");
-            dateCell.innerHTML = ordinalSuffixOf(statsEntry["dateTime"]["date"]["day"]);
+            dateCell.innerHTML = leftPad(statsEntry["dateTime"]["time"]["hour"], 2, '0') + ":00";
             tableRow.append(dateCell);
 
             pointsCell = document.createElement("td");

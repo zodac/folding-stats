@@ -56,7 +56,6 @@
         <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
         <maven-war-plugin.version>3.3.1</maven-war-plugin.version>
-        <minify-maven-plugin.version>1.7.6</minify-maven-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -221,11 +220,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
                     <version>${maven-war-plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>com.samaxes.maven</groupId>
-                    <artifactId>minify-maven-plugin</artifactId>
-                    <version>${minify-maven-plugin.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>

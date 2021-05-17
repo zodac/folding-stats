@@ -59,6 +59,21 @@
 </nav>
 <h1>Team Hourly Stats</h1>
 
+<div class="dropdown">
+    <button class="btn btn-secondary dropdown-toggle" type="button" id="team_dropdown_root" data-bs-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+        Select User
+    </button>
+    <div id="team_dropdown" class="dropdown-menu" aria-labelledby="team_dropdown">
+        <!-- Will be populated on document load -->
+    </div>
+</div>
+
+<div id="loader" class="loader" style="display: none;"></div>
+
+<!-- Will be populated when team is selected -->
+<div id="historic_stats">
+</div>
 
 </body>
 </html>
