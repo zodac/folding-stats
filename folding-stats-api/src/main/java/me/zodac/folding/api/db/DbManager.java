@@ -6,6 +6,7 @@ import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.exception.HardwareNotFoundException;
+import me.zodac.folding.api.tc.exception.NoStatsAvailableException;
 import me.zodac.folding.api.tc.exception.TeamNotFoundException;
 import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.stats.OffsetStats;
@@ -22,8 +23,6 @@ import java.util.Collection;
  * Interface used to interact with the storage backend and perform CRUD operations.
  */
 public interface DbManager {
-
-    // CRUD operations
 
     /**
      * Creates a {@link Hardware} instance in the DB.
@@ -70,15 +69,17 @@ public interface DbManager {
 
     // Historic TC operations
 
-    Collection<HistoricStats> getHistoricStatsDaily(final int userId, final Month month, final Year year) throws FoldingException, UserNotFoundException;
+    Collection<HistoricStats> getHistoricStatsHourly(final int userId, final int day, final Month month, final Year year) throws FoldingException, NoStatsAvailableException;
 
-    Collection<HistoricStats> getHistoricStatsMonthly(final int userId, final Year year) throws FoldingException, UserNotFoundException;
+    Collection<HistoricStats> getHistoricStatsDaily(final int userId, final Month month, final Year year) throws FoldingException, NoStatsAvailableException;
+
+    Collection<HistoricStats> getHistoricStatsMonthly(final int userId, final Year year) throws FoldingException, NoStatsAvailableException;
 
     void persistInitialStats(final UserStats userStats) throws FoldingException;
 
     UserStats getInitialStats(final int userId) throws FoldingException;
 
-    UserTcStats getHourlyTcStats(final int userId) throws FoldingException, UserNotFoundException;
+    UserTcStats getHourlyTcStats(final int userId) throws FoldingException, NoStatsAvailableException;
 
     void persistTotalStats(final UserStats stats) throws FoldingException;
 

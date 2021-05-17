@@ -9,6 +9,7 @@ import me.zodac.folding.api.tc.OperatingSystem;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.exception.HardwareNotFoundException;
+import me.zodac.folding.api.tc.exception.NoStatsAvailableException;
 import me.zodac.folding.api.tc.exception.TeamNotFoundException;
 import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.stats.OffsetStats;
@@ -231,13 +232,13 @@ public class PostgresDbManagerTest {
     }
 
     @Test
-    public void hourlyTcStatsTest() throws FoldingConflictException, FoldingException, UserNotFoundException {
+    public void hourlyTcStatsTest() throws FoldingConflictException, FoldingException, NoStatsAvailableException {
         assertThat(POSTGRES_DB_MANAGER.isAnyHourlyTcStats())
                 .isFalse();
 
         final int userId = createUser().getId();
         assertThatThrownBy(() -> POSTGRES_DB_MANAGER.getHourlyTcStats(userId))
-                .isInstanceOf(UserNotFoundException.class);
+                .isInstanceOf(NoStatsAvailableException.class);
 
         final long points = 100L;
         final long multipliedPoints = 1_000L;

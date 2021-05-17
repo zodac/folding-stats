@@ -9,6 +9,7 @@ import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.exception.HardwareNotFoundException;
+import me.zodac.folding.api.tc.exception.NoStatsAvailableException;
 import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
@@ -240,7 +241,7 @@ public class TeamCompetitionStatsEndpoint {
             final UserTcStats userTcStats = storageFacade.getTcStatsForUser(user.getId());
             LOGGER.debug("Results for {}: {} points | {} multiplied points | {} units", user.getDisplayName(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits());
             return UserResult.createWithNoRank(user.getDisplayName(), hardware, category.displayName(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits(), user.getLiveStatsLink(), user.isRetired());
-        } catch (final UserNotFoundException e) {
+        } catch (final UserNotFoundException | NoStatsAvailableException e) {
             LOGGER.debug("No stats found for user ID: {}", user.getId(), e);
             LOGGER.warn("No stats found for user ID: {}", user.getId());
             return UserResult.empty(user.getDisplayName());

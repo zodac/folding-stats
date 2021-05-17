@@ -9,6 +9,7 @@ import me.zodac.folding.api.exception.FoldingExternalServiceException;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.exception.FoldingIdInvalidException;
 import me.zodac.folding.api.tc.exception.FoldingIdOutOfRangeException;
+import me.zodac.folding.api.tc.exception.NoStatsAvailableException;
 import me.zodac.folding.api.tc.exception.NotFoundException;
 import me.zodac.folding.api.tc.exception.TeamNotFoundException;
 import me.zodac.folding.api.tc.exception.UserNotFoundException;
@@ -148,6 +149,9 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
             return serverError();
         } catch (final FoldingConflictException e) {
             getLogger().error("Error updating team with ID: {}", teamId, e);
+            return serverError();
+        } catch (final NoStatsAvailableException e) {
+            getLogger().error("No stats returned for user to retire with ID {}, possible invalid ID?", userId, e);
             return serverError();
         } catch (final Exception e) {
             getLogger().error("Unexpected error updating team with ID: {}", teamId, e);

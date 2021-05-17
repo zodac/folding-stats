@@ -12,6 +12,7 @@ import me.zodac.folding.api.tc.OperatingSystem;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.exception.HardwareNotFoundException;
+import me.zodac.folding.api.tc.exception.NoStatsAvailableException;
 import me.zodac.folding.api.tc.exception.NotFoundException;
 import me.zodac.folding.api.tc.exception.TeamNotFoundException;
 import me.zodac.folding.api.tc.exception.UserNotFoundException;
@@ -274,7 +275,10 @@ public class StorageFacade {
         try {
             return getTcStatsForUser(updatedUser.getId());
         } catch (final UserNotFoundException e) {
-            LOGGER.debug("Unable to find user with ID: {}, using 0 values", e.getId(), e);
+            LOGGER.debug("Unable to find {} with ID: {}, using 0 values", e.getType(), e.getId(), e);
+            return UserTcStats.empty(updatedUser.getId());
+        } catch (final NoStatsAvailableException e) {
+            LOGGER.debug("No stats found for user with ID: {}, using 0 values", updatedUser.getId(), e);
             return UserTcStats.empty(updatedUser.getId());
         }
     }
@@ -354,7 +358,7 @@ public class StorageFacade {
         return retiredUserTcStatsFromDb;
     }
 
-    public Team retireUser(final int teamId, final int userId) throws FoldingConflictException, UserNotFoundException, FoldingException, TeamNotFoundException {
+    public Team retireUser(final int teamId, final int userId) throws FoldingConflictException, UserNotFoundException, FoldingException, TeamNotFoundException, NoStatsAvailableException {
         final User retiredUser = User.retireUser(getUser(userId));
         dbManager.updateUser(retiredUser);
         userCache.add(retiredUser);
@@ -445,7 +449,7 @@ public class StorageFacade {
         tcStatsCache.add(userTcStats.getUserId(), userTcStats);
     }
 
-    public UserTcStats getTcStatsForUser(final int userId) throws UserNotFoundException, FoldingException {
+    public UserTcStats getTcStatsForUser(final int userId) throws UserNotFoundException, FoldingException, NoStatsAvailableException {
         final Optional<UserTcStats> optionalUserTcStats = tcStatsCache.get(userId);
 
         if (optionalUserTcStats.isPresent()) {
@@ -460,12 +464,34 @@ public class StorageFacade {
         return userTcStatsFromDb;
     }
 
+    public Collection<HistoricStats> getHistoricStatsHourly(final int userId, final int day, final Month month, final Year year) throws FoldingException, UserNotFoundException {
+        try {
+            return dbManager.getHistoricStatsHourly(userId, day, month, year);
+        } catch (final NoStatsAvailableException e) {
+            LOGGER.debug("No stats retrieved for user with ID {} on {}/{}/{}, returning empty", userId, year.getValue(), month.getValue(), day, e);
+            LOGGER.warn("No stats retrieved for user with ID {} on {}/{}/{}, returning empty", userId, year.getValue(), month.getValue(), day);
+            return Collections.emptyList();
+        }
+    }
+
     public Collection<HistoricStats> getHistoricStatsDaily(final int userId, final Month month, final Year year) throws FoldingException, UserNotFoundException {
-        return dbManager.getHistoricStatsDaily(userId, month, year);
+        try {
+            return dbManager.getHistoricStatsDaily(userId, month, year);
+        } catch (final NoStatsAvailableException e) {
+            LOGGER.debug("No stats retrieved for user with ID {} on {}/{}, returning empty", userId, year.getValue(), month.getValue(), e);
+            LOGGER.warn("No stats retrieved for user with ID {} on {}/{}, returning empty", userId, year.getValue(), month.getValue());
+            return Collections.emptyList();
+        }
     }
 
     public Collection<HistoricStats> getHistoricStatsMonthly(final int userId, final Year year) throws FoldingException, UserNotFoundException {
-        return dbManager.getHistoricStatsMonthly(userId, year);
+        try {
+            return dbManager.getHistoricStatsMonthly(userId, year);
+        } catch (final NoStatsAvailableException e) {
+            LOGGER.debug("No stats retrieved for user with ID {} on {}, returning empty", userId, year.getValue(), e);
+            LOGGER.warn("No stats retrieved for user with ID {} on {}, returning empty", userId, year.getValue());
+            return Collections.emptyList();
+        }
     }
 
     public void addOffsetStats(final int userId, final OffsetStats offsetStats) throws FoldingException {

@@ -10,6 +10,7 @@ import me.zodac.folding.api.tc.OperatingSystem;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.exception.HardwareNotFoundException;
+import me.zodac.folding.api.tc.exception.NoStatsAvailableException;
 import me.zodac.folding.api.tc.exception.TeamNotFoundException;
 import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.stats.OffsetStats;
@@ -436,7 +437,7 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public UserTcStats getHourlyTcStats(final int userId) throws FoldingException, UserNotFoundException {
+    public UserTcStats getHourlyTcStats(final int userId) throws FoldingException, NoStatsAvailableException {
         LOGGER.debug("Getting current TC stats for user {}", userId);
         final String preparedSelectSqlStatement = "SELECT utc_timestamp, tc_points, tc_points_multiplied, tc_units " +
                 "FROM user_tc_stats_hourly " +
@@ -457,7 +458,7 @@ public class PostgresDbManager implements DbManager {
             } catch (final SQLException e) {
                 LOGGER.warn("Unable to get TC stats for user: {}", userId, e);
             }
-            throw new UserNotFoundException(userId);
+            throw new NoStatsAvailableException("Unable to find TC stats for user with ID: " + userId);
         } catch (final SQLException e) {
             throw new FoldingException("Error opening connection to the DB", e);
         }
@@ -485,7 +486,202 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public List<HistoricStats> getHistoricStatsDaily(final int userId, final Month month, final Year year) throws FoldingException, UserNotFoundException {
+    public Collection<HistoricStats> getHistoricStatsHourly(final int userId, final int day, final Month month, final Year year) throws FoldingException, NoStatsAvailableException {
+        LOGGER.debug("Getting historic hourly user TC stats for {}/{}/{} for user {}", year, DateTimeUtils.formatMonth(month), day, userId);
+
+        final String selectSqlStatement = "SELECT MAX(utc_timestamp) AS hourly_timestamp, " +
+                "COALESCE(MAX(tc_points) - LAG(MAX(tc_points)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points, " +
+                "COALESCE(MAX(tc_points_multiplied) - LAG(MAX(tc_points_multiplied)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points_multiplied, " +
+                "COALESCE(MAX(tc_units) - LAG(MAX(tc_units)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_units " +
+                "FROM user_tc_stats_hourly " +
+                "WHERE utc_timestamp BETWEEN ? AND ? " +
+                "AND user_id = ? " +
+                "GROUP BY EXTRACT(HOUR FROM utc_timestamp) " +
+                "ORDER BY EXTRACT(HOUR FROM utc_timestamp) ASC";
+
+        try (final Connection connection = dbConnectionPool.getConnection();
+             final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
+
+            preparedStatement.setTimestamp(1, DateTimeUtils.getTimestampOf(year, month, day, 0, 0, 0));
+            preparedStatement.setTimestamp(2, DateTimeUtils.getTimestampOf(year, month, day, 23, 59, 59));
+            preparedStatement.setInt(3, userId);
+
+            LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
+            try (final ResultSet resultSet = preparedStatement.executeQuery()) {
+
+                final List<HistoricStats> userStats = new ArrayList<>();
+
+                // First entry will be zeroed, so we need to manually get the first hour's stats for the user
+                if (resultSet.next()) {
+                    final UserTcStats userTcStats = getTcStatsForFirstHourOfDay(userId, day, month, year);
+
+                    userStats.add(
+                            HistoricStats.create(
+                                    resultSet.getTimestamp("hourly_timestamp").toLocalDateTime(),
+                                    userTcStats.getPoints(),
+                                    userTcStats.getMultipliedPoints(),
+                                    userTcStats.getUnits()
+                            )
+                    );
+                }
+
+                // All remaining entries will be diff-ed from the previous entry
+                while (resultSet.next()) {
+                    userStats.add(
+                            HistoricStats.create(
+                                    resultSet.getTimestamp("hourly_timestamp").toLocalDateTime(),
+                                    resultSet.getLong("diff_points"),
+                                    resultSet.getLong("diff_points_multiplied"),
+                                    resultSet.getInt("diff_units")
+                            )
+                    );
+                }
+
+                if (userStats.isEmpty()) {
+                    throw new NoStatsAvailableException(String.format("No hourly TC historic stats found for user with ID %s on %s/%s/%s", userId, year.getValue(), month.getValue(), day));
+                }
+
+                return userStats;
+            }
+        } catch (final FoldingException e) {
+            LOGGER.warn("Unable to get the stats for the first hour of {}/{}/{} for user {}", year, DateTimeUtils.formatMonth(month), day, userId);
+            throw e;
+        } catch (final SQLException e) {
+            throw new FoldingException("Error opening connection to the DB", e);
+        }
+    }
+
+    private UserTcStats getCurrentDayFirstHourTcStats(final int userId, final int day, final Month month, final Year year) throws FoldingException {
+        LOGGER.debug("Getting current day's first hour TC stats for user {} on {}/{}/{}", userId, year.getValue(), month.getValue(), day);
+        final String preparedSelectSqlStatement = "SELECT MAX(utc_timestamp) AS hourly_timestamp, " +
+                "MAX(tc_points) AS tc_points, " +
+                "MAX(tc_points_multiplied) AS tc_points_multiplied, " +
+                "MAX(tc_units) AS tc_units " +
+                "FROM user_tc_stats_hourly " +
+                "WHERE utc_timestamp BETWEEN ? AND ? " +
+                "AND user_id = ? " +
+                "GROUP BY EXTRACT(HOUR FROM utc_timestamp) " +
+                "ORDER BY EXTRACT(HOUR FROM utc_timestamp) ASC " +
+                "LIMIT 1;";
+
+        try (final Connection connection = dbConnectionPool.getConnection();
+             final PreparedStatement preparedStatement = connection.prepareStatement(preparedSelectSqlStatement)) {
+
+            preparedStatement.setTimestamp(1, DateTimeUtils.getTimestampOf(year, month, day, 0, 0, 0));
+            preparedStatement.setTimestamp(2, DateTimeUtils.getTimestampOf(year, month, day, 0, 59, 59));
+            preparedStatement.setInt(3, userId);
+
+            LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
+            try (final ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return UserTcStats.create(userId,
+                            resultSet.getTimestamp("hourly_timestamp"),
+                            resultSet.getLong("tc_points"),
+                            resultSet.getLong("tc_points_multiplied"),
+                            resultSet.getInt("tc_units")
+                    );
+                }
+                LOGGER.warn("Unable to get current day first hour historic stats for user with ID {}, returning empty", userId);
+                return UserTcStats.empty(userId);
+            } catch (final SQLException e) {
+                LOGGER.warn("Unable to get TC stats for user with ID: {}", userId, e);
+                throw new FoldingException("Error getting TC stats for user ID: " + userId, e);
+            }
+        } catch (final SQLException e) {
+            throw new FoldingException("Error opening connection to the DB", e);
+        }
+    }
+
+    private UserTcStats getPreviousDayLastHourTcStats(final int userId, final int day, final Month month, final Year year) throws FoldingException {
+        LOGGER.debug("Getting previous day's first hour TC stats for user {} on {}/{}/{}", userId, year.getValue(), month.getValue(), day);
+        final String preparedSelectSqlStatement = "SELECT MAX(utc_timestamp) AS hourly_timestamp, " +
+                "MAX(tc_points) AS tc_points, " +
+                "MAX(tc_points_multiplied) AS tc_points_multiplied, " +
+                "MAX(tc_units) AS tc_units " +
+                "FROM user_tc_stats_hourly " +
+                "WHERE utc_timestamp BETWEEN ? AND ? " +
+                "AND user_id = ? " +
+                "GROUP BY EXTRACT(HOUR FROM utc_timestamp) " +
+                "ORDER BY EXTRACT(HOUR FROM utc_timestamp) DESC " +
+                "LIMIT 1;";
+
+        try (final Connection connection = dbConnectionPool.getConnection();
+             final PreparedStatement preparedStatement = connection.prepareStatement(preparedSelectSqlStatement)) {
+
+            preparedStatement.setTimestamp(1, DateTimeUtils.getTimestampOf(year, month, day, 23, 0, 0));
+            preparedStatement.setTimestamp(2, DateTimeUtils.getTimestampOf(year, month, day, 23, 59, 59));
+            preparedStatement.setInt(3, userId);
+
+            LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
+            try (final ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return UserTcStats.create(userId,
+                            resultSet.getTimestamp("hourly_timestamp"),
+                            resultSet.getLong("tc_points"),
+                            resultSet.getLong("tc_points_multiplied"),
+                            resultSet.getInt("tc_units")
+                    );
+                }
+
+                LOGGER.warn("Unable to get previous day first hour historic stats for user with ID {}, returning empty", userId);
+                return UserTcStats.empty(userId);
+            } catch (final SQLException e) {
+                LOGGER.warn("Unable to get historic stats for user with ID: {}", userId, e);
+                throw new FoldingException("Error getting historic stats for user ID: " + userId, e);
+            }
+        } catch (final SQLException e) {
+            throw new FoldingException("Error opening connection to the DB", e);
+        }
+    }
+
+
+    private UserTcStats getTcStatsForFirstHourOfDay(final int userId, final int day, final Month month, final Year year) throws FoldingException {
+        final UserTcStats firstHourTcStatsCurrentDay = getCurrentDayFirstHourTcStats(userId, day, month, year);
+        final UserTcStats lastHourTcStatsPreviousDay = (day == 1) ? UserTcStats.empty(userId) : getPreviousDayLastHourTcStats(userId, (day - 1), month, year);
+
+        if (lastHourTcStatsPreviousDay.isEmpty()) {
+
+            if (firstHourTcStatsCurrentDay.isEmpty()) {
+                return UserTcStats.empty(userId);
+            }
+
+
+            // If no stats in previous day (meaning we are getting historic stats for the first day available), we need to remove the initial points from the current day's points
+            final UserStats initialStats = getInitialStats(userId);
+            LOGGER.debug("Removing initial stats from current day's first hour stats: {} - {}", firstHourTcStatsCurrentDay, initialStats);
+
+            try {
+                // Since we didn't get any previous day's stats, we don't need to worry about the hardware multiplier having been changed
+                // As a result, we will get the user's current hardware and use that multiplier
+                final User user = getUser(userId);
+                final Hardware hardware = getHardware(user.getHardwareId());
+                final double hardwareMultiplier = hardware.getMultiplier();
+
+                return UserTcStats.create(
+                        firstHourTcStatsCurrentDay.getUserId(),
+                        firstHourTcStatsCurrentDay.getTimestamp(),
+                        Math.max(0, firstHourTcStatsCurrentDay.getPoints() - initialStats.getPoints()),
+                        Math.max(0, firstHourTcStatsCurrentDay.getMultipliedPoints() - Math.round(hardwareMultiplier * initialStats.getPoints())),
+                        Math.max(0, firstHourTcStatsCurrentDay.getUnits() - initialStats.getUnits())
+                );
+            } catch (final UserNotFoundException | HardwareNotFoundException e) {
+                throw new FoldingException("Unable to find hardware or user to calculate hardware multiplier for initial stats", e);
+            }
+        }
+
+        LOGGER.debug("Removing previous day's last hour stats from current day's first hour stats: {} - {}", firstHourTcStatsCurrentDay, lastHourTcStatsPreviousDay);
+        return UserTcStats.create(
+                firstHourTcStatsCurrentDay.getUserId(),
+                firstHourTcStatsCurrentDay.getTimestamp(),
+                Math.max(0, firstHourTcStatsCurrentDay.getPoints() - lastHourTcStatsPreviousDay.getPoints()),
+                Math.max(0, firstHourTcStatsCurrentDay.getMultipliedPoints() - lastHourTcStatsPreviousDay.getMultipliedPoints()),
+                Math.max(0, firstHourTcStatsCurrentDay.getUnits() - lastHourTcStatsPreviousDay.getUnits())
+        );
+    }
+
+
+    @Override
+    public List<HistoricStats> getHistoricStatsDaily(final int userId, final Month month, final Year year) throws FoldingException, NoStatsAvailableException {
         LOGGER.debug("Getting historic daily user TC stats for {}/{} for user {}", DateTimeUtils.formatMonth(month), year, userId);
 
         final String selectSqlStatement = "SELECT utc_timestamp::DATE AS daily_timestamp, " +
@@ -514,16 +710,20 @@ public class PostgresDbManager implements DbManager {
                 // First entry will be zeroed, so we need to manually get the first day's stats for the user
                 if (resultSet.next()) {
                     final LocalDateTime localDateTime = resultSet.getTimestamp("daily_timestamp").toLocalDateTime();
-                    final UserTcStats userTcStats = getTcStatsForDay(localDateTime, userId);
+                    final UserTcStats userTcStats = getTcStatsForFirstDayOfMonth(localDateTime, userId);
 
-                    userStats.add(
-                            HistoricStats.create(
-                                    localDateTime,
-                                    userTcStats.getPoints(),
-                                    userTcStats.getMultipliedPoints(),
-                                    userTcStats.getUnits()
-                            )
-                    );
+                    if (userTcStats.isEmpty()) {
+                        LOGGER.warn("Error getting historic stats for first day of {} for user with ID {}", DateTimeUtils.formatMonth(month), userId);
+                    } else {
+                        userStats.add(
+                                HistoricStats.create(
+                                        localDateTime,
+                                        userTcStats.getPoints(),
+                                        userTcStats.getMultipliedPoints(),
+                                        userTcStats.getUnits()
+                                )
+                        );
+                    }
                 }
 
                 // All remaining entries will be diff-ed from the previous entry
@@ -539,12 +739,12 @@ public class PostgresDbManager implements DbManager {
                 }
 
                 if (userStats.isEmpty()) {
-                    throw new UserNotFoundException(userId);
+                    throw new NoStatsAvailableException("Unable to find historic daily stats for user with ID: " + userId);
                 }
 
                 return userStats;
             }
-        } catch (final FoldingException | UserNotFoundException e) {
+        } catch (final FoldingException e) {
             LOGGER.warn("Unable to get the stats for the first day of {}/{} for user {}", DateTimeUtils.formatMonth(month), year, userId);
             throw e;
         } catch (final SQLException e) {
@@ -553,10 +753,10 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public List<HistoricStats> getHistoricStatsMonthly(final int userId, final Year year) throws FoldingException, UserNotFoundException {
+    public List<HistoricStats> getHistoricStatsMonthly(final int userId, final Year year) throws FoldingException, NoStatsAvailableException {
         LOGGER.debug("Getting historic monthly user TC stats for {} for user {}", year, userId);
 
-        final String selectSqlStatement = "SELECT MAX(utc_timestamp) AS month_timestamp, " +
+        final String selectSqlStatement = "SELECT MAX(utc_timestamp) AS monthly_timestamp, " +
                 "MAX(tc_points) AS diff_points, " +
                 "MAX(tc_points_multiplied) AS diff_points_multiplied, " +
                 "MAX(tc_units) AS diff_units " +
@@ -580,7 +780,7 @@ public class PostgresDbManager implements DbManager {
                 while (resultSet.next()) {
                     userStats.add(
                             HistoricStats.create(
-                                    resultSet.getTimestamp("month_timestamp").toLocalDateTime(),
+                                    resultSet.getTimestamp("monthly_timestamp").toLocalDateTime(),
                                     resultSet.getLong("diff_points"),
                                     resultSet.getLong("diff_points_multiplied"),
                                     resultSet.getInt("diff_units")
@@ -589,7 +789,7 @@ public class PostgresDbManager implements DbManager {
                 }
 
                 if (userStats.isEmpty()) {
-                    throw new UserNotFoundException(userId);
+                    throw new NoStatsAvailableException("Unable to find historic monthly stats for user with ID: " + userId);
                 }
 
                 return userStats;
@@ -599,7 +799,7 @@ public class PostgresDbManager implements DbManager {
         }
     }
 
-    private UserTcStats getTcStatsForDay(final LocalDateTime localDateTime, final int userId) throws UserNotFoundException, FoldingException {
+    private UserTcStats getTcStatsForFirstDayOfMonth(final LocalDateTime localDateTime, final int userId) throws FoldingException {
         LOGGER.debug("Getting TC stats for user {} on {}", userId, localDateTime);
         final String preparedSelectSqlStatement = "SELECT utc_timestamp, tc_points, tc_points_multiplied, tc_units " +
                 "FROM user_tc_stats_hourly " +
@@ -622,11 +822,13 @@ public class PostgresDbManager implements DbManager {
             try (final ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     return UserTcStats.create(userId, resultSet.getTimestamp("utc_timestamp"), resultSet.getLong("tc_points"), resultSet.getLong("tc_points_multiplied"), resultSet.getInt("tc_units"));
+                } else {
+                    LOGGER.debug("No stats for user on {}, returning empty", localDateTime);
                 }
             } catch (final SQLException e) {
                 LOGGER.warn("Unable to get TC stats for user: {}", userId, e);
             }
-            throw new UserNotFoundException(userId);
+            return UserTcStats.empty(userId);
         } catch (final SQLException e) {
             throw new FoldingException("Error opening connection to the DB", e);
         }

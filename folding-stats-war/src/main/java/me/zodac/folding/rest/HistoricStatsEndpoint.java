@@ -4,7 +4,8 @@ import me.zodac.folding.StorageFacade;
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.tc.Team;
-import me.zodac.folding.api.tc.exception.NotFoundException;
+import me.zodac.folding.api.tc.exception.TeamNotFoundException;
+import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,7 @@ import javax.ws.rs.core.UriInfo;
 import java.time.DateTimeException;
 import java.time.Month;
 import java.time.Year;
+import java.time.YearMonth;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,11 +35,11 @@ import java.util.concurrent.TimeUnit;
 
 import static me.zodac.folding.rest.response.Responses.badRequest;
 import static me.zodac.folding.rest.response.Responses.notFound;
-import static me.zodac.folding.rest.response.Responses.notImplemented;
 import static me.zodac.folding.rest.response.Responses.okBuilder;
 import static me.zodac.folding.rest.response.Responses.serverError;
 import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
 
+// TODO: [zodac] Verify that all places that return a HTTP response also log something
 @Path("/historic/")
 @RequestScoped
 public class HistoricStatsEndpoint {
@@ -56,15 +58,69 @@ public class HistoricStatsEndpoint {
     @GET
     @Path("/users/{userId}/{year}/{month}/{day}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getUserHistoricStatsHourly(@PathParam("userId") final String userId) {
-        LOGGER.info("GET request received to show hourly TC user stats at '{}'", uriContext.getAbsolutePath());
+    public Response getUserHistoricStatsHourly(@PathParam("userId") final String userId, @PathParam("year") final String year, @PathParam("month") final String month, @PathParam("day") final String day, @Context final Request request) {
+        LOGGER.debug("GET request received to show hourly TC user stats at '{}'", uriContext.getAbsolutePath());
 
         if (SystemStateManager.current().isReadBlocked()) {
             LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
             return serviceUnavailable();
         }
 
-        return notImplemented();
+        try {
+            final int dayAsInt = Integer.parseInt(day);
+            final int monthAsInt = Integer.parseInt(month);
+            final int yearAsInt = Year.parse(year).getValue();
+            storageFacade.getUser(Integer.parseInt(userId)); // Check if user exists first, catch UserNotFoundException early
+
+            final YearMonth date = YearMonth.of(yearAsInt, monthAsInt);
+            if (!date.isValidDay(dayAsInt)) {
+                final String errorMessage = String.format("The day '%s' is not a valid day for %s/%s", day, year, month);
+                LOGGER.error(errorMessage);
+                return badRequest(errorMessage);
+            }
+
+            final Collection<HistoricStats> hourlyStats = storageFacade.getHistoricStatsHourly(Integer.parseInt(userId), Integer.parseInt(day), Month.of(Integer.parseInt(month)), Year.parse(year));
+
+            final CacheControl cacheControl = new CacheControl();
+            cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);
+
+            final EntityTag entityTag = new EntityTag(String.valueOf(hourlyStats.stream().mapToInt(HistoricStats::hashCode).sum()));
+            Response.ResponseBuilder builder = request.evaluatePreconditions(entityTag);
+
+            if (builder == null) {
+                LOGGER.debug("Cached resources have changed");
+                builder = okBuilder(hourlyStats);
+                builder.tag(entityTag);
+            }
+
+            builder.cacheControl(cacheControl);
+            return builder.build();
+        } catch (final DateTimeParseException e) {
+            final String errorMessage = String.format("The year '%s' is not a valid format", year);
+            LOGGER.debug(errorMessage, e);
+            LOGGER.error(errorMessage);
+            return badRequest(errorMessage);
+        } catch (final DateTimeException e) {
+            final String errorMessage = String.format("The month '%s' is not a valid format", month);
+            LOGGER.debug(errorMessage, e);
+            LOGGER.error(errorMessage);
+            return badRequest(errorMessage);
+        } catch (final NumberFormatException e) {
+            final String errorMessage = String.format("The user ID '%s', month '%s' or day '%s' is not a valid format", userId, month, day);
+            LOGGER.debug(errorMessage, e);
+            LOGGER.error(errorMessage);
+            return badRequest(errorMessage);
+        } catch (final UserNotFoundException e) {
+            LOGGER.debug("No {} found with ID: {}", e.getType(), e.getId(), e);
+            LOGGER.error("No {} found with ID: {}", e.getType(), e.getId());
+            return notFound();
+        } catch (final FoldingException e) {
+            LOGGER.error("Error getting user with ID: {}", userId, e.getCause());
+            return serverError();
+        } catch (final Exception e) {
+            LOGGER.error("Unexpected error getting user with ID: {}", userId, e);
+            return serverError();
+        }
     }
 
     @GET
@@ -79,6 +135,7 @@ public class HistoricStatsEndpoint {
         }
 
         try {
+            storageFacade.getUser(Integer.parseInt(userId)); // Check if user exists first, catch UserNotFoundException early
             final Collection<HistoricStats> dailyStats = storageFacade.getHistoricStatsDaily(Integer.parseInt(userId), Month.of(Integer.parseInt(month)), Year.parse(year));
 
             final CacheControl cacheControl = new CacheControl();
@@ -110,9 +167,9 @@ public class HistoricStatsEndpoint {
             LOGGER.debug(errorMessage, e);
             LOGGER.error(errorMessage);
             return badRequest(errorMessage);
-        } catch (final NotFoundException e) {
-            LOGGER.debug("No user found with ID: {}", userId, e);
-            LOGGER.error("No user found with ID: {}", userId);
+        } catch (final UserNotFoundException e) {
+            LOGGER.debug("No {} found with ID: {}", e.getType(), e.getId(), e);
+            LOGGER.error("No {} found with ID: {}", e.getType(), e.getId());
             return notFound();
         } catch (final FoldingException e) {
             LOGGER.error("Error getting user with ID: {}", userId, e.getCause());
@@ -135,6 +192,7 @@ public class HistoricStatsEndpoint {
         }
 
         try {
+            storageFacade.getUser(Integer.parseInt(userId)); // Check if user exists first, catch UserNotFoundException early
             final Collection<HistoricStats> monthlyStats = storageFacade.getHistoricStatsMonthly(Integer.parseInt(userId), Year.parse(year));
 
             final CacheControl cacheControl = new CacheControl();
@@ -161,7 +219,7 @@ public class HistoricStatsEndpoint {
             LOGGER.debug(errorMessage, e);
             LOGGER.error(errorMessage);
             return badRequest(errorMessage);
-        } catch (final NotFoundException e) {
+        } catch (final UserNotFoundException e) {
             LOGGER.debug("No {} found with ID: {}", e.getType(), e.getId(), e);
             LOGGER.error("No {} found with ID: {}", e.getType(), e.getId());
             return notFound();
@@ -177,15 +235,79 @@ public class HistoricStatsEndpoint {
     @GET
     @Path("/teams/{teamId}/{year}/{month}/{day}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getTeamHistoricStatsHourly(@PathParam("teamId") final String teamId) {
-        LOGGER.debug("GET request received to show hourly TC team stats at '{}'", uriContext.getAbsolutePath());
+    public Response getTeamHistoricStatsHourly(@PathParam("teamId") final String teamId, @PathParam("year") final String year, @PathParam("month") final String month, @PathParam("day") final String day, @Context final Request request) {
+        LOGGER.debug("GET request received to show hourly TC user stats at '{}'", uriContext.getAbsolutePath());
 
         if (SystemStateManager.current().isReadBlocked()) {
             LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
             return serviceUnavailable();
         }
 
-        return notImplemented();
+        try {
+            final int dayAsInt = Integer.parseInt(day);
+            final int monthAsInt = Integer.parseInt(month);
+            final int yearAsInt = Year.parse(year).getValue();
+
+
+            final YearMonth date = YearMonth.of(yearAsInt, monthAsInt);
+            if (!date.isValidDay(dayAsInt)) {
+                final String errorMessage = String.format("The day '%s' is not a valid day for %s/%s", day, year, month);
+                LOGGER.error(errorMessage);
+                return badRequest(errorMessage);
+            }
+
+            final Team team = storageFacade.getTeam(Integer.parseInt(teamId));
+            final List<HistoricStats> teamHourlyStats = new ArrayList<>();
+
+            for (final Integer userId : team.getUserIds()) {
+                LOGGER.debug("Getting historic stats for user with ID: {}", userId);
+                storageFacade.getUser(userId); // Check if user exists first, catch UserNotFoundException early
+                final Collection<HistoricStats> dailyStats = storageFacade.getHistoricStatsHourly(userId, Integer.parseInt(day), Month.of(Integer.parseInt(month)), Year.parse(year));
+                teamHourlyStats.addAll(dailyStats);
+            }
+
+            final Collection<HistoricStats> combinedTeamHourlyStats = HistoricStats.combine(teamHourlyStats);
+
+            final CacheControl cacheControl = new CacheControl();
+            cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);
+
+            final EntityTag entityTag = new EntityTag(String.valueOf(combinedTeamHourlyStats.stream().mapToInt(HistoricStats::hashCode).sum()));
+            Response.ResponseBuilder builder = request.evaluatePreconditions(entityTag);
+
+            if (builder == null) {
+                LOGGER.debug("Cached resources have changed");
+                builder = okBuilder(combinedTeamHourlyStats);
+                builder.tag(entityTag);
+            }
+
+            builder.cacheControl(cacheControl);
+            return builder.build();
+        } catch (final DateTimeParseException e) {
+            final String errorMessage = String.format("The year '%s' is not a valid format", year);
+            LOGGER.debug(errorMessage, e);
+            LOGGER.error(errorMessage);
+            return badRequest(errorMessage);
+        } catch (final DateTimeException e) {
+            final String errorMessage = String.format("The month '%s' is not a valid format", month);
+            LOGGER.debug(errorMessage, e);
+            LOGGER.error(errorMessage);
+            return badRequest(errorMessage);
+        } catch (final NumberFormatException e) {
+            final String errorMessage = String.format("The team ID '%s', month '%s' or day '%s' is not a valid format", teamId, month, day);
+            LOGGER.debug(errorMessage, e);
+            LOGGER.error(errorMessage);
+            return badRequest(errorMessage);
+        } catch (final UserNotFoundException e) {
+            LOGGER.debug("No {} found with ID: {}", e.getType(), e.getId(), e);
+            LOGGER.error("No {} found with ID: {}", e.getType(), e.getId());
+            return notFound();
+        } catch (final FoldingException e) {
+            LOGGER.error("Error getting team with ID: {}", teamId, e.getCause());
+            return serverError();
+        } catch (final Exception e) {
+            LOGGER.error("Unexpected error getting user with ID: {}", teamId, e);
+            return serverError();
+        }
     }
 
     @GET
@@ -204,6 +326,8 @@ public class HistoricStatsEndpoint {
             final List<HistoricStats> teamDailyStats = new ArrayList<>();
 
             for (final Integer userId : team.getUserIds()) {
+                LOGGER.debug("Getting historic stats for user with ID: {}", userId);
+                storageFacade.getUser(userId); // Check if user exists first, catch UserNotFoundException early
                 final Collection<HistoricStats> dailyStats = storageFacade.getHistoricStatsDaily(userId, Month.of(Integer.parseInt(month)), Year.parse(year));
                 teamDailyStats.addAll(dailyStats);
             }
@@ -239,7 +363,7 @@ public class HistoricStatsEndpoint {
             LOGGER.debug(errorMessage, e);
             LOGGER.error(errorMessage);
             return badRequest(errorMessage);
-        } catch (final NotFoundException e) {
+        } catch (final TeamNotFoundException e) {
             LOGGER.debug("No {} found with ID: {}", e.getType(), e.getId(), e);
             LOGGER.error("No {} found with ID: {}", e.getType(), e.getId());
             return notFound();
@@ -268,6 +392,8 @@ public class HistoricStatsEndpoint {
             final List<HistoricStats> teamMonthlyStats = new ArrayList<>();
 
             for (final Integer userId : team.getUserIds()) {
+                LOGGER.debug("Getting historic stats for user with ID: {}", userId);
+                storageFacade.getUser(userId); // Check if user exists first, catch UserNotFoundException early
                 final Collection<HistoricStats> monthlyStats = storageFacade.getHistoricStatsMonthly(userId, Year.parse(year));
                 teamMonthlyStats.addAll(monthlyStats);
             }
@@ -297,7 +423,7 @@ public class HistoricStatsEndpoint {
             LOGGER.debug(errorMessage, e);
             LOGGER.error(errorMessage);
             return badRequest(errorMessage);
-        } catch (final NotFoundException e) {
+        } catch (final TeamNotFoundException e) {
             LOGGER.debug("No {} found with ID: {}", e.getType(), e.getId(), e);
             LOGGER.error("No {} found with ID: {}", e.getType(), e.getId());
             return notFound();

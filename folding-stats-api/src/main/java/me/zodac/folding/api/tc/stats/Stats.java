@@ -11,7 +11,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString(doNotUseGetters = true)
 public class Stats {
-
+    
     private final long points;
     private final int units;
 

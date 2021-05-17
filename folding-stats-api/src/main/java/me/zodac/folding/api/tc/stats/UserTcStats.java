@@ -44,4 +44,8 @@ public class UserTcStats {
 
         return new UserTcStats(tcStatsForUser.getUserId(), tcStatsForUser.getTimestamp(), offsetPoints, offsetMultipliedPoints, offsetUnits);
     }
+
+    public boolean isEmpty() {
+        return points == DEFAULT_POINTS && multipliedPoints == DEFAULT_MULTIPLIED_POINTS && units == DEFAULT_UNITS;
+    }
 }

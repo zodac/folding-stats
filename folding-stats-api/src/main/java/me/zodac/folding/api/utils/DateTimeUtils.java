@@ -2,6 +2,7 @@ package me.zodac.folding.api.utils;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.OffsetDateTime;
 import java.time.Year;
@@ -51,11 +52,25 @@ public class DateTimeUtils {
         return monthAsString.substring(0, 1).toUpperCase(Locale.UK) + monthAsString.substring(1).toLowerCase(Locale.UK);
     }
 
+    /**
+     * Get the {@link Timestamp} in {@link ZoneOffset#UTC} for the given values
+     *
+     * @param year   the {@link Year}
+     * @param month  the {@link Month}
+     * @param day    the day of the {@link Month}
+     * @param hour   the hour
+     * @param minute the minute
+     * @param second the second
+     * @return the {@link ZoneOffset#UTC} {@link Timestamp}
+     */
+    public static Timestamp getTimestampOf(final Year year, final Month month, final int day, final int hour, final int minute, final int second) {
+        return new Timestamp(LocalDateTime.of(year.getValue(), month.getValue(), day, hour, minute, second).toInstant(ZoneOffset.UTC).toEpochMilli());
+    }
 
     /**
      * Get the current {@link Timestamp} in {@link ZoneOffset#UTC}.
      *
-     * @return the current {@link ZoneOffset#UTC} {@link Month}
+     * @return the current {@link ZoneOffset#UTC} {@link Timestamp}
      */
     public static Timestamp currentUtcTimestamp() {
         return new Timestamp(currentUtcDateTime().toInstant().toEpochMilli());
