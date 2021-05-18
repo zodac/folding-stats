@@ -115,6 +115,7 @@
                                 <jsSourceFile>historic-user-hourly.js</jsSourceFile>
                                 <!-- Util files -->
                                 <jsSourceFile>util/display_toggle.js</jsSourceFile>
+                                <jsSourceFile>util/dropdown_populator.js</jsSourceFile>
                                 <jsSourceFile>util/ordinal_suffix.js</jsSourceFile>
                                 <jsSourceFile>util/padding.js</jsSourceFile>
                                 <jsSourceFile>util/table_sort.js</jsSourceFile>
@@ -144,6 +145,7 @@
                                 <jsSourceFile>historic-user-daily.js</jsSourceFile>
                                 <!-- Util files -->
                                 <jsSourceFile>util/display_toggle.js</jsSourceFile>
+                                <jsSourceFile>util/dropdown_populator.js</jsSourceFile>
                                 <jsSourceFile>util/ordinal_suffix.js</jsSourceFile>
                                 <jsSourceFile>util/table_sort.js</jsSourceFile>
                                 <jsSourceFile>util/timer.js</jsSourceFile>
@@ -172,6 +174,7 @@
                                 <jsSourceFile>historic-user-monthly.js</jsSourceFile>
                                 <!-- Util files -->
                                 <jsSourceFile>util/display_toggle.js</jsSourceFile>
+                                <jsSourceFile>util/dropdown_populator.js</jsSourceFile>
                                 <jsSourceFile>util/table_sort.js</jsSourceFile>
                                 <jsSourceFile>util/timer.js</jsSourceFile>
                             </jsSourceFiles>
@@ -199,6 +202,7 @@
                                 <jsSourceFile>historic-team-hourly.js</jsSourceFile>
                                 <!-- Util files -->
                                 <jsSourceFile>util/display_toggle.js</jsSourceFile>
+                                <jsSourceFile>util/dropdown_populator.js</jsSourceFile>
                                 <jsSourceFile>util/ordinal_suffix.js</jsSourceFile>
                                 <jsSourceFile>util/padding.js</jsSourceFile>
                                 <jsSourceFile>util/table_sort.js</jsSourceFile>
@@ -228,6 +232,7 @@
                                 <jsSourceFile>historic-team-daily.js</jsSourceFile>
                                 <!-- Util files -->
                                 <jsSourceFile>util/display_toggle.js</jsSourceFile>
+                                <jsSourceFile>util/dropdown_populator.js</jsSourceFile>
                                 <jsSourceFile>util/ordinal_suffix.js</jsSourceFile>
                                 <jsSourceFile>util/table_sort.js</jsSourceFile>
                                 <jsSourceFile>util/timer.js</jsSourceFile>
@@ -256,6 +261,7 @@
                                 <jsSourceFile>historic-team-monthly.js</jsSourceFile>
                                 <!-- Util files -->
                                 <jsSourceFile>util/display_toggle.js</jsSourceFile>
+                                <jsSourceFile>util/dropdown_populator.js</jsSourceFile>
                                 <jsSourceFile>util/table_sort.js</jsSourceFile>
                                 <jsSourceFile>util/timer.js</jsSourceFile>
                             </jsSourceFiles>

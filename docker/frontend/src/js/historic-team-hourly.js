@@ -1,58 +1,65 @@
 const ROOT_URL='http://internal.axihub.ca/folding';
 
-function populateTeamDropdown() {
-    var dropdown = document.getElementById('team_dropdown');
-    while (dropdown.firstChild) {
-        dropdown.removeChild(dropdown.lastChild);
+var currentDate = new Date();
+var currentUtcDate = new Date(currentDate.getUTCFullYear(), currentDate.getUTCMonth(), currentDate.getUTCDate(), currentDate.getUTCHours(), currentDate.getUTCMinutes(), currentDate.getUTCSeconds());
+
+var selectedTeamId = 0;
+var selectedTeam = "";
+var selectedMonth = (currentUtcDate.getMonth()+1);
+var selectedYear = currentUtcDate.getFullYear();
+var selectedMonthName = new Date(selectedYear, (selectedMonth-1), 1).toLocaleString('default', { month: 'long' });
+var selectedDay = currentDate.getUTCDate();
+
+function getTeamHistoricStats(teamId, teamName, day, month, monthName, year) {
+    if(teamId != 0){
+        selectedTeamId = teamId;
     }
 
-    fetch(ROOT_URL+'/teams')
-    .then(response => {
-        return response.json();
-    })
-    .then(function(jsonResponse) {
-        teamDropDownDiv = document.getElementById("team_dropdown");
+    if(teamName != null){
+        selectedTeam = teamName;
+         teamDropdownTitle = document.getElementById("team_dropdown_root");
+        teamDropdownTitle.innerHTML = selectedTeam;
+    }
 
-        jsonResponse.forEach(function(teamItem, i){
-            teamButton = document.createElement("button");
-            teamButton.setAttribute("class", "dropdown-item");
-            teamButton.setAttribute("type", "button");
-            teamButton.setAttribute("onclick", "getTeamHistoricStats("+teamItem["id"]+",'"+teamItem["teamName"]+"')");
-            teamButton.innerHTML = teamItem["teamName"];
+    if(day != null) {
+        selectedDay = day;
+        dayDropdownTitle = document.getElementById("day_dropdown_root");
+        dayDropdownTitle.innerHTML = ordinalSuffixOf(selectedDay);
+    }
 
-            teamDropDownDiv.append(teamButton);
-        });
-    });
-}
+    if (month != null){
+        selectedMonth = month;
+    }
 
-function getTeamHistoricStats(teamId, teamName) {
+    if (monthName != null) {
+        selectedMonthName = monthName;
+        monthDropdownTitle = document.getElementById("month_dropdown_root");
+        monthDropdownTitle.innerHTML = selectedMonthName;
+    }
+
+    if (year != null) {
+        selectedYear = year;
+        yearDropdownTitle = document.getElementById("year_dropdown_root");
+        yearDropdownTitle.innerHTML = selectedYear;
+    }
+
+    if(selectedTeam === "" || selectedTeamId === 0){
+        return;
+    }
+
     show("loader");
     hide("historic_stats");
 
-    var currentDate = new Date();
-    var year = currentDate.getFullYear();
-    var month = (currentDate.getMonth()+1);
-    var monthName = currentDate.toLocaleString('default', { month: 'long' });
-    var dayOfMonth = currentDate.getDate();
-
-    fetch(ROOT_URL+'/historic/teams/' + teamId + '/' + year + '/' + month + '/' + dayOfMonth)
+    fetch(ROOT_URL+'/historic/teams/' + selectedTeamId + '/' + selectedYear + '/' + selectedMonth + '/' + selectedDay)
     .then(response => {
         return response.json();
     })
     .then(function(jsonResponse) {
-        dropDownTitle = document.getElementById("team_dropdown_root");
-        dropDownTitle.innerHTML = teamName;
-
         // Clear existing entries in div
         historicDiv = document.getElementById("historic_stats");
         while (historicDiv.firstChild) {
             historicDiv.removeChild(historicDiv.lastChild);
         }
-
-        teamTitle = document.createElement("h1");
-        teamTitle.setAttribute("class", "navbar-brand");
-        teamTitle.innerHTML = teamName + " ("+ordinalSuffixOf(dayOfMonth)+" "+monthName+" "+year+")";
-        historicDiv.append(teamTitle);
 
         const headers = ["Hour", "Points", "Units"];
         historicTable = document.createElement('table');
@@ -104,6 +111,9 @@ function getTeamHistoricStats(teamId, teamName) {
 }
 
 document.addEventListener("DOMContentLoaded", function(event) {
-    populateTeamDropdown();
+    populateTeamDropdown("team_dropdown");
+    populateDayDropdown(selectedMonth, selectedYear, "day_dropdown", "getTeamHistoricStats");
+    populateMonthDropdown("month_dropdown", "getTeamHistoricStats");
+    populateYearDropdown("year_dropdown", "getTeamHistoricStats");
     updateTimer();
 });

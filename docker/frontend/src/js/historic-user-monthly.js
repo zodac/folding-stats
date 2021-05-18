@@ -1,55 +1,44 @@
 const ROOT_URL='http://internal.axihub.ca/folding';
 
-function populateUserDropdown() {
-    var dropdown = document.getElementById('user_dropdown');
-    while (dropdown.firstChild) {
-        dropdown.removeChild(dropdown.lastChild);
+var selectedUserId = 0;
+var selectedUser = "";
+var selectedYear = new Date().getUTCFullYear();
+
+
+function getUserHistoricStats(userId, userName, day, month, monthName, year) {
+    if(userId != 0){
+        selectedUserId = userId;
     }
 
-    fetch(ROOT_URL+'/users')
-    .then(response => {
-        return response.json();
-    })
-    .then(function(jsonResponse) {
-        userDropdownDiv = document.getElementById("user_dropdown");
+    if(userName != null){
+        selectedUser = userName;
+        userDropdownTitle = document.getElementById("user_dropdown_root");
+        userDropdownTitle.innerHTML = selectedUser;
+    }
 
-        jsonResponse.forEach(function(userItem, i){
-            userButton = document.createElement("button");
-            userButton.setAttribute("class", "dropdown-item");
-            userButton.setAttribute("type", "button");
-            userButton.setAttribute("onclick", "getUserHistoricStats("+userItem["id"]+",'"+userItem["displayName"]+"')");
-            userButton.innerHTML = userItem["displayName"];
+    if (year != null) {
+        selectedYear = year;
+        yearDropdownTitle = document.getElementById("year_dropdown_root");
+        yearDropdownTitle.innerHTML = selectedYear;
+    }
 
-            userDropdownDiv.append(userButton);
-        });
-    });
-}
+    if(selectedUser === "" || selectedUserId === 0){
+        return;
+    }
 
-function getUserHistoricStats(userId, userName) {
     show("loader");
     hide("historic_stats");
 
-    var currentDate = new Date();
-    var year = currentDate.getFullYear();
-
-    fetch(ROOT_URL+'/historic/users/' + userId + '/' + year)
+    fetch(ROOT_URL+'/historic/users/' + selectedUserId + '/' + selectedYear)
     .then(response => {
         return response.json();
     })
     .then(function(jsonResponse) {
-        dropDownTitle = document.getElementById("user_dropdown_root");
-        dropDownTitle.innerHTML = userName;
-
         // Clear existing entries in div
         historicDiv = document.getElementById("historic_stats");
         while (historicDiv.firstChild) {
             historicDiv.removeChild(historicDiv.lastChild);
         }
-
-        userTitle = document.createElement("h1");
-        userTitle.setAttribute("class", "navbar-brand");
-        userTitle.innerHTML = userName + " ("+year+")";
-        historicDiv.append(userTitle);
 
         const headers = ["Month", "Points", "Units"];
         historicTable = document.createElement('table');
@@ -101,6 +90,7 @@ function getUserHistoricStats(userId, userName) {
 }
 
 document.addEventListener("DOMContentLoaded", function(event) {
-    populateUserDropdown();
+    populateUserDropdown("user_dropdown");
+    populateYearDropdown("year_dropdown", "getUserHistoricStats");
     updateTimer();
 });

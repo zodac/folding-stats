@@ -1,5 +1,9 @@
 const ROOT_URL='http://internal.axihub.ca/folding';
 
+var selectedUserId = 0;
+var selectedUser = "";
+var selectedYear = new Date().getUTCFullYear();
+
 function populateTeamDropdown() {
     var dropdown = document.getElementById('team_dropdown');
     while (dropdown.firstChild) {
@@ -25,31 +29,48 @@ function populateTeamDropdown() {
     });
 }
 
-function getTeamHistoricStats(teamId, teamName) {
+function getTeamHistoricStats(teamId, teamName, day, month, monthName, year) {
+    if(teamId != 0){
+        selectedTeamId = teamId;
+    }
+
+    if(teamName != null){
+        selectedTeam = teamName;
+        teamDropdownTitle = document.getElementById("team_dropdown_root");
+        teamDropdownTitle.innerHTML = selectedTeam;
+    }
+
+    if (month != null){
+        selectedMonth = month;
+    }
+
+    if (monthName != null) {
+        selectedMonthName = monthName;
+    }
+
+    if (year != null) {
+        selectedYear = year;
+        yearDropdownTitle = document.getElementById("year_dropdown_root");
+        yearDropdownTitle.innerHTML = selectedYear;
+    }
+
+    if(selectedTeam === "" || selectedTeamId === 0){
+        return;
+    }
+
     show("loader");
     hide("historic_stats");
 
-    var currentDate = new Date();
-    var year = currentDate.getFullYear();
-
-    fetch(ROOT_URL+'/historic/teams/' + teamId + '/' + year)
+    fetch(ROOT_URL+'/historic/teams/' + selectedTeamId + '/' + selectedYear)
     .then(response => {
         return response.json();
     })
     .then(function(jsonResponse) {
-        dropDownTitle = document.getElementById("team_dropdown_root");
-        dropDownTitle.innerHTML = teamName;
-
         // Clear existing entries in div
         historicDiv = document.getElementById("historic_stats");
         while (historicDiv.firstChild) {
             historicDiv.removeChild(historicDiv.lastChild);
         }
-
-        teamTitle = document.createElement("h1");
-        teamTitle.setAttribute("class", "navbar-brand");
-        teamTitle.innerHTML = teamName + " ("+year+")";
-        historicDiv.append(teamTitle);
 
         const headers = ["Month", "Points", "Units"];
         historicTable = document.createElement('table');
@@ -101,6 +122,7 @@ function getTeamHistoricStats(teamId, teamName) {
 }
 
 document.addEventListener("DOMContentLoaded", function(event) {
-    populateTeamDropdown();
+    populateTeamDropdown("team_dropdown");
+    populateYearDropdown("year_dropdown", "getTeamHistoricStats");
     updateTimer();
 });
