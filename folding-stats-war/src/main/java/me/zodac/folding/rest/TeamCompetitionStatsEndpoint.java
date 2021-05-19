@@ -2,24 +2,17 @@ package me.zodac.folding.rest;
 
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.SystemState;
-import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.tc.Category;
-import me.zodac.folding.api.tc.Hardware;
-import me.zodac.folding.api.tc.Team;
-import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.tc.exception.HardwareNotFoundException;
-import me.zodac.folding.api.tc.exception.NoStatsAvailableException;
-import me.zodac.folding.api.tc.exception.UserNotFoundException;
-import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
-import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.api.utils.ExecutionType;
-import me.zodac.folding.cache.CompetitionResultCache;
 import me.zodac.folding.ejb.BusinessLogic;
+import me.zodac.folding.ejb.CompetitionResultGenerator;
 import me.zodac.folding.ejb.TeamCompetitionResetScheduler;
 import me.zodac.folding.ejb.TeamCompetitionStatsScheduler;
 import me.zodac.folding.rest.api.tc.CompetitionResult;
 import me.zodac.folding.rest.api.tc.TeamResult;
 import me.zodac.folding.rest.api.tc.UserResult;
+import me.zodac.folding.rest.api.tc.leaderboard.TeamSummary;
+import me.zodac.folding.rest.api.tc.leaderboard.UserSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,14 +27,14 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.Comparator;
+import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toList;
 import static me.zodac.folding.rest.response.Responses.ok;
 import static me.zodac.folding.rest.response.Responses.serverError;
 import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
@@ -54,6 +47,9 @@ public class TeamCompetitionStatsEndpoint {
 
     @EJB
     private BusinessLogic businessLogic;
+
+    @EJB
+    private CompetitionResultGenerator competitionResultGenerator;
 
     @EJB
     private TeamCompetitionResetScheduler teamCompetitionResetScheduler;
@@ -74,9 +70,14 @@ public class TeamCompetitionStatsEndpoint {
             return serviceUnavailable();
         }
 
-        final ExecutionType executionType = async ? ExecutionType.ASYNCHRONOUS : ExecutionType.SYNCHRONOUS;
-        teamCompetitionStatsScheduler.manualTeamCompetitionStatsParsing(executionType);
-        return ok();
+        try {
+            final ExecutionType executionType = async ? ExecutionType.ASYNCHRONOUS : ExecutionType.SYNCHRONOUS;
+            teamCompetitionStatsScheduler.manualTeamCompetitionStatsParsing(executionType);
+            return ok();
+        } catch (final Exception e) {
+            LOGGER.error("Unexpected error manually parsing TC stats", e);
+            return serverError();
+        }
     }
 
     @GET
@@ -89,161 +90,151 @@ public class TeamCompetitionStatsEndpoint {
             return serviceUnavailable();
         }
 
-        SystemStateManager.next(SystemState.RESETTING_STATS);
-        teamCompetitionResetScheduler.manualResetTeamCompetitionStats();
-        SystemStateManager.next(SystemState.WRITE_EXECUTED);
-        return ok();
+        try {
+            SystemStateManager.next(SystemState.RESETTING_STATS);
+            teamCompetitionResetScheduler.manualResetTeamCompetitionStats();
+            SystemStateManager.next(SystemState.WRITE_EXECUTED);
+            return ok();
+        } catch (final Exception e) {
+            LOGGER.error("Unexpected error manually resetting TC stats", e);
+            return serverError();
+        }
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getTeamCompetitionStats() {
-        LOGGER.debug("GET request received to show TC stats");
+    public Response getFullTeamCompetitionStats() {
+        LOGGER.debug("GET request received to show full TC stats");
 
         if (SystemStateManager.current().isReadBlocked()) {
             LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
             return serviceUnavailable();
         }
 
-        if (SystemStateManager.current() != SystemState.WRITE_EXECUTED && CompetitionResultCache.hasCachedResult()) {
-            LOGGER.debug("System is not in state {} and has a cached TC result, using cache", SystemState.WRITE_EXECUTED);
-
-            final Optional<CompetitionResult> cachedCompetitionResult = CompetitionResultCache.get();
-            if (cachedCompetitionResult.isPresent()) {
-                final CompetitionResult cachedResult = cachedCompetitionResult.get();
-                return ok(cachedResult);
-            } else {
-                LOGGER.warn("Cache said it had TC result, but none was returned! Calculating new TC result");
-            }
-        }
-
-        LOGGER.debug("Calculating latest TC result, system state: {}, TC cache populated: {}", SystemStateManager.current(), CompetitionResultCache.hasCachedResult());
-
         try {
-            final List<TeamResult> teamResults = getStatsForTeams();
-            LOGGER.debug("Found {} TC teams", teamResults.size());
-
-            if (teamResults.isEmpty()) {
-                LOGGER.warn("No TC teams to show");
-            }
-
-            final CompetitionResult competitionResult = CompetitionResult.create(teamResults);
-            CompetitionResultCache.add(competitionResult);
-            SystemStateManager.next(SystemState.AVAILABLE);
+            final CompetitionResult competitionResult = competitionResultGenerator.generate();
             return ok(competitionResult);
         } catch (final Exception e) {
-            LOGGER.error("Unexpected error retrieving TC stats", e);
+            LOGGER.error("Unexpected error retrieving full TC stats", e);
             return serverError();
         }
     }
 
-    private List<TeamResult> getStatsForTeams() {
-        try {
-            final Collection<Team> teams = businessLogic.getAllTeams();
-            final List<TeamResult> teamResults = new ArrayList<>(teams.size());
+    @GET
+    @Path("/leaderboard/")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getTeamCompetitionLeaderboard() {
+        LOGGER.debug("GET request received to show TC leaderboard");
 
-            for (final Team team : teams) {
-                teamResults.add(getTcTeamResult(team));
+        if (SystemStateManager.current().isReadBlocked()) {
+            LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
+            return serviceUnavailable();
+        }
+
+        try {
+            final CompetitionResult competitionResult = competitionResultGenerator.generate();
+            final List<TeamResult> teamResults = competitionResult.getTeams()
+                    .stream()
+                    .sorted(Comparator.comparingLong(TeamResult::getTeamMultipliedPoints).reversed())
+                    .collect(Collectors.toList());
+
+            if (teamResults.isEmpty()) {
+                LOGGER.warn("No TC teams to show");
+                ok();
             }
 
-            return teamResults;
-        } catch (final FoldingException e) {
-            LOGGER.warn("Error retrieving TC team stats", e.getCause());
-            return Collections.emptyList();
+            final TeamSummary leader = TeamSummary.createLeader(teamResults.get(0));
+
+            final List<TeamSummary> teamSummaries = new ArrayList<>(teamResults.size());
+            teamSummaries.add(leader);
+
+            for (int i = 1; i < teamResults.size(); i++) {
+                final TeamResult teamResult = teamResults.get(i);
+                final TeamResult teamAhead = teamResults.get(i - 1);
+
+                final long diffToLeader = leader.getTeamMultipliedPoints() - teamResult.getTeamMultipliedPoints();
+                final long diffToNext = teamAhead.getTeamMultipliedPoints() - teamResult.getTeamMultipliedPoints();
+
+                final TeamSummary teamSummary = TeamSummary.create(teamResult, diffToLeader, diffToNext);
+                teamSummaries.add(teamSummary);
+            }
+
+            return ok(teamSummaries);
+        } catch (final Exception e) {
+            LOGGER.error("Unexpected error retrieving TC leaderboard", e);
+            return serverError();
         }
     }
 
-    private TeamResult getTcTeamResult(final Team team) throws FoldingException {
-        LOGGER.debug("Converting team '{}' for TC stats", team.getTeamName());
+    @GET
+    @Path("/category/")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getTeamCompetitionCategoryLeaderboard() {
+        LOGGER.debug("GET request received to show TC category leaderboard");
 
-        final List<UserResult> userResults = team.getUserIds()
-                .stream()
-                .map(this::getTcUser)
-                .filter(Objects::nonNull)
-                .collect(toList());
+        if (SystemStateManager.current().isReadBlocked()) {
+            LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
+            return serviceUnavailable();
+        }
 
         try {
-            final User captain = businessLogic.getUser(team.getCaptainUserId());
-            final Set<Integer> retiredUserIds = team.getRetiredUserIds();
+            final CompetitionResult competitionResult = competitionResultGenerator.generate();
+            final Map<Category, List<UserResult>> userResultsByCategory = new EnumMap<>(Category.class);
+            final Map<String, String> teamNameForFoldingUserName = new HashMap<>(); // Convenient way to determine the team name of a user
 
-            final List<UserResult> retiredUserResults = new ArrayList<>(retiredUserIds.size());
+            if (competitionResult.getTeams().isEmpty()) {
+                LOGGER.warn("No TC teams to show");
+                ok();
+            }
 
-            for (final int retiredUserId : retiredUserIds) {
-                final RetiredUserTcStats retiredUserTcStats = businessLogic.getRetiredUser(retiredUserId);
+            for (final TeamResult teamResult : competitionResult.getTeams()) {
+                final String teamName = teamResult.getTeamName();
 
-                try {
-                    final User retiredUser = businessLogic.getUser(retiredUserTcStats.getUserId());
-                    final Hardware retiredUserHardware = businessLogic.getHardware(retiredUser.getHardwareId());
-                    retiredUserResults.add(UserResult.createForRetiredUser(retiredUser, retiredUserHardware, retiredUserTcStats));
-                } catch (final UserNotFoundException e) {
-                    LOGGER.debug("Unable to find retired user ID {} with original user ID: {}", retiredUserId, retiredUserTcStats.getUserId(), e);
-                    LOGGER.warn("Unable to find retired user ID {} with original user ID: {}", retiredUserId, retiredUserTcStats.getUserId());
-                    retiredUserResults.add(UserResult.empty(retiredUserTcStats.getDisplayUserName()));
+                for (final UserResult userResult : teamResult.getActiveUsers()) {
+                    final Category category = Category.get(userResult.getCategory());
+
+                    final List<UserResult> existingUsersInCategory = userResultsByCategory.getOrDefault(category, new ArrayList<>());
+                    existingUsersInCategory.add(userResult);
+
+                    userResultsByCategory.put(category, existingUsersInCategory);
+                    teamNameForFoldingUserName.put(userResult.getFoldingName(), teamName);
                 }
             }
 
-            return TeamResult.create(team.getTeamName(), team.getTeamDescription(), team.getForumLink(), captain.getDisplayName(), userResults, retiredUserResults);
-        } catch (final FoldingException e) {
-            LOGGER.warn("Unable to get details for team captain: {}", team, e);
-            throw e;
-        } catch (final UserNotFoundException e) {
-            LOGGER.warn("User ID not found, unexpected error: {}", team, e);
-            throw new FoldingException(String.format("User ID not found: %s", team), e);
-        } catch (final HardwareNotFoundException e) {
-            LOGGER.warn("Hardware ID not found for retired user, unexpected error: {}", team, e);
-            throw new FoldingException(String.format("Hardware ID not found for retired user: %s", team), e);
-        }
-    }
+            final Map<String, List<UserSummary>> categoryLeaderboard = new TreeMap<>();
 
-    private UserResult getTcUser(final int userId) {
-        if (userId == User.EMPTY_USER_ID) {
-            LOGGER.warn("User had invalid ID");
-            return null;
-        }
+            for (final var entry : userResultsByCategory.entrySet()) {
+                final Category category = entry.getKey();
+                final List<UserResult> userResults = entry.getValue()
+                        .stream()
+                        .sorted(Comparator.comparingLong(UserResult::getMultipliedPoints).reversed())
+                        .collect(Collectors.toList());
 
-        try {
-            final User user = businessLogic.getUser(userId);
-            return getTcStatsForUser(user);
-        } catch (final UserNotFoundException e) {
-            LOGGER.warn("Unable to find user ID: {}", userId, e);
-            return null;
-        } catch (final FoldingException e) {
-            LOGGER.warn("Error finding user ID: {}", userId, e.getCause());
-            return null;
-        }
-    }
+                final UserResult firstResult = userResults.get(0);
+                final UserSummary categoryLeader = UserSummary.createLeader(firstResult, teamNameForFoldingUserName.get(firstResult.getFoldingName()));
 
-    private UserResult getTcStatsForUser(final User user) {
-        final Hardware hardware;
+                final List<UserSummary> userSummariesInCategory = new ArrayList<>(userResults.size());
+                userSummariesInCategory.add(categoryLeader);
 
-        try {
-            hardware = businessLogic.getHardware(user.getHardwareId());
-        } catch (final HardwareNotFoundException e) {
-            LOGGER.debug("No hardware found for ID: {}", user.getHardwareId(), e);
-            LOGGER.warn("No hardware found for ID: {}", user.getHardwareId());
-            return null;
-        } catch (final FoldingException e) {
-            LOGGER.warn("Error getting TC stats for user: {}", user, e.getCause());
-            return null;
-        }
+                for (int i = 1; i < userResults.size(); i++) {
+                    final UserResult userResult = userResults.get(i);
+                    final UserResult userAhead = userResults.get(i - 1);
 
-        final Category category = Category.get(user.getCategory());
-        if (category == Category.INVALID) {
-            LOGGER.warn("Unexpectedly got an invalid category '{}' for Folding user: {}", user.getCategory(), user.getDisplayName());
-            return null;
-        }
+                    final long diffToLeader = categoryLeader.getMultipliedPoints() - userResult.getMultipliedPoints();
+                    final long diffToNext = userAhead.getMultipliedPoints() - userResult.getMultipliedPoints();
 
-        try {
-            final UserTcStats userTcStats = businessLogic.getTcStatsForUser(user.getId());
-            LOGGER.debug("Results for {}: {} points | {} multiplied points | {} units", user.getDisplayName(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits());
-            return UserResult.createWithNoRank(user.getDisplayName(), user.getFoldingUserName(), hardware, category.displayName(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits(), user.getProfileLink(), user.getLiveStatsLink(), user.isRetired());
-        } catch (final UserNotFoundException | NoStatsAvailableException e) {
-            LOGGER.debug("No stats found for user ID: {}", user.getId(), e);
-            LOGGER.warn("No stats found for user ID: {}", user.getId());
-            return UserResult.empty(user.getDisplayName());
-        } catch (final FoldingException e) {
-            LOGGER.warn("Error getting TC stats for user: {}", user, e.getCause());
-            return null;
+                    final String teamName = teamNameForFoldingUserName.get(userResult.getFoldingName());
+                    final UserSummary userSummary = UserSummary.create(userResult, teamName, diffToLeader, diffToNext);
+                    userSummariesInCategory.add(userSummary);
+                }
+
+                categoryLeaderboard.put(category.displayName(), userSummariesInCategory);
+            }
+
+            return ok(categoryLeaderboard);
+        } catch (final Exception e) {
+            LOGGER.error("Unexpected error retrieving TC stats", e);
+            return serverError();
         }
     }
 }
