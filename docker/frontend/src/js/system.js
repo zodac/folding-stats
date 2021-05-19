@@ -80,8 +80,8 @@ function loadUsers() {
     .then(function(jsonResponse) {
         // Build users
         jsonResponse.sort(sortJsonByKey("id"));
-        const usersHeaders = ["ID", "User", "Passkey", "Category", "Hardware ID", "Live Stats Link"];
-        const usersProperties = ["id", "displayName", "passkey", "category", "hardwareId", "liveStatsLink"];
+        const usersHeaders = ["ID", "User", "Folding Name", "Passkey", "Category", "Hardware ID", "Profile Link", "Live Stats Link", "Retired"];
+        const usersProperties = ["id", "displayName", "foldingUserName", "passkey", "category", "hardwareId", "profileLink", "liveStatsLink", "isRetired"];
 
         usersDiv = document.getElementById("users_div");
 
@@ -124,7 +124,9 @@ function loadUsers() {
                         usersTableBodyCell.append(liveStatsLink);
                     }
                 } else {
-                    usersTableBodyCell.innerHTML = usersItem[usersProperty].toLocaleString();
+                    if (usersProperty in usersItem) {
+                        usersTableBodyCell.innerHTML = usersItem[usersProperty].toLocaleString();
+                    }
                 }
                 usersTableBodyRow.append(usersTableBodyCell);
             });
@@ -144,8 +146,8 @@ function loadTeams() {
     .then(function(jsonResponse) {
         // Build teams
         jsonResponse.sort(sortJsonByKey("id"));
-        const teamsHeaders = ["ID", "Name", "Description", "Captain ID", "User IDs", "Retired User IDs"];
-        const teamsProperties = ["id", "teamName", "teamDescription", "captainUserId", "userIds", "retiredUserIds"];
+        const teamsHeaders = ["ID", "Name", "Description", "Forum Link", "Captain ID", "User IDs", "Retired User IDs"];
+        const teamsProperties = ["id", "teamName", "teamDescription", "forumLink", "captainUserId", "userIds", "retiredUserIds"];
 
         teamsDiv = document.getElementById("teams_div");
 
@@ -187,9 +189,11 @@ function loadTeams() {
                         teamsTableBodyCell.append(liveStatsLink);
                     }
                 } else {
-                    teamsTableBodyCell.innerHTML = teamsItem[teamsProperty].toLocaleString();
-                    teamsTableBodyRow.append(teamsTableBodyCell);
+                    if (teamsProperty in teamsItem) {
+                        teamsTableBodyCell.innerHTML = teamsItem[teamsProperty].toLocaleString();
+                    }
                 }
+                teamsTableBodyRow.append(teamsTableBodyCell);
             });
             teamsTableBody.append(teamsTableBodyRow);
         });

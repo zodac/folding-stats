@@ -26,6 +26,7 @@ public class TeamResult {
 
     private String teamName;
     private String teamDescription;
+    private String forumLink;
     private String captainName;
 
     private long teamPoints;
@@ -35,7 +36,7 @@ public class TeamResult {
     private Collection<UserResult> activeUsers;
     private Collection<UserResult> retiredUsers;
 
-    public static TeamResult create(final String teamName, final String teamDescription, final String captainName, final List<UserResult> activeUsers, final List<UserResult> retiredUsers) {
+    public static TeamResult create(final String teamName, final String teamDescription, final String forumLink, final String captainName, final List<UserResult> activeUsers, final List<UserResult> retiredUsers) {
         int teamUnits = 0;
         long teamPoints = 0L;
         long teamMultipliedPoints = 0L;
@@ -78,11 +79,11 @@ public class TeamResult {
                 .collect(toList());
 
         // Not ranked to begin with, will be updated by the calling class
-        return new TeamResult(teamName, teamDescription, captainName, teamPoints, teamMultipliedPoints, teamUnits, DEFAULT_TEAM_RANK, rankedActiveUsers, rankedRetiredUsers);
+        return new TeamResult(teamName, teamDescription, forumLink, captainName, teamPoints, teamMultipliedPoints, teamUnits, DEFAULT_TEAM_RANK, rankedActiveUsers, rankedRetiredUsers);
     }
 
 
     public static TeamResult updateWithRank(final TeamResult teamResult, final int rank) {
-        return new TeamResult(teamResult.teamName, teamResult.teamDescription, teamResult.captainName, teamResult.teamPoints, teamResult.teamMultipliedPoints, teamResult.teamUnits, rank, teamResult.activeUsers, teamResult.retiredUsers);
+        return new TeamResult(teamResult.teamName, teamResult.teamDescription, teamResult.forumLink, teamResult.captainName, teamResult.teamPoints, teamResult.teamMultipliedPoints, teamResult.teamUnits, rank, teamResult.activeUsers, teamResult.retiredUsers);
     }
 }

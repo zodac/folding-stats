@@ -25,7 +25,8 @@ public class UserResult {
     private static final long DEFAULT_MULTIPLIED_POINTS = 0L;
     private static final int DEFAULT_UNITS = 0;
 
-    private String userName;
+    private String displayName;
+    private String foldingName;
     private Hardware hardware;
     private String category;
 
@@ -33,23 +34,24 @@ public class UserResult {
     private long multipliedPoints;
     private int units;
     private int rankInTeam;
+    private String profileLink;
     private String liveStatsLink;
     private boolean isRetired;
 
     // Not ranked to begin with, will be updated by the calling class
-    public static UserResult createWithNoRank(final String userName, final Hardware hardware, final String category, final long points, final long pointsWithoutMultiplier, final int units, final String liveStatsLink, final boolean isRetired) {
-        return new UserResult(userName, hardware, category, points, pointsWithoutMultiplier, units, DEFAULT_USER_RANK, liveStatsLink, isRetired);
+    public static UserResult createWithNoRank(final String displayName, final String foldingName, final Hardware hardware, final String category, final long points, final long pointsWithoutMultiplier, final int units, final String profileLink, final String liveStatsLink, final boolean isRetired) {
+        return new UserResult(displayName, foldingName, hardware, category, points, pointsWithoutMultiplier, units, DEFAULT_USER_RANK, profileLink, liveStatsLink, isRetired);
     }
 
     public static UserResult empty(final String userName) {
-        return new UserResult(userName, null, "", DEFAULT_POINTS, DEFAULT_MULTIPLIED_POINTS, DEFAULT_UNITS, DEFAULT_USER_RANK, "", false);
+        return new UserResult(userName, "", null, "", DEFAULT_POINTS, DEFAULT_MULTIPLIED_POINTS, DEFAULT_UNITS, DEFAULT_USER_RANK, "", "", false);
     }
 
     public static UserResult updateWithRankInTeam(final UserResult userResult, final int teamRank) {
-        return new UserResult(userResult.userName, userResult.hardware, userResult.category, userResult.points, userResult.multipliedPoints, userResult.units, teamRank, userResult.liveStatsLink, userResult.isRetired);
+        return new UserResult(userResult.displayName, userResult.foldingName, userResult.hardware, userResult.category, userResult.points, userResult.multipliedPoints, userResult.units, teamRank, userResult.profileLink, userResult.liveStatsLink, userResult.isRetired);
     }
 
     public static UserResult createForRetiredUser(final User retiredUser, final Hardware retiredUserHardware, final RetiredUserTcStats retiredUserTcStats) {
-        return new UserResult(retiredUserTcStats.getDisplayUserName(), retiredUserHardware, Category.get(retiredUser.getCategory()).displayName(), retiredUserTcStats.getPoints(), retiredUserTcStats.getMultipliedPoints(), retiredUserTcStats.getUnits(), DEFAULT_USER_RANK, retiredUser.getLiveStatsLink(), true);
+        return new UserResult(retiredUserTcStats.getDisplayUserName(), retiredUserTcStats.getDisplayUserName(), retiredUserHardware, Category.get(retiredUser.getCategory()).displayName(), retiredUserTcStats.getPoints(), retiredUserTcStats.getMultipliedPoints(), retiredUserTcStats.getUnits(), DEFAULT_USER_RANK, retiredUser.getProfileLink(), retiredUser.getLiveStatsLink(), true);
     }
 }

@@ -186,7 +186,7 @@ public class TeamCompetitionStatsEndpoint {
                 }
             }
 
-            return TeamResult.create(team.getTeamName(), team.getTeamDescription(), captain.getDisplayName(), userResults, retiredUserResults);
+            return TeamResult.create(team.getTeamName(), team.getTeamDescription(), team.getForumLink(), captain.getDisplayName(), userResults, retiredUserResults);
         } catch (final FoldingException e) {
             LOGGER.warn("Unable to get details for team captain: {}", team, e);
             throw e;
@@ -240,7 +240,7 @@ public class TeamCompetitionStatsEndpoint {
         try {
             final UserTcStats userTcStats = storageFacade.getTcStatsForUser(user.getId());
             LOGGER.debug("Results for {}: {} points | {} multiplied points | {} units", user.getDisplayName(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits());
-            return UserResult.createWithNoRank(user.getDisplayName(), hardware, category.displayName(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits(), user.getLiveStatsLink(), user.isRetired());
+            return UserResult.createWithNoRank(user.getDisplayName(), user.getFoldingUserName(), hardware, category.displayName(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits(), user.getProfileLink(), user.getLiveStatsLink(), user.isRetired());
         } catch (final UserNotFoundException | NoStatsAvailableException e) {
             LOGGER.debug("No stats found for user ID: {}", user.getId(), e);
             LOGGER.warn("No stats found for user ID: {}", user.getId());

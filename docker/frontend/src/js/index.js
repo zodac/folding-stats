@@ -81,7 +81,7 @@ function loadTcStats() {
 
         // Build team tables
         const teamTableHeaders = ["Rank", "User", "Category", "Hardware", "Points", "Units"];
-        const teamTableUserProperties = ["rankInTeam", "userName", "category", "hardware", "multipliedPoints", "units"];
+        const teamTableUserProperties = ["rankInTeam", "displayName", "category", "hardware", "multipliedPoints", "units"];
 
         var jsonResponseTeams = jsonResponse['teams'];
         jsonResponseTeams.sort(sortJsonByKey("rank"));
@@ -96,7 +96,13 @@ function loadTcStats() {
             metadataDiv.setAttribute("id", "team_"+teamNumber+"_metadata")
 
             teamTitle = document.createElement('h2');
-            teamTitle.innerHTML = "Rank #" + team['rank'] + ": " + team['teamName'];
+            teamTitle.innerHTML = "Rank #" + team['rank'] + ": ";
+
+            if ("forumLink" in team) {
+                teamTitle.innerHTML += "<a href='" + team["forumLink"] + "' target='_blank'>" + team['teamName'] + "</a>";
+            } else {
+                teamTitle.innerHTML += team['teamName'];
+            }
             metadataDiv.append(teamTitle);
 
             teamStats = document.createElement('h5');
@@ -157,8 +163,30 @@ function loadTcStats() {
                         teamTableUserCell.setAttribute("title", "Unmultiplied: " + activeUser["points"].toLocaleString());
                         teamTableUserCell.innerHTML = activeUser[userProperty].toLocaleString();
                         new bootstrap.Tooltip(teamTableUserCell);
-                    } else if (userProperty === "userName" && activeUser[userProperty] === captainName) {
-                        teamTableUserCell.innerHTML = activeUser[userProperty].toLocaleString() + " (Captain)";
+                    } else if (userProperty === "displayName") {
+                        teamTableUserCell.innerHTML = activeUser[userProperty] + " ";
+
+                        if (activeUser[userProperty] === captainName){
+                            teamTableUserCell.innerHTML += "(Captain) ";
+                        }
+
+                        if ("profileLink" in activeUser) {
+                            teamTableUserCell.innerHTML = "<a href='" + activeUser["profileLink"] + "' target='_blank'>" + teamTableUserCell.innerHTML + "</a>"
+                        }
+
+                        if ("liveStatsLink" in activeUser) {
+                            teamTableUserCell.innerHTML +=
+                                "<a href='" + activeUser["liveStatsLink"] + "' target='_blank'>" +
+                                    "<img alt='stats' src='./res/img/live.png' width='16px' height='16px'>" +
+                                "</a>";
+                        }
+
+                        if(activeUser["displayName"] != activeUser["foldingName"]){
+                            teamTableUserCell.setAttribute("data-bs-toggle", "tooltip");
+                            teamTableUserCell.setAttribute("data-placement", "left");
+                            teamTableUserCell.setAttribute("title", "Folding Username: " + activeUser["foldingName"]);
+                            new bootstrap.Tooltip(teamTableUserCell);
+                        }
                     } else if (userProperty === "hardware") {
                         teamTableUserCell.setAttribute("data-bs-toggle", "tooltip");
                         teamTableUserCell.setAttribute("data-placement", "left");

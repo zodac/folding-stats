@@ -65,7 +65,7 @@ public class TeamCompetitionStatsUtils {
      */
     public static UserResult getActiveUserFromTeam(final TeamResult teamResult, final String userName) throws FoldingRestException {
         for (final UserResult userResult : teamResult.getActiveUsers()) {
-            if (userResult.getUserName().equalsIgnoreCase(userName)) {
+            if (userResult.getDisplayName().equalsIgnoreCase(userName)) {
                 return userResult;
             }
         }
@@ -82,7 +82,7 @@ public class TeamCompetitionStatsUtils {
      */
     public static UserResult getRetiredUserFromTeam(final TeamResult teamResult, final String userName) throws FoldingRestException {
         for (final UserResult userResult : teamResult.getRetiredUsers()) {
-            if (userResult.getUserName().equalsIgnoreCase(userName)) {
+            if (userResult.getDisplayName().equalsIgnoreCase(userName)) {
                 return userResult;
             }
         }
