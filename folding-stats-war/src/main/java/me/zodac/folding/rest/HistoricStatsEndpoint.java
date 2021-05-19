@@ -297,7 +297,7 @@ public class HistoricStatsEndpoint {
             LOGGER.debug(errorMessage, e);
             LOGGER.error(errorMessage);
             return badRequest(errorMessage);
-        } catch (final UserNotFoundException e) {
+        } catch (final TeamNotFoundException e) {
             LOGGER.debug("No {} found with ID: {}", e.getType(), e.getId(), e);
             LOGGER.error("No {} found with ID: {}", e.getType(), e.getId());
             return notFound();
@@ -305,7 +305,7 @@ public class HistoricStatsEndpoint {
             LOGGER.error("Error getting team with ID: {}", teamId, e.getCause());
             return serverError();
         } catch (final Exception e) {
-            LOGGER.error("Unexpected error getting user with ID: {}", teamId, e);
+            LOGGER.error("Unexpected error getting team with ID: {}", teamId, e);
             return serverError();
         }
     }

@@ -107,13 +107,7 @@ public class UserTest {
 
     @Test
     public void whenGettingUser_givenAValidUserId_thenUserIsReturned_andHasA200Status() throws FoldingRestException {
-        final Collection<User> allUsers = UserUtils.getAll();
-        int userId = allUsers.size();
-
-        if (allUsers.isEmpty()) {
-            final User userToCreate = generateUser();
-            userId = UserUtils.createOrConflict(userToCreate).getId();
-        }
+        final int userId = UserUtils.createOrConflict(generateUser()).getId();
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.get(userId);
         assertThat(response.statusCode())
@@ -129,13 +123,8 @@ public class UserTest {
 
     @Test
     public void whenUpdatingUser_givenAValidUserId_andAValidPayload_thenUpdatedUserIsReturned_andNoNewUserIsCreated_andHasA200Status() throws FoldingRestException {
-        final Collection<User> allUsers = UserUtils.getAll();
-        int userId = allUsers.size();
-
-        if (allUsers.isEmpty()) {
-            final User userToCreate = generateUser();
-            userId = UserUtils.createOrConflict(userToCreate).getId();
-        }
+        final int userId = UserUtils.createOrConflict(generateUser()).getId();
+        final int initialSize = UserUtils.getNumberOfUsers();
 
         final User updatedUser = User.updateWithId(userId, UserUtils.get(userId));
         updatedUser.setPasskey("updatedPasskey");
@@ -155,18 +144,13 @@ public class UserTest {
         final int allUsersAfterUpdate = UserUtils.getNumberOfUsers();
         assertThat(allUsersAfterUpdate)
                 .as("Expected no new user instances to be created")
-                .isEqualTo(userId);
+                .isEqualTo(initialSize);
     }
 
     @Test
     public void whenDeletingUser_givenAValidUserId_thenUserIsDeleted_andHasA200Status_andUserCountIsReduced_andUserCannotBeRetrievedAgain() throws FoldingRestException {
-        final Collection<User> allUsers = UserUtils.getAll();
-        int userId = allUsers.size();
-
-        if (allUsers.isEmpty()) {
-            final User userToCreate = generateUser();
-            userId = UserUtils.createOrConflict(userToCreate).getId();
-        }
+        final int userId = UserUtils.createOrConflict(generateUser()).getId();
+        final int initialSize = UserUtils.getNumberOfUsers();
 
         final HttpResponse<Void> response = USER_REQUEST_SENDER.delete(userId);
         assertThat(response.statusCode())
@@ -181,7 +165,7 @@ public class UserTest {
         final int newSize = UserUtils.getNumberOfUsers();
         assertThat(newSize)
                 .as("Get all response did not return the initial users - deleted user")
-                .isEqualTo(userId - 1);
+                .isEqualTo(initialSize - 1);
     }
 
     @Test
@@ -363,7 +347,7 @@ public class UserTest {
     }
 
     @Test
-    public void whenGettingUserById_givenRequestHasIfNoMatchHeader_andUserHasNotChanged_thenResponseHasA304Status_andNoBody() throws FoldingRestException {
+    public void whenGettingUserById_givenRequestUsesPreviousETag_andUserHasNotChanged_thenResponseHasA304Status_andNoBody() throws FoldingRestException {
         final int userId = UserUtils.createOrConflict(generateUser()).getId();
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.get(userId);
@@ -384,7 +368,7 @@ public class UserTest {
     }
 
     @Test
-    public void whenGettingAllUsers_givenRequestHasIfNoMatchHeader_andUsersHaveNotChanged_thenResponseHasA304Status_andNoBody() throws FoldingRestException {
+    public void whenGettingAllUsers_givenRequestUsesPreviousETag_andUsersHaveNotChanged_thenResponseHasA304Status_andNoBody() throws FoldingRestException {
         UserUtils.createOrConflict(generateUser());
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.getAll();

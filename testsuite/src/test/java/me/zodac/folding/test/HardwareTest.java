@@ -96,12 +96,7 @@ public class HardwareTest {
 
     @Test
     public void whenGettingHardware_givenAValidHardwareId_thenHardwareIsReturned_andHasA200Status() throws FoldingRestException {
-        final Collection<Hardware> allHardware = HardwareUtils.getAll();
-        int hardwareId = allHardware.size();
-
-        if (allHardware.isEmpty()) {
-            hardwareId = HardwareUtils.createOrConflict(generateHardware()).getId();
-        }
+        final int hardwareId = HardwareUtils.createOrConflict(generateHardware()).getId();
 
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get(hardwareId);
         assertThat(response.statusCode())
@@ -117,12 +112,8 @@ public class HardwareTest {
 
     @Test
     public void whenUpdatingHardware_givenAValidHardwareId_andAValidPayload_thenUpdatedHardwareIsReturned_andNoNewHardwareIsCreated_andHasA200Status() throws FoldingRestException {
-        final Collection<Hardware> allHardware = HardwareUtils.getAll();
-        int hardwareId = allHardware.size();
-
-        if (allHardware.isEmpty()) {
-            hardwareId = HardwareUtils.createOrConflict(generateHardware()).getId();
-        }
+        final int hardwareId = HardwareUtils.createOrConflict(generateHardware()).getId();
+        final int initialSize = HardwareUtils.getNumberOfHardware();
 
         final Hardware updatedHardware = Hardware.updateWithId(hardwareId, HardwareUtils.get(hardwareId));
         updatedHardware.setOperatingSystem(OperatingSystem.LINUX.displayName());
@@ -141,17 +132,13 @@ public class HardwareTest {
         final int allHardwareAfterUpdate = HardwareUtils.getNumberOfHardware();
         assertThat(allHardwareAfterUpdate)
                 .as("Expected no new hardware instances to be created")
-                .isEqualTo(hardwareId);
+                .isEqualTo(initialSize);
     }
 
     @Test
     public void whenDeletingHardware_givenAValidHardwareId_thenHardwareIsDeleted_andHasA200Status_andHardwareCountIsReduced_andHardwareCannotBeRetrievedAgain() throws FoldingRestException {
-        final Collection<Hardware> allHardware = HardwareUtils.getAll();
-        int hardwareId = allHardware.size();
-
-        if (allHardware.isEmpty()) {
-            hardwareId = HardwareUtils.createOrConflict(generateHardware()).getId();
-        }
+        final int hardwareId = HardwareUtils.createOrConflict(generateHardware()).getId();
+        final int initialSize = HardwareUtils.getNumberOfHardware();
 
         final HttpResponse<Void> response = HARDWARE_REQUEST_SENDER.delete(hardwareId);
         assertThat(response.statusCode())
@@ -167,7 +154,7 @@ public class HardwareTest {
         final int newSize = HardwareUtils.getNumberOfHardware();
         assertThat(newSize)
                 .as("Get all response did not return the initial hardware - deleted hardware")
-                .isEqualTo(hardwareId - 1);
+                .isEqualTo(initialSize - 1);
     }
 
     // Negative/alternative test cases
@@ -311,7 +298,7 @@ public class HardwareTest {
     }
 
     @Test
-    public void whenGettingHardwareById_givenRequestHasIfNoMatchHeader_andHardwareHasNotChanged_thenResponseHasA304Status_andNoBody() throws FoldingRestException {
+    public void whenGettingHardwareById_givenRequestUsesPreviousETag_andHardwareHasNotChanged_thenResponseHasA304Status_andNoBody() throws FoldingRestException {
         final int hardwareId = HardwareUtils.createOrConflict(generateHardware()).getId();
 
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get(hardwareId);
@@ -332,7 +319,7 @@ public class HardwareTest {
     }
 
     @Test
-    public void whenGettingAllHardware_givenRequestHasIfNoMatchHeader_andHardwareHasNotChanged_thenResponseHasA304Status_andNoBody() throws FoldingRestException {
+    public void whenGettingAllHardware_givenRequestUsesPreviousETag_andHardwareHasNotChanged_thenResponseHasA304Status_andNoBody() throws FoldingRestException {
         HardwareUtils.createOrConflict(generateHardware());
 
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.getAll();

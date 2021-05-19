@@ -4,12 +4,14 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 /**
- * Utility class for cleaning database tables for tests.
+ * Utility class for database tables for tests.
  */
-public final class DatabaseCleaner {
+public final class DatabaseUtils {
 
     private static final String JDBC_CONNECTION_URL = "jdbc:postgresql://192.168.99.100:5433/folding_db";
     private static final Properties JDBC_CONNECTION_PROPERTIES = new Properties();
@@ -20,12 +22,12 @@ public final class DatabaseCleaner {
         JDBC_CONNECTION_PROPERTIES.setProperty("driver", "org.postgresql.Driver");
     }
 
-    private DatabaseCleaner() {
+    private DatabaseUtils() {
 
     }
 
     /**
-     * Deletes all entries in the given {@code tableNames} and resets the serial count for the identity to 0.
+     * Deletes all entries in the given {@code tableNames} and resets the serial count for the identity to <b>0</b>.
      *
      * @param tableNames the tables to clean/truncate
      */
@@ -39,6 +41,24 @@ public final class DatabaseCleaner {
             } catch (final SQLException e) {
                 throw new AssertionError(String.format("Error cleaning table: '%s'", tableName), e);
             }
+        }
+    }
+
+    /**
+     * Insert {@link Stats} into the provided {@code tableName}.
+     *
+     * @param tableName the name of the table
+     * @param stats     the {@link Stats} to be persisted
+     */
+    public static void insertStats(final String tableName, final Stats... stats) {
+        final String insertStatement = String.format("INSERT INTO %s VALUES %s;", tableName,
+                Arrays.stream(stats).map(Stats::toString).collect(Collectors.joining(",")));
+
+        try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+             final PreparedStatement preparedStatement = connection.prepareStatement(insertStatement)) {
+            preparedStatement.execute();
+        } catch (final SQLException e) {
+            throw new AssertionError(String.format("Error inserting TC stats: '%s'", insertStatement), e);
         }
     }
 }

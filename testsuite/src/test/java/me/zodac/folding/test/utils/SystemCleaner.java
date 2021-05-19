@@ -35,10 +35,10 @@ public final class SystemCleaner {
      * </ol>
      *
      * @throws FoldingRestException thrown if an error occurs during cleanup
-     * @see DatabaseCleaner#truncateTableAndResetId(String...)
+     * @see DatabaseUtils#truncateTableAndResetId(String...)
      */
     public static void cleanSystemForSimpleTests() throws FoldingRestException {
-        DatabaseCleaner.truncateTableAndResetId("retired_user_stats");
+        DatabaseUtils.truncateTableAndResetId("retired_user_stats");
 
         for (final Team team : TeamUtils.getAll()) {
             TEAM_REQUEST_SENDER.delete(team.getId());
@@ -52,7 +52,7 @@ public final class SystemCleaner {
             HARDWARE_REQUEST_SENDER.delete(hardware.getId());
         }
 
-        DatabaseCleaner.truncateTableAndResetId("hardware", "users", "teams");
+        DatabaseUtils.truncateTableAndResetId("hardware", "users", "teams");
     }
 
     /**
@@ -72,7 +72,7 @@ public final class SystemCleaner {
     public static void cleanSystemForComplexTests() throws FoldingRestException {
         StubbedFoldingEndpointUtils.deletePoints();
         StubbedFoldingEndpointUtils.deleteUnits();
-        DatabaseCleaner.truncateTableAndResetId("user_initial_stats", "user_offset_tc_stats", "user_tc_stats_hourly", "user_total_stats");
+        DatabaseUtils.truncateTableAndResetId("user_initial_stats", "user_offset_tc_stats", "user_tc_stats_hourly", "user_total_stats");
         cleanSystemForSimpleTests();
     }
 }

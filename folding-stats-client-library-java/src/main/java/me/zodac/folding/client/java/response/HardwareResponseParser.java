@@ -5,14 +5,13 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import lombok.experimental.UtilityClass;
 import me.zodac.folding.api.tc.Hardware;
-import me.zodac.folding.client.java.request.HardwareRequestSender;
 
 import java.lang.reflect.Type;
 import java.net.http.HttpResponse;
 import java.util.Collection;
 
 /**
- * {@link UtilityClass} used to parse a {@link HttpResponse} returned from {@link HardwareRequestSender}.
+ * {@link UtilityClass} used to parse a {@link HttpResponse} returned from {@link me.zodac.folding.client.java.request.HardwareRequestSender}.
  */
 @UtilityClass
 public final class HardwareResponseParser {
@@ -20,7 +19,7 @@ public final class HardwareResponseParser {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     /**
-     * Returns the {@link Hardware}s retrieved by {@link HardwareRequestSender#getAll()}.
+     * Returns the {@link Hardware}s retrieved by {@link me.zodac.folding.client.java.request.HardwareRequestSender#getAll()}.
      *
      * @param response the {@link HttpResponse} to parse
      * @return the retrieved {@link Hardware}s
@@ -32,7 +31,7 @@ public final class HardwareResponseParser {
     }
 
     /**
-     * Returns the {@link Hardware} retrieved by {@link HardwareRequestSender#get(int)}.
+     * Returns the {@link Hardware} retrieved by {@link me.zodac.folding.client.java.request.HardwareRequestSender#get(int)}.
      *
      * @param response the {@link HttpResponse} to parse
      * @return the retrieved {@link Hardware}
@@ -42,7 +41,7 @@ public final class HardwareResponseParser {
     }
 
     /**
-     * Returns the {@link Hardware} created by {@link HardwareRequestSender#create(Hardware)}.
+     * Returns the {@link Hardware} created by {@link me.zodac.folding.client.java.request.HardwareRequestSender#create(Hardware)}.
      *
      * @param response the {@link HttpResponse} to parse
      * @return the created {@link Hardware}
@@ -52,7 +51,7 @@ public final class HardwareResponseParser {
     }
 
     /**
-     * Returns the {@link Hardware} updated by {@link HardwareRequestSender#update(Hardware)}.
+     * Returns the {@link Hardware} updated by {@link me.zodac.folding.client.java.request.HardwareRequestSender#update(Hardware)}.
      *
      * @param response the {@link HttpResponse} to parse
      * @return the updated {@link Hardware}

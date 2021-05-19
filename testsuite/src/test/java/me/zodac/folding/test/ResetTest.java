@@ -33,7 +33,7 @@ import static me.zodac.folding.test.utils.UserUtils.createOrConflict;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests for the monthly reset of the <code>Team Competition</code> stats.
+ * Tests for the monthly reset of the <code>Team Competition</code> {@link CompetitionResult}.
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ResetTest {

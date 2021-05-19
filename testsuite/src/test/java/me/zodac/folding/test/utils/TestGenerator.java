@@ -101,7 +101,7 @@ public final class TestGenerator {
     }
 
     /**
-     * Generates a {@link User} with the supplied {@link Hardware} ID
+     * Generates a {@link User} with the supplied {@link Hardware} ID.
      *
      * @param hardwareId the ID of the {@link Hardware} for the user
      * @return the generated {@link User}
@@ -197,7 +197,7 @@ public final class TestGenerator {
     }
 
     /**
-     * Generates a {@link Team} with with the supplied {@link User} IDs
+     * Generates a {@link Team} with with the supplied {@link User} IDs.
      *
      * @param captainId   the ID of the captain {@link User}
      * @param teamUserIds the IDs of the rest of the {@link Team} {@link User}s

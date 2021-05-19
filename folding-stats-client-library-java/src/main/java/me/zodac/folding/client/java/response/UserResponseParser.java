@@ -5,14 +5,13 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import lombok.experimental.UtilityClass;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.client.java.request.UserRequestSender;
 
 import java.lang.reflect.Type;
 import java.net.http.HttpResponse;
 import java.util.Collection;
 
 /**
- * {@link UtilityClass} used to parse a {@link HttpResponse} returned from {@link UserRequestSender}.
+ * {@link UtilityClass} used to parse a {@link HttpResponse} returned from {@link me.zodac.folding.client.java.request.UserRequestSender}.
  */
 @UtilityClass
 public final class UserResponseParser {
@@ -20,7 +19,7 @@ public final class UserResponseParser {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     /**
-     * Returns the {@link User}s retrieved by {@link UserRequestSender#getAll()}.
+     * Returns the {@link User}s retrieved by {@link me.zodac.folding.client.java.request.UserRequestSender#getAll()}.
      *
      * @param response the {@link HttpResponse} to parse
      * @return the retrieved {@link User}s
@@ -32,7 +31,7 @@ public final class UserResponseParser {
     }
 
     /**
-     * Returns the {@link User} retrieved by {@link UserRequestSender#get(int)}.
+     * Returns the {@link User} retrieved by {@link me.zodac.folding.client.java.request.UserRequestSender#get(int)}.
      *
      * @param response the {@link HttpResponse} to parse
      * @return the retrieved {@link User}
@@ -42,7 +41,7 @@ public final class UserResponseParser {
     }
 
     /**
-     * Returns the {@link User} created by {@link UserRequestSender#create(User)}.
+     * Returns the {@link User} created by {@link me.zodac.folding.client.java.request.UserRequestSender#create(User)}.
      *
      * @param response the {@link HttpResponse} to parse
      * @return the created {@link User}
@@ -52,7 +51,7 @@ public final class UserResponseParser {
     }
 
     /**
-     * Returns the {@link User} updated by {@link UserRequestSender#update(User)}.
+     * Returns the {@link User} updated by {@link me.zodac.folding.client.java.request.UserRequestSender#update(User)}.
      *
      * @param response the {@link HttpResponse} to parse
      * @return the updated {@link User}

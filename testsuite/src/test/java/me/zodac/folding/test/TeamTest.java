@@ -101,13 +101,7 @@ public class TeamTest {
 
     @Test
     public void whenGettingTeam_givenAValidTeamId_thenTeamIsReturned_andHasA200Status() throws FoldingRestException {
-        final Collection<Team> allTeams = TeamUtils.getAll();
-        int teamId = allTeams.size();
-
-        if (allTeams.isEmpty()) {
-            final Team team = generateTeam();
-            teamId = TeamUtils.createOrConflict(team).getId();
-        }
+        final int teamId = TeamUtils.createOrConflict(generateTeam()).getId();
 
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.get(teamId);
         assertThat(response.statusCode())
@@ -123,13 +117,8 @@ public class TeamTest {
 
     @Test
     public void whenUpdatingTeam_givenAValidTeamId_andAValidPayload_thenUpdatedTeamIsReturned_andNoNewTeamIsCreated_andHasA200Status() throws FoldingRestException {
-        final Collection<Team> allTeams = TeamUtils.getAll();
-        int teamId = allTeams.size();
-
-        if (allTeams.isEmpty()) {
-            final Team team = generateTeam();
-            teamId = TeamUtils.createOrConflict(team).getId();
-        }
+        final int teamId = TeamUtils.createOrConflict(generateTeam()).getId();
+        final int initialSize = TeamUtils.getNumberOfTeams();
 
         final Team updatedTeam = Team.updateWithId(teamId, TeamUtils.get(teamId));
         updatedTeam.setTeamDescription("Updated description");
@@ -148,18 +137,13 @@ public class TeamTest {
         final int allTeamsAfterUpdate = TeamUtils.getNumberOfTeams();
         assertThat(allTeamsAfterUpdate)
                 .as("Expected no new team instances to be created")
-                .isEqualTo(teamId);
+                .isEqualTo(initialSize);
     }
 
     @Test
     public void whenDeletingTeam_givenAValidTeamId_thenTeamIsDeleted_andHasA200Status_andTeamCountIsReduced_andTeamCannotBeRetrievedAgain() throws FoldingRestException {
-        final Collection<Team> allTeams = TeamUtils.getAll();
-        int teamId = allTeams.size();
-
-        if (allTeams.isEmpty()) {
-            final Team team = generateTeam();
-            teamId = TeamUtils.createOrConflict(team).getId();
-        }
+        final int teamId = TeamUtils.createOrConflict(generateTeam()).getId();
+        final int initialSize = TeamUtils.getNumberOfTeams();
 
         final HttpResponse<Void> response = TEAM_REQUEST_SENDER.delete(teamId);
         assertThat(response.statusCode())
@@ -174,7 +158,7 @@ public class TeamTest {
         final int newSize = TeamUtils.getNumberOfTeams();
         assertThat(newSize)
                 .as("Get all response did not return the initial teams - deleted team")
-                .isEqualTo(teamId - 1);
+                .isEqualTo(initialSize - 1);
     }
 
     @Test
@@ -249,7 +233,6 @@ public class TeamTest {
         final int secondCaptainUserId = UserUtils.createOrConflict(secondCaptainUser).getId();
         final Team newTeam = generateTeamWithUserIds(secondCaptainUserId);
         final int newTeamId = TeamUtils.createOrConflict(newTeam).getId();
-
 
         final Team updatedNewTeam = TeamUtils.unretireUser(newTeamId, retiredUserId);
 
@@ -538,7 +521,7 @@ public class TeamTest {
     }
 
     @Test
-    public void whenGettingTeamById_givenRequestHasIfNoMatchHeader_andTeamHasNotChanged_thenResponseHasA304Status_andNoBody() throws FoldingRestException {
+    public void whenGettingTeamById_givenRequestUsesPreviousETag_andTeamHasNotChanged_thenResponseHasA304Status_andNoBody() throws FoldingRestException {
         final int teamId = TeamUtils.createOrConflict(generateTeam()).getId();
 
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.get(teamId);
@@ -559,7 +542,7 @@ public class TeamTest {
     }
 
     @Test
-    public void whenGettingAllTeams_givenRequestHasIfNoMatchHeader_andTeamsHaveNotChanged_thenResponseHasA304Status_andNoBody() throws FoldingRestException {
+    public void whenGettingAllTeams_givenRequestUsesPreviousETag_andTeamsHaveNotChanged_thenResponseHasA304Status_andNoBody() throws FoldingRestException {
         TeamUtils.createOrConflict(generateTeam());
 
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.getAll();
