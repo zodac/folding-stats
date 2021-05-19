@@ -1,12 +1,12 @@
 package me.zodac.folding.rest.validator;
 
-import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.cache.HardwareCache;
+import me.zodac.folding.ejb.BusinessLogic;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.slf4j.Logger;
@@ -22,16 +22,16 @@ public class UserValidator {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserValidator.class);
     private static final UrlValidator URL_VALIDATOR = new UrlValidator();
 
-    private final StorageFacade storageFacade;
+    private final BusinessLogic businessLogic;
     private final FoldingStatsRetriever foldingStatsRetriever;
 
-    private UserValidator(final StorageFacade storageFacade, final FoldingStatsRetriever foldingStatsRetriever) {
-        this.storageFacade = storageFacade;
+    private UserValidator(final BusinessLogic businessLogic, final FoldingStatsRetriever foldingStatsRetriever) {
+        this.businessLogic = businessLogic;
         this.foldingStatsRetriever = foldingStatsRetriever;
     }
 
-    public static UserValidator create(final StorageFacade storageFacade, final FoldingStatsRetriever foldingStatsRetriever) {
-        return new UserValidator(storageFacade, foldingStatsRetriever);
+    public static UserValidator create(final BusinessLogic businessLogic, final FoldingStatsRetriever foldingStatsRetriever) {
+        return new UserValidator(businessLogic, foldingStatsRetriever);
     }
 
     public ValidationResponse isValid(final User user) {
@@ -65,7 +65,7 @@ public class UserValidator {
             }
         }
 
-        if (user.getHardwareId() <= Hardware.EMPTY_HARDWARE_ID || storageFacade.doesNotContainHardware(user.getHardwareId())) {
+        if (user.getHardwareId() <= Hardware.EMPTY_HARDWARE_ID || businessLogic.doesNotContainHardware(user.getHardwareId())) {
             final List<String> availableHardware = HardwareCache.get()
                     .getAll()
                     .stream()

@@ -1,6 +1,5 @@
 package me.zodac.folding.rest;
 
-import me.zodac.folding.StorageFacade;
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.db.exception.FoldingConflictException;
@@ -15,7 +14,8 @@ import me.zodac.folding.api.tc.exception.TeamNotFoundException;
 import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.utils.ExecutionType;
 import me.zodac.folding.api.validator.ValidationResponse;
-import me.zodac.folding.bean.TeamCompetitionStatsScheduler;
+import me.zodac.folding.ejb.BusinessLogic;
+import me.zodac.folding.ejb.TeamCompetitionStatsScheduler;
 import me.zodac.folding.rest.validator.TeamValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +54,7 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
     private static final Logger LOGGER = LoggerFactory.getLogger(TeamEndpoint.class);
 
     @EJB
-    private StorageFacade storageFacade;
+    private BusinessLogic businessLogic;
 
     @EJB
     private TeamCompetitionStatsScheduler teamCompetitionStatsScheduler;
@@ -118,14 +118,14 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
             final int parsedTeamId = super.parseId(teamId);
             final int parsedUnitId = super.parseId(userId);
 
-            final Team team = storageFacade.getTeam(parsedTeamId);
-            final TeamValidator teamValidator = TeamValidator.create(storageFacade);
+            final Team team = businessLogic.getTeam(parsedTeamId);
+            final TeamValidator teamValidator = TeamValidator.create(businessLogic);
             final ValidationResponse validationResponse = teamValidator.isValidRetirement(team, parsedUnitId);
             if (validationResponse.isInvalid()) {
                 return badRequest(validationResponse);
             }
 
-            final Team updatedTeam = storageFacade.retireUser(parsedTeamId, parsedUnitId);
+            final Team updatedTeam = businessLogic.retireUser(parsedTeamId, parsedUnitId);
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             return ok(updatedTeam);
         } catch (final FoldingIdInvalidException e) {
@@ -175,14 +175,14 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
             final int parsedTeamId = super.parseId(teamId);
             final int parsedRetiredUserId = super.parseId(retiredUserId);
 
-            final Team team = storageFacade.getTeam(parsedTeamId);
-            final TeamValidator teamValidator = TeamValidator.create(storageFacade);
+            final Team team = businessLogic.getTeam(parsedTeamId);
+            final TeamValidator teamValidator = TeamValidator.create(businessLogic);
             final ValidationResponse validationResponse = teamValidator.isValidUnretirement(team, parsedRetiredUserId);
             if (validationResponse.isInvalid()) {
                 return badRequest(validationResponse);
             }
 
-            final Team updatedTeam = storageFacade.unretireUser(parsedTeamId, parsedRetiredUserId);
+            final Team updatedTeam = businessLogic.unretireUser(parsedTeamId, parsedRetiredUserId);
             return ok(updatedTeam);
         } catch (final FoldingIdInvalidException e) {
             final String errorMessage = String.format("The ID '%s' is not a valid format", e.getId());
@@ -229,25 +229,25 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
 
     @Override
     protected ValidationResponse validate(final Team element) {
-        final TeamValidator teamValidator = TeamValidator.create(storageFacade);
+        final TeamValidator teamValidator = TeamValidator.create(businessLogic);
         return teamValidator.isValid(element);
     }
 
     @Override
     protected Team createElement(final Team team) throws FoldingException, FoldingConflictException {
-        final Team teamWithId = storageFacade.createTeam(team);
+        final Team teamWithId = businessLogic.createTeam(team);
         teamCompetitionStatsScheduler.parseTcStatsForTeam(team, ExecutionType.SYNCHRONOUS);
         return teamWithId;
     }
 
     @Override
     protected Collection<Team> getAllElements() throws FoldingException {
-        return storageFacade.getAllTeams();
+        return businessLogic.getAllTeams();
     }
 
     @Override
     protected Team getElementById(final int teamId) throws FoldingException, NotFoundException {
-        return storageFacade.getTeam(teamId);
+        return businessLogic.getTeam(teamId);
     }
 
     @Override
@@ -255,16 +255,16 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
         if (team.getId() == 0) {
             // The payload 'should' have the ID, but it's not necessary if the correct URL is used
             final Team teamWithId = Team.updateWithId(teamId, team);
-            storageFacade.updateTeam(teamWithId);
+            businessLogic.updateTeam(teamWithId);
             return teamWithId;
         }
 
-        storageFacade.updateTeam(team);
+        businessLogic.updateTeam(team);
         return team;
     }
 
     @Override
     protected void deleteElementById(final int teamId) throws FoldingConflictException, FoldingException {
-        storageFacade.deleteTeam(teamId);
+        businessLogic.deleteTeam(teamId);
     }
 }

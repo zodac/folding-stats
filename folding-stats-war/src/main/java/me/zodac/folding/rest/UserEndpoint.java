@@ -1,6 +1,5 @@
 package me.zodac.folding.rest;
 
-import me.zodac.folding.StorageFacade;
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.db.exception.FoldingConflictException;
@@ -15,7 +14,8 @@ import me.zodac.folding.api.tc.exception.NotFoundException;
 import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.stats.OffsetStats;
 import me.zodac.folding.api.validator.ValidationResponse;
-import me.zodac.folding.bean.UserTeamCompetitionStatsParser;
+import me.zodac.folding.ejb.BusinessLogic;
+import me.zodac.folding.ejb.UserTeamCompetitionStatsParser;
 import me.zodac.folding.rest.validator.UserValidator;
 import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.slf4j.Logger;
@@ -55,7 +55,7 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserEndpoint.class);
 
     @EJB
-    private StorageFacade storageFacade;
+    private BusinessLogic businessLogic;
 
     @EJB
     private UserTeamCompetitionStatsParser userTeamCompetitionStatsParser;
@@ -120,9 +120,9 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
             getElementById(parsedId); // We call this so if the value does not exist, we can fail with a NOT_FOUND response
 
             final OffsetStats offsetStatsToUse = getValidUserStatsOffset(offsetStats, parsedId);
-            storageFacade.addOrUpdateOffsetStats(parsedId, offsetStatsToUse);
+            businessLogic.addOrUpdateOffsetStats(parsedId, offsetStatsToUse);
             SystemStateManager.next(SystemState.UPDATING_STATS);
-            userTeamCompetitionStatsParser.parseTcStatsForUserAndWait(storageFacade.getUser(parsedId));
+            userTeamCompetitionStatsParser.parseTcStatsForUserAndWait(businessLogic.getUser(parsedId));
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             return ok();
         } catch (final FoldingIdInvalidException e) {
@@ -152,8 +152,8 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
             return offsetStats;
         }
 
-        final User user = storageFacade.getUser(parsedId);
-        final Hardware hardware = storageFacade.getHardware(user.getHardwareId());
+        final User user = businessLogic.getUser(parsedId);
+        final Hardware hardware = businessLogic.getHardware(user.getHardwareId());
         return OffsetStats.updateWithHardwareMultiplier(offsetStats, hardware.getMultiplier());
     }
 
@@ -169,23 +169,23 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
 
     @Override
     protected ValidationResponse validate(final User element) {
-        final UserValidator userValidator = UserValidator.create(storageFacade, HttpFoldingStatsRetriever.create());
+        final UserValidator userValidator = UserValidator.create(businessLogic, HttpFoldingStatsRetriever.create());
         return userValidator.isValid(element);
     }
 
     @Override
     protected User createElement(final User user) throws FoldingException, FoldingConflictException, FoldingExternalServiceException {
-        return storageFacade.createUser(user);
+        return businessLogic.createUser(user);
     }
 
     @Override
     protected Collection<User> getAllElements() throws FoldingException {
-        return storageFacade.getAllUsersWithPasskeys(false);
+        return businessLogic.getAllUsersWithPasskeys(false);
     }
 
     @Override
     protected User getElementById(final int userId) throws FoldingException, NotFoundException {
-        return storageFacade.getUserWithPasskey(userId, false);
+        return businessLogic.getUserWithPasskey(userId, false);
     }
 
     @Override
@@ -193,16 +193,16 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
         if (user.getId() == 0) {
             // The payload 'should' have the ID, but it's not necessary if the correct URL is used
             final User userWithId = User.updateWithId(userId, user);
-            storageFacade.updateUser(userWithId);
+            businessLogic.updateUser(userWithId);
             return userWithId;
         }
 
-        storageFacade.updateUser(user);
+        businessLogic.updateUser(user);
         return user;
     }
 
     @Override
     protected void deleteElementById(final int user) throws FoldingConflictException, FoldingException {
-        storageFacade.deleteUser(user);
+        businessLogic.deleteUser(user);
     }
 }

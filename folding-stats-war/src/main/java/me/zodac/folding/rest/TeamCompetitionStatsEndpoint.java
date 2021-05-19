@@ -1,6 +1,5 @@
 package me.zodac.folding.rest;
 
-import me.zodac.folding.StorageFacade;
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.exception.FoldingException;
@@ -14,9 +13,10 @@ import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.api.utils.ExecutionType;
-import me.zodac.folding.bean.TeamCompetitionResetScheduler;
-import me.zodac.folding.bean.TeamCompetitionStatsScheduler;
 import me.zodac.folding.cache.CompetitionResultCache;
+import me.zodac.folding.ejb.BusinessLogic;
+import me.zodac.folding.ejb.TeamCompetitionResetScheduler;
+import me.zodac.folding.ejb.TeamCompetitionStatsScheduler;
 import me.zodac.folding.rest.api.tc.CompetitionResult;
 import me.zodac.folding.rest.api.tc.TeamResult;
 import me.zodac.folding.rest.api.tc.UserResult;
@@ -40,7 +40,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import static java.util.stream.Collectors.toList;
 import static me.zodac.folding.rest.response.Responses.ok;
@@ -53,11 +52,8 @@ public class TeamCompetitionStatsEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TeamCompetitionStatsEndpoint.class);
 
-    // Stats updates occur every hour, so we must invalidate responses every hour
-    private static final int CACHE_EXPIRATION_TIME = (int) TimeUnit.HOURS.toSeconds(1);
-
     @EJB
-    private StorageFacade storageFacade;
+    private BusinessLogic businessLogic;
 
     @EJB
     private TeamCompetitionResetScheduler teamCompetitionResetScheduler;
@@ -143,7 +139,7 @@ public class TeamCompetitionStatsEndpoint {
 
     private List<TeamResult> getStatsForTeams() {
         try {
-            final Collection<Team> teams = storageFacade.getAllTeams();
+            final Collection<Team> teams = businessLogic.getAllTeams();
             final List<TeamResult> teamResults = new ArrayList<>(teams.size());
 
             for (final Team team : teams) {
@@ -167,17 +163,17 @@ public class TeamCompetitionStatsEndpoint {
                 .collect(toList());
 
         try {
-            final User captain = storageFacade.getUser(team.getCaptainUserId());
+            final User captain = businessLogic.getUser(team.getCaptainUserId());
             final Set<Integer> retiredUserIds = team.getRetiredUserIds();
 
             final List<UserResult> retiredUserResults = new ArrayList<>(retiredUserIds.size());
 
             for (final int retiredUserId : retiredUserIds) {
-                final RetiredUserTcStats retiredUserTcStats = storageFacade.getRetiredUser(retiredUserId);
+                final RetiredUserTcStats retiredUserTcStats = businessLogic.getRetiredUser(retiredUserId);
 
                 try {
-                    final User retiredUser = storageFacade.getUser(retiredUserTcStats.getUserId());
-                    final Hardware retiredUserHardware = storageFacade.getHardware(retiredUser.getHardwareId());
+                    final User retiredUser = businessLogic.getUser(retiredUserTcStats.getUserId());
+                    final Hardware retiredUserHardware = businessLogic.getHardware(retiredUser.getHardwareId());
                     retiredUserResults.add(UserResult.createForRetiredUser(retiredUser, retiredUserHardware, retiredUserTcStats));
                 } catch (final UserNotFoundException e) {
                     LOGGER.debug("Unable to find retired user ID {} with original user ID: {}", retiredUserId, retiredUserTcStats.getUserId(), e);
@@ -206,7 +202,7 @@ public class TeamCompetitionStatsEndpoint {
         }
 
         try {
-            final User user = storageFacade.getUser(userId);
+            final User user = businessLogic.getUser(userId);
             return getTcStatsForUser(user);
         } catch (final UserNotFoundException e) {
             LOGGER.warn("Unable to find user ID: {}", userId, e);
@@ -221,7 +217,7 @@ public class TeamCompetitionStatsEndpoint {
         final Hardware hardware;
 
         try {
-            hardware = storageFacade.getHardware(user.getHardwareId());
+            hardware = businessLogic.getHardware(user.getHardwareId());
         } catch (final HardwareNotFoundException e) {
             LOGGER.debug("No hardware found for ID: {}", user.getHardwareId(), e);
             LOGGER.warn("No hardware found for ID: {}", user.getHardwareId());
@@ -238,7 +234,7 @@ public class TeamCompetitionStatsEndpoint {
         }
 
         try {
-            final UserTcStats userTcStats = storageFacade.getTcStatsForUser(user.getId());
+            final UserTcStats userTcStats = businessLogic.getTcStatsForUser(user.getId());
             LOGGER.debug("Results for {}: {} points | {} multiplied points | {} units", user.getDisplayName(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits());
             return UserResult.createWithNoRank(user.getDisplayName(), user.getFoldingUserName(), hardware, category.displayName(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits(), user.getProfileLink(), user.getLiveStatsLink(), user.isRetired());
         } catch (final UserNotFoundException | NoStatsAvailableException e) {

@@ -1,6 +1,5 @@
-package me.zodac.folding.bean;
+package me.zodac.folding.ejb;
 
-import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.FoldingExternalServiceException;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
@@ -24,7 +23,7 @@ import java.util.Optional;
 import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
 
 /**
- * Class that parses stats for <code>Team Competition</code> {@link User}s.
+ * Class that parses {@link Stats} for <code>Team Competition</code> {@link User}s.
  */
 @LocalBean
 @Stateless
@@ -34,7 +33,7 @@ public class UserTeamCompetitionStatsParser {
     private static final FoldingStatsRetriever FOLDING_STATS_RETRIEVER = HttpFoldingStatsRetriever.create();
 
     @EJB
-    private StorageFacade storageFacade;
+    private BusinessLogic businessLogic;
 
     /**
      * Parses the latest TC stats for the given {@link User}.
@@ -85,13 +84,13 @@ public class UserTeamCompetitionStatsParser {
         }
 
         try {
-            storageFacade.persistTotalStatsForUser(totalStats);
+            businessLogic.persistTotalStatsForUser(totalStats);
         } catch (final FoldingException e) {
             LOGGER.warn("Error persisting total user stats", e.getCause());
             return;
         }
 
-        final Optional<Hardware> hardware = storageFacade.getHardwareForUser(user);
+        final Optional<Hardware> hardware = businessLogic.getHardwareForUser(user);
         if (hardware.isEmpty()) {
             LOGGER.warn("Unable to find hardware multiplier for user: {}", user);
             return;
@@ -113,7 +112,7 @@ public class UserTeamCompetitionStatsParser {
         LOGGER.info("{}: {} TC points | {} TC units", user.getDisplayName(), formatWithCommas(hourlyUserTcStats.getMultipliedPoints()), formatWithCommas(hourlyUserTcStats.getUnits()));
 
         try {
-            storageFacade.persistHourlyTcStatsForUser(hourlyUserTcStats);
+            businessLogic.persistHourlyTcStatsForUser(hourlyUserTcStats);
         } catch (final FoldingException e) {
             LOGGER.error("Error persisting hourly TC stats", e.getCause());
         }
@@ -133,7 +132,7 @@ public class UserTeamCompetitionStatsParser {
 
     private Stats getInitialStatsForUserOrEmpty(final User user) {
         try {
-            return storageFacade.getInitialStatsForUser(user.getId());
+            return businessLogic.getInitialStatsForUser(user.getId());
         } catch (final FoldingException e) {
             LOGGER.warn("Error getting initial user stats for user: {}", user, e.getCause());
         }
@@ -143,7 +142,7 @@ public class UserTeamCompetitionStatsParser {
 
     private OffsetStats getOffsetStatsForUserOrEmpty(final User user) {
         try {
-            return storageFacade.getOffsetStatsForUser(user.getId());
+            return businessLogic.getOffsetStatsForUser(user.getId());
         } catch (final FoldingException e) {
             LOGGER.warn("Error getting user offset stats for user: {}", user, e.getCause());
         }

@@ -1,4 +1,4 @@
-package me.zodac.folding;
+package me.zodac.folding.ejb;
 
 
 import me.zodac.folding.api.db.DbManager;
@@ -50,10 +50,9 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 /**
- * In order to decouple the REST layer from the storage/persistence, we use this {@link StorageFacade} instead.
+ * In order to decouple the REST layer from any business requirements, we move that logic into this {@link Singleton} EJB.
  * <p>
- * This way the {@link StorageFacade} is aware of caches or any other internal implementation, while the REST layer
- * does not need to know about them or any DBs being used.
+ * This should simplify the REST layer to simply validate incoming requests and forward to here.
  */
 // TODO: [zodac] Should replace the cache miss warnings with some metrics instead?
 // TODO: [zodac] Split into one Facade for POJOs and one for stats?
@@ -61,9 +60,9 @@ import static java.util.stream.Collectors.toMap;
 //  both DB and cache in the REST/EJB layer. I think it's gotten too big and needs to be scaled back...
 // TODO: [zodac] Also don't like how the #get() methods don't use Optional, why am I relying on *NotFoundException?
 @Singleton
-public class StorageFacade {
+public class BusinessLogic {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(StorageFacade.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BusinessLogic.class);
     private static final FoldingStatsRetriever FOLDING_STATS_RETRIEVER = HttpFoldingStatsRetriever.create();
 
     private final DbManager dbManager = DbManagerRetriever.get();

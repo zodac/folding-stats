@@ -1,6 +1,5 @@
-package me.zodac.folding.bean;
+package me.zodac.folding.ejb;
 
-import me.zodac.folding.StorageFacade;
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.exception.FoldingException;
@@ -24,7 +23,20 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 
-// TODO: [zodac] Move this to an EJB module?
+/**
+ * {@link Startup} EJB which schedules the <code>Team Competition</code> stats retrieval for the system. By default, the
+ * system will update stats using {@link UserTeamCompetitionStatsParser} every hour at <b>55</b> minutes past the hour.
+ * <p>
+ * However, this default time can be changed by setting the environment variables:
+ * <ul>
+ *     <li>STATS_PARSING_SCHEDULE_HOUR</li>
+ *     <li>STATS_PARSING_SCHEDULE_MINUTE</li>
+ *     <li>STATS_PARSING_SCHEDULE_SECOND</li>
+ * </ul>
+ *
+ * <b>NOTE:</b> The {@link TeamCompetitionResetScheduler} schedule cannot be modified, so you should be careful not to
+ * have the stats retrieval conflict with the reset time.
+ */
 @Startup
 @Singleton
 public class TeamCompetitionStatsScheduler {
@@ -38,7 +50,7 @@ public class TeamCompetitionStatsScheduler {
     private static final String STATS_PARSING_SCHEDULE_SECOND = EnvironmentVariables.get("STATS_PARSING_SCHEDULE_SECOND", "0");
 
     @EJB
-    private StorageFacade storageFacade;
+    private BusinessLogic businessLogic;
 
     @EJB
     private UserTeamCompetitionStatsParser userTeamCompetitionStatsParser;
@@ -117,7 +129,7 @@ public class TeamCompetitionStatsScheduler {
 
     private Optional<User> getTcUser(final int userId) {
         try {
-            final User user = storageFacade.getUser(userId);
+            final User user = businessLogic.getUser(userId);
 
             if (user.isRetired()) {
                 LOGGER.warn("TC user was retired, was expecting active user: {}", user);
@@ -132,7 +144,7 @@ public class TeamCompetitionStatsScheduler {
 
     private Collection<Team> getTcTeams() {
         try {
-            return storageFacade.getAllTeams();
+            return businessLogic.getAllTeams();
         } catch (final FoldingException e) {
             LOGGER.warn("Error retrieving TC teams", e);
             return Collections.emptyList();

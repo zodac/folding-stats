@@ -18,7 +18,6 @@ import lombok.ToString;
  *     }
  * </pre>
  */
-
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter

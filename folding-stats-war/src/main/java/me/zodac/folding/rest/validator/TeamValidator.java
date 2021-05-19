@@ -1,11 +1,11 @@
 package me.zodac.folding.rest.validator;
 
-import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.validator.ValidationResponse;
+import me.zodac.folding.ejb.BusinessLogic;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.UrlValidator;
 
@@ -24,14 +24,14 @@ public class TeamValidator {
 
     private static final UrlValidator URL_VALIDATOR = new UrlValidator();
 
-    private final StorageFacade storageFacade;
+    private final BusinessLogic businessLogic;
 
-    private TeamValidator(final StorageFacade storageFacade) {
-        this.storageFacade = storageFacade;
+    private TeamValidator(final BusinessLogic businessLogic) {
+        this.businessLogic = businessLogic;
     }
 
-    public static TeamValidator create(final StorageFacade storageFacade) {
-        return new TeamValidator(storageFacade);
+    public static TeamValidator create(final BusinessLogic businessLogic) {
+        return new TeamValidator(businessLogic);
     }
 
 
@@ -48,8 +48,8 @@ public class TeamValidator {
             }
         }
 
-        if (team.getCaptainUserId() <= User.EMPTY_USER_ID || storageFacade.doesNotContainUser(team.getCaptainUserId())) {
-            final List<String> availableUsers = storageFacade
+        if (team.getCaptainUserId() <= User.EMPTY_USER_ID || businessLogic.doesNotContainUser(team.getCaptainUserId())) {
+            final List<String> availableUsers = businessLogic
                     .getAllUsersOrEmpty()
                     .stream()
                     .map(foldingUser -> String.format("%s: %s", foldingUser.getId(), foldingUser.getFoldingUserName()))
@@ -67,7 +67,7 @@ public class TeamValidator {
         }
 
         if (team.getUserIds().isEmpty()) {
-            final List<String> availableUsers = storageFacade
+            final List<String> availableUsers = businessLogic
                     .getAllUsersOrEmpty()
                     .stream()
                     .map(foldingUser -> String.format("%s: %s", foldingUser.getId(), foldingUser.getFoldingUserName()))
@@ -78,13 +78,13 @@ public class TeamValidator {
 
         final List<Integer> invalidUserIds = new ArrayList<>(team.getUserIds().size());
         for (final int userId : team.getUserIds()) {
-            if (storageFacade.doesNotContainUser(userId)) {
+            if (businessLogic.doesNotContainUser(userId)) {
                 invalidUserIds.add(userId);
             }
         }
 
         if (!invalidUserIds.isEmpty()) {
-            final List<String> availableUsers = storageFacade
+            final List<String> availableUsers = businessLogic
                     .getAllUsersOrEmpty()
                     .stream()
                     .map(foldingUser -> String.format("%s: %s", foldingUser.getId(), foldingUser.getFoldingUserName()))
@@ -93,7 +93,7 @@ public class TeamValidator {
             failureMessages.add(String.format("Attribute 'userIds' contains invalid IDs %s, must be: %s", invalidUserIds, availableUsers));
         }
 
-        for (final Team existingTeam : storageFacade.getAllTeamsOrEmpty()) {
+        for (final Team existingTeam : businessLogic.getAllTeamsOrEmpty()) {
             if (existingTeam.getTeamName().equalsIgnoreCase(team.getTeamName())) {
                 continue;
             }
@@ -111,7 +111,7 @@ public class TeamValidator {
         if (failureMessages.isEmpty()) {
             final Map<Category, Long> categoryCount = team.getUserIds()
                     .stream()
-                    .map(storageFacade::getUserOrNull)
+                    .map(businessLogic::getUserOrNull)
                     .filter(Objects::nonNull)
                     .map(User::getCategory)
                     .map(Category::get)
@@ -157,8 +157,8 @@ public class TeamValidator {
             failureMessages.add(String.format("Unable to add retired user ID %s to team %s, %s users already on the team", retiredUserId, team, team.getUserIds().size()));
         }
 
-        if (storageFacade.doesNotContainRetiredUser(retiredUserId)) {
-            final List<Integer> availableRetiredUsers = storageFacade
+        if (businessLogic.doesNotContainRetiredUser(retiredUserId)) {
+            final List<Integer> availableRetiredUsers = businessLogic
                     .getAllRetiredUserStats()
                     .stream()
                     .mapToInt(RetiredUserTcStats::getRetiredUserId)

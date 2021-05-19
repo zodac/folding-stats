@@ -25,8 +25,6 @@ public class JaxRsApplication extends Application {
 
         // REST providers
         services.add(InvalidUrlHandler.class);
-
-        // TODO: [zodac] Add a Healthcheck endpoint for liveliness/readiness probes (though we probably won't ever be in K8S)?
         return services;
     }
 }

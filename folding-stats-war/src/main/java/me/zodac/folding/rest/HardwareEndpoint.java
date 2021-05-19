@@ -1,12 +1,12 @@
 package me.zodac.folding.rest;
 
-import me.zodac.folding.StorageFacade;
 import me.zodac.folding.api.db.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.FoldingExternalServiceException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.exception.NotFoundException;
 import me.zodac.folding.api.validator.ValidationResponse;
+import me.zodac.folding.ejb.BusinessLogic;
 import me.zodac.folding.rest.validator.HardwareValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +38,7 @@ public class HardwareEndpoint extends AbstractIdentifiableCrudEndpoint<Hardware>
     private static final Logger LOGGER = LoggerFactory.getLogger(HardwareEndpoint.class);
 
     @EJB
-    private StorageFacade storageFacade;
+    private BusinessLogic businessLogic;
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -101,17 +101,17 @@ public class HardwareEndpoint extends AbstractIdentifiableCrudEndpoint<Hardware>
 
     @Override
     protected Hardware createElement(final Hardware hardware) throws FoldingException, FoldingConflictException {
-        return storageFacade.createHardware(hardware);
+        return businessLogic.createHardware(hardware);
     }
 
     @Override
     protected Collection<Hardware> getAllElements() throws FoldingException {
-        return storageFacade.getAllHardware();
+        return businessLogic.getAllHardware();
     }
 
     @Override
     protected Hardware getElementById(final int hardwareId) throws FoldingException, NotFoundException {
-        return storageFacade.getHardware(hardwareId);
+        return businessLogic.getHardware(hardwareId);
     }
 
     @Override
@@ -119,16 +119,16 @@ public class HardwareEndpoint extends AbstractIdentifiableCrudEndpoint<Hardware>
         if (hardware.getId() == 0) {
             // The payload 'should' have the ID, but it's not necessary if the correct URL is used
             final Hardware hardwareWithId = Hardware.updateWithId(hardwareId, hardware);
-            storageFacade.updateHardware(hardwareWithId);
+            businessLogic.updateHardware(hardwareWithId);
             return hardwareWithId;
         }
 
-        storageFacade.updateHardware(hardware);
+        businessLogic.updateHardware(hardware);
         return hardware;
     }
 
     @Override
     protected void deleteElementById(final int hardwareId) throws FoldingConflictException, FoldingException {
-        storageFacade.deleteHardware(hardwareId);
+        businessLogic.deleteHardware(hardwareId);
     }
 }

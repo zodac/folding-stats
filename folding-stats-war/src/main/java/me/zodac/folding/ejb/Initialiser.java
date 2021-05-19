@@ -1,6 +1,5 @@
-package me.zodac.folding.bean;
+package me.zodac.folding.ejb;
 
-import me.zodac.folding.StorageFacade;
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.db.DbManager;
@@ -18,8 +17,11 @@ import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import java.util.Collection;
 
-
-// TODO: [zodac] Move this to an EJB module?
+/**
+ * The {@link Startup} EJB which initialises the system when it comes online. This involves initalising any caches or
+ * any available {@link User} {@link Stats}, and verifying the {@link SystemState} and marking the system as {@link SystemState#AVAILABLE}
+ * when intialisation is complete.
+ */
 @Startup
 @Singleton
 public class Initialiser {
@@ -29,7 +31,7 @@ public class Initialiser {
     private final DbManager dbManager = DbManagerRetriever.get();
 
     @EJB
-    private StorageFacade storageFacade;
+    private BusinessLogic businessLogic;
 
     @EJB
     private TeamCompetitionStatsScheduler teamCompetitionStatsScheduler;
@@ -45,15 +47,15 @@ public class Initialiser {
 
     private void initCaches() {
         try {
-            storageFacade.getAllHardware();
-            storageFacade.getAllTeams();
+            businessLogic.getAllHardware();
+            businessLogic.getAllTeams();
 
-            final Collection<User> users = storageFacade.getAllUsers();
-            storageFacade.initialiseOffsetStats();
+            final Collection<User> users = businessLogic.getAllUsers();
+            businessLogic.initialiseOffsetStats();
 
             for (final User user : users) {
                 try {
-                    final Stats initialStatsForUser = storageFacade.getInitialStatsForUser(user.getId());
+                    final Stats initialStatsForUser = businessLogic.getInitialStatsForUser(user.getId());
                     LOGGER.debug("Found initial stats for user {}: {}", user, initialStatsForUser);
                 } catch (final FoldingException e) {
                     LOGGER.warn("Unable to get initial stats for user {}", user, e.getCause());

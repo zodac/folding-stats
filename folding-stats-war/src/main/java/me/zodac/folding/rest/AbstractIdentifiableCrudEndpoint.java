@@ -10,7 +10,7 @@ import me.zodac.folding.api.tc.exception.FoldingIdInvalidException;
 import me.zodac.folding.api.tc.exception.FoldingIdOutOfRangeException;
 import me.zodac.folding.api.tc.exception.NotFoundException;
 import me.zodac.folding.api.validator.ValidationResponse;
-import me.zodac.folding.rest.response.BulkCreateResponse;
+import me.zodac.folding.rest.response.BatchCreateResponse;
 import org.slf4j.Logger;
 
 import javax.ws.rs.core.CacheControl;
@@ -147,22 +147,22 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
             }
         }
 
-        final BulkCreateResponse bulkCreateResponse = BulkCreateResponse.create(successful, unsuccessful);
+        final BatchCreateResponse batchCreateResponse = BatchCreateResponse.create(successful, unsuccessful);
 
         if (successful.isEmpty()) {
             getLogger().error("No {}s successfully created", elementType());
-            return badRequest(bulkCreateResponse);
+            return badRequest(batchCreateResponse);
         }
 
         if (!unsuccessful.isEmpty()) {
             getLogger().error("{} {}s successfully created, {} {}s unsuccessful", successful.size(), elementType(), unsuccessful.size(), elementType());
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
-            return ok(bulkCreateResponse);
+            return ok(batchCreateResponse);
         }
 
         getLogger().debug("{} {}s successfully created", successful.size(), elementType());
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
-        return ok(bulkCreateResponse.getSuccessful());
+        return ok(batchCreateResponse.getSuccessful());
     }
 
     protected Response getAll(final Request request) {
@@ -187,7 +187,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
                 builder = okBuilder(elements);
                 builder.tag(entityTag);
             }
-            
+
             builder.cacheControl(cacheControl);
             return builder.build();
         } catch (final FoldingException e) {

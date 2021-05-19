@@ -17,7 +17,6 @@ COPY ./folding-stats-api/pom.xml ./folding-stats-api/pom.xml
 COPY ./folding-stats-client-library-java/pom.xml ./folding-stats-client-library-java/pom.xml
 COPY ./folding-stats-jar/pom.xml ./folding-stats-jar/pom.xml
 COPY ./folding-stats-war/pom.xml ./folding-stats-war/pom.xml
-COPY ./folding-stats-ear/pom.xml ./folding-stats-ear/pom.xml
 COPY ./stubbed-folding-endpoints-war/pom.xml ./stubbed-folding-endpoints-war/pom.xml
 COPY ./testsuite/pom.xml ./testsuite/pom.xml
 
@@ -28,7 +27,6 @@ COPY ./folding-stats-api ./folding-stats-api
 COPY ./folding-stats-client-library-java ./folding-stats-client-library-java
 COPY ./folding-stats-jar ./folding-stats-jar
 COPY ./folding-stats-war ./folding-stats-war
-COPY ./folding-stats-ear ./folding-stats-ear
 COPY ./stubbed-folding-endpoints-war ./stubbed-folding-endpoints-war
 COPY ./testsuite ./testsuite
 
@@ -37,7 +35,7 @@ RUN mvn clean install
 
 # Output
 RUN mkdir --parents /opt/jboss/wildfly/standalone/deployments/
-RUN mv ./folding-stats-ear/target/folding-stats-ear*.ear /opt/jboss/wildfly/standalone/deployments/folding-stats-ear.ear
+RUN mv ./folding-stats-war/target/folding-stats-war*.war /opt/jboss/wildfly/standalone/deployments/folding-stats-war.war
 RUN mv ./stubbed-folding-endpoints-war/target/stubbed-folding-endpoints-war*.war /opt/jboss/wildfly/standalone/deployments/stubbed-folding-endpoints-war.war
 
 # Override default command (which tries to execute a maven command)
