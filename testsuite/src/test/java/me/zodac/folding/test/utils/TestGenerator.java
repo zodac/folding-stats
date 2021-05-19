@@ -114,6 +114,7 @@ public final class TestGenerator {
                 Category.NVIDIA_GPU,
                 hardwareId,
                 "",
+                "",
                 false);
     }
 
@@ -133,6 +134,7 @@ public final class TestGenerator {
                 "DummyPasskey" + userCount++,
                 category,
                 hardwareId,
+                "",
                 "",
                 false);
     }
@@ -155,6 +157,7 @@ public final class TestGenerator {
                 Category.NVIDIA_GPU,
                 hardwareId,
                 "",
+                "",
                 false);
     }
 
@@ -171,6 +174,7 @@ public final class TestGenerator {
         return Team.createWithoutId(
                 "Dummy_Team" + teamCount++,
                 "Dummy Team",
+                "",
                 userId,
                 Set.of(userId),
                 Collections.emptySet());
@@ -191,6 +195,7 @@ public final class TestGenerator {
                 teamId,
                 "Dummy_Team" + teamCount++,
                 "Dummy Team",
+                "",
                 userId,
                 Set.of(userId),
                 Collections.emptySet());
@@ -211,6 +216,7 @@ public final class TestGenerator {
         return Team.createWithoutId(
                 "Dummy_Team" + teamCount++,
                 "Dummy Team",
+                "",
                 captainId,
                 userIds,
                 Collections.emptySet());

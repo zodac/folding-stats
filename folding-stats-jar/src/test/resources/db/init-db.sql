@@ -19,6 +19,7 @@ CREATE TABLE users (
     category TEXT NOT NULL,
     hardware_id INT NOT NULL,
     live_stats_link TEXT NULL,
+    profile_link TEXT NULL,
     is_retired BOOLEAN DEFAULT(false),
     CONSTRAINT unique_user UNIQUE(folding_username, passkey),
     CONSTRAINT fk_hardware_id
@@ -33,7 +34,8 @@ CREATE INDEX index_user_id
 CREATE TABLE teams (
     team_id SERIAL PRIMARY KEY,
     team_name TEXT NOT NULL UNIQUE,
-    team_description TEXT,
+    team_description TEXT NULL,
+    forum_link TEXT NULL,
     captain_user_id INT NOT NULL,
     user_ids INT[] NOT NULL,
     retired_user_ids INT[] DEFAULT '{}',
@@ -140,4 +142,3 @@ CREATE TABLE user_tc_stats_hourly (
 
 CREATE INDEX index_user_tc_stats_hourly
     ON user_tc_stats_hourly(user_id, utc_timestamp);
-

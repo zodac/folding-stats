@@ -7,6 +7,7 @@ import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.validator.ValidationResponse;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.validator.routines.UrlValidator;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -20,6 +21,8 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toList;
 
 public class TeamValidator {
+
+    private static final UrlValidator URL_VALIDATOR = new UrlValidator();
 
     private final StorageFacade storageFacade;
 
@@ -37,6 +40,12 @@ public class TeamValidator {
 
         if (StringUtils.isBlank(team.getTeamName())) {
             failureMessages.add("Attribute 'teamName' must not be empty");
+        }
+
+        if (StringUtils.isNotEmpty(team.getForumLink())) {
+            if (!URL_VALIDATOR.isValid(team.getForumLink())) {
+                failureMessages.add(String.format("Attribute 'forumLink' is not a valid link: '%s'", team.getForumLink()));
+            }
         }
 
         if (team.getCaptainUserId() <= User.EMPTY_USER_ID || storageFacade.doesNotContainUser(team.getCaptainUserId())) {

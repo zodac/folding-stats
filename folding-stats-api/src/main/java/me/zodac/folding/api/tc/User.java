@@ -40,6 +40,7 @@ public class User implements Identifiable {
     private String passkey;
     private String category;
     private int hardwareId;
+    private String profileLink;
     private String liveStatsLink;
     private boolean isRetired;
 
@@ -54,12 +55,13 @@ public class User implements Identifiable {
      * @param passkey         the Folding@Home passkey for this user
      * @param category        the {@link Category} the user is eligible for when added to a {@link Team}
      * @param hardwareId      the ID of the {@link Hardware} that this {@link User} is Folding on
+     * @param profileLink     a URL linking to the {@link User}'s profile on their forum
      * @param liveStatsLink   a URL linking to the live Folding@Home stats (HFM, for example) for the {@link User}
      * @param isRetired       whether the user has been retired from a team
      * @return the created {@link User}
      */
-    public static User create(final int userId, final String foldingUserName, final String displayName, final String passkey, final Category category, final int hardwareId, final String liveStatsLink, final boolean isRetired) {
-        return new User(userId, foldingUserName, displayName, passkey, category.displayName(), hardwareId, liveStatsLink, isRetired);
+    public static User create(final int userId, final String foldingUserName, final String displayName, final String passkey, final Category category, final int hardwareId, final String profileLink, final String liveStatsLink, final boolean isRetired) {
+        return new User(userId, foldingUserName, displayName, passkey, category.displayName(), hardwareId, profileLink, liveStatsLink, isRetired);
     }
 
     /**
@@ -72,12 +74,13 @@ public class User implements Identifiable {
      * @param passkey         the Folding@Home passkey for this user
      * @param category        the {@link Category} the user is eligible for when added to a {@link Team}
      * @param hardwareId      the ID of the {@link Hardware} that this {@link User} is Folding on
+     * @param profileLink     a URL linking to the {@link User}'s profile on their forum
      * @param liveStatsLink   a URL linking to the live Folding@Home stats (HFM, for example) for the {@link User}
      * @param isRetired       whether the user has been retired from a team
      * @return the created {@link User}
      */
-    public static User createWithoutId(final String foldingUserName, final String displayName, final String passkey, final Category category, final int hardwareId, final String liveStatsLink, final boolean isRetired) {
-        return new User(EMPTY_USER_ID, foldingUserName, displayName, passkey, category.displayName(), hardwareId, liveStatsLink, isRetired);
+    public static User createWithoutId(final String foldingUserName, final String displayName, final String passkey, final Category category, final int hardwareId, final String profileLink, final String liveStatsLink, final boolean isRetired) {
+        return new User(EMPTY_USER_ID, foldingUserName, displayName, passkey, category.displayName(), hardwareId, profileLink, liveStatsLink, isRetired);
     }
 
     /**
@@ -91,7 +94,7 @@ public class User implements Identifiable {
      * @return the updated {@link User}
      */
     public static User updateWithId(final int userId, final User user) {
-        return new User(userId, user.foldingUserName, user.displayName, user.passkey, user.category, user.hardwareId, user.liveStatsLink, user.isRetired);
+        return new User(userId, user.foldingUserName, user.displayName, user.passkey, user.category, user.hardwareId, user.profileLink, user.liveStatsLink, user.isRetired);
     }
 
     /**
@@ -104,7 +107,7 @@ public class User implements Identifiable {
      * @return the retired {@link User}
      */
     public static User retireUser(final User user) {
-        return new User(user.id, user.foldingUserName, user.displayName, user.passkey, user.category, user.hardwareId, user.liveStatsLink, true);
+        return new User(user.id, user.foldingUserName, user.displayName, user.passkey, user.category, user.hardwareId, user.profileLink, user.liveStatsLink, true);
     }
 
     /**
@@ -117,7 +120,7 @@ public class User implements Identifiable {
      * @return the un-retired {@link User}
      */
     public static User unretireUser(final User user) {
-        return new User(user.id, user.foldingUserName, user.displayName, user.passkey, user.category, user.hardwareId, user.liveStatsLink, false);
+        return new User(user.id, user.foldingUserName, user.displayName, user.passkey, user.category, user.hardwareId, user.profileLink, user.liveStatsLink, false);
     }
 
     /**
@@ -129,7 +132,7 @@ public class User implements Identifiable {
      * @return the updated {@link User}
      */
     public static User hidePasskey(final User user) {
-        return new User(user.id, user.foldingUserName, user.displayName, hidePasskey(user.passkey), user.category, user.hardwareId, user.liveStatsLink, user.isRetired);
+        return new User(user.id, user.foldingUserName, user.displayName, hidePasskey(user.passkey), user.category, user.hardwareId, user.profileLink, user.liveStatsLink, user.isRetired);
     }
 
     private static String hidePasskey(final String passkey) {

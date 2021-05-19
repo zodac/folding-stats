@@ -20,14 +20,13 @@ import java.net.HttpURLConnection;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import static me.zodac.folding.test.utils.HttpResponseHeaderUtils.getETag;
 import static me.zodac.folding.test.utils.HttpResponseHeaderUtils.getXTotalCount;
 import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForSimpleTests;
 import static me.zodac.folding.test.utils.TestGenerator.generateHardware;
+import static me.zodac.folding.test.utils.TestGenerator.generateTeamWithUserIds;
 import static me.zodac.folding.test.utils.TestGenerator.generateUser;
 import static me.zodac.folding.test.utils.TestGenerator.generateUserWithHardwareId;
 import static me.zodac.folding.test.utils.TestGenerator.generateUserWithUserId;
@@ -337,7 +336,7 @@ public class UserTest {
         final User user = generateUser();
         final int userId = UserUtils.createOrConflict(user).getId();
 
-        final Team team = Team.createWithoutId("DummyTeam", "Dummy team", userId, Set.of(userId), Collections.emptySet());
+        final Team team = generateTeamWithUserIds(userId);
         TeamUtils.createOrConflict(team);
 
         final HttpResponse<Void> deleteUserResponse = USER_REQUEST_SENDER.delete(userId);

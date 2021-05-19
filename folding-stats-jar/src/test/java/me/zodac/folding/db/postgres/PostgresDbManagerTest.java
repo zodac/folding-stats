@@ -264,7 +264,7 @@ public class PostgresDbManagerTest {
 
     private User generateUser() throws FoldingConflictException, FoldingException {
         final int hardwareId = createHardware().getId();
-        return User.createWithoutId(nextUserName(), "user", "passkey", Category.NVIDIA_GPU, hardwareId, "", false);
+        return User.createWithoutId(nextUserName(), "user", "passkey", Category.NVIDIA_GPU, hardwareId, "", "", false);
     }
 
     private User createUser() throws FoldingConflictException, FoldingException {
@@ -273,7 +273,7 @@ public class PostgresDbManagerTest {
 
     private Team generateTeam() throws FoldingConflictException, FoldingException {
         final int userId = createUser().getId();
-        return Team.createWithoutId(nextTeamName(), "team", userId, Set.of(userId), Collections.emptySet());
+        return Team.createWithoutId(nextTeamName(), "team", "", userId, Set.of(userId), Collections.emptySet());
     }
 
     private Team createTeam() throws FoldingConflictException, FoldingException {

@@ -53,6 +53,12 @@ public class UserValidator {
             failureMessages.add("Attribute 'passkey' must not be empty");
         }
 
+        if (StringUtils.isNotEmpty(user.getProfileLink())) {
+            if (!URL_VALIDATOR.isValid(user.getProfileLink())) {
+                failureMessages.add(String.format("Attribute 'profileLink' is not a valid link: '%s'", user.getProfileLink()));
+            }
+        }
+
         if (StringUtils.isNotEmpty(user.getLiveStatsLink())) {
             if (!URL_VALIDATOR.isValid(user.getLiveStatsLink())) {
                 failureMessages.add(String.format("Attribute 'liveStatsLink' is not a valid link: '%s'", user.getLiveStatsLink()));

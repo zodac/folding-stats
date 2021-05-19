@@ -19,8 +19,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import java.net.HttpURLConnection;
 import java.net.http.HttpResponse;
-import java.util.Collections;
-import java.util.Set;
 
 import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForComplexTests;
 import static me.zodac.folding.test.utils.TeamCompetitionStatsUtils.TEAM_COMPETITION_REQUEST_SENDER;
@@ -106,18 +104,15 @@ public class ResetTest {
 
     @Test
     public void whenResetOccurs_thenStatsAreResetForCompetitionAndTeamsAndUsers() throws FoldingRestException {
-        final User firstUser = User.createWithoutId("User3", "User3", "Passkey3", Category.NVIDIA_GPU, 1, "", false);
-        final User secondUser = User.createWithoutId("User4", "User4", "Passkey4", Category.AMD_GPU, 1, "", false);
-        final User thirdUser = User.createWithoutId("User5", "User5", "Passkey5", Category.AMD_GPU, 1, "", false);
-        StubbedFoldingEndpointUtils.enableUser(firstUser);
-        StubbedFoldingEndpointUtils.enableUser(secondUser);
-        StubbedFoldingEndpointUtils.enableUser(thirdUser);
+        final User firstUser = generateUserWithCategory(Category.NVIDIA_GPU);
+        final User secondUser = generateUserWithCategory(Category.AMD_GPU);
+        final User thirdUser = generateUserWithCategory(Category.AMD_GPU);
         final int firstUserId = createOrConflict(firstUser).getId();
         final int secondUserId = createOrConflict(secondUser).getId();
         final int thirdUserId = createOrConflict(thirdUser).getId();
 
-        final Team firstTeam = TeamUtils.createOrConflict(Team.createWithoutId("Team2", "", firstUserId, Set.of(firstUserId, secondUserId), Collections.emptySet()));
-        final Team secondTeam = TeamUtils.createOrConflict(Team.createWithoutId("Team3", "", thirdUserId, Set.of(thirdUserId), Collections.emptySet()));
+        final Team firstTeam = TeamUtils.createOrConflict(generateTeamWithUserIds(firstUserId, secondUserId));
+        final Team secondTeam = TeamUtils.createOrConflict(generateTeamWithUserIds(thirdUserId));
 
         final long firstUserPoints = 10_000L;
         final long secondUserPoints = 7_000L;

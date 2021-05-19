@@ -6,7 +6,6 @@ import me.zodac.folding.api.tc.User;
 import me.zodac.folding.client.java.response.HardwareResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.test.utils.HardwareUtils;
-import me.zodac.folding.test.utils.StubbedFoldingEndpointUtils;
 import me.zodac.folding.test.utils.TestGenerator;
 import me.zodac.folding.test.utils.UserUtils;
 import org.junit.jupiter.api.AfterAll;
@@ -288,7 +287,6 @@ public class HardwareTest {
     public void whenDeletingHardware_givenTheHardwareIsLinkedToAUser_thenResponseHasA409Status() throws FoldingRestException {
         final int hardwareId = HardwareUtils.createOrConflict(generateHardware()).getId();
         final User user = TestGenerator.generateUserWithHardwareId(hardwareId);
-        StubbedFoldingEndpointUtils.enableUser(user);
         UserUtils.createOrConflict(user);
 
         final HttpResponse<Void> deleteHardwareResponse = HARDWARE_REQUEST_SENDER.delete(hardwareId);

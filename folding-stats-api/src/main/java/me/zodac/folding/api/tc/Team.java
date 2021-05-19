@@ -39,6 +39,7 @@ public class Team implements Identifiable {
     private int id;
     private String teamName;
     private String teamDescription;
+    private String forumLink;
     private int captainUserId;
     private Set<Integer> userIds = new HashSet<>(0);
     private Set<Integer> retiredUserIds = new HashSet<>(0);
@@ -51,13 +52,14 @@ public class Team implements Identifiable {
      * @param teamId          the ID
      * @param teamName        the name of the team
      * @param teamDescription an optional description for the team
+     * @param forumLink       a link to the {@link Team} thread on the forum
      * @param captainUserId   the {@link User} ID for the captain of this {@link Team}
      * @param userIds         the IDs of the active {@link User}s in the {@link Team}
      * @param retiredUserIds  the IDs of the retired {@link User}s in the {@link Team}
      * @return the created {@link Team}
      */
-    public static Team create(final int teamId, final String teamName, final String teamDescription, final int captainUserId, final Set<Integer> userIds, final Set<Integer> retiredUserIds) {
-        return new Team(teamId, teamName, teamDescription, captainUserId, userIds, retiredUserIds);
+    public static Team create(final int teamId, final String teamName, final String teamDescription, final String forumLink, final int captainUserId, final Set<Integer> userIds, final Set<Integer> retiredUserIds) {
+        return new Team(teamId, teamName, teamDescription, forumLink, captainUserId, userIds, retiredUserIds);
     }
 
     /**
@@ -67,13 +69,14 @@ public class Team implements Identifiable {
      *
      * @param teamName        the name of the team
      * @param teamDescription an optional description for the team
+     * @param forumLink       a link to the {@link Team} thread on the forum
      * @param captainUserId   the {@link User} ID for the captain of this {@link Team}
      * @param userIds         the IDs of the active {@link User}s in the {@link Team}
      * @param retiredUserIds  the IDs of the retired {@link User}s in the {@link Team}
      * @return the created {@link Team}
      */
-    public static Team createWithoutId(final String teamName, final String teamDescription, final int captainUserId, final Set<Integer> userIds, final Set<Integer> retiredUserIds) {
-        return new Team(EMPTY_TEAM_ID, teamName, teamDescription, captainUserId, userIds, retiredUserIds);
+    public static Team createWithoutId(final String teamName, final String teamDescription, final String forumLink, final int captainUserId, final Set<Integer> userIds, final Set<Integer> retiredUserIds) {
+        return new Team(EMPTY_TEAM_ID, teamName, teamDescription, forumLink, captainUserId, userIds, retiredUserIds);
     }
 
     /**
@@ -87,7 +90,7 @@ public class Team implements Identifiable {
      * @return the updated {@link Team}
      */
     public static Team updateWithId(final int teamId, final Team team) {
-        return new Team(teamId, team.teamName, team.teamDescription, team.captainUserId, team.userIds, team.retiredUserIds);
+        return new Team(teamId, team.teamName, team.teamDescription, team.forumLink, team.captainUserId, team.userIds, team.retiredUserIds);
     }
 
     /**
@@ -108,7 +111,7 @@ public class Team implements Identifiable {
         final Set<Integer> retiredUserIds = new HashSet<>(team.getRetiredUserIds());
         retiredUserIds.add(retiredUserId);
 
-        return new Team(team.id, team.teamName, team.teamDescription, team.captainUserId, updateUserIds, retiredUserIds);
+        return new Team(team.id, team.teamName, team.teamDescription, team.forumLink, team.captainUserId, updateUserIds, retiredUserIds);
     }
 
     /**
@@ -129,7 +132,7 @@ public class Team implements Identifiable {
         final Set<Integer> retiredUserStats = new HashSet<>(team.getRetiredUserIds());
         retiredUserStats.remove(retiredUserId);
 
-        return new Team(team.id, team.teamName, team.teamDescription, team.captainUserId, updateUserIds, retiredUserStats);
+        return new Team(team.id, team.teamName, team.teamDescription, team.forumLink, team.captainUserId, updateUserIds, retiredUserStats);
     }
 
     /**
@@ -141,6 +144,6 @@ public class Team implements Identifiable {
      * @return the {@link Team} with no retired {@link User}s
      */
     public static Team removeRetiredUsers(final Team team) {
-        return new Team(team.id, team.teamName, team.teamDescription, team.captainUserId, team.userIds, Collections.emptySet());
+        return new Team(team.id, team.teamName, team.teamDescription, team.forumLink, team.captainUserId, team.userIds, Collections.emptySet());
     }
 }
