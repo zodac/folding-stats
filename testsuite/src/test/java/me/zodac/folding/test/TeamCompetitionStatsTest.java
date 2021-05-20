@@ -16,10 +16,7 @@ import me.zodac.folding.test.utils.TeamUtils;
 import me.zodac.folding.test.utils.UserUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 
 import java.net.HttpURLConnection;
 import java.net.http.HttpResponse;
@@ -45,7 +42,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * <p>
  * Since the TC stats are done on the full system (meaning all {@link Team}s), we wipe the system before each test with a {@link BeforeEach} method.
  */
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TeamCompetitionStatsTest {
 
     @BeforeEach
@@ -54,15 +50,14 @@ public class TeamCompetitionStatsTest {
     }
 
     @Test
-    @Order(1)
     public void whenNoTeamsExistInTheSystem_thenResponseIsReturnedWithNoStats_andNoTeams() throws FoldingRestException {
-        final HttpResponse<String> response = TEAM_COMPETITION_REQUEST_SENDER.get();
+        final HttpResponse<String> response = TEAM_COMPETITION_REQUEST_SENDER.getStats();
 
         assertThat(response.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_OK);
 
-        final CompetitionResult result = TeamCompetitionResponseParser.get(response);
+        final CompetitionResult result = TeamCompetitionResponseParser.getStats(response);
 
         assertThat(result.getTeams())
                 .as("Expected no teams: " + result)
@@ -88,7 +83,7 @@ public class TeamCompetitionStatsTest {
         final Team team = generateTeamWithUserIds(userId);
         TeamUtils.createOrConflict(team);
 
-        final CompetitionResult resultBeforeStats = TeamCompetitionStatsUtils.get();
+        final CompetitionResult resultBeforeStats = TeamCompetitionStatsUtils.getStats();
 
         assertThat(resultBeforeStats.getTotalPoints())
                 .as("Expected no points: " + resultBeforeStats)
@@ -154,7 +149,7 @@ public class TeamCompetitionStatsTest {
                 .as("Did not receive a 200_OK HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_OK);
 
-        final CompetitionResult resultAfterStats = TeamCompetitionStatsUtils.get();
+        final CompetitionResult resultAfterStats = TeamCompetitionStatsUtils.getStats();
 
         assertThat(resultAfterStats.getTotalPoints())
                 .as("Expected updated points: " + resultAfterStats)
@@ -219,7 +214,7 @@ public class TeamCompetitionStatsTest {
         final Team team = generateTeamWithUserIds(firstUserId, secondUserId);
         TeamUtils.createOrConflict(team);
 
-        final CompetitionResult result = TeamCompetitionStatsUtils.get();
+        final CompetitionResult result = TeamCompetitionStatsUtils.getStats();
         final TeamResult teamResult = getTeamFromCompetition(result, team.getTeamName());
         final Collection<UserResult> activeUserResults = teamResult.getActiveUsers();
 
@@ -243,7 +238,7 @@ public class TeamCompetitionStatsTest {
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
 
-        final CompetitionResult resultAfterFirstUpdate = TeamCompetitionStatsUtils.get();
+        final CompetitionResult resultAfterFirstUpdate = TeamCompetitionStatsUtils.getStats();
         final TeamResult teamResultAfterFirstUpdate = getTeamFromCompetition(resultAfterFirstUpdate, team.getTeamName());
         final UserResult firstUserResultAfterFirstUpdate = getActiveUserFromTeam(teamResultAfterFirstUpdate, firstUser.getDisplayName());
         final UserResult secondUserResultAfterFirstUpdate = getActiveUserFromTeam(teamResultAfterFirstUpdate, secondUser.getDisplayName());
@@ -261,7 +256,7 @@ public class TeamCompetitionStatsTest {
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
 
-        final CompetitionResult resultAfterSecondUpdate = TeamCompetitionStatsUtils.get();
+        final CompetitionResult resultAfterSecondUpdate = TeamCompetitionStatsUtils.getStats();
         final TeamResult teamResultAfterSecondUpdate = getTeamFromCompetition(resultAfterSecondUpdate, team.getTeamName());
         final UserResult firstUserResultAfterSecondUpdate = getActiveUserFromTeam(teamResultAfterSecondUpdate, firstUser.getDisplayName());
         final UserResult secondUserResultAfterSecondUpdate = getActiveUserFromTeam(teamResultAfterSecondUpdate, secondUser.getDisplayName());
@@ -287,7 +282,7 @@ public class TeamCompetitionStatsTest {
         final Team secondTeam = generateTeamWithUserIds(secondUserId);
         TeamUtils.createOrConflict(secondTeam);
 
-        final CompetitionResult result = TeamCompetitionStatsUtils.get();
+        final CompetitionResult result = TeamCompetitionStatsUtils.getStats();
         assertThat(result.getTeams())
                 .as("Expected exactly 2 teams: " + result)
                 .hasSize(2);
@@ -308,7 +303,7 @@ public class TeamCompetitionStatsTest {
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
 
-        final CompetitionResult resultAfterFirstUpdate = TeamCompetitionStatsUtils.get();
+        final CompetitionResult resultAfterFirstUpdate = TeamCompetitionStatsUtils.getStats();
         final TeamResult firstTeamResultAfterFirstUpdate = getTeamFromCompetition(resultAfterFirstUpdate, firstTeam.getTeamName());
         final TeamResult secondTeamResultAfterFirstUpdate = getTeamFromCompetition(resultAfterFirstUpdate, secondTeam.getTeamName());
 
@@ -325,7 +320,7 @@ public class TeamCompetitionStatsTest {
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
 
-        final CompetitionResult resultAfterSecondUpdate = TeamCompetitionStatsUtils.get();
+        final CompetitionResult resultAfterSecondUpdate = TeamCompetitionStatsUtils.getStats();
         final TeamResult firstTeamResultAfterSecondUpdate = getTeamFromCompetition(resultAfterSecondUpdate, firstTeam.getTeamName());
         final TeamResult secondTeamResultAfterSecondUpdate = getTeamFromCompetition(resultAfterSecondUpdate, secondTeam.getTeamName());
 
@@ -354,7 +349,7 @@ public class TeamCompetitionStatsTest {
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
 
-        final CompetitionResult result = TeamCompetitionStatsUtils.get();
+        final CompetitionResult result = TeamCompetitionStatsUtils.getStats();
         final TeamResult teamResult = getTeamFromCompetition(result, team.getTeamName());
         final UserResult userResult = getActiveUserFromTeam(teamResult, user.getDisplayName());
 
@@ -386,7 +381,7 @@ public class TeamCompetitionStatsTest {
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
 
-        final CompetitionResult result = TeamCompetitionStatsUtils.get();
+        final CompetitionResult result = TeamCompetitionStatsUtils.getStats();
         final TeamResult teamResult = getTeamFromCompetition(result, team.getTeamName());
         final UserResult userResult = getActiveUserFromTeam(teamResult, user.getDisplayName());
 
@@ -408,7 +403,7 @@ public class TeamCompetitionStatsTest {
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
 
-        final CompetitionResult resultAfterUpdate = TeamCompetitionStatsUtils.get();
+        final CompetitionResult resultAfterUpdate = TeamCompetitionStatsUtils.getStats();
         final TeamResult teamResultAfterUpdate = getTeamFromCompetition(resultAfterUpdate, team.getTeamName());
         final UserResult userResultAfterUpdate = getActiveUserFromTeam(teamResultAfterUpdate, user.getDisplayName());
 
@@ -436,7 +431,7 @@ public class TeamCompetitionStatsTest {
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
 
-        final CompetitionResult result = TeamCompetitionStatsUtils.get();
+        final CompetitionResult result = TeamCompetitionStatsUtils.getStats();
         final TeamResult teamResult = getTeamFromCompetition(result, team.getTeamName());
         final UserResult userResult = getActiveUserFromTeam(teamResult, user.getDisplayName());
 
@@ -460,7 +455,7 @@ public class TeamCompetitionStatsTest {
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
 
-        final CompetitionResult resultAfterUpdate = TeamCompetitionStatsUtils.get();
+        final CompetitionResult resultAfterUpdate = TeamCompetitionStatsUtils.getStats();
         final TeamResult teamResultAfterUpdate = getTeamFromCompetition(resultAfterUpdate, team.getTeamName());
         final UserResult userResultAfterUpdate = getActiveUserFromTeam(teamResultAfterUpdate, user.getDisplayName());
 
@@ -489,7 +484,7 @@ public class TeamCompetitionStatsTest {
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
 
-        final CompetitionResult result = TeamCompetitionStatsUtils.get();
+        final CompetitionResult result = TeamCompetitionStatsUtils.getStats();
         final TeamResult teamResult = getTeamFromCompetition(result, team.getTeamName());
 
         assertThat(teamResult.getActiveUsers())
@@ -507,7 +502,7 @@ public class TeamCompetitionStatsTest {
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
 
-        final CompetitionResult resultAfterRetirement = TeamCompetitionStatsUtils.get();
+        final CompetitionResult resultAfterRetirement = TeamCompetitionStatsUtils.getStats();
         final TeamResult teamResultAfterRetirement = getTeamFromCompetition(resultAfterRetirement, team.getTeamName());
 
         assertThat(teamResultAfterRetirement.getTeamMultipliedPoints())
@@ -540,7 +535,7 @@ public class TeamCompetitionStatsTest {
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
 
-        final CompetitionResult resultAfterUnretirement = TeamCompetitionStatsUtils.get();
+        final CompetitionResult resultAfterUnretirement = TeamCompetitionStatsUtils.getStats();
         final TeamResult teamResultAfterUnretirement = getTeamFromCompetition(resultAfterUnretirement, team.getTeamName());
 
         assertThat(teamResultAfterUnretirement.getTeamMultipliedPoints())
@@ -587,7 +582,7 @@ public class TeamCompetitionStatsTest {
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
 
-        final CompetitionResult result = TeamCompetitionStatsUtils.get();
+        final CompetitionResult result = TeamCompetitionStatsUtils.getStats();
         final TeamResult originalTeamResult = getTeamFromCompetition(result, originalTeam.getTeamName());
         final TeamResult newTeamResult = getTeamFromCompetition(result, newTeam.getTeamName());
 
@@ -621,7 +616,7 @@ public class TeamCompetitionStatsTest {
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
 
-        final CompetitionResult resultAfterUnretirement = TeamCompetitionStatsUtils.get();
+        final CompetitionResult resultAfterUnretirement = TeamCompetitionStatsUtils.getStats();
         final TeamResult originalTeamResultAfterUnretirement = getTeamFromCompetition(resultAfterUnretirement, originalTeam.getTeamName());
         final TeamResult newTeamResultAfterUnretirement = getTeamFromCompetition(resultAfterUnretirement, newTeam.getTeamName());
 
@@ -678,7 +673,7 @@ public class TeamCompetitionStatsTest {
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
 
-        final CompetitionResult result = TeamCompetitionStatsUtils.get();
+        final CompetitionResult result = TeamCompetitionStatsUtils.getStats();
         final TeamResult teamResult = getTeamFromCompetition(result, team.getTeamName());
         final UserResult userResult = getActiveUserFromTeam(teamResult, user.getDisplayName());
 
@@ -710,7 +705,7 @@ public class TeamCompetitionStatsTest {
         USER_REQUEST_SENDER.offset(userId, pointsOffset, pointsOffset, unitsOffset);
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
-        final CompetitionResult result = TeamCompetitionStatsUtils.get();
+        final CompetitionResult result = TeamCompetitionStatsUtils.getStats();
         final TeamResult teamResult = getTeamFromCompetition(result, team.getTeamName());
         final UserResult userResult = getActiveUserFromTeam(teamResult, user.getDisplayName());
 

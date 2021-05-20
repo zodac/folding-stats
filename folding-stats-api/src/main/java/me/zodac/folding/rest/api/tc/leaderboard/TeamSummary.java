@@ -21,15 +21,16 @@ public class TeamSummary {
     private long teamPoints;
     private long teamMultipliedPoints;
     private int teamUnits;
+    private int rank;
 
     private long diffToLeader;
     private long diffToNext;
 
-    public static TeamSummary create(final TeamResult teamResult, final long diffToLeader, final long diffToNext) {
-        return new TeamSummary(teamResult.getTeamName(), teamResult.getTeamPoints(), teamResult.getTeamMultipliedPoints(), teamResult.getTeamUnits(), diffToLeader, diffToNext);
+    public static TeamSummary create(final TeamResult teamResult, final int rank, final long diffToLeader, final long diffToNext) {
+        return new TeamSummary(teamResult.getTeamName(), teamResult.getTeamPoints(), teamResult.getTeamMultipliedPoints(), teamResult.getTeamUnits(), rank, diffToLeader, diffToNext);
     }
 
     public static TeamSummary createLeader(final TeamResult teamResult) {
-        return create(teamResult, 0L, 0L);
+        return create(teamResult, 1, 0L, 0L);
     }
 }

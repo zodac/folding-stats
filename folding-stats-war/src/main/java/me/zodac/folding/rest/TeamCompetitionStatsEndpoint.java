@@ -27,6 +27,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -103,8 +104,8 @@ public class TeamCompetitionStatsEndpoint {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getFullTeamCompetitionStats() {
-        LOGGER.debug("GET request received to show full TC stats");
+    public Response getTeamCompetitionStats() {
+        LOGGER.debug("GET request received to show TC stats");
 
         if (SystemStateManager.current().isReadBlocked()) {
             LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
@@ -123,7 +124,7 @@ public class TeamCompetitionStatsEndpoint {
     @GET
     @Path("/leaderboard/")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getTeamCompetitionLeaderboard() {
+    public Response getTeamLeaderboard() {
         LOGGER.debug("GET request received to show TC leaderboard");
 
         if (SystemStateManager.current().isReadBlocked()) {
@@ -140,7 +141,7 @@ public class TeamCompetitionStatsEndpoint {
 
             if (teamResults.isEmpty()) {
                 LOGGER.warn("No TC teams to show");
-                ok();
+                return ok(Collections.emptyList());
             }
 
             final TeamSummary leader = TeamSummary.createLeader(teamResults.get(0));
@@ -155,7 +156,8 @@ public class TeamCompetitionStatsEndpoint {
                 final long diffToLeader = leader.getTeamMultipliedPoints() - teamResult.getTeamMultipliedPoints();
                 final long diffToNext = teamAhead.getTeamMultipliedPoints() - teamResult.getTeamMultipliedPoints();
 
-                final TeamSummary teamSummary = TeamSummary.create(teamResult, diffToLeader, diffToNext);
+                final int rank = i + 1;
+                final TeamSummary teamSummary = TeamSummary.create(teamResult, rank, diffToLeader, diffToNext);
                 teamSummaries.add(teamSummary);
             }
 
@@ -169,7 +171,7 @@ public class TeamCompetitionStatsEndpoint {
     @GET
     @Path("/category/")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getTeamCompetitionCategoryLeaderboard() {
+    public Response getCategoryLeaderboard() {
         LOGGER.debug("GET request received to show TC category leaderboard");
 
         if (SystemStateManager.current().isReadBlocked()) {
@@ -184,7 +186,7 @@ public class TeamCompetitionStatsEndpoint {
 
             if (competitionResult.getTeams().isEmpty()) {
                 LOGGER.warn("No TC teams to show");
-                ok();
+                return ok(Collections.emptyList());
             }
 
             for (final TeamResult teamResult : competitionResult.getTeams()) {
@@ -224,7 +226,8 @@ public class TeamCompetitionStatsEndpoint {
                     final long diffToNext = userAhead.getMultipliedPoints() - userResult.getMultipliedPoints();
 
                     final String teamName = teamNameForFoldingUserName.get(userResult.getFoldingName());
-                    final UserSummary userSummary = UserSummary.create(userResult, teamName, diffToLeader, diffToNext);
+                    final int rank = i + 1;
+                    final UserSummary userSummary = UserSummary.create(userResult, teamName, rank, diffToLeader, diffToNext);
                     userSummariesInCategory.add(userSummary);
                 }
 

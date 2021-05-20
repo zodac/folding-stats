@@ -41,10 +41,10 @@ public final class TeamCompetitionRequestSender {
      *
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
-     * @see #get(String)
+     * @see #getStats(String)
      */
-    public HttpResponse<String> get() throws FoldingRestException {
-        return get(null);
+    public HttpResponse<String> getStats() throws FoldingRestException {
+        return getStats(null);
     }
 
     /**
@@ -56,12 +56,94 @@ public final class TeamCompetitionRequestSender {
      * @param eTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached {@link me.zodac.folding.rest.api.tc.CompetitionResult}
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
-     * @see #get()
+     * @see #getStats()
      */
-    public HttpResponse<String> get(final String eTag) throws FoldingRestException {
+    public HttpResponse<String> getStats(final String eTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .GET()
                 .uri(URI.create(foldingUrl + "/tc_stats"))
+                .header("Content-Type", "application/json");
+
+        if (StringUtils.isNotBlank(eTag)) {
+            requestBuilder.header("If-None-Match", eTag);
+        }
+
+        final HttpRequest request = requestBuilder.build();
+
+        try {
+            return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (final IOException | InterruptedException e) {
+            throw new FoldingRestException("Error sending HTTP request to get TC stats", e);
+        }
+    }
+
+    /**
+     * Send a <b>GET</b> request to retrieve the overall <code>Team Competition</code> {@link me.zodac.folding.api.tc.Team} leaderboard.
+     *
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     * @see #getTeamLeaderboard(String)
+     */
+    public HttpResponse<String> getTeamLeaderboard() throws FoldingRestException {
+        return getTeamLeaderboard(null);
+    }
+
+    /**
+     * Send a <b>GET</b> request to retrieve the overall <code>Team Competition</code> {@link me.zodac.folding.api.tc.Team} leaderboard.
+     *
+     * <p>
+     * <b>NOTE:</b> If the server has a cached {@link HttpResponse} based on the <code>ETag</code>, an empty {@link HttpResponse#body()} is returned.
+     *
+     * @param eTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached {@link HttpResponse}
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     * @see #getTeamLeaderboard()
+     */
+    public HttpResponse<String> getTeamLeaderboard(final String eTag) throws FoldingRestException {
+        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+                .GET()
+                .uri(URI.create(foldingUrl + "/tc_stats/leaderboard"))
+                .header("Content-Type", "application/json");
+
+        if (StringUtils.isNotBlank(eTag)) {
+            requestBuilder.header("If-None-Match", eTag);
+        }
+
+        final HttpRequest request = requestBuilder.build();
+
+        try {
+            return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (final IOException | InterruptedException e) {
+            throw new FoldingRestException("Error sending HTTP request to get TC stats", e);
+        }
+    }
+
+    /**
+     * Send a <b>GET</b> request to retrieve the <code>Team Competition</code> category leaderboard.
+     *
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     * @see #getCategoryLeaderboard(String)
+     */
+    public HttpResponse<String> getCategoryLeaderboard() throws FoldingRestException {
+        return getCategoryLeaderboard(null);
+    }
+
+    /**
+     * Send a <b>GET</b> request to retrieve the <code>Team Competition</code> category leaderboard.
+     *
+     * <p>
+     * <b>NOTE:</b> If the server has a cached {@link HttpResponse} based on the <code>ETag</code>, an empty {@link HttpResponse#body()} is returned.
+     *
+     * @param eTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached{@link HttpResponse}
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     * @see #getCategoryLeaderboard()
+     */
+    public HttpResponse<String> getCategoryLeaderboard(final String eTag) throws FoldingRestException {
+        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+                .GET()
+                .uri(URI.create(foldingUrl + "/tc_stats/category"))
                 .header("Content-Type", "application/json");
 
         if (StringUtils.isNotBlank(eTag)) {

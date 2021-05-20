@@ -62,7 +62,7 @@ public class ResetTest {
 
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
-        final CompetitionResult result = TeamCompetitionStatsUtils.get();
+        final CompetitionResult result = TeamCompetitionStatsUtils.getStats();
         final TeamResult teamResult = getTeamFromCompetition(result, team.getTeamName());
 
         assertThat(teamResult.getActiveUsers())
@@ -76,7 +76,7 @@ public class ResetTest {
         TEAM_REQUEST_SENDER.retireUser(teamId, userToRetireId);
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
-        final CompetitionResult resultAfterRetirement = TeamCompetitionStatsUtils.get();
+        final CompetitionResult resultAfterRetirement = TeamCompetitionStatsUtils.getStats();
         final TeamResult teamResultAfterRetirement = getTeamFromCompetition(resultAfterRetirement, team.getTeamName());
 
         assertThat(teamResultAfterRetirement.getActiveUsers())
@@ -90,7 +90,7 @@ public class ResetTest {
         TEAM_COMPETITION_REQUEST_SENDER.manualReset();
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
-        final CompetitionResult resultAfterReset = TeamCompetitionStatsUtils.get();
+        final CompetitionResult resultAfterReset = TeamCompetitionStatsUtils.getStats();
         final TeamResult teamResultAfterReset = getTeamFromCompetition(resultAfterReset, team.getTeamName());
 
         assertThat(teamResultAfterReset.getActiveUsers())
@@ -123,7 +123,7 @@ public class ResetTest {
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
 
-        final CompetitionResult result = TeamCompetitionStatsUtils.get();
+        final CompetitionResult result = TeamCompetitionStatsUtils.getStats();
         assertThat(result.getTotalPoints())
                 .as("Expected points from all three users: " + result)
                 .isEqualTo(firstUserPoints + secondUserPoints + thirdUserPoints);
@@ -159,7 +159,7 @@ public class ResetTest {
         TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
 
 
-        final CompetitionResult resultAfterReset = TeamCompetitionStatsUtils.get();
+        final CompetitionResult resultAfterReset = TeamCompetitionStatsUtils.getStats();
         assertThat(resultAfterReset.getTotalPoints())
                 .as("Expected no points overall: " + result)
                 .isEqualTo(0L);
