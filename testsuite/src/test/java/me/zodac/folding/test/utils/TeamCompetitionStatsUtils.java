@@ -38,36 +38,6 @@ public class TeamCompetitionStatsUtils {
     }
 
     /**
-     * Get the overall TC results.
-     *
-     * @return the TC {@link CompetitionResult}
-     * @throws FoldingRestException thrown if an error occurs sending the HTTP request
-     */
-    public static CompetitionResult getTeamLeaderboard() throws FoldingRestException {
-        final HttpResponse<String> response = TEAM_COMPETITION_REQUEST_SENDER.getTeamLeaderboard();
-        if (response.statusCode() == HttpURLConnection.HTTP_OK) {
-            return TeamCompetitionResponseParser.getStats(response);
-        }
-
-        throw new FoldingRestException(String.format("Invalid response (%s) when getting all TC result with: %s", response.statusCode(), response.body()));
-    }
-
-    /**
-     * Get the overall TC results.
-     *
-     * @return the TC {@link CompetitionResult}
-     * @throws FoldingRestException thrown if an error occurs sending the HTTP request
-     */
-    public static CompetitionResult getCategoryLeaderboard() throws FoldingRestException {
-        final HttpResponse<String> response = TEAM_COMPETITION_REQUEST_SENDER.getCategoryLeaderboard();
-        if (response.statusCode() == HttpURLConnection.HTTP_OK) {
-            return TeamCompetitionResponseParser.getStats(response);
-        }
-
-        throw new FoldingRestException(String.format("Invalid response (%s) when getting all TC result with: %s", response.statusCode(), response.body()));
-    }
-
-    /**
      * Retrieves the {@link TeamResult} with the given {@code teamName} from the {@link CompetitionResult}.
      *
      * @param competitionResult the {@link CompetitionResult} to check

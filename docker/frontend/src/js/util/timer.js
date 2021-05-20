@@ -1,14 +1,50 @@
-// 'Borrowed' code:
+const NUMBER_OF_UPDATES_PROPERTY_NAME = "numberOfUpdates";
+const UPDATE_MINUTE = 55;
+
+function startTimer() {
+    calculateNumberOfUpdates();
+    updateTimer();
+}
+
+function calculateNumberOfUpdates() {
+    if(!isStorageAvailable){
+        console.log("No local storage available!");
+        return;
+    }
+
+    var now = new Date();
+    var startOfMonth = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, UPDATE_MINUTE, 0, 0);
+    seconds = Math.floor((now - (startOfMonth))/1000);
+    minutes = seconds/60;
+    hours = Math.floor(minutes/60);
+
+    if (storageContains(NUMBER_OF_UPDATES_PROPERTY_NAME)){
+        var previousNumber = storageGet(NUMBER_OF_UPDATES_PROPERTY_NAME);
+
+        if(previousNumber < hours){
+            var diff = hours - previousNumber;
+            var updateCountToast = document.getElementById("toast-update-count");
+            updateCountToast.innerHTML = diff.toLocaleString();
+            showToast("toast-update", true);
+        }
+    }
+
+    storageSet(NUMBER_OF_UPDATES_PROPERTY_NAME, hours);
+}
+
 // https://stackoverflow.com/questions/37179899/countdown-timer-every-hour-but-on-30-minute-marks
 function updateTimer() {
     const zeroPad = (num, places) => String(num).padStart(places, '0')
-    const timeOfHourForUpdate = 55;
     var time = new Date(),
-    secsRemaining = 3600 - (time.getUTCMinutes()-timeOfHourForUpdate)%60 * 60 - time.getUTCSeconds();
+    secsRemaining = 3600 - (time.getUTCMinutes()-UPDATE_MINUTE)%60 * 60 - time.getUTCSeconds();
     minutes = Math.floor(secsRemaining / 60) % 60;
     seconds = secsRemaining % 60;
     document.getElementById("min-part").innerHTML = minutes;
     document.getElementById("sec-part").innerHTML = zeroPad(seconds, 2);
 
-    setTimeout(updateTimer, 1000 - (new Date()).getUTCMilliseconds() );
+    if(minutes === 0 && seconds === 0){
+        showToast("toast-refresh", false);
+    }
+
+    setTimeout(updateTimer, 1000 - (new Date()).getUTCMilliseconds());
 }

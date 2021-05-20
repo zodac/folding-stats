@@ -71,5 +71,18 @@
 <!-- This will be populated by index.js -->
 <div id="stats_div" class="collapse show"></div>
 
+
+<!-- Toasts, which will be triggered to show by JS scripts -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+    <div id="toast-update" class="toast text-white bg-secondary" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-body"><span id="toast-update-count"></span> updates since last visit</div>
+    </div>
+</div>
+
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+    <div id="toast-refresh" class="toast text-white bg-secondary" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-body">Stats updated, click to refresh!</div>
+    </div>
+</div>
 </body>
 </html>

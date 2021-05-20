@@ -114,7 +114,7 @@ public final class TeamCompetitionRequestSender {
         try {
             return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (final IOException | InterruptedException e) {
-            throw new FoldingRestException("Error sending HTTP request to get TC stats", e);
+            throw new FoldingRestException("Error sending HTTP request to get TC team leaderboard", e);
         }
     }
 
@@ -155,7 +155,7 @@ public final class TeamCompetitionRequestSender {
         try {
             return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (final IOException | InterruptedException e) {
-            throw new FoldingRestException("Error sending HTTP request to get TC stats", e);
+            throw new FoldingRestException("Error sending HTTP request to get TC category leaderboard", e);
         }
     }
 
