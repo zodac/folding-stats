@@ -73,6 +73,9 @@ services:
     build:
       context: .
       dockerfile: docker/postgres/Dockerfile
+      args:
+        ADMIN_USERNAME: "root"
+        ADMIN_PASSWORD: "shroot"
     container_name: postgres_dev
     hostname: postgres_dev
     environment:

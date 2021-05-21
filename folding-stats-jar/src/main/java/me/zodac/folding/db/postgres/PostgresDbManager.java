@@ -1132,6 +1132,34 @@ public class PostgresDbManager implements DbManager {
             throw new FoldingException("Error opening connection to the DB", e);
         }
     }
+    
+    @Override
+    public boolean isAdminUser(final String userName, final String password) throws FoldingException {
+        LOGGER.debug("Checking if supplied user name '{}' and password is valid admin user", userName);
+        final String selectSql = "SELECT user_password_hash = crypt(?, user_password_hash) AS is_match " +
+                "FROM admin_users " +
+                "WHERE user_name = ?;";
+        LOGGER.debug("Executing prepared statement (without password): {}", selectSql);
+        try (final Connection connection = dbConnectionPool.getConnection();
+             final PreparedStatement preparedStatement = connection.prepareStatement(selectSql)) {
+            try {
+                preparedStatement.setString(1, password);
+                preparedStatement.setString(2, userName);
+
+                try (final ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        return resultSet.getBoolean("is_match");
+                    }
+                }
+                LOGGER.warn("Unable to validate user, no result returned");
+                return false;
+            } catch (final SQLException e) {
+                throw new FoldingException("Error when validating user", e);
+            }
+        } catch (final SQLException e) {
+            throw new FoldingException("Error opening connection to the DB", e);
+        }
+    }
 
     private static Hardware createHardware(final ResultSet resultSet) throws SQLException {
         return Hardware.create(
