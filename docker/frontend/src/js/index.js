@@ -1,8 +1,8 @@
 const ROOT_URL='http://internal.axihub.ca/folding';
 
 // The 'toggle' functions below simply change the colour of the buttons. There must be a smarter way to do this...
-function toggleMainButtonStyle(type, classList){
-    var button = document.getElementById(type+"_button");
+function toggleMainButtonStyle(id, classList){
+    var button = document.getElementById(id);
 
     if(classList.contains("collapsed")){
         button.classList.add("btn-primary");
@@ -25,60 +25,201 @@ function toggleTeam(teamNumber, classList) {
     }
 }
 
-function loadTcStats() {
+function loadOverallStats() {
+    fetch(ROOT_URL+'/tc_stats')
+        .then(response => {
+            return response.json();
+        })
+        .then(function(jsonResponse) {
+        // Build competition stats
+        const overallTableHeaders = ["Total Points", "Total Units"];
+        const overallTableProperties = ["totalMultipliedPoints", "totalUnits"];
+
+        overallDiv = document.getElementById("overall_div");
+
+        overallTitle = document.createElement('h2');
+        overallTitle.setAttribute("class", "navbar-brand");
+        overallTitle.innerHTML = "Overall Stats";
+        overallDiv.append(overallTitle);
+
+        overallTable = document.createElement('table');
+        overallTable.setAttribute("id", "overall");
+        overallTable.setAttribute("class", "table table-dark table-striped table-hover");
+
+        overallTableHead = document.createElement('thead');
+        overallTableHeaderRow = document.createElement('tr');
+        overallTableHeaders.forEach(function (header, i) {
+            overallTableHeader = document.createElement("th");
+            overallTableHeader.setAttribute("onclick", "sortTable("+i+", 'overall')");
+            overallTableHeader.setAttribute("scope", "col");
+            overallTableHeader.innerHTML = header;
+
+            overallTableHeaderRow.append(overallTableHeader);
+        });
+        overallTableHead.append(overallTableHeaderRow);
+        overallTable.append(overallTableHead);
+
+        overallTableBody = document.createElement('tbody');
+        overallTableBodyRow = document.createElement('tr');
+        overallTableProperties.forEach(function (property, i) {
+            overallTableBodyCell = document.createElement("td");
+
+            if(property === "totalMultipliedPoints"){
+                overallTableBodyCell.setAttribute("data-bs-toggle", "tooltip");
+                overallTableBodyCell.setAttribute("data-placement", "top");
+                overallTableBodyCell.setAttribute("title", "Unmultiplied: " + jsonResponse["totalPoints"].toLocaleString());
+                new bootstrap.Tooltip(overallTableBodyCell);
+            }
+
+            overallTableBodyCell.innerHTML = jsonResponse[property].toLocaleString();
+            overallTableBodyRow.append(overallTableBodyCell);
+        });
+        overallTableBody.append(overallTableBodyRow);
+        overallTable.append(overallTableBody);
+
+        overallDiv.append(overallTable);
+        return true;
+    })
+};
+
+function loadTeamLeaderboard() {
+    fetch(ROOT_URL+'/tc_stats/leaderboard')
+    .then(response => {
+        return response.json();
+    })
+    .then(function(jsonResponse){
+        const leaderboardHeaders = ["Rank", "Team", "Points", "Units", "Points To Leader", "Points To Next"];
+        const leaderboardProperties = [ "rank", "teamName", "teamMultipliedPoints", "teamUnits", "diffToLeader", "diffToNext"];
+
+        leaderboardDiv = document.getElementById("leaderboard_div");
+
+        leaderboardTitle = document.createElement('h2');
+        leaderboardTitle.setAttribute("class", "navbar-brand");
+        leaderboardTitle.innerHTML = "Team Leaderboard";
+
+        leaderboardTable = document.createElement('table');
+        leaderboardTable.setAttribute("id", "leaderboard");
+        leaderboardTable.setAttribute("class", "table table-dark table-striped table-hover");
+
+        leaderboardTableHead = document.createElement('thead');
+        leaderboardTableHeaderRow = document.createElement('tr');
+        leaderboardHeaders.forEach(function (header, i) {
+            leaderboardTableHeader = document.createElement("th");
+            leaderboardTableHeader.setAttribute("onclick", "sortTable("+i+", 'leaderboard')");
+            leaderboardTableHeader.setAttribute("scope", "col");
+            leaderboardTableHeader.innerHTML = header;
+
+            leaderboardTableHeaderRow.append(leaderboardTableHeader);
+        });
+        leaderboardTableHead.append(leaderboardTableHeaderRow);
+        leaderboardTable.append(leaderboardTableHead);
+
+        leaderboardTableBody = document.createElement('tbody');
+
+        jsonResponse.forEach(function(team, i){
+            leaderboardTableBodyRow = document.createElement('tr');
+
+            leaderboardProperties.forEach(function(property){
+                leaderboardCell = document.createElement('td');
+
+                if(property === "teamMultipliedPoints") {
+                    leaderboardCell.setAttribute("data-bs-toggle", "tooltip");
+                    leaderboardCell.setAttribute("data-placement", "top");
+                    leaderboardCell.setAttribute("title", "Unmultiplied: " + team["teamPoints"].toLocaleString());
+                    new bootstrap.Tooltip(leaderboardCell);
+                }
+
+                leaderboardCell.innerHTML = team[property].toLocaleString();
+                leaderboardTableBodyRow.append(leaderboardCell);
+            });
+            leaderboardTableBody.append(leaderboardTableBodyRow);
+        });
+
+
+        leaderboardTable.append(leaderboardTableBody);
+
+        leaderboardDiv.append(leaderboardTitle);
+        leaderboardDiv.append(leaderboardTable);
+        hide("loader");
+    });
+};
+
+function loadCategoryLeaderboard() {
+    fetch(ROOT_URL+'/tc_stats/category')
+        .then(response => {
+            return response.json();
+        })
+        .then(function(jsonResponse){
+            categoryDiv = document.getElementById("category_div");
+
+            const categoryHeaders = ["Rank", "User", "Points", "Units", "Points to Leader", "Points to Next"];
+            const categoryProperties = ["rank", "displayName", "multipliedPoints", "units", "diffToLeader", "diffToNext"];
+
+            categoryLeaderboardTitle = document.createElement('h2');
+            categoryLeaderboardTitle.setAttribute("class", "navbar-brand");
+            categoryLeaderboardTitle.innerHTML = "Category Leaderboard";
+            categoryDiv.append(categoryLeaderboardTitle);
+
+            Object.keys(jsonResponse).forEach(function(key) {
+                categoryTitle = document.createElement('h2');
+                categoryTitle.setAttribute("class", "navbar-brand");
+                categoryTitle.innerHTML = key;
+                categoryDiv.append(categoryTitle);
+
+                tableId = "category_" + key.replace(/\s+/g,"_").toLowerCase();
+
+                categoryTable = document.createElement('table');
+                categoryTable.setAttribute("id", tableId);
+                categoryTable.setAttribute("class", "table table-dark table-striped table-hover");
+
+                categoryTableHead = document.createElement('thead');
+                categoryTableHeaderRow = document.createElement('tr');
+                categoryHeaders.forEach(function (header, i) {
+                    categoryTableHeader = document.createElement("th");
+                    categoryTableHeader.setAttribute("onclick", "sortTable("+i+", '"+tableId+"')");
+                    categoryTableHeader.setAttribute("scope", "col");
+                    categoryTableHeader.innerHTML = header;
+
+                    categoryTableHeaderRow.append(categoryTableHeader);
+                });
+                categoryTableHead.append(categoryTableHeaderRow);
+                categoryTable.append(categoryTableHead);
+
+                categoryTableBody = document.createElement('tbody');
+
+                users = jsonResponse[key];
+                users.forEach(function(user){
+                    categoryTableBodyRow = document.createElement('tr');
+
+                    categoryProperties.forEach(function(property){
+                        categoryCell = document.createElement('td');
+
+                        if(property === "multipliedPoints") {
+                            categoryCell.setAttribute("data-bs-toggle", "tooltip");
+                            categoryCell.setAttribute("data-placement", "top");
+                            categoryCell.setAttribute("title", "Unmultiplied: " + user["points"].toLocaleString());
+                            new bootstrap.Tooltip(categoryCell);
+                        }
+
+                        categoryCell.innerHTML = user[property].toLocaleString();
+                        categoryTableBodyRow.append(categoryCell);
+                    });
+                    categoryTableBody.append(categoryTableBodyRow);
+                });
+                categoryTable.append(categoryTableBody);
+
+                categoryDiv.append(categoryTable);
+                categoryDiv.append(document.createElement('br'));
+            });
+        });
+};
+
+function loadTeamStats() {
     fetch(ROOT_URL+'/tc_stats')
     .then(response => {
         return response.json();
     })
     .then(function(jsonResponse) {
-        // Build competition stats
-        const statsTableHeaders = ["Total Points", "Total Units"];
-        const statsTableTeamProperties = ["totalMultipliedPoints", "totalUnits"];
-
-        statsDiv = document.getElementById("stats_div");
-
-        statsTitle = document.createElement('h2');
-        statsTitle.setAttribute("class", "navbar-brand");
-        statsTitle.innerHTML = "Overall Stats";
-        statsDiv.append(statsTitle);
-
-        statsTable = document.createElement('table');
-        statsTable.setAttribute("id", "stats");
-        statsTable.setAttribute("class", "table table-dark table-striped table-hover");
-
-        statsTableHead = document.createElement('thead');
-        statsTableHeaderRow = document.createElement('tr');
-        statsTableHeaders.forEach(function (header, i) {
-            statsTableHeader = document.createElement("th");
-            statsTableHeader.setAttribute("onclick", "sortTable("+i+", 'stats')");
-            statsTableHeader.setAttribute("scope", "col");
-            statsTableHeader.innerHTML = header;
-
-            statsTableHeaderRow.append(statsTableHeader);
-        });
-        statsTableHead.append(statsTableHeaderRow);
-        statsTable.append(statsTableHead);
-
-        statsTableBody = document.createElement('tbody');
-        statsTableBodyRow = document.createElement('tr');
-        statsTableTeamProperties.forEach(function (teamProperty, i) {
-            statsTableBodyCell = document.createElement("td");
-
-            if(teamProperty === "totalMultipliedPoints"){
-                statsTableBodyCell.setAttribute("data-bs-toggle", "tooltip");
-                statsTableBodyCell.setAttribute("data-placement", "top");
-                statsTableBodyCell.setAttribute("title", "Unmultiplied: " + jsonResponse["totalPoints"].toLocaleString());
-                new bootstrap.Tooltip(statsTableBodyCell);
-            }
-
-            statsTableBodyCell.innerHTML = jsonResponse[teamProperty].toLocaleString();
-            statsTableBodyRow.append(statsTableBodyCell);
-        });
-        statsTableBody.append(statsTableBodyRow);
-        statsTable.append(statsTableBody);
-
-        statsDiv.append(statsTable);
-
         // Build team tables
         const teamTableHeaders = ["Rank", "User", "Category", "Hardware", "Points", "Units"];
         const teamTableUserProperties = ["rankInTeam", "displayName", "category", "hardware", "multipliedPoints", "units"];
@@ -96,6 +237,7 @@ function loadTcStats() {
             metadataDiv.setAttribute("id", "team_"+teamNumber+"_metadata")
 
             teamTitle = document.createElement('h2');
+            teamTitle.setAttribute("class", "navbar-brand");
             teamTitle.innerHTML = "Rank #" + team['rank'] + ": ";
 
             if ("forumLink" in team) {
@@ -145,7 +287,6 @@ function loadTcStats() {
             });
             teamTableHead.append(teamTableHeaderRow);
             teamTable.append(teamTableHead);
-
 
             teamTableBody = document.createElement("tbody");
 
@@ -237,21 +378,17 @@ function loadTcStats() {
 
             teamDiv.append(subDiv);
 
+            statsDiv = document.getElementById("stats_div");
             statsDiv.append(teamDiv);
             statsDiv.append(document.createElement('br'));
         });
-
-        hide("loader");
     })
 };
 
 document.addEventListener("DOMContentLoaded", function(event) {
-    loadTcStats();
+    loadOverallStats();
+    loadTeamLeaderboard();
+    loadCategoryLeaderboard();
+    loadTeamStats();
     startTimer();
-
-    // Enable toasts
-//    var toastElList = [].slice.call(document.querySelectorAll('.toast'))
-//    var toastList = toastElList.map(function (toastEl) {
-//        return new bootstrap.Toast(toastEl)
-//    })
 });

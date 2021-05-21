@@ -23,8 +23,14 @@ function calculateNumberOfUpdates() {
 
         if(previousNumber < hours){
             var diff = hours - previousNumber;
-            var updateCountToast = document.getElementById("toast-update-count");
-            updateCountToast.innerHTML = diff.toLocaleString();
+            var updateCountToast = document.getElementById("toast-update-count-text");
+
+            if(diff == 1){
+                updateCountToast.innerHTML = diff.toLocaleString() + " update";
+            } else {
+                updateCountToast.innerHTML = diff.toLocaleString() + " updates";
+            }
+
             showToast("toast-update", true);
         }
     }
