@@ -164,10 +164,10 @@ function loadTcStats() {
                         teamTableUserCell.innerHTML = activeUser[userProperty].toLocaleString();
                         new bootstrap.Tooltip(teamTableUserCell);
                     } else if (userProperty === "displayName") {
-                        teamTableUserCell.innerHTML = activeUser[userProperty] + " ";
+                        teamTableUserCell.innerHTML = activeUser[userProperty];
 
                         if (activeUser[userProperty] === captainName){
-                            teamTableUserCell.innerHTML += "(Captain) ";
+                            teamTableUserCell.innerHTML += " (Captain)";
                         }
 
                         if ("profileLink" in activeUser) {
@@ -176,7 +176,7 @@ function loadTcStats() {
 
                         if ("liveStatsLink" in activeUser) {
                             teamTableUserCell.innerHTML +=
-                                "<a href='" + activeUser["liveStatsLink"] + "' target='_blank'>" +
+                                " <a href='" + activeUser["liveStatsLink"] + "' target='_blank'>" +
                                     "<img alt='stats' src='./res/img/live.png' width='16px' height='16px'>" +
                                 "</a>";
                         }
