@@ -7,19 +7,14 @@ function startTimer() {
 }
 
 function calculateNumberOfUpdates() {
-    if(!isStorageAvailable){
-        console.log("No local storage available!");
-        return;
-    }
-
     var now = new Date();
     var startOfMonth = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, UPDATE_MINUTE, 0, 0);
     seconds = Math.floor((now - (startOfMonth))/1000);
     minutes = seconds/60;
     hours = Math.floor(minutes/60);
 
-    if (storageContains(NUMBER_OF_UPDATES_PROPERTY_NAME)){
-        var previousNumber = storageGet(NUMBER_OF_UPDATES_PROPERTY_NAME);
+    if (localContains(NUMBER_OF_UPDATES_PROPERTY_NAME)){
+        var previousNumber = localGet(NUMBER_OF_UPDATES_PROPERTY_NAME);
 
         if(previousNumber < hours){
             var diff = hours - previousNumber;
@@ -35,7 +30,7 @@ function calculateNumberOfUpdates() {
         }
     }
 
-    storageSet(NUMBER_OF_UPDATES_PROPERTY_NAME, hours);
+    localSet(NUMBER_OF_UPDATES_PROPERTY_NAME, hours);
 }
 
 // https://stackoverflow.com/questions/37179899/countdown-timer-every-hour-but-on-30-minute-marks

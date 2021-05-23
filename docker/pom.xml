@@ -61,7 +61,7 @@
                                 <jsSourceFile>util/display_toggle.js</jsSourceFile>
                                 <jsSourceFile>util/google_analytics.js</jsSourceFile>
                                 <jsSourceFile>util/json_sorter.js</jsSourceFile>
-                                <jsSourceFile>util/local_storage.js</jsSourceFile>
+                                <jsSourceFile>util/storage.js</jsSourceFile>
                                 <jsSourceFile>util/table_sort.js</jsSourceFile>
                                 <jsSourceFile>util/timer.js</jsSourceFile>
                                 <jsSourceFile>util/toast.js</jsSourceFile>
@@ -89,8 +89,10 @@
                                 <!-- Main JS file -->
                                 <jsSourceFile>system.js</jsSourceFile>
                                 <!-- Util files -->
+                                <jsSourceFile>util/display_toggle.js</jsSourceFile>
                                 <jsSourceFile>util/encoder.js</jsSourceFile>
                                 <jsSourceFile>util/json_sorter.js</jsSourceFile>
+                                <jsSourceFile>util/storage.js</jsSourceFile>
                                 <jsSourceFile>util/table_sort.js</jsSourceFile>
                                 <jsSourceFile>util/timer.js</jsSourceFile>
                                 <jsSourceFile>util/toast.js</jsSourceFile>

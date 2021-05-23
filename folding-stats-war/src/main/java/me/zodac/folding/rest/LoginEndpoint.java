@@ -16,10 +16,8 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import java.util.Map;
 
 import static me.zodac.folding.rest.response.Responses.badRequest;
@@ -35,9 +33,6 @@ public class LoginEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginEndpoint.class);
 
-    @Context
-    private UriInfo uriContext;
-
     @EJB
     private BusinessLogic businessLogic;
 
@@ -47,28 +42,23 @@ public class LoginEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response loginAsAdmin(final LoginPayload loginPayload) {
-        LOGGER.info("Login request received");
+        LOGGER.debug("Login request received");
 
         if (SystemStateManager.current().isReadBlocked()) {
             LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
             return serviceUnavailable();
         }
 
-        LOGGER.info("Payload: {}", loginPayload);
-        if (loginPayload == null) {
-            return badRequest("");
-        }
-
         try {
             final Map<String, String> decodedUserNameAndPassword = EncodingUtils.decodeBasicAuthentication(loginPayload.getEncodedUserNameAndPassword());
             final String userName = decodedUserNameAndPassword.get(EncodingUtils.DECODED_USERNAME_KEY);
             final String password = decodedUserNameAndPassword.get(EncodingUtils.DECODED_PASSWORD_KEY);
-            LOGGER.info("Login request received for user: '{}'", userName);
+            LOGGER.debug("Login request received for user: '{}'", userName);
 
             final AuthenticationResponse authenticationResponse = businessLogic.isValidUser(userName, password);
 
             if (!authenticationResponse.isUserExists() || !authenticationResponse.isPasswordMatch()) {
-                LOGGER.warn("Invalid user credentials supplied");
+                LOGGER.warn("Invalid user credentials supplied: {}", loginPayload);
                 return unauthorized();
             }
 
@@ -82,6 +72,9 @@ public class LoginEndpoint {
         } catch (final FoldingException e) {
             LOGGER.error("Error validating user credentials", e.getCause());
             return serverError();
+        } catch (final IllegalArgumentException e) {
+            LOGGER.error("Encoded user name and password was not a valid Base64 string", e);
+            return badRequest(loginPayload);
         } catch (final Exception e) {
             LOGGER.error("Unexpected error validating user credentials", e);
             return serverError();

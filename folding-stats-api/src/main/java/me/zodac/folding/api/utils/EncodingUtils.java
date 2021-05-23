@@ -15,13 +15,13 @@ public final class EncodingUtils {
     public static final String DECODED_USERNAME_KEY = "userName";
     public static final String DECODED_PASSWORD_KEY = "password";
     public static final String BASIC_AUTHENTICATION_SCHEME = "Basic ";
-    
+
     private static final String DECODED_USERNAME_PASSWORD_DELIMITER = ":";
 
     /**
      * Encodes the provided {@code userName} and {@code password} for basic authentication. Takes the {@code userName}
      * and {@code password}, concatenates them with a <b>:</b> as separator, then encodes in {@link Base64}. This is then
-     * prefixed by the{@link String} "Basic " (note the trailing space).
+     * prefixed by the {@link String} "Basic " (note the trailing space).
      *
      * @param userName the user name
      * @param password the password
@@ -49,8 +49,9 @@ public final class EncodingUtils {
      *
      * @param authorizationPayload the authorization value to decode
      * @return a {@link Map} with two keys, the {@link #DECODED_USERNAME_KEY} and {@link #DECODED_PASSWORD_KEY}
+     * @throws IllegalArgumentException thrown if the input is not a valid {@link Base64} {@link String}
      */
-    public static Map<String, String> decodeBasicAuthentication(final String authorizationPayload) {
+    public static Map<String, String> decodeBasicAuthentication(final String authorizationPayload) throws IllegalArgumentException {
         final String encodedUserNameAndPassword = authorizationPayload.split(BASIC_AUTHENTICATION_SCHEME)[1];
         return decodeAuthentication(encodedUserNameAndPassword);
     }
@@ -60,8 +61,9 @@ public final class EncodingUtils {
      *
      * @param encodedUserNameAndPassword the encoded user name and password to decode
      * @return a {@link Map} with two keys, the {@link #DECODED_USERNAME_KEY} and {@link #DECODED_PASSWORD_KEY}
+     * @throws IllegalArgumentException thrown if the input is not a valid {@link Base64} {@link String}
      */
-    public static Map<String, String> decodeAuthentication(final String encodedUserNameAndPassword) {
+    public static Map<String, String> decodeAuthentication(final String encodedUserNameAndPassword) throws IllegalArgumentException {
         final String decodedUserNameAndPassword = new String(Base64.getDecoder().decode(encodedUserNameAndPassword), StandardCharsets.ISO_8859_1);
         final String[] userNameAndPasswordTokens = decodedUserNameAndPassword.split(DECODED_USERNAME_PASSWORD_DELIMITER, 2);
 

@@ -98,20 +98,144 @@
 <div>
     <br/>
 </div>
-<form id="admin-form" class="row g-3" onsubmit="adminLogin(); return false;" action="">
-    <div class="col-auto">
-        <label for="inputUserName" class="visually-hidden">Username</label>
-        <input id="inputUserName" class="form-control" type="text" placeholder="Username" aria-label="Username"
-               required>
+
+<div id="login-form">
+    <form id="admin-form" class="row g-3" onsubmit="adminLogin(); return false;" action="">
+        <div class="col-auto">
+            <label for="inputUserName" class="visually-hidden">Username</label>
+            <input id="inputUserName" class="form-control" type="text" placeholder="Username" aria-label="Username"
+                   required>
+        </div>
+        <div class="col-auto">
+            <label for="inputPassword" class="visually-hidden">Password</label>
+            <input type="password" class="form-control" id="inputPassword" placeholder="Password" required>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary mb-3">Enable Admin Functions</button>
+        </div>
+    </form>
+</div>
+
+<div id="loader" class="loader"></div>
+
+<div id="admin-functions" style="display:none;">
+    <h2 class="navbar-brand">Admin Functions</h2>
+    <div id="admin-functions-hardware">
+        <form id="create-hardware-form" class="row g-3" onsubmit="createHardware(); return false;" action="">
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary mb-3">Create Hardware</button>
+            </div>
+            <div class="col-auto">
+                <label for="create-hardware-name" class="visually-hidden">Hardware Name</label>
+                <input id="create-hardware-name" class="form-control" type="text" placeholder="Hardware Name"
+                       aria-label="Hardware Name" required>
+            </div>
+            <div class="col-auto">
+                <label for="create-hardware-display-name" class="visually-hidden">Display Name</label>
+                <input id="create-hardware-display-name" class="form-control" type="text" placeholder="Display Name"
+                       aria-label="Display Name" required>
+            </div>
+            <div class="col-auto">
+                <input id="create-hardware-operating-system" class="form-control" list="operating-systems"
+                       placeholder="Operating System">
+                <datalist id="operating-systems">
+                    <option value="Linux">
+                    <option value="Windows">
+                </datalist>
+            </div>
+            <div class="col-auto">
+                <label for="create-hardware-multiplier" class="visually-hidden">Multiplier</label>
+                <input id="create-hardware-multiplier" class="form-control" type="number" step="0.01"
+                       placeholder="Multiplier" aria-label="Multiplier" required>
+            </div>
+        </form>
     </div>
-    <div class="col-auto">
-        <label for="inputPassword" class="visually-hidden">Password</label>
-        <input type="password" class="form-control" id="inputPassword" placeholder="Password" required>
+
+    <div id="admin-functions-user">
+        <form id="create-user-form" class="row g-3" onsubmit="createUser(); return false;" action="">
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary mb-3">Create User</button>
+            </div>
+            <div class="col-auto">
+                <label for="create-user-folding-name" class="visually-hidden">Folding@Home Name</label>
+                <input id="create-user-folding-name" class="form-control" type="text" pattern="[^\s]+"
+                       placeholder="Folding@Home Name" aria-label="Folding@Home Name" required>
+            </div>
+            <div class="col-auto">
+                <label for="create-user-display-name" class="visually-hidden">Display Name</label>
+                <input id="create-user-display-name" class="form-control" type="text" placeholder="Display Name"
+                       aria-label="Display Name" required>
+            </div>
+            <div class="col-auto">
+                <label for="create-user-passkey" class="visually-hidden">Passkey</label>
+                <input id="create-user-passkey" class="form-control" type="text" maxlength="32" minlength="32"
+                       placeholder="Passkey" aria-label="Passkey" required>
+            </div>
+            <div class="col-auto">
+                <input id="create-user-category" class="form-control" list="user-categories"
+                       placeholder="Category">
+                <datalist id="user-categories">
+                    <option value="AMD GPU">
+                    <option value="nVidia GPU">
+                    <option value="Wildcard">
+                </datalist>
+            </div>
+            <div class="col-auto">
+                <input id="create-user-hardware" class="form-control" list="available-hardware"
+                       placeholder="Hardware">
+                <datalist id="available-hardware">
+                    <!-- Will be populated by system.js -->
+                </datalist>
+            </div>
+            <div class="col-auto">
+                <label for="create-user-profile-link" class="visually-hidden">Profile Link</label>
+                <input id="create-user-profile-link" class="form-control" type="url" placeholder="Profile Link"
+                       aria-label="Profile Link">
+            </div>
+            <div class="col-auto">
+                <label for="create-user-live-stats-link" class="visually-hidden">Live Stats Link</label>
+                <input id="create-user-live-stats-link" class="form-control" type="url" placeholder="Live Stats Link"
+                       aria-label="Live Stats Link">
+            </div>
+        </form>
     </div>
-    <div class="col-auto">
-        <button type="submit" class="btn btn-primary mb-3">Enable Admin Functions</button>
+
+    <div id="admin-functions-team">
+        <form id="create-team-form" class="row g-3" onsubmit="createTeam(); return false;" action="">
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary mb-3">Create Team</button>
+            </div>
+            <div class="col-auto">
+                <label for="create-team-name" class="visually-hidden">Team Name</label>
+                <input id="create-team-name" class="form-control" type="text"
+                       placeholder="Team Name" aria-label="Team Name" required>
+            </div>
+            <div class="col-auto">
+                <label for="create-team-description" class="visually-hidden">Team Description</label>
+                <input id="create-team-description" class="form-control" type="text"
+                       placeholder="Team Description" aria-label="Team Description">
+            </div>
+            <div class="col-auto">
+                <label for="create-team-forum-link" class="visually-hidden">Forum Link</label>
+                <input id="create-team-forum-link" class="form-control" type="url" placeholder="Forum Link"
+                       aria-label="Forum Link">
+            </div>
+            <div class="col-auto">
+                <input id="create-team-captain" class="form-control" list="available-users"
+                       placeholder="Captain">
+                <datalist id="available-users">
+                    <!-- Will be populated by system.js -->
+                </datalist>
+            </div>
+            <div class="col-auto mb-3">
+                <select id="create-team-users" class="form-select" multiple
+                        aria-label="Team Users">
+                    <!-- Will be populated by system.js -->
+                </select>
+            </div>
+        </form>
     </div>
-</form>
+</div>
 
 </body>
 </html>

@@ -18,12 +18,11 @@ function adminLogin(){
     var password = document.getElementById("inputPassword").value;
     var authorizationPayload = "Basic " + encode(userName, password);
 
-    document.getElementById("inputUserName").value = '';
-    document.getElementById("inputPassword").value = '';
-
     var requestData = {
         "encodedUserNameAndPassword": authorizationPayload
     };
+
+    show("loader");
 
     fetch(ROOT_URL+'/login/admin', {
         method: 'POST',
@@ -33,12 +32,19 @@ function adminLogin(){
         body: JSON.stringify(requestData)
     })
     .then(response => {
+        document.getElementById("inputUserName").value = '';
+        document.getElementById("inputPassword").value = '';
+        hide("loader");
+
         if(response.status != 200){
             showToast("toast-login-failure", true);
             return;
         }
 
         showToast("toast-login-success", true);
+        hide("login-form");
+        show("admin-functions");
+        sessionSet("Authorization", authorizationPayload);
     });
 }
 
@@ -79,8 +85,10 @@ function loadHardware() {
 
 
         hardwareTableBody = document.createElement('tbody');
+        dataListOfHardware = document.getElementById("available-hardware");
 
         jsonResponse.forEach(function(hardwareItem, i) {
+            // Update hardware display table
             hardwareTableBodyRow = document.createElement('tr');
             hardwareProperties.forEach(function (hardwareProperty, i) {
                 hardwareTableBodyCell = document.createElement("td");
@@ -94,6 +102,12 @@ function loadHardware() {
                 hardwareTableBodyRow.append(hardwareTableBodyCell);
             });
             hardwareTableBody.append(hardwareTableBodyRow);
+
+            // Update the create/update dropdown menus for users
+            hardwareOption = document.createElement("option");
+            hardwareOption.setAttribute("value", hardwareItem['id']);
+            hardwareOption.innerHTML = hardwareItem["displayName"];
+            dataListOfHardware.append(hardwareOption);
         });
         hardwareTable.append(hardwareTableBody);
 
@@ -139,7 +153,11 @@ function loadUsers() {
 
         usersTableBody = document.createElement('tbody');
 
+        dataListOfUsers = document.getElementById("available-users");
+        selectOfUsers = document.getElementById("create-team-users");
+
         jsonResponse.forEach(function(usersItem, i) {
+            // Update users display table
             usersTableBodyRow = document.createElement('tr');
             usersProperties.forEach(function (usersProperty, i) {
                 usersTableBodyCell = document.createElement("td");
@@ -160,6 +178,14 @@ function loadUsers() {
                 usersTableBodyRow.append(usersTableBodyCell);
             });
             usersTableBody.append(usersTableBodyRow);
+
+            // Update the create/update dropdown menus for users
+            userOption = document.createElement("option");
+            userOption.setAttribute("value", usersItem['id']);
+            userOption.innerHTML = usersItem["displayName"];
+
+            dataListOfUsers.append(userOption);
+            selectOfUsers.append(userOption);
         });
         usersTable.append(usersTableBody);
 
@@ -234,8 +260,14 @@ function loadTeams() {
 };
 
 document.addEventListener("DOMContentLoaded", function(event) {
+    if(sessionContains("Authorization")) {
+        hide("login-form");
+        show("admin-functions");
+    }
+
     loadHardware();
     loadUsers();
     loadTeams();
     updateTimer();
+    hide("loader");
 });
