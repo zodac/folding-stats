@@ -89,6 +89,7 @@
                                 <!-- Main JS file -->
                                 <jsSourceFile>system.js</jsSourceFile>
                                 <!-- Util files -->
+                                <jsSourceFile>util/encoder.js</jsSourceFile>
                                 <jsSourceFile>util/json_sorter.js</jsSourceFile>
                                 <jsSourceFile>util/table_sort.js</jsSourceFile>
                                 <jsSourceFile>util/timer.js</jsSourceFile>

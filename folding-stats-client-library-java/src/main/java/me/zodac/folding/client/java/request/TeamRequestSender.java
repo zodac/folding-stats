@@ -16,7 +16,7 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.List;
 
-import static me.zodac.folding.client.java.request.EncodingUtils.encodeAuthentication;
+import static me.zodac.folding.api.utils.EncodingUtils.encodeBasicAuthentication;
 
 /**
  * Convenience class to send HTTP requests to the {@link Team} REST endpoint.
@@ -152,7 +152,7 @@ public final class TeamRequestSender {
                 .header("Content-Type", "application/json");
 
         if (StringUtils.isNoneBlank(userName, password)) {
-            requestBuilder.header("Authorization", encodeAuthentication(userName, password));
+            requestBuilder.header("Authorization", encodeBasicAuthentication(userName, password));
         }
 
         final HttpRequest request = requestBuilder.build();
@@ -191,7 +191,7 @@ public final class TeamRequestSender {
                 .header("Content-Type", "application/json");
 
         if (StringUtils.isNoneBlank(userName, password)) {
-            requestBuilder.header("Authorization", encodeAuthentication(userName, password));
+            requestBuilder.header("Authorization", encodeBasicAuthentication(userName, password));
         }
 
         final HttpRequest request = requestBuilder.build();
@@ -230,7 +230,7 @@ public final class TeamRequestSender {
                 .header("Content-Type", "application/json");
 
         if (StringUtils.isNoneBlank(userName, password)) {
-            requestBuilder.header("Authorization", encodeAuthentication(userName, password));
+            requestBuilder.header("Authorization", encodeBasicAuthentication(userName, password));
         }
 
         final HttpRequest request = requestBuilder.build();
@@ -269,7 +269,7 @@ public final class TeamRequestSender {
                 .header("Content-Type", "application/json");
 
         if (StringUtils.isNoneBlank(userName, password)) {
-            requestBuilder.header("Authorization", encodeAuthentication(userName, password));
+            requestBuilder.header("Authorization", encodeBasicAuthentication(userName, password));
         }
 
         final HttpRequest request = requestBuilder.build();
@@ -310,7 +310,7 @@ public final class TeamRequestSender {
                 .header("Content-Type", "application/json");
 
         if (StringUtils.isNoneBlank(userName, password)) {
-            requestBuilder.header("Authorization", encodeAuthentication(userName, password));
+            requestBuilder.header("Authorization", encodeBasicAuthentication(userName, password));
         }
 
         final HttpRequest request = requestBuilder.build();
@@ -351,7 +351,7 @@ public final class TeamRequestSender {
                 .header("Content-Type", "application/json");
 
         if (StringUtils.isNoneBlank(userName, password)) {
-            requestBuilder.header("Authorization", encodeAuthentication(userName, password));
+            requestBuilder.header("Authorization", encodeBasicAuthentication(userName, password));
         }
 
         final HttpRequest request = requestBuilder.build();

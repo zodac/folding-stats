@@ -18,9 +18,11 @@ import java.util.Set;
 @ToString(doNotUseGetters = true)
 public class AuthenticationResponse {
 
-    final boolean userExists;
-    final boolean passwordMatch;
-    final Set<String> userRoles;
+    private static final String ADMIN_ROLE = "admin";
+
+    private final boolean userExists;
+    private final boolean passwordMatch;
+    private final Set<String> userRoles;
 
     /**
      * User does not exist {@link AuthenticationResponse}.
@@ -47,5 +49,14 @@ public class AuthenticationResponse {
      */
     public static AuthenticationResponse success(final Set<String> userRoles) {
         return new AuthenticationResponse(true, true, userRoles);
+    }
+
+    /**
+     * Checks if the {@code userRoles} of the {@link AuthenticationResponse} contain the 'admin' user role.
+     *
+     * @return <code>true</code> if the {@code userRoles} contains the 'admin' user role
+     */
+    public boolean isAdmin() {
+        return userRoles.contains(ADMIN_ROLE);
     }
 }

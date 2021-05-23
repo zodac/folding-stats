@@ -78,7 +78,6 @@ function loadOverallStats() {
         overallTable.append(overallTableBody);
 
         overallDiv.append(overallTable);
-        return true;
     })
 };
 

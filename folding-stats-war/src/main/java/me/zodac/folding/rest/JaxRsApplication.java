@@ -18,6 +18,7 @@ public class JaxRsApplication extends Application {
                 // REST endpoints
                 HardwareEndpoint.class,
                 HistoricStatsEndpoint.class,
+                LoginEndpoint.class,
                 TeamCompetitionStatsEndpoint.class,
                 TeamEndpoint.class,
                 UserEndpoint.class,

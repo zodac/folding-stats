@@ -12,7 +12,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 
-import static me.zodac.folding.client.java.request.EncodingUtils.encodeAuthentication;
+import static me.zodac.folding.api.utils.EncodingUtils.encodeBasicAuthentication;
 
 /**
  * Convenience class to send HTTP requests to the <code>Team Competition</code> REST endpoint.
@@ -214,7 +214,7 @@ public final class TeamCompetitionRequestSender {
                 .header("Content-Type", "application/json");
 
         if (StringUtils.isNoneBlank(userName, password)) {
-            requestBuilder.header("Authorization", encodeAuthentication(userName, password));
+            requestBuilder.header("Authorization", encodeBasicAuthentication(userName, password));
         }
 
         final HttpRequest request = requestBuilder.build();
@@ -261,7 +261,7 @@ public final class TeamCompetitionRequestSender {
                 .header("Content-Type", "application/json");
 
         if (StringUtils.isNoneBlank(userName, password)) {
-            requestBuilder.header("Authorization", encodeAuthentication(userName, password));
+            requestBuilder.header("Authorization", encodeBasicAuthentication(userName, password));
         }
 
         final HttpRequest request = requestBuilder.build();

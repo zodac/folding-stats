@@ -2,9 +2,9 @@ package me.zodac.folding.rest;
 
 import me.zodac.folding.api.db.AuthenticationResponse;
 import me.zodac.folding.api.exception.FoldingException;
+import me.zodac.folding.api.utils.EncodingUtils;
 import me.zodac.folding.ejb.BusinessLogic;
 import me.zodac.folding.rest.response.Responses;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,11 +19,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 import java.lang.reflect.Method;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
@@ -72,7 +72,7 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 
     private static final String AUTHORIZATION_PROPERTY = "Authorization";
     private static final String AUTHENTICATION_SCHEME = "Basic ";
-    private static final String DECODED_USERNAME_PASSWORD_DELIMITER = ":";
+
 
     // TODO: [zodac] Log levels!
 
@@ -103,19 +103,15 @@ public class SecurityInterceptor implements ContainerRequestFilter {
         }
 
         final String authorizationProperty = requestContext.getHeaderString(AUTHORIZATION_PROPERTY);
-
-        if (StringUtils.isBlank(authorizationProperty) || !authorizationProperty.contains(AUTHENTICATION_SCHEME)) {
+        if (!EncodingUtils.isBasicAuthentication(authorizationProperty)) {
             LOGGER.warn("Invalid {} header provided at '{}': '{}'", AUTHORIZATION_PROPERTY, requestContext.getUriInfo().getAbsolutePath(), authorizationProperty);
             requestContext.abortWith(unauthorized());
             return;
         }
 
-        // Authorization should be in the form: 'Basic <encodedUsernameAndPassword>', we only want the encoded data
-        final String encodedUserNameAndPassword = authorizationProperty.split(AUTHENTICATION_SCHEME)[1];
-        final String decodedUserNameAndPassword = new String(Base64.getDecoder().decode(encodedUserNameAndPassword), StandardCharsets.ISO_8859_1);
-        final String[] userNameAndPasswordTokens = decodedUserNameAndPassword.split(DECODED_USERNAME_PASSWORD_DELIMITER, 2);
-        final String userName = userNameAndPasswordTokens[0];
-        final String password = userNameAndPasswordTokens[1];
+        final Map<String, String> decodedUserNameAndPassword = EncodingUtils.decodeBasicAuthentication(authorizationProperty);
+        final String userName = decodedUserNameAndPassword.get(EncodingUtils.DECODED_USERNAME_KEY);
+        final String password = decodedUserNameAndPassword.get(EncodingUtils.DECODED_PASSWORD_KEY);
 
         final AuthenticationResponse authenticationResponse = businessLogic.isValidUser(userName, password);
 

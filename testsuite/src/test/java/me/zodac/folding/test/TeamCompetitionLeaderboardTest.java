@@ -31,7 +31,7 @@ import static me.zodac.folding.test.utils.TestGenerator.generateUserWithCategory
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests for the <code>Team Competition</code> {@link Team} and {@link User} catgeory leaderboards.
+ * Tests for the <code>Team Competition</code> {@link Team} and {@link User} category leaderboards.
  * <p>
  * Since the TC stats are done on the full system (meaning all {@link Team}s), we wipe the system before each test with a {@link BeforeEach} method.
  */

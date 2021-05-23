@@ -282,7 +282,6 @@ public class PostgresDbManagerTest {
                 .contains("admin");
 
         final AuthenticationResponse readOnly = POSTGRES_DB_MANAGER.isValidUser("READ_ONLY_USERNAME", "READ_ONLY_PASSWORD");
-        System.out.println(readOnly);
         assertThat(readOnly.isUserExists())
                 .isTrue();
         assertThat(readOnly.isPasswordMatch())
