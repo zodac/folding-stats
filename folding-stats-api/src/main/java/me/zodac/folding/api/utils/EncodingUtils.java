@@ -14,8 +14,8 @@ public final class EncodingUtils {
 
     public static final String DECODED_USERNAME_KEY = "userName";
     public static final String DECODED_PASSWORD_KEY = "password";
-
-    private static final String BASIC_AUTHENTICATION_SCHEME = "Basic ";
+    public static final String BASIC_AUTHENTICATION_SCHEME = "Basic ";
+    
     private static final String DECODED_USERNAME_PASSWORD_DELIMITER = ":";
 
     /**

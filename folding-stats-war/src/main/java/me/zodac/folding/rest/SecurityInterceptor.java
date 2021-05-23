@@ -71,10 +71,6 @@ public class SecurityInterceptor implements ContainerRequestFilter {
     private BusinessLogic businessLogic;
 
     private static final String AUTHORIZATION_PROPERTY = "Authorization";
-    private static final String AUTHENTICATION_SCHEME = "Basic ";
-
-
-    // TODO: [zodac] Log levels!
 
     @Override
     public void filter(final ContainerRequestContext requestContext) {
@@ -90,7 +86,7 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 
     private void validateRequest(final ContainerRequestContext requestContext) throws FoldingException {
         final Method method = resourceInfo.getResourceMethod();
-
+        
         if (method.isAnnotationPresent(DenyAll.class)) {
             LOGGER.warn("All access to '#{}()' at '{}' is denied", method.getName(), requestContext.getUriInfo().getAbsolutePath());
             requestContext.abortWith(forbidden());

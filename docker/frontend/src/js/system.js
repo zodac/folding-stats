@@ -13,6 +13,35 @@ function toggleMainButtonStyle(type, classList){
     }
 }
 
+function adminLogin(){
+    var userName = document.getElementById("inputUserName").value;
+    var password = document.getElementById("inputPassword").value;
+    var authorizationPayload = "Basic " + encode(userName, password);
+
+    document.getElementById("inputUserName").value = '';
+    document.getElementById("inputPassword").value = '';
+
+    var requestData = {
+        "encodedUserNameAndPassword": authorizationPayload
+    };
+
+    fetch(ROOT_URL+'/login/admin', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestData)
+    })
+    .then(response => {
+        if(response.status != 200){
+            showToast("toast-login-failure", true);
+            return;
+        }
+
+        showToast("toast-login-success", true);
+    });
+}
+
 function loadHardware() {
     fetch(ROOT_URL+'/hardware')
     .then(response => {

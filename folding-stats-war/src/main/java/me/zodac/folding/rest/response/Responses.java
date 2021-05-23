@@ -10,9 +10,7 @@ import javax.ws.rs.core.UriBuilder;
 import java.util.Collection;
 
 /**
- * {@link UtilityClass} to simplify returning a {@link Response} in the REST layer. Since we want to add the headers for
- * <b>Access-Control-Allow-Origin</b> and <b>Access-Control-Allow-Methods</b> for all REST functions, it's simpler to
- * move that logic here, and call a simpler function from the REST layer.
+ * {@link UtilityClass} to simplify returning a {@link Response} in the REST layer.
  * <p>
  * For most use-cases we return a {@link Response}, but for more complex use-cases, we can return a {@link Response.ResponseBuilder}
  * to allow the REST function to decide to add additional logic (like a {@link javax.ws.rs.core.CacheControl} or similar).
@@ -21,11 +19,6 @@ import java.util.Collection;
 public final class Responses {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-
-    private static final String ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_NAME = "Access-Control-Allow-Origin";
-    private static final String ACCESS_CONTROL_ALLOW_METHODS_HEADER_NAME = "Access-Control-Allow-Methods";
-    private static final String ACCESS_CONTROL_ALLOW_ORIGIN_DEFAULT_VALUE = "*";
-    private static final String ACCESS_CONTROL_ALLOW_METHODS_DEFAULT_VALUE = "GET, PUT, POST, PATCH, DELETE, HEAD";
 
     /**
      * A <b>200_OK</b> {@link Response}.
@@ -38,8 +31,6 @@ public final class Responses {
     public static Response ok() {
         return Response
                 .ok()
-                .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_NAME, ACCESS_CONTROL_ALLOW_ORIGIN_DEFAULT_VALUE)
-                .header(ACCESS_CONTROL_ALLOW_METHODS_HEADER_NAME, ACCESS_CONTROL_ALLOW_METHODS_DEFAULT_VALUE)
                 .build();
     }
 
@@ -85,8 +76,6 @@ public final class Responses {
     public static Response ok(final Object entity, final UriBuilder entityLocationBuilder) {
         return Response
                 .ok(entityLocationBuilder.build())
-                .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_NAME, ACCESS_CONTROL_ALLOW_ORIGIN_DEFAULT_VALUE)
-                .header(ACCESS_CONTROL_ALLOW_METHODS_HEADER_NAME, ACCESS_CONTROL_ALLOW_METHODS_DEFAULT_VALUE)
                 .entity(GSON.toJson(entity))
                 .build();
     }
@@ -104,8 +93,6 @@ public final class Responses {
     public static Response.ResponseBuilder okBuilder(final Collection<? extends Identifiable> entities) {
         return Response
                 .ok()
-                .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_NAME, ACCESS_CONTROL_ALLOW_ORIGIN_DEFAULT_VALUE)
-                .header(ACCESS_CONTROL_ALLOW_METHODS_HEADER_NAME, ACCESS_CONTROL_ALLOW_METHODS_DEFAULT_VALUE)
                 .header("X-Total-Count", entities.size())
                 .entity(GSON.toJson(entities));
     }
@@ -124,8 +111,6 @@ public final class Responses {
     public static Response.ResponseBuilder okBuilder(final Object entity) {
         return Response
                 .ok()
-                .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_NAME, ACCESS_CONTROL_ALLOW_ORIGIN_DEFAULT_VALUE)
-                .header(ACCESS_CONTROL_ALLOW_METHODS_HEADER_NAME, ACCESS_CONTROL_ALLOW_METHODS_DEFAULT_VALUE)
                 .entity(GSON.toJson(entity));
     }
 
@@ -142,8 +127,6 @@ public final class Responses {
     public static Response created(final Object entity, final UriBuilder entityLocationBuilder) {
         return Response
                 .created(entityLocationBuilder.build())
-                .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_NAME, ACCESS_CONTROL_ALLOW_ORIGIN_DEFAULT_VALUE)
-                .header(ACCESS_CONTROL_ALLOW_METHODS_HEADER_NAME, ACCESS_CONTROL_ALLOW_METHODS_DEFAULT_VALUE)
                 .entity(GSON.toJson(entity))
                 .build();
     }
@@ -160,8 +143,6 @@ public final class Responses {
     public static Response badRequest(final String errorMessage) {
         return Response
                 .status(Response.Status.BAD_REQUEST)
-                .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_NAME, ACCESS_CONTROL_ALLOW_ORIGIN_DEFAULT_VALUE)
-                .header(ACCESS_CONTROL_ALLOW_METHODS_HEADER_NAME, ACCESS_CONTROL_ALLOW_METHODS_DEFAULT_VALUE)
                 .entity(GSON.toJson(ErrorResponse.create(errorMessage), ErrorResponse.class))
                 .build();
     }
@@ -178,8 +159,6 @@ public final class Responses {
     public static Response badRequest(final Object entity) {
         return Response
                 .status(Response.Status.BAD_REQUEST)
-                .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_NAME, ACCESS_CONTROL_ALLOW_ORIGIN_DEFAULT_VALUE)
-                .header(ACCESS_CONTROL_ALLOW_METHODS_HEADER_NAME, ACCESS_CONTROL_ALLOW_METHODS_DEFAULT_VALUE)
                 .entity(GSON.toJson(entity))
                 .build();
     }
@@ -195,8 +174,6 @@ public final class Responses {
     public static Response unauthorized() {
         return Response
                 .status(Response.Status.UNAUTHORIZED)
-                .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_NAME, ACCESS_CONTROL_ALLOW_ORIGIN_DEFAULT_VALUE)
-                .header(ACCESS_CONTROL_ALLOW_METHODS_HEADER_NAME, ACCESS_CONTROL_ALLOW_METHODS_DEFAULT_VALUE)
                 .build();
     }
 
@@ -211,8 +188,6 @@ public final class Responses {
     public static Response forbidden() {
         return Response
                 .status(Response.Status.FORBIDDEN)
-                .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_NAME, ACCESS_CONTROL_ALLOW_ORIGIN_DEFAULT_VALUE)
-                .header(ACCESS_CONTROL_ALLOW_METHODS_HEADER_NAME, ACCESS_CONTROL_ALLOW_METHODS_DEFAULT_VALUE)
                 .build();
     }
 
@@ -226,8 +201,6 @@ public final class Responses {
     public static Response notFound() {
         return Response
                 .status(Response.Status.NOT_FOUND)
-                .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_NAME, ACCESS_CONTROL_ALLOW_ORIGIN_DEFAULT_VALUE)
-                .header(ACCESS_CONTROL_ALLOW_METHODS_HEADER_NAME, ACCESS_CONTROL_ALLOW_METHODS_DEFAULT_VALUE)
                 .build();
     }
 
@@ -247,8 +220,6 @@ public final class Responses {
     public static Response conflict(final String errorMessage) {
         return Response
                 .status(Response.Status.CONFLICT)
-                .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_NAME, ACCESS_CONTROL_ALLOW_ORIGIN_DEFAULT_VALUE)
-                .header(ACCESS_CONTROL_ALLOW_METHODS_HEADER_NAME, ACCESS_CONTROL_ALLOW_METHODS_DEFAULT_VALUE)
                 .entity(GSON.toJson(ErrorResponse.create(errorMessage), ErrorResponse.class))
                 .build();
     }
@@ -263,8 +234,6 @@ public final class Responses {
     public static Response serverError() {
         return Response
                 .serverError()
-                .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_NAME, ACCESS_CONTROL_ALLOW_ORIGIN_DEFAULT_VALUE)
-                .header(ACCESS_CONTROL_ALLOW_METHODS_HEADER_NAME, ACCESS_CONTROL_ALLOW_METHODS_DEFAULT_VALUE)
                 .build();
     }
 
@@ -279,8 +248,6 @@ public final class Responses {
     public static Response badGateway() {
         return Response
                 .status(Response.Status.BAD_GATEWAY)
-                .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_NAME, ACCESS_CONTROL_ALLOW_ORIGIN_DEFAULT_VALUE)
-                .header(ACCESS_CONTROL_ALLOW_METHODS_HEADER_NAME, ACCESS_CONTROL_ALLOW_METHODS_DEFAULT_VALUE)
                 .build();
     }
 
@@ -295,8 +262,6 @@ public final class Responses {
     public static Response serviceUnavailable() {
         return Response
                 .status(Response.Status.SERVICE_UNAVAILABLE)
-                .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_NAME, ACCESS_CONTROL_ALLOW_ORIGIN_DEFAULT_VALUE)
-                .header(ACCESS_CONTROL_ALLOW_METHODS_HEADER_NAME, ACCESS_CONTROL_ALLOW_METHODS_DEFAULT_VALUE)
                 .build();
     }
 }

@@ -24,6 +24,7 @@ public class JaxRsApplication extends Application {
                 UserEndpoint.class,
 
                 // REST providers
+                CorsFilter.class,
                 InvalidUrlRedirecter.class,
                 SecurityInterceptor.class
         );
