@@ -115,13 +115,13 @@ function loadUsers() {
             usersProperties.forEach(function (usersProperty, i) {
                 usersTableBodyCell = document.createElement("td");
 
-                if (usersProperty === "liveStatsLink") {
+                if (usersProperty === "liveStatsLink" || usersProperty === "profileLink") {
                     if (usersProperty in usersItem) {
-                        liveStatsLink = document.createElement('a');
-                        liveStatsLink.setAttribute("href", usersItem[usersProperty]);
-                        liveStatsLink.innerHTML = usersItem[usersProperty];
+                        link = document.createElement('a');
+                        link.setAttribute("href", usersItem[usersProperty]);
+                        link.innerHTML = usersItem[usersProperty];
 
-                        usersTableBodyCell.append(liveStatsLink);
+                        usersTableBodyCell.append(link);
                     }
                 } else {
                     if (usersProperty in usersItem) {
@@ -180,13 +180,13 @@ function loadTeams() {
             teamsProperties.forEach(function (teamsProperty, i) {
                 teamsTableBodyCell = document.createElement("td");
 
-                if (teamsProperty === "liveStatsLink") {
+                if (teamsProperty === "forumLink") {
                     if (teamsProperty in teamsItem) {
-                        liveStatsLink = document.createElement('a');
-                        liveStatsLink.setAttribute("href", teamsItem[teamsProperty]);
-                        liveStatsLink.innerHTML = teamsItem[teamsProperty];
+                        link = document.createElement('a');
+                        link.setAttribute("href", teamsItem[teamsProperty]);
+                        link.innerHTML = teamsItem[teamsProperty];
 
-                        teamsTableBodyCell.append(liveStatsLink);
+                        teamsTableBodyCell.append(link);
                     }
                 } else {
                     if (teamsProperty in teamsItem) {
