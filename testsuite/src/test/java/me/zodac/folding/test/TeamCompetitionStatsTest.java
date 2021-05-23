@@ -28,6 +28,8 @@ import static me.zodac.folding.test.utils.TeamCompetitionStatsUtils.TEAM_COMPETI
 import static me.zodac.folding.test.utils.TeamCompetitionStatsUtils.getActiveUserFromTeam;
 import static me.zodac.folding.test.utils.TeamCompetitionStatsUtils.getRetiredUserFromTeam;
 import static me.zodac.folding.test.utils.TeamCompetitionStatsUtils.getTeamFromCompetition;
+import static me.zodac.folding.test.utils.TeamCompetitionStatsUtils.manuallyUpdateStats;
+import static me.zodac.folding.test.utils.TestAuthenticationData.ADMIN_USER;
 import static me.zodac.folding.test.utils.TestGenerator.generateHardware;
 import static me.zodac.folding.test.utils.TestGenerator.generateHardwareWithMultiplier;
 import static me.zodac.folding.test.utils.TestGenerator.generateTeamWithUserIds;
@@ -143,7 +145,7 @@ public class TeamCompetitionStatsTest {
         final int newUnits = 5;
         StubbedFoldingEndpointUtils.setUnits(user, newUnits);
 
-        final HttpResponse<Void> response = TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+        final HttpResponse<Void> response = TEAM_COMPETITION_REQUEST_SENDER.manualUpdate(ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(response.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + response.body())
@@ -235,7 +237,7 @@ public class TeamCompetitionStatsTest {
 
         StubbedFoldingEndpointUtils.setPoints(firstUser, 10_000L);
         StubbedFoldingEndpointUtils.setUnits(firstUser, 10);
-        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+        manuallyUpdateStats();
 
 
         final CompetitionResult resultAfterFirstUpdate = TeamCompetitionStatsUtils.getStats();
@@ -253,7 +255,7 @@ public class TeamCompetitionStatsTest {
 
         StubbedFoldingEndpointUtils.setPoints(secondUser, 20_000L);
         StubbedFoldingEndpointUtils.setUnits(secondUser, 20);
-        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+        manuallyUpdateStats();
 
 
         final CompetitionResult resultAfterSecondUpdate = TeamCompetitionStatsUtils.getStats();
@@ -300,7 +302,7 @@ public class TeamCompetitionStatsTest {
 
         StubbedFoldingEndpointUtils.setPoints(firstUser, 10_000L);
         StubbedFoldingEndpointUtils.setUnits(firstUser, 10);
-        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+        manuallyUpdateStats();
 
 
         final CompetitionResult resultAfterFirstUpdate = TeamCompetitionStatsUtils.getStats();
@@ -317,7 +319,7 @@ public class TeamCompetitionStatsTest {
 
         StubbedFoldingEndpointUtils.setPoints(secondUser, 20_000L);
         StubbedFoldingEndpointUtils.setUnits(secondUser, 20);
-        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+        manuallyUpdateStats();
 
 
         final CompetitionResult resultAfterSecondUpdate = TeamCompetitionStatsUtils.getStats();
@@ -346,7 +348,7 @@ public class TeamCompetitionStatsTest {
         final int newUnits = 20;
         StubbedFoldingEndpointUtils.setPoints(user, newPoints);
         StubbedFoldingEndpointUtils.setUnits(user, newUnits);
-        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+        manuallyUpdateStats();
 
 
         final CompetitionResult result = TeamCompetitionStatsUtils.getStats();
@@ -378,7 +380,7 @@ public class TeamCompetitionStatsTest {
 
         final long firstPoints = 10_000L;
         StubbedFoldingEndpointUtils.setPoints(user, firstPoints);
-        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+        manuallyUpdateStats();
 
 
         final CompetitionResult result = TeamCompetitionStatsUtils.getStats();
@@ -396,11 +398,11 @@ public class TeamCompetitionStatsTest {
         // Change the multiplier on the hardware, no need to update the user
         hardware.setMultiplier(2.0D);
         hardware.setId(hardwareId);
-        HARDWARE_REQUEST_SENDER.update(hardware);
+        HARDWARE_REQUEST_SENDER.update(hardware, ADMIN_USER.userName(), ADMIN_USER.password());
 
         final long secondPoints = 5_000L;
         StubbedFoldingEndpointUtils.setPoints(user, secondPoints);
-        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+        manuallyUpdateStats();
 
 
         final CompetitionResult resultAfterUpdate = TeamCompetitionStatsUtils.getStats();
@@ -428,7 +430,7 @@ public class TeamCompetitionStatsTest {
 
         final long firstPoints = 10_000L;
         StubbedFoldingEndpointUtils.setPoints(user, firstPoints);
-        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+        manuallyUpdateStats();
 
 
         final CompetitionResult result = TeamCompetitionStatsUtils.getStats();
@@ -448,11 +450,11 @@ public class TeamCompetitionStatsTest {
         final int hardwareWithMultiplierId = HardwareUtils.createOrConflict(hardwareWithMultiplier).getId();
         user.setHardwareId(hardwareWithMultiplierId);
         user.setId(userId);
-        USER_REQUEST_SENDER.update(user);
+        USER_REQUEST_SENDER.update(user, ADMIN_USER.userName(), ADMIN_USER.password());
 
         final long secondPoints = 5_000L;
         StubbedFoldingEndpointUtils.setPoints(user, secondPoints);
-        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+        manuallyUpdateStats();
 
 
         final CompetitionResult resultAfterUpdate = TeamCompetitionStatsUtils.getStats();
@@ -481,7 +483,7 @@ public class TeamCompetitionStatsTest {
         final long firstPoints = 10_000L;
         StubbedFoldingEndpointUtils.setPoints(firstUser, firstPoints);
         StubbedFoldingEndpointUtils.setPoints(secondUser, firstPoints);
-        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+        manuallyUpdateStats();
 
 
         final CompetitionResult result = TeamCompetitionStatsUtils.getStats();
@@ -499,7 +501,7 @@ public class TeamCompetitionStatsTest {
         final long secondPoints = 8_000L;
         StubbedFoldingEndpointUtils.setPoints(firstUser, secondPoints);
         StubbedFoldingEndpointUtils.setPoints(secondUser, secondPoints);
-        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+        manuallyUpdateStats();
 
 
         final CompetitionResult resultAfterRetirement = TeamCompetitionStatsUtils.getStats();
@@ -532,7 +534,7 @@ public class TeamCompetitionStatsTest {
         final long thirdPoints = 14_000L;
         StubbedFoldingEndpointUtils.setPoints(firstUser, thirdPoints);
         StubbedFoldingEndpointUtils.setPoints(secondUser, thirdPoints);
-        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+        manuallyUpdateStats();
 
 
         final CompetitionResult resultAfterUnretirement = TeamCompetitionStatsUtils.getStats();
@@ -579,7 +581,7 @@ public class TeamCompetitionStatsTest {
 
         final long firstPoints = 10_000L;
         StubbedFoldingEndpointUtils.setPoints(userToRetire, firstPoints);
-        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+        manuallyUpdateStats();
 
 
         final CompetitionResult result = TeamCompetitionStatsUtils.getStats();
@@ -607,13 +609,13 @@ public class TeamCompetitionStatsTest {
 
         final long secondPoints = 8_000L;
         StubbedFoldingEndpointUtils.setPoints(userToRetire, secondPoints);
-        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+        manuallyUpdateStats();
 
 
         TeamUtils.unretireUser(newTeamId, retiredUserId);
         final long thirdPoints = 14_000L;
         StubbedFoldingEndpointUtils.setPoints(userToRetire, thirdPoints);
-        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+        manuallyUpdateStats();
 
 
         final CompetitionResult resultAfterUnretirement = TeamCompetitionStatsUtils.getStats();
@@ -665,13 +667,12 @@ public class TeamCompetitionStatsTest {
 
         final long firstPoints = 2_500L;
         StubbedFoldingEndpointUtils.setPoints(user, firstPoints);
-        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+        manuallyUpdateStats();
 
 
         final long pointsOffset = 1_000L;
-        USER_REQUEST_SENDER.offset(userId, pointsOffset, pointsOffset, 0);
-        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
-
+        USER_REQUEST_SENDER.offset(userId, pointsOffset, pointsOffset, 0, ADMIN_USER.userName(), ADMIN_USER.password());
+        manuallyUpdateStats();
 
         final CompetitionResult result = TeamCompetitionStatsUtils.getStats();
         final TeamResult teamResult = getTeamFromCompetition(result, team.getTeamName());
@@ -697,13 +698,13 @@ public class TeamCompetitionStatsTest {
         final int firstUnits = 25;
         StubbedFoldingEndpointUtils.setPoints(user, firstPoints);
         StubbedFoldingEndpointUtils.setUnits(user, firstUnits);
-        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+        manuallyUpdateStats();
 
 
         final long pointsOffset = -20_000L;
         final int unitsOffset = -400;
-        USER_REQUEST_SENDER.offset(userId, pointsOffset, pointsOffset, unitsOffset);
-        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+        USER_REQUEST_SENDER.offset(userId, pointsOffset, pointsOffset, unitsOffset, ADMIN_USER.userName(), ADMIN_USER.password());
+        manuallyUpdateStats();
 
         final CompetitionResult result = TeamCompetitionStatsUtils.getStats();
         final TeamResult teamResult = getTeamFromCompetition(result, team.getTeamName());

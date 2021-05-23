@@ -11,6 +11,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import static me.zodac.folding.test.utils.TestAuthenticationData.ADMIN_USER;
+
 /**
  * Utility class for {@link Hardware}-based tests.
  */
@@ -30,7 +32,7 @@ public class HardwareUtils {
      * @throws FoldingRestException thrown if an error occurs creating/retrieving the {@link Hardware}
      */
     public static Hardware createOrConflict(final Hardware hardware) throws FoldingRestException {
-        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.create(hardware);
+        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.create(hardware, ADMIN_USER.userName(), ADMIN_USER.password());
         if (response.statusCode() == HttpURLConnection.HTTP_CREATED) {
             return HardwareResponseParser.create(response);
         }

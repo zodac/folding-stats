@@ -7,6 +7,7 @@ import me.zodac.folding.rest.api.exception.FoldingRestException;
 
 import static me.zodac.folding.test.utils.HardwareUtils.HARDWARE_REQUEST_SENDER;
 import static me.zodac.folding.test.utils.TeamUtils.TEAM_REQUEST_SENDER;
+import static me.zodac.folding.test.utils.TestAuthenticationData.ADMIN_USER;
 import static me.zodac.folding.test.utils.UserUtils.USER_REQUEST_SENDER;
 
 /**
@@ -41,15 +42,15 @@ public final class SystemCleaner {
         DatabaseUtils.truncateTableAndResetId("retired_user_stats");
 
         for (final Team team : TeamUtils.getAll()) {
-            TEAM_REQUEST_SENDER.delete(team.getId());
+            TEAM_REQUEST_SENDER.delete(team.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
         }
 
         for (final User user : UserUtils.getAll()) {
-            USER_REQUEST_SENDER.delete(user.getId());
+            USER_REQUEST_SENDER.delete(user.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
         }
 
         for (final Hardware hardware : HardwareUtils.getAll()) {
-            HARDWARE_REQUEST_SENDER.delete(hardware.getId());
+            HARDWARE_REQUEST_SENDER.delete(hardware.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
         }
 
         DatabaseUtils.truncateTableAndResetId("hardware", "users", "teams");

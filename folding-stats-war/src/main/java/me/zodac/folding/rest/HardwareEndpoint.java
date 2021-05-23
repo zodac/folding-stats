@@ -11,6 +11,8 @@ import me.zodac.folding.rest.validator.HardwareValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.Consumes;
@@ -40,7 +42,9 @@ public class HardwareEndpoint extends AbstractIdentifiableCrudEndpoint<Hardware>
     @EJB
     private BusinessLogic businessLogic;
 
+
     @POST
+    @RolesAllowed("admin")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createHardware(final Hardware hardware) {
@@ -48,6 +52,7 @@ public class HardwareEndpoint extends AbstractIdentifiableCrudEndpoint<Hardware>
     }
 
     @POST
+    @RolesAllowed("admin")
     @Path("/batch")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -56,12 +61,14 @@ public class HardwareEndpoint extends AbstractIdentifiableCrudEndpoint<Hardware>
     }
 
     @GET
+    @PermitAll
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllHardware(@Context final Request request) {
         return super.getAll(request);
     }
 
     @GET
+    @PermitAll
     @Path("/{hardwareId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getHardwareById(@PathParam("hardwareId") final String hardwareId, @Context final Request request) {
@@ -69,6 +76,7 @@ public class HardwareEndpoint extends AbstractIdentifiableCrudEndpoint<Hardware>
     }
 
     @PUT
+    @RolesAllowed("admin")
     @Path("/{hardwareId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -77,6 +85,7 @@ public class HardwareEndpoint extends AbstractIdentifiableCrudEndpoint<Hardware>
     }
 
     @DELETE
+    @RolesAllowed("admin")
     @Path("/{hardwareId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteHardwareById(@PathParam("hardwareId") final String hardwareId) {

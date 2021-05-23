@@ -17,6 +17,8 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.List;
 
+import static me.zodac.folding.client.java.request.EncodingUtils.encodeAuthentication;
+
 /**
  * Convenience class to send HTTP requests to the {@link User} REST endpoint.
  */
@@ -132,11 +134,29 @@ public final class UserRequestSender {
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<String> create(final User user) throws FoldingRestException {
-        final HttpRequest request = HttpRequest.newBuilder()
+        return create(user, null, null);
+    }
+
+    /**
+     * Send a <b>POST</b> request to create the given {@link User} in the system.
+     *
+     * @param user     the {@link User} to create
+     * @param userName the user name
+     * @param password the password
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     */
+    public HttpResponse<String> create(final User user, final String userName, final String password) throws FoldingRestException {
+        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(user)))
                 .uri(URI.create(foldingUrl + "/users"))
-                .header("Content-Type", "application/json")
-                .build();
+                .header("Content-Type", "application/json");
+
+        if (StringUtils.isNoneBlank(userName, password)) {
+            requestBuilder.header("Authorization", encodeAuthentication(userName, password));
+        }
+
+        final HttpRequest request = requestBuilder.build();
 
         try {
             return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -153,11 +173,29 @@ public final class UserRequestSender {
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<String> createBatchOf(final List<User> batchOfUsers) throws FoldingRestException {
-        final HttpRequest request = HttpRequest.newBuilder()
+        return createBatchOf(batchOfUsers, null, null);
+    }
+
+    /**
+     * Send a <b>POST</b> request to create the given {@link User}s in the system.
+     *
+     * @param batchOfUsers the {@link List} of {@link User}s to create
+     * @param userName     the user name
+     * @param password     the password
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     */
+    public HttpResponse<String> createBatchOf(final List<User> batchOfUsers, final String userName, final String password) throws FoldingRestException {
+        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(batchOfUsers)))
                 .uri(URI.create(foldingUrl + "/users/batch"))
-                .header("Content-Type", "application/json")
-                .build();
+                .header("Content-Type", "application/json");
+
+        if (StringUtils.isNoneBlank(userName, password)) {
+            requestBuilder.header("Authorization", encodeAuthentication(userName, password));
+        }
+
+        final HttpRequest request = requestBuilder.build();
 
         try {
             return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -174,11 +212,29 @@ public final class UserRequestSender {
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<String> update(final User user) throws FoldingRestException {
-        final HttpRequest request = HttpRequest.newBuilder()
+        return update(user, null, null);
+    }
+
+    /**
+     * Send a <b>PUT</b> request to update the given {@link User} in the system.
+     *
+     * @param user     the {@link User} to update
+     * @param userName the user name
+     * @param password the password
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     */
+    public HttpResponse<String> update(final User user, final String userName, final String password) throws FoldingRestException {
+        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .PUT(HttpRequest.BodyPublishers.ofString(GSON.toJson(user)))
                 .uri(URI.create(foldingUrl + "/users/" + user.getId()))
-                .header("Content-Type", "application/json")
-                .build();
+                .header("Content-Type", "application/json");
+
+        if (StringUtils.isNoneBlank(userName, password)) {
+            requestBuilder.header("Authorization", encodeAuthentication(userName, password));
+        }
+
+        final HttpRequest request = requestBuilder.build();
 
         try {
             return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -195,11 +251,29 @@ public final class UserRequestSender {
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<Void> delete(final int userId) throws FoldingRestException {
-        final HttpRequest request = HttpRequest.newBuilder()
+        return delete(userId, null, null);
+    }
+
+    /**
+     * Send a <b>DELETE</b> request to remove a {@link User} with the given {@code userId}.
+     *
+     * @param userId   the ID of the {@link User} to remove
+     * @param userName the user name
+     * @param password the password
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     */
+    public HttpResponse<Void> delete(final int userId, final String userName, final String password) throws FoldingRestException {
+        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .DELETE()
                 .uri(URI.create(foldingUrl + "/users/" + userId))
-                .header("Content-Type", "application/json")
-                .build();
+                .header("Content-Type", "application/json");
+
+        if (StringUtils.isNoneBlank(userName, password)) {
+            requestBuilder.header("Authorization", encodeAuthentication(userName, password));
+        }
+
+        final HttpRequest request = requestBuilder.build();
 
         try {
             return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
@@ -222,13 +296,37 @@ public final class UserRequestSender {
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<Void> offset(final int userId, final long pointsOffset, final long multipliedPointsOffset, final int unitsOffset) throws FoldingRestException {
+        return offset(userId, pointsOffset, multipliedPointsOffset, unitsOffset, null, null);
+    }
+
+    /**
+     * Send a <b>PATCH</b> request to retrieve update {@link User}s with the given {@code userId} with a points/unit offset.
+     * <p>
+     * <b>NOTE:</b> If either the {@code pointsOffset} or {@code multipliedPointsOffset} are set to <b>0</b>, then it will be calculated
+     * based on the hardware multiplier of the {@link User}.
+     *
+     * @param userId                 the ID of the {@link User} to update
+     * @param pointsOffset           the additional (unmultiplied) points to add to the {@link User}
+     * @param multipliedPointsOffset the additional (multiplied) points to add to the {@link User}
+     * @param unitsOffset            the additional units to add to the {@link User}
+     * @param userName               the user name
+     * @param password               the password
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     */
+    public HttpResponse<Void> offset(final int userId, final long pointsOffset, final long multipliedPointsOffset, final int unitsOffset, final String userName, final String password) throws FoldingRestException {
         final OffsetStats offsetStats = OffsetStats.create(pointsOffset, multipliedPointsOffset, unitsOffset);
 
-        final HttpRequest request = HttpRequest.newBuilder()
+        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .method("PATCH", HttpRequest.BodyPublishers.ofString(GSON.toJson(offsetStats)))
                 .uri(URI.create(foldingUrl + "/users/" + userId))
-                .header("Content-Type", "application/json")
-                .build();
+                .header("Content-Type", "application/json");
+
+        if (StringUtils.isNoneBlank(userName, password)) {
+            requestBuilder.header("Authorization", encodeAuthentication(userName, password));
+        }
+
+        final HttpRequest request = requestBuilder.build();
 
         try {
             return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());

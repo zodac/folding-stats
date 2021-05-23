@@ -185,6 +185,38 @@ public final class Responses {
     }
 
     /**
+     * A <b>401_UNAUTHORIZED</b> {@link Response}.
+     * <p>
+     * Generally used for cases where the user has not been successfully authenticated, and cannot be authorized to
+     * execute the REST endpoint.
+     *
+     * @return the <b>401_UNAUTHORIZED</b> {@link Response}
+     */
+    public static Response unauthorized() {
+        return Response
+                .status(Response.Status.UNAUTHORIZED)
+                .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_NAME, ACCESS_CONTROL_ALLOW_ORIGIN_DEFAULT_VALUE)
+                .header(ACCESS_CONTROL_ALLOW_METHODS_HEADER_NAME, ACCESS_CONTROL_ALLOW_METHODS_DEFAULT_VALUE)
+                .build();
+    }
+
+    /**
+     * A <b>403_FORBIDDEN</b> {@link Response}.
+     * <p>
+     * Generally used for cases where a user has successfully authenticated, but does not have the required
+     * authorization to execute the REST endpoint.
+     *
+     * @return the <b>403_FORBIDDEN</b> {@link Response}
+     */
+    public static Response forbidden() {
+        return Response
+                .status(Response.Status.FORBIDDEN)
+                .header(ACCESS_CONTROL_ALLOW_ORIGIN_HEADER_NAME, ACCESS_CONTROL_ALLOW_ORIGIN_DEFAULT_VALUE)
+                .header(ACCESS_CONTROL_ALLOW_METHODS_HEADER_NAME, ACCESS_CONTROL_ALLOW_METHODS_DEFAULT_VALUE)
+                .build();
+    }
+
+    /**
      * A <b>404_NOT_FOUND</b> {@link Response}.
      * <p>
      * Generally used for cases when an ID is supplied in a REST request, but no resource exists matching that ID..

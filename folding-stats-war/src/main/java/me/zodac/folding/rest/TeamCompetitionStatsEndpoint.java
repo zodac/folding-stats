@@ -16,6 +16,8 @@ import me.zodac.folding.rest.api.tc.leaderboard.UserSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.GET;
@@ -62,6 +64,7 @@ public class TeamCompetitionStatsEndpoint {
     private UriInfo uriContext;
 
     @GET
+    @RolesAllowed("admin")
     @Path("/manual/")
     public Response manualStats(@QueryParam("async") final boolean async) {
         LOGGER.info("GET request received to manually parse TC stats");
@@ -82,6 +85,7 @@ public class TeamCompetitionStatsEndpoint {
     }
 
     @GET
+    @RolesAllowed("admin")
     @Path("/reset/")
     public Response resetStats() {
         LOGGER.info("GET request received to manually reset TC stats");
@@ -103,6 +107,7 @@ public class TeamCompetitionStatsEndpoint {
     }
 
     @GET
+    @PermitAll
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTeamCompetitionStats() {
         LOGGER.debug("GET request received to show TC stats");
@@ -122,6 +127,7 @@ public class TeamCompetitionStatsEndpoint {
     }
 
     @GET
+    @PermitAll
     @Path("/leaderboard/")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTeamLeaderboard() {
@@ -169,6 +175,7 @@ public class TeamCompetitionStatsEndpoint {
     }
 
     @GET
+    @PermitAll
     @Path("/category/")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCategoryLeaderboard() {

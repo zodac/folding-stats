@@ -76,6 +76,8 @@ services:
       args:
         ADMIN_USERNAME: "root"
         ADMIN_PASSWORD: "shroot"
+        READ_ONLY_USERNAME: "root2"
+        READ_ONLY_PASSWORD: "shroot2"
     container_name: postgres_dev
     hostname: postgres_dev
     environment:

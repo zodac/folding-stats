@@ -11,6 +11,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import static me.zodac.folding.test.utils.TestAuthenticationData.ADMIN_USER;
+
 /**
  * Utility class for {@link Team}-based tests.
  */
@@ -30,7 +32,7 @@ public class TeamUtils {
      * @throws FoldingRestException thrown if an error occurs creating/retrieving the {@link Team}
      */
     public static Team createOrConflict(final Team team) throws FoldingRestException {
-        final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(team);
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(team, ADMIN_USER.userName(), ADMIN_USER.password());
         if (response.statusCode() == HttpURLConnection.HTTP_CREATED) {
             return TeamResponseParser.create(response);
         }
@@ -104,7 +106,7 @@ public class TeamUtils {
      * @throws FoldingRestException thrown if an error occurs retiring the {@link me.zodac.folding.api.tc.User}
      */
     public static int retireUser(final int teamId, final int userId) throws FoldingRestException {
-        final HttpResponse<String> response = TEAM_REQUEST_SENDER.retireUser(teamId, userId);
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.retireUser(teamId, userId, ADMIN_USER.userName(), ADMIN_USER.password());
         if (response.statusCode() == HttpURLConnection.HTTP_OK) {
             return TeamResponseParser.retireUser(response).getRetiredUserIds().iterator().next();
         }
@@ -121,7 +123,7 @@ public class TeamUtils {
      * @throws FoldingRestException thrown if an error occurs un-retiring the {@link me.zodac.folding.api.tc.User}
      */
     public static Team unretireUser(final int teamId, final int retiredUserId) throws FoldingRestException {
-        final HttpResponse<String> response = TEAM_REQUEST_SENDER.unretireUser(teamId, retiredUserId);
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.unretireUser(teamId, retiredUserId, ADMIN_USER.userName(), ADMIN_USER.password());
         if (response.statusCode() == HttpURLConnection.HTTP_OK) {
             return TeamResponseParser.unretireUser(response);
         }

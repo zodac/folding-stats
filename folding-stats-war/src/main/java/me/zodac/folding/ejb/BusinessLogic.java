@@ -1,6 +1,7 @@
 package me.zodac.folding.ejb;
 
 
+import me.zodac.folding.api.db.AuthenticationResponse;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.db.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
@@ -585,5 +586,9 @@ public class BusinessLogic {
     public Collection<RetiredUserTcStats> getAllRetiredUserStats() {
         // TODO: [zodac] Needs to check DB if cache miss
         return retiredStatsCache.getAll();
+    }
+
+    public AuthenticationResponse isValidUser(final String userName, final String password) throws FoldingException {
+        return dbManager.isValidUser(userName, password);
     }
 }

@@ -1,5 +1,6 @@
 package me.zodac.folding.db.postgres;
 
+import me.zodac.folding.api.db.AuthenticationResponse;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.db.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
@@ -252,6 +253,42 @@ public class PostgresDbManagerTest {
 
         assertThat(POSTGRES_DB_MANAGER.isAnyHourlyTcStats())
                 .isTrue();
+    }
+
+    @Test
+    public void validUserTest() throws FoldingException {
+        final AuthenticationResponse invalidUserName = POSTGRES_DB_MANAGER.isValidUser("invalidUserName", "ADMIN_PASSWORD");
+        assertThat(invalidUserName.isUserExists())
+                .isFalse();
+        assertThat(invalidUserName.isPasswordMatch())
+                .isFalse();
+        assertThat(invalidUserName.getUserRoles())
+                .isEmpty();
+
+        final AuthenticationResponse invalidPassword = POSTGRES_DB_MANAGER.isValidUser("ADMIN_USERNAME", "invalidPassword");
+        assertThat(invalidPassword.isUserExists())
+                .isTrue();
+        assertThat(invalidPassword.isPasswordMatch())
+                .isFalse();
+        assertThat(invalidPassword.getUserRoles())
+                .isEmpty();
+
+        final AuthenticationResponse admin = POSTGRES_DB_MANAGER.isValidUser("ADMIN_USERNAME", "ADMIN_PASSWORD");
+        assertThat(admin.isUserExists())
+                .isTrue();
+        assertThat(admin.isPasswordMatch())
+                .isTrue();
+        assertThat(admin.getUserRoles())
+                .contains("admin");
+
+        final AuthenticationResponse readOnly = POSTGRES_DB_MANAGER.isValidUser("READ_ONLY_USERNAME", "READ_ONLY_PASSWORD");
+        System.out.println(readOnly);
+        assertThat(readOnly.isUserExists())
+                .isTrue();
+        assertThat(readOnly.isPasswordMatch())
+                .isTrue();
+        assertThat(readOnly.getUserRoles())
+                .contains("read-only");
     }
 
     private Hardware generateHardware() {

@@ -16,6 +16,8 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.List;
 
+import static me.zodac.folding.client.java.request.EncodingUtils.encodeAuthentication;
+
 /**
  * Convenience class to send HTTP requests to the {@link Team} REST endpoint.
  */
@@ -131,11 +133,29 @@ public final class TeamRequestSender {
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<String> create(final Team team) throws FoldingRestException {
-        final HttpRequest request = HttpRequest.newBuilder()
+        return create(team, null, null);
+    }
+
+    /**
+     * Send a <b>POST</b> request to create the given {@link Team} in the system.
+     *
+     * @param team     the {@link Team} to create
+     * @param userName the user name
+     * @param password the password
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     */
+    public HttpResponse<String> create(final Team team, final String userName, final String password) throws FoldingRestException {
+        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(team)))
                 .uri(URI.create(foldingUrl + "/teams"))
-                .header("Content-Type", "application/json")
-                .build();
+                .header("Content-Type", "application/json");
+
+        if (StringUtils.isNoneBlank(userName, password)) {
+            requestBuilder.header("Authorization", encodeAuthentication(userName, password));
+        }
+
+        final HttpRequest request = requestBuilder.build();
 
         try {
             return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -152,11 +172,29 @@ public final class TeamRequestSender {
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<String> createBatchOf(final List<Team> batchOfTeams) throws FoldingRestException {
-        final HttpRequest request = HttpRequest.newBuilder()
+        return createBatchOf(batchOfTeams, null, null);
+    }
+
+    /**
+     * Send a <b>POST</b> request to create the given {@link Team}s in the system.
+     *
+     * @param batchOfTeams the {@link List} of {@link Team}s to create
+     * @param userName     the user name
+     * @param password     the password
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     */
+    public HttpResponse<String> createBatchOf(final List<Team> batchOfTeams, final String userName, final String password) throws FoldingRestException {
+        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(batchOfTeams)))
                 .uri(URI.create(foldingUrl + "/teams/batch"))
-                .header("Content-Type", "application/json")
-                .build();
+                .header("Content-Type", "application/json");
+
+        if (StringUtils.isNoneBlank(userName, password)) {
+            requestBuilder.header("Authorization", encodeAuthentication(userName, password));
+        }
+
+        final HttpRequest request = requestBuilder.build();
 
         try {
             return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -173,11 +211,29 @@ public final class TeamRequestSender {
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<String> update(final Team team) throws FoldingRestException {
-        final HttpRequest request = HttpRequest.newBuilder()
+        return update(team, null, null);
+    }
+
+    /**
+     * Send a <b>PUT</b> request to update the given {@link Team} in the system.
+     *
+     * @param team     the {@link Team} to update
+     * @param userName the user name
+     * @param password the password
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     */
+    public HttpResponse<String> update(final Team team, final String userName, final String password) throws FoldingRestException {
+        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .PUT(HttpRequest.BodyPublishers.ofString(GSON.toJson(team)))
                 .uri(URI.create(foldingUrl + "/teams/" + team.getId()))
-                .header("Content-Type", "application/json")
-                .build();
+                .header("Content-Type", "application/json");
+
+        if (StringUtils.isNoneBlank(userName, password)) {
+            requestBuilder.header("Authorization", encodeAuthentication(userName, password));
+        }
+
+        final HttpRequest request = requestBuilder.build();
 
         try {
             return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -194,11 +250,29 @@ public final class TeamRequestSender {
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<Void> delete(final int teamId) throws FoldingRestException {
-        final HttpRequest request = HttpRequest.newBuilder()
+        return delete(teamId, null, null);
+    }
+
+    /**
+     * Send a <b>DELETE</b> request to remove a {@link Team} with the given {@code teamId}.
+     *
+     * @param teamId   the ID of the {@link Team} to remove
+     * @param userName the user name
+     * @param password the password
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     */
+    public HttpResponse<Void> delete(final int teamId, final String userName, final String password) throws FoldingRestException {
+        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .DELETE()
                 .uri(URI.create(foldingUrl + "/teams/" + teamId))
-                .header("Content-Type", "application/json")
-                .build();
+                .header("Content-Type", "application/json");
+
+        if (StringUtils.isNoneBlank(userName, password)) {
+            requestBuilder.header("Authorization", encodeAuthentication(userName, password));
+        }
+
+        final HttpRequest request = requestBuilder.build();
 
         try {
             return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
@@ -216,11 +290,30 @@ public final class TeamRequestSender {
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<String> retireUser(final int teamId, final int userId) throws FoldingRestException {
-        final HttpRequest request = HttpRequest.newBuilder()
+        return retireUser(teamId, userId, null, null);
+    }
+
+    /**
+     * Send a <b>PATCH</b> request to retire a {@link me.zodac.folding.api.tc.User} from a {@link Team}.
+     *
+     * @param teamId   the ID of the {@link Team}
+     * @param userId   the ID of the {@link me.zodac.folding.api.tc.User} to retire
+     * @param userName the user name
+     * @param password the password
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     */
+    public HttpResponse<String> retireUser(final int teamId, final int userId, final String userName, final String password) throws FoldingRestException {
+        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .method("PATCH", HttpRequest.BodyPublishers.noBody())
                 .uri(URI.create(foldingUrl + "/teams/" + teamId + "/retire/" + userId))
-                .header("Content-Type", "application/json")
-                .build();
+                .header("Content-Type", "application/json");
+
+        if (StringUtils.isNoneBlank(userName, password)) {
+            requestBuilder.header("Authorization", encodeAuthentication(userName, password));
+        }
+
+        final HttpRequest request = requestBuilder.build();
 
         try {
             return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -238,11 +331,30 @@ public final class TeamRequestSender {
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<String> unretireUser(final int teamId, final int retiredUserId) throws FoldingRestException {
-        final HttpRequest request = HttpRequest.newBuilder()
+        return unretireUser(teamId, retiredUserId, null, null);
+    }
+
+    /**
+     * Send a <b>PATCH</b> request to un-retire a {@link me.zodac.folding.api.tc.User} to a {@link Team}.
+     *
+     * @param teamId        the ID of the {@link Team} to un-retire the {@link me.zodac.folding.api.tc.User} to
+     * @param retiredUserId the ID of the retired {@link me.zodac.folding.api.tc.User} to un-retire
+     * @param userName      the user name
+     * @param password      the password
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     */
+    public HttpResponse<String> unretireUser(final int teamId, final int retiredUserId, final String userName, final String password) throws FoldingRestException {
+        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .method("PATCH", HttpRequest.BodyPublishers.noBody())
                 .uri(URI.create(foldingUrl + "/teams/" + teamId + "/unretire/" + retiredUserId))
-                .header("Content-Type", "application/json")
-                .build();
+                .header("Content-Type", "application/json");
+
+        if (StringUtils.isNoneBlank(userName, password)) {
+            requestBuilder.header("Authorization", encodeAuthentication(userName, password));
+        }
+
+        final HttpRequest request = requestBuilder.build();
 
         try {
             return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());

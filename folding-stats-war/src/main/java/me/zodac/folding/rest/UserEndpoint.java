@@ -21,6 +21,8 @@ import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.Consumes;
@@ -61,6 +63,7 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
     private UserTeamCompetitionStatsParser userTeamCompetitionStatsParser;
 
     @POST
+    @RolesAllowed("admin")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createUser(final User user) {
@@ -68,6 +71,7 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
     }
 
     @POST
+    @RolesAllowed("admin")
     @Path("/batch")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -76,12 +80,14 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
     }
 
     @GET
+    @PermitAll
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllUsers(@Context final Request request) {
         return super.getAll(request);
     }
 
     @GET
+    @PermitAll
     @Path("/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUserById(@PathParam("userId") final String userId, @Context final Request request) {
@@ -89,6 +95,7 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
     }
 
     @PUT
+    @RolesAllowed("admin")
     @Path("/{userId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -97,6 +104,7 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
     }
 
     @DELETE
+    @RolesAllowed("admin")
     @Path("/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteUserById(@PathParam("userId") final String userId) {
@@ -104,6 +112,7 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
     }
 
     @PATCH
+    @RolesAllowed("admin")
     @Path("/{userId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)

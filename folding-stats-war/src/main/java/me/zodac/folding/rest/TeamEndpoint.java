@@ -20,6 +20,8 @@ import me.zodac.folding.rest.validator.TeamValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.Consumes;
@@ -60,6 +62,7 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
     private TeamCompetitionStatsScheduler teamCompetitionStatsScheduler;
 
     @POST
+    @RolesAllowed("admin")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createTeam(final Team team) {
@@ -67,6 +70,7 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
     }
 
     @POST
+    @RolesAllowed("admin")
     @Path("/batch")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -75,12 +79,14 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
     }
 
     @GET
+    @PermitAll
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllTeams(@Context final Request request) {
         return super.getAll(request);
     }
 
     @GET
+    @PermitAll
     @Path("/{teamId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTeamById(@PathParam("teamId") final String teamId, @Context final Request request) {
@@ -88,6 +94,7 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
     }
 
     @PUT
+    @RolesAllowed("admin")
     @Path("/{teamId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -96,6 +103,7 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
     }
 
     @DELETE
+    @RolesAllowed("admin")
     @Path("/{teamId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteTeamById(@PathParam("teamId") final String teamId) {
@@ -103,6 +111,7 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
     }
 
     @PATCH
+    @RolesAllowed("admin")
     @Path("/{teamId}/retire/{userId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -160,6 +169,7 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
     }
 
     @PATCH
+    @RolesAllowed("admin")
     @Path("/{teamId}/unretire/{retiredUserId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)

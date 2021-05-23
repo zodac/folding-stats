@@ -10,7 +10,7 @@ import java.net.URI;
  * {@link Provider} used to handle invalid URL requests. Redirects to the main <code>Team Competition</code> homepage.
  */
 @Provider
-public class InvalidUrlHandler implements ExceptionMapper<NotFoundException> {
+public class InvalidUrlRedirecter implements ExceptionMapper<NotFoundException> {
 
     private static final String TEAM_COMPETITION_HOME_PAGE = "http://teamcomp.axihub.ca/";
 

@@ -11,6 +11,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import static me.zodac.folding.test.utils.TestAuthenticationData.ADMIN_USER;
+
 
 /**
  * Utility class for {@link User}-based tests.
@@ -35,7 +37,7 @@ public final class UserUtils {
      */
     public static User createOrConflict(final User user) throws FoldingRestException {
         StubbedFoldingEndpointUtils.enableUser(user);
-        final HttpResponse<String> response = USER_REQUEST_SENDER.create(user);
+        final HttpResponse<String> response = USER_REQUEST_SENDER.create(user, ADMIN_USER.userName(), ADMIN_USER.password());
         if (response.statusCode() == HttpURLConnection.HTTP_CREATED) {
             return UserResponseParser.create(response);
         }

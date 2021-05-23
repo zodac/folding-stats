@@ -24,6 +24,7 @@ import java.util.Map;
 import static java.util.stream.Collectors.toList;
 import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForComplexTests;
 import static me.zodac.folding.test.utils.TeamCompetitionStatsUtils.TEAM_COMPETITION_REQUEST_SENDER;
+import static me.zodac.folding.test.utils.TeamCompetitionStatsUtils.manuallyUpdateStats;
 import static me.zodac.folding.test.utils.TestGenerator.generateTeamWithUserIds;
 import static me.zodac.folding.test.utils.TestGenerator.generateUser;
 import static me.zodac.folding.test.utils.TestGenerator.generateUserWithCategory;
@@ -76,7 +77,7 @@ public class TeamCompetitionLeaderboardTest {
         TeamUtils.createOrConflict(thirdTeam);
         StubbedFoldingEndpointUtils.setPoints(thirdUser, 1_000L);
 
-        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+        manuallyUpdateStats();
         final HttpResponse<String> response = TEAM_COMPETITION_REQUEST_SENDER.getTeamLeaderboard();
 
         assertThat(response.statusCode())
@@ -146,7 +147,7 @@ public class TeamCompetitionLeaderboardTest {
         StubbedFoldingEndpointUtils.setPoints(thirdUser, 1_000L);
         StubbedFoldingEndpointUtils.setPoints(fourthUser, 1_000L);
 
-        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+        manuallyUpdateStats();
         final HttpResponse<String> response = TEAM_COMPETITION_REQUEST_SENDER.getCategoryLeaderboard();
 
         assertThat(response.statusCode())

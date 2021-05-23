@@ -12,6 +12,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 
+import static me.zodac.folding.client.java.request.EncodingUtils.encodeAuthentication;
+
 /**
  * Convenience class to send HTTP requests to the <code>Team Competition</code> REST endpoint.
  */
@@ -173,17 +175,49 @@ public final class TeamCompetitionRequestSender {
 
     /**
      * Sends a <b>GET</b> request to manually trigger an update of the <code>Team Competition</code> stats for all {@link me.zodac.folding.api.tc.User}s and {@link me.zodac.folding.api.tc.Team}s.
+     * <p>
+     * Request will be sent and only return when the update is complete. If an asynchronous update is required, look at {@link #manualUpdate(boolean)}.
+     *
+     * @param userName the user name
+     * @param password the password
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     */
+    public HttpResponse<Void> manualUpdate(final String userName, final String password) throws FoldingRestException {
+        return manualUpdate(false, userName, password);
+    }
+
+    /**
+     * Sends a <b>GET</b> request to manually trigger an update of the <code>Team Competition</code> stats for all {@link me.zodac.folding.api.tc.User}s and {@link me.zodac.folding.api.tc.Team}s.
      *
      * @param async should the update be performed asynchronously, or wait for the result
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<Void> manualUpdate(final boolean async) throws FoldingRestException {
-        final HttpRequest request = HttpRequest.newBuilder()
+        return manualUpdate(async, null, null);
+    }
+
+    /**
+     * Sends a <b>GET</b> request to manually trigger an update of the <code>Team Competition</code> stats for all {@link me.zodac.folding.api.tc.User}s and {@link me.zodac.folding.api.tc.Team}s.
+     *
+     * @param async    should the update be performed asynchronously, or wait for the result
+     * @param userName the user name
+     * @param password the password
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     */
+    public HttpResponse<Void> manualUpdate(final boolean async, final String userName, final String password) throws FoldingRestException {
+        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .GET()
                 .uri(URI.create(foldingUrl + "/tc_stats/manual?async=" + async))
-                .header("Content-Type", "application/json")
-                .build();
+                .header("Content-Type", "application/json");
+
+        if (StringUtils.isNoneBlank(userName, password)) {
+            requestBuilder.header("Authorization", encodeAuthentication(userName, password));
+        }
+
+        final HttpRequest request = requestBuilder.build();
 
         try {
             return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
@@ -204,6 +238,33 @@ public final class TeamCompetitionRequestSender {
                 .uri(URI.create(foldingUrl + "/tc_stats/reset"))
                 .header("Content-Type", "application/json")
                 .build();
+
+        try {
+            return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
+        } catch (final IOException | InterruptedException e) {
+            throw new FoldingRestException("Error sending HTTP request to manually trigger monthly reset of TC stats", e);
+        }
+    }
+
+    /**
+     * Sends a <b>GET</b> request to manually reset the <code>Team Competition</code> stats for all {@link me.zodac.folding.api.tc.User}s and {@link me.zodac.folding.api.tc.Team}s.
+     *
+     * @param userName the user name
+     * @param password the password
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     */
+    public HttpResponse<Void> manualReset(final String userName, final String password) throws FoldingRestException {
+        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+                .GET()
+                .uri(URI.create(foldingUrl + "/tc_stats/reset"))
+                .header("Content-Type", "application/json");
+
+        if (StringUtils.isNoneBlank(userName, password)) {
+            requestBuilder.header("Authorization", encodeAuthentication(userName, password));
+        }
+
+        final HttpRequest request = requestBuilder.build();
 
         try {
             return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());

@@ -1,5 +1,6 @@
 package me.zodac.folding.db.postgres;
 
+import me.zodac.folding.api.db.AuthenticationResponse;
 import me.zodac.folding.api.db.DbConnectionPool;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.db.exception.FoldingConflictException;
@@ -1132,13 +1133,14 @@ public class PostgresDbManager implements DbManager {
             throw new FoldingException("Error opening connection to the DB", e);
         }
     }
-    
+
     @Override
-    public boolean isAdminUser(final String userName, final String password) throws FoldingException {
-        LOGGER.debug("Checking if supplied user name '{}' and password is valid admin user", userName);
-        final String selectSql = "SELECT user_password_hash = crypt(?, user_password_hash) AS is_match " +
-                "FROM admin_users " +
+    public AuthenticationResponse isValidUser(final String userName, final String password) throws FoldingException {
+        LOGGER.debug("Checking if supplied user name '{}' and password is valid user, then returning roles", userName);
+        final String selectSql = "SELECT user_password_hash = crypt(?, user_password_hash) AS is_password_match, roles " +
+                "FROM system_users " +
                 "WHERE user_name = ?;";
+
         LOGGER.debug("Executing prepared statement (without password): {}", selectSql);
         try (final Connection connection = dbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(selectSql)) {
@@ -1148,11 +1150,18 @@ public class PostgresDbManager implements DbManager {
 
                 try (final ResultSet resultSet = preparedStatement.executeQuery()) {
                     if (resultSet.next()) {
-                        return resultSet.getBoolean("is_match");
+                        final boolean isPasswordMatch = resultSet.getBoolean("is_password_match");
+
+                        if (!isPasswordMatch) {
+                            LOGGER.debug("Invalid password supplied for user: {}", userName);
+                            return AuthenticationResponse.invalidPassword();
+                        }
+
+                        return AuthenticationResponse.success(Set.of((String[]) resultSet.getArray("roles").getArray()));
                     }
                 }
-                LOGGER.warn("Unable to validate user, no result returned");
-                return false;
+                LOGGER.debug("No entries found for user: {}", userName);
+                return AuthenticationResponse.userDoesNotExist();
             } catch (final SQLException e) {
                 throw new FoldingException("Error when validating user", e);
             }

@@ -16,6 +16,8 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.List;
 
+import static me.zodac.folding.client.java.request.EncodingUtils.encodeAuthentication;
+
 /**
  * Convenience class to send HTTP requests to the {@link Hardware} REST endpoint.
  */
@@ -131,11 +133,31 @@ public final class HardwareRequestSender {
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<String> create(final Hardware hardware) throws FoldingRestException {
-        final HttpRequest request = HttpRequest.newBuilder()
+        return create(hardware, null, null);
+    }
+
+    /**
+     * Send a <b>POST</b> request to create the given {@link Hardware} in the system, using the supplied {@code userName}
+     * and {@code password} for authentication.
+     *
+     * @param hardware the {@link Hardware} to create
+     * @param userName the user name
+     * @param password the password
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     */
+    public HttpResponse<String> create(final Hardware hardware, final String userName, final String password) throws FoldingRestException {
+        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(hardware)))
                 .uri(URI.create(foldingUrl + "/hardware"))
-                .header("Content-Type", "application/json")
-                .build();
+                .header("Content-Type", "application/json");
+
+
+        if (StringUtils.isNoneBlank(userName, password)) {
+            requestBuilder.header("Authorization", encodeAuthentication(userName, password));
+        }
+
+        final HttpRequest request = requestBuilder.build();
 
         try {
             return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -152,11 +174,29 @@ public final class HardwareRequestSender {
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<String> createBatchOf(final List<Hardware> batchOfHardware) throws FoldingRestException {
-        final HttpRequest request = HttpRequest.newBuilder()
+        return createBatchOf(batchOfHardware, null, null);
+    }
+
+    /**
+     * Send a <b>POST</b> request to create the given {@link Hardware}s in the system.
+     *
+     * @param batchOfHardware the {@link List} of {@link Hardware}s to create
+     * @param userName        the user name
+     * @param password        the password
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     */
+    public HttpResponse<String> createBatchOf(final List<Hardware> batchOfHardware, final String userName, final String password) throws FoldingRestException {
+        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(batchOfHardware)))
                 .uri(URI.create(foldingUrl + "/hardware/batch"))
-                .header("Content-Type", "application/json")
-                .build();
+                .header("Content-Type", "application/json");
+
+        if (StringUtils.isNoneBlank(userName, password)) {
+            requestBuilder.header("Authorization", encodeAuthentication(userName, password));
+        }
+
+        final HttpRequest request = requestBuilder.build();
 
         try {
             return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -173,11 +213,29 @@ public final class HardwareRequestSender {
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<String> update(final Hardware hardware) throws FoldingRestException {
-        final HttpRequest request = HttpRequest.newBuilder()
+        return update(hardware, null, null);
+    }
+
+    /**
+     * Send a <b>PUT</b> request to update the given {@link Hardware} in the system.
+     *
+     * @param hardware the {@link Hardware} to update
+     * @param userName the user name
+     * @param password the password
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     */
+    public HttpResponse<String> update(final Hardware hardware, final String userName, final String password) throws FoldingRestException {
+        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .PUT(HttpRequest.BodyPublishers.ofString(GSON.toJson(hardware)))
                 .uri(URI.create(foldingUrl + "/hardware/" + hardware.getId()))
-                .header("Content-Type", "application/json")
-                .build();
+                .header("Content-Type", "application/json");
+
+        if (StringUtils.isNoneBlank(userName, password)) {
+            requestBuilder.header("Authorization", encodeAuthentication(userName, password));
+        }
+
+        final HttpRequest request = requestBuilder.build();
 
         try {
             return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -194,11 +252,29 @@ public final class HardwareRequestSender {
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<Void> delete(final int hardwareId) throws FoldingRestException {
-        final HttpRequest request = HttpRequest.newBuilder()
+        return delete(hardwareId, null, null);
+    }
+
+    /**
+     * Send a <b>DELETE</b> request to remove a {@link Hardware} with the given {@code hardwareId}.
+     *
+     * @param hardwareId the ID of the {@link Hardware} to remove
+     * @param userName   the user name
+     * @param password   the password
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     */
+    public HttpResponse<Void> delete(final int hardwareId, final String userName, final String password) throws FoldingRestException {
+        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .DELETE()
                 .uri(URI.create(foldingUrl + "/hardware/" + hardwareId))
-                .header("Content-Type", "application/json")
-                .build();
+                .header("Content-Type", "application/json");
+
+        if (StringUtils.isNoneBlank(userName, password)) {
+            requestBuilder.header("Authorization", encodeAuthentication(userName, password));
+        }
+
+        final HttpRequest request = requestBuilder.build();
 
         try {
             return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());

@@ -24,7 +24,10 @@ import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForComplexTes
 import static me.zodac.folding.test.utils.TeamCompetitionStatsUtils.TEAM_COMPETITION_REQUEST_SENDER;
 import static me.zodac.folding.test.utils.TeamCompetitionStatsUtils.getActiveUserFromTeam;
 import static me.zodac.folding.test.utils.TeamCompetitionStatsUtils.getTeamFromCompetition;
+import static me.zodac.folding.test.utils.TeamCompetitionStatsUtils.manuallyResetStats;
+import static me.zodac.folding.test.utils.TeamCompetitionStatsUtils.manuallyUpdateStats;
 import static me.zodac.folding.test.utils.TeamUtils.TEAM_REQUEST_SENDER;
+import static me.zodac.folding.test.utils.TestAuthenticationData.ADMIN_USER;
 import static me.zodac.folding.test.utils.TestGenerator.generateTeamWithUserIds;
 import static me.zodac.folding.test.utils.TestGenerator.generateUserWithCategory;
 import static me.zodac.folding.test.utils.UserUtils.createOrConflict;
@@ -44,10 +47,18 @@ public class ResetTest {
     @Test
     @Order(1)
     public void whenResetOccurs_andNoTeamsExist_thenNoErrorOccurs() throws FoldingRestException {
-        final HttpResponse<Void> response = TEAM_COMPETITION_REQUEST_SENDER.manualReset();
+        final HttpResponse<Void> response = TEAM_COMPETITION_REQUEST_SENDER.manualReset(ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
                 .as("Expected a 200_OK when no teams exist")
                 .isEqualTo(HttpURLConnection.HTTP_OK);
+    }
+
+    @Test
+    public void whenResetOccurs_givenNoAuthentication_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
+        final HttpResponse<Void> response = TEAM_COMPETITION_REQUEST_SENDER.manualReset();
+        assertThat(response.statusCode())
+                .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
     @Test
@@ -60,7 +71,7 @@ public class ResetTest {
         final Team team = generateTeamWithUserIds(captainUserId, userToRetireId);
         final int teamId = TeamUtils.createOrConflict(team).getId();
 
-        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+        manuallyUpdateStats();
 
         final CompetitionResult result = TeamCompetitionStatsUtils.getStats();
         final TeamResult teamResult = getTeamFromCompetition(result, team.getTeamName());
@@ -73,8 +84,8 @@ public class ResetTest {
                 .as("Expected no retired users at start: " + teamResult)
                 .isEmpty();
 
-        TEAM_REQUEST_SENDER.retireUser(teamId, userToRetireId);
-        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+        TEAM_REQUEST_SENDER.retireUser(teamId, userToRetireId, ADMIN_USER.userName(), ADMIN_USER.password());
+        manuallyUpdateStats();
 
         final CompetitionResult resultAfterRetirement = TeamCompetitionStatsUtils.getStats();
         final TeamResult teamResultAfterRetirement = getTeamFromCompetition(resultAfterRetirement, team.getTeamName());
@@ -87,8 +98,8 @@ public class ResetTest {
                 .as("Expected exactly 1 retired users after retirement: " + teamResultAfterRetirement)
                 .hasSize(1);
 
-        TEAM_COMPETITION_REQUEST_SENDER.manualReset();
-        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
+        manuallyResetStats();
+        manuallyUpdateStats();
 
         final CompetitionResult resultAfterReset = TeamCompetitionStatsUtils.getStats();
         final TeamResult teamResultAfterReset = getTeamFromCompetition(resultAfterReset, team.getTeamName());
@@ -120,8 +131,7 @@ public class ResetTest {
         StubbedFoldingEndpointUtils.setPoints(firstUser, firstUserPoints);
         StubbedFoldingEndpointUtils.setPoints(secondUser, secondUserPoints);
         StubbedFoldingEndpointUtils.setPoints(thirdUser, thirdUserPoints);
-        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
-
+        manuallyUpdateStats();
 
         final CompetitionResult result = TeamCompetitionStatsUtils.getStats();
         assertThat(result.getTotalPoints())
@@ -155,9 +165,8 @@ public class ResetTest {
                 .as("Expected points for user: " + thirdUserResult)
                 .isEqualTo(thirdUserPoints);
 
-        TEAM_COMPETITION_REQUEST_SENDER.manualReset();
-        TEAM_COMPETITION_REQUEST_SENDER.manualUpdate();
-
+        manuallyResetStats();
+        manuallyUpdateStats();
 
         final CompetitionResult resultAfterReset = TeamCompetitionStatsUtils.getStats();
         assertThat(resultAfterReset.getTotalPoints())

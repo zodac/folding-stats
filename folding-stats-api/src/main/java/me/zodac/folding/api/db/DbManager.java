@@ -97,5 +97,5 @@ public interface DbManager {
 
     RetiredUserTcStats getRetiredUserStats(final int retiredUserId) throws FoldingException;
 
-    boolean isAdminUser(final String userName, final String password) throws FoldingException;
+    AuthenticationResponse isValidUser(final String userName, final String password) throws FoldingException;
 }

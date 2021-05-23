@@ -10,6 +10,9 @@ import me.zodac.folding.rest.api.tc.UserResult;
 import java.net.HttpURLConnection;
 import java.net.http.HttpResponse;
 
+import static me.zodac.folding.test.utils.TestAuthenticationData.ADMIN_USER;
+import static org.assertj.core.api.Assertions.assertThat;
+
 /**
  * Utility class for TC stats-based tests.
  */
@@ -86,5 +89,29 @@ public class TeamCompetitionStatsUtils {
             }
         }
         throw new FoldingRestException(String.format("Unable to find user '%s' in retired users: %s", userName, teamResult.getRetiredUsers()));
+    }
+
+    /**
+     * Executes a manual reset of the <code>Team Competition</code> stats.
+     *
+     * @throws FoldingRestException thrown if an error occurs sending the HTTP request
+     */
+    public static void manuallyResetStats() throws FoldingRestException {
+        final HttpResponse<Void> response = TEAM_COMPETITION_REQUEST_SENDER.manualReset(ADMIN_USER.userName(), ADMIN_USER.password());
+        assertThat(response.statusCode())
+                .as("Expected a 200_OK")
+                .isEqualTo(HttpURLConnection.HTTP_OK);
+    }
+
+    /**
+     * Executes a manual update of the <code>Team Competition</code> stats.
+     *
+     * @throws FoldingRestException thrown if an error occurs sending the HTTP request
+     */
+    public static void manuallyUpdateStats() throws FoldingRestException {
+        final HttpResponse<Void> response = TEAM_COMPETITION_REQUEST_SENDER.manualUpdate(ADMIN_USER.userName(), ADMIN_USER.password());
+        assertThat(response.statusCode())
+                .as("Expected a 200_OK")
+                .isEqualTo(HttpURLConnection.HTTP_OK);
     }
 }

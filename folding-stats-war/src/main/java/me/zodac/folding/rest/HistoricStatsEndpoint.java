@@ -10,6 +10,7 @@ import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.security.PermitAll;
 import javax.ejb.EJB;
 import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.GET;
@@ -56,6 +57,7 @@ public class HistoricStatsEndpoint {
     private UriInfo uriContext;
 
     @GET
+    @PermitAll
     @Path("/users/{userId}/{year}/{month}/{day}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUserHistoricStatsHourly(@PathParam("userId") final String userId, @PathParam("year") final String year, @PathParam("month") final String month, @PathParam("day") final String day, @Context final Request request) {
@@ -124,6 +126,7 @@ public class HistoricStatsEndpoint {
     }
 
     @GET
+    @PermitAll
     @Path("/users/{userId}/{year}/{month}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUserHistoricStatsDaily(@PathParam("userId") final String userId, @PathParam("year") final String year, @PathParam("month") final String month, @Context final Request request) {
@@ -181,6 +184,7 @@ public class HistoricStatsEndpoint {
     }
 
     @GET
+    @PermitAll
     @Path("/users/{userId}/{year}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUserHistoricStatsMonthly(@PathParam("userId") final String userId, @PathParam("year") final String year, @Context final Request request) {
@@ -233,6 +237,7 @@ public class HistoricStatsEndpoint {
     }
 
     @GET
+    @PermitAll
     @Path("/teams/{teamId}/{year}/{month}/{day}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTeamHistoricStatsHourly(@PathParam("teamId") final String teamId, @PathParam("year") final String year, @PathParam("month") final String month, @PathParam("day") final String day, @Context final Request request) {
@@ -311,6 +316,7 @@ public class HistoricStatsEndpoint {
     }
 
     @GET
+    @PermitAll
     @Path("/teams/{teamId}/{year}/{month}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTeamHistoricStatsDaily(@PathParam("teamId") final String teamId, @PathParam("year") final String year, @PathParam("month") final String month, @Context final Request request) {
@@ -377,6 +383,7 @@ public class HistoricStatsEndpoint {
     }
 
     @GET
+    @PermitAll
     @Path("/teams/{teamId}/{year}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTeamHistoricStatsMonthly(@PathParam("teamId") final String teamId, @PathParam("year") final String year, @Context final Request request) {

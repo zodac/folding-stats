@@ -25,6 +25,10 @@ import static me.zodac.folding.test.utils.HttpResponseHeaderUtils.getXTotalCount
 import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForSimpleTests;
 import static me.zodac.folding.test.utils.TeamUtils.TEAM_REQUEST_SENDER;
 import static me.zodac.folding.test.utils.TeamUtils.createOrConflict;
+import static me.zodac.folding.test.utils.TestAuthenticationData.ADMIN_USER;
+import static me.zodac.folding.test.utils.TestAuthenticationData.INVALID_PASSWORD;
+import static me.zodac.folding.test.utils.TestAuthenticationData.INVALID_USERNAME;
+import static me.zodac.folding.test.utils.TestAuthenticationData.READ_ONLY_USER;
 import static me.zodac.folding.test.utils.TestGenerator.generateTeam;
 import static me.zodac.folding.test.utils.TestGenerator.generateTeamWithId;
 import static me.zodac.folding.test.utils.TestGenerator.generateTeamWithUserIds;
@@ -65,7 +69,7 @@ public class TeamTest {
     public void whenCreatingTeam_givenPayloadIsValid_thenTheCreatedTeamIsReturnedInResponse_andHasId_andResponseHasA201StatusCode() throws FoldingRestException {
         final Team teamToCreate = generateTeam();
 
-        final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(teamToCreate);
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(teamToCreate, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
                 .as("Did not receive a 201_CREATED HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_CREATED);
@@ -88,7 +92,7 @@ public class TeamTest {
         );
 
 
-        final HttpResponse<String> response = TEAM_REQUEST_SENDER.createBatchOf(batchOfTeams);
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.createBatchOf(batchOfTeams, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -109,9 +113,8 @@ public class TeamTest {
                 .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Team team = TeamResponseParser.get(response);
-        assertThat(team)
+        assertThat(team.getId())
                 .as("Did not receive the expected team: " + response.body())
-                .extracting("id")
                 .isEqualTo(teamId);
     }
 
@@ -123,7 +126,7 @@ public class TeamTest {
         final Team updatedTeam = Team.updateWithId(teamId, TeamUtils.get(teamId));
         updatedTeam.setTeamDescription("Updated description");
 
-        final HttpResponse<String> response = TEAM_REQUEST_SENDER.update(updatedTeam);
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.update(updatedTeam, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -145,7 +148,7 @@ public class TeamTest {
         final int teamId = TeamUtils.createOrConflict(generateTeam()).getId();
         final int initialSize = TeamUtils.getNumberOfTeams();
 
-        final HttpResponse<Void> response = TEAM_REQUEST_SENDER.delete(teamId);
+        final HttpResponse<Void> response = TEAM_REQUEST_SENDER.delete(teamId, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -171,7 +174,7 @@ public class TeamTest {
         final Team team = generateTeamWithUserIds(captainUserId, userToRetireId);
         final int teamId = TeamUtils.createOrConflict(team).getId();
 
-        final HttpResponse<String> retireResponse = TEAM_REQUEST_SENDER.retireUser(teamId, userToRetireId);
+        final HttpResponse<String> retireResponse = TEAM_REQUEST_SENDER.retireUser(teamId, userToRetireId, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(retireResponse.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + retireResponse.body())
                 .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -201,7 +204,7 @@ public class TeamTest {
 
         final int retiredUserId = TeamUtils.retireUser(teamId, userToRetireId);
 
-        final HttpResponse<String> unretireResponse = TEAM_REQUEST_SENDER.unretireUser(teamId, retiredUserId);
+        final HttpResponse<String> unretireResponse = TEAM_REQUEST_SENDER.unretireUser(teamId, retiredUserId, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(unretireResponse.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + unretireResponse.body())
                 .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -260,7 +263,7 @@ public class TeamTest {
     @Test
     public void whenCreatingTeam_givenATeamWithInvalidCaptainUserId_thenJsonResponseWithErrorIsReturned_andHasA400Status() throws FoldingRestException {
         final Team team = generateTeamWithUserIds(0);
-        final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(team);
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(team, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(response.statusCode())
                 .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
@@ -277,8 +280,8 @@ public class TeamTest {
         final Team teamWithSameName = generateTeam();
         teamWithSameName.setTeamName(teamToCreate.getTeamName());
 
-        TEAM_REQUEST_SENDER.create(teamToCreate);
-        final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(teamWithSameName);
+        TEAM_REQUEST_SENDER.create(teamToCreate, ADMIN_USER.userName(), ADMIN_USER.password());
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(teamWithSameName, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(response.statusCode())
                 .as("Did not receive a 409_CONFLICT HTTP response: " + response.body())
@@ -304,7 +307,7 @@ public class TeamTest {
         final int invalidId = 99;
         final Team updatedTeam = generateTeamWithId(invalidId);
 
-        final HttpResponse<String> response = TEAM_REQUEST_SENDER.update(updatedTeam);
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.update(updatedTeam, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
                 .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
@@ -317,7 +320,7 @@ public class TeamTest {
     @Test
     public void whenDeletingTeam_givenANonExistingTeamId_thenResponseHasA404Status() throws FoldingRestException {
         final int invalidId = 99;
-        final HttpResponse<Void> response = TEAM_REQUEST_SENDER.delete(invalidId);
+        final HttpResponse<Void> response = TEAM_REQUEST_SENDER.delete(invalidId, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(response.statusCode())
                 .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
@@ -330,7 +333,7 @@ public class TeamTest {
         final int createdTeamId = createOrConflict(team).getId();
         final Team teamWithId = Team.updateWithId(createdTeamId, team);
 
-        final HttpResponse<String> updateResponse = TEAM_REQUEST_SENDER.update(teamWithId);
+        final HttpResponse<String> updateResponse = TEAM_REQUEST_SENDER.update(teamWithId, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(updateResponse.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + updateResponse.body())
@@ -360,7 +363,7 @@ public class TeamTest {
         batchOfTeams.addAll(batchOfInvalidTeams);
 
 
-        final HttpResponse<String> response = TEAM_REQUEST_SENDER.createBatchOf(batchOfTeams);
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.createBatchOf(batchOfTeams, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -380,7 +383,7 @@ public class TeamTest {
                 generateTeamWithUserIds(0)
         );
 
-        final HttpResponse<String> response = TEAM_REQUEST_SENDER.createBatchOf(batchOfInvalidTeams);
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.createBatchOf(batchOfInvalidTeams, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
                 .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
@@ -400,7 +403,7 @@ public class TeamTest {
 
         final Team team = generateTeamWithUserIds(firstUserId, secondUserId);
 
-        final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(team);
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(team, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
                 .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
@@ -423,7 +426,7 @@ public class TeamTest {
 
         final Team team = generateTeamWithUserIds(firstUserId, secondUserId, thirdUserId, fourthUserId);
 
-        final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(team);
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(team, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
                 .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
@@ -444,7 +447,7 @@ public class TeamTest {
         final Team team = generateTeamWithUserIds(captainUserId, userToRetireId);
         final int teamId = TeamUtils.createOrConflict(team).getId();
 
-        final HttpResponse<String> retireResponse = TEAM_REQUEST_SENDER.retireUser(teamId, captainUserId);
+        final HttpResponse<String> retireResponse = TEAM_REQUEST_SENDER.retireUser(teamId, captainUserId, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(retireResponse.statusCode())
                 .as("Did not receive a 400_BAD_REQUEST HTTP response: " + retireResponse.body())
                 .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
@@ -453,7 +456,7 @@ public class TeamTest {
     @Test
     public void whenRetiringAUserFromATeam_givenTheTeamIdIsInvalid_thenResponseHasA404Status() throws FoldingRestException {
         final int invalidTeamId = 99;
-        final HttpResponse<String> response = TEAM_REQUEST_SENDER.retireUser(invalidTeamId, 1);
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.retireUser(invalidTeamId, 1, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
                 .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
@@ -465,7 +468,7 @@ public class TeamTest {
         final int teamId = TeamUtils.createOrConflict(team).getId();
         final int invalidUserId = 99;
 
-        final HttpResponse<String> retireResponse = TEAM_REQUEST_SENDER.retireUser(teamId, invalidUserId);
+        final HttpResponse<String> retireResponse = TEAM_REQUEST_SENDER.retireUser(teamId, invalidUserId, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(retireResponse.statusCode())
                 .as("Did not receive a 400_BAD_REQUEST HTTP response: " + retireResponse.body())
                 .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
@@ -474,7 +477,7 @@ public class TeamTest {
     @Test
     public void whenUnRetiringAUserFromATeam_givenTheTeamIdIsInvalid_thenResponseHasA404Status() throws FoldingRestException {
         final int invalidTeamId = 99;
-        final HttpResponse<String> response = TEAM_REQUEST_SENDER.unretireUser(invalidTeamId, 1);
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.unretireUser(invalidTeamId, 1, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
                 .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
@@ -486,7 +489,7 @@ public class TeamTest {
         final int teamId = TeamUtils.createOrConflict(team).getId();
         final int invalidUserId = 99;
 
-        final HttpResponse<String> retireResponse = TEAM_REQUEST_SENDER.unretireUser(teamId, invalidUserId);
+        final HttpResponse<String> retireResponse = TEAM_REQUEST_SENDER.unretireUser(teamId, invalidUserId, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(retireResponse.statusCode())
                 .as("Did not receive a 400_BAD_REQUEST HTTP response: " + retireResponse.body())
                 .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
@@ -514,7 +517,7 @@ public class TeamTest {
         final Team newTeam = generateTeamWithUserIds(secondTeamCaptainId, secondTeamFirstUserId, secondTeamSecondUserId);
         final int newTeamId = TeamUtils.createOrConflict(newTeam).getId();
 
-        final HttpResponse<String> unretireResponse = TEAM_REQUEST_SENDER.unretireUser(newTeamId, retiredUserId);
+        final HttpResponse<String> unretireResponse = TEAM_REQUEST_SENDER.unretireUser(newTeamId, retiredUserId, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(unretireResponse.statusCode())
                 .as("Did not receive a 400_BAD_REQUEST HTTP response: " + unretireResponse.body())
                 .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
@@ -560,6 +563,118 @@ public class TeamTest {
         assertThat(TeamResponseParser.getAll(cachedResponse))
                 .as("Expected cached response to have the same content as the non-cached response")
                 .isNull();
+    }
+
+    @Test
+    public void whenCreatingTeam_givenNoAuthentication_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
+        final Team teamToCreate = generateTeam();
+
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(teamToCreate);
+        assertThat(response.statusCode())
+                .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
+    }
+
+    @Test
+    public void whenCreatingBatchOfTeams_givenNoAuthentication_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
+        final List<Team> batchOfTeams = List.of(
+                generateTeam(),
+                generateTeam(),
+                generateTeam()
+        );
+
+
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.createBatchOf(batchOfTeams);
+        assertThat(response.statusCode())
+                .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
+    }
+
+    @Test
+    public void whenUpdatingTeam_givenNoAuthentication_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
+        final int teamId = TeamUtils.createOrConflict(generateTeam()).getId();
+
+        final Team updatedTeam = Team.updateWithId(teamId, TeamUtils.get(teamId));
+        updatedTeam.setTeamDescription("Updated description");
+
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.update(updatedTeam);
+        assertThat(response.statusCode())
+                .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
+    }
+
+    @Test
+    public void whenDeletingTeam_givenNoAuthentication_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
+        final int teamId = TeamUtils.createOrConflict(generateTeam()).getId();
+
+        final HttpResponse<Void> response = TEAM_REQUEST_SENDER.delete(teamId);
+        assertThat(response.statusCode())
+                .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
+    }
+
+    @Test
+    public void whenRetiringAUserFromATeam_givenNoAuthentication_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
+        final User captainUser = generateUserWithCategory(Category.NVIDIA_GPU);
+        final User userToRetire = generateUserWithCategory(Category.AMD_GPU);
+        final int captainUserId = UserUtils.createOrConflict(captainUser).getId();
+        final int userToRetireId = UserUtils.createOrConflict(userToRetire).getId();
+
+        final Team team = generateTeamWithUserIds(captainUserId, userToRetireId);
+        final int teamId = TeamUtils.createOrConflict(team).getId();
+
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.retireUser(teamId, userToRetireId);
+        assertThat(response.statusCode())
+                .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
+    }
+
+    @Test
+    public void whenUnRetiringAUserToATeam_givenNoAuthentication_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
+        final User captainUser = generateUserWithCategory(Category.NVIDIA_GPU);
+        final User userToRetire = generateUserWithCategory(Category.AMD_GPU);
+        final int captainUserId = UserUtils.createOrConflict(captainUser).getId();
+        final int userToRetireId = UserUtils.createOrConflict(userToRetire).getId();
+
+        final Team team = generateTeamWithUserIds(captainUserId, userToRetireId);
+        final int teamId = TeamUtils.createOrConflict(team).getId();
+
+        final int retiredUserId = TeamUtils.retireUser(teamId, userToRetireId);
+
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.unretireUser(teamId, retiredUserId);
+        assertThat(response.statusCode())
+                .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
+    }
+
+    @Test
+    public void whenCreatingTeam_givenAuthentication_andAuthenticationHasInvalidUser_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
+        final Team teamToCreate = generateTeam();
+
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(teamToCreate, INVALID_USERNAME.userName(), INVALID_USERNAME.password());
+        assertThat(response.statusCode())
+                .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
+    }
+
+    @Test
+    public void whenCreatingTeam_givenAuthentication_andAuthenticationHasInvalidPassword_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
+        final Team teamToCreate = generateTeam();
+
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(teamToCreate, INVALID_PASSWORD.userName(), INVALID_PASSWORD.password());
+        assertThat(response.statusCode())
+                .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
+    }
+
+    @Test
+    public void whenCreatingTeam_givenAuthentication_andUserDoesNotHaveAdminRole_thenRequestFails_andResponseHasA403StatusCode() throws FoldingRestException {
+        final Team teamToCreate = generateTeam();
+
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(teamToCreate, READ_ONLY_USER.userName(), READ_ONLY_USER.password());
+        assertThat(response.statusCode())
+                .as("Did not receive a 403_FORBIDDEN HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_FORBIDDEN);
     }
 
     @AfterAll
