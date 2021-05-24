@@ -6,6 +6,8 @@ import me.zodac.folding.api.tc.OperatingSystem;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
+import me.zodac.folding.test.utils.rest.request.HardwareUtils;
+import me.zodac.folding.test.utils.rest.request.UserUtils;
 
 import java.util.Arrays;
 import java.util.Collections;

@@ -124,6 +124,11 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
             return serviceUnavailable();
         }
 
+        if (offsetStats == null) {
+            getLogger().error("Payload is null");
+            return badRequest("Payload is null");
+        }
+
         try {
             final int parsedId = super.parseId(userId);
             getElementById(parsedId); // We call this so if the value does not exist, we can fail with a NOT_FOUND response

@@ -1,4 +1,4 @@
-package me.zodac.folding.test.utils;
+package me.zodac.folding.test.utils.rest.request;
 
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.client.java.request.UserRequestSender;
@@ -8,10 +8,10 @@ import me.zodac.folding.rest.api.exception.FoldingRestException;
 import java.net.HttpURLConnection;
 import java.net.http.HttpResponse;
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
 import static me.zodac.folding.test.utils.TestAuthenticationData.ADMIN_USER;
+import static me.zodac.folding.test.utils.TestConstants.FOLDING_URL;
+import static me.zodac.folding.test.utils.rest.response.HttpResponseHeaderUtils.getXTotalCount;
 
 
 /**
@@ -19,7 +19,7 @@ import static me.zodac.folding.test.utils.TestAuthenticationData.ADMIN_USER;
  */
 public final class UserUtils {
 
-    public static final UserRequestSender USER_REQUEST_SENDER = UserRequestSender.create("http://192.168.99.100:8081/folding");
+    public static final UserRequestSender USER_REQUEST_SENDER = UserRequestSender.create(FOLDING_URL);
 
     private UserUtils() {
 
@@ -73,17 +73,7 @@ public final class UserUtils {
      */
     public static int getNumberOfUsers() throws FoldingRestException {
         final HttpResponse<String> response = USER_REQUEST_SENDER.getAll();
-        final Map<String, List<String>> headers = response.headers().map();
-        if (headers.containsKey("X-Total-Count")) {
-            final String firstHeaderValue = headers.get("X-Total-Count").get(0);
-
-            try {
-                return Integer.parseInt(firstHeaderValue);
-            } catch (final NumberFormatException e) {
-                throw new FoldingRestException(String.format("Error parsing 'X-Total-Count' header %s", firstHeaderValue), e);
-            }
-        }
-        throw new FoldingRestException(String.format("Unable to find 'X-Total-Count' header: %s", headers));
+        return getXTotalCount(response);
     }
 
     /**

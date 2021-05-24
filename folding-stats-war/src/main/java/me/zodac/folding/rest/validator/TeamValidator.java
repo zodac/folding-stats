@@ -36,6 +36,10 @@ public class TeamValidator {
 
 
     public ValidationResponse isValid(final Team team) {
+        if (team == null) {
+            return ValidationResponse.nullObject();
+        }
+
         final List<String> failureMessages = new ArrayList<>();
 
         if (StringUtils.isBlank(team.getTeamName())) {

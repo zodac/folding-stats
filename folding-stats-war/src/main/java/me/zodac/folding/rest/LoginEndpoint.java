@@ -49,6 +49,11 @@ public class LoginEndpoint {
             return serviceUnavailable();
         }
 
+        if (loginPayload == null || EncodingUtils.isNotBasicAuthentication(loginPayload.getEncodedUserNameAndPassword())) {
+            LOGGER.error("Invalid payload: {}", loginPayload);
+            return badRequest(loginPayload);
+        }
+
         try {
             final Map<String, String> decodedUserNameAndPassword = EncodingUtils.decodeBasicAuthentication(loginPayload.getEncodedUserNameAndPassword());
             final String userName = decodedUserNameAndPassword.get(EncodingUtils.DECODED_USERNAME_KEY);

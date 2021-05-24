@@ -40,8 +40,8 @@ public final class EncodingUtils {
      * @param authorizationPayload the value to check
      * @return <code>true</code> if the value is a basic authentication payload
      */
-    public static boolean isBasicAuthentication(final String authorizationPayload) {
-        return authorizationPayload != null && !authorizationPayload.isEmpty() && authorizationPayload.contains(BASIC_AUTHENTICATION_SCHEME);
+    public static boolean isNotBasicAuthentication(final String authorizationPayload) {
+        return authorizationPayload == null || authorizationPayload.isEmpty() || !authorizationPayload.contains(BASIC_AUTHENTICATION_SCHEME);
     }
 
     /**
@@ -52,6 +52,10 @@ public final class EncodingUtils {
      * @throws IllegalArgumentException thrown if the input is not a valid {@link Base64} {@link String}
      */
     public static Map<String, String> decodeBasicAuthentication(final String authorizationPayload) throws IllegalArgumentException {
+        if (authorizationPayload == null) {
+            throw new IllegalArgumentException("Cannot decode null");
+        }
+
         final String encodedUserNameAndPassword = authorizationPayload.split(BASIC_AUTHENTICATION_SCHEME)[1];
         return decodeAuthentication(encodedUserNameAndPassword);
     }

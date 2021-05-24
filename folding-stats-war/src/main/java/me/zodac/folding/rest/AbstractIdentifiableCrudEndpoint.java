@@ -255,6 +255,11 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
             return serviceUnavailable();
         }
 
+        if (element == null) {
+            getLogger().error("No payload provided");
+            return badRequest("No payload provided");
+        }
+
         try {
             final int parsedId = parseId(elementId);
             // We want to make sure the payload is not trying to change the ID of the element

@@ -7,9 +7,9 @@ import me.zodac.folding.client.java.response.TeamCompetitionResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.tc.leaderboard.TeamSummary;
 import me.zodac.folding.rest.api.tc.leaderboard.UserSummary;
-import me.zodac.folding.test.utils.StubbedFoldingEndpointUtils;
-import me.zodac.folding.test.utils.TeamUtils;
-import me.zodac.folding.test.utils.UserUtils;
+import me.zodac.folding.test.utils.rest.request.StubbedFoldingEndpointUtils;
+import me.zodac.folding.test.utils.rest.request.TeamUtils;
+import me.zodac.folding.test.utils.rest.request.UserUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,11 +23,11 @@ import java.util.Map;
 
 import static java.util.stream.Collectors.toList;
 import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForComplexTests;
-import static me.zodac.folding.test.utils.TeamCompetitionStatsUtils.TEAM_COMPETITION_REQUEST_SENDER;
-import static me.zodac.folding.test.utils.TeamCompetitionStatsUtils.manuallyUpdateStats;
 import static me.zodac.folding.test.utils.TestGenerator.generateTeamWithUserIds;
 import static me.zodac.folding.test.utils.TestGenerator.generateUser;
 import static me.zodac.folding.test.utils.TestGenerator.generateUserWithCategory;
+import static me.zodac.folding.test.utils.rest.request.TeamCompetitionStatsUtils.TEAM_COMPETITION_REQUEST_SENDER;
+import static me.zodac.folding.test.utils.rest.request.TeamCompetitionStatsUtils.manuallyUpdateStats;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

@@ -7,9 +7,9 @@ import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.tc.CompetitionResult;
 import me.zodac.folding.rest.api.tc.TeamResult;
 import me.zodac.folding.rest.api.tc.UserResult;
-import me.zodac.folding.test.utils.StubbedFoldingEndpointUtils;
-import me.zodac.folding.test.utils.TeamCompetitionStatsUtils;
-import me.zodac.folding.test.utils.TeamUtils;
+import me.zodac.folding.test.utils.rest.request.StubbedFoldingEndpointUtils;
+import me.zodac.folding.test.utils.rest.request.TeamCompetitionStatsUtils;
+import me.zodac.folding.test.utils.rest.request.TeamUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
@@ -21,16 +21,16 @@ import java.net.HttpURLConnection;
 import java.net.http.HttpResponse;
 
 import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForComplexTests;
-import static me.zodac.folding.test.utils.TeamCompetitionStatsUtils.TEAM_COMPETITION_REQUEST_SENDER;
-import static me.zodac.folding.test.utils.TeamCompetitionStatsUtils.getActiveUserFromTeam;
-import static me.zodac.folding.test.utils.TeamCompetitionStatsUtils.getTeamFromCompetition;
-import static me.zodac.folding.test.utils.TeamCompetitionStatsUtils.manuallyResetStats;
-import static me.zodac.folding.test.utils.TeamCompetitionStatsUtils.manuallyUpdateStats;
-import static me.zodac.folding.test.utils.TeamUtils.TEAM_REQUEST_SENDER;
 import static me.zodac.folding.test.utils.TestAuthenticationData.ADMIN_USER;
 import static me.zodac.folding.test.utils.TestGenerator.generateTeamWithUserIds;
 import static me.zodac.folding.test.utils.TestGenerator.generateUserWithCategory;
-import static me.zodac.folding.test.utils.UserUtils.createOrConflict;
+import static me.zodac.folding.test.utils.rest.request.TeamCompetitionStatsUtils.TEAM_COMPETITION_REQUEST_SENDER;
+import static me.zodac.folding.test.utils.rest.request.TeamCompetitionStatsUtils.getActiveUserFromTeam;
+import static me.zodac.folding.test.utils.rest.request.TeamCompetitionStatsUtils.getTeamFromCompetition;
+import static me.zodac.folding.test.utils.rest.request.TeamCompetitionStatsUtils.manuallyResetStats;
+import static me.zodac.folding.test.utils.rest.request.TeamCompetitionStatsUtils.manuallyUpdateStats;
+import static me.zodac.folding.test.utils.rest.request.TeamUtils.TEAM_REQUEST_SENDER;
+import static me.zodac.folding.test.utils.rest.request.UserUtils.createOrConflict;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

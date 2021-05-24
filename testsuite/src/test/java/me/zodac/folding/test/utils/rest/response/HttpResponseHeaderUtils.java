@@ -1,4 +1,4 @@
-package me.zodac.folding.test.utils;
+package me.zodac.folding.test.utils.rest.response;
 
 import java.net.http.HttpHeaders;
 import java.net.http.HttpResponse;
@@ -34,7 +34,6 @@ public final class HttpResponseHeaderUtils {
      */
     public static int getXTotalCount(final HttpResponse<String> response) {
         final String headerValue = getHeader(response, "X-Total-Count");
-
         return Integer.parseInt(headerValue);
     }
 

@@ -6,12 +6,17 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
+import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 import static me.zodac.folding.test.utils.TestAuthenticationData.ADMIN_USER;
 import static me.zodac.folding.test.utils.TestAuthenticationData.INVALID_USERNAME;
 import static me.zodac.folding.test.utils.TestAuthenticationData.READ_ONLY_USER;
+import static me.zodac.folding.test.utils.TestConstants.FOLDING_URL;
+import static me.zodac.folding.test.utils.TestConstants.HTTP_CLIENT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -20,7 +25,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class LoginTest {
 
-    private static final LoginRequestSender LOGIN_REQUEST_SENDER = LoginRequestSender.create("http://192.168.99.100:8081/folding");
+    // TODO: Move URL, HTTP_CLIENT and GSON to a util class so it's only defined in a single place
+    private static final LoginRequestSender LOGIN_REQUEST_SENDER = LoginRequestSender.create(FOLDING_URL);
 
     @Test
     public void whenLoggingIn_givenCredentialsAreCorrect_andUserIsAdmin_thenResponseHasA200StatusCode() throws FoldingRestException {
@@ -44,5 +50,23 @@ public class LoginTest {
         assertThat(response.statusCode())
                 .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
+    }
+
+    @Test
+    public void whenLoggingIn_givenInvalidCredentials_thenResponseHasA400StatusCode() throws FoldingRestException {
+        final HttpRequest request = HttpRequest.newBuilder()
+                .POST(HttpRequest.BodyPublishers.noBody())
+                .uri(URI.create(FOLDING_URL + "/login/admin"))
+                .header("Content-Type", "application/json")
+                .build();
+
+        try {
+            final HttpResponse<Void> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
+            assertThat(response.statusCode())
+                    .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+                    .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+        } catch (final IOException | InterruptedException e) {
+            throw new FoldingRestException("Error sending HTTP request to login as admin", e);
+        }
     }
 }

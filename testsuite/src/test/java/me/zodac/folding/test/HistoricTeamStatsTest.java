@@ -5,11 +5,11 @@ import me.zodac.folding.client.java.request.HistoricStatsRequestSender;
 import me.zodac.folding.client.java.response.HistoricStatsResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
-import me.zodac.folding.test.utils.DatabaseUtils;
 import me.zodac.folding.test.utils.Stats;
-import me.zodac.folding.test.utils.TeamUtils;
 import me.zodac.folding.test.utils.TestGenerator;
-import me.zodac.folding.test.utils.UserUtils;
+import me.zodac.folding.test.utils.db.DatabaseUtils;
+import me.zodac.folding.test.utils.rest.request.TeamUtils;
+import me.zodac.folding.test.utils.rest.request.UserUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -17,18 +17,18 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.Duration;
 import java.time.Month;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static me.zodac.folding.test.utils.HttpResponseHeaderUtils.getETag;
 import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForComplexTests;
+import static me.zodac.folding.test.utils.TestConstants.FOLDING_URL;
+import static me.zodac.folding.test.utils.TestConstants.HTTP_CLIENT;
+import static me.zodac.folding.test.utils.rest.response.HttpResponseHeaderUtils.getETag;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -36,7 +36,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class HistoricTeamStatsTest {
 
-    private static final String FOLDING_URL = "http://192.168.99.100:8081/folding";
     private static final HistoricStatsRequestSender HISTORIC_STATS_REQUEST_SENDER = HistoricStatsRequestSender.create(FOLDING_URL);
 
     @BeforeAll
@@ -375,11 +374,7 @@ public class HistoricTeamStatsTest {
 
         final HttpRequest request = requestBuilder.build();
 
-        final HttpResponse<String> response = HttpClient.newBuilder()
-                .version(HttpClient.Version.HTTP_1_1)
-                .connectTimeout(Duration.ofSeconds(10))
-                .build()
-                .send(request, HttpResponse.BodyHandlers.ofString());
+        final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertThat(response.statusCode())
                 .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
@@ -553,11 +548,7 @@ public class HistoricTeamStatsTest {
 
         final HttpRequest request = requestBuilder.build();
 
-        final HttpResponse<String> response = HttpClient.newBuilder()
-                .version(HttpClient.Version.HTTP_1_1)
-                .connectTimeout(Duration.ofSeconds(10))
-                .build()
-                .send(request, HttpResponse.BodyHandlers.ofString());
+        final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertThat(response.statusCode())
                 .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())

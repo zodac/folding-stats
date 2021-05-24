@@ -16,6 +16,10 @@ public class HardwareValidator {
     }
 
     public ValidationResponse isValid(final Hardware hardware) {
+        if (hardware == null) {
+            return ValidationResponse.nullObject();
+        }
+
         final List<String> failureMessages = new ArrayList<>();
 
         if (StringUtils.isBlank(hardware.getHardwareName())) {

@@ -86,7 +86,7 @@ public class SecurityInterceptor implements ContainerRequestFilter {
 
     private void validateRequest(final ContainerRequestContext requestContext) throws FoldingException {
         final Method method = resourceInfo.getResourceMethod();
-        
+
         if (method.isAnnotationPresent(DenyAll.class)) {
             LOGGER.warn("All access to '#{}()' at '{}' is denied", method.getName(), requestContext.getUriInfo().getAbsolutePath());
             requestContext.abortWith(forbidden());
@@ -99,8 +99,8 @@ public class SecurityInterceptor implements ContainerRequestFilter {
         }
 
         final String authorizationProperty = requestContext.getHeaderString(AUTHORIZATION_PROPERTY);
-        if (!EncodingUtils.isBasicAuthentication(authorizationProperty)) {
-            LOGGER.warn("Invalid {} header provided at '{}': '{}'", AUTHORIZATION_PROPERTY, requestContext.getUriInfo().getAbsolutePath(), authorizationProperty);
+        if (EncodingUtils.isNotBasicAuthentication(authorizationProperty)) {
+            LOGGER.warn("Invalid {} value provided at '{}': '{}'", AUTHORIZATION_PROPERTY, requestContext.getUriInfo().getAbsolutePath(), authorizationProperty);
             requestContext.abortWith(unauthorized());
             return;
         }

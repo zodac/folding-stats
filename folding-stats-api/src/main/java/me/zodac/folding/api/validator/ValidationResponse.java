@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -23,14 +24,33 @@ import java.util.List;
 public class ValidationResponse {
 
     private Object invalidObject;
-    private List<String> errors;
+    private Collection<String> errors;
 
+    /**
+     * Validation was successful.
+     *
+     * @return a {@link ValidationResponse} with no invalid object and an empty {@link Collection} of errors.
+     */
     public static ValidationResponse success() {
         return new ValidationResponse(null, Collections.emptyList());
     }
 
+    /**
+     * Validation failed due to one or more errors.
+     *
+     * @return a {@link ValidationResponse} with the invalid object and a {@link Collection} of errors.
+     */
     public static ValidationResponse failure(final Object invalidObject, final List<String> errors) {
         return new ValidationResponse(invalidObject, errors);
+    }
+
+    /**
+     * Validation failed due to a null object.
+     *
+     * @return a {@link ValidationResponse} with the null object a single error.
+     */
+    public static ValidationResponse nullObject() {
+        return new ValidationResponse(null, List.of("Payload is null"));
     }
 
     public boolean isInvalid() {

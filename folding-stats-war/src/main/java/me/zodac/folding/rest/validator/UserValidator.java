@@ -35,7 +35,11 @@ public class UserValidator {
     }
 
     public ValidationResponse isValid(final User user) {
-        final List<String> failureMessages = new ArrayList<>(6);
+        if (user == null) {
+            return ValidationResponse.nullObject();
+        }
+
+        final List<String> failureMessages = new ArrayList<>();
 
         if (Category.INVALID == Category.get(user.getCategory())) {
             failureMessages.add(String.format("Attribute 'category' must be one of: %s", Category.getAllValues()));

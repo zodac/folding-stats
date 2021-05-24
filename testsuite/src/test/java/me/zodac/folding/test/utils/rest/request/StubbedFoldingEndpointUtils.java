@@ -1,28 +1,26 @@
-package me.zodac.folding.test.utils;
+package me.zodac.folding.test.utils.rest.request;
 
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.Duration;
+
+import static me.zodac.folding.test.utils.TestConstants.HTTP_CLIENT;
+import static me.zodac.folding.test.utils.TestConstants.TEST_SERVICE_URL;
 
 /**
  * Utility class for REST calls to the stubbed Folding@Home endpoints.
  */
-public class StubbedFoldingEndpointUtils {
+public final class StubbedFoldingEndpointUtils {
 
-    private static final String POINTS_URL_ROOT = "http://192.168.99.100:8081/user";
+    private static final String POINTS_URL_ROOT = TEST_SERVICE_URL + "/user";
     private static final String POINTS_URL_FORMAT = POINTS_URL_ROOT + "/%s/stats?passkey=%s&points=%s";
-    private static final String UNIT_URL_ROOT = "http://192.168.99.100:8081/bonus";
+    private static final String UNIT_URL_ROOT = TEST_SERVICE_URL + "/bonus";
     private static final String UNIT_URL_FORMAT = UNIT_URL_ROOT + "?user=%s&passkey=%s&units=%s";
-    private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
-            .version(HttpClient.Version.HTTP_1_1)
-            .connectTimeout(Duration.ofSeconds(10))
-            .build();
+
 
     private StubbedFoldingEndpointUtils() {
 

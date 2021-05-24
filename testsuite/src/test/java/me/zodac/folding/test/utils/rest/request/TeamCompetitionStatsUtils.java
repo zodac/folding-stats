@@ -1,4 +1,4 @@
-package me.zodac.folding.test.utils;
+package me.zodac.folding.test.utils.rest.request;
 
 import me.zodac.folding.client.java.request.TeamCompetitionRequestSender;
 import me.zodac.folding.client.java.response.TeamCompetitionResponseParser;
@@ -11,15 +11,15 @@ import java.net.HttpURLConnection;
 import java.net.http.HttpResponse;
 
 import static me.zodac.folding.test.utils.TestAuthenticationData.ADMIN_USER;
+import static me.zodac.folding.test.utils.TestConstants.FOLDING_URL;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Utility class for TC stats-based tests.
  */
-public class TeamCompetitionStatsUtils {
+public final class TeamCompetitionStatsUtils {
 
-
-    public static final TeamCompetitionRequestSender TEAM_COMPETITION_REQUEST_SENDER = TeamCompetitionRequestSender.create("http://192.168.99.100:8081/folding");
+    public static final TeamCompetitionRequestSender TEAM_COMPETITION_REQUEST_SENDER = TeamCompetitionRequestSender.create(FOLDING_URL);
 
     private TeamCompetitionStatsUtils() {
 

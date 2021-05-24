@@ -5,9 +5,9 @@ import me.zodac.folding.api.tc.OperatingSystem;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.client.java.response.HardwareResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
-import me.zodac.folding.test.utils.HardwareUtils;
 import me.zodac.folding.test.utils.TestGenerator;
-import me.zodac.folding.test.utils.UserUtils;
+import me.zodac.folding.test.utils.rest.request.HardwareUtils;
+import me.zodac.folding.test.utils.rest.request.UserUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
@@ -15,21 +15,27 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
+import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static me.zodac.folding.test.utils.HardwareUtils.HARDWARE_REQUEST_SENDER;
-import static me.zodac.folding.test.utils.HttpResponseHeaderUtils.getETag;
-import static me.zodac.folding.test.utils.HttpResponseHeaderUtils.getXTotalCount;
+import static me.zodac.folding.api.utils.EncodingUtils.encodeBasicAuthentication;
 import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForSimpleTests;
 import static me.zodac.folding.test.utils.TestAuthenticationData.ADMIN_USER;
 import static me.zodac.folding.test.utils.TestAuthenticationData.INVALID_PASSWORD;
 import static me.zodac.folding.test.utils.TestAuthenticationData.INVALID_USERNAME;
 import static me.zodac.folding.test.utils.TestAuthenticationData.READ_ONLY_USER;
+import static me.zodac.folding.test.utils.TestConstants.FOLDING_URL;
+import static me.zodac.folding.test.utils.TestConstants.HTTP_CLIENT;
 import static me.zodac.folding.test.utils.TestGenerator.generateHardware;
+import static me.zodac.folding.test.utils.rest.request.HardwareUtils.HARDWARE_REQUEST_SENDER;
+import static me.zodac.folding.test.utils.rest.response.HttpResponseHeaderUtils.getETag;
+import static me.zodac.folding.test.utils.rest.response.HttpResponseHeaderUtils.getXTotalCount;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -411,6 +417,40 @@ public class HardwareTest {
         assertThat(response.statusCode())
                 .as("Did not receive a 403_FORBIDDEN HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_FORBIDDEN);
+    }
+
+    @Test
+    public void whenCreatingHardware_givenEmptyPayload_thenRequestFails_andResponseHasA400StatusCode() throws IOException, InterruptedException {
+        final HttpRequest request = HttpRequest.newBuilder()
+                .POST(HttpRequest.BodyPublishers.noBody())
+                .uri(URI.create(FOLDING_URL + "/hardware"))
+                .header("Content-Type", "application/json")
+                .header("Authorization", encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
+                .build();
+
+        final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+        assertThat(response.statusCode())
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+    }
+
+    @Test
+    public void whenUpdatingHardware_givenEmptyPayload_thenRequestFails_andResponseHasA400StatusCode() throws FoldingRestException, IOException, InterruptedException {
+        final int hardwareId = HardwareUtils.createOrConflict(generateHardware()).getId();
+        final Hardware updatedHardware = Hardware.updateWithId(hardwareId, HardwareUtils.get(hardwareId));
+        updatedHardware.setOperatingSystem(OperatingSystem.LINUX.displayName());
+
+        final HttpRequest request = HttpRequest.newBuilder()
+                .PUT(HttpRequest.BodyPublishers.noBody())
+                .uri(URI.create(FOLDING_URL + "/hardware/" + updatedHardware.getId()))
+                .header("Content-Type", "application/json")
+                .header("Authorization", encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
+                .build();
+
+        final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+        assertThat(response.statusCode())
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
     @AfterAll

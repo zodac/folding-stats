@@ -1,4 +1,6 @@
-package me.zodac.folding.test.utils;
+package me.zodac.folding.test.utils.db;
+
+import me.zodac.folding.test.utils.Stats;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
