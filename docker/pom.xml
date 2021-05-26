@@ -89,6 +89,8 @@
                                 <!-- Main JS file -->
                                 <jsSourceFile>system.js</jsSourceFile>
                                 <!-- Util files -->
+                                <jsSourceFile>util/crud.js</jsSourceFile>
+                                <jsSourceFile>util/crud_field_populator.js</jsSourceFile>
                                 <jsSourceFile>util/display_toggle.js</jsSourceFile>
                                 <jsSourceFile>util/encoder.js</jsSourceFile>
                                 <jsSourceFile>util/json_sorter.js</jsSourceFile>

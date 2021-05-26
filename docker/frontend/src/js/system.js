@@ -230,6 +230,44 @@ function loadUsers() {
         usersTable.append(usersTableBody);
 
         usersDiv.append(usersTable);
+
+        // Update any list that needs all users
+        jsonResponse.sort(sortJsonByKey("displayName"));
+
+        userLists = document.querySelectorAll(".user_list");
+        for (var i = 0, userList; userList = userLists[i]; i++) {
+            // Clear existing entries
+            while (userList.firstChild) {
+                userList.removeChild(userList.lastChild);
+            }
+
+            // Add the default entry
+            defaultUserOption = document.createElement("option");
+            defaultUserOption.setAttribute("value", "");
+            defaultUserOption.setAttribute("disabled", "");
+            defaultUserOption.setAttribute("selected", "");
+            defaultUserOption.innerHTML = "Choose User...";
+            userList.append(defaultUserOption);
+
+            // Add entries
+            jsonResponse.forEach(function(userItem, i) {
+                userOption = document.createElement("option");
+                userOption.setAttribute("value", userItem['id']);
+
+                userOption.setAttribute("user_id", userItem['id']);
+                userOption.setAttribute("user_folding_name", userItem['foldingUserName']);
+                userOption.setAttribute("user_display_name", userItem['displayName']);
+                userOption.setAttribute("user_passkey", userItem['passkey']);
+                userOption.setAttribute("user_category", userItem['category']);
+                userOption.setAttribute("user_hardware_id", userItem['hardwareId']);
+                userOption.setAttribute("user_profile_link", userItem['profileLink']);
+                userOption.setAttribute("user_live_stats_link", userItem['liveStatsLink']);
+                userOption.setAttribute("user_is_retired", userItem['isRetired']);
+
+                userOption.innerHTML = userItem["displayName"];
+                userList.append(userOption);
+            });
+        }
     })
 };
 
@@ -302,173 +340,6 @@ function loadTeams() {
         teamsDiv.append(teamsTable);
     })
 };
-
-function populateHardwareUpdate(){
-    show("loader");
-    element = document.getElementById("hardware_update_selector");
-    selectedElement = element.options[element.selectedIndex];
-
-    document.getElementById("hardware_update_id").value = selectedElement.getAttribute("hardware_id");
-    document.getElementById("hardware_update_name").value = selectedElement.getAttribute("hardware_name");
-    document.getElementById("hardware_update_display_name").value = selectedElement.getAttribute("display_name");
-    document.getElementById("hardware_update_operating_system").value = selectedElement.getAttribute("operating_system");
-    document.getElementById("hardware_update_multiplier").value = selectedElement.getAttribute("multiplier");
-
-    hardwareFields = document.querySelectorAll(".hardware_update");
-    for (var i = 0, hardwareField; hardwareField = hardwareFields[i]; i++) {
-        showElement(hardwareField);
-    }
-    hide("loader");
-}
-
-function populateHardwareDelete(){
-    show("loader");
-    element = document.getElementById("hardware_delete_selector");
-    selectedElement = element.options[element.selectedIndex];
-
-    document.getElementById("hardware_delete_id").value = selectedElement.getAttribute("hardware_id");
-    document.getElementById("hardware_delete_name").value = selectedElement.getAttribute("hardware_name");
-    document.getElementById("hardware_delete_display_name").value = selectedElement.getAttribute("display_name");
-    document.getElementById("hardware_delete_operating_system").value = selectedElement.getAttribute("operating_system");
-    document.getElementById("hardware_delete_multiplier").value = selectedElement.getAttribute("multiplier");
-
-    hardwareFields = document.querySelectorAll(".hardware_delete");
-    for (var i = 0, hardwareField; hardwareField = hardwareFields[i]; i++) {
-        showElement(hardwareField);
-    }
-    hide("loader");
-}
-
-function createHardware() {
-    var hardwareName = document.getElementById("hardware_create_name").value.trim();
-    var displayName = document.getElementById("hardware_create_display_name").value.trim();
-    var operatingSystem = document.getElementById("hardware_create_operating_system").value.trim();
-    var multiplier = document.getElementById("hardware_create_multiplier").value.trim();
-
-    var requestData = JSON.stringify(
-        {
-            "hardwareName": hardwareName,
-            "displayName": displayName,
-            "operatingSystem": operatingSystem,
-            "multiplier": multiplier
-        }
-    );
-
-    show("loader");
-    fetch(ROOT_URL+'/hardware', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': sessionGet("Authorization")
-        },
-        body: requestData
-    })
-    .then(response => {
-        hide("loader");
-
-        if(response.status != 201){
-            failureToast("Hardware create failed with code: " + response.status);
-            return;
-        }
-
-        document.getElementById("hardware_create_name").value = '';
-        document.getElementById("hardware_create_display_name").value = '';
-        document.getElementById("hardware_create_operating_system").value = '';
-        document.getElementById("hardware_create_multiplier").value = '';
-        successToast("Hardware '" + displayName + "' created");
-        loadHardware();
-    });
-}
-
-function updateHardware() {
-    var element = document.getElementById("hardware_update_selector");
-    element = document.getElementById("hardware_update_selector");
-    selectedElement = element.options[element.selectedIndex];
-
-    var hardwareId = selectedElement.getAttribute("hardware_id");
-
-    var hardwareName = document.getElementById("hardware_update_name").value.trim();
-    var displayName = document.getElementById("hardware_update_display_name").value.trim();
-    var operatingSystem = document.getElementById("hardware_update_operating_system").value.trim();
-    var multiplier = document.getElementById("hardware_update_multiplier").value.trim();
-
-    var requestData = JSON.stringify(
-        {
-            "hardwareName": hardwareName,
-            "displayName": displayName,
-            "operatingSystem": operatingSystem,
-            "multiplier": multiplier
-        }
-    );
-
-    console.log("Updating " + hardwareId + ", payload: " + requestData);
-
-    show("loader");
-    fetch(ROOT_URL+'/hardware/' + hardwareId, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': sessionGet("Authorization")
-        },
-        body: requestData
-    })
-    .then(response => {
-        hide("loader");
-
-        if(response.status != 200){
-            failureToast("Hardware update failed with code: " + response.status);
-            return;
-        }
-
-        document.getElementById("hardware_update_id").value = '';
-        document.getElementById("hardware_update_name").value = '';
-        document.getElementById("hardware_update_display_name").value = '';
-        document.getElementById("hardware_update_operating_system").value = '';
-        document.getElementById("hardware_update_multiplier").value = '';
-        successToast("Hardware '" + displayName + "' updated");
-        loadHardware();
-    });
-}
-
-function deleteHardware() {
-    var element = document.getElementById("hardware_delete_selector");
-    element = document.getElementById("hardware_delete_selector");
-    selectedElement = element.options[element.selectedIndex];
-
-    var hardwareId = selectedElement.getAttribute("hardware_id");
-    var hardwareDisplayName = selectedElement.getAttribute("hardware_name");
-
-    show("loader");
-    fetch(ROOT_URL+'/hardware/' + hardwareId, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': sessionGet("Authorization")
-        }
-    })
-    .then(response => {
-        hide("loader");
-
-        if(response.status != 200){
-            failureToast("Hardware delete failed with code: " + response.status);
-            return;
-        }
-
-        document.getElementById("hardware_delete_id").value = '';
-        document.getElementById("hardware_delete_name").value = '';
-        document.getElementById("hardware_delete_display_name").value = '';
-        document.getElementById("hardware_delete_operating_system").value = '';
-        document.getElementById("hardware_delete_multiplier").value = '';
-
-        hardwareFields = document.querySelectorAll(".hardware_delete");
-        for (var i = 0, hardwareField; hardwareField = hardwareFields[i]; i++) {
-            hideElement(hardwareField);
-        }
-
-        successToast("Hardware '" + hardwareDisplayName + "' deleted");
-        loadHardware();
-    });
-}
 
 
 document.addEventListener("DOMContentLoaded", function(event) {
