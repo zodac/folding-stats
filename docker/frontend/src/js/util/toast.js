@@ -15,3 +15,13 @@ function closeToast(id) {
         .Toast(document.getElementById(id))
         .dispose();
 }
+
+function successToast(text){
+    document.getElementById("toast-success-text").innerHTML = text;
+    showToast("toast-success", true);
+}
+
+function failureToast(text){
+    document.getElementById("toast-failure-text").innerHTML = text;
+    showToast("toast-failure", true);
+}

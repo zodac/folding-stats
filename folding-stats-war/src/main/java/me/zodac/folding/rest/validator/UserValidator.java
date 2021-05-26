@@ -57,6 +57,14 @@ public class UserValidator {
             failureMessages.add("Attribute 'passkey' must not be empty");
         }
 
+        if (user.getPasskey().contains("*")) {
+            failureMessages.add("Attribute 'passkey' cannot contain '*' characters");
+        }
+
+        if (user.getPasskey().length() != 32) {
+            failureMessages.add("Attribute 'passkey' must be 32 characters in length");
+        }
+
         if (StringUtils.isNotEmpty(user.getProfileLink())) {
             if (!URL_VALIDATOR.isValid(user.getProfileLink())) {
                 failureMessages.add(String.format("Attribute 'profileLink' is not a valid link: '%s'", user.getProfileLink()));

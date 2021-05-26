@@ -61,13 +61,13 @@
 
 <br/>
 
-<button onclick="toggleMainButtonStyle('hardware', this.classList)" class="btn btn-primary" id="hardware_button"
+<button onclick="toggleMainButtonStyle('hardware_button', this.classList)" class="btn btn-primary" id="hardware_button"
         href="#hardware_div" data-bs-toggle="collapse" role="button">List of Hardware
 </button>
-<button onclick="toggleMainButtonStyle('users', this.classList)" class="btn btn-primary" id="users_button"
+<button onclick="toggleMainButtonStyle('users_button', this.classList)" class="btn btn-primary" id="users_button"
         href="#users_div" data-bs-toggle="collapse" role="button">List of Users
 </button>
-<button onclick="toggleMainButtonStyle('teams', this.classList)" class="btn btn-primary" id="teams_button"
+<button onclick="toggleMainButtonStyle('teams_button', this.classList)" class="btn btn-primary" id="teams_button"
         href="#teams_div" data-bs-toggle="collapse" role="button">List of Teams
 </button>
 
@@ -83,15 +83,15 @@
     </div>
 </div>
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
-    <div id="toast-login-failure" class="toast text-white bg-danger" role="alert" aria-live="assertive"
+    <div id="toast-success" class="toast text-white bg-success" role="alert" aria-live="assertive"
          aria-atomic="true">
-        <div class="toast-body">Invalid admin credentials!</div>
+        <div id="toast-success-text" class="toast-body"></div>
     </div>
 </div>
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
-    <div id="toast-login-success" class="toast text-white bg-success" role="alert" aria-live="assertive"
+    <div id="toast-failure" class="toast text-white bg-danger" role="alert" aria-live="assertive"
          aria-atomic="true">
-        <div class="toast-body">Logged in successfully!</div>
+        <div id="toast-failure-text" class="toast-body"></div>
     </div>
 </div>
 
@@ -99,16 +99,16 @@
     <br/>
 </div>
 
-<div id="login-form">
+<div id="login_form">
     <form id="admin-form" class="row g-3" onsubmit="adminLogin(); return false;" action="">
         <div class="col-auto">
-            <label for="inputUserName" class="visually-hidden">Username</label>
-            <input id="inputUserName" class="form-control" type="text" placeholder="Username" aria-label="Username"
+            <label for="login_username" class="visually-hidden">Username</label>
+            <input id="login_username" class="form-control" type="text" placeholder="Username" aria-label="Username"
                    required>
         </div>
         <div class="col-auto">
-            <label for="inputPassword" class="visually-hidden">Password</label>
-            <input type="password" class="form-control" id="inputPassword" placeholder="Password" required>
+            <label for="login_password" class="visually-hidden">Password</label>
+            <input id="login_password" type="password" class="form-control" placeholder="Password" required>
         </div>
         <div class="col-auto">
             <button type="submit" class="btn btn-primary mb-3">Enable Admin Functions</button>
@@ -116,119 +116,270 @@
     </form>
 </div>
 
-<div id="loader" class="loader"></div>
-
-<div id="admin-functions" style="display:none;">
+<div id="admin_functions" style="display:none;">
     <h2 class="navbar-brand">Admin Functions</h2>
-    <div id="admin-functions-hardware">
-        <form id="create-hardware-form" class="row g-3" onsubmit="createHardware(); return false;" action="">
-            <div class="col-auto">
-                <button type="submit" class="btn btn-primary mb-3">Create Hardware</button>
-            </div>
-            <div class="col-auto">
-                <label for="create-hardware-name" class="visually-hidden">Hardware Name</label>
-                <input id="create-hardware-name" class="form-control" type="text" placeholder="Hardware Name"
-                       aria-label="Hardware Name" required>
-            </div>
-            <div class="col-auto">
-                <label for="create-hardware-display-name" class="visually-hidden">Display Name</label>
-                <input id="create-hardware-display-name" class="form-control" type="text" placeholder="Display Name"
-                       aria-label="Display Name" required>
-            </div>
-            <div class="col-auto">
-                <input id="create-hardware-operating-system" class="form-control" list="operating-systems"
-                       placeholder="Operating System">
-                <datalist id="operating-systems">
-                    <option value="Linux">
-                    <option value="Windows">
-                </datalist>
-            </div>
-            <div class="col-auto">
-                <label for="create-hardware-multiplier" class="visually-hidden">Multiplier</label>
-                <input id="create-hardware-multiplier" class="form-control" type="number" step="0.01"
-                       placeholder="Multiplier" aria-label="Multiplier" required>
-            </div>
-        </form>
+    <button onclick="toggleMainButtonStyle('hardware_admin_button', this.classList)" class="btn btn-primary"
+            id="hardware_admin_button" href="#hardware_admin_functions" data-bs-toggle="collapse" role="button">Hardware
+    </button>
+    <button onclick="toggleMainButtonStyle('users_admin_button', this.classList)" class="btn btn-primary"
+            id="users_admin_button" href="#admin_functions_user" data-bs-toggle="collapse" role="button">Users
+    </button>
+    <button onclick="toggleMainButtonStyle('teams_admin_button', this.classList)" class="btn btn-primary"
+            id="teams_admin_button" href="#admin_functions_team" data-bs-toggle="collapse" role="button">Teams
+    </button>
+
+    <div>
+        <br/>
     </div>
 
-    <div id="admin-functions-user">
-        <form id="create-user-form" class="row g-3" onsubmit="createUser(); return false;" action="">
+    <div id="hardware_admin_functions" class="collapse">
+        <h1 class="navbar-brand">Hardware Admin Functions</h1>
+        <div id="hardware_accordion" class="accordion bg-dark text-light">
+
+            <div id="hardware_create_accordion_parent" class="accordion-item bg-dark">
+                <h2 id="hardware_create_accordion_header" class="accordion-header bg-dark text-light">
+                    <button class="accordion-button collapsed bg-dark text-light" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#hardware_create_accordion_item"
+                            aria-expanded="true"
+                            aria-controls="hardware_create_accordion">
+                        Create Hardware
+                    </button>
+                </h2>
+                <div id="hardware_create_accordion_item" class="accordion-collapse collapse"
+                     aria-labelledby="hardware_create_accordion_header"
+                     data-bs-parent="#hardware_accordion">
+                    <div class="accordion-body">
+                        <form id="hardware_create_form" class="row g-3" onsubmit="createHardware(); return false;"
+                              action="">
+                            <div class="col-auto">
+                                <button type="submit" class="btn btn-primary mb-3">Create Hardware</button>
+                            </div>
+                            <div class="col-auto">
+                                <label for="hardware_create_name" class="visually-hidden">Hardware Name</label>
+                                <input id="hardware_create_name" class="form-control" type="text"
+                                       placeholder="Hardware Name"
+                                       aria-label="Hardware Name" required>
+                            </div>
+                            <div class="col-auto">
+                                <label for="hardware_create_display_name" class="visually-hidden">Display Name</label>
+                                <input id="hardware_create_display_name" class="form-control" type="text"
+                                       placeholder="Display Name"
+                                       aria-label="Display Name" required>
+                            </div>
+                            <div class="col-auto">
+                                <select id="hardware_create_operating_system" class="form-select"
+                                        aria-label="hardware_create_operating_system_list" required>
+                                    <option selected disabled value="">Operating System</option>
+                                    <option value="Linux">Linux</option>
+                                    <option value="Windows">Windows</option>
+                                </select>
+                            </div>
+                            <div class="col-auto">
+                                <label for="hardware_create_multiplier" class="visually-hidden">Multiplier</label>
+                                <input id="hardware_create_multiplier" class="form-control" type="number" step="0.01"
+                                       placeholder="Multiplier" aria-label="Multiplier" required>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div id="hardware_update_accordion_parent" class="accordion-item bg-dark">
+                <h2 id="hardware_update_accordion_header" class="accordion-header bg-dark text-light">
+                    <button class="accordion-button collapsed bg-dark text-light" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#hardware_update_accordion_item"
+                            aria-expanded="true"
+                            aria-controls="hardware_update_accordion">
+                        Update Hardware
+                    </button>
+                </h2>
+                <div id="hardware_update_accordion_item" class="accordion-collapse collapse"
+                     aria-labelledby="hardware_update_accordion_header"
+                     data-bs-parent="#hardware_accordion">
+                    <div class="accordion-body">
+                        <form id="hardware_update_form" class="row g-3" onsubmit="updateHardware(); return false;"
+                              action="">
+                            <div class="col-auto">
+                                <button type="submit" class="btn btn-primary mb-3">Update Hardware</button>
+                            </div>
+                            <div class="col-auto">
+                                <select id="hardware_update_selector" class="form-select hardware_list"
+                                        aria-label="hardware_update_list" onchange="populateHardwareUpdate();" required>
+                                    <!-- Will be populated by system.js -->
+                                </select>
+                            </div>
+                            <div class="col-auto hardware_update" style="display:none;">
+                                <label for="hardware_update_id" class="visually-hidden">Hardware Name</label>
+                                <input id="hardware_update_id" class="form-control" type="text" placeholder="ID"
+                                       aria-label="ID" disabled>
+                            </div>
+                            <div class="col-auto hardware_update" style="display:none;">
+                                <label for="hardware_update_name" class="visually-hidden">Hardware Name</label>
+                                <input id="hardware_update_name" class="form-control" type="text"
+                                       placeholder="Hardware Name"
+                                       aria-label="Hardware Name" required>
+                            </div>
+                            <div class="col-auto hardware_update" style="display:none;">
+                                <label for="hardware_update_display_name" class="visually-hidden">Display Name</label>
+                                <input id="hardware_update_display_name" class="form-control" type="text"
+                                       placeholder="Display Name"
+                                       aria-label="Display Name" required>
+                            </div>
+                            <div class="col-auto hardware_update" style="display:none;">
+                                <select id="hardware_update_operating_system" class="form-select"
+                                        aria-label="hardware_update_list" required>
+                                    <option selected disabled value="">Operating System</option>
+                                    <option value="Linux">Linux</option>
+                                    <option value="Windows">Windows</option>
+                                </select>
+                            </div>
+                            <div class="col-auto hardware_update" style="display:none;">
+                                <label for="hardware_update_multiplier" class="visually-hidden">Multiplier</label>
+                                <input id="hardware_update_multiplier" class="form-control" type="number" step="0.01"
+                                       placeholder="Multiplier" aria-label="Multiplier" required>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div id="hardware_delete_accordion_parent" class="accordion-item bg-dark">
+                <h2 id="hardware_delete_accordion_header" class="accordion-header bg-dark text-light">
+                    <button class="accordion-button collapsed bg-dark text-light" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#hardware_delete_accordion_item"
+                            aria-expanded="true" aria-controls="hardware_delete_accordion">
+                        Delete Hardware
+                    </button>
+                </h2>
+                <div id="hardware_delete_accordion_item" class="accordion-collapse collapse"
+                     aria-labelledby="hardware_delete_accordion_header"
+                     data-bs-parent="#hardware_accordion">
+                    <div class="accordion-body">
+                        <form id="hardware_delete_form" class="row g-3" onsubmit="deleteHardware(); return false;"
+                              action="">
+                            <div class="col-auto">
+                                <button type="submit" class="btn btn-danger mb-3">Delete Hardware</button>
+                            </div>
+                            <div class="col-auto">
+                                <select id="hardware_delete_selector" class="form-select hardware_list"
+                                        aria-label="hardware_delete_list" onchange="populateHardwareDelete();" required>
+                                    <!-- Will be populated by system.js -->
+                                </select>
+                            </div>
+                            <div class="col-auto hardware_delete" style="display:none;">
+                                <label for="hardware_delete_id" class="visually-hidden">Hardware Name</label>
+                                <input id="hardware_delete_id" class="form-control" type="text" placeholder="ID"
+                                       aria-label="ID" disabled>
+                            </div>
+                            <div class="col-auto hardware_delete" style="display:none;">
+                                <label for="hardware_delete_name" class="visually-hidden">Hardware Name</label>
+                                <input id="hardware_delete_name" class="form-control" type="text"
+                                       placeholder="Hardware Name" aria-label="Hardware Name" disabled>
+                            </div>
+                            <div class="col-auto hardware_delete" style="display:none;">
+                                <label for="hardware_delete_display_name" class="visually-hidden">Display Name</label>
+                                <input id="hardware_delete_display_name" class="form-control" type="text"
+                                       placeholder="Display Name" aria-label="Display Name" disabled>
+                            </div>
+                            <div class="col-auto hardware_delete" style="display:none;">
+                                <select id="hardware_delete_operating_system" class="form-select"
+                                        aria-label="hardware_delete_list" disabled>
+                                    <option selected disabled value="">Operating System</option>
+                                    <option value="Linux">Linux</option>
+                                    <option value="Windows">Windows</option>
+                                </select>
+                            </div>
+                            <div class="col-auto hardware_delete" style="display:none;">
+                                <label for="hardware_delete_multiplier" class="visually-hidden">Multiplier</label>
+                                <input id="hardware_delete_multiplier" class="form-control" type="number" step="0.01"
+                                       placeholder="Multiplier" aria-label="Multiplier" disabled>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="admin_functions_user" class="collapse">
+        <h2 class="navbar-brand">User Admin Functions</h2>
+        <form id="create_user_form" class="row g-3" onsubmit="createUser(); return false;" action="">
             <div class="col-auto">
                 <button type="submit" class="btn btn-primary mb-3">Create User</button>
             </div>
             <div class="col-auto">
-                <label for="create-user-folding-name" class="visually-hidden">Folding@Home Name</label>
-                <input id="create-user-folding-name" class="form-control" type="text" pattern="[^\s]+"
+                <label for="create_user_folding_name" class="visually-hidden">Folding@Home Name</label>
+                <input id="create_user_folding_name" class="form-control" type="text" pattern="[^\s]+"
                        placeholder="Folding@Home Name" aria-label="Folding@Home Name" required>
             </div>
-            <div class="col-auto">
-                <label for="create-user-display-name" class="visually-hidden">Display Name</label>
-                <input id="create-user-display-name" class="form-control" type="text" placeholder="Display Name"
+            <div class="col">
+                <label for="create_user_display_name" class="visually-hidden">Display Name</label>
+                <input id="create_user_display_name" class="form-control" type="text" placeholder="Display Name"
                        aria-label="Display Name" required>
             </div>
             <div class="col-auto">
-                <label for="create-user-passkey" class="visually-hidden">Passkey</label>
-                <input id="create-user-passkey" class="form-control" type="text" maxlength="32" minlength="32"
+                <label for="create_user_passkey" class="visually-hidden">Passkey</label>
+                <input id="create_user_passkey" class="form-control" type="text" maxlength="32" minlength="32"
                        placeholder="Passkey" aria-label="Passkey" required>
             </div>
-            <div class="col-auto">
-                <input id="create-user-category" class="form-control" list="user-categories"
+            <div class="col">
+                <input id="create_user_category" class="form-control" list="user_categories"
                        placeholder="Category">
-                <datalist id="user-categories">
+                <datalist id="user_categories">
                     <option value="AMD GPU">
                     <option value="nVidia GPU">
                     <option value="Wildcard">
                 </datalist>
             </div>
             <div class="col-auto">
-                <input id="create-user-hardware" class="form-control" list="available-hardware"
-                       placeholder="Hardware">
-                <datalist id="available-hardware">
+                <select id="create_user_hardware_selector" class="form-select hardware_list"
+                        aria-label="create_user_hardware" required>
                     <!-- Will be populated by system.js -->
-                </datalist>
+                </select>
             </div>
-            <div class="col-auto">
-                <label for="create-user-profile-link" class="visually-hidden">Profile Link</label>
-                <input id="create-user-profile-link" class="form-control" type="url" placeholder="Profile Link"
+            <div class="col">
+                <label for="create_user_profile_link" class="visually-hidden">Profile Link</label>
+                <input id="create_user_profile_link" class="form-control" type="url" placeholder="Profile Link"
                        aria-label="Profile Link">
             </div>
-            <div class="col-auto">
-                <label for="create-user-live-stats-link" class="visually-hidden">Live Stats Link</label>
-                <input id="create-user-live-stats-link" class="form-control" type="url" placeholder="Live Stats Link"
+            <div class="col">
+                <label for="create_user_live_stats_link" class="visually-hidden">Live Stats Link</label>
+                <input id="create_user_live_stats_link" class="form-control" type="url" placeholder="Live Stats Link"
                        aria-label="Live Stats Link">
             </div>
         </form>
     </div>
 
-    <div id="admin-functions-team">
-        <form id="create-team-form" class="row g-3" onsubmit="createTeam(); return false;" action="">
+    <div id="admin_functions_team" class="collapse">
+        <h2 class="navbar-brand">Team Admin Functions</h2>
+        <form id="create_team_form" class="row g-3" onsubmit="createTeam(); return false;" action="">
             <div class="col-auto">
                 <button type="submit" class="btn btn-primary mb-3">Create Team</button>
             </div>
             <div class="col-auto">
-                <label for="create-team-name" class="visually-hidden">Team Name</label>
-                <input id="create-team-name" class="form-control" type="text"
+                <label for="create_team_name" class="visually-hidden">Team Name</label>
+                <input id="create_team_name" class="form-control" type="text"
                        placeholder="Team Name" aria-label="Team Name" required>
             </div>
             <div class="col-auto">
-                <label for="create-team-description" class="visually-hidden">Team Description</label>
-                <input id="create-team-description" class="form-control" type="text"
+                <label for="create_team_description" class="visually-hidden">Team Description</label>
+                <input id="create_team_description" class="form-control" type="text"
                        placeholder="Team Description" aria-label="Team Description">
             </div>
             <div class="col-auto">
-                <label for="create-team-forum-link" class="visually-hidden">Forum Link</label>
-                <input id="create-team-forum-link" class="form-control" type="url" placeholder="Forum Link"
+                <label for="create_team_forum_link" class="visually-hidden">Forum Link</label>
+                <input id="create_team_forum_link" class="form-control" type="url" placeholder="Forum Link"
                        aria-label="Forum Link">
             </div>
             <div class="col-auto">
-                <input id="create-team-captain" class="form-control" list="available-users"
+                <input id="create_team_captain" class="form-control" list="available_users"
                        placeholder="Captain">
-                <datalist id="available-users">
+                <datalist id="available_users">
                     <!-- Will be populated by system.js -->
                 </datalist>
             </div>
             <div class="col-auto mb-3">
-                <select id="create-team-users" class="form-select" multiple
+                <select id="create_team_users" class="form-select" multiple
                         aria-label="Team Users">
                     <!-- Will be populated by system.js -->
                 </select>
@@ -236,6 +387,8 @@
         </form>
     </div>
 </div>
+
+<div id="loader" class="loader"></div>
 
 </body>
 </html>
