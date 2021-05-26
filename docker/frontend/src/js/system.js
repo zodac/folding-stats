@@ -368,7 +368,7 @@ function createHardware() {
 
         if(response.status != 201){
             failureToast("Hardware create failed with code: " + response.status);
-            throw new Error("Hardware create failed with code: " + response.status + ": " + response.json);
+            return;
         }
 
         document.getElementById("hardware_create_name").value = '';
@@ -417,7 +417,7 @@ function updateHardware() {
 
         if(response.status != 200){
             failureToast("Hardware update failed with code: " + response.status);
-            throw new Error("Hardware update failed with code: " + response.status + ": " + response.json);
+            return;
         }
 
         document.getElementById("hardware_update_id").value = '';
@@ -451,7 +451,7 @@ function deleteHardware() {
 
         if(response.status != 200){
             failureToast("Hardware delete failed with code: " + response.status);
-            throw new Error("Hardware delete failed with code: " + response.status + ": " + response.json);
+            return;
         }
 
         document.getElementById("hardware_delete_id").value = '';
