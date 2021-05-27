@@ -194,7 +194,6 @@ function createUser() {
             return;
         }
 
-        document.getElementById("user_create_id").value = '';
         document.getElementById("user_create_folding_name").value = '';
         document.getElementById("user_create_display_name").value = '';
         document.getElementById("user_create_passkey").value = '';

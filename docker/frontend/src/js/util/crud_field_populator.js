@@ -51,10 +51,14 @@ function populateUserUpdate(){
 
     if (profileLink !== 'undefined') {
         document.getElementById("user_update_profile_link").value = profileLink;
+    } else {
+        document.getElementById("user_update_profile_link").value = '';
     }
 
     if(liveStatsLink !== 'undefined'){
         document.getElementById("user_update_live_stats_link").value = liveStatsLink;
+    } else {
+        document.getElementById("user_update_live_stats_link").value = '';
     }
 
     userFields = document.querySelectorAll(".user_update");
@@ -81,10 +85,14 @@ function populateUserDelete(){
 
     if (profileLink !== 'undefined') {
         document.getElementById("user_delete_profile_link").value = profileLink;
+    } else {
+        document.getElementById("user_delete_profile_link").value = '';
     }
 
     if (liveStatsLink !== 'undefined'){
         document.getElementById("user_delete_live_stats_link").value = liveStatsLink;
+    } else {
+        document.getElementById("user_delete_live_stats_link").value = '';
     }
 
     userFields = document.querySelectorAll(".user_delete");
