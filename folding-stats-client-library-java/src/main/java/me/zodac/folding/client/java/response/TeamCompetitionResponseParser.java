@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import lombok.experimental.UtilityClass;
 import me.zodac.folding.rest.api.tc.CompetitionResult;
+import me.zodac.folding.rest.api.tc.UserResult;
 import me.zodac.folding.rest.api.tc.leaderboard.TeamSummary;
 import me.zodac.folding.rest.api.tc.leaderboard.UserSummary;
 
@@ -30,6 +31,16 @@ public final class TeamCompetitionResponseParser {
      */
     public static CompetitionResult getStats(final HttpResponse<String> response) {
         return GSON.fromJson(response.body(), CompetitionResult.class);
+    }
+
+    /**
+     * Returns the {@link UserResult} retrieved by {@link me.zodac.folding.client.java.request.TeamCompetitionRequestSender#getStatsForUser(int)}.
+     *
+     * @param response the {@link HttpResponse} to parse
+     * @return the retrieved {@link UserResult}
+     */
+    public static UserResult getStatsForUser(final HttpResponse<String> response) {
+        return GSON.fromJson(response.body(), UserResult.class);
     }
 
     /**

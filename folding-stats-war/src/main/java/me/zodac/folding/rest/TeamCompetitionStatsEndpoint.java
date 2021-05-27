@@ -3,6 +3,10 @@ package me.zodac.folding.rest;
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.tc.Category;
+import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.exception.FoldingIdInvalidException;
+import me.zodac.folding.api.tc.exception.FoldingIdOutOfRangeException;
+import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.utils.ExecutionType;
 import me.zodac.folding.ejb.BusinessLogic;
 import me.zodac.folding.ejb.CompetitionResultGenerator;
@@ -22,6 +26,7 @@ import javax.ejb.EJB;
 import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -29,6 +34,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumMap;
@@ -36,8 +42,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
+import static me.zodac.folding.rest.response.Responses.badRequest;
+import static me.zodac.folding.rest.response.Responses.notFound;
 import static me.zodac.folding.rest.response.Responses.ok;
 import static me.zodac.folding.rest.response.Responses.serverError;
 import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
@@ -128,6 +136,57 @@ public class TeamCompetitionStatsEndpoint {
 
     @GET
     @PermitAll
+    @Path("/users/{userId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getTeamCompetitionStatsForUser(@PathParam("userId") final String userId) {
+        LOGGER.debug("GET request received to show TC stats for user received at '{}'", uriContext.getAbsolutePath());
+
+        if (SystemStateManager.current().isReadBlocked()) {
+            LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
+            return serviceUnavailable();
+        }
+
+        try {
+            final int parsedId = ParsingUtils.parseId(userId);
+            final User user = businessLogic.getUserWithPasskey(parsedId, false);
+
+
+            final CompetitionResult competitionResult = competitionResultGenerator.generate();
+            final Collection<UserResult> userResults = competitionResult.getTeams()
+                    .stream()
+                    .flatMap(teamResult -> teamResult.getActiveUsers().stream())
+                    .collect(toList());
+
+
+            for (final UserResult userResult : userResults) {
+                if (userResult.getId() == user.getId()) {
+                    return ok(userResult);
+                }
+            }
+
+            return notFound();
+        } catch (final FoldingIdInvalidException e) {
+            final String errorMessage = String.format("The user ID '%s' is not a valid format", e.getId());
+            LOGGER.debug(errorMessage, e);
+            LOGGER.error(errorMessage);
+            return badRequest(errorMessage);
+        } catch (final FoldingIdOutOfRangeException e) {
+            final String errorMessage = String.format("The user ID '%s' is out of range", e.getId());
+            LOGGER.debug(errorMessage, e);
+            LOGGER.error(errorMessage);
+            return badRequest(errorMessage);
+        } catch (final UserNotFoundException e) {
+            LOGGER.debug("Error getting {} with ID {}", e.getType(), e.getId(), e);
+            LOGGER.error("Error getting {} with ID {}", e.getType(), e.getId());
+            return notFound();
+        } catch (final Exception e) {
+            LOGGER.error("Unexpected error retrieving TC stats for users", e);
+            return serverError();
+        }
+    }
+
+    @GET
+    @PermitAll
     @Path("/leaderboard/")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTeamLeaderboard() {
@@ -143,7 +202,7 @@ public class TeamCompetitionStatsEndpoint {
             final List<TeamResult> teamResults = competitionResult.getTeams()
                     .stream()
                     .sorted(Comparator.comparingLong(TeamResult::getTeamMultipliedPoints).reversed())
-                    .collect(Collectors.toList());
+                    .collect(toList());
 
             if (teamResults.isEmpty()) {
                 LOGGER.warn("No TC teams to show");
@@ -217,7 +276,7 @@ public class TeamCompetitionStatsEndpoint {
                 final List<UserResult> userResults = entry.getValue()
                         .stream()
                         .sorted(Comparator.comparingLong(UserResult::getMultipliedPoints).reversed())
-                        .collect(Collectors.toList());
+                        .collect(toList());
 
                 final UserResult firstResult = userResults.get(0);
                 final UserSummary categoryLeader = UserSummary.createLeader(firstResult, teamNameForFoldingUserName.get(firstResult.getFoldingName()));

@@ -124,8 +124,8 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
         }
 
         try {
-            final int parsedTeamId = super.parseId(teamId);
-            final int parsedUnitId = super.parseId(userId);
+            final int parsedTeamId = ParsingUtils.parseId(teamId);
+            final int parsedUnitId = ParsingUtils.parseId(userId);
 
             final Team team = businessLogic.getTeam(parsedTeamId);
             final TeamValidator teamValidator = TeamValidator.create(businessLogic);
@@ -182,8 +182,8 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
         }
 
         try {
-            final int parsedTeamId = super.parseId(teamId);
-            final int parsedRetiredUserId = super.parseId(retiredUserId);
+            final int parsedTeamId = ParsingUtils.parseId(teamId);
+            final int parsedRetiredUserId = ParsingUtils.parseId(retiredUserId);
 
             final Team team = businessLogic.getTeam(parsedTeamId);
             final TeamValidator teamValidator = TeamValidator.create(businessLogic);

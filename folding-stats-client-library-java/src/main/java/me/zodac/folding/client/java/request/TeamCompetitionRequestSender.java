@@ -80,6 +80,48 @@ public final class TeamCompetitionRequestSender {
     }
 
     /**
+     * Send a <b>GET</b> request to retrieve the <code>Team Competition</code> {@link me.zodac.folding.rest.api.tc.UserResult} for a {@link me.zodac.folding.api.tc.User}.
+     *
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     * @see #getStats(String)
+     */
+    public HttpResponse<String> getStatsForUser(final int userId) throws FoldingRestException {
+        return getStatsForUser(userId, null);
+    }
+
+    /**
+     * Send a <b>GET</b> request to retrieve the <code>Team Competition</code> {@link me.zodac.folding.rest.api.tc.UserResult} for a {@link me.zodac.folding.api.tc.User}.
+     *
+     * <p>
+     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.rest.api.tc.UserResult} based on the <code>ETag</code>, an empty {@link HttpResponse#body()} is returned.
+     *
+     * @param userId the ID of the {@link me.zodac.folding.api.tc.User} whose {@link me.zodac.folding.rest.api.tc.UserResult} is to be retrieved
+     * @param eTag   the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached {@link me.zodac.folding.rest.api.tc.UserResult}
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     * @see #getStats()
+     */
+    public HttpResponse<String> getStatsForUser(final int userId, final String eTag) throws FoldingRestException {
+        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+                .GET()
+                .uri(URI.create(foldingUrl + "/tc_stats/users/" + userId))
+                .header("Content-Type", "application/json");
+
+        if (StringUtils.isNotBlank(eTag)) {
+            requestBuilder.header("If-None-Match", eTag);
+        }
+
+        final HttpRequest request = requestBuilder.build();
+
+        try {
+            return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (final IOException | InterruptedException e) {
+            throw new FoldingRestException("Error sending HTTP request to get TC stats", e);
+        }
+    }
+
+    /**
      * Send a <b>GET</b> request to retrieve the overall <code>Team Competition</code> {@link me.zodac.folding.api.tc.Team} leaderboard.
      *
      * @return the {@link HttpResponse} from the {@link HttpRequest}

@@ -208,7 +208,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
         }
 
         try {
-            final V element = getElementById(parseId(elementId));
+            final V element = getElementById(ParsingUtils.parseId(elementId));
 
             final CacheControl cacheControl = new CacheControl();
             cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);
@@ -235,8 +235,8 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
             getLogger().error(errorMessage);
             return badRequest(errorMessage);
         } catch (final NotFoundException e) {
-            getLogger().debug("Error getting {}, could not find {} with ID {}", elementType(), e.getType(), e.getId(), e);
-            getLogger().error("Error getting {}, could not find {} with ID {}", elementType(), e.getType(), e.getId());
+            getLogger().debug("Error getting {} with ID {}", e.getType(), e.getId(), e);
+            getLogger().error("Error getting {} with ID {}", e.getType(), e.getId());
             return notFound();
         } catch (final FoldingException e) {
             getLogger().error("Error getting {} with ID: {}", elementType(), elementId, e.getCause());
@@ -261,7 +261,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
         }
 
         try {
-            final int parsedId = parseId(elementId);
+            final int parsedId = ParsingUtils.parseId(elementId);
             // We want to make sure the payload is not trying to change the ID of the element
             // If no ID is provided, the POJO will default to a value of 0, which is acceptable
             if (parsedId != element.getId() && element.getId() != 0) {
@@ -331,7 +331,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
         }
 
         try {
-            final int parsedId = parseId(elementId);
+            final int parsedId = ParsingUtils.parseId(elementId);
             getElementById(parsedId); // We call this so if the value does not exist, we can fail with a NOT_FOUND response
             deleteElementById(parsedId);
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
@@ -361,18 +361,6 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
         } catch (final Exception e) {
             getLogger().error("Unexpected error deleting {} with ID: {}", elementType(), elementId, e);
             return serverError();
-        }
-    }
-
-    protected int parseId(final String id) throws FoldingIdInvalidException, FoldingIdOutOfRangeException {
-        try {
-            final int parsedId = Integer.parseInt(id);
-            if (parsedId < 0) {
-                throw new FoldingIdOutOfRangeException(parsedId);
-            }
-            return parsedId;
-        } catch (final NumberFormatException e) {
-            throw new FoldingIdInvalidException(id, e);
         }
     }
 }

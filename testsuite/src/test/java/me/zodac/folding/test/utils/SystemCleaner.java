@@ -7,6 +7,7 @@ import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.test.utils.db.DatabaseUtils;
 import me.zodac.folding.test.utils.rest.request.HardwareUtils;
 import me.zodac.folding.test.utils.rest.request.StubbedFoldingEndpointUtils;
+import me.zodac.folding.test.utils.rest.request.TeamCompetitionStatsUtils;
 import me.zodac.folding.test.utils.rest.request.TeamUtils;
 import me.zodac.folding.test.utils.rest.request.UserUtils;
 
@@ -80,5 +81,6 @@ public final class SystemCleaner {
         StubbedFoldingEndpointUtils.deleteUnits();
         DatabaseUtils.truncateTableAndResetId("user_initial_stats", "user_offset_tc_stats", "user_tc_stats_hourly", "user_total_stats");
         cleanSystemForSimpleTests();
+        TeamCompetitionStatsUtils.manuallyResetStats();
     }
 }

@@ -723,6 +723,92 @@ public class TeamCompetitionStatsTest {
                 .isEqualTo(0);
     }
 
+    @Test
+    public void whenOneTeamExistsWithOneUser_andUserEarnsStats_thenUserStartsWithNoStats_thenIncrementsAsUserPointsIncrease() throws FoldingRestException {
+        final User user = generateUser();
+        final int userId = UserUtils.createOrConflict(user).getId();
+        final Team team = generateTeamWithUserIds(userId);
+        TeamUtils.createOrConflict(team);
+
+        final UserResult resultBeforeStats = TeamCompetitionStatsUtils.getStatsForUser(userId);
+
+        assertThat(resultBeforeStats.getPoints())
+                .as("Expected no points: " + resultBeforeStats)
+                .isEqualTo(0L);
+
+        assertThat(resultBeforeStats.getMultipliedPoints())
+                .as("Expected no multiplied points: " + resultBeforeStats)
+                .isEqualTo(0L);
+
+        assertThat(resultBeforeStats.getUnits())
+                .as("Expected no units: " + resultBeforeStats)
+                .isEqualTo(0);
+
+        final long newPoints = 10_000L;
+        StubbedFoldingEndpointUtils.setPoints(user, newPoints);
+
+        final int newUnits = 5;
+        StubbedFoldingEndpointUtils.setUnits(user, newUnits);
+
+        manuallyUpdateStats();
+
+        final UserResult resultAfterStats = TeamCompetitionStatsUtils.getStatsForUser(userId);
+
+        assertThat(resultAfterStats.getPoints())
+                .as("Expected updated points: " + resultAfterStats)
+                .isEqualTo(newPoints);
+
+        assertThat(resultAfterStats.getMultipliedPoints())
+                .as("Expected updated multiplied points: " + resultAfterStats)
+                .isEqualTo(newPoints);
+
+        assertThat(resultAfterStats.getUnits())
+                .as("Expected updated units: " + resultAfterStats)
+                .isEqualTo(newUnits);
+    }
+
+    @Test
+    public void whenGettingStatsForUser_andUserRankIs2ndInTeamBut3rdInCompetition_thenResponseHasTeamRankListed() throws FoldingRestException {
+        final User firstInTeamFirstOverall = generateUserWithCategory(Category.AMD_GPU);
+        final int firstInTeamFirstOverallId = UserUtils.createOrConflict(firstInTeamFirstOverall).getId();
+
+        final User secondInTeamThirdOverall = generateUserWithCategory(Category.NVIDIA_GPU);
+        final int secondInTeamThirdOverallId = UserUtils.createOrConflict(secondInTeamThirdOverall).getId();
+
+        final Team mainTeam = generateTeamWithUserIds(firstInTeamFirstOverallId, secondInTeamThirdOverallId);
+        TeamUtils.createOrConflict(mainTeam);
+
+        final User firstInTeamSecondOverall = generateUser();
+        final int firstInTeamSecondOverallId = UserUtils.createOrConflict(firstInTeamSecondOverall).getId();
+
+        final Team otherTeam = generateTeamWithUserIds(firstInTeamSecondOverallId);
+        TeamUtils.createOrConflict(otherTeam);
+
+        final UserResult resultBeforeStats = TeamCompetitionStatsUtils.getStatsForUser(secondInTeamThirdOverallId);
+        assertThat(resultBeforeStats.getRankInTeam())
+                .as("Expected all users to start at rank 1: " + resultBeforeStats)
+                .isEqualTo(1);
+
+        StubbedFoldingEndpointUtils.setPoints(firstInTeamFirstOverall, 10_000L);
+        StubbedFoldingEndpointUtils.setPoints(secondInTeamThirdOverall, 1_000L);
+        StubbedFoldingEndpointUtils.setPoints(firstInTeamSecondOverall, 5_000L);
+        manuallyUpdateStats();
+
+        final UserResult resultAfterStats = TeamCompetitionStatsUtils.getStatsForUser(secondInTeamThirdOverallId);
+        assertThat(resultAfterStats.getRankInTeam())
+                .as("Expected user to be third overall, but second in team: " + resultBeforeStats)
+                .isEqualTo(2);
+    }
+
+    @Test
+    public void whenGettingStatsForUser_andUserDoesNotExist_thenResponseHasA404Status() throws FoldingRestException {
+        final int invalidId = 99;
+        final HttpResponse<String> response = TEAM_COMPETITION_REQUEST_SENDER.getStatsForUser(invalidId);
+        assertThat(response.statusCode())
+                .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
+    }
+
     @AfterAll
     public static void tearDown() throws FoldingRestException {
         cleanSystemForComplexTests();

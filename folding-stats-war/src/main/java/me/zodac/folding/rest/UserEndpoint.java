@@ -130,7 +130,7 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
         }
 
         try {
-            final int parsedId = super.parseId(userId);
+            final int parsedId = ParsingUtils.parseId(userId);
             getElementById(parsedId); // We call this so if the value does not exist, we can fail with a NOT_FOUND response
 
             final OffsetStats offsetStatsToUse = getValidUserStatsOffset(offsetStats, parsedId);

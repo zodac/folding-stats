@@ -41,6 +41,22 @@ public final class TeamCompetitionStatsUtils {
     }
 
     /**
+     * Get the TC results for a single {@link me.zodac.folding.api.tc.User}.
+     *
+     * @param userId the ID of the {@link me.zodac.folding.api.tc.User} whose {@link UserResult} is to be retrieved
+     * @return the TC {@link UserResult}
+     * @throws FoldingRestException thrown if an error occurs sending the HTTP request
+     */
+    public static UserResult getStatsForUser(final int userId) throws FoldingRestException {
+        final HttpResponse<String> response = TEAM_COMPETITION_REQUEST_SENDER.getStatsForUser(userId);
+        if (response.statusCode() == HttpURLConnection.HTTP_OK) {
+            return TeamCompetitionResponseParser.getStatsForUser(response);
+        }
+
+        throw new FoldingRestException(String.format("Invalid response (%s) when getting TC result for user with ID %s with: %s", userId, response.statusCode(), response.body()));
+    }
+
+    /**
      * Retrieves the {@link TeamResult} with the given {@code teamName} from the {@link CompetitionResult}.
      *
      * @param competitionResult the {@link CompetitionResult} to check
