@@ -327,3 +327,64 @@ function deleteUser() {
         return false;
     });
 }
+
+function offsetUser() {
+    var element = document.getElementById("user_offset_selector");
+    element = document.getElementById("user_offset_selector");
+    selectedElement = element.options[element.selectedIndex];
+
+    var userId = selectedElement.getAttribute("user_id");
+    var displayName = selectedElement.getAttribute("user_display_name");
+
+    show("loader");
+    fetch(ROOT_URL+'/tc_stats/users/' + userId)
+    .then(response => {
+        return response.json();
+    })
+    .then(function(jsonResponse) {
+        var startPoints = jsonResponse['multipliedPoints'];
+        var startUnits = jsonResponse['units'];
+        var endPoints = document.getElementById("user_offset_points").value;
+        var endUnits = document.getElementById("user_offset_units").value
+
+        var offsetPoints = (endPoints - startPoints);
+        var offsetUnits = (endUnits - startUnits);
+
+        var requestData = JSON.stringify(
+            {
+                "multipliedPointsOffset": offsetPoints,
+                "unitsOffset": offsetUnits
+            }
+        );
+
+        fetch(ROOT_URL+'/users/' + userId, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': sessionGet("Authorization")
+            },
+            body: requestData
+        })
+        .then(response => {
+            hide("loader");
+
+            if(response.status != 200){
+                failureToast("User stats offset failed with code: " + response.status)
+                response.json()
+                .then(response => {
+                    console.error(JSON.stringify(response, null, 2));
+                });
+                return;
+            }
+
+            document.getElementById("user_offset_points").value = '';
+            document.getElementById("user_offset_units").value = '';
+            successToast("User '" + displayName + "' stats updated: " + offsetPoints + " points, " + offsetUnits + " units");
+            loadUsers();
+        })
+        .catch((error) => {
+            console.error('Unexpected error offsetting user stats: ', error);
+            return false;
+        });
+    });
+}

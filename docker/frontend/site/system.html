@@ -515,6 +515,59 @@
                     </div>
                 </div>
             </div>
+
+            <div id="user_offset_accordion_parent" class="accordion-item bg-dark">
+                <h2 id="user_offset_accordion_header" class="accordion-header bg-dark text-light">
+                    <button class="accordion-button collapsed bg-dark text-light" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#user_offset_accordion_item"
+                            aria-expanded="true"
+                            aria-controls="user_offset_accordion">
+                        Edit User Points/Units
+                    </button>
+                </h2>
+                <div id="user_offset_accordion_item" class="accordion-collapse collapse"
+                     aria-labelledby="user_offset_accordion_header"
+                     data-bs-parent="#user_accordion">
+                    <div class="accordion-body">
+                        <form id="user_offset_form" class="row g-3" onsubmit="offsetUser(); return false;" action="">
+                            <div class="col-auto">
+                                <button type="submit" class="btn btn-primary mb-3">Edit User Stats</button>
+                            </div>
+                            <div class="col-auto">
+                                <select id="user_offset_selector" class="form-select user_list"
+                                        aria-label="user_offset_list" onchange="populateUserOffset();" required>
+                                    <!-- Will be populated by system.js -->
+                                </select>
+                            </div>
+                            <div class="col-auto user_offset" style="display:none;">
+                                <label for="user_offset_id" class="visually-hidden">User ID</label>
+                                <input id="user_offset_id" class="form-control" type="text" placeholder="ID"
+                                       aria-label="ID" disabled>
+                            </div>
+                            <div class="col-auto user_offset" style="display:none;">
+                                <label for="user_offset_folding_name" class="visually-hidden">Folding@Home Name</label>
+                                <input id="user_offset_folding_name" class="form-control" type="text" pattern="[^\s]+"
+                                       placeholder="Folding@Home Name" aria-label="Folding@Home Name" required disabled>
+                            </div>
+                            <div class="col-auto user_offset" style="display:none;">
+                                <label for="user_offset_display_name" class="visually-hidden">Display Name</label>
+                                <input id="user_offset_display_name" class="form-control" type="text" pattern="[^\s]+"
+                                       placeholder="Display Name" aria-label="Display Name" required disabled>
+                            </div>
+                            <div class="col-auto user_offset" style="display:none;">
+                                <label for="user_offset_points" class="visually-hidden">Points</label>
+                                <input id="user_offset_points" class="form-control" type="number" step="1"
+                                       placeholder="Points" aria-label="Points">
+                            </div>
+                            <div class="col-auto user_offset" style="display:none;">
+                                <label for="user_offset_units" class="visually-hidden">Points</label>
+                                <input id="user_offset_units" class="form-control" type="number" step="1"
+                                       placeholder="Units" aria-label="Units">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

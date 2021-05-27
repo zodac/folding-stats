@@ -101,3 +101,30 @@ function populateUserDelete(){
     }
     hide("loader");
 }
+
+function populateUserOffset(){
+    show("loader");
+    element = document.getElementById("user_offset_selector");
+    selectedElement = element.options[element.selectedIndex];
+
+    userId = selectedElement.getAttribute("user_id");
+
+    document.getElementById("user_offset_id").value = userId;
+    document.getElementById("user_offset_folding_name").value = selectedElement.getAttribute("user_folding_name");
+    document.getElementById("user_offset_display_name").value = selectedElement.getAttribute("user_display_name");
+
+    fetch(ROOT_URL+'/tc_stats/users/' + userId)
+    .then(response => {
+        return response.json();
+    })
+    .then(function(jsonResponse) {
+        document.getElementById("user_offset_points").value = jsonResponse['multipliedPoints'];
+        document.getElementById("user_offset_units").value = jsonResponse['units'];
+    });
+
+    userFields = document.querySelectorAll(".user_offset");
+    for (var i = 0, userField; userField = userFields[i]; i++) {
+        showElement(userField);
+    }
+    hide("loader");
+}
