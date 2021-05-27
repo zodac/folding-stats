@@ -125,15 +125,10 @@ public class HardwareEndpoint extends AbstractIdentifiableCrudEndpoint<Hardware>
 
     @Override
     protected Hardware updateElementById(final int hardwareId, final Hardware hardware) throws FoldingException, NotFoundException, FoldingConflictException, FoldingExternalServiceException {
-        if (hardware.getId() == 0) {
-            // The payload 'should' have the ID, but it's not necessary if the correct URL is used
-            final Hardware hardwareWithId = Hardware.updateWithId(hardwareId, hardware);
-            businessLogic.updateHardware(hardwareWithId);
-            return hardwareWithId;
-        }
-
-        businessLogic.updateHardware(hardware);
-        return hardware;
+        // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
+        final Hardware hardwareWithId = Hardware.updateWithId(hardwareId, hardware);
+        businessLogic.updateHardware(hardwareWithId);
+        return hardwareWithId;
     }
 
     @Override

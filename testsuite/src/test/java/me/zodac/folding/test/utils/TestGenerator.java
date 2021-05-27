@@ -111,8 +111,8 @@ public final class TestGenerator {
     public static User generateUserWithHardwareId(final int hardwareId) {
         return User.createWithoutId(
                 "Dummy_User" + userCount,
-                "Dummy User" + userCount,
-                "DummyPasskey" + userCount++,
+                "Dummy User" + userCount++,
+                "DummyPasskey12345678901234567890",
                 Category.NVIDIA_GPU,
                 hardwareId,
                 "",
@@ -132,8 +132,8 @@ public final class TestGenerator {
         final int hardwareId = HardwareUtils.createOrConflict(generateHardware()).getId();
         return User.createWithoutId(
                 "Dummy_User" + userCount,
-                "Dummy User" + userCount,
-                "DummyPasskey" + userCount++,
+                "Dummy User" + userCount++,
+                "DummyPasskey12345678901234567890",
                 category,
                 hardwareId,
                 "",
@@ -154,8 +154,8 @@ public final class TestGenerator {
         return User.create(
                 userId,
                 "Dummy_User" + userCount,
-                "Dummy User" + userCount,
-                "DummyPasskey" + userCount++,
+                "Dummy User" + userCount++,
+                "DummyPasskey12345678901234567890",
                 Category.NVIDIA_GPU,
                 hardwareId,
                 "",
@@ -171,8 +171,7 @@ public final class TestGenerator {
      * @see #generateUser()
      */
     public static Team generateTeam() throws FoldingRestException {
-        final User user = generateUser();
-        final int userId = UserUtils.createOrConflict(user).getId();
+        final int userId = UserUtils.createOrConflict(generateUser()).getId();
         return Team.createWithoutId(
                 "Dummy_Team" + teamCount++,
                 "Dummy Team",
@@ -191,8 +190,7 @@ public final class TestGenerator {
      * @see #generateUser()
      */
     public static Team generateTeamWithId(final int teamId) throws FoldingRestException {
-        final User user = generateUser();
-        final int userId = UserUtils.createOrConflict(user).getId();
+        final int userId = UserUtils.createOrConflict(generateUser()).getId();
         return Team.create(
                 teamId,
                 "Dummy_Team" + teamCount++,

@@ -204,15 +204,10 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
 
     @Override
     protected User updateElementById(final int userId, final User user) throws FoldingException, NotFoundException, FoldingConflictException, FoldingExternalServiceException {
-        if (user.getId() == 0) {
-            // The payload 'should' have the ID, but it's not necessary if the correct URL is used
-            final User userWithId = User.updateWithId(userId, user);
-            businessLogic.updateUser(userWithId);
-            return userWithId;
-        }
-
-        businessLogic.updateUser(user);
-        return user;
+        // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
+        final User userWithId = User.updateWithId(userId, user);
+        businessLogic.updateUser(userWithId);
+        return userWithId;
     }
 
     @Override

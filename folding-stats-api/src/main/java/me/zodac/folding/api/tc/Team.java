@@ -59,7 +59,9 @@ public class Team implements Identifiable {
      * @return the created {@link Team}
      */
     public static Team create(final int teamId, final String teamName, final String teamDescription, final String forumLink, final int captainUserId, final Set<Integer> userIds, final Set<Integer> retiredUserIds) {
-        return new Team(teamId, teamName, teamDescription, forumLink, captainUserId, userIds, retiredUserIds);
+        final String teamDescriptionOrNull = isEmpty(teamDescription) ? null : teamDescription;
+        final String forumLinkOrNull = isEmpty(forumLink) ? null : forumLink;
+        return new Team(teamId, teamName, teamDescriptionOrNull, forumLinkOrNull, captainUserId, userIds, retiredUserIds);
     }
 
     /**
@@ -76,7 +78,9 @@ public class Team implements Identifiable {
      * @return the created {@link Team}
      */
     public static Team createWithoutId(final String teamName, final String teamDescription, final String forumLink, final int captainUserId, final Set<Integer> userIds, final Set<Integer> retiredUserIds) {
-        return new Team(EMPTY_TEAM_ID, teamName, teamDescription, forumLink, captainUserId, userIds, retiredUserIds);
+        final String teamDescriptionOrNull = isEmpty(teamDescription) ? null : teamDescription;
+        final String forumLinkOrNull = isEmpty(forumLink) ? null : forumLink;
+        return new Team(EMPTY_TEAM_ID, teamName, teamDescriptionOrNull, forumLinkOrNull, captainUserId, userIds, retiredUserIds);
     }
 
     /**
@@ -90,7 +94,9 @@ public class Team implements Identifiable {
      * @return the updated {@link Team}
      */
     public static Team updateWithId(final int teamId, final Team team) {
-        return new Team(teamId, team.teamName, team.teamDescription, team.forumLink, team.captainUserId, team.userIds, team.retiredUserIds);
+        final String teamDescription = isEmpty(team.teamDescription) ? null : team.teamDescription;
+        final String forumLink = isEmpty(team.forumLink) ? null : team.forumLink;
+        return new Team(teamId, team.teamName, teamDescription, forumLink, team.captainUserId, team.userIds, team.retiredUserIds);
     }
 
     /**
@@ -111,7 +117,9 @@ public class Team implements Identifiable {
         final Set<Integer> retiredUserIds = new HashSet<>(team.getRetiredUserIds());
         retiredUserIds.add(retiredUserId);
 
-        return new Team(team.id, team.teamName, team.teamDescription, team.forumLink, team.captainUserId, updateUserIds, retiredUserIds);
+        final String teamDescription = isEmpty(team.teamDescription) ? null : team.teamDescription;
+        final String forumLink = isEmpty(team.forumLink) ? null : team.forumLink;
+        return new Team(team.id, team.teamName, teamDescription, forumLink, team.captainUserId, updateUserIds, retiredUserIds);
     }
 
     /**
@@ -132,7 +140,9 @@ public class Team implements Identifiable {
         final Set<Integer> retiredUserStats = new HashSet<>(team.getRetiredUserIds());
         retiredUserStats.remove(retiredUserId);
 
-        return new Team(team.id, team.teamName, team.teamDescription, team.forumLink, team.captainUserId, updateUserIds, retiredUserStats);
+        final String teamDescription = isEmpty(team.teamDescription) ? null : team.teamDescription;
+        final String forumLink = isEmpty(team.forumLink) ? null : team.forumLink;
+        return new Team(team.id, team.teamName, teamDescription, forumLink, team.captainUserId, updateUserIds, retiredUserStats);
     }
 
     /**
@@ -144,6 +154,12 @@ public class Team implements Identifiable {
      * @return the {@link Team} with no retired {@link User}s
      */
     public static Team removeRetiredUsers(final Team team) {
-        return new Team(team.id, team.teamName, team.teamDescription, team.forumLink, team.captainUserId, team.userIds, Collections.emptySet());
+        final String teamDescription = isEmpty(team.teamDescription) ? null : team.teamDescription;
+        final String forumLink = isEmpty(team.forumLink) ? null : team.forumLink;
+        return new Team(team.id, team.teamName, teamDescription, forumLink, team.captainUserId, team.userIds, Collections.emptySet());
+    }
+
+    private static boolean isEmpty(final String input) {
+        return input == null || input.isBlank();
     }
 }

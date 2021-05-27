@@ -262,15 +262,10 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
 
     @Override
     protected Team updateElementById(final int teamId, final Team team) throws FoldingException, FoldingConflictException {
-        if (team.getId() == 0) {
-            // The payload 'should' have the ID, but it's not necessary if the correct URL is used
-            final Team teamWithId = Team.updateWithId(teamId, team);
-            businessLogic.updateTeam(teamWithId);
-            return teamWithId;
-        }
-
-        businessLogic.updateTeam(team);
-        return team;
+        // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
+        final Team teamWithId = Team.updateWithId(teamId, team);
+        businessLogic.updateTeam(teamWithId);
+        return teamWithId;
     }
 
     @Override

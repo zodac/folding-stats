@@ -1,5 +1,6 @@
 package me.zodac.folding.test;
 
+import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
@@ -135,7 +136,7 @@ public class UserTest {
         final int initialSize = UserUtils.getNumberOfUsers();
 
         final User updatedUser = User.updateWithId(userId, UserUtils.get(userId));
-        updatedUser.setPasskey("updatedPasskey");
+        updatedUser.setPasskey("updatedPasskey123456789012345678");
         StubbedFoldingEndpointUtils.enableUser(updatedUser);
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.update(updatedUser, ADMIN_USER.userName(), ADMIN_USER.password());
@@ -557,6 +558,65 @@ public class UserTest {
         assertThat(response.statusCode())
                 .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+    }
+
+    @Test
+    public void whenCreatingUser_andOptionalFieldIsEmptyString_thenValueShouldBeNullNotEmpty() throws FoldingRestException {
+        final int hardwareId = HardwareUtils.createOrConflict(generateHardware()).getId();
+        final User user = User.createWithoutId(
+                "Dummy_User_create_null",
+                "Dummy User",
+                "DummyPasskey12345678901234567890",
+                Category.AMD_GPU,
+                hardwareId,
+                "",
+                "",
+                false);
+        StubbedFoldingEndpointUtils.enableUser(user);
+
+        final HttpResponse<String> response = USER_REQUEST_SENDER.create(user, ADMIN_USER.userName(), ADMIN_USER.password());
+        assertThat(response.statusCode())
+                .as("Did not receive a 201_CREATED HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_CREATED);
+
+        final int userId = UserResponseParser.create(response).getId();
+
+        final User actual = UserUtils.get(userId);
+        assertThat(actual)
+                .as("Empty optional value should not be returned: " + response.body())
+                .extracting("liveStatsLink")
+                .isEqualTo(null);
+    }
+
+    @Test
+    public void whenUpdatingUser_andOptionalFieldIsEmptyString_thenValueShouldBeNullNotEmpty() throws FoldingRestException {
+        final int hardwareId = HardwareUtils.createOrConflict(generateHardware()).getId();
+        final User user = User.createWithoutId(
+                "Dummy_User_update_null",
+                "Dummy User",
+                "DummyPasskey12345678901234567890",
+                Category.AMD_GPU,
+                hardwareId,
+                "http://google.com",
+                "http://google.com",
+                false);
+        StubbedFoldingEndpointUtils.enableUser(user);
+
+        final User userToUpdate = UserUtils.createOrConflict(user);
+
+        final int userId = userToUpdate.getId();
+        userToUpdate.setLiveStatsLink("");
+
+        final HttpResponse<String> response = USER_REQUEST_SENDER.update(userToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
+        assertThat(response.statusCode())
+                .as("Did not receive a 200_OK HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_OK);
+
+        final User actual = UserUtils.get(userId);
+        assertThat(actual)
+                .as("Empty optional value should not be returned: " + response.body())
+                .extracting("liveStatsLink")
+                .isEqualTo(null);
     }
 
     @AfterAll

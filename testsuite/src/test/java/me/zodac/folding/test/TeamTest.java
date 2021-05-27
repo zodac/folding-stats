@@ -21,7 +21,9 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import static me.zodac.folding.api.utils.EncodingUtils.encodeBasicAuthentication;
 import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForSimpleTests;
@@ -715,6 +717,58 @@ public class TeamTest {
         assertThat(response.statusCode())
                 .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+    }
+
+    @Test
+    public void whenCreatingUser_andOptionalFieldIsEmptyString_thenValueShouldBeNullNotEmpty() throws FoldingRestException {
+        final int userId = UserUtils.createOrConflict(generateUser()).getId();
+        final Team teamToCreate = Team.createWithoutId(
+                "Dummy_Team_create_null",
+                "Dummy Team",
+                "",
+                userId,
+                Set.of(userId),
+                Collections.emptySet());
+
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(teamToCreate, ADMIN_USER.userName(), ADMIN_USER.password());
+        assertThat(response.statusCode())
+                .as("Did not receive a 201_CREATED HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_CREATED);
+
+        final int teamId = TeamResponseParser.create(response).getId();
+
+        final Team actual = TeamUtils.get(teamId);
+        assertThat(actual)
+                .as("Empty optional value should not be returned: " + response.body())
+                .extracting("forumLink")
+                .isEqualTo(null);
+    }
+
+    @Test
+    public void whenUpdatingUser_andOptionalFieldIsEmptyString_thenValueShouldBeNullNotEmpty() throws FoldingRestException {
+        final int userId = UserUtils.createOrConflict(generateUser()).getId();
+        final Team team = Team.createWithoutId(
+                "Dummy_Team_update_null",
+                "Dummy Team",
+                "http://google.com",
+                userId,
+                Set.of(userId),
+                Collections.emptySet());
+
+        final Team teamToUpdate = TeamUtils.createOrConflict(team);
+        final int teamId = teamToUpdate.getId();
+        teamToUpdate.setForumLink("");
+
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.update(teamToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
+        assertThat(response.statusCode())
+                .as("Did not receive a 200_OK HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_OK);
+
+        final Team actual = TeamUtils.get(teamId);
+        assertThat(actual)
+                .as("Empty optional value should not be returned: " + response.body())
+                .extracting("forumLink")
+                .isEqualTo(null);
     }
 
     @AfterAll

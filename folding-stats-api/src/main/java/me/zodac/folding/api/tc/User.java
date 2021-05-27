@@ -80,7 +80,9 @@ public class User implements Identifiable {
      * @return the created {@link User}
      */
     public static User createWithoutId(final String foldingUserName, final String displayName, final String passkey, final Category category, final int hardwareId, final String profileLink, final String liveStatsLink, final boolean isRetired) {
-        return new User(EMPTY_USER_ID, foldingUserName, displayName, passkey, category.displayName(), hardwareId, profileLink, liveStatsLink, isRetired);
+        final String profileLinkOrNull = isEmpty(profileLink) ? null : profileLink;
+        final String liveStatsLinkOrNull = isEmpty(liveStatsLink) ? null : liveStatsLink;
+        return new User(EMPTY_USER_ID, foldingUserName, displayName, passkey, category.displayName(), hardwareId, profileLinkOrNull, liveStatsLinkOrNull, isRetired);
     }
 
     /**
@@ -94,7 +96,9 @@ public class User implements Identifiable {
      * @return the updated {@link User}
      */
     public static User updateWithId(final int userId, final User user) {
-        return new User(userId, user.foldingUserName, user.displayName, user.passkey, user.category, user.hardwareId, user.profileLink, user.liveStatsLink, user.isRetired);
+        final String profileLink = isEmpty(user.profileLink) ? null : user.profileLink;
+        final String liveStatsLink = isEmpty(user.liveStatsLink) ? null : user.liveStatsLink;
+        return new User(userId, user.foldingUserName, user.displayName, user.passkey, user.category, user.hardwareId, profileLink, liveStatsLink, user.isRetired);
     }
 
     /**
@@ -107,7 +111,9 @@ public class User implements Identifiable {
      * @return the retired {@link User}
      */
     public static User retireUser(final User user) {
-        return new User(user.id, user.foldingUserName, user.displayName, user.passkey, user.category, user.hardwareId, user.profileLink, user.liveStatsLink, true);
+        final String profileLink = isEmpty(user.profileLink) ? null : user.profileLink;
+        final String liveStatsLink = isEmpty(user.liveStatsLink) ? null : user.liveStatsLink;
+        return new User(user.id, user.foldingUserName, user.displayName, user.passkey, user.category, user.hardwareId, profileLink, liveStatsLink, true);
     }
 
     /**
@@ -120,7 +126,9 @@ public class User implements Identifiable {
      * @return the un-retired {@link User}
      */
     public static User unretireUser(final User user) {
-        return new User(user.id, user.foldingUserName, user.displayName, user.passkey, user.category, user.hardwareId, user.profileLink, user.liveStatsLink, false);
+        final String profileLink = isEmpty(user.profileLink) ? null : user.profileLink;
+        final String liveStatsLink = isEmpty(user.liveStatsLink) ? null : user.liveStatsLink;
+        return new User(user.id, user.foldingUserName, user.displayName, user.passkey, user.category, user.hardwareId, profileLink, liveStatsLink, false);
     }
 
     /**
@@ -132,11 +140,17 @@ public class User implements Identifiable {
      * @return the updated {@link User}
      */
     public static User hidePasskey(final User user) {
-        return new User(user.id, user.foldingUserName, user.displayName, hidePasskey(user.passkey), user.category, user.hardwareId, user.profileLink, user.liveStatsLink, user.isRetired);
+        final String profileLink = isEmpty(user.profileLink) ? null : user.profileLink;
+        final String liveStatsLink = isEmpty(user.liveStatsLink) ? null : user.liveStatsLink;
+        return new User(user.id, user.foldingUserName, user.displayName, hidePasskey(user.passkey), user.category, user.hardwareId, profileLink, liveStatsLink, user.isRetired);
     }
 
     private static String hidePasskey(final String passkey) {
         final int endIndex = Math.min(PASSKEY_LENGTH_NOT_TO_HIDE, passkey.length()); // In case passkey has fewer than 8 characters
         return passkey.substring(0, endIndex).concat(PASSKEY_MASK);
+    }
+
+    private static boolean isEmpty(final String input) {
+        return input == null || input.isBlank();
     }
 }
