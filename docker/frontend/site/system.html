@@ -64,17 +64,17 @@
 <button onclick="toggleMainButtonStyle('hardware_button', this.classList)" class="btn btn-primary" id="hardware_button"
         href="#hardware_div" data-bs-toggle="collapse" role="button">List of Hardware
 </button>
-<button onclick="toggleMainButtonStyle('users_button', this.classList)" class="btn btn-primary" id="users_button"
-        href="#users_div" data-bs-toggle="collapse" role="button">List of Users
-</button>
 <button onclick="toggleMainButtonStyle('teams_button', this.classList)" class="btn btn-primary" id="teams_button"
         href="#teams_div" data-bs-toggle="collapse" role="button">List of Teams
+</button>
+<button onclick="toggleMainButtonStyle('users_button', this.classList)" class="btn btn-primary" id="users_button"
+        href="#users_div" data-bs-toggle="collapse" role="button">List of Users
 </button>
 
 <!-- These divs will be populated by index.js -->
 <div id="hardware_div" class="collapse"></div>
-<div id="users_div" class="collapse"></div>
 <div id="teams_div" class="collapse"></div>
+<div id="users_div" class="collapse"></div>
 
 <!-- Toasts, which will be triggered to show by JS scripts -->
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
@@ -121,11 +121,11 @@
     <button onclick="toggleMainButtonStyle('hardware_admin_button', this.classList)" class="btn btn-primary"
             id="hardware_admin_button" href="#hardware_admin_functions" data-bs-toggle="collapse" role="button">Hardware
     </button>
+    <button onclick="toggleMainButtonStyle('teams_admin_button', this.classList)" class="btn btn-primary"
+            id="teams_admin_button" href="#team_admin_functions" data-bs-toggle="collapse" role="button">Teams
+    </button>
     <button onclick="toggleMainButtonStyle('users_admin_button', this.classList)" class="btn btn-primary"
             id="users_admin_button" href="#user_admin_functions" data-bs-toggle="collapse" role="button">Users
-    </button>
-    <button onclick="toggleMainButtonStyle('teams_admin_button', this.classList)" class="btn btn-primary"
-            id="teams_admin_button" href="#admin_functions_team" data-bs-toggle="collapse" role="button">Teams
     </button>
 
     <div>
@@ -166,6 +166,7 @@
                                        placeholder="Display Name"
                                        aria-label="Display Name" required>
                             </div>
+                            <!-- [zodac] I think it's safe to assume we will only support these two OSs, and no need to specify the Linux distro -->
                             <div class="col-auto">
                                 <select id="hardware_create_operating_system" class="form-select"
                                         aria-label="hardware_create_operating_system_list" required>
@@ -301,6 +302,43 @@
         </div>
     </div>
 
+    <div id="team_admin_functions" class="collapse">
+        <h2 class="navbar-brand">Team Admin Functions</h2>
+        <form id="create_team_form" class="row g-3" onsubmit="createTeam(); return false;" action="">
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary mb-3">Create Team</button>
+            </div>
+            <div class="col-auto">
+                <label for="create_team_name" class="visually-hidden">Team Name</label>
+                <input id="create_team_name" class="form-control" type="text"
+                       placeholder="Team Name" aria-label="Team Name" required>
+            </div>
+            <div class="col-auto">
+                <label for="create_team_description" class="visually-hidden">Team Description</label>
+                <input id="create_team_description" class="form-control" type="text"
+                       placeholder="Team Description" aria-label="Team Description">
+            </div>
+            <div class="col-auto">
+                <label for="create_team_forum_link" class="visually-hidden">Forum Link</label>
+                <input id="create_team_forum_link" class="form-control" type="url" placeholder="Forum Link"
+                       aria-label="Forum Link">
+            </div>
+            <div class="col-auto">
+                <input id="create_team_captain" class="form-control" list="available_users"
+                       placeholder="Captain">
+                <datalist id="available_users">
+                    <!-- Will be populated by system.js -->
+                </datalist>
+            </div>
+            <div class="col-auto mb-3">
+                <select id="create_team_users" class="form-select" multiple
+                        aria-label="Team Users">
+                    <!-- Will be populated by system.js -->
+                </select>
+            </div>
+        </form>
+    </div>
+
     <div id="user_admin_functions" class="collapse">
         <h1 class="navbar-brand">User Admin Functions</h1>
         <div id="user_accordion" class="accordion bg-dark text-light">
@@ -339,6 +377,7 @@
                                 <input id="user_create_passkey" class="form-control" type="text" maxlength="32"
                                        minlength="32" placeholder="Passkey" aria-label="Passkey" required>
                             </div>
+                            <!-- TODO: [zodac] Could expose a REST endpoint defining the available categories? -->
                             <div class="col-auto">
                                 <select id="user_create_category" class="form-select"
                                         aria-label="user_create_operating_system_list" required>
@@ -346,12 +385,6 @@
                                     <option value="AMD GPU">AMD GPU</option>
                                     <option value="nVidia GPU">nVidia GPU</option>
                                     <option value="Wildcard">Wildcard</option>
-                                </select>
-                            </div>
-                            <div class="col-auto">
-                                <select id="user_create_hardware_selector" class="form-select hardware_list"
-                                        aria-label="user_create_hardware" required>
-                                    <!-- Will be populated by system.js -->
                                 </select>
                             </div>
                             <div class="col">
@@ -363,6 +396,22 @@
                                 <label for="user_create_live_stats_link" class="visually-hidden">Live Stats Link</label>
                                 <input id="user_create_live_stats_link" class="form-control" type="url"
                                        placeholder="Live Stats Link" aria-label="Live Stats Link">
+                            </div>
+                            <div class="col-auto">
+                                <select id="user_create_hardware_selector" class="form-select hardware_list"
+                                        aria-label="user_create_hardware_selector" required>
+                                    <!-- Will be populated by system.js -->
+                                </select>
+                            </div>
+                            <div class="col-auto">
+                                <select id="user_create_team_selector" class="form-select team_list"
+                                        aria-label="user_create_team_selector" required>
+                                    <!-- Will be populated by system.js -->
+                                </select>
+                            </div>
+                            <div class="mb-3 form-check">
+                                <label for="user_create_is_captain" class="form-check-label">Team Captain</label>
+                                <input id="user_create_is_captain" type="checkbox" class="form-check-input">
                             </div>
                         </form>
                     </div>
@@ -422,12 +471,6 @@
                                     <option value="Wildcard">Wildcard</option>
                                 </select>
                             </div>
-                            <div class="col-auto user_update" style="display:none;">
-                                <select id="user_update_hardware_selector" class="form-select hardware_list"
-                                        aria-label="user_update_hardware" required>
-                                    <!-- Will be populated by system.js -->
-                                </select>
-                            </div>
                             <div class="col user_update" style="display:none;">
                                 <label for="user_update_profile_link" class="visually-hidden">Profile Link</label>
                                 <input id="user_update_profile_link" class="form-control" type="url"
@@ -437,6 +480,22 @@
                                 <label for="user_update_live_stats_link" class="visually-hidden">Live Stats Link</label>
                                 <input id="user_update_live_stats_link" class="form-control" type="url"
                                        placeholder="Live Stats Link" aria-label="Live Stats Link">
+                            </div>
+                            <div class="col-auto user_update" style="display:none;">
+                                <select id="user_update_hardware_selector" class="form-select hardware_list"
+                                        aria-label="user_update_hardware_selector" required>
+                                    <!-- Will be populated by system.js -->
+                                </select>
+                            </div>
+                            <div class="col-auto user_update" style="display:none;">
+                                <select id="user_update_team_selector" class="form-select team_list"
+                                        aria-label="user_update_team_selector" required>
+                                    <!-- Will be populated by system.js -->
+                                </select>
+                            </div>
+                            <div class="mb-3 form-check user_update" style="display:none;">
+                                <label for="user_update_is_captain" class="form-check-label">Team Captain</label>
+                                <input id="user_update_is_captain" type="checkbox" class="form-check-input">
                             </div>
                         </form>
                     </div>
@@ -495,12 +554,6 @@
                                     <option value="Wildcard">Wildcard</option>
                                 </select>
                             </div>
-                            <div class="col-auto user_delete" style="display:none;">
-                                <select id="user_delete_hardware_selector" class="form-select hardware_list"
-                                        aria-label="user_delete_hardware" required>
-                                    <!-- Will be populated by system.js -->
-                                </select>
-                            </div>
                             <div class="col user_delete" style="display:none;">
                                 <label for="user_delete_profile_link" class="visually-hidden">Profile Link</label>
                                 <input id="user_delete_profile_link" class="form-control" type="url"
@@ -510,6 +563,22 @@
                                 <label for="user_delete_live_stats_link" class="visually-hidden">Live Stats Link</label>
                                 <input id="user_delete_live_stats_link" class="form-control" type="url"
                                        placeholder="Live Stats Link" aria-label="Live Stats Link" disabled>
+                            </div>
+                            <div class="col-auto user_delete" style="display:none;">
+                                <select id="user_delete_hardware_selector" class="form-select hardware_list"
+                                        aria-label="user_delete_hardware_selector" disabled>
+                                    <!-- Will be populated by system.js -->
+                                </select>
+                            </div>
+                            <div class="col-auto user_delete" style="display:none;">
+                                <select id="user_delete_team_selector" class="form-select team_list"
+                                        aria-label="user_delete_team_selector" disabled>
+                                    <!-- Will be populated by system.js -->
+                                </select>
+                            </div>
+                            <div class="mb-3 form-check user_delete" style="display:none;">
+                                <label for="user_delete_is_captain" class="form-check-label">Team Captain</label>
+                                <input id="user_delete_is_captain" type="checkbox" class="form-check-input" disabled>
                             </div>
                         </form>
                     </div>
@@ -569,43 +638,6 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <div id="admin_functions_team" class="collapse">
-        <h2 class="navbar-brand">Team Admin Functions</h2>
-        <form id="create_team_form" class="row g-3" onsubmit="createTeam(); return false;" action="">
-            <div class="col-auto">
-                <button type="submit" class="btn btn-primary mb-3">Create Team</button>
-            </div>
-            <div class="col-auto">
-                <label for="create_team_name" class="visually-hidden">Team Name</label>
-                <input id="create_team_name" class="form-control" type="text"
-                       placeholder="Team Name" aria-label="Team Name" required>
-            </div>
-            <div class="col-auto">
-                <label for="create_team_description" class="visually-hidden">Team Description</label>
-                <input id="create_team_description" class="form-control" type="text"
-                       placeholder="Team Description" aria-label="Team Description">
-            </div>
-            <div class="col-auto">
-                <label for="create_team_forum_link" class="visually-hidden">Forum Link</label>
-                <input id="create_team_forum_link" class="form-control" type="url" placeholder="Forum Link"
-                       aria-label="Forum Link">
-            </div>
-            <div class="col-auto">
-                <input id="create_team_captain" class="form-control" list="available_users"
-                       placeholder="Captain">
-                <datalist id="available_users">
-                    <!-- Will be populated by system.js -->
-                </datalist>
-            </div>
-            <div class="col-auto mb-3">
-                <select id="create_team_users" class="form-select" multiple
-                        aria-label="Team Users">
-                    <!-- Will be populated by system.js -->
-                </select>
-            </div>
-        </form>
     </div>
 </div>
 

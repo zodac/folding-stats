@@ -7,10 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
-import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -37,22 +34,17 @@ public class UserResult {
     private int rankInTeam;
     private String profileLink;
     private String liveStatsLink;
-    private boolean isRetired;
 
     // Not ranked to begin with, will be updated by the calling class
-    public static UserResult createWithNoRank(final int id, final String displayName, final String foldingName, final Hardware hardware, final String category, final long points, final long pointsWithoutMultiplier, final int units, final String profileLink, final String liveStatsLink, final boolean isRetired) {
-        return new UserResult(id, displayName, foldingName, hardware, category, points, pointsWithoutMultiplier, units, DEFAULT_USER_RANK, profileLink, liveStatsLink, isRetired);
+    public static UserResult create(final int id, final String displayName, final String foldingName, final Hardware hardware, final String category, final long points, final long multipliedPoints, final int units, final String profileLink, final String liveStatsLink) {
+        return new UserResult(id, displayName, foldingName, hardware, category, points, multipliedPoints, units, DEFAULT_USER_RANK, profileLink, liveStatsLink);
     }
 
     public static UserResult empty(final String userName) {
-        return new UserResult(0, userName, "", null, "", DEFAULT_POINTS, DEFAULT_MULTIPLIED_POINTS, DEFAULT_UNITS, DEFAULT_USER_RANK, "", "", false);
+        return new UserResult(0, userName, "", null, "", DEFAULT_POINTS, DEFAULT_MULTIPLIED_POINTS, DEFAULT_UNITS, DEFAULT_USER_RANK, "", "");
     }
 
     public static UserResult updateWithRankInTeam(final UserResult userResult, final int teamRank) {
-        return new UserResult(userResult.id, userResult.displayName, userResult.foldingName, userResult.hardware, userResult.category, userResult.points, userResult.multipliedPoints, userResult.units, teamRank, userResult.profileLink, userResult.liveStatsLink, userResult.isRetired);
-    }
-
-    public static UserResult createForRetiredUser(final User retiredUser, final Hardware retiredUserHardware, final RetiredUserTcStats retiredUserTcStats) {
-        return new UserResult(retiredUserTcStats.getUserId(), retiredUserTcStats.getDisplayUserName(), retiredUserTcStats.getDisplayUserName(), retiredUserHardware, Category.get(retiredUser.getCategory()).displayName(), retiredUserTcStats.getPoints(), retiredUserTcStats.getMultipliedPoints(), retiredUserTcStats.getUnits(), DEFAULT_USER_RANK, retiredUser.getProfileLink(), retiredUser.getLiveStatsLink(), true);
+        return new UserResult(userResult.id, userResult.displayName, userResult.foldingName, userResult.hardware, userResult.category, userResult.points, userResult.multipliedPoints, userResult.units, teamRank, userResult.profileLink, userResult.liveStatsLink);
     }
 }

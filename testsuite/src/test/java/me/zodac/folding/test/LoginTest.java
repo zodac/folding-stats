@@ -25,7 +25,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class LoginTest {
 
-    // TODO: Move URL, HTTP_CLIENT and GSON to a util class so it's only defined in a single place
     private static final LoginRequestSender LOGIN_REQUEST_SENDER = LoginRequestSender.create(FOLDING_URL);
 
     @Test

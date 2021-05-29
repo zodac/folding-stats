@@ -1,12 +1,14 @@
 package me.zodac.folding.test;
 
 import me.zodac.folding.api.tc.Category;
+import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.tc.CompetitionResult;
 import me.zodac.folding.rest.api.tc.TeamResult;
 import me.zodac.folding.rest.api.tc.UserResult;
+import me.zodac.folding.test.utils.rest.request.HardwareUtils;
 import me.zodac.folding.test.utils.rest.request.StubbedFoldingEndpointUtils;
 import me.zodac.folding.test.utils.rest.request.TeamCompetitionStatsUtils;
 import me.zodac.folding.test.utils.rest.request.TeamUtils;
@@ -22,14 +24,16 @@ import java.net.http.HttpResponse;
 
 import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForComplexTests;
 import static me.zodac.folding.test.utils.TestAuthenticationData.ADMIN_USER;
-import static me.zodac.folding.test.utils.TestGenerator.generateTeamWithUserIds;
+import static me.zodac.folding.test.utils.TestGenerator.generateHardware;
+import static me.zodac.folding.test.utils.TestGenerator.generateTeam;
 import static me.zodac.folding.test.utils.TestGenerator.generateUserWithCategory;
+import static me.zodac.folding.test.utils.TestGenerator.nextUserName;
 import static me.zodac.folding.test.utils.rest.request.TeamCompetitionStatsUtils.TEAM_COMPETITION_REQUEST_SENDER;
 import static me.zodac.folding.test.utils.rest.request.TeamCompetitionStatsUtils.getActiveUserFromTeam;
 import static me.zodac.folding.test.utils.rest.request.TeamCompetitionStatsUtils.getTeamFromCompetition;
 import static me.zodac.folding.test.utils.rest.request.TeamCompetitionStatsUtils.manuallyResetStats;
 import static me.zodac.folding.test.utils.rest.request.TeamCompetitionStatsUtils.manuallyUpdateStats;
-import static me.zodac.folding.test.utils.rest.request.TeamUtils.TEAM_REQUEST_SENDER;
+import static me.zodac.folding.test.utils.rest.request.UserUtils.USER_REQUEST_SENDER;
 import static me.zodac.folding.test.utils.rest.request.UserUtils.createOrConflict;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -62,14 +66,31 @@ public class ResetTest {
     }
 
     @Test
-    public void whenResetOccurs_andTeamHasRetiredUsers_thenRetiredUsersAreRemovedOnReset() throws FoldingRestException {
-        final User captainUser = generateUserWithCategory(Category.NVIDIA_GPU);
-        final User userToRetire = generateUserWithCategory(Category.AMD_GPU);
-        final int captainUserId = createOrConflict(captainUser).getId();
-        final int userToRetireId = createOrConflict(userToRetire).getId();
+    public void whenResetOccurs_andRetiredStatsExistForTeam_thenRetiredStatsAreRemovedOnReset() throws FoldingRestException {
+        final Hardware hardware = HardwareUtils.createOrConflict(generateHardware());
+        final Team team = TeamUtils.createOrConflict(generateTeam());
 
-        final Team team = generateTeamWithUserIds(captainUserId, userToRetireId);
-        final int teamId = TeamUtils.createOrConflict(team).getId();
+        final User captainUser = User.builder()
+                .foldingUserName(nextUserName())
+                .displayName("displayName")
+                .passkey("DummyPasskey12345678901234567890")
+                .category(Category.NVIDIA_GPU.displayName())
+                .hardwareId(hardware.getId())
+                .teamId(team.getId())
+                .userIsCaptain(true)
+                .build();
+        createOrConflict(captainUser);
+
+        final User userToRetire = User.builder()
+                .foldingUserName(nextUserName())
+                .displayName("displayName")
+                .passkey("DummyPasskey12345678901234567890")
+                .category(Category.AMD_GPU.displayName())
+                .hardwareId(hardware.getId())
+                .teamId(team.getId())
+                .build();
+
+        final int userToRetireId = createOrConflict(userToRetire).getId();
 
         manuallyUpdateStats();
 
@@ -84,7 +105,7 @@ public class ResetTest {
                 .as("Expected no retired users at start: " + teamResult)
                 .isEmpty();
 
-        TEAM_REQUEST_SENDER.retireUser(teamId, userToRetireId, ADMIN_USER.userName(), ADMIN_USER.password());
+        USER_REQUEST_SENDER.delete(userToRetireId, ADMIN_USER.userName(), ADMIN_USER.password());
         manuallyUpdateStats();
 
         final CompetitionResult resultAfterRetirement = TeamCompetitionStatsUtils.getStats();
@@ -115,15 +136,22 @@ public class ResetTest {
 
     @Test
     public void whenResetOccurs_thenStatsAreResetForCompetitionAndTeamsAndUsers() throws FoldingRestException {
-        final User firstUser = generateUserWithCategory(Category.NVIDIA_GPU);
-        final User secondUser = generateUserWithCategory(Category.AMD_GPU);
-        final User thirdUser = generateUserWithCategory(Category.AMD_GPU);
-        final int firstUserId = createOrConflict(firstUser).getId();
-        final int secondUserId = createOrConflict(secondUser).getId();
-        final int thirdUserId = createOrConflict(thirdUser).getId();
+        final Team firstTeam = TeamUtils.createOrConflict(generateTeam());
 
-        final Team firstTeam = TeamUtils.createOrConflict(generateTeamWithUserIds(firstUserId, secondUserId));
-        final Team secondTeam = TeamUtils.createOrConflict(generateTeamWithUserIds(thirdUserId));
+        final User firstUser = generateUserWithCategory(Category.NVIDIA_GPU);
+        firstUser.setUserIsCaptain(true);
+        firstUser.setTeamId(firstTeam.getId());
+        createOrConflict(firstUser);
+
+        final User secondUser = generateUserWithCategory(Category.AMD_GPU);
+        secondUser.setTeamId(firstTeam.getId());
+        createOrConflict(secondUser);
+
+        final Team secondTeam = TeamUtils.createOrConflict(generateTeam());
+        final User thirdUser = generateUserWithCategory(Category.AMD_GPU);
+        thirdUser.setUserIsCaptain(true);
+        thirdUser.setTeamId(secondTeam.getId());
+        createOrConflict(thirdUser);
 
         final long firstUserPoints = 10_000L;
         final long secondUserPoints = 7_000L;

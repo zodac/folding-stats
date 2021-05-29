@@ -2,6 +2,7 @@ package me.zodac.folding.api.tc;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,10 +16,10 @@ import me.zodac.folding.api.Identifiable;
  * Though we cannot verify that externally, we only allow each {@link User} a single {@link Hardware} at a time.
  * <p>
  * Each {@link User} can join a {@link Team} in order to have their Folding@Home stats retrieved, and they can contribute to the <code>Team Competition</code>.
- * However, this {@link User} object holds no reference to which team they are on (if any).
  */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
 @Getter
 @Setter
 @EqualsAndHashCode
@@ -39,10 +40,11 @@ public class User implements Identifiable {
     private String displayName;
     private String passkey;
     private String category;
-    private int hardwareId;
     private String profileLink;
     private String liveStatsLink;
-    private boolean isRetired;
+    private int hardwareId;
+    private int teamId;
+    private boolean userIsCaptain;
 
     /**
      * Creates a {@link User}.
@@ -54,14 +56,17 @@ public class User implements Identifiable {
      * @param displayName     the display name for the <code>Team Competition</code>
      * @param passkey         the Folding@Home passkey for this user
      * @param category        the {@link Category} the user is eligible for when added to a {@link Team}
-     * @param hardwareId      the ID of the {@link Hardware} that this {@link User} is Folding on
      * @param profileLink     a URL linking to the {@link User}'s profile on their forum
      * @param liveStatsLink   a URL linking to the live Folding@Home stats (HFM, for example) for the {@link User}
-     * @param isRetired       whether the user has been retired from a team
+     * @param hardwareId      the ID of the {@link Hardware} that this {@link User} is Folding on
+     * @param teamId          the ID of the {@link Team} that the {@link User} is Folding for
+     * @param isCaptain       whether the {@link User} is the captain of their {@link Team}
      * @return the created {@link User}
      */
-    public static User create(final int userId, final String foldingUserName, final String displayName, final String passkey, final Category category, final int hardwareId, final String profileLink, final String liveStatsLink, final boolean isRetired) {
-        return new User(userId, foldingUserName, displayName, passkey, category.displayName(), hardwareId, profileLink, liveStatsLink, isRetired);
+    public static User create(final int userId, final String foldingUserName, final String displayName, final String passkey, final Category category, final String profileLink, final String liveStatsLink, final int hardwareId, final int teamId, final boolean isCaptain) {
+        final String profileLinkOrNull = isEmpty(profileLink) ? null : profileLink;
+        final String liveStatsLinkOrNull = isEmpty(liveStatsLink) ? null : liveStatsLink;
+        return new User(userId, foldingUserName, displayName, passkey, category.displayName(), profileLinkOrNull, liveStatsLinkOrNull, hardwareId, teamId, isCaptain);
     }
 
     /**
@@ -73,16 +78,17 @@ public class User implements Identifiable {
      * @param displayName     the display name for the <code>Team Competition</code>
      * @param passkey         the Folding@Home passkey for this user
      * @param category        the {@link Category} the user is eligible for when added to a {@link Team}
-     * @param hardwareId      the ID of the {@link Hardware} that this {@link User} is Folding on
      * @param profileLink     a URL linking to the {@link User}'s profile on their forum
      * @param liveStatsLink   a URL linking to the live Folding@Home stats (HFM, for example) for the {@link User}
-     * @param isRetired       whether the user has been retired from a team
+     * @param hardwareId      the ID of the {@link Hardware} that this {@link User} is Folding on
+     * @param teamId          the ID of the {@link Team} that the {@link User} is Folding for
+     * @param isCaptain       whether the {@link User} is the captain of their {@link Team}
      * @return the created {@link User}
      */
-    public static User createWithoutId(final String foldingUserName, final String displayName, final String passkey, final Category category, final int hardwareId, final String profileLink, final String liveStatsLink, final boolean isRetired) {
+    public static User createWithoutId(final String foldingUserName, final String displayName, final String passkey, final Category category, final String profileLink, final String liveStatsLink, final int hardwareId, final int teamId, final boolean isCaptain) {
         final String profileLinkOrNull = isEmpty(profileLink) ? null : profileLink;
         final String liveStatsLinkOrNull = isEmpty(liveStatsLink) ? null : liveStatsLink;
-        return new User(EMPTY_USER_ID, foldingUserName, displayName, passkey, category.displayName(), hardwareId, profileLinkOrNull, liveStatsLinkOrNull, isRetired);
+        return new User(EMPTY_USER_ID, foldingUserName, displayName, passkey, category.displayName(), profileLinkOrNull, liveStatsLinkOrNull, hardwareId, teamId, isCaptain);
     }
 
     /**
@@ -98,37 +104,7 @@ public class User implements Identifiable {
     public static User updateWithId(final int userId, final User user) {
         final String profileLink = isEmpty(user.profileLink) ? null : user.profileLink;
         final String liveStatsLink = isEmpty(user.liveStatsLink) ? null : user.liveStatsLink;
-        return new User(userId, user.foldingUserName, user.displayName, user.passkey, user.category, user.hardwareId, profileLink, liveStatsLink, user.isRetired);
-    }
-
-    /**
-     * Retire the given {@link User}.
-     * <p>
-     * While a {@link User} may be retired from a {@link Team}, we want to keep their historic stats. So rather than simply delete it, we mark it as retired, which allows us
-     * to skip them from Folding@Home stats retrieval in future.
-     *
-     * @param user the {@link User} to be retired
-     * @return the retired {@link User}
-     */
-    public static User retireUser(final User user) {
-        final String profileLink = isEmpty(user.profileLink) ? null : user.profileLink;
-        final String liveStatsLink = isEmpty(user.liveStatsLink) ? null : user.liveStatsLink;
-        return new User(user.id, user.foldingUserName, user.displayName, user.passkey, user.category, user.hardwareId, profileLink, liveStatsLink, true);
-    }
-
-    /**
-     * Un-retire the given {@link User}.
-     * <p>
-     * A previously-retired {@link User} may have been retired from a {@link Team}, but then choose to return to their {@link Team} (or another one).
-     * Since a retired {@link User}'s Folding@Home stats retrieval is skipped, we need to mark them as un-retired to retrieve their Folding@Home stats again.
-     *
-     * @param user the {@link User} to be un-retired
-     * @return the un-retired {@link User}
-     */
-    public static User unretireUser(final User user) {
-        final String profileLink = isEmpty(user.profileLink) ? null : user.profileLink;
-        final String liveStatsLink = isEmpty(user.liveStatsLink) ? null : user.liveStatsLink;
-        return new User(user.id, user.foldingUserName, user.displayName, user.passkey, user.category, user.hardwareId, profileLink, liveStatsLink, false);
+        return new User(userId, user.foldingUserName, user.displayName, user.passkey, user.category, profileLink, liveStatsLink, user.hardwareId, user.teamId, user.userIsCaptain);
     }
 
     /**
@@ -142,7 +118,7 @@ public class User implements Identifiable {
     public static User hidePasskey(final User user) {
         final String profileLink = isEmpty(user.profileLink) ? null : user.profileLink;
         final String liveStatsLink = isEmpty(user.liveStatsLink) ? null : user.liveStatsLink;
-        return new User(user.id, user.foldingUserName, user.displayName, hidePasskey(user.passkey), user.category, user.hardwareId, profileLink, liveStatsLink, user.isRetired);
+        return new User(user.id, user.foldingUserName, user.displayName, hidePasskey(user.passkey), user.category, profileLink, liveStatsLink, user.hardwareId, user.teamId, user.userIsCaptain);
     }
 
     private static String hidePasskey(final String passkey) {

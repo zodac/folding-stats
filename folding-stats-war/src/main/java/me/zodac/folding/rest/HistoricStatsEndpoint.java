@@ -3,6 +3,7 @@ package me.zodac.folding.rest;
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.tc.Team;
+import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.exception.TeamNotFoundException;
 import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.ejb.BusinessLogic;
@@ -263,11 +264,11 @@ public class HistoricStatsEndpoint {
 
             final Team team = businessLogic.getTeam(Integer.parseInt(teamId));
             final List<HistoricStats> teamHourlyStats = new ArrayList<>();
+            final Collection<User> teamUsers = businessLogic.getUsersOnTeam(team);
 
-            for (final Integer userId : team.getUserIds()) {
-                LOGGER.debug("Getting historic stats for user with ID: {}", userId);
-                businessLogic.getUser(userId); // Check if user exists first, catch UserNotFoundException early
-                final Collection<HistoricStats> dailyStats = businessLogic.getHistoricStatsHourly(userId, Integer.parseInt(day), Month.of(Integer.parseInt(month)), Year.parse(year));
+            for (final User user : teamUsers) {
+                LOGGER.debug("Getting historic stats for user with ID: {}", user.getId());
+                final Collection<HistoricStats> dailyStats = businessLogic.getHistoricStatsHourly(user.getId(), Integer.parseInt(day), Month.of(Integer.parseInt(month)), Year.parse(year));
                 teamHourlyStats.addAll(dailyStats);
             }
 
@@ -330,11 +331,11 @@ public class HistoricStatsEndpoint {
         try {
             final Team team = businessLogic.getTeam(Integer.parseInt(teamId));
             final List<HistoricStats> teamDailyStats = new ArrayList<>();
+            final Collection<User> teamUsers = businessLogic.getUsersOnTeam(team);
 
-            for (final Integer userId : team.getUserIds()) {
-                LOGGER.debug("Getting historic stats for user with ID: {}", userId);
-                businessLogic.getUser(userId); // Check if user exists first, catch UserNotFoundException early
-                final Collection<HistoricStats> dailyStats = businessLogic.getHistoricStatsDaily(userId, Month.of(Integer.parseInt(month)), Year.parse(year));
+            for (final User user : teamUsers) {
+                LOGGER.debug("Getting historic stats for user with ID: {}", user.getId());
+                final Collection<HistoricStats> dailyStats = businessLogic.getHistoricStatsDaily(user.getId(), Month.of(Integer.parseInt(month)), Year.parse(year));
                 teamDailyStats.addAll(dailyStats);
             }
 
@@ -387,7 +388,7 @@ public class HistoricStatsEndpoint {
     @Path("/teams/{teamId}/{year}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTeamHistoricStatsMonthly(@PathParam("teamId") final String teamId, @PathParam("year") final String year, @Context final Request request) {
-        LOGGER.debug("GET request received to show monthly TC team stats at '{}'", uriContext.getAbsolutePath());
+        LOGGER.info("GET request received to show monthly TC team stats at '{}'", uriContext.getAbsolutePath());
 
         if (SystemStateManager.current().isReadBlocked()) {
             LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
@@ -397,11 +398,11 @@ public class HistoricStatsEndpoint {
         try {
             final Team team = businessLogic.getTeam(Integer.parseInt(teamId));
             final List<HistoricStats> teamMonthlyStats = new ArrayList<>();
+            final Collection<User> teamUsers = businessLogic.getUsersOnTeam(team);
 
-            for (final Integer userId : team.getUserIds()) {
-                LOGGER.debug("Getting historic stats for user with ID: {}", userId);
-                businessLogic.getUser(userId); // Check if user exists first, catch UserNotFoundException early
-                final Collection<HistoricStats> monthlyStats = businessLogic.getHistoricStatsMonthly(userId, Year.parse(year));
+            for (final User user : teamUsers) {
+                LOGGER.debug("Getting historic stats for user with ID: {}", user.getId());
+                final Collection<HistoricStats> monthlyStats = businessLogic.getHistoricStatsMonthly(user.getId(), Year.parse(year));
                 teamMonthlyStats.addAll(monthlyStats);
             }
 

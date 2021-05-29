@@ -25,13 +25,17 @@ public class TestDbConnectionPool implements DbConnectionPool {
 
     private final DataSource dataSource;
 
-    public TestDbConnectionPool() {
+    private TestDbConnectionPool() {
         try {
             dataSource = EmbeddedPostgres.builder().start().getPostgresDatabase();
             createDatabaseTables();
         } catch (final Exception e) {
             throw new AssertionError("Unable to start test DB", e);
         }
+    }
+
+    public static TestDbConnectionPool create() {
+        return new TestDbConnectionPool();
     }
 
     @Override

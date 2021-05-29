@@ -21,7 +21,6 @@ import javax.ejb.Timer;
 import javax.ejb.TimerService;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Optional;
 
 /**
  * {@link Startup} EJB which schedules the <code>Team Competition</code> stats retrieval for the system. By default, the
@@ -111,34 +110,19 @@ public class TeamCompetitionStatsScheduler {
 
     public void parseTcStatsForTeam(final Team team, final ExecutionType executionType) {
         LOGGER.debug("Getting TC stats for users in team {}", team.getTeamName());
+        final Collection<User> teamUsers = getUsersOnTeam(team);
 
-        for (final int userId : team.getUserIds()) {
-            final Optional<User> user = getTcUser(userId);
-            if (user.isEmpty()) {
-                LOGGER.warn("Error finding user with ID: {}", userId);
-                continue;
-            }
-
-            if (executionType == ExecutionType.ASYNCHRONOUS) {
-                userTeamCompetitionStatsParser.parseTcStatsForUser(user.get());
-            } else {
-                userTeamCompetitionStatsParser.parseTcStatsForUserAndWait(user.get());
-            }
+        if (teamUsers.isEmpty()) {
+            LOGGER.warn("No users for team '{}'", team.getTeamName());
+            return;
         }
-    }
 
-    private Optional<User> getTcUser(final int userId) {
-        try {
-            final User user = businessLogic.getUser(userId);
-
-            if (user.isRetired()) {
-                LOGGER.warn("TC user was retired, was expecting active user: {}", user);
-                return Optional.empty();
+        for (final User user : teamUsers) {
+            if (executionType == ExecutionType.ASYNCHRONOUS) {
+                userTeamCompetitionStatsParser.parseTcStatsForUser(user);
+            } else {
+                userTeamCompetitionStatsParser.parseTcStatsForUserAndWait(user);
             }
-            return Optional.of(user);
-        } catch (final Exception e) {
-            LOGGER.warn("Unable to get TC user with ID: {}", userId, e);
-            return Optional.empty();
         }
     }
 
@@ -146,7 +130,18 @@ public class TeamCompetitionStatsScheduler {
         try {
             return businessLogic.getAllTeams();
         } catch (final FoldingException e) {
-            LOGGER.warn("Error retrieving TC teams", e);
+            LOGGER.debug("Error retrieving TC teams", e);
+            LOGGER.warn("Error retrieving TC teams");
+            return Collections.emptyList();
+        }
+    }
+
+    private Collection<User> getUsersOnTeam(final Team team) {
+        try {
+            return businessLogic.getUsersOnTeam(team);
+        } catch (final FoldingException e) {
+            LOGGER.debug("Unable to find users for team: '{}'", team.getTeamName(), e);
+            LOGGER.warn("Unable to find users for team: '{}'", team.getTeamName());
             return Collections.emptyList();
         }
     }

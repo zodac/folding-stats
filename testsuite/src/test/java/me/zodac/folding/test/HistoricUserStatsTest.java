@@ -5,6 +5,7 @@ import me.zodac.folding.client.java.response.HistoricStatsResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import me.zodac.folding.test.utils.Stats;
+import me.zodac.folding.test.utils.TestConstants;
 import me.zodac.folding.test.utils.TestGenerator;
 import me.zodac.folding.test.utils.db.DatabaseUtils;
 import me.zodac.folding.test.utils.rest.request.UserUtils;
@@ -151,8 +152,7 @@ public class HistoricUserStatsTest {
 
     @Test
     public void whenGettingHourlyStats_andInvalidUserIdIsGiven_thenResponseHasA404Status() throws FoldingRestException {
-        final int invalidId = 99;
-        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getHourlyUserStats(invalidId, Year.parse("2020"), Month.of(4), 12);
+        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getHourlyUserStats(TestConstants.INVALID_ID, Year.parse("2020"), Month.of(4), 12);
         assertThat(response.statusCode())
                 .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
@@ -279,8 +279,7 @@ public class HistoricUserStatsTest {
 
     @Test
     public void whenGettingDailyStats_andInvalidUserIdIsGiven_thenResponseHasA404Status() throws FoldingRestException {
-        final int invalidId = 99;
-        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getDailyUserStats(invalidId, Year.parse("2020"), Month.of(4));
+        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getDailyUserStats(TestConstants.INVALID_ID, Year.parse("2020"), Month.of(4));
         assertThat(response.statusCode())
                 .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
@@ -416,8 +415,7 @@ public class HistoricUserStatsTest {
 
     @Test
     public void whenGettingMonthlyStats_andInvalidUserIdIsGiven_thenResponseHasA404Status() throws FoldingRestException {
-        final int invalidId = 99;
-        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getMonthlyUserStats(invalidId, Year.parse("2020"));
+        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getMonthlyUserStats(TestConstants.INVALID_ID, Year.parse("2020"));
         assertThat(response.statusCode())
                 .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);

@@ -156,8 +156,8 @@ function loadUsers() {
     .then(function(jsonResponse) {
         // Build users
         jsonResponse.sort(sortJsonByKey("id"));
-        const usersHeaders = ["ID", "User", "Folding Name", "Passkey", "Category", "Hardware ID", "Profile Link", "Live Stats Link", "Retired"];
-        const usersProperties = ["id", "displayName", "foldingUserName", "passkey", "category", "hardwareId", "profileLink", "liveStatsLink", "isRetired"];
+        const usersHeaders = ["ID", "User", "Folding Name", "Passkey", "Category", "Profile Link", "Live Stats Link", "Hardware ID", "Team ID", "Is Captain"];
+        const usersProperties = ["id", "displayName", "foldingUserName", "passkey", "category", "profileLink", "liveStatsLink", "hardwareId", "teamId", "userIsCaptain"];
 
         // Empty div of existing content, if any
         usersDiv = document.getElementById("users_div");
@@ -259,10 +259,11 @@ function loadUsers() {
                 userOption.setAttribute("user_display_name", userItem['displayName']);
                 userOption.setAttribute("user_passkey", userItem['passkey']);
                 userOption.setAttribute("user_category", userItem['category']);
-                userOption.setAttribute("user_hardware_id", userItem['hardwareId']);
                 userOption.setAttribute("user_profile_link", userItem['profileLink']);
                 userOption.setAttribute("user_live_stats_link", userItem['liveStatsLink']);
-                userOption.setAttribute("user_is_retired", userItem['isRetired']);
+                userOption.setAttribute("user_hardware_id", userItem['hardwareId']);
+                userOption.setAttribute("user_team_id", userItem['teamId']);
+                userOption.setAttribute("user_is_captain", userItem['userIsCaptain']);
 
                 userOption.innerHTML = userItem["displayName"];
                 userList.append(userOption);
@@ -279,8 +280,8 @@ function loadTeams() {
     .then(function(jsonResponse) {
         // Build teams
         jsonResponse.sort(sortJsonByKey("id"));
-        const teamsHeaders = ["ID", "Name", "Description", "Forum Link", "Captain ID", "User IDs", "Retired User IDs"];
-        const teamsProperties = ["id", "teamName", "teamDescription", "forumLink", "captainUserId", "userIds", "retiredUserIds"];
+        const teamsHeaders = ["ID", "Name", "Description", "Forum Link"];
+        const teamsProperties = ["id", "teamName", "teamDescription", "forumLink"];
 
         // Empty div of existing content, if any
         teamsDiv = document.getElementById("teams_div");
@@ -338,6 +339,36 @@ function loadTeams() {
         teamsTable.append(teamsTableBody);
 
         teamsDiv.append(teamsTable);
+
+        teamLists = document.querySelectorAll(".team_list");
+        for (var i = 0, teamList; teamList = teamLists[i]; i++) {
+            // Clear existing entries
+            while (teamList.firstChild) {
+                teamList.removeChild(teamList.lastChild);
+            }
+
+            // Add the default entry
+            defaultTeamOption = document.createElement("option");
+            defaultTeamOption.setAttribute("value", "");
+            defaultTeamOption.setAttribute("disabled", "");
+            defaultTeamOption.setAttribute("selected", "");
+            defaultTeamOption.innerHTML = "Choose Team...";
+            teamList.append(defaultTeamOption);
+
+            // Add entries
+            jsonResponse.forEach(function(teamItem, i) {
+                teamOption = document.createElement("option");
+                teamOption.setAttribute("value", teamItem['id']);
+
+                teamOption.setAttribute("team_id", teamItem['id']);
+                teamOption.setAttribute("team_name", teamItem['teamName']);
+                teamOption.setAttribute("team_description", teamItem['teamDescription']);
+                teamOption.setAttribute("team_forum_link", teamItem['forumLink']);
+
+                teamOption.innerHTML = teamItem["teamName"];
+                teamList.append(teamOption);
+            });
+        }
     })
 };
 
@@ -349,8 +380,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
     }
 
     loadHardware();
-    loadUsers();
     loadTeams();
+    loadUsers();
     updateTimer();
     hide("loader");
 });

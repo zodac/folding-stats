@@ -1,11 +1,11 @@
 package me.zodac.folding.rest;
 
 import me.zodac.folding.SystemStateManager;
-import me.zodac.folding.api.db.AuthenticationResponse;
+import me.zodac.folding.api.db.SystemUserAuthentication;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.utils.EncodingUtils;
 import me.zodac.folding.ejb.BusinessLogic;
-import me.zodac.folding.rest.api.LoginPayload;
+import me.zodac.folding.rest.api.LoginCredentials;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +41,7 @@ public class LoginEndpoint {
     @Path("/admin/")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response loginAsAdmin(final LoginPayload loginPayload) {
+    public Response loginAsAdmin(final LoginCredentials loginCredentials) {
         LOGGER.debug("Login request received");
 
         if (SystemStateManager.current().isReadBlocked()) {
@@ -49,25 +49,25 @@ public class LoginEndpoint {
             return serviceUnavailable();
         }
 
-        if (loginPayload == null || EncodingUtils.isNotBasicAuthentication(loginPayload.getEncodedUserNameAndPassword())) {
-            LOGGER.error("Invalid payload: {}", loginPayload);
-            return badRequest(loginPayload);
+        if (loginCredentials == null || EncodingUtils.isNotBasicAuthentication(loginCredentials.getEncodedUserNameAndPassword())) {
+            LOGGER.error("Invalid payload: {}", loginCredentials);
+            return badRequest(loginCredentials);
         }
 
         try {
-            final Map<String, String> decodedUserNameAndPassword = EncodingUtils.decodeBasicAuthentication(loginPayload.getEncodedUserNameAndPassword());
+            final Map<String, String> decodedUserNameAndPassword = EncodingUtils.decodeBasicAuthentication(loginCredentials.getEncodedUserNameAndPassword());
             final String userName = decodedUserNameAndPassword.get(EncodingUtils.DECODED_USERNAME_KEY);
             final String password = decodedUserNameAndPassword.get(EncodingUtils.DECODED_PASSWORD_KEY);
             LOGGER.debug("Login request received for user: '{}'", userName);
 
-            final AuthenticationResponse authenticationResponse = businessLogic.isValidUser(userName, password);
+            final SystemUserAuthentication systemUserAuthentication = businessLogic.isValidUser(userName, password);
 
-            if (!authenticationResponse.isUserExists() || !authenticationResponse.isPasswordMatch()) {
-                LOGGER.warn("Invalid user credentials supplied: {}", loginPayload);
+            if (!systemUserAuthentication.isUserExists() || !systemUserAuthentication.isPasswordMatch()) {
+                LOGGER.warn("Invalid user credentials supplied: {}", loginCredentials);
                 return unauthorized();
             }
 
-            if (!authenticationResponse.isAdmin()) {
+            if (!systemUserAuthentication.isAdmin()) {
                 LOGGER.warn("User '{}' is not an admin", userName);
                 return forbidden();
             }
@@ -79,7 +79,7 @@ public class LoginEndpoint {
             return serverError();
         } catch (final IllegalArgumentException e) {
             LOGGER.error("Encoded user name and password was not a valid Base64 string", e);
-            return badRequest(loginPayload);
+            return badRequest(loginCredentials);
         } catch (final Exception e) {
             LOGGER.error("Unexpected error validating user credentials", e);
             return serverError();

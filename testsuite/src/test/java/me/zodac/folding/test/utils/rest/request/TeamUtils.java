@@ -86,37 +86,4 @@ public final class TeamUtils {
 
         throw new FoldingRestException(String.format("Invalid response (%s) when getting team with ID %s: %s", response.statusCode(), teamId, response.body()));
     }
-
-    /**
-     * Retires a {@link me.zodac.folding.api.tc.User} from a {@link Team}.
-     *
-     * @param teamId the ID of the {@link Team}
-     * @param userId the ID of the {@link me.zodac.folding.api.tc.User} to retire
-     * @return the retired {@link me.zodac.folding.api.tc.User} ID
-     * @throws FoldingRestException thrown if an error occurs retiring the {@link me.zodac.folding.api.tc.User}
-     */
-    public static int retireUser(final int teamId, final int userId) throws FoldingRestException {
-        final HttpResponse<String> response = TEAM_REQUEST_SENDER.retireUser(teamId, userId, ADMIN_USER.userName(), ADMIN_USER.password());
-        if (response.statusCode() == HttpURLConnection.HTTP_OK) {
-            return TeamResponseParser.retireUser(response).getRetiredUserIds().iterator().next();
-        }
-
-        throw new FoldingRestException(String.format("Invalid response (%s) when retiring user with ID %s from team with ID %s: %s", response.statusCode(), userId, teamId, response.body()));
-    }
-
-    /**
-     * Un-retires a {@link me.zodac.folding.api.tc.User}, and adds them to a {@link Team}.
-     *
-     * @param teamId        the ID of the {@link Team}
-     * @param retiredUserId the ID of the retired{@link me.zodac.folding.api.tc.User} to un-retire
-     * @return the updated {@link Team}
-     * @throws FoldingRestException thrown if an error occurs un-retiring the {@link me.zodac.folding.api.tc.User}
-     */
-    public static Team unretireUser(final int teamId, final int retiredUserId) throws FoldingRestException {
-        final HttpResponse<String> response = TEAM_REQUEST_SENDER.unretireUser(teamId, retiredUserId, ADMIN_USER.userName(), ADMIN_USER.password());
-        if (response.statusCode() == HttpURLConnection.HTTP_OK) {
-            return TeamResponseParser.unretireUser(response);
-        }
-        throw new FoldingRestException(String.format("Invalid response (%s) when un-retiring user with ID %s from team with ID %s: %s", response.statusCode(), retiredUserId, teamId, response.body()));
-    }
 }

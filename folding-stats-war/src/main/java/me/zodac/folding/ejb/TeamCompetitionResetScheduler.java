@@ -6,9 +6,11 @@ import me.zodac.folding.api.db.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.tc.exception.TeamNotFoundException;
 import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.utils.EnvironmentVariables;
+import me.zodac.folding.cache.RetiredTcStatsCache;
+import me.zodac.folding.cache.TcStatsCache;
+import me.zodac.folding.cache.TotalStatsCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +20,7 @@ import javax.ejb.Schedule;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import java.util.Collection;
-import java.util.Map;
+import java.util.Collections;
 
 /**
  * {@link Startup} EJB which schedules the monthly reset of the <code>Team Competition</code>. The reset will occur once
@@ -75,45 +77,44 @@ public class TeamCompetitionResetScheduler {
             return;
         }
 
-        final Map<Integer, User> usersById = businessLogic.getActiveTcUsers(teams);
-        if (usersById.isEmpty()) {
-            LOGGER.error("No TC users configured in system!");
+        final Collection<User> users = getAllUsers();
+        if (users.isEmpty()) {
+            LOGGER.error("No TC users configured in system to reset!");
             return;
         }
 
-        resetStats(usersById.values());
+        resetStats(users);
         clearOffsets();
-        removeRetiredUsersFromTeams(teams);
-    }
+        resetCaches();
 
-    private void removeRetiredUsersFromTeams(final Collection<Team> teams) {
-        LOGGER.debug("Removing retired users from teams");
-        for (final Team team : teams) {
-            try {
-                businessLogic.getTeam(team.getId());
-
-                if (team.getRetiredUserIds().isEmpty()) {
-                    LOGGER.debug("No retired users in team '{}'", team.getTeamName());
-                    continue;
-                }
-
-                LOGGER.debug("Removing retired users from team '{}'", team.getTeamName());
-                final Team teamWithoutRetiredUsers = Team.removeRetiredUsers(team);
-                businessLogic.updateTeam(teamWithoutRetiredUsers);
-            } catch (final TeamNotFoundException e) {
-                LOGGER.debug("Error removing retired users from team, no team found with ID: {}", team.getId(), e);
-                LOGGER.warn("Error removing retired users from team, no team found with ID: {}", team.getId());
-            } catch (final FoldingConflictException e) {
-                LOGGER.warn("Error removing retired users from team, conflict found for ID: {}", team.getId(), e);
-            } catch (final FoldingException e) {
-                LOGGER.warn("Error removing retired users from team with ID: {}", team.getId(), e.getCause());
-            }
+        try {
+            LOGGER.info("Deleting retired users");
+            businessLogic.deleteRetiredUserStats();
+        } catch (final FoldingException | FoldingConflictException e) {
+            LOGGER.error("Unable to reset retired stats", e);
         }
     }
 
+    // TODO: [zodac] Go through Storage/BL, not direct to caches
+    private void resetCaches() {
+        LOGGER.info("Resetting caches");
+        TcStatsCache.get().clear();
+        TotalStatsCache.get().clear();
+        RetiredTcStatsCache.get().clear();
+    }
+
+    private Collection<User> getAllUsers() {
+        try {
+            return businessLogic.getAllUsers();
+        } catch (final FoldingException e) {
+            LOGGER.warn("Error getting all users to reset stats", e);
+            return Collections.emptyList();
+        }
+    }
 
     private void clearOffsets() {
         try {
+            LOGGER.info("Clearing offsets");
             businessLogic.clearOffsetStats();
         } catch (final FoldingException e) {
             LOGGER.warn("Error clearing offset stats for users", e.getCause());
@@ -123,16 +124,17 @@ public class TeamCompetitionResetScheduler {
     }
 
     private void resetStats(final Collection<User> usersToReset) {
+        LOGGER.info("Resetting all TC stats");
         for (final User user : usersToReset) {
             try {
-                LOGGER.info("Resetting stats for {}", user.getDisplayName());
+                LOGGER.info("Resetting TC stats for {}", user.getDisplayName());
                 businessLogic.updateInitialStatsForUser(user);
             } catch (final UserNotFoundException e) {
-                LOGGER.warn("No user found to reset stats: {}", user);
+                LOGGER.warn("No user found to reset TC stats: {}", user);
             } catch (final FoldingException e) {
-                LOGGER.warn("Error resetting stats for user: {}", user);
+                LOGGER.warn("Error resetting TC stats for user: {}", user);
             } catch (final Exception e) {
-                LOGGER.warn("Unexpected error resetting stats for user: {}", user);
+                LOGGER.warn("Unexpected error resetting TC stats for user: {}", user);
             }
         }
     }

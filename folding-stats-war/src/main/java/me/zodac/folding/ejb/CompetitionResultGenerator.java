@@ -10,10 +10,10 @@ import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.exception.HardwareNotFoundException;
 import me.zodac.folding.api.tc.exception.NoStatsAvailableException;
 import me.zodac.folding.api.tc.exception.UserNotFoundException;
-import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.cache.CompetitionResultCache;
 import me.zodac.folding.rest.api.tc.CompetitionResult;
+import me.zodac.folding.rest.api.tc.RetiredUserResult;
 import me.zodac.folding.rest.api.tc.TeamResult;
 import me.zodac.folding.rest.api.tc.UserResult;
 import org.slf4j.Logger;
@@ -25,9 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
 import static java.util.stream.Collectors.toList;
 
@@ -98,61 +96,31 @@ public class CompetitionResultGenerator {
     private TeamResult getTcTeamResult(final Team team) throws FoldingException {
         LOGGER.debug("Converting team '{}' for TC stats", team.getTeamName());
 
-        final List<UserResult> userResults = team.getUserIds()
+        final Collection<User> usersOnTeam = businessLogic.getUsersOnTeam(team);
+
+        final Collection<UserResult> activeUserResults = usersOnTeam
                 .stream()
-                .map(this::getTcUser)
-                .filter(Objects::nonNull)
+                .map(this::getTcStatsForUser)
                 .collect(toList());
 
-        try {
-            final User captain = businessLogic.getUser(team.getCaptainUserId());
-            final Set<Integer> retiredUserIds = team.getRetiredUserIds();
+        final Collection<RetiredUserResult> retiredUserResults = businessLogic.getRetiredUsersForTeam(team)
+                .stream()
+                .map(RetiredUserResult::createFromRetiredStats)
+                .collect(toList());
 
-            final List<UserResult> retiredUserResults = new ArrayList<>(retiredUserIds.size());
-
-            for (final int retiredUserId : retiredUserIds) {
-                final RetiredUserTcStats retiredUserTcStats = businessLogic.getRetiredUser(retiredUserId);
-
-                try {
-                    final User retiredUser = businessLogic.getUser(retiredUserTcStats.getUserId());
-                    final Hardware retiredUserHardware = businessLogic.getHardware(retiredUser.getHardwareId());
-                    retiredUserResults.add(UserResult.createForRetiredUser(retiredUser, retiredUserHardware, retiredUserTcStats));
-                } catch (final UserNotFoundException e) {
-                    LOGGER.debug("Unable to find retired user ID {} with original user ID: {}", retiredUserId, retiredUserTcStats.getUserId(), e);
-                    LOGGER.warn("Unable to find retired user ID {} with original user ID: {}", retiredUserId, retiredUserTcStats.getUserId());
-                    retiredUserResults.add(UserResult.empty(retiredUserTcStats.getDisplayUserName()));
-                }
-            }
-
-            return TeamResult.create(team.getTeamName(), team.getTeamDescription(), team.getForumLink(), captain.getDisplayName(), userResults, retiredUserResults);
-        } catch (final FoldingException e) {
-            LOGGER.warn("Unable to get details for team captain: {}", team, e);
-            throw e;
-        } catch (final UserNotFoundException e) {
-            LOGGER.warn("User ID not found, unexpected error: {}", team, e);
-            throw new FoldingException(String.format("User ID not found: %s", team), e);
-        } catch (final HardwareNotFoundException e) {
-            LOGGER.warn("Hardware ID not found for retired user, unexpected error: {}", team, e);
-            throw new FoldingException(String.format("Hardware ID not found for retired user: %s", team), e);
-        }
+        final String captainDisplayName = getCaptainDisplayName(usersOnTeam);
+        return TeamResult.create(team.getTeamName(), team.getTeamDescription(), team.getForumLink(), captainDisplayName, activeUserResults, retiredUserResults);
     }
 
-    private UserResult getTcUser(final int userId) {
-        if (userId == User.EMPTY_USER_ID) {
-            LOGGER.warn("User had invalid ID");
-            return null;
+    private String getCaptainDisplayName(final Collection<User> usersOnTeam) {
+        for (final User user : usersOnTeam) {
+            if (user.isUserIsCaptain()) {
+                return user.getDisplayName();
+            }
         }
 
-        try {
-            final User user = businessLogic.getUser(userId);
-            return getTcStatsForUser(user);
-        } catch (final UserNotFoundException e) {
-            LOGGER.warn("Unable to find user ID: {}", userId, e);
-            return null;
-        } catch (final FoldingException e) {
-            LOGGER.warn("Error finding user ID: {}", userId, e.getCause());
-            return null;
-        }
+        LOGGER.warn("No captain set for team");
+        return null;
     }
 
     private UserResult getTcStatsForUser(final User user) {
@@ -163,29 +131,29 @@ public class CompetitionResultGenerator {
         } catch (final HardwareNotFoundException e) {
             LOGGER.debug("No hardware found for ID: {}", user.getHardwareId(), e);
             LOGGER.warn("No hardware found for ID: {}", user.getHardwareId());
-            return null;
+            return UserResult.empty(user.getDisplayName());
         } catch (final FoldingException e) {
             LOGGER.warn("Error getting TC stats for user: {}", user, e.getCause());
-            return null;
+            return UserResult.empty(user.getDisplayName());
         }
 
         final Category category = Category.get(user.getCategory());
         if (category == Category.INVALID) {
             LOGGER.warn("Unexpectedly got an invalid category '{}' for Folding user: {}", user.getCategory(), user.getDisplayName());
-            return null;
+            return UserResult.empty(user.getDisplayName());
         }
 
         try {
             final UserTcStats userTcStats = businessLogic.getTcStatsForUser(user.getId());
             LOGGER.debug("Results for {}: {} points | {} multiplied points | {} units", user.getDisplayName(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits());
-            return UserResult.createWithNoRank(user.getId(), user.getDisplayName(), user.getFoldingUserName(), hardware, category.displayName(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits(), user.getProfileLink(), user.getLiveStatsLink(), user.isRetired());
+            return UserResult.create(user.getId(), user.getDisplayName(), user.getFoldingUserName(), hardware, category.displayName(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits(), user.getProfileLink(), user.getLiveStatsLink());
         } catch (final UserNotFoundException | NoStatsAvailableException e) {
             LOGGER.debug("No stats found for user ID: {}", user.getId(), e);
             LOGGER.warn("No stats found for user ID: {}", user.getId());
             return UserResult.empty(user.getDisplayName());
         } catch (final FoldingException e) {
             LOGGER.warn("Error getting TC stats for user: {}", user, e.getCause());
-            return null;
+            return UserResult.empty(user.getDisplayName());
         }
     }
 }

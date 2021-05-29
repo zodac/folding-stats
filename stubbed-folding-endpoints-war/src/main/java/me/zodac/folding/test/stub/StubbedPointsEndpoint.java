@@ -74,7 +74,6 @@ public class StubbedPointsEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteUserPoints() {
         pointsByUserAndPasskey.clear();
-
         return Response
                 .ok()
                 .build();

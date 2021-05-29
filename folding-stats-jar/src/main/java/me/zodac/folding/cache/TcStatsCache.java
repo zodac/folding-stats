@@ -32,4 +32,8 @@ public class TcStatsCache {
     public Optional<UserTcStats> get(final int userId) {
         return Optional.ofNullable(tcStatsByUserId.get(userId));
     }
+
+    public void clear() {
+        tcStatsByUserId.clear();
+    }
 }

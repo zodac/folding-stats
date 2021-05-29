@@ -34,11 +34,11 @@ public class RetiredTcStatsCache {
         return Optional.ofNullable(retiredTcStatsByRetiredUserId.get(retiredUserId));
     }
 
-    public boolean contains(final int retiredUserId) {
-        return retiredTcStatsByRetiredUserId.containsKey(retiredUserId);
-    }
-
     public Collection<RetiredUserTcStats> getAll() {
         return retiredTcStatsByRetiredUserId.values();
+    }
+
+    public void clear() {
+        retiredTcStatsByRetiredUserId.clear();
     }
 }

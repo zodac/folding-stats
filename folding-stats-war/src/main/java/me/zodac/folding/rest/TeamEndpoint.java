@@ -1,17 +1,9 @@
 package me.zodac.folding.rest;
 
-import me.zodac.folding.SystemStateManager;
-import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.db.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
-import me.zodac.folding.api.exception.FoldingExternalServiceException;
 import me.zodac.folding.api.tc.Team;
-import me.zodac.folding.api.tc.exception.FoldingIdInvalidException;
-import me.zodac.folding.api.tc.exception.FoldingIdOutOfRangeException;
-import me.zodac.folding.api.tc.exception.NoStatsAvailableException;
 import me.zodac.folding.api.tc.exception.NotFoundException;
-import me.zodac.folding.api.tc.exception.TeamNotFoundException;
-import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.utils.ExecutionType;
 import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.ejb.BusinessLogic;
@@ -27,7 +19,6 @@ import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -38,13 +29,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import java.util.Collection;
-
-import static me.zodac.folding.rest.response.Responses.badGateway;
-import static me.zodac.folding.rest.response.Responses.badRequest;
-import static me.zodac.folding.rest.response.Responses.notFound;
-import static me.zodac.folding.rest.response.Responses.ok;
-import static me.zodac.folding.rest.response.Responses.serverError;
-import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
 
 /**
  * REST endpoints for teams for <code>folding-stats</code>.
@@ -110,123 +94,6 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
         return super.deleteById(teamId);
     }
 
-    @PATCH
-    @RolesAllowed("admin")
-    @Path("/{teamId}/retire/{userId}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response retireUserFromTeam(@PathParam("teamId") final String teamId, @PathParam("userId") final String userId) {
-        getLogger().debug("PATCH request to retire user from team received at '{}'", uriContext.getAbsolutePath());
-
-        if (SystemStateManager.current().isWriteBlocked()) {
-            getLogger().warn("System state {} does not allow write requests", SystemStateManager.current());
-            return serviceUnavailable();
-        }
-
-        try {
-            final int parsedTeamId = ParsingUtils.parseId(teamId);
-            final int parsedUnitId = ParsingUtils.parseId(userId);
-
-            final Team team = businessLogic.getTeam(parsedTeamId);
-            final TeamValidator teamValidator = TeamValidator.create(businessLogic);
-            final ValidationResponse validationResponse = teamValidator.isValidRetirement(team, parsedUnitId);
-            if (validationResponse.isInvalid()) {
-                return badRequest(validationResponse);
-            }
-
-            final Team updatedTeam = businessLogic.retireUser(parsedTeamId, parsedUnitId);
-            SystemStateManager.next(SystemState.WRITE_EXECUTED);
-            return ok(updatedTeam);
-        } catch (final FoldingIdInvalidException e) {
-            final String errorMessage = String.format("The ID '%s' is not a valid format", e.getId());
-            getLogger().debug(errorMessage, e);
-            getLogger().error(errorMessage);
-            return badRequest(errorMessage);
-        } catch (final FoldingIdOutOfRangeException e) {
-            final String errorMessage = String.format("The ID '%s' is out of range", e.getId());
-            getLogger().debug(errorMessage, e);
-            getLogger().error(errorMessage);
-            return badRequest(errorMessage);
-        } catch (final UserNotFoundException e) {
-            getLogger().error("Error finding user with ID: {}", userId, e.getCause());
-            return notFound();
-        } catch (final TeamNotFoundException e) {
-            getLogger().error("Error finding team with ID: {}", teamId, e.getCause());
-            return notFound();
-        } catch (final FoldingException e) {
-            getLogger().error("Error updating team with ID: {}", teamId, e.getCause());
-            return serverError();
-        } catch (final FoldingConflictException e) {
-            getLogger().error("Error updating team with ID: {}", teamId, e);
-            return serverError();
-        } catch (final NoStatsAvailableException e) {
-            getLogger().error("No stats returned for user to retire with ID {}, possible invalid ID?", userId, e);
-            return serverError();
-        } catch (final Exception e) {
-            getLogger().error("Unexpected error updating team with ID: {}", teamId, e);
-            return serverError();
-        }
-    }
-
-    @PATCH
-    @RolesAllowed("admin")
-    @Path("/{teamId}/unretire/{retiredUserId}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response unretireUserFromTeam(@PathParam("teamId") final String teamId, @PathParam("retiredUserId") final String retiredUserId) {
-        getLogger().debug("PATCH request to un-retire user from team received at '{}'", uriContext.getAbsolutePath());
-
-        if (SystemStateManager.current().isWriteBlocked()) {
-            getLogger().warn("System state {} does not allow write requests", SystemStateManager.current());
-            return serviceUnavailable();
-        }
-
-        try {
-            final int parsedTeamId = ParsingUtils.parseId(teamId);
-            final int parsedRetiredUserId = ParsingUtils.parseId(retiredUserId);
-
-            final Team team = businessLogic.getTeam(parsedTeamId);
-            final TeamValidator teamValidator = TeamValidator.create(businessLogic);
-            final ValidationResponse validationResponse = teamValidator.isValidUnretirement(team, parsedRetiredUserId);
-            if (validationResponse.isInvalid()) {
-                return badRequest(validationResponse);
-            }
-
-            final Team updatedTeam = businessLogic.unretireUser(parsedTeamId, parsedRetiredUserId);
-            return ok(updatedTeam);
-        } catch (final FoldingIdInvalidException e) {
-            final String errorMessage = String.format("The ID '%s' is not a valid format", e.getId());
-            getLogger().debug(errorMessage, e);
-            getLogger().error(errorMessage);
-            return badRequest(errorMessage);
-        } catch (final FoldingIdOutOfRangeException e) {
-            final String errorMessage = String.format("The ID '%s' is out of range", e.getId());
-            getLogger().debug(errorMessage, e);
-            getLogger().error(errorMessage);
-            return badRequest(errorMessage);
-        } catch (final FoldingExternalServiceException e) {
-            final String errorMessage = String.format("Error connecting to external service at '%s': %s", e.getUrl(), e.getMessage());
-            getLogger().debug(errorMessage, e);
-            getLogger().error(errorMessage);
-            return badGateway();
-        } catch (final UserNotFoundException e) {
-            getLogger().error("Error finding retired user with ID: {}", retiredUserId, e.getCause());
-            return notFound();
-        } catch (final TeamNotFoundException e) {
-            getLogger().error("Error finding team with ID: {}", teamId, e.getCause());
-            return notFound();
-        } catch (final FoldingException e) {
-            getLogger().error("Error updating team with ID: {}", teamId, e.getCause());
-            return serverError();
-        } catch (final FoldingConflictException e) {
-            getLogger().error("Error updating team with ID: {}", teamId, e);
-            return serverError();
-        } catch (final Exception e) {
-            getLogger().error("Unexpected error updating team with ID: {}", teamId, e);
-            return serverError();
-        }
-    }
-
     @Override
     protected Logger getLogger() {
         return LOGGER;
@@ -239,7 +106,7 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
 
     @Override
     protected ValidationResponse validate(final Team element) {
-        final TeamValidator teamValidator = TeamValidator.create(businessLogic);
+        final TeamValidator teamValidator = TeamValidator.create();
         return teamValidator.isValid(element);
     }
 

@@ -32,4 +32,8 @@ public class TotalStatsCache {
     public Optional<Stats> get(final int userId) {
         return Optional.ofNullable(totalStatsByUserId.get(userId));
     }
+
+    public void clear() {
+        totalStatsByUserId.clear();
+    }
 }

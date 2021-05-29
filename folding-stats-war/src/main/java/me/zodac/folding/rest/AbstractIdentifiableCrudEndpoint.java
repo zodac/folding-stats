@@ -8,7 +8,10 @@ import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.FoldingExternalServiceException;
 import me.zodac.folding.api.tc.exception.FoldingIdInvalidException;
 import me.zodac.folding.api.tc.exception.FoldingIdOutOfRangeException;
+import me.zodac.folding.api.tc.exception.NoStatsAvailableException;
 import me.zodac.folding.api.tc.exception.NotFoundException;
+import me.zodac.folding.api.tc.exception.TeamNotFoundException;
+import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.rest.response.BatchCreateResponse;
 import org.slf4j.Logger;
@@ -58,7 +61,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
 
     protected abstract V updateElementById(final int elementId, final V element) throws FoldingException, NotFoundException, FoldingConflictException, FoldingExternalServiceException;
 
-    protected abstract void deleteElementById(final int elementId) throws FoldingConflictException, FoldingException;
+    protected abstract void deleteElementById(final int elementId) throws FoldingConflictException, FoldingException, UserNotFoundException, NoStatsAvailableException, TeamNotFoundException;
 
     protected Response create(final V element) {
         getLogger().debug("POST request received to create {} at '{}' with request: {}", elementType(), uriContext.getAbsolutePath(), element);

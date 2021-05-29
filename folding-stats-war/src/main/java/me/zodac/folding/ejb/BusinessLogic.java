@@ -1,8 +1,8 @@
 package me.zodac.folding.ejb;
 
 
-import me.zodac.folding.api.db.AuthenticationResponse;
 import me.zodac.folding.api.db.DbManager;
+import me.zodac.folding.api.db.SystemUserAuthentication;
 import me.zodac.folding.api.db.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.FoldingExternalServiceException;
@@ -43,12 +43,9 @@ import java.time.Year;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 
 /**
  * In order to decouple the REST layer from any business requirements, we move that logic into this {@link Singleton} EJB.
@@ -171,15 +168,6 @@ public class BusinessLogic {
         return getUserWithPasskey(userId, true);
     }
 
-    public User getUserOrNull(final int userId) {
-        try {
-            return getUserWithPasskey(userId, true);
-        } catch (final FoldingException | UserNotFoundException e) {
-            LOGGER.debug("Unable to find user with ID {}, returning null", userId, e);
-            return null;
-        }
-    }
-
     public User getUserWithPasskey(final int userId, final boolean showFullPasskeys) throws FoldingException, UserNotFoundException {
         try {
             final User user = userCache.get(userId);
@@ -199,15 +187,6 @@ public class BusinessLogic {
 
     public Collection<User> getAllUsers() throws FoldingException {
         return getAllUsersWithPasskeys(true);
-    }
-
-    public Collection<User> getAllUsersOrEmpty() {
-        try {
-            return getAllUsersWithPasskeys(true);
-        } catch (final FoldingException e) {
-            LOGGER.debug("Error getting all users, returning empty collection", e);
-            return Collections.emptyList();
-        }
     }
 
     public Collection<User> getAllUsersWithPasskeys(final boolean showFullPasskeys) throws FoldingException {
@@ -283,7 +262,19 @@ public class BusinessLogic {
         }
     }
 
-    public void deleteUser(final int userId) throws FoldingException, FoldingConflictException {
+    public void deleteUser(final int userId) throws FoldingConflictException, FoldingException {
+        try {
+            final User user = getUser(userId);
+            final Team team = getTeam(user.getTeamId());
+            final UserTcStats userStats = getTcStatsForUser(userId);
+            final int retiredUserId = dbManager.persistRetiredUserStats(team.getId(), user.getId(), user.getDisplayName(), userStats);
+            retiredStatsCache.add(RetiredUserTcStats.create(retiredUserId, team.getId(), user.getDisplayName(), userStats));
+
+        } catch (final UserNotFoundException | FoldingException | NoStatsAvailableException | TeamNotFoundException e) {
+            LOGGER.debug("Error getting final stats for deleted user with ID: {}", userId, e);
+            LOGGER.warn("Error getting final stats for deleted user with ID: {}", userId);
+        }
+
         dbManager.deleteUser(userId);
         userCache.remove(userId);
     }
@@ -324,15 +315,6 @@ public class BusinessLogic {
         return allTeamsFromDb;
     }
 
-    public Collection<Team> getAllTeamsOrEmpty() {
-        try {
-            return getAllTeams();
-        } catch (final FoldingException e) {
-            LOGGER.debug("Error getting all teams, returning empty", e);
-            return Collections.emptyList();
-        }
-    }
-
     public void updateTeam(final Team team) throws FoldingException, FoldingConflictException {
         dbManager.updateTeam(team);
         teamCache.add(team);
@@ -341,73 +323,6 @@ public class BusinessLogic {
     public void deleteTeam(final int teamId) throws FoldingException, FoldingConflictException {
         dbManager.deleteTeam(teamId);
         teamCache.remove(teamId);
-    }
-
-    public RetiredUserTcStats getRetiredUser(final int retiredUserId) throws FoldingException {
-        final Optional<RetiredUserTcStats> optionalRetiredUserStats = retiredStatsCache.get(retiredUserId);
-
-        if (optionalRetiredUserStats.isPresent()) {
-            return optionalRetiredUserStats.get();
-        }
-
-        LOGGER.trace("Cache miss! Retired user TC stats");
-        // Should be no need to get anything from the DB (since it should have been added to the cache when created)
-        // But adding this just in case we decide to add some cache eviction in future
-        final RetiredUserTcStats retiredUserTcStatsFromDb = dbManager.getRetiredUserStats(retiredUserId);
-        retiredStatsCache.add(retiredUserTcStatsFromDb);
-        return retiredUserTcStatsFromDb;
-    }
-
-    public Team retireUser(final int teamId, final int userId) throws FoldingConflictException, UserNotFoundException, FoldingException, TeamNotFoundException, NoStatsAvailableException {
-        final User retiredUser = User.retireUser(getUser(userId));
-        dbManager.updateUser(retiredUser);
-        userCache.add(retiredUser);
-
-        final UserTcStats userStats = getTcStatsForUser(retiredUser.getId());
-        final int retiredUserId = dbManager.persistRetiredUserStats(teamId, retiredUser.getDisplayName(), userStats);
-        retiredStatsCache.add(RetiredUserTcStats.create(retiredUserId, teamId, retiredUser.getDisplayName(), userStats));
-
-        final Team team = getTeam(teamId);
-        final Team updatedTeam = Team.retireUser(team, userStats.getUserId(), retiredUserId);
-        dbManager.updateTeam(updatedTeam);
-        teamCache.add(updatedTeam);
-        return updatedTeam;
-    }
-
-    public Team unretireUser(final int teamId, final int retiredUserId) throws UserNotFoundException, FoldingException, FoldingConflictException, TeamNotFoundException, FoldingExternalServiceException {
-        // Get the original user ID
-        final RetiredUserTcStats retiredUserStats = dbManager.getRetiredUserStats(retiredUserId); // TODO: [zodac] Add another cache? I like caches :)
-        final int userId = retiredUserStats.getUserId();
-
-        // Update the user to no longer be retired
-        final User user = getUser(userId);
-        final User unretiredUser = User.unretireUser(user);
-        dbManager.updateUser(unretiredUser);
-        userCache.add(unretiredUser);
-
-        // Update the user's initial stats to their current total
-        persistInitialUserStats(unretiredUser);
-
-        final Team team = getTeam(teamId);
-
-        // If retired user is from this team, AND still listed as retired (meaning the monthly reset has not removed this user from the team),
-        // we want to allow them to keep their points pre-retirement
-        // We add an offset for the user based on their retired stats
-        if (teamId == retiredUserStats.getTeamId() && team.getRetiredUserIds().contains(retiredUserId)) {
-            LOGGER.debug("Un-retiring user for original team, adding offset: {}", retiredUserStats);
-            addOffsetStats(unretiredUser.getId(), OffsetStats.create(retiredUserStats.getPoints(), retiredUserStats.getMultipliedPoints(), retiredUserStats.getUnits()));
-        } else {
-            LOGGER.debug("User {} was not previously a member {} of this team {}, resetting offset", retiredUserStats, team.getRetiredUserIds(), teamId);
-            addOffsetStats(unretiredUser.getId(), OffsetStats.empty());
-        }
-
-        // Update the team with the new user
-        // Team may not be the original team the user retired from, so may not exist in this team
-        // But we do not remove the retired user from the original team, unless it is the same team
-        final Team updatedTeam = Team.unretireUser(team, userId, retiredUserId);
-        dbManager.updateTeam(updatedTeam);
-        teamCache.add(updatedTeam);
-        return updatedTeam;
     }
 
     public void persistInitialUserStats(final User user) throws FoldingException, FoldingExternalServiceException {
@@ -432,16 +347,6 @@ public class BusinessLogic {
         final Stats initialStatsFromDb = dbManager.getInitialStats(userId).getStats();
         initialStatsCache.add(userId, initialStatsFromDb);
         return initialStatsFromDb;
-    }
-
-    public Map<Integer, User> getActiveTcUsers(final Collection<Team> teams) {
-        return teams
-                .stream()
-                .map(Team::getUserIds)
-                .flatMap(Collection::stream)
-                .map(userId -> UserCache.get().getOrNull(userId))
-                .filter(user -> Objects.nonNull(user) && !user.isRetired())
-                .collect(toMap(User::getId, user -> user));
     }
 
     public void persistHourlyTcStatsForUser(final UserTcStats userTcStats) throws FoldingException {
@@ -568,27 +473,31 @@ public class BusinessLogic {
         }
     }
 
-    public boolean doesNotContainUser(final int userId) {
+    public SystemUserAuthentication isValidUser(final String userName, final String password) throws FoldingException {
+        return dbManager.isValidSystemUser(userName, password);
+    }
+
+    public boolean doesNotContainTeam(final int teamId) {
         try {
-            getUser(userId);
+            getTeam(teamId);
             return false;
-        } catch (final FoldingException | UserNotFoundException e) {
-            LOGGER.debug("Unable to find user with ID: {}", userId, e);
+        } catch (final FoldingException | TeamNotFoundException e) {
+            LOGGER.debug("Unable to find team with ID: {}", teamId, e);
             return true;
         }
     }
 
-    public boolean doesNotContainRetiredUser(final int retiredUserId) {
-        // TODO: [zodac] Needs to check DB if cache miss
-        return !retiredStatsCache.contains(retiredUserId);
+    public Collection<User> getUsersOnTeam(final Team team) throws FoldingException {
+        return getAllUsers().stream()
+                .filter(user -> user.getTeamId() == team.getId())
+                .collect(toList());
     }
 
-    public Collection<RetiredUserTcStats> getAllRetiredUserStats() {
-        // TODO: [zodac] Needs to check DB if cache miss
-        return retiredStatsCache.getAll();
+    public Collection<RetiredUserTcStats> getRetiredUsersForTeam(final Team team) throws FoldingException {
+        return dbManager.getRetiredUserStatsForTeam(team);
     }
 
-    public AuthenticationResponse isValidUser(final String userName, final String password) throws FoldingException {
-        return dbManager.isValidUser(userName, password);
+    public void deleteRetiredUserStats() throws FoldingConflictException, FoldingException {
+        dbManager.deleteRetiredUserStats();
     }
 }

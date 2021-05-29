@@ -7,28 +7,34 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.test.utils.rest.request.HardwareUtils;
-import me.zodac.folding.test.utils.rest.request.UserUtils;
+import me.zodac.folding.test.utils.rest.request.TeamUtils;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
-import static java.util.stream.Collectors.toSet;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Utility class used to generate {@link Hardware}, {@link User} and {@link Team} instances for test cases.
  */
 public final class TestGenerator {
 
-    private static int hardwareCount = 1;
-    private static int userCount = 1;
-    private static int teamCount = 1;
+    private static final AtomicInteger HARDWARE_COUNT = new AtomicInteger(1);
+    private static final AtomicInteger USER_COUNT = new AtomicInteger(1);
+    private static final AtomicInteger TEAM_COUNT = new AtomicInteger(1);
 
     private TestGenerator() {
 
     }
 
+    public static String nextHardwareName() {
+        return "DummyHardware" + HARDWARE_COUNT.getAndIncrement();
+    }
+
+    public static String nextTeamName() {
+        return "DummyTeam" + TEAM_COUNT.getAndIncrement();
+    }
+
+    public static String nextUserName() {
+        return "DummyUser" + USER_COUNT.getAndIncrement();
+    }
 
     /**
      * Generate a {@link Hardware} with a {@link Hardware#getMultiplier()} of <b>x1</b>.
@@ -36,13 +42,15 @@ public final class TestGenerator {
      * @return the generated {@link Hardware}
      */
     public static Hardware generateHardware() {
-        return Hardware.createWithoutId(
-                "Dummy_Hardware" + hardwareCount++,
-                "Dummy Hardware",
-                OperatingSystem.WINDOWS,
-                1.0D
-        );
+        final String hardwareName = nextHardwareName();
+        return Hardware.builder()
+                .hardwareName(hardwareName)
+                .displayName(hardwareName)
+                .operatingSystem(OperatingSystem.WINDOWS.displayName())
+                .multiplier(1.0D)
+                .build();
     }
+//
 
     /**
      * Generate a {@link Hardware} with a {@link Hardware#getMultiplier()} of <b>x1</b>.
@@ -51,13 +59,13 @@ public final class TestGenerator {
      * @return the generated {@link Hardware}
      */
     public static Hardware generateHardwareWithId(final int hardwareId) {
-        return Hardware.create(
-                hardwareId,
-                "Dummy_Hardware" + hardwareCount++,
-                "Dummy Hardware",
-                OperatingSystem.WINDOWS,
-                1.0D
-        );
+        final String hardwareName = nextHardwareName();
+        return Hardware.builder()
+                .id(hardwareId)
+                .hardwareName(hardwareName)
+                .displayName(hardwareName).operatingSystem(OperatingSystem.WINDOWS.displayName())
+                .multiplier(1.0D)
+                .build();
     }
 
     /**
@@ -67,12 +75,13 @@ public final class TestGenerator {
      * @return the generated {@link Hardware}
      */
     public static Hardware generateHardwareWithMultiplier(final double multiplier) {
-        return Hardware.createWithoutId(
-                "Dummy_Hardware" + hardwareCount++,
-                "Dummy Hardware",
-                OperatingSystem.WINDOWS,
-                multiplier
-        );
+        final String hardwareName = nextHardwareName();
+        return Hardware.builder()
+                .hardwareName(hardwareName)
+                .displayName(hardwareName)
+                .operatingSystem(OperatingSystem.WINDOWS.displayName())
+                .multiplier(multiplier)
+                .build();
     }
 
     /**
@@ -82,143 +91,222 @@ public final class TestGenerator {
      * @return the generated {@link Hardware}
      */
     public static Hardware generateHardwareWithOperatingSystem(final OperatingSystem operatingSystem) {
-        return Hardware.createWithoutId(
-                "Dummy_Hardware" + hardwareCount++,
-                "Dummy Hardware",
-                operatingSystem,
-                1.0D
-        );
+        final String hardwareName = nextHardwareName();
+        return Hardware.builder()
+                .hardwareName(hardwareName)
+                .displayName(hardwareName)
+                .operatingSystem(operatingSystem.displayName())
+                .multiplier(1.0D)
+                .build();
     }
 
+
     /**
-     * Generates a {@link User} linked with an auto-created {@link Hardware}.
+     * Generates a {@link Team}.
      *
-     * @return the generated {@link User}
-     * @throws FoldingRestException thrown if an error occurs creating the {@link Hardware}
-     * @see #generateHardware()
+     * @return the generated {@link Team}
      */
+    public static Team generateTeam() {
+        return Team.builder()
+                .teamName(nextTeamName())
+                .build();
+    }
+
+    public static Team generateTeamWithId(final int teamId) {
+        return Team.builder()
+                .id(teamId)
+                .teamName(nextTeamName())
+                .build();
+    }
+
+    public static Team generateInvalidTeam() {
+        return Team.builder()
+                .teamName(nextTeamName())
+                .forumLink("invalidLink")
+                .build();
+    }
+
     public static User generateUser() throws FoldingRestException {
         final int hardwareId = HardwareUtils.createOrConflict(generateHardware()).getId();
-        return generateUserWithUserId(hardwareId);
+        final int teamId = TeamUtils.createOrConflict(generateTeam()).getId();
+        final String userName = nextUserName();
+
+        return User.builder()
+                .foldingUserName(userName)
+                .displayName(userName)
+                .passkey("DummyPasskey12345678901234567890")
+                .category(Category.NVIDIA_GPU.displayName())
+                .hardwareId(hardwareId)
+                .teamId(teamId)
+                .build();
     }
 
-    /**
-     * Generates a {@link User} with the supplied {@link Hardware} ID.
-     *
-     * @param hardwareId the ID of the {@link Hardware} for the user
-     * @return the generated {@link User}
-     */
-    public static User generateUserWithHardwareId(final int hardwareId) {
-        return User.createWithoutId(
-                "Dummy_User" + userCount,
-                "Dummy User" + userCount++,
-                "DummyPasskey12345678901234567890",
-                Category.NVIDIA_GPU,
-                hardwareId,
-                "",
-                "",
-                false);
-    }
-
-    /**
-     * Generates a {@link User} with the supplied {@link Category} linked with an auto-created {@link Hardware}.
-     *
-     * @param category the {@link Category} of the {@link Hardware} for the user
-     * @return the generated {@link User}
-     * @throws FoldingRestException thrown if an error occurs creating the {@link Hardware}
-     * @see #generateHardware()
-     */
     public static User generateUserWithCategory(final Category category) throws FoldingRestException {
         final int hardwareId = HardwareUtils.createOrConflict(generateHardware()).getId();
-        return User.createWithoutId(
-                "Dummy_User" + userCount,
-                "Dummy User" + userCount++,
-                "DummyPasskey12345678901234567890",
-                category,
-                hardwareId,
-                "",
-                "",
-                false);
+        final int teamId = TeamUtils.createOrConflict(generateTeam()).getId();
+        final String userName = nextUserName();
+
+        return User.builder()
+                .foldingUserName(userName)
+                .displayName(userName)
+                .passkey("DummyPasskey12345678901234567890")
+                .category(category.displayName())
+                .hardwareId(hardwareId)
+                .teamId(teamId)
+                .build();
     }
 
-    /**
-     * Generates a {@link User} with the supplied {@link User} ID linked with an auto-created {@link Hardware}.
-     *
-     * @param userId the ID of the {@link User}
-     * @return the generated {@link User}
-     * @throws FoldingRestException thrown if an error occurs creating the {@link Hardware}
-     * @see #generateHardware()
-     */
-    public static User generateUserWithUserId(final int userId) throws FoldingRestException {
+    public static User generateUserWithId(final int userId) throws FoldingRestException {
         final int hardwareId = HardwareUtils.createOrConflict(generateHardware()).getId();
-        return User.create(
-                userId,
-                "Dummy_User" + userCount,
-                "Dummy User" + userCount++,
-                "DummyPasskey12345678901234567890",
-                Category.NVIDIA_GPU,
-                hardwareId,
-                "",
-                "",
-                false);
+        final int teamId = TeamUtils.createOrConflict(generateTeam()).getId();
+        final String userName = nextUserName();
+
+        return User.builder()
+                .id(userId)
+                .foldingUserName(userName)
+                .displayName(userName)
+                .passkey("DummyPasskey12345678901234567890")
+                .category(Category.NVIDIA_GPU.displayName())
+                .hardwareId(hardwareId)
+                .teamId(teamId)
+                .build();
     }
 
-    /**
-     * Generates a {@link Team} with a single {@link User}.
-     *
-     * @return the generated {@link Team}
-     * @throws FoldingRestException thrown if an error occurs creating the {@link User} or {@link Hardware}
-     * @see #generateUser()
-     */
-    public static Team generateTeam() throws FoldingRestException {
-        final int userId = UserUtils.createOrConflict(generateUser()).getId();
-        return Team.createWithoutId(
-                "Dummy_Team" + teamCount++,
-                "Dummy Team",
-                "",
-                userId,
-                Set.of(userId),
-                Collections.emptySet());
+    public static User generateUserWithHardwareId(final int hardwareId) throws FoldingRestException {
+        final int teamId = TeamUtils.createOrConflict(generateTeam()).getId();
+        final String userName = nextUserName();
+
+        return User.builder()
+                .foldingUserName(userName)
+                .displayName(userName)
+                .passkey("DummyPasskey12345678901234567890")
+                .category(Category.NVIDIA_GPU.displayName())
+                .hardwareId(hardwareId)
+                .teamId(teamId)
+                .build();
     }
 
-    /**
-     * Generates a {@link Team} with a single {@link User}.
-     *
-     * @param teamId the ID of the {@link Team}
-     * @return the generated {@link Team}
-     * @throws FoldingRestException thrown if an error occurs creating the {@link User} or {@link Hardware}
-     * @see #generateUser()
-     */
-    public static Team generateTeamWithId(final int teamId) throws FoldingRestException {
-        final int userId = UserUtils.createOrConflict(generateUser()).getId();
-        return Team.create(
-                teamId,
-                "Dummy_Team" + teamCount++,
-                "Dummy Team",
-                "",
-                userId,
-                Set.of(userId),
-                Collections.emptySet());
+    public static User generateUserWithTeamId(final int teamId) throws FoldingRestException {
+        final int hardwareId = HardwareUtils.createOrConflict(generateHardware()).getId();
+        final String userName = nextUserName();
+
+        return User.builder()
+                .foldingUserName(userName)
+                .displayName(userName)
+                .passkey("DummyPasskey12345678901234567890")
+                .category(Category.NVIDIA_GPU.displayName())
+                .hardwareId(hardwareId)
+                .teamId(teamId)
+                .build();
     }
 
-    /**
-     * Generates a {@link Team} with with the supplied {@link User} IDs.
-     *
-     * @param captainId   the ID of the captain {@link User}
-     * @param teamUserIds the IDs of the rest of the {@link Team} {@link User}s
-     * @return the generated {@link Team}
-     */
-    public static Team generateTeamWithUserIds(final int captainId, final int... teamUserIds) {
-        final Set<Integer> userIds = new HashSet<>();
-        userIds.add(captainId);
-        userIds.addAll(Arrays.stream(teamUserIds).boxed().collect(toSet()));
+    public static User generateUserWithTeamIdAndCategory(final int teamId, final Category category) throws FoldingRestException {
+        final int hardwareId = HardwareUtils.createOrConflict(generateHardware()).getId();
+        final String userName = nextUserName();
 
-        return Team.createWithoutId(
-                "Dummy_Team" + teamCount++,
-                "Dummy Team",
-                "",
-                captainId,
-                userIds,
-                Collections.emptySet());
+        return User.builder()
+                .foldingUserName(userName)
+                .displayName(userName)
+                .passkey("DummyPasskey12345678901234567890")
+                .category(category.displayName())
+                .hardwareId(hardwareId)
+                .teamId(teamId)
+                .build();
     }
+
+    public static User generateUserWithLiveStatsLink(final String liveStatsLink) throws FoldingRestException {
+        final int hardwareId = HardwareUtils.createOrConflict(generateHardware()).getId();
+        final int teamId = TeamUtils.createOrConflict(generateTeam()).getId();
+        final String userName = nextUserName();
+
+        return User.builder()
+                .foldingUserName(userName)
+                .displayName(userName)
+                .passkey("DummyPasskey12345678901234567890")
+                .category(Category.NVIDIA_GPU.displayName())
+                .liveStatsLink(liveStatsLink)
+                .hardwareId(hardwareId)
+                .teamId(teamId)
+                .build();
+    }
+//
+////    public static User generateCaptain() throws FoldingRestException {
+////        final int hardwareId = HardwareUtils.createOrConflict(generateHardware()).getId();
+////        final int teamId = TeamUtils.createOrConflict(generateTeam()).getId();
+////        return generateUser(hardwareId, teamId, true);
+////    }
+//
+//    private static User generateUser(final int hardwareId, final int teamId, final boolean isCaptain) {
+//        return User.createWithoutId(
+//                "Dummy_User" + userCount++,
+//                "Dummy User",
+//                "DummyPasskey12345678901234567890",
+//                Category.AMD_GPU,
+//                "",
+//                "",
+//                hardwareId,
+//                teamId,
+//                isCaptain);
+//    }
+//
+//    /**
+//     * Generates a {@link User} with the supplied {@link Hardware} ID.
+//     *
+//     * @param hardwareId the ID of the {@link Hardware} for the user
+//     * @return the generated {@link User}
+//     */
+//    public static User generateUserWithHardwareId(final int hardwareId) {
+//        return User.createWithoutId(
+//                "Dummy_User" + userCount,
+//                "Dummy User" + userCount++,
+//                "DummyPasskey12345678901234567890",
+//                Category.NVIDIA_GPU,
+//                hardwareId,
+//                "",
+//                "",
+//                false);
+//    }
+//
+//    /**
+//     * Generates a {@link User} with the supplied {@link Category} linked with an auto-created {@link Hardware}.
+//     *
+//     * @param category the {@link Category} of the {@link Hardware} for the user
+//     * @return the generated {@link User}
+//     * @throws FoldingRestException thrown if an error occurs creating the {@link Hardware}
+//     * @see #generateHardware()
+//     */
+//    public static User generateUserWithCategory(final Category category) throws FoldingRestException {
+//        final int hardwareId = HardwareUtils.createOrConflict(generateHardware()).getId();
+//        return User.createWithoutId(
+//                "Dummy_User" + userCount,
+//                "Dummy User" + userCount++,
+//                "DummyPasskey12345678901234567890",
+//                category,
+//                hardwareId,
+//                "",
+//                "",
+//                false);
+//    }
+//
+//    /**
+//     * Generates a {@link User} with the supplied {@link User} ID linked with an auto-created {@link Hardware}.
+//     *
+//     * @param userId the ID of the {@link User}
+//     * @return the generated {@link User}
+//     * @throws FoldingRestException thrown if an error occurs creating the {@link Hardware}
+//     * @see #generateHardware()
+//     */
+//    public static User generateUserWithUserId(final int userId) throws FoldingRestException {
+//        final int hardwareId = HardwareUtils.createOrConflict(generateHardware()).getId();
+//        return User.create(
+//                userId,
+//                "Dummy_User" + userCount,
+//                "Dummy User" + userCount++,
+//                "DummyPasskey12345678901234567890",
+//                Category.NVIDIA_GPU,
+//                hardwareId,
+//                "",
+//                "",
+//                false);
+//    }
 }

@@ -6,7 +6,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.utils.EncodingUtils;
-import me.zodac.folding.rest.api.LoginPayload;
+import me.zodac.folding.rest.api.LoginCredentials;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 
 import java.io.IOException;
@@ -64,10 +64,10 @@ public final class LoginRequestSender {
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<Void> loginAsAdmin(final String encodedUserNameAndPassword) throws FoldingRestException {
-        final LoginPayload loginPayload = LoginPayload.createWithBasicAuthentication(encodedUserNameAndPassword);
+        final LoginCredentials loginCredentials = LoginCredentials.createWithBasicAuthentication(encodedUserNameAndPassword);
 
         final HttpRequest request = HttpRequest.newBuilder()
-                .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(loginPayload)))
+                .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(loginCredentials)))
                 .uri(URI.create(foldingUrl + "/login/admin"))
                 .header("Content-Type", "application/json")
                 .build();

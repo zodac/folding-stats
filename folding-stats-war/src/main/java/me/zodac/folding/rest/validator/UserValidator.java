@@ -1,11 +1,13 @@
 package me.zodac.folding.rest.validator;
 
+import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
+import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.exception.TeamNotFoundException;
 import me.zodac.folding.api.validator.ValidationResponse;
-import me.zodac.folding.cache.HardwareCache;
 import me.zodac.folding.ejb.BusinessLogic;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.UrlValidator;
@@ -13,7 +15,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -73,16 +79,70 @@ public class UserValidator {
         if (StringUtils.isNotEmpty(user.getLiveStatsLink()) && !URL_VALIDATOR.isValid(user.getLiveStatsLink())) {
             failureMessages.add(String.format("Attribute 'liveStatsLink' is not a valid link: '%s'", user.getLiveStatsLink()));
         }
-        
 
-        if (user.getHardwareId() <= Hardware.EMPTY_HARDWARE_ID || businessLogic.doesNotContainHardware(user.getHardwareId())) {
-            final List<String> availableHardware = HardwareCache.get()
-                    .getAll()
+        try {
+            if (user.getHardwareId() <= Hardware.EMPTY_HARDWARE_ID || businessLogic.doesNotContainHardware(user.getHardwareId())) {
+                final List<String> availableHardware = businessLogic
+                        .getAllHardware()
+                        .stream()
+                        .map(hardware -> String.format("%s: %s", hardware.getId(), hardware.getHardwareName()))
+                        .collect(toList());
+
+                failureMessages.add(String.format("Attribute 'hardwareId' must be one of: %s", availableHardware));
+            }
+        } catch (final FoldingException e) {
+            LOGGER.warn("Unable to get hardware for user {}", user, e);
+            failureMessages.add("Unable to check hardware for user");
+        }
+
+        try {
+            if (user.getTeamId() <= Team.EMPTY_TEAM_ID || businessLogic.doesNotContainTeam(user.getTeamId())) {
+                final List<String> availableTeams = businessLogic
+                        .getAllTeams()
+                        .stream()
+                        .map(team -> String.format("%s: %s", team.getId(), team.getTeamName()))
+                        .collect(toList());
+
+                failureMessages.add(String.format("Attribute 'teamId' must be one of: %s", availableTeams));
+            }
+        } catch (final FoldingException e) {
+            LOGGER.warn("Unable to get team for user {}", user, e);
+            failureMessages.add("Unable to check team for user");
+        }
+
+
+        try {
+            final Team team = businessLogic.getTeam(user.getTeamId());
+            final Collection<User> usersOnTeam = businessLogic.getUsersOnTeam(team);
+
+            if (usersOnTeam.size() >= Category.maximumPermittedAmountForAllCategories()) {
+                failureMessages.add(String.format("Team '%s' has %s users, maximum permitted is %s", team.getTeamName(), usersOnTeam.size(), Category.maximumPermittedAmountForAllCategories()));
+            }
+
+            if (user.isUserIsCaptain()) {
+                for (final User existingUserOnTeam : usersOnTeam) {
+                    if (existingUserOnTeam.isUserIsCaptain()) {
+                        failureMessages.add(String.format("Team '%s' already has a captain (%s), cannot have multiple captains", team.getTeamName(), user.getDisplayName()));
+                    }
+                }
+            }
+
+            final Map<Category, Long> categoryCount = usersOnTeam
                     .stream()
-                    .map(hardware -> String.format("%s: %s", hardware.getId(), hardware.getHardwareName()))
-                    .collect(toList());
+                    .map(User::getCategory)
+                    .map(Category::get)
+                    .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
-            failureMessages.add(String.format("Attribute 'hardwareId' must be one of: %s", availableHardware));
+            for (final Map.Entry<Category, Long> categoryAndCount : categoryCount.entrySet()) {
+                if (categoryAndCount.getValue() > categoryAndCount.getKey().permittedAmount()) {
+                    failureMessages.add(String.format("Found %s users of category %s, only %s permitted", categoryAndCount.getValue(), categoryAndCount.getKey().displayName(), categoryAndCount.getKey().permittedAmount()));
+                }
+            }
+
+
+        } catch (final FoldingException | TeamNotFoundException e) {
+            LOGGER.warn("Unable to validate current team users", e);
+            failureMessages.add("Unable to validate current team users");
         }
 
         // Since this is a heavy validation check, only do it if the rest of the user is valid

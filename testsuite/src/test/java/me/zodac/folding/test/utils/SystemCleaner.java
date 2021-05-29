@@ -47,19 +47,19 @@ public final class SystemCleaner {
     public static void cleanSystemForSimpleTests() throws FoldingRestException {
         DatabaseUtils.truncateTableAndResetId("retired_user_stats");
 
-        for (final Team team : TeamUtils.getAll()) {
-            TEAM_REQUEST_SENDER.delete(team.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
-        }
-
         for (final User user : UserUtils.getAll()) {
             USER_REQUEST_SENDER.delete(user.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
+        }
+
+        for (final Team team : TeamUtils.getAll()) {
+            TEAM_REQUEST_SENDER.delete(team.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
         }
 
         for (final Hardware hardware : HardwareUtils.getAll()) {
             HARDWARE_REQUEST_SENDER.delete(hardware.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
         }
 
-        DatabaseUtils.truncateTableAndResetId("hardware", "users", "teams");
+//        DatabaseUtils.truncateTableAndResetId("hardware", "users", "teams");
     }
 
     /**
@@ -80,7 +80,7 @@ public final class SystemCleaner {
         StubbedFoldingEndpointUtils.deletePoints();
         StubbedFoldingEndpointUtils.deleteUnits();
         DatabaseUtils.truncateTableAndResetId("user_initial_stats", "user_offset_tc_stats", "user_tc_stats_hourly", "user_total_stats");
-        cleanSystemForSimpleTests();
         TeamCompetitionStatsUtils.manuallyResetStats();
+        cleanSystemForSimpleTests();
     }
 }

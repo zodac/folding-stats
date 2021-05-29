@@ -15,15 +15,15 @@ import me.zodac.folding.api.utils.EncodingUtils;
 @Setter
 @EqualsAndHashCode
 @ToString(doNotUseGetters = true)
-public class LoginPayload {
+public class LoginCredentials {
 
     private String encodedUserNameAndPassword;
 
-    public static LoginPayload createWithBasicAuthentication(final String encodedUserNameAndPassword) {
+    public static LoginCredentials createWithBasicAuthentication(final String encodedUserNameAndPassword) {
         if (!encodedUserNameAndPassword.startsWith(EncodingUtils.BASIC_AUTHENTICATION_SCHEME)) {
-            return new LoginPayload(EncodingUtils.BASIC_AUTHENTICATION_SCHEME + encodedUserNameAndPassword);
+            return new LoginCredentials(EncodingUtils.BASIC_AUTHENTICATION_SCHEME + encodedUserNameAndPassword);
         }
-        
-        return new LoginPayload(encodedUserNameAndPassword);
+
+        return new LoginCredentials(encodedUserNameAndPassword);
     }
 }

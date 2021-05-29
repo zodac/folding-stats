@@ -12,7 +12,7 @@
         <!-- Do not merge or minify JS/CSS by default -->
         <skip-minify>true</skip-minify>
 
-        <!-- Plygin Versions -->
+        <!-- Plugin Versions -->
         <minify-maven-plugin.version>1.7.6</minify-maven-plugin.version>
     </properties>
 

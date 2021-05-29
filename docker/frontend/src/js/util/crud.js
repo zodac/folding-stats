@@ -155,10 +155,11 @@ function createUser() {
     var displayName = document.getElementById("user_create_display_name").value.trim();
     var passkey = document.getElementById("user_create_passkey").value.trim();
     var category = document.getElementById("user_create_category").value.trim();
-    var hardwareId = document.getElementById("user_create_hardware_selector").value.trim();
     var profileLink = document.getElementById("user_create_profile_link").value.trim();
     var liveStatsLink = document.getElementById("user_create_live_stats_link").value.trim();
-    var isRetired = false;
+    var hardwareId = document.getElementById("user_create_hardware_selector").value.trim();
+    var teamId = document.getElementById("user_create_team_selector").value.trim();
+    var isCaptain = document.getElementById("user_create_is_captain").checked;
 
     var requestData = JSON.stringify(
         {
@@ -166,10 +167,11 @@ function createUser() {
             "displayName": displayName,
             "passkey": passkey,
             "category": category,
-            "hardwareId": hardwareId,
             "profileLink": profileLink,
             "liveStatsLink": liveStatsLink,
-            "isRetired": isRetired
+            "hardwareId": hardwareId,
+            "teamId": teamId,
+            "userIsCaptain": isCaptain
         }
     );
 
@@ -198,9 +200,11 @@ function createUser() {
         document.getElementById("user_create_display_name").value = '';
         document.getElementById("user_create_passkey").value = '';
         document.getElementById("user_create_category").value = '';
-        document.getElementById("user_create_hardware_selector").value = '';
         document.getElementById("user_create_profile_link").value = '';
         document.getElementById("user_create_live_stats_link").value = '';
+        document.getElementById("user_create_hardware_selector").value = '';
+        document.getElementById("user_create_team_selector").value = '';
+        document.getElementById("user_create_is_captain").checked = false;
         successToast("User '" + displayName + "' created");
         loadUsers();
     })
@@ -221,10 +225,11 @@ function updateUser() {
     var displayName = document.getElementById("user_update_display_name").value.trim();
     var passkey = document.getElementById("user_update_passkey").value.trim();
     var category = document.getElementById("user_update_category").value.trim();
-    var hardwareId = document.getElementById("user_update_hardware_selector").value.trim();
     var profileLink = document.getElementById("user_update_profile_link").value.trim();
     var liveStatsLink = document.getElementById("user_update_live_stats_link").value.trim();
-    var isRetired = selectedElement.getAttribute("user_is_retired");
+    var hardwareId = document.getElementById("user_update_hardware_selector").value.trim();
+    var teamId = document.getElementById("user_update_team_selector").value.trim();
+    var isCaptain = selectedElement.getAttribute("user_is_captain").checked;
 
     var requestData = JSON.stringify(
         {
@@ -232,10 +237,11 @@ function updateUser() {
             "displayName": displayName,
             "passkey": passkey,
             "category": category,
-            "hardwareId": hardwareId,
             "profileLink": profileLink,
             "liveStatsLink": liveStatsLink,
-            "isRetired": isRetired
+            "hardwareId": hardwareId,
+            "teamId": teamId,
+            "userIsCaptain": isCaptain,
         }
     );
 
@@ -265,9 +271,11 @@ function updateUser() {
         document.getElementById("user_update_display_name").value = '';
         document.getElementById("user_update_passkey").value = '';
         document.getElementById("user_update_category").value = '';
-        document.getElementById("user_update_hardware_selector").value = '';
         document.getElementById("user_update_profile_link").value = '';
         document.getElementById("user_update_live_stats_link").value = '';
+        document.getElementById("user_update_hardware_selector").value = '';
+        document.getElementById("user_update_team_selector").value = '';
+        document.getElementById("user_update_is_captain").checked = false;
         successToast("User '" + displayName + "' updated");
         loadUsers();
     })
@@ -310,9 +318,11 @@ function deleteUser() {
         document.getElementById("user_delete_display_name").value = '';
         document.getElementById("user_delete_passkey").value = '';
         document.getElementById("user_delete_category").value = '';
-        document.getElementById("user_delete_hardware_selector").value = '';
         document.getElementById("user_delete_profile_link").value = '';
         document.getElementById("user_delete_live_stats_link").value = '';
+        document.getElementById("user_delete_hardware_selector").value = '';
+        document.getElementById("user_delete_team_selector").value = '';
+        document.getElementById("user_delete_is_captain").checked = false;
 
         userFields = document.querySelectorAll(".user_delete");
         for (var i = 0, userField; userField = userFields[i]; i++) {

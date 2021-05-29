@@ -1,6 +1,6 @@
 package me.zodac.folding.rest;
 
-import me.zodac.folding.api.db.AuthenticationResponse;
+import me.zodac.folding.api.db.SystemUserAuthentication;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.utils.EncodingUtils;
 import me.zodac.folding.ejb.BusinessLogic;
@@ -109,21 +109,21 @@ public class SecurityInterceptor implements ContainerRequestFilter {
         final String userName = decodedUserNameAndPassword.get(EncodingUtils.DECODED_USERNAME_KEY);
         final String password = decodedUserNameAndPassword.get(EncodingUtils.DECODED_PASSWORD_KEY);
 
-        final AuthenticationResponse authenticationResponse = businessLogic.isValidUser(userName, password);
+        final SystemUserAuthentication systemUserAuthentication = businessLogic.isValidUser(userName, password);
 
-        if (!authenticationResponse.isUserExists()) {
+        if (!systemUserAuthentication.isUserExists()) {
             LOGGER.warn("User '{}' does not exist", userName);
             requestContext.abortWith(unauthorized());
             return;
         }
 
-        if (!authenticationResponse.isPasswordMatch()) {
+        if (!systemUserAuthentication.isPasswordMatch()) {
             LOGGER.warn("Invalid password supplied for user '{}'", userName);
             requestContext.abortWith(unauthorized());
             return;
         }
 
-        final Set<String> userRoles = authenticationResponse.getUserRoles().stream().map(String::toLowerCase).collect(toSet());
+        final Set<String> userRoles = systemUserAuthentication.getUserRoles().stream().map(String::toLowerCase).collect(toSet());
 
         final RolesAllowed rolesAnnotation = method.getAnnotation(RolesAllowed.class);
         final Set<String> permittedRoles = Arrays.stream(rolesAnnotation.value()).map(String::toLowerCase).collect(toSet());

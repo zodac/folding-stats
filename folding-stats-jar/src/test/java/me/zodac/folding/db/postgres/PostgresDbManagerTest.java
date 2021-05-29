@@ -1,7 +1,7 @@
 package me.zodac.folding.db.postgres;
 
-import me.zodac.folding.api.db.AuthenticationResponse;
 import me.zodac.folding.api.db.DbManager;
+import me.zodac.folding.api.db.SystemUserAuthentication;
 import me.zodac.folding.api.db.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.tc.Category;
@@ -24,9 +24,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 import static me.zodac.folding.db.postgres.TestGenerator.nextHardwareName;
 import static me.zodac.folding.db.postgres.TestGenerator.nextTeamName;
@@ -40,7 +37,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class PostgresDbManagerTest {
 
-    private static final DbManager POSTGRES_DB_MANAGER = PostgresDbManager.create(new TestDbConnectionPool());
+    private static final DbManager POSTGRES_DB_MANAGER = PostgresDbManager.create(TestDbConnectionPool.create());
 
     @Test
     @Order(1)
@@ -74,37 +71,6 @@ public class PostgresDbManagerTest {
 
     @Test
     @Order(2)
-    public void userTest() throws FoldingException, FoldingConflictException, UserNotFoundException {
-        final User user = generateUser();
-        final User createdUser = POSTGRES_DB_MANAGER.createUser(user);
-
-        assertThat(createdUser.getId())
-                .isNotEqualTo(User.EMPTY_USER_ID);
-
-        final Collection<User> allUsers = POSTGRES_DB_MANAGER.getAllUsers();
-        assertThat(allUsers)
-                .hasSize(1);
-
-        final User retrievedUser = POSTGRES_DB_MANAGER.getUser(createdUser.getId());
-        assertThat(retrievedUser)
-                .isEqualTo(createdUser);
-
-        createdUser.setCategory(Category.AMD_GPU.displayName());
-
-        POSTGRES_DB_MANAGER.updateUser(createdUser);
-        final User updatedUser = POSTGRES_DB_MANAGER.getUser(createdUser.getId());
-        assertThat(updatedUser)
-                .isEqualTo(createdUser);
-
-        POSTGRES_DB_MANAGER.deleteUser(createdUser.getId());
-
-        final Collection<User> allUsersAfterDelete = POSTGRES_DB_MANAGER.getAllUsers();
-        assertThat(allUsersAfterDelete)
-                .isEmpty();
-    }
-
-    @Test
-    @Order(3)
     public void teamTest() throws FoldingException, FoldingConflictException, TeamNotFoundException {
         final Team team = generateTeam();
         final Team createdTeam = POSTGRES_DB_MANAGER.createTeam(team);
@@ -131,6 +97,37 @@ public class PostgresDbManagerTest {
 
         final Collection<Team> allTeamsAfterDelete = POSTGRES_DB_MANAGER.getAllTeams();
         assertThat(allTeamsAfterDelete)
+                .isEmpty();
+    }
+
+    @Test
+    @Order(3)
+    public void userTest() throws FoldingException, FoldingConflictException, UserNotFoundException {
+        final User user = generateUser();
+        final User createdUser = POSTGRES_DB_MANAGER.createUser(user);
+
+        assertThat(createdUser.getId())
+                .isNotEqualTo(User.EMPTY_USER_ID);
+
+        final Collection<User> allUsers = POSTGRES_DB_MANAGER.getAllUsers();
+        assertThat(allUsers)
+                .hasSize(1);
+
+        final User retrievedUser = POSTGRES_DB_MANAGER.getUser(createdUser.getId());
+        assertThat(retrievedUser)
+                .isEqualTo(createdUser);
+
+        createdUser.setCategory(Category.AMD_GPU.displayName());
+
+        POSTGRES_DB_MANAGER.updateUser(createdUser);
+        final User updatedUser = POSTGRES_DB_MANAGER.getUser(createdUser.getId());
+        assertThat(updatedUser)
+                .isEqualTo(createdUser);
+
+        POSTGRES_DB_MANAGER.deleteUser(createdUser.getId());
+
+        final Collection<User> allUsersAfterDelete = POSTGRES_DB_MANAGER.getAllUsers();
+        assertThat(allUsersAfterDelete)
                 .isEmpty();
     }
 
@@ -166,22 +163,19 @@ public class PostgresDbManagerTest {
 
     @Test
     public void retiredUserStatsTest() throws FoldingConflictException, FoldingException {
-        final int invalidId = 99;
+        final int invalidId = 9_999;
         assertThatThrownBy(() -> POSTGRES_DB_MANAGER.getRetiredUserStats(invalidId))
                 .isInstanceOf(FoldingException.class);
 
         final Team team = createTeam();
         final User userToRetire = createUser();
-        final Set<Integer> newUserIds = new HashSet<>(team.getUserIds());
-        newUserIds.add(userToRetire.getId());
-        team.setUserIds(newUserIds);
         POSTGRES_DB_MANAGER.updateTeam(team);
 
         final long points = 100L;
         final long multipliedPoints = 1_000L;
         final int units = 5;
 
-        final int retiredUserId = POSTGRES_DB_MANAGER.persistRetiredUserStats(team.getId(), userToRetire.getDisplayName(),
+        final int retiredUserId = POSTGRES_DB_MANAGER.persistRetiredUserStats(team.getId(), userToRetire.getId(), userToRetire.getDisplayName(),
                 UserTcStats.createWithoutTimestamp(userToRetire.getId(), points, multipliedPoints, units));
 
         final RetiredUserTcStats retiredUserStats = POSTGRES_DB_MANAGER.getRetiredUserStats(retiredUserId);
@@ -256,8 +250,8 @@ public class PostgresDbManagerTest {
     }
 
     @Test
-    public void validUserTest() throws FoldingException {
-        final AuthenticationResponse invalidUserName = POSTGRES_DB_MANAGER.isValidUser("invalidUserName", "ADMIN_PASSWORD");
+    public void validSystemUserTest() throws FoldingException {
+        final SystemUserAuthentication invalidUserName = POSTGRES_DB_MANAGER.isValidSystemUser("invalidUserName", "ADMIN_PASSWORD");
         assertThat(invalidUserName.isUserExists())
                 .isFalse();
         assertThat(invalidUserName.isPasswordMatch())
@@ -265,7 +259,7 @@ public class PostgresDbManagerTest {
         assertThat(invalidUserName.getUserRoles())
                 .isEmpty();
 
-        final AuthenticationResponse invalidPassword = POSTGRES_DB_MANAGER.isValidUser("ADMIN_USERNAME", "invalidPassword");
+        final SystemUserAuthentication invalidPassword = POSTGRES_DB_MANAGER.isValidSystemUser("ADMIN_USERNAME", "invalidPassword");
         assertThat(invalidPassword.isUserExists())
                 .isTrue();
         assertThat(invalidPassword.isPasswordMatch())
@@ -273,7 +267,7 @@ public class PostgresDbManagerTest {
         assertThat(invalidPassword.getUserRoles())
                 .isEmpty();
 
-        final AuthenticationResponse admin = POSTGRES_DB_MANAGER.isValidUser("ADMIN_USERNAME", "ADMIN_PASSWORD");
+        final SystemUserAuthentication admin = POSTGRES_DB_MANAGER.isValidSystemUser("ADMIN_USERNAME", "ADMIN_PASSWORD");
         assertThat(admin.isUserExists())
                 .isTrue();
         assertThat(admin.isPasswordMatch())
@@ -281,7 +275,7 @@ public class PostgresDbManagerTest {
         assertThat(admin.getUserRoles())
                 .contains("admin");
 
-        final AuthenticationResponse readOnly = POSTGRES_DB_MANAGER.isValidUser("READ_ONLY_USERNAME", "READ_ONLY_PASSWORD");
+        final SystemUserAuthentication readOnly = POSTGRES_DB_MANAGER.isValidSystemUser("READ_ONLY_USERNAME", "READ_ONLY_PASSWORD");
         assertThat(readOnly.isUserExists())
                 .isTrue();
         assertThat(readOnly.isPasswordMatch())
@@ -300,16 +294,16 @@ public class PostgresDbManagerTest {
 
     private User generateUser() throws FoldingConflictException, FoldingException {
         final int hardwareId = createHardware().getId();
-        return User.createWithoutId(nextUserName(), "user", "passkey", Category.NVIDIA_GPU, hardwareId, "", "", false);
+        final int teamId = createTeam().getId();
+        return User.createWithoutId(nextUserName(), "user", "passkey", Category.NVIDIA_GPU, "", "", hardwareId, teamId, true);
     }
 
     private User createUser() throws FoldingConflictException, FoldingException {
         return POSTGRES_DB_MANAGER.createUser(generateUser());
     }
 
-    private Team generateTeam() throws FoldingConflictException, FoldingException {
-        final int userId = createUser().getId();
-        return Team.createWithoutId(nextTeamName(), "team", "", userId, Set.of(userId), Collections.emptySet());
+    private Team generateTeam() {
+        return Team.createWithoutId(nextTeamName(), "team", "");
     }
 
     private Team createTeam() throws FoldingConflictException, FoldingException {

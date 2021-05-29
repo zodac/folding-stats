@@ -48,6 +48,13 @@ function populateUserUpdate(){
     document.getElementById("user_update_passkey").value = selectedElement.getAttribute("user_passkey");
     document.getElementById("user_update_category").value = selectedElement.getAttribute("user_category");
     document.getElementById("user_update_hardware_selector").value = selectedElement.getAttribute("user_hardware_id");
+    document.getElementById("user_update_team_selector").value = selectedElement.getAttribute("user_team_id");
+
+    if (selectedElement.getAttribute("user_is_captain") === "true") {
+        document.getElementById("user_update_is_captain").checked = true;
+    } else {
+        document.getElementById("user_update_is_captain").checked = false;
+    }
 
     if (profileLink !== 'undefined') {
         document.getElementById("user_update_profile_link").value = profileLink;
@@ -82,6 +89,13 @@ function populateUserDelete(){
     document.getElementById("user_delete_passkey").value = selectedElement.getAttribute("user_passkey");
     document.getElementById("user_delete_category").value = selectedElement.getAttribute("user_category");
     document.getElementById("user_delete_hardware_selector").value = selectedElement.getAttribute("user_hardware_id");
+    document.getElementById("user_delete_team_selector").value = selectedElement.getAttribute("user_team_id");
+
+    if (selectedElement.getAttribute("user_is_captain") === "true") {
+        document.getElementById("user_delete_is_captain").checked = true;
+    } else {
+        document.getElementById("user_delete_is_captain").checked = false;
+    }
 
     if (profileLink !== 'undefined') {
         document.getElementById("user_delete_profile_link").value = profileLink;

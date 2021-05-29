@@ -34,9 +34,9 @@ public class TeamResult {
     private int teamUnits;
     private int rank; // Rank in 'division', but we only have one division so no need to be more explicit, yet
     private Collection<UserResult> activeUsers;
-    private Collection<UserResult> retiredUsers;
+    private Collection<RetiredUserResult> retiredUsers;
 
-    public static TeamResult create(final String teamName, final String teamDescription, final String forumLink, final String captainName, final List<UserResult> activeUsers, final List<UserResult> retiredUsers) {
+    public static TeamResult create(final String teamName, final String teamDescription, final String forumLink, final String captainName, final Collection<UserResult> activeUsers, final Collection<RetiredUserResult> retiredUsers) {
         int teamUnits = 0;
         long teamPoints = 0L;
         long teamMultipliedPoints = 0L;
@@ -48,7 +48,7 @@ public class TeamResult {
             teamMultipliedPoints += activeUser.getMultipliedPoints();
         }
 
-        for (final UserResult retired : retiredUsers) {
+        for (final RetiredUserResult retired : retiredUsers) {
             teamUnits += retired.getUnits();
             teamPoints += retired.getPoints();
             teamMultipliedPoints += retired.getMultipliedPoints();
@@ -63,19 +63,19 @@ public class TeamResult {
                         UserResult::updateWithRankInTeam)
                 );
 
-        final List<UserResult> rankedRetiredUsers = retiredUsers
+        final List<RetiredUserResult> rankedRetiredUsers = retiredUsers
                 .stream()
-                .sorted(Comparator.comparingLong(UserResult::getMultipliedPoints).reversed())
+                .sorted(Comparator.comparingLong(RetiredUserResult::getMultipliedPoints).reversed())
                 .collect(new IntegerRankingCollector<>(
-                        Comparator.comparingLong(UserResult::getMultipliedPoints),
-                        UserResult::getRankInTeam,
-                        UserResult::updateWithRankInTeam)
+                        Comparator.comparingLong(RetiredUserResult::getMultipliedPoints),
+                        RetiredUserResult::getRankInTeam,
+                        RetiredUserResult::updateWithRankInTeam)
                 )
                 // We need to offset the ranks of the retired users, so they are ranked below active users
                 // Annoyingly, we cannot simply add an offset to the #updateWithRankInTeam call above, since the collector applies it multiple times
                 // Instead, we now iterate over the retired users again and manually offset them
                 .stream()
-                .map(rankedRetiredUser -> UserResult.updateWithRankInTeam(rankedRetiredUser, rankedRetiredUser.getRankInTeam() + activeUsers.size()))
+                .map(rankedRetiredUser -> RetiredUserResult.updateWithRankInTeam(rankedRetiredUser, rankedRetiredUser.getRankInTeam() + activeUsers.size()))
                 .collect(toList());
 
         // Not ranked to begin with, will be updated by the calling class

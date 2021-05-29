@@ -5,6 +5,7 @@ import me.zodac.folding.api.tc.OperatingSystem;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.client.java.response.HardwareResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
+import me.zodac.folding.test.utils.TestConstants;
 import me.zodac.folding.test.utils.TestGenerator;
 import me.zodac.folding.test.utils.rest.request.HardwareUtils;
 import me.zodac.folding.test.utils.rest.request.UserUtils;
@@ -190,8 +191,7 @@ public class HardwareTest {
 
     @Test
     public void whenGettingHardware_givenANonExistingHardwareId_thenNoJsonResponseIsReturned_andHasA404Status() throws FoldingRestException {
-        final int invalidId = 99;
-        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get(invalidId);
+        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get(TestConstants.INVALID_ID);
 
         assertThat(response.statusCode())
                 .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
@@ -204,9 +204,7 @@ public class HardwareTest {
 
     @Test
     public void whenUpdatingHardware_givenANonExistingHardwareId_thenNoJsonResponseIsReturned_andHasA404Status() throws FoldingRestException {
-        final int invalidId = 99;
-        final Hardware updatedHardware = TestGenerator.generateHardwareWithId(invalidId);
-
+        final Hardware updatedHardware = TestGenerator.generateHardwareWithId(TestConstants.INVALID_ID);
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.update(updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
                 .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
@@ -219,8 +217,7 @@ public class HardwareTest {
 
     @Test
     public void whenDeletingHardware_givenANonExistingHardwareId_thenResponseHasA404Status() throws FoldingRestException {
-        final int invalidId = 99;
-        final HttpResponse<Void> response = HARDWARE_REQUEST_SENDER.delete(invalidId, ADMIN_USER.userName(), ADMIN_USER.password());
+        final HttpResponse<Void> response = HARDWARE_REQUEST_SENDER.delete(TestConstants.INVALID_ID, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(response.statusCode())
                 .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
@@ -300,7 +297,7 @@ public class HardwareTest {
 
         final HttpResponse<Void> deleteHardwareResponse = HARDWARE_REQUEST_SENDER.delete(hardwareId, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(deleteHardwareResponse.statusCode())
-                .as("Expected to fail due to a 409_CONFLICT: " + deleteHardwareResponse.body())
+                .as("Expected to fail due to a 409_CONFLICT: " + deleteHardwareResponse)
                 .isEqualTo(HttpURLConnection.HTTP_CONFLICT);
     }
 

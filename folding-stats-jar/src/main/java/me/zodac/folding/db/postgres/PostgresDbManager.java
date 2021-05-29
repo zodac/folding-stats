@@ -1,8 +1,8 @@
 package me.zodac.folding.db.postgres;
 
-import me.zodac.folding.api.db.AuthenticationResponse;
 import me.zodac.folding.api.db.DbConnectionPool;
 import me.zodac.folding.api.db.DbManager;
+import me.zodac.folding.api.db.SystemUserAuthentication;
 import me.zodac.folding.api.db.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.tc.Category;
@@ -172,7 +172,7 @@ public class PostgresDbManager implements DbManager {
 
     @Override
     public User createUser(final User user) throws FoldingException, FoldingConflictException {
-        final String insertSqlWithReturnId = "INSERT INTO users (folding_username, display_username, passkey, category, hardware_id, profile_link, live_stats_link, is_retired) VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING user_id;";
+        final String insertSqlWithReturnId = "INSERT INTO users (folding_username, display_username, passkey, category, profile_link, live_stats_link, hardware_id, team_id, is_captain) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING user_id;";
 
         try (final Connection connection = dbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(insertSqlWithReturnId)) {
@@ -181,10 +181,11 @@ public class PostgresDbManager implements DbManager {
             preparedStatement.setString(2, user.getDisplayName());
             preparedStatement.setString(3, user.getPasskey());
             preparedStatement.setString(4, user.getCategory());
-            preparedStatement.setInt(5, user.getHardwareId());
-            preparedStatement.setString(6, user.getProfileLink());
-            preparedStatement.setString(7, user.getLiveStatsLink());
-            preparedStatement.setBoolean(8, user.isRetired());
+            preparedStatement.setString(5, user.getProfileLink());
+            preparedStatement.setString(6, user.getLiveStatsLink());
+            preparedStatement.setInt(7, user.getHardwareId());
+            preparedStatement.setInt(8, user.getTeamId());
+            preparedStatement.setBoolean(9, user.isUserIsCaptain());
 
             LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
             try (final ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -248,7 +249,7 @@ public class PostgresDbManager implements DbManager {
     @Override
     public void updateUser(final User user) throws FoldingException, FoldingConflictException {
         final String updateSqlStatement = "UPDATE users " +
-                "SET folding_username = ?, display_username = ?, passkey = ?, category = ?, hardware_id = ?, profile_link = ?, live_stats_link = ?, is_retired = ? " +
+                "SET folding_username = ?, display_username = ?, passkey = ?, category = ?, profile_link = ?, live_stats_link = ?, hardware_id = ?, team_id = ?, is_captain = ? " +
                 "WHERE user_id = ?;";
 
         try (final Connection connection = dbConnectionPool.getConnection();
@@ -258,11 +259,12 @@ public class PostgresDbManager implements DbManager {
             preparedStatement.setString(2, user.getDisplayName());
             preparedStatement.setString(3, user.getPasskey());
             preparedStatement.setString(4, user.getCategory());
-            preparedStatement.setInt(5, user.getHardwareId());
-            preparedStatement.setString(6, user.getProfileLink());
-            preparedStatement.setString(7, user.getLiveStatsLink());
-            preparedStatement.setBoolean(8, user.isRetired());
-            preparedStatement.setInt(9, user.getId());
+            preparedStatement.setString(5, user.getProfileLink());
+            preparedStatement.setString(6, user.getLiveStatsLink());
+            preparedStatement.setInt(7, user.getHardwareId());
+            preparedStatement.setInt(8, user.getTeamId());
+            preparedStatement.setBoolean(9, user.isUserIsCaptain());
+            preparedStatement.setInt(10, user.getId());
 
             LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
             if (preparedStatement.executeUpdate() == 0) {
@@ -297,7 +299,7 @@ public class PostgresDbManager implements DbManager {
 
     @Override
     public Team createTeam(final Team team) throws FoldingException, FoldingConflictException {
-        final String insertSqlWithReturnId = "INSERT INTO teams (team_name, team_description, forum_link, captain_user_id, user_ids, retired_user_ids) VALUES (?, ?, ?, ?, ?, ?) RETURNING team_id;";
+        final String insertSqlWithReturnId = "INSERT INTO teams (team_name, team_description, forum_link) VALUES (?, ?, ?) RETURNING team_id;";
 
         try (final Connection connection = dbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(insertSqlWithReturnId)) {
@@ -305,9 +307,6 @@ public class PostgresDbManager implements DbManager {
             preparedStatement.setString(1, team.getTeamName());
             preparedStatement.setString(2, team.getTeamDescription());
             preparedStatement.setString(3, team.getForumLink());
-            preparedStatement.setInt(4, team.getCaptainUserId());
-            preparedStatement.setArray(5, connection.createArrayOf("INT", team.getUserIds().toArray(new Integer[0])));
-            preparedStatement.setArray(6, connection.createArrayOf("INT", team.getRetiredUserIds().toArray(new Integer[0])));
 
             LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
             try (final ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -371,7 +370,7 @@ public class PostgresDbManager implements DbManager {
     @Override
     public void updateTeam(final Team team) throws FoldingException, FoldingConflictException {
         final String updateSqlStatement = "UPDATE teams " +
-                "SET team_name = ?, team_description = ?, forum_link = ?, captain_user_id = ?, user_ids = ?, retired_user_ids = ? " +
+                "SET team_name = ?, team_description = ?, forum_link = ? " +
                 "WHERE team_id = ?;";
 
         try (final Connection connection = dbConnectionPool.getConnection();
@@ -380,10 +379,7 @@ public class PostgresDbManager implements DbManager {
             preparedStatement.setString(1, team.getTeamName());
             preparedStatement.setString(2, team.getTeamDescription());
             preparedStatement.setString(3, team.getForumLink());
-            preparedStatement.setInt(4, team.getCaptainUserId());
-            preparedStatement.setArray(5, connection.createArrayOf("INT", team.getUserIds().toArray(new Integer[0])));
-            preparedStatement.setArray(6, connection.createArrayOf("INT", team.getRetiredUserIds().toArray(new Integer[0])));
-            preparedStatement.setInt(7, team.getId());
+            preparedStatement.setInt(4, team.getId());
 
             LOGGER.debug("Executing SQL statement '{}'", preparedStatement);
             if (preparedStatement.executeUpdate() == 0) {
@@ -1053,7 +1049,6 @@ public class PostgresDbManager implements DbManager {
         try (final Connection connection = dbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
             preparedStatement.executeUpdate();
-
         } catch (final SQLException e) {
             if (e.getMessage().contains(VIOLATES_FOREIGN_KEY_CONSTRAINT)) {
                 throw new FoldingConflictException();
@@ -1063,15 +1058,15 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public int persistRetiredUserStats(final int teamId, final String displayUserName, final UserTcStats retiredUserStats) throws FoldingException {
-        LOGGER.debug("Persisting retired user ID {} for team ID {}", retiredUserStats.getUserId(), teamId);
-        final String preparedInsertSqlStatement = "INSERT INTO retired_user_stats (user_id, team_id, display_username, utc_timestamp, final_points, final_multiplied_points, final_units) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id;";
+    public int persistRetiredUserStats(final int teamId, final int userId, final String displayUserName, final UserTcStats retiredUserStats) throws FoldingException {
+        LOGGER.debug("Persisting retired user ID {} for team ID {}", userId, teamId);
+        final String preparedInsertSqlStatement = "INSERT INTO retired_user_stats (team_id, user_id, display_username, utc_timestamp, final_points, final_multiplied_points, final_units) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING retired_user_id;";
 
         try (final Connection connection = dbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
             try {
-                preparedStatement.setInt(1, retiredUserStats.getUserId());
-                preparedStatement.setInt(2, teamId);
+                preparedStatement.setInt(1, teamId);
+                preparedStatement.setInt(2, userId);
                 preparedStatement.setString(3, displayUserName);
                 preparedStatement.setTimestamp(4, DateTimeUtils.currentUtcTimestamp());
                 preparedStatement.setLong(5, retiredUserStats.getPoints());
@@ -1081,12 +1076,12 @@ public class PostgresDbManager implements DbManager {
                 LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
                 try (final ResultSet resultSet = preparedStatement.executeQuery()) {
                     if (resultSet.next()) {
-                        return resultSet.getInt("id");
+                        return resultSet.getInt("retired_user_id");
                     }
                 }
                 throw new IllegalStateException("No ID was returned from the DB, but no exception was raised");
             } catch (final SQLException e) {
-                LOGGER.warn("Unable to persist retired stats for user ID {} for team ID {}", retiredUserStats.getUserId(), teamId, e);
+                LOGGER.warn("Unable to persist retired stats for user '{}' for team ID {}", displayUserName, teamId, e);
                 throw new FoldingException("Error persisting retired stats", e);
             }
         } catch (final SQLException e) {
@@ -1096,10 +1091,10 @@ public class PostgresDbManager implements DbManager {
 
     @Override
     public RetiredUserTcStats getRetiredUserStats(final int retiredUserId) throws FoldingException {
-        LOGGER.debug("Getting retired user with ID: {} ", retiredUserId);
-        final String preparedInsertSqlStatement = "SELECT id, user_id, team_id, display_username, utc_timestamp, final_points, final_multiplied_points, final_units " +
+        LOGGER.debug("Getting retired user with ID: {}", retiredUserId);
+        final String preparedInsertSqlStatement = "SELECT retired_user_id, team_id, user_id, display_username, utc_timestamp, final_points, final_multiplied_points, final_units " +
                 "FROM retired_user_stats " +
-                "WHERE id = ? " +
+                "WHERE retired_user_id = ? " +
                 "ORDER BY utc_timestamp DESC " +
                 "LIMIT 1;";
 
@@ -1112,7 +1107,7 @@ public class PostgresDbManager implements DbManager {
                 try (final ResultSet resultSet = preparedStatement.executeQuery()) {
                     if (resultSet.next()) {
                         return RetiredUserTcStats.create(
-                                resultSet.getInt("id"),
+                                resultSet.getInt("retired_user_id"),
                                 resultSet.getInt("team_id"),
                                 resultSet.getString("display_username"),
                                 UserTcStats.create(
@@ -1135,7 +1130,63 @@ public class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public AuthenticationResponse isValidUser(final String userName, final String password) throws FoldingException {
+    public Collection<RetiredUserTcStats> getRetiredUserStatsForTeam(final Team team) throws FoldingException {
+        LOGGER.debug("Getting retired user stats for team with ID: {}", team.getId());
+        final String preparedInsertSqlStatement = "SELECT retired_user_id, team_id, user_id, display_username, utc_timestamp, final_points, final_multiplied_points, final_units " +
+                "FROM retired_user_stats " +
+                "WHERE team_id = ? " +
+                "ORDER BY retired_user_id ASC;";
+
+        try (final Connection connection = dbConnectionPool.getConnection();
+             final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
+            try {
+                preparedStatement.setInt(1, team.getId());
+
+                LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
+                final Collection<RetiredUserTcStats> retiredUserTcStats = new ArrayList<>();
+                try (final ResultSet resultSet = preparedStatement.executeQuery()) {
+                    while (resultSet.next()) {
+                        retiredUserTcStats.add(RetiredUserTcStats.create(
+                                resultSet.getInt("retired_user_id"),
+                                resultSet.getInt("team_id"),
+                                resultSet.getString("display_username"),
+                                UserTcStats.create(
+                                        resultSet.getInt("user_id"),
+                                        resultSet.getTimestamp("utc_timestamp"),
+                                        resultSet.getLong("final_points"),
+                                        resultSet.getLong("final_multiplied_points"),
+                                        resultSet.getInt("final_units")
+                                )
+                        ));
+                    }
+                }
+                return retiredUserTcStats;
+            } catch (final SQLException e) {
+                throw new FoldingException("Error getting retired stats for team with ID: " + team.getId(), e);
+            }
+        } catch (final SQLException e) {
+            throw new FoldingException("Error opening connection to the DB", e);
+        }
+    }
+
+    @Override
+    public void deleteRetiredUserStats() throws FoldingException, FoldingConflictException {
+        LOGGER.debug("Deleting all retired users");
+        final String preparedInsertSqlStatement = "DELETE FROM retired_user_stats;";
+
+        try (final Connection connection = dbConnectionPool.getConnection();
+             final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
+            preparedStatement.executeUpdate();
+        } catch (final SQLException e) {
+            if (e.getMessage().contains(VIOLATES_FOREIGN_KEY_CONSTRAINT)) {
+                throw new FoldingConflictException();
+            }
+            throw new FoldingException("Error opening connection to the DB", e);
+        }
+    }
+
+    @Override
+    public SystemUserAuthentication isValidSystemUser(final String userName, final String password) throws FoldingException {
         LOGGER.debug("Checking if supplied user name '{}' and password is valid user, then returning roles", userName);
         final String selectSql = "SELECT user_password_hash = crypt(?, user_password_hash) AS is_password_match, roles " +
                 "FROM system_users " +
@@ -1154,14 +1205,14 @@ public class PostgresDbManager implements DbManager {
 
                         if (!isPasswordMatch) {
                             LOGGER.debug("Invalid password supplied for user: {}", userName);
-                            return AuthenticationResponse.invalidPassword();
+                            return SystemUserAuthentication.invalidPassword();
                         }
 
-                        return AuthenticationResponse.success(Set.of((String[]) resultSet.getArray("roles").getArray()));
+                        return SystemUserAuthentication.success(Set.of((String[]) resultSet.getArray("roles").getArray()));
                     }
                 }
                 LOGGER.debug("No entries found for user: {}", userName);
-                return AuthenticationResponse.userDoesNotExist();
+                return SystemUserAuthentication.userDoesNotExist();
             } catch (final SQLException e) {
                 throw new FoldingException("Error when validating user", e);
             }
@@ -1187,10 +1238,11 @@ public class PostgresDbManager implements DbManager {
                 resultSet.getString("display_username"),
                 resultSet.getString("passkey"),
                 Category.get(resultSet.getString("category")),
-                resultSet.getInt("hardware_id"),
                 resultSet.getString("profile_link"),
                 resultSet.getString("live_stats_link"),
-                resultSet.getBoolean("is_retired")
+                resultSet.getInt("hardware_id"),
+                resultSet.getInt("team_id"),
+                resultSet.getBoolean("is_captain")
         );
     }
 
@@ -1199,10 +1251,7 @@ public class PostgresDbManager implements DbManager {
                 resultSet.getInt("team_id"),
                 resultSet.getString("team_name"),
                 resultSet.getString("team_description"),
-                resultSet.getString("forum_link"),
-                resultSet.getInt("captain_user_id"),
-                Set.of((Integer[]) resultSet.getArray("user_ids").getArray()),
-                Set.of((Integer[]) resultSet.getArray("retired_user_ids").getArray())
+                resultSet.getString("forum_link")
         );
     }
 }

@@ -4,6 +4,7 @@ import me.zodac.folding.client.java.request.TeamCompetitionRequestSender;
 import me.zodac.folding.client.java.response.TeamCompetitionResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.tc.CompetitionResult;
+import me.zodac.folding.rest.api.tc.RetiredUserResult;
 import me.zodac.folding.rest.api.tc.TeamResult;
 import me.zodac.folding.rest.api.tc.UserResult;
 
@@ -53,7 +54,7 @@ public final class TeamCompetitionStatsUtils {
             return TeamCompetitionResponseParser.getStatsForUser(response);
         }
 
-        throw new FoldingRestException(String.format("Invalid response (%s) when getting TC result for user with ID %s with: %s", userId, response.statusCode(), response.body()));
+        throw new FoldingRestException(String.format("Invalid response (%s) when getting TC result for user with ID %s with: %s", response.statusCode(), userId, response.body()));
     }
 
     /**
@@ -98,8 +99,8 @@ public final class TeamCompetitionStatsUtils {
      * @return the {@link UserResult}
      * @throws FoldingRestException thrown if an error occurs sending the HTTP request
      */
-    public static UserResult getRetiredUserFromTeam(final TeamResult teamResult, final String userName) throws FoldingRestException {
-        for (final UserResult userResult : teamResult.getRetiredUsers()) {
+    public static RetiredUserResult getRetiredUserFromTeam(final TeamResult teamResult, final String userName) throws FoldingRestException {
+        for (final RetiredUserResult userResult : teamResult.getRetiredUsers()) {
             if (userResult.getDisplayName().equalsIgnoreCase(userName)) {
                 return userResult;
             }

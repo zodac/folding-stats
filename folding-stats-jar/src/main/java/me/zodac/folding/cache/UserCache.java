@@ -2,10 +2,6 @@ package me.zodac.folding.cache;
 
 import me.zodac.folding.api.tc.User;
 
-import java.util.Map;
-
-import static java.util.stream.Collectors.toMap;
-
 public class UserCache extends AbstractIdentifiableCache<User> {
 
     // TODO: [zodac] Do I really need a singleton instance? May as well make it a static class?
@@ -28,10 +24,10 @@ public class UserCache extends AbstractIdentifiableCache<User> {
         return INSTANCE;
     }
 
-    public Map<Integer, User> getRetired() {
-        return super.getAll()
-                .stream()
-                .filter(User::isRetired)
-                .collect(toMap(User::getId, retiredUser -> retiredUser));
-    }
+//    public Map<Integer, User> getRetired() {
+//        return super.getAll()
+//                .stream()
+//                .filter(User::isRetired)
+//                .collect(toMap(User::getId, retiredUser -> retiredUser));
+//    }
 }
