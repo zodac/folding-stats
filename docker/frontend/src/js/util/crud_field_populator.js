@@ -34,13 +34,68 @@ function populateHardwareDelete(){
     hide("loader");
 }
 
+function populateTeamUpdate(){
+    show("loader");
+    element = document.getElementById("team_update_selector");
+    selectedElement = element.options[element.selectedIndex];
+
+    document.getElementById("team_update_id").value = selectedElement.getAttribute("team_id");
+    document.getElementById("team_update_name").value = selectedElement.getAttribute("team_name");
+
+    teamDescription = selectedElement.getAttribute("team_description");
+    if (teamDescription !== 'undefined') {
+        document.getElementById("team_update_description").value = teamDescription;
+    } else {
+        document.getElementById("team_update_description").value = '';
+    }
+
+    forumLink = selectedElement.getAttribute("team_forum_link");
+    if (forumLink !== 'undefined') {
+        document.getElementById("team_update_forum_link").value = forumLink;
+    } else {
+        document.getElementById("team_update_forum_link").value = '';
+    }
+
+    teamFields = document.querySelectorAll(".team_update");
+    for (var i = 0, teamField; teamField = teamFields[i]; i++) {
+        showElement(teamField);
+    }
+    hide("loader");
+}
+
+function populateTeamDelete(){
+    show("loader");
+    element = document.getElementById("team_delete_selector");
+    selectedElement = element.options[element.selectedIndex];
+
+    document.getElementById("team_delete_id").value = selectedElement.getAttribute("team_id");
+    document.getElementById("team_delete_name").value = selectedElement.getAttribute("team_name");
+
+    teamDescription = selectedElement.getAttribute("team_description");
+    if (teamDescription !== 'undefined') {
+        document.getElementById("team_delete_description").value = teamDescription;
+    } else {
+        document.getElementById("team_delete_description").value = '';
+    }
+
+    forumLink = selectedElement.getAttribute("team_forum_link");
+    if (forumLink !== 'undefined') {
+        document.getElementById("team_delete_forum_link").value = forumLink;
+    } else {
+        document.getElementById("team_delete_forum_link").value = '';
+    }
+
+    teamFields = document.querySelectorAll(".team_delete");
+        for (var i = 0, teamField; teamField = teamFields[i]; i++) {
+            showElement(teamField);
+        }
+    hide("loader");
+}
+
 function populateUserUpdate(){
     show("loader");
     element = document.getElementById("user_update_selector");
     selectedElement = element.options[element.selectedIndex];
-
-    profileLink = selectedElement.getAttribute("user_profile_link");
-    liveStatsLink = selectedElement.getAttribute("user_live_stats_link");
 
     document.getElementById("user_update_id").value = selectedElement.getAttribute("user_id");
     document.getElementById("user_update_folding_name").value = selectedElement.getAttribute("user_folding_name");
@@ -56,13 +111,15 @@ function populateUserUpdate(){
         document.getElementById("user_update_is_captain").checked = false;
     }
 
+    profileLink = selectedElement.getAttribute("user_profile_link");
     if (profileLink !== 'undefined') {
         document.getElementById("user_update_profile_link").value = profileLink;
     } else {
         document.getElementById("user_update_profile_link").value = '';
     }
 
-    if(liveStatsLink !== 'undefined'){
+    liveStatsLink = selectedElement.getAttribute("user_live_stats_link");
+    if (liveStatsLink !== 'undefined') {
         document.getElementById("user_update_live_stats_link").value = liveStatsLink;
     } else {
         document.getElementById("user_update_live_stats_link").value = '';
@@ -80,9 +137,6 @@ function populateUserDelete(){
     element = document.getElementById("user_delete_selector");
     selectedElement = element.options[element.selectedIndex];
 
-    profileLink = selectedElement.getAttribute("user_profile_link");
-    liveStatsLink = selectedElement.getAttribute("user_live_stats_link");
-
     document.getElementById("user_delete_id").value = selectedElement.getAttribute("user_id");
     document.getElementById("user_delete_folding_name").value = selectedElement.getAttribute("user_folding_name");
     document.getElementById("user_delete_display_name").value = selectedElement.getAttribute("user_display_name");
@@ -97,12 +151,14 @@ function populateUserDelete(){
         document.getElementById("user_delete_is_captain").checked = false;
     }
 
+    profileLink = selectedElement.getAttribute("user_profile_link");
     if (profileLink !== 'undefined') {
         document.getElementById("user_delete_profile_link").value = profileLink;
     } else {
         document.getElementById("user_delete_profile_link").value = '';
     }
 
+    liveStatsLink = selectedElement.getAttribute("user_live_stats_link");
     if (liveStatsLink !== 'undefined'){
         document.getElementById("user_delete_live_stats_link").value = liveStatsLink;
     } else {

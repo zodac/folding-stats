@@ -93,6 +93,12 @@ function updateHardware() {
         document.getElementById("hardware_update_display_name").value = '';
         document.getElementById("hardware_update_operating_system").value = '';
         document.getElementById("hardware_update_multiplier").value = '';
+
+        hardwareFields = document.querySelectorAll(".hardware_update");
+        for (var i = 0, hardwareField; hardwareField = hardwareFields[i]; i++) {
+            hideElement(hardwareField);
+        }
+
         successToast("Hardware '" + displayName + "' updated");
         loadHardware();
     })
@@ -146,6 +152,157 @@ function deleteHardware() {
     })
     .catch((error) => {
         console.error('Unexpected error deleting hardware: ', error);
+        return false;
+    });
+}
+
+function createTeam() {
+    var teamName = document.getElementById("team_create_name").value.trim();
+    var teamDescription = document.getElementById("team_create_description").value.trim();
+    var forumLink = document.getElementById("team_create_forum_link").value.trim();
+
+    var requestData = JSON.stringify(
+        {
+            "teamName": teamName,
+            "teamDescription": teamDescription,
+            "forumLink": forumLink
+        }
+    );
+
+    show("loader");
+    fetch(ROOT_URL+'/teams', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': sessionGet("Authorization")
+        },
+        body: requestData
+    })
+    .then(response => {
+        hide("loader");
+
+        if(response.status != 201){
+            failureToast("Team create failed with code: " + response.status);
+            response.json()
+            .then(response => {
+                console.error(JSON.stringify(response, null, 2));
+            });
+            return;
+        }
+
+        document.getElementById("team_create_name").value = '';
+        document.getElementById("team_create_description").value = '';
+        document.getElementById("team_create_forum_link").value = '';
+        successToast("Team '" + teamName + "' created");
+        loadTeams();
+    })
+    .catch((error) => {
+        console.error('Unexpected error creating team: ', error);
+        return false;
+    });
+}
+
+function updateTeam() {
+    var element = document.getElementById("team_update_selector");
+    element = document.getElementById("team_update_selector");
+    selectedElement = element.options[element.selectedIndex];
+    var teamId = selectedElement.getAttribute("team_id");
+
+    var teamName = document.getElementById("team_update_name").value.trim();
+    var teamDescription = document.getElementById("team_update_description").value.trim();
+    var forumLink = document.getElementById("team_update_forum_link").value.trim();
+
+    var requestData = JSON.stringify(
+        {
+            "teamName": teamName,
+            "teamDescription": teamDescription,
+            "forumLink": forumLink
+        }
+    );
+
+    show("loader");
+    fetch(ROOT_URL+'/teams/' + teamId, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': sessionGet("Authorization")
+        },
+        body: requestData
+    })
+    .then(response => {
+        hide("loader");
+
+        if(response.status != 200){
+            failureToast("Team update failed with code: " + response.status);
+            response.json()
+            .then(response => {
+                console.error(JSON.stringify(response, null, 2));
+            });
+            return;
+        }
+
+        document.getElementById("team_update_id").value = '';
+        document.getElementById("team_update_name").value = '';
+        document.getElementById("team_update_description").value = '';
+        document.getElementById("team_update_forum_link").value = '';
+
+        teamFields = document.querySelectorAll(".team_update");
+        for (var i = 0, teamField; teamField = teamFields[i]; i++) {
+            hideElement(teamField);
+        }
+
+        successToast("Team '" + teamName + "' updated");
+        loadTeams();
+    })
+    .catch((error) => {
+        console.error('Unexpected error updating team: ', error);
+        return false;
+    });
+}
+
+function deleteTeam() {
+    var element = document.getElementById("team_delete_selector");
+    element = document.getElementById("team_delete_selector");
+    selectedElement = element.options[element.selectedIndex];
+
+    var teamId = selectedElement.getAttribute("team_id");
+    var teamName = selectedElement.getAttribute("team_name");
+
+    show("loader");
+    fetch(ROOT_URL+'/teams/' + teamId, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': sessionGet("Authorization")
+        }
+    })
+    .then(response => {
+        hide("loader");
+
+        if(response.status != 200){
+            failureToast("Team delete failed with code: " + response.status);
+            response.json()
+            .then(response => {
+                console.error(JSON.stringify(response, null, 2));
+            });
+            return;
+        }
+
+        document.getElementById("team_delete_id").value = '';
+        document.getElementById("team_delete_name").value = '';
+        document.getElementById("team_delete_description").value = '';
+        document.getElementById("team_delete_forum_link").value = '';
+
+        teamFields = document.querySelectorAll(".team_delete");
+        for (var i = 0, teamField; teamField = teamFields[i]; i++) {
+            hideElement(teamField);
+        }
+
+        successToast("Team '" + teamName + "' deleted");
+        loadTeams();
+    })
+    .catch((error) => {
+        console.error('Unexpected error deleting team: ', error);
         return false;
     });
 }
@@ -276,6 +433,12 @@ function updateUser() {
         document.getElementById("user_update_hardware_selector").value = '';
         document.getElementById("user_update_team_selector").value = '';
         document.getElementById("user_update_is_captain").checked = false;
+
+        userFields = document.querySelectorAll(".user_delete");
+        for (var i = 0, userField; userField = userFields[i]; i++) {
+            hideElement(userField);
+        }
+
         successToast("User '" + displayName + "' updated");
         loadUsers();
     })

@@ -124,8 +124,8 @@
     <button onclick="toggleMainButtonStyle('teams_admin_button', this.classList)" class="btn btn-primary"
             id="teams_admin_button" href="#team_admin_functions" data-bs-toggle="collapse" role="button">Teams
     </button>
-    <button onclick="toggleMainButtonStyle('users_admin_button', this.classList)" class="btn btn-primary"
-            id="users_admin_button" href="#user_admin_functions" data-bs-toggle="collapse" role="button">Users
+    <button onclick="toggleMainButtonStyle('user_admin_button', this.classList)" class="btn btn-primary"
+            id="user_admin_button" href="#user_admin_functions" data-bs-toggle="collapse" role="button">Users
     </button>
 
     <div>
@@ -303,40 +303,141 @@
     </div>
 
     <div id="team_admin_functions" class="collapse">
-        <h2 class="navbar-brand">Team Admin Functions</h2>
-        <form id="create_team_form" class="row g-3" onsubmit="createTeam(); return false;" action="">
-            <div class="col-auto">
-                <button type="submit" class="btn btn-primary mb-3">Create Team</button>
+        <h1 class="navbar-brand">Team Admin Functions</h1>
+        <div id="team_accordion" class="accordion bg-dark text-light">
+
+            <div id="team_create_accordion_parent" class="accordion-item bg-dark">
+                <h2 id="team_create_accordion_header" class="accordion-header bg-dark text-light">
+                    <button class="accordion-button collapsed bg-dark text-light" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#team_create_accordion_item"
+                            aria-expanded="true" aria-controls="team_create_accordion">
+                        Create Team
+                    </button>
+                </h2>
+                <div id="team_create_accordion_item" class="accordion-collapse collapse"
+                     aria-labelledby="team_create_accordion_header"
+                     data-bs-parent="#team_accordion">
+                    <div class="accordion-body">
+                        <form id="team_create_form" class="row g-3" onsubmit="createTeam(); return false;"
+                              action="">
+                            <div class="col-auto">
+                                <button type="submit" class="btn btn-primary mb-3">Create Team</button>
+                            </div>
+                            <div class="col-auto">
+                                <label for="team_create_name" class="visually-hidden">Team Name</label>
+                                <input id="team_create_name" class="form-control" type="text"
+                                       placeholder="Team Name" aria-label="Team Name" required>
+                            </div>
+                            <div class="col-auto">
+                                <label for="team_create_description" class="visually-hidden">Team Description</label>
+                                <input id="team_create_description" class="form-control" type="text"
+                                       placeholder="Description" aria-label="Description">
+                            </div>
+                            <div class="col-auto">
+                                <label for="team_create_forum_link" class="visually-hidden">Forum Link</label>
+                                <input id="team_create_forum_link" class="form-control" type="url"
+                                       placeholder="Forum Link" aria-label="Forum Link" required>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <div class="col-auto">
-                <label for="create_team_name" class="visually-hidden">Team Name</label>
-                <input id="create_team_name" class="form-control" type="text"
-                       placeholder="Team Name" aria-label="Team Name" required>
+
+            <div id="team_update_accordion_parent" class="accordion-item bg-dark">
+                <h2 id="team_update_accordion_header" class="accordion-header bg-dark text-light">
+                    <button class="accordion-button collapsed bg-dark text-light" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#team_update_accordion_item"
+                            aria-expanded="true" aria-controls="team_update_accordion">
+                        Update Team
+                    </button>
+                </h2>
+                <div id="team_update_accordion_item" class="accordion-collapse collapse"
+                     aria-labelledby="team_update_accordion_header" data-bs-parent="#team_accordion">
+                    <div class="accordion-body">
+                        <form id="team_update_form" class="row g-3" onsubmit="updateTeam(); return false;"
+                              action="">
+                            <div class="col-auto">
+                                <button type="submit" class="btn btn-primary mb-3">Update Team</button>
+                            </div>
+                            <div class="col-auto">
+                                <select id="team_update_selector" class="form-select team_list"
+                                        aria-label="team_update_list" onchange="populateTeamUpdate();" required>
+                                    <!-- Will be populated by system.js -->
+                                </select>
+                            </div>
+                            <div class="col-auto" style="display:none;">
+                                <label for="team_update_id" class="visually-hidden">Team ID</label>
+                                <input id="team_update_id" class="form-control" type="text" placeholder="ID"
+                                       aria-label="ID" disabled>
+                            </div>
+                            <div class="col-auto team_update" style="display:none;">
+                                <label for="team_update_name" class="visually-hidden">Team Name</label>
+                                <input id="team_update_name" class="form-control" type="text"
+                                       placeholder="Team Name" aria-label="Team Name" required>
+                            </div>
+                            <div class="col-auto team_update" style="display:none;">
+                                <label for="team_update_description" class="visually-hidden">Team Description</label>
+                                <input id="team_update_description" class="form-control" type="text"
+                                       placeholder="Team Description" aria-label="Team Description">
+                            </div>
+                            <div class="col-auto team_update" style="display:none;">
+                                <label for="team_update_forum_link" class="visually-hidden">Forum Link</label>
+                                <input id="team_update_forum_link" class="form-control" type="url"
+                                       placeholder="Forum Link" aria-label="Forum Link" required>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <div class="col-auto">
-                <label for="create_team_description" class="visually-hidden">Team Description</label>
-                <input id="create_team_description" class="form-control" type="text"
-                       placeholder="Team Description" aria-label="Team Description">
+
+            <div id="team_delete_accordion_parent" class="accordion-item bg-dark">
+                <h2 id="team_delete_accordion_header" class="accordion-header bg-dark text-light">
+                    <button class="accordion-button collapsed bg-dark text-light" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#team_delete_accordion_item"
+                            aria-expanded="true" aria-controls="team_delete_accordion">
+                        Delete Hardware
+                    </button>
+                </h2>
+                <div id="team_delete_accordion_item" class="accordion-collapse collapse"
+                     aria-labelledby="team_delete_accordion_header"
+                     data-bs-parent="#team_accordion">
+                    <div class="accordion-body">
+                        <form id="team_delete_form" class="row g-3" onsubmit="deleteTeam(); return false;"
+                              action="">
+                            <div class="col-auto">
+                                <button type="submit" class="btn btn-danger mb-3">Delete Team</button>
+                            </div>
+                            <div class="col-auto">
+                                <select id="team_delete_selector" class="form-select team_list"
+                                        aria-label="team_delete_list" onchange="populateTeamDelete();" required>
+                                    <!-- Will be populated by system.js -->
+                                </select>
+                            </div>
+                            <div class="col-auto" style="display:none;">
+                                <label for="team_delete_id" class="visually-hidden">Team ID</label>
+                                <input id="team_delete_id" class="form-control" type="text" placeholder="ID"
+                                       aria-label="ID" disabled>
+                            </div>
+                            <div class="col-auto team_delete" style="display:none;">
+                                <label for="team_delete_name" class="visually-hidden">Team Name</label>
+                                <input id="team_delete_name" class="form-control" type="text"
+                                       placeholder="Team Name" aria-label="Team Name" disabled>
+                            </div>
+                            <div class="col-auto team_delete" style="display:none;">
+                                <label for="team_delete_description" class="visually-hidden">Team Description</label>
+                                <input id="team_delete_description" class="form-control" type="text"
+                                       placeholder="Team Description" aria-label="Team Description" disabled>
+                            </div>
+                            <div class="col-auto team_delete" style="display:none;">
+                                <label for="team_delete_forum_link" class="visually-hidden">Forum Link</label>
+                                <input id="team_delete_forum_link" class="form-control" type="url"
+                                       placeholder="Forum Link" aria-label="Forum Link" disabled>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <div class="col-auto">
-                <label for="create_team_forum_link" class="visually-hidden">Forum Link</label>
-                <input id="create_team_forum_link" class="form-control" type="url" placeholder="Forum Link"
-                       aria-label="Forum Link">
-            </div>
-            <div class="col-auto">
-                <input id="create_team_captain" class="form-control" list="available_users"
-                       placeholder="Captain">
-                <datalist id="available_users">
-                    <!-- Will be populated by system.js -->
-                </datalist>
-            </div>
-            <div class="col-auto mb-3">
-                <select id="create_team_users" class="form-select" multiple
-                        aria-label="Team Users">
-                    <!-- Will be populated by system.js -->
-                </select>
-            </div>
-        </form>
+        </div>
     </div>
 
     <div id="user_admin_functions" class="collapse">

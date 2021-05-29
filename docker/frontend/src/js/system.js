@@ -190,9 +190,6 @@ function loadUsers() {
 
         usersTableBody = document.createElement('tbody');
 
-        dataListOfUsers = document.getElementById("available_users");
-        selectOfUsers = document.getElementById("create_team_users");
-
         jsonResponse.forEach(function(usersItem, i) {
             // Update users display table
             usersTableBodyRow = document.createElement('tr');
@@ -215,17 +212,6 @@ function loadUsers() {
                 usersTableBodyRow.append(usersTableBodyCell);
             });
             usersTableBody.append(usersTableBodyRow);
-
-            // Update the create/update dropdown menus for users
-            var userOption = document.createElement("option");
-            userOption.setAttribute("value", usersItem['id']);
-            userOption.innerHTML = usersItem["displayName"];
-            dataListOfUsers.append(userOption);
-
-            var userOption = document.createElement("option");
-            userOption.setAttribute("value", usersItem['id']);
-            userOption.innerHTML = usersItem["displayName"];
-            selectOfUsers.append(userOption);
         });
         usersTable.append(usersTableBody);
 
