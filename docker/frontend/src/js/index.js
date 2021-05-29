@@ -221,7 +221,7 @@ function loadTeamStats() {
     .then(function(jsonResponse) {
         // Build team tables
         const teamTableHeaders = ["Rank", "User", "Category", "Hardware", "Points", "Units"];
-        const teamTableUserProperties = ["rankInTeam", "displayName", "category", "hardware", "multipliedPoints", "units"];
+        const activeUserProperties = ["rankInTeam", "displayName", "category", "hardware", "multipliedPoints", "units"];
 
         var jsonResponseTeams = jsonResponse['teams'];
         jsonResponseTeams.sort(sortJsonByKey("rank"));
@@ -294,7 +294,7 @@ function loadTeamStats() {
             activeUsers.forEach(function (activeUser, i) {
                 teamTableBodyRow = document.createElement("tr");
 
-                teamTableUserProperties.forEach(function (userProperty, i) {
+                activeUserProperties.forEach(function (userProperty, i) {
                     teamTableUserCell = document.createElement("td");
 
                     if(userProperty === "multipliedPoints"){
@@ -334,7 +334,9 @@ function loadTeamStats() {
                         teamTableUserCell.innerHTML = activeUser[userProperty]["displayName"].toLocaleString();
                         new bootstrap.Tooltip(teamTableUserCell);
                     } else {
-                        teamTableUserCell.innerHTML = activeUser[userProperty].toLocaleString();
+                        if (userProperty in activeUser) {
+                            teamTableUserCell.innerHTML = activeUser[userProperty].toLocaleString();
+                        }
                     }
 
                     teamTableBodyRow.append(teamTableUserCell);
@@ -347,28 +349,24 @@ function loadTeamStats() {
             retiredUsers.forEach(function (retiredUser, i) {
                 teamTableBodyRow = document.createElement("tr");
 
-                teamTableUserProperties.forEach(function (userProperty, i) {
+                activeUserProperties.forEach(function (userProperty, i) {
                     teamTableUserCell = document.createElement("td");
 
-                    if(userProperty === "multipliedPoints"){
+                    if (userProperty === "multipliedPoints") {
                         teamTableUserCell.setAttribute("data-bs-toggle", "tooltip");
                         teamTableUserCell.setAttribute("data-placement", "left");
                         teamTableUserCell.setAttribute("title", "Unmultiplied: " + retiredUser["points"].toLocaleString());
                         teamTableUserCell.innerHTML = retiredUser[userProperty].toLocaleString();
                         new bootstrap.Tooltip(teamTableUserCell);
-                    } else if (userProperty === "userName") {
-                        teamTableUserCell.innerHTML = retiredUser[userProperty] + " (retired)";
-                    } else if (userProperty === "hardware") {
-                        teamTableUserCell.setAttribute("data-bs-toggle", "tooltip");
-                        teamTableUserCell.setAttribute("data-placement", "left");
-                        teamTableUserCell.setAttribute("title", "Multiplier: x" + retiredUser["hardware"]["multiplier"].toLocaleString());
-                        teamTableUserCell.innerHTML = retiredUser[userProperty]["displayName"].toLocaleString();
-                        new bootstrap.Tooltip(teamTableUserCell);
+                    } else if (userProperty === "category") {
+                        teamTableUserCell.innerHTML = "Retired";
                     } else {
-                        teamTableUserCell.innerHTML = retiredUser[userProperty].toLocaleString();
+                        if (userProperty in retiredUser) {
+                            teamTableUserCell.innerHTML = retiredUser[userProperty].toLocaleString();
+                        }
                     }
 
-                    teamTableBodyRow.append(teamTableUserRow);
+                    teamTableBodyRow.append(teamTableUserCell);
                 });
                 teamTableBody.append(teamTableBodyRow);
             });
