@@ -271,6 +271,12 @@ public class BusinessLogic {
             userCache.remove(userId);
 
             final UserTcStats userStats = getTcStatsForUser(userId);
+
+            if (userStats.isEmpty()) {
+                LOGGER.warn("User '{}' has no stats, not saving any retired stats", user.getDisplayName());
+                return;
+            }
+
             final int retiredUserId = dbManager.persistRetiredUserStats(team.getId(), user.getId(), user.getDisplayName(), userStats);
             retiredStatsCache.add(RetiredUserTcStats.create(retiredUserId, team.getId(), user.getDisplayName(), userStats));
         } catch (final UserNotFoundException | NoStatsAvailableException | TeamNotFoundException e) {
