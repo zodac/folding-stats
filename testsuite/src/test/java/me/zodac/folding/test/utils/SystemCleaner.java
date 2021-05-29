@@ -59,7 +59,7 @@ public final class SystemCleaner {
             HARDWARE_REQUEST_SENDER.delete(hardware.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
         }
 
-//        DatabaseUtils.truncateTableAndResetId("hardware", "users", "teams");
+        DatabaseUtils.truncateTableAndResetId("hardware", "users", "teams");
     }
 
     /**

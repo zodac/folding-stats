@@ -1060,7 +1060,12 @@ public class PostgresDbManager implements DbManager {
     @Override
     public int persistRetiredUserStats(final int teamId, final int userId, final String displayUserName, final UserTcStats retiredUserStats) throws FoldingException {
         LOGGER.debug("Persisting retired user ID {} for team ID {}", userId, teamId);
-        final String preparedInsertSqlStatement = "INSERT INTO retired_user_stats (team_id, user_id, display_username, utc_timestamp, final_points, final_multiplied_points, final_units) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING retired_user_id;";
+        final String preparedInsertSqlStatement = "INSERT INTO retired_user_stats (team_id, user_id, display_username, utc_timestamp, final_points, final_multiplied_points, final_units) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?) " +
+                "ON CONFLICT (user_id) " +
+                "DO UPDATE " +
+                "SET team_id = ?, user_id = ?, display_username = ?, utc_timestamp = ?, final_points = ?, final_multiplied_points = ?, final_units = ? " +
+                "RETURNING retired_user_id;";
 
         try (final Connection connection = dbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
@@ -1072,6 +1077,13 @@ public class PostgresDbManager implements DbManager {
                 preparedStatement.setLong(5, retiredUserStats.getPoints());
                 preparedStatement.setLong(6, retiredUserStats.getMultipliedPoints());
                 preparedStatement.setInt(7, retiredUserStats.getUnits());
+                preparedStatement.setInt(8, teamId);
+                preparedStatement.setInt(9, userId);
+                preparedStatement.setString(10, displayUserName);
+                preparedStatement.setTimestamp(11, DateTimeUtils.currentUtcTimestamp());
+                preparedStatement.setLong(12, retiredUserStats.getPoints());
+                preparedStatement.setLong(13, retiredUserStats.getMultipliedPoints());
+                preparedStatement.setInt(14, retiredUserStats.getUnits());
 
                 LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
                 try (final ResultSet resultSet = preparedStatement.executeQuery()) {

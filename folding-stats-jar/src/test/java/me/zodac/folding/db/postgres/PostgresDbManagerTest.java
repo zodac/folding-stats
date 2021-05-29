@@ -167,15 +167,15 @@ public class PostgresDbManagerTest {
         assertThatThrownBy(() -> POSTGRES_DB_MANAGER.getRetiredUserStats(invalidId))
                 .isInstanceOf(FoldingException.class);
 
-        final Team team = createTeam();
         final User userToRetire = createUser();
-        POSTGRES_DB_MANAGER.updateTeam(team);
+        final int teamId = userToRetire.getTeamId();
+        POSTGRES_DB_MANAGER.deleteUser(userToRetire.getId());
 
         final long points = 100L;
         final long multipliedPoints = 1_000L;
         final int units = 5;
 
-        final int retiredUserId = POSTGRES_DB_MANAGER.persistRetiredUserStats(team.getId(), userToRetire.getId(), userToRetire.getDisplayName(),
+        final int retiredUserId = POSTGRES_DB_MANAGER.persistRetiredUserStats(teamId, userToRetire.getId(), userToRetire.getDisplayName(),
                 UserTcStats.createWithoutTimestamp(userToRetire.getId(), points, multipliedPoints, units));
 
         final RetiredUserTcStats retiredUserStats = POSTGRES_DB_MANAGER.getRetiredUserStats(retiredUserId);

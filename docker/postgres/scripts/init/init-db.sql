@@ -103,7 +103,7 @@ CREATE INDEX index_user_total_stats
 CREATE TABLE retired_user_stats (
     retired_user_id SERIAL PRIMARY KEY,
     team_id INT NOT NULL,
-    user_id INT NOT NULL,
+    user_id INT UNIQUE NOT NULL,
     display_username TEXT NOT NULL,
     utc_timestamp TIMESTAMP NOT NULL,
     final_points BIGINT NOT NULL,

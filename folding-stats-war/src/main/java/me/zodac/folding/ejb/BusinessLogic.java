@@ -266,17 +266,17 @@ public class BusinessLogic {
         try {
             final User user = getUser(userId);
             final Team team = getTeam(user.getTeamId());
+
+            dbManager.deleteUser(userId);
+            userCache.remove(userId);
+
             final UserTcStats userStats = getTcStatsForUser(userId);
             final int retiredUserId = dbManager.persistRetiredUserStats(team.getId(), user.getId(), user.getDisplayName(), userStats);
             retiredStatsCache.add(RetiredUserTcStats.create(retiredUserId, team.getId(), user.getDisplayName(), userStats));
-
-        } catch (final UserNotFoundException | FoldingException | NoStatsAvailableException | TeamNotFoundException e) {
+        } catch (final UserNotFoundException | NoStatsAvailableException | TeamNotFoundException e) {
             LOGGER.debug("Error getting final stats for deleted user with ID: {}", userId, e);
             LOGGER.warn("Error getting final stats for deleted user with ID: {}", userId);
         }
-
-        dbManager.deleteUser(userId);
-        userCache.remove(userId);
     }
 
     public Team createTeam(final Team team) throws FoldingException, FoldingConflictException {
