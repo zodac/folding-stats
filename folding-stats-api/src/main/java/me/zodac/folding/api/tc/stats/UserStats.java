@@ -36,8 +36,8 @@ public class UserStats {
         return new UserStats(User.EMPTY_USER_ID, DateTimeUtils.currentUtcTimestamp(), Stats.empty());
     }
 
-    public boolean isEmpty() {
-        return userId == 0 && stats.isEmpty();
+    public Timestamp getTimestamp() {
+        return new Timestamp(timestamp.getTime());
     }
 
     public long getPoints() {
@@ -46,5 +46,9 @@ public class UserStats {
 
     public int getUnits() {
         return stats.getUnits();
+    }
+    
+    public boolean isEmpty() {
+        return userId == 0 && stats.isEmpty();
     }
 }

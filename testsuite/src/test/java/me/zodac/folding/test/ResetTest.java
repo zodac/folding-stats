@@ -105,6 +105,10 @@ public class ResetTest {
                 .as("Expected no retired users at start: " + teamResult)
                 .isEmpty();
 
+        // User must have points or else will not show as 'retired' for the team
+        StubbedFoldingEndpointUtils.setPoints(userToRetire, 1_000L);
+        manuallyUpdateStats();
+        
         USER_REQUEST_SENDER.delete(userToRetireId, ADMIN_USER.userName(), ADMIN_USER.password());
         manuallyUpdateStats();
 

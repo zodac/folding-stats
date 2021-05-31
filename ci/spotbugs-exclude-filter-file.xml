@@ -1,0 +1,12 @@
+<FindBugsFilter>
+    <!-- Mostly using Lombok, so these non-null checks are file -->
+    <Match>
+        <Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"/>
+    </Match>
+
+    <!-- False positive, unable to see that generic response from cache is actually a valid case -->
+    <Match>
+        <Class name="me.zodac.folding.ejb.BusinessLogic"/>
+        <Bug pattern="BC_IMPOSSIBLE_CAST"/>
+    </Match>
+</FindBugsFilter>

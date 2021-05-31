@@ -27,6 +27,9 @@
         <!-- Do not run tests by default -->
         <skip-tests>true</skip-tests>
 
+        <!-- Do not run linters by default -->
+        <skip-linters>true</skip-linters>
+
         <!-- 3PP Versions -->
         <commons-lang3.version>3.12.0</commons-lang3.version>
         <commons-validator.version>1.7</commons-validator.version>
@@ -46,12 +49,20 @@
         <flyway-core>6.5.1</flyway-core>
         <junit.version>5.7.1</junit.version>
 
+        <!-- Linter 3PP Versions -->
+        <spotbugs.version>4.2.3</spotbugs.version>
+
+        <!-- Linter Properties -->
+        <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
+        <spotbugs-exclude-file>${project.parent.basedir}/ci/spotbugs-exclude-filter-file.xml</spotbugs-exclude-file>
+
         <!-- Plugin Versions -->
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-dependency-plugin.version>3.1.2</maven-dependency-plugin.version>
         <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
         <maven-war-plugin.version>3.3.1</maven-war-plugin.version>
+        <spotbugs-maven-plugin.version>4.2.0</spotbugs-maven-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -186,27 +197,85 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${maven-surefire-plugin.version}</version>
+                    <configuration>
+                        <skipTests>${skip-tests}</skipTests>
+                        <includes>
+                            <include>**/*Test.java</include>
+                        </includes>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
                     <version>${maven-war-plugin.version}</version>
                 </plugin>
+                <plugin>
+                    <groupId>com.github.spotbugs</groupId>
+                    <artifactId>spotbugs-maven-plugin</artifactId>
+                    <version>${spotbugs-maven-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <phase>install</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <excludeFilterFile>${spotbugs-exclude-file}</excludeFilterFile>
+                        <skip>${skip-linters}</skip>
+                    </configuration>
+                    <dependencies>
+                        <!-- Overwrite dependency on spotbugs if you want to specify the version of spotbugs -->
+                        <dependency>
+                            <groupId>com.github.spotbugs</groupId>
+                            <artifactId>spotbugs</artifactId>
+                            <version>${spotbugs.version}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
 
     <profiles>
-        <!-- Profile used to enable to maven-surefire-plugin and execute each module's testsuite (if any) -->
+        <!-- Profile to run both tests and linters -->
         <profile>
-            <id>activate_testsuite</id>
+            <id>activate_all</id>
             <activation>
                 <property>
-                    <name>ts</name>
+                    <name>ts</name> <!-- Name technically means 'testsuite', but it's just what I'm used to running -->
                 </property>
             </activation>
             <properties>
                 <skip-tests>false</skip-tests>
+                <skip-linters>false</skip-linters>
+            </properties>
+        </profile>
+
+        <!-- Profile used to execute each module's testsuite (if any) -->
+        <profile>
+            <id>activate_tests</id>
+            <activation>
+                <property>
+                    <name>tests</name>
+                </property>
+            </activation>
+            <properties>
+                <skip-tests>false</skip-tests>
+            </properties>
+        </profile>
+
+        <!-- Profile used to execute each module's linters (if any) -->
+        <profile>
+            <id>activate_linters</id>
+            <activation>
+                <property>
+                    <name>lint</name>
+                </property>
+            </activation>
+            <properties>
+                <skip-linters>false</skip-linters>
             </properties>
         </profile>
     </profiles>
