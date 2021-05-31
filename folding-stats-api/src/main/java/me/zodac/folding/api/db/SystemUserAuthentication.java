@@ -45,6 +45,7 @@ public class SystemUserAuthentication {
     /**
      * Successful {@link SystemUserAuthentication} with retrieved user roles.
      *
+     * @param userRoles the roles of the user that has been successfully logged in
      * @return the {@link SystemUserAuthentication}
      */
     public static SystemUserAuthentication success(final Set<String> userRoles) {

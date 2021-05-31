@@ -29,7 +29,7 @@ public class ValidationResponse {
     /**
      * Validation was successful.
      *
-     * @return a {@link ValidationResponse} with no invalid object and an empty {@link Collection} of errors.
+     * @return a {@link ValidationResponse} with no invalid object and an empty {@link Collection} of errors
      */
     public static ValidationResponse success() {
         return new ValidationResponse(null, Collections.emptyList());
@@ -38,16 +38,18 @@ public class ValidationResponse {
     /**
      * Validation failed due to one or more errors.
      *
-     * @return a {@link ValidationResponse} with the invalid object and a {@link Collection} of errors.
+     * @param invalidObject the {@link Object} that failed validation
+     * @param errors        a {@link Collection} of the validation errors for the {@link Object}
+     * @return a {@link ValidationResponse} with the invalid object and a {@link Collection} of errors
      */
-    public static ValidationResponse failure(final Object invalidObject, final List<String> errors) {
+    public static ValidationResponse failure(final Object invalidObject, final Collection<String> errors) {
         return new ValidationResponse(invalidObject, errors);
     }
 
     /**
      * Validation failed due to a null object.
      *
-     * @return a {@link ValidationResponse} with the null object a single error.
+     * @return a {@link ValidationResponse} with the null object a single error
      */
     public static ValidationResponse nullObject() {
         return new ValidationResponse(null, List.of("Payload is null"));

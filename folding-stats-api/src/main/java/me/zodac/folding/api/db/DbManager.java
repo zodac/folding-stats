@@ -29,9 +29,10 @@ public interface DbManager {
      *
      * @param hardware the {@link Hardware} to persist
      * @return the {@link Hardware} updated with an ID
-     * @throws FoldingException thrown on error persisting the {@link Hardware}
+     * @throws FoldingConflictException thrown if another {@link Hardware} exists with a conflicting unique key
+     * @throws FoldingException         thrown on error persisting the {@link Hardware}
      */
-    Hardware createHardware(final Hardware hardware) throws FoldingException, FoldingConflictException;
+    Hardware createHardware(final Hardware hardware) throws FoldingConflictException, FoldingException;
 
     Collection<Hardware> getAllHardware() throws FoldingException;
 

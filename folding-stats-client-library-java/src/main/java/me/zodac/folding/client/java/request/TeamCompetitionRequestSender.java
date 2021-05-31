@@ -82,6 +82,7 @@ public final class TeamCompetitionRequestSender {
     /**
      * Send a <b>GET</b> request to retrieve the <code>Team Competition</code> {@link me.zodac.folding.rest.api.tc.UserResult} for a {@link me.zodac.folding.api.tc.User}.
      *
+     * @param userId the ID of the {@link me.zodac.folding.api.tc.User} whose {@link me.zodac.folding.rest.api.tc.UserResult} is to be retrieved
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      * @see #getStats(String)

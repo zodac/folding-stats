@@ -49,6 +49,13 @@
         <flyway-core>6.5.1</flyway-core>
         <junit.version>5.7.1</junit.version>
 
+        <!-- Plugin Versions -->
+        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+        <maven-dependency-plugin.version>3.1.2</maven-dependency-plugin.version>
+        <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
+        <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
+        <maven-war-plugin.version>3.3.1</maven-war-plugin.version>
+
         <!-- Linter 3PP Versions -->
         <spotbugs.version>4.2.3</spotbugs.version>
 
@@ -56,12 +63,8 @@
         <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
         <spotbugs-exclude-file>${project.parent.basedir}/ci/spotbugs-exclude-filter-file.xml</spotbugs-exclude-file>
 
-        <!-- Plugin Versions -->
-        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
-        <maven-dependency-plugin.version>3.1.2</maven-dependency-plugin.version>
-        <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
-        <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
-        <maven-war-plugin.version>3.3.1</maven-war-plugin.version>
+        <!-- Linter Plugin Versions -->
+        <maven-javadoc-plugin.version>3.3.0</maven-javadoc-plugin.version>
         <spotbugs-maven-plugin.version>4.2.0</spotbugs-maven-plugin.version>
     </properties>
 
@@ -209,10 +212,40 @@
                     <artifactId>maven-war-plugin</artifactId>
                     <version>${maven-war-plugin.version}</version>
                 </plugin>
+
+                <!-- Linters -->
+
+                <!-- Manual execution: -->
+                <!-- mvn clean install javadoc:javadoc -Dskip-linters=false -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>${maven-javadoc-plugin.version}</version>
+                    <configuration>
+                        <failOnWarnings>true</failOnWarnings>
+                        <quiet>true</quiet>
+                        <skip>${skip-linters}</skip>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>javadoc</goal>
+                            </goals>
+                            <phase>install</phase>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <!-- Manual execution: -->
+                <!-- mvn clean install spotbugs:spotbugs -Dskip-linters=false -->
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
                     <version>${spotbugs-maven-plugin.version}</version>
+                    <configuration>
+                        <excludeFilterFile>${spotbugs-exclude-file}</excludeFilterFile>
+                        <skip>${skip-linters}</skip>
+                    </configuration>
                     <executions>
                         <execution>
                             <phase>install</phase>
@@ -221,10 +254,6 @@
                             </goals>
                         </execution>
                     </executions>
-                    <configuration>
-                        <excludeFilterFile>${spotbugs-exclude-file}</excludeFilterFile>
-                        <skip>${skip-linters}</skip>
-                    </configuration>
                     <dependencies>
                         <!-- Overwrite dependency on spotbugs if you want to specify the version of spotbugs -->
                         <dependency>
