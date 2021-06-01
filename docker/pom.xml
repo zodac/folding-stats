@@ -87,6 +87,7 @@
                                 <jsSourceFile>index.js</jsSourceFile>
                                 <!-- Util files -->
                                 <jsSourceFile>util/display_toggle.js</jsSourceFile>
+                                <jsSourceFile>util/enum_mapper.js</jsSourceFile>
                                 <jsSourceFile>util/google_analytics.js</jsSourceFile>
                                 <jsSourceFile>util/json_sorter.js</jsSourceFile>
                                 <jsSourceFile>util/storage.js</jsSourceFile>
