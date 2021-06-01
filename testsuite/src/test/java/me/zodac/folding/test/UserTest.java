@@ -92,8 +92,8 @@ public class UserTest {
         final User actual = UserResponseParser.create(response);
         assertThat(actual)
                 .as("Did not receive created object as JSON response: " + response.body())
-                .extracting("foldingUserName", "displayName", "passkey", "category", "profileLink", "liveStatsLink", "hardwareId", "teamId", "userIsCaptain")
-                .containsExactly(userToCreate.getFoldingUserName(), userToCreate.getDisplayName(), userToCreate.getPasskey(), userToCreate.getCategory(), userToCreate.getProfileLink(), userToCreate.getLiveStatsLink(), userToCreate.getHardwareId(), userToCreate.getTeamId(), userToCreate.isUserIsCaptain());
+                .extracting("foldingUserName", "displayName", "passkey", "category", "profileLink", "liveStatsLink", "userIsCaptain")
+                .containsExactly(userToCreate.getFoldingUserName(), userToCreate.getDisplayName(), userToCreate.getPasskey(), Category.get(userToCreate.getCategory()), userToCreate.getProfileLink(), userToCreate.getLiveStatsLink(), userToCreate.isUserIsCaptain());
     }
 
     @Test
@@ -147,11 +147,11 @@ public class UserTest {
                 .foldingUserName(createdUser.getFoldingUserName())
                 .displayName(createdUser.getDisplayName())
                 .passkey(updatedPasskey)
-                .category(createdUser.getCategory())
+                .category(createdUser.getCategory().displayName())
                 .profileLink(createdUser.getProfileLink())
                 .liveStatsLink(createdUser.getLiveStatsLink())
-                .hardwareId(createdUser.getHardwareId())
-                .teamId(createdUser.getTeamId())
+                .hardwareId(createdUser.getHardware().getId())
+                .teamId(createdUser.getTeam().getId())
                 .userIsCaptain(createdUser.isUserIsCaptain())
                 .build();
         StubbedFoldingEndpointUtils.enableUser(userToUpdate);
@@ -165,8 +165,8 @@ public class UserTest {
         final User actual = UserResponseParser.update(response);
         assertThat(actual)
                 .as("Did not receive created object as JSON response: " + response.body())
-                .extracting("id", "foldingUserName", "displayName", "passkey", "category", "profileLink", "liveStatsLink", "hardwareId", "teamId", "userIsCaptain")
-                .containsExactly(createdUser.getId(), createdUser.getFoldingUserName(), createdUser.getDisplayName(), updatedPasskey, createdUser.getCategory(), createdUser.getProfileLink(), createdUser.getLiveStatsLink(), createdUser.getHardwareId(), createdUser.getTeamId(), createdUser.isUserIsCaptain());
+                .extracting("id", "foldingUserName", "displayName", "passkey", "category", "profileLink", "liveStatsLink", "userIsCaptain")
+                .containsExactly(createdUser.getId(), createdUser.getFoldingUserName(), createdUser.getDisplayName(), updatedPasskey, createdUser.getCategory(), createdUser.getProfileLink(), createdUser.getLiveStatsLink(), createdUser.isUserIsCaptain());
 
 
         final int allUsersAfterUpdate = UserUtils.getNumberOfUsers();
@@ -296,11 +296,11 @@ public class UserTest {
                 .foldingUserName(createdUser.getFoldingUserName())
                 .displayName(createdUser.getDisplayName())
                 .passkey(createdUser.getPasskey())
-                .category(createdUser.getCategory())
+                .category(createdUser.getCategory().displayName())
                 .profileLink(createdUser.getProfileLink())
                 .liveStatsLink(createdUser.getLiveStatsLink())
-                .hardwareId(createdUser.getHardwareId())
-                .teamId(createdUser.getTeamId())
+                .hardwareId(createdUser.getHardware().getId())
+                .teamId(createdUser.getTeam().getId())
                 .userIsCaptain(createdUser.isUserIsCaptain())
                 .build();
 
@@ -314,8 +314,8 @@ public class UserTest {
         final User actual = UserResponseParser.update(updateResponse);
 
         assertThat(actual)
-                .extracting("id", "foldingUserName", "displayName", "passkey", "category", "profileLink", "liveStatsLink", "hardwareId", "teamId", "userIsCaptain")
-                .containsExactly(createdUser.getId(), createdUser.getFoldingUserName(), createdUser.getDisplayName(), createdUser.getPasskey(), createdUser.getCategory(), createdUser.getProfileLink(), createdUser.getLiveStatsLink(), createdUser.getHardwareId(), createdUser.getTeamId(), createdUser.isUserIsCaptain());
+                .extracting("id", "foldingUserName", "displayName", "passkey", "category", "profileLink", "liveStatsLink", "userIsCaptain")
+                .containsExactly(createdUser.getId(), createdUser.getFoldingUserName(), createdUser.getDisplayName(), createdUser.getPasskey(), createdUser.getCategory(), createdUser.getProfileLink(), createdUser.getLiveStatsLink(), createdUser.isUserIsCaptain());
     }
 
     @Test
@@ -456,11 +456,11 @@ public class UserTest {
                 .foldingUserName(createdUser.getFoldingUserName())
                 .displayName(createdUser.getDisplayName())
                 .passkey("updatedPasskey123456789012345678")
-                .category(createdUser.getCategory())
+                .category(createdUser.getCategory().displayName())
                 .profileLink(createdUser.getProfileLink())
                 .liveStatsLink(createdUser.getLiveStatsLink())
-                .hardwareId(createdUser.getHardwareId())
-                .teamId(createdUser.getTeamId())
+                .hardwareId(createdUser.getHardware().getId())
+                .teamId(createdUser.getTeam().getId())
                 .userIsCaptain(createdUser.isUserIsCaptain())
                 .build();
         StubbedFoldingEndpointUtils.enableUser(userToUpdate);
@@ -603,11 +603,11 @@ public class UserTest {
                 .foldingUserName(createdUser.getFoldingUserName())
                 .displayName(createdUser.getDisplayName())
                 .passkey(createdUser.getPasskey())
-                .category(createdUser.getCategory())
+                .category(createdUser.getCategory().displayName())
                 .profileLink(createdUser.getProfileLink())
                 .liveStatsLink("")
-                .hardwareId(createdUser.getHardwareId())
-                .teamId(createdUser.getTeamId())
+                .hardwareId(createdUser.getHardware().getId())
+                .teamId(createdUser.getTeam().getId())
                 .userIsCaptain(createdUser.isUserIsCaptain())
                 .build();
 

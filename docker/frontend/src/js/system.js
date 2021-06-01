@@ -98,8 +98,10 @@ function loadHardware() {
             hardwareProperties.forEach(function (hardwareProperty, i) {
                 hardwareTableBodyCell = document.createElement("td");
 
-                if(hardwareProperty === "multiplier"){
+                if (hardwareProperty === "multiplier") {
                     hardwareTableBodyCell.innerHTML = "x" + hardwareItem[hardwareProperty].toLocaleString();
+                } else if (hardwareProperty === "operatingSystem") {
+                    hardwareTableBodyCell.innerHTML = getOperatingSystem(hardwareItem["operatingSystem"]);
                 } else {
                     hardwareTableBodyCell.innerHTML = hardwareItem[hardwareProperty].toLocaleString();
                 }
@@ -138,10 +140,10 @@ function loadHardware() {
                 hardwareOption.setAttribute("hardware_id", hardwareItem['id']);
                 hardwareOption.setAttribute("hardware_name", hardwareItem['hardwareName']);
                 hardwareOption.setAttribute("display_name", hardwareItem['displayName']);
-                hardwareOption.setAttribute("operating_system", hardwareItem['operatingSystem']);
+                hardwareOption.setAttribute("operating_system", getOperatingSystem(hardwareItem['operatingSystem']));
                 hardwareOption.setAttribute("multiplier", hardwareItem['multiplier']);
 
-                hardwareOption.innerHTML = hardwareItem["displayName"] + " (" +hardwareItem["operatingSystem"] + ")";
+                hardwareOption.innerHTML = hardwareItem["displayName"] + " (" + getOperatingSystem(hardwareItem["operatingSystem"]) + ")";
                 hardwareList.append(hardwareOption);
             });
         }
@@ -156,8 +158,8 @@ function loadUsers() {
     .then(function(jsonResponse) {
         // Build users
         jsonResponse.sort(sortJsonByKey("id"));
-        const usersHeaders = ["ID", "User", "Folding Name", "Passkey", "Category", "Profile Link", "Live Stats Link", "Hardware ID", "Team ID", "Is Captain"];
-        const usersProperties = ["id", "displayName", "foldingUserName", "passkey", "category", "profileLink", "liveStatsLink", "hardwareId", "teamId", "userIsCaptain"];
+        const usersHeaders = ["ID", "User", "Folding Name", "Passkey", "Category", "Profile Link", "Live Stats Link", "Hardware", "Team", "Is Captain"];
+        const usersProperties = ["id", "displayName", "foldingUserName", "passkey", "category", "profileLink", "liveStatsLink", "hardware", "team", "userIsCaptain"];
 
         // Empty div of existing content, if any
         usersDiv = document.getElementById("users_div");
@@ -204,6 +206,12 @@ function loadUsers() {
 
                         usersTableBodyCell.append(link);
                     }
+                } else if (usersProperty === "hardware") {
+                    usersTableBodyCell.innerHTML = usersItem["hardware"]["hardwareName"].toLocaleString();
+                } else if (usersProperty === "team") {
+                    usersTableBodyCell.innerHTML = usersItem["team"]["teamName"].toLocaleString();
+                } else if (usersProperty === "category") {
+                    usersTableBodyCell.innerHTML = getCategory(usersItem["category"]);
                 } else {
                     if (usersProperty in usersItem) {
                         usersTableBodyCell.innerHTML = usersItem[usersProperty].toLocaleString();
@@ -244,11 +252,11 @@ function loadUsers() {
                 userOption.setAttribute("user_folding_name", userItem['foldingUserName']);
                 userOption.setAttribute("user_display_name", userItem['displayName']);
                 userOption.setAttribute("user_passkey", userItem['passkey']);
-                userOption.setAttribute("user_category", userItem['category']);
+                userOption.setAttribute("user_category", getCategory(userItem['category']));
                 userOption.setAttribute("user_profile_link", userItem['profileLink']);
                 userOption.setAttribute("user_live_stats_link", userItem['liveStatsLink']);
-                userOption.setAttribute("user_hardware_id", userItem['hardwareId']);
-                userOption.setAttribute("user_team_id", userItem['teamId']);
+                userOption.setAttribute("user_hardware_id", userItem['hardware']['id']);
+                userOption.setAttribute("user_team_id", userItem['team']['id']);
                 userOption.setAttribute("user_is_captain", userItem['userIsCaptain']);
 
                 userOption.innerHTML = userItem["displayName"];

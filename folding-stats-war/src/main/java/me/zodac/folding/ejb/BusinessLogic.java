@@ -112,7 +112,7 @@ public class BusinessLogic {
         try {
             return getAllHardware()
                     .stream()
-                    .filter(hardware -> hardware.getId() == user.getHardwareId())
+                    .filter(hardware -> hardware.getId() == user.getHardware().getId())
                     .findAny();
         } catch (final FoldingException e) {
             LOGGER.warn("Error getting all hardware to retrieve hardware for user", e.getCause());
@@ -129,7 +129,7 @@ public class BusinessLogic {
         if (existingHardware.getMultiplier() != updatedHardware.getMultiplier()) {
             final List<User> usersWithUpdatedHardware = getAllUsers()
                     .stream()
-                    .filter(user -> user.getHardwareId() == updatedHardware.getId())
+                    .filter(user -> user.getHardware().getId() == updatedHardware.getId())
                     .collect(toList());
             LOGGER.debug("Hardware had state change to multiplier {} -> {}, recalculating initial stats for {} users", existingHardware.getMultiplier(), updatedHardware.getMultiplier(), usersWithUpdatedHardware.size());
 
@@ -222,8 +222,8 @@ public class BusinessLogic {
         } else if (!existingUser.getPasskey().equalsIgnoreCase(updatedUser.getPasskey())) {
             LOGGER.debug("User had state change to passkey {} -> {}, recalculating initial stats", existingUser.getPasskey(), updatedUser.getPasskey());
             handleStateChangeForUser(updatedUser);
-        } else if (existingUser.getHardwareId() != updatedUser.getHardwareId()) {
-            LOGGER.debug("User had state change to hardware ID {} -> {}, recalculating initial stats", existingUser.getHardwareId(), updatedUser.getHardwareId());
+        } else if (existingUser.getHardware() != updatedUser.getHardware()) {
+            LOGGER.debug("User had state change to hardware ID {} -> {}, recalculating initial stats", existingUser.getHardware(), updatedUser.getHardware());
             handleStateChangeForUser(updatedUser);
         }
     }
@@ -259,7 +259,7 @@ public class BusinessLogic {
     public void deleteUser(final int userId) throws FoldingConflictException, FoldingException {
         try {
             final User user = getUser(userId);
-            final Team team = getTeam(user.getTeamId());
+            final Team team = user.getTeam();
 
             dbManager.deleteUser(userId);
             userCache.remove(userId);
@@ -273,7 +273,7 @@ public class BusinessLogic {
 
             final int retiredUserId = dbManager.persistRetiredUserStats(team.getId(), user.getId(), user.getDisplayName(), userStats);
             retiredStatsCache.add(RetiredUserTcStats.create(retiredUserId, team.getId(), user.getDisplayName(), userStats));
-        } catch (final UserNotFoundException | NoStatsAvailableException | TeamNotFoundException e) {
+        } catch (final UserNotFoundException | NoStatsAvailableException e) {
             LOGGER.debug("Error getting final stats for deleted user with ID: {}", userId, e);
             LOGGER.warn("Error getting final stats for deleted user with ID: {}", userId);
         }
@@ -489,7 +489,7 @@ public class BusinessLogic {
 
     public Collection<User> getUsersOnTeam(final Team team) throws FoldingException {
         return getAllUsers().stream()
-                .filter(user -> user.getTeamId() == team.getId())
+                .filter(user -> user.getTeam().getId() == team.getId())
                 .collect(toList());
     }
 

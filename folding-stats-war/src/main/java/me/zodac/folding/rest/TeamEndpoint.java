@@ -6,7 +6,6 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.exception.NotFoundException;
 import me.zodac.folding.api.utils.ExecutionType;
 import me.zodac.folding.api.validator.ValidationResponse;
-import me.zodac.folding.ejb.BusinessLogic;
 import me.zodac.folding.ejb.TeamCompetitionStatsScheduler;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
 import me.zodac.folding.rest.validator.TeamValidator;
@@ -39,9 +38,6 @@ import java.util.Collection;
 public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TeamEndpoint.class);
-
-    @EJB
-    private BusinessLogic businessLogic;
 
     @EJB
     private TeamCompetitionStatsScheduler teamCompetitionStatsScheduler;

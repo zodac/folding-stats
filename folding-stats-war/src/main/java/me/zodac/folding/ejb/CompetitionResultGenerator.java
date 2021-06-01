@@ -7,7 +7,6 @@ import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.tc.exception.HardwareNotFoundException;
 import me.zodac.folding.api.tc.exception.NoStatsAvailableException;
 import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.stats.UserTcStats;
@@ -124,36 +123,20 @@ public class CompetitionResultGenerator {
     }
 
     private UserResult getTcStatsForUser(final User user) {
-        final Hardware hardware;
-
-        try {
-            hardware = businessLogic.getHardware(user.getHardwareId());
-        } catch (final HardwareNotFoundException e) {
-            LOGGER.debug("No hardware found for ID: {}", user.getHardwareId(), e);
-            LOGGER.warn("No hardware found for ID: {}", user.getHardwareId());
-            return UserResult.empty(user.getDisplayName());
-        } catch (final FoldingException e) {
-            LOGGER.warn("Error getting TC stats for user: {}", user, e.getCause());
-            return UserResult.empty(user.getDisplayName());
-        }
-
-        final Category category = Category.get(user.getCategory());
-        if (category == Category.INVALID) {
-            LOGGER.warn("Unexpectedly got an invalid category '{}' for Folding user: {}", user.getCategory(), user.getDisplayName());
-            return UserResult.empty(user.getDisplayName());
-        }
+        final Hardware hardware = user.getHardware();
+        final Category category = user.getCategory();
 
         try {
             final UserTcStats userTcStats = businessLogic.getTcStatsForUser(user.getId());
             LOGGER.debug("Results for {}: {} points | {} multiplied points | {} units", user.getDisplayName(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits());
-            return UserResult.create(user.getId(), user.getDisplayName(), user.getFoldingUserName(), hardware, category.displayName(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits(), user.getProfileLink(), user.getLiveStatsLink());
+            return UserResult.create(user.getId(), user.getDisplayName(), user.getFoldingUserName(), hardware, category, userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits(), user.getProfileLink(), user.getLiveStatsLink());
         } catch (final UserNotFoundException | NoStatsAvailableException e) {
             LOGGER.debug("No stats found for user ID: {}", user.getId(), e);
             LOGGER.warn("No stats found for user ID: {}", user.getId());
-            return UserResult.empty(user.getDisplayName());
+            return UserResult.empty(user.getDisplayName(), user.getFoldingUserName(), category, hardware);
         } catch (final FoldingException e) {
             LOGGER.warn("Error getting TC stats for user: {}", user, e.getCause());
-            return UserResult.empty(user.getDisplayName());
+            return UserResult.empty(user.getDisplayName(), user.getFoldingUserName(), category, hardware);
         }
     }
 }

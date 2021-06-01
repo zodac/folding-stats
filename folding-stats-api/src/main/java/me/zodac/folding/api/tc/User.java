@@ -39,11 +39,11 @@ public class User implements ResponsePojo {
     private final String foldingUserName;
     private final String displayName;
     private final String passkey;
-    private final String category;
+    private final Category category;
     private final String profileLink;
     private final String liveStatsLink;
-    private final int hardwareId;
-    private final int teamId;
+    private final Hardware hardware;
+    private final Team team;
     private final boolean userIsCaptain;
 
     /**
@@ -58,15 +58,15 @@ public class User implements ResponsePojo {
      * @param category        the {@link Category} the user is eligible for when added to a {@link Team}
      * @param profileLink     a URL linking to the {@link User}'s profile on their forum
      * @param liveStatsLink   a URL linking to the live Folding@Home stats (HFM, for example) for the {@link User}
-     * @param hardwareId      the ID of the {@link Hardware} that this {@link User} is Folding on
-     * @param teamId          the ID of the {@link Team} that the {@link User} is Folding for
+     * @param hardware        the {@link Hardware} that this {@link User} is Folding on
+     * @param team            the {@link Team} that the {@link User} is Folding for
      * @param isCaptain       whether the {@link User} is the captain of their {@link Team}
      * @return the created {@link User}
      */
-    public static User create(final int userId, final String foldingUserName, final String displayName, final String passkey, final Category category, final String profileLink, final String liveStatsLink, final int hardwareId, final int teamId, final boolean isCaptain) {
+    public static User create(final int userId, final String foldingUserName, final String displayName, final String passkey, final Category category, final String profileLink, final String liveStatsLink, final Hardware hardware, final Team team, final boolean isCaptain) {
         final String profileLinkOrNull = isEmpty(profileLink) ? null : profileLink;
         final String liveStatsLinkOrNull = isEmpty(liveStatsLink) ? null : liveStatsLink;
-        return new User(userId, foldingUserName, displayName, passkey, category.displayName(), profileLinkOrNull, liveStatsLinkOrNull, hardwareId, teamId, isCaptain);
+        return new User(userId, foldingUserName, displayName, passkey, category, profileLinkOrNull, liveStatsLinkOrNull, hardware, team, isCaptain);
     }
 
     /**
@@ -80,15 +80,15 @@ public class User implements ResponsePojo {
      * @param category        the {@link Category} the user is eligible for when added to a {@link Team}
      * @param profileLink     a URL linking to the {@link User}'s profile on their forum
      * @param liveStatsLink   a URL linking to the live Folding@Home stats (HFM, for example) for the {@link User}
-     * @param hardwareId      the ID of the {@link Hardware} that this {@link User} is Folding on
-     * @param teamId          the ID of the {@link Team} that the {@link User} is Folding for
+     * @param hardware        the {@link Hardware} that this {@link User} is Folding on
+     * @param team            the {@link Team} that the {@link User} is Folding for
      * @param isCaptain       whether the {@link User} is the captain of their {@link Team}
      * @return the created {@link User}
      */
-    public static User createWithoutId(final String foldingUserName, final String displayName, final String passkey, final Category category, final String profileLink, final String liveStatsLink, final int hardwareId, final int teamId, final boolean isCaptain) {
+    public static User createWithoutId(final String foldingUserName, final String displayName, final String passkey, final Category category, final String profileLink, final String liveStatsLink, final Hardware hardware, final Team team, final boolean isCaptain) {
         final String profileLinkOrNull = isEmpty(profileLink) ? null : profileLink;
         final String liveStatsLinkOrNull = isEmpty(liveStatsLink) ? null : liveStatsLink;
-        return new User(EMPTY_USER_ID, foldingUserName, displayName, passkey, category.displayName(), profileLinkOrNull, liveStatsLinkOrNull, hardwareId, teamId, isCaptain);
+        return new User(EMPTY_USER_ID, foldingUserName, displayName, passkey, category, profileLinkOrNull, liveStatsLinkOrNull, hardware, team, isCaptain);
     }
 
     /**
@@ -104,7 +104,7 @@ public class User implements ResponsePojo {
     public static User updateWithId(final int userId, final User user) {
         final String profileLink = isEmpty(user.profileLink) ? null : user.profileLink;
         final String liveStatsLink = isEmpty(user.liveStatsLink) ? null : user.liveStatsLink;
-        return new User(userId, user.foldingUserName, user.displayName, user.passkey, user.category, profileLink, liveStatsLink, user.hardwareId, user.teamId, user.userIsCaptain);
+        return new User(userId, user.foldingUserName, user.displayName, user.passkey, user.category, profileLink, liveStatsLink, user.hardware, user.team, user.userIsCaptain);
     }
 
     /**
@@ -118,7 +118,7 @@ public class User implements ResponsePojo {
     public static User hidePasskey(final User user) {
         final String profileLink = isEmpty(user.profileLink) ? null : user.profileLink;
         final String liveStatsLink = isEmpty(user.liveStatsLink) ? null : user.liveStatsLink;
-        return new User(user.id, user.foldingUserName, user.displayName, hidePasskey(user.passkey), user.category, profileLink, liveStatsLink, user.hardwareId, user.teamId, user.userIsCaptain);
+        return new User(user.id, user.foldingUserName, user.displayName, hidePasskey(user.passkey), user.category, profileLink, liveStatsLink, user.hardware, user.team, user.userIsCaptain);
     }
 
     private static String hidePasskey(final String passkey) {
@@ -139,13 +139,13 @@ public class User implements ResponsePojo {
         final UserRequest userRequest = (UserRequest) inputRequest;
 
         return id == userRequest.getId() &&
-                hardwareId == userRequest.getHardwareId() &&
-                teamId == userRequest.getTeamId() &&
+                hardware.getId() == userRequest.getHardwareId() &&
+                team.getId() == userRequest.getTeamId() &&
                 userIsCaptain == userRequest.isUserIsCaptain() &&
                 Objects.equals(foldingUserName, userRequest.getFoldingUserName()) &&
                 Objects.equals(displayName, userRequest.getDisplayName()) &&
                 Objects.equals(passkey, userRequest.getPasskey()) &&
-                Objects.equals(category, userRequest.getCategory()) &&
+                Objects.equals(category.displayName(), userRequest.getCategory()) &&
                 Objects.equals(profileLink, userRequest.getProfileLink()) &&
                 Objects.equals(liveStatsLink, userRequest.getLiveStatsLink());
     }

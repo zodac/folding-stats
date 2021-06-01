@@ -61,7 +61,7 @@ public class PostgresDbManager implements DbManager {
 
             preparedStatement.setString(1, hardware.getHardwareName());
             preparedStatement.setString(2, hardware.getDisplayName());
-            preparedStatement.setString(3, hardware.getOperatingSystem());
+            preparedStatement.setString(3, hardware.getOperatingSystem().displayName());
             preparedStatement.setDouble(4, hardware.getMultiplier());
 
             LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
@@ -135,7 +135,7 @@ public class PostgresDbManager implements DbManager {
 
             preparedStatement.setString(1, hardware.getHardwareName());
             preparedStatement.setString(2, hardware.getDisplayName());
-            preparedStatement.setString(3, hardware.getOperatingSystem());
+            preparedStatement.setString(3, hardware.getOperatingSystem().displayName());
             preparedStatement.setDouble(4, hardware.getMultiplier());
             preparedStatement.setInt(5, hardware.getId());
 
@@ -180,11 +180,11 @@ public class PostgresDbManager implements DbManager {
             preparedStatement.setString(1, user.getFoldingUserName());
             preparedStatement.setString(2, user.getDisplayName());
             preparedStatement.setString(3, user.getPasskey());
-            preparedStatement.setString(4, user.getCategory());
+            preparedStatement.setString(4, user.getCategory().displayName());
             preparedStatement.setString(5, user.getProfileLink());
             preparedStatement.setString(6, user.getLiveStatsLink());
-            preparedStatement.setInt(7, user.getHardwareId());
-            preparedStatement.setInt(8, user.getTeamId());
+            preparedStatement.setInt(7, user.getHardware().getId());
+            preparedStatement.setInt(8, user.getTeam().getId());
             preparedStatement.setBoolean(9, user.isUserIsCaptain());
 
             LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
@@ -205,7 +205,13 @@ public class PostgresDbManager implements DbManager {
 
     @Override
     public Collection<User> getAllUsers() throws FoldingException {
-        final String selectSqlStatement = "SELECT * FROM users ORDER BY user_id ASC;";
+        final String selectSqlStatement = "SELECT users.user_id, users.folding_username, users.display_username, users.passkey, users.category, users.profile_link, users.live_stats_link, users.is_captain, hardware.*, teams.* " +
+                "FROM users " +
+                "LEFT JOIN hardware " +
+                "ON users.hardware_id = hardware.hardware_id " +
+                "LEFT JOIN teams " +
+                "ON users.team_id = teams.team_id " +
+                "ORDER BY user_id ASC;";
         LOGGER.debug("Executing SQL statement: '{}'", selectSqlStatement);
 
         try (final Connection connection = dbConnectionPool.getConnection();
@@ -226,7 +232,13 @@ public class PostgresDbManager implements DbManager {
 
     @Override
     public User getUser(final int userId) throws FoldingException, UserNotFoundException {
-        final String selectSqlStatement = "SELECT * FROM users WHERE user_id = ?;";
+        final String selectSqlStatement = "SELECT users.user_id, users.folding_username, users.display_username, users.passkey, users.category, users.profile_link, users.live_stats_link, users.is_captain, hardware.*, teams.* " +
+                "FROM users " +
+                "LEFT JOIN hardware " +
+                "ON users.hardware_id = hardware.hardware_id " +
+                "LEFT JOIN teams " +
+                "ON users.team_id = teams.team_id " +
+                "WHERE user_Id = ?;";
 
         try (final Connection connection = dbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
@@ -258,11 +270,11 @@ public class PostgresDbManager implements DbManager {
             preparedStatement.setString(1, user.getFoldingUserName());
             preparedStatement.setString(2, user.getDisplayName());
             preparedStatement.setString(3, user.getPasskey());
-            preparedStatement.setString(4, user.getCategory());
+            preparedStatement.setString(4, user.getCategory().displayName());
             preparedStatement.setString(5, user.getProfileLink());
             preparedStatement.setString(6, user.getLiveStatsLink());
-            preparedStatement.setInt(7, user.getHardwareId());
-            preparedStatement.setInt(8, user.getTeamId());
+            preparedStatement.setInt(7, user.getHardware().getId());
+            preparedStatement.setInt(8, user.getTeam().getId());
             preparedStatement.setBoolean(9, user.isUserIsCaptain());
             preparedStatement.setInt(10, user.getId());
 
@@ -655,7 +667,7 @@ public class PostgresDbManager implements DbManager {
                 // Since we didn't get any previous day's stats, we don't need to worry about the hardware multiplier having been changed
                 // As a result, we will get the user's current hardware and use that multiplier
                 final User user = getUser(userId);
-                final Hardware hardware = getHardware(user.getHardwareId());
+                final Hardware hardware = user.getHardware();
                 final double hardwareMultiplier = hardware.getMultiplier();
 
                 return UserTcStats.create(
@@ -665,7 +677,7 @@ public class PostgresDbManager implements DbManager {
                         Math.max(0, firstHourTcStatsCurrentDay.getMultipliedPoints() - Math.round(hardwareMultiplier * initialStats.getPoints())),
                         Math.max(0, firstHourTcStatsCurrentDay.getUnits() - initialStats.getUnits())
                 );
-            } catch (final UserNotFoundException | HardwareNotFoundException e) {
+            } catch (final UserNotFoundException e) {
                 throw new FoldingException("Unable to find hardware or user to calculate hardware multiplier for initial stats", e);
             }
         }
@@ -1252,8 +1264,8 @@ public class PostgresDbManager implements DbManager {
                 Category.get(resultSet.getString("category")),
                 resultSet.getString("profile_link"),
                 resultSet.getString("live_stats_link"),
-                resultSet.getInt("hardware_id"),
-                resultSet.getInt("team_id"),
+                createHardware(resultSet),
+                createTeam(resultSet),
                 resultSet.getBoolean("is_captain")
         );
     }

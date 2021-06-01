@@ -59,7 +59,7 @@ public class PostgresDbManagerTest {
                 .id(retrievedHardware.getId())
                 .hardwareName(retrievedHardware.getHardwareName())
                 .displayName(retrievedHardware.getDisplayName())
-                .operatingSystem(OperatingSystem.LINUX.displayName())
+                .operatingSystem(OperatingSystem.LINUX)
                 .multiplier(retrievedHardware.getMultiplier())
                 .build();
 
@@ -133,11 +133,11 @@ public class PostgresDbManagerTest {
                 .foldingUserName(retrievedUser.getFoldingUserName())
                 .displayName(retrievedUser.getDisplayName())
                 .passkey(retrievedUser.getPasskey())
-                .category(Category.AMD_GPU.displayName())
+                .category(Category.AMD_GPU)
                 .profileLink(retrievedUser.getProfileLink())
                 .liveStatsLink(retrievedUser.getLiveStatsLink())
-                .hardwareId(retrievedUser.getHardwareId())
-                .teamId(retrievedUser.getTeamId())
+                .hardware(retrievedUser.getHardware())
+                .team(retrievedUser.getTeam())
                 .userIsCaptain(retrievedUser.isUserIsCaptain())
                 .build();
 
@@ -190,7 +190,7 @@ public class PostgresDbManagerTest {
                 .isInstanceOf(FoldingException.class);
 
         final User userToRetire = createUser();
-        final int teamId = userToRetire.getTeamId();
+        final int teamId = userToRetire.getTeam().getId();
         POSTGRES_DB_MANAGER.deleteUser(userToRetire.getId());
 
         final long points = 100L;
@@ -315,9 +315,9 @@ public class PostgresDbManagerTest {
     }
 
     private User generateUser() throws FoldingConflictException, FoldingException {
-        final int hardwareId = createHardware().getId();
-        final int teamId = createTeam().getId();
-        return User.createWithoutId(nextUserName(), "user", "passkey", Category.NVIDIA_GPU, "", "", hardwareId, teamId, true);
+        final Hardware hardware = createHardware();
+        final Team team = createTeam();
+        return User.createWithoutId(nextUserName(), "user", "passkey", Category.NVIDIA_GPU, "", "", hardware, team, true);
     }
 
     private User createUser() throws FoldingConflictException, FoldingException {

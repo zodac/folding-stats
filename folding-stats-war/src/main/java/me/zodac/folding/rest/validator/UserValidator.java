@@ -7,6 +7,7 @@ import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.exception.NotFoundException;
 import me.zodac.folding.api.tc.exception.TeamNotFoundException;
 import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.ejb.BusinessLogic;
@@ -83,6 +84,7 @@ public class UserValidator {
             failureMessages.add(String.format("Attribute 'liveStatsLink' is not a valid link: '%s'", userRequest.getLiveStatsLink()));
         }
 
+
         try {
             if (userRequest.getHardwareId() <= Hardware.EMPTY_HARDWARE_ID || businessLogic.doesNotContainHardware(userRequest.getHardwareId())) {
                 final List<String> availableHardware = businessLogic
@@ -133,7 +135,6 @@ public class UserValidator {
             final Map<Category, Long> categoryCount = usersOnTeam
                     .stream()
                     .map(User::getCategory)
-                    .map(Category::get)
                     .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
             for (final Map.Entry<Category, Long> categoryAndCount : categoryCount.entrySet()) {
@@ -167,8 +168,19 @@ public class UserValidator {
         }
 
         if (failureMessages.isEmpty()) {
-            final User user = User.createWithoutId(userRequest.getFoldingUserName(), userRequest.getDisplayName(), userRequest.getPasskey(), category, userRequest.getProfileLink(), userRequest.getLiveStatsLink(), userRequest.getHardwareId(), userRequest.getTeamId(), userRequest.isUserIsCaptain());
-            return ValidationResponse.success(user);
+            try {
+                final Hardware hardware = businessLogic.getHardware(userRequest.getHardwareId());
+                final Team team = businessLogic.getTeam(userRequest.getTeamId());
+
+                final User user = User.createWithoutId(userRequest.getFoldingUserName(), userRequest.getDisplayName(), userRequest.getPasskey(), category, userRequest.getProfileLink(), userRequest.getLiveStatsLink(), hardware, team, userRequest.isUserIsCaptain());
+                return ValidationResponse.success(user);
+            } catch (final NotFoundException e) {
+                LOGGER.warn("{} with ID {} was validated successfully, but could not be retrieved", e.getType(), e.getId(), e);
+                failureMessages.add(String.format("Unable to find %s with ID %s", e.getType(), e.getId()));
+            } catch (final FoldingException e) {
+                LOGGER.warn("Unexpected error retrieving hardware/team", e);
+                failureMessages.add("Unable to retrieve hardware/team");
+            }
         }
 
         return ValidationResponse.failure(userRequest, failureMessages);

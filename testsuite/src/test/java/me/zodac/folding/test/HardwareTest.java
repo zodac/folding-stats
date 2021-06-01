@@ -81,7 +81,7 @@ public class HardwareTest {
         assertThat(actual)
                 .as("Did not receive created object as JSON response: " + response.body())
                 .extracting("hardwareName", "displayName", "operatingSystem", "multiplier")
-                .containsExactly(hardwareToCreate.getHardwareName(), hardwareToCreate.getDisplayName(), hardwareToCreate.getOperatingSystem(), hardwareToCreate.getMultiplier());
+                .containsExactly(hardwareToCreate.getHardwareName(), hardwareToCreate.getDisplayName(), OperatingSystem.get(hardwareToCreate.getOperatingSystem()), hardwareToCreate.getMultiplier());
     }
 
     @Test
@@ -139,11 +139,9 @@ public class HardwareTest {
                 .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Hardware actual = HardwareResponseParser.update(response);
-        assertThat(actual)
+        assertThat(actual.isEqualRequest(updatedHardware))
                 .as("Did not receive created object as JSON response: " + response.body())
-                .extracting("id", "hardwareName", "displayName", "operatingSystem", "multiplier")
-                .containsExactly(createdHardware.getId(), createdHardware.getHardwareName(), createdHardware.getDisplayName(), OperatingSystem.LINUX.displayName(), createdHardware.getMultiplier());
-
+                .isTrue();
 
         final int allHardwareAfterUpdate = HardwareUtils.getNumberOfHardware();
         assertThat(allHardwareAfterUpdate)
@@ -239,7 +237,7 @@ public class HardwareTest {
                 .id(createdHardware.getId())
                 .hardwareName(createdHardware.getHardwareName())
                 .displayName(createdHardware.getDisplayName())
-                .operatingSystem(createdHardware.getOperatingSystem())
+                .operatingSystem(createdHardware.getOperatingSystem().displayName())
                 .multiplier(createdHardware.getMultiplier())
                 .build();
 
@@ -250,10 +248,9 @@ public class HardwareTest {
                 .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Hardware actual = HardwareResponseParser.update(updateResponse);
-        assertThat(actual)
+        assertThat(actual.isEqualRequest(updatedHardware))
                 .as("Did not receive the original hardware in response")
-                .extracting("id", "hardwareName", "displayName", "operatingSystem", "multiplier")
-                .containsExactly(createdHardware.getId(), createdHardware.getHardwareName(), createdHardware.getDisplayName(), createdHardware.getOperatingSystem(), createdHardware.getMultiplier());
+                .isTrue();
     }
 
     @Test

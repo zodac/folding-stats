@@ -6,7 +6,6 @@ import me.zodac.folding.api.exception.FoldingExternalServiceException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.exception.NotFoundException;
 import me.zodac.folding.api.validator.ValidationResponse;
-import me.zodac.folding.ejb.BusinessLogic;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 import me.zodac.folding.rest.validator.HardwareValidator;
 import org.slf4j.Logger;
@@ -14,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
-import javax.ejb.EJB;
 import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -39,10 +37,6 @@ import java.util.Collection;
 public class HardwareEndpoint extends AbstractCrudEndpoint<HardwareRequest, Hardware> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HardwareEndpoint.class);
-
-    @EJB
-    private BusinessLogic businessLogic;
-
 
     @POST
     @RolesAllowed("admin")

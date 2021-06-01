@@ -40,7 +40,7 @@ public class Hardware implements ResponsePojo {
     private final int id;
     private final String hardwareName;
     private final String displayName;
-    private final String operatingSystem; // TODO: [zodac] Use Enum
+    private final OperatingSystem operatingSystem;
     private final double multiplier;
 
     /**
@@ -56,7 +56,7 @@ public class Hardware implements ResponsePojo {
      * @return the created {@link Hardware}
      */
     public static Hardware create(final int hardwareId, final String hardwareName, final String displayName, final OperatingSystem operatingSystem, final double multiplier) {
-        return new Hardware(hardwareId, hardwareName, displayName, operatingSystem.displayName(), multiplier);
+        return new Hardware(hardwareId, hardwareName, displayName, operatingSystem, multiplier);
     }
 
     /**
@@ -71,7 +71,7 @@ public class Hardware implements ResponsePojo {
      * @return the created {@link Hardware}
      */
     public static Hardware createWithoutId(final String hardwareName, final String displayName, final OperatingSystem operatingSystem, final double multiplier) {
-        return new Hardware(EMPTY_HARDWARE_ID, hardwareName, displayName, operatingSystem.displayName(), multiplier);
+        return new Hardware(EMPTY_HARDWARE_ID, hardwareName, displayName, operatingSystem, multiplier);
     }
 
     /**
@@ -100,6 +100,6 @@ public class Hardware implements ResponsePojo {
                 Double.compare(multiplier, hardwareRequest.getMultiplier()) == 0 &&
                 Objects.equals(hardwareName, hardwareRequest.getHardwareName()) &&
                 Objects.equals(displayName, hardwareRequest.getDisplayName()) &&
-                Objects.equals(operatingSystem, hardwareRequest.getOperatingSystem());
+                Objects.equals(operatingSystem.displayName(), hardwareRequest.getOperatingSystem());
     }
 }

@@ -160,9 +160,10 @@ function loadCategoryLeaderboard() {
             categoryDiv.append(categoryLeaderboardTitle);
 
             Object.keys(jsonResponse).forEach(function(key) {
+                var keyDisplay = getCategory(key);
                 categoryTitle = document.createElement('h2');
                 categoryTitle.setAttribute("class", "navbar-brand");
-                categoryTitle.innerHTML = key;
+                categoryTitle.innerHTML = keyDisplay;
                 categoryDiv.append(categoryTitle);
 
                 tableId = "category_" + key.replace(/\s+/g,"_").toLowerCase();

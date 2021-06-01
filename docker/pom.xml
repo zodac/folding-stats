@@ -93,6 +93,7 @@
                                 <jsSourceFile>util/crud_field_populator.js</jsSourceFile>
                                 <jsSourceFile>util/display_toggle.js</jsSourceFile>
                                 <jsSourceFile>util/encoder.js</jsSourceFile>
+                                <jsSourceFile>util/enum_mapper.js</jsSourceFile>
                                 <jsSourceFile>util/json_sorter.js</jsSourceFile>
                                 <jsSourceFile>util/storage.js</jsSourceFile>
                                 <jsSourceFile>util/table_sort.js</jsSourceFile>

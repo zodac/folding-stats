@@ -9,12 +9,10 @@ import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.exception.FoldingIdInvalidException;
 import me.zodac.folding.api.tc.exception.FoldingIdOutOfRangeException;
-import me.zodac.folding.api.tc.exception.HardwareNotFoundException;
 import me.zodac.folding.api.tc.exception.NotFoundException;
 import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.stats.OffsetStats;
 import me.zodac.folding.api.validator.ValidationResponse;
-import me.zodac.folding.ejb.BusinessLogic;
 import me.zodac.folding.ejb.UserTeamCompetitionStatsParser;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 import me.zodac.folding.rest.validator.UserValidator;
@@ -56,9 +54,6 @@ import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
 public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserEndpoint.class);
-
-    @EJB
-    private BusinessLogic businessLogic; // TODO: [zodac] Make protected?
 
     @EJB
     private UserTeamCompetitionStatsParser userTeamCompetitionStatsParser;
@@ -163,13 +158,13 @@ public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
         }
     }
 
-    private OffsetStats getValidUserStatsOffset(final OffsetStats offsetStats, final int parsedId) throws FoldingException, UserNotFoundException, HardwareNotFoundException {
+    private OffsetStats getValidUserStatsOffset(final OffsetStats offsetStats, final int parsedId) throws FoldingException, UserNotFoundException {
         if (!offsetStats.isMissingPointsOrMultipliedPoints()) {
             return offsetStats;
         }
 
         final User user = businessLogic.getUser(parsedId);
-        final Hardware hardware = businessLogic.getHardware(user.getHardwareId());
+        final Hardware hardware = user.getHardware();
         return OffsetStats.updateWithHardwareMultiplier(offsetStats, hardware.getMultiplier());
     }
 

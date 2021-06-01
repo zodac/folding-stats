@@ -14,9 +14,11 @@ import me.zodac.folding.api.tc.exception.NotFoundException;
 import me.zodac.folding.api.tc.exception.TeamNotFoundException;
 import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.validator.ValidationResponse;
+import me.zodac.folding.ejb.BusinessLogic;
 import me.zodac.folding.rest.response.BatchCreateResponse;
 import org.slf4j.Logger;
 
+import javax.ejb.EJB;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.EntityTag;
@@ -48,6 +50,9 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
     @Context
     protected UriInfo uriContext;
 
+    @EJB
+    protected BusinessLogic businessLogic;
+    
     protected abstract Logger getLogger();
 
     protected abstract String elementType();
