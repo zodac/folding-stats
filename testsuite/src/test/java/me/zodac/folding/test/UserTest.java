@@ -1,14 +1,12 @@
 package me.zodac.folding.test;
 
 import me.zodac.folding.api.tc.Category;
-import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.client.java.response.UserResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 import me.zodac.folding.test.utils.TestConstants;
-import me.zodac.folding.test.utils.rest.request.HardwareUtils;
 import me.zodac.folding.test.utils.rest.request.StubbedFoldingEndpointUtils;
 import me.zodac.folding.test.utils.rest.request.TeamUtils;
 import me.zodac.folding.test.utils.rest.request.UserUtils;
@@ -36,7 +34,6 @@ import static me.zodac.folding.test.utils.TestAuthenticationData.INVALID_USERNAM
 import static me.zodac.folding.test.utils.TestAuthenticationData.READ_ONLY_USER;
 import static me.zodac.folding.test.utils.TestConstants.FOLDING_URL;
 import static me.zodac.folding.test.utils.TestConstants.HTTP_CLIENT;
-import static me.zodac.folding.test.utils.TestGenerator.generateHardware;
 import static me.zodac.folding.test.utils.TestGenerator.generateTeam;
 import static me.zodac.folding.test.utils.TestGenerator.generateUser;
 import static me.zodac.folding.test.utils.TestGenerator.generateUserWithCategory;
@@ -194,18 +191,6 @@ public class UserTest {
         assertThat(newSize)
                 .as("Get all response did not return the initial users - deleted user")
                 .isEqualTo(initialSize - 1);
-    }
-
-    @Test
-    public void whenPatchingAUserWithPointsOffsets_givenThePayloadIsValid_thenResponseHasA200Status() throws FoldingRestException {
-        final Hardware hardware = HardwareUtils.create(generateHardware());
-        final UserRequest user = generateUserWithHardwareId(hardware.getId());
-
-        final int userId = UserUtils.create(user).getId();
-        final HttpResponse<Void> patchResponse = USER_REQUEST_SENDER.offset(userId, 100L, Math.round(100L * hardware.getMultiplier()), 10, ADMIN_USER.userName(), ADMIN_USER.password());
-        assertThat(patchResponse.statusCode())
-                .as("Was not able to patch user: " + patchResponse.body())
-                .isEqualTo(HttpURLConnection.HTTP_OK);
     }
 
     // Negative/alternative test cases
@@ -411,14 +396,6 @@ public class UserTest {
     }
 
     @Test
-    public void whenPatchingAUserWithPointsOffsets_AndUserDoesNotExist_thenResponseHasA404Status() throws FoldingRestException {
-        final HttpResponse<Void> patchResponse = USER_REQUEST_SENDER.offset(TestConstants.INVALID_ID, 100L, 1_000L, 10, ADMIN_USER.userName(), ADMIN_USER.password());
-        assertThat(patchResponse.statusCode())
-                .as("Was able to patch user, was expected user to not be found: " + patchResponse.body())
-                .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
-    }
-
-    @Test
     public void whenCreatingUser_givenNoAuthentication_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
         final UserRequest userToCreate = generateUser();
         StubbedFoldingEndpointUtils.enableUser(userToCreate);
@@ -485,18 +462,6 @@ public class UserTest {
     }
 
     @Test
-    public void whenPatchingAUserWithPointsOffsets_givenNoAuthentication_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
-        final Hardware hardware = HardwareUtils.create(generateHardware());
-        final UserRequest user = generateUserWithId(hardware.getId());
-
-        final int userId = UserUtils.create(user).getId();
-        final HttpResponse<Void> response = USER_REQUEST_SENDER.offset(userId, 100L, Math.round(100L * hardware.getMultiplier()), 10);
-        assertThat(response.statusCode())
-                .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
-                .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
-    }
-
-    @Test
     public void whenCreatingUser_givenAuthentication_andAuthenticationHasInvalidUser_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
         final UserRequest userToCreate = generateUser();
         StubbedFoldingEndpointUtils.enableUser(userToCreate);
@@ -556,26 +521,6 @@ public class UserTest {
                 .build();
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-        assertThat(response.statusCode())
-                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
-                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
-    }
-
-    @Test
-    public void whenPatchingAUserWithPointsOffsets_givenEmptyPayload_thenRequestFails_andResponseHasA400StatusCode() throws IOException, InterruptedException, FoldingRestException {
-        final Hardware hardware = HardwareUtils.create(generateHardware());
-        final UserRequest user = generateUserWithId(hardware.getId());
-        final int userId = UserUtils.create(user).getId();
-
-        final HttpRequest request = HttpRequest.newBuilder()
-                .method("PATCH", HttpRequest.BodyPublishers.noBody())
-                .uri(URI.create(FOLDING_URL + "/users/" + userId))
-                .header("Content-Type", "application/json")
-                .header("Authorization", encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
-                .build();
-
-        final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-
         assertThat(response.statusCode())
                 .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);

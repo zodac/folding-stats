@@ -1,6 +1,7 @@
 package me.zodac.folding.test;
 
 import me.zodac.folding.api.tc.Category;
+import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.client.java.response.TeamCompetitionResponseParser;
@@ -21,17 +22,24 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Collection;
 
+import static me.zodac.folding.api.utils.EncodingUtils.encodeBasicAuthentication;
 import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForComplexTests;
 import static me.zodac.folding.test.utils.TestAuthenticationData.ADMIN_USER;
+import static me.zodac.folding.test.utils.TestConstants.FOLDING_URL;
+import static me.zodac.folding.test.utils.TestConstants.HTTP_CLIENT;
 import static me.zodac.folding.test.utils.TestGenerator.generateHardware;
 import static me.zodac.folding.test.utils.TestGenerator.generateHardwareWithMultiplier;
 import static me.zodac.folding.test.utils.TestGenerator.generateTeam;
 import static me.zodac.folding.test.utils.TestGenerator.generateUser;
 import static me.zodac.folding.test.utils.TestGenerator.generateUserWithHardwareId;
+import static me.zodac.folding.test.utils.TestGenerator.generateUserWithId;
 import static me.zodac.folding.test.utils.TestGenerator.generateUserWithTeamId;
 import static me.zodac.folding.test.utils.TestGenerator.generateUserWithTeamIdAndCategory;
 import static me.zodac.folding.test.utils.rest.request.HardwareUtils.HARDWARE_REQUEST_SENDER;
@@ -669,7 +677,7 @@ public class TeamCompetitionStatsTest {
 
 
         final long pointsOffset = 1_000L;
-        USER_REQUEST_SENDER.offset(userId, pointsOffset, pointsOffset, 0, ADMIN_USER.userName(), ADMIN_USER.password());
+        TEAM_COMPETITION_REQUEST_SENDER.offset(userId, pointsOffset, pointsOffset, 0, ADMIN_USER.userName(), ADMIN_USER.password());
         manuallyUpdateStats();
 
         final CompetitionResult result = TeamCompetitionStatsUtils.getStats();
@@ -699,7 +707,7 @@ public class TeamCompetitionStatsTest {
 
         final long pointsOffset = -20_000L;
         final int unitsOffset = -400;
-        USER_REQUEST_SENDER.offset(userId, pointsOffset, pointsOffset, unitsOffset, ADMIN_USER.userName(), ADMIN_USER.password());
+        TEAM_COMPETITION_REQUEST_SENDER.offset(userId, pointsOffset, pointsOffset, unitsOffset, ADMIN_USER.userName(), ADMIN_USER.password());
         manuallyUpdateStats();
 
         final CompetitionResult result = TeamCompetitionStatsUtils.getStats();
@@ -796,6 +804,58 @@ public class TeamCompetitionStatsTest {
         assertThat(response.statusCode())
                 .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
+    }
+
+    @Test
+    public void whenPatchingAUserWithPointsOffsets_givenThePayloadIsValid_thenResponseHasA200Status() throws FoldingRestException {
+        final Hardware hardware = HardwareUtils.create(generateHardware());
+        final UserRequest user = generateUserWithHardwareId(hardware.getId());
+
+        final int userId = UserUtils.create(user).getId();
+        final HttpResponse<Void> patchResponse = TEAM_COMPETITION_REQUEST_SENDER.offset(userId, 100L, Math.round(100L * hardware.getMultiplier()), 10, ADMIN_USER.userName(), ADMIN_USER.password());
+        assertThat(patchResponse.statusCode())
+                .as("Was not able to patch user: " + patchResponse.body())
+                .isEqualTo(HttpURLConnection.HTTP_OK);
+    }
+
+    @Test
+    public void whenPatchingAUserWithPointsOffsets_AndUserDoesNotExist_thenResponseHasA404Status() throws FoldingRestException {
+        final HttpResponse<Void> patchResponse = TEAM_COMPETITION_REQUEST_SENDER.offset(TestConstants.INVALID_ID, 100L, 1_000L, 10, ADMIN_USER.userName(), ADMIN_USER.password());
+        assertThat(patchResponse.statusCode())
+                .as("Was able to patch user, was expected user to not be found: " + patchResponse.body())
+                .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
+    }
+
+    @Test
+    public void whenPatchingAUserWithPointsOffsets_givenNoAuthentication_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
+        final Hardware hardware = HardwareUtils.create(generateHardware());
+        final UserRequest user = generateUserWithId(hardware.getId());
+
+        final int userId = UserUtils.create(user).getId();
+        final HttpResponse<Void> response = TEAM_COMPETITION_REQUEST_SENDER.offset(userId, 100L, Math.round(100L * hardware.getMultiplier()), 10);
+        assertThat(response.statusCode())
+                .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
+    }
+
+    @Test
+    public void whenPatchingAUserWithPointsOffsets_givenEmptyPayload_thenRequestFails_andResponseHasA400StatusCode() throws IOException, InterruptedException, FoldingRestException {
+        final Hardware hardware = HardwareUtils.create(generateHardware());
+        final UserRequest user = generateUserWithId(hardware.getId());
+        final int userId = UserUtils.create(user).getId();
+
+        final HttpRequest request = HttpRequest.newBuilder()
+                .method("PATCH", HttpRequest.BodyPublishers.noBody())
+                .uri(URI.create(FOLDING_URL + "/stats/users/" + userId))
+                .header("Content-Type", "application/json")
+                .header("Authorization", encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
+                .build();
+
+        final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+
+        assertThat(response.statusCode())
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
     @AfterAll

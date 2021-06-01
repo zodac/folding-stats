@@ -1,4 +1,4 @@
-package me.zodac.folding.rest;
+package me.zodac.folding.rest.endpoint;
 
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.RequestPojo;
@@ -15,7 +15,8 @@ import me.zodac.folding.api.tc.exception.TeamNotFoundException;
 import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.ejb.BusinessLogic;
-import me.zodac.folding.rest.response.BatchCreateResponse;
+import me.zodac.folding.rest.util.ParsingUtils;
+import me.zodac.folding.rest.util.response.BatchCreateResponse;
 import org.slf4j.Logger;
 
 import javax.ejb.EJB;
@@ -32,15 +33,16 @@ import java.util.Collection;
 import java.util.List;
 
 import static me.zodac.folding.api.utils.DateTimeUtils.untilNextMonthUtc;
-import static me.zodac.folding.rest.response.Responses.badGateway;
-import static me.zodac.folding.rest.response.Responses.badRequest;
-import static me.zodac.folding.rest.response.Responses.conflict;
-import static me.zodac.folding.rest.response.Responses.created;
-import static me.zodac.folding.rest.response.Responses.notFound;
-import static me.zodac.folding.rest.response.Responses.ok;
-import static me.zodac.folding.rest.response.Responses.okBuilder;
-import static me.zodac.folding.rest.response.Responses.serverError;
-import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
+import static me.zodac.folding.rest.util.response.Responses.badGateway;
+import static me.zodac.folding.rest.util.response.Responses.badRequest;
+import static me.zodac.folding.rest.util.response.Responses.conflict;
+import static me.zodac.folding.rest.util.response.Responses.created;
+import static me.zodac.folding.rest.util.response.Responses.notFound;
+import static me.zodac.folding.rest.util.response.Responses.nullRequest;
+import static me.zodac.folding.rest.util.response.Responses.ok;
+import static me.zodac.folding.rest.util.response.Responses.okBuilder;
+import static me.zodac.folding.rest.util.response.Responses.serverError;
+import static me.zodac.folding.rest.util.response.Responses.serviceUnavailable;
 
 abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePojo> {
 
@@ -52,7 +54,7 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
 
     @EJB
     protected BusinessLogic businessLogic;
-    
+
     protected abstract Logger getLogger();
 
     protected abstract String elementType();
@@ -269,7 +271,7 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
 
         if (inputRequest == null) {
             getLogger().error("No payload provided");
-            return badRequest("No payload provided");
+            return nullRequest();
         }
 
         try {

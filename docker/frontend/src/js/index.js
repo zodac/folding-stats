@@ -26,7 +26,7 @@ function toggleTeam(teamNumber, classList) {
 }
 
 function loadOverallStats() {
-    fetch(ROOT_URL+'/tc_stats')
+    fetch(ROOT_URL+'/stats')
         .then(response => {
             return response.json();
         })
@@ -82,7 +82,7 @@ function loadOverallStats() {
 };
 
 function loadTeamLeaderboard() {
-    fetch(ROOT_URL+'/tc_stats/leaderboard')
+    fetch(ROOT_URL+'/stats/leaderboard')
     .then(response => {
         return response.json();
     })
@@ -144,7 +144,7 @@ function loadTeamLeaderboard() {
 };
 
 function loadCategoryLeaderboard() {
-    fetch(ROOT_URL+'/tc_stats/category')
+    fetch(ROOT_URL+'/stats/category')
         .then(response => {
             return response.json();
         })
@@ -215,7 +215,7 @@ function loadCategoryLeaderboard() {
 };
 
 function loadTeamStats() {
-    fetch(ROOT_URL+'/tc_stats')
+    fetch(ROOT_URL+'/stats')
     .then(response => {
         return response.json();
     })

@@ -1,4 +1,4 @@
-package me.zodac.folding.rest.response;
+package me.zodac.folding.rest.util.response;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -160,6 +160,20 @@ public final class Responses {
         return Response
                 .status(Response.Status.BAD_REQUEST)
                 .entity(GSON.toJson(entity))
+                .build();
+    }
+
+    /**
+     * A <b>400_BAD_REQUEST</b> {@link Response}.
+     * <p>
+     * Used for cases where the REST request has an empty or null payload.
+     *
+     * @return the <b>400_BAD_REQUEST</b> {@link Response}
+     */
+    public static Response nullRequest() {
+        return Response
+                .status(Response.Status.BAD_REQUEST)
+                .entity(GSON.toJson(ErrorResponse.create("Payload is null"), ErrorResponse.class))
                 .build();
     }
 

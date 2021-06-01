@@ -183,7 +183,7 @@ function populateUserOffset(){
     document.getElementById("user_offset_folding_name").value = selectedElement.getAttribute("user_folding_name");
     document.getElementById("user_offset_display_name").value = selectedElement.getAttribute("user_display_name");
 
-    fetch(ROOT_URL+'/tc_stats/users/' + userId)
+    fetch(ROOT_URL+'/stats/users/' + userId)
     .then(response => {
         return response.json();
     })

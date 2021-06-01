@@ -1,4 +1,4 @@
-package me.zodac.folding.rest;
+package me.zodac.folding.rest.endpoint;
 
 import me.zodac.folding.api.db.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
@@ -7,7 +7,7 @@ import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.exception.NotFoundException;
 import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
-import me.zodac.folding.rest.validator.HardwareValidator;
+import me.zodac.folding.rest.util.validator.HardwareValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

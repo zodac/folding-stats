@@ -1,4 +1,4 @@
-package me.zodac.folding.rest;
+package me.zodac.folding.rest.endpoint;
 
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.exception.FoldingException;
@@ -35,11 +35,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static me.zodac.folding.rest.response.Responses.badRequest;
-import static me.zodac.folding.rest.response.Responses.notFound;
-import static me.zodac.folding.rest.response.Responses.okBuilder;
-import static me.zodac.folding.rest.response.Responses.serverError;
-import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
+import static me.zodac.folding.rest.util.response.Responses.badRequest;
+import static me.zodac.folding.rest.util.response.Responses.notFound;
+import static me.zodac.folding.rest.util.response.Responses.okBuilder;
+import static me.zodac.folding.rest.util.response.Responses.serverError;
+import static me.zodac.folding.rest.util.response.Responses.serviceUnavailable;
 
 // TODO: [zodac] Verify that all places that return a HTTP response also log something
 @Path("/historic/")

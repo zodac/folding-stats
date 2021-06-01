@@ -510,7 +510,7 @@ function offsetUser() {
     var displayName = selectedElement.getAttribute("user_display_name");
 
     show("loader");
-    fetch(ROOT_URL+'/tc_stats/users/' + userId)
+    fetch(ROOT_URL+'/stats/users/' + userId)
     .then(response => {
         return response.json();
     })
@@ -530,7 +530,7 @@ function offsetUser() {
             }
         );
 
-        fetch(ROOT_URL+'/users/' + userId, {
+        fetch(ROOT_URL+'/stats/users/' + userId, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',

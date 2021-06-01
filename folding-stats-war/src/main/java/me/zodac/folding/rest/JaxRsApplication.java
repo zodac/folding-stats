@@ -1,5 +1,15 @@
 package me.zodac.folding.rest;
 
+import me.zodac.folding.rest.endpoint.HardwareEndpoint;
+import me.zodac.folding.rest.endpoint.HistoricStatsEndpoint;
+import me.zodac.folding.rest.endpoint.LoginEndpoint;
+import me.zodac.folding.rest.endpoint.TeamCompetitionStatsEndpoint;
+import me.zodac.folding.rest.endpoint.TeamEndpoint;
+import me.zodac.folding.rest.endpoint.UserEndpoint;
+import me.zodac.folding.rest.provider.CorsFilter;
+import me.zodac.folding.rest.provider.InvalidUrlRedirecter;
+import me.zodac.folding.rest.provider.SecurityInterceptor;
+
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 import java.util.Set;

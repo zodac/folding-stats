@@ -1,4 +1,4 @@
-package me.zodac.folding.rest;
+package me.zodac.folding.rest.endpoint;
 
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.db.SystemUserAuthentication;
@@ -20,12 +20,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Map;
 
-import static me.zodac.folding.rest.response.Responses.badRequest;
-import static me.zodac.folding.rest.response.Responses.forbidden;
-import static me.zodac.folding.rest.response.Responses.ok;
-import static me.zodac.folding.rest.response.Responses.serverError;
-import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
-import static me.zodac.folding.rest.response.Responses.unauthorized;
+import static me.zodac.folding.rest.util.response.Responses.badRequest;
+import static me.zodac.folding.rest.util.response.Responses.forbidden;
+import static me.zodac.folding.rest.util.response.Responses.ok;
+import static me.zodac.folding.rest.util.response.Responses.serverError;
+import static me.zodac.folding.rest.util.response.Responses.serviceUnavailable;
+import static me.zodac.folding.rest.util.response.Responses.unauthorized;
 
 @Path("/login/")
 @RequestScoped

@@ -1,4 +1,4 @@
-package me.zodac.folding.rest.validator;
+package me.zodac.folding.rest.util.validator;
 
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.stats.FoldingStatsDetails;

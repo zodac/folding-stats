@@ -1,4 +1,4 @@
-package me.zodac.folding.rest;
+package me.zodac.folding.rest.util;
 
 import me.zodac.folding.api.tc.exception.FoldingIdInvalidException;
 import me.zodac.folding.api.tc.exception.FoldingIdOutOfRangeException;

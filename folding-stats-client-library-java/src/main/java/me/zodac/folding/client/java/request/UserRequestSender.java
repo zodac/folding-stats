@@ -5,7 +5,6 @@ import com.google.gson.GsonBuilder;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.tc.stats.OffsetStats;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 import org.apache.commons.lang3.StringUtils;
@@ -280,59 +279,6 @@ public final class UserRequestSender {
             return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
         } catch (final IOException | InterruptedException e) {
             throw new FoldingRestException("Error sending HTTP request to delete user", e);
-        }
-    }
-
-    /**
-     * Send a <b>PATCH</b> request to retrieve update {@link User}s with the given {@code userId} with a points/unit offset.
-     * <p>
-     * <b>NOTE:</b> If either the {@code pointsOffset} or {@code multipliedPointsOffset} are set to <b>0</b>, then it will be calculated
-     * based on the hardware multiplier of the {@link User}.
-     *
-     * @param userId                 the ID of the {@link User} to update
-     * @param pointsOffset           the additional (unmultiplied) points to add to the {@link User}
-     * @param multipliedPointsOffset the additional (multiplied) points to add to the {@link User}
-     * @param unitsOffset            the additional units to add to the {@link User}
-     * @return the {@link HttpResponse} from the {@link HttpRequest}
-     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
-     */
-    public HttpResponse<Void> offset(final int userId, final long pointsOffset, final long multipliedPointsOffset, final int unitsOffset) throws FoldingRestException {
-        return offset(userId, pointsOffset, multipliedPointsOffset, unitsOffset, null, null);
-    }
-
-    /**
-     * Send a <b>PATCH</b> request to retrieve update {@link User}s with the given {@code userId} with a points/unit offset.
-     * <p>
-     * <b>NOTE:</b> If either the {@code pointsOffset} or {@code multipliedPointsOffset} are set to <b>0</b>, then it will be calculated
-     * based on the hardware multiplier of the {@link User}.
-     *
-     * @param userId                 the ID of the {@link User} to update
-     * @param pointsOffset           the additional (unmultiplied) points to add to the {@link User}
-     * @param multipliedPointsOffset the additional (multiplied) points to add to the {@link User}
-     * @param unitsOffset            the additional units to add to the {@link User}
-     * @param userName               the user name
-     * @param password               the password
-     * @return the {@link HttpResponse} from the {@link HttpRequest}
-     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
-     */
-    public HttpResponse<Void> offset(final int userId, final long pointsOffset, final long multipliedPointsOffset, final int unitsOffset, final String userName, final String password) throws FoldingRestException {
-        final OffsetStats offsetStats = OffsetStats.create(pointsOffset, multipliedPointsOffset, unitsOffset);
-
-        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
-                .method("PATCH", HttpRequest.BodyPublishers.ofString(GSON.toJson(offsetStats)))
-                .uri(URI.create(foldingUrl + "/users/" + userId))
-                .header("Content-Type", "application/json");
-
-        if (StringUtils.isNoneBlank(userName, password)) {
-            requestBuilder.header("Authorization", encodeBasicAuthentication(userName, password));
-        }
-
-        final HttpRequest request = requestBuilder.build();
-
-        try {
-            return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
-        } catch (final IOException | InterruptedException e) {
-            throw new FoldingRestException("Error sending HTTP request to offset user stats", e);
         }
     }
 }

@@ -1,4 +1,4 @@
-package me.zodac.folding.rest;
+package me.zodac.folding.rest.provider;
 
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;

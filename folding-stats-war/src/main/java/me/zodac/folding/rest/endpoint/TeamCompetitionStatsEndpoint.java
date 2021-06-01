@@ -1,22 +1,27 @@
-package me.zodac.folding.rest;
+package me.zodac.folding.rest.endpoint;
 
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.SystemState;
+import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.tc.Category;
+import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.exception.FoldingIdInvalidException;
 import me.zodac.folding.api.tc.exception.FoldingIdOutOfRangeException;
 import me.zodac.folding.api.tc.exception.UserNotFoundException;
+import me.zodac.folding.api.tc.stats.OffsetStats;
 import me.zodac.folding.api.utils.ExecutionType;
 import me.zodac.folding.ejb.BusinessLogic;
 import me.zodac.folding.ejb.CompetitionResultGenerator;
 import me.zodac.folding.ejb.TeamCompetitionResetScheduler;
 import me.zodac.folding.ejb.TeamCompetitionStatsScheduler;
+import me.zodac.folding.ejb.UserTeamCompetitionStatsParser;
 import me.zodac.folding.rest.api.tc.CompetitionResult;
 import me.zodac.folding.rest.api.tc.TeamResult;
 import me.zodac.folding.rest.api.tc.UserResult;
 import me.zodac.folding.rest.api.tc.leaderboard.TeamSummary;
 import me.zodac.folding.rest.api.tc.leaderboard.UserSummary;
+import me.zodac.folding.rest.util.ParsingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +29,9 @@ import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.enterprise.context.RequestScoped;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.PATCH;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -44,13 +51,14 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import static java.util.stream.Collectors.toList;
-import static me.zodac.folding.rest.response.Responses.badRequest;
-import static me.zodac.folding.rest.response.Responses.notFound;
-import static me.zodac.folding.rest.response.Responses.ok;
-import static me.zodac.folding.rest.response.Responses.serverError;
-import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
+import static me.zodac.folding.rest.util.response.Responses.badRequest;
+import static me.zodac.folding.rest.util.response.Responses.notFound;
+import static me.zodac.folding.rest.util.response.Responses.nullRequest;
+import static me.zodac.folding.rest.util.response.Responses.ok;
+import static me.zodac.folding.rest.util.response.Responses.serverError;
+import static me.zodac.folding.rest.util.response.Responses.serviceUnavailable;
 
-@Path("/tc_stats/")
+@Path("/stats/")
 @RequestScoped
 public class TeamCompetitionStatsEndpoint {
 
@@ -68,12 +76,15 @@ public class TeamCompetitionStatsEndpoint {
     @EJB
     private TeamCompetitionStatsScheduler teamCompetitionStatsScheduler;
 
+    @EJB
+    private UserTeamCompetitionStatsParser userTeamCompetitionStatsParser;
+
     @Context
     private UriInfo uriContext;
 
     @GET
     @RolesAllowed("admin")
-    @Path("/manual/")
+    @Path("/manual/update")
     public Response manualStats(@QueryParam("async") final boolean async) {
         LOGGER.info("GET request received to manually parse TC stats");
 
@@ -94,7 +105,7 @@ public class TeamCompetitionStatsEndpoint {
 
     @GET
     @RolesAllowed("admin")
-    @Path("/reset/")
+    @Path("/manual/reset/")
     public Response resetStats() {
         LOGGER.info("GET request received to manually reset TC stats");
 
@@ -305,5 +316,64 @@ public class TeamCompetitionStatsEndpoint {
             LOGGER.error("Unexpected error retrieving TC stats", e);
             return serverError();
         }
+    }
+
+    @PATCH
+    @RolesAllowed("admin")
+    @Path("/users/{userId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateUserWithOffset(@PathParam("userId") final String userId, final OffsetStats offsetStats) {
+        LOGGER.debug("PATCH request to update offset for user received at '{}': {}", uriContext.getAbsolutePath(), offsetStats);
+
+        if (SystemStateManager.current().isWriteBlocked()) {
+            LOGGER.warn("System state {} does not allow write requests", SystemStateManager.current());
+            return serviceUnavailable();
+        }
+
+        if (offsetStats == null) {
+            LOGGER.error("Payload is null");
+            return nullRequest();
+        }
+
+        try {
+            final int parsedId = ParsingUtils.parseId(userId);
+            final User user = businessLogic.getUser(parsedId);
+
+            final OffsetStats offsetStatsToUse = getValidUserStatsOffset(user, offsetStats, parsedId);
+            businessLogic.addOrUpdateOffsetStats(parsedId, offsetStatsToUse);
+            SystemStateManager.next(SystemState.UPDATING_STATS);
+            userTeamCompetitionStatsParser.parseTcStatsForUserAndWait(businessLogic.getUser(parsedId));
+            SystemStateManager.next(SystemState.WRITE_EXECUTED);
+            return ok();
+        } catch (final FoldingIdInvalidException e) {
+            final String errorMessage = String.format("The user ID '%s' is not a valid format", e.getId());
+            LOGGER.debug(errorMessage, e);
+            LOGGER.error(errorMessage);
+            return badRequest(errorMessage);
+        } catch (final FoldingIdOutOfRangeException e) {
+            final String errorMessage = String.format("The user ID '%s' is out of range", e.getId());
+            LOGGER.debug(errorMessage, e);
+            LOGGER.error(errorMessage);
+            return badRequest(errorMessage);
+        } catch (final UserNotFoundException e) {
+            LOGGER.error("Error finding user with ID: {}", userId, e.getCause());
+            return notFound();
+        } catch (final FoldingException e) {
+            LOGGER.error("Error updating user with ID: {}", userId, e.getCause());
+            return serverError();
+        } catch (final Exception e) {
+            LOGGER.error("Unexpected error updating user with ID: {}", userId, e);
+            return serverError();
+        }
+    }
+
+    private OffsetStats getValidUserStatsOffset(final User user, final OffsetStats offsetStats, final int parsedId) throws FoldingException, UserNotFoundException {
+        if (!offsetStats.isMissingPointsOrMultipliedPoints()) {
+            return offsetStats;
+        }
+        
+        final Hardware hardware = user.getHardware();
+        return OffsetStats.updateWithHardwareMultiplier(offsetStats, hardware.getMultiplier());
     }
 }

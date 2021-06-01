@@ -52,7 +52,7 @@ function adminLogin(){
 
 function manualUpdate() {
     show("loader");
-    fetch(ROOT_URL+'/tc_stats/manual', {
+    fetch(ROOT_URL+'/stats/manual/update', {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': sessionGet("Authorization")
@@ -80,7 +80,7 @@ function manualUpdate() {
 
 function manualReset() {
     show("loader");
-    fetch(ROOT_URL+'/tc_stats/reset', {
+    fetch(ROOT_URL+'/stats/manual/reset', {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': sessionGet("Authorization")

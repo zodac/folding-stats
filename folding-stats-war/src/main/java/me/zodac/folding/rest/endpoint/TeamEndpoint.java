@@ -1,4 +1,4 @@
-package me.zodac.folding.rest;
+package me.zodac.folding.rest.endpoint;
 
 import me.zodac.folding.api.db.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
@@ -8,7 +8,7 @@ import me.zodac.folding.api.utils.ExecutionType;
 import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.ejb.TeamCompetitionStatsScheduler;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
-import me.zodac.folding.rest.validator.TeamValidator;
+import me.zodac.folding.rest.util.validator.TeamValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

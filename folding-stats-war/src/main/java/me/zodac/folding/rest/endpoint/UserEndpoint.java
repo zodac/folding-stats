@@ -1,33 +1,23 @@
-package me.zodac.folding.rest;
+package me.zodac.folding.rest.endpoint;
 
-import me.zodac.folding.SystemStateManager;
-import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.db.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.FoldingExternalServiceException;
-import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.tc.exception.FoldingIdInvalidException;
-import me.zodac.folding.api.tc.exception.FoldingIdOutOfRangeException;
 import me.zodac.folding.api.tc.exception.NotFoundException;
-import me.zodac.folding.api.tc.exception.UserNotFoundException;
-import me.zodac.folding.api.tc.stats.OffsetStats;
 import me.zodac.folding.api.validator.ValidationResponse;
-import me.zodac.folding.ejb.UserTeamCompetitionStatsParser;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
-import me.zodac.folding.rest.validator.UserValidator;
+import me.zodac.folding.rest.util.validator.UserValidator;
 import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
-import javax.ejb.EJB;
 import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -39,12 +29,6 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import java.util.Collection;
 
-import static me.zodac.folding.rest.response.Responses.badRequest;
-import static me.zodac.folding.rest.response.Responses.notFound;
-import static me.zodac.folding.rest.response.Responses.ok;
-import static me.zodac.folding.rest.response.Responses.serverError;
-import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
-
 /**
  * REST endpoints for users for <code>folding-stats</code>.
  */
@@ -54,9 +38,6 @@ import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
 public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserEndpoint.class);
-
-    @EJB
-    private UserTeamCompetitionStatsParser userTeamCompetitionStatsParser;
 
     @POST
     @RolesAllowed("admin")
@@ -105,67 +86,6 @@ public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteUserById(@PathParam("userId") final String userId) {
         return super.deleteById(userId);
-    }
-
-    // TODO: [zodac] Not really a PATCH on the User resource. Should probably be moved to /tc_stats/
-    @PATCH
-    @RolesAllowed("admin")
-    @Path("/{userId}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response updateUserWithOffset(@PathParam("userId") final String userId, final OffsetStats offsetStats) {
-        getLogger().debug("PATCH request to update offset for user received at '{}': {}", uriContext.getAbsolutePath(), offsetStats);
-
-        if (SystemStateManager.current().isWriteBlocked()) {
-            getLogger().warn("System state {} does not allow write requests", SystemStateManager.current());
-            return serviceUnavailable();
-        }
-
-        if (offsetStats == null) {
-            getLogger().error("Payload is null");
-            return badRequest("Payload is null");
-        }
-
-        try {
-            final int parsedId = ParsingUtils.parseId(userId);
-            getElementById(parsedId); // We call this so if the value does not exist, we can fail with a NOT_FOUND response
-
-            final OffsetStats offsetStatsToUse = getValidUserStatsOffset(offsetStats, parsedId);
-            businessLogic.addOrUpdateOffsetStats(parsedId, offsetStatsToUse);
-            SystemStateManager.next(SystemState.UPDATING_STATS);
-            userTeamCompetitionStatsParser.parseTcStatsForUserAndWait(businessLogic.getUser(parsedId));
-            SystemStateManager.next(SystemState.WRITE_EXECUTED);
-            return ok();
-        } catch (final FoldingIdInvalidException e) {
-            final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), e.getId());
-            getLogger().debug(errorMessage, e);
-            getLogger().error(errorMessage);
-            return badRequest(errorMessage);
-        } catch (final FoldingIdOutOfRangeException e) {
-            final String errorMessage = String.format("The %s ID '%s' is out of range", elementType(), e.getId());
-            getLogger().debug(errorMessage, e);
-            getLogger().error(errorMessage);
-            return badRequest(errorMessage);
-        } catch (final UserNotFoundException e) {
-            getLogger().error("Error finding user with ID: {}", userId, e.getCause());
-            return notFound();
-        } catch (final FoldingException e) {
-            getLogger().error("Error updating user with ID: {}", userId, e.getCause());
-            return serverError();
-        } catch (final Exception e) {
-            getLogger().error("Unexpected error updating user with ID: {}", userId, e);
-            return serverError();
-        }
-    }
-
-    private OffsetStats getValidUserStatsOffset(final OffsetStats offsetStats, final int parsedId) throws FoldingException, UserNotFoundException {
-        if (!offsetStats.isMissingPointsOrMultipliedPoints()) {
-            return offsetStats;
-        }
-
-        final User user = businessLogic.getUser(parsedId);
-        final Hardware hardware = user.getHardware();
-        return OffsetStats.updateWithHardwareMultiplier(offsetStats, hardware.getMultiplier());
     }
 
     @Override
