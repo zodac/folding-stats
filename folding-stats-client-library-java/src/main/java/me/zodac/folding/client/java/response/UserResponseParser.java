@@ -41,7 +41,7 @@ public final class UserResponseParser {
     }
 
     /**
-     * Returns the {@link User} created by {@link me.zodac.folding.client.java.request.UserRequestSender#create(User)}.
+     * Returns the {@link User} created by {@link me.zodac.folding.client.java.request.UserRequestSender#create(me.zodac.folding.rest.api.tc.request.UserRequest)}.
      *
      * @param response the {@link HttpResponse} to parse
      * @return the created {@link User}
@@ -51,7 +51,7 @@ public final class UserResponseParser {
     }
 
     /**
-     * Returns the {@link User} updated by {@link me.zodac.folding.client.java.request.UserRequestSender#update(User)}.
+     * Returns the {@link User} updated by {@link me.zodac.folding.client.java.request.UserRequestSender#update(me.zodac.folding.rest.api.tc.request.UserRequest)}.
      *
      * @param response the {@link HttpResponse} to parse
      * @return the updated {@link User}

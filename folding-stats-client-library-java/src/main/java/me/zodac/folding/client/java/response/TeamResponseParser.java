@@ -41,7 +41,7 @@ public final class TeamResponseParser {
     }
 
     /**
-     * Returns the {@link Team} created by {@link me.zodac.folding.client.java.request.TeamRequestSender#create(Team)}.
+     * Returns the {@link Team} created by {@link me.zodac.folding.client.java.request.TeamRequestSender#create(me.zodac.folding.rest.api.tc.request.TeamRequest)}.
      *
      * @param response the {@link HttpResponse} to parse
      * @return the created {@link Team}
@@ -51,32 +51,12 @@ public final class TeamResponseParser {
     }
 
     /**
-     * Returns the {@link Team} updated by {@link me.zodac.folding.client.java.request.TeamRequestSender#update(Team)}.
+     * Returns the {@link Team} updated by {@link me.zodac.folding.client.java.request.TeamRequestSender#update(me.zodac.folding.rest.api.tc.request.TeamRequest)}.
      *
      * @param response the {@link HttpResponse} to parse
      * @return the updated {@link Team}
      */
     public static Team update(final HttpResponse<String> response) {
-        return GSON.fromJson(response.body(), Team.class);
-    }
-
-    /**
-     * Returns the {@link Team} updated by {@link me.zodac.folding.client.java.request.TeamRequestSender#retireUser(int, int)}.
-     *
-     * @param response the {@link HttpResponse} to parse
-     * @return the updated {@link Team}
-     */
-    public static Team retireUser(final HttpResponse<String> response) {
-        return GSON.fromJson(response.body(), Team.class);
-    }
-
-    /**
-     * Returns the {@link Team} updated by {@link me.zodac.folding.client.java.request.TeamRequestSender#unretireUser(int, int)}.
-     *
-     * @param response the {@link HttpResponse} to parse
-     * @return the updated {@link Team}
-     */
-    public static Team unretireUser(final HttpResponse<String> response) {
         return GSON.fromJson(response.body(), Team.class);
     }
 }

@@ -7,6 +7,7 @@ import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.exception.NotFoundException;
 import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.ejb.BusinessLogic;
+import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 import me.zodac.folding.rest.validator.HardwareValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +36,7 @@ import java.util.Collection;
 // TODO: [zodac] Add GET query endpoint to retrieve all hardware instances with same name
 @Path("/hardware/")
 @RequestScoped
-public class HardwareEndpoint extends AbstractIdentifiableCrudEndpoint<Hardware> {
+public class HardwareEndpoint extends AbstractCrudEndpoint<HardwareRequest, Hardware> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HardwareEndpoint.class);
 
@@ -47,8 +48,8 @@ public class HardwareEndpoint extends AbstractIdentifiableCrudEndpoint<Hardware>
     @RolesAllowed("admin")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createHardware(final Hardware hardware) {
-        return super.create(hardware);
+    public Response createHardware(final HardwareRequest hardwareRequest) {
+        return super.create(hardwareRequest);
     }
 
     @POST
@@ -56,8 +57,8 @@ public class HardwareEndpoint extends AbstractIdentifiableCrudEndpoint<Hardware>
     @Path("/batch")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createBatchOfHardware(final Collection<Hardware> hardware) {
-        return super.createBatchOf(hardware);
+    public Response createBatchOfHardware(final Collection<HardwareRequest> hardwareRequests) {
+        return super.createBatchOf(hardwareRequests);
     }
 
     @GET
@@ -80,8 +81,8 @@ public class HardwareEndpoint extends AbstractIdentifiableCrudEndpoint<Hardware>
     @Path("/{hardwareId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateFoldingTeamById(@PathParam("hardwareId") final String hardwareId, final Hardware hardware) {
-        return super.updateById(hardwareId, hardware);
+    public Response updateFoldingTeamById(@PathParam("hardwareId") final String hardwareId, final HardwareRequest hardwareRequest) {
+        return super.updateById(hardwareId, hardwareRequest);
     }
 
     @DELETE
@@ -103,12 +104,6 @@ public class HardwareEndpoint extends AbstractIdentifiableCrudEndpoint<Hardware>
     }
 
     @Override
-    protected ValidationResponse validate(final Hardware hardware) {
-        final HardwareValidator hardwareValidator = HardwareValidator.create();
-        return hardwareValidator.isValid(hardware);
-    }
-
-    @Override
     protected Hardware createElement(final Hardware hardware) throws FoldingException, FoldingConflictException {
         return businessLogic.createHardware(hardware);
     }
@@ -116,6 +111,12 @@ public class HardwareEndpoint extends AbstractIdentifiableCrudEndpoint<Hardware>
     @Override
     protected Collection<Hardware> getAllElements() throws FoldingException {
         return businessLogic.getAllHardware();
+    }
+
+    @Override
+    protected ValidationResponse<Hardware> validateAndConvert(final HardwareRequest hardwareRequest) {
+        final HardwareValidator hardwareValidator = HardwareValidator.create();
+        return hardwareValidator.isValid(hardwareRequest);
     }
 
     @Override

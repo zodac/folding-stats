@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import me.zodac.folding.api.ResponsePojo;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -14,6 +15,8 @@ import java.util.List;
 
 /**
  * Simple POJO defining the result of a validation check.
+ *
+ * @param <E> the type of the validated object, if it is valid
  */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -21,18 +24,21 @@ import java.util.List;
 @Setter
 @EqualsAndHashCode
 @ToString(doNotUseGetters = true)
-public class ValidationResponse {
+public class ValidationResponse<E extends ResponsePojo> {
 
     private Object invalidObject;
+    private E output;
     private Collection<String> errors;
 
     /**
      * Validation was successful.
      *
+     * @param output the output {@link ResponsePojo} after validation
+     * @param <E>    the output type of the validated object
      * @return a {@link ValidationResponse} with no invalid object and an empty {@link Collection} of errors
      */
-    public static ValidationResponse success() {
-        return new ValidationResponse(null, Collections.emptyList());
+    public static <E extends ResponsePojo> ValidationResponse<E> success(final E output) {
+        return new ValidationResponse<>(null, output, Collections.emptyList());
     }
 
     /**
@@ -40,21 +46,28 @@ public class ValidationResponse {
      *
      * @param invalidObject the {@link Object} that failed validation
      * @param errors        a {@link Collection} of the validation errors for the {@link Object}
+     * @param <E>           the output type of the validated object
      * @return a {@link ValidationResponse} with the invalid object and a {@link Collection} of errors
      */
-    public static ValidationResponse failure(final Object invalidObject, final Collection<String> errors) {
-        return new ValidationResponse(invalidObject, errors);
+    public static <E extends ResponsePojo> ValidationResponse<E> failure(final Object invalidObject, final Collection<String> errors) {
+        return new ValidationResponse<>(invalidObject, null, errors);
     }
 
     /**
      * Validation failed due to a null object.
      *
+     * @param <E> the output type of the validated object
      * @return a {@link ValidationResponse} with the null object a single error
      */
-    public static ValidationResponse nullObject() {
-        return new ValidationResponse(null, List.of("Payload is null"));
+    public static <E extends ResponsePojo> ValidationResponse<E> nullObject() {
+        return new ValidationResponse<>(null, null, List.of("Payload is null"));
     }
 
+    /**
+     * Checks if it was a failed validation.
+     *
+     * @return <code>true</code> if the validation failed
+     */
     public boolean isInvalid() {
         return !errors.isEmpty();
     }

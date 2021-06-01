@@ -59,16 +59,16 @@ public class TeamCompetitionLeaderboardTest {
 
     @Test
     public void whenGettingTeamLeaderboard_andTeamsExistWithStats_thenTeamsAreOrderedCorrectly_andPointsDiffIsCorrectlyCalculated() throws FoldingRestException {
-        final Team firstTeam = TeamUtils.createOrConflict(generateTeam());
-        final User firstUser = UserUtils.createOrConflict(generateUserWithTeamId(firstTeam.getId()));
+        final Team firstTeam = TeamUtils.create(generateTeam());
+        final User firstUser = UserUtils.create(generateUserWithTeamId(firstTeam.getId()));
         StubbedFoldingEndpointUtils.setPoints(firstUser, 10_000L);
 
-        final Team secondTeam = TeamUtils.createOrConflict(generateTeam());
-        final User secondUser = UserUtils.createOrConflict(generateUserWithTeamId(secondTeam.getId()));
+        final Team secondTeam = TeamUtils.create(generateTeam());
+        final User secondUser = UserUtils.create(generateUserWithTeamId(secondTeam.getId()));
         StubbedFoldingEndpointUtils.setPoints(secondUser, 15_000L);
 
-        final Team thirdTeam = TeamUtils.createOrConflict(generateTeam());
-        final User thirdUser = UserUtils.createOrConflict(generateUserWithTeamId(thirdTeam.getId()));
+        final Team thirdTeam = TeamUtils.create(generateTeam());
+        final User thirdUser = UserUtils.create(generateUserWithTeamId(thirdTeam.getId()));
         StubbedFoldingEndpointUtils.setPoints(thirdUser, 1_000L);
 
         manuallyUpdateStats();
@@ -120,18 +120,18 @@ public class TeamCompetitionLeaderboardTest {
 
     @Test
     public void whenGettingCategoryLeaderboard_andUsersExistWithStats_thenUsersAreGroupedByCategory_andPointsDiffIsCalculatedCorrectly() throws FoldingRestException {
-        final Team firstTeam = TeamUtils.createOrConflict(generateTeam());
-        final User firstUser = UserUtils.createOrConflict(generateUserWithTeamIdAndCategory(firstTeam.getId(), Category.AMD_GPU));
+        final Team firstTeam = TeamUtils.create(generateTeam());
+        final User firstUser = UserUtils.create(generateUserWithTeamIdAndCategory(firstTeam.getId(), Category.AMD_GPU));
         StubbedFoldingEndpointUtils.setPoints(firstUser, 10_000L);
 
-        final Team secondTeam = TeamUtils.createOrConflict(generateTeam());
-        final User secondUser = UserUtils.createOrConflict(generateUserWithTeamIdAndCategory(secondTeam.getId(), Category.AMD_GPU));
+        final Team secondTeam = TeamUtils.create(generateTeam());
+        final User secondUser = UserUtils.create(generateUserWithTeamIdAndCategory(secondTeam.getId(), Category.AMD_GPU));
         StubbedFoldingEndpointUtils.setPoints(secondUser, 15_000L);
 
-        final Team thirdTeam = TeamUtils.createOrConflict(generateTeam());
-        final User thirdUser = UserUtils.createOrConflict(generateUserWithTeamIdAndCategory(thirdTeam.getId(), Category.AMD_GPU));
+        final Team thirdTeam = TeamUtils.create(generateTeam());
+        final User thirdUser = UserUtils.create(generateUserWithTeamIdAndCategory(thirdTeam.getId(), Category.AMD_GPU));
         StubbedFoldingEndpointUtils.setPoints(thirdUser, 1_000L);
-        final User fourthUser = UserUtils.createOrConflict(generateUserWithTeamIdAndCategory(thirdTeam.getId(), Category.NVIDIA_GPU));
+        final User fourthUser = UserUtils.create(generateUserWithTeamIdAndCategory(thirdTeam.getId(), Category.NVIDIA_GPU));
         StubbedFoldingEndpointUtils.setPoints(fourthUser, 1_000L);
 
 

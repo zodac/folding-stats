@@ -52,6 +52,16 @@
 
     <build>
         <plugins>
+            <!-- Execute linters (before the tests) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+            </plugin>
+
             <!-- Execute tests -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

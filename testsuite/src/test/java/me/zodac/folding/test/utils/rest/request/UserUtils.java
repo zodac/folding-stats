@@ -4,6 +4,7 @@ import me.zodac.folding.api.tc.User;
 import me.zodac.folding.client.java.request.UserRequestSender;
 import me.zodac.folding.client.java.response.UserResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
+import me.zodac.folding.rest.api.tc.request.UserRequest;
 
 import java.net.HttpURLConnection;
 import java.net.http.HttpResponse;
@@ -26,16 +27,16 @@ public final class UserUtils {
     }
 
     /**
-     * Creates the given {@link User}, or if it already exists, returns the existing one.
+     * Creates the given {@link UserRequest}.
      * <p>
-     * Will also call {@link StubbedFoldingEndpointUtils#enableUser(User)}, so if you wish to test an invalid number of
+     * Will also call {@link StubbedFoldingEndpointUtils#enableUser(UserRequest)}, so if you wish to test an invalid number of
      * units, you must set that explicitly.
      *
-     * @param user the {@link User} to create/retrieve
-     * @return the created {@link User} or existing {@link User}
-     * @throws FoldingRestException thrown if an error occurs creating/retrieving the {@link User}
+     * @param user the {@link User} to create
+     * @return the created {@link User}
+     * @throws FoldingRestException thrown if an error occurs creating the {@link User}
      */
-    public static User createOrConflict(final User user) throws FoldingRestException {
+    public static User create(final UserRequest user) throws FoldingRestException {
         StubbedFoldingEndpointUtils.enableUser(user);
         final HttpResponse<String> response = USER_REQUEST_SENDER.create(user, ADMIN_USER.userName(), ADMIN_USER.password());
         if (response.statusCode() == HttpURLConnection.HTTP_CREATED) {

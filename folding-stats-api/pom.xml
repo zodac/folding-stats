@@ -13,7 +13,7 @@
     <name>[${project.parent.artifactId}] API module</name>
 
     <dependencies>
-        <!-- Project Dependencies -->
+        <!-- 3PP Dependencies -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

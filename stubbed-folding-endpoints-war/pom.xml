@@ -38,6 +38,7 @@
 
     <build>
         <plugins>
+            <!-- Build WAR -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
@@ -55,6 +56,16 @@
                         </resource>
                     </webResources>
                 </configuration>
+            </plugin>
+
+            <!-- Execute linters -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

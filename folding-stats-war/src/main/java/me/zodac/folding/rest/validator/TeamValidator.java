@@ -2,7 +2,7 @@ package me.zodac.folding.rest.validator;
 
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.validator.ValidationResponse;
-import org.apache.commons.lang3.StringUtils;
+import me.zodac.folding.rest.api.tc.request.TeamRequest;
 import org.apache.commons.validator.routines.UrlValidator;
 
 import java.util.ArrayList;
@@ -22,25 +22,30 @@ public class TeamValidator {
     }
 
 
-    public ValidationResponse isValid(final Team team) {
-        if (team == null) {
+    public ValidationResponse<Team> isValid(final TeamRequest teamRequest) {
+        if (teamRequest == null) {
             return ValidationResponse.nullObject();
         }
 
         final List<String> failureMessages = new ArrayList<>();
 
-        if (StringUtils.isBlank(team.getTeamName())) {
+        if (isBlank(teamRequest.getTeamName())) {
             failureMessages.add("Attribute 'teamName' must not be empty");
         }
 
-        if (StringUtils.isNotEmpty(team.getForumLink()) && !URL_VALIDATOR.isValid(team.getForumLink())) {
-            failureMessages.add(String.format("Attribute 'forumLink' is not a valid link: '%s'", team.getForumLink()));
+        if (!isBlank(teamRequest.getForumLink()) && !URL_VALIDATOR.isValid(teamRequest.getForumLink())) {
+            failureMessages.add(String.format("Attribute 'forumLink' is not a valid link: '%s'", teamRequest.getForumLink()));
         }
 
         if (failureMessages.isEmpty()) {
-            return ValidationResponse.success();
+            final Team convertedTeam = Team.createWithoutId(teamRequest.getTeamName(), teamRequest.getTeamDescription(), teamRequest.getForumLink());
+            return ValidationResponse.success(convertedTeam);
         }
 
-        return ValidationResponse.failure(team, failureMessages);
+        return ValidationResponse.failure(teamRequest, failureMessages);
+    }
+
+    private boolean isBlank(final String input) {
+        return input == null || input.isBlank();
     }
 }

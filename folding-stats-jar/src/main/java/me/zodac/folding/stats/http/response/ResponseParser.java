@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import me.zodac.folding.api.exception.FoldingExternalServiceException;
+import me.zodac.folding.api.stats.FoldingStatsDetails;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +43,7 @@ public final class ResponseParser {
         }
     }
 
-    public static int getUnitsFromResponse(final String userName, final String passkey, final HttpResponse<String> response) throws FoldingExternalServiceException {
+    public static int getUnitsFromResponse(final FoldingStatsDetails foldingStatsDetails, final HttpResponse<String> response) throws FoldingExternalServiceException {
         if (StringUtils.isBlank(response.body())) {
             throw new FoldingExternalServiceException(response.uri().toString(), "Empty Folding units response");
         }
@@ -52,7 +53,7 @@ public final class ResponseParser {
         final List<UnitsApiInstance> unitsResponse = GSON.fromJson(response.body(), collectionType);
 
         if (unitsResponse.isEmpty()) {
-            LOGGER.warn("No valid units found for user/passkey: '{}/{}'", userName, passkey);
+            LOGGER.warn("No valid units found for user/passkey: '{}/{}'", foldingStatsDetails.getFoldingUserName(), foldingStatsDetails.getPasskey());
             return 0;
         }
 

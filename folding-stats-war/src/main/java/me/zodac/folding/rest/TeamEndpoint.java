@@ -8,6 +8,7 @@ import me.zodac.folding.api.utils.ExecutionType;
 import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.ejb.BusinessLogic;
 import me.zodac.folding.ejb.TeamCompetitionStatsScheduler;
+import me.zodac.folding.rest.api.tc.request.TeamRequest;
 import me.zodac.folding.rest.validator.TeamValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +36,7 @@ import java.util.Collection;
  */
 @Path("/teams/")
 @RequestScoped
-public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
+public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TeamEndpoint.class);
 
@@ -49,8 +50,8 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
     @RolesAllowed("admin")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createTeam(final Team team) {
-        return super.create(team);
+    public Response createTeam(final TeamRequest teamRequest) {
+        return super.create(teamRequest);
     }
 
     @POST
@@ -58,8 +59,8 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
     @Path("/batch")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createBatchOfTeams(final Collection<Team> teams) {
-        return super.createBatchOf(teams);
+    public Response createBatchOfTeams(final Collection<TeamRequest> teamRequests) {
+        return super.createBatchOf(teamRequests);
     }
 
     @GET
@@ -82,8 +83,8 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
     @Path("/{teamId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateTeamById(@PathParam("teamId") final String teamId, final Team team) {
-        return super.updateById(teamId, team);
+    public Response updateTeamById(@PathParam("teamId") final String teamId, final TeamRequest teamRequest) {
+        return super.updateById(teamId, teamRequest);
     }
 
     @DELETE
@@ -105,12 +106,6 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
     }
 
     @Override
-    protected ValidationResponse validate(final Team element) {
-        final TeamValidator teamValidator = TeamValidator.create();
-        return teamValidator.isValid(element);
-    }
-
-    @Override
     protected Team createElement(final Team team) throws FoldingException, FoldingConflictException {
         final Team teamWithId = businessLogic.createTeam(team);
         teamCompetitionStatsScheduler.parseTcStatsForTeam(team, ExecutionType.SYNCHRONOUS);
@@ -120,6 +115,12 @@ public class TeamEndpoint extends AbstractIdentifiableCrudEndpoint<Team> {
     @Override
     protected Collection<Team> getAllElements() throws FoldingException {
         return businessLogic.getAllTeams();
+    }
+
+    @Override
+    protected ValidationResponse<Team> validateAndConvert(final TeamRequest teamRequest) {
+        final TeamValidator teamValidator = TeamValidator.create();
+        return teamValidator.isValid(teamRequest);
     }
 
     @Override

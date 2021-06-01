@@ -3,11 +3,11 @@ package me.zodac.folding.test;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
-import me.zodac.folding.api.tc.User;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.tc.CompetitionResult;
 import me.zodac.folding.rest.api.tc.TeamResult;
 import me.zodac.folding.rest.api.tc.UserResult;
+import me.zodac.folding.rest.api.tc.request.UserRequest;
 import me.zodac.folding.test.utils.rest.request.HardwareUtils;
 import me.zodac.folding.test.utils.rest.request.StubbedFoldingEndpointUtils;
 import me.zodac.folding.test.utils.rest.request.TeamCompetitionStatsUtils;
@@ -34,7 +34,7 @@ import static me.zodac.folding.test.utils.rest.request.TeamCompetitionStatsUtils
 import static me.zodac.folding.test.utils.rest.request.TeamCompetitionStatsUtils.manuallyResetStats;
 import static me.zodac.folding.test.utils.rest.request.TeamCompetitionStatsUtils.manuallyUpdateStats;
 import static me.zodac.folding.test.utils.rest.request.UserUtils.USER_REQUEST_SENDER;
-import static me.zodac.folding.test.utils.rest.request.UserUtils.createOrConflict;
+import static me.zodac.folding.test.utils.rest.request.UserUtils.create;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -67,10 +67,10 @@ public class ResetTest {
 
     @Test
     public void whenResetOccurs_andRetiredStatsExistForTeam_thenRetiredStatsAreRemovedOnReset() throws FoldingRestException {
-        final Hardware hardware = HardwareUtils.createOrConflict(generateHardware());
-        final Team team = TeamUtils.createOrConflict(generateTeam());
+        final Hardware hardware = HardwareUtils.create(generateHardware());
+        final Team team = TeamUtils.create(generateTeam());
 
-        final User captainUser = User.builder()
+        final UserRequest captainUser = UserRequest.builder()
                 .foldingUserName(nextUserName())
                 .displayName("displayName")
                 .passkey("DummyPasskey12345678901234567890")
@@ -79,9 +79,9 @@ public class ResetTest {
                 .teamId(team.getId())
                 .userIsCaptain(true)
                 .build();
-        createOrConflict(captainUser);
+        create(captainUser);
 
-        final User userToRetire = User.builder()
+        final UserRequest userToRetire = UserRequest.builder()
                 .foldingUserName(nextUserName())
                 .displayName("displayName")
                 .passkey("DummyPasskey12345678901234567890")
@@ -90,7 +90,7 @@ public class ResetTest {
                 .teamId(team.getId())
                 .build();
 
-        final int userToRetireId = createOrConflict(userToRetire).getId();
+        final int userToRetireId = create(userToRetire).getId();
 
         manuallyUpdateStats();
 
@@ -108,7 +108,7 @@ public class ResetTest {
         // User must have points or else will not show as 'retired' for the team
         StubbedFoldingEndpointUtils.setPoints(userToRetire, 1_000L);
         manuallyUpdateStats();
-        
+
         USER_REQUEST_SENDER.delete(userToRetireId, ADMIN_USER.userName(), ADMIN_USER.password());
         manuallyUpdateStats();
 
@@ -140,22 +140,22 @@ public class ResetTest {
 
     @Test
     public void whenResetOccurs_thenStatsAreResetForCompetitionAndTeamsAndUsers() throws FoldingRestException {
-        final Team firstTeam = TeamUtils.createOrConflict(generateTeam());
+        final Team firstTeam = TeamUtils.create(generateTeam());
 
-        final User firstUser = generateUserWithCategory(Category.NVIDIA_GPU);
+        final UserRequest firstUser = generateUserWithCategory(Category.NVIDIA_GPU);
         firstUser.setUserIsCaptain(true);
         firstUser.setTeamId(firstTeam.getId());
-        createOrConflict(firstUser);
+        create(firstUser);
 
-        final User secondUser = generateUserWithCategory(Category.AMD_GPU);
+        final UserRequest secondUser = generateUserWithCategory(Category.AMD_GPU);
         secondUser.setTeamId(firstTeam.getId());
-        createOrConflict(secondUser);
+        create(secondUser);
 
-        final Team secondTeam = TeamUtils.createOrConflict(generateTeam());
-        final User thirdUser = generateUserWithCategory(Category.AMD_GPU);
+        final Team secondTeam = TeamUtils.create(generateTeam());
+        final UserRequest thirdUser = generateUserWithCategory(Category.AMD_GPU);
         thirdUser.setUserIsCaptain(true);
         thirdUser.setTeamId(secondTeam.getId());
-        createOrConflict(thirdUser);
+        create(thirdUser);
 
         final long firstUserPoints = 10_000L;
         final long secondUserPoints = 7_000L;

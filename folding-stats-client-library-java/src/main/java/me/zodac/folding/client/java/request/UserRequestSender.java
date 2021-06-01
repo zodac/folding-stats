@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.OffsetStats;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
+import me.zodac.folding.rest.api.tc.request.UserRequest;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -15,7 +16,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.List;
+import java.util.Collection;
 
 import static me.zodac.folding.api.utils.EncodingUtils.encodeBasicAuthentication;
 
@@ -127,26 +128,26 @@ public final class UserRequestSender {
     }
 
     /**
-     * Send a <b>POST</b> request to create the given {@link User} in the system.
+     * Send a <b>POST</b> request to create the given {@link UserRequest} in the system.
      *
-     * @param user the {@link User} to create
+     * @param user the {@link UserRequest} to create
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
-    public HttpResponse<String> create(final User user) throws FoldingRestException {
+    public HttpResponse<String> create(final UserRequest user) throws FoldingRestException {
         return create(user, null, null);
     }
 
     /**
-     * Send a <b>POST</b> request to create the given {@link User} in the system.
+     * Send a <b>POST</b> request to create the given {@link UserRequest} in the system.
      *
-     * @param user     the {@link User} to create
+     * @param user     the {@link UserRequest} to create
      * @param userName the user name
      * @param password the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
-    public HttpResponse<String> create(final User user, final String userName, final String password) throws FoldingRestException {
+    public HttpResponse<String> create(final UserRequest user, final String userName, final String password) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(user)))
                 .uri(URI.create(foldingUrl + "/users"))
@@ -166,26 +167,26 @@ public final class UserRequestSender {
     }
 
     /**
-     * Send a <b>POST</b> request to create the given {@link User}s in the system.
+     * Send a <b>POST</b> request to create the given {@link UserRequest}s in the system.
      *
-     * @param batchOfUsers the {@link List} of {@link User}s to create
+     * @param batchOfUsers the {@link Collection} of {@link UserRequest}s to create
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
-    public HttpResponse<String> createBatchOf(final List<User> batchOfUsers) throws FoldingRestException {
+    public HttpResponse<String> createBatchOf(final Collection<UserRequest> batchOfUsers) throws FoldingRestException {
         return createBatchOf(batchOfUsers, null, null);
     }
 
     /**
-     * Send a <b>POST</b> request to create the given {@link User}s in the system.
+     * Send a <b>POST</b> request to create the given {@link UserRequest}s in the system.
      *
-     * @param batchOfUsers the {@link List} of {@link User}s to create
+     * @param batchOfUsers the {@link Collection} of {@link UserRequest}s to create
      * @param userName     the user name
      * @param password     the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
-    public HttpResponse<String> createBatchOf(final List<User> batchOfUsers, final String userName, final String password) throws FoldingRestException {
+    public HttpResponse<String> createBatchOf(final Collection<UserRequest> batchOfUsers, final String userName, final String password) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(batchOfUsers)))
                 .uri(URI.create(foldingUrl + "/users/batch"))
@@ -205,26 +206,26 @@ public final class UserRequestSender {
     }
 
     /**
-     * Send a <b>PUT</b> request to update the given {@link User} in the system.
+     * Send a <b>PUT</b> request to update the given {@link UserRequest} in the system.
      *
-     * @param user the {@link User} to update
+     * @param user the {@link UserRequest} to update
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
-    public HttpResponse<String> update(final User user) throws FoldingRestException {
+    public HttpResponse<String> update(final UserRequest user) throws FoldingRestException {
         return update(user, null, null);
     }
 
     /**
-     * Send a <b>PUT</b> request to update the given {@link User} in the system.
+     * Send a <b>PUT</b> request to update the given {@link UserRequest} in the system.
      *
-     * @param user     the {@link User} to update
+     * @param user     the {@link UserRequest} to update
      * @param userName the user name
      * @param password the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
-    public HttpResponse<String> update(final User user, final String userName, final String password) throws FoldingRestException {
+    public HttpResponse<String> update(final UserRequest user, final String userName, final String password) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .PUT(HttpRequest.BodyPublishers.ofString(GSON.toJson(user)))
                 .uri(URI.create(foldingUrl + "/users/" + user.getId()))

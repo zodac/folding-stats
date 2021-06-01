@@ -7,9 +7,7 @@ import me.zodac.folding.api.db.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.FoldingExternalServiceException;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
-import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
-import me.zodac.folding.api.tc.OperatingSystem;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.exception.HardwareNotFoundException;
@@ -75,8 +73,6 @@ public class BusinessLogic {
     private final TotalStatsCache totalStatsCache = TotalStatsCache.get();
 
     public Hardware createHardware(final Hardware hardware) throws FoldingException, FoldingConflictException {
-        // The REST input may not use the correct format for the ENUM, so we normalise it here
-        hardware.setOperatingSystem(OperatingSystem.get(hardware.getOperatingSystem()).displayName());
         final Hardware hardwareWithId = dbManager.createHardware(hardware);
         hardwareCache.add(hardwareWithId);
         return hardwareWithId;
@@ -150,8 +146,6 @@ public class BusinessLogic {
     }
 
     public User createUser(final User user) throws FoldingException, FoldingConflictException, FoldingExternalServiceException {
-        // The REST input may not use the correct format for the ENUM, so we normalise it here
-        user.setCategory(Category.get(user.getCategory()).displayName());
         final User userWithId = dbManager.createUser(user);
         userCache.add(userWithId);
 

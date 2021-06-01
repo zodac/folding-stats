@@ -1,9 +1,9 @@
 package me.zodac.folding.test;
 
 import me.zodac.folding.api.tc.Team;
-import me.zodac.folding.api.tc.User;
 import me.zodac.folding.client.java.response.TeamResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
+import me.zodac.folding.rest.api.tc.request.TeamRequest;
 import me.zodac.folding.test.utils.TestConstants;
 import me.zodac.folding.test.utils.TestGenerator;
 import me.zodac.folding.test.utils.rest.request.TeamUtils;
@@ -37,7 +37,7 @@ import static me.zodac.folding.test.utils.TestGenerator.generateTeam;
 import static me.zodac.folding.test.utils.TestGenerator.generateTeamWithId;
 import static me.zodac.folding.test.utils.TestGenerator.nextTeamName;
 import static me.zodac.folding.test.utils.rest.request.TeamUtils.TEAM_REQUEST_SENDER;
-import static me.zodac.folding.test.utils.rest.request.TeamUtils.createOrConflict;
+import static me.zodac.folding.test.utils.rest.request.TeamUtils.create;
 import static me.zodac.folding.test.utils.rest.response.HttpResponseHeaderUtils.getETag;
 import static me.zodac.folding.test.utils.rest.response.HttpResponseHeaderUtils.getXTotalCount;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -73,7 +73,7 @@ public class TeamTest {
 
     @Test
     public void whenCreatingTeam_givenPayloadIsValid_thenTheCreatedTeamIsReturnedInResponse_andHasId_andResponseHasA201StatusCode() throws FoldingRestException {
-        final Team teamToCreate = generateTeam();
+        final TeamRequest teamToCreate = generateTeam();
 
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(teamToCreate, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
@@ -81,17 +81,18 @@ public class TeamTest {
                 .isEqualTo(HttpURLConnection.HTTP_CREATED);
 
         final Team actual = TeamResponseParser.create(response);
-        final Team expected = Team.updateWithId(actual.getId(), teamToCreate);
         assertThat(actual)
                 .as("Did not receive created object as JSON response: " + response.body())
-                .isEqualTo(expected);
+                .extracting("teamName", "teamDescription", "forumLink")
+                .containsExactly(teamToCreate.getTeamName(), teamToCreate.getTeamDescription(), teamToCreate.getForumLink());
+
     }
 
     @Test
     public void whenCreatingBatchOfTeams_givenPayloadIsValid_thenTheTeamsAreCreated_andResponseHasA200Status() throws FoldingRestException {
         final int initialSize = TeamUtils.getNumberOfTeams();
 
-        final List<Team> batchOfTeams = List.of(
+        final List<TeamRequest> batchOfTeams = List.of(
                 generateTeam(),
                 generateTeam(),
                 generateTeam()
@@ -111,7 +112,7 @@ public class TeamTest {
 
     @Test
     public void whenGettingTeam_givenAValidTeamId_thenTeamIsReturned_andHasA200Status() throws FoldingRestException {
-        final int teamId = TeamUtils.createOrConflict(generateTeam()).getId();
+        final int teamId = TeamUtils.create(generateTeam()).getId();
 
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.get(teamId);
         assertThat(response.statusCode())
@@ -126,13 +127,18 @@ public class TeamTest {
 
     @Test
     public void whenUpdatingTeam_givenAValidTeamId_andAValidPayload_thenUpdatedTeamIsReturned_andNoNewTeamIsCreated_andHasA200Status() throws FoldingRestException {
-        final int teamId = TeamUtils.createOrConflict(generateTeam()).getId();
+        final Team createdTeam = TeamUtils.create(generateTeam());
         final int initialSize = TeamUtils.getNumberOfTeams();
 
-        final Team updatedTeam = Team.updateWithId(teamId, TeamUtils.get(teamId));
-        updatedTeam.setTeamDescription("Updated description");
 
-        final HttpResponse<String> response = TEAM_REQUEST_SENDER.update(updatedTeam, ADMIN_USER.userName(), ADMIN_USER.password());
+        final TeamRequest teamToUpdate = TeamRequest.builder()
+                .id(createdTeam.getId())
+                .teamName(createdTeam.getTeamName())
+                .teamDescription("Updated description")
+                .forumLink(createdTeam.getForumLink())
+                .build();
+
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.update(teamToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -140,7 +146,8 @@ public class TeamTest {
         final Team actual = TeamResponseParser.update(response);
         assertThat(actual)
                 .as("Did not receive created object as JSON response: " + response.body())
-                .isEqualTo(updatedTeam);
+                .extracting("id", "teamName", "teamDescription", "forumLink")
+                .containsExactly(teamToUpdate.getId(), teamToUpdate.getTeamName(), teamToUpdate.getTeamDescription(), teamToUpdate.getForumLink());
 
 
         final int allTeamsAfterUpdate = TeamUtils.getNumberOfTeams();
@@ -151,7 +158,7 @@ public class TeamTest {
 
     @Test
     public void whenDeletingTeam_givenAValidTeamId_thenTeamIsDeleted_andHasA200Status_andTeamCountIsReduced_andTeamCannotBeRetrievedAgain() throws FoldingRestException {
-        final int teamId = TeamUtils.createOrConflict(generateTeam()).getId();
+        final int teamId = TeamUtils.create(generateTeam()).getId();
         final int initialSize = TeamUtils.getNumberOfTeams();
 
         final HttpResponse<Void> response = TEAM_REQUEST_SENDER.delete(teamId, ADMIN_USER.userName(), ADMIN_USER.password());
@@ -174,7 +181,7 @@ public class TeamTest {
 
     @Test
     public void whenCreatingTeam_givenATeamWithInvalidUrl_thenJsonResponseWithErrorIsReturned_andHasA400Status() throws FoldingRestException {
-        final Team team = Team.builder()
+        final TeamRequest team = TeamRequest.builder()
                 .teamName(nextTeamName())
                 .forumLink("invalidLink")
                 .build();
@@ -191,8 +198,8 @@ public class TeamTest {
 
     @Test
     public void whenCreatingTeam_givenTeamWithTheNameAlreadyExists_thenA409ResponseIsReturned() throws FoldingRestException {
-        final Team teamToCreate = generateTeam();
-        final Team teamWithSameName = generateTeam();
+        final TeamRequest teamToCreate = generateTeam();
+        final TeamRequest teamWithSameName = generateTeam();
         teamWithSameName.setTeamName(teamToCreate.getTeamName());
 
         TEAM_REQUEST_SENDER.create(teamToCreate, ADMIN_USER.userName(), ADMIN_USER.password());
@@ -218,7 +225,7 @@ public class TeamTest {
 
     @Test
     public void whenUpdatingTeam_givenANonExistingTeamId_thenNoJsonResponseIsReturned_andHasA404Status() throws FoldingRestException {
-        final Team updatedTeam = generateTeamWithId(TestConstants.INVALID_ID);
+        final TeamRequest updatedTeam = generateTeamWithId(TestConstants.INVALID_ID);
 
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.update(updatedTeam, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
@@ -241,37 +248,41 @@ public class TeamTest {
 
     @Test
     public void whenUpdatingTeam_givenAValidTeamId_andPayloadHasNoChanges_thenOriginalTeamIsReturned_andHasA200Status() throws FoldingRestException {
-        final Team team = generateTeam();
-        final int createdTeamId = createOrConflict(team).getId();
-        final Team teamWithId = Team.updateWithId(createdTeamId, team);
+        final Team createdTeam = create(generateTeam());
 
-        final HttpResponse<String> updateResponse = TEAM_REQUEST_SENDER.update(teamWithId, ADMIN_USER.userName(), ADMIN_USER.password());
+        final TeamRequest teamToUpdate = TeamRequest.builder()
+                .id(createdTeam.getId())
+                .teamName(createdTeam.getTeamName())
+                .teamDescription(createdTeam.getTeamDescription())
+                .forumLink(createdTeam.getForumLink())
+                .build();
+
+        final HttpResponse<String> updateResponse = TEAM_REQUEST_SENDER.update(teamToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(updateResponse.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + updateResponse.body())
                 .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Team actual = TeamResponseParser.update(updateResponse);
-
         assertThat(actual)
                 .as("Did not receive the original team in response")
-                .isEqualTo(teamWithId);
+                .extracting("id", "teamName", "teamDescription", "forumLink")
+                .containsExactly(createdTeam.getId(), createdTeam.getTeamName(), createdTeam.getTeamDescription(), createdTeam.getForumLink());
     }
 
     @Test
     public void whenCreatingBatchOfTeams_givenPayloadIsPartiallyValid_thenOnlyValidTeamsAreCreated_andResponseHasA200Status() throws FoldingRestException {
         final int initialTeamsSize = TeamUtils.getNumberOfTeams();
 
-
-        final List<Team> batchOfValidTeams = List.of(
+        final List<TeamRequest> batchOfValidTeams = List.of(
                 generateTeam(),
                 generateTeam()
         );
-        final List<Team> batchOfInvalidTeams = List.of(
+        final List<TeamRequest> batchOfInvalidTeams = List.of(
                 generateInvalidTeam(),
                 generateInvalidTeam()
         );
-        final List<Team> batchOfTeams = new ArrayList<>(batchOfValidTeams.size() + batchOfInvalidTeams.size());
+        final List<TeamRequest> batchOfTeams = new ArrayList<>(batchOfValidTeams.size() + batchOfInvalidTeams.size());
         batchOfTeams.addAll(batchOfValidTeams);
         batchOfTeams.addAll(batchOfInvalidTeams);
 
@@ -291,7 +302,7 @@ public class TeamTest {
     public void whenCreatingBatchOfTeams_givenPayloadIsInvalid_thenResponseHasA400Status() throws FoldingRestException {
         final int initialTeamsSize = TeamUtils.getNumberOfTeams();
 
-        final List<Team> batchOfInvalidTeams = List.of(
+        final List<TeamRequest> batchOfInvalidTeams = List.of(
                 generateInvalidTeam(),
                 generateInvalidTeam()
         );
@@ -309,9 +320,8 @@ public class TeamTest {
 
     @Test
     public void whenDeletingTeam_givenTheTeamIsLinkedToAUser_thenResponseHasA409Status() throws FoldingRestException {
-        final int teamId = TeamUtils.createOrConflict(generateTeam()).getId();
-        final User user = TestGenerator.generateUserWithTeamId(teamId);
-        UserUtils.createOrConflict(user);
+        final int teamId = TeamUtils.create(generateTeam()).getId();
+        UserUtils.create(TestGenerator.generateUserWithTeamId(teamId));
 
         final HttpResponse<Void> deleteTeamResponse = TEAM_REQUEST_SENDER.delete(teamId, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(deleteTeamResponse.statusCode())
@@ -321,7 +331,7 @@ public class TeamTest {
 
     @Test
     public void whenGettingTeamById_givenRequestUsesPreviousETag_andTeamHasNotChanged_thenResponseHasA304Status_andNoBody() throws FoldingRestException {
-        final int teamId = TeamUtils.createOrConflict(generateTeam()).getId();
+        final int teamId = TeamUtils.create(generateTeam()).getId();
 
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.get(teamId);
         assertThat(response.statusCode())
@@ -342,7 +352,7 @@ public class TeamTest {
 
     @Test
     public void whenGettingAllTeams_givenRequestUsesPreviousETag_andTeamsHaveNotChanged_thenResponseHasA304Status_andNoBody() throws FoldingRestException {
-        TeamUtils.createOrConflict(generateTeam());
+        TeamUtils.create(generateTeam());
 
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.getAll();
         assertThat(response.statusCode())
@@ -363,7 +373,7 @@ public class TeamTest {
 
     @Test
     public void whenCreatingTeam_givenNoAuthentication_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
-        final Team teamToCreate = generateTeam();
+        final TeamRequest teamToCreate = generateTeam();
 
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(teamToCreate);
         assertThat(response.statusCode())
@@ -373,7 +383,7 @@ public class TeamTest {
 
     @Test
     public void whenCreatingBatchOfTeams_givenNoAuthentication_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
-        final List<Team> batchOfTeams = List.of(
+        final List<TeamRequest> batchOfTeams = List.of(
                 generateTeam(),
                 generateTeam(),
                 generateTeam()
@@ -387,12 +397,18 @@ public class TeamTest {
 
     @Test
     public void whenUpdatingTeam_givenNoAuthentication_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
-        final int teamId = TeamUtils.createOrConflict(generateTeam()).getId();
+        final int teamId = TeamUtils.create(generateTeam()).getId();
 
-        final Team updatedTeam = Team.updateWithId(teamId, TeamUtils.get(teamId));
-        updatedTeam.setTeamDescription("Updated description");
+        final Team createdTeam = Team.updateWithId(teamId, TeamUtils.get(teamId));
 
-        final HttpResponse<String> response = TEAM_REQUEST_SENDER.update(updatedTeam);
+        final TeamRequest teamToUpdate = TeamRequest.builder()
+                .id(teamId)
+                .teamName(createdTeam.getTeamName())
+                .teamDescription("Updated description")
+                .forumLink(createdTeam.getForumLink())
+                .build();
+
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.update(teamToUpdate);
         assertThat(response.statusCode())
                 .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
@@ -400,7 +416,7 @@ public class TeamTest {
 
     @Test
     public void whenDeletingTeam_givenNoAuthentication_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
-        final int teamId = TeamUtils.createOrConflict(generateTeam()).getId();
+        final int teamId = TeamUtils.create(generateTeam()).getId();
 
         final HttpResponse<Void> response = TEAM_REQUEST_SENDER.delete(teamId);
         assertThat(response.statusCode())
@@ -410,7 +426,7 @@ public class TeamTest {
 
     @Test
     public void whenCreatingTeam_givenAuthentication_andAuthenticationHasInvalidUser_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
-        final Team teamToCreate = generateTeam();
+        final TeamRequest teamToCreate = generateTeam();
 
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(teamToCreate, INVALID_USERNAME.userName(), INVALID_USERNAME.password());
         assertThat(response.statusCode())
@@ -420,7 +436,7 @@ public class TeamTest {
 
     @Test
     public void whenCreatingTeam_givenAuthentication_andAuthenticationHasInvalidPassword_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
-        final Team teamToCreate = generateTeam();
+        final TeamRequest teamToCreate = generateTeam();
 
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(teamToCreate, INVALID_PASSWORD.userName(), INVALID_PASSWORD.password());
         assertThat(response.statusCode())
@@ -430,7 +446,7 @@ public class TeamTest {
 
     @Test
     public void whenCreatingTeam_givenAuthentication_andUserDoesNotHaveAdminRole_thenRequestFails_andResponseHasA403StatusCode() throws FoldingRestException {
-        final Team teamToCreate = generateTeam();
+        final TeamRequest teamToCreate = generateTeam();
 
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(teamToCreate, READ_ONLY_USER.userName(), READ_ONLY_USER.password());
         assertThat(response.statusCode())
@@ -455,13 +471,11 @@ public class TeamTest {
 
     @Test
     public void whenUpdatingTeam_givenEmptyPayload_thenRequestFails_andResponseHasA400StatusCode() throws FoldingRestException, IOException, InterruptedException {
-        final int teamId = TeamUtils.createOrConflict(generateTeam()).getId();
-        final Team updatedTeam = Team.updateWithId(teamId, TeamUtils.get(teamId));
-        updatedTeam.setTeamDescription("Updated description");
+        final int teamId = TeamUtils.create(generateTeam()).getId();
 
         final HttpRequest request = HttpRequest.newBuilder()
                 .PUT(HttpRequest.BodyPublishers.noBody())
-                .uri(URI.create(FOLDING_URL + "/teams/" + updatedTeam.getId()))
+                .uri(URI.create(FOLDING_URL + "/teams/" + teamId))
                 .header("Content-Type", "application/json")
                 .header("Authorization", encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
                 .build();
@@ -474,7 +488,7 @@ public class TeamTest {
 
     @Test
     public void whenCreatingTeam_andOptionalFieldIsEmptyString_thenValueShouldBeNullNotEmpty() throws FoldingRestException {
-        final Team teamToCreate = Team.builder()
+        final TeamRequest teamToCreate = TeamRequest.builder()
                 .teamName(nextTeamName())
                 .forumLink("")
                 .build();
@@ -495,14 +509,20 @@ public class TeamTest {
 
     @Test
     public void whenUpdatingTeam_andOptionalFieldIsEmptyString_thenValueShouldBeNullNotEmpty() throws FoldingRestException {
-        final Team team = Team.builder()
+        final TeamRequest team = TeamRequest.builder()
                 .teamName(nextTeamName())
                 .forumLink("http://google.com")
                 .build();
 
-        final Team teamToUpdate = TeamUtils.createOrConflict(team);
-        final int teamId = teamToUpdate.getId();
-        teamToUpdate.setForumLink("");
+        final Team createdTeam = TeamUtils.create(team);
+        final int teamId = createdTeam.getId();
+
+        final TeamRequest teamToUpdate = TeamRequest.builder()
+                .id(teamId)
+                .teamName(createdTeam.getTeamName())
+                .teamDescription(createdTeam.getTeamDescription())
+                .forumLink("")
+                .build();
 
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.update(teamToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())

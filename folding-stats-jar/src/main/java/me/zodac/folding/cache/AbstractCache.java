@@ -1,6 +1,6 @@
 package me.zodac.folding.cache;
 
-import me.zodac.folding.api.Identifiable;
+import me.zodac.folding.api.ResponsePojo;
 import me.zodac.folding.api.tc.exception.NotFoundException;
 
 import java.util.Collection;
@@ -8,11 +8,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-abstract class AbstractIdentifiableCache<V extends Identifiable> {
+abstract class AbstractCache<V extends ResponsePojo> {
 
     private final Map<Integer, V> elementsById;
 
-    protected AbstractIdentifiableCache() {
+    protected AbstractCache() {
         elementsById = new HashMap<>();
     }
 

@@ -3,7 +3,7 @@ package me.zodac.folding.rest.response;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.experimental.UtilityClass;
-import me.zodac.folding.api.Identifiable;
+import me.zodac.folding.api.ResponsePojo;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -37,13 +37,13 @@ public final class Responses {
     /**
      * A <b>200_OK</b> {@link Response}.
      * <p>
-     * Generally used for cases where a HTTP request is sent to retrieve a {@link Collection} of {@link Identifiable} resources.
+     * Generally used for cases where a HTTP request is sent to retrieve a {@link Collection} of {@link ResponsePojo} resources.
      *
-     * @param entities the {@link Collection} of {@link Identifiable} resourced being retrieved
+     * @param entities the {@link Collection} of {@link ResponsePojo} resourced being retrieved
      * @return the <b>200_OK</b> {@link Response}
      * @see #okBuilder(Collection)
      */
-    public static Response ok(final Collection<? extends Identifiable> entities) {
+    public static Response ok(final Collection<? extends ResponsePojo> entities) {
         return okBuilder(entities)
                 .build();
     }
@@ -51,7 +51,7 @@ public final class Responses {
     /**
      * A <b>200_OK</b> {@link Response}.
      * <p>
-     * Generally used for cases where a HTTP request is sent to retrieve a single {@link Identifiable} resource, or also
+     * Generally used for cases where a HTTP request is sent to retrieve a single {@link ResponsePojo} resource, or also
      * if a batch of resources is being created (since there are partial failure scenarios, we cannot return a <b>201_CREATED</b>).
      *
      * @param entity the {@link Object} being retrieved
@@ -66,7 +66,7 @@ public final class Responses {
     /**
      * A <b>200_OK</b> {@link Response}.
      * <p>
-     * Generally used for cases where a HTTP request is sent to update a single {@link Identifiable} resource.
+     * Generally used for cases where a HTTP request is sent to update a single {@link ResponsePojo} resource.
      *
      * @param entity                the updated resource
      * @param entityLocationBuilder the {@link UriBuilder} defining the {@link java.net.URI} of the updated resource, to
@@ -83,14 +83,14 @@ public final class Responses {
     /**
      * A <b>200_OK</b> {@link Response.ResponseBuilder}.
      * <p>
-     * Generally used for cases where a HTTP request is sent to create a batch of {@link Identifiable} resources, but
+     * Generally used for cases where a HTTP request is sent to create a batch of {@link ResponsePojo} resources, but
      * the REST layer might want to add additional logic like a {@link javax.ws.rs.core.CacheControl}.
      *
-     * @param entities the {@link Collection} of {@link Identifiable} resourced being retrieved
+     * @param entities the {@link Collection} of {@link ResponsePojo} resourced being retrieved
      * @return the <b>200_OK</b> {@link Response}
      * @see #ok(Collection)
      */
-    public static Response.ResponseBuilder okBuilder(final Collection<? extends Identifiable> entities) {
+    public static Response.ResponseBuilder okBuilder(final Collection<? extends ResponsePojo> entities) {
         return Response
                 .ok()
                 .header("X-Total-Count", entities.size())
@@ -100,7 +100,7 @@ public final class Responses {
     /**
      * A <b>200_OK</b> {@link Response}.
      * <p>
-     * Generally used for cases where a HTTP request is sent to retrieve a single {@link Identifiable} resource, or also
+     * Generally used for cases where a HTTP request is sent to retrieve a single {@link ResponsePojo} resource, or also
      * if a batch of resources is being created (since there are partial failure scenarios, we cannot return a <b>201_CREATED</b>),
      * but the REST layer might want to add additional logic like a {@link javax.ws.rs.core.CacheControl}.
      *

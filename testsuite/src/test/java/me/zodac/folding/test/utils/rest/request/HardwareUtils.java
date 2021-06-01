@@ -4,6 +4,7 @@ import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.client.java.request.HardwareRequestSender;
 import me.zodac.folding.client.java.response.HardwareResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
+import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 
 import java.net.HttpURLConnection;
 import java.net.http.HttpResponse;
@@ -25,13 +26,13 @@ public final class HardwareUtils {
     }
 
     /**
-     * Creates the given {@link Hardware}, or if it already exists, returns the existing one.
+     * Creates the given {@link HardwareRequest}.
      *
-     * @param hardware the {@link Hardware} to create/retrieve
-     * @return the created {@link Hardware} or existing {@link Hardware}
-     * @throws FoldingRestException thrown if an error occurs creating/retrieving the {@link Hardware}
+     * @param hardware the {@link HardwareRequest} to create
+     * @return the created {@link Hardware}
+     * @throws FoldingRestException thrown if an error occurs creating the {@link Hardware}
      */
-    public static Hardware createOrConflict(final Hardware hardware) throws FoldingRestException {
+    public static Hardware create(final HardwareRequest hardware) throws FoldingRestException {
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.create(hardware, ADMIN_USER.userName(), ADMIN_USER.password());
         if (response.statusCode() == HttpURLConnection.HTTP_CREATED) {
             return HardwareResponseParser.create(response);

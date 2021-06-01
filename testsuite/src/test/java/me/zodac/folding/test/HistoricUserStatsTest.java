@@ -44,7 +44,7 @@ public class HistoricUserStatsTest {
 
     @Test
     public void whenGettingHourlyStats_andValidUserIdIsGiven_andUserHasNoStats_thenNoStatsAreReturned_andResponseHas200Status() throws FoldingRestException {
-        final int userId = UserUtils.createOrConflict(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
 
         final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getHourlyUserStats(userId, Year.parse("2020"), Month.of(4), 12);
         assertThat(response.statusCode())
@@ -58,7 +58,7 @@ public class HistoricUserStatsTest {
 
     @Test
     public void whenGettingHourlyStats_andValidUserIdIsGiven_andUserHasSomeStats_thenStatsAreReturned_andResponseHas200Status() throws FoldingRestException {
-        final int userId = UserUtils.createOrConflict(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
                 Stats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10)
         );
@@ -75,7 +75,7 @@ public class HistoricUserStatsTest {
 
     @Test
     public void whenGettingHourlyStats_andUserHasMultipleStats_thenEachStatsEntryIsADiffFromPreviousHour_andResponseHas200Status() throws FoldingRestException {
-        final int userId = UserUtils.createOrConflict(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
                 Stats.create(userId, "2020-04-12 13:00:00", 20L, 200L, 2),
                 Stats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10)
@@ -101,7 +101,7 @@ public class HistoricUserStatsTest {
 
     @Test
     public void whenGettingHourlyStats_andUserHasMultipleStatsInSameHour_thenMaxStatsInHourAreReturned_andResponseHas200Status() throws FoldingRestException {
-        final int userId = UserUtils.createOrConflict(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
                 Stats.create(userId, "2020-04-12 13:00:00", 50L, 500L, 5),
                 Stats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10),
@@ -128,7 +128,7 @@ public class HistoricUserStatsTest {
 
     @Test
     public void whenGettingHourlyStats_givenRequestUsesPreviousETag_andStatsHaveNotChanged_thenResponseHasA304Status_andNoBody() throws FoldingRestException {
-        final int userId = UserUtils.createOrConflict(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
                 Stats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10)
         );
@@ -160,7 +160,7 @@ public class HistoricUserStatsTest {
 
     @Test
     public void whenGettingHourlyStats_andInvalidDateIsGiven_thenResponseHasA400Status() throws FoldingRestException {
-        final int userId = UserUtils.createOrConflict(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
         final int invalidDay = 35;
 
         final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getHourlyUserStats(userId, Year.parse("2020"), Month.of(4), invalidDay);
@@ -171,7 +171,7 @@ public class HistoricUserStatsTest {
 
     @Test
     public void whenGettingDailyStats_andValidUserIdIsGiven_andUserHasNoStats_thenNoStatsAreReturned_andResponseHas200Status() throws FoldingRestException {
-        final int userId = UserUtils.createOrConflict(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
 
         final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getDailyUserStats(userId, Year.parse("2020"), Month.of(4));
         assertThat(response.statusCode())
@@ -185,7 +185,7 @@ public class HistoricUserStatsTest {
 
     @Test
     public void whenGettingDailyStats_andValidUserIdIsGiven_andUserHasSomeStats_thenStatsAreReturned_andResponseHas200Status() throws FoldingRestException {
-        final int userId = UserUtils.createOrConflict(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
                 Stats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10)
         );
@@ -202,7 +202,7 @@ public class HistoricUserStatsTest {
 
     @Test
     public void whenGettingDailyStats_andUserHasMultipleStats_thenEachStatsEntryIsADiffFromPreviousDay_andResponseHas200Status() throws FoldingRestException {
-        final int userId = UserUtils.createOrConflict(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
                 Stats.create(userId, "2020-04-12 13:00:00", 20L, 200L, 2),
                 Stats.create(userId, "2020-04-13 13:00:00", 100L, 1_000L, 10)
@@ -228,7 +228,7 @@ public class HistoricUserStatsTest {
 
     @Test
     public void whenGettingDailyStats_andUserHasMultipleStatsInSameDay_thenMaxStatsInDayAreReturned_andResponseHas200Status() throws FoldingRestException {
-        final int userId = UserUtils.createOrConflict(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
                 Stats.create(userId, "2020-04-12 13:00:00", 10L, 100L, 1),
                 Stats.create(userId, "2020-04-13 14:00:00", 50L, 500L, 5),
@@ -255,7 +255,7 @@ public class HistoricUserStatsTest {
 
     @Test
     public void whenGettingDailyStats_givenRequestUsesPreviousETag_andStatsHaveNotChanged_thenResponseHasA304Status_andNoBody() throws FoldingRestException {
-        final int userId = UserUtils.createOrConflict(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
                 Stats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10)
         );
@@ -287,7 +287,7 @@ public class HistoricUserStatsTest {
 
     @Test
     public void whenGettingDailyStats_andInvalidDateIsGiven_thenResponseHasA400Status() throws FoldingRestException, IOException, InterruptedException {
-        final int userId = UserUtils.createOrConflict(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
         final int invalidMonth = 25;
 
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
@@ -307,7 +307,7 @@ public class HistoricUserStatsTest {
 
     @Test
     public void whenGettingMonthlyStats_andValidUserIdIsGiven_andUserHasNoStats_thenNoStatsAreReturned_andResponseHas200Status() throws FoldingRestException {
-        final int userId = UserUtils.createOrConflict(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
 
         final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getMonthlyUserStats(userId, Year.parse("2020"));
         assertThat(response.statusCode())
@@ -321,7 +321,7 @@ public class HistoricUserStatsTest {
 
     @Test
     public void whenGettingMonthlyStats_andValidUserIdIsGiven_andUserHasSomeStats_thenStatsAreReturned_andResponseHas200Status() throws FoldingRestException {
-        final int userId = UserUtils.createOrConflict(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
                 Stats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10)
         );
@@ -338,7 +338,7 @@ public class HistoricUserStatsTest {
 
     @Test
     public void whenGettingMonthlyStats_andUserHasMultipleStats_thenEachStatsEntryIsADiffFromPreviousMonth_andResponseHas200Status() throws FoldingRestException {
-        final int userId = UserUtils.createOrConflict(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
                 Stats.create(userId, "2020-03-12 13:00:00", 20L, 200L, 2), // No diff from this result, since stats are reset each month
                 Stats.create(userId, "2020-04-12 13:00:00", 100L, 1_000L, 10)
@@ -364,7 +364,7 @@ public class HistoricUserStatsTest {
 
     @Test
     public void whenGettingMonthlyStats_andUserHasMultipleStatsInSameMonth_thenMaxStatsInMonthAreReturned_andResponseHas200Status() throws FoldingRestException {
-        final int userId = UserUtils.createOrConflict(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
                 Stats.create(userId, "2020-03-12 13:00:00", 50L, 500L, 5), // No diff from this result, since stats are reset each month
                 Stats.create(userId, "2020-04-13 14:00:00", 100L, 1_000L, 10),
@@ -391,7 +391,7 @@ public class HistoricUserStatsTest {
 
     @Test
     public void whenGettingMonthlyStats_givenRequestUsesPreviousETag_andStatsHaveNotChanged_thenResponseHasA304Status_andNoBody() throws FoldingRestException {
-        final int userId = UserUtils.createOrConflict(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
                 Stats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10)
         );
@@ -423,7 +423,7 @@ public class HistoricUserStatsTest {
 
     @Test
     public void whenGettingMonthlyStats_andInvalidDateIsGiven_thenResponseHasA400Status() throws FoldingRestException, IOException, InterruptedException {
-        final int userId = UserUtils.createOrConflict(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
         final int invalidYear = -100;
 
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()

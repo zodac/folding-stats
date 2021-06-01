@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import me.zodac.folding.api.Identifiable;
+import me.zodac.folding.api.ResponsePojo;
 
 import java.util.Collection;
 
@@ -22,18 +22,18 @@ import java.util.Collection;
 @ToString(doNotUseGetters = true)
 public class BatchCreateResponse {
 
-    private Collection<? extends Identifiable> successful;
-    private Collection<? extends Identifiable> unsuccessful;
+    private Collection<? extends ResponsePojo> successful;
+    private Collection<? extends ResponsePojo> unsuccessful;
 
     /**
      * Create a {@link BatchCreateResponse} with {@code successful} and {@code unsuccessful} {@link Collection}s of the
-     * {@link Identifiable} implementation attempting to be created.
+     * {@link ResponsePojo} implementation attempting to be created.
      *
-     * @param successful   the successfully created {@link Identifiable}s
-     * @param unsuccessful the unsuccessfully created {@link Identifiable}s
+     * @param successful   the successfully created {@link ResponsePojo}s
+     * @param unsuccessful the unsuccessfully created {@link ResponsePojo}s
      * @return the created {@link BatchCreateResponse}
      */
-    public static BatchCreateResponse create(final Collection<? extends Identifiable> successful, final Collection<? extends Identifiable> unsuccessful) {
+    public static BatchCreateResponse create(final Collection<? extends ResponsePojo> successful, final Collection<? extends ResponsePojo> unsuccessful) {
         return new BatchCreateResponse(successful, unsuccessful);
     }
 }

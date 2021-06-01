@@ -6,6 +6,7 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.client.java.response.UserResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
+import me.zodac.folding.rest.api.tc.request.UserRequest;
 import me.zodac.folding.test.utils.TestConstants;
 import me.zodac.folding.test.utils.rest.request.HardwareUtils;
 import me.zodac.folding.test.utils.rest.request.StubbedFoldingEndpointUtils;
@@ -44,7 +45,7 @@ import static me.zodac.folding.test.utils.TestGenerator.generateUserWithId;
 import static me.zodac.folding.test.utils.TestGenerator.generateUserWithLiveStatsLink;
 import static me.zodac.folding.test.utils.TestGenerator.generateUserWithTeamId;
 import static me.zodac.folding.test.utils.rest.request.UserUtils.USER_REQUEST_SENDER;
-import static me.zodac.folding.test.utils.rest.request.UserUtils.createOrConflict;
+import static me.zodac.folding.test.utils.rest.request.UserUtils.create;
 import static me.zodac.folding.test.utils.rest.response.HttpResponseHeaderUtils.getETag;
 import static me.zodac.folding.test.utils.rest.response.HttpResponseHeaderUtils.getXTotalCount;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -80,7 +81,7 @@ public class UserTest {
 
     @Test
     public void whenCreatingUser_givenPayloadIsValid_thenTheCreatedUserIsReturnedInResponse_andHasId_andResponseHasA201StatusCode() throws FoldingRestException {
-        final User userToCreate = generateUser();
+        final UserRequest userToCreate = generateUser();
         StubbedFoldingEndpointUtils.enableUser(userToCreate);
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.create(userToCreate, ADMIN_USER.userName(), ADMIN_USER.password());
@@ -89,23 +90,23 @@ public class UserTest {
                 .isEqualTo(HttpURLConnection.HTTP_CREATED);
 
         final User actual = UserResponseParser.create(response);
-        final User expected = User.updateWithId(actual.getId(), userToCreate);
         assertThat(actual)
                 .as("Did not receive created object as JSON response: " + response.body())
-                .isEqualTo(expected);
+                .extracting("foldingUserName", "displayName", "passkey", "category", "profileLink", "liveStatsLink", "hardwareId", "teamId", "userIsCaptain")
+                .containsExactly(userToCreate.getFoldingUserName(), userToCreate.getDisplayName(), userToCreate.getPasskey(), userToCreate.getCategory(), userToCreate.getProfileLink(), userToCreate.getLiveStatsLink(), userToCreate.getHardwareId(), userToCreate.getTeamId(), userToCreate.isUserIsCaptain());
     }
 
     @Test
     public void whenCreatingBatchOfUsers_givenPayloadIsValid_thenTheUsersAreCreated_andResponseHasA200Status() throws FoldingRestException {
         final int initialSize = UserUtils.getNumberOfUsers();
 
-        final List<User> batchOfUsers = List.of(
+        final List<UserRequest> batchOfUsers = List.of(
                 generateUser(),
                 generateUser(),
                 generateUser()
         );
 
-        for (final User user : batchOfUsers) {
+        for (final UserRequest user : batchOfUsers) {
             StubbedFoldingEndpointUtils.enableUser(user);
         }
 
@@ -122,7 +123,7 @@ public class UserTest {
 
     @Test
     public void whenGettingUser_givenAValidUserId_thenUserIsReturned_andHasA200Status() throws FoldingRestException {
-        final int userId = UserUtils.createOrConflict(generateUser()).getId();
+        final int userId = UserUtils.create(generateUser()).getId();
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.get(userId);
         assertThat(response.statusCode())
@@ -137,14 +138,26 @@ public class UserTest {
 
     @Test
     public void whenUpdatingUser_givenAValidUserId_andAValidPayload_thenUpdatedUserIsReturned_andNoNewUserIsCreated_andHasA200Status() throws FoldingRestException {
-        final int userId = UserUtils.createOrConflict(generateUser()).getId();
+        final User createdUser = UserUtils.create(generateUser());
         final int initialSize = UserUtils.getNumberOfUsers();
 
-        final User updatedUser = User.updateWithId(userId, UserUtils.get(userId));
-        updatedUser.setPasskey("updatedPasskey123456789012345678");
-        StubbedFoldingEndpointUtils.enableUser(updatedUser);
+        final String updatedPasskey = "updatedPasskey123456789012345678";
+        final UserRequest userToUpdate = UserRequest.builder()
+                .id(createdUser.getId())
+                .foldingUserName(createdUser.getFoldingUserName())
+                .displayName(createdUser.getDisplayName())
+                .passkey(updatedPasskey)
+                .category(createdUser.getCategory())
+                .profileLink(createdUser.getProfileLink())
+                .liveStatsLink(createdUser.getLiveStatsLink())
+                .hardwareId(createdUser.getHardwareId())
+                .teamId(createdUser.getTeamId())
+                .userIsCaptain(createdUser.isUserIsCaptain())
+                .build();
+        StubbedFoldingEndpointUtils.enableUser(userToUpdate);
 
-        final HttpResponse<String> response = USER_REQUEST_SENDER.update(updatedUser, ADMIN_USER.userName(), ADMIN_USER.password());
+
+        final HttpResponse<String> response = USER_REQUEST_SENDER.update(userToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -152,7 +165,8 @@ public class UserTest {
         final User actual = UserResponseParser.update(response);
         assertThat(actual)
                 .as("Did not receive created object as JSON response: " + response.body())
-                .isEqualTo(updatedUser);
+                .extracting("id", "foldingUserName", "displayName", "passkey", "category", "profileLink", "liveStatsLink", "hardwareId", "teamId", "userIsCaptain")
+                .containsExactly(createdUser.getId(), createdUser.getFoldingUserName(), createdUser.getDisplayName(), updatedPasskey, createdUser.getCategory(), createdUser.getProfileLink(), createdUser.getLiveStatsLink(), createdUser.getHardwareId(), createdUser.getTeamId(), createdUser.isUserIsCaptain());
 
 
         final int allUsersAfterUpdate = UserUtils.getNumberOfUsers();
@@ -163,7 +177,7 @@ public class UserTest {
 
     @Test
     public void whenDeletingUser_givenAValidUserId_thenUserIsDeleted_andHasA200Status_andUserCountIsReduced_andUserCannotBeRetrievedAgain() throws FoldingRestException {
-        final int userId = UserUtils.createOrConflict(generateUser()).getId();
+        final int userId = UserUtils.create(generateUser()).getId();
         final int initialSize = UserUtils.getNumberOfUsers();
 
         final HttpResponse<Void> response = USER_REQUEST_SENDER.delete(userId, ADMIN_USER.userName(), ADMIN_USER.password());
@@ -184,10 +198,10 @@ public class UserTest {
 
     @Test
     public void whenPatchingAUserWithPointsOffsets_givenThePayloadIsValid_thenResponseHasA200Status() throws FoldingRestException {
-        final Hardware hardware = HardwareUtils.createOrConflict(generateHardware());
-        final User user = generateUserWithHardwareId(hardware.getId());
+        final Hardware hardware = HardwareUtils.create(generateHardware());
+        final UserRequest user = generateUserWithHardwareId(hardware.getId());
 
-        final int userId = UserUtils.createOrConflict(user).getId();
+        final int userId = UserUtils.create(user).getId();
         final HttpResponse<Void> patchResponse = USER_REQUEST_SENDER.offset(userId, 100L, Math.round(100L * hardware.getMultiplier()), 10, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(patchResponse.statusCode())
                 .as("Was not able to patch user: " + patchResponse.body())
@@ -199,7 +213,7 @@ public class UserTest {
     @Test
     public void whenCreatingUser_givenAUserWithInvalidHardwareId_thenJsonResponseWithErrorIsReturned_andHasA400Status() throws FoldingRestException {
         final int invalidHardwareId = 0;
-        final User user = generateUserWithHardwareId(invalidHardwareId);
+        final UserRequest user = generateUserWithHardwareId(invalidHardwareId);
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.create(user, ADMIN_USER.userName(), ADMIN_USER.password());
 
@@ -214,7 +228,7 @@ public class UserTest {
 
     @Test
     public void whenCreatingUser_givenUserHasNoUnitsCompleted_thenUserIsNotCreated_andHasA400Stats() throws FoldingRestException {
-        final User user = generateUser();
+        final UserRequest user = generateUser();
         StubbedFoldingEndpointUtils.disableUser(user);
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.create(user, ADMIN_USER.userName(), ADMIN_USER.password());
@@ -226,7 +240,7 @@ public class UserTest {
 
     @Test
     public void whenCreatingUser_givenUserWithTheSameFoldingNameAndPasskeyAlreadyExists_thenA409ResponseIsReturned() throws FoldingRestException {
-        final User userToCreate = generateUser();
+        final UserRequest userToCreate = generateUser();
         StubbedFoldingEndpointUtils.enableUser(userToCreate);
 
         USER_REQUEST_SENDER.create(userToCreate, ADMIN_USER.userName(), ADMIN_USER.password()); // Send one request and ignore it (even if the user already exists, we can verify the conflict with the next one)
@@ -252,7 +266,7 @@ public class UserTest {
 
     @Test
     public void whenUpdatingUser_givenANonExistingUserId_thenNoJsonResponseIsReturned_andHasA404Status() throws FoldingRestException {
-        final User updatedUser = generateUserWithId(TestConstants.INVALID_ID);
+        final UserRequest updatedUser = generateUserWithId(TestConstants.INVALID_ID);
         StubbedFoldingEndpointUtils.enableUser(updatedUser);
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.update(updatedUser, ADMIN_USER.userName(), ADMIN_USER.password());
@@ -276,11 +290,22 @@ public class UserTest {
 
     @Test
     public void whenUpdatingUser_givenAValidUserId_andPayloadHasNoChanges_thenOriginalUserIsReturned_andHasA200Status() throws FoldingRestException {
-        final User user = generateUser();
-        final int createdUserId = UserUtils.createOrConflict(user).getId();
-        final User userWithId = User.updateWithId(createdUserId, user);
+        final User createdUser = UserUtils.create(generateUser());
+        final UserRequest userToUpdate = UserRequest.builder()
+                .id(createdUser.getId())
+                .foldingUserName(createdUser.getFoldingUserName())
+                .displayName(createdUser.getDisplayName())
+                .passkey(createdUser.getPasskey())
+                .category(createdUser.getCategory())
+                .profileLink(createdUser.getProfileLink())
+                .liveStatsLink(createdUser.getLiveStatsLink())
+                .hardwareId(createdUser.getHardwareId())
+                .teamId(createdUser.getTeamId())
+                .userIsCaptain(createdUser.isUserIsCaptain())
+                .build();
 
-        final HttpResponse<String> updateResponse = USER_REQUEST_SENDER.update(userWithId, ADMIN_USER.userName(), ADMIN_USER.password());
+
+        final HttpResponse<String> updateResponse = USER_REQUEST_SENDER.update(userToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(updateResponse.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + updateResponse.body())
@@ -289,27 +314,27 @@ public class UserTest {
         final User actual = UserResponseParser.update(updateResponse);
 
         assertThat(actual)
-                .as("Did not receive the original user in response")
-                .isEqualTo(userWithId);
+                .extracting("id", "foldingUserName", "displayName", "passkey", "category", "profileLink", "liveStatsLink", "hardwareId", "teamId", "userIsCaptain")
+                .containsExactly(createdUser.getId(), createdUser.getFoldingUserName(), createdUser.getDisplayName(), createdUser.getPasskey(), createdUser.getCategory(), createdUser.getProfileLink(), createdUser.getLiveStatsLink(), createdUser.getHardwareId(), createdUser.getTeamId(), createdUser.isUserIsCaptain());
     }
 
     @Test
     public void whenCreatingBatchOfUsers_givenPayloadIsPartiallyValid_thenOnlyValidUsersAreCreated_andResponseHasA200Status() throws FoldingRestException {
         final int initialUsersSize = UserUtils.getNumberOfUsers();
 
-        final List<User> batchOfValidUsers = List.of(
+        final List<UserRequest> batchOfValidUsers = List.of(
                 generateUser(),
                 generateUser()
         );
-        final List<User> batchOfInvalidUsers = List.of(
+        final List<UserRequest> batchOfInvalidUsers = List.of(
                 generateUserWithHardwareId(0),
                 generateUserWithHardwareId(0)
         );
-        final List<User> batchOfUsers = new ArrayList<>(batchOfValidUsers.size() + batchOfInvalidUsers.size());
+        final List<UserRequest> batchOfUsers = new ArrayList<>(batchOfValidUsers.size() + batchOfInvalidUsers.size());
         batchOfUsers.addAll(batchOfValidUsers);
         batchOfUsers.addAll(batchOfInvalidUsers);
 
-        for (final User validUser : batchOfValidUsers) {
+        for (final UserRequest validUser : batchOfValidUsers) {
             StubbedFoldingEndpointUtils.enableUser(validUser);
         }
 
@@ -327,7 +352,7 @@ public class UserTest {
     @Test
     public void whenCreatingBatchOfUsers_givenPayloadIsInvalid_thenResponseHasA400Status() throws FoldingRestException {
         final int initialUsersSize = UserUtils.getNumberOfUsers();
-        final List<User> batchOfInvalidUsers = List.of(
+        final List<UserRequest> batchOfInvalidUsers = List.of(
                 generateUserWithHardwareId(0),
                 generateUserWithHardwareId(0)
         );
@@ -345,7 +370,7 @@ public class UserTest {
 
     @Test
     public void whenGettingUserById_givenRequestUsesPreviousETag_andUserHasNotChanged_thenResponseHasA304Status_andNoBody() throws FoldingRestException {
-        final int userId = UserUtils.createOrConflict(generateUser()).getId();
+        final int userId = UserUtils.create(generateUser()).getId();
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.get(userId);
         assertThat(response.statusCode())
@@ -366,7 +391,7 @@ public class UserTest {
 
     @Test
     public void whenGettingAllUsers_givenRequestUsesPreviousETag_andUsersHaveNotChanged_thenResponseHasA304Status_andNoBody() throws FoldingRestException {
-        UserUtils.createOrConflict(generateUser());
+        UserUtils.create(generateUser());
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.getAll();
         assertThat(response.statusCode())
@@ -395,7 +420,7 @@ public class UserTest {
 
     @Test
     public void whenCreatingUser_givenNoAuthentication_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
-        final User userToCreate = generateUser();
+        final UserRequest userToCreate = generateUser();
         StubbedFoldingEndpointUtils.enableUser(userToCreate);
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.create(userToCreate);
@@ -406,13 +431,13 @@ public class UserTest {
 
     @Test
     public void whenCreatingBatchOfUsers_givenNoAuthentication_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
-        final List<User> batchOfUsers = List.of(
+        final List<UserRequest> batchOfUsers = List.of(
                 generateUser(),
                 generateUser(),
                 generateUser()
         );
 
-        for (final User user : batchOfUsers) {
+        for (final UserRequest user : batchOfUsers) {
             StubbedFoldingEndpointUtils.enableUser(user);
         }
 
@@ -424,13 +449,26 @@ public class UserTest {
 
     @Test
     public void whenUpdatingUser_givenNoAuthentication_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
-        final int userId = UserUtils.createOrConflict(generateUser()).getId();
+        final User createdUser = UserUtils.create(generateUser());
 
-        final User updatedUser = User.updateWithId(userId, UserUtils.get(userId));
-        updatedUser.setPasskey("updatedPasskey");
-        StubbedFoldingEndpointUtils.enableUser(updatedUser);
+        final UserRequest userToUpdate = UserRequest.builder()
+                .id(createdUser.getId())
+                .foldingUserName(createdUser.getFoldingUserName())
+                .displayName(createdUser.getDisplayName())
+                .passkey("updatedPasskey123456789012345678")
+                .category(createdUser.getCategory())
+                .profileLink(createdUser.getProfileLink())
+                .liveStatsLink(createdUser.getLiveStatsLink())
+                .hardwareId(createdUser.getHardwareId())
+                .teamId(createdUser.getTeamId())
+                .userIsCaptain(createdUser.isUserIsCaptain())
+                .build();
+        StubbedFoldingEndpointUtils.enableUser(userToUpdate);
 
-        final HttpResponse<String> response = USER_REQUEST_SENDER.update(updatedUser);
+
+        StubbedFoldingEndpointUtils.enableUser(userToUpdate);
+
+        final HttpResponse<String> response = USER_REQUEST_SENDER.update(userToUpdate);
         assertThat(response.statusCode())
                 .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
@@ -438,7 +476,7 @@ public class UserTest {
 
     @Test
     public void whenDeletingUser_givenNoAuthentication_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
-        final int userId = UserUtils.createOrConflict(generateUser()).getId();
+        final int userId = UserUtils.create(generateUser()).getId();
 
         final HttpResponse<Void> response = USER_REQUEST_SENDER.delete(userId);
         assertThat(response.statusCode())
@@ -448,10 +486,10 @@ public class UserTest {
 
     @Test
     public void whenPatchingAUserWithPointsOffsets_givenNoAuthentication_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
-        final Hardware hardware = HardwareUtils.createOrConflict(generateHardware());
-        final User user = generateUserWithId(hardware.getId());
+        final Hardware hardware = HardwareUtils.create(generateHardware());
+        final UserRequest user = generateUserWithId(hardware.getId());
 
-        final int userId = UserUtils.createOrConflict(user).getId();
+        final int userId = UserUtils.create(user).getId();
         final HttpResponse<Void> response = USER_REQUEST_SENDER.offset(userId, 100L, Math.round(100L * hardware.getMultiplier()), 10);
         assertThat(response.statusCode())
                 .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
@@ -460,7 +498,7 @@ public class UserTest {
 
     @Test
     public void whenCreatingUser_givenAuthentication_andAuthenticationHasInvalidUser_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
-        final User userToCreate = generateUser();
+        final UserRequest userToCreate = generateUser();
         StubbedFoldingEndpointUtils.enableUser(userToCreate);
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.create(userToCreate, INVALID_USERNAME.userName(), INVALID_USERNAME.password());
@@ -471,7 +509,7 @@ public class UserTest {
 
     @Test
     public void whenCreatingUser_givenAuthentication_andAuthenticationHasInvalidPassword_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
-        final User userToCreate = generateUser();
+        final UserRequest userToCreate = generateUser();
         StubbedFoldingEndpointUtils.enableUser(userToCreate);
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.create(userToCreate, INVALID_PASSWORD.userName(), INVALID_PASSWORD.password());
@@ -482,7 +520,7 @@ public class UserTest {
 
     @Test
     public void whenCreatingUser_givenAuthentication_andUserDoesNotHaveAdminRole_thenRequestFails_andResponseHasA403StatusCode() throws FoldingRestException {
-        final User userToCreate = generateUser();
+        final UserRequest userToCreate = generateUser();
         StubbedFoldingEndpointUtils.enableUser(userToCreate);
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.create(userToCreate, READ_ONLY_USER.userName(), READ_ONLY_USER.password());
@@ -508,15 +546,11 @@ public class UserTest {
 
     @Test
     public void whenUpdatingUser_givenEmptyPayload_thenRequestFails_andResponseHasA400StatusCode() throws FoldingRestException, IOException, InterruptedException {
-        final int userId = UserUtils.createOrConflict(generateUser()).getId();
-
-        final User updatedUser = User.updateWithId(userId, UserUtils.get(userId));
-        updatedUser.setPasskey("updatedPasskey");
-        StubbedFoldingEndpointUtils.enableUser(updatedUser);
+        final User createdUser = UserUtils.create(generateUser());
 
         final HttpRequest request = HttpRequest.newBuilder()
                 .PUT(HttpRequest.BodyPublishers.noBody())
-                .uri(URI.create(FOLDING_URL + "/users/" + updatedUser.getId()))
+                .uri(URI.create(FOLDING_URL + "/users/" + createdUser.getId()))
                 .header("Content-Type", "application/json")
                 .header("Authorization", encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
                 .build();
@@ -529,9 +563,9 @@ public class UserTest {
 
     @Test
     public void whenPatchingAUserWithPointsOffsets_givenEmptyPayload_thenRequestFails_andResponseHasA400StatusCode() throws IOException, InterruptedException, FoldingRestException {
-        final Hardware hardware = HardwareUtils.createOrConflict(generateHardware());
-        final User user = generateUserWithId(hardware.getId());
-        final int userId = UserUtils.createOrConflict(user).getId();
+        final Hardware hardware = HardwareUtils.create(generateHardware());
+        final UserRequest user = generateUserWithId(hardware.getId());
+        final int userId = UserUtils.create(user).getId();
 
         final HttpRequest request = HttpRequest.newBuilder()
                 .method("PATCH", HttpRequest.BodyPublishers.noBody())
@@ -549,9 +583,9 @@ public class UserTest {
 
     @Test
     public void whenCreatingUser_andOptionalFieldIsEmptyString_thenValueShouldBeNullNotEmpty() throws FoldingRestException {
-        final User user = generateUser();
+        final UserRequest user = generateUser();
         StubbedFoldingEndpointUtils.enableUser(user);
-        final int userId = UserUtils.createOrConflict(user).getId();
+        final int userId = UserUtils.create(user).getId();
 
         final User actual = UserUtils.get(userId);
         assertThat(actual)
@@ -562,19 +596,27 @@ public class UserTest {
 
     @Test
     public void whenUpdatingUser_andOptionalFieldIsEmptyString_thenValueShouldBeNullNotEmpty() throws FoldingRestException {
-        final User user = generateUserWithLiveStatsLink("http://google.com");
-        StubbedFoldingEndpointUtils.enableUser(user);
-        final User userToUpdate = UserUtils.createOrConflict(user);
+        final User createdUser = create(generateUserWithLiveStatsLink("http://google.com"));
 
-        final int userId = userToUpdate.getId();
-        userToUpdate.setLiveStatsLink("");
+        final UserRequest userToUpdate = UserRequest.builder()
+                .id(createdUser.getId())
+                .foldingUserName(createdUser.getFoldingUserName())
+                .displayName(createdUser.getDisplayName())
+                .passkey(createdUser.getPasskey())
+                .category(createdUser.getCategory())
+                .profileLink(createdUser.getProfileLink())
+                .liveStatsLink("")
+                .hardwareId(createdUser.getHardwareId())
+                .teamId(createdUser.getTeamId())
+                .userIsCaptain(createdUser.isUserIsCaptain())
+                .build();
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.update(userToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_OK);
 
-        final User actual = UserUtils.get(userId);
+        final User actual = UserUtils.get(createdUser.getId());
         assertThat(actual)
                 .as("Empty optional value should not be returned: " + response.body())
                 .extracting("liveStatsLink")
@@ -584,14 +626,14 @@ public class UserTest {
     // TODO: [zodac] Category and captain checks can be done in UserValidatorTest class?
     @Test
     public void whenCreatingUser_givenUsersExceedingPermittedAmountForACategory_thenUserIsNotCreated_andResponseHasA400Status() throws FoldingRestException {
-        final Team team = TeamUtils.createOrConflict(generateTeam());
-        final User firstUser = generateUserWithTeamId(team.getId());
+        final Team team = TeamUtils.create(generateTeam());
+        final UserRequest firstUser = generateUserWithTeamId(team.getId());
         firstUser.setCategory(Category.NVIDIA_GPU.displayName());
-        UserUtils.createOrConflict(firstUser);
+        UserUtils.create(firstUser);
 
-        final User secondUser = generateUserWithTeamId(team.getId());
+        final UserRequest secondUser = generateUserWithTeamId(team.getId());
         secondUser.setCategory(Category.NVIDIA_GPU.displayName());
-        UserUtils.createOrConflict(secondUser);
+        UserUtils.create(secondUser);
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.create(secondUser, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
@@ -605,18 +647,18 @@ public class UserTest {
 
     @Test
     public void whenCreatingUser_givenUsersExceedingTotalPermittedAmountForATeam_thenUserIsNotCreated_andResponseHasA400Status() throws FoldingRestException {
-        final Team team = TeamUtils.createOrConflict(generateTeam());
-        final User firstUser = generateUserWithCategory(Category.NVIDIA_GPU);
+        final Team team = TeamUtils.create(generateTeam());
+        final UserRequest firstUser = generateUserWithCategory(Category.NVIDIA_GPU);
         firstUser.setTeamId(team.getId());
-        createOrConflict(firstUser);
-        final User secondUser = generateUserWithCategory(Category.WILDCARD);
+        create(firstUser);
+        final UserRequest secondUser = generateUserWithCategory(Category.WILDCARD);
         secondUser.setTeamId(team.getId());
-        createOrConflict(secondUser);
-        final User thirdUser = generateUserWithCategory(Category.AMD_GPU);
+        create(secondUser);
+        final UserRequest thirdUser = generateUserWithCategory(Category.AMD_GPU);
         thirdUser.setTeamId(team.getId());
-        createOrConflict(thirdUser);
+        create(thirdUser);
 
-        final User fourthUser = generateUserWithCategory(Category.NVIDIA_GPU);
+        final UserRequest fourthUser = generateUserWithCategory(Category.NVIDIA_GPU);
         fourthUser.setTeamId(team.getId());
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.create(secondUser, ADMIN_USER.userName(), ADMIN_USER.password());
@@ -631,11 +673,11 @@ public class UserTest {
 
     @Test
     public void whenCreatingUser_andUserIsCaptain_givenTeamAlreadyHasACaptain_thenUserIsNotCreated_andResponseHasA400Status() throws FoldingRestException {
-        final User firstCaptain = generateUserWithCategory(Category.NVIDIA_GPU);
+        final UserRequest firstCaptain = generateUserWithCategory(Category.NVIDIA_GPU);
         firstCaptain.setUserIsCaptain(true);
-        createOrConflict(firstCaptain);
+        create(firstCaptain);
 
-        final User secondCaptain = generateUserWithCategory(Category.AMD_GPU);
+        final UserRequest secondCaptain = generateUserWithCategory(Category.AMD_GPU);
         secondCaptain.setTeamId(firstCaptain.getTeamId());
         secondCaptain.setUserIsCaptain(true);
         StubbedFoldingEndpointUtils.enableUser(secondCaptain);

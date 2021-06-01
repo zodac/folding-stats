@@ -3,6 +3,7 @@ package me.zodac.folding.api.stats;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.FoldingExternalServiceException;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
 
 /**
@@ -11,32 +12,42 @@ import me.zodac.folding.api.tc.stats.UserStats;
 public interface FoldingStatsRetriever {
 
     /**
-     * Gets the total {@link UserStats} for the given {@link User}
+     * Gets the {@link Stats} for the given {@link FoldingStatsDetails}.
      *
-     * @param user the {@link User} whose {@link UserStats} are to be retrieved
+     * @param foldingStatsDetails the {@link FoldingStatsDetails} to use in stats retrieval
+     * @return the {@link Stats} for the {@link FoldingStatsDetails}
+     * @throws FoldingException                thrown if an error occurs retrieving {@link Stats}
+     * @throws FoldingExternalServiceException thrown if an error occurs connecting to an external service
+     */
+    Stats getStats(final FoldingStatsDetails foldingStatsDetails) throws FoldingException, FoldingExternalServiceException;
+
+    /**
+     * Gets the total {@link UserStats} for the given {@link User}.
+     *
+     * @param user the {@link User} to use in stats retrieval
      * @return the {@link UserStats} for the {@link User}
-     * @throws FoldingException                thrown if an error occurs retrieving {@link UserStats}
+     * @throws FoldingException                thrown if an error occurs retrieving {@link User}
      * @throws FoldingExternalServiceException thrown if an error occurs connecting to an external service
      */
     UserStats getTotalStats(final User user) throws FoldingException, FoldingExternalServiceException;
 
     /**
-     * Gets the total points for the given {@link User}
+     * Gets the total points for the given {@link FoldingStatsDetails}.
      *
-     * @param user the {@link User} whose points are to be retrieved
-     * @return the points for the {@link User}
+     * @param foldingStatsDetails the {@link FoldingStatsDetails} to use in stats retrieval
+     * @return the points for the {@link FoldingStatsDetails}
      * @throws FoldingException                thrown if an error occurs retrieving {@link UserStats}
      * @throws FoldingExternalServiceException thrown if an error occurs connecting to an external service
      */
-    long getPoints(final User user) throws FoldingException, FoldingExternalServiceException;
+    long getPoints(final FoldingStatsDetails foldingStatsDetails) throws FoldingException, FoldingExternalServiceException;
 
     /**
-     * Gets the total Work Units for the given {@link User}
+     * Gets the total Work Units for the given {@link FoldingStatsDetails}.
      *
-     * @param user the {@link User} whose units are to be retrieved
-     * @return the units for the {@link User}
+     * @param foldingStatsDetails the {@link FoldingStatsDetails} to use in stats retrieval
+     * @return the units for the {@link FoldingStatsDetails}
      * @throws FoldingException                thrown if an error occurs retrieving {@link UserStats}
      * @throws FoldingExternalServiceException thrown if an error occurs connecting to an external service
      */
-    int getUnits(final User user) throws FoldingException, FoldingExternalServiceException;
+    int getUnits(final FoldingStatsDetails foldingStatsDetails) throws FoldingException, FoldingExternalServiceException;
 }

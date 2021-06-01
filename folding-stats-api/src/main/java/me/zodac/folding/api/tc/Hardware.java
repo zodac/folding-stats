@@ -5,10 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
-import me.zodac.folding.api.Identifiable;
+import me.zodac.folding.api.ResponsePojo;
+import me.zodac.folding.rest.api.tc.request.HardwareRequest;
+
+import java.util.Objects;
 
 
 /**
@@ -22,14 +23,12 @@ import me.zodac.folding.api.Identifiable;
  *
  * @see <a href="https://https://folding.lar.systems/">LARS PPD database</a>
  */
-@NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 @Getter
-@Setter
 @EqualsAndHashCode
 @ToString(doNotUseGetters = true)
-public class Hardware implements Identifiable {
+public class Hardware implements ResponsePojo {
 
     /**
      * The default {@link Hardware} ID. Since the REST request would not know the ID until the DB has created the object,
@@ -37,11 +36,11 @@ public class Hardware implements Identifiable {
      */
     public static final int EMPTY_HARDWARE_ID = 0;
 
-    private int id;
-    private String hardwareName;
-    private String displayName;
-    private String operatingSystem;
-    private double multiplier;
+    private final int id;
+    private final String hardwareName;
+    private final String displayName;
+    private final String operatingSystem; // TODO: [zodac] Use Enum
+    private final double multiplier;
 
     /**
      * Creates a {@link Hardware}.
@@ -86,5 +85,20 @@ public class Hardware implements Identifiable {
      */
     public static Hardware updateWithId(final int hardwareId, final Hardware hardware) {
         return new Hardware(hardwareId, hardware.hardwareName, hardware.displayName, hardware.operatingSystem, hardware.multiplier);
+    }
+
+    @Override
+    public boolean isEqualRequest(final Object inputRequest) {
+        if (!(inputRequest instanceof HardwareRequest)) {
+            return false;
+        }
+
+        final HardwareRequest hardwareRequest = (HardwareRequest) inputRequest;
+
+        return id == hardwareRequest.getId() &&
+                Double.compare(multiplier, hardwareRequest.getMultiplier()) == 0 &&
+                Objects.equals(hardwareName, hardwareRequest.getHardwareName()) &&
+                Objects.equals(displayName, hardwareRequest.getDisplayName()) &&
+                Objects.equals(operatingSystem, hardwareRequest.getOperatingSystem());
     }
 }

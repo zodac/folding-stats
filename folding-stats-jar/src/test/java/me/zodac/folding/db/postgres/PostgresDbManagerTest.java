@@ -55,12 +55,18 @@ public class PostgresDbManagerTest {
         assertThat(retrievedHardware)
                 .isEqualTo(createdHardware);
 
-        createdHardware.setOperatingSystem(OperatingSystem.LINUX.displayName());
+        final Hardware hardwareToUpdate = Hardware.builder()
+                .id(retrievedHardware.getId())
+                .hardwareName(retrievedHardware.getHardwareName())
+                .displayName(retrievedHardware.getDisplayName())
+                .operatingSystem(OperatingSystem.LINUX.displayName())
+                .multiplier(retrievedHardware.getMultiplier())
+                .build();
 
-        POSTGRES_DB_MANAGER.updateHardware(createdHardware);
+        POSTGRES_DB_MANAGER.updateHardware(hardwareToUpdate);
         final Hardware updatedHardware = POSTGRES_DB_MANAGER.getHardware(createdHardware.getId());
         assertThat(updatedHardware)
-                .isEqualTo(createdHardware);
+                .isEqualTo(hardwareToUpdate);
 
         POSTGRES_DB_MANAGER.deleteHardware(createdHardware.getId());
 
@@ -86,12 +92,17 @@ public class PostgresDbManagerTest {
         assertThat(retrievedTeam)
                 .isEqualTo(createdTeam);
 
-        createdTeam.setTeamDescription("Updated description");
+        final Team teamToUpdate = Team.builder()
+                .id(retrievedTeam.getId())
+                .teamName(retrievedTeam.getTeamName())
+                .teamDescription("Updated description")
+                .forumLink(retrievedTeam.getForumLink())
+                .build();
 
-        POSTGRES_DB_MANAGER.updateTeam(createdTeam);
+        POSTGRES_DB_MANAGER.updateTeam(teamToUpdate);
         final Team updatedTeam = POSTGRES_DB_MANAGER.getTeam(createdTeam.getId());
         assertThat(updatedTeam)
-                .isEqualTo(createdTeam);
+                .isEqualTo(teamToUpdate);
 
         POSTGRES_DB_MANAGER.deleteTeam(createdTeam.getId());
 
@@ -117,12 +128,23 @@ public class PostgresDbManagerTest {
         assertThat(retrievedUser)
                 .isEqualTo(createdUser);
 
-        createdUser.setCategory(Category.AMD_GPU.displayName());
+        final User userToUpdate = User.builder()
+                .id(retrievedUser.getId())
+                .foldingUserName(retrievedUser.getFoldingUserName())
+                .displayName(retrievedUser.getDisplayName())
+                .passkey(retrievedUser.getPasskey())
+                .category(Category.AMD_GPU.displayName())
+                .profileLink(retrievedUser.getProfileLink())
+                .liveStatsLink(retrievedUser.getLiveStatsLink())
+                .hardwareId(retrievedUser.getHardwareId())
+                .teamId(retrievedUser.getTeamId())
+                .userIsCaptain(retrievedUser.isUserIsCaptain())
+                .build();
 
-        POSTGRES_DB_MANAGER.updateUser(createdUser);
+        POSTGRES_DB_MANAGER.updateUser(userToUpdate);
         final User updatedUser = POSTGRES_DB_MANAGER.getUser(createdUser.getId());
         assertThat(updatedUser)
-                .isEqualTo(createdUser);
+                .isEqualTo(userToUpdate);
 
         POSTGRES_DB_MANAGER.deleteUser(createdUser.getId());
 

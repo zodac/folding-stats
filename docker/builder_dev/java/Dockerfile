@@ -28,7 +28,6 @@ COPY ./folding-stats-client-library-java ./folding-stats-client-library-java
 COPY ./folding-stats-jar ./folding-stats-jar
 COPY ./folding-stats-war ./folding-stats-war
 COPY ./stubbed-folding-endpoints-war ./stubbed-folding-endpoints-war
-COPY ./testsuite ./testsuite
 
 # Build artifacts
 RUN mvn clean install

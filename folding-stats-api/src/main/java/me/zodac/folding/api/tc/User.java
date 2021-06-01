@@ -5,10 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
-import me.zodac.folding.api.Identifiable;
+import me.zodac.folding.api.ResponsePojo;
+import me.zodac.folding.rest.api.tc.request.UserRequest;
+
+import java.util.Objects;
 
 
 /**
@@ -17,14 +18,12 @@ import me.zodac.folding.api.Identifiable;
  * <p>
  * Each {@link User} can join a {@link Team} in order to have their Folding@Home stats retrieved, and they can contribute to the <code>Team Competition</code>.
  */
-@NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 @Getter
-@Setter
 @EqualsAndHashCode
 @ToString(doNotUseGetters = true)
-public class User implements Identifiable {
+public class User implements ResponsePojo {
 
     /**
      * The default {@link User} ID. Since the REST request would not know the ID until the DB has created the object,
@@ -35,16 +34,16 @@ public class User implements Identifiable {
     private static final int PASSKEY_LENGTH_NOT_TO_HIDE = 8;
     private static final String PASSKEY_MASK = "************************"; // 24 characters
 
-    private int id;
-    private String foldingUserName;
-    private String displayName;
-    private String passkey;
-    private String category;
-    private String profileLink;
-    private String liveStatsLink;
-    private int hardwareId;
-    private int teamId;
-    private boolean userIsCaptain;
+    private final int id;
+    private final String foldingUserName;
+    private final String displayName;
+    private final String passkey;
+    private final String category;
+    private final String profileLink;
+    private final String liveStatsLink;
+    private final int hardwareId;
+    private final int teamId;
+    private final boolean userIsCaptain;
 
     /**
      * Creates a {@link User}.
@@ -128,5 +127,25 @@ public class User implements Identifiable {
 
     private static boolean isEmpty(final String input) {
         return input == null || input.isBlank();
+    }
+
+    @Override
+    public boolean isEqualRequest(final Object inputRequest) {
+        if (!(inputRequest instanceof UserRequest)) {
+            return false;
+        }
+
+        final UserRequest userRequest = (UserRequest) inputRequest;
+
+        return id == userRequest.getId() &&
+                hardwareId == userRequest.getHardwareId() &&
+                teamId == userRequest.getTeamId() &&
+                userIsCaptain == userRequest.isUserIsCaptain() &&
+                Objects.equals(foldingUserName, userRequest.getFoldingUserName()) &&
+                Objects.equals(displayName, userRequest.getDisplayName()) &&
+                Objects.equals(passkey, userRequest.getPasskey()) &&
+                Objects.equals(category, userRequest.getCategory()) &&
+                Objects.equals(profileLink, userRequest.getProfileLink()) &&
+                Objects.equals(liveStatsLink, userRequest.getLiveStatsLink());
     }
 }

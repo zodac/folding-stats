@@ -4,6 +4,7 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.client.java.request.TeamRequestSender;
 import me.zodac.folding.client.java.response.TeamResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
+import me.zodac.folding.rest.api.tc.request.TeamRequest;
 
 import java.net.HttpURLConnection;
 import java.net.http.HttpResponse;
@@ -25,13 +26,13 @@ public final class TeamUtils {
     }
 
     /**
-     * Creates the given {@link Team}, or if it already exists, returns the existing one.
+     * Creates the given {@link TeamRequest}.
      *
-     * @param team the {@link Team} to create/retrieve
-     * @return the created {@link Team} or existing {@link Team}
-     * @throws FoldingRestException thrown if an error occurs creating/retrieving the {@link Team}
+     * @param team the {@link TeamRequest} to create
+     * @return the created {@link Team}
+     * @throws FoldingRestException thrown if an error occurs creating the {@link Team}
      */
-    public static Team createOrConflict(final Team team) throws FoldingRestException {
+    public static Team create(final TeamRequest team) throws FoldingRestException {
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(team, ADMIN_USER.userName(), ADMIN_USER.password());
         if (response.statusCode() == HttpURLConnection.HTTP_CREATED) {
             return TeamResponseParser.create(response);

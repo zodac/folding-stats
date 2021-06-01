@@ -3,7 +3,7 @@ package me.zodac.folding.cache;
 
 import me.zodac.folding.api.tc.Team;
 
-public class TeamCache extends AbstractIdentifiableCache<Team> {
+public class TeamCache extends AbstractCache<Team> {
 
     private static TeamCache INSTANCE = null;
 

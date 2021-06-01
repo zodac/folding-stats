@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
+import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -14,7 +15,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.List;
+import java.util.Collection;
 
 import static me.zodac.folding.api.utils.EncodingUtils.encodeBasicAuthentication;
 
@@ -126,27 +127,27 @@ public final class HardwareRequestSender {
     }
 
     /**
-     * Send a <b>POST</b> request to create the given {@link Hardware} in the system.
+     * Send a <b>POST</b> request to create the given {@link HardwareRequest} in the system.
      *
-     * @param hardware the {@link Hardware} to create
+     * @param hardware the {@link HardwareRequest} to create
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
-    public HttpResponse<String> create(final Hardware hardware) throws FoldingRestException {
+    public HttpResponse<String> create(final HardwareRequest hardware) throws FoldingRestException {
         return create(hardware, null, null);
     }
 
     /**
-     * Send a <b>POST</b> request to create the given {@link Hardware} in the system, using the supplied {@code userName}
+     * Send a <b>POST</b> request to create the given {@link HardwareRequest} in the system, using the supplied {@code userName}
      * and {@code password} for authentication.
      *
-     * @param hardware the {@link Hardware} to create
+     * @param hardware the {@link HardwareRequest} to create
      * @param userName the user name
      * @param password the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
-    public HttpResponse<String> create(final Hardware hardware, final String userName, final String password) throws FoldingRestException {
+    public HttpResponse<String> create(final HardwareRequest hardware, final String userName, final String password) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(hardware)))
                 .uri(URI.create(foldingUrl + "/hardware"))
@@ -167,26 +168,26 @@ public final class HardwareRequestSender {
     }
 
     /**
-     * Send a <b>POST</b> request to create the given {@link Hardware}s in the system.
+     * Send a <b>POST</b> request to create the given {@link HardwareRequest}s in the system.
      *
-     * @param batchOfHardware the {@link List} of {@link Hardware}s to create
+     * @param batchOfHardware the {@link Collection} of {@link HardwareRequest}s to create
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
-    public HttpResponse<String> createBatchOf(final List<Hardware> batchOfHardware) throws FoldingRestException {
+    public HttpResponse<String> createBatchOf(final Collection<HardwareRequest> batchOfHardware) throws FoldingRestException {
         return createBatchOf(batchOfHardware, null, null);
     }
 
     /**
-     * Send a <b>POST</b> request to create the given {@link Hardware}s in the system.
+     * Send a <b>POST</b> request to create the given {@link HardwareRequest}s in the system.
      *
-     * @param batchOfHardware the {@link List} of {@link Hardware}s to create
+     * @param batchOfHardware the {@link Collection} of {@link HardwareRequest}s to create
      * @param userName        the user name
      * @param password        the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
-    public HttpResponse<String> createBatchOf(final List<Hardware> batchOfHardware, final String userName, final String password) throws FoldingRestException {
+    public HttpResponse<String> createBatchOf(final Collection<HardwareRequest> batchOfHardware, final String userName, final String password) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(batchOfHardware)))
                 .uri(URI.create(foldingUrl + "/hardware/batch"))
@@ -206,26 +207,26 @@ public final class HardwareRequestSender {
     }
 
     /**
-     * Send a <b>PUT</b> request to update the given {@link Hardware} in the system.
+     * Send a <b>PUT</b> request to update the given {@link HardwareRequest} in the system.
      *
-     * @param hardware the {@link Hardware} to update
+     * @param hardware the {@link HardwareRequest} to update
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
-    public HttpResponse<String> update(final Hardware hardware) throws FoldingRestException {
+    public HttpResponse<String> update(final HardwareRequest hardware) throws FoldingRestException {
         return update(hardware, null, null);
     }
 
     /**
-     * Send a <b>PUT</b> request to update the given {@link Hardware} in the system.
+     * Send a <b>PUT</b> request to update the given {@link HardwareRequest} in the system.
      *
-     * @param hardware the {@link Hardware} to update
+     * @param hardware the {@link HardwareRequest} to update
      * @param userName the user name
      * @param password the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
-    public HttpResponse<String> update(final Hardware hardware, final String userName, final String password) throws FoldingRestException {
+    public HttpResponse<String> update(final HardwareRequest hardware, final String userName, final String password) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .PUT(HttpRequest.BodyPublishers.ofString(GSON.toJson(hardware)))
                 .uri(URI.create(foldingUrl + "/hardware/" + hardware.getId()))

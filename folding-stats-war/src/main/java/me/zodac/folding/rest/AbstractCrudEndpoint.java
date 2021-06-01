@@ -1,7 +1,8 @@
 package me.zodac.folding.rest;
 
 import me.zodac.folding.SystemStateManager;
-import me.zodac.folding.api.Identifiable;
+import me.zodac.folding.api.RequestPojo;
+import me.zodac.folding.api.ResponsePojo;
 import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.db.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
@@ -39,7 +40,7 @@ import static me.zodac.folding.rest.response.Responses.okBuilder;
 import static me.zodac.folding.rest.response.Responses.serverError;
 import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
 
-abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
+abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePojo> {
 
     // Expecting most changes to be at the monthly reset, so counting number of seconds until then
     private static final int CACHE_EXPIRATION_TIME = untilNextMonthUtc(ChronoUnit.SECONDS);
@@ -51,33 +52,36 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
 
     protected abstract String elementType();
 
-    protected abstract ValidationResponse validate(final V element);
+//    protected abstract ValidationResponse<O> validateAndConvert(final I element);
 
-    protected abstract V createElement(final V element) throws FoldingException, NotFoundException, FoldingConflictException, FoldingExternalServiceException;
+    protected abstract O createElement(final O element) throws FoldingException, NotFoundException, FoldingConflictException, FoldingExternalServiceException;
 
-    protected abstract Collection<V> getAllElements() throws FoldingException;
+    protected abstract Collection<O> getAllElements() throws FoldingException;
 
-    protected abstract V getElementById(final int elementId) throws FoldingException, NotFoundException;
+    protected abstract ValidationResponse<O> validateAndConvert(final I inputRequest);
 
-    protected abstract V updateElementById(final int elementId, final V element) throws FoldingException, NotFoundException, FoldingConflictException, FoldingExternalServiceException;
+    protected abstract O getElementById(final int elementId) throws FoldingException, NotFoundException;
+
+    protected abstract O updateElementById(final int elementId, final O element) throws FoldingException, NotFoundException, FoldingConflictException, FoldingExternalServiceException;
 
     protected abstract void deleteElementById(final int elementId) throws FoldingConflictException, FoldingException, UserNotFoundException, NoStatsAvailableException, TeamNotFoundException;
 
-    protected Response create(final V element) {
-        getLogger().debug("POST request received to create {} at '{}' with request: {}", elementType(), uriContext.getAbsolutePath(), element);
+    protected Response create(final I inputRequest) {
+        getLogger().debug("POST request received to create {} at '{}' with request: {}", elementType(), uriContext.getAbsolutePath(), inputRequest);
 
         if (SystemStateManager.current().isWriteBlocked()) {
             getLogger().warn("System state {} does not allow write requests", SystemStateManager.current());
             return serviceUnavailable();
         }
 
-        final ValidationResponse validationResponse = validate(element);
+        final ValidationResponse<O> validationResponse = validateAndConvert(inputRequest);
         if (validationResponse.isInvalid()) {
             return badRequest(validationResponse);
         }
 
         try {
-            final V elementWithId = createElement(element);
+            final O elementToCreate = validationResponse.getOutput();
+            final O elementWithId = createElement(elementToCreate);
 
             final UriBuilder elementLocationBuilder = uriContext
                     .getRequestUriBuilder()
@@ -100,32 +104,32 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
             getLogger().error("Error creating {}, could not find {} with ID {}", elementType(), e.getType(), e.getId());
             return serverError();
         } catch (final FoldingException e) {
-            getLogger().error("Error creating {}: {}", elementType(), element, e.getCause());
+            getLogger().error("Error creating {}: {}", elementType(), inputRequest, e.getCause());
             return serverError();
         } catch (final Exception e) {
-            getLogger().error("Unexpected error creating {}: {}", elementType(), element, e);
+            getLogger().error("Unexpected error creating {}: {}", elementType(), inputRequest, e);
             return serverError();
         }
     }
 
-    protected Response createBatchOf(final Collection<V> batchOfElements) {
-        getLogger().debug("POST request received to create {} {}s at '{}' with request: {}", batchOfElements.size(), elementType(), uriContext.getAbsolutePath(), batchOfElements);
+    protected Response createBatchOf(final Collection<I> batchOfInputRequests) {
+        getLogger().debug("POST request received to create {} {}s at '{}' with request: {}", batchOfInputRequests.size(), elementType(), uriContext.getAbsolutePath(), batchOfInputRequests);
 
         if (SystemStateManager.current().isWriteBlocked()) {
             getLogger().warn("System state {} does not allow write requests", SystemStateManager.current());
             return serviceUnavailable();
         }
 
-        final List<V> validElements = new ArrayList<>(batchOfElements.size() / 2);
-        final List<ValidationResponse> failedValidationResponses = new ArrayList<>(batchOfElements.size() / 2);
+        final Collection<O> validElements = new ArrayList<>(batchOfInputRequests.size() / 2);
+        final Collection<ValidationResponse<O>> failedValidationResponses = new ArrayList<>(batchOfInputRequests.size() / 2);
 
-        for (final V element : batchOfElements) {
-            final ValidationResponse validationResponse = validate(element);
+        for (final I inputRequest : batchOfInputRequests) {
+            final ValidationResponse<O> validationResponse = validateAndConvert(inputRequest);
             if (validationResponse.isInvalid()) {
-                getLogger().error("Found validation error for {}: {}", element, validationResponse);
+                getLogger().error("Found validation error for {}: {}", inputRequest, validationResponse);
                 failedValidationResponses.add(validationResponse);
             } else {
-                validElements.add(element);
+                validElements.add(validationResponse.getOutput());
             }
         }
 
@@ -134,12 +138,12 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
             return badRequest(failedValidationResponses);
         }
 
-        final List<V> successful = new ArrayList<>(batchOfElements.size() / 2);
-        final List<V> unsuccessful = new ArrayList<>(batchOfElements.size() / 2);
+        final List<O> successful = new ArrayList<>(batchOfInputRequests.size() / 2);
+        final List<O> unsuccessful = new ArrayList<>(batchOfInputRequests.size() / 2);
 
-        for (final V element : validElements) {
+        for (final O element : validElements) {
             try {
-                final V elementWithId = createElement(element);
+                final O elementWithId = createElement(element);
                 successful.add(elementWithId);
             } catch (final FoldingConflictException | FoldingException | FoldingExternalServiceException e) {
                 getLogger().error("Error creating {}: {}", elementType(), element, e.getCause());
@@ -177,12 +181,12 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
         }
 
         try {
-            final Collection<V> elements = getAllElements();
+            final Collection<O> elements = getAllElements();
 
             final CacheControl cacheControl = new CacheControl();
             cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);
 
-            final EntityTag entityTag = new EntityTag(String.valueOf(elements.stream().mapToInt(V::hashCode).sum()));
+            final EntityTag entityTag = new EntityTag(String.valueOf(elements.stream().mapToInt(O::hashCode).sum()));
             Response.ResponseBuilder builder = request.evaluatePreconditions(entityTag);
 
             if (builder == null) {
@@ -211,7 +215,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
         }
 
         try {
-            final V element = getElementById(ParsingUtils.parseId(elementId));
+            final O element = getElementById(ParsingUtils.parseId(elementId));
 
             final CacheControl cacheControl = new CacheControl();
             cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);
@@ -250,7 +254,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
         }
     }
 
-    protected Response updateById(final String elementId, final V element) {
+    protected Response updateById(final String elementId, final I inputRequest) {
         getLogger().debug("PUT request for {} received at '{}'", elementType(), uriContext.getAbsolutePath());
 
         if (SystemStateManager.current().isWriteBlocked()) {
@@ -258,7 +262,7 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
             return serviceUnavailable();
         }
 
-        if (element == null) {
+        if (inputRequest == null) {
             getLogger().error("No payload provided");
             return badRequest("No payload provided");
         }
@@ -267,29 +271,29 @@ abstract class AbstractIdentifiableCrudEndpoint<V extends Identifiable> {
             final int parsedId = ParsingUtils.parseId(elementId);
             // We want to make sure the payload is not trying to change the ID of the element
             // If no ID is provided, the POJO will default to a value of 0, which is acceptable
-            if (parsedId != element.getId() && element.getId() != 0) {
-                final String errorMessage = String.format("Path ID '%s' does not match ID '%s' of payload", elementId, element.getId());
+            if (parsedId != inputRequest.getId() && inputRequest.getId() != 0) {
+                final String errorMessage = String.format("Path ID '%s' does not match ID '%s' of payload", elementId, inputRequest.getId());
                 getLogger().error(errorMessage);
                 return badRequest(errorMessage);
             }
 
-            final V existingElement = getElementById(parsedId);
+            final O existingElement = getElementById(parsedId);
 
-            if (existingElement.equals(element)) {
+            if (existingElement.isEqualRequest(inputRequest)) {
                 getLogger().debug("No change necessary");
                 return ok(existingElement);
             }
 
-            final ValidationResponse validationResponse = validate(element);
+            final ValidationResponse<O> validationResponse = validateAndConvert(inputRequest);
             if (validationResponse.isInvalid()) {
                 return badRequest(validationResponse);
             }
 
-            final V updatedElementWithId = updateElementById(parsedId, element);
+            final O updatedElementWithId = updateElementById(parsedId, validationResponse.getOutput());
 
             final UriBuilder elementLocationBuilder = uriContext
                     .getRequestUriBuilder()
-                    .path(String.valueOf(element.getId()));
+                    .path(String.valueOf(inputRequest.getId()));
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             return ok(updatedElementWithId, elementLocationBuilder);
         } catch (final FoldingIdInvalidException e) {

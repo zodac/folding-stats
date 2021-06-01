@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
+import me.zodac.folding.rest.api.tc.request.TeamRequest;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -14,7 +15,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.List;
+import java.util.Collection;
 
 import static me.zodac.folding.api.utils.EncodingUtils.encodeBasicAuthentication;
 
@@ -126,26 +127,26 @@ public final class TeamRequestSender {
     }
 
     /**
-     * Send a <b>POST</b> request to create the given {@link Team} in the system.
+     * Send a <b>POST</b> request to create the given {@link TeamRequest} in the system.
      *
-     * @param team the {@link Team} to create
+     * @param team the {@link TeamRequest} to create
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
-    public HttpResponse<String> create(final Team team) throws FoldingRestException {
+    public HttpResponse<String> create(final TeamRequest team) throws FoldingRestException {
         return create(team, null, null);
     }
 
     /**
-     * Send a <b>POST</b> request to create the given {@link Team} in the system.
+     * Send a <b>POST</b> request to create the given {@link TeamRequest} in the system.
      *
-     * @param team     the {@link Team} to create
+     * @param team     the {@link TeamRequest} to create
      * @param userName the user name
      * @param password the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
-    public HttpResponse<String> create(final Team team, final String userName, final String password) throws FoldingRestException {
+    public HttpResponse<String> create(final TeamRequest team, final String userName, final String password) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(team)))
                 .uri(URI.create(foldingUrl + "/teams"))
@@ -167,24 +168,24 @@ public final class TeamRequestSender {
     /**
      * Send a <b>POST</b> request to create the given {@link Team}s in the system.
      *
-     * @param batchOfTeams the {@link List} of {@link Team}s to create
+     * @param batchOfTeams the {@link Collection} of {@link Team}s to create
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
-    public HttpResponse<String> createBatchOf(final List<Team> batchOfTeams) throws FoldingRestException {
+    public HttpResponse<String> createBatchOf(final Collection<TeamRequest> batchOfTeams) throws FoldingRestException {
         return createBatchOf(batchOfTeams, null, null);
     }
 
     /**
      * Send a <b>POST</b> request to create the given {@link Team}s in the system.
      *
-     * @param batchOfTeams the {@link List} of {@link Team}s to create
+     * @param batchOfTeams the {@link Collection} of {@link Team}s to create
      * @param userName     the user name
      * @param password     the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
-    public HttpResponse<String> createBatchOf(final List<Team> batchOfTeams, final String userName, final String password) throws FoldingRestException {
+    public HttpResponse<String> createBatchOf(final Collection<TeamRequest> batchOfTeams, final String userName, final String password) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(batchOfTeams)))
                 .uri(URI.create(foldingUrl + "/teams/batch"))
@@ -204,26 +205,26 @@ public final class TeamRequestSender {
     }
 
     /**
-     * Send a <b>PUT</b> request to update the given {@link Team} in the system.
+     * Send a <b>PUT</b> request to update the given {@link TeamRequest} in the system.
      *
-     * @param team the {@link Team} to update
+     * @param team the {@link TeamRequest} to update
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
-    public HttpResponse<String> update(final Team team) throws FoldingRestException {
+    public HttpResponse<String> update(final TeamRequest team) throws FoldingRestException {
         return update(team, null, null);
     }
 
     /**
-     * Send a <b>PUT</b> request to update the given {@link Team} in the system.
+     * Send a <b>PUT</b> request to update the given {@link TeamRequest} in the system.
      *
-     * @param team     the {@link Team} to update
+     * @param team     the {@link TeamRequest} to update
      * @param userName the user name
      * @param password the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
-    public HttpResponse<String> update(final Team team, final String userName, final String password) throws FoldingRestException {
+    public HttpResponse<String> update(final TeamRequest team, final String userName, final String password) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .PUT(HttpRequest.BodyPublishers.ofString(GSON.toJson(team)))
                 .uri(URI.create(foldingUrl + "/teams/" + team.getId()))

@@ -2,7 +2,7 @@ package me.zodac.folding.cache;
 
 import me.zodac.folding.api.tc.User;
 
-public class UserCache extends AbstractIdentifiableCache<User> {
+public class UserCache extends AbstractCache<User> {
 
     // TODO: [zodac] Do I really need a singleton instance? May as well make it a static class?
     private static UserCache INSTANCE = null;

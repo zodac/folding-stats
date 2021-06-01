@@ -6,6 +6,9 @@ import me.zodac.folding.api.tc.OperatingSystem;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
+import me.zodac.folding.rest.api.tc.request.HardwareRequest;
+import me.zodac.folding.rest.api.tc.request.TeamRequest;
+import me.zodac.folding.rest.api.tc.request.UserRequest;
 import me.zodac.folding.test.utils.rest.request.HardwareUtils;
 import me.zodac.folding.test.utils.rest.request.TeamUtils;
 
@@ -41,9 +44,9 @@ public final class TestGenerator {
      *
      * @return the generated {@link Hardware}
      */
-    public static Hardware generateHardware() {
+    public static HardwareRequest generateHardware() {
         final String hardwareName = nextHardwareName();
-        return Hardware.builder()
+        return HardwareRequest.builder()
                 .hardwareName(hardwareName)
                 .displayName(hardwareName)
                 .operatingSystem(OperatingSystem.WINDOWS.displayName())
@@ -58,9 +61,9 @@ public final class TestGenerator {
      * @param hardwareId the ID of the {@link Hardware}
      * @return the generated {@link Hardware}
      */
-    public static Hardware generateHardwareWithId(final int hardwareId) {
+    public static HardwareRequest generateHardwareWithId(final int hardwareId) {
         final String hardwareName = nextHardwareName();
-        return Hardware.builder()
+        return HardwareRequest.builder()
                 .id(hardwareId)
                 .hardwareName(hardwareName)
                 .displayName(hardwareName).operatingSystem(OperatingSystem.WINDOWS.displayName())
@@ -74,9 +77,9 @@ public final class TestGenerator {
      * @param multiplier the multiplier to be applied to the {@link Hardware}
      * @return the generated {@link Hardware}
      */
-    public static Hardware generateHardwareWithMultiplier(final double multiplier) {
+    public static HardwareRequest generateHardwareWithMultiplier(final double multiplier) {
         final String hardwareName = nextHardwareName();
-        return Hardware.builder()
+        return HardwareRequest.builder()
                 .hardwareName(hardwareName)
                 .displayName(hardwareName)
                 .operatingSystem(OperatingSystem.WINDOWS.displayName())
@@ -90,9 +93,9 @@ public final class TestGenerator {
      * @param operatingSystem the {@link OperatingSystem} of the {@link Hardware}
      * @return the generated {@link Hardware}
      */
-    public static Hardware generateHardwareWithOperatingSystem(final OperatingSystem operatingSystem) {
+    public static HardwareRequest generateHardwareWithOperatingSystem(final OperatingSystem operatingSystem) {
         final String hardwareName = nextHardwareName();
-        return Hardware.builder()
+        return HardwareRequest.builder()
                 .hardwareName(hardwareName)
                 .displayName(hardwareName)
                 .operatingSystem(operatingSystem.displayName())
@@ -106,32 +109,32 @@ public final class TestGenerator {
      *
      * @return the generated {@link Team}
      */
-    public static Team generateTeam() {
-        return Team.builder()
+    public static TeamRequest generateTeam() {
+        return TeamRequest.builder()
                 .teamName(nextTeamName())
                 .build();
     }
 
-    public static Team generateTeamWithId(final int teamId) {
-        return Team.builder()
+    public static TeamRequest generateTeamWithId(final int teamId) {
+        return TeamRequest.builder()
                 .id(teamId)
                 .teamName(nextTeamName())
                 .build();
     }
 
-    public static Team generateInvalidTeam() {
-        return Team.builder()
+    public static TeamRequest generateInvalidTeam() {
+        return TeamRequest.builder()
                 .teamName(nextTeamName())
                 .forumLink("invalidLink")
                 .build();
     }
 
-    public static User generateUser() throws FoldingRestException {
-        final int hardwareId = HardwareUtils.createOrConflict(generateHardware()).getId();
-        final int teamId = TeamUtils.createOrConflict(generateTeam()).getId();
+    public static UserRequest generateUser() throws FoldingRestException {
+        final int hardwareId = HardwareUtils.create(generateHardware()).getId();
+        final int teamId = TeamUtils.create(generateTeam()).getId();
         final String userName = nextUserName();
 
-        return User.builder()
+        return UserRequest.builder()
                 .foldingUserName(userName)
                 .displayName(userName)
                 .passkey("DummyPasskey12345678901234567890")
@@ -141,12 +144,12 @@ public final class TestGenerator {
                 .build();
     }
 
-    public static User generateUserWithCategory(final Category category) throws FoldingRestException {
-        final int hardwareId = HardwareUtils.createOrConflict(generateHardware()).getId();
-        final int teamId = TeamUtils.createOrConflict(generateTeam()).getId();
+    public static UserRequest generateUserWithCategory(final Category category) throws FoldingRestException {
+        final int hardwareId = HardwareUtils.create(generateHardware()).getId();
+        final int teamId = TeamUtils.create(generateTeam()).getId();
         final String userName = nextUserName();
 
-        return User.builder()
+        return UserRequest.builder()
                 .foldingUserName(userName)
                 .displayName(userName)
                 .passkey("DummyPasskey12345678901234567890")
@@ -156,12 +159,12 @@ public final class TestGenerator {
                 .build();
     }
 
-    public static User generateUserWithId(final int userId) throws FoldingRestException {
-        final int hardwareId = HardwareUtils.createOrConflict(generateHardware()).getId();
-        final int teamId = TeamUtils.createOrConflict(generateTeam()).getId();
+    public static UserRequest generateUserWithId(final int userId) throws FoldingRestException {
+        final int hardwareId = HardwareUtils.create(generateHardware()).getId();
+        final int teamId = TeamUtils.create(generateTeam()).getId();
         final String userName = nextUserName();
 
-        return User.builder()
+        return UserRequest.builder()
                 .id(userId)
                 .foldingUserName(userName)
                 .displayName(userName)
@@ -172,11 +175,11 @@ public final class TestGenerator {
                 .build();
     }
 
-    public static User generateUserWithHardwareId(final int hardwareId) throws FoldingRestException {
-        final int teamId = TeamUtils.createOrConflict(generateTeam()).getId();
+    public static UserRequest generateUserWithHardwareId(final int hardwareId) throws FoldingRestException {
+        final int teamId = TeamUtils.create(generateTeam()).getId();
         final String userName = nextUserName();
 
-        return User.builder()
+        return UserRequest.builder()
                 .foldingUserName(userName)
                 .displayName(userName)
                 .passkey("DummyPasskey12345678901234567890")
@@ -186,11 +189,11 @@ public final class TestGenerator {
                 .build();
     }
 
-    public static User generateUserWithTeamId(final int teamId) throws FoldingRestException {
-        final int hardwareId = HardwareUtils.createOrConflict(generateHardware()).getId();
+    public static UserRequest generateUserWithTeamId(final int teamId) throws FoldingRestException {
+        final int hardwareId = HardwareUtils.create(generateHardware()).getId();
         final String userName = nextUserName();
 
-        return User.builder()
+        return UserRequest.builder()
                 .foldingUserName(userName)
                 .displayName(userName)
                 .passkey("DummyPasskey12345678901234567890")
@@ -200,11 +203,11 @@ public final class TestGenerator {
                 .build();
     }
 
-    public static User generateUserWithTeamIdAndCategory(final int teamId, final Category category) throws FoldingRestException {
-        final int hardwareId = HardwareUtils.createOrConflict(generateHardware()).getId();
+    public static UserRequest generateUserWithTeamIdAndCategory(final int teamId, final Category category) throws FoldingRestException {
+        final int hardwareId = HardwareUtils.create(generateHardware()).getId();
         final String userName = nextUserName();
 
-        return User.builder()
+        return UserRequest.builder()
                 .foldingUserName(userName)
                 .displayName(userName)
                 .passkey("DummyPasskey12345678901234567890")
@@ -214,12 +217,12 @@ public final class TestGenerator {
                 .build();
     }
 
-    public static User generateUserWithLiveStatsLink(final String liveStatsLink) throws FoldingRestException {
-        final int hardwareId = HardwareUtils.createOrConflict(generateHardware()).getId();
-        final int teamId = TeamUtils.createOrConflict(generateTeam()).getId();
+    public static UserRequest generateUserWithLiveStatsLink(final String liveStatsLink) throws FoldingRestException {
+        final int hardwareId = HardwareUtils.create(generateHardware()).getId();
+        final int teamId = TeamUtils.create(generateTeam()).getId();
         final String userName = nextUserName();
 
-        return User.builder()
+        return UserRequest.builder()
                 .foldingUserName(userName)
                 .displayName(userName)
                 .passkey("DummyPasskey12345678901234567890")
@@ -229,84 +232,4 @@ public final class TestGenerator {
                 .teamId(teamId)
                 .build();
     }
-//
-////    public static User generateCaptain() throws FoldingRestException {
-////        final int hardwareId = HardwareUtils.createOrConflict(generateHardware()).getId();
-////        final int teamId = TeamUtils.createOrConflict(generateTeam()).getId();
-////        return generateUser(hardwareId, teamId, true);
-////    }
-//
-//    private static User generateUser(final int hardwareId, final int teamId, final boolean isCaptain) {
-//        return User.createWithoutId(
-//                "Dummy_User" + userCount++,
-//                "Dummy User",
-//                "DummyPasskey12345678901234567890",
-//                Category.AMD_GPU,
-//                "",
-//                "",
-//                hardwareId,
-//                teamId,
-//                isCaptain);
-//    }
-//
-//    /**
-//     * Generates a {@link User} with the supplied {@link Hardware} ID.
-//     *
-//     * @param hardwareId the ID of the {@link Hardware} for the user
-//     * @return the generated {@link User}
-//     */
-//    public static User generateUserWithHardwareId(final int hardwareId) {
-//        return User.createWithoutId(
-//                "Dummy_User" + userCount,
-//                "Dummy User" + userCount++,
-//                "DummyPasskey12345678901234567890",
-//                Category.NVIDIA_GPU,
-//                hardwareId,
-//                "",
-//                "",
-//                false);
-//    }
-//
-//    /**
-//     * Generates a {@link User} with the supplied {@link Category} linked with an auto-created {@link Hardware}.
-//     *
-//     * @param category the {@link Category} of the {@link Hardware} for the user
-//     * @return the generated {@link User}
-//     * @throws FoldingRestException thrown if an error occurs creating the {@link Hardware}
-//     * @see #generateHardware()
-//     */
-//    public static User generateUserWithCategory(final Category category) throws FoldingRestException {
-//        final int hardwareId = HardwareUtils.createOrConflict(generateHardware()).getId();
-//        return User.createWithoutId(
-//                "Dummy_User" + userCount,
-//                "Dummy User" + userCount++,
-//                "DummyPasskey12345678901234567890",
-//                category,
-//                hardwareId,
-//                "",
-//                "",
-//                false);
-//    }
-//
-//    /**
-//     * Generates a {@link User} with the supplied {@link User} ID linked with an auto-created {@link Hardware}.
-//     *
-//     * @param userId the ID of the {@link User}
-//     * @return the generated {@link User}
-//     * @throws FoldingRestException thrown if an error occurs creating the {@link Hardware}
-//     * @see #generateHardware()
-//     */
-//    public static User generateUserWithUserId(final int userId) throws FoldingRestException {
-//        final int hardwareId = HardwareUtils.createOrConflict(generateHardware()).getId();
-//        return User.create(
-//                userId,
-//                "Dummy_User" + userCount,
-//                "Dummy User" + userCount++,
-//                "DummyPasskey12345678901234567890",
-//                Category.NVIDIA_GPU,
-//                hardwareId,
-//                "",
-//                "",
-//                false);
-//    }
 }

@@ -16,6 +16,7 @@ import me.zodac.folding.api.tc.stats.OffsetStats;
 import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.ejb.BusinessLogic;
 import me.zodac.folding.ejb.UserTeamCompetitionStatsParser;
+import me.zodac.folding.rest.api.tc.request.UserRequest;
 import me.zodac.folding.rest.validator.UserValidator;
 import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.slf4j.Logger;
@@ -52,12 +53,12 @@ import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
 // TODO: [zodac] Add a GET endpoint with query, so we can see all instances of a user
 @Path("/users/")
 @RequestScoped
-public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
+public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserEndpoint.class);
 
     @EJB
-    private BusinessLogic businessLogic;
+    private BusinessLogic businessLogic; // TODO: [zodac] Make protected?
 
     @EJB
     private UserTeamCompetitionStatsParser userTeamCompetitionStatsParser;
@@ -66,8 +67,8 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
     @RolesAllowed("admin")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createUser(final User user) {
-        return super.create(user);
+    public Response createUser(final UserRequest userRequest) {
+        return super.create(userRequest);
     }
 
     @POST
@@ -75,8 +76,8 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
     @Path("/batch")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createBatchOfUsers(final Collection<User> users) {
-        return super.createBatchOf(users);
+    public Response createBatchOfUsers(final Collection<UserRequest> userRequests) {
+        return super.createBatchOf(userRequests);
     }
 
     @GET
@@ -99,8 +100,8 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
     @Path("/{userId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateUserById(@PathParam("userId") final String userId, final User user) {
-        return super.updateById(userId, user);
+    public Response updateUserById(@PathParam("userId") final String userId, final UserRequest userRequest) {
+        return super.updateById(userId, userRequest);
     }
 
     @DELETE
@@ -111,6 +112,7 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
         return super.deleteById(userId);
     }
 
+    // TODO: [zodac] Not really a PATCH on the User resource. Should probably be moved to /tc_stats/
     @PATCH
     @RolesAllowed("admin")
     @Path("/{userId}")
@@ -182,12 +184,6 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
     }
 
     @Override
-    protected ValidationResponse validate(final User element) {
-        final UserValidator userValidator = UserValidator.create(businessLogic, HttpFoldingStatsRetriever.create());
-        return userValidator.isValid(element);
-    }
-
-    @Override
     protected User createElement(final User user) throws FoldingException, FoldingConflictException, FoldingExternalServiceException {
         return businessLogic.createUser(user);
     }
@@ -195,6 +191,12 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
     @Override
     protected Collection<User> getAllElements() throws FoldingException {
         return businessLogic.getAllUsersWithPasskeys(false);
+    }
+
+    @Override
+    protected ValidationResponse<User> validateAndConvert(final UserRequest userRequest) {
+        final UserValidator userValidator = UserValidator.create(businessLogic, HttpFoldingStatsRetriever.create());
+        return userValidator.isValid(userRequest);
     }
 
     @Override
@@ -211,7 +213,7 @@ public class UserEndpoint extends AbstractIdentifiableCrudEndpoint<User> {
     }
 
     @Override
-    protected void deleteElementById(final int user) throws FoldingConflictException, FoldingException {
-        businessLogic.deleteUser(user);
+    protected void deleteElementById(final int userId) throws FoldingConflictException, FoldingException {
+        businessLogic.deleteUser(userId);
     }
 }

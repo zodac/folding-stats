@@ -2,6 +2,7 @@ package me.zodac.folding.test.utils.rest.request;
 
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
+import me.zodac.folding.rest.api.tc.request.UserRequest;
 
 import java.io.IOException;
 import java.net.URI;
@@ -27,22 +28,22 @@ public final class StubbedFoldingEndpointUtils {
     }
 
     /**
-     * Adds one unit to the {@link User} so it can be created successfully.
+     * Adds one unit to the {@link UserRequest} so it can be created successfully.
      *
-     * @param user the {@link User} to enable
+     * @param user the {@link UserRequest} to enable
      * @throws FoldingRestException thrown if an error occurs sending the HTTP request
      */
-    public static void enableUser(final User user) throws FoldingRestException {
+    public static void enableUser(final UserRequest user) throws FoldingRestException {
         setUnits(user, 1);
     }
 
     /**
-     * Removes all units from the {@link User} so it cannot be created successfully.
+     * Removes all units from the {@link UserRequest} so it cannot be created successfully.
      *
-     * @param user the {@link User} to disable
+     * @param user the {@link UserRequest} to disable
      * @throws FoldingRestException thrown if an error occurs sending the HTTP request
      */
-    public static void disableUser(final User user) throws FoldingRestException {
+    public static void disableUser(final UserRequest user) throws FoldingRestException {
         setUnits(user, 0);
     }
 
@@ -53,21 +54,35 @@ public final class StubbedFoldingEndpointUtils {
      * @throws FoldingRestException thrown if an error occurs sending the HTTP request
      */
     public static void setPoints(final User user, final long points) throws FoldingRestException {
+        setPoints(user.getFoldingUserName(), user.getPasskey(), points);
+    }
+
+    /**
+     * Sets the number of points for a {@link UserRequest}.
+     *
+     * @param user the {@link UserRequest} to update
+     * @throws FoldingRestException thrown if an error occurs sending the HTTP request
+     */
+    public static void setPoints(final UserRequest user, final long points) throws FoldingRestException {
+        setPoints(user.getFoldingUserName(), user.getPasskey(), points);
+    }
+
+    private static void setPoints(final String foldingUserName, final String passkey, final long points) throws FoldingRestException {
         final HttpRequest unitsRequest = HttpRequest.newBuilder()
                 .POST(HttpRequest.BodyPublishers.noBody())
-                .uri(URI.create(String.format(POINTS_URL_FORMAT, user.getFoldingUserName(), user.getPasskey(), points)))
+                .uri(URI.create(String.format(POINTS_URL_FORMAT, foldingUserName, passkey, points)))
                 .header("Content-Type", "application/json")
                 .build();
 
         try {
             HTTP_CLIENT.send(unitsRequest, HttpResponse.BodyHandlers.discarding());
         } catch (final IOException | InterruptedException e) {
-            throw new FoldingRestException(String.format("Error setting points count of user %s/%s to %s", user.getFoldingUserName(), user.getPasskey(), points), e);
+            throw new FoldingRestException(String.format("Error setting points count of user %s/%s to %s", foldingUserName, passkey, points), e);
         }
     }
 
     /**
-     * Removes all points for all {@link User}s.
+     * Removes all points for all {@link UserRequest}s.
      *
      * @throws FoldingRestException thrown if an error occurs sending the HTTP request
      */
@@ -92,22 +107,36 @@ public final class StubbedFoldingEndpointUtils {
      * @throws FoldingRestException thrown if an error occurs sending the HTTP request
      */
     public static void setUnits(final User user, final int units) throws FoldingRestException {
+        setUnits(user.getFoldingUserName(), user.getPasskey(), units);
+    }
+
+    /**
+     * Sets the number of units for a {@link UserRequest}.
+     *
+     * @param user the {@link UserRequest} to update
+     * @throws FoldingRestException thrown if an error occurs sending the HTTP request
+     */
+    public static void setUnits(final UserRequest user, final int units) throws FoldingRestException {
+        setUnits(user.getFoldingUserName(), user.getPasskey(), units);
+    }
+
+    private static void setUnits(final String foldingUserName, final String passkey, final int units) throws FoldingRestException {
         final HttpRequest unitsRequest = HttpRequest.newBuilder()
                 .POST(HttpRequest.BodyPublishers.noBody())
-                .uri(URI.create(String.format(UNIT_URL_FORMAT, user.getFoldingUserName(), user.getPasskey(), units)))
+                .uri(URI.create(String.format(UNIT_URL_FORMAT, foldingUserName, passkey, units)))
                 .header("Content-Type", "application/json")
                 .build();
 
         try {
             HTTP_CLIENT.send(unitsRequest, HttpResponse.BodyHandlers.discarding());
         } catch (final IOException | InterruptedException e) {
-            throw new FoldingRestException(String.format("Error setting unit count of user %s/%s to %s", user.getFoldingUserName(), user.getPasskey(), units), e);
+            throw new FoldingRestException(String.format("Error setting unit count of user %s/%s to %s", foldingUserName, passkey, units), e);
         }
     }
 
 
     /**
-     * Removes all units for all {@link User}s.
+     * Removes all units for all {@link UserRequest}s.
      *
      * @throws FoldingRestException thrown if an error occurs sending the HTTP request
      */
