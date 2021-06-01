@@ -59,8 +59,6 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
 
     protected abstract String elementType();
 
-//    protected abstract ValidationResponse<O> validateAndConvert(final I element);
-
     protected abstract O createElement(final O element) throws FoldingException, NotFoundException, FoldingConflictException, FoldingExternalServiceException;
 
     protected abstract Collection<O> getAllElements() throws FoldingException;
@@ -145,8 +143,8 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
             return badRequest(failedValidationResponses);
         }
 
-        final List<O> successful = new ArrayList<>(batchOfInputRequests.size() / 2);
-        final List<O> unsuccessful = new ArrayList<>(batchOfInputRequests.size() / 2);
+        final List<Object> successful = new ArrayList<>();
+        final List<Object> unsuccessful = new ArrayList<>(failedValidationResponses);
 
         for (final O element : validElements) {
             try {
@@ -164,7 +162,6 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
         final BatchCreateResponse batchCreateResponse = BatchCreateResponse.create(successful, unsuccessful);
 
         if (successful.isEmpty()) {
-            getLogger().error("No {}s successfully created", elementType());
             return badRequest(batchCreateResponse);
         }
 

@@ -7,9 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import me.zodac.folding.api.ResponsePojo;
 
-import java.util.Collection;
+import java.util.List;
 
 /**
  * Response POJO used to encapsulate the result of a batch create operation through the REST layer.
@@ -22,18 +21,18 @@ import java.util.Collection;
 @ToString(doNotUseGetters = true)
 public class BatchCreateResponse {
 
-    private Collection<? extends ResponsePojo> successful;
-    private Collection<? extends ResponsePojo> unsuccessful;
+    private List<Object> successful;
+    private List<Object> unsuccessful;
 
     /**
-     * Create a {@link BatchCreateResponse} with {@code successful} and {@code unsuccessful} {@link Collection}s of the
-     * {@link ResponsePojo} implementation attempting to be created.
+     * Create a {@link BatchCreateResponse} with {@code successful} and {@code unsuccessful} {@link List}s of the
+     * payload attempting to be created.
      *
-     * @param successful   the successfully created {@link ResponsePojo}s
-     * @param unsuccessful the unsuccessfully created {@link ResponsePojo}s
+     * @param successful   the successfully created {@link Object}s
+     * @param unsuccessful the unsuccessfully created {@link Object}s
      * @return the created {@link BatchCreateResponse}
      */
-    public static BatchCreateResponse create(final Collection<? extends ResponsePojo> successful, final Collection<? extends ResponsePojo> unsuccessful) {
+    public static BatchCreateResponse create(final List<Object> successful, final List<Object> unsuccessful) {
         return new BatchCreateResponse(successful, unsuccessful);
     }
 }

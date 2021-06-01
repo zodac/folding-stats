@@ -83,49 +83,6 @@ public class TeamCompetitionStatsEndpoint {
     private UriInfo uriContext;
 
     @GET
-    @RolesAllowed("admin")
-    @Path("/manual/update")
-    public Response manualStats(@QueryParam("async") final boolean async) {
-        LOGGER.info("GET request received to manually parse TC stats");
-
-        if (SystemStateManager.current().isReadBlocked()) {
-            LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
-            return serviceUnavailable();
-        }
-
-        try {
-            final ExecutionType executionType = async ? ExecutionType.ASYNCHRONOUS : ExecutionType.SYNCHRONOUS;
-            teamCompetitionStatsScheduler.manualTeamCompetitionStatsParsing(executionType);
-            return ok();
-        } catch (final Exception e) {
-            LOGGER.error("Unexpected error manually parsing TC stats", e);
-            return serverError();
-        }
-    }
-
-    @GET
-    @RolesAllowed("admin")
-    @Path("/manual/reset/")
-    public Response resetStats() {
-        LOGGER.info("GET request received to manually reset TC stats");
-
-        if (SystemStateManager.current().isReadBlocked()) {
-            LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
-            return serviceUnavailable();
-        }
-
-        try {
-            SystemStateManager.next(SystemState.RESETTING_STATS);
-            teamCompetitionResetScheduler.manualResetTeamCompetitionStats();
-            SystemStateManager.next(SystemState.WRITE_EXECUTED);
-            return ok();
-        } catch (final Exception e) {
-            LOGGER.error("Unexpected error manually resetting TC stats", e);
-            return serverError();
-        }
-    }
-
-    @GET
     @PermitAll
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTeamCompetitionStats() {
@@ -194,6 +151,65 @@ public class TeamCompetitionStatsEndpoint {
             LOGGER.error("Unexpected error retrieving TC stats for users", e);
             return serverError();
         }
+    }
+
+    @PATCH
+    @RolesAllowed("admin")
+    @Path("/users/{userId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateUserWithOffset(@PathParam("userId") final String userId, final OffsetStats offsetStats) {
+        LOGGER.debug("PATCH request to update offset for user received at '{}': {}", uriContext.getAbsolutePath(), offsetStats);
+
+        if (SystemStateManager.current().isWriteBlocked()) {
+            LOGGER.warn("System state {} does not allow write requests", SystemStateManager.current());
+            return serviceUnavailable();
+        }
+
+        if (offsetStats == null) {
+            LOGGER.error("Payload is null");
+            return nullRequest();
+        }
+
+        try {
+            final int parsedId = ParsingUtils.parseId(userId);
+            final User user = businessLogic.getUser(parsedId);
+
+            final OffsetStats offsetStatsToUse = getValidUserStatsOffset(user, offsetStats, parsedId);
+            businessLogic.addOrUpdateOffsetStats(parsedId, offsetStatsToUse);
+            SystemStateManager.next(SystemState.UPDATING_STATS);
+            userTeamCompetitionStatsParser.parseTcStatsForUserAndWait(businessLogic.getUser(parsedId));
+            SystemStateManager.next(SystemState.WRITE_EXECUTED);
+            return ok();
+        } catch (final FoldingIdInvalidException e) {
+            final String errorMessage = String.format("The user ID '%s' is not a valid format", e.getId());
+            LOGGER.debug(errorMessage, e);
+            LOGGER.error(errorMessage);
+            return badRequest(errorMessage);
+        } catch (final FoldingIdOutOfRangeException e) {
+            final String errorMessage = String.format("The user ID '%s' is out of range", e.getId());
+            LOGGER.debug(errorMessage, e);
+            LOGGER.error(errorMessage);
+            return badRequest(errorMessage);
+        } catch (final UserNotFoundException e) {
+            LOGGER.error("Error finding user with ID: {}", userId, e.getCause());
+            return notFound();
+        } catch (final FoldingException e) {
+            LOGGER.error("Error updating user with ID: {}", userId, e.getCause());
+            return serverError();
+        } catch (final Exception e) {
+            LOGGER.error("Unexpected error updating user with ID: {}", userId, e);
+            return serverError();
+        }
+    }
+
+    private OffsetStats getValidUserStatsOffset(final User user, final OffsetStats offsetStats, final int parsedId) throws FoldingException, UserNotFoundException {
+        if (!offsetStats.isMissingPointsOrMultipliedPoints()) {
+            return offsetStats;
+        }
+
+        final Hardware hardware = user.getHardware();
+        return OffsetStats.updateWithHardwareMultiplier(offsetStats, hardware.getMultiplier());
     }
 
     @GET
@@ -318,62 +334,46 @@ public class TeamCompetitionStatsEndpoint {
         }
     }
 
-    @PATCH
+    @GET
     @RolesAllowed("admin")
-    @Path("/users/{userId}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response updateUserWithOffset(@PathParam("userId") final String userId, final OffsetStats offsetStats) {
-        LOGGER.debug("PATCH request to update offset for user received at '{}': {}", uriContext.getAbsolutePath(), offsetStats);
+    @Path("/manual/update")
+    public Response manualStats(@QueryParam("async") final boolean async) {
+        LOGGER.info("GET request received to manually parse TC stats");
 
-        if (SystemStateManager.current().isWriteBlocked()) {
-            LOGGER.warn("System state {} does not allow write requests", SystemStateManager.current());
+        if (SystemStateManager.current().isReadBlocked()) {
+            LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
             return serviceUnavailable();
         }
 
-        if (offsetStats == null) {
-            LOGGER.error("Payload is null");
-            return nullRequest();
-        }
-
         try {
-            final int parsedId = ParsingUtils.parseId(userId);
-            final User user = businessLogic.getUser(parsedId);
-
-            final OffsetStats offsetStatsToUse = getValidUserStatsOffset(user, offsetStats, parsedId);
-            businessLogic.addOrUpdateOffsetStats(parsedId, offsetStatsToUse);
-            SystemStateManager.next(SystemState.UPDATING_STATS);
-            userTeamCompetitionStatsParser.parseTcStatsForUserAndWait(businessLogic.getUser(parsedId));
-            SystemStateManager.next(SystemState.WRITE_EXECUTED);
+            final ExecutionType executionType = async ? ExecutionType.ASYNCHRONOUS : ExecutionType.SYNCHRONOUS;
+            teamCompetitionStatsScheduler.manualTeamCompetitionStatsParsing(executionType);
             return ok();
-        } catch (final FoldingIdInvalidException e) {
-            final String errorMessage = String.format("The user ID '%s' is not a valid format", e.getId());
-            LOGGER.debug(errorMessage, e);
-            LOGGER.error(errorMessage);
-            return badRequest(errorMessage);
-        } catch (final FoldingIdOutOfRangeException e) {
-            final String errorMessage = String.format("The user ID '%s' is out of range", e.getId());
-            LOGGER.debug(errorMessage, e);
-            LOGGER.error(errorMessage);
-            return badRequest(errorMessage);
-        } catch (final UserNotFoundException e) {
-            LOGGER.error("Error finding user with ID: {}", userId, e.getCause());
-            return notFound();
-        } catch (final FoldingException e) {
-            LOGGER.error("Error updating user with ID: {}", userId, e.getCause());
-            return serverError();
         } catch (final Exception e) {
-            LOGGER.error("Unexpected error updating user with ID: {}", userId, e);
+            LOGGER.error("Unexpected error manually parsing TC stats", e);
             return serverError();
         }
     }
 
-    private OffsetStats getValidUserStatsOffset(final User user, final OffsetStats offsetStats, final int parsedId) throws FoldingException, UserNotFoundException {
-        if (!offsetStats.isMissingPointsOrMultipliedPoints()) {
-            return offsetStats;
+    @GET
+    @RolesAllowed("admin")
+    @Path("/manual/reset/")
+    public Response resetStats() {
+        LOGGER.info("GET request received to manually reset TC stats");
+
+        if (SystemStateManager.current().isReadBlocked()) {
+            LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
+            return serviceUnavailable();
         }
-        
-        final Hardware hardware = user.getHardware();
-        return OffsetStats.updateWithHardwareMultiplier(offsetStats, hardware.getMultiplier());
+
+        try {
+            SystemStateManager.next(SystemState.RESETTING_STATS);
+            teamCompetitionResetScheduler.manualResetTeamCompetitionStats();
+            SystemStateManager.next(SystemState.WRITE_EXECUTED);
+            return ok();
+        } catch (final Exception e) {
+            LOGGER.error("Unexpected error manually resetting TC stats", e);
+            return serverError();
+        }
     }
 }

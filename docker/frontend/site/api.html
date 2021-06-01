@@ -1,0 +1,321 @@
+<!DOCTYPE HTML><html><head><title>'Extreme Team Folding'</title><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="generator" content="https://github.com/raml2html/raml2html 7.8.0"><link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/default.min.css"><script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.min.js"></script><script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script><script type="text/javascript">
+      $(document).ready(function() {
+  $('.page-header pre code, .top-resource-description pre code, .modal-body pre code').each(function(i, block) {
+    hljs.highlightBlock(block);
+  });
+
+  $('[data-toggle]').click(function() {
+    var selector = $(this).data('target') + ' pre code';
+    $(selector).each(function(i, block) {
+      hljs.highlightBlock(block);
+    });
+  });
+
+  // open modal on hashes like #_action_get
+  $(window).bind('hashchange', function(e) {
+    var anchor_id = document.location.hash.substr(1); //strip #
+    var element = $('#' + anchor_id);
+
+    // do we have such element + is it a modal?  --> show it
+    if (element.length && element.hasClass('modal')) {
+      element.modal('show');
+    }
+  });
+
+  // execute hashchange on first page load
+  $(window).trigger('hashchange');
+
+  // remove url fragment on modal hide
+  $('.modal').on('hidden.bs.modal', function() {
+    try {
+      if (history && history.replaceState) {
+          history.replaceState({}, '', '#');
+      }
+    } catch(e) {}
+  });
+});
+    </script><style>
+      .hljs {
+  background: transparent;
+}
+.parent {
+  color: #999;
+}
+.list-group-item > .badge {
+  float: none;
+  margin-right: 6px;
+}
+.panel-title > .methods {
+  float: right;
+}
+.badge {
+  border-radius: 0;
+  text-transform: uppercase;
+  width: 70px;
+  font-weight: normal;
+  color: #f3f3f6;
+  line-height: normal;
+}
+.badge_get {
+  background-color: #63a8e2;
+}
+.badge_post {
+  background-color: #6cbd7d;
+}
+.badge_put {
+  background-color: #22bac4;
+}
+.badge_delete {
+  background-color: #d26460;
+}
+.badge_patch {
+  background-color: #ccc444;
+}
+.list-group,
+.panel-group {
+  margin-bottom: 0;
+}
+.panel-group .panel+.panel-white {
+  margin-top: 0;
+}
+.panel-group .panel-white {
+  border-bottom: 1px solid #F5F5F5;
+  border-radius: 0;
+}
+.panel-white:last-child {
+  border-bottom-color: white;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+.panel-white .panel-heading {
+  background: white;
+}
+.tab-pane ul {
+  padding-left: 2em;
+}
+.tab-pane h1 {
+  font-size: 1.3em;
+}
+.tab-pane h2 {
+  font-size: 1.2em;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #ddd;
+}
+.tab-pane h3 {
+  font-size: 1.1em;
+}
+.tab-content {
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+  padding: 10px;
+}
+#sidebar {
+  margin-top: 30px;
+  padding-right: 5px;
+  overflow: auto;
+  height: 90%;
+}
+.top-resource-description {
+  border-bottom: 1px solid #ddd;
+  background: #fcfcfc;
+  padding: 15px 15px 0 15px;
+  margin: -15px -15px 10px -15px;
+}
+.resource-description {
+  border-bottom: 1px solid #fcfcfc;
+  background: #fcfcfc;
+  padding: 15px 15px 0 15px;
+  margin: -15px -15px 10px -15px;
+}
+.resource-description p:last-child {
+  margin: 0;
+}
+.list-group .badge {
+  float: left;
+}
+.method_description {
+  margin-left: 85px;
+}
+.method_description p:last-child {
+  margin: 0;
+}
+.list-group-item {
+  cursor: pointer;
+}
+.list-group-item:hover {
+  background-color: #f5f5f5;
+}
+pre code {
+  overflow: auto;
+  word-wrap: normal;
+  white-space: pre;
+}
+.items {
+  background: #f5f5f5;
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 9.5px;
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.42857143;
+}
+.examples {
+  margin-left: 0.5em;
+}
+.resource-modal li > ul {
+  margin-bottom: 1em;
+}
+.required {
+  color: #f00;
+}
+    </style></head><body data-spy="scroll" data-target="#sidebar"><div class="container"><div class="row"><div class="col-md-9" role="main"><div class="page-header"><h1>'Extreme Team Folding'</h1><p>http://internal.axihub.ca/folding</p></div><div class="panel panel-default"><div class="panel-heading"><h3 id="hardware" class="panel-title">/hardware</h3></div><div class="panel-body"><div class="panel-group"><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_hardware"><span class="parent"></span>/hardware</a> <span class="methods"><a href="#hardware_get"><span class="badge badge_get">get</span></a> <a href="#hardware_post"><span class="badge badge_post">post</span></a></span></h4></div><div id="panel_hardware" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#hardware_get'" class="list-group-item"><span class="badge badge_get">get</span><div class="method_description"><p>Retrieves all hardware</p></div><div class="clearfix"></div></div><div onclick="window.location.href = '#hardware_post'" class="list-group-item"><span class="badge badge_post">post</span><div class="method_description"><p>Creates a new hardware with the given properties</p></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="hardware_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get</span> <span class="parent"></span>/hardware</h4></div><div class="modal-body"><div class="alert alert-info"><p>Retrieves all hardware</p></div><ul class="nav nav-tabs"><li class="active"><a href="#hardware_get_request" data-toggle="tab">Request</a></li><li><a href="#hardware_get_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="hardware_get_request"><h3>Headers</h3><ul><li><strong>If-None-Match</strong>: <em>(String)</em><p>An EntityTag used to retrieve a cache version of the response</p></li></ul></div><div class="tab-pane" id="hardware_get_response"><h2>HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><p>All hardware has been retrieved</p><h3>Headers</h3><ul><li><strong>eTag</strong>: <em><span class="required">required</span>(String)</em><p>An EntityTag which can be used to retrieve a cached version of the response in future requests</p></li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: any</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>[
+  {
+    "id": 1,
+    "hardwareName": "GTX 960",
+    "displayName": "GTX 960",
+    "operatingSystem": "WINDOWS",
+    "multiplier": 21.33
+  },
+  {
+    "id": 2,
+    "hardwareName": "Radeon VII",
+    "displayName": "Radeon VII",
+    "operatingSystem": "LINUX",
+    "multiplier": 3.62
+  }
+]</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/503" target="_blank">503</a></h2><p>The system is not in a valid state to execute read requests</p></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="hardware_post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post</span> <span class="parent"></span>/hardware</h4></div><div class="modal-body"><div class="alert alert-info"><p>Creates a new hardware with the given properties</p></div><ul class="nav nav-tabs"><li class="active"><a href="#hardware_post_request" data-toggle="tab">Request</a></li><li><a href="#hardware_post_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="hardware_post_request"><h3>Headers</h3><ul><li><strong>Authorization</strong>: <em><span class="required">required</span>(String)</em><p>Basic authentication encoded as a Base64 string, with the credentials in the form &#39;username:password&#39;</p></li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: any</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
+  "hardwareName": "GTX 960",
+  "displayName": "GTX 960",
+  "operatingSystem": "WINDOWS",
+  "multiplier": 21.33
+}</code></pre></div></div><div class="tab-pane" id="hardware_post_response"><h2>HTTP status code <a href="http://httpstatus.es/201" target="_blank">201</a></h2><p>The hardware has been created</p><h3>Headers</h3><ul><li><strong>location</strong>: <em><span class="required">required</span>(String)</em><p>The URL to the created hardware</p></li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: any</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
+  "id": 1,
+  "hardwareName": "GTX 960",
+  "displayName": "GTX 960",
+  "operatingSystem": "WINDOWS",
+  "multiplier": 21.33
+}</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><p>The given payload is invalid</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: any</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
+  "invalidObject": {
+    "id": 0,
+    "hardwareName": " ",
+    "operatingSystem": "invalid",
+    "multiplier": -1.0
+  },
+  "errors": [
+    "Attribute &#39;hardwareName&#39; must not be empty",
+    "Attribute &#39;displayName&#39; must not be empty",
+    "Attribute &#39;operatingSystem&#39; must be one of: [WINDOWS, LINUX]",
+    "Attribute &#39;multiplier&#39; must be over 0.0"
+  ]
+}</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><p>System user cannot be successfully logged in with provided credentials</p><h2>HTTP status code <a href="http://httpstatus.es/403" target="_blank">403</a></h2><p>System user does not have the correct role to perform this request</p><h2>HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><p>A hardware with the same &#39;hardwareName&#39; already exists</p><h2>HTTP status code <a href="http://httpstatus.es/502" target="_blank">502</a></h2><p>An error occurred connecting to an external system to verify the hardware</p><h2>HTTP status code <a href="http://httpstatus.es/503" target="_blank">503</a></h2><p>The system is not in a valid state to execute write requests</p></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_hardware__hardwareid_"><span class="parent">/hardware</span>/{hardwareId}</a> <span class="methods"><a href="#hardware__hardwareid__delete"><span class="badge badge_delete">delete</span></a> <a href="#hardware__hardwareid__get"><span class="badge badge_get">get</span></a> <a href="#hardware__hardwareid__put"><span class="badge badge_put">put</span></a></span></h4></div><div id="panel_hardware__hardwareid_" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#hardware__hardwareid__delete'" class="list-group-item"><span class="badge badge_delete">delete</span><div class="method_description"><p>Deletes the hardware with the given ID</p></div><div class="clearfix"></div></div><div onclick="window.location.href = '#hardware__hardwareid__get'" class="list-group-item"><span class="badge badge_get">get</span><div class="method_description"><p>Retrieves the hardware with the given ID</p></div><div class="clearfix"></div></div><div onclick="window.location.href = '#hardware__hardwareid__put'" class="list-group-item"><span class="badge badge_put">put</span><div class="method_description"><p>Updates an existing hardware with the given properties</p></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="hardware__hardwareid__delete"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_delete">delete</span> <span class="parent">/hardware</span>/{hardwareId}</h4></div><div class="modal-body"><div class="alert alert-info"><p>Deletes the hardware with the given ID</p></div><ul class="nav nav-tabs"><li class="active"><a href="#hardware__hardwareid__delete_request" data-toggle="tab">Request</a></li><li><a href="#hardware__hardwareid__delete_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="hardware__hardwareid__delete_request"><h3>URI Parameters</h3><ul><li><strong>hardwareId</strong>: <em><span class="required">required</span>(Integer)</em><p>The ID of the hardware</p></li></ul><h3>Headers</h3><ul><li><strong>Authorization</strong>: <em><span class="required">required</span>(String)</em><p>Basic authentication encoded as a Base64 string, with the credentials in the form &#39;username:password&#39;</p></li></ul></div><div class="tab-pane" id="hardware__hardwareid__delete_response"><h2>HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><p>The hardware has been deleted from the system</p><h2>HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><p>System user cannot be successfully logged in with provided credentials</p><h2>HTTP status code <a href="http://httpstatus.es/403" target="_blank">403</a></h2><p>System user does not have the correct role to perform this request</p><h2>HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><p>No hardware exists with the given ID</p><h2>HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><p>The hardware is being referenced by a user and cannot be deleted</p><h2>HTTP status code <a href="http://httpstatus.es/503" target="_blank">503</a></h2><p>The system is not in a valid state to execute write requests</p></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="hardware__hardwareid__get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get</span> <span class="parent">/hardware</span>/{hardwareId}</h4></div><div class="modal-body"><div class="alert alert-info"><p>Retrieves the hardware with the given ID</p></div><ul class="nav nav-tabs"><li class="active"><a href="#hardware__hardwareid__get_request" data-toggle="tab">Request</a></li><li><a href="#hardware__hardwareid__get_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="hardware__hardwareid__get_request"><h3>URI Parameters</h3><ul><li><strong>hardwareId</strong>: <em><span class="required">required</span>(Integer)</em><p>The ID of the hardware</p></li></ul><h3>Headers</h3><ul><li><strong>If-None-Match</strong>: <em>(String)</em><p>An EntityTag used to retrieve a cache version of the response</p></li></ul></div><div class="tab-pane" id="hardware__hardwareid__get_response"><h2>HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><p>The hardware has been retrieved from the system</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: any</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
+  "id": 1,
+  "hardwareName": "GTX 960",
+  "displayName": "GTX 960",
+  "operatingSystem": "WINDOWS",
+  "multiplier": 21.33
+}</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><p>The provided ID is an invalid integer, or out of range</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: any</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
+  "invalidObject": {
+    "id": 0,
+    "hardwareName": " ",
+    "operatingSystem": "invalid",
+    "multiplier": -1.0
+  },
+  "errors": [
+    "Attribute &#39;hardwareName&#39; must not be empty",
+    "Attribute &#39;displayName&#39; must not be empty",
+    "Attribute &#39;operatingSystem&#39; must be one of: [WINDOWS, LINUX]",
+    "Attribute &#39;multiplier&#39; must be over 0.0"
+  ]
+}</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><p>No hardware exists with the given ID</p><h2>HTTP status code <a href="http://httpstatus.es/503" target="_blank">503</a></h2><p>The system is not in a valid state to execute read requests</p></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="hardware__hardwareid__put"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_put">put</span> <span class="parent">/hardware</span>/{hardwareId}</h4></div><div class="modal-body"><div class="alert alert-info"><p>Updates an existing hardware with the given properties</p></div><ul class="nav nav-tabs"><li class="active"><a href="#hardware__hardwareid__put_request" data-toggle="tab">Request</a></li><li><a href="#hardware__hardwareid__put_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="hardware__hardwareid__put_request"><h3>URI Parameters</h3><ul><li><strong>hardwareId</strong>: <em><span class="required">required</span>(Integer)</em><p>The ID of the hardware</p></li></ul><h3>Headers</h3><ul><li><strong>Authorization</strong>: <em><span class="required">required</span>(String)</em><p>Basic authentication encoded as a Base64 string, with the credentials in the form &#39;username:password&#39;</p></li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: any</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
+  "hardwareName": "GTX 960",
+  "displayName": "GTX 960 (updated)",
+  "operatingSystem": "WINDOWS",
+  "multiplier": 21.33
+}</code></pre></div></div><div class="tab-pane" id="hardware__hardwareid__put_response"><h2>HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><p>The hardware has been updated</p><h3>Headers</h3><ul><li><strong>location</strong>: <em>(String)</em><p>The URL to the updated hardware (unless there was no change to the hardware)</p></li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: any</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
+  "id": 1,
+  "hardwareName": "GTX 960",
+  "displayName": "GTX 960 (updated)",
+  "operatingSystem": "WINDOWS",
+  "multiplier": 21.33
+}</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><p>The given payload is invalid</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: any</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
+  "invalidObject": {
+    "id": 0,
+    "hardwareName": " ",
+    "operatingSystem": "invalid",
+    "multiplier": -1.0
+  },
+  "errors": [
+    "Attribute &#39;hardwareName&#39; must not be empty",
+    "Attribute &#39;displayName&#39; must not be empty",
+    "Attribute &#39;operatingSystem&#39; must be one of: [WINDOWS, LINUX]",
+    "Attribute &#39;multiplier&#39; must be over 0.0"
+  ]
+}</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><p>System user cannot be successfully logged in with provided credentials</p><h2>HTTP status code <a href="http://httpstatus.es/403" target="_blank">403</a></h2><p>System user does not have the correct role to perform this request</p><h2>HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><p>No hardware exists with the given ID</p><h2>HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><p>A hardware with the same &#39;hardwareName&#39; already exists</p><h2>HTTP status code <a href="http://httpstatus.es/502" target="_blank">502</a></h2><p>An error occurred connecting to an external system to verify the hardware</p><h2>HTTP status code <a href="http://httpstatus.es/503" target="_blank">503</a></h2><p>The system is not in a valid state to execute write requests</p></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_hardware_batch"><span class="parent">/hardware</span>/batch</a> <span class="methods"><a href="#hardware_batch_post"><span class="badge badge_post">post</span></a></span></h4></div><div id="panel_hardware_batch" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#hardware_batch_post'" class="list-group-item"><span class="badge badge_post">post</span><div class="method_description"><p>Creates a batch of hardware with the given properties</p></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="hardware_batch_post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post</span> <span class="parent">/hardware</span>/batch</h4></div><div class="modal-body"><div class="alert alert-info"><p>Creates a batch of hardware with the given properties</p></div><ul class="nav nav-tabs"><li class="active"><a href="#hardware_batch_post_request" data-toggle="tab">Request</a></li><li><a href="#hardware_batch_post_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="hardware_batch_post_request"><h3>Headers</h3><ul><li><strong>Authorization</strong>: <em><span class="required">required</span>(String)</em><p>Basic authentication encoded as a Base64 string, with the credentials in the form &#39;username:password&#39;</p></li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json-all-success</p><p><strong>Type</strong>: any</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>[
+  {
+    "hardwareName": "GTX 960",
+    "displayName": "GTX 960",
+    "operatingSystem": "WINDOWS",
+    "multiplier": 21.33
+  },
+  {
+    "hardwareName": "Radeon VII",
+    "displayName": "Radeon VII",
+    "operatingSystem": "LINUX",
+    "multiplier": 3.62
+  }
+]</code></pre></div><p><strong>Media type</strong>: application/json-partial-success</p><p><strong>Type</strong>: any</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>[
+  {
+    "hardwareName": "GTX 960",
+    "displayName": "GTX 960",
+    "operatingSystem": "WINDOWS",
+    "multiplier": 21.33
+  },
+  {
+    "hardwareName": "Radeon VII",
+    "displayName": "Radeon VII",
+    "operatingSystem": "LINUX",
+    "multiplier": 3.62
+  }
+]</code></pre></div></div><div class="tab-pane" id="hardware_batch_post_response"><h2>HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><p>At least one hardware in the payload is created</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: any</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>[
+  {
+    "id": 1,
+    "hardwareName": "GTX 960",
+    "displayName": "GTX 960",
+    "operatingSystem": "WINDOWS",
+    "multiplier": 21.33
+  },
+  {
+    "id": 2,
+    "hardwareName": "Radeon VII",
+    "displayName": "Radeon VII",
+    "operatingSystem": "LINUX",
+    "multiplier": 3.62
+  }
+]</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><p>All given payloads are invalid</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: any</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>[
+  {
+    "invalidObject": {
+      "id": 0,
+      "hardwareName": "GTX 960",
+      "displayName": "GTX 960",
+      "operatingSystem": "WINDOWS",
+      "multiplier": -21.33
+    },
+    "errors": [
+      "Attribute &#39;multiplier&#39; must be over 0.0"
+    ]
+  },
+  {
+    "invalidObject": {
+      "id": 0,
+      "hardwareName": "Radeon VII",
+      "displayName": "Radeon VII",
+      "operatingSystem": "LINUX",
+      "multiplier": -3.62
+    },
+    "errors": [
+      "Attribute &#39;multiplier&#39; must be over 0.0"
+    ]
+  }
+]</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><p>System user cannot be successfully logged in with provided credentials</p><h2>HTTP status code <a href="http://httpstatus.es/403" target="_blank">403</a></h2><p>System user does not have the correct role to perform this request</p><h2>HTTP status code <a href="http://httpstatus.es/502" target="_blank">502</a></h2><p>An error occurred connecting to an external system to verify the hardware</p><h2>HTTP status code <a href="http://httpstatus.es/503" target="_blank">503</a></h2><p>The system is not in a valid state to execute write requests</p></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default"><div class="panel-heading"><h3 id="users" class="panel-title">/users</h3></div><div class="panel-body"><div class="panel-group"><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_users"><span class="parent"></span>/users</a> <span class="methods"><a href="#users_get"><span class="badge badge_get">get</span></a> <a href="#users_post"><span class="badge badge_post">post</span></a></span></h4></div><div id="panel_users" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#users_get'" class="list-group-item"><span class="badge badge_get">get</span><div class="method_description"></div><div class="clearfix"></div></div><div onclick="window.location.href = '#users_post'" class="list-group-item"><span class="badge badge_post">post</span><div class="method_description"></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="users_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get</span> <span class="parent"></span>/users</h4></div><div class="modal-body"><ul class="nav nav-tabs"></ul><div class="tab-content"></div></div></div></div></div><div class="modal fade" tabindex="0" id="users_post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post</span> <span class="parent"></span>/users</h4></div><div class="modal-body"><ul class="nav nav-tabs"></ul><div class="tab-content"></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_users__userid_"><span class="parent">/users</span>/{userId}</a> <span class="methods"><a href="#users__userid__delete"><span class="badge badge_delete">delete</span></a> <a href="#users__userid__get"><span class="badge badge_get">get</span></a> <a href="#users__userid__put"><span class="badge badge_put">put</span></a></span></h4></div><div id="panel_users__userid_" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#users__userid__delete'" class="list-group-item"><span class="badge badge_delete">delete</span><div class="method_description"></div><div class="clearfix"></div></div><div onclick="window.location.href = '#users__userid__get'" class="list-group-item"><span class="badge badge_get">get</span><div class="method_description"></div><div class="clearfix"></div></div><div onclick="window.location.href = '#users__userid__put'" class="list-group-item"><span class="badge badge_put">put</span><div class="method_description"></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="users__userid__delete"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_delete">delete</span> <span class="parent">/users</span>/{userId}</h4></div><div class="modal-body"><ul class="nav nav-tabs"><li class="active"><a href="#users__userid__delete_request" data-toggle="tab">Request</a></li></ul><div class="tab-content"><div class="tab-pane active" id="users__userid__delete_request"><h3>URI Parameters</h3><ul><li><strong>userId</strong>: <em><span class="required">required</span>(Integer)</em><p>The ID of the user instance</p></li></ul></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="users__userid__get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get</span> <span class="parent">/users</span>/{userId}</h4></div><div class="modal-body"><ul class="nav nav-tabs"><li class="active"><a href="#users__userid__get_request" data-toggle="tab">Request</a></li></ul><div class="tab-content"><div class="tab-pane active" id="users__userid__get_request"><h3>URI Parameters</h3><ul><li><strong>userId</strong>: <em><span class="required">required</span>(Integer)</em><p>The ID of the user instance</p></li></ul></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="users__userid__put"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_put">put</span> <span class="parent">/users</span>/{userId}</h4></div><div class="modal-body"><ul class="nav nav-tabs"><li class="active"><a href="#users__userid__put_request" data-toggle="tab">Request</a></li></ul><div class="tab-content"><div class="tab-pane active" id="users__userid__put_request"><h3>URI Parameters</h3><ul><li><strong>userId</strong>: <em><span class="required">required</span>(Integer)</em><p>The ID of the user instance</p></li></ul></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_users_batch"><span class="parent">/users</span>/batch</a> <span class="methods"><a href="#users_batch_post"><span class="badge badge_post">post</span></a></span></h4></div><div id="panel_users_batch" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#users_batch_post'" class="list-group-item"><span class="badge badge_post">post</span><div class="method_description"></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="users_batch_post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post</span> <span class="parent">/users</span>/batch</h4></div><div class="modal-body"><ul class="nav nav-tabs"></ul><div class="tab-content"></div></div></div></div></div></div></div></div></div><div class="panel panel-default"><div class="panel-heading"><h3 id="teams" class="panel-title">/teams</h3></div><div class="panel-body"><div class="panel-group"><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_teams"><span class="parent"></span>/teams</a> <span class="methods"><a href="#teams_get"><span class="badge badge_get">get</span></a> <a href="#teams_post"><span class="badge badge_post">post</span></a></span></h4></div><div id="panel_teams" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#teams_get'" class="list-group-item"><span class="badge badge_get">get</span><div class="method_description"></div><div class="clearfix"></div></div><div onclick="window.location.href = '#teams_post'" class="list-group-item"><span class="badge badge_post">post</span><div class="method_description"></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="teams_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get</span> <span class="parent"></span>/teams</h4></div><div class="modal-body"><ul class="nav nav-tabs"></ul><div class="tab-content"></div></div></div></div></div><div class="modal fade" tabindex="0" id="teams_post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post</span> <span class="parent"></span>/teams</h4></div><div class="modal-body"><ul class="nav nav-tabs"></ul><div class="tab-content"></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_teams__teamid_"><span class="parent">/teams</span>/{teamId}</a> <span class="methods"><a href="#teams__teamid__delete"><span class="badge badge_delete">delete</span></a> <a href="#teams__teamid__get"><span class="badge badge_get">get</span></a> <a href="#teams__teamid__put"><span class="badge badge_put">put</span></a></span></h4></div><div id="panel_teams__teamid_" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#teams__teamid__delete'" class="list-group-item"><span class="badge badge_delete">delete</span><div class="method_description"></div><div class="clearfix"></div></div><div onclick="window.location.href = '#teams__teamid__get'" class="list-group-item"><span class="badge badge_get">get</span><div class="method_description"></div><div class="clearfix"></div></div><div onclick="window.location.href = '#teams__teamid__put'" class="list-group-item"><span class="badge badge_put">put</span><div class="method_description"></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="teams__teamid__delete"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_delete">delete</span> <span class="parent">/teams</span>/{teamId}</h4></div><div class="modal-body"><ul class="nav nav-tabs"><li class="active"><a href="#teams__teamid__delete_request" data-toggle="tab">Request</a></li></ul><div class="tab-content"><div class="tab-pane active" id="teams__teamid__delete_request"><h3>URI Parameters</h3><ul><li><strong>teamId</strong>: <em><span class="required">required</span>(Integer)</em><p>The ID of the team instance</p></li></ul></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="teams__teamid__get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get</span> <span class="parent">/teams</span>/{teamId}</h4></div><div class="modal-body"><ul class="nav nav-tabs"><li class="active"><a href="#teams__teamid__get_request" data-toggle="tab">Request</a></li></ul><div class="tab-content"><div class="tab-pane active" id="teams__teamid__get_request"><h3>URI Parameters</h3><ul><li><strong>teamId</strong>: <em><span class="required">required</span>(Integer)</em><p>The ID of the team instance</p></li></ul></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="teams__teamid__put"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_put">put</span> <span class="parent">/teams</span>/{teamId}</h4></div><div class="modal-body"><ul class="nav nav-tabs"><li class="active"><a href="#teams__teamid__put_request" data-toggle="tab">Request</a></li></ul><div class="tab-content"><div class="tab-pane active" id="teams__teamid__put_request"><h3>URI Parameters</h3><ul><li><strong>teamId</strong>: <em><span class="required">required</span>(Integer)</em><p>The ID of the team instance</p></li></ul></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_teams_batch"><span class="parent">/teams</span>/batch</a> <span class="methods"><a href="#teams_batch_post"><span class="badge badge_post">post</span></a></span></h4></div><div id="panel_teams_batch" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#teams_batch_post'" class="list-group-item"><span class="badge badge_post">post</span><div class="method_description"></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="teams_batch_post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post</span> <span class="parent">/teams</span>/batch</h4></div><div class="modal-body"><ul class="nav nav-tabs"></ul><div class="tab-content"></div></div></div></div></div></div></div></div></div><div class="panel panel-default"><div class="panel-heading"><h3 id="stats" class="panel-title">/stats</h3></div><div class="panel-body"><div class="panel-group"><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_stats"><span class="parent"></span>/stats</a> <span class="methods"><a href="#stats_get"><span class="badge badge_get">get</span></a></span></h4></div><div id="panel_stats" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#stats_get'" class="list-group-item"><span class="badge badge_get">get</span><div class="method_description"></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="stats_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get</span> <span class="parent"></span>/stats</h4></div><div class="modal-body"><ul class="nav nav-tabs"></ul><div class="tab-content"></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_stats_category"><span class="parent">/stats</span>/category</a> <span class="methods"><a href="#stats_category_get"><span class="badge badge_get">get</span></a></span></h4></div><div id="panel_stats_category" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#stats_category_get'" class="list-group-item"><span class="badge badge_get">get</span><div class="method_description"></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="stats_category_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get</span> <span class="parent">/stats</span>/category</h4></div><div class="modal-body"><ul class="nav nav-tabs"></ul><div class="tab-content"></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_stats_leaderboard"><span class="parent">/stats</span>/leaderboard</a> <span class="methods"><a href="#stats_leaderboard_get"><span class="badge badge_get">get</span></a></span></h4></div><div id="panel_stats_leaderboard" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#stats_leaderboard_get'" class="list-group-item"><span class="badge badge_get">get</span><div class="method_description"></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="stats_leaderboard_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get</span> <span class="parent">/stats</span>/leaderboard</h4></div><div class="modal-body"><ul class="nav nav-tabs"></ul><div class="tab-content"></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_stats_manual_reset"><span class="parent">/stats/manual</span>/reset</a> <span class="methods"><a href="#stats_manual_reset_get"><span class="badge badge_get">get</span></a></span></h4></div><div id="panel_stats_manual_reset" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#stats_manual_reset_get'" class="list-group-item"><span class="badge badge_get">get</span><div class="method_description"></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="stats_manual_reset_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get</span> <span class="parent">/stats/manual</span>/reset</h4></div><div class="modal-body"><ul class="nav nav-tabs"></ul><div class="tab-content"></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_stats_manual_update"><span class="parent">/stats/manual</span>/update</a> <span class="methods"><a href="#stats_manual_update_get"><span class="badge badge_get">get</span></a></span></h4></div><div id="panel_stats_manual_update" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#stats_manual_update_get'" class="list-group-item"><span class="badge badge_get">get</span><div class="method_description"></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="stats_manual_update_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get</span> <span class="parent">/stats/manual</span>/update</h4></div><div class="modal-body"><ul class="nav nav-tabs"></ul><div class="tab-content"></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_stats_users__userid_"><span class="parent">/stats</span>/users/{userId}</a> <span class="methods"><a href="#stats_users__userid__get"><span class="badge badge_get">get</span></a> <a href="#stats_users__userid__patch"><span class="badge badge_patch">patch</span></a></span></h4></div><div id="panel_stats_users__userid_" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#stats_users__userid__get'" class="list-group-item"><span class="badge badge_get">get</span><div class="method_description"></div><div class="clearfix"></div></div><div onclick="window.location.href = '#stats_users__userid__patch'" class="list-group-item"><span class="badge badge_patch">patch</span><div class="method_description"></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="stats_users__userid__get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get</span> <span class="parent">/stats</span>/users/{userId}</h4></div><div class="modal-body"><ul class="nav nav-tabs"><li class="active"><a href="#stats_users__userid__get_request" data-toggle="tab">Request</a></li></ul><div class="tab-content"><div class="tab-pane active" id="stats_users__userid__get_request"><h3>URI Parameters</h3><ul><li><strong>userId</strong>: <em><span class="required">required</span>(Integer)</em><p>The ID of the user whose stats are to be retrieved/updated</p></li></ul></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="stats_users__userid__patch"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_patch">patch</span> <span class="parent">/stats</span>/users/{userId}</h4></div><div class="modal-body"><ul class="nav nav-tabs"><li class="active"><a href="#stats_users__userid__patch_request" data-toggle="tab">Request</a></li></ul><div class="tab-content"><div class="tab-pane active" id="stats_users__userid__patch_request"><h3>URI Parameters</h3><ul><li><strong>userId</strong>: <em><span class="required">required</span>(Integer)</em><p>The ID of the user whose stats are to be retrieved/updated</p></li></ul></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default"><div class="panel-heading"><h3 id="historic" class="panel-title">/historic</h3></div><div class="panel-body"><div class="panel-group"><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_historic_users__userid___year_"><span class="parent">/historic</span>/users/{userId}/{year}</a> <span class="methods"><a href="#historic_users__userid___year__get"><span class="badge badge_get">get</span></a></span></h4></div><div id="panel_historic_users__userid___year_" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#historic_users__userid___year__get'" class="list-group-item"><span class="badge badge_get">get</span><div class="method_description"></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="historic_users__userid___year__get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get</span> <span class="parent">/historic</span>/users/{userId}/{year}</h4></div><div class="modal-body"><ul class="nav nav-tabs"><li class="active"><a href="#historic_users__userid___year__get_request" data-toggle="tab">Request</a></li></ul><div class="tab-content"><div class="tab-pane active" id="historic_users__userid___year__get_request"><h3>URI Parameters</h3><ul><li><strong>userId</strong>: <em><span class="required">required</span>(Integer)</em><p>The ID of the user whose stats are to be retrieved</p></li><li><strong>year</strong>: <em><span class="required">required</span>(Integer)</em><p>The year of the monthly/daily/hourly stats to be retrieved</p></li></ul></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_historic_users__userid___year___month_"><span class="parent">/historic/users/{userId}/{year}</span>/{month}</a> <span class="methods"><a href="#historic_users__userid___year___month__get"><span class="badge badge_get">get</span></a></span></h4></div><div id="panel_historic_users__userid___year___month_" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#historic_users__userid___year___month__get'" class="list-group-item"><span class="badge badge_get">get</span><div class="method_description"></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="historic_users__userid___year___month__get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get</span> <span class="parent">/historic/users/{userId}/{year}</span>/{month}</h4></div><div class="modal-body"><ul class="nav nav-tabs"><li class="active"><a href="#historic_users__userid___year___month__get_request" data-toggle="tab">Request</a></li></ul><div class="tab-content"><div class="tab-pane active" id="historic_users__userid___year___month__get_request"><h3>URI Parameters</h3><ul><li><strong>userId</strong>: <em><span class="required">required</span>(Integer)</em><p>The ID of the user whose stats are to be retrieved</p></li><li><strong>year</strong>: <em><span class="required">required</span>(Integer)</em><p>The year of the monthly/daily/hourly stats to be retrieved</p></li><li><strong>month</strong>: <em><span class="required">required</span>(string)</em></li></ul></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_historic_users__userid___year___month___day_"><span class="parent">/historic/users/{userId}/{year}/{month}</span>/{day}</a> <span class="methods"><a href="#historic_users__userid___year___month___day__get"><span class="badge badge_get">get</span></a></span></h4></div><div id="panel_historic_users__userid___year___month___day_" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#historic_users__userid___year___month___day__get'" class="list-group-item"><span class="badge badge_get">get</span><div class="method_description"></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="historic_users__userid___year___month___day__get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get</span> <span class="parent">/historic/users/{userId}/{year}/{month}</span>/{day}</h4></div><div class="modal-body"><ul class="nav nav-tabs"><li class="active"><a href="#historic_users__userid___year___month___day__get_request" data-toggle="tab">Request</a></li></ul><div class="tab-content"><div class="tab-pane active" id="historic_users__userid___year___month___day__get_request"><h3>URI Parameters</h3><ul><li><strong>userId</strong>: <em><span class="required">required</span>(Integer)</em><p>The ID of the user whose stats are to be retrieved</p></li><li><strong>year</strong>: <em><span class="required">required</span>(Integer)</em><p>The year of the monthly/daily/hourly stats to be retrieved</p></li><li><strong>month</strong>: <em><span class="required">required</span>(string)</em></li><li><strong>day</strong>: <em><span class="required">required</span>(string)</em></li></ul></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_historic_teams__teamid___year_"><span class="parent">/historic</span>/teams/{teamId}/{year}</a> <span class="methods"><a href="#historic_teams__teamid___year__get"><span class="badge badge_get">get</span></a></span></h4></div><div id="panel_historic_teams__teamid___year_" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#historic_teams__teamid___year__get'" class="list-group-item"><span class="badge badge_get">get</span><div class="method_description"></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="historic_teams__teamid___year__get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get</span> <span class="parent">/historic</span>/teams/{teamId}/{year}</h4></div><div class="modal-body"><ul class="nav nav-tabs"><li class="active"><a href="#historic_teams__teamid___year__get_request" data-toggle="tab">Request</a></li></ul><div class="tab-content"><div class="tab-pane active" id="historic_teams__teamid___year__get_request"><h3>URI Parameters</h3><ul><li><strong>teamId</strong>: <em><span class="required">required</span>(string)</em></li><li><strong>year</strong>: <em><span class="required">required</span>(string)</em></li></ul></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_historic_teams__teamid___year___month_"><span class="parent">/historic/teams/{teamId}/{year}</span>/{month}</a> <span class="methods"><a href="#historic_teams__teamid___year___month__get"><span class="badge badge_get">get</span></a></span></h4></div><div id="panel_historic_teams__teamid___year___month_" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#historic_teams__teamid___year___month__get'" class="list-group-item"><span class="badge badge_get">get</span><div class="method_description"></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="historic_teams__teamid___year___month__get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get</span> <span class="parent">/historic/teams/{teamId}/{year}</span>/{month}</h4></div><div class="modal-body"><ul class="nav nav-tabs"><li class="active"><a href="#historic_teams__teamid___year___month__get_request" data-toggle="tab">Request</a></li></ul><div class="tab-content"><div class="tab-pane active" id="historic_teams__teamid___year___month__get_request"><h3>URI Parameters</h3><ul><li><strong>teamId</strong>: <em><span class="required">required</span>(string)</em></li><li><strong>year</strong>: <em><span class="required">required</span>(string)</em></li><li><strong>month</strong>: <em><span class="required">required</span>(string)</em></li></ul></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_historic_teams__teamid___year___month___day_"><span class="parent">/historic/teams/{teamId}/{year}/{month}</span>/{day}</a> <span class="methods"><a href="#historic_teams__teamid___year___month___day__get"><span class="badge badge_get">get</span></a></span></h4></div><div id="panel_historic_teams__teamid___year___month___day_" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#historic_teams__teamid___year___month___day__get'" class="list-group-item"><span class="badge badge_get">get</span><div class="method_description"></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="historic_teams__teamid___year___month___day__get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get</span> <span class="parent">/historic/teams/{teamId}/{year}/{month}</span>/{day}</h4></div><div class="modal-body"><ul class="nav nav-tabs"><li class="active"><a href="#historic_teams__teamid___year___month___day__get_request" data-toggle="tab">Request</a></li></ul><div class="tab-content"><div class="tab-pane active" id="historic_teams__teamid___year___month___day__get_request"><h3>URI Parameters</h3><ul><li><strong>teamId</strong>: <em><span class="required">required</span>(string)</em></li><li><strong>year</strong>: <em><span class="required">required</span>(string)</em></li><li><strong>month</strong>: <em><span class="required">required</span>(string)</em></li><li><strong>day</strong>: <em><span class="required">required</span>(string)</em></li></ul></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default"><div class="panel-heading"><h3 id="login_admin_" class="panel-title">/login/admin/</h3></div><div class="panel-body"><div class="panel-group"><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_login_admin_"><span class="parent"></span>/login/admin/</a> <span class="methods"><a href="#login_admin__post"><span class="badge badge_post">post</span></a></span></h4></div><div id="panel_login_admin_" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#login_admin__post'" class="list-group-item"><span class="badge badge_post">post</span><div class="method_description"></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="login_admin__post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post</span> <span class="parent"></span>/login/admin/</h4></div><div class="modal-body"><ul class="nav nav-tabs"></ul><div class="tab-content"></div></div></div></div></div></div></div></div></div></div><div class="col-md-3"><div id="sidebar" class="hidden-print affix" role="complementary"><ul class="nav nav-pills nav-stacked"><li><a href="#hardware">/hardware</a></li><li><a href="#users">/users</a></li><li><a href="#teams">/teams</a></li><li><a href="#stats">/stats</a></li><li><a href="#historic">/historic</a></li><li><a href="#login_admin_">/login/admin/</a></li></ul></div></div></div></div></body></html>

@@ -1,0 +1,14 @@
+[
+  {
+    "hardwareName": "GTX 960",
+    "displayName": "GTX 960",
+    "operatingSystem": "WINDOWS",
+    "multiplier": 21.33
+  },
+  {
+    "hardwareName": "Radeon VII",
+    "displayName": "Radeon VII",
+    "operatingSystem": "LINUX",
+    "multiplier": 3.62
+  }
+]

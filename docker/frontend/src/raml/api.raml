@@ -1,0 +1,245 @@
+#%RAML 1.0
+title: "'Extreme Team Folding'"
+baseUri: "http://internal.axihub.ca/folding"
+
+traits:
+  adminOnly:
+    headers:
+      Authorization:
+        displayName: Authorization
+        description: "Basic authentication encoded as a Base64 string, with the credentials in the form 'username:password'"
+        type: String
+        required: true
+  cached:
+    headers:
+      If-None-Match:
+        description: "An EntityTag used to retrieve a cache version of the response"
+        type: String
+        required: false
+
+/hardware:
+  get:
+    is: [ "cached" ]
+    description: "Retrieves all hardware"
+    responses:
+      200:
+        description: "All hardware has been retrieved"
+        body:
+          application/json:
+            example: !include responses/hardware/hardwareGetAll.json
+        headers:
+          eTag:
+            description: "An EntityTag which can be used to retrieve a cached version of the response in future requests"
+            type: String
+      503:
+        description: "The system is not in a valid state to execute read requests"
+  post:
+    is: [ "adminOnly" ]
+    description: "Creates a new hardware with the given properties"
+    body:
+      application/json:
+        example: !include requests/hardware/hardwarePost.json
+    responses:
+      201:
+        description: "The hardware has been created"
+        body:
+          application/json:
+            example: !include responses/hardware/hardwarePost.json
+        headers:
+          location:
+            description: "The URL to the created hardware"
+            type: String
+      400:
+        description: "The given payload is invalid"
+        body:
+          application/json:
+            example: !include responses/hardware/hardwarePostBadRequest.json
+      401:
+        description: "System user cannot be successfully logged in with provided credentials"
+      403:
+        description: "System user does not have the correct role to perform this request"
+      409:
+        description: "A hardware with the same 'hardwareName' already exists"
+      502:
+        description: "An error occurred connecting to an external system to verify the hardware"
+      503:
+        description: "The system is not in a valid state to execute write requests"
+  /{hardwareId}:
+    uriParameters:
+      hardwareId:
+        description: "The ID of the hardware"
+        type: Integer
+        required: true
+    delete:
+      is: [ "adminOnly" ]
+      description: "Deletes the hardware with the given ID"
+      responses:
+        200:
+          description: "The hardware has been deleted from the system"
+        401:
+          description: "System user cannot be successfully logged in with provided credentials"
+        403:
+          description: "System user does not have the correct role to perform this request"
+        404:
+          description: "No hardware exists with the given ID"
+        409:
+          description: "The hardware is being referenced by a user and cannot be deleted"
+        503:
+          description: "The system is not in a valid state to execute write requests"
+    get:
+      is: [ "cached" ]
+      description: "Retrieves the hardware with the given ID"
+      responses:
+        200:
+          description: "The hardware has been retrieved from the system"
+          body:
+            application/json:
+              example: !include responses/hardware/hardwareGet.json
+        400:
+          description: "The provided ID is an invalid integer, or out of range"
+          body:
+            application/json:
+              example: !include responses/hardware/hardwareGetBadRequest.json
+        404:
+          description: "No hardware exists with the given ID"
+        503:
+          description: "The system is not in a valid state to execute read requests"
+    put:
+      is: [ "adminOnly" ]
+      description: "Updates an existing hardware with the given properties"
+      body:
+        application/json:
+          example: !include requests/hardware/hardwarePut.json
+      responses:
+        200:
+          description: "The hardware has been updated"
+          body:
+            application/json:
+              example: !include responses/hardware/hardwarePut.json
+          headers:
+            location:
+              description: "The URL to the updated hardware (unless there was no change to the hardware)"
+              type: String
+              required: false
+        400:
+          description: "The given payload is invalid"
+          body:
+            application/json:
+              example: !include responses/hardware/hardwarePutBadRequest.json
+        401:
+          description: "System user cannot be successfully logged in with provided credentials"
+        403:
+          description: "System user does not have the correct role to perform this request"
+        404:
+          description: "No hardware exists with the given ID"
+        409:
+          description: "A hardware with the same 'hardwareName' already exists"
+        502:
+          description: "An error occurred connecting to an external system to verify the hardware"
+        503:
+          description: "The system is not in a valid state to execute write requests"
+  /batch:
+    post:
+      is: [ "adminOnly" ]
+      description: "Creates a batch of hardware with the given properties"
+      body:
+        application/json-all-success:
+          example: !include requests/hardware/hardwarePostBatch.json
+        application/json-partial-success:
+          example: !include requests/hardware/hardwarePostBatch.json
+      responses:
+        200:
+          description: "At least one hardware in the payload is created"
+          body:
+            application/json:
+              example: !include responses/hardware/hardwarePostBatch.json
+        400:
+          description: "All given payloads are invalid"
+          body:
+            application/json:
+              example: !include responses/hardware/hardwarePostBatchBadRequest.json
+        401:
+          description: "System user cannot be successfully logged in with provided credentials"
+        403:
+          description: "System user does not have the correct role to perform this request"
+        502:
+          description: "An error occurred connecting to an external system to verify the hardware"
+        503:
+          description: "The system is not in a valid state to execute write requests"
+
+/users:
+  get:
+  post:
+  /{userId}:
+    uriParameters:
+      userId:
+        description: "The ID of the user instance"
+        type: Integer
+        required: true
+    delete:
+    get:
+    put:
+  /batch:
+    post:
+
+/teams:
+  get:
+  post:
+  /{teamId}:
+    uriParameters:
+      teamId:
+        description: "The ID of the team instance"
+        type: Integer
+        required: true
+    delete:
+    get:
+    put:
+  /batch:
+    post:
+
+/stats:
+  get:
+  /category:
+    get:
+  /leaderboard:
+    get:
+  /manual:
+    /reset:
+      get:
+    /update:
+      get:
+  /users/{userId}:
+    uriParameters:
+      userId:
+        description: "The ID of the user whose stats are to be retrieved/updated"
+        type: Integer
+        required: true
+    get:
+    patch:
+
+/historic:
+  /users/{userId}/{year}:
+    uriParameters:
+      userId:
+        description: "The ID of the user whose stats are to be retrieved"
+        type: Integer
+        required: true
+      year:
+        description: "The year of the monthly/daily/hourly stats to be retrieved"
+        type: Integer
+        required: true
+    get:
+      description:
+    /{month}:
+      get:
+      /{day}:
+        get:
+  /teams/{teamId}/{year}:
+    get:
+    /{month}:
+      get:
+      /{day}:
+        get:
+
+/login/admin/:
+  post:
