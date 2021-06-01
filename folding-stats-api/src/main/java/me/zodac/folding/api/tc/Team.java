@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import me.zodac.folding.api.RequestPojo;
 import me.zodac.folding.api.ResponsePojo;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
 
@@ -89,7 +90,7 @@ public class Team implements ResponsePojo {
     }
 
     @Override
-    public boolean isEqualRequest(final Object inputRequest) {
+    public boolean isEqualRequest(final RequestPojo inputRequest) {
         if (!(inputRequest instanceof TeamRequest)) {
             return false;
         }

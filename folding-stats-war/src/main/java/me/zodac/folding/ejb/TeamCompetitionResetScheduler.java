@@ -8,6 +8,7 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.utils.EnvironmentVariables;
+import me.zodac.folding.api.utils.ExecutionType;
 import me.zodac.folding.cache.RetiredTcStatsCache;
 import me.zodac.folding.cache.TcStatsCache;
 import me.zodac.folding.cache.TotalStatsCache;
@@ -42,6 +43,9 @@ public class TeamCompetitionResetScheduler {
 
     @EJB
     private BusinessLogic businessLogic;
+
+    @EJB
+    private TeamCompetitionStatsScheduler teamCompetitionStatsScheduler;
 
     @PostConstruct
     public void init() {
@@ -93,6 +97,8 @@ public class TeamCompetitionResetScheduler {
         } catch (final FoldingException | FoldingConflictException e) {
             LOGGER.error("Unable to reset retired stats", e);
         }
+
+        teamCompetitionStatsScheduler.manualTeamCompetitionStatsParsing(ExecutionType.SYNCHRONOUS);
     }
 
     // TODO: [zodac] Go through Storage/BL, not direct to caches

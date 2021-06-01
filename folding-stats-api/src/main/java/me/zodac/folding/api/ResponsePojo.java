@@ -13,13 +13,13 @@ public interface ResponsePojo {
     int getId();
 
     /**
-     * Checks if the input {@link Object} is a valid {@link RequestPojo} and is equal to the {@link ResponsePojo}.
+     * Checks if the input {@link RequestPojo} is equal to the {@link ResponsePojo}.
      * <p>
      * While the {@link RequestPojo} will likely not be a complete match, there should be enough fields to verify
      * if it is the same as an existing {@link ResponsePojo}.
      *
-     * @param inputRequest input {@link Object}
-     * @return <code>true</code> if the input {@link Object} is a valid {@link RequestPojo} and is equal to the {@link ResponsePojo}
+     * @param inputRequest input {@link RequestPojo}
+     * @return <code>true</code> if the input{@link RequestPojo} is equal to the {@link ResponsePojo}
      */
-    boolean isEqualRequest(final Object inputRequest);
+    boolean isEqualRequest(final RequestPojo inputRequest);
 }

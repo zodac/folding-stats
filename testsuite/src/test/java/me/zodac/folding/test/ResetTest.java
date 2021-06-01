@@ -124,7 +124,6 @@ public class ResetTest {
                 .hasSize(1);
 
         manuallyResetStats();
-        manuallyUpdateStats();
 
         final CompetitionResult resultAfterReset = TeamCompetitionStatsUtils.getStats();
         final TeamResult teamResultAfterReset = getTeamFromCompetition(resultAfterReset, team.getTeamName());
@@ -198,7 +197,6 @@ public class ResetTest {
                 .isEqualTo(thirdUserPoints);
 
         manuallyResetStats();
-        manuallyUpdateStats();
 
         final CompetitionResult resultAfterReset = TeamCompetitionStatsUtils.getStats();
         assertThat(resultAfterReset.getTotalPoints())
