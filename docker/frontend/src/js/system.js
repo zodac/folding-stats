@@ -78,35 +78,6 @@ function manualUpdate() {
     });
 }
 
-function manualReset() {
-    show("loader");
-    fetch(ROOT_URL+'/stats/manual/reset', {
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': sessionGet("Authorization")
-        },
-        body: requestData
-    })
-    .then(response => {
-        hide("loader");
-
-        if(response.status != 200){
-            failureToast("Manual reset failed with code: " + response.status);
-            response.json()
-            .then(response => {
-                console.error(JSON.stringify(response, null, 2));
-            });
-            return;
-        }
-        successToast("Stats manually reset");
-    })
-    .catch((error) => {
-        console.error('Unexpected error resetting stats: ', error);
-        return false;
-    });
-}
-
-
 function loadHardware() {
     fetch(ROOT_URL+'/hardware')
     .then(response => {
