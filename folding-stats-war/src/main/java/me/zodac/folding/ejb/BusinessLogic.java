@@ -457,7 +457,7 @@ public class BusinessLogic {
     }
 
     public void updateInitialStatsForUser(final User user) throws UserNotFoundException, FoldingException {
-        LOGGER.info("Updating initial stats for user: {}", user);
+        LOGGER.info("Updating initial stats for user: {}", user.getDisplayName());
         final Stats totalStats = getTotalStatsForUser(user.getId());
         persistInitialUserStats(UserStats.create(user.getId(), DateTimeUtils.currentUtcTimestamp(), totalStats));
         initialStatsCache.add(user.getId(), totalStats);

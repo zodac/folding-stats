@@ -50,6 +50,63 @@ function adminLogin(){
     });
 }
 
+function manualUpdate() {
+    show("loader");
+    fetch(ROOT_URL+'/tc_stats/manual', {
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': sessionGet("Authorization")
+        },
+        body: requestData
+    })
+    .then(response => {
+        hide("loader");
+
+        if(response.status != 200){
+            failureToast("Manual update failed with code: " + response.status);
+            response.json()
+            .then(response => {
+                console.error(JSON.stringify(response, null, 2));
+            });
+            return;
+        }
+        successToast("Stats manually updated");
+    })
+    .catch((error) => {
+        console.error('Unexpected error updating stats: ', error);
+        return false;
+    });
+}
+
+function manualReset() {
+    show("loader");
+    fetch(ROOT_URL+'/tc_stats/reset', {
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': sessionGet("Authorization")
+        },
+        body: requestData
+    })
+    .then(response => {
+        hide("loader");
+
+        if(response.status != 200){
+            failureToast("Manual reset failed with code: " + response.status);
+            response.json()
+            .then(response => {
+                console.error(JSON.stringify(response, null, 2));
+            });
+            return;
+        }
+        successToast("Stats manually reset");
+    })
+    .catch((error) => {
+        console.error('Unexpected error resetting stats: ', error);
+        return false;
+    });
+}
+
+
 function loadHardware() {
     fetch(ROOT_URL+'/hardware')
     .then(response => {
