@@ -21,9 +21,9 @@ import static java.util.stream.Collectors.toList;
 /**
  * Implementation of {@link DbConnectionPool} to use an {@link EmbeddedPostgres} DB for tests.
  */
-public class TestDbConnectionPool implements DbConnectionPool {
+public final class TestDbConnectionPool implements DbConnectionPool {
 
-    private final DataSource dataSource;
+    private transient final DataSource dataSource;
 
     private TestDbConnectionPool() {
         try {

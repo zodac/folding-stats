@@ -62,19 +62,19 @@ public class BusinessLogic {
     private static final Logger LOGGER = LoggerFactory.getLogger(BusinessLogic.class);
     private static final FoldingStatsRetriever FOLDING_STATS_RETRIEVER = HttpFoldingStatsRetriever.create();
 
-    private final DbManager dbManager = DbManagerRetriever.get();
-    private final TeamCache teamCache = TeamCache.get();
-    private final UserCache userCache = UserCache.get();
-    private final HardwareCache hardwareCache = HardwareCache.get();
+    private transient final DbManager dbManager = DbManagerRetriever.get();
+    private transient final TeamCache teamCache = TeamCache.get();
+    private transient final UserCache userCache = UserCache.get();
+    private transient final HardwareCache hardwareCache = HardwareCache.get();
 
-    private final InitialStatsCache initialStatsCache = InitialStatsCache.get();
-    private final OffsetStatsCache offsetStatsCache = OffsetStatsCache.get();
-    private final RetiredTcStatsCache retiredStatsCache = RetiredTcStatsCache.get();
-    private final TcStatsCache tcStatsCache = TcStatsCache.get();
-    private final TotalStatsCache totalStatsCache = TotalStatsCache.get();
+    private transient final InitialStatsCache initialStatsCache = InitialStatsCache.get();
+    private transient final OffsetStatsCache offsetStatsCache = OffsetStatsCache.get();
+    private transient final RetiredTcStatsCache retiredStatsCache = RetiredTcStatsCache.get();
+    private transient final TcStatsCache tcStatsCache = TcStatsCache.get();
+    private transient final TotalStatsCache totalStatsCache = TotalStatsCache.get();
 
     @EJB
-    private UserTeamCompetitionStatsParser userTeamCompetitionStatsParser;
+    private transient UserTeamCompetitionStatsParser userTeamCompetitionStatsParser;
 
     public Hardware createHardware(final Hardware hardware) throws FoldingException, FoldingConflictException {
         final Hardware hardwareWithId = dbManager.createHardware(hardware);
@@ -222,16 +222,31 @@ public class BusinessLogic {
         dbManager.updateUser(updatedUser);
         userCache.add(updatedUser);
 
-        if (!existingUser.getFoldingUserName().equalsIgnoreCase(updatedUser.getFoldingUserName())) {
-            LOGGER.debug("User had state change to Folding username {} -> {}, recalculating initial stats", existingUser.getFoldingUserName(), updatedUser.getFoldingUserName());
+        if (!existingUser.getHardware().equals(updatedUser.getHardware())) {
+            LOGGER.debug("User had state change to hardware, {} -> {}, recalculating initial stats", existingUser.getHardware(), updatedUser.getHardware());
             handleStateChangeForUser(updatedUser);
-        } else if (!existingUser.getPasskey().equalsIgnoreCase(updatedUser.getPasskey())) {
-            LOGGER.debug("User had state change to passkey {} -> {}, recalculating initial stats", existingUser.getPasskey(), updatedUser.getPasskey());
-            handleStateChangeForUser(updatedUser);
-        } else if (existingUser.getHardware() != updatedUser.getHardware()) {
-            LOGGER.debug("User had state change to hardware ID {} -> {}, recalculating initial stats", existingUser.getHardware(), updatedUser.getHardware());
-            handleStateChangeForUser(updatedUser);
+            return;
         }
+
+        if (!existingUser.getTeam().equals(updatedUser.getTeam())) {
+            LOGGER.debug("User had state change to team, {} -> {}, recalculating initial stats", existingUser.getTeam(), updatedUser.getTeam());
+            handleStateChangeForUser(updatedUser);
+            return;
+        }
+
+        if (!existingUser.getFoldingUserName().equalsIgnoreCase(updatedUser.getFoldingUserName())) {
+            LOGGER.debug("User had state change to Folding username, {} -> {}, recalculating initial stats", existingUser.getFoldingUserName(), updatedUser.getFoldingUserName());
+            handleStateChangeForUser(updatedUser);
+            return;
+        }
+
+        if (!existingUser.getPasskey().equalsIgnoreCase(updatedUser.getPasskey())) {
+            LOGGER.debug("User had state change to passkey, {} -> {}, recalculating initial stats", existingUser.getPasskey(), updatedUser.getPasskey());
+            handleStateChangeForUser(updatedUser);
+            return;
+        }
+
+        LOGGER.trace("User updated with any required state changes");
     }
 
     // If a user is updated and their Folding username, hardware ID or passkey is changed, we need to update their initial offset again
@@ -265,7 +280,6 @@ public class BusinessLogic {
     public void deleteUser(final int userId) throws FoldingConflictException, FoldingException {
         try {
             final User user = getUser(userId);
-            final Team team = user.getTeam();
 
             dbManager.deleteUser(userId);
             userCache.remove(userId);
@@ -277,6 +291,7 @@ public class BusinessLogic {
                 return;
             }
 
+            final Team team = user.getTeam();
             final int retiredUserId = dbManager.persistRetiredUserStats(team.getId(), user.getId(), user.getDisplayName(), userStats);
             retiredStatsCache.add(RetiredUserTcStats.create(retiredUserId, team.getId(), user.getDisplayName(), userStats));
         } catch (final UserNotFoundException | NoStatsAvailableException e) {
@@ -479,8 +494,8 @@ public class BusinessLogic {
         }
     }
 
-    public SystemUserAuthentication isValidUser(final String userName, final String password) throws FoldingException {
-        return dbManager.isValidSystemUser(userName, password);
+    public SystemUserAuthentication authenticateSystemUser(final String userName, final String password) throws FoldingException {
+        return dbManager.authenticateSystemUser(userName, password);
     }
 
     public boolean doesNotContainTeam(final int teamId) {

@@ -37,8 +37,9 @@ import java.util.Map;
 public class StubbedPointsEndpoint {
 
     private static final Gson GSON = new Gson();
+    private static final long NO_POINTS = 0L;
 
-    private final Map<String, Long> pointsByUserAndPasskey = new HashMap<>();
+    private transient final Map<String, Long> pointsByUserAndPasskey = new HashMap<>();
 
     @GET
     @Path("/{foldingUserName}/stats")
@@ -54,14 +55,14 @@ public class StubbedPointsEndpoint {
     @Path("/{foldingUserName}/stats")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response setUserPoints(@PathParam("foldingUserName") final String foldingUserName, @QueryParam("passkey") final String passkey, @QueryParam("points") final long points) {
+    public Response updateUserPoints(@PathParam("foldingUserName") final String foldingUserName, @QueryParam("passkey") final String passkey, @QueryParam("points") final long points) {
         final String key = foldingUserName + passkey;
 
-        if (points == 0L) {
+        if (points == NO_POINTS) {
             // Remove all points from the user
             pointsByUserAndPasskey.put(key, points);
         } else {
-            pointsByUserAndPasskey.put(key, pointsByUserAndPasskey.getOrDefault(key, 0L) + points);
+            pointsByUserAndPasskey.put(key, pointsByUserAndPasskey.getOrDefault(key, NO_POINTS) + points);
         }
 
         return Response
@@ -104,7 +105,7 @@ public class StubbedPointsEndpoint {
         }
 
         public static PointsResponse empty() {
-            return new PointsResponse(0L);
+            return new PointsResponse(NO_POINTS);
         }
     }
 }

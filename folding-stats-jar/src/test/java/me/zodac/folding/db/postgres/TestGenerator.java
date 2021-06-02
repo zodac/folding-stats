@@ -3,11 +3,15 @@ package me.zodac.folding.db.postgres;
 /**
  * Utility class to generate IDs/names for tests.
  */
-public class TestGenerator {
+public final class TestGenerator {
 
-    private static int hardwareCount = 0;
-    private static int userCount = 0;
-    private static int teamCount = 0;
+    private static int hardwareCount;
+    private static int userCount;
+    private static int teamCount;
+
+    private TestGenerator() {
+
+    }
 
     /**
      * Gets the next {@link me.zodac.folding.api.tc.Hardware} name.

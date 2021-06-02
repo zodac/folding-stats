@@ -56,15 +56,15 @@ import static org.assertj.core.api.Assertions.assertThat;
  * <p>
  * Since the TC stats are done on the full system (meaning all {@link Team}s), we wipe the system before each test with a {@link BeforeEach} method.
  */
-public class TeamCompetitionStatsTest {
+class TeamCompetitionStatsTest {
 
     @BeforeEach
-    public void setUp() throws FoldingRestException {
+    void setUp() throws FoldingRestException {
         cleanSystemForComplexTests();
     }
 
     @Test
-    public void whenNoTeamsExistInTheSystem_thenResponseIsReturnedWithNoStats_andNoTeams() throws FoldingRestException {
+    void whenNoTeamsExistInTheSystem_thenResponseIsReturnedWithNoStats_andNoTeams() throws FoldingRestException {
         final HttpResponse<String> response = TEAM_COMPETITION_REQUEST_SENDER.getStats();
 
         assertThat(response.statusCode())
@@ -91,7 +91,7 @@ public class TeamCompetitionStatsTest {
     }
 
     @Test
-    public void whenOneTeamExistsWithOneUser_andUserEarnsStats_thenUserAndTeamAndOverallStartWithNoStats_thenAllIncrementAsUserPointsIncrease() throws FoldingRestException {
+    void whenOneTeamExistsWithOneUser_andUserEarnsStats_thenUserAndTeamAndOverallStartWithNoStats_thenAllIncrementAsUserPointsIncrease() throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
         final User user = UserUtils.create(generateUserWithTeamId(team.getId()));
 
@@ -217,7 +217,7 @@ public class TeamCompetitionStatsTest {
     }
 
     @Test
-    public void whenOneTeamExistsWithTwoUser_andUserEarnsStats_thenBothUsersStartAtRank1_thenRanksUpdateCorrectlyAsUsersEarnStats() throws FoldingRestException {
+    void whenOneTeamExistsWithTwoUser_andUserEarnsStats_thenBothUsersStartAtRank1_thenRanksUpdateCorrectlyAsUsersEarnStats() throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
         final User firstUser = UserUtils.create(generateUserWithTeamIdAndCategory(team.getId(), Category.AMD_GPU));
         final User secondUser = UserUtils.create(generateUserWithTeamIdAndCategory(team.getId(), Category.NVIDIA_GPU));
@@ -279,7 +279,7 @@ public class TeamCompetitionStatsTest {
     }
 
     @Test
-    public void whenTwoTeamsExistsWithOneUserEach_andUserEarnsStats_thenBothTeamsStartAtRank1_thenTeamRanksUpdateCorrectlyAsUsersEarnStats() throws FoldingRestException {
+    void whenTwoTeamsExistsWithOneUserEach_andUserEarnsStats_thenBothTeamsStartAtRank1_thenTeamRanksUpdateCorrectlyAsUsersEarnStats() throws FoldingRestException {
         final Team firstTeam = TeamUtils.create(generateTeam());
         final User firstUser = UserUtils.create(generateUserWithTeamId(firstTeam.getId()));
 
@@ -338,7 +338,7 @@ public class TeamCompetitionStatsTest {
     }
 
     @Test
-    public void whenTeamExistsWithOneUser_andUserHasAHardwareMultiplier_thenUserPointsAreMultipliedCorrectly_andUserUnitsAreNotImpacted() throws FoldingRestException {
+    void whenTeamExistsWithOneUser_andUserHasAHardwareMultiplier_thenUserPointsAreMultipliedCorrectly_andUserUnitsAreNotImpacted() throws FoldingRestException {
         final double hardwareMultiplier = 2.0D;
         final int hardwareId = HardwareUtils.create(generateHardwareWithMultiplier(2.0D)).getId();
         final Team team = TeamUtils.create(generateTeam());
@@ -372,7 +372,7 @@ public class TeamCompetitionStatsTest {
     }
 
     @Test
-    public void whenTeamExistsWithOneUser_andUserIsUpdatedWithANewHardwareMultiplier_thenOriginalPointsAreNotChanged_andNewPointsAreMultipliedCorrectly() throws FoldingRestException {
+    void whenTeamExistsWithOneUser_andUserIsUpdatedWithANewHardwareMultiplier_thenOriginalPointsAreNotChanged_andNewPointsAreMultipliedCorrectly() throws FoldingRestException {
         final HardwareRequest hardware = generateHardware();
         final int hardwareId = HardwareUtils.create(hardware).getId();
         final Team team = TeamUtils.create(generateTeam());
@@ -422,7 +422,7 @@ public class TeamCompetitionStatsTest {
     }
 
     @Test
-    public void whenTeamExistsWithOneUser_andUserIsUpdatedWithANewHardware_thenOriginalPointsAreNotChanged_andNewPointsAreMultipliedCorrectly() throws FoldingRestException {
+    void whenTeamExistsWithOneUser_andUserIsUpdatedWithANewHardware_thenOriginalPointsAreNotChanged_andNewPointsAreMultipliedCorrectly() throws FoldingRestException {
         final int hardwareId = HardwareUtils.create(generateHardware()).getId();
         final Team team = TeamUtils.create(generateTeam());
 
@@ -473,7 +473,7 @@ public class TeamCompetitionStatsTest {
     }
 
     @Test
-    public void whenTeamExistsWithTwoUsers_andOneUserIsDeleted_andUserIsAddedAgain_thenOriginalStatsAreNotLostFromTeam_andNewStatsWhileDeletedAreNotAddedToTeam_andStatsAfterReturnAreCounted() throws FoldingRestException {
+    void whenTeamExistsWithTwoUsers_andOneUserIsDeleted_andUserIsAddedAgain_thenOriginalStatsAreNotLostFromTeam_andNewStatsWhileDeletedAreNotAddedToTeam_andStatsAfterReturnAreCounted() throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
         final User firstUser = UserUtils.create(generateUserWithTeamIdAndCategory(team.getId(), Category.AMD_GPU));
 
@@ -573,7 +573,7 @@ public class TeamCompetitionStatsTest {
     }
 
     @Test
-    public void whenTeamExistsWithTwoUsers_andOneUserIsDeleted_andUserIsReAddedToANewTeam_thenOriginalStatsAreNotLostFromOriginalTeam_andNewTeamGetsStatsAfterUnretirement_andStatsDuringRetirementAreNotCounted() throws FoldingRestException {
+    void whenTeamExistsWithTwoUsers_andOneUserIsDeleted_andUserIsReAddedToANewTeam_thenOriginalStatsAreNotLostFromOriginalTeam_andNewTeamGetsStatsAfterUnretirement_andStatsDuringRetirementAreNotCounted() throws FoldingRestException {
         final Team originalTeam = TeamUtils.create(generateTeam());
 
         UserUtils.create(generateUserWithTeamIdAndCategory(originalTeam.getId(), Category.NVIDIA_GPU));
@@ -666,7 +666,7 @@ public class TeamCompetitionStatsTest {
     }
 
     @Test
-    public void whenOneTeamHasOneUser_andUserHasOffsetApplied_thenUserOffsetIsAppendedToStats() throws FoldingRestException {
+    void whenOneTeamHasOneUser_andUserHasOffsetApplied_thenUserOffsetIsAppendedToStats() throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
         final User user = UserUtils.create(generateUserWithTeamId(team.getId()));
         final int userId = user.getId();
@@ -694,7 +694,7 @@ public class TeamCompetitionStatsTest {
     }
 
     @Test
-    public void whenOneTeamHasOneUser_andUserHasOffsetApplied_andOffsetIsNegative_andOffsetIsGreaterThanCurrentUserStats_thenUserHasZeroStats() throws FoldingRestException {
+    void whenOneTeamHasOneUser_andUserHasOffsetApplied_andOffsetIsNegative_andOffsetIsGreaterThanCurrentUserStats_thenUserHasZeroStats() throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
         final User user = UserUtils.create(generateUserWithTeamId(team.getId()));
         final int userId = user.getId();
@@ -728,7 +728,7 @@ public class TeamCompetitionStatsTest {
     }
 
     @Test
-    public void whenOneTeamExistsWithOneUser_andUserEarnsStats_thenUserStartsWithNoStats_thenIncrementsAsUserPointsIncrease() throws FoldingRestException {
+    void whenOneTeamExistsWithOneUser_andUserEarnsStats_thenUserStartsWithNoStats_thenIncrementsAsUserPointsIncrease() throws FoldingRestException {
         final User user = UserUtils.create(generateUser());
         final int userId = user.getId();
 
@@ -771,7 +771,7 @@ public class TeamCompetitionStatsTest {
     }
 
     @Test
-    public void whenGettingStatsForUser_andUserRankIs2ndInTeamBut3rdInCompetition_thenResponseHasTeamRankListed() throws FoldingRestException {
+    void whenGettingStatsForUser_andUserRankIs2ndInTeamBut3rdInCompetition_thenResponseHasTeamRankListed() throws FoldingRestException {
         final Team mainTeam = TeamUtils.create(generateTeam());
         final User firstInTeamFirstOverall = UserUtils.create(generateUserWithTeamIdAndCategory(mainTeam.getId(), Category.AMD_GPU));
 
@@ -799,7 +799,7 @@ public class TeamCompetitionStatsTest {
     }
 
     @Test
-    public void whenGettingStatsForUser_andUserDoesNotExist_thenResponseHasA404Status() throws FoldingRestException {
+    void whenGettingStatsForUser_andUserDoesNotExist_thenResponseHasA404Status() throws FoldingRestException {
         final HttpResponse<String> response = TEAM_COMPETITION_REQUEST_SENDER.getStatsForUser(TestConstants.INVALID_ID);
         assertThat(response.statusCode())
                 .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
@@ -807,7 +807,7 @@ public class TeamCompetitionStatsTest {
     }
 
     @Test
-    public void whenPatchingAUserWithPointsOffsets_givenThePayloadIsValid_thenResponseHasA200Status() throws FoldingRestException {
+    void whenPatchingAUserWithPointsOffsets_givenThePayloadIsValid_thenResponseHasA200Status() throws FoldingRestException {
         final Hardware hardware = HardwareUtils.create(generateHardware());
         final UserRequest user = generateUserWithHardwareId(hardware.getId());
 
@@ -819,7 +819,7 @@ public class TeamCompetitionStatsTest {
     }
 
     @Test
-    public void whenPatchingAUserWithPointsOffsets_AndUserDoesNotExist_thenResponseHasA404Status() throws FoldingRestException {
+    void whenPatchingAUserWithPointsOffsets_AndUserDoesNotExist_thenResponseHasA404Status() throws FoldingRestException {
         final HttpResponse<Void> patchResponse = TEAM_COMPETITION_REQUEST_SENDER.offset(TestConstants.INVALID_ID, 100L, 1_000L, 10, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(patchResponse.statusCode())
                 .as("Was able to patch user, was expected user to not be found: " + patchResponse.body())
@@ -827,7 +827,7 @@ public class TeamCompetitionStatsTest {
     }
 
     @Test
-    public void whenPatchingAUserWithPointsOffsets_givenNoAuthentication_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
+    void whenPatchingAUserWithPointsOffsets_givenNoAuthentication_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
         final Hardware hardware = HardwareUtils.create(generateHardware());
         final UserRequest user = generateUserWithId(hardware.getId());
 
@@ -839,7 +839,7 @@ public class TeamCompetitionStatsTest {
     }
 
     @Test
-    public void whenPatchingAUserWithPointsOffsets_givenEmptyPayload_thenRequestFails_andResponseHasA400StatusCode() throws IOException, InterruptedException, FoldingRestException {
+    void whenPatchingAUserWithPointsOffsets_givenEmptyPayload_thenRequestFails_andResponseHasA400StatusCode() throws IOException, InterruptedException, FoldingRestException {
         final Hardware hardware = HardwareUtils.create(generateHardware());
         final UserRequest user = generateUserWithId(hardware.getId());
         final int userId = UserUtils.create(user).getId();
@@ -859,7 +859,7 @@ public class TeamCompetitionStatsTest {
     }
 
     @AfterAll
-    public static void tearDown() throws FoldingRestException {
+    static void tearDown() throws FoldingRestException {
         cleanSystemForComplexTests();
     }
 }

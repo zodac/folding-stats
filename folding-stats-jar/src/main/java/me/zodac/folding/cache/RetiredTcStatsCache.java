@@ -4,25 +4,21 @@ package me.zodac.folding.cache;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class RetiredTcStatsCache {
+public final class RetiredTcStatsCache {
 
-    private static RetiredTcStatsCache INSTANCE = null;
+    private static final RetiredTcStatsCache INSTANCE = new RetiredTcStatsCache();
 
-    private final Map<Integer, RetiredUserTcStats> retiredTcStatsByRetiredUserId = new HashMap<>();
+    private transient final Map<Integer, RetiredUserTcStats> retiredTcStatsByRetiredUserId = new ConcurrentHashMap<>();
 
     private RetiredTcStatsCache() {
 
     }
 
     public static RetiredTcStatsCache get() {
-        if (INSTANCE == null) {
-            INSTANCE = new RetiredTcStatsCache();
-        }
-
         return INSTANCE;
     }
 

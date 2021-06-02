@@ -55,14 +55,14 @@ public final class RequestSender {
         } catch (final ConnectException e) {
             LOGGER.debug("Connection error retrieving stats for user", e);
             LOGGER.warn("Connection error retrieving stats for user");
-            throw new FoldingExternalServiceException(requestUrl, "Unable to connect to Folding@Home API");
+            throw new FoldingExternalServiceException(requestUrl, "Unable to connect to Folding@Home API", e);
         } catch (final IOException | InterruptedException e) {
             throw new FoldingException("Unable to send HTTP request to Folding@Home API", e);
         } catch (final ClassCastException e) {
             throw new FoldingException("Unable to parse HTTP response from Folding@Home API correctly", e);
         } catch (final Exception e) {
             LOGGER.warn("Unexpected error retrieving stats for user", e);
-            throw e;
+            throw new FoldingException("Unexpected error retrieving stats for user", e);
         }
     }
 }

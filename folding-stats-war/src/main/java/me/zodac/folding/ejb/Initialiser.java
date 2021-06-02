@@ -28,13 +28,13 @@ public class Initialiser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Initialiser.class);
 
-    private final DbManager dbManager = DbManagerRetriever.get();
+    private transient final DbManager dbManager = DbManagerRetriever.get();
 
     @EJB
-    private BusinessLogic businessLogic;
+    private transient BusinessLogic businessLogic;
 
     @EJB
-    private TeamCompetitionStatsScheduler teamCompetitionStatsScheduler;
+    private transient TeamCompetitionStatsScheduler teamCompetitionStatsScheduler;
 
     @PostConstruct
     public void init() {

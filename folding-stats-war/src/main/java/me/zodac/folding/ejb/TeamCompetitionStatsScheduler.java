@@ -5,7 +5,7 @@ import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.utils.EnvironmentVariables;
+import me.zodac.folding.api.utils.EnvironmentVariableUtils;
 import me.zodac.folding.api.utils.ExecutionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,21 +41,21 @@ import java.util.Collections;
 public class TeamCompetitionStatsScheduler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TeamCompetitionStatsScheduler.class);
-    private static final boolean IS_STATS_SCHEDULED_PARSING_ENABLED = Boolean.parseBoolean(EnvironmentVariables.get("ENABLE_STATS_SCHEDULED_PARSING", "false"));
+    private static final boolean IS_STATS_SCHEDULED_PARSING_ENABLED = Boolean.parseBoolean(EnvironmentVariableUtils.get("ENABLE_STATS_SCHEDULED_PARSING", "false"));
 
     // Default is to run every hour at 55 minutes past the hour
-    private static final String STATS_PARSING_SCHEDULE_HOUR = EnvironmentVariables.get("STATS_PARSING_SCHEDULE_HOUR", "*");
-    private static final String STATS_PARSING_SCHEDULE_MINUTE = EnvironmentVariables.get("STATS_PARSING_SCHEDULE_MINUTE", "55");
-    private static final String STATS_PARSING_SCHEDULE_SECOND = EnvironmentVariables.get("STATS_PARSING_SCHEDULE_SECOND", "0");
+    private static final String STATS_PARSING_SCHEDULE_HOUR = EnvironmentVariableUtils.get("STATS_PARSING_SCHEDULE_HOUR", "*");
+    private static final String STATS_PARSING_SCHEDULE_MINUTE = EnvironmentVariableUtils.get("STATS_PARSING_SCHEDULE_MINUTE", "55");
+    private static final String STATS_PARSING_SCHEDULE_SECOND = EnvironmentVariableUtils.get("STATS_PARSING_SCHEDULE_SECOND", "0");
 
     @EJB
-    private BusinessLogic businessLogic;
+    private transient BusinessLogic businessLogic;
 
     @EJB
-    private UserTeamCompetitionStatsParser userTeamCompetitionStatsParser;
+    private transient UserTeamCompetitionStatsParser userTeamCompetitionStatsParser;
 
     @Resource
-    private TimerService timerService;
+    private transient TimerService timerService;
 
     @PostConstruct
     public void init() {

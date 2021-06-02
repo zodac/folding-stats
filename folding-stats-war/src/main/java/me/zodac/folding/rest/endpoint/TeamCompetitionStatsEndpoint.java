@@ -21,7 +21,7 @@ import me.zodac.folding.rest.api.tc.TeamResult;
 import me.zodac.folding.rest.api.tc.UserResult;
 import me.zodac.folding.rest.api.tc.leaderboard.TeamSummary;
 import me.zodac.folding.rest.api.tc.leaderboard.UserSummary;
-import me.zodac.folding.rest.util.ParsingUtils;
+import me.zodac.folding.rest.util.IdentityParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,23 +64,23 @@ public class TeamCompetitionStatsEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TeamCompetitionStatsEndpoint.class);
 
-    @EJB
-    private BusinessLogic businessLogic;
-
-    @EJB
-    private CompetitionResultGenerator competitionResultGenerator;
-
-    @EJB
-    private TeamCompetitionResetScheduler teamCompetitionResetScheduler;
-
-    @EJB
-    private TeamCompetitionStatsScheduler teamCompetitionStatsScheduler;
-
-    @EJB
-    private UserTeamCompetitionStatsParser userTeamCompetitionStatsParser;
-
     @Context
-    private UriInfo uriContext;
+    private transient UriInfo uriContext;
+
+    @EJB
+    private transient BusinessLogic businessLogic;
+
+    @EJB
+    private transient CompetitionResultGenerator competitionResultGenerator;
+
+    @EJB
+    private transient TeamCompetitionResetScheduler teamCompetitionResetScheduler;
+
+    @EJB
+    private transient TeamCompetitionStatsScheduler teamCompetitionStatsScheduler;
+
+    @EJB
+    private transient UserTeamCompetitionStatsParser userTeamCompetitionStatsParser;
 
     @GET
     @PermitAll
@@ -115,7 +115,7 @@ public class TeamCompetitionStatsEndpoint {
         }
 
         try {
-            final int parsedId = ParsingUtils.parseId(userId);
+            final int parsedId = IdentityParser.parse(userId);
             final User user = businessLogic.getUserWithPasskey(parsedId, false);
 
             final CompetitionResult competitionResult = competitionResultGenerator.generate();
@@ -170,10 +170,10 @@ public class TeamCompetitionStatsEndpoint {
         }
 
         try {
-            final int parsedId = ParsingUtils.parseId(userId);
+            final int parsedId = IdentityParser.parse(userId);
             final User user = businessLogic.getUser(parsedId);
 
-            final OffsetStats offsetStatsToUse = getValidUserStatsOffset(user, offsetStats, parsedId);
+            final OffsetStats offsetStatsToUse = getValidUserStatsOffset(user, offsetStats);
             businessLogic.addOrUpdateOffsetStats(parsedId, offsetStatsToUse);
             SystemStateManager.next(SystemState.UPDATING_STATS);
             userTeamCompetitionStatsParser.parseTcStatsForUserAndWait(businessLogic.getUser(parsedId));
@@ -201,7 +201,7 @@ public class TeamCompetitionStatsEndpoint {
         }
     }
 
-    private OffsetStats getValidUserStatsOffset(final User user, final OffsetStats offsetStats, final int parsedId) throws FoldingException, UserNotFoundException {
+    private OffsetStats getValidUserStatsOffset(final User user, final OffsetStats offsetStats) throws FoldingException, UserNotFoundException {
         if (!offsetStats.isMissingPointsOrMultipliedPoints()) {
             return offsetStats;
         }
@@ -272,13 +272,13 @@ public class TeamCompetitionStatsEndpoint {
 
         try {
             final CompetitionResult competitionResult = competitionResultGenerator.generate();
-            final Map<Category, List<UserResult>> userResultsByCategory = new EnumMap<>(Category.class);
-            final Map<String, String> teamNameForFoldingUserName = new HashMap<>(); // Convenient way to determine the team name of a user
-
             if (competitionResult.getTeams().isEmpty()) {
                 LOGGER.warn("No TC teams to show");
                 return ok(Collections.emptyList());
             }
+
+            final Map<Category, List<UserResult>> userResultsByCategory = new EnumMap<>(Category.class);
+            final Map<String, String> teamNameForFoldingUserName = new HashMap<>(); // Convenient way to determine the team name of a user
 
             for (final TeamResult teamResult : competitionResult.getTeams()) {
                 final String teamName = teamResult.getTeamName();
@@ -286,7 +286,7 @@ public class TeamCompetitionStatsEndpoint {
                 for (final UserResult userResult : teamResult.getActiveUsers()) {
                     final Category category = Category.get(userResult.getCategory());
 
-                    final List<UserResult> existingUsersInCategory = userResultsByCategory.getOrDefault(category, new ArrayList<>());
+                    final List<UserResult> existingUsersInCategory = userResultsByCategory.getOrDefault(category, new ArrayList<>(0));
                     existingUsersInCategory.add(userResult);
 
                     userResultsByCategory.put(category, existingUsersInCategory);

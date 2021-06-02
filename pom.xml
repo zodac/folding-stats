@@ -58,13 +58,17 @@
 
         <!-- Linter 3PP Versions -->
         <spotbugs.version>4.2.3</spotbugs.version>
+        <pmd.version>6.35.0</pmd.version>
 
         <!-- Linter Properties -->
         <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
         <spotbugs-exclude-file>${project.parent.basedir}/ci/spotbugs-exclude-filter-file.xml</spotbugs-exclude-file>
+        <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
+        <pmd-ruleset>${project.parent.basedir}/ci/pmd-ruleset.xml</pmd-ruleset>
 
         <!-- Linter Plugin Versions -->
         <maven-javadoc-plugin.version>3.3.0</maven-javadoc-plugin.version>
+        <maven-pmd-plugin.version>3.14.0</maven-pmd-plugin.version>
         <spotbugs-maven-plugin.version>4.2.0</spotbugs-maven-plugin.version>
     </properties>
 
@@ -230,6 +234,56 @@
                         <execution>
                             <goals>
                                 <goal>javadoc</goal>
+                            </goals>
+                            <phase>install</phase>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <!-- Manual execution: -->
+                <!-- mvn clean install pmd:check -Dskip-linters=false -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-pmd-plugin</artifactId>
+                    <version>${maven-pmd-plugin.version}</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>net.sourceforge.pmd</groupId>
+                            <artifactId>pmd-core</artifactId>
+                            <version>${pmd.version}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>net.sourceforge.pmd</groupId>
+                            <artifactId>pmd-java</artifactId>
+                            <version>${pmd.version}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>net.sourceforge.pmd</groupId>
+                            <artifactId>pmd-javascript</artifactId>
+                            <version>${pmd.version}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>net.sourceforge.pmd</groupId>
+                            <artifactId>pmd-jsp</artifactId>
+                            <version>${pmd.version}</version>
+                        </dependency>
+                    </dependencies>
+                    <configuration>
+                        <failOnViolation>true</failOnViolation>
+                        <includeTests>true</includeTests>
+                        <linkXRef>false</linkXRef>
+                        <printFailingErrors>true</printFailingErrors>
+                        <rulesets>
+                            <ruleset>${pmd-ruleset}</ruleset>
+                        </rulesets>
+                        <skip>${skip-linters}</skip>
+                        <sourceEncoding>utf-8</sourceEncoding>
+                        <targetJdk>${java-release}</targetJdk>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>check</goal>
                             </goals>
                             <phase>install</phase>
                         </execution>

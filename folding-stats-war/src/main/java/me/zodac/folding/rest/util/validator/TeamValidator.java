@@ -8,7 +8,7 @@ import org.apache.commons.validator.routines.UrlValidator;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TeamValidator {
+public final class TeamValidator {
 
     private static final UrlValidator URL_VALIDATOR = new UrlValidator();
 
@@ -22,7 +22,7 @@ public class TeamValidator {
     }
 
 
-    public ValidationResponse<Team> isValid(final TeamRequest teamRequest) {
+    public ValidationResponse<Team> validate(final TeamRequest teamRequest) {
         if (teamRequest == null) {
             return ValidationResponse.nullObject();
         }

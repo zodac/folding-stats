@@ -25,7 +25,7 @@ import static me.zodac.folding.stats.http.response.ResponseParser.getUnitsFromRe
  *
  * @see <a href="https://api2.foldingathome.org/">Folding@Home REST API</a>
  */
-public class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
+public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpFoldingStatsRetriever.class);
 

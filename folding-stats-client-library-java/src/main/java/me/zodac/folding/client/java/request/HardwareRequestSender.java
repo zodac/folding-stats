@@ -5,6 +5,8 @@ import com.google.gson.GsonBuilder;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import me.zodac.folding.api.tc.Hardware;
+import me.zodac.folding.rest.api.ContentType;
+import me.zodac.folding.rest.api.RestHeader;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 import org.apache.commons.lang3.StringUtils;
@@ -27,11 +29,11 @@ public final class HardwareRequestSender {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
-            .version(HttpClient.Version.HTTP_1_1)
+            .version(HttpClient.Version.HTTP_1_1) // TODO: [zodac] What's wrong with HTTP_2?
             .connectTimeout(Duration.ofSeconds(10))
             .build();
 
-    private final String foldingUrl;
+    private final String hardwareUrl;
 
     /**
      * Create an instance of {@link HardwareRequestSender}.
@@ -41,7 +43,8 @@ public final class HardwareRequestSender {
      * @return the created {@link HardwareRequestSender}
      */
     public static HardwareRequestSender create(final String foldingUrl) {
-        return new HardwareRequestSender(foldingUrl);
+        final String hardwareUrl = foldingUrl + "/hardware";
+        return new HardwareRequestSender(hardwareUrl);
     }
 
     /**
@@ -68,11 +71,11 @@ public final class HardwareRequestSender {
     public HttpResponse<String> getAll(final String eTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .GET()
-                .uri(URI.create(foldingUrl + "/hardware"))
-                .header("Content-Type", "application/json");
+                .uri(URI.create(hardwareUrl))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
         if (StringUtils.isNotBlank(eTag)) {
-            requestBuilder.header("If-None-Match", eTag);
+            requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), eTag);
         }
 
         final HttpRequest request = requestBuilder.build();
@@ -110,11 +113,11 @@ public final class HardwareRequestSender {
     public HttpResponse<String> get(final int hardwareId, final String eTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .GET()
-                .uri(URI.create(foldingUrl + "/hardware/" + hardwareId))
-                .header("Content-Type", "application/json");
+                .uri(URI.create(hardwareUrl + '/' + hardwareId))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
         if (StringUtils.isNotBlank(eTag)) {
-            requestBuilder.header("If-None-Match", eTag);
+            requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), eTag);
         }
 
         final HttpRequest request = requestBuilder.build();
@@ -150,12 +153,12 @@ public final class HardwareRequestSender {
     public HttpResponse<String> create(final HardwareRequest hardware, final String userName, final String password) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(hardware)))
-                .uri(URI.create(foldingUrl + "/hardware"))
-                .header("Content-Type", "application/json");
+                .uri(URI.create(hardwareUrl))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
 
         if (StringUtils.isNoneBlank(userName, password)) {
-            requestBuilder.header("Authorization", encodeBasicAuthentication(userName, password));
+            requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
         }
 
         final HttpRequest request = requestBuilder.build();
@@ -190,11 +193,11 @@ public final class HardwareRequestSender {
     public HttpResponse<String> createBatchOf(final Collection<HardwareRequest> batchOfHardware, final String userName, final String password) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(batchOfHardware)))
-                .uri(URI.create(foldingUrl + "/hardware/batch"))
-                .header("Content-Type", "application/json");
+                .uri(URI.create(hardwareUrl + "/batch"))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
         if (StringUtils.isNoneBlank(userName, password)) {
-            requestBuilder.header("Authorization", encodeBasicAuthentication(userName, password));
+            requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
         }
 
         final HttpRequest request = requestBuilder.build();
@@ -229,11 +232,11 @@ public final class HardwareRequestSender {
     public HttpResponse<String> update(final HardwareRequest hardware, final String userName, final String password) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .PUT(HttpRequest.BodyPublishers.ofString(GSON.toJson(hardware)))
-                .uri(URI.create(foldingUrl + "/hardware/" + hardware.getId()))
-                .header("Content-Type", "application/json");
+                .uri(URI.create(hardwareUrl + '/' + hardware.getId()))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
         if (StringUtils.isNoneBlank(userName, password)) {
-            requestBuilder.header("Authorization", encodeBasicAuthentication(userName, password));
+            requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
         }
 
         final HttpRequest request = requestBuilder.build();
@@ -268,11 +271,11 @@ public final class HardwareRequestSender {
     public HttpResponse<Void> delete(final int hardwareId, final String userName, final String password) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .DELETE()
-                .uri(URI.create(foldingUrl + "/hardware/" + hardwareId))
-                .header("Content-Type", "application/json");
+                .uri(URI.create(hardwareUrl + '/' + hardwareId))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
         if (StringUtils.isNoneBlank(userName, password)) {
-            requestBuilder.header("Authorization", encodeBasicAuthentication(userName, password));
+            requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
         }
 
         final HttpRequest request = requestBuilder.build();

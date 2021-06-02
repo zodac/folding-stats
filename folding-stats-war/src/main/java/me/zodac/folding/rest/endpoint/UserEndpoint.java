@@ -111,7 +111,7 @@ public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
     @Override
     protected ValidationResponse<User> validateAndConvert(final UserRequest userRequest) {
         final UserValidator userValidator = UserValidator.create(businessLogic, HttpFoldingStatsRetriever.create());
-        return userValidator.isValid(userRequest);
+        return userValidator.validate(userRequest);
     }
 
     @Override

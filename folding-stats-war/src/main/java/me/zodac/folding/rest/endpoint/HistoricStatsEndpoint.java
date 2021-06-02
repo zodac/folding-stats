@@ -51,11 +51,11 @@ public class HistoricStatsEndpoint {
     // Stats updates occur every hour, so we must invalidate responses every hour
     private static final int CACHE_EXPIRATION_TIME = (int) TimeUnit.HOURS.toSeconds(1);
 
-    @EJB
-    private BusinessLogic businessLogic;
-
     @Context
-    private UriInfo uriContext;
+    private transient UriInfo uriContext;
+
+    @EJB
+    private transient BusinessLogic businessLogic;
 
     @GET
     @PermitAll

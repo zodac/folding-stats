@@ -14,6 +14,11 @@ public class FoldingExternalServiceException extends Exception {
         this.url = url;
     }
 
+    public FoldingExternalServiceException(final String url, final String message, final Throwable throwable) {
+        super(message, throwable);
+        this.url = url;
+    }
+
     public String getUrl() {
         return url;
     }

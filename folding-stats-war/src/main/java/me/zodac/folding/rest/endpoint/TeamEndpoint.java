@@ -40,7 +40,7 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
     private static final Logger LOGGER = LoggerFactory.getLogger(TeamEndpoint.class);
 
     @EJB
-    private TeamCompetitionStatsScheduler teamCompetitionStatsScheduler;
+    private transient TeamCompetitionStatsScheduler teamCompetitionStatsScheduler;
 
     @POST
     @RolesAllowed("admin")
@@ -116,7 +116,7 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
     @Override
     protected ValidationResponse<Team> validateAndConvert(final TeamRequest teamRequest) {
         final TeamValidator teamValidator = TeamValidator.create();
-        return teamValidator.isValid(teamRequest);
+        return teamValidator.validate(teamRequest);
     }
 
     @Override

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="zodac's Ruleset"
+         xmlns="http://pmd.sourceforge.net/ruleset/3.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/3.0.0 http://pmd.sourceforge.net/ruleset_3_0_0.xsd">
+
+    <description>
+        Custom ruleset defined for Java projects. Based on:
+        https://pmd.github.io/latest/pmd_userdocs_making_rulesets.html
+    </description>
+
+    <rule ref="category/java/bestpractices.xml">
+        <!-- It would be nice to use a Supplier for String creation, but SLF4J 2.x is not released yet -->
+        <!-- TODO: [zodac] Try the alpha, see if it's usable -->
+        <exclude name="GuardLogStatement"/>
+        <!-- I have no problem with multiple asserts in my tests -->
+        <exclude name="JUnitTestContainsTooManyAsserts"/>
+    </rule>
+
+    <rule ref="category/java/codestyle.xml">
+        <!-- Public constructors are fine in many cases -->
+        <exclude name="AtLeastOneConstructor"/>
+        <!-- Unnecessary -->
+        <exclude name="CommentDefaultAccessModifier"/>
+        <!-- Plenty of scenarios where we would like to exit a method early in error cases -->
+        <exclude name="OnlyOneReturn"/>
+        <!-- I prefer to be explicit in TRY-WITH-RESOURCES blocks -->
+        <!-- Would be nice to keep the check for other cases (interfaces/annotations), but not possible -->
+        <exclude name="UnnecessaryModifier"/>
+
+        <!-- Issues for a style guide -->
+        <exclude name="ClassNamingConventions"/>
+        <exclude name="LongVariable"/>
+        <exclude name="ShortClassName"/>
+        <exclude name="ShortMethodName"/>
+        <exclude name="ShortVariable"/>
+        <exclude name="TooManyStaticImports"/>
+    </rule>
+    <!-- I don't want to stick to the convention for unit tests, reasonable for production methods though -->
+    <rule ref="category/java/codestyle.xml/MethodNamingConventions">
+        <properties>
+            <property name="methodPattern" value="[a-z][a-zA-Z0-9]*"/>
+            <property name="staticPattern" value="[a-z][a-zA-Z0-9]*"/>
+            <property name="nativePattern" value="[a-z][a-zA-Z0-9]*"/>
+            <property name="junit3TestPattern" value=".*"/>
+            <property name="junit4TestPattern" value=".*"/>
+            <property name="junit5TestPattern" value=".*"/>
+        </properties>
+    </rule>
+
+    <rule ref="category/java/design.xml">
+        <!-- Disagree, useful to explicitly catch generic Exceptions in some scenarios -->
+        <exclude name="AvoidCatchingGenericException"/>
+        <!-- TODO: [zodac] Look into re-adding this, maybe with a higher threshold -->
+        <exclude name="CyclomaticComplexity"/>
+        <!-- I like chaining methods... -->
+        <exclude name="LawOfDemeter"/>
+        <!-- Not necessary -->
+        <exclude name="LoosePackageCoupling"/>
+
+        <!-- Issues for a style guide -->
+        <exclude name="ExcessiveClassLength"/>
+        <exclude name="ExcessiveImports"/>
+        <exclude name="ExcessiveMethodLength"/>
+        <exclude name="ExcessiveParameterList"/>
+        <exclude name="TooManyMethods"/>
+        <exclude name="UseObjectForClearerAPI"/>
+    </rule>
+    <!-- Default threshold is a bit high for some of our validation flows -->
+    <rule ref="category/java/design.xml/NPathComplexity">
+        <properties>
+            <property name="reportLevel" value="600"/>
+        </properties>
+    </rule>
+
+    <!--    <rule ref="category/java/documentation.xml"/>-->
+
+    <rule ref="category/java/errorprone.xml">
+        <!-- Many false positives in PostgresDbManager -->
+        <!-- TODO: [zodac] Move to jOOQ, should remove the duplicate strings -->
+        <exclude name="AvoidDuplicateLiterals"/>
+    </rule>
+
+    <rule ref="category/java/multithreading.xml">
+        <!-- False positives in TeamCompetitionStatsEndpoint#getCategoryLeaderboard() -->
+        <!-- No need for concurrency in a @RequestScoped EJB, certainly not for an internal function -->
+        <exclude name="UseConcurrentHashMap"/>
+    </rule>
+
+    <rule ref="category/java/performance.xml">
+        <!-- False positives in TeamCompetitionStatsEndpoint#getCategoryLeaderboard() -->
+        <exclude name="AvoidInstantiatingObjectsInLoops"/>
+    </rule>
+
+    <rule ref="category/java/security.xml"/>
+</ruleset>

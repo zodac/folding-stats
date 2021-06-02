@@ -21,10 +21,10 @@ import java.util.stream.Collector;
  */
 class IntegerRankingCollector<T> implements Collector<T, List<T>, List<T>> {
 
-    private static final Set<Characteristics> CHARACTERISTICS = Collections.unmodifiableSet(EnumSet.of(Characteristics.IDENTITY_FINISH));
-    private final Comparator<? super T> comparator;
-    private final BiFunction<T, Integer, T> creator;
-    private final Function<T, Integer> ranker;
+    private static final Set<Characteristics> COLLECTOR_CHARACTERISTICS = Collections.unmodifiableSet(EnumSet.of(Characteristics.IDENTITY_FINISH));
+    private transient final Comparator<? super T> comparator;
+    private transient final BiFunction<T, Integer, T> creator;
+    private transient final Function<T, Integer> ranker;
 
     public IntegerRankingCollector(final Comparator<? super T> comparator, final Function<T, Integer> ranker, final BiFunction<T, Integer, T> creator) {
         this.comparator = comparator;
@@ -59,6 +59,7 @@ class IntegerRankingCollector<T> implements Collector<T, List<T>, List<T>> {
         if (lastElementOnTheLeft.isEmpty() || firstElementOnTheRight.isEmpty()) {
             return 0;
         }
+
         if (comparator.compare(firstElementOnTheRight.get(), lastElementOnTheLeft.get()) == 0) {
             return ranker.apply(lastElementOnTheLeft.get()) - 1;
         }
@@ -67,7 +68,7 @@ class IntegerRankingCollector<T> implements Collector<T, List<T>, List<T>> {
     }
 
     private Optional<T> optGet(final List<T> list, final int index) {
-        return (list == null || list.isEmpty()) ? Optional.empty() : Optional.of(list.get(index));
+        return list == null || list.isEmpty() ? Optional.empty() : Optional.of(list.get(index));
     }
 
     @Override
@@ -82,6 +83,6 @@ class IntegerRankingCollector<T> implements Collector<T, List<T>, List<T>> {
 
     @Override
     public Set<Characteristics> characteristics() {
-        return CHARACTERISTICS;
+        return COLLECTOR_CHARACTERISTICS;
     }
 }

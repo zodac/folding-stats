@@ -6,9 +6,9 @@ import me.zodac.folding.api.tc.exception.FoldingIdOutOfRangeException;
 /**
  * Utility class used to parse values for the REST endpoints.
  */
-public final class ParsingUtils {
+public final class IdentityParser {
 
-    private ParsingUtils() {
+    private IdentityParser() {
 
     }
 
@@ -20,7 +20,7 @@ public final class ParsingUtils {
      * @throws FoldingIdInvalidException    thrown if the input is not a valid {@link Integer}
      * @throws FoldingIdOutOfRangeException thrown if the input is less than <b>0</b>
      */
-    public static int parseId(final String id) throws FoldingIdInvalidException, FoldingIdOutOfRangeException {
+    public static int parse(final String id) throws FoldingIdInvalidException, FoldingIdOutOfRangeException {
         try {
             final int parsedId = Integer.parseInt(id);
             if (parsedId < 0) {

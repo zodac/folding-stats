@@ -21,6 +21,7 @@ public final class ResponseParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ResponseParser.class);
     private static final Gson GSON = new Gson();
+    private static final int EXPECTED_NUMBER_OF_UNIT_RESPONSES = 1;
 
     private ResponseParser() {
 
@@ -66,7 +67,7 @@ public final class ResponseParser {
                 .collect(toList())
                 .get(0);
 
-        if (unitsResponse.size() > 1) {
+        if (unitsResponse.size() > EXPECTED_NUMBER_OF_UNIT_RESPONSES) {
             LOGGER.warn("Too many unit responses returned for user, using {} from response: {}", firstEntry, response.body());
         }
 

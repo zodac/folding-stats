@@ -5,7 +5,7 @@ public class FoldingConflictException extends Exception {
 
     private static final long serialVersionUID = 2084075114898438910L;
 
-    public FoldingConflictException() {
-        super();
+    public FoldingConflictException(final Throwable throwable) {
+        super(throwable);
     }
 }

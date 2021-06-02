@@ -6,7 +6,9 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.utils.EncodingUtils;
+import me.zodac.folding.rest.api.ContentType;
 import me.zodac.folding.rest.api.LoginCredentials;
+import me.zodac.folding.rest.api.RestHeader;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 
 import java.io.IOException;
@@ -28,7 +30,7 @@ public final class LoginRequestSender {
             .connectTimeout(Duration.ofSeconds(10))
             .build();
 
-    private final String foldingUrl;
+    private final String loginUrl;
 
     /**
      * Create an instance of {@link LoginRequestSender}.
@@ -38,7 +40,8 @@ public final class LoginRequestSender {
      * @return the created {@link LoginRequestSender}
      */
     public static LoginRequestSender create(final String foldingUrl) {
-        return new LoginRequestSender(foldingUrl);
+        final String loginUrl = foldingUrl + "/login";
+        return new LoginRequestSender(loginUrl);
     }
 
     /**
@@ -68,8 +71,8 @@ public final class LoginRequestSender {
 
         final HttpRequest request = HttpRequest.newBuilder()
                 .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(loginCredentials)))
-                .uri(URI.create(foldingUrl + "/login/admin"))
-                .header("Content-Type", "application/json")
+                .uri(URI.create(loginUrl + "/admin"))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
                 .build();
 
         try {

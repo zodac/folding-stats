@@ -35,15 +35,15 @@ import static org.assertj.core.api.Assertions.assertThat;
  * <p>
  * Since the TC stats are done on the full system (meaning all {@link Team}s), we wipe the system before each test with a {@link BeforeEach} method.
  */
-public class TeamCompetitionLeaderboardTest {
+class TeamCompetitionLeaderboardTest {
 
     @BeforeEach
-    public void setUp() throws FoldingRestException {
+    void setUp() throws FoldingRestException {
         cleanSystemForComplexTests();
     }
 
     @Test
-    public void whenGettingTeamLeaderboard_andNoTeamsExistInTheSystem_thenResponseIsReturnedWithNoStats_andNoTeams() throws FoldingRestException {
+    void whenGettingTeamLeaderboard_andNoTeamsExistInTheSystem_thenResponseIsReturnedWithNoStats_andNoTeams() throws FoldingRestException {
         final HttpResponse<String> response = TEAM_COMPETITION_REQUEST_SENDER.getTeamLeaderboard();
 
         assertThat(response.statusCode())
@@ -58,7 +58,7 @@ public class TeamCompetitionLeaderboardTest {
     }
 
     @Test
-    public void whenGettingTeamLeaderboard_andTeamsExistWithStats_thenTeamsAreOrderedCorrectly_andPointsDiffIsCorrectlyCalculated() throws FoldingRestException {
+    void whenGettingTeamLeaderboard_andTeamsExistWithStats_thenTeamsAreOrderedCorrectly_andPointsDiffIsCorrectlyCalculated() throws FoldingRestException {
         final Team firstTeam = TeamUtils.create(generateTeam());
         final User firstUser = UserUtils.create(generateUserWithTeamId(firstTeam.getId()));
         StubbedFoldingEndpointUtils.setPoints(firstUser, 10_000L);
@@ -104,7 +104,7 @@ public class TeamCompetitionLeaderboardTest {
     }
 
     @Test
-    public void whenGettingCategoryLeaderboard_andNoTeamsExistInTheSystem_thenResponseIsReturnedWithNoStats_andNoTeams() throws FoldingRestException {
+    void whenGettingCategoryLeaderboard_andNoTeamsExistInTheSystem_thenResponseIsReturnedWithNoStats_andNoTeams() throws FoldingRestException {
         final HttpResponse<String> response = TEAM_COMPETITION_REQUEST_SENDER.getCategoryLeaderboard();
 
         assertThat(response.statusCode())
@@ -119,7 +119,7 @@ public class TeamCompetitionLeaderboardTest {
     }
 
     @Test
-    public void whenGettingCategoryLeaderboard_andUsersExistWithStats_thenUsersAreGroupedByCategory_andPointsDiffIsCalculatedCorrectly() throws FoldingRestException {
+    void whenGettingCategoryLeaderboard_andUsersExistWithStats_thenUsersAreGroupedByCategory_andPointsDiffIsCalculatedCorrectly() throws FoldingRestException {
         final Team firstTeam = TeamUtils.create(generateTeam());
         final User firstUser = UserUtils.create(generateUserWithTeamIdAndCategory(firstTeam.getId(), Category.AMD_GPU));
         StubbedFoldingEndpointUtils.setPoints(firstUser, 10_000L);
@@ -194,7 +194,7 @@ public class TeamCompetitionLeaderboardTest {
     }
 
     @AfterAll
-    public static void tearDown() throws FoldingRestException {
+    static void tearDown() throws FoldingRestException {
         cleanSystemForComplexTests();
     }
 }

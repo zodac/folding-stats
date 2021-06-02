@@ -2,6 +2,8 @@ package me.zodac.folding.client.java.request;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import me.zodac.folding.rest.api.ContentType;
+import me.zodac.folding.rest.api.RestHeader;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import org.apache.commons.lang3.StringUtils;
 
@@ -25,7 +27,7 @@ public final class HistoricStatsRequestSender {
             .connectTimeout(Duration.ofSeconds(10))
             .build();
 
-    private final String foldingUrl;
+    private final String historicStatsUrl;
 
     /**
      * Create an instance of {@link HistoricStatsRequestSender}.
@@ -35,7 +37,8 @@ public final class HistoricStatsRequestSender {
      * @return the created {@link HistoricStatsRequestSender}
      */
     public static HistoricStatsRequestSender create(final String foldingUrl) {
-        return new HistoricStatsRequestSender(foldingUrl);
+        final String historicStatsUrl = foldingUrl + "/historic";
+        return new HistoricStatsRequestSender(historicStatsUrl);
     }
 
     /**
@@ -119,11 +122,11 @@ public final class HistoricStatsRequestSender {
     private HttpResponse<String> getHourlyStats(final HistoricStatsType historicStatsType, final int id, final Year year, final Month month, final int day, final String eTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .GET()
-                .uri(URI.create(foldingUrl + "/historic/" + historicStatsType.endpointUrl + '/' + id + '/' + year.getValue() + '/' + month.getValue() + '/' + day))
-                .header("Content-Type", "application/json");
+                .uri(URI.create(historicStatsUrl + '/' + historicStatsType.endpointUrl + '/' + id + '/' + year.getValue() + '/' + month.getValue() + '/' + day))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
         if (StringUtils.isNotBlank(eTag)) {
-            requestBuilder.header("If-None-Match", eTag);
+            requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), eTag);
         }
 
         final HttpRequest request = requestBuilder.build();
@@ -216,11 +219,11 @@ public final class HistoricStatsRequestSender {
     private HttpResponse<String> getDailyStats(final HistoricStatsType historicStatsType, final int id, final Year year, final Month month, final String eTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .GET()
-                .uri(URI.create(foldingUrl + "/historic/" + historicStatsType.endpointUrl + '/' + id + '/' + year.getValue() + '/' + month.getValue()))
-                .header("Content-Type", "application/json");
+                .uri(URI.create(historicStatsUrl + '/' + historicStatsType.endpointUrl + '/' + id + '/' + year.getValue() + '/' + month.getValue()))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
         if (StringUtils.isNotBlank(eTag)) {
-            requestBuilder.header("If-None-Match", eTag);
+            requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), eTag);
         }
 
         final HttpRequest request = requestBuilder.build();
@@ -309,11 +312,11 @@ public final class HistoricStatsRequestSender {
     private HttpResponse<String> getMonthlyStats(final HistoricStatsType historicStatsType, final int id, final Year year, final String eTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .GET()
-                .uri(URI.create(foldingUrl + "/historic/" + historicStatsType.endpointUrl + '/' + id + '/' + year.getValue()))
-                .header("Content-Type", "application/json");
+                .uri(URI.create(historicStatsUrl + '/' + historicStatsType.endpointUrl + '/' + id + '/' + year.getValue()))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
         if (StringUtils.isNotBlank(eTag)) {
-            requestBuilder.header("If-None-Match", eTag);
+            requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), eTag);
         }
 
         final HttpRequest request = requestBuilder.build();
@@ -326,6 +329,7 @@ public final class HistoricStatsRequestSender {
     }
 
     private enum HistoricStatsType {
+
         TEAM("teams"),
         USER("users");
 

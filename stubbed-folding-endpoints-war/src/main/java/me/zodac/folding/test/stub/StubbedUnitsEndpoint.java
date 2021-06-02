@@ -39,8 +39,9 @@ import java.util.Map;
 public class StubbedUnitsEndpoint {
 
     private static final Gson GSON = new Gson();
+    private static final int NO_UNITS = 0;
 
-    private final Map<String, Integer> unitsByUserAndPasskey = new HashMap<>();
+    private transient final Map<String, Integer> unitsByUserAndPasskey = new HashMap<>();
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -54,14 +55,14 @@ public class StubbedUnitsEndpoint {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response setUserUnits(@QueryParam("user") final String foldingUserName, @QueryParam("passkey") final String passkey, @QueryParam("units") final int units) {
+    public Response updateUserUnits(@QueryParam("user") final String foldingUserName, @QueryParam("passkey") final String passkey, @QueryParam("units") final int units) {
         final String key = foldingUserName + passkey;
 
-        if (units == 0) {
+        if (units == NO_UNITS) {
             // Remove all units from the user
             unitsByUserAndPasskey.put(key, units);
         } else {
-            unitsByUserAndPasskey.put(key, unitsByUserAndPasskey.getOrDefault(key, 0) + units);
+            unitsByUserAndPasskey.put(key, unitsByUserAndPasskey.getOrDefault(key, NO_UNITS) + units);
         }
 
         return Response

@@ -3,9 +3,9 @@ package me.zodac.folding.cache;
 
 import me.zodac.folding.api.tc.Team;
 
-public class TeamCache extends AbstractCache<Team> {
+public final class TeamCache extends AbstractCache<Team> {
 
-    private static TeamCache INSTANCE = null;
+    private static final TeamCache INSTANCE = new TeamCache();
 
     private TeamCache() {
         super();
@@ -17,10 +17,6 @@ public class TeamCache extends AbstractCache<Team> {
     }
 
     public static TeamCache get() {
-        if (INSTANCE == null) {
-            INSTANCE = new TeamCache();
-        }
-
         return INSTANCE;
     }
 }

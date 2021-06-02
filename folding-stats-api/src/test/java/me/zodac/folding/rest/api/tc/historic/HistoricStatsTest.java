@@ -13,10 +13,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Unit tests for {@link HistoricStats}.
  */
-public class HistoricStatsTest {
+class HistoricStatsTest {
 
     @Test
-    public void testCombine() {
+    void testCombine() {
         final HistoricStats zero = HistoricStats.create(LocalDateTime.of(2020, 1, 25, 1, 1), 300L, 3_000L, 30);
         final HistoricStats first = HistoricStats.create(LocalDateTime.of(2020, 1, 1, 1, 1), 500L, 5_000L, 50);
         final HistoricStats second = HistoricStats.create(LocalDateTime.of(2020, 1, 1, 1, 1), 100L, 1_000L, 10);

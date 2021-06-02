@@ -5,15 +5,15 @@ import me.zodac.folding.api.tc.exception.NotFoundException;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 abstract class AbstractCache<V extends ResponsePojo> {
 
-    private final Map<Integer, V> elementsById;
+    private transient final Map<Integer, V> elementsById;
 
     protected AbstractCache() {
-        elementsById = new HashMap<>();
+        elementsById = new ConcurrentHashMap<>();
     }
 
     protected abstract String elementType();

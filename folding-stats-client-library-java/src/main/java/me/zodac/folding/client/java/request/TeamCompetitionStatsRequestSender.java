@@ -5,6 +5,8 @@ import com.google.gson.GsonBuilder;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import me.zodac.folding.api.tc.stats.OffsetStats;
+import me.zodac.folding.rest.api.ContentType;
+import me.zodac.folding.rest.api.RestHeader;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import org.apache.commons.lang3.StringUtils;
 
@@ -18,10 +20,10 @@ import java.time.Duration;
 import static me.zodac.folding.api.utils.EncodingUtils.encodeBasicAuthentication;
 
 /**
- * Convenience class to send HTTP requests to the <code>Team Competition</code> REST endpoint.
+ * Convenience class to send HTTP requests to the <code>Team Competition</code> stats REST endpoint.
  */
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public final class TeamCompetitionRequestSender {
+public final class TeamCompetitionStatsRequestSender {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
@@ -29,17 +31,18 @@ public final class TeamCompetitionRequestSender {
             .connectTimeout(Duration.ofSeconds(10))
             .build();
 
-    private final String foldingUrl;
+    private final String statsUrl;
 
     /**
-     * Create an instance of {@link TeamCompetitionRequestSender}.
+     * Create an instance of {@link TeamCompetitionStatsRequestSender}.
      *
      * @param foldingUrl the root URL of the <code>/folding</code> endpoint, i.e:
      *                   <pre>http://127.0.0.1:8080/folding</pre>
-     * @return the created {@link TeamCompetitionRequestSender}
+     * @return the created {@link TeamCompetitionStatsRequestSender}
      */
-    public static TeamCompetitionRequestSender create(final String foldingUrl) {
-        return new TeamCompetitionRequestSender(foldingUrl);
+    public static TeamCompetitionStatsRequestSender create(final String foldingUrl) {
+        final String statsUrl = foldingUrl + "/stats";
+        return new TeamCompetitionStatsRequestSender(statsUrl);
     }
 
     /**
@@ -67,11 +70,11 @@ public final class TeamCompetitionRequestSender {
     public HttpResponse<String> getStats(final String eTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .GET()
-                .uri(URI.create(foldingUrl + "/stats"))
-                .header("Content-Type", "application/json");
+                .uri(URI.create(statsUrl))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
         if (StringUtils.isNotBlank(eTag)) {
-            requestBuilder.header("If-None-Match", eTag);
+            requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), eTag);
         }
 
         final HttpRequest request = requestBuilder.build();
@@ -110,11 +113,11 @@ public final class TeamCompetitionRequestSender {
     public HttpResponse<String> getStatsForUser(final int userId, final String eTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .GET()
-                .uri(URI.create(foldingUrl + "/stats/users/" + userId))
-                .header("Content-Type", "application/json");
+                .uri(URI.create(statsUrl + "/users/" + userId))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
         if (StringUtils.isNotBlank(eTag)) {
-            requestBuilder.header("If-None-Match", eTag);
+            requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), eTag);
         }
 
         final HttpRequest request = requestBuilder.build();
@@ -151,11 +154,11 @@ public final class TeamCompetitionRequestSender {
     public HttpResponse<String> getTeamLeaderboard(final String eTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .GET()
-                .uri(URI.create(foldingUrl + "/stats/leaderboard"))
-                .header("Content-Type", "application/json");
+                .uri(URI.create(statsUrl + "/leaderboard"))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
         if (StringUtils.isNotBlank(eTag)) {
-            requestBuilder.header("If-None-Match", eTag);
+            requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), eTag);
         }
 
         final HttpRequest request = requestBuilder.build();
@@ -192,11 +195,11 @@ public final class TeamCompetitionRequestSender {
     public HttpResponse<String> getCategoryLeaderboard(final String eTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .GET()
-                .uri(URI.create(foldingUrl + "/stats/category"))
-                .header("Content-Type", "application/json");
+                .uri(URI.create(statsUrl + "/category"))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
         if (StringUtils.isNotBlank(eTag)) {
-            requestBuilder.header("If-None-Match", eTag);
+            requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), eTag);
         }
 
         final HttpRequest request = requestBuilder.build();
@@ -234,11 +237,11 @@ public final class TeamCompetitionRequestSender {
     public HttpResponse<Void> manualUpdate(final boolean async, final String userName, final String password) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .GET()
-                .uri(URI.create(foldingUrl + "/stats/manual/update?async=" + async))
-                .header("Content-Type", "application/json");
+                .uri(URI.create(statsUrl + "/manual/update?async=" + async))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
         if (StringUtils.isNoneBlank(userName, password)) {
-            requestBuilder.header("Authorization", encodeBasicAuthentication(userName, password));
+            requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
         }
 
         final HttpRequest request = requestBuilder.build();
@@ -271,11 +274,11 @@ public final class TeamCompetitionRequestSender {
     public HttpResponse<Void> manualReset(final String userName, final String password) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .GET()
-                .uri(URI.create(foldingUrl + "/stats/manual/reset"))
-                .header("Content-Type", "application/json");
+                .uri(URI.create(statsUrl + "/manual/reset"))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
         if (StringUtils.isNoneBlank(userName, password)) {
-            requestBuilder.header("Authorization", encodeBasicAuthentication(userName, password));
+            requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
         }
 
         final HttpRequest request = requestBuilder.build();
@@ -325,11 +328,11 @@ public final class TeamCompetitionRequestSender {
 
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .method("PATCH", HttpRequest.BodyPublishers.ofString(GSON.toJson(offsetStats)))
-                .uri(URI.create(foldingUrl + "/stats/users/" + userId))
-                .header("Content-Type", "application/json");
+                .uri(URI.create(statsUrl + "/users/" + userId))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
         if (StringUtils.isNoneBlank(userName, password)) {
-            requestBuilder.header("Authorization", encodeBasicAuthentication(userName, password));
+            requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
         }
 
         final HttpRequest request = requestBuilder.build();

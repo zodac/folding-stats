@@ -6,21 +6,27 @@ import java.util.Optional;
 
 public final class CompetitionResultCache {
 
-    private static CompetitionResult cachedResult = null;
+    private static final CompetitionResultCache INSTANCE = new CompetitionResultCache();
+
+    private transient CompetitionResult cachedResult;
 
     private CompetitionResultCache() {
 
     }
 
-    public static boolean hasCachedResult() {
+    public static CompetitionResultCache get() {
+        return INSTANCE;
+    }
+
+    public boolean hasCachedResult() {
         return cachedResult != null;
     }
 
-    public static void add(final CompetitionResult competitionResult) {
+    public void add(final CompetitionResult competitionResult) {
         cachedResult = competitionResult;
     }
 
-    public static Optional<CompetitionResult> get() {
+    public Optional<CompetitionResult> getResult() {
         return Optional.ofNullable(cachedResult);
     }
 }

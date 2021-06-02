@@ -7,7 +7,7 @@ import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.exception.UserNotFoundException;
-import me.zodac.folding.api.utils.EnvironmentVariables;
+import me.zodac.folding.api.utils.EnvironmentVariableUtils;
 import me.zodac.folding.api.utils.ExecutionType;
 import me.zodac.folding.cache.RetiredTcStatsCache;
 import me.zodac.folding.cache.TcStatsCache;
@@ -39,13 +39,13 @@ import java.util.Collections;
 public class TeamCompetitionResetScheduler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TeamCompetitionResetScheduler.class);
-    private static final boolean IS_MONTHLY_RESET_ENABLED = Boolean.parseBoolean(EnvironmentVariables.get("ENABLE_STATS_MONTHLY_RESET", "false"));
+    private static final boolean IS_MONTHLY_RESET_ENABLED = Boolean.parseBoolean(EnvironmentVariableUtils.get("ENABLE_STATS_MONTHLY_RESET", "false"));
 
     @EJB
-    private BusinessLogic businessLogic;
+    private transient BusinessLogic businessLogic;
 
     @EJB
-    private TeamCompetitionStatsScheduler teamCompetitionStatsScheduler;
+    private transient TeamCompetitionStatsScheduler teamCompetitionStatsScheduler;
 
     @PostConstruct
     public void init() {

@@ -41,16 +41,16 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Tests for the monthly reset of the <code>Team Competition</code> {@link CompetitionResult}.
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class ResetTest {
+class ResetTest {
 
     @BeforeAll
-    public static void setUp() throws FoldingRestException {
+    static void setUp() throws FoldingRestException {
         cleanSystemForComplexTests();
     }
 
     @Test
     @Order(1)
-    public void whenResetOccurs_andNoTeamsExist_thenNoErrorOccurs() throws FoldingRestException {
+    void whenResetOccurs_andNoTeamsExist_thenNoErrorOccurs() throws FoldingRestException {
         final HttpResponse<Void> response = TEAM_COMPETITION_REQUEST_SENDER.manualReset(ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
                 .as("Expected a 200_OK when no teams exist")
@@ -58,7 +58,7 @@ public class ResetTest {
     }
 
     @Test
-    public void whenResetOccurs_givenNoAuthentication_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
+    void whenResetOccurs_givenNoAuthentication_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
         final HttpResponse<Void> response = TEAM_COMPETITION_REQUEST_SENDER.manualReset();
         assertThat(response.statusCode())
                 .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
@@ -66,7 +66,7 @@ public class ResetTest {
     }
 
     @Test
-    public void whenResetOccurs_andRetiredStatsExistForTeam_thenRetiredStatsAreRemovedOnReset() throws FoldingRestException {
+    void whenResetOccurs_andRetiredStatsExistForTeam_thenRetiredStatsAreRemovedOnReset() throws FoldingRestException {
         final Hardware hardware = HardwareUtils.create(generateHardware());
         final Team team = TeamUtils.create(generateTeam());
 
@@ -138,7 +138,7 @@ public class ResetTest {
     }
 
     @Test
-    public void whenResetOccurs_thenStatsAreResetForCompetitionAndTeamsAndUsers() throws FoldingRestException {
+    void whenResetOccurs_thenStatsAreResetForCompetitionAndTeamsAndUsers() throws FoldingRestException {
         final Team firstTeam = TeamUtils.create(generateTeam());
 
         final UserRequest firstUser = generateUserWithCategory(Category.NVIDIA_GPU);
@@ -232,7 +232,7 @@ public class ResetTest {
     }
 
     @AfterAll
-    public static void tearDown() throws FoldingRestException {
+    static void tearDown() throws FoldingRestException {
         cleanSystemForComplexTests();
     }
 }

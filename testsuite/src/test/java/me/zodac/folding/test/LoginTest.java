@@ -23,12 +23,12 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Tests for the login REST endpoint at <code>/folding/login</code>.
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class LoginTest {
+class LoginTest {
 
     private static final LoginRequestSender LOGIN_REQUEST_SENDER = LoginRequestSender.create(FOLDING_URL);
 
     @Test
-    public void whenLoggingIn_givenCredentialsAreCorrect_andUserIsAdmin_thenResponseHasA200StatusCode() throws FoldingRestException {
+    void whenLoggingIn_givenCredentialsAreCorrect_andUserIsAdmin_thenResponseHasA200StatusCode() throws FoldingRestException {
         final HttpResponse<Void> response = LOGIN_REQUEST_SENDER.loginAsAdmin(ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + response.body())
@@ -36,7 +36,7 @@ public class LoginTest {
     }
 
     @Test
-    public void whenLoggingIn_givenCredentialsAreCorrect_andUserIsNotAdmin_thenResponseHasA403StatusCode() throws FoldingRestException {
+    void whenLoggingIn_givenCredentialsAreCorrect_andUserIsNotAdmin_thenResponseHasA403StatusCode() throws FoldingRestException {
         final HttpResponse<Void> response = LOGIN_REQUEST_SENDER.loginAsAdmin(READ_ONLY_USER.userName(), READ_ONLY_USER.password());
         assertThat(response.statusCode())
                 .as("Did not receive a 403_FORBIDDEN HTTP response: " + response.body())
@@ -44,7 +44,7 @@ public class LoginTest {
     }
 
     @Test
-    public void whenLoggingIn_givenCredentialsAreIncorrect_thenResponseHasA401StatusCode() throws FoldingRestException {
+    void whenLoggingIn_givenCredentialsAreIncorrect_thenResponseHasA401StatusCode() throws FoldingRestException {
         final HttpResponse<Void> response = LOGIN_REQUEST_SENDER.loginAsAdmin(INVALID_USERNAME.userName(), INVALID_USERNAME.password());
         assertThat(response.statusCode())
                 .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
@@ -52,7 +52,7 @@ public class LoginTest {
     }
 
     @Test
-    public void whenLoggingIn_givenInvalidCredentials_thenResponseHasA400StatusCode() throws FoldingRestException {
+    void whenLoggingIn_givenInvalidCredentials_thenResponseHasA400StatusCode() throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
                 .POST(HttpRequest.BodyPublishers.noBody())
                 .uri(URI.create(FOLDING_URL + "/login/admin"))

@@ -1,6 +1,6 @@
 package me.zodac.folding.test.utils.rest.request;
 
-import me.zodac.folding.client.java.request.TeamCompetitionRequestSender;
+import me.zodac.folding.client.java.request.TeamCompetitionStatsRequestSender;
 import me.zodac.folding.client.java.response.TeamCompetitionResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.tc.CompetitionResult;
@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public final class TeamCompetitionStatsUtils {
 
-    public static final TeamCompetitionRequestSender TEAM_COMPETITION_REQUEST_SENDER = TeamCompetitionRequestSender.create(FOLDING_URL);
+    public static final TeamCompetitionStatsRequestSender TEAM_COMPETITION_REQUEST_SENDER = TeamCompetitionStatsRequestSender.create(FOLDING_URL);
 
     private TeamCompetitionStatsUtils() {
 

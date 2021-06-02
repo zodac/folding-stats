@@ -13,7 +13,7 @@ import java.util.Locale;
 /**
  * Utility class with convenient date/time-based functions.
  */
-public class DateTimeUtils {
+public final class DateTimeUtils {
 
     private DateTimeUtils() {
 

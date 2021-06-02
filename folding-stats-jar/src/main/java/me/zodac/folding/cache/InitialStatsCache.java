@@ -3,25 +3,21 @@ package me.zodac.folding.cache;
 
 import me.zodac.folding.api.tc.stats.Stats;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class InitialStatsCache {
+public final class InitialStatsCache {
 
-    private static InitialStatsCache INSTANCE = null;
+    private static final InitialStatsCache INSTANCE = new InitialStatsCache();
 
-    private final Map<Integer, Stats> initialStatsByUserId = new HashMap<>();
+    private transient final Map<Integer, Stats> initialStatsByUserId = new ConcurrentHashMap<>();
 
     private InitialStatsCache() {
 
     }
 
     public static InitialStatsCache get() {
-        if (INSTANCE == null) {
-            INSTANCE = new InitialStatsCache();
-        }
-
         return INSTANCE;
     }
 

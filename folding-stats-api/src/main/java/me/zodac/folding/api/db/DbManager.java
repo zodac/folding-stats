@@ -102,5 +102,5 @@ public interface DbManager {
 
     void deleteRetiredUserStats() throws FoldingException, FoldingConflictException;
 
-    SystemUserAuthentication isValidSystemUser(final String userName, final String password) throws FoldingException;
+    SystemUserAuthentication authenticateSystemUser(final String userName, final String password) throws FoldingException;
 }

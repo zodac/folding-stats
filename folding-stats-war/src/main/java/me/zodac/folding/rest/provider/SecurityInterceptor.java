@@ -4,6 +4,7 @@ import me.zodac.folding.api.db.SystemUserAuthentication;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.utils.EncodingUtils;
 import me.zodac.folding.ejb.BusinessLogic;
+import me.zodac.folding.rest.api.RestHeader;
 import me.zodac.folding.rest.util.response.Responses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,12 +66,10 @@ public class SecurityInterceptor implements ContainerRequestFilter {
     private static final Logger LOGGER = LoggerFactory.getLogger(SecurityInterceptor.class);
 
     @Context
-    private ResourceInfo resourceInfo;
+    private transient ResourceInfo resourceInfo;
 
     @EJB
-    private BusinessLogic businessLogic;
-
-    private static final String AUTHORIZATION_PROPERTY = "Authorization";
+    private transient BusinessLogic businessLogic;
 
     @Override
     public void filter(final ContainerRequestContext requestContext) {
@@ -98,9 +97,9 @@ public class SecurityInterceptor implements ContainerRequestFilter {
             return;
         }
 
-        final String authorizationProperty = requestContext.getHeaderString(AUTHORIZATION_PROPERTY);
+        final String authorizationProperty = requestContext.getHeaderString(RestHeader.AUTHORIZATION.headerName());
         if (EncodingUtils.isNotBasicAuthentication(authorizationProperty)) {
-            LOGGER.warn("Invalid {} value provided at '{}': '{}'", AUTHORIZATION_PROPERTY, requestContext.getUriInfo().getAbsolutePath(), authorizationProperty);
+            LOGGER.warn("Invalid {} value provided at '{}': '{}'", RestHeader.AUTHORIZATION.headerName(), requestContext.getUriInfo().getAbsolutePath(), authorizationProperty);
             requestContext.abortWith(unauthorized());
             return;
         }
@@ -109,7 +108,7 @@ public class SecurityInterceptor implements ContainerRequestFilter {
         final String userName = decodedUserNameAndPassword.get(EncodingUtils.DECODED_USERNAME_KEY);
         final String password = decodedUserNameAndPassword.get(EncodingUtils.DECODED_PASSWORD_KEY);
 
-        final SystemUserAuthentication systemUserAuthentication = businessLogic.isValidUser(userName, password);
+        final SystemUserAuthentication systemUserAuthentication = businessLogic.authenticateSystemUser(userName, password);
 
         if (!systemUserAuthentication.isUserExists()) {
             LOGGER.warn("User '{}' does not exist", userName);

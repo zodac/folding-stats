@@ -15,7 +15,7 @@ import me.zodac.folding.api.tc.exception.TeamNotFoundException;
 import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.ejb.BusinessLogic;
-import me.zodac.folding.rest.util.ParsingUtils;
+import me.zodac.folding.rest.util.IdentityParser;
 import me.zodac.folding.rest.util.response.BatchCreateResponse;
 import org.slf4j.Logger;
 
@@ -50,7 +50,7 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
     private static final int CACHE_EXPIRATION_TIME = untilNextMonthUtc(ChronoUnit.SECONDS);
 
     @Context
-    protected UriInfo uriContext;
+    protected transient UriInfo uriContext;
 
     @EJB
     protected BusinessLogic businessLogic;
@@ -219,7 +219,7 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
         }
 
         try {
-            final O element = getElementById(ParsingUtils.parseId(elementId));
+            final O element = getElementById(IdentityParser.parse(elementId));
 
             final CacheControl cacheControl = new CacheControl();
             cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);
@@ -272,7 +272,7 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
         }
 
         try {
-            final int parsedId = ParsingUtils.parseId(elementId);
+            final int parsedId = IdentityParser.parse(elementId);
             // We want to make sure the payload is not trying to change the ID of the element
             // If no ID is provided, the POJO will default to a value of 0, which is acceptable
             if (parsedId != inputRequest.getId() && inputRequest.getId() != 0) {
@@ -342,7 +342,7 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
         }
 
         try {
-            final int parsedId = ParsingUtils.parseId(elementId);
+            final int parsedId = IdentityParser.parse(elementId);
             getElementById(parsedId); // We call this so if the value does not exist, we can fail with a NOT_FOUND response
             deleteElementById(parsedId);
             SystemStateManager.next(SystemState.WRITE_EXECUTED);

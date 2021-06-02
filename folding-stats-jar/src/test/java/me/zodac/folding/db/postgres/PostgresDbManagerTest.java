@@ -35,13 +35,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * Unit tests for {@link PostgresDbManager}.
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class PostgresDbManagerTest {
+class PostgresDbManagerTest {
 
     private static final DbManager POSTGRES_DB_MANAGER = PostgresDbManager.create(TestDbConnectionPool.create());
 
     @Test
     @Order(1)
-    public void hardwareTest() throws FoldingException, FoldingConflictException, HardwareNotFoundException {
+    void hardwareTest() throws FoldingException, FoldingConflictException, HardwareNotFoundException {
         final Hardware hardware = generateHardware();
         final Hardware createdHardware = POSTGRES_DB_MANAGER.createHardware(hardware);
         assertThat(createdHardware.getId())
@@ -77,7 +77,7 @@ public class PostgresDbManagerTest {
 
     @Test
     @Order(2)
-    public void teamTest() throws FoldingException, FoldingConflictException, TeamNotFoundException {
+    void teamTest() throws FoldingException, FoldingConflictException, TeamNotFoundException {
         final Team team = generateTeam();
         final Team createdTeam = POSTGRES_DB_MANAGER.createTeam(team);
 
@@ -113,7 +113,7 @@ public class PostgresDbManagerTest {
 
     @Test
     @Order(3)
-    public void userTest() throws FoldingException, FoldingConflictException, UserNotFoundException {
+    void userTest() throws FoldingException, FoldingConflictException, UserNotFoundException {
         final User user = generateUser();
         final User createdUser = POSTGRES_DB_MANAGER.createUser(user);
 
@@ -154,7 +154,7 @@ public class PostgresDbManagerTest {
     }
 
     @Test
-    public void initialUserStatsTest() throws FoldingConflictException, FoldingException {
+    void initialUserStatsTest() throws FoldingConflictException, FoldingException {
         final int userId = createUser().getId();
 
         assertThatThrownBy(() -> POSTGRES_DB_MANAGER.getInitialStats(userId))
@@ -169,7 +169,7 @@ public class PostgresDbManagerTest {
     }
 
     @Test
-    public void totalStatsTest() throws FoldingConflictException, FoldingException {
+    void totalStatsTest() throws FoldingConflictException, FoldingException {
         final int userId = createUser().getId();
 
         assertThatThrownBy(() -> POSTGRES_DB_MANAGER.getTotalStats(userId))
@@ -184,7 +184,7 @@ public class PostgresDbManagerTest {
     }
 
     @Test
-    public void retiredUserStatsTest() throws FoldingConflictException, FoldingException {
+    void retiredUserStatsTest() throws FoldingConflictException, FoldingException {
         final int invalidId = 9_999;
         assertThatThrownBy(() -> POSTGRES_DB_MANAGER.getRetiredUserStats(invalidId))
                 .isInstanceOf(FoldingException.class);
@@ -210,7 +210,7 @@ public class PostgresDbManagerTest {
     }
 
     @Test
-    public void offsetStatsTest() throws FoldingConflictException, FoldingException {
+    void offsetStatsTest() throws FoldingConflictException, FoldingException {
         final int userId = createUser().getId();
 
         assertThat(POSTGRES_DB_MANAGER.getOffsetStats(userId))
@@ -249,7 +249,7 @@ public class PostgresDbManagerTest {
     }
 
     @Test
-    public void hourlyTcStatsTest() throws FoldingConflictException, FoldingException, NoStatsAvailableException {
+    void hourlyTcStatsTest() throws FoldingConflictException, FoldingException, NoStatsAvailableException {
         assertThat(POSTGRES_DB_MANAGER.isAnyHourlyTcStats())
                 .isFalse();
 
@@ -272,8 +272,8 @@ public class PostgresDbManagerTest {
     }
 
     @Test
-    public void validSystemUserTest() throws FoldingException {
-        final SystemUserAuthentication invalidUserName = POSTGRES_DB_MANAGER.isValidSystemUser("invalidUserName", "ADMIN_PASSWORD");
+    void validSystemUserTest() throws FoldingException {
+        final SystemUserAuthentication invalidUserName = POSTGRES_DB_MANAGER.authenticateSystemUser("invalidUserName", "ADMIN_PASSWORD");
         assertThat(invalidUserName.isUserExists())
                 .isFalse();
         assertThat(invalidUserName.isPasswordMatch())
@@ -281,7 +281,7 @@ public class PostgresDbManagerTest {
         assertThat(invalidUserName.getUserRoles())
                 .isEmpty();
 
-        final SystemUserAuthentication invalidPassword = POSTGRES_DB_MANAGER.isValidSystemUser("ADMIN_USERNAME", "invalidPassword");
+        final SystemUserAuthentication invalidPassword = POSTGRES_DB_MANAGER.authenticateSystemUser("ADMIN_USERNAME", "invalidPassword");
         assertThat(invalidPassword.isUserExists())
                 .isTrue();
         assertThat(invalidPassword.isPasswordMatch())
@@ -289,7 +289,7 @@ public class PostgresDbManagerTest {
         assertThat(invalidPassword.getUserRoles())
                 .isEmpty();
 
-        final SystemUserAuthentication admin = POSTGRES_DB_MANAGER.isValidSystemUser("ADMIN_USERNAME", "ADMIN_PASSWORD");
+        final SystemUserAuthentication admin = POSTGRES_DB_MANAGER.authenticateSystemUser("ADMIN_USERNAME", "ADMIN_PASSWORD");
         assertThat(admin.isUserExists())
                 .isTrue();
         assertThat(admin.isPasswordMatch())
@@ -297,7 +297,7 @@ public class PostgresDbManagerTest {
         assertThat(admin.getUserRoles())
                 .contains("admin");
 
-        final SystemUserAuthentication readOnly = POSTGRES_DB_MANAGER.isValidSystemUser("READ_ONLY_USERNAME", "READ_ONLY_PASSWORD");
+        final SystemUserAuthentication readOnly = POSTGRES_DB_MANAGER.authenticateSystemUser("READ_ONLY_USERNAME", "READ_ONLY_PASSWORD");
         assertThat(readOnly.isUserExists())
                 .isTrue();
         assertThat(readOnly.isPasswordMatch())

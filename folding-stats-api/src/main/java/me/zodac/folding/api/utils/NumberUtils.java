@@ -6,7 +6,7 @@ import java.util.Locale;
 /**
  * Utility class used to retrieve environment variables.
  */
-public class NumberUtils {
+public final class NumberUtils {
 
     private NumberUtils() {
 

@@ -8,14 +8,16 @@ import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HardwareValidator {
+public final class HardwareValidator {
 
+    // Assuming multiplier cannot be less than 0, also assuming we might want a 0.1/0.5 at some point with future hardware
+    private static final double INVALID_MULTIPLIER_VALUE = 0.0D;
 
     public static HardwareValidator create() {
         return new HardwareValidator();
     }
 
-    public ValidationResponse<Hardware> isValid(final HardwareRequest hardwareRequest) {
+    public ValidationResponse<Hardware> validate(final HardwareRequest hardwareRequest) {
         if (hardwareRequest == null) {
             return ValidationResponse.nullObject();
         }
@@ -35,8 +37,7 @@ public class HardwareValidator {
             failureMessages.add(String.format("Attribute 'operatingSystem' must be one of: %s", OperatingSystem.getAllValues()));
         }
 
-        // I am assuming multiplier cannot be less than 0, also assuming we might want a 0.1/0.5 at some point with future hardware
-        if (hardwareRequest.getMultiplier() <= 0.0D) {
+        if (hardwareRequest.getMultiplier() <= INVALID_MULTIPLIER_VALUE) {
             failureMessages.add("Attribute 'multiplier' must be over 0.0");
         }
 

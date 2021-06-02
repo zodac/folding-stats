@@ -8,13 +8,13 @@ traits:
       Authorization:
         displayName: Authorization
         description: "Basic authentication encoded as a Base64 string, with the credentials in the form 'username:password'"
-        type: String
+        type: string
         required: true
   cached:
     headers:
       If-None-Match:
         description: "An EntityTag used to retrieve a cache version of the response"
-        type: String
+        type: string
         required: false
 
 /hardware:
@@ -30,7 +30,7 @@ traits:
         headers:
           eTag:
             description: "An EntityTag which can be used to retrieve a cached version of the response in future requests"
-            type: String
+            type: string
       503:
         description: "The system is not in a valid state to execute read requests"
   post:
@@ -48,7 +48,7 @@ traits:
         headers:
           location:
             description: "The URL to the created hardware"
-            type: String
+            type: string
       400:
         description: "The given payload is invalid"
         body:
@@ -68,7 +68,7 @@ traits:
     uriParameters:
       hardwareId:
         description: "The ID of the hardware"
-        type: Integer
+        type: integer
         required: true
     delete:
       is: [ "adminOnly" ]
@@ -119,7 +119,7 @@ traits:
           headers:
             location:
               description: "The URL to the updated hardware (unless there was no change to the hardware)"
-              type: String
+              type: string
               required: false
         400:
           description: "The given payload is invalid"
@@ -180,7 +180,7 @@ traits:
         headers:
           eTag:
             description: "An EntityTag which can be used to retrieve a cached version of the response in future requests"
-            type: String
+            type: string
       503:
         description: "The system is not in a valid state to execute read requests"
   post:
@@ -198,7 +198,7 @@ traits:
         headers:
           location:
             description: "The URL to the created team"
-            type: String
+            type: string
       400:
         description: "The given payload is invalid"
         body:
@@ -218,7 +218,7 @@ traits:
     uriParameters:
       teamId:
         description: "The ID of the team"
-        type: Integer
+        type: integer
         required: true
     delete:
       is: [ "adminOnly" ]
@@ -249,7 +249,7 @@ traits:
           description: "The provided ID is an invalid integer, or out of range"
           body:
             application/json:
-              example: !include responses/team/teamsGetBadRequest.json
+              example: !include responses/teams/teamsGetBadRequest.json
         404:
           description: "No team exists with the given ID"
         503:
@@ -269,7 +269,7 @@ traits:
           headers:
             location:
               description: "The URL to the updated team (unless there was no change to the team)"
-              type: String
+              type: string
               required: false
         400:
           description: "The given payload is invalid"
@@ -307,7 +307,7 @@ traits:
           description: "All given payloads are invalid"
           body:
             application/json:
-              example: !include responses/team/teamsPostBatchBadRequest.json
+              example: !include responses/teams/teamsPostBatchBadRequest.json
         401:
           description: "System user cannot be successfully logged in with provided credentials"
         403:
@@ -330,7 +330,7 @@ traits:
         headers:
           eTag:
             description: "An EntityTag which can be used to retrieve a cached version of the response in future requests"
-            type: String
+            type: string
       503:
         description: "The system is not in a valid state to execute read requests"
   post:
@@ -348,7 +348,7 @@ traits:
         headers:
           location:
             description: "The URL to the created user"
-            type: String
+            type: string
       400:
         description: "The given payload is invalid"
         body:
@@ -368,7 +368,7 @@ traits:
     uriParameters:
       userId:
         description: "The ID of the user instance"
-        type: Integer
+        type: integer
         required: true
     delete:
       is: [ "adminOnly" ]
@@ -417,7 +417,7 @@ traits:
           headers:
             location:
               description: "The URL to the updated user (unless there was no change to the user)"
-              type: String
+              type: string
               required: false
         400:
           description: "The given payload is invalid"
@@ -455,7 +455,7 @@ traits:
           description: "All given payloads are invalid"
           body:
             application/json:
-              example: !include responses/user/usersPostBatchBadRequest.json
+              example: !include responses/users/usersPostBatchBadRequest.json
         401:
           description: "System user cannot be successfully logged in with provided credentials"
         403:
@@ -483,8 +483,8 @@ traits:
         200:
           description: "Retrieve the category leaderboards for all users"
           body:
-          application/json:
-            example: !include responses/stats/statsGetCategory.json
+            application/json:
+              example: !include responses/stats/statsGetCategory.json
         503:
           description: "The system is not in a valid state to execute read requests"
   /leaderboard:
@@ -517,7 +517,7 @@ traits:
         queryParameters:
           async:
             displayName: Async
-            type: Boolean
+            type: boolean
             description: "Whether the stats should be retrieved asynchronously, or the request should only return a response when complete"
             example: true
             required: false
@@ -532,7 +532,7 @@ traits:
     uriParameters:
       userId:
         description: "The ID of the user whose stats are to be retrieved/updated"
-        type: Integer
+        type: integer
         required: true
     get:
       description: "Used to retrieve current the TC stats for the user"
@@ -564,7 +564,7 @@ traits:
           description: "The payload is invalid, or an invalid user ID was provided"
           body:
             application/json:
-              example: !include requests/stats/userOffsetPatchBadRequest.json
+              example: !include responses/stats/userOffsetPatchBadRequest.json
         401:
           description: "System user cannot be successfully logged in with provided credentials"
         403:
@@ -579,11 +579,11 @@ traits:
     uriParameters:
       userId:
         description: "The ID of the user whose stats are to be retrieved"
-        type: Integer
+        type: integer
         required: true
       year:
         description: "The year of the monthly/daily/hourly stats to be retrieved"
-        type: Integer
+        type: integer
         required: true
     get:
       description: "Retrieves the monthly stats for a user for the given year"
@@ -636,11 +636,11 @@ traits:
     uriParameters:
       teamId:
         description: "The ID of the team whose stats are to be retrieved"
-        type: Integer
+        type: integer
         required: true
       year:
         description: "The year of the monthly/daily/hourly stats to be retrieved"
-        type: Integer
+        type: integer
         required: true
     get:
       description: "Retrieves the monthly stats for a team for the given year"

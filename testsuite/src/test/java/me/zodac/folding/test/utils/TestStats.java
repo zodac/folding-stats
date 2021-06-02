@@ -5,15 +5,15 @@ package me.zodac.folding.test.utils;
  * Used since the normal stubbed endpoints insert stats with the timestamp based on the time of execution, whereas for
  * historic stats, we want to specify the timestamps.
  */
-public class Stats {
+public final class TestStats {
 
-    private final int userId;
-    private final String timestamp;
-    private final long points;
-    private final long multipliedPoints;
-    private final int units;
+    private transient final int userId;
+    private transient final String timestamp;
+    private transient final long points;
+    private transient final long multipliedPoints;
+    private transient final int units;
 
-    private Stats(final int userId, final String timestamp, final long points, final long multipliedPoints, final int units) {
+    private TestStats(final int userId, final String timestamp, final long points, final long multipliedPoints, final int units) {
         this.userId = userId;
         this.timestamp = timestamp;
         this.points = points;
@@ -21,8 +21,8 @@ public class Stats {
         this.units = units;
     }
 
-    public static Stats create(final int userId, final String timestamp, final long points, final long multipliedPoints, final int units) {
-        return new Stats(userId, timestamp, points, multipliedPoints, units);
+    public static TestStats create(final int userId, final String timestamp, final long points, final long multipliedPoints, final int units) {
+        return new TestStats(userId, timestamp, points, multipliedPoints, units);
     }
 
     @Override

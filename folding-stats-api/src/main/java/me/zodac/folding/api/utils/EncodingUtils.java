@@ -51,7 +51,7 @@ public final class EncodingUtils {
      * @return a {@link Map} with two keys, the {@link #DECODED_USERNAME_KEY} and {@link #DECODED_PASSWORD_KEY}
      * @throws IllegalArgumentException thrown if the input is not a valid {@link Base64} {@link String}
      */
-    public static Map<String, String> decodeBasicAuthentication(final String authorizationPayload) throws IllegalArgumentException {
+    public static Map<String, String> decodeBasicAuthentication(final String authorizationPayload) {
         if (authorizationPayload == null) {
             throw new IllegalArgumentException("Cannot decode null");
         }
@@ -67,7 +67,7 @@ public final class EncodingUtils {
      * @return a {@link Map} with two keys, the {@link #DECODED_USERNAME_KEY} and {@link #DECODED_PASSWORD_KEY}
      * @throws IllegalArgumentException thrown if the input is not a valid {@link Base64} {@link String}
      */
-    public static Map<String, String> decodeAuthentication(final String encodedUserNameAndPassword) throws IllegalArgumentException {
+    public static Map<String, String> decodeAuthentication(final String encodedUserNameAndPassword) {
         final String decodedUserNameAndPassword = new String(Base64.getDecoder().decode(encodedUserNameAndPassword), StandardCharsets.ISO_8859_1);
         final String[] userNameAndPasswordTokens = decodedUserNameAndPassword.split(DECODED_USERNAME_PASSWORD_DELIMITER, 2);
 

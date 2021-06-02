@@ -34,7 +34,7 @@ public class LoginEndpoint {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginEndpoint.class);
 
     @EJB
-    private BusinessLogic businessLogic;
+    private transient BusinessLogic businessLogic;
 
     @POST
     @PermitAll
@@ -60,7 +60,7 @@ public class LoginEndpoint {
             final String password = decodedUserNameAndPassword.get(EncodingUtils.DECODED_PASSWORD_KEY);
             LOGGER.debug("Login request received for user: '{}'", userName);
 
-            final SystemUserAuthentication systemUserAuthentication = businessLogic.isValidUser(userName, password);
+            final SystemUserAuthentication systemUserAuthentication = businessLogic.authenticateSystemUser(userName, password);
 
             if (!systemUserAuthentication.isUserExists() || !systemUserAuthentication.isPasswordMatch()) {
                 LOGGER.warn("Invalid user credentials supplied: {}", loginCredentials);

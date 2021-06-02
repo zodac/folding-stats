@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import lombok.experimental.UtilityClass;
+import me.zodac.folding.client.java.request.TeamCompetitionStatsRequestSender;
 import me.zodac.folding.rest.api.tc.CompetitionResult;
 import me.zodac.folding.rest.api.tc.UserResult;
 import me.zodac.folding.rest.api.tc.leaderboard.TeamSummary;
@@ -16,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * {@link UtilityClass} used to parse a {@link HttpResponse} returned from {@link me.zodac.folding.client.java.request.TeamCompetitionRequestSender}.
+ * {@link UtilityClass} used to parse a {@link HttpResponse} returned from {@link TeamCompetitionStatsRequestSender}.
  */
 @UtilityClass
 public final class TeamCompetitionResponseParser {
@@ -24,7 +25,7 @@ public final class TeamCompetitionResponseParser {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     /**
-     * Returns the {@link CompetitionResult} retrieved by {@link me.zodac.folding.client.java.request.TeamCompetitionRequestSender#getStats()}.
+     * Returns the {@link CompetitionResult} retrieved by {@link TeamCompetitionStatsRequestSender#getStats()}.
      *
      * @param response the {@link HttpResponse} to parse
      * @return the retrieved {@link CompetitionResult}
@@ -34,7 +35,7 @@ public final class TeamCompetitionResponseParser {
     }
 
     /**
-     * Returns the {@link UserResult} retrieved by {@link me.zodac.folding.client.java.request.TeamCompetitionRequestSender#getStatsForUser(int)}.
+     * Returns the {@link UserResult} retrieved by {@link TeamCompetitionStatsRequestSender#getStatsForUser(int)}.
      *
      * @param response the {@link HttpResponse} to parse
      * @return the retrieved {@link UserResult}
@@ -44,7 +45,7 @@ public final class TeamCompetitionResponseParser {
     }
 
     /**
-     * Returns the {@link TeamSummary}s retrieved by {@link me.zodac.folding.client.java.request.TeamCompetitionRequestSender#getTeamLeaderboard()}.
+     * Returns the {@link TeamSummary}s retrieved by {@link TeamCompetitionStatsRequestSender#getTeamLeaderboard()}.
      *
      * @param response the {@link HttpResponse} to parse
      * @return the retrieved {@link TeamSummary}s
@@ -56,7 +57,7 @@ public final class TeamCompetitionResponseParser {
     }
 
     /**
-     * Returns the {@link UserSummary}s retrieved by {@link me.zodac.folding.client.java.request.TeamCompetitionRequestSender#getCategoryLeaderboard()}.
+     * Returns the {@link UserSummary}s retrieved by {@link TeamCompetitionStatsRequestSender#getCategoryLeaderboard()}.
      *
      * @param response the {@link HttpResponse} to parse
      * @return the retrieved {@link UserSummary}s

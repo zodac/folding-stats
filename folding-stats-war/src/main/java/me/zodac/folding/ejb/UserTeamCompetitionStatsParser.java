@@ -33,7 +33,7 @@ public class UserTeamCompetitionStatsParser {
     private static final FoldingStatsRetriever FOLDING_STATS_RETRIEVER = HttpFoldingStatsRetriever.create();
 
     @EJB
-    private BusinessLogic businessLogic;
+    private transient BusinessLogic businessLogic;
 
     /**
      * Parses the latest TC stats for the given {@link User}.

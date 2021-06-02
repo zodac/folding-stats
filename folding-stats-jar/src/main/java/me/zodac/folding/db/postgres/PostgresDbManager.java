@@ -36,13 +36,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-public class PostgresDbManager implements DbManager {
+public final class PostgresDbManager implements DbManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PostgresDbManager.class);
     private static final String VIOLATES_FOREIGN_KEY_CONSTRAINT = "violates foreign key constraint";
     private static final String VIOLATES_UNIQUE_CONSTRAINT = "violates unique constraint";
 
-    private final DbConnectionPool dbConnectionPool;
+    private transient final DbConnectionPool dbConnectionPool;
 
     private PostgresDbManager(final DbConnectionPool dbConnectionPool) {
         this.dbConnectionPool = dbConnectionPool;
@@ -74,7 +74,7 @@ public class PostgresDbManager implements DbManager {
             }
         } catch (final SQLException e) {
             if (e.getMessage().contains(VIOLATES_UNIQUE_CONSTRAINT)) {
-                throw new FoldingConflictException();
+                throw new FoldingConflictException(e);
             }
             throw new FoldingException("Error opening connection to the DB", e);
         }
@@ -83,7 +83,7 @@ public class PostgresDbManager implements DbManager {
     @Override
     public Collection<Hardware> getAllHardware() throws FoldingException {
         final String selectSqlStatement = "SELECT * FROM hardware ORDER BY hardware_id ASC;";
-        LOGGER.debug("Executing SQL statement '{}'", selectSqlStatement);
+        LOGGER.debug("Executing prepared statement: '{}'", selectSqlStatement);
 
         try (final Connection connection = dbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement);
@@ -104,7 +104,6 @@ public class PostgresDbManager implements DbManager {
     @Override
     public Hardware getHardware(final int hardwareId) throws FoldingException, HardwareNotFoundException {
         final String selectSqlStatement = "SELECT * FROM hardware WHERE hardware_id = ?;";
-        LOGGER.debug("Executing SQL statement '{}'", selectSqlStatement);
 
         try (final Connection connection = dbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
@@ -145,7 +144,7 @@ public class PostgresDbManager implements DbManager {
             }
         } catch (final SQLException e) {
             if (e.getMessage().contains(VIOLATES_UNIQUE_CONSTRAINT)) {
-                throw new FoldingConflictException();
+                throw new FoldingConflictException(e);
             }
             throw new FoldingException("Error opening connection to the DB", e);
         }
@@ -164,7 +163,7 @@ public class PostgresDbManager implements DbManager {
             preparedStatement.executeUpdate();
         } catch (final SQLException e) {
             if (e.getMessage().contains(VIOLATES_FOREIGN_KEY_CONSTRAINT)) {
-                throw new FoldingConflictException();
+                throw new FoldingConflictException(e);
             }
             throw new FoldingException("Error opening connection to the DB", e);
         }
@@ -197,7 +196,7 @@ public class PostgresDbManager implements DbManager {
             throw new IllegalStateException("No ID was returned from the DB, but no exception was raised");
         } catch (final SQLException e) {
             if (e.getMessage().contains(VIOLATES_UNIQUE_CONSTRAINT)) {
-                throw new FoldingConflictException();
+                throw new FoldingConflictException(e);
             }
             throw new FoldingException("Error opening connection to the DB", e);
         }
@@ -212,7 +211,7 @@ public class PostgresDbManager implements DbManager {
                 "LEFT JOIN teams " +
                 "ON users.team_id = teams.team_id " +
                 "ORDER BY user_id ASC;";
-        LOGGER.debug("Executing SQL statement: '{}'", selectSqlStatement);
+        LOGGER.debug("Executing prepared statement: '{}'", selectSqlStatement);
 
         try (final Connection connection = dbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement);
@@ -284,7 +283,7 @@ public class PostgresDbManager implements DbManager {
             }
         } catch (final SQLException e) {
             if (e.getMessage().contains(VIOLATES_UNIQUE_CONSTRAINT)) {
-                throw new FoldingConflictException();
+                throw new FoldingConflictException(e);
             }
             throw new FoldingException("Error opening connection to the DB", e);
         }
@@ -303,7 +302,7 @@ public class PostgresDbManager implements DbManager {
             preparedStatement.executeUpdate();
         } catch (final SQLException e) {
             if (e.getMessage().contains(VIOLATES_FOREIGN_KEY_CONSTRAINT)) {
-                throw new FoldingConflictException();
+                throw new FoldingConflictException(e);
             }
             throw new FoldingException("Error opening connection to the DB", e);
         }
@@ -331,7 +330,7 @@ public class PostgresDbManager implements DbManager {
             }
         } catch (final SQLException e) {
             if (e.getMessage().contains(VIOLATES_UNIQUE_CONSTRAINT)) {
-                throw new FoldingConflictException();
+                throw new FoldingConflictException(e);
             }
             throw new FoldingException("Error opening connection to the DB", e);
         }
@@ -340,7 +339,7 @@ public class PostgresDbManager implements DbManager {
     @Override
     public Collection<Team> getAllTeams() throws FoldingException {
         final String selectSqlStatement = "SELECT * FROM teams ORDER BY team_id ASC;";
-        LOGGER.debug("Executing SQL statement '{}'", selectSqlStatement);
+        LOGGER.debug("Executing prepared statement: '{}'", selectSqlStatement);
 
         try (final Connection connection = dbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement); final ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -393,13 +392,13 @@ public class PostgresDbManager implements DbManager {
             preparedStatement.setString(3, team.getForumLink());
             preparedStatement.setInt(4, team.getId());
 
-            LOGGER.debug("Executing SQL statement '{}'", preparedStatement);
+            LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
             if (preparedStatement.executeUpdate() == 0) {
                 throw new FoldingException(String.format("Error executing update for team: %s", preparedStatement));
             }
         } catch (final SQLException e) {
             if (e.getMessage().contains(VIOLATES_UNIQUE_CONSTRAINT)) {
-                throw new FoldingConflictException();
+                throw new FoldingConflictException(e);
             }
             throw new FoldingException("Error opening connection to the DB", e);
         }
@@ -419,7 +418,7 @@ public class PostgresDbManager implements DbManager {
             preparedStatement.executeUpdate();
         } catch (final SQLException e) {
             if (e.getMessage().contains(VIOLATES_FOREIGN_KEY_CONSTRAINT)) {
-                throw new FoldingConflictException();
+                throw new FoldingConflictException(e);
             }
             throw new FoldingException("Error opening connection to the DB", e);
         }
@@ -650,7 +649,10 @@ public class PostgresDbManager implements DbManager {
 
     private UserTcStats getTcStatsForFirstHourOfDay(final int userId, final int day, final Month month, final Year year) throws FoldingException {
         final UserTcStats firstHourTcStatsCurrentDay = getCurrentDayFirstHourTcStats(userId, day, month, year);
-        final UserTcStats lastHourTcStatsPreviousDay = (day == 1) ? UserTcStats.empty(userId) : getPreviousDayLastHourTcStats(userId, (day - 1), month, year);
+
+        final boolean isFirstDay = day == 1;
+        final int previousDay = day - 1;
+        final UserTcStats lastHourTcStatsPreviousDay = isFirstDay ? UserTcStats.empty(userId) : getPreviousDayLastHourTcStats(userId, previousDay, month, year);
 
         if (lastHourTcStatsPreviousDay.isEmpty()) {
 
@@ -1063,7 +1065,7 @@ public class PostgresDbManager implements DbManager {
             preparedStatement.executeUpdate();
         } catch (final SQLException e) {
             if (e.getMessage().contains(VIOLATES_FOREIGN_KEY_CONSTRAINT)) {
-                throw new FoldingConflictException();
+                throw new FoldingConflictException(e);
             }
             throw new FoldingException("Error opening connection to the DB", e);
         }
@@ -1203,14 +1205,14 @@ public class PostgresDbManager implements DbManager {
             preparedStatement.executeUpdate();
         } catch (final SQLException e) {
             if (e.getMessage().contains(VIOLATES_FOREIGN_KEY_CONSTRAINT)) {
-                throw new FoldingConflictException();
+                throw new FoldingConflictException(e);
             }
             throw new FoldingException("Error opening connection to the DB", e);
         }
     }
 
     @Override
-    public SystemUserAuthentication isValidSystemUser(final String userName, final String password) throws FoldingException {
+    public SystemUserAuthentication authenticateSystemUser(final String userName, final String password) throws FoldingException {
         LOGGER.debug("Checking if supplied user name '{}' and password is valid user, then returning roles", userName);
         final String selectSql = "SELECT user_password_hash = crypt(?, user_password_hash) AS is_password_match, roles " +
                 "FROM system_users " +

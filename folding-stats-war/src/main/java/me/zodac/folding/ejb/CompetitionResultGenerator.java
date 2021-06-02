@@ -40,7 +40,7 @@ public class CompetitionResultGenerator {
     private static final Logger LOGGER = LoggerFactory.getLogger(CompetitionResultGenerator.class);
 
     @EJB
-    private BusinessLogic businessLogic;
+    private transient BusinessLogic businessLogic;
 
     /**
      * Generates a {@link CompetitionResult} based on the latest <code>Team Competition</code> {@link UserTcStats}.
@@ -50,10 +50,12 @@ public class CompetitionResultGenerator {
      */
     public CompetitionResult generate() {
         // TODO: [zodac] This cache logic should not be here, should be in the Storage access layer (whatever that will be)
-        if (SystemStateManager.current() != SystemState.WRITE_EXECUTED && CompetitionResultCache.hasCachedResult()) {
+        final CompetitionResultCache competitionResultCache = CompetitionResultCache.get();
+        if (SystemStateManager.current() != SystemState.WRITE_EXECUTED && competitionResultCache.hasCachedResult()) {
             LOGGER.debug("System is not in state {} and has a cached TC result, using cache", SystemState.WRITE_EXECUTED);
 
-            final Optional<CompetitionResult> cachedCompetitionResult = CompetitionResultCache.get();
+
+            final Optional<CompetitionResult> cachedCompetitionResult = competitionResultCache.getResult();
             if (cachedCompetitionResult.isPresent()) {
                 return cachedCompetitionResult.get();
             } else {
@@ -61,7 +63,7 @@ public class CompetitionResultGenerator {
             }
         }
 
-        LOGGER.debug("Calculating latest TC result, system state: {}, TC cache populated: {}", SystemStateManager.current(), CompetitionResultCache.hasCachedResult());
+        LOGGER.debug("Calculating latest TC result, system state: {}, TC cache populated: {}", SystemStateManager.current(), competitionResultCache.hasCachedResult());
 
         final List<TeamResult> teamResults = getStatsForTeams();
         LOGGER.debug("Found {} TC teams", teamResults.size());
@@ -71,7 +73,7 @@ public class CompetitionResultGenerator {
         }
 
         final CompetitionResult competitionResult = CompetitionResult.create(teamResults);
-        CompetitionResultCache.add(competitionResult);
+        competitionResultCache.add(competitionResult);
         SystemStateManager.next(SystemState.AVAILABLE);
         return competitionResult;
     }

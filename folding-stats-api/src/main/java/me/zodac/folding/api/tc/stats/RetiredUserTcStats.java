@@ -17,25 +17,25 @@ public class RetiredUserTcStats {
     private final String displayUserName;
 
     @Getter(AccessLevel.NONE)
-    private final UserTcStats retiredUserTcStats;
+    private final UserTcStats userTcStats;
 
     public static RetiredUserTcStats create(final int retiredUserId, final int teamId, final String displayUserName, final UserTcStats retiredUserTcStats) {
         return new RetiredUserTcStats(retiredUserId, teamId, displayUserName, retiredUserTcStats);
     }
 
     public int getUserId() {
-        return retiredUserTcStats.getUserId();
+        return userTcStats.getUserId();
     }
 
     public long getPoints() {
-        return retiredUserTcStats.getPoints();
+        return userTcStats.getPoints();
     }
 
     public long getMultipliedPoints() {
-        return retiredUserTcStats.getMultipliedPoints();
+        return userTcStats.getMultipliedPoints();
     }
 
     public int getUnits() {
-        return retiredUserTcStats.getUnits();
+        return userTcStats.getUnits();
     }
 }

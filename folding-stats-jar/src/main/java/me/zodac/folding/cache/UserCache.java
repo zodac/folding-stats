@@ -2,10 +2,9 @@ package me.zodac.folding.cache;
 
 import me.zodac.folding.api.tc.User;
 
-public class UserCache extends AbstractCache<User> {
+public final class UserCache extends AbstractCache<User> {
 
-    // TODO: [zodac] Do I really need a singleton instance? May as well make it a static class?
-    private static UserCache INSTANCE = null;
+    private static final UserCache INSTANCE = new UserCache();
 
     private UserCache() {
         super();
@@ -17,17 +16,6 @@ public class UserCache extends AbstractCache<User> {
     }
 
     public static UserCache get() {
-        if (INSTANCE == null) {
-            INSTANCE = new UserCache();
-        }
-
         return INSTANCE;
     }
-
-//    public Map<Integer, User> getRetired() {
-//        return super.getAll()
-//                .stream()
-//                .filter(User::isRetired)
-//                .collect(toMap(User::getId, retiredUser -> retiredUser));
-//    }
 }

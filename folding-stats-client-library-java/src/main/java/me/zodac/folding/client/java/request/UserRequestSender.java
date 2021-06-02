@@ -5,6 +5,8 @@ import com.google.gson.GsonBuilder;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.rest.api.ContentType;
+import me.zodac.folding.rest.api.RestHeader;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 import org.apache.commons.lang3.StringUtils;
@@ -31,7 +33,7 @@ public final class UserRequestSender {
             .connectTimeout(Duration.ofSeconds(10))
             .build();
 
-    private final String foldingUrl;
+    private final String usersUrl;
 
     /**
      * Create an instance of {@link UserRequestSender}.
@@ -41,7 +43,8 @@ public final class UserRequestSender {
      * @return the created {@link UserRequestSender}
      */
     public static UserRequestSender create(final String foldingUrl) {
-        return new UserRequestSender(foldingUrl);
+        final String usersUrl = foldingUrl + "/users";
+        return new UserRequestSender(usersUrl);
     }
 
     /**
@@ -68,11 +71,11 @@ public final class UserRequestSender {
     public HttpResponse<String> getAll(final String eTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .GET()
-                .uri(URI.create(foldingUrl + "/users"))
-                .header("Content-Type", "application/json");
+                .uri(URI.create(usersUrl))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
         if (StringUtils.isNotBlank(eTag)) {
-            requestBuilder.header("If-None-Match", eTag);
+            requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), eTag);
         }
 
         final HttpRequest request = requestBuilder.build();
@@ -110,11 +113,11 @@ public final class UserRequestSender {
     public HttpResponse<String> get(final int userId, final String eTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .GET()
-                .uri(URI.create(foldingUrl + "/users/" + userId))
-                .header("Content-Type", "application/json");
+                .uri(URI.create(usersUrl + '/' + userId))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
         if (StringUtils.isNotBlank(eTag)) {
-            requestBuilder.header("If-None-Match", eTag);
+            requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), eTag);
         }
 
         final HttpRequest request = requestBuilder.build();
@@ -149,11 +152,11 @@ public final class UserRequestSender {
     public HttpResponse<String> create(final UserRequest user, final String userName, final String password) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(user)))
-                .uri(URI.create(foldingUrl + "/users"))
-                .header("Content-Type", "application/json");
+                .uri(URI.create(usersUrl))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
         if (StringUtils.isNoneBlank(userName, password)) {
-            requestBuilder.header("Authorization", encodeBasicAuthentication(userName, password));
+            requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
         }
 
         final HttpRequest request = requestBuilder.build();
@@ -188,11 +191,11 @@ public final class UserRequestSender {
     public HttpResponse<String> createBatchOf(final Collection<UserRequest> batchOfUsers, final String userName, final String password) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(batchOfUsers)))
-                .uri(URI.create(foldingUrl + "/users/batch"))
-                .header("Content-Type", "application/json");
+                .uri(URI.create(usersUrl + "/batch"))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
         if (StringUtils.isNoneBlank(userName, password)) {
-            requestBuilder.header("Authorization", encodeBasicAuthentication(userName, password));
+            requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
         }
 
         final HttpRequest request = requestBuilder.build();
@@ -227,11 +230,11 @@ public final class UserRequestSender {
     public HttpResponse<String> update(final UserRequest user, final String userName, final String password) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .PUT(HttpRequest.BodyPublishers.ofString(GSON.toJson(user)))
-                .uri(URI.create(foldingUrl + "/users/" + user.getId()))
-                .header("Content-Type", "application/json");
+                .uri(URI.create(usersUrl + '/' + user.getId()))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
         if (StringUtils.isNoneBlank(userName, password)) {
-            requestBuilder.header("Authorization", encodeBasicAuthentication(userName, password));
+            requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
         }
 
         final HttpRequest request = requestBuilder.build();
@@ -266,11 +269,11 @@ public final class UserRequestSender {
     public HttpResponse<Void> delete(final int userId, final String userName, final String password) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .DELETE()
-                .uri(URI.create(foldingUrl + "/users/" + userId))
-                .header("Content-Type", "application/json");
+                .uri(URI.create(usersUrl + '/' + userId))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
         if (StringUtils.isNoneBlank(userName, password)) {
-            requestBuilder.header("Authorization", encodeBasicAuthentication(userName, password));
+            requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
         }
 
         final HttpRequest request = requestBuilder.build();

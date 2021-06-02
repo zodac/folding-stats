@@ -21,9 +21,9 @@ import java.util.List;
 @ToString(doNotUseGetters = true)
 public class CompetitionResult {
 
-    private long totalPoints = 0L;
-    private long totalMultipliedPoints = 0L;
-    private int totalUnits = 0;
+    private long totalPoints;
+    private long totalMultipliedPoints;
+    private int totalUnits;
     private Collection<TeamResult> teams = new ArrayList<>();
 
     public static CompetitionResult create(final List<TeamResult> teams) {
