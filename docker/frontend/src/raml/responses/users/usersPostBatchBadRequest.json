@@ -1,0 +1,34 @@
+[
+  {
+    "invalidObject": {
+      "id": 0,
+      "foldingUserName": "User1",
+      "displayName": "User1",
+      "passkey": "fc7d6837269d86784d8bfd0b386d6bca",
+      "category": "WILDCARD",
+      "profileLink": "https://forums.extremehw.net/",
+      "liveStatsLink": "http://teamcomp.axihub.ca/",
+      "hardwareId": 1,
+      "teamId": 1,
+      "userIsCaptain": true
+    },
+    "errors": [
+      "User 'User1' has 0 completed Work Units with passkey 'fc7d6837269d86784d8bfd0b386d6bca', there must be at least one valid Work Unit submitted on the passkey before adding the user"
+    ]
+  },
+  {
+    "invalidObject": {
+      "id": 0,
+      "foldingUserName": "User2",
+      "displayName": "User2",
+      "passkey": "fc7d6837269d86784d8bfd0b386d6bca",
+      "category": "AMD_GPU",
+      "hardwareId": 2,
+      "teamId": 1,
+      "userIsCaptain": false
+    },
+    "errors": [
+      "User 'User2' has 0 completed Work Units with passkey 'fc7d6837269d86784d8bfd0b386d6bca', there must be at least one valid Work Unit submitted on the passkey before adding the user"
+    ]
+  }
+]

@@ -167,9 +167,203 @@ traits:
         503:
           description: "The system is not in a valid state to execute write requests"
 
+/teams:
+  get:
+    is: [ "cached" ]
+    description: "Retrieves all teams"
+    responses:
+      200:
+        description: "All teams have been retrieved"
+        body:
+          application/json:
+            example: !include responses/teams/teamsGetAll.json
+        headers:
+          eTag:
+            description: "An EntityTag which can be used to retrieve a cached version of the response in future requests"
+            type: String
+      503:
+        description: "The system is not in a valid state to execute read requests"
+  post:
+    is: [ "adminOnly" ]
+    description: "Creates a new team with the given properties"
+    body:
+      application/json:
+        example: !include requests/teams/teamsPost.json
+    responses:
+      201:
+        description: "The team has been created"
+        body:
+          application/json:
+            example: !include responses/teams/teamsPost.json
+        headers:
+          location:
+            description: "The URL to the created team"
+            type: String
+      400:
+        description: "The given payload is invalid"
+        body:
+          application/json:
+            example: !include responses/teams/teamsPostBadRequest.json
+      401:
+        description: "System user cannot be successfully logged in with provided credentials"
+      403:
+        description: "System user does not have the correct role to perform this request"
+      409:
+        description: "A team with the same 'teamName' already exists"
+      502:
+        description: "An error occurred connecting to an external system to verify the team"
+      503:
+        description: "The system is not in a valid state to execute write requests"
+  /{teamId}:
+    uriParameters:
+      teamId:
+        description: "The ID of the team"
+        type: Integer
+        required: true
+    delete:
+      is: [ "adminOnly" ]
+      description: "Deletes the team with the given ID"
+      responses:
+        200:
+          description: "The team has been deleted from the system"
+        401:
+          description: "System user cannot be successfully logged in with provided credentials"
+        403:
+          description: "System user does not have the correct role to perform this request"
+        404:
+          description: "No team exists with the given ID"
+        409:
+          description: "The team is being referenced by a user and cannot be deleted"
+        503:
+          description: "The system is not in a valid state to execute write requests"
+    get:
+      is: [ "cached" ]
+      description: "Retrieves the team with the given ID"
+      responses:
+        200:
+          description: "The team has been retrieved from the system"
+          body:
+            application/json:
+              example: !include responses/teams/teamsGet.json
+        400:
+          description: "The provided ID is an invalid integer, or out of range"
+          body:
+            application/json:
+              example: !include responses/team/teamsGetBadRequest.json
+        404:
+          description: "No team exists with the given ID"
+        503:
+          description: "The system is not in a valid state to execute read requests"
+    put:
+      is: [ "adminOnly" ]
+      description: "Updates an existing team with the given properties"
+      body:
+        application/json:
+          example: !include requests/teams/teamsPut.json
+      responses:
+        200:
+          description: "The hardware has been updated"
+          body:
+            application/json:
+              example: !include responses/teams/teamsPut.json
+          headers:
+            location:
+              description: "The URL to the updated team (unless there was no change to the team)"
+              type: String
+              required: false
+        400:
+          description: "The given payload is invalid"
+          body:
+            application/json:
+              example: !include responses/teams/teamsPutBadRequest.json
+        401:
+          description: "System user cannot be successfully logged in with provided credentials"
+        403:
+          description: "System user does not have the correct role to perform this request"
+        404:
+          description: "No team exists with the given ID"
+        409:
+          description: "A team with the same 'teamName' already exists"
+        502:
+          description: "An error occurred connecting to an external system to verify the team"
+        503:
+          description: "The system is not in a valid state to execute write requests"
+  /batch:
+    post:
+      is: [ "adminOnly" ]
+      description: "Creates a batch of team with the given properties"
+      body:
+        application/json-all-success:
+          example: !include requests/teams/teamsPostBatch.json
+        application/json-partial-success:
+          example: !include requests/teams/teamsPostBatch.json
+      responses:
+        200:
+          description: "At least one team in the payload is created"
+          body:
+            application/json:
+              example: !include responses/teams/teamsPostBatch.json
+        400:
+          description: "All given payloads are invalid"
+          body:
+            application/json:
+              example: !include responses/team/teamsPostBatchBadRequest.json
+        401:
+          description: "System user cannot be successfully logged in with provided credentials"
+        403:
+          description: "System user does not have the correct role to perform this request"
+        502:
+          description: "An error occurred connecting to an external system to verify the team"
+        503:
+          description: "The system is not in a valid state to execute write requests"
+
 /users:
   get:
+    is: [ "cached" ]
+    description: "Retrieves all users"
+    responses:
+      200:
+        description: "All users have been retrieved"
+        body:
+          application/json:
+            example: !include responses/users/usersGetAll.json
+        headers:
+          eTag:
+            description: "An EntityTag which can be used to retrieve a cached version of the response in future requests"
+            type: String
+      503:
+        description: "The system is not in a valid state to execute read requests"
   post:
+    is: [ "adminOnly" ]
+    description: "Creates a new user with the given properties"
+    body:
+      application/json:
+        example: !include requests/users/usersPost.json
+    responses:
+      201:
+        description: "The user has been created"
+        body:
+          application/json:
+            example: !include responses/users/usersPost.json
+        headers:
+          location:
+            description: "The URL to the created user"
+            type: String
+      400:
+        description: "The given payload is invalid"
+        body:
+          application/json:
+            example: !include responses/users/usersPostBadRequest.json
+      401:
+        description: "System user cannot be successfully logged in with provided credentials"
+      403:
+        description: "System user does not have the correct role to perform this request"
+      409:
+        description: "A user with the same 'foldingUserName' and 'passkey' already exists"
+      502:
+        description: "An error occurred connecting to an external system to verify the user"
+      503:
+        description: "The system is not in a valid state to execute write requests"
   /{userId}:
     uriParameters:
       userId:
@@ -177,37 +371,163 @@ traits:
         type: Integer
         required: true
     delete:
+      is: [ "adminOnly" ]
+      description: "Deletes the user with the given ID"
+      responses:
+        200:
+          description: "The user has been deleted from the system"
+        401:
+          description: "System user cannot be successfully logged in with provided credentials"
+        403:
+          description: "System user does not have the correct role to perform this request"
+        404:
+          description: "No user exists with the given ID"
+        503:
+          description: "The system is not in a valid state to execute write requests"
     get:
+      is: [ "cached" ]
+      description: "Retrieves the user with the given ID"
+      responses:
+        200:
+          description: "The user has been retrieved from the system"
+          body:
+            application/json:
+              example: !include responses/users/usersGet.json
+        400:
+          description: "The provided ID is an invalid integer, or out of range"
+          body:
+            application/json:
+              example: !include responses/users/usersGetBadRequest.json
+        404:
+          description: "No user exists with the given ID"
+        503:
+          description: "The system is not in a valid state to execute read requests"
     put:
+      is: [ "adminOnly" ]
+      description: "Updates an existing user with the given properties"
+      body:
+        application/json:
+          example: !include requests/users/usersPut.json
+      responses:
+        200:
+          description: "The user has been updated"
+          body:
+            application/json:
+              example: !include responses/users/usersPut.json
+          headers:
+            location:
+              description: "The URL to the updated user (unless there was no change to the user)"
+              type: String
+              required: false
+        400:
+          description: "The given payload is invalid"
+          body:
+            application/json:
+              example: !include responses/users/usersPutBadRequest.json
+        401:
+          description: "System user cannot be successfully logged in with provided credentials"
+        403:
+          description: "System user does not have the correct role to perform this request"
+        404:
+          description: "No user exists with the given ID"
+        409:
+          description: "A user with the same 'foldingUserName' and 'passkey' already exists"
+        502:
+          description: "An error occurred connecting to an external system to verify the hardware"
+        503:
+          description: "The system is not in a valid state to execute write requests"
   /batch:
     post:
-
-/teams:
-  get:
-  post:
-  /{teamId}:
-    uriParameters:
-      teamId:
-        description: "The ID of the team instance"
-        type: Integer
-        required: true
-    delete:
-    get:
-    put:
-  /batch:
-    post:
+      is: [ "adminOnly" ]
+      description: "Creates a batch of users with the given properties"
+      body:
+        application/json-all-success:
+          example: !include requests/users/usersPostBatch.json
+        application/json-partial-success:
+          example: !include requests/users/usersPostBatch.json
+      responses:
+        200:
+          description: "At least one user in the payload is created"
+          body:
+            application/json:
+              example: !include responses/users/usersPostBatch.json
+        400:
+          description: "All given payloads are invalid"
+          body:
+            application/json:
+              example: !include responses/user/usersPostBatchBadRequest.json
+        401:
+          description: "System user cannot be successfully logged in with provided credentials"
+        403:
+          description: "System user does not have the correct role to perform this request"
+        502:
+          description: "An error occurred connecting to an external system to verify the user"
+        503:
+          description: "The system is not in a valid state to execute write requests"
 
 /stats:
   get:
+    description:
+    responses:
+      200:
+        description: "Retrieve the overall stats for teams/users"
+        body:
+          application/json:
+            example: !include responses/stats/statsGet.json
+      503:
+        description: "The system is not in a valid state to execute read requests"
   /category:
     get:
+      description:
+      responses:
+        200:
+          description: "Retrieve the category leaderboards for all users"
+          body:
+          application/json:
+            example: !include responses/stats/statsGetCategory.json
+        503:
+          description: "The system is not in a valid state to execute read requests"
   /leaderboard:
     get:
+      description: "Retrieve the team leaderboard for all teams"
+      responses:
+        200:
+          description:
+          body:
+            application/json:
+              example: !include responses/stats/statsGetLeaderboard.json
+        503:
+          description: "The system is not in a valid state to execute read requests"
   /manual:
     /reset:
       get:
+        is: [ "adminOnly" ]
+        description: "Resets all user/team stats"
+        responses:
+          401:
+            description: "System user cannot be successfully logged in with provided credentials"
+          403:
+            description: "System user does not have the correct role to perform this request"
+          503:
+            description: "The system is not in a valid state to execute write requests"
     /update:
       get:
+        is: [ "adminOnly" ]
+        description: "Requests an update of all user/team stats"
+        queryParameters:
+          async:
+            displayName: Async
+            type: Boolean
+            description: "Whether the stats should be retrieved asynchronously, or the request should only return a response when complete"
+            example: true
+            required: false
+        responses:
+          401:
+            description: "System user cannot be successfully logged in with provided credentials"
+          403:
+            description: "System user does not have the correct role to perform this request"
+          503:
+            description: "The system is not in a valid state to execute write requests"
   /users/{userId}:
     uriParameters:
       userId:
@@ -215,7 +535,44 @@ traits:
         type: Integer
         required: true
     get:
+      description: "Used to retrieve current the TC stats for the user"
+      responses:
+        200:
+          description: "The user stats have been successfully retrieved"
+          body:
+            application/json:
+              example: !include responses/stats/userOffsetGet.json
+        400:
+          description: "The user ID is invalid"
+          body:
+            application/json:
+              example: !include responses/stats/userOffsetGetBadRequest.json
+        404:
+          description: "No user exists with the given ID"
+        503:
+          description: "The system is not in a valid state to execute read requests"
     patch:
+      is: [ "adminOnly" ]
+      description: "Used to offset the TC stats for the user"
+      body:
+        application/json:
+          example: !include requests/stats/userOffsetPatch.json
+      responses:
+        200:
+          description: "The user stats have been updated successfully"
+        400:
+          description: "The payload is invalid, or an invalid user ID was provided"
+          body:
+            application/json:
+              example: !include requests/stats/userOffsetPatchBadRequest.json
+        401:
+          description: "System user cannot be successfully logged in with provided credentials"
+        403:
+          description: "System user does not have the correct role to perform this request"
+        404:
+          description: "No user exists with the given ID"
+        503:
+          description: "The system is not in a valid state to execute write requests"
 
 /historic:
   /users/{userId}/{year}:
@@ -229,17 +586,127 @@ traits:
         type: Integer
         required: true
     get:
-      description:
+      description: "Retrieves the monthly stats for a user for the given year"
+      responses:
+        200:
+          description: "Historic stats are retrieved successfully"
+          body:
+            application/json:
+              example: !include responses/historic/historicUserGetMonthly.json
+        400:
+          description: "The year or user ID is not valid"
+          body:
+            application/json:
+              example: !include responses/historic/historicUserGetMonthlyBadRequest.json
+        404:
+          description: "No user exists with the given ID"
     /{month}:
       get:
+        description: "Retrieves the daily stats for a user for the given year and month"
+        responses:
+          200:
+            description: "Historic stats are retrieved successfully"
+            body:
+              application/json:
+                example: !include responses/historic/historicUserGetDaily.json
+          400:
+            description: "The year, month or user ID is not valid"
+            body:
+              application/json:
+                example: !include responses/historic/historicUserGetDailyBadRequest.json
+          404:
+            description: "No user exists with the given ID"
       /{day}:
         get:
+          description: "Retrieves the hourly stats for a user for the given year, month and day"
+          responses:
+            200:
+              description: "Historic stats are retrieved successfully"
+              body:
+                application/json:
+                  example: !include responses/historic/historicUserGetHourly.json
+            400:
+              description: "The year, month, day or user ID is not valid"
+              body:
+                application/json:
+                  example: !include responses/historic/historicUserGetHourlyBadRequest.json
+            404:
+              description: "No user exists with the given ID"
   /teams/{teamId}/{year}:
+    uriParameters:
+      teamId:
+        description: "The ID of the team whose stats are to be retrieved"
+        type: Integer
+        required: true
+      year:
+        description: "The year of the monthly/daily/hourly stats to be retrieved"
+        type: Integer
+        required: true
     get:
+      description: "Retrieves the monthly stats for a team for the given year"
+      responses:
+        200:
+          description: "Historic stats are retrieved successfully"
+          body:
+            application/json:
+              example: !include responses/historic/historicTeamGetMonthly.json
+        400:
+          description: "The year or team ID is not valid"
+          body:
+            application/json:
+              example: !include responses/historic/historicTeamGetMonthlyBadRequest.json
+        404:
+          description: "No team exists with the given ID"
     /{month}:
       get:
+        description: "Retrieves the daily stats for a team for the given year and month"
+        responses:
+          200:
+            description: "Historic stats are retrieved successfully"
+            body:
+              application/json:
+                example: !include responses/historic/historicTeamGetDaily.json
+          400:
+            description: "The year, month or team ID is not valid"
+            body:
+              application/json:
+                example: !include responses/historic/historicTeamGetDailyBadRequest.json
+          404:
+            description: "No team exists with the given ID"
       /{day}:
         get:
+          description: "Retrieves the hourly stats for a team for the given year, month and day"
+          responses:
+            200:
+              description: "Historic stats are retrieved successfully"
+              body:
+                application/json:
+                  example: !include responses/historic/historicTeamGetHourly.json
+            400:
+              description: "The year, month, day or team ID is not valid"
+              body:
+                application/json:
+                  example: !include responses/historic/historicTeamGetHourlyBadRequest.json
+            404:
+              description: "No team exists with the given ID"
 
 /login/admin/:
   post:
+    description: "Accepts user credentials and verifies whether they have admin access to the system"
+    body:
+      application/json:
+        example: !include requests/login/loginPost.json
+    responses:
+      200:
+        description: "Credentials are valid and for an admin user"
+      400:
+        description:
+        body:
+          application/json:
+            example: !include responses/login/loginPostBadRequest.json
+      401:
+        description: "System user cannot be successfully logged in with provided credentials"
+      403:
+        description: "System user is a valid user, but not an admin"
+      503:
+        description: "The system is not in a valid state to execute write requests"

@@ -1,0 +1,22 @@
+{
+  "successful": [
+    {
+      "id": 1,
+      "teamName": "Team1",
+      "teamDescription": "Team1",
+      "forumLink": "https://forums.extremehw.net/forum/125-extreme-team-folding/"
+    }
+  ],
+  "unsuccessful": [
+    {
+      "invalidObject": {
+        "id": 0,
+        "teamName": "Team2",
+        "forumLink": "invalidUrl"
+      },
+      "errors": [
+        "Attribute 'forumLink' is not a valid link: 'invalidUrl'"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,129 @@
+{
+  "AMD GPU": [
+    {
+      "displayName": "User1",
+      "foldingName": "User1",
+      "teamName": "Team1",
+      "points": 35765379,
+      "multipliedPoints": 250000000,
+      "units": 1,
+      "rank": 1,
+      "diffToLeader": 0,
+      "diffToNext": 0
+    },
+    {
+      "displayName": "User3",
+      "foldingName": "User3",
+      "teamName": "Team2",
+      "points": 226055,
+      "multipliedPoints": 16067989,
+      "units": 2,
+      "rank": 2,
+      "diffToLeader": 233932011,
+      "diffToNext": 233932011
+    },
+    {
+      "displayName": "User8",
+      "foldingName": "User8",
+      "teamName": "Team3",
+      "points": 540033,
+      "multipliedPoints": 8845741,
+      "units": 4,
+      "rank": 3,
+      "diffToLeader": 241154259,
+      "diffToNext": 7222248
+    },
+    {
+      "displayName": "User10",
+      "foldingName": "User10",
+      "teamName": "Team4",
+      "points": 1863462,
+      "multipliedPoints": 6745732,
+      "units": 7,
+      "rank": 4,
+      "diffToLeader": 243254268,
+      "diffToNext": 2100009
+    }
+  ],
+  "Wildcard": [
+    {
+      "displayName": "User6",
+      "foldingName": "User6",
+      "teamName": "Team3",
+      "points": 480103,
+      "multipliedPoints": 10240597,
+      "units": 34,
+      "rank": 1,
+      "diffToLeader": 0,
+      "diffToNext": 0
+    },
+    {
+      "displayName": "User5",
+      "foldingName": "User5",
+      "teamName": "Team2",
+      "points": 533639,
+      "multipliedPoints": 8741007,
+      "units": 3,
+      "rank": 2,
+      "diffToLeader": 1499590,
+      "diffToNext": 1499590
+    },
+    {
+      "displayName": "User9",
+      "foldingName": "User9",
+      "teamName": "Team4",
+      "points": 972294,
+      "multipliedPoints": 7263036,
+      "units": 6,
+      "rank": 3,
+      "diffToLeader": 2977561,
+      "diffToNext": 1477971
+    }
+  ],
+  "nVidia GPU": [
+    {
+      "displayName": "User2",
+      "foldingName": "User2",
+      "teamName": "Team1",
+      "points": 171232877,
+      "multipliedPoints": 250000000,
+      "units": 1,
+      "rank": 1,
+      "diffToLeader": 0,
+      "diffToNext": 0
+    },
+    {
+      "displayName": "User7",
+      "foldingName": "User7",
+      "teamName": "Team3",
+      "points": 6372742,
+      "multipliedPoints": 9304203,
+      "units": 22,
+      "rank": 2,
+      "diffToLeader": 240695797,
+      "diffToNext": 240695797
+    },
+    {
+      "displayName": "User4",
+      "foldingName": "User4",
+      "teamName": "Team2",
+      "points": 424706,
+      "multipliedPoints": 8842379,
+      "units": 31,
+      "rank": 3,
+      "diffToLeader": 241157621,
+      "diffToNext": 461824
+    },
+    {
+      "displayName": "User11",
+      "foldingName": "User11",
+      "teamName": "Team4",
+      "points": 0,
+      "multipliedPoints": 0,
+      "units": 0,
+      "rank": 4,
+      "diffToLeader": 250000000,
+      "diffToNext": 8842379
+    }
+  ]
+}

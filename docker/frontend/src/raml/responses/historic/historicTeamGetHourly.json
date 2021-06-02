@@ -1,0 +1,434 @@
+[
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 25
+      },
+      "time": {
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 292600,
+    "multipliedPoints": 708973,
+    "units": 2
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 25
+      },
+      "time": {
+        "hour": 1,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 417281,
+    "multipliedPoints": 2740944,
+    "units": 3
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 25
+      },
+      "time": {
+        "hour": 2,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 319359,
+    "multipliedPoints": 743371,
+    "units": 2
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 25
+      },
+      "time": {
+        "hour": 3,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 28029,
+    "multipliedPoints": 597859,
+    "units": 2
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 25
+      },
+      "time": {
+        "hour": 4,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 293121,
+    "multipliedPoints": 709276,
+    "units": 2
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 25
+      },
+      "time": {
+        "hour": 5,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 316845,
+    "multipliedPoints": 745921,
+    "units": 2
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 25
+      },
+      "time": {
+        "hour": 6,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 307130,
+    "multipliedPoints": 1014565,
+    "units": 3
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 25
+      },
+      "time": {
+        "hour": 7,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 14085,
+    "multipliedPoints": 300433,
+    "units": 1
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 25
+      },
+      "time": {
+        "hour": 8,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 440876,
+    "multipliedPoints": 2772241,
+    "units": 3
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 25
+      },
+      "time": {
+        "hour": 9,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 316589,
+    "multipliedPoints": 743043,
+    "units": 2
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 25
+      },
+      "time": {
+        "hour": 10,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 28420,
+    "multipliedPoints": 606199,
+    "units": 2
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 25
+      },
+      "time": {
+        "hour": 11,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 315932,
+    "multipliedPoints": 742878,
+    "units": 2
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 25
+      },
+      "time": {
+        "hour": 12,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 314918,
+    "multipliedPoints": 740265,
+    "units": 2
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 25
+      },
+      "time": {
+        "hour": 13,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 28146,
+    "multipliedPoints": 600354,
+    "units": 2
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 25
+      },
+      "time": {
+        "hour": 14,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 318528,
+    "multipliedPoints": 746370,
+    "units": 2
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 25
+      },
+      "time": {
+        "hour": 15,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 440537,
+    "multipliedPoints": 2764902,
+    "units": 3
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 25
+      },
+      "time": {
+        "hour": 16,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 14192,
+    "multipliedPoints": 302715,
+    "units": 1
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 25
+      },
+      "time": {
+        "hour": 17,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 331729,
+    "multipliedPoints": 1048692,
+    "units": 3
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 25
+      },
+      "time": {
+        "hour": 18,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 319285,
+    "multipliedPoints": 748687,
+    "units": 2
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 25
+      },
+      "time": {
+        "hour": 19,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 14232,
+    "multipliedPoints": 303569,
+    "units": 1
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 25
+      },
+      "time": {
+        "hour": 20,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 292149,
+    "multipliedPoints": 709069,
+    "units": 2
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 25
+      },
+      "time": {
+        "hour": 21,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 307426,
+    "multipliedPoints": 1014402,
+    "units": 3
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 25
+      },
+      "time": {
+        "hour": 22,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 417242,
+    "multipliedPoints": 2750110,
+    "units": 3
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 25
+      },
+      "time": {
+        "hour": 23,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 14223,
+    "multipliedPoints": 303377,
+    "units": 1
+  }
+]

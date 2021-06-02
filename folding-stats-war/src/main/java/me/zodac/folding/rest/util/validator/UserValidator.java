@@ -84,7 +84,6 @@ public class UserValidator {
             failureMessages.add(String.format("Attribute 'liveStatsLink' is not a valid link: '%s'", userRequest.getLiveStatsLink()));
         }
 
-
         try {
             if (userRequest.getHardwareId() <= Hardware.EMPTY_HARDWARE_ID || businessLogic.doesNotContainHardware(userRequest.getHardwareId())) {
                 final List<String> availableHardware = businessLogic
@@ -115,38 +114,38 @@ public class UserValidator {
             failureMessages.add("Unable to check team for user");
         }
 
+        // Since this is a heavy validation check, only do it if the rest of the user is valid
+        if (failureMessages.isEmpty()) {
+            try {
+                final Team team = businessLogic.getTeam(userRequest.getTeamId());
+                final Collection<User> usersOnTeam = businessLogic.getUsersOnTeam(team);
 
-        try {
-            final Team team = businessLogic.getTeam(userRequest.getTeamId());
-            final Collection<User> usersOnTeam = businessLogic.getUsersOnTeam(team);
+                if (usersOnTeam.size() >= Category.maximumPermittedAmountForAllCategories()) {
+                    failureMessages.add(String.format("Team '%s' has %s users, maximum permitted is %s", team.getTeamName(), usersOnTeam.size(), Category.maximumPermittedAmountForAllCategories()));
+                }
 
-            if (usersOnTeam.size() >= Category.maximumPermittedAmountForAllCategories()) {
-                failureMessages.add(String.format("Team '%s' has %s users, maximum permitted is %s", team.getTeamName(), usersOnTeam.size(), Category.maximumPermittedAmountForAllCategories()));
-            }
-
-            if (userRequest.isUserIsCaptain()) {
-                for (final User existingUserOnTeam : usersOnTeam) {
-                    if (existingUserOnTeam.isUserIsCaptain()) {
-                        failureMessages.add(String.format("Team '%s' already has a captain (%s), cannot have multiple captains", team.getTeamName(), userRequest.getDisplayName()));
+                if (userRequest.isUserIsCaptain()) {
+                    for (final User existingUserOnTeam : usersOnTeam) {
+                        if (existingUserOnTeam.isUserIsCaptain()) {
+                            failureMessages.add(String.format("Team '%s' already has a captain (%s), cannot have multiple captains", team.getTeamName(), userRequest.getDisplayName()));
+                        }
                     }
                 }
-            }
 
-            final Map<Category, Long> categoryCount = usersOnTeam
-                    .stream()
-                    .map(User::getCategory)
-                    .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+                final Map<Category, Long> categoryCount = usersOnTeam
+                        .stream()
+                        .map(User::getCategory)
+                        .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
-            for (final Map.Entry<Category, Long> categoryAndCount : categoryCount.entrySet()) {
-                if (categoryAndCount.getValue() > categoryAndCount.getKey().permittedAmount()) {
-                    failureMessages.add(String.format("Found %s users of category %s, only %s permitted", categoryAndCount.getValue(), categoryAndCount.getKey().displayName(), categoryAndCount.getKey().permittedAmount()));
+                for (final Map.Entry<Category, Long> categoryAndCount : categoryCount.entrySet()) {
+                    if (categoryAndCount.getValue() > categoryAndCount.getKey().permittedAmount()) {
+                        failureMessages.add(String.format("Found %s users of category %s, only %s permitted", categoryAndCount.getValue(), categoryAndCount.getKey().displayName(), categoryAndCount.getKey().permittedAmount()));
+                    }
                 }
+            } catch (final FoldingException | TeamNotFoundException e) {
+                LOGGER.warn("Unable to validate current team users", e);
+                failureMessages.add("Unable to validate current team users");
             }
-
-
-        } catch (final FoldingException | TeamNotFoundException e) {
-            LOGGER.warn("Unable to validate current team users", e);
-            failureMessages.add("Unable to validate current team users");
         }
 
         // Since this is a heavy validation check, only do it if the rest of the user is valid

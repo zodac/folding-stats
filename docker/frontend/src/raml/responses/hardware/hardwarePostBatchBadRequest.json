@@ -2,8 +2,8 @@
   {
     "invalidObject": {
       "id": 0,
-      "hardwareName": "GTX 960",
-      "displayName": "GTX 960",
+      "hardwareName": "Hardware1",
+      "displayName": "Hardware1",
       "operatingSystem": "WINDOWS",
       "multiplier": -21.33
     },
@@ -14,8 +14,8 @@
   {
     "invalidObject": {
       "id": 0,
-      "hardwareName": "Radeon VII",
-      "displayName": "Radeon VII",
+      "hardwareName": "Hardware2",
+      "displayName": "Hardware2",
       "operatingSystem": "LINUX",
       "multiplier": -3.62
     },

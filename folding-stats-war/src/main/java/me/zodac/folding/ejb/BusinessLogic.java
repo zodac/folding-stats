@@ -35,6 +35,7 @@ import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import java.time.Month;
 import java.time.Year;
@@ -71,6 +72,9 @@ public class BusinessLogic {
     private final RetiredTcStatsCache retiredStatsCache = RetiredTcStatsCache.get();
     private final TcStatsCache tcStatsCache = TcStatsCache.get();
     private final TotalStatsCache totalStatsCache = TotalStatsCache.get();
+
+    @EJB
+    private UserTeamCompetitionStatsParser userTeamCompetitionStatsParser;
 
     public Hardware createHardware(final Hardware hardware) throws FoldingException, FoldingConflictException {
         final Hardware hardwareWithId = dbManager.createHardware(hardware);
@@ -154,6 +158,8 @@ public class BusinessLogic {
         persistInitialUserStats(userWithId);
         // When adding a new user, we give an empty offset to the offset cache
         offsetStatsCache.add(userWithId.getId(), OffsetStats.empty());
+
+        userTeamCompetitionStatsParser.parseTcStatsForUser(user);
 
         return userWithId;
     }

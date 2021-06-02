@@ -1,0 +1,17 @@
+{
+  "id": 1,
+  "displayName": "User1",
+  "foldingName": "User1",
+  "hardware": {
+    "id": 1,
+    "hardwareName": "Hardware1",
+    "displayName": "Hardware1",
+    "operatingSystem": "WINDOWS",
+    "multiplier": 16.38
+  },
+  "category": "AMD GPU",
+  "points": 540033,
+  "multipliedPoints": 8845741,
+  "units": 4,
+  "rankInTeam": 1
+}

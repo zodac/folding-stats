@@ -1,0 +1,21 @@
+{
+  "id": 1,
+  "foldingUserName": "User1",
+  "displayName": "User1",
+  "passkey": "13d79997************************",
+  "category": "AMD_GPU",
+  "profileLink": "https://forums.extremehw.net/",
+  "liveStatsLink": "http://teamcomp.axihub.ca/",
+  "hardware": {
+    "id": 1,
+    "hardwareName": "Hardware1",
+    "displayName": "Hardware1",
+    "operatingSystem": "WINDOWS",
+    "multiplier": 16.38
+  },
+  "team": {
+    "id": 1,
+    "teamName": "Team1"
+  },
+  "userIsCaptain": true
+}

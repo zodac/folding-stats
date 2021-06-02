@@ -1,0 +1,38 @@
+[
+  {
+    "teamName": "Team1",
+    "teamPoints": 206998256,
+    "teamMultipliedPoints": 500000000,
+    "teamUnits": 2,
+    "rank": 1,
+    "diffToLeader": 0,
+    "diffToNext": 0
+  },
+  {
+    "teamName": "Team2",
+    "teamPoints": 1184400,
+    "teamMultipliedPoints": 33651375,
+    "teamUnits": 36,
+    "rank": 2,
+    "diffToLeader": 466348625,
+    "diffToNext": 466348625
+  },
+  {
+    "teamName": "Team3",
+    "teamPoints": 7392878,
+    "teamMultipliedPoints": 28390541,
+    "teamUnits": 60,
+    "rank": 3,
+    "diffToLeader": 471609459,
+    "diffToNext": 5260834
+  },
+  {
+    "teamName": "Team4",
+    "teamPoints": 2835756,
+    "teamMultipliedPoints": 14008768,
+    "teamUnits": 13,
+    "rank": 4,
+    "diffToLeader": 485991232,
+    "diffToNext": 14381773
+  }
+]

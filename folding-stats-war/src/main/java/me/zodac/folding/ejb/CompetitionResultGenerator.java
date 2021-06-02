@@ -107,18 +107,18 @@ public class CompetitionResultGenerator {
                 .map(RetiredUserResult::createFromRetiredStats)
                 .collect(toList());
 
-        final String captainDisplayName = getCaptainDisplayName(usersOnTeam);
+        final String captainDisplayName = getCaptainDisplayName(team.getTeamName(), usersOnTeam);
         return TeamResult.create(team.getTeamName(), team.getTeamDescription(), team.getForumLink(), captainDisplayName, activeUserResults, retiredUserResults);
     }
 
-    private String getCaptainDisplayName(final Collection<User> usersOnTeam) {
+    private String getCaptainDisplayName(final String teamName, final Collection<User> usersOnTeam) {
         for (final User user : usersOnTeam) {
             if (user.isUserIsCaptain()) {
                 return user.getDisplayName();
             }
         }
 
-        LOGGER.warn("No captain set for team");
+        LOGGER.warn("No captain set for team '{}'", teamName);
         return null;
     }
 

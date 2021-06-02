@@ -118,13 +118,11 @@ public class TeamCompetitionStatsEndpoint {
             final int parsedId = ParsingUtils.parseId(userId);
             final User user = businessLogic.getUserWithPasskey(parsedId, false);
 
-
             final CompetitionResult competitionResult = competitionResultGenerator.generate();
             final Collection<UserResult> userResults = competitionResult.getTeams()
                     .stream()
                     .flatMap(teamResult -> teamResult.getActiveUsers().stream())
                     .collect(toList());
-
 
             for (final UserResult userResult : userResults) {
                 if (userResult.getId() == user.getId()) {
@@ -337,8 +335,8 @@ public class TeamCompetitionStatsEndpoint {
     @GET
     @RolesAllowed("admin")
     @Path("/manual/update")
-    public Response manualStats(@QueryParam("async") final boolean async) {
-        LOGGER.info("GET request received to manually parse TC stats");
+    public Response updateStats(@QueryParam("async") final boolean async) {
+        LOGGER.info("GET request received to manually update TC stats");
 
         if (SystemStateManager.current().isReadBlocked()) {
             LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());

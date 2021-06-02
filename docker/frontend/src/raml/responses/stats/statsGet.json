@@ -1,0 +1,237 @@
+{
+  "totalPoints": 218411290,
+  "totalMultipliedPoints": 576050684,
+  "totalUnits": 111,
+  "teams": [
+    {
+      "teamName": "Team1",
+      "teamPoints": 206998256,
+      "teamMultipliedPoints": 500000000,
+      "teamUnits": 2,
+      "rank": 1,
+      "activeUsers": [
+        {
+          "id": 1,
+          "displayName": "User1",
+          "foldingName": "User1",
+          "hardware": {
+            "id": 1,
+            "hardwareName": "Tesla M40",
+            "displayName": "Tesla M40",
+            "operatingSystem": "WINDOWS",
+            "multiplier": 6.99
+          },
+          "category": "AMD GPU",
+          "points": 35765379,
+          "multipliedPoints": 250000000,
+          "units": 1,
+          "rankInTeam": 1
+        },
+        {
+          "id": 2,
+          "displayName": "User2",
+          "foldingName": "User2",
+          "hardware": {
+            "id": 2,
+            "hardwareName": "RTX 2080 Ti",
+            "displayName": "RTX 2080 Ti",
+            "operatingSystem": "WINDOWS",
+            "multiplier": 1.46
+          },
+          "category": "nVidia GPU",
+          "points": 171232877,
+          "multipliedPoints": 250000000,
+          "units": 1,
+          "rankInTeam": 1
+        }
+      ],
+      "retiredUsers": []
+    },
+    {
+      "teamName": "Team2",
+      "captainName": "User4",
+      "teamPoints": 1184400,
+      "teamMultipliedPoints": 33651375,
+      "teamUnits": 36,
+      "rank": 2,
+      "activeUsers": [
+        {
+          "id": 3,
+          "displayName": "User3",
+          "foldingName": "User3",
+          "hardware": {
+            "id": 8,
+            "hardwareName": "HD 7850",
+            "displayName": "HD 7850",
+            "operatingSystem": "WINDOWS",
+            "multiplier": 71.08
+          },
+          "category": "AMD GPU",
+          "points": 226055,
+          "multipliedPoints": 16067989,
+          "units": 2,
+          "rankInTeam": 1
+        },
+        {
+          "id": 4,
+          "displayName": "User4",
+          "foldingName": "User4",
+          "hardware": {
+            "id": 7,
+            "hardwareName": "GTX 960",
+            "displayName": "GTX 960",
+            "operatingSystem": "LINUX",
+            "multiplier": 20.82
+          },
+          "category": "nVidia GPU",
+          "points": 424706,
+          "multipliedPoints": 8842379,
+          "units": 31,
+          "rankInTeam": 2
+        },
+        {
+          "id": 5,
+          "displayName": "User5",
+          "foldingName": "User5",
+          "hardware": {
+            "id": 1,
+            "hardwareName": "RX 580",
+            "displayName": "RX 580",
+            "operatingSystem": "WINDOWS",
+            "multiplier": 16.38
+          },
+          "category": "Wildcard",
+          "points": 533639,
+          "multipliedPoints": 8741007,
+          "units": 3,
+          "rankInTeam": 3
+        }
+      ],
+      "retiredUsers": []
+    },
+    {
+      "teamName": "Team3",
+      "captainName": "User6",
+      "teamPoints": 7392878,
+      "teamMultipliedPoints": 28390541,
+      "teamUnits": 60,
+      "rank": 3,
+      "activeUsers": [
+        {
+          "id": 6,
+          "displayName": "User6",
+          "foldingName": "User6",
+          "hardware": {
+            "id": 3,
+            "hardwareName": "GTX 960",
+            "displayName": "GTX 960",
+            "operatingSystem": "WINDOWS",
+            "multiplier": 21.33
+          },
+          "category": "Wildcard",
+          "points": 480103,
+          "multipliedPoints": 10240597,
+          "units": 34,
+          "rankInTeam": 1
+        },
+        {
+          "id": 7,
+          "displayName": "User7",
+          "foldingName": "User7",
+          "hardware": {
+            "id": 2,
+            "hardwareName": "RTX 2080 Ti",
+            "displayName": "RTX 2080 Ti",
+            "operatingSystem": "WINDOWS",
+            "multiplier": 1.46
+          },
+          "category": "nVidia GPU",
+          "points": 6372742,
+          "multipliedPoints": 9304203,
+          "units": 22,
+          "rankInTeam": 2
+        },
+        {
+          "id": 8,
+          "displayName": "User8",
+          "foldingName": "User8",
+          "hardware": {
+            "id": 1,
+            "hardwareName": "RX 580",
+            "displayName": "RX 580",
+            "operatingSystem": "WINDOWS",
+            "multiplier": 16.38
+          },
+          "category": "AMD GPU",
+          "points": 540033,
+          "multipliedPoints": 8845741,
+          "units": 4,
+          "rankInTeam": 3
+        }
+      ],
+      "retiredUsers": []
+    },
+    {
+      "teamName": "Team4",
+      "captainName": "User10",
+      "teamPoints": 2835756,
+      "teamMultipliedPoints": 14008768,
+      "teamUnits": 13,
+      "rank": 4,
+      "activeUsers": [
+        {
+          "id": 9,
+          "displayName": "User9",
+          "foldingName": "User9",
+          "hardware": {
+            "id": 6,
+            "hardwareName": "RX 5700",
+            "displayName": "RX 5700",
+            "operatingSystem": "WINDOWS",
+            "multiplier": 7.47
+          },
+          "category": "Wildcard",
+          "points": 972294,
+          "multipliedPoints": 7263036,
+          "units": 6,
+          "rankInTeam": 1
+        },
+        {
+          "id": 10,
+          "displayName": "User10",
+          "foldingName": "User10",
+          "hardware": {
+            "id": 4,
+            "hardwareName": "Radeon VII",
+            "displayName": "Radeon VII",
+            "operatingSystem": "LINUX",
+            "multiplier": 3.62
+          },
+          "category": "AMD GPU",
+          "points": 1863462,
+          "multipliedPoints": 6745732,
+          "units": 7,
+          "rankInTeam": 2
+        },
+        {
+          "id": 11,
+          "displayName": "User11",
+          "foldingName": "User11",
+          "hardware": {
+            "id": 5,
+            "hardwareName": "Tesla M40",
+            "displayName": "Tesla M40",
+            "operatingSystem": "WINDOWS",
+            "multiplier": 6.99
+          },
+          "category": "nVidia GPU",
+          "points": 0,
+          "multipliedPoints": 0,
+          "units": 0,
+          "rankInTeam": 3
+        }
+      ],
+      "retiredUsers": []
+    }
+  ]
+}

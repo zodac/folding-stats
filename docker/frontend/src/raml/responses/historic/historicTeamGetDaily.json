@@ -1,0 +1,362 @@
+[
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 12
+      },
+      "time": {
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 54202352,
+    "multipliedPoints": 200515186,
+    "units": 296
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 13
+      },
+      "time": {
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 5487555,
+    "multipliedPoints": 20701526,
+    "units": 27
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 14
+      },
+      "time": {
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 6051040,
+    "multipliedPoints": 22116175,
+    "units": 31
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 15
+      },
+      "time": {
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 6008299,
+    "multipliedPoints": 25482395,
+    "units": 53
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 16
+      },
+      "time": {
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 5863995,
+    "multipliedPoints": 23218366,
+    "units": 53
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 17
+      },
+      "time": {
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 5944444,
+    "multipliedPoints": 24617947,
+    "units": 52
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 18
+      },
+      "time": {
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 5897598,
+    "multipliedPoints": 23677492,
+    "units": 52
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 19
+      },
+      "time": {
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 5663822,
+    "multipliedPoints": 24042257,
+    "units": 54
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 20
+      },
+      "time": {
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 5833631,
+    "multipliedPoints": 22570189,
+    "units": 50
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 21
+      },
+      "time": {
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 5962266,
+    "multipliedPoints": 24787971,
+    "units": 53
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 22
+      },
+      "time": {
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 5830343,
+    "multipliedPoints": 22734228,
+    "units": 52
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 23
+      },
+      "time": {
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 5846078,
+    "multipliedPoints": 23031836,
+    "units": 52
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 24
+      },
+      "time": {
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 5597825,
+    "multipliedPoints": 23262432,
+    "units": 50
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 25
+      },
+      "time": {
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 5902874,
+    "multipliedPoints": 24458215,
+    "units": 51
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 26
+      },
+      "time": {
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 5757176,
+    "multipliedPoints": 21581331,
+    "units": 52
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 27
+      },
+      "time": {
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 5903899,
+    "multipliedPoints": 25337116,
+    "units": 50
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 28
+      },
+      "time": {
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 5988982,
+    "multipliedPoints": 24890199,
+    "units": 51
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 29
+      },
+      "time": {
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 5583411,
+    "multipliedPoints": 23087904,
+    "units": 51
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 30
+      },
+      "time": {
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 5911518,
+    "multipliedPoints": 24184185,
+    "units": 51
+  },
+  {
+    "dateTime": {
+      "date": {
+        "year": 2021,
+        "month": 5,
+        "day": 31
+      },
+      "time": {
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    },
+    "points": 5889009,
+    "multipliedPoints": 22702468,
+    "units": 52
+  }
+]

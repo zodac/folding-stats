@@ -38,8 +38,8 @@
                 <configuration>
                     <executable>raml2html</executable>
                     <commandlineArgs>
-                        -i ${project.basedir}/frontend/src/raml/api.raml
-                        -o ${project.basedir}/frontend/site/api.html
+                        --input ${project.basedir}/frontend/src/raml/api.raml
+                        --output ${project.basedir}/frontend/site/api.html
                     </commandlineArgs>
                     <skip>${skip-raml}</skip>
                 </configuration>

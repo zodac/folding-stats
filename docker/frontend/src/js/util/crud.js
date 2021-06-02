@@ -42,6 +42,7 @@ function createHardware() {
         loadHardware();
     })
     .catch((error) => {
+        hide("loader");
         console.error('Unexpected error creating hardware: ', error);
         return false;
     });
@@ -103,6 +104,7 @@ function updateHardware() {
         loadHardware();
     })
     .catch((error) => {
+        hide("loader");
         console.error('Unexpected error updating hardware: ', error);
         return false;
     });
@@ -151,6 +153,7 @@ function deleteHardware() {
         loadHardware();
     })
     .catch((error) => {
+        hide("loader");
         console.error('Unexpected error deleting hardware: ', error);
         return false;
     });
@@ -197,6 +200,7 @@ function createTeam() {
         loadTeams();
     })
     .catch((error) => {
+        hide("loader");
         console.error('Unexpected error creating team: ', error);
         return false;
     });
@@ -255,6 +259,7 @@ function updateTeam() {
         loadTeams();
     })
     .catch((error) => {
+        hide("loader");
         console.error('Unexpected error updating team: ', error);
         return false;
     });
@@ -302,6 +307,7 @@ function deleteTeam() {
         loadTeams();
     })
     .catch((error) => {
+        hide("loader");
         console.error('Unexpected error deleting team: ', error);
         return false;
     });
@@ -366,6 +372,7 @@ function createUser() {
         loadUsers();
     })
     .catch((error) => {
+        hide("loader");
         console.error('Unexpected error creating user: ', error);
         return false;
     });
@@ -443,6 +450,7 @@ function updateUser() {
         loadUsers();
     })
     .catch((error) => {
+        hide("loader");
         console.error('Unexpected error updating user: ', error);
         return false;
     });
@@ -496,6 +504,7 @@ function deleteUser() {
         loadUsers();
     })
     .catch((error) => {
+        hide("loader");
         console.error('Unexpected error deleting user: ', error);
         return false;
     });
@@ -556,6 +565,7 @@ function offsetUser() {
             loadUsers();
         })
         .catch((error) => {
+            hide("loader");
             console.error('Unexpected error offsetting user stats: ', error);
             return false;
         });

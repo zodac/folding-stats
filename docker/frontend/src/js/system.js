@@ -34,9 +34,9 @@ function adminLogin(){
         body: requestData
     })
     .then(response => {
+        hide("loader");
         document.getElementById("login_username").value = '';
         document.getElementById("login_password").value = '';
-        hide("loader");
 
         if(response.status != 200){
             failureToast("Invalid admin credentials!");
@@ -47,6 +47,11 @@ function adminLogin(){
         hide("login_form");
         show("admin_functions");
         sessionSet("Authorization", authorizationPayload);
+    })
+    .catch((error) => {
+        hide("loader");
+        console.error('Unexpected error logging in: ', error);
+        return false;
     });
 }
 
@@ -56,8 +61,7 @@ function manualUpdate() {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': sessionGet("Authorization")
-        },
-        body: requestData
+        }
     })
     .then(response => {
         hide("loader");
@@ -73,6 +77,7 @@ function manualUpdate() {
         successToast("Stats manually updated");
     })
     .catch((error) => {
+        hide("loader");
         console.error('Unexpected error updating stats: ', error);
         return false;
     });
@@ -287,7 +292,7 @@ function loadUsers() {
                 userOption.setAttribute("user_team_id", userItem['team']['id']);
                 userOption.setAttribute("user_is_captain", userItem['userIsCaptain']);
 
-                userOption.innerHTML = userItem["displayName"];
+                userOption.innerHTML = userItem["displayName"] + " ("+userItem['team']['teamName']+")";
                 userList.append(userOption);
             });
         }

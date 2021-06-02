@@ -1,0 +1,17 @@
+{
+  "invalidObject": {
+    "id": 1,
+    "foldingUserName": "User1",
+    "displayName": "User1",
+    "passkey": "fc7d6837************************",
+    "category": "WILDCARD",
+    "hardwareId": 0,
+    "teamId": 0,
+    "userIsCaptain": true
+  },
+  "errors": [
+    "Attribute 'passkey' cannot contain '*' characters",
+    "Attribute 'hardwareId' must be one of: [1: Hardware1, 2: Hardware2]",
+    "Attribute 'teamId' must be one of: [1: Team1, 2: Team2]"
+  ]
+}

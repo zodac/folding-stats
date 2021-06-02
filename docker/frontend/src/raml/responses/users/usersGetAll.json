@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "foldingUserName": "User1",
+    "displayName": "User1",
+    "passkey": "fc7d6837************************",
+    "category": "WILDCARD",
+    "profileLink": "https://forums.extremehw.net/",
+    "liveStatsLink": "http://teamcomp.axihub.ca/",
+    "hardware": {
+      "id": 1,
+      "hardwareName": "Hardware1",
+      "displayName": "Hardware1",
+      "operatingSystem": "WINDOWS",
+      "multiplier": 16.38
+    },
+    "team": {
+      "id": 1,
+      "teamName": "Team1"
+    },
+    "userIsCaptain": true
+  },
+  {
+    "id": 1,
+    "foldingUserName": "User2",
+    "displayName": "User2",
+    "passkey": "fc7d6837************************",
+    "category": "AMD_GPU",
+    "hardware": {
+      "id": 2,
+      "hardwareName": "Hardware2",
+      "displayName": "Hardware2",
+      "operatingSystem": "LINUX",
+      "multiplier": 3.62
+    },
+    "team": {
+      "id": 1,
+      "teamName": "Team1"
+    },
+    "userIsCaptain": false
+  }
+]
