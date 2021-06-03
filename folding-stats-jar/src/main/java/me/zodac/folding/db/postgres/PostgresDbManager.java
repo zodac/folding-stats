@@ -19,7 +19,13 @@ import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.api.utils.DateTimeUtils;
+import me.zodac.folding.db.postgres.gen.tables.records.HardwareRecord;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.SQLDialect;
+import org.jooq.SelectSeekStep1;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,11 +42,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import static java.util.stream.Collectors.toList;
+import static me.zodac.folding.db.postgres.gen.tables.Hardware.HARDWARE;
+
 public final class PostgresDbManager implements DbManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PostgresDbManager.class);
     private static final String VIOLATES_FOREIGN_KEY_CONSTRAINT = "violates foreign key constraint";
     private static final String VIOLATES_UNIQUE_CONSTRAINT = "violates unique constraint";
+    private static final DSLContext QUERY_BUILDER = DSL.using(SQLDialect.POSTGRES);
 
     private transient final DbConnectionPool dbConnectionPool;
 
@@ -82,20 +92,21 @@ public final class PostgresDbManager implements DbManager {
 
     @Override
     public Collection<Hardware> getAllHardware() throws FoldingException {
-        final String selectSqlStatement = "SELECT * FROM hardware ORDER BY hardware_id ASC;";
-        LOGGER.debug("Executing prepared statement: '{}'", selectSqlStatement);
+        try (final Connection connection = dbConnectionPool.getConnection()) {
+            final DSLContext queryBuilder = DSL.using(connection, SQLDialect.POSTGRES);
 
-        try (final Connection connection = dbConnectionPool.getConnection();
-             final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement);
-             final ResultSet resultSet = preparedStatement.executeQuery()) {
+            final SelectSeekStep1<Record, Integer> query = queryBuilder
+                    .select()
+                    .from(HARDWARE)
+                    .orderBy(HARDWARE.HARDWARE_ID.asc());
+            LOGGER.debug("Executing SQL: '{}'", query);
 
-            final List<Hardware> allHardware = new ArrayList<>();
-
-            while (resultSet.next()) {
-                allHardware.add(createHardware(resultSet));
-            }
-
-            return allHardware;
+            return query
+                    .fetch()
+                    .into(HARDWARE)
+                    .stream()
+                    .map(PostgresDbManager::createHardware)
+                    .collect(toList());
         } catch (final SQLException e) {
             throw new FoldingException("Error opening connection to the DB", e);
         }
@@ -1254,6 +1265,16 @@ public final class PostgresDbManager implements DbManager {
                 resultSet.getString("display_name"),
                 OperatingSystem.get(resultSet.getString("operating_system")),
                 resultSet.getDouble("multiplier")
+        );
+    }
+
+    private static Hardware createHardware(final HardwareRecord hardwareRecord) {
+        return Hardware.create(
+                hardwareRecord.getHardwareId(),
+                hardwareRecord.getHardwareName(),
+                hardwareRecord.getDisplayName(),
+                OperatingSystem.get(hardwareRecord.getOperatingSystem()),
+                hardwareRecord.getMultiplier().doubleValue()
         );
     }
 

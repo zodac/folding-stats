@@ -226,6 +226,9 @@
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>${maven-javadoc-plugin.version}</version>
                     <configuration>
+                        <excludePackageNames>
+                            me.zodac.folding.db.postgres.gen:me.zodac.folding.db.postgres.gen.*
+                        </excludePackageNames>
                         <failOnWarnings>true</failOnWarnings>
                         <quiet>true</quiet>
                         <skip>${skip-linters}</skip>
@@ -269,6 +272,11 @@
                         </dependency>
                     </dependencies>
                     <configuration>
+                        <excludes>
+                            <!-- Generated classes -->
+                            <exclude>**/gen/*.java</exclude>
+                            <exclude>**/gen/**/*.java</exclude>
+                        </excludes>
                         <failOnViolation>true</failOnViolation>
                         <includeTests>true</includeTests>
                         <linkXRef>false</linkXRef>

@@ -10,3 +10,7 @@ docker/frontend/site/res/css/*.css
 !docker/frontend/site/res/css/*.min.css
 docker/frontend/site/res/js/*.js
 !docker/frontend/site/res/js/*.min.js
+
+# Generated jOOQ schema files
+docker/postgres/jooq/me/
+!docker/postgres/jooq/*.jar

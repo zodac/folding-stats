@@ -1,4 +1,9 @@
 <FindBugsFilter>
+    <!-- Exclude generated files -->
+    <Match>
+        <Package name="~me.zodac.folding.db.postgres.gen.*"/>
+    </Match>
+
     <!-- Mostly using Lombok, so these non-null checks are file -->
     <Match>
         <Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"/>

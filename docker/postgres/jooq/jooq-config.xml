@@ -1,0 +1,28 @@
+<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.14.0.xsd">
+    <!-- Configure the database connection here -->
+    <jdbc>
+        <driver>org.postgresql.Driver</driver>
+        <url>jdbc:postgresql://192.168.99.100:5433/folding_db</url> <!-- Test container IP -->
+        <user>folding_user</user>
+        <password>shroot</password>
+    </jdbc>
+
+    <generator>
+        <database>
+            <name>org.jooq.meta.postgres.PostgresDatabase</name>
+            <includes>.*</includes>
+            <excludes>
+                UNUSED_TABLE # This table (unqualified name) should not be generated
+                | PREFIX_.* # Objects with a given prefix should not be generated
+                | SECRET_SCHEMA\.SECRET_TABLE # This table (qualified name) should not be generated
+                | SECRET_ROUTINE # This routine (unqualified name) ...
+            </excludes>
+			<inputSchema>public</inputSchema>
+        </database>
+
+        <target>
+            <packageName>me.zodac.folding.db.postgres.gen</packageName>
+            <directory>.</directory>
+        </target>
+    </generator>
+</configuration>
