@@ -1,6 +1,5 @@
 package me.zodac.folding.rest.endpoint;
 
-import me.zodac.folding.api.db.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.FoldingExternalServiceException;
 import me.zodac.folding.api.tc.User;
@@ -99,7 +98,7 @@ public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
     }
 
     @Override
-    protected User createElement(final User user) throws FoldingException, FoldingConflictException, FoldingExternalServiceException {
+    protected User createElement(final User user) throws FoldingException, FoldingExternalServiceException {
         return businessLogic.createUser(user);
     }
 
@@ -109,9 +108,20 @@ public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
     }
 
     @Override
-    protected ValidationResponse<User> validateAndConvert(final UserRequest userRequest) {
+    protected ValidationResponse<User> validateCreateAndConvert(final UserRequest userRequest) {
         final UserValidator userValidator = UserValidator.create(businessLogic, HttpFoldingStatsRetriever.create());
-        return userValidator.validate(userRequest);
+        return userValidator.validateCreate(userRequest);
+    }
+
+    @Override
+    protected ValidationResponse<User> validateUpdateAndConvert(final UserRequest userRequest) {
+        final UserValidator userValidator = UserValidator.create(businessLogic, HttpFoldingStatsRetriever.create());
+        return userValidator.validateUpdate(userRequest);
+    }
+
+    @Override
+    protected ValidationResponse<User> validateDeleteAndConvert(final User user) {
+        return ValidationResponse.success(user);
     }
 
     @Override
@@ -120,7 +130,7 @@ public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
     }
 
     @Override
-    protected User updateElementById(final int userId, final User user) throws FoldingException, NotFoundException, FoldingConflictException, FoldingExternalServiceException {
+    protected User updateElementById(final int userId, final User user) throws FoldingException, NotFoundException, FoldingExternalServiceException {
         // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
         final User userWithId = User.updateWithId(userId, user);
         businessLogic.updateUser(userWithId);
@@ -128,7 +138,7 @@ public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
     }
 
     @Override
-    protected void deleteElementById(final int userId) throws FoldingConflictException, FoldingException {
+    protected void deleteElementById(final int userId) throws FoldingException {
         businessLogic.deleteUser(userId);
     }
 }

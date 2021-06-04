@@ -239,6 +239,26 @@ public final class Responses {
     }
 
     /**
+     * A <b>409_CONFLICT</b> {@link Response}.
+     * <p>
+     * Generally used for cases where the REST request is trying to do one of the following:
+     * <ul>
+     *     <li>Create a resource that already exists</li>
+     *     <li>Update a resource with a value that conflicts with another resource</li>
+     *     <li>Delete a resource that is being used by another resource</li>
+     * </ul>
+     *
+     * @param entity the entity in the payload that caused the error
+     * @return the <b>409_CONFLICT</b> {@link Response}
+     */
+    public static Response conflict(final Object entity) {
+        return Response
+                .status(Response.Status.CONFLICT)
+                .entity(GSON.toJson(entity))
+                .build();
+    }
+
+    /**
      * A <b>500_INTERNAL_SERVER_ERROR</b> {@link Response}.
      * <p>
      * Generally used for cases where an unexpected error has occurred.

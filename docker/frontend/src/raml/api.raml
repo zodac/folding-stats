@@ -60,6 +60,9 @@ traits:
         description: "System user does not have the correct role to perform this request"
       409:
         description: "A hardware with the same 'hardwareName' already exists"
+        body:
+          application/json:
+            example: !include responses/hardware/hardwarePostConflict.json
       502:
         description: "An error occurred connecting to an external system to verify the hardware"
       503:
@@ -84,6 +87,9 @@ traits:
           description: "No hardware exists with the given ID"
         409:
           description: "The hardware is being referenced by a user and cannot be deleted"
+          body:
+            application/json:
+              example: !include responses/hardware/hardwareDeleteConflict.json
         503:
           description: "The system is not in a valid state to execute write requests"
     get:
@@ -210,6 +216,9 @@ traits:
         description: "System user does not have the correct role to perform this request"
       409:
         description: "A team with the same 'teamName' already exists"
+        body:
+          application/json:
+            example: !include responses/teams/teamsPostConflict.json
       502:
         description: "An error occurred connecting to an external system to verify the team"
       503:
@@ -234,6 +243,9 @@ traits:
           description: "No team exists with the given ID"
         409:
           description: "The team is being referenced by a user and cannot be deleted"
+          body:
+            application/json:
+              example: !include responses/teams/teamsDeleteConflict.json
         503:
           description: "The system is not in a valid state to execute write requests"
     get:
@@ -360,6 +372,9 @@ traits:
         description: "System user does not have the correct role to perform this request"
       409:
         description: "A user with the same 'foldingUserName' and 'passkey' already exists"
+        body:
+          application/json:
+            example: !include responses/users/usersPostConflict.json
       502:
         description: "An error occurred connecting to an external system to verify the user"
       503:

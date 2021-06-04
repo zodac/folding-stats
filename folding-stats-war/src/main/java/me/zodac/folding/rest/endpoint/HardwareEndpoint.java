@@ -1,6 +1,5 @@
 package me.zodac.folding.rest.endpoint;
 
-import me.zodac.folding.api.db.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.FoldingExternalServiceException;
 import me.zodac.folding.api.tc.Hardware;
@@ -98,7 +97,7 @@ public class HardwareEndpoint extends AbstractCrudEndpoint<HardwareRequest, Hard
     }
 
     @Override
-    protected Hardware createElement(final Hardware hardware) throws FoldingException, FoldingConflictException {
+    protected Hardware createElement(final Hardware hardware) throws FoldingException {
         return businessLogic.createHardware(hardware);
     }
 
@@ -108,9 +107,21 @@ public class HardwareEndpoint extends AbstractCrudEndpoint<HardwareRequest, Hard
     }
 
     @Override
-    protected ValidationResponse<Hardware> validateAndConvert(final HardwareRequest hardwareRequest) {
-        final HardwareValidator hardwareValidator = HardwareValidator.create();
-        return hardwareValidator.validate(hardwareRequest);
+    protected ValidationResponse<Hardware> validateCreateAndConvert(final HardwareRequest hardwareRequest) {
+        final HardwareValidator hardwareValidator = HardwareValidator.create(businessLogic);
+        return hardwareValidator.validateCreate(hardwareRequest);
+    }
+
+    @Override
+    protected ValidationResponse<Hardware> validateUpdateAndConvert(final HardwareRequest hardwareRequest) {
+        final HardwareValidator hardwareValidator = HardwareValidator.create(businessLogic);
+        return hardwareValidator.validateUpdate(hardwareRequest);
+    }
+
+    @Override
+    protected ValidationResponse<Hardware> validateDeleteAndConvert(final Hardware hardware) {
+        final HardwareValidator hardwareValidator = HardwareValidator.create(businessLogic);
+        return hardwareValidator.validateDelete(hardware);
     }
 
     @Override
@@ -119,7 +130,7 @@ public class HardwareEndpoint extends AbstractCrudEndpoint<HardwareRequest, Hard
     }
 
     @Override
-    protected Hardware updateElementById(final int hardwareId, final Hardware hardware) throws FoldingException, NotFoundException, FoldingConflictException, FoldingExternalServiceException {
+    protected Hardware updateElementById(final int hardwareId, final Hardware hardware) throws FoldingException, NotFoundException, FoldingExternalServiceException {
         // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
         final Hardware hardwareWithId = Hardware.updateWithId(hardwareId, hardware);
         businessLogic.updateHardware(hardwareWithId);
@@ -127,7 +138,7 @@ public class HardwareEndpoint extends AbstractCrudEndpoint<HardwareRequest, Hard
     }
 
     @Override
-    protected void deleteElementById(final int hardwareId) throws FoldingConflictException, FoldingException {
+    protected void deleteElementById(final int hardwareId) throws FoldingException {
         businessLogic.deleteHardware(hardwareId);
     }
 }

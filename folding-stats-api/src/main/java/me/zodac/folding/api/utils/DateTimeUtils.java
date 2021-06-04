@@ -54,7 +54,22 @@ public final class DateTimeUtils {
     }
 
     /**
-     * Get the {@link Timestamp} in {@link ZoneOffset#UTC} for the given values
+     * Get the {@link LocalDateTime} for the given values.
+     *
+     * @param year   the {@link Year}
+     * @param month  the {@link Month}
+     * @param day    the day of the {@link Month}
+     * @param hour   the hour
+     * @param minute the minute
+     * @param second the second
+     * @return the {@link LocalDateTime}
+     */
+    public static LocalDateTime getLocalDateTimeOf(final Year year, final Month month, final int day, final int hour, final int minute, final int second) {
+        return LocalDateTime.of(year.getValue(), month.getValue(), day, hour, minute, second);
+    }
+
+    /**
+     * Get the {@link Timestamp} in {@link ZoneOffset#UTC} for the given values.
      *
      * @param year   the {@link Year}
      * @param month  the {@link Month}
@@ -65,7 +80,30 @@ public final class DateTimeUtils {
      * @return the {@link ZoneOffset#UTC} {@link Timestamp}
      */
     public static Timestamp getTimestampOf(final Year year, final Month month, final int day, final int hour, final int minute, final int second) {
-        return new Timestamp(LocalDateTime.of(year.getValue(), month.getValue(), day, hour, minute, second).toInstant(ZoneOffset.UTC).toEpochMilli());
+        return toTimestamp(LocalDateTime.of(year.getValue(), month.getValue(), day, hour, minute, second));
+    }
+
+    /**
+     * Convert the given {@link LocalDateTime} into a {@link Timestamp} in {@link ZoneOffset#UTC}.
+     *
+     * @param localDateTime the {@link LocalDateTime} to convert
+     * @return the {@link ZoneOffset#UTC} {@link Timestamp}
+     */
+    public static Timestamp toTimestamp(final LocalDateTime localDateTime) {
+        return new Timestamp(localDateTime.toInstant(ZoneOffset.UTC).toEpochMilli());
+    }
+
+    /**
+     * Convert the given {@link Timestamp} into a {@link LocalDateTime} in {@link ZoneOffset#UTC}.
+     *
+     * @param timestamp the {@link Timestamp} to convert
+     * @return the {@link ZoneOffset#UTC} {@link LocalDateTime}
+     */
+    public static LocalDateTime toUtcLocalDateTime(final Timestamp timestamp) {
+        return timestamp
+                .toInstant()
+                .atOffset(ZoneOffset.UTC)
+                .toLocalDateTime();
     }
 
     /**

@@ -4,7 +4,6 @@ import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.RequestPojo;
 import me.zodac.folding.api.ResponsePojo;
 import me.zodac.folding.api.SystemState;
-import me.zodac.folding.api.db.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.FoldingExternalServiceException;
 import me.zodac.folding.api.tc.exception.FoldingIdInvalidException;
@@ -14,6 +13,7 @@ import me.zodac.folding.api.tc.exception.NotFoundException;
 import me.zodac.folding.api.tc.exception.TeamNotFoundException;
 import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.validator.ValidationResponse;
+import me.zodac.folding.api.validator.ValidationResult;
 import me.zodac.folding.ejb.BusinessLogic;
 import me.zodac.folding.rest.util.IdentityParser;
 import me.zodac.folding.rest.util.response.BatchCreateResponse;
@@ -59,17 +59,21 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
 
     protected abstract String elementType();
 
-    protected abstract O createElement(final O element) throws FoldingException, NotFoundException, FoldingConflictException, FoldingExternalServiceException;
+    protected abstract O createElement(final O element) throws FoldingException, NotFoundException, FoldingExternalServiceException;
 
     protected abstract Collection<O> getAllElements() throws FoldingException;
 
-    protected abstract ValidationResponse<O> validateAndConvert(final I inputRequest);
+    protected abstract ValidationResponse<O> validateCreateAndConvert(final I inputRequest);
+
+    protected abstract ValidationResponse<O> validateUpdateAndConvert(final I inputRequest);
+
+    protected abstract ValidationResponse<O> validateDeleteAndConvert(final O element);
 
     protected abstract O getElementById(final int elementId) throws FoldingException, NotFoundException;
 
-    protected abstract O updateElementById(final int elementId, final O element) throws FoldingException, NotFoundException, FoldingConflictException, FoldingExternalServiceException;
+    protected abstract O updateElementById(final int elementId, final O element) throws FoldingException, NotFoundException, FoldingExternalServiceException;
 
-    protected abstract void deleteElementById(final int elementId) throws FoldingConflictException, FoldingException, UserNotFoundException, NoStatsAvailableException, TeamNotFoundException;
+    protected abstract void deleteElementById(final int elementId) throws FoldingException, UserNotFoundException, NoStatsAvailableException, TeamNotFoundException;
 
     protected Response create(final I inputRequest) {
         getLogger().debug("POST request received to create {} at '{}' with request: {}", elementType(), uriContext.getAbsolutePath(), inputRequest);
@@ -79,9 +83,11 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
             return serviceUnavailable();
         }
 
-        final ValidationResponse<O> validationResponse = validateAndConvert(inputRequest);
-        if (validationResponse.isInvalid()) {
+        final ValidationResponse<O> validationResponse = validateCreateAndConvert(inputRequest);
+        if (validationResponse.getValidationResult() == ValidationResult.FAILURE_ON_VALIDATION) {
             return badRequest(validationResponse);
+        } else if (validationResponse.getValidationResult() == ValidationResult.FAILURE_DUE_TO_CONFLICT) {
+            return conflict(validationResponse);
         }
 
         try {
@@ -93,12 +99,6 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
                     .path(String.valueOf(elementWithId.getId()));
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             return created(elementWithId, elementLocationBuilder);
-        } catch (final FoldingConflictException e) {
-            // TODO: [zodac] For conflict exceptions, return the ID conflicted against
-            final String errorMessage = String.format("The %1$s conflicts with an existing %1$s", elementType());
-            getLogger().debug(errorMessage, e);
-            getLogger().error(errorMessage);
-            return conflict(errorMessage);
         } catch (final FoldingExternalServiceException e) {
             final String errorMessage = String.format("Error connecting to external service at '%s': %s", e.getUrl(), e.getMessage());
             getLogger().debug(errorMessage, e);
@@ -129,7 +129,8 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
         final Collection<ValidationResponse<O>> failedValidationResponses = new ArrayList<>(batchOfInputRequests.size() / 2);
 
         for (final I inputRequest : batchOfInputRequests) {
-            final ValidationResponse<O> validationResponse = validateAndConvert(inputRequest);
+            final ValidationResponse<O> validationResponse = validateCreateAndConvert(inputRequest);
+
             if (validationResponse.isInvalid()) {
                 getLogger().error("Found validation error for {}: {}", inputRequest, validationResponse);
                 failedValidationResponses.add(validationResponse);
@@ -150,7 +151,7 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
             try {
                 final O elementWithId = createElement(element);
                 successful.add(elementWithId);
-            } catch (final FoldingConflictException | FoldingException | FoldingExternalServiceException e) {
+            } catch (final FoldingException | FoldingExternalServiceException e) {
                 getLogger().error("Error creating {}: {}", elementType(), element, e.getCause());
                 unsuccessful.add(element);
             } catch (final Exception e) {
@@ -288,7 +289,7 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
                 return ok(existingElement);
             }
 
-            final ValidationResponse<O> validationResponse = validateAndConvert(inputRequest);
+            final ValidationResponse<O> validationResponse = validateUpdateAndConvert(inputRequest);
             if (validationResponse.isInvalid()) {
                 return badRequest(validationResponse);
             }
@@ -310,11 +311,6 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
             getLogger().debug(errorMessage, e);
             getLogger().error(errorMessage);
             return badRequest(errorMessage);
-        } catch (final FoldingConflictException e) {
-            final String errorMessage = String.format("The %1$s conflicts with an existing %1$s", elementType());
-            getLogger().debug(errorMessage, e);
-            getLogger().error(errorMessage);
-            return conflict(errorMessage);
         } catch (final FoldingExternalServiceException e) {
             final String errorMessage = String.format("Error connecting to external service at '%s': %s", e.getUrl(), e.getMessage());
             getLogger().debug(errorMessage, e);
@@ -341,9 +337,18 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
             return serviceUnavailable();
         }
 
+
         try {
             final int parsedId = IdentityParser.parse(elementId);
-            getElementById(parsedId); // We call this so if the value does not exist, we can fail with a NOT_FOUND response
+            final O element = getElementById(parsedId);
+
+            final ValidationResponse<O> validationResponse = validateDeleteAndConvert(element);
+            if (validationResponse.getValidationResult() == ValidationResult.FAILURE_ON_VALIDATION) {
+                return badRequest(validationResponse);
+            } else if (validationResponse.getValidationResult() == ValidationResult.FAILURE_DUE_TO_CONFLICT) {
+                return conflict(validationResponse);
+            }
+
             deleteElementById(parsedId);
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             return ok();
@@ -361,11 +366,6 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
             getLogger().debug("Error deleting {}, could not find {} with ID {}", elementType(), e.getType(), e.getId(), e);
             getLogger().error("Error deleting {}, could not find {} with ID {}", elementType(), e.getType(), e.getId());
             return notFound();
-        } catch (final FoldingConflictException e) {
-            final String errorMessage = String.format("The %s ID '%s' is in use, remove all usages before deleting", elementType(), elementId);
-            getLogger().debug(errorMessage, e);
-            getLogger().error(errorMessage);
-            return conflict(errorMessage);
         } catch (final FoldingException e) {
             getLogger().error("Error deleting {} with ID: {}", elementType(), elementId, e.getCause());
             return serverError();

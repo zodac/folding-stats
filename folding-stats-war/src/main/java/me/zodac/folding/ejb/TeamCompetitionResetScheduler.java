@@ -2,7 +2,6 @@ package me.zodac.folding.ejb;
 
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.SystemState;
-import me.zodac.folding.api.db.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
@@ -94,7 +93,7 @@ public class TeamCompetitionResetScheduler {
         try {
             LOGGER.info("Deleting retired users");
             businessLogic.deleteRetiredUserStats();
-        } catch (final FoldingException | FoldingConflictException e) {
+        } catch (final FoldingException e) {
             LOGGER.error("Unable to reset retired stats", e);
         }
 

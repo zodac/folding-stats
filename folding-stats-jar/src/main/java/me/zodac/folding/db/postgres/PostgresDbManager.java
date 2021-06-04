@@ -3,16 +3,11 @@ package me.zodac.folding.db.postgres;
 import me.zodac.folding.api.db.DbConnectionPool;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.db.SystemUserAuthentication;
-import me.zodac.folding.api.db.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
-import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
-import me.zodac.folding.api.tc.OperatingSystem;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.tc.exception.HardwareNotFoundException;
 import me.zodac.folding.api.tc.exception.NoStatsAvailableException;
-import me.zodac.folding.api.tc.exception.TeamNotFoundException;
 import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.stats.OffsetStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
@@ -20,37 +15,50 @@ import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.api.utils.DateTimeUtils;
 import me.zodac.folding.db.postgres.gen.tables.records.HardwareRecord;
+import me.zodac.folding.db.postgres.gen.tables.records.TeamsRecord;
+import me.zodac.folding.db.postgres.gen.tables.records.UsersRecord;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import org.jooq.DSLContext;
-import org.jooq.Record;
+import org.jooq.Result;
 import org.jooq.SQLDialect;
-import org.jooq.SelectSeekStep1;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 import static java.util.stream.Collectors.toList;
 import static me.zodac.folding.db.postgres.gen.tables.Hardware.HARDWARE;
+import static me.zodac.folding.db.postgres.gen.tables.RetiredUserStats.RETIRED_USER_STATS;
+import static me.zodac.folding.db.postgres.gen.tables.Teams.TEAMS;
+import static me.zodac.folding.db.postgres.gen.tables.UserInitialStats.USER_INITIAL_STATS;
+import static me.zodac.folding.db.postgres.gen.tables.UserOffsetTcStats.USER_OFFSET_TC_STATS;
+import static me.zodac.folding.db.postgres.gen.tables.UserTcStatsHourly.USER_TC_STATS_HOURLY;
+import static me.zodac.folding.db.postgres.gen.tables.UserTotalStats.USER_TOTAL_STATS;
+import static me.zodac.folding.db.postgres.gen.tables.Users.USERS;
+import static org.jooq.impl.DSL.day;
+import static org.jooq.impl.DSL.hour;
+import static org.jooq.impl.DSL.max;
+import static org.jooq.impl.DSL.month;
+import static org.jooq.impl.DSL.year;
 
 public final class PostgresDbManager implements DbManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PostgresDbManager.class);
-    private static final String VIOLATES_FOREIGN_KEY_CONSTRAINT = "violates foreign key constraint";
-    private static final String VIOLATES_UNIQUE_CONSTRAINT = "violates unique constraint";
-    private static final DSLContext QUERY_BUILDER = DSL.using(SQLDialect.POSTGRES);
+    private static final int SINGLE_RESULT = 1;
 
     private transient final DbConnectionPool dbConnectionPool;
 
@@ -63,39 +71,25 @@ public final class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public Hardware createHardware(final Hardware hardware) throws FoldingException, FoldingConflictException {
-        final String insertSqlWithReturnId = "INSERT INTO hardware (hardware_name, display_name, operating_system, multiplier) VALUES (?, ?, ?, ?) RETURNING hardware_id;";
+    public Hardware createHardware(final Hardware hardware) throws FoldingException {
+        return executeQuery((queryContext) -> {
+            final var query = queryContext
+                    .insertInto(HARDWARE)
+                    .columns(HARDWARE.HARDWARE_NAME, HARDWARE.DISPLAY_NAME, HARDWARE.OPERATING_SYSTEM, HARDWARE.MULTIPLIER)
+                    .values(hardware.getHardwareName(), hardware.getDisplayName(), hardware.getOperatingSystem().displayName(), BigDecimal.valueOf(hardware.getMultiplier()))
+                    .returning(HARDWARE.HARDWARE_ID);
+            LOGGER.debug("Executing SQL: '{}'", query);
 
-        try (final Connection connection = dbConnectionPool.getConnection();
-             final PreparedStatement preparedStatement = connection.prepareStatement(insertSqlWithReturnId)) {
-
-            preparedStatement.setString(1, hardware.getHardwareName());
-            preparedStatement.setString(2, hardware.getDisplayName());
-            preparedStatement.setString(3, hardware.getOperatingSystem().displayName());
-            preparedStatement.setDouble(4, hardware.getMultiplier());
-
-            LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
-            try (final ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    final int hardwareId = resultSet.getInt("hardware_id");
-                    return Hardware.updateWithId(hardwareId, hardware);
-                }
-                throw new IllegalStateException("No ID was returned from the DB, but no exception was raised");
-            }
-        } catch (final SQLException e) {
-            if (e.getMessage().contains(VIOLATES_UNIQUE_CONSTRAINT)) {
-                throw new FoldingConflictException(e);
-            }
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
+            final Result<HardwareRecord> hardwareRecordResult = query.fetch();
+            final int hardwareId = hardwareRecordResult.get(0).getHardwareId();
+            return Hardware.updateWithId(hardwareId, hardware);
+        });
     }
 
     @Override
     public Collection<Hardware> getAllHardware() throws FoldingException {
-        try (final Connection connection = dbConnectionPool.getConnection()) {
-            final DSLContext queryBuilder = DSL.using(connection, SQLDialect.POSTGRES);
-
-            final SelectSeekStep1<Record, Integer> query = queryBuilder
+        return executeQuery((queryContext) -> {
+            final var query = queryContext
                     .select()
                     .from(HARDWARE)
                     .orderBy(HARDWARE.HARDWARE_ID.asc());
@@ -105,407 +99,278 @@ public final class PostgresDbManager implements DbManager {
                     .fetch()
                     .into(HARDWARE)
                     .stream()
-                    .map(PostgresDbManager::createHardware)
+                    .map(RecordConverter::toHardware)
                     .collect(toList());
-        } catch (final SQLException e) {
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
+        });
     }
 
     @Override
-    public Hardware getHardware(final int hardwareId) throws FoldingException, HardwareNotFoundException {
-        final String selectSqlStatement = "SELECT * FROM hardware WHERE hardware_id = ?;";
+    public Optional<Hardware> getHardware(final int hardwareId) throws FoldingException {
+        return executeQuery((queryContext) -> {
+            final var query = queryContext
+                    .select()
+                    .from(HARDWARE)
+                    .where(HARDWARE.HARDWARE_ID.equal(hardwareId));
+            LOGGER.debug("Executing SQL: '{}'", query);
 
-        try (final Connection connection = dbConnectionPool.getConnection();
-             final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
-
-            preparedStatement.setInt(1, hardwareId);
-
-            LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
-            try (final ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return createHardware(resultSet);
-                }
-            }
-
-            throw new HardwareNotFoundException(hardwareId);
-        } catch (final SQLException e) {
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
+            return query
+                    .fetch()
+                    .into(HARDWARE)
+                    .stream()
+                    .map(RecordConverter::toHardware)
+                    .findAny();
+        });
     }
 
     @Override
-    public void updateHardware(final Hardware hardware) throws FoldingException, FoldingConflictException {
-        final String updateSqlStatement = "UPDATE hardware " +
-                "SET hardware_name = ?, display_name = ?, operating_system = ?, multiplier = ? " +
-                "WHERE hardware_id = ?;";
+    public void updateHardware(final Hardware hardware) throws FoldingException {
+        executeQuery((queryContext) -> {
+            final var query = queryContext
+                    .update(HARDWARE)
+                    .set(HARDWARE.HARDWARE_NAME, hardware.getHardwareName())
+                    .set(HARDWARE.DISPLAY_NAME, hardware.getDisplayName())
+                    .set(HARDWARE.OPERATING_SYSTEM, hardware.getOperatingSystem().displayName())
+                    .set(HARDWARE.MULTIPLIER, BigDecimal.valueOf(hardware.getMultiplier()))
+                    .where(HARDWARE.HARDWARE_ID.equal(hardware.getId()));
+            LOGGER.debug("Executing SQL: '{}'", query);
 
-        try (final Connection connection = dbConnectionPool.getConnection();
-             final PreparedStatement preparedStatement = connection.prepareStatement(updateSqlStatement)) {
-
-            preparedStatement.setString(1, hardware.getHardwareName());
-            preparedStatement.setString(2, hardware.getDisplayName());
-            preparedStatement.setString(3, hardware.getOperatingSystem().displayName());
-            preparedStatement.setDouble(4, hardware.getMultiplier());
-            preparedStatement.setInt(5, hardware.getId());
-
-            LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
-            if (preparedStatement.executeUpdate() == 0) {
-                throw new FoldingException(String.format("Error executing update for hardware: %s", preparedStatement));
-            }
-        } catch (final SQLException e) {
-            if (e.getMessage().contains(VIOLATES_UNIQUE_CONSTRAINT)) {
-                throw new FoldingConflictException(e);
-            }
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
+            return query.execute();
+        });
     }
 
     @Override
-    public void deleteHardware(final int hardwareId) throws FoldingException, FoldingConflictException {
-        final String deleteSqlStatement = "DELETE FROM hardware WHERE hardware_id = ?;";
+    public void deleteHardware(final int hardwareId) throws FoldingException {
+        executeQuery((queryContext) -> {
+            final var query = queryContext
+                    .deleteFrom(HARDWARE)
+                    .where(HARDWARE.HARDWARE_ID.equal(hardwareId));
+            LOGGER.debug("Executing SQL: '{}'", query);
 
-        try (final Connection connection = dbConnectionPool.getConnection();
-             final PreparedStatement preparedStatement = connection.prepareStatement(deleteSqlStatement)) {
-
-            preparedStatement.setInt(1, hardwareId);
-
-            LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
-            preparedStatement.executeUpdate();
-        } catch (final SQLException e) {
-            if (e.getMessage().contains(VIOLATES_FOREIGN_KEY_CONSTRAINT)) {
-                throw new FoldingConflictException(e);
-            }
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
+            return query.execute();
+        });
     }
 
     @Override
-    public User createUser(final User user) throws FoldingException, FoldingConflictException {
-        final String insertSqlWithReturnId = "INSERT INTO users (folding_username, display_username, passkey, category, profile_link, live_stats_link, hardware_id, team_id, is_captain) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING user_id;";
+    public Team createTeam(final Team team) throws FoldingException {
+        return executeQuery((queryContext) -> {
+            final var query = queryContext
+                    .insertInto(TEAMS)
+                    .columns(TEAMS.TEAM_NAME, TEAMS.TEAM_DESCRIPTION, TEAMS.FORUM_LINK)
+                    .values(team.getTeamName(), team.getTeamDescription(), team.getForumLink())
+                    .returning(TEAMS.TEAM_ID);
+            LOGGER.debug("Executing SQL: '{}'", query);
 
-        try (final Connection connection = dbConnectionPool.getConnection();
-             final PreparedStatement preparedStatement = connection.prepareStatement(insertSqlWithReturnId)) {
-
-            preparedStatement.setString(1, user.getFoldingUserName());
-            preparedStatement.setString(2, user.getDisplayName());
-            preparedStatement.setString(3, user.getPasskey());
-            preparedStatement.setString(4, user.getCategory().displayName());
-            preparedStatement.setString(5, user.getProfileLink());
-            preparedStatement.setString(6, user.getLiveStatsLink());
-            preparedStatement.setInt(7, user.getHardware().getId());
-            preparedStatement.setInt(8, user.getTeam().getId());
-            preparedStatement.setBoolean(9, user.isUserIsCaptain());
-
-            LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
-            try (final ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    final int foldingUserId = resultSet.getInt("user_id");
-                    return User.updateWithId(foldingUserId, user);
-                }
-            }
-            throw new IllegalStateException("No ID was returned from the DB, but no exception was raised");
-        } catch (final SQLException e) {
-            if (e.getMessage().contains(VIOLATES_UNIQUE_CONSTRAINT)) {
-                throw new FoldingConflictException(e);
-            }
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
-    }
-
-    @Override
-    public Collection<User> getAllUsers() throws FoldingException {
-        final String selectSqlStatement = "SELECT users.user_id, users.folding_username, users.display_username, users.passkey, users.category, users.profile_link, users.live_stats_link, users.is_captain, hardware.*, teams.* " +
-                "FROM users " +
-                "LEFT JOIN hardware " +
-                "ON users.hardware_id = hardware.hardware_id " +
-                "LEFT JOIN teams " +
-                "ON users.team_id = teams.team_id " +
-                "ORDER BY user_id ASC;";
-        LOGGER.debug("Executing prepared statement: '{}'", selectSqlStatement);
-
-        try (final Connection connection = dbConnectionPool.getConnection();
-             final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement);
-             final ResultSet resultSet = preparedStatement.executeQuery()) {
-
-            final List<User> allUsers = new ArrayList<>();
-
-            while (resultSet.next()) {
-                allUsers.add(createUser(resultSet));
-            }
-
-            return allUsers;
-        } catch (final SQLException e) {
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
-    }
-
-    @Override
-    public User getUser(final int userId) throws FoldingException, UserNotFoundException {
-        final String selectSqlStatement = "SELECT users.user_id, users.folding_username, users.display_username, users.passkey, users.category, users.profile_link, users.live_stats_link, users.is_captain, hardware.*, teams.* " +
-                "FROM users " +
-                "LEFT JOIN hardware " +
-                "ON users.hardware_id = hardware.hardware_id " +
-                "LEFT JOIN teams " +
-                "ON users.team_id = teams.team_id " +
-                "WHERE user_Id = ?;";
-
-        try (final Connection connection = dbConnectionPool.getConnection();
-             final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
-
-            preparedStatement.setInt(1, userId);
-
-            LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
-            try (final ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return createUser(resultSet);
-                }
-
-                throw new UserNotFoundException(userId);
-            }
-        } catch (final SQLException e) {
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
-    }
-
-    @Override
-    public void updateUser(final User user) throws FoldingException, FoldingConflictException {
-        final String updateSqlStatement = "UPDATE users " +
-                "SET folding_username = ?, display_username = ?, passkey = ?, category = ?, profile_link = ?, live_stats_link = ?, hardware_id = ?, team_id = ?, is_captain = ? " +
-                "WHERE user_id = ?;";
-
-        try (final Connection connection = dbConnectionPool.getConnection();
-             final PreparedStatement preparedStatement = connection.prepareStatement(updateSqlStatement)) {
-
-            preparedStatement.setString(1, user.getFoldingUserName());
-            preparedStatement.setString(2, user.getDisplayName());
-            preparedStatement.setString(3, user.getPasskey());
-            preparedStatement.setString(4, user.getCategory().displayName());
-            preparedStatement.setString(5, user.getProfileLink());
-            preparedStatement.setString(6, user.getLiveStatsLink());
-            preparedStatement.setInt(7, user.getHardware().getId());
-            preparedStatement.setInt(8, user.getTeam().getId());
-            preparedStatement.setBoolean(9, user.isUserIsCaptain());
-            preparedStatement.setInt(10, user.getId());
-
-            LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
-            if (preparedStatement.executeUpdate() == 0) {
-                throw new FoldingException(String.format("Error executing update for user: %s", preparedStatement));
-            }
-        } catch (final SQLException e) {
-            if (e.getMessage().contains(VIOLATES_UNIQUE_CONSTRAINT)) {
-                throw new FoldingConflictException(e);
-            }
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
-    }
-
-    @Override
-    public void deleteUser(final int userId) throws FoldingException, FoldingConflictException {
-        final String deleteSqlStatement = "DELETE FROM users WHERE user_id = ?;";
-
-        try (final Connection connection = dbConnectionPool.getConnection();
-             final PreparedStatement preparedStatement = connection.prepareStatement(deleteSqlStatement)) {
-
-            preparedStatement.setInt(1, userId);
-
-            LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
-            preparedStatement.executeUpdate();
-        } catch (final SQLException e) {
-            if (e.getMessage().contains(VIOLATES_FOREIGN_KEY_CONSTRAINT)) {
-                throw new FoldingConflictException(e);
-            }
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
-    }
-
-    @Override
-    public Team createTeam(final Team team) throws FoldingException, FoldingConflictException {
-        final String insertSqlWithReturnId = "INSERT INTO teams (team_name, team_description, forum_link) VALUES (?, ?, ?) RETURNING team_id;";
-
-        try (final Connection connection = dbConnectionPool.getConnection();
-             final PreparedStatement preparedStatement = connection.prepareStatement(insertSqlWithReturnId)) {
-
-            preparedStatement.setString(1, team.getTeamName());
-            preparedStatement.setString(2, team.getTeamDescription());
-            preparedStatement.setString(3, team.getForumLink());
-
-            LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
-            try (final ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    final int foldingTeamId = resultSet.getInt("team_id");
-                    return Team.updateWithId(foldingTeamId, team);
-                }
-
-                throw new IllegalStateException("No ID was returned from the DB, but no exception was raised");
-            }
-        } catch (final SQLException e) {
-            if (e.getMessage().contains(VIOLATES_UNIQUE_CONSTRAINT)) {
-                throw new FoldingConflictException(e);
-            }
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
+            final Result<TeamsRecord> teamRecordResult = query.fetch();
+            final int teamId = teamRecordResult.get(0).getTeamId();
+            return Team.updateWithId(teamId, team);
+        });
     }
 
     @Override
     public Collection<Team> getAllTeams() throws FoldingException {
-        final String selectSqlStatement = "SELECT * FROM teams ORDER BY team_id ASC;";
-        LOGGER.debug("Executing prepared statement: '{}'", selectSqlStatement);
+        return executeQuery((queryContext) -> {
+            final var query = queryContext
+                    .select()
+                    .from(TEAMS)
+                    .orderBy(TEAMS.TEAM_ID.asc());
+            LOGGER.debug("Executing SQL: '{}'", query);
 
-        try (final Connection connection = dbConnectionPool.getConnection();
-             final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement); final ResultSet resultSet = preparedStatement.executeQuery()) {
-
-            final List<Team> allTeams = new ArrayList<>();
-
-            while (resultSet.next()) {
-                allTeams.add(createTeam(resultSet));
-            }
-
-            return allTeams;
-        } catch (final SQLException e) {
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
+            return query
+                    .fetch()
+                    .into(TEAMS)
+                    .stream()
+                    .map(RecordConverter::toTeam)
+                    .collect(toList());
+        });
     }
 
     @Override
-    public Team getTeam(final int teamId) throws FoldingException, TeamNotFoundException {
-        final String selectSqlStatement = "SELECT * FROM teams WHERE team_id = ?;";
+    public Optional<Team> getTeam(final int teamId) throws FoldingException {
+        return executeQuery((queryContext) -> {
+            final var query = queryContext
+                    .select()
+                    .from(TEAMS)
+                    .where(TEAMS.TEAM_ID.equal(teamId));
+            LOGGER.debug("Executing SQL: '{}'", query);
 
-        try (final Connection connection = dbConnectionPool.getConnection();
-             final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
-
-            preparedStatement.setInt(1, teamId);
-
-            LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
-            try (final ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return createTeam(resultSet);
-                }
-
-                throw new TeamNotFoundException(teamId);
-            }
-        } catch (final SQLException e) {
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
+            return query
+                    .fetch()
+                    .into(TEAMS)
+                    .stream()
+                    .map(RecordConverter::toTeam)
+                    .findAny();
+        });
     }
 
     @Override
-    public void updateTeam(final Team team) throws FoldingException, FoldingConflictException {
-        final String updateSqlStatement = "UPDATE teams " +
-                "SET team_name = ?, team_description = ?, forum_link = ? " +
-                "WHERE team_id = ?;";
+    public void updateTeam(final Team team) throws FoldingException {
+        executeQuery((queryContext) -> {
+            final var query = queryContext
+                    .update(TEAMS)
+                    .set(TEAMS.TEAM_NAME, team.getTeamName())
+                    .set(TEAMS.TEAM_DESCRIPTION, team.getTeamDescription())
+                    .set(TEAMS.FORUM_LINK, team.getForumLink())
+                    .where(TEAMS.TEAM_ID.equal(team.getId()));
+            LOGGER.debug("Executing SQL: '{}'", query);
 
-        try (final Connection connection = dbConnectionPool.getConnection();
-             final PreparedStatement preparedStatement = connection.prepareStatement(updateSqlStatement)) {
-
-            preparedStatement.setString(1, team.getTeamName());
-            preparedStatement.setString(2, team.getTeamDescription());
-            preparedStatement.setString(3, team.getForumLink());
-            preparedStatement.setInt(4, team.getId());
-
-            LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
-            if (preparedStatement.executeUpdate() == 0) {
-                throw new FoldingException(String.format("Error executing update for team: %s", preparedStatement));
-            }
-        } catch (final SQLException e) {
-            if (e.getMessage().contains(VIOLATES_UNIQUE_CONSTRAINT)) {
-                throw new FoldingConflictException(e);
-            }
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
+            return query.execute();
+        });
     }
 
     @Override
-    public void deleteTeam(final int teamId) throws FoldingException, FoldingConflictException {
+    public void deleteTeam(final int teamId) throws FoldingException {
         LOGGER.debug("Deleting team {} from DB", teamId);
-        final String deleteSqlStatement = "DELETE FROM teams WHERE team_id = ?;";
+        executeQuery((queryContext) -> {
+            final var query = queryContext
+                    .deleteFrom(TEAMS)
+                    .where(TEAMS.TEAM_ID.equal(teamId));
+            LOGGER.debug("Executing SQL: '{}'", query);
 
-        try (final Connection connection = dbConnectionPool.getConnection();
-             final PreparedStatement preparedStatement = connection.prepareStatement(deleteSqlStatement)) {
+            return query.execute();
+        });
+    }
 
-            preparedStatement.setInt(1, teamId);
+    @Override
+    public User createUser(final User user) throws FoldingException {
+        return executeQuery((queryContext) -> {
+            final var query = queryContext
+                    .insertInto(USERS)
+                    .columns(USERS.FOLDING_USERNAME, USERS.DISPLAY_USERNAME, USERS.PASSKEY, USERS.CATEGORY, USERS.PROFILE_LINK, USERS.LIVE_STATS_LINK, USERS.HARDWARE_ID, USERS.TEAM_ID, USERS.IS_CAPTAIN)
+                    .values(user.getFoldingUserName(), user.getDisplayName(), user.getPasskey(), user.getCategory().displayName(), user.getProfileLink(), user.getLiveStatsLink(), user.getHardware().getId(), user.getTeam().getId(), user.isUserIsCaptain())
+                    .returning(USERS.USER_ID);
+            LOGGER.debug("Executing SQL: '{}'", query);
 
-            LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
-            preparedStatement.executeUpdate();
-        } catch (final SQLException e) {
-            if (e.getMessage().contains(VIOLATES_FOREIGN_KEY_CONSTRAINT)) {
-                throw new FoldingConflictException(e);
-            }
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
+            final Result<UsersRecord> usersRecordResult = query.fetch();
+            final int userId = usersRecordResult.get(0).getUserId();
+            return User.updateWithId(userId, user);
+        });
+    }
+
+    @Override
+    public Collection<User> getAllUsers() throws FoldingException {
+        return executeQuery((queryContext) -> {
+            final var query = queryContext
+                    .select()
+                    .from(USERS)
+                    .leftJoin(HARDWARE)
+                    .on(USERS.HARDWARE_ID.equal(HARDWARE.HARDWARE_ID))
+                    .leftJoin(TEAMS)
+                    .on(USERS.TEAM_ID.equal(TEAMS.TEAM_ID))
+                    .orderBy(USERS.USER_ID.asc());
+            LOGGER.debug("Executing SQL: '{}'", query);
+
+            return query
+                    .fetch()
+                    .stream()
+                    .map(RecordConverter::toUser)
+                    .collect(toList());
+        });
+    }
+
+    @Override
+    public Optional<User> getUser(final int userId) throws FoldingException {
+        return executeQuery((queryContext) -> {
+            final var query = queryContext
+                    .select()
+                    .from(USERS)
+                    .leftJoin(HARDWARE)
+                    .on(USERS.HARDWARE_ID.equal(HARDWARE.HARDWARE_ID))
+                    .leftJoin(TEAMS)
+                    .on(USERS.TEAM_ID.equal(TEAMS.TEAM_ID))
+                    .where(USERS.USER_ID.equal(userId));
+            LOGGER.debug("Executing SQL: '{}'", query);
+
+            return query
+                    .fetch()
+                    .stream()
+                    .map(RecordConverter::toUser)
+                    .findAny();
+        });
+    }
+
+    @Override
+    public void updateUser(final User user) throws FoldingException {
+        executeQuery((queryContext) -> {
+            final var query = queryContext
+                    .update(USERS)
+                    .set(USERS.FOLDING_USERNAME, user.getFoldingUserName())
+                    .set(USERS.DISPLAY_USERNAME, user.getDisplayName())
+                    .set(USERS.PASSKEY, user.getPasskey())
+                    .set(USERS.CATEGORY, user.getCategory().displayName())
+                    .set(USERS.PROFILE_LINK, user.getProfileLink())
+                    .set(USERS.LIVE_STATS_LINK, user.getLiveStatsLink())
+                    .set(USERS.HARDWARE_ID, user.getHardware().getId())
+                    .set(USERS.TEAM_ID, user.getTeam().getId())
+                    .set(USERS.IS_CAPTAIN, user.isUserIsCaptain())
+                    .where(USERS.USER_ID.equal(user.getId()));
+            LOGGER.debug("Executing SQL: '{}'", query);
+
+            return query.execute();
+        });
+    }
+
+    @Override
+    public void deleteUser(final int userId) throws FoldingException {
+        executeQuery((queryContext) -> {
+            final var query = queryContext
+                    .deleteFrom(USERS)
+                    .where(USERS.USER_ID.equal(userId));
+            LOGGER.debug("Executing SQL: '{}'", query);
+
+            return query.execute();
+        });
     }
 
     @Override
     public void persistHourlyTcStats(final UserTcStats userTcStats) throws FoldingException {
         LOGGER.debug("Inserting TC stats for user ID: {}", userTcStats.getUserId());
-        final String preparedInsertSqlStatement = "INSERT INTO user_tc_stats_hourly (user_id, utc_timestamp, tc_points, tc_points_multiplied, tc_units) VALUES (?, ?, ?, ?, ?);";
 
-        try (final Connection connection = dbConnectionPool.getConnection();
-             final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
-            try {
-                preparedStatement.setInt(1, userTcStats.getUserId());
-                preparedStatement.setTimestamp(2, userTcStats.getTimestamp());
-                preparedStatement.setLong(3, userTcStats.getPoints());
-                preparedStatement.setLong(4, userTcStats.getMultipliedPoints());
-                preparedStatement.setInt(5, userTcStats.getUnits());
+        executeQuery((queryContext) -> {
+            final var query = queryContext
+                    .insertInto(USER_TC_STATS_HOURLY)
+                    .columns(USER_TC_STATS_HOURLY.USER_ID, USER_TC_STATS_HOURLY.UTC_TIMESTAMP, USER_TC_STATS_HOURLY.TC_POINTS, USER_TC_STATS_HOURLY.TC_POINTS_MULTIPLIED, USER_TC_STATS_HOURLY.TC_UNITS)
+                    .values(userTcStats.getUserId(), DateTimeUtils.toUtcLocalDateTime(userTcStats.getTimestamp()), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits());
+            LOGGER.debug("Executing SQL: '{}'", query);
 
-                LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
-                preparedStatement.execute();
-            } catch (final SQLException e) {
-                throw new FoldingException(String.format("Unable to persist TC stats for user: %s", userTcStats), e);
-            }
-        } catch (final SQLException e) {
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
+            return query.execute();
+        });
     }
 
     @Override
-    public UserTcStats getHourlyTcStats(final int userId) throws FoldingException, NoStatsAvailableException {
+    public Optional<UserTcStats> getHourlyTcStats(final int userId) throws FoldingException {
         LOGGER.debug("Getting current TC stats for user {}", userId);
-        final String preparedSelectSqlStatement = "SELECT utc_timestamp, tc_points, tc_points_multiplied, tc_units " +
-                "FROM user_tc_stats_hourly " +
-                "WHERE user_id = ? " +
-                "ORDER BY utc_timestamp DESC " +
-                "LIMIT 1;";
 
-        try (final Connection connection = dbConnectionPool.getConnection();
-             final PreparedStatement preparedStatement = connection.prepareStatement(preparedSelectSqlStatement)) {
+        return executeQuery((queryContext) -> {
+            final var query = queryContext
+                    .select(USER_TC_STATS_HOURLY.USER_ID, USER_TC_STATS_HOURLY.UTC_TIMESTAMP, USER_TC_STATS_HOURLY.TC_POINTS, USER_TC_STATS_HOURLY.TC_POINTS_MULTIPLIED, USER_TC_STATS_HOURLY.TC_UNITS)
+                    .from(USER_TC_STATS_HOURLY)
+                    .where(USER_TC_STATS_HOURLY.USER_ID.equal(userId))
+                    .orderBy(USER_TC_STATS_HOURLY.UTC_TIMESTAMP.desc())
+                    .limit(SINGLE_RESULT);
+            LOGGER.debug("Executing SQL: '{}'", query);
 
-            preparedStatement.setInt(1, userId);
-
-            LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
-            try (final ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return UserTcStats.create(userId, resultSet.getTimestamp("utc_timestamp"), resultSet.getLong("tc_points"), resultSet.getLong("tc_points_multiplied"), resultSet.getInt("tc_units"));
-                }
-            } catch (final SQLException e) {
-                LOGGER.warn("Unable to get TC stats for user: {}", userId, e);
-            }
-            throw new NoStatsAvailableException("Unable to find TC stats for user with ID: " + userId);
-        } catch (final SQLException e) {
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
+            return query
+                    .fetch()
+                    .into(USER_TC_STATS_HOURLY)
+                    .stream()
+                    .map(RecordConverter::toUserTcStats)
+                    .findAny();
+        });
     }
 
     @Override
     public boolean isAnyHourlyTcStats() throws FoldingException {
         LOGGER.debug("Checking if any TC stats exist in the DB");
-        final String selectSqlStatement = "SELECT COUNT(*) AS count FROM user_tc_stats_hourly;";
 
-        try (final Connection connection = dbConnectionPool.getConnection();
-             final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
+        return executeQuery((queryContext) -> {
+            final var query = queryContext
+                    .selectCount()
+                    .from(USER_TC_STATS_HOURLY);
+            LOGGER.debug("Executing SQL: '{}'", query);
 
-            LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
-            try (final ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return resultSet.getInt("count") > 0;
-                }
-
-                return false;
-            }
-        } catch (final SQLException e) {
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
+            final Integer count = query.fetchOne(0, Integer.class);
+            return count != null && count > 0;
+        });
     }
 
     @Override
@@ -576,85 +441,58 @@ public final class PostgresDbManager implements DbManager {
 
     private UserTcStats getCurrentDayFirstHourTcStats(final int userId, final int day, final Month month, final Year year) throws FoldingException {
         LOGGER.debug("Getting current day's first hour TC stats for user {} on {}/{}/{}", userId, year.getValue(), month.getValue(), day);
-        final String preparedSelectSqlStatement = "SELECT MAX(utc_timestamp) AS hourly_timestamp, " +
-                "MAX(tc_points) AS tc_points, " +
-                "MAX(tc_points_multiplied) AS tc_points_multiplied, " +
-                "MAX(tc_units) AS tc_units " +
-                "FROM user_tc_stats_hourly " +
-                "WHERE utc_timestamp BETWEEN ? AND ? " +
-                "AND user_id = ? " +
-                "GROUP BY EXTRACT(HOUR FROM utc_timestamp) " +
-                "ORDER BY EXTRACT(HOUR FROM utc_timestamp) ASC " +
-                "LIMIT 1;";
 
-        try (final Connection connection = dbConnectionPool.getConnection();
-             final PreparedStatement preparedStatement = connection.prepareStatement(preparedSelectSqlStatement)) {
+        return executeQuery((queryContext) -> {
+            final LocalDateTime start = DateTimeUtils.getLocalDateTimeOf(year, month, day, 0, 0, 0);
+            final LocalDateTime end = DateTimeUtils.getLocalDateTimeOf(year, month, day, 0, 59, 59);
 
-            preparedStatement.setTimestamp(1, DateTimeUtils.getTimestampOf(year, month, day, 0, 0, 0));
-            preparedStatement.setTimestamp(2, DateTimeUtils.getTimestampOf(year, month, day, 0, 59, 59));
-            preparedStatement.setInt(3, userId);
 
-            LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
-            try (final ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return UserTcStats.create(userId,
-                            resultSet.getTimestamp("hourly_timestamp"),
-                            resultSet.getLong("tc_points"),
-                            resultSet.getLong("tc_points_multiplied"),
-                            resultSet.getInt("tc_units")
-                    );
-                }
-                LOGGER.warn("Unable to get current day first hour historic stats for user with ID {}, returning empty", userId);
-                return UserTcStats.empty(userId);
-            } catch (final SQLException e) {
-                LOGGER.warn("Unable to get TC stats for user with ID: {}", userId, e);
-                throw new FoldingException("Error getting TC stats for user ID: " + userId, e);
-            }
-        } catch (final SQLException e) {
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
+            final var query = queryContext
+                    .select(max(USER_TC_STATS_HOURLY.UTC_TIMESTAMP), max(USER_TC_STATS_HOURLY.TC_POINTS), max(USER_TC_STATS_HOURLY.TC_POINTS_MULTIPLIED), max(USER_TC_STATS_HOURLY.TC_UNITS))
+                    .from(USER_TC_STATS_HOURLY)
+                    .where(USER_TC_STATS_HOURLY.UTC_TIMESTAMP.between(start, end))
+                    .and(USER_TC_STATS_HOURLY.USER_ID.equal(userId))
+                    .groupBy(hour(USER_TC_STATS_HOURLY.UTC_TIMESTAMP))
+                    .orderBy(hour(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).asc())
+                    .limit(SINGLE_RESULT);
+            LOGGER.debug("Executing SQL: '{}'", query);
+
+            return query
+                    .fetch()
+                    .into(USER_TC_STATS_HOURLY)
+                    .stream()
+                    .map(RecordConverter::toUserTcStats)
+                    .findAny()
+                    .orElse(UserTcStats.empty(userId));
+        });
     }
 
     private UserTcStats getPreviousDayLastHourTcStats(final int userId, final int day, final Month month, final Year year) throws FoldingException {
         LOGGER.debug("Getting previous day's first hour TC stats for user {} on {}/{}/{}", userId, year.getValue(), month.getValue(), day);
-        final String preparedSelectSqlStatement = "SELECT MAX(utc_timestamp) AS hourly_timestamp, " +
-                "MAX(tc_points) AS tc_points, " +
-                "MAX(tc_points_multiplied) AS tc_points_multiplied, " +
-                "MAX(tc_units) AS tc_units " +
-                "FROM user_tc_stats_hourly " +
-                "WHERE utc_timestamp BETWEEN ? AND ? " +
-                "AND user_id = ? " +
-                "GROUP BY EXTRACT(HOUR FROM utc_timestamp) " +
-                "ORDER BY EXTRACT(HOUR FROM utc_timestamp) DESC " +
-                "LIMIT 1;";
 
-        try (final Connection connection = dbConnectionPool.getConnection();
-             final PreparedStatement preparedStatement = connection.prepareStatement(preparedSelectSqlStatement)) {
+        return executeQuery((queryContext) -> {
+            final LocalDateTime start = DateTimeUtils.getLocalDateTimeOf(year, month, day, 23, 0, 0);
+            final LocalDateTime end = DateTimeUtils.getLocalDateTimeOf(year, month, day, 23, 59, 59);
 
-            preparedStatement.setTimestamp(1, DateTimeUtils.getTimestampOf(year, month, day, 23, 0, 0));
-            preparedStatement.setTimestamp(2, DateTimeUtils.getTimestampOf(year, month, day, 23, 59, 59));
-            preparedStatement.setInt(3, userId);
 
-            LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
-            try (final ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return UserTcStats.create(userId,
-                            resultSet.getTimestamp("hourly_timestamp"),
-                            resultSet.getLong("tc_points"),
-                            resultSet.getLong("tc_points_multiplied"),
-                            resultSet.getInt("tc_units")
-                    );
-                }
+            final var query = queryContext
+                    .select(max(USER_TC_STATS_HOURLY.UTC_TIMESTAMP), max(USER_TC_STATS_HOURLY.TC_POINTS), max(USER_TC_STATS_HOURLY.TC_POINTS_MULTIPLIED), max(USER_TC_STATS_HOURLY.TC_UNITS))
+                    .from(USER_TC_STATS_HOURLY)
+                    .where(USER_TC_STATS_HOURLY.UTC_TIMESTAMP.between(start, end))
+                    .and(USER_TC_STATS_HOURLY.USER_ID.equal(userId))
+                    .groupBy(hour(USER_TC_STATS_HOURLY.UTC_TIMESTAMP))
+                    .orderBy(hour(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).desc())
+                    .limit(SINGLE_RESULT);
+            LOGGER.debug("Executing SQL: '{}'", query);
 
-                LOGGER.warn("Unable to get previous day first hour historic stats for user with ID {}, returning empty", userId);
-                return UserTcStats.empty(userId);
-            } catch (final SQLException e) {
-                LOGGER.warn("Unable to get historic stats for user with ID: {}", userId, e);
-                throw new FoldingException("Error getting historic stats for user ID: " + userId, e);
-            }
-        } catch (final SQLException e) {
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
+            return query
+                    .fetch()
+                    .into(USER_TC_STATS_HOURLY)
+                    .stream()
+                    .map(RecordConverter::toUserTcStats)
+                    .findAny()
+                    .orElse(UserTcStats.empty(userId));
+        });
     }
 
 
@@ -673,13 +511,13 @@ public final class PostgresDbManager implements DbManager {
 
 
             // If no stats in previous day (meaning we are getting historic stats for the first day available), we need to remove the initial points from the current day's points
-            final UserStats initialStats = getInitialStats(userId);
+            final UserStats initialStats = getInitialStats(userId).orElseThrow(FoldingException::new);
             LOGGER.debug("Removing initial stats from current day's first hour stats: {} - {}", firstHourTcStatsCurrentDay, initialStats);
 
             try {
                 // Since we didn't get any previous day's stats, we don't need to worry about the hardware multiplier having been changed
                 // As a result, we will get the user's current hardware and use that multiplier
-                final User user = getUser(userId);
+                final User user = getUser(userId).orElseThrow(() -> new UserNotFoundException(userId));
                 final Hardware hardware = user.getHardware();
                 final double hardwareMultiplier = hardware.getMultiplier();
 
@@ -707,7 +545,7 @@ public final class PostgresDbManager implements DbManager {
 
 
     @Override
-    public List<HistoricStats> getHistoricStatsDaily(final int userId, final Month month, final Year year) throws FoldingException, NoStatsAvailableException {
+    public Collection<HistoricStats> getHistoricStatsDaily(final int userId, final Month month, final Year year) throws FoldingException, NoStatsAvailableException {
         LOGGER.debug("Getting historic daily user TC stats for {}/{} for user {}", DateTimeUtils.formatMonth(month), year, userId);
 
         final String selectSqlStatement = "SELECT utc_timestamp::DATE AS daily_timestamp, " +
@@ -779,452 +617,283 @@ public final class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public List<HistoricStats> getHistoricStatsMonthly(final int userId, final Year year) throws FoldingException, NoStatsAvailableException {
+    public Collection<HistoricStats> getHistoricStatsMonthly(final int userId, final Year year) throws FoldingException {
         LOGGER.debug("Getting historic monthly user TC stats for {} for user {}", year, userId);
 
-        final String selectSqlStatement = "SELECT MAX(utc_timestamp) AS monthly_timestamp, " +
-                "MAX(tc_points) AS diff_points, " +
-                "MAX(tc_points_multiplied) AS diff_points_multiplied, " +
-                "MAX(tc_units) AS diff_units " +
-                "FROM user_tc_stats_hourly " +
-                "WHERE EXTRACT(YEAR FROM utc_timestamp) = ? " +
-                "AND user_id = ? " +
-                "GROUP BY EXTRACT(MONTH FROM utc_timestamp)::INT " +
-                "ORDER BY EXTRACT(MONTH FROM utc_timestamp)::INT ASC;";
+        return executeQuery((queryContext) -> {
+            final var query = queryContext
+                    .select(max(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).as(USER_TC_STATS_HOURLY.UTC_TIMESTAMP.getName()),
+                            max(USER_TC_STATS_HOURLY.TC_POINTS).as(USER_TC_STATS_HOURLY.TC_POINTS.getName()),
+                            max(USER_TC_STATS_HOURLY.TC_POINTS_MULTIPLIED).as(USER_TC_STATS_HOURLY.TC_POINTS_MULTIPLIED.getName()),
+                            max(USER_TC_STATS_HOURLY.TC_UNITS).as(USER_TC_STATS_HOURLY.TC_UNITS.getName())
+                    )
+                    .from(USER_TC_STATS_HOURLY)
+                    .where(year(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).equal(year.getValue()))
+                    .and(USER_TC_STATS_HOURLY.USER_ID.equal(userId))
+                    .groupBy(month(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).cast(int.class))
+                    .orderBy(month(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).cast(int.class).asc());
+            LOGGER.info("Executing SQL: '{}'", query);
 
-        try (final Connection connection = dbConnectionPool.getConnection();
-             final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
-
-            preparedStatement.setInt(1, year.getValue());
-            preparedStatement.setInt(2, userId);
-
-            LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
-            try (final ResultSet resultSet = preparedStatement.executeQuery()) {
-
-                final List<HistoricStats> userStats = new ArrayList<>();
-
-                while (resultSet.next()) {
-                    userStats.add(
-                            HistoricStats.create(
-                                    resultSet.getTimestamp("monthly_timestamp").toLocalDateTime(),
-                                    resultSet.getLong("diff_points"),
-                                    resultSet.getLong("diff_points_multiplied"),
-                                    resultSet.getInt("diff_units")
-                            )
-                    );
-                }
-
-                if (userStats.isEmpty()) {
-                    throw new NoStatsAvailableException("Unable to find historic monthly stats for user with ID: " + userId);
-                }
-
-                return userStats;
-            }
-        } catch (final SQLException e) {
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
+            return query.fetch()
+                    .into(USER_TC_STATS_HOURLY)
+                    .stream()
+                    .map(RecordConverter::toHistoricStats)
+                    .collect(toList());
+        });
     }
 
     private UserTcStats getTcStatsForFirstDayOfMonth(final LocalDateTime localDateTime, final int userId) throws FoldingException {
         LOGGER.debug("Getting TC stats for user {} on {}", userId, localDateTime);
-        final String preparedSelectSqlStatement = "SELECT utc_timestamp, tc_points, tc_points_multiplied, tc_units " +
-                "FROM user_tc_stats_hourly " +
-                "WHERE EXTRACT(DAY FROM utc_timestamp) = ? " +
-                "AND EXTRACT(MONTH FROM utc_timestamp) = ? " +
-                "AND EXTRACT(YEAR FROM utc_timestamp) = ? " +
-                "AND user_id = ? " +
-                "ORDER BY utc_timestamp DESC " +
-                "LIMIT 1;";
 
-        try (final Connection connection = dbConnectionPool.getConnection();
-             final PreparedStatement preparedStatement = connection.prepareStatement(preparedSelectSqlStatement)) {
+        return executeQuery((queryContext) -> {
+            final var query = queryContext
+                    .select()
+                    .from(USER_TC_STATS_HOURLY)
+                    .where(day(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).equal(localDateTime.getDayOfMonth()))
+                    .and(month(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).equal(localDateTime.getMonth().getValue()))
+                    .and(year(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).equal(localDateTime.getYear()))
+                    .and(USER_TC_STATS_HOURLY.USER_ID.equal(userId))
+                    .orderBy(hour(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).desc())
+                    .limit(SINGLE_RESULT);
+            LOGGER.debug("Executing SQL: '{}'", query);
 
-            preparedStatement.setInt(1, localDateTime.getDayOfMonth());
-            preparedStatement.setInt(2, localDateTime.getMonth().getValue());
-            preparedStatement.setInt(3, localDateTime.getYear());
-            preparedStatement.setInt(4, userId);
-
-            LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
-            try (final ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return UserTcStats.create(userId, resultSet.getTimestamp("utc_timestamp"), resultSet.getLong("tc_points"), resultSet.getLong("tc_points_multiplied"), resultSet.getInt("tc_units"));
-                } else {
-                    LOGGER.debug("No stats for user on {}, returning empty", localDateTime);
-                }
-            } catch (final SQLException e) {
-                LOGGER.warn("Unable to get TC stats for user: {}", userId, e);
-            }
-            return UserTcStats.empty(userId);
-        } catch (final SQLException e) {
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
+            return query
+                    .fetch()
+                    .into(USER_TC_STATS_HOURLY)
+                    .stream()
+                    .map(RecordConverter::toUserTcStats)
+                    .findAny()
+                    .orElse(UserTcStats.empty(userId));
+        });
     }
 
     @Override
     public void persistInitialStats(final UserStats userStats) throws FoldingException {
         LOGGER.debug("Inserting initial stats for user {} to DB", userStats.getUserId());
-        final String preparedInsertSqlStatement = "INSERT INTO user_initial_stats (user_id, utc_timestamp, initial_points, initial_units) VALUES (?, ?, ?, ?);";
 
-        try (final Connection connection = dbConnectionPool.getConnection();
-             final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
-            try {
-                preparedStatement.setInt(1, userStats.getUserId());
-                preparedStatement.setTimestamp(2, userStats.getTimestamp());
-                preparedStatement.setLong(3, userStats.getPoints());
-                preparedStatement.setInt(4, userStats.getUnits());
+        executeQuery((queryContext) -> {
+            final var query = queryContext
+                    .insertInto(USER_INITIAL_STATS)
+                    .columns(USER_INITIAL_STATS.USER_ID, USER_INITIAL_STATS.UTC_TIMESTAMP, USER_INITIAL_STATS.INITIAL_POINTS, USER_INITIAL_STATS.INITIAL_UNITS)
+                    .values(userStats.getUserId(), DateTimeUtils.toUtcLocalDateTime(userStats.getTimestamp()), userStats.getPoints(), userStats.getUnits());
+            LOGGER.debug("Executing SQL: '{}'", query);
 
-                LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
-                preparedStatement.execute();
-            } catch (final SQLException e) {
-                LOGGER.warn("Unable to persist initial stats for user: {}", userStats, e);
-            }
-        } catch (final SQLException e) {
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
+            return query.execute();
+        });
     }
 
     @Override
-    public UserStats getInitialStats(final int userId) throws FoldingException {
+    public Optional<UserStats> getInitialStats(final int userId) throws FoldingException {
         LOGGER.debug("Getting initial stats for user ID: {}", userId);
-        final String preparedInsertSqlStatement = "SELECT utc_timestamp, initial_points, initial_units " +
-                "FROM user_initial_stats " +
-                "WHERE user_id = ? " +
-                "ORDER BY utc_timestamp DESC " +
-                "LIMIT 1;";
 
-        try (final Connection connection = dbConnectionPool.getConnection();
-             final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
-            preparedStatement.setInt(1, userId);
+        return executeQuery((queryContext) -> {
+            final var query = queryContext
+                    .select()
+                    .from(USER_INITIAL_STATS)
+                    .where(USER_INITIAL_STATS.USER_ID.equal(userId))
+                    .orderBy(USER_INITIAL_STATS.UTC_TIMESTAMP.desc())
+                    .limit(SINGLE_RESULT);
+            LOGGER.debug("Executing SQL: '{}'", query);
 
-            LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
-            try (final ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return UserStats.createWithPointsAndUnits(userId,
-                            resultSet.getTimestamp("utc_timestamp"),
-                            resultSet.getLong("initial_points"),
-                            resultSet.getInt("initial_units")
-                    );
-                }
-
-            } catch (final SQLException e) {
-                throw new FoldingException("Unable to get initial stats for user ID: " + userId, e);
-            }
-
-            throw new FoldingException("No initial stats found for user ID: " + userId);
-        } catch (final SQLException e) {
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
+            return query
+                    .fetch()
+                    .into(USER_INITIAL_STATS)
+                    .stream()
+                    .map(RecordConverter::toUserStats)
+                    .findAny();
+        });
     }
 
     @Override
-    public void persistTotalStats(final UserStats stats) throws FoldingException {
-        LOGGER.debug("Inserting total stats for user ID {} to DB", stats.getUserId());
-        final String preparedInsertSqlStatement = "INSERT INTO user_total_stats (user_id, utc_timestamp, total_points, total_units) VALUES (?, ?, ?, ?);";
+    public void persistTotalStats(final UserStats userStats) throws FoldingException {
+        LOGGER.debug("Inserting total stats for user ID {} to DB", userStats.getUserId());
 
-        try (final Connection connection = dbConnectionPool.getConnection();
-             final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
-            try {
-                preparedStatement.setInt(1, stats.getUserId());
-                preparedStatement.setTimestamp(2, stats.getTimestamp());
-                preparedStatement.setLong(3, stats.getPoints());
-                preparedStatement.setInt(4, stats.getUnits());
+        executeQuery((queryContext) -> {
+            final var query = queryContext
+                    .insertInto(USER_TOTAL_STATS)
+                    .columns(USER_TOTAL_STATS.USER_ID, USER_TOTAL_STATS.UTC_TIMESTAMP, USER_TOTAL_STATS.TOTAL_POINTS, USER_TOTAL_STATS.TOTAL_UNITS)
+                    .values(userStats.getUserId(), DateTimeUtils.toUtcLocalDateTime(userStats.getTimestamp()), userStats.getPoints(), userStats.getUnits());
+            LOGGER.debug("Executing SQL: '{}'", query);
 
-                LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
-                preparedStatement.execute();
-            } catch (final SQLException e) {
-                throw new FoldingException(String.format("Unable to persist total stats for user: %s", stats), e);
-            }
-        } catch (final SQLException e) {
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
+            return query.execute();
+        });
     }
 
     @Override
-    public UserStats getTotalStats(final int userId) throws FoldingException {
+    public Optional<UserStats> getTotalStats(final int userId) throws FoldingException {
         LOGGER.debug("Getting total stats for user ID: {}", userId);
-        final String preparedSqlStatement = "SELECT utc_timestamp, total_points, total_units " +
-                "FROM user_total_stats " +
-                "WHERE user_id = ? " +
-                "ORDER BY utc_timestamp DESC " +
-                "LIMIT 1;";
 
-        try (final Connection connection = dbConnectionPool.getConnection();
-             final PreparedStatement preparedStatement = connection.prepareStatement(preparedSqlStatement)) {
-            preparedStatement.setInt(1, userId);
+        return executeQuery((queryContext) -> {
+            final var query = queryContext
+                    .select()
+                    .from(USER_TOTAL_STATS)
+                    .where(USER_TOTAL_STATS.USER_ID.equal(userId))
+                    .orderBy(USER_TOTAL_STATS.UTC_TIMESTAMP.desc())
+                    .limit(SINGLE_RESULT);
+            LOGGER.debug("Executing SQL: '{}'", query);
 
-            LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
-            preparedStatement.execute();
-            try (final ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return UserStats.createWithPointsAndUnits(userId,
-                            resultSet.getTimestamp("utc_timestamp"),
-                            resultSet.getLong("total_points"),
-                            resultSet.getInt("total_units")
-                    );
-                }
-                throw new FoldingException("Could not find any total stats for user ID: " + userId);
-            }
-        } catch (final SQLException e) {
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
+            return query
+                    .fetch()
+                    .into(USER_TOTAL_STATS)
+                    .stream()
+                    .map(RecordConverter::toUserStats)
+                    .findAny();
+        });
     }
 
     @Override
     public void addOffsetStats(final int userId, final OffsetStats offsetStats) throws FoldingException {
         LOGGER.debug("Adding offset stats for user {}", userId);
-        final String preparedInsertSqlStatement = "INSERT INTO user_offset_tc_stats (user_id, utc_timestamp, offset_points, offset_multiplied_points, offset_units) VALUES (?, ?, ?, ?, ?) " +
-                "ON CONFLICT (user_id) " +
-                "DO UPDATE " +
-                "SET utc_timestamp = ?, offset_points = ?, offset_multiplied_points = ?, offset_units = ?;";
 
-        try (final Connection connection = dbConnectionPool.getConnection();
-             final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
-            final Timestamp currentUtcTimestamp = DateTimeUtils.currentUtcTimestamp();
+        executeQuery((queryContext) -> {
+            final LocalDateTime currentUtcLocalDateTime = DateTimeUtils.toUtcLocalDateTime(DateTimeUtils.currentUtcTimestamp());
 
-            preparedStatement.setInt(1, userId);
-            preparedStatement.setTimestamp(2, currentUtcTimestamp);
-            preparedStatement.setLong(3, offsetStats.getPointsOffset());
-            preparedStatement.setLong(4, offsetStats.getMultipliedPointsOffset());
-            preparedStatement.setInt(5, offsetStats.getUnitsOffset());
-            preparedStatement.setTimestamp(6, currentUtcTimestamp);
-            preparedStatement.setLong(7, offsetStats.getPointsOffset());
-            preparedStatement.setLong(8, offsetStats.getMultipliedPointsOffset());
-            preparedStatement.setInt(9, offsetStats.getUnitsOffset());
+            final var query = queryContext
+                    .insertInto(USER_OFFSET_TC_STATS)
+                    .columns(USER_OFFSET_TC_STATS.USER_ID, USER_OFFSET_TC_STATS.UTC_TIMESTAMP, USER_OFFSET_TC_STATS.OFFSET_POINTS, USER_OFFSET_TC_STATS.OFFSET_MULTIPLIED_POINTS, USER_OFFSET_TC_STATS.OFFSET_UNITS)
+                    .values(userId, currentUtcLocalDateTime, offsetStats.getPointsOffset(), offsetStats.getMultipliedPointsOffset(), offsetStats.getUnitsOffset())
+                    .onConflict(USER_OFFSET_TC_STATS.USER_ID)
+                    .doUpdate()
+                    .set(USER_OFFSET_TC_STATS.UTC_TIMESTAMP, currentUtcLocalDateTime)
+                    .set(USER_OFFSET_TC_STATS.OFFSET_POINTS, offsetStats.getPointsOffset())
+                    .set(USER_OFFSET_TC_STATS.OFFSET_MULTIPLIED_POINTS, offsetStats.getMultipliedPointsOffset())
+                    .set(USER_OFFSET_TC_STATS.OFFSET_UNITS, offsetStats.getUnitsOffset());
+            LOGGER.debug("Executing SQL: '{}'", query);
 
-            LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
-            preparedStatement.execute();
-        } catch (final SQLException e) {
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
+            return query.execute();
+        });
     }
 
     @Override
-    public OffsetStats addOrUpdateOffsetStats(final int userId, final OffsetStats offsetStats) throws FoldingException {
+    public Optional<OffsetStats> addOrUpdateOffsetStats(final int userId, final OffsetStats offsetStats) throws FoldingException {
         LOGGER.debug("Adding/updating offset stats for user {}", userId);
-        final String preparedInsertSqlStatement = "INSERT INTO user_offset_tc_stats (user_id, utc_timestamp, offset_points, offset_multiplied_points, offset_units) VALUES (?, ?, ?, ?, ?) " +
-                "ON CONFLICT (user_id) " +
-                "DO UPDATE " +
-                "SET utc_timestamp = ?, offset_points = user_offset_tc_stats.offset_points + ?, offset_multiplied_points = user_offset_tc_stats.offset_multiplied_points + ?, offset_units = user_offset_tc_stats.offset_units + ? " +
-                "RETURNING offset_points, offset_multiplied_points, offset_units;";
 
-        try (final Connection connection = dbConnectionPool.getConnection();
-             final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
-            final Timestamp currentUtcTimestamp = DateTimeUtils.currentUtcTimestamp();
+        return executeQuery((queryContext) -> {
+            final LocalDateTime currentUtcLocalDateTime = DateTimeUtils.toUtcLocalDateTime(DateTimeUtils.currentUtcTimestamp());
 
-            preparedStatement.setInt(1, userId);
-            preparedStatement.setTimestamp(2, currentUtcTimestamp);
-            preparedStatement.setLong(3, offsetStats.getPointsOffset());
-            preparedStatement.setLong(4, offsetStats.getMultipliedPointsOffset());
-            preparedStatement.setInt(5, offsetStats.getUnitsOffset());
-            preparedStatement.setTimestamp(6, currentUtcTimestamp);
-            preparedStatement.setLong(7, offsetStats.getPointsOffset());
-            preparedStatement.setLong(8, offsetStats.getMultipliedPointsOffset());
-            preparedStatement.setInt(9, offsetStats.getUnitsOffset());
+            final var query = queryContext
+                    .insertInto(USER_OFFSET_TC_STATS)
+                    .columns(USER_OFFSET_TC_STATS.USER_ID, USER_OFFSET_TC_STATS.UTC_TIMESTAMP, USER_OFFSET_TC_STATS.OFFSET_POINTS, USER_OFFSET_TC_STATS.OFFSET_MULTIPLIED_POINTS, USER_OFFSET_TC_STATS.OFFSET_UNITS)
+                    .values(userId, currentUtcLocalDateTime, offsetStats.getPointsOffset(), offsetStats.getMultipliedPointsOffset(), offsetStats.getUnitsOffset())
+                    .onConflict(USER_OFFSET_TC_STATS.USER_ID)
+                    .doUpdate()
+                    .set(USER_OFFSET_TC_STATS.UTC_TIMESTAMP, currentUtcLocalDateTime)
+                    .set(USER_OFFSET_TC_STATS.OFFSET_POINTS, USER_OFFSET_TC_STATS.OFFSET_POINTS.plus(offsetStats.getPointsOffset()))
+                    .set(USER_OFFSET_TC_STATS.OFFSET_MULTIPLIED_POINTS, USER_OFFSET_TC_STATS.OFFSET_MULTIPLIED_POINTS.plus(offsetStats.getMultipliedPointsOffset()))
+                    .set(USER_OFFSET_TC_STATS.OFFSET_UNITS, USER_OFFSET_TC_STATS.OFFSET_UNITS.plus(offsetStats.getUnitsOffset()))
+                    .returning();
+            LOGGER.debug("Executing SQL: '{}'", query);
 
-            LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
-            try (final ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return OffsetStats.create(resultSet.getLong("offset_points"), resultSet.getLong("offset_multiplied_points"), resultSet.getInt("offset_units"));
-                }
-                throw new FoldingException("Error inserting to offset stats");
-            }
-        } catch (final SQLException e) {
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
+            return query
+                    .fetch()
+                    .into(USER_OFFSET_TC_STATS)
+                    .stream()
+                    .map(RecordConverter::toOffsetStats)
+                    .findAny();
+        });
     }
 
     @Override
-    public OffsetStats getOffsetStats(final int userId) throws FoldingException {
+    public Optional<OffsetStats> getOffsetStats(final int userId) throws FoldingException {
         LOGGER.debug("Getting offset stats for user ID: {}", userId);
-        final String preparedInsertSqlStatement = "SELECT offset_points, offset_multiplied_points, offset_units " +
-                "FROM user_offset_tc_stats " +
-                "WHERE user_id = ? " +
-                "ORDER BY utc_timestamp DESC " +
-                "LIMIT 1;";
+        return executeQuery((queryContext) -> {
+            final var query = queryContext
+                    .select(USER_OFFSET_TC_STATS.OFFSET_POINTS, USER_OFFSET_TC_STATS.OFFSET_MULTIPLIED_POINTS, USER_OFFSET_TC_STATS.OFFSET_UNITS)
+                    .from(USER_OFFSET_TC_STATS)
+                    .orderBy(USER_OFFSET_TC_STATS.UTC_TIMESTAMP.desc())
+                    .limit(SINGLE_RESULT);
+            LOGGER.debug("Executing SQL: '{}'", query);
 
-        try (final Connection connection = dbConnectionPool.getConnection();
-             final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
-            preparedStatement.setInt(1, userId);
-
-            LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
-            try (final ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return OffsetStats.create(
-                            resultSet.getLong("offset_points"),
-                            resultSet.getLong("offset_multiplied_points"),
-                            resultSet.getInt("offset_units"));
-                }
-            } catch (final SQLException e) {
-                LOGGER.warn("Error getting offset stats for user: {}", userId, e);
-            }
-
-            LOGGER.debug("No result found for user ID {}, returning empty", userId);
-            return OffsetStats.empty();
-        } catch (final SQLException e) {
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
+            return query
+                    .fetch()
+                    .into(USER_OFFSET_TC_STATS)
+                    .stream()
+                    .map(RecordConverter::toOffsetStats)
+                    .findAny();
+        });
     }
 
     @Override
-    public void clearAllOffsetStats() throws FoldingConflictException, FoldingException {
+    public void clearAllOffsetStats() throws FoldingException {
         LOGGER.debug("Clearing offset stats for all users");
-        final String preparedInsertSqlStatement = "DELETE FROM user_offset_tc_stats;";
-        LOGGER.debug("Executing prepared statement: '{}'", preparedInsertSqlStatement);
 
-        try (final Connection connection = dbConnectionPool.getConnection();
-             final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
-            preparedStatement.executeUpdate();
-        } catch (final SQLException e) {
-            if (e.getMessage().contains(VIOLATES_FOREIGN_KEY_CONSTRAINT)) {
-                throw new FoldingConflictException(e);
-            }
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
+        executeQuery((queryContext) -> {
+            final var query = queryContext
+                    .deleteFrom(USER_OFFSET_TC_STATS);
+            LOGGER.debug("Executing SQL: '{}'", query);
+
+            return query.execute();
+        });
     }
 
     @Override
     public int persistRetiredUserStats(final int teamId, final int userId, final String displayUserName, final UserTcStats retiredUserStats) throws FoldingException {
         LOGGER.debug("Persisting retired user ID {} for team ID {}", userId, teamId);
-        final String preparedInsertSqlStatement = "INSERT INTO retired_user_stats (team_id, user_id, display_username, utc_timestamp, final_points, final_multiplied_points, final_units) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?) " +
-                "ON CONFLICT (user_id) " +
-                "DO UPDATE " +
-                "SET team_id = ?, user_id = ?, display_username = ?, utc_timestamp = ?, final_points = ?, final_multiplied_points = ?, final_units = ? " +
-                "RETURNING retired_user_id;";
 
-        try (final Connection connection = dbConnectionPool.getConnection();
-             final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
-            try {
-                preparedStatement.setInt(1, teamId);
-                preparedStatement.setInt(2, userId);
-                preparedStatement.setString(3, displayUserName);
-                preparedStatement.setTimestamp(4, DateTimeUtils.currentUtcTimestamp());
-                preparedStatement.setLong(5, retiredUserStats.getPoints());
-                preparedStatement.setLong(6, retiredUserStats.getMultipliedPoints());
-                preparedStatement.setInt(7, retiredUserStats.getUnits());
-                preparedStatement.setInt(8, teamId);
-                preparedStatement.setInt(9, userId);
-                preparedStatement.setString(10, displayUserName);
-                preparedStatement.setTimestamp(11, DateTimeUtils.currentUtcTimestamp());
-                preparedStatement.setLong(12, retiredUserStats.getPoints());
-                preparedStatement.setLong(13, retiredUserStats.getMultipliedPoints());
-                preparedStatement.setInt(14, retiredUserStats.getUnits());
+        return executeQuery((queryContext) -> {
+            final LocalDateTime currentUtcLocalDateTime = DateTimeUtils.toUtcLocalDateTime(DateTimeUtils.currentUtcTimestamp());
 
-                LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
-                try (final ResultSet resultSet = preparedStatement.executeQuery()) {
-                    if (resultSet.next()) {
-                        return resultSet.getInt("retired_user_id");
-                    }
-                }
-                throw new IllegalStateException("No ID was returned from the DB, but no exception was raised");
-            } catch (final SQLException e) {
-                LOGGER.warn("Unable to persist retired stats for user '{}' for team ID {}", displayUserName, teamId, e);
-                throw new FoldingException("Error persisting retired stats", e);
-            }
-        } catch (final SQLException e) {
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
-    }
+            final var query = queryContext
+                    .insertInto(RETIRED_USER_STATS)
+                    .columns(RETIRED_USER_STATS.TEAM_ID, RETIRED_USER_STATS.USER_ID, RETIRED_USER_STATS.DISPLAY_USERNAME, USER_OFFSET_TC_STATS.UTC_TIMESTAMP,
+                            RETIRED_USER_STATS.FINAL_POINTS, RETIRED_USER_STATS.FINAL_MULTIPLIED_POINTS, RETIRED_USER_STATS.FINAL_UNITS)
+                    .values(teamId, userId, displayUserName, currentUtcLocalDateTime, retiredUserStats.getPoints(), retiredUserStats.getMultipliedPoints(), retiredUserStats.getUnits())
+                    .onConflict(RETIRED_USER_STATS.USER_ID)
+                    .doUpdate()
+                    .set(RETIRED_USER_STATS.TEAM_ID, teamId)
+                    .set(RETIRED_USER_STATS.UTC_TIMESTAMP, currentUtcLocalDateTime)
+                    .set(RETIRED_USER_STATS.DISPLAY_USERNAME, displayUserName)
+                    .set(RETIRED_USER_STATS.FINAL_POINTS, retiredUserStats.getPoints())
+                    .set(RETIRED_USER_STATS.FINAL_MULTIPLIED_POINTS, retiredUserStats.getMultipliedPoints())
+                    .set(RETIRED_USER_STATS.FINAL_UNITS, retiredUserStats.getUnits())
+                    .returning();
+            LOGGER.debug("Executing SQL: '{}'", query);
 
-    @Override
-    public RetiredUserTcStats getRetiredUserStats(final int retiredUserId) throws FoldingException {
-        LOGGER.debug("Getting retired user with ID: {}", retiredUserId);
-        final String preparedInsertSqlStatement = "SELECT retired_user_id, team_id, user_id, display_username, utc_timestamp, final_points, final_multiplied_points, final_units " +
-                "FROM retired_user_stats " +
-                "WHERE retired_user_id = ? " +
-                "ORDER BY utc_timestamp DESC " +
-                "LIMIT 1;";
-
-        try (final Connection connection = dbConnectionPool.getConnection();
-             final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
-            try {
-                preparedStatement.setInt(1, retiredUserId);
-
-                LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
-                try (final ResultSet resultSet = preparedStatement.executeQuery()) {
-                    if (resultSet.next()) {
-                        return RetiredUserTcStats.create(
-                                resultSet.getInt("retired_user_id"),
-                                resultSet.getInt("team_id"),
-                                resultSet.getString("display_username"),
-                                UserTcStats.create(
-                                        resultSet.getInt("user_id"),
-                                        resultSet.getTimestamp("utc_timestamp"),
-                                        resultSet.getLong("final_points"),
-                                        resultSet.getLong("final_multiplied_points"),
-                                        resultSet.getInt("final_units")
-                                )
-                        );
-                    }
-                }
-                throw new FoldingException("Unable to find retired stats for retired user ID: " + retiredUserId);
-            } catch (final SQLException e) {
-                throw new FoldingException("Error getting retired stats for retired user ID: " + retiredUserId, e);
-            }
-        } catch (final SQLException e) {
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
+            return query
+                    .fetch()
+                    .into(RETIRED_USER_STATS)
+                    .get(0)
+                    .getRetiredUserId();
+        });
     }
 
     @Override
     public Collection<RetiredUserTcStats> getRetiredUserStatsForTeam(final Team team) throws FoldingException {
         LOGGER.debug("Getting retired user stats for team with ID: {}", team.getId());
-        final String preparedInsertSqlStatement = "SELECT retired_user_id, team_id, user_id, display_username, utc_timestamp, final_points, final_multiplied_points, final_units " +
-                "FROM retired_user_stats " +
-                "WHERE team_id = ? " +
-                "ORDER BY retired_user_id ASC;";
+        return executeQuery((queryContext) -> {
+            final var query = queryContext
+                    .select()
+                    .from(RETIRED_USER_STATS)
+                    .where(RETIRED_USER_STATS.TEAM_ID.equal(team.getId()))
+                    .orderBy(RETIRED_USER_STATS.RETIRED_USER_ID.asc());
+            LOGGER.debug("Executing SQL: '{}'", query);
 
-        try (final Connection connection = dbConnectionPool.getConnection();
-             final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
-            try {
-                preparedStatement.setInt(1, team.getId());
-
-                LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
-                final Collection<RetiredUserTcStats> retiredUserTcStats = new ArrayList<>();
-                try (final ResultSet resultSet = preparedStatement.executeQuery()) {
-                    while (resultSet.next()) {
-                        retiredUserTcStats.add(RetiredUserTcStats.create(
-                                resultSet.getInt("retired_user_id"),
-                                resultSet.getInt("team_id"),
-                                resultSet.getString("display_username"),
-                                UserTcStats.create(
-                                        resultSet.getInt("user_id"),
-                                        resultSet.getTimestamp("utc_timestamp"),
-                                        resultSet.getLong("final_points"),
-                                        resultSet.getLong("final_multiplied_points"),
-                                        resultSet.getInt("final_units")
-                                )
-                        ));
-                    }
-                }
-                return retiredUserTcStats;
-            } catch (final SQLException e) {
-                throw new FoldingException("Error getting retired stats for team with ID: " + team.getId(), e);
-            }
-        } catch (final SQLException e) {
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
+            return query
+                    .fetch()
+                    .into(RETIRED_USER_STATS)
+                    .stream()
+                    .map(RecordConverter::toRetiredUserStats)
+                    .collect(toList());
+        });
     }
 
     @Override
-    public void deleteRetiredUserStats() throws FoldingException, FoldingConflictException {
+    public void deleteRetiredUserStats() throws FoldingException {
         LOGGER.debug("Deleting all retired users");
-        final String preparedInsertSqlStatement = "DELETE FROM retired_user_stats;";
 
-        try (final Connection connection = dbConnectionPool.getConnection();
-             final PreparedStatement preparedStatement = connection.prepareStatement(preparedInsertSqlStatement)) {
-            preparedStatement.executeUpdate();
-        } catch (final SQLException e) {
-            if (e.getMessage().contains(VIOLATES_FOREIGN_KEY_CONSTRAINT)) {
-                throw new FoldingConflictException(e);
-            }
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
+        executeQuery((queryContext) -> {
+            final var query = queryContext
+                    .deleteFrom(RETIRED_USER_STATS);
+            LOGGER.debug("Executing SQL: '{}'", query);
+
+            return query.execute();
+        });
     }
 
     @Override
     public SystemUserAuthentication authenticateSystemUser(final String userName, final String password) throws FoldingException {
         LOGGER.debug("Checking if supplied user name '{}' and password is valid user, then returning roles", userName);
+
         final String selectSql = "SELECT user_password_hash = crypt(?, user_password_hash) AS is_password_match, roles " +
                 "FROM system_users " +
                 "WHERE user_name = ?;";
@@ -1258,47 +927,13 @@ public final class PostgresDbManager implements DbManager {
         }
     }
 
-    private static Hardware createHardware(final ResultSet resultSet) throws SQLException {
-        return Hardware.create(
-                resultSet.getInt("hardware_id"),
-                resultSet.getString("hardware_name"),
-                resultSet.getString("display_name"),
-                OperatingSystem.get(resultSet.getString("operating_system")),
-                resultSet.getDouble("multiplier")
-        );
-    }
 
-    private static Hardware createHardware(final HardwareRecord hardwareRecord) {
-        return Hardware.create(
-                hardwareRecord.getHardwareId(),
-                hardwareRecord.getHardwareName(),
-                hardwareRecord.getDisplayName(),
-                OperatingSystem.get(hardwareRecord.getOperatingSystem()),
-                hardwareRecord.getMultiplier().doubleValue()
-        );
-    }
-
-    private static User createUser(final ResultSet resultSet) throws SQLException {
-        return User.create(
-                resultSet.getInt("user_id"),
-                resultSet.getString("folding_username"),
-                resultSet.getString("display_username"),
-                resultSet.getString("passkey"),
-                Category.get(resultSet.getString("category")),
-                resultSet.getString("profile_link"),
-                resultSet.getString("live_stats_link"),
-                createHardware(resultSet),
-                createTeam(resultSet),
-                resultSet.getBoolean("is_captain")
-        );
-    }
-
-    private static Team createTeam(final ResultSet resultSet) throws SQLException {
-        return Team.create(
-                resultSet.getInt("team_id"),
-                resultSet.getString("team_name"),
-                resultSet.getString("team_description"),
-                resultSet.getString("forum_link")
-        );
+    private <T> T executeQuery(final Function<DSLContext, T> sqlQuery) throws FoldingException {
+        try (final Connection connection = dbConnectionPool.getConnection()) {
+            final DSLContext queryContext = DSL.using(connection, SQLDialect.POSTGRES);
+            return sqlQuery.apply(queryContext);
+        } catch (final SQLException e) {
+            throw new FoldingException("Error opening connection to the DB", e);
+        }
     }
 }

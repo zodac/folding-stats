@@ -10,9 +10,24 @@ import static java.util.stream.Collectors.toUnmodifiableList;
  */
 public enum Category {
 
+    /**
+     * {@link User} is using an AMD GPU as their {@link Hardware}.
+     */
     AMD_GPU("AMD GPU", 1),
+
+    /**
+     * {@link User} is using an nVidia GPU as their {@link Hardware}.
+     */
     NVIDIA_GPU("nVidia GPU", 1),
+
+    /**
+     * {@link User} is permitted to use any GPU or CPU as their {@link Hardware}.
+     */
     WILDCARD("Wildcard", 1),
+
+    /**
+     * Not a valid {@link Category}.
+     */
     INVALID("Invalid", 0);
 
     private static final Collection<Category> ALL_VALUES = Stream.of(values())

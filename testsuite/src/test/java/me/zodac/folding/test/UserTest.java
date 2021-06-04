@@ -578,7 +578,7 @@ class UserTest {
 
         final UserRequest secondUser = generateUserWithTeamId(team.getId());
         secondUser.setCategory(Category.NVIDIA_GPU.displayName());
-        create(secondUser);
+        StubbedFoldingEndpointUtils.enableUser(secondUser);
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.create(secondUser, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
@@ -587,7 +587,7 @@ class UserTest {
 
         assertThat(response.body())
                 .as("Did not receive an error message specifying too many users for a specific category")
-                .contains("category " + Category.NVIDIA_GPU.displayName());
+                .contains("category '" + Category.NVIDIA_GPU.displayName() + "'");
     }
 
     @Test
@@ -606,7 +606,7 @@ class UserTest {
         final UserRequest fourthUser = generateUserWithCategory(Category.NVIDIA_GPU);
         fourthUser.setTeamId(team.getId());
 
-        final HttpResponse<String> response = USER_REQUEST_SENDER.create(secondUser, ADMIN_USER.userName(), ADMIN_USER.password());
+        final HttpResponse<String> response = USER_REQUEST_SENDER.create(fourthUser, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
                 .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);

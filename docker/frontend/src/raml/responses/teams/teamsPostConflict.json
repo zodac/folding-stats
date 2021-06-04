@@ -1,0 +1,16 @@
+{
+  "invalidObject": {
+    "id": 0,
+    "teamName": "Team1",
+    "teamDescription": "Desc"
+  },
+  "conflictingObject": {
+    "id": 1,
+    "teamName": "Team1",
+    "teamDescription": "Desc"
+  },
+  "validationResult": "FAILURE_DUE_TO_CONFLICT",
+  "errors": [
+    "Payload conflicts with an existing object on: [teamName]"
+  ]
+}

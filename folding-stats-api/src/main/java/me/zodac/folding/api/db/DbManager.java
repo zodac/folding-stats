@@ -1,13 +1,11 @@
 package me.zodac.folding.api.db;
 
-import me.zodac.folding.api.db.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.exception.HardwareNotFoundException;
 import me.zodac.folding.api.tc.exception.NoStatsAvailableException;
-import me.zodac.folding.api.tc.exception.TeamNotFoundException;
 import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.stats.OffsetStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
@@ -18,6 +16,7 @@ import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
+import java.util.Optional;
 
 /**
  * Interface used to interact with the storage backend and perform CRUD operations.
@@ -29,38 +28,37 @@ public interface DbManager {
      *
      * @param hardware the {@link Hardware} to persist
      * @return the {@link Hardware} updated with an ID
-     * @throws FoldingConflictException thrown if another {@link Hardware} exists with a conflicting unique key
-     * @throws FoldingException         thrown on error persisting the {@link Hardware}
+     * @throws FoldingException thrown on error persisting the {@link Hardware}
      */
-    Hardware createHardware(final Hardware hardware) throws FoldingConflictException, FoldingException;
+    Hardware createHardware(final Hardware hardware) throws FoldingException;
 
     Collection<Hardware> getAllHardware() throws FoldingException;
 
-    Hardware getHardware(final int hardwareId) throws FoldingException, HardwareNotFoundException;
+    Optional<Hardware> getHardware(final int hardwareId) throws FoldingException;
 
-    void updateHardware(final Hardware hardware) throws FoldingException, HardwareNotFoundException, FoldingConflictException;
+    void updateHardware(final Hardware hardware) throws FoldingException, HardwareNotFoundException;
 
-    void deleteHardware(final int hardwareId) throws FoldingException, FoldingConflictException;
+    void deleteHardware(final int hardwareId) throws FoldingException;
 
-    User createUser(final User user) throws FoldingException, FoldingConflictException;
-
-    Collection<User> getAllUsers() throws FoldingException;
-
-    User getUser(final int userId) throws FoldingException, UserNotFoundException;
-
-    void updateUser(final User user) throws FoldingException, UserNotFoundException, FoldingConflictException;
-
-    void deleteUser(final int userId) throws FoldingException, FoldingConflictException;
-
-    Team createTeam(final Team team) throws FoldingException, FoldingConflictException;
+    Team createTeam(final Team team) throws FoldingException;
 
     Collection<Team> getAllTeams() throws FoldingException;
 
-    Team getTeam(final int foldingTeamId) throws FoldingException, TeamNotFoundException;
+    Optional<Team> getTeam(final int foldingTeamId) throws FoldingException;
 
-    void updateTeam(final Team team) throws FoldingException, FoldingConflictException;
+    void updateTeam(final Team team) throws FoldingException;
 
-    void deleteTeam(final int teamId) throws FoldingException, FoldingConflictException;
+    void deleteTeam(final int teamId) throws FoldingException;
+
+    User createUser(final User user) throws FoldingException;
+
+    Collection<User> getAllUsers() throws FoldingException;
+
+    Optional<User> getUser(final int userId) throws FoldingException;
+
+    void updateUser(final User user) throws FoldingException, UserNotFoundException;
+
+    void deleteUser(final int userId) throws FoldingException;
 
     // TC operations
 
@@ -74,33 +72,31 @@ public interface DbManager {
 
     Collection<HistoricStats> getHistoricStatsDaily(final int userId, final Month month, final Year year) throws FoldingException, NoStatsAvailableException;
 
-    Collection<HistoricStats> getHistoricStatsMonthly(final int userId, final Year year) throws FoldingException, NoStatsAvailableException;
+    Collection<HistoricStats> getHistoricStatsMonthly(final int userId, final Year year) throws FoldingException;
 
     void persistInitialStats(final UserStats userStats) throws FoldingException;
 
-    UserStats getInitialStats(final int userId) throws FoldingException;
+    Optional<UserStats> getInitialStats(final int userId) throws FoldingException;
 
-    UserTcStats getHourlyTcStats(final int userId) throws FoldingException, NoStatsAvailableException;
+    Optional<UserTcStats> getHourlyTcStats(final int userId) throws FoldingException;
 
     void persistTotalStats(final UserStats stats) throws FoldingException;
 
-    UserStats getTotalStats(final int userId) throws FoldingException;
+    Optional<UserStats> getTotalStats(final int userId) throws FoldingException;
 
     void addOffsetStats(int userId, OffsetStats offsetStats) throws FoldingException;
 
-    OffsetStats addOrUpdateOffsetStats(final int userId, final OffsetStats offsetStats) throws FoldingException;
+    Optional<OffsetStats> addOrUpdateOffsetStats(final int userId, final OffsetStats offsetStats) throws FoldingException;
 
-    OffsetStats getOffsetStats(final int userId) throws FoldingException;
+    Optional<OffsetStats> getOffsetStats(final int userId) throws FoldingException;
 
-    void clearAllOffsetStats() throws FoldingConflictException, FoldingException;
+    void clearAllOffsetStats() throws FoldingException;
 
     int persistRetiredUserStats(final int teamId, final int userId, final String displayUserName, final UserTcStats retiredUserStats) throws FoldingException;
 
-    RetiredUserTcStats getRetiredUserStats(final int retiredUserId) throws FoldingException;
-
     Collection<RetiredUserTcStats> getRetiredUserStatsForTeam(final Team team) throws FoldingException;
 
-    void deleteRetiredUserStats() throws FoldingException, FoldingConflictException;
+    void deleteRetiredUserStats() throws FoldingException;
 
     SystemUserAuthentication authenticateSystemUser(final String userName, final String password) throws FoldingException;
 }

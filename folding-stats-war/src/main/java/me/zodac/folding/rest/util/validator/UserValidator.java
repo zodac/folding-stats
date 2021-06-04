@@ -21,9 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 
@@ -45,15 +43,55 @@ public final class UserValidator {
         return new UserValidator(businessLogic, foldingStatsRetriever);
     }
 
-    public ValidationResponse<User> validate(final UserRequest userRequest) {
+    public ValidationResponse<User> validateCreate(final UserRequest userRequest) { // NOPMD: NPathComplexity is high but better than the alternative of breaking into smaller functions
         if (userRequest == null) {
             return ValidationResponse.nullObject();
         }
 
+        final List<String> failureMessages = new ArrayList<>();
+
         final Category category = Category.get(userRequest.getCategory());
+        if (Category.INVALID == category) {
+            failureMessages.add(String.format("Field 'category' must be one of: %s", Category.getAllValues()));
+        }
 
+        if (StringUtils.isBlank(userRequest.getFoldingUserName())) {
+            failureMessages.add("Field 'foldingUserName' must not be empty");
+        }
 
-        final List<String> failureMessages = validateAttributes(userRequest, category);
+        if (StringUtils.isBlank(userRequest.getPasskey())) {
+            failureMessages.add("Field 'passkey' must not be empty");
+        }
+
+        // If foldingUserName and passkey are valid, ensure they don't already exist
+        if (failureMessages.isEmpty()) {
+            final Optional<User> userWithMatchingFoldingUserNameAndPasskey = businessLogic.getUserWithFoldingUserNameAndPasskey(userRequest.getFoldingUserName(), userRequest.getPasskey());
+
+            if (userWithMatchingFoldingUserNameAndPasskey.isPresent()) {
+                return ValidationResponse.conflictingWith(userRequest, userWithMatchingFoldingUserNameAndPasskey.get(), List.of("foldingUserName", "passkey"));
+            }
+        }
+
+        if (StringUtils.isBlank(userRequest.getDisplayName())) {
+            failureMessages.add("Field 'displayName' must not be empty");
+        }
+
+        if (userRequest.getPasskey().contains("*")) {
+            failureMessages.add("Field 'passkey' cannot contain '*' characters");
+        }
+
+        if (userRequest.getPasskey().length() != EXPECTED_PASSKEY_LENGTH) {
+            failureMessages.add("Field 'passkey' must be 32 characters in length");
+        }
+
+        if (StringUtils.isNotEmpty(userRequest.getProfileLink()) && !URL_VALIDATOR.isValid(userRequest.getProfileLink())) {
+            failureMessages.add(String.format("Field 'profileLink' is not a valid link: '%s'", userRequest.getProfileLink()));
+
+        }
+
+        if (StringUtils.isNotEmpty(userRequest.getLiveStatsLink()) && !URL_VALIDATOR.isValid(userRequest.getLiveStatsLink())) {
+            failureMessages.add(String.format("Field 'liveStatsLink' is not a valid link: '%s'", userRequest.getLiveStatsLink()));
+        }
 
         final List<String> hardwareValidationFailureMessages = validateHardware(userRequest);
         failureMessages.addAll(hardwareValidationFailureMessages);
@@ -63,7 +101,85 @@ public final class UserValidator {
 
         // Since this is a heavy validation check, only do it if the rest of the user is valid
         if (failureMessages.isEmpty()) {
-            final List<String> teamFailureMessages = validateIfUserCanBeAddedToTeam(userRequest);
+            final List<String> teamFailureMessages = validateIfUserCanBeAddedToTeam(userRequest, category, true);
+            failureMessages.addAll(teamFailureMessages);
+        }
+
+        // Since this is a heavy validation check, only do it if the rest of the user is valid
+        if (failureMessages.isEmpty()) {
+            final List<String> userUnitsFailureMessages = validateUserUnits(userRequest);
+            failureMessages.addAll(userUnitsFailureMessages);
+        }
+
+        if (failureMessages.isEmpty()) {
+            try {
+                final Hardware hardware = businessLogic.getHardware(userRequest.getHardwareId());
+                final Team team = businessLogic.getTeam(userRequest.getTeamId());
+
+                final User user = User.createWithoutId(userRequest.getFoldingUserName(), userRequest.getDisplayName(), userRequest.getPasskey(), category, userRequest.getProfileLink(), userRequest.getLiveStatsLink(), hardware, team, userRequest.isUserIsCaptain());
+                return ValidationResponse.success(user);
+            } catch (final NotFoundException e) {
+                LOGGER.warn("{} with ID {} was validated successfully, but could not be retrieved", e.getType(), e.getId(), e);
+                failureMessages.add(String.format("Unable to find %s with ID %s", e.getType(), e.getId()));
+            } catch (final FoldingException e) {
+                LOGGER.warn("Unexpected error retrieving hardware/team", e);
+                failureMessages.add("Unable to retrieve hardware/team");
+            }
+        }
+
+        return ValidationResponse.failure(userRequest, failureMessages);
+    }
+
+    public ValidationResponse<User> validateUpdate(final UserRequest userRequest) { // NOPMD: NPathComplexity is high but better than the alternative of breaking into smaller functions
+        if (userRequest == null) {
+            return ValidationResponse.nullObject();
+        }
+
+        final List<String> failureMessages = new ArrayList<>();
+
+        final Category category = Category.get(userRequest.getCategory());
+        if (Category.INVALID == category) {
+            failureMessages.add(String.format("Field 'category' must be one of: %s", Category.getAllValues()));
+        }
+
+        if (StringUtils.isBlank(userRequest.getFoldingUserName())) {
+            failureMessages.add("Field 'foldingUserName' must not be empty");
+        }
+
+        if (StringUtils.isBlank(userRequest.getPasskey())) {
+            failureMessages.add("Field 'passkey' must not be empty");
+        }
+
+        if (StringUtils.isBlank(userRequest.getDisplayName())) {
+            failureMessages.add("Field 'displayName' must not be empty");
+        }
+
+        if (userRequest.getPasskey().contains("*")) {
+            failureMessages.add("Field 'passkey' cannot contain '*' characters");
+        }
+
+        if (userRequest.getPasskey().length() != EXPECTED_PASSKEY_LENGTH) {
+            failureMessages.add("Field 'passkey' must be 32 characters in length");
+        }
+
+        if (StringUtils.isNotEmpty(userRequest.getProfileLink()) && !URL_VALIDATOR.isValid(userRequest.getProfileLink())) {
+            failureMessages.add(String.format("Field 'profileLink' is not a valid link: '%s'", userRequest.getProfileLink()));
+
+        }
+
+        if (StringUtils.isNotEmpty(userRequest.getLiveStatsLink()) && !URL_VALIDATOR.isValid(userRequest.getLiveStatsLink())) {
+            failureMessages.add(String.format("Field 'liveStatsLink' is not a valid link: '%s'", userRequest.getLiveStatsLink()));
+        }
+
+        final List<String> hardwareValidationFailureMessages = validateHardware(userRequest);
+        failureMessages.addAll(hardwareValidationFailureMessages);
+
+        final List<String> teamValidationFailureMessages = validateTeam(userRequest);
+        failureMessages.addAll(teamValidationFailureMessages);
+
+        // Since this is a heavy validation check, only do it if the rest of the user is valid
+        if (failureMessages.isEmpty()) {
+            final List<String> teamFailureMessages = validateIfUserCanBeAddedToTeam(userRequest, category, false);
             failureMessages.addAll(teamFailureMessages);
         }
 
@@ -101,7 +217,7 @@ public final class UserValidator {
                         .map(team -> String.format("%s: %s", team.getId(), team.getTeamName()))
                         .collect(toList());
 
-                return List.of(String.format("Attribute 'teamId' must be one of: %s", availableTeams));
+                return List.of(String.format("Field 'teamId' must be one of: %s", availableTeams));
             }
         } catch (final FoldingException e) {
             LOGGER.warn("Unable to get team for user {}", userRequest, e);
@@ -120,7 +236,7 @@ public final class UserValidator {
                         .map(hardware -> String.format("%s: %s", hardware.getId(), hardware.getHardwareName()))
                         .collect(toList());
 
-                return List.of(String.format("Attribute 'hardwareId' must be one of: %s", availableHardware));
+                return List.of(String.format("Field 'hardwareId' must be one of: %s", availableHardware));
             }
         } catch (final FoldingException e) {
             LOGGER.warn("Unable to get hardware for user {}", userRequest, e);
@@ -128,44 +244,6 @@ public final class UserValidator {
         }
 
         return Collections.emptyList();
-    }
-
-    private List<String> validateAttributes(final UserRequest userRequest, final Category category) {
-        final List<String> failureMessages = new ArrayList<>();
-
-        if (Category.INVALID == category) {
-            failureMessages.add(String.format("Attribute 'category' must be one of: %s", Category.getAllValues()));
-        }
-
-        if (StringUtils.isBlank(userRequest.getFoldingUserName())) {
-            failureMessages.add("Attribute 'foldingUserName' must not be empty");
-        }
-
-        if (StringUtils.isBlank(userRequest.getDisplayName())) {
-            failureMessages.add("Attribute 'displayName' must not be empty");
-        }
-
-        if (StringUtils.isBlank(userRequest.getPasskey())) {
-            failureMessages.add("Attribute 'passkey' must not be empty");
-        }
-
-        if (userRequest.getPasskey().contains("*")) {
-            failureMessages.add("Attribute 'passkey' cannot contain '*' characters");
-        }
-
-        if (userRequest.getPasskey().length() != EXPECTED_PASSKEY_LENGTH) {
-            failureMessages.add("Attribute 'passkey' must be 32 characters in length");
-        }
-
-        if (StringUtils.isNotEmpty(userRequest.getProfileLink()) && !URL_VALIDATOR.isValid(userRequest.getProfileLink())) {
-            failureMessages.add(String.format("Attribute 'profileLink' is not a valid link: '%s'", userRequest.getProfileLink()));
-
-        }
-
-        if (StringUtils.isNotEmpty(userRequest.getLiveStatsLink()) && !URL_VALIDATOR.isValid(userRequest.getLiveStatsLink())) {
-            failureMessages.add(String.format("Attribute 'liveStatsLink' is not a valid link: '%s'", userRequest.getLiveStatsLink()));
-        }
-        return failureMessages;
     }
 
     private List<String> validateUserUnits(final UserRequest userRequest) {
@@ -187,7 +265,7 @@ public final class UserValidator {
         return Collections.emptyList();
     }
 
-    private List<String> validateIfUserCanBeAddedToTeam(final UserRequest userRequest) {
+    private List<String> validateIfUserCanBeAddedToTeam(final UserRequest userRequest, final Category category, final boolean isCreate) {
         final List<String> failureMessages = new ArrayList<>();
 
         try {
@@ -206,14 +284,25 @@ public final class UserValidator {
                 }
             }
 
-            final Map<Category, Long> categoryCount = usersOnTeam
-                    .stream()
-                    .map(User::getCategory)
-                    .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+            if (isCreate) {
+                final int permittedNumberForCategory = category.permittedAmount();
+                final int numberOfUsersInTeamWithCategory = (int) usersOnTeam
+                        .stream()
+                        .filter(user -> user.getCategory() == category)
+                        .count();
 
-            for (final Map.Entry<Category, Long> categoryAndCount : categoryCount.entrySet()) {
-                if (categoryAndCount.getValue() > categoryAndCount.getKey().permittedAmount()) {
-                    failureMessages.add(String.format("Found %s users of category %s, only %s permitted", categoryAndCount.getValue(), categoryAndCount.getKey().displayName(), categoryAndCount.getKey().permittedAmount()));
+                if (numberOfUsersInTeamWithCategory >= permittedNumberForCategory) {
+                    failureMessages.add(String.format("Found %s users of category '%s', only %s permitted", numberOfUsersInTeamWithCategory, category.displayName(), permittedNumberForCategory));
+                }
+            } else {
+                final int permittedNumberForCategory = category.permittedAmount();
+                final int numberOfUsersInTeamWithCategory = (int) usersOnTeam
+                        .stream()
+                        .filter(user -> user.getCategory() == category)
+                        .count();
+
+                if (numberOfUsersInTeamWithCategory > permittedNumberForCategory) {
+                    failureMessages.add(String.format("Found %s users of category '%s', only %s permitted", numberOfUsersInTeamWithCategory, category.displayName(), permittedNumberForCategory));
                 }
             }
         } catch (final FoldingException | TeamNotFoundException e) {

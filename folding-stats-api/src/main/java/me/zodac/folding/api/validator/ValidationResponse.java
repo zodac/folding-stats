@@ -27,7 +27,9 @@ import java.util.List;
 public class ValidationResponse<E extends ResponsePojo> {
 
     private Object invalidObject;
+    private Object conflictingObject;
     private E output;
+    private ValidationResult validationResult;
     private Collection<String> errors;
 
     /**
@@ -38,7 +40,7 @@ public class ValidationResponse<E extends ResponsePojo> {
      * @return a {@link ValidationResponse} with no invalid object and an empty {@link Collection} of errors
      */
     public static <E extends ResponsePojo> ValidationResponse<E> success(final E output) {
-        return new ValidationResponse<>(null, output, Collections.emptyList());
+        return new ValidationResponse<>(null, null, output, ValidationResult.SUCCESSFUL_VALIDATION, Collections.emptyList());
     }
 
     /**
@@ -50,7 +52,7 @@ public class ValidationResponse<E extends ResponsePojo> {
      * @return a {@link ValidationResponse} with the invalid object and a {@link Collection} of errors
      */
     public static <E extends ResponsePojo> ValidationResponse<E> failure(final Object invalidObject, final Collection<String> errors) {
-        return new ValidationResponse<>(invalidObject, null, errors);
+        return new ValidationResponse<>(invalidObject, null, null, ValidationResult.FAILURE_ON_VALIDATION, errors);
     }
 
     /**
@@ -60,7 +62,33 @@ public class ValidationResponse<E extends ResponsePojo> {
      * @return a {@link ValidationResponse} with the null object a single error
      */
     public static <E extends ResponsePojo> ValidationResponse<E> nullObject() {
-        return new ValidationResponse<>(null, null, List.of("Payload is null"));
+        return new ValidationResponse<>(null, null, null, ValidationResult.FAILURE_ON_VALIDATION, List.of("Payload is null"));
+    }
+
+    /**
+     * Validation failed due to a conflict with an existing {@link Object}.
+     *
+     * @param invalidObject         the {@link Object} that failed validation
+     * @param conflictingObject     the conflicting {@link Object}
+     * @param conflictingAttributes a {@link Collection} of the conflicting fields
+     * @param <E>                   the output type of the validated object
+     * @return a {@link ValidationResponse} with the conflicting {@link Object}
+     */
+    public static <E extends ResponsePojo> ValidationResponse<E> conflictingWith(final Object invalidObject, final Object conflictingObject, final Collection<String> conflictingAttributes) {
+        final Collection<String> errors = List.of(String.format("Payload conflicts with an existing object on: %s", conflictingAttributes));
+        return new ValidationResponse<>(invalidObject, conflictingObject, null, ValidationResult.FAILURE_DUE_TO_CONFLICT, errors);
+    }
+
+    /**
+     * Validation failed due to a conflict with an existing {@link Object} using this {@link Object}.
+     *
+     * @param invalidObject     the {@link Object} that failed validation
+     * @param conflictingObject the conflicting {@link Object}
+     * @param <E>               the output type of the validated object
+     * @return a {@link ValidationResponse} with the conflicting {@link Object}
+     */
+    public static <E extends ResponsePojo> ValidationResponse<E> usedBy(final Object invalidObject, final Object conflictingObject) {
+        return new ValidationResponse<>(invalidObject, conflictingObject, null, ValidationResult.FAILURE_DUE_TO_CONFLICT, List.of("Payload conflicts with an existing object"));
     }
 
     /**
@@ -69,6 +97,6 @@ public class ValidationResponse<E extends ResponsePojo> {
      * @return <code>true</code> if the validation failed
      */
     public boolean isInvalid() {
-        return !errors.isEmpty();
+        return validationResult != ValidationResult.SUCCESSFUL_VALIDATION;
     }
 }

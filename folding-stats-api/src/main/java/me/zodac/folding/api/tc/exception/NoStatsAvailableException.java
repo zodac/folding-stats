@@ -11,4 +11,8 @@ public class NoStatsAvailableException extends Exception {
     public NoStatsAvailableException(final String message) {
         super(message);
     }
+
+    public NoStatsAvailableException(final String type, final int id) {
+        super(String.format("Unable to find stats for %s with ID: '%s'", type, id));
+    }
 }

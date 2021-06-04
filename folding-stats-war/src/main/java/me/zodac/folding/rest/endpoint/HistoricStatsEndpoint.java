@@ -200,6 +200,8 @@ public class HistoricStatsEndpoint {
             businessLogic.getUser(Integer.parseInt(userId)); // Check if user exists first, catch UserNotFoundException early
             final Collection<HistoricStats> monthlyStats = businessLogic.getHistoricStatsMonthly(Integer.parseInt(userId), Year.parse(year));
 
+            LOGGER.info("Found(final): {}", monthlyStats);
+
             final CacheControl cacheControl = new CacheControl();
             cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);
 

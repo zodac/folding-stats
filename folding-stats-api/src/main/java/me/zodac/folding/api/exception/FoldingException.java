@@ -14,6 +14,10 @@ public class FoldingException extends Exception {
         super(message);
     }
 
+    public FoldingException(final Throwable throwable) {
+        super(throwable);
+    }
+
     public FoldingException(final String message, final Throwable throwable) {
         super(message, throwable);
     }

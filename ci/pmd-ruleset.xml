@@ -65,14 +65,17 @@
         <exclude name="ExcessiveParameterList"/>
         <exclude name="TooManyMethods"/>
         <exclude name="UseObjectForClearerAPI"/>
+        <!-- TODO: Split BusinessLogic into Storage, then disable this rule -->
+        <exclude name="ExcessivePublicCount"/>
     </rule>
     <!-- Default threshold is a bit high for some of our validation flows -->
-    <rule ref="category/java/design.xml/NPathComplexity">
+    <rule ref="category/java/design.xml/CognitiveComplexity">
         <properties>
-            <property name="reportLevel" value="600"/>
+            <property name="reportLevel" value="25"/>
         </properties>
     </rule>
 
+    <!-- TODO: [zodac] Sort out documentation first :) -->
     <!--    <rule ref="category/java/documentation.xml"/>-->
 
     <rule ref="category/java/errorprone.xml">
@@ -80,6 +83,16 @@
         <!-- TODO: [zodac] Move to jOOQ, should remove the duplicate strings -->
         <exclude name="AvoidDuplicateLiterals"/>
     </rule>
+    <!-- Printing SQL statements in PostgresDbManager.java -->
+    <!--    <rule ref="category/java/errorprone.xml/AvoidDuplicateLiterals">-->
+    <!--        <properties>-->
+    <!--            <property name="separator" value=","/>-->
+    <!--            <property name="maxDuplicateLiterals" value="4"/>-->
+    <!--            <property name="minimumLength" value="3"/>-->
+    <!--            <property name="skipAnnotations" value="false"/>-->
+    <!--            <property name="exceptionList" value="Executing SQL: '{}'"/>-->
+    <!--        </properties>-->
+    <!--    </rule>-->
 
     <rule ref="category/java/multithreading.xml">
         <!-- False positives in TeamCompetitionStatsEndpoint#getCategoryLeaderboard() -->

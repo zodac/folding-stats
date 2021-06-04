@@ -1,6 +1,5 @@
 package me.zodac.folding.rest.endpoint;
 
-import me.zodac.folding.api.db.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.exception.NotFoundException;
@@ -102,7 +101,7 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
     }
 
     @Override
-    protected Team createElement(final Team team) throws FoldingException, FoldingConflictException {
+    protected Team createElement(final Team team) throws FoldingException {
         final Team teamWithId = businessLogic.createTeam(team);
         teamCompetitionStatsScheduler.parseTcStatsForTeam(team, ExecutionType.SYNCHRONOUS);
         return teamWithId;
@@ -114,9 +113,21 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
     }
 
     @Override
-    protected ValidationResponse<Team> validateAndConvert(final TeamRequest teamRequest) {
-        final TeamValidator teamValidator = TeamValidator.create();
-        return teamValidator.validate(teamRequest);
+    protected ValidationResponse<Team> validateCreateAndConvert(final TeamRequest teamRequest) {
+        final TeamValidator teamValidator = TeamValidator.create(businessLogic);
+        return teamValidator.validateCreate(teamRequest);
+    }
+
+    @Override
+    protected ValidationResponse<Team> validateUpdateAndConvert(final TeamRequest teamRequest) {
+        final TeamValidator teamValidator = TeamValidator.create(businessLogic);
+        return teamValidator.validateUpdate(teamRequest);
+    }
+
+    @Override
+    protected ValidationResponse<Team> validateDeleteAndConvert(final Team team) {
+        final TeamValidator teamValidator = TeamValidator.create(businessLogic);
+        return teamValidator.validateDelete(team);
     }
 
     @Override
@@ -125,7 +136,7 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
     }
 
     @Override
-    protected Team updateElementById(final int teamId, final Team team) throws FoldingException, FoldingConflictException {
+    protected Team updateElementById(final int teamId, final Team team) throws FoldingException {
         // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
         final Team teamWithId = Team.updateWithId(teamId, team);
         businessLogic.updateTeam(teamWithId);
@@ -133,7 +144,7 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
     }
 
     @Override
-    protected void deleteElementById(final int teamId) throws FoldingConflictException, FoldingException {
+    protected void deleteElementById(final int teamId) throws FoldingException {
         businessLogic.deleteTeam(teamId);
     }
 }

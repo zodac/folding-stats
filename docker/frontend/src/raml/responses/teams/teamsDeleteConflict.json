@@ -1,0 +1,31 @@
+{
+  "invalidObject": {
+    "id": 1,
+    "teamName": "Team1",
+    "teamDescription": "Desc"
+  },
+  "conflictingObject": {
+    "id": 1,
+    "foldingUserName": "User1",
+    "displayName": "User1",
+    "passkey": "fc7d6837269d86784d8bfd0b386d6bca",
+    "category": "WILDCARD",
+    "hardware": {
+      "id": 1,
+      "hardwareName": "Hardware1",
+      "displayName": "Hardware1",
+      "operatingSystem": "WINDOWS",
+      "multiplier": 16.38
+    },
+    "team": {
+      "id": 1,
+      "teamName": "Team1",
+      "teamDescription": "Desc"
+    },
+    "userIsCaptain": true
+  },
+  "validationResult": "FAILURE_DUE_TO_CONFLICT",
+  "errors": [
+    "Payload conflicts with an existing object"
+  ]
+}

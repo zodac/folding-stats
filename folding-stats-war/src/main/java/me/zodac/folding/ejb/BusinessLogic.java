@@ -3,7 +3,6 @@ package me.zodac.folding.ejb;
 
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.db.SystemUserAuthentication;
-import me.zodac.folding.api.db.exception.FoldingConflictException;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.FoldingExternalServiceException;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
@@ -76,7 +75,7 @@ public class BusinessLogic {
     @EJB
     private transient UserTeamCompetitionStatsParser userTeamCompetitionStatsParser;
 
-    public Hardware createHardware(final Hardware hardware) throws FoldingException, FoldingConflictException {
+    public Hardware createHardware(final Hardware hardware) throws FoldingException {
         final Hardware hardwareWithId = dbManager.createHardware(hardware);
         hardwareCache.add(hardwareWithId);
         return hardwareWithId;
@@ -92,7 +91,7 @@ public class BusinessLogic {
         LOGGER.trace("Cache miss! Get hardware");
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
-        final Hardware hardwareFromDb = dbManager.getHardware(hardwareId);
+        final Hardware hardwareFromDb = dbManager.getHardware(hardwareId).orElseThrow(() -> new HardwareNotFoundException(hardwareId));
         hardwareCache.add(hardwareFromDb);
         return hardwareFromDb;
     }
@@ -124,7 +123,7 @@ public class BusinessLogic {
         }
     }
 
-    public void updateHardware(final Hardware updatedHardware) throws FoldingException, HardwareNotFoundException, FoldingConflictException, FoldingExternalServiceException {
+    public void updateHardware(final Hardware updatedHardware) throws FoldingException, HardwareNotFoundException, FoldingExternalServiceException {
         final Hardware existingHardware = getHardware(updatedHardware.getId());
         dbManager.updateHardware(updatedHardware);
         hardwareCache.add(updatedHardware);
@@ -144,12 +143,12 @@ public class BusinessLogic {
         }
     }
 
-    public void deleteHardware(final int hardwareId) throws FoldingException, FoldingConflictException {
+    public void deleteHardware(final int hardwareId) throws FoldingException {
         dbManager.deleteHardware(hardwareId);
         hardwareCache.remove(hardwareId);
     }
 
-    public User createUser(final User user) throws FoldingException, FoldingConflictException, FoldingExternalServiceException {
+    public User createUser(final User user) throws FoldingException, FoldingExternalServiceException {
         final User userWithId = dbManager.createUser(user);
         userCache.add(userWithId);
 
@@ -179,7 +178,7 @@ public class BusinessLogic {
         LOGGER.trace("Cache miss! Get user");
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
-        final User userFromDb = dbManager.getUser(userId);
+        final User userFromDb = dbManager.getUser(userId).orElseThrow(() -> new UserNotFoundException(userId));
         userCache.add(userFromDb);
 
         return showFullPasskeys ? userFromDb : User.hidePasskey(userFromDb);
@@ -217,7 +216,7 @@ public class BusinessLogic {
                 .collect(toList());
     }
 
-    public void updateUser(final User updatedUser) throws FoldingException, UserNotFoundException, FoldingConflictException, FoldingExternalServiceException {
+    public void updateUser(final User updatedUser) throws FoldingException, UserNotFoundException, FoldingExternalServiceException {
         final User existingUser = getUser(updatedUser.getId());
         dbManager.updateUser(updatedUser);
         userCache.add(updatedUser);
@@ -277,7 +276,7 @@ public class BusinessLogic {
         }
     }
 
-    public void deleteUser(final int userId) throws FoldingConflictException, FoldingException {
+    public void deleteUser(final int userId) throws FoldingException {
         try {
             final User user = getUser(userId);
 
@@ -300,7 +299,7 @@ public class BusinessLogic {
         }
     }
 
-    public Team createTeam(final Team team) throws FoldingException, FoldingConflictException {
+    public Team createTeam(final Team team) throws FoldingException {
         final Team teamWithId = dbManager.createTeam(team);
         teamCache.add(teamWithId);
         return teamWithId;
@@ -316,7 +315,7 @@ public class BusinessLogic {
         LOGGER.trace("Cache miss! Get team");
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
-        final Team teamFromDb = dbManager.getTeam(teamId);
+        final Team teamFromDb = dbManager.getTeam(teamId).orElseThrow(() -> new TeamNotFoundException(teamId));
         teamCache.add(teamFromDb);
         return teamFromDb;
     }
@@ -336,12 +335,12 @@ public class BusinessLogic {
         return allTeamsFromDb;
     }
 
-    public void updateTeam(final Team team) throws FoldingException, FoldingConflictException {
+    public void updateTeam(final Team team) throws FoldingException {
         dbManager.updateTeam(team);
         teamCache.add(team);
     }
 
-    public void deleteTeam(final int teamId) throws FoldingException, FoldingConflictException {
+    public void deleteTeam(final int teamId) throws FoldingException {
         dbManager.deleteTeam(teamId);
         teamCache.remove(teamId);
     }
@@ -365,7 +364,7 @@ public class BusinessLogic {
         LOGGER.trace("Cache miss! getInitialStatsForUser");
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
-        final Stats initialStatsFromDb = dbManager.getInitialStats(userId).getStats();
+        final Stats initialStatsFromDb = dbManager.getInitialStats(userId).orElseThrow(() -> new FoldingException("Unable to get initial stats for user ID: " + userId)).getStats();
         initialStatsCache.add(userId, initialStatsFromDb);
         return initialStatsFromDb;
     }
@@ -385,7 +384,7 @@ public class BusinessLogic {
         LOGGER.trace("Cache miss! Current TC stats");
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
-        final UserTcStats userTcStatsFromDb = dbManager.getHourlyTcStats(userId);
+        final UserTcStats userTcStatsFromDb = dbManager.getHourlyTcStats(userId).orElseThrow(() -> new NoStatsAvailableException("user", userId));
         tcStatsCache.add(userId, userTcStatsFromDb);
         return userTcStatsFromDb;
     }
@@ -410,14 +409,14 @@ public class BusinessLogic {
         }
     }
 
-    public Collection<HistoricStats> getHistoricStatsMonthly(final int userId, final Year year) throws FoldingException, UserNotFoundException {
-        try {
-            return dbManager.getHistoricStatsMonthly(userId, year);
-        } catch (final NoStatsAvailableException e) {
-            LOGGER.debug("No stats retrieved for user with ID {} on {}, returning empty", userId, year.getValue(), e);
+    public Collection<HistoricStats> getHistoricStatsMonthly(final int userId, final Year year) throws FoldingException {
+        final Collection<HistoricStats> historicStats = dbManager.getHistoricStatsMonthly(userId, year);
+
+        if (historicStats.isEmpty()) {
             LOGGER.warn("No stats retrieved for user with ID {} on {}, returning empty", userId, year.getValue());
-            return Collections.emptyList();
         }
+
+        return historicStats;
     }
 
     public void addOffsetStats(final int userId, final OffsetStats offsetStats) throws FoldingException {
@@ -426,7 +425,7 @@ public class BusinessLogic {
     }
 
     public void addOrUpdateOffsetStats(final int userId, final OffsetStats offsetStats) throws FoldingException {
-        final OffsetStats offsetStatsFromDb = dbManager.addOrUpdateOffsetStats(userId, offsetStats);
+        final OffsetStats offsetStatsFromDb = dbManager.addOrUpdateOffsetStats(userId, offsetStats).orElseThrow(FoldingException::new);
         offsetStatsCache.add(userId, offsetStatsFromDb);
     }
 
@@ -439,7 +438,7 @@ public class BusinessLogic {
         LOGGER.trace("Cache miss! getOffsetStatsForUser");
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
-        final OffsetStats offsetStatsFromDb = dbManager.getOffsetStats(userId);
+        final OffsetStats offsetStatsFromDb = dbManager.getOffsetStats(userId).orElse(OffsetStats.empty());
         offsetStatsCache.add(userId, offsetStatsFromDb);
         return offsetStatsFromDb;
     }
@@ -447,12 +446,12 @@ public class BusinessLogic {
 
     public void initialiseOffsetStats() throws FoldingException {
         for (final User user : getAllUsers()) {
-            final OffsetStats offsetStats = dbManager.getOffsetStats(user.getId());
+            final OffsetStats offsetStats = dbManager.getOffsetStats(user.getId()).orElse(OffsetStats.empty());
             offsetStatsCache.add(user.getId(), offsetStats);
         }
     }
 
-    public void clearOffsetStats() throws FoldingConflictException, FoldingException {
+    public void clearOffsetStats() throws FoldingException {
         dbManager.clearAllOffsetStats();
         offsetStatsCache.clearOffsets();
     }
@@ -472,7 +471,7 @@ public class BusinessLogic {
         LOGGER.trace("Cache miss! Total stats");
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
-        final Stats userTotalStatsFromDb = dbManager.getTotalStats(userId).getStats();
+        final Stats userTotalStatsFromDb = dbManager.getTotalStats(userId).orElseThrow(() -> new FoldingException("Could not find any total stats for user ID: " + userId)).getStats();
         totalStatsCache.add(userId, userTotalStatsFromDb);
         return userTotalStatsFromDb;
     }
@@ -518,7 +517,67 @@ public class BusinessLogic {
         return dbManager.getRetiredUserStatsForTeam(team);
     }
 
-    public void deleteRetiredUserStats() throws FoldingConflictException, FoldingException {
+    public void deleteRetiredUserStats() throws FoldingException {
         dbManager.deleteRetiredUserStats();
+    }
+
+    public Optional<Hardware> getHardwareWithName(final String hardwareName) {
+        try {
+            return getAllHardware()
+                    .stream()
+                    .filter(hardware -> hardware.getHardwareName().equalsIgnoreCase(hardwareName))
+                    .findAny();
+        } catch (final FoldingException e) {
+            LOGGER.warn("Error getting hardware with hardwareName '{}'", hardwareName, e);
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Team> getTeamWithName(final String teamName) {
+        try {
+            return getAllTeams()
+                    .stream()
+                    .filter(team -> team.getTeamName().equalsIgnoreCase(teamName))
+                    .findAny();
+        } catch (final FoldingException e) {
+            LOGGER.warn("Error getting team with teamName '{}'", teamName, e);
+            return Optional.empty();
+        }
+    }
+
+    public Optional<User> getUserWithFoldingUserNameAndPasskey(final String foldingUserName, final String passkey) {
+        try {
+            return getAllUsersWithPasskeys(true)
+                    .stream()
+                    .filter(user -> user.getFoldingUserName().equalsIgnoreCase(foldingUserName) && user.getPasskey().equalsIgnoreCase(passkey))
+                    .findAny();
+        } catch (final FoldingException e) {
+            LOGGER.warn("Error getting user with foldingUserName '{}' and passkey '{}'", foldingUserName, passkey, e);
+            return Optional.empty();
+        }
+    }
+
+    public Optional<User> getUserWithHardware(final Hardware hardware) {
+        try {
+            return getAllUsers()
+                    .stream()
+                    .filter(user -> user.getHardware().getId() == hardware.getId())
+                    .findAny();
+        } catch (final FoldingException e) {
+            LOGGER.warn("Error getting user with hardware '{}'", hardware, e);
+            return Optional.empty();
+        }
+    }
+
+    public Optional<User> getUserWithTeam(final Team team) {
+        try {
+            return getAllUsers()
+                    .stream()
+                    .filter(user -> user.getTeam().getId() == team.getId())
+                    .findAny();
+        } catch (final FoldingException e) {
+            LOGGER.warn("Error getting user with team '{}'", team, e);
+            return Optional.empty();
+        }
     }
 }

@@ -1,0 +1,20 @@
+{
+  "invalidObject": {
+    "id": 0,
+    "hardwareName": "Hardware1",
+    "displayName": "Hardware1",
+    "operatingSystem": "Windows",
+    "multiplier": 16.38
+  },
+  "conflictingObject": {
+    "id": 1,
+    "hardwareName": "Hardware1",
+    "displayName": "Hardware1",
+    "operatingSystem": "WINDOWS",
+    "multiplier": 16.38
+  },
+  "validationResult": "FAILURE_DUE_TO_CONFLICT",
+  "errors": [
+    "Payload conflicts with an existing object on: [hardwareName]"
+  ]
+}

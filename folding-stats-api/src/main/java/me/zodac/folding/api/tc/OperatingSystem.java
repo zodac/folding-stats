@@ -11,8 +11,19 @@ import static java.util.stream.Collectors.toUnmodifiableList;
  */
 public enum OperatingSystem {
 
+    /**
+     * All Microsoft Windows {@link OperatingSystem}s.
+     */
     WINDOWS("Windows"),
+
+    /**
+     * All Linux {@link OperatingSystem} distributions.
+     */
     LINUX("Linux"),
+
+    /**
+     * Not a valid {@link OperatingSystem}.
+     */
     INVALID("Invalid");
 
     private static final Collection<OperatingSystem> ALL_VALUES = Stream.of(values())
