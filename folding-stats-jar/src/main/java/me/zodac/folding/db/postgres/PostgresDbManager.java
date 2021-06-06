@@ -7,7 +7,6 @@ import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.tc.exception.NoStatsAvailableException;
 import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.stats.OffsetStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
@@ -374,8 +373,8 @@ public final class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public Collection<HistoricStats> getHistoricStatsHourly(final int userId, final int day, final Month month, final Year year) throws FoldingException, NoStatsAvailableException {
-        LOGGER.debug("Getting historic hourly user TC stats for {}/{}/{} for user {}", year, DateTimeUtils.formatMonth(month), day, userId);
+    public Collection<HistoricStats> getHistoricStatsHourly(final int userId, final int day, final Month month, final Year year) throws FoldingException {
+        LOGGER.info("Getting historic hourly user TC stats for {}/{}/{} for user {}", year, DateTimeUtils.formatMonth(month), day, userId);
 
         final String selectSqlStatement = "SELECT MAX(utc_timestamp) AS hourly_timestamp, " +
                 "COALESCE(MAX(tc_points) - LAG(MAX(tc_points)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points, " +
@@ -425,10 +424,6 @@ public final class PostgresDbManager implements DbManager {
                     );
                 }
 
-                if (userStats.isEmpty()) {
-                    throw new NoStatsAvailableException(String.format("No hourly TC historic stats found for user with ID %s on %s/%s/%s", userId, year.getValue(), month.getValue(), day));
-                }
-
                 return userStats;
             }
         } catch (final FoldingException e) {
@@ -446,9 +441,14 @@ public final class PostgresDbManager implements DbManager {
             final LocalDateTime start = DateTimeUtils.getLocalDateTimeOf(year, month, day, 0, 0, 0);
             final LocalDateTime end = DateTimeUtils.getLocalDateTimeOf(year, month, day, 0, 59, 59);
 
-
             final var query = queryContext
-                    .select(max(USER_TC_STATS_HOURLY.UTC_TIMESTAMP), max(USER_TC_STATS_HOURLY.TC_POINTS), max(USER_TC_STATS_HOURLY.TC_POINTS_MULTIPLIED), max(USER_TC_STATS_HOURLY.TC_UNITS))
+                    .select(
+                            max(USER_TC_STATS_HOURLY.USER_ID).as(USER_TC_STATS_HOURLY.USER_ID),
+                            max(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).as(USER_TC_STATS_HOURLY.UTC_TIMESTAMP),
+                            max(USER_TC_STATS_HOURLY.TC_POINTS).as(USER_TC_STATS_HOURLY.TC_POINTS),
+                            max(USER_TC_STATS_HOURLY.TC_POINTS_MULTIPLIED).as(USER_TC_STATS_HOURLY.TC_POINTS_MULTIPLIED),
+                            max(USER_TC_STATS_HOURLY.TC_UNITS).as(USER_TC_STATS_HOURLY.TC_UNITS)
+                    )
                     .from(USER_TC_STATS_HOURLY)
                     .where(USER_TC_STATS_HOURLY.UTC_TIMESTAMP.between(start, end))
                     .and(USER_TC_STATS_HOURLY.USER_ID.equal(userId))
@@ -468,7 +468,7 @@ public final class PostgresDbManager implements DbManager {
     }
 
     private UserTcStats getPreviousDayLastHourTcStats(final int userId, final int day, final Month month, final Year year) throws FoldingException {
-        LOGGER.debug("Getting previous day's first hour TC stats for user {} on {}/{}/{}", userId, year.getValue(), month.getValue(), day);
+        LOGGER.debug("Getting previous day's last hour TC stats for user {} on {}/{}/{}", userId, year.getValue(), month.getValue(), day);
 
         return executeQuery((queryContext) -> {
             final LocalDateTime start = DateTimeUtils.getLocalDateTimeOf(year, month, day, 23, 0, 0);
@@ -476,7 +476,13 @@ public final class PostgresDbManager implements DbManager {
 
 
             final var query = queryContext
-                    .select(max(USER_TC_STATS_HOURLY.UTC_TIMESTAMP), max(USER_TC_STATS_HOURLY.TC_POINTS), max(USER_TC_STATS_HOURLY.TC_POINTS_MULTIPLIED), max(USER_TC_STATS_HOURLY.TC_UNITS))
+                    .select(
+                            max(USER_TC_STATS_HOURLY.USER_ID).as(USER_TC_STATS_HOURLY.USER_ID),
+                            max(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).as(USER_TC_STATS_HOURLY.UTC_TIMESTAMP),
+                            max(USER_TC_STATS_HOURLY.TC_POINTS).as(USER_TC_STATS_HOURLY.TC_POINTS),
+                            max(USER_TC_STATS_HOURLY.TC_POINTS_MULTIPLIED).as(USER_TC_STATS_HOURLY.TC_POINTS_MULTIPLIED),
+                            max(USER_TC_STATS_HOURLY.TC_UNITS).as(USER_TC_STATS_HOURLY.TC_UNITS)
+                    )
                     .from(USER_TC_STATS_HOURLY)
                     .where(USER_TC_STATS_HOURLY.UTC_TIMESTAMP.between(start, end))
                     .and(USER_TC_STATS_HOURLY.USER_ID.equal(userId))
@@ -511,7 +517,7 @@ public final class PostgresDbManager implements DbManager {
 
 
             // If no stats in previous day (meaning we are getting historic stats for the first day available), we need to remove the initial points from the current day's points
-            final UserStats initialStats = getInitialStats(userId).orElseThrow(FoldingException::new);
+            final UserStats initialStats = getInitialStats(userId).orElse(UserStats.empty());
             LOGGER.debug("Removing initial stats from current day's first hour stats: {} - {}", firstHourTcStatsCurrentDay, initialStats);
 
             try {
@@ -545,7 +551,7 @@ public final class PostgresDbManager implements DbManager {
 
 
     @Override
-    public Collection<HistoricStats> getHistoricStatsDaily(final int userId, final Month month, final Year year) throws FoldingException, NoStatsAvailableException {
+    public Collection<HistoricStats> getHistoricStatsDaily(final int userId, final Month month, final Year year) throws FoldingException {
         LOGGER.debug("Getting historic daily user TC stats for {}/{} for user {}", DateTimeUtils.formatMonth(month), year, userId);
 
         final String selectSqlStatement = "SELECT utc_timestamp::DATE AS daily_timestamp, " +
@@ -602,10 +608,6 @@ public final class PostgresDbManager implements DbManager {
                     );
                 }
 
-                if (userStats.isEmpty()) {
-                    throw new NoStatsAvailableException("Unable to find historic daily stats for user with ID: " + userId);
-                }
-
                 return userStats;
             }
         } catch (final FoldingException e) {
@@ -622,7 +624,8 @@ public final class PostgresDbManager implements DbManager {
 
         return executeQuery((queryContext) -> {
             final var query = queryContext
-                    .select(max(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).as(USER_TC_STATS_HOURLY.UTC_TIMESTAMP.getName()),
+                    .select(
+                            max(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).as(USER_TC_STATS_HOURLY.UTC_TIMESTAMP.getName()),
                             max(USER_TC_STATS_HOURLY.TC_POINTS).as(USER_TC_STATS_HOURLY.TC_POINTS.getName()),
                             max(USER_TC_STATS_HOURLY.TC_POINTS_MULTIPLIED).as(USER_TC_STATS_HOURLY.TC_POINTS_MULTIPLIED.getName()),
                             max(USER_TC_STATS_HOURLY.TC_UNITS).as(USER_TC_STATS_HOURLY.TC_UNITS.getName())

@@ -31,9 +31,15 @@ import static me.zodac.folding.db.postgres.gen.tables.Users.USERS;
 final class RecordConverter {
 
     private RecordConverter() {
-        
+
     }
 
+    /**
+     * Convert a {@link HardwareRecord} into a {@link Hardware}.
+     *
+     * @param hardwareRecord the {@link HardwareRecord} to convert
+     * @return the converted {@link Hardware}
+     */
     static Hardware toHardware(final HardwareRecord hardwareRecord) {
         return Hardware.create(
                 hardwareRecord.getHardwareId(),
@@ -44,6 +50,12 @@ final class RecordConverter {
         );
     }
 
+    /**
+     * Convert a {@link TeamsRecord} into a {@link Team}.
+     *
+     * @param teamRecord the {@link TeamsRecord} to convert
+     * @return the converted {@link Team}
+     */
     static Team toTeam(final TeamsRecord teamRecord) {
         return Team.create(
                 teamRecord.getTeamId(),
@@ -53,6 +65,14 @@ final class RecordConverter {
         );
     }
 
+    /**
+     * Convert a {@link Record} into a {@link User}. The {@link Record} should contain info for the {@link User} and also the {@link Hardware} and {@link Team}.
+     *
+     * @param joinedRecord the {@link Record} to convert
+     * @return the converted {@link Hardware}
+     * @see #toHardware(HardwareRecord)
+     * @see #toTeam(TeamsRecord)
+     */
     static User toUser(final Record joinedRecord) {
         final UsersRecord userRecord = joinedRecord.into(USERS);
         return User.create(
@@ -69,6 +89,12 @@ final class RecordConverter {
         );
     }
 
+    /**
+     * Convert a {@link UserTcStatsHourlyRecord} into a {@link UserTcStats}.
+     *
+     * @param userTcStatsHourlyRecord the {@link UserTcStatsHourlyRecord} to convert
+     * @return the converted {@link UserTcStats}
+     */
     static UserTcStats toUserTcStats(final UserTcStatsHourlyRecord userTcStatsHourlyRecord) {
         return UserTcStats.create(
                 userTcStatsHourlyRecord.getUserId(),
@@ -79,6 +105,12 @@ final class RecordConverter {
         );
     }
 
+    /**
+     * Convert a {@link UserTcStatsHourlyRecord} into a {@link HistoricStats}.
+     *
+     * @param userTcStatsHourlyRecord the {@link UserTcStatsHourlyRecord} to convert
+     * @return the converted {@link HistoricStats}
+     */
     static HistoricStats toHistoricStats(final UserTcStatsHourlyRecord userTcStatsHourlyRecord) {
         return HistoricStats.create(
                 userTcStatsHourlyRecord.getUtcTimestamp(),
@@ -88,6 +120,12 @@ final class RecordConverter {
         );
     }
 
+    /**
+     * Convert a {@link UserTotalStatsRecord} into a {@link UserStats}.
+     *
+     * @param userTotalStatsRecord the {@link UserTotalStatsRecord} to convert
+     * @return the converted {@link UserStats}
+     */
     static UserStats toUserStats(final UserTotalStatsRecord userTotalStatsRecord) {
         return UserStats.createWithPointsAndUnits(
                 userTotalStatsRecord.getUserId(),
@@ -97,6 +135,12 @@ final class RecordConverter {
         );
     }
 
+    /**
+     * Convert a {@link UserInitialStatsRecord} into a {@link UserStats}.
+     *
+     * @param userInitialStatsRecord the {@link UserInitialStatsRecord} to convert
+     * @return the converted {@link UserStats}
+     */
     static UserStats toUserStats(final UserInitialStatsRecord userInitialStatsRecord) {
         return UserStats.createWithPointsAndUnits(
                 userInitialStatsRecord.getUserId(),
@@ -106,6 +150,12 @@ final class RecordConverter {
         );
     }
 
+    /**
+     * Convert a {@link UserOffsetTcStatsRecord} into a {@link OffsetStats}.
+     *
+     * @param userOffsetTcStatsRecord the {@link UserOffsetTcStatsRecord} to convert
+     * @return the converted {@link OffsetStats}
+     */
     static OffsetStats toOffsetStats(final UserOffsetTcStatsRecord userOffsetTcStatsRecord) {
         return OffsetStats.create(
                 userOffsetTcStatsRecord.getOffsetPoints(),
@@ -114,6 +164,12 @@ final class RecordConverter {
         );
     }
 
+    /**
+     * Convert a {@link RetiredUserStatsRecord} into a {@link RetiredUserTcStats}.
+     *
+     * @param retiredUserStatsRecord the {@link RetiredUserStatsRecord} to convert
+     * @return the converted {@link RetiredUserTcStats}
+     */
     static RetiredUserTcStats toRetiredUserStats(final RetiredUserStatsRecord retiredUserStatsRecord) {
         return RetiredUserTcStats.create(
                 retiredUserStatsRecord.getRetiredUserId(),

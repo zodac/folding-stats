@@ -39,7 +39,6 @@ import javax.ejb.Singleton;
 import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -390,23 +389,23 @@ public class BusinessLogic {
     }
 
     public Collection<HistoricStats> getHistoricStatsHourly(final int userId, final int day, final Month month, final Year year) throws FoldingException, UserNotFoundException {
-        try {
-            return dbManager.getHistoricStatsHourly(userId, day, month, year);
-        } catch (final NoStatsAvailableException e) {
-            LOGGER.debug("No stats retrieved for user with ID {} on {}/{}/{}, returning empty", userId, year.getValue(), month.getValue(), day, e);
+        final Collection<HistoricStats> historicStats = dbManager.getHistoricStatsHourly(userId, day, month, year);
+
+        if (historicStats.isEmpty()) {
             LOGGER.warn("No stats retrieved for user with ID {} on {}/{}/{}, returning empty", userId, year.getValue(), month.getValue(), day);
-            return Collections.emptyList();
         }
+
+        return historicStats;
     }
 
     public Collection<HistoricStats> getHistoricStatsDaily(final int userId, final Month month, final Year year) throws FoldingException, UserNotFoundException {
-        try {
-            return dbManager.getHistoricStatsDaily(userId, month, year);
-        } catch (final NoStatsAvailableException e) {
-            LOGGER.debug("No stats retrieved for user with ID {} on {}/{}, returning empty", userId, year.getValue(), month.getValue(), e);
+        final Collection<HistoricStats> historicStats = dbManager.getHistoricStatsDaily(userId, month, year);
+
+        if (historicStats.isEmpty()) {
             LOGGER.warn("No stats retrieved for user with ID {} on {}/{}, returning empty", userId, year.getValue(), month.getValue());
-            return Collections.emptyList();
         }
+
+        return historicStats;
     }
 
     public Collection<HistoricStats> getHistoricStatsMonthly(final int userId, final Year year) throws FoldingException {

@@ -67,6 +67,7 @@ class HistoricTeamStatsTest {
         final Team team = TeamUtils.create(generateTeam());
         final int userId = UserUtils.create(generateUserWithTeamId(team.getId())).getId();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
+                TestStats.create(userId, "2020-04-11 23:00:00", 0L, 0L, 0),
                 TestStats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10)
         );
 
@@ -85,6 +86,7 @@ class HistoricTeamStatsTest {
         final Team team = TeamUtils.create(generateTeam());
         final int userId = UserUtils.create(generateUserWithTeamId(team.getId())).getId();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
+                TestStats.create(userId, "2020-04-11 23:00:00", 0L, 0L, 0),
                 TestStats.create(userId, "2020-04-12 13:00:00", 20L, 200L, 2),
                 TestStats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10)
         );
@@ -112,6 +114,7 @@ class HistoricTeamStatsTest {
         final Team team = TeamUtils.create(generateTeam());
         final int userId = UserUtils.create(generateUserWithTeamId(team.getId())).getId();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
+                TestStats.create(userId, "2020-04-11 23:00:00", 0L, 0L, 0),
                 TestStats.create(userId, "2020-04-12 13:00:00", 50L, 500L, 5),
                 TestStats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10),
                 TestStats.create(userId, "2020-04-12 14:30:00", 110L, 1_100L, 11)
@@ -141,6 +144,8 @@ class HistoricTeamStatsTest {
         final int firstUserId = UserUtils.create(generateUserWithTeamIdAndCategory(team.getId(), Category.AMD_GPU)).getId();
         final int secondUserId = UserUtils.create(generateUserWithTeamIdAndCategory(team.getId(), Category.NVIDIA_GPU)).getId();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
+                TestStats.create(firstUserId, "2020-04-11 23:00:00", 0L, 0L, 0),
+                TestStats.create(secondUserId, "2020-04-11 23:00:00", 0L, 0L, 0),
                 TestStats.create(firstUserId, "2020-04-12 13:00:00", 50L, 500L, 5),
                 TestStats.create(secondUserId, "2020-04-12 13:00:00", 50L, 500L, 5),
                 TestStats.create(firstUserId, "2020-04-12 14:00:00", 100L, 1_000L, 10),

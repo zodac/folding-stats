@@ -9,7 +9,6 @@ import me.zodac.folding.api.tc.OperatingSystem;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.exception.HardwareNotFoundException;
-import me.zodac.folding.api.tc.exception.NoStatsAvailableException;
 import me.zodac.folding.api.tc.exception.TeamNotFoundException;
 import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.stats.OffsetStats;
@@ -17,12 +16,15 @@ import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
+import me.zodac.folding.api.utils.DateTimeUtils;
 import org.jooq.exception.DataAccessException;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
+import java.time.Month;
+import java.time.Year;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -277,13 +279,13 @@ class PostgresDbManagerTest {
     }
 
     @Test
-    void hourlyTcStatsTest() throws FoldingException, NoStatsAvailableException {
+    void hourlyTcStatsTest() throws FoldingException {
         assertThat(POSTGRES_DB_MANAGER.isAnyHourlyTcStats())
                 .isFalse();
 
         final int userId = createUser().getId();
-        assertThatThrownBy(() -> POSTGRES_DB_MANAGER.getHourlyTcStats(userId).orElseThrow(() -> new NoStatsAvailableException("user", userId)))
-                .isInstanceOf(NoStatsAvailableException.class);
+        assertThat(POSTGRES_DB_MANAGER.getHourlyTcStats(userId))
+                .isEmpty();
 
         final long points = 100L;
         final long multipliedPoints = 1_000L;
@@ -291,12 +293,56 @@ class PostgresDbManagerTest {
         final UserTcStats userTcStats = UserTcStats.createWithoutTimestamp(userId, points, multipliedPoints, units);
         POSTGRES_DB_MANAGER.persistHourlyTcStats(userTcStats);
 
-        final UserTcStats retrievedUserTcStats = POSTGRES_DB_MANAGER.getHourlyTcStats(userId).orElseThrow(() -> new NoStatsAvailableException("user", userId));
+        final Optional<UserTcStats> retrievedUserTcStats = POSTGRES_DB_MANAGER.getHourlyTcStats(userId);
         assertThat(retrievedUserTcStats)
+                .isPresent();
+        assertThat(retrievedUserTcStats.get())
                 .isEqualTo(userTcStats);
 
         assertThat(POSTGRES_DB_MANAGER.isAnyHourlyTcStats())
                 .isTrue();
+    }
+
+    @Test
+    void historicTest() throws FoldingException {
+        final int userId = createUser().getId();
+
+        final Year year = Year.of(2020);
+        final Month month = Month.APRIL;
+        final int yesterday = 14;
+        final int day = 15;
+
+        assertThat(POSTGRES_DB_MANAGER.getHistoricStatsHourly(userId, yesterday, month, year))
+                .isEmpty();
+        assertThat(POSTGRES_DB_MANAGER.getHistoricStatsDaily(userId, month, year))
+                .isEmpty();
+        assertThat(POSTGRES_DB_MANAGER.getHistoricStatsMonthly(userId, year))
+                .isEmpty();
+
+        final long currentDayFirstPoints = 200L;
+        final long currentDayFirstMultipliedPoints = 2_000L;
+        final int currentDayFirstUnits = 10;
+        final UserTcStats currentDayFirstUserTcStats = UserTcStats.create(userId, DateTimeUtils.getTimestampOf(year, month, yesterday, 0, 0, 0), currentDayFirstPoints, currentDayFirstMultipliedPoints, currentDayFirstUnits);
+        POSTGRES_DB_MANAGER.persistHourlyTcStats(currentDayFirstUserTcStats);
+
+        final long currentDaySecondPoints = 300L;
+        final long currentDaySecondMultipliedPoints = 3_000L;
+        final int currentDaySecondUnits = 15;
+        final UserTcStats currentDaySecondUserTcStats = UserTcStats.create(userId, DateTimeUtils.getTimestampOf(year, month, yesterday, 1, 0, 0), currentDaySecondPoints, currentDaySecondMultipliedPoints, currentDaySecondUnits);
+        POSTGRES_DB_MANAGER.persistHourlyTcStats(currentDaySecondUserTcStats);
+
+        final long currentDayThirdPoints = 300L;
+        final long currentDayThirdMultipliedPoints = 3_000L;
+        final int currentDayThirdUnits = 15;
+        final UserTcStats currentDayThirdUserTcStats = UserTcStats.create(userId, DateTimeUtils.getTimestampOf(year, month, day, 1, 0, 0), currentDayThirdPoints, currentDayThirdMultipliedPoints, currentDayThirdUnits);
+        POSTGRES_DB_MANAGER.persistHourlyTcStats(currentDayThirdUserTcStats);
+
+        assertThat(POSTGRES_DB_MANAGER.getHistoricStatsHourly(userId, yesterday, month, year))
+                .isNotEmpty();
+        assertThat(POSTGRES_DB_MANAGER.getHistoricStatsDaily(userId, month, year))
+                .isNotEmpty();
+        assertThat(POSTGRES_DB_MANAGER.getHistoricStatsMonthly(userId, year))
+                .isNotEmpty();
     }
 
     @Test

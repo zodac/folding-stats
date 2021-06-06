@@ -77,6 +77,7 @@ class HistoricUserStatsTest {
     void whenGettingHourlyStats_andUserHasMultipleStats_thenEachStatsEntryIsADiffFromPreviousHour_andResponseHas200Status() throws FoldingRestException {
         final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
+                TestStats.create(userId, "2020-04-11 23:00:00", 0L, 0L, 0),
                 TestStats.create(userId, "2020-04-12 13:00:00", 20L, 200L, 2),
                 TestStats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10)
         );
@@ -103,6 +104,7 @@ class HistoricUserStatsTest {
     void whenGettingHourlyStats_andUserHasMultipleStatsInSameHour_thenMaxStatsInHourAreReturned_andResponseHas200Status() throws FoldingRestException {
         final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
+                TestStats.create(userId, "2020-04-11 23:00:00", 0L, 0L, 0),
                 TestStats.create(userId, "2020-04-12 13:00:00", 50L, 500L, 5),
                 TestStats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10),
                 TestStats.create(userId, "2020-04-12 14:30:00", 110L, 1_100L, 11)

@@ -5,7 +5,6 @@ import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.exception.HardwareNotFoundException;
-import me.zodac.folding.api.tc.exception.NoStatsAvailableException;
 import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.stats.OffsetStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
@@ -68,9 +67,9 @@ public interface DbManager {
 
     // Historic TC operations
 
-    Collection<HistoricStats> getHistoricStatsHourly(final int userId, final int day, final Month month, final Year year) throws FoldingException, NoStatsAvailableException;
+    Collection<HistoricStats> getHistoricStatsHourly(final int userId, final int day, final Month month, final Year year) throws FoldingException;
 
-    Collection<HistoricStats> getHistoricStatsDaily(final int userId, final Month month, final Year year) throws FoldingException, NoStatsAvailableException;
+    Collection<HistoricStats> getHistoricStatsDaily(final int userId, final Month month, final Year year) throws FoldingException;
 
     Collection<HistoricStats> getHistoricStatsMonthly(final int userId, final Year year) throws FoldingException;
 

@@ -3,7 +3,7 @@
     "id": 0,
     "hardwareName": "Hardware1",
     "displayName": "Hardware1",
-    "operatingSystem": "Windows",
+    "operatingSystem": "WINDOWS",
     "multiplier": 16.38
   },
   "conflictingObject": {
