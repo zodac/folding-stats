@@ -4,7 +4,7 @@ import me.zodac.folding.api.db.SystemUserAuthentication;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.utils.EncodingUtils;
 import me.zodac.folding.ejb.BusinessLogic;
-import me.zodac.folding.rest.api.RestHeader;
+import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.util.response.Responses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

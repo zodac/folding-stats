@@ -56,6 +56,11 @@ import static org.jooq.impl.DSL.max;
 import static org.jooq.impl.DSL.month;
 import static org.jooq.impl.DSL.year;
 
+/**
+ * Implementation of {@link DbManager} for PostgreSQL databases.
+ * <p>
+ * Uses <b>jOOQ</b> for code generation for the DB tables/schemas, rather than direct SQL queries. See existing methods for examples.
+ */
 public final class PostgresDbManager implements DbManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PostgresDbManager.class);

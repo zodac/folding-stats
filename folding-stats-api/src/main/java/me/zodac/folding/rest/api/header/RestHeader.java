@@ -1,4 +1,4 @@
-package me.zodac.folding.rest.api;
+package me.zodac.folding.rest.api.header;
 
 /**
  * Set of REST headers and their name.
@@ -6,6 +6,7 @@ package me.zodac.folding.rest.api;
 public enum RestHeader {
 
     AUTHORIZATION("Authorization"),
+    CACHE_CONTROL("Cache-Control"),
     CONTENT_TYPE("Content-Type"),
     IF_NONE_MATCH("If-None-Match");
 

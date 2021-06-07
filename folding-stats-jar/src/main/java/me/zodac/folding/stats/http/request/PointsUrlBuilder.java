@@ -8,7 +8,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class PointsUrlBuilder {
 
-    // We do not care about the team number, as we want the points for user+passkey on all teams
+    // We do not care about the team number, as we want the points for user/passkey on all teams
     // However, the API call requires a team number to be specified, so we'll stick to OCN. :)
     private static final int TEAM_NUMBER = 37_726;
     private static final String STATS_URL_ROOT = EnvironmentVariableUtils.get("STATS_URL_ROOT", "https://api2.foldingathome.org");
@@ -17,17 +17,34 @@ public class PointsUrlBuilder {
     private transient String user;
     private transient String passkey;
 
+    /**
+     * Update the {@link PointsUrlBuilder} with the 'user' for the URL.
+     *
+     * @param user the user for the request
+     * @return the updated {@link PointsUrlBuilder}
+     */
     public PointsUrlBuilder forUser(final String user) {
         this.user = user;
         return this;
     }
 
+    /**
+     * Update the {@link PointsUrlBuilder} with the 'passkey' for the URL.
+     *
+     * @param passkey the passkey for the request
+     * @return the updated {@link PointsUrlBuilder}
+     */
     public PointsUrlBuilder withPasskey(final String passkey) {
         this.passkey = passkey;
         return this;
     }
 
-    public String build() {
+    /**
+     * Build the points REST request URL for a user/passkey.
+     *
+     * @return the URL to request units
+     */
+    public StatsRequestUrl build() {
         if (StringUtils.isBlank(user)) {
             throw new IllegalArgumentException("'user' cannot be null or empty");
         }
@@ -41,6 +58,6 @@ public class PointsUrlBuilder {
             pointsUrl.append("&passkey=").append(passkey);
         }
 
-        return pointsUrl.toString();
+        return StatsRequestUrl.create(pointsUrl);
     }
 }

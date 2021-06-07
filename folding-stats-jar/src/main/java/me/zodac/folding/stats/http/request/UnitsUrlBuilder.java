@@ -14,18 +14,34 @@ public class UnitsUrlBuilder {
     private transient String user;
     private transient String passkey;
 
+    /**
+     * Update the {@link UnitsUrlBuilder} with the 'user' for the URL.
+     *
+     * @param user the user for the request
+     * @return the updated {@link UnitsUrlBuilder}
+     */
     public UnitsUrlBuilder forUser(final String user) {
         this.user = user;
         return this;
     }
 
+    /**
+     * Update the {@link UnitsUrlBuilder} with the 'passkey' for the URL.
+     *
+     * @param passkey the passkey for the request
+     * @return the updated {@link UnitsUrlBuilder}
+     */
     public UnitsUrlBuilder withPasskey(final String passkey) {
         this.passkey = passkey;
         return this;
     }
 
-
-    public String build() {
+    /**
+     * Build the Work Units REST request URL for a user/passkey.
+     *
+     * @return the URL to request units
+     */
+    public StatsRequestUrl build() {
         if (StringUtils.isBlank(user)) {
             throw new IllegalArgumentException("'user' cannot be null or empty");
         }
@@ -36,7 +52,7 @@ public class UnitsUrlBuilder {
             statsUrl.append("&passkey=").append(passkey);
         }
 
-        return statsUrl.toString();
+        return StatsRequestUrl.create(statsUrl);
     }
 }
 

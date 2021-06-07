@@ -1,6 +1,5 @@
 package me.zodac.folding.stats;
 
-import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.exception.FoldingExternalServiceException;
 import me.zodac.folding.api.stats.FoldingStatsDetails;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
@@ -9,16 +8,18 @@ import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.utils.DateTimeUtils;
 import me.zodac.folding.stats.http.request.PointsUrlBuilder;
+import me.zodac.folding.stats.http.request.StatsRequestUrl;
 import me.zodac.folding.stats.http.request.UnitsUrlBuilder;
+import me.zodac.folding.stats.http.response.StatsResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.http.HttpResponse;
 import java.sql.Timestamp;
 
-import static me.zodac.folding.stats.http.request.RequestSender.sendFoldingRequest;
-import static me.zodac.folding.stats.http.response.ResponseParser.getPointsFromResponse;
-import static me.zodac.folding.stats.http.response.ResponseParser.getUnitsFromResponse;
+import static me.zodac.folding.stats.http.request.StatsRequestSender.sendFoldingRequest;
+import static me.zodac.folding.stats.http.response.StatsResponseParser.getPointsFromResponse;
+import static me.zodac.folding.stats.http.response.StatsResponseParser.getUnitsFromResponse;
 
 /**
  * Concrete implementation of {@link FoldingStatsRetriever} that retrieves {@link UserStats} through HTTP calls to the Folding@Home REST API.
@@ -38,7 +39,8 @@ public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
     }
 
     @Override
-    public Stats getStats(final FoldingStatsDetails foldingStatsDetails) throws FoldingException, FoldingExternalServiceException {
+    public Stats getStats(final FoldingStatsDetails foldingStatsDetails) throws FoldingExternalServiceException {
+        LOGGER.debug(""); // Line break to differentiate different users
         LOGGER.debug("Getting stats for username/passkey '{}/{}'", foldingStatsDetails.getFoldingUserName(), foldingStatsDetails.getPasskey());
         final long userPoints = getPoints(foldingStatsDetails);
         final int userUnits = getUnits(foldingStatsDetails);
@@ -47,15 +49,15 @@ public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
 
 
     @Override
-    public UserStats getTotalStats(final User user) throws FoldingException, FoldingExternalServiceException {
+    public UserStats getTotalStats(final User user) throws FoldingExternalServiceException {
         final Timestamp currentUtcTime = DateTimeUtils.currentUtcTimestamp();
         final Stats userStats = getStats(FoldingStatsDetails.createFromUser(user));
         return UserStats.create(user.getId(), currentUtcTime, userStats);
     }
 
     @Override
-    public long getPoints(final FoldingStatsDetails foldingStatsDetails) throws FoldingException, FoldingExternalServiceException {
-        final String pointsRequestUrl = new PointsUrlBuilder()
+    public long getPoints(final FoldingStatsDetails foldingStatsDetails) throws FoldingExternalServiceException {
+        final StatsRequestUrl pointsRequestUrl = new PointsUrlBuilder()
                 .forUser(foldingStatsDetails.getFoldingUserName())
                 .withPasskey(foldingStatsDetails.getPasskey())
                 .build();
@@ -64,12 +66,13 @@ public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
         final HttpResponse<String> response = sendFoldingRequest(pointsRequestUrl);
         LOGGER.debug("Points response: {}", response.body());
 
-        return getPointsFromResponse(response);
+        final StatsResponse statsResponse = StatsResponse.create(response);
+        return getPointsFromResponse(statsResponse);
     }
 
     @Override
-    public int getUnits(final FoldingStatsDetails foldingStatsDetails) throws FoldingException, FoldingExternalServiceException {
-        final String unitsRequestUrl = new UnitsUrlBuilder()
+    public int getUnits(final FoldingStatsDetails foldingStatsDetails) throws FoldingExternalServiceException {
+        final StatsRequestUrl unitsRequestUrl = new UnitsUrlBuilder()
                 .forUser(foldingStatsDetails.getFoldingUserName())
                 .withPasskey(foldingStatsDetails.getPasskey())
                 .build();
@@ -78,6 +81,7 @@ public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
         final HttpResponse<String> response = sendFoldingRequest(unitsRequestUrl);
         LOGGER.debug("Units response: {}", response.body());
 
-        return getUnitsFromResponse(foldingStatsDetails, response);
+        final StatsResponse statsResponse = StatsResponse.create(response);
+        return getUnitsFromResponse(foldingStatsDetails, statsResponse);
     }
 }

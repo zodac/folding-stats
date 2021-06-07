@@ -18,13 +18,18 @@ public final class DbManagerRetriever {
 
     /**
      * Returns a concrete implementation of {@link DbManager}, based on the value of the <b>DEPLOYED_DATABASE</b> environment variable.
+     * <p>
+     * Supported DBs are:
+     * <ul>
+     *     <li>PostgreSQL</li>
+     * </ul>
      *
      * @return the {@link DbManager} instance
      */
     public static DbManager get() {
         final String deployedDatabase = EnvironmentVariableUtils.get(DATABASE_VARIABLE_NAME);
 
-        if ("postgres".equalsIgnoreCase(deployedDatabase)) {
+        if ("postgresql".equalsIgnoreCase(deployedDatabase)) {
             return PostgresDbManager.create(PostgresDbConnectionPool.create());
         }
         throw new IllegalStateException(String.format("Unable to find database of type using variable '%s': %s", DATABASE_VARIABLE_NAME, deployedDatabase));

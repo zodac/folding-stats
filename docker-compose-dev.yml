@@ -53,7 +53,7 @@ services:
       STATS_PARSING_SCHEDULE_MINUTE: "55"
       STATS_PARSING_SCHEDULE_SECOND: "0"
       # Database configuration
-      DEPLOYED_DATABASE: "postgres"
+      DEPLOYED_DATABASE: "postgresql"
       JDBC_CONNECTION_URL: "jdbc:postgresql://192.168.99.100:5433/folding_db" # TODO: [zodac] Not working with 'postgres_dev' as host
       JDBC_CONNECTION_USER: "folding_user"
       JDBC_CONNECTION_PASSWORD: "shroot"

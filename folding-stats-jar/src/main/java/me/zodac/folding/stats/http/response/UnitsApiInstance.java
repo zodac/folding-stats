@@ -9,7 +9,9 @@ import lombok.ToString;
 import java.util.Comparator;
 
 /**
- * Valid response:
+ * Response returned from {@link me.zodac.folding.stats.http.request.UnitsUrlBuilder} for a user/passkey.
+ * <p>
+ * Expected response:
  * <pre>
  *     [
  *         {

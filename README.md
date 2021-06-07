@@ -1,14 +1,16 @@
+# Still a work in progress!
+
 # Folding Stats
 
 ## Development
 
 ### jOOQ Database Access
 
-We use **jOOQ** for generating SQL queries (as seen in *PostgresDbManager.java*). We use **jOOQ** code generation to
-generate files to make query builder simpler and able to conform to schemas. This requires a few steps when the DB
-changes:
+We use **jOOQ** for generating PostgreSQL queries (as seen in *PostgresDbManager.java*). We use **jOOQ** code generation
+to generate files to make SQL query building simpler and able to conform to schemas. This requires a few steps when the
+DB changes:
 
-- Start the test containers ("Executing tests")
+- Start the test containers (--> "Executing tests" <-- )
 - Update the `docker/postgres/jooq/jooq-config.xml` file with the DB connection properties if not using the default
 - Run the `generate.bat` batch file, which will generate the schemas (starting in a directory named `me`)
 - Traverse the `me` directory until you get to `gen` (full path is `me/zodac/folding/db/postgres/gen`)
@@ -18,6 +20,22 @@ changes:
 
 Once this is done, it will be possible to reference the DB tables/fields/schema from *PostgresDbManager.java* to assist
 with SQL query generation.
+
+### Adding Support for Another Database
+
+Since the system is containerised, it is possible to swap out the default PostgreSQL DB for an alternative. The steps
+required for this are:
+
+- Update docker-compose.yml:
+    - Remove the PostgreSQL DB `postgres` container
+    - Add the new DB container (if containerised)
+    - Update the `wildfly` container environment variables for "Database configuration"
+- Add support for the new DB container in code:
+    - Update *DbManagerRetriever.java* with a new SWITCH condition for the DB name
+    - Implement the *DbManager.java* interface, with code stored in
+      the `folding-stats-jar/src/main/java/me/zodac/folding/db/<DB_NAME>` package
+    - Optionally, use the instructions in --> jooQ Database Access <-- to run jOOQ code generation for easier SQL query
+      building
 
 ### JS/CSS Updates
 

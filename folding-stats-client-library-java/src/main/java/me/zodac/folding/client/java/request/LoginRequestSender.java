@@ -6,10 +6,10 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.utils.EncodingUtils;
-import me.zodac.folding.rest.api.ContentType;
 import me.zodac.folding.rest.api.LoginCredentials;
-import me.zodac.folding.rest.api.RestHeader;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
+import me.zodac.folding.rest.api.header.ContentType;
+import me.zodac.folding.rest.api.header.RestHeader;
 
 import java.io.IOException;
 import java.net.URI;

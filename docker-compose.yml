@@ -55,7 +55,7 @@ services:
       STATS_PARSING_SCHEDULE_MINUTE: "55"
       STATS_PARSING_SCHEDULE_SECOND: "0"
       # Database configuration
-      DEPLOYED_DATABASE: "postgres"
+      DEPLOYED_DATABASE: "postgresql"
       JDBC_CONNECTION_URL: "jdbc:postgresql://postgres:5432/folding_db"
       JDBC_CONNECTION_USER: "folding_user"
       JDBC_CONNECTION_PASSWORD: "shroot"

@@ -123,8 +123,6 @@ public class UserTeamCompetitionStatsParser {
             return FOLDING_STATS_RETRIEVER.getTotalStats(user);
         } catch (final FoldingExternalServiceException e) {
             LOGGER.warn("Error connecting to Folding@Home API at '{}'", e.getUrl(), e);
-        } catch (final FoldingException e) {
-            LOGGER.warn("Error sending request to Folding@Home API", e.getCause());
         }
 
         return UserStats.empty();

@@ -1,4 +1,4 @@
-package me.zodac.folding.rest.api;
+package me.zodac.folding.rest.api.header;
 
 /**
  * Values for {@link RestHeader#CONTENT_TYPE} REST headers.

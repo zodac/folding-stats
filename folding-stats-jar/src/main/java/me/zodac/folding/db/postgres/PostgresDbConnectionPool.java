@@ -33,6 +33,11 @@ public final class PostgresDbConnectionPool implements DbConnectionPool {
 
     }
 
+    /**
+     * Creates an instance of {@link PostgresDbConnectionPool}.
+     *
+     * @return the created {@link PostgresDbConnectionPool}
+     */
     public static PostgresDbConnectionPool create() {
         return new PostgresDbConnectionPool();
     }

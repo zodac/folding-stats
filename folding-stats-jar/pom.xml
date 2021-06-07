@@ -35,12 +35,10 @@
         <dependency>
             <groupId>org.jooq</groupId>
             <artifactId>jooq</artifactId>
-            <version>3.14.11</version>
         </dependency>
         <dependency>
             <groupId>org.jooq</groupId>
             <artifactId>jooq-meta</artifactId>
-            <version>3.14.11</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
