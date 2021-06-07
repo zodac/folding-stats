@@ -492,12 +492,13 @@ public class BusinessLogic {
         }
     }
 
+    @SuppressWarnings("PMD.ConfusingTernary") // False positive
     public SystemUserAuthentication authenticateSystemUser(final String userName, final String password) throws FoldingException {
         final SystemUserAuthentication systemUserAuthentication = dbManager.authenticateSystemUser(userName, password);
 
         if (systemUserAuthentication.isUserExists() && systemUserAuthentication.isPasswordMatch()) {
             LOGGER.debug("System user '{}' successfully logged in", userName);
-        } else if (!systemUserAuthentication.isUserExists()) { // NOPMD: ConfusingTernary false positive
+        } else if (!systemUserAuthentication.isUserExists()) {
             LOGGER.debug("No system user with name: '{}'", userName);
         } else if (!systemUserAuthentication.isPasswordMatch()) {
             LOGGER.debug("Invalid password supplied for user: '{}'", userName);

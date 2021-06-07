@@ -58,6 +58,7 @@
         <maven-war-plugin.version>3.3.1</maven-war-plugin.version>
 
         <!-- Linter 3PP Versions -->
+        <errorprone.version>2.7.1</errorprone.version>
         <spotbugs.version>4.2.3</spotbugs.version>
         <pmd.version>6.35.0</pmd.version>
 
@@ -199,6 +200,37 @@
                     <version>${maven-compiler-plugin.version}</version>
                     <configuration>
                         <release>${java-release}</release>
+
+                        <!-- Configuration for errorprone compiler checks -->
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>com.google.errorprone</groupId>
+                                <artifactId>error_prone_core</artifactId>
+                                <version>${errorprone.version}</version>
+                            </path>
+
+                            <!-- The errorprone checks will fail unless Lombok is also added -->
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>${lombok.version}</version>
+                            </path>
+                        </annotationProcessorPaths>
+                        <fork>true</fork>
+                        <compilerArgs>
+                            <arg>-XDcompilePolicy=simple</arg>
+                            <arg>-Xplugin:ErrorProne</arg>
+                            <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
+                            <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
+                            <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
+                            <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED</arg>
+                            <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED</arg>
+                            <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED</arg>
+                            <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</arg>
+                            <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
+                            <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
+                            <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
+                        </compilerArgs>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -346,7 +378,7 @@
             <id>activate_all</id>
             <activation>
                 <property>
-                    <name>ts</name> <!-- Name technically means 'testsuite', but it's just what I'm used to running -->
+                    <name>ts</name> <!-- Name means 'testsuite', but it's just what I'm used to running from work -->
                 </property>
             </activation>
             <properties>

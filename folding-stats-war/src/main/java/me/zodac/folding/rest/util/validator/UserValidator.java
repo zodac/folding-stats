@@ -43,7 +43,8 @@ public final class UserValidator {
         return new UserValidator(businessLogic, foldingStatsRetriever);
     }
 
-    public ValidationResponse<User> validateCreate(final UserRequest userRequest) { // NOPMD: NPathComplexity is high but better than the alternative of breaking into smaller functions
+    @SuppressWarnings("PMD.NPathComplexity") // Better than breaking into smaller functions
+    public ValidationResponse<User> validateCreate(final UserRequest userRequest) {
         if (userRequest == null) {
             return ValidationResponse.nullObject();
         }
@@ -130,7 +131,8 @@ public final class UserValidator {
         return ValidationResponse.failure(userRequest, failureMessages);
     }
 
-    public ValidationResponse<User> validateUpdate(final UserRequest userRequest) { // NOPMD: NPathComplexity is high but better than the alternative of breaking into smaller functions
+    @SuppressWarnings("PMD.NPathComplexity") // Better than breaking into smaller functions
+    public ValidationResponse<User> validateUpdate(final UserRequest userRequest) {
         if (userRequest == null) {
             return ValidationResponse.nullObject();
         }

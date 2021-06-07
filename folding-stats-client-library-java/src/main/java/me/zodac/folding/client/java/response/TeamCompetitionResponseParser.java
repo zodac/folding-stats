@@ -3,7 +3,6 @@ package me.zodac.folding.client.java.response;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import lombok.experimental.UtilityClass;
 import me.zodac.folding.client.java.request.TeamCompetitionStatsRequestSender;
 import me.zodac.folding.rest.api.tc.CompetitionResult;
 import me.zodac.folding.rest.api.tc.UserResult;
@@ -17,12 +16,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * {@link UtilityClass} used to parse a {@link HttpResponse} returned from {@link TeamCompetitionStatsRequestSender}.
+ * Utility class used to parse a {@link HttpResponse} returned from {@link TeamCompetitionStatsRequestSender}.
  */
-@UtilityClass
 public final class TeamCompetitionResponseParser {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+
+    private TeamCompetitionResponseParser() {
+        
+    }
 
     /**
      * Returns the {@link CompetitionResult} retrieved by {@link TeamCompetitionStatsRequestSender#getStats()}.

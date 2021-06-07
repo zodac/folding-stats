@@ -1,15 +1,12 @@
 package me.zodac.folding.api.utils;
 
-import lombok.experimental.UtilityClass;
-
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Map;
 
 /**
- * {@link UtilityClass} to assist with encoding or decoding {@link String}s for authentication.
+ * Utility class to assist with encoding or decoding {@link String}s for authentication.
  */
-@UtilityClass
 public final class EncodingUtils {
 
     public static final String DECODED_USERNAME_KEY = "userName";
@@ -17,6 +14,10 @@ public final class EncodingUtils {
     public static final String BASIC_AUTHENTICATION_SCHEME = "Basic ";
 
     private static final String DECODED_USERNAME_PASSWORD_DELIMITER = ":";
+
+    private EncodingUtils() {
+
+    }
 
     /**
      * Encodes the provided {@code userName} and {@code password} for basic authentication. Takes the {@code userName}

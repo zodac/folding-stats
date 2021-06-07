@@ -33,9 +33,10 @@ class IntegerRankingCollector<T> implements Collector<T, List<T>, List<T>> {
     }
 
     @Override
+    @SuppressWarnings("ReturnValueIgnored") // False positive
     public BiConsumer<List<T>, T> accumulator() {
         return (list, current) -> {
-            final List<T> right = new ArrayList<>();
+            final List<T> right = new ArrayList<>(1);
             right.add(creator.apply(current, 1));
             combiner().apply(list, right);
         };

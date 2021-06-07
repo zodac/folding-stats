@@ -2,7 +2,6 @@ package me.zodac.folding.rest.util.response;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import lombok.experimental.UtilityClass;
 import me.zodac.folding.api.ResponsePojo;
 
 import javax.ws.rs.core.Response;
@@ -10,15 +9,18 @@ import javax.ws.rs.core.UriBuilder;
 import java.util.Collection;
 
 /**
- * {@link UtilityClass} to simplify returning a {@link Response} in the REST layer.
+ * Utility class to simplify returning a {@link Response} in the REST layer.
  * <p>
  * For most use-cases we return a {@link Response}, but for more complex use-cases, we can return a {@link Response.ResponseBuilder}
  * to allow the REST function to decide to add additional logic (like a {@link javax.ws.rs.core.CacheControl} or similar).
  */
-@UtilityClass
 public final class Responses {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+
+    private Responses() {
+        
+    }
 
     /**
      * A <b>200_OK</b> {@link Response}.

@@ -3,7 +3,6 @@ package me.zodac.folding.client.java.response;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import lombok.experimental.UtilityClass;
 import me.zodac.folding.api.tc.User;
 
 import java.lang.reflect.Type;
@@ -11,12 +10,15 @@ import java.net.http.HttpResponse;
 import java.util.Collection;
 
 /**
- * {@link UtilityClass} used to parse a {@link HttpResponse} returned from {@link me.zodac.folding.client.java.request.UserRequestSender}.
+ * Utility class used to parse a {@link HttpResponse} returned from {@link me.zodac.folding.client.java.request.UserRequestSender}.
  */
-@UtilityClass
 public final class UserResponseParser {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+
+    private UserResponseParser() {
+        
+    }
 
     /**
      * Returns the {@link User}s retrieved by {@link me.zodac.folding.client.java.request.UserRequestSender#getAll()}.

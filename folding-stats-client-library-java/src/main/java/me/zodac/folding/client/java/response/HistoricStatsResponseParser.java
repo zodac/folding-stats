@@ -3,7 +3,6 @@ package me.zodac.folding.client.java.response;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import lombok.experimental.UtilityClass;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 
 import java.lang.reflect.Type;
@@ -13,12 +12,15 @@ import java.time.Year;
 import java.util.Collection;
 
 /**
- * {@link UtilityClass} used to parse a {@link HttpResponse} returned from {@link me.zodac.folding.client.java.request.HistoricStatsRequestSender}.
+ * Utility class used to parse a {@link HttpResponse} returned from {@link me.zodac.folding.client.java.request.HistoricStatsRequestSender}.
  */
-@UtilityClass
 public final class HistoricStatsResponseParser {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+
+    private HistoricStatsResponseParser() {
+
+    }
 
     /**
      * Returns the {@link HistoricStats} retrieved by {@link me.zodac.folding.client.java.request.HistoricStatsRequestSender#getHourlyUserStats(int, Year, Month, int, String)}.
