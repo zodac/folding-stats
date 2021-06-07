@@ -1,5 +1,6 @@
 package me.zodac.folding.db.postgres;
 
+import me.zodac.folding.api.db.SystemUserAuthentication;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.OperatingSystem;
@@ -21,12 +22,15 @@ import me.zodac.folding.db.postgres.gen.tables.records.UsersRecord;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import org.jooq.Record;
 
+import java.util.Set;
+
 import static me.zodac.folding.db.postgres.gen.tables.Hardware.HARDWARE;
+import static me.zodac.folding.db.postgres.gen.tables.SystemUsers.SYSTEM_USERS;
 import static me.zodac.folding.db.postgres.gen.tables.Teams.TEAMS;
 import static me.zodac.folding.db.postgres.gen.tables.Users.USERS;
 
 /**
- * Utility class that converts a {@link org.jooq.Record} into another POJO for {@link PostgresDbManager}.
+ * Utility class that converts a {@link Record} into another POJO for {@link PostgresDbManager}.
  */
 final class RecordConverter {
 
@@ -183,5 +187,22 @@ final class RecordConverter {
                         retiredUserStatsRecord.getFinalUnits()
                 )
         );
+    }
+
+    /**
+     * Convert a {@link Record} into an appropriate {@link SystemUserAuthentication}.
+     * Expects a field called <code>is_password_match</code> as a {@link Boolean} value determining whether
+     * a supplied password matches a has in the DB.
+     *
+     * @param systemUsersRecord the {@link Record} to convert
+     * @return {@link SystemUserAuthentication#getUserRoles()} if a valid password was supplied, or else {@link SystemUserAuthentication#invalidPassword()}
+     */
+    static SystemUserAuthentication toSystemUserAuthentication(final Record systemUsersRecord) {
+        if (systemUsersRecord.get("is_password_match", Boolean.class)) {
+            final Set<String> roles = Set.of(systemUsersRecord.into(SYSTEM_USERS).getRoles());
+            return SystemUserAuthentication.success(roles);
+        }
+
+        return SystemUserAuthentication.invalidPassword();
     }
 }

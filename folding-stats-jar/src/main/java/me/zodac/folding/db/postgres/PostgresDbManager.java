@@ -36,12 +36,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 
 import static java.util.stream.Collectors.toList;
+import static me.zodac.folding.db.postgres.gen.Routines.crypt;
 import static me.zodac.folding.db.postgres.gen.tables.Hardware.HARDWARE;
 import static me.zodac.folding.db.postgres.gen.tables.RetiredUserStats.RETIRED_USER_STATS;
+import static me.zodac.folding.db.postgres.gen.tables.SystemUsers.SYSTEM_USERS;
 import static me.zodac.folding.db.postgres.gen.tables.Teams.TEAMS;
 import static me.zodac.folding.db.postgres.gen.tables.UserInitialStats.USER_INITIAL_STATS;
 import static me.zodac.folding.db.postgres.gen.tables.UserOffsetTcStats.USER_OFFSET_TC_STATS;
@@ -49,6 +50,7 @@ import static me.zodac.folding.db.postgres.gen.tables.UserTcStatsHourly.USER_TC_
 import static me.zodac.folding.db.postgres.gen.tables.UserTotalStats.USER_TOTAL_STATS;
 import static me.zodac.folding.db.postgres.gen.tables.Users.USERS;
 import static org.jooq.impl.DSL.day;
+import static org.jooq.impl.DSL.field;
 import static org.jooq.impl.DSL.hour;
 import static org.jooq.impl.DSL.max;
 import static org.jooq.impl.DSL.month;
@@ -897,39 +899,36 @@ public final class PostgresDbManager implements DbManager {
     public SystemUserAuthentication authenticateSystemUser(final String userName, final String password) throws FoldingException {
         LOGGER.debug("Checking if supplied user name '{}' and password is valid user, then returning roles", userName);
 
-        final String selectSql = "SELECT user_password_hash = crypt(?, user_password_hash) AS is_password_match, roles " +
-                "FROM system_users " +
-                "WHERE user_name = ?;";
+        return executeQuery((queryContext) -> {
+            final var query = queryContext
+                    .select(
+                            field(crypt(password, SYSTEM_USERS.USER_PASSWORD_HASH.getValue(
+                                    queryContext
+                                            .select()
+                                            .from(SYSTEM_USERS)
+                                            .where(SYSTEM_USERS.USER_NAME.equalIgnoreCase(userName))
+                                            .fetch()
+                                            .into(SYSTEM_USERS)
+                                            .stream()
+                                            .findAny()
+                                            .orElse(SYSTEM_USERS.newRecord())
+                                    )
+                            ).equal(SYSTEM_USERS.USER_PASSWORD_HASH)).as("is_password_match"),
+                            SYSTEM_USERS.USER_NAME,
+                            SYSTEM_USERS.ROLES
+                    )
+                    .from(SYSTEM_USERS)
+                    .where(SYSTEM_USERS.USER_NAME.equal(userName));
+            LOGGER.debug("Executing SQL: '{}'", query);
 
-        LOGGER.debug("Executing prepared statement (without password): {}", selectSql);
-        try (final Connection connection = dbConnectionPool.getConnection();
-             final PreparedStatement preparedStatement = connection.prepareStatement(selectSql)) {
-            try {
-                preparedStatement.setString(1, password);
-                preparedStatement.setString(2, userName);
-
-                try (final ResultSet resultSet = preparedStatement.executeQuery()) {
-                    if (resultSet.next()) {
-                        final boolean isPasswordMatch = resultSet.getBoolean("is_password_match");
-
-                        if (!isPasswordMatch) {
-                            LOGGER.debug("Invalid password supplied for user: {}", userName);
-                            return SystemUserAuthentication.invalidPassword();
-                        }
-
-                        return SystemUserAuthentication.success(Set.of((String[]) resultSet.getArray("roles").getArray()));
-                    }
-                }
-                LOGGER.debug("No entries found for user: {}", userName);
-                return SystemUserAuthentication.userDoesNotExist();
-            } catch (final SQLException e) {
-                throw new FoldingException("Error when validating user", e);
-            }
-        } catch (final SQLException e) {
-            throw new FoldingException("Error opening connection to the DB", e);
-        }
+            return query
+                    .fetch()
+                    .stream()
+                    .map(RecordConverter::toSystemUserAuthentication)
+                    .findAny()
+                    .orElse(SystemUserAuthentication.userDoesNotExist());
+        });
     }
-
 
     private <T> T executeQuery(final Function<DSLContext, T> sqlQuery) throws FoldingException {
         try (final Connection connection = dbConnectionPool.getConnection()) {

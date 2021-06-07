@@ -2,6 +2,8 @@ package me.zodac.folding.db.postgres;
 
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
 import me.zodac.folding.api.db.DbConnectionPool;
+import org.junit.platform.commons.logging.Logger;
+import org.junit.platform.commons.logging.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -23,10 +25,13 @@ import static java.util.stream.Collectors.toList;
  */
 public final class TestDbConnectionPool implements DbConnectionPool {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestDbConnectionPool.class);
+
     private transient final DataSource dataSource;
 
     private TestDbConnectionPool() {
         try {
+            LOGGER.info(() -> "Configuring test DB...");
             dataSource = EmbeddedPostgres.builder().start().getPostgresDatabase();
             createDatabaseTables();
         } catch (final Exception e) {
