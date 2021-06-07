@@ -33,7 +33,7 @@ public class UserTeamCompetitionStatsParser {
     private static final FoldingStatsRetriever FOLDING_STATS_RETRIEVER = HttpFoldingStatsRetriever.create();
 
     @EJB
-    private transient BusinessLogic businessLogic;
+    private transient OldFacade oldFacade;
 
     /**
      * Parses the latest TC stats for the given {@link User}.
@@ -84,13 +84,13 @@ public class UserTeamCompetitionStatsParser {
         }
 
         try {
-            businessLogic.persistTotalStatsForUser(totalStats);
+            oldFacade.persistTotalStatsForUser(totalStats);
         } catch (final FoldingException e) {
             LOGGER.warn("Error persisting total user stats", e.getCause());
             return;
         }
 
-        final Optional<Hardware> hardware = businessLogic.getHardwareForUser(user);
+        final Optional<Hardware> hardware = oldFacade.getHardwareForUser(user);
         if (hardware.isEmpty()) {
             LOGGER.warn("Unable to find hardware multiplier for user: {}", user);
             return;
@@ -106,13 +106,13 @@ public class UserTeamCompetitionStatsParser {
         final int units = Math.max(0, totalStats.getUnits() - initialStats.getUnits());
         final UserTcStats statsBeforeOffset = UserTcStats.create(user.getId(), totalStats.getTimestamp(), points, multipliedPoints, units);
 
-        final UserTcStats hourlyUserTcStats = UserTcStats.updateWithOffsets(statsBeforeOffset, offsetStats);
+        final UserTcStats hourlyUserTcStats = statsBeforeOffset.updateWithOffsets(offsetStats);
         LOGGER.debug("{}: {} total points (unmultiplied) | {} total units", user.getDisplayName(), formatWithCommas(totalStats.getPoints()), formatWithCommas(totalStats.getUnits()));
         LOGGER.debug("{}: {} TC points (pre-offset) | {} TC units (pre-offset)", user.getDisplayName(), formatWithCommas(multipliedPoints), formatWithCommas(units));
         LOGGER.info("{}: {} TC points | {} TC units", user.getDisplayName(), formatWithCommas(hourlyUserTcStats.getMultipliedPoints()), formatWithCommas(hourlyUserTcStats.getUnits()));
 
         try {
-            businessLogic.persistHourlyTcStatsForUser(hourlyUserTcStats);
+            oldFacade.persistHourlyTcStatsForUser(hourlyUserTcStats);
         } catch (final FoldingException e) {
             LOGGER.error("Error persisting hourly TC stats", e.getCause());
         }
@@ -130,7 +130,7 @@ public class UserTeamCompetitionStatsParser {
 
     private Stats getInitialStatsForUserOrEmpty(final User user) {
         try {
-            return businessLogic.getInitialStatsForUser(user.getId());
+            return oldFacade.getInitialStatsForUser(user.getId());
         } catch (final FoldingException e) {
             LOGGER.warn("Error getting initial user stats for user: {}", user, e.getCause());
         }
@@ -140,7 +140,7 @@ public class UserTeamCompetitionStatsParser {
 
     private OffsetStats getOffsetStatsForUserOrEmpty(final User user) {
         try {
-            return businessLogic.getOffsetStatsForUser(user.getId());
+            return oldFacade.getOffsetStatsForUser(user.getId());
         } catch (final FoldingException e) {
             LOGGER.warn("Error getting user offset stats for user: {}", user, e.getCause());
         }

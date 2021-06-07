@@ -131,7 +131,7 @@ final class RecordConverter {
      * @return the converted {@link UserStats}
      */
     static UserStats toUserStats(final UserTotalStatsRecord userTotalStatsRecord) {
-        return UserStats.createWithPointsAndUnits(
+        return UserStats.create(
                 userTotalStatsRecord.getUserId(),
                 DateTimeUtils.toTimestamp(userTotalStatsRecord.getUtcTimestamp()),
                 userTotalStatsRecord.getTotalPoints(),
@@ -146,7 +146,7 @@ final class RecordConverter {
      * @return the converted {@link UserStats}
      */
     static UserStats toUserStats(final UserInitialStatsRecord userInitialStatsRecord) {
-        return UserStats.createWithPointsAndUnits(
+        return UserStats.create(
                 userInitialStatsRecord.getUserId(),
                 DateTimeUtils.toTimestamp(userInitialStatsRecord.getUtcTimestamp()),
                 userInitialStatsRecord.getInitialPoints(),

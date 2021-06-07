@@ -41,7 +41,7 @@ public class TeamCompetitionResetScheduler {
     private static final boolean IS_MONTHLY_RESET_ENABLED = Boolean.parseBoolean(EnvironmentVariableUtils.get("ENABLE_STATS_MONTHLY_RESET", "false"));
 
     @EJB
-    private transient BusinessLogic businessLogic;
+    private transient OldFacade oldFacade;
 
     @EJB
     private transient TeamCompetitionStatsScheduler teamCompetitionStatsScheduler;
@@ -70,7 +70,7 @@ public class TeamCompetitionResetScheduler {
     public void manualResetTeamCompetitionStats() {
         final Collection<Team> teams;
         try {
-            teams = businessLogic.getAllTeams();
+            teams = oldFacade.getAllTeams();
             if (teams.isEmpty()) {
                 LOGGER.error("No TC teams configured in system!");
                 return;
@@ -92,7 +92,7 @@ public class TeamCompetitionResetScheduler {
 
         try {
             LOGGER.info("Deleting retired users");
-            businessLogic.deleteRetiredUserStats();
+            oldFacade.deleteRetiredUserStats();
         } catch (final FoldingException e) {
             LOGGER.error("Unable to reset retired stats", e);
         }
@@ -110,7 +110,7 @@ public class TeamCompetitionResetScheduler {
 
     private Collection<User> getAllUsers() {
         try {
-            return businessLogic.getAllUsers();
+            return oldFacade.getAllUsers();
         } catch (final FoldingException e) {
             LOGGER.warn("Error getting all users to reset stats", e);
             return Collections.emptyList();
@@ -120,7 +120,7 @@ public class TeamCompetitionResetScheduler {
     private void clearOffsets() {
         try {
             LOGGER.info("Clearing offsets");
-            businessLogic.clearOffsetStats();
+            oldFacade.clearOffsetStats();
         } catch (final FoldingException e) {
             LOGGER.warn("Error clearing offset stats for users", e.getCause());
         } catch (final Exception e) {
@@ -133,7 +133,7 @@ public class TeamCompetitionResetScheduler {
         for (final User user : usersToReset) {
             try {
                 LOGGER.info("Resetting TC stats for {}", user.getDisplayName());
-                businessLogic.updateInitialStatsForUser(user);
+                oldFacade.updateInitialStatsForUser(user);
             } catch (final UserNotFoundException e) {
                 LOGGER.warn("No user found to reset TC stats: {}", user);
             } catch (final FoldingException e) {

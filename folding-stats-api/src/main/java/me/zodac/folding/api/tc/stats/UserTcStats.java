@@ -1,7 +1,5 @@
 package me.zodac.folding.api.tc.stats;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -9,47 +7,84 @@ import me.zodac.folding.api.utils.DateTimeUtils;
 
 import java.sql.Timestamp;
 
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+/**
+ * POJO that extends {@link UserStats} adding multiplied points for a <code>Team Competition</code>
+ * {@link me.zodac.folding.api.tc.User}, based on a hardware multiplier.
+ */
 @Getter
-@EqualsAndHashCode
-@ToString(doNotUseGetters = true)
-public class UserTcStats {
+@EqualsAndHashCode(callSuper = true)
+@ToString(doNotUseGetters = true, callSuper = true)
+public class UserTcStats extends UserStats {
 
     private static final long DEFAULT_POINTS = 0L;
     private static final long DEFAULT_MULTIPLIED_POINTS = 0L;
     private static final int DEFAULT_UNITS = 0;
 
-    private final int userId;
-    private final Timestamp timestamp;
-    private final long points;
     private final long multipliedPoints;
-    private final int units;
 
+    protected UserTcStats(final int userId, final Timestamp timestamp, final long points, final long multipliedPoints, final int units) {
+        super(userId, timestamp, points, units);
+        this.multipliedPoints = multipliedPoints;
+    }
+
+    /**
+     * Creates an instance of {@link UserTcStats}.
+     *
+     * @param userId           the ID of the {@link me.zodac.folding.api.tc.User}
+     * @param timestamp        the {@link Timestamp} the {@link UserTcStats} were retrieved
+     * @param points           the points
+     * @param multipliedPoints the multiplied points
+     * @param units            the units
+     * @return the created {@link UserTcStats}
+     */
     public static UserTcStats create(final int userId, final Timestamp timestamp, final long points, final long multipliedPoints, final int units) {
         return new UserTcStats(userId, timestamp, points, multipliedPoints, units);
     }
 
-    public static UserTcStats createWithoutTimestamp(final int userId, final long points, final long multipliedPoints, final int units) {
+    /**
+     * Creates an instance of {@link UserTcStats}. Assumes the {@link UserTcStats} were retrieved at {@link DateTimeUtils#currentUtcTimestamp()}.
+     *
+     * @param userId           the ID of the {@link me.zodac.folding.api.tc.User}
+     * @param points           the points
+     * @param multipliedPoints the multiplied points
+     * @param units            the units
+     * @return the created {@link UserTcStats}
+     */
+    public static UserTcStats createNow(final int userId, final long points, final long multipliedPoints, final int units) {
         return new UserTcStats(userId, DateTimeUtils.currentUtcTimestamp(), points, multipliedPoints, units);
     }
 
+    /**
+     * Creates an empty instance of {@link UserTcStats}, with no values. Can be used where no stats are necessary, but
+     * an {@link java.util.Optional} is not clean enough.
+     *
+     * @param userId the ID of the {@link me.zodac.folding.api.tc.User}
+     * @return the empty {@link UserTcStats}
+     */
     public static UserTcStats empty(final int userId) {
         return new UserTcStats(userId, DateTimeUtils.currentUtcTimestamp(), DEFAULT_POINTS, DEFAULT_MULTIPLIED_POINTS, DEFAULT_UNITS);
     }
 
-    public static UserTcStats updateWithOffsets(final UserTcStats tcStatsForUser, final OffsetStats offsetStats) {
-        final long offsetPoints = Math.max(tcStatsForUser.getPoints() + offsetStats.getPointsOffset(), 0);
-        final long offsetMultipliedPoints = Math.max(tcStatsForUser.getMultipliedPoints() + offsetStats.getMultipliedPointsOffset(), 0);
-        final int offsetUnits = Math.max(tcStatsForUser.getUnits() + offsetStats.getUnitsOffset(), 0);
+    /**
+     * Creates a new instance of {@link UserTcStats} with {@link OffsetStats}. Can be used when retrieving a current
+     * {@link me.zodac.folding.api.tc.User}'s {@link UserTcStats} and wanted to make an offset.
+     * <p>
+     * In case the {@link OffsetStats} values are greater than the {@link UserTcStats}, the values will not be negative
+     * and will be set to <b>0L</b>
+     *
+     * @param offsetStats the {@link OffsetStats} to apply
+     * @return the new {@link UserTcStats} instances with {@link OffsetStats} applied
+     */
+    public UserTcStats updateWithOffsets(final OffsetStats offsetStats) {
+        final long offsetPoints = Math.max(getPoints() + offsetStats.getPointsOffset(), DEFAULT_POINTS);
+        final long offsetMultipliedPoints = Math.max(multipliedPoints + offsetStats.getMultipliedPointsOffset(), DEFAULT_MULTIPLIED_POINTS);
+        final int offsetUnits = Math.max(getUnits() + offsetStats.getUnitsOffset(), DEFAULT_UNITS);
 
-        return new UserTcStats(tcStatsForUser.getUserId(), tcStatsForUser.getTimestamp(), offsetPoints, offsetMultipliedPoints, offsetUnits);
+        return new UserTcStats(getUserId(), getTimestamp(), offsetPoints, offsetMultipliedPoints, offsetUnits);
     }
 
-    public Timestamp getTimestamp() {
-        return new Timestamp(timestamp.getTime());
-    }
-
+    @Override
     public boolean isEmpty() {
-        return points == DEFAULT_POINTS && multipliedPoints == DEFAULT_MULTIPLIED_POINTS && units == DEFAULT_UNITS;
+        return multipliedPoints == DEFAULT_MULTIPLIED_POINTS && super.isEmpty();
     }
 }

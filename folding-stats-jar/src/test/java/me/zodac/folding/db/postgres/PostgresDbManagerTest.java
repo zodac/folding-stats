@@ -13,7 +13,6 @@ import me.zodac.folding.api.tc.exception.TeamNotFoundException;
 import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.stats.OffsetStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
-import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.api.utils.DateTimeUtils;
@@ -175,12 +174,15 @@ class PostgresDbManagerTest {
         assertThatThrownBy(() -> POSTGRES_DB_MANAGER.getInitialStats(userId).orElseThrow(FoldingException::new))
                 .isInstanceOf(FoldingException.class);
 
-        final Stats newStats = Stats.create(100L, 5);
-        POSTGRES_DB_MANAGER.persistInitialStats(UserStats.createWithoutTimestamp(userId, newStats));
+        final long points = 100L;
+        final int units = 10;
+        POSTGRES_DB_MANAGER.persistInitialStats(UserStats.create(userId, DateTimeUtils.currentUtcTimestamp(), points, units));
 
         final UserStats userStatsAfterUpdate = POSTGRES_DB_MANAGER.getInitialStats(userId).orElseThrow(FoldingException::new);
-        assertThat(userStatsAfterUpdate.getStats())
-                .isEqualTo(newStats);
+        assertThat(userStatsAfterUpdate.getPoints())
+                .isEqualTo(points);
+        assertThat(userStatsAfterUpdate.getUnits())
+                .isEqualTo(units);
     }
 
     @Test
@@ -190,12 +192,15 @@ class PostgresDbManagerTest {
         assertThatThrownBy(() -> POSTGRES_DB_MANAGER.getTotalStats(userId).orElseThrow(FoldingException::new))
                 .isInstanceOf(FoldingException.class);
 
-        final Stats newStats = Stats.create(100L, 5);
-        POSTGRES_DB_MANAGER.persistTotalStats(UserStats.createWithoutTimestamp(userId, newStats));
+        final long points = 100L;
+        final int units = 10;
+        POSTGRES_DB_MANAGER.persistTotalStats(UserStats.create(userId, DateTimeUtils.currentUtcTimestamp(), points, units));
 
         final UserStats userStatsAfterUpdate = POSTGRES_DB_MANAGER.getTotalStats(userId).orElseThrow(FoldingException::new);
-        assertThat(userStatsAfterUpdate.getStats())
-                .isEqualTo(newStats);
+        assertThat(userStatsAfterUpdate.getPoints())
+                .isEqualTo(points);
+        assertThat(userStatsAfterUpdate.getUnits())
+                .isEqualTo(units);
     }
 
     @Test
@@ -213,7 +218,7 @@ class PostgresDbManagerTest {
         final int units = 5;
 
         POSTGRES_DB_MANAGER.persistRetiredUserStats(team.getId(), userToRetire.getId(), userToRetire.getDisplayName(),
-                UserTcStats.createWithoutTimestamp(userToRetire.getId(), points, multipliedPoints, units));
+                UserTcStats.createNow(userToRetire.getId(), points, multipliedPoints, units));
 
         final Collection<RetiredUserTcStats> retiredUserStatsForTeam = POSTGRES_DB_MANAGER.getRetiredUserStatsForTeam(team);
 
@@ -290,7 +295,7 @@ class PostgresDbManagerTest {
         final long points = 100L;
         final long multipliedPoints = 1_000L;
         final int units = 5;
-        final UserTcStats userTcStats = UserTcStats.createWithoutTimestamp(userId, points, multipliedPoints, units);
+        final UserTcStats userTcStats = UserTcStats.createNow(userId, points, multipliedPoints, units);
         POSTGRES_DB_MANAGER.persistHourlyTcStats(userTcStats);
 
         final Optional<UserTcStats> retrievedUserTcStats = POSTGRES_DB_MANAGER.getHourlyTcStats(userId);

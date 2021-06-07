@@ -31,7 +31,7 @@ import static java.util.stream.Collectors.toList;
 /**
  * {@link Singleton} EJB used to generate a {@link CompetitionResult} for the <code>Team Competition</code>.
  * <p>
- * Currently an EJB since we need to inject an instance of {@link BusinessLogic}, but if we can split that up with an
+ * Currently an EJB since we need to inject an instance of {@link OldFacade}, but if we can split that up with an
  * interface, we could move this into the JAR module as a simple class.
  */
 @Singleton
@@ -40,7 +40,7 @@ public class CompetitionResultGenerator {
     private static final Logger LOGGER = LoggerFactory.getLogger(CompetitionResultGenerator.class);
 
     @EJB
-    private transient BusinessLogic businessLogic;
+    private transient OldFacade oldFacade;
 
     /**
      * Generates a {@link CompetitionResult} based on the latest <code>Team Competition</code> {@link UserTcStats}.
@@ -80,7 +80,7 @@ public class CompetitionResultGenerator {
 
     private List<TeamResult> getStatsForTeams() {
         try {
-            final Collection<Team> teams = businessLogic.getAllTeams();
+            final Collection<Team> teams = oldFacade.getAllTeams();
             final List<TeamResult> teamResults = new ArrayList<>(teams.size());
 
             for (final Team team : teams) {
@@ -97,14 +97,14 @@ public class CompetitionResultGenerator {
     private TeamResult getTcTeamResult(final Team team) throws FoldingException {
         LOGGER.debug("Converting team '{}' for TC stats", team.getTeamName());
 
-        final Collection<User> usersOnTeam = businessLogic.getUsersOnTeam(team);
+        final Collection<User> usersOnTeam = oldFacade.getUsersOnTeam(team);
 
         final Collection<UserResult> activeUserResults = usersOnTeam
                 .stream()
                 .map(this::getTcStatsForUser)
                 .collect(toList());
 
-        final Collection<RetiredUserResult> retiredUserResults = businessLogic.getRetiredUsersForTeam(team)
+        final Collection<RetiredUserResult> retiredUserResults = oldFacade.getRetiredUsersForTeam(team)
                 .stream()
                 .map(RetiredUserResult::createFromRetiredStats)
                 .collect(toList());
@@ -129,7 +129,7 @@ public class CompetitionResultGenerator {
         final Category category = user.getCategory();
 
         try {
-            final UserTcStats userTcStats = businessLogic.getTcStatsForUser(user.getId());
+            final UserTcStats userTcStats = oldFacade.getTcStatsForUser(user.getId());
             LOGGER.debug("Results for {}: {} points | {} multiplied points | {} units", user.getDisplayName(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits());
             return UserResult.create(user.getId(), user.getDisplayName(), user.getFoldingUserName(), hardware, category, userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits(), user.getProfileLink(), user.getLiveStatsLink());
         } catch (final UserNotFoundException | NoStatsAvailableException e) {

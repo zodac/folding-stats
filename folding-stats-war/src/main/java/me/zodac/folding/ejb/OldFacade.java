@@ -44,18 +44,16 @@ import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 
-/**
- * {@link Singleton} EJB implementation of {@link me.zodac.folding.api.ejb.BusinessLogic}.
- */
 // TODO: [zodac] Should replace the cache miss warnings with some metrics instead?
 // TODO: [zodac] Split into one Facade for POJOs and one for stats?
 // TODO: [zodac] I really don't like how much logic is in here now, originally I planned for this just to avoid needing to specify
 //  both DB and cache in the REST/EJB layer. I think it's gotten too big and needs to be scaled back...
 // TODO: [zodac] Also don't like how the #get() methods don't use Optional, why am I relying on *NotFoundException?
+@Deprecated
 @Singleton
-public class BusinessLogic {
+public class OldFacade {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BusinessLogic.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OldFacade.class);
     private static final FoldingStatsRetriever FOLDING_STATS_RETRIEVER = HttpFoldingStatsRetriever.create();
 
     private transient final DbManager dbManager = DbManagerRetriever.get();
@@ -476,18 +474,8 @@ public class BusinessLogic {
     public void updateInitialStatsForUser(final User user) throws UserNotFoundException, FoldingException {
         LOGGER.info("Updating initial stats for user: {}", user.getDisplayName());
         final Stats totalStats = getTotalStatsForUser(user.getId());
-        persistInitialUserStats(UserStats.create(user.getId(), DateTimeUtils.currentUtcTimestamp(), totalStats));
+        persistInitialUserStats(UserStats.create(user.getId(), DateTimeUtils.currentUtcTimestamp(), totalStats.getPoints(), totalStats.getUnits()));
         initialStatsCache.add(user.getId(), totalStats);
-    }
-
-    public boolean doesNotContainHardware(final int hardwareId) {
-        try {
-            getHardware(hardwareId);
-            return false;
-        } catch (final FoldingException | HardwareNotFoundException e) {
-            LOGGER.debug("Unable to find hardware with ID: {}", hardwareId, e);
-            return true;
-        }
     }
 
     @SuppressWarnings("PMD.ConfusingTernary") // False positive
@@ -503,6 +491,16 @@ public class BusinessLogic {
         }
 
         return systemUserAuthentication;
+    }
+
+    public boolean doesNotContainHardware(final int hardwareId) {
+        try {
+            getHardware(hardwareId);
+            return false;
+        } catch (final FoldingException | HardwareNotFoundException e) {
+            LOGGER.debug("Unable to find hardware with ID: {}", hardwareId, e);
+            return true;
+        }
     }
 
     public boolean doesNotContainTeam(final int teamId) {

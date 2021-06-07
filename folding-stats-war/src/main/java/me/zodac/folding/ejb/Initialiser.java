@@ -31,7 +31,7 @@ public class Initialiser {
     private transient final DbManager dbManager = DbManagerRetriever.get();
 
     @EJB
-    private transient BusinessLogic businessLogic;
+    private transient OldFacade oldFacade;
 
     @EJB
     private transient TeamCompetitionStatsScheduler teamCompetitionStatsScheduler;
@@ -47,15 +47,15 @@ public class Initialiser {
 
     private void initCaches() {
         try {
-            businessLogic.getAllHardware();
-            businessLogic.getAllTeams();
+            oldFacade.getAllHardware();
+            oldFacade.getAllTeams();
 
-            final Collection<User> users = businessLogic.getAllUsers();
-            businessLogic.initialiseOffsetStats();
+            final Collection<User> users = oldFacade.getAllUsers();
+            oldFacade.initialiseOffsetStats();
 
             for (final User user : users) {
                 try {
-                    final Stats initialStatsForUser = businessLogic.getInitialStatsForUser(user.getId());
+                    final Stats initialStatsForUser = oldFacade.getInitialStatsForUser(user.getId());
                     LOGGER.debug("Found initial stats for user {}: {}", user, initialStatsForUser);
                 } catch (final FoldingException e) {
                     LOGGER.warn("Unable to get initial stats for user {}", user, e.getCause());

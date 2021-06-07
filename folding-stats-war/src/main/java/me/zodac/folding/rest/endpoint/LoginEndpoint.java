@@ -4,7 +4,7 @@ import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.db.SystemUserAuthentication;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.utils.EncodingUtils;
-import me.zodac.folding.ejb.BusinessLogic;
+import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.rest.api.LoginCredentials;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +34,7 @@ public class LoginEndpoint {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginEndpoint.class);
 
     @EJB
-    private transient BusinessLogic businessLogic;
+    private transient OldFacade oldFacade;
 
     @POST
     @PermitAll
@@ -60,7 +60,7 @@ public class LoginEndpoint {
             final String password = decodedUserNameAndPassword.get(EncodingUtils.DECODED_PASSWORD_KEY);
             LOGGER.debug("Login request received for user: '{}'", userName);
 
-            final SystemUserAuthentication systemUserAuthentication = businessLogic.authenticateSystemUser(userName, password);
+            final SystemUserAuthentication systemUserAuthentication = oldFacade.authenticateSystemUser(userName, password);
 
             if (!systemUserAuthentication.isUserExists() || !systemUserAuthentication.isPasswordMatch()) {
                 LOGGER.warn("Invalid user credentials supplied: {}", loginCredentials);

@@ -11,7 +11,7 @@ import lombok.ToString;
 import me.zodac.folding.api.RequestPojo;
 
 /**
- * POJO defining a single {@link TeamRequest} participating in the <code>Team Competition</code>.
+ * REST request to create/update a {@link me.zodac.folding.api.tc.Team}.
  */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -21,12 +21,6 @@ import me.zodac.folding.api.RequestPojo;
 @EqualsAndHashCode
 @ToString(doNotUseGetters = true)
 public class TeamRequest implements RequestPojo {
-
-    /**
-     * The default {@link TeamRequest} ID. Since the REST request would not know the ID until the DB has created the object,
-     * we use this and update the ID later.
-     */
-    public static final int EMPTY_TEAM_ID = 0;
 
     private int id;
     private String teamName;

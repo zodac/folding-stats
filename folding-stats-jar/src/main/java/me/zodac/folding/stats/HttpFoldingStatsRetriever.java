@@ -52,7 +52,7 @@ public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
     public UserStats getTotalStats(final User user) throws FoldingExternalServiceException {
         final Timestamp currentUtcTime = DateTimeUtils.currentUtcTimestamp();
         final Stats userStats = getStats(FoldingStatsDetails.createFromUser(user));
-        return UserStats.create(user.getId(), currentUtcTime, userStats);
+        return UserStats.create(user.getId(), currentUtcTime, userStats.getPoints(), userStats.getUnits());
     }
 
     @Override

@@ -29,7 +29,7 @@ public class OffsetStats {
     private int unitsOffset;
 
     /**
-     * Create an instance of {@link OffsetStats}.
+     * Creates an instance of {@link OffsetStats}.
      *
      * @param pointsOffset           the points offset
      * @param multipliedPointsOffset the multiplied points offset
@@ -41,7 +41,7 @@ public class OffsetStats {
     }
 
     /**
-     * Create an empty instance of {@link OffsetStats}, with no offsets. Can be used where no offset is necessary, but
+     * Creates an empty instance of {@link OffsetStats}, with no offsets. Can be used where no offset is necessary, but
      * an {@link java.util.Optional} is not clean enough.
      *
      * @return the empty {@link OffsetStats}

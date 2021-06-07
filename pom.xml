@@ -382,7 +382,20 @@
                 </property>
             </activation>
             <properties>
+                <skip-linters>false</skip-linters>
                 <skip-tests>false</skip-tests>
+            </properties>
+        </profile>
+        
+        <!-- Profile used to execute each module's linters (if any) -->
+        <profile>
+            <id>activate_linters</id>
+            <activation>
+                <property>
+                    <name>lint</name>
+                </property>
+            </activation>
+            <properties>
                 <skip-linters>false</skip-linters>
             </properties>
         </profile>
@@ -397,19 +410,6 @@
             </activation>
             <properties>
                 <skip-tests>false</skip-tests>
-            </properties>
-        </profile>
-
-        <!-- Profile used to execute each module's linters (if any) -->
-        <profile>
-            <id>activate_linters</id>
-            <activation>
-                <property>
-                    <name>lint</name>
-                </property>
-            </activation>
-            <properties>
-                <skip-linters>false</skip-linters>
             </properties>
         </profile>
     </profiles>

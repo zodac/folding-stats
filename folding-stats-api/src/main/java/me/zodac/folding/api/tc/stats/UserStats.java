@@ -1,54 +1,65 @@
 package me.zodac.folding.api.tc.stats;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.ToString;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.utils.DateTimeUtils;
 
 import java.sql.Timestamp;
 
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@EqualsAndHashCode
-@Getter
-@ToString(doNotUseGetters = true)
-public class UserStats {
+/**
+ * POJO that extends {@link Stats} adding a {@link User} ID and a {@link Timestamp}.
+ */
+@EqualsAndHashCode(callSuper = true)
+@ToString(doNotUseGetters = true, callSuper = true)
+public class UserStats extends Stats {
 
     private final int userId;
     private final Timestamp timestamp;
-    private final Stats stats;
 
-    public static UserStats create(final int userId, final Timestamp timestamp, final Stats stats) {
-        return new UserStats(userId, timestamp, stats);
+    protected UserStats(final int userId, final Timestamp timestamp, final long points, final int units) {
+        super(points, units);
+        this.userId = userId;
+        this.timestamp = timestamp;
     }
 
-    public static UserStats createWithPointsAndUnits(final int userId, final Timestamp timestamp, final long points, final int units) {
-        return new UserStats(userId, timestamp, Stats.create(points, units));
+    /**
+     * Creates an instance of {@link UserStats}.
+     *
+     * @param userId    the ID of the {@link User}
+     * @param timestamp the {@link Timestamp} the {@link UserStats} were retrieved
+     * @param points    the points
+     * @param units     the units
+     * @return the created {@link UserStats}
+     */
+    public static UserStats create(final int userId, final Timestamp timestamp, final long points, final int units) {
+        return new UserStats(userId, timestamp, points, units);
     }
 
-    public static UserStats createWithoutTimestamp(final int userId, final Stats totalStats) {
-        return new UserStats(userId, DateTimeUtils.currentUtcTimestamp(), totalStats);
-    }
-
+    /**
+     * Creates an empty instance of {@link UserStats}, with no values. Can be used where no stats are necessary, but
+     * an {@link java.util.Optional} is not clean enough.
+     *
+     * @return the empty {@link UserStats}
+     */
     public static UserStats empty() {
-        return new UserStats(User.EMPTY_USER_ID, DateTimeUtils.currentUtcTimestamp(), Stats.empty());
+        return new UserStats(User.EMPTY_USER_ID, DateTimeUtils.currentUtcTimestamp(), 0L, 0);
+    }
+
+    public int getUserId() {
+        return userId;
     }
 
     public Timestamp getTimestamp() {
         return new Timestamp(timestamp.getTime());
     }
 
-    public long getPoints() {
-        return stats.getPoints();
+    @Override
+    public boolean isEmpty() {
+        return userId == 0 && super.isEmpty();
     }
 
-    public int getUnits() {
-        return stats.getUnits();
-    }
-    
-    public boolean isEmpty() {
-        return userId == 0 && stats.isEmpty();
+    public Stats getStats() {
+        return Stats.create(getPoints(), getUnits());
     }
 }

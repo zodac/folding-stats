@@ -1,9 +1,7 @@
 package me.zodac.folding.api.db;
 
 import me.zodac.folding.api.exception.FoldingException;
-import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
-import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.OffsetStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
@@ -16,48 +14,16 @@ import java.util.Collection;
 import java.util.Optional;
 
 /**
- * Interface used to interact with the storage backend and perform CRUD operations.
+ * Interface used to interact with the storage backend and perform stats operations on:
+ * <ul>
+ *     <li>{@link HistoricStats}</li>
+ *     <li>{@link OffsetStats}</li>
+ *     <li>{@link RetiredUserTcStats}</li>
+ *     <li>{@link UserStats}</li>
+ *     <li>{@link UserTcStats}</li>
+ * </ul>
  */
-// TODO: [zodac] Split into StatsDbManager and CrudDbManager
-@Deprecated
-public interface DbManager {
-
-    /**
-     * Creates a {@link Hardware} instance in the DB.
-     *
-     * @param hardware the {@link Hardware} to persist
-     * @return the {@link Hardware} updated with an ID
-     * @throws FoldingException thrown on error persisting the {@link Hardware}
-     */
-    Hardware createHardware(final Hardware hardware) throws FoldingException;
-
-    Collection<Hardware> getAllHardware() throws FoldingException;
-
-    Optional<Hardware> getHardware(final int hardwareId) throws FoldingException;
-
-    void updateHardware(final Hardware hardware) throws FoldingException;
-
-    void deleteHardware(final int hardwareId) throws FoldingException;
-
-    Team createTeam(final Team team) throws FoldingException;
-
-    Collection<Team> getAllTeams() throws FoldingException;
-
-    Optional<Team> getTeam(final int foldingTeamId) throws FoldingException;
-
-    void updateTeam(final Team team) throws FoldingException;
-
-    void deleteTeam(final int teamId) throws FoldingException;
-
-    User createUser(final User user) throws FoldingException;
-
-    Collection<User> getAllUsers() throws FoldingException;
-
-    Optional<User> getUser(final int userId) throws FoldingException;
-
-    void updateUser(final User user) throws FoldingException;
-
-    void deleteUser(final int userId) throws FoldingException;
+public interface DbStatsManager {
 
     // TC operations
 
@@ -96,6 +62,4 @@ public interface DbManager {
     Collection<RetiredUserTcStats> getRetiredUserStatsForTeam(final Team team) throws FoldingException;
 
     void deleteRetiredUserStats() throws FoldingException;
-
-    SystemUserAuthentication authenticateSystemUser(final String userName, final String password) throws FoldingException;
 }

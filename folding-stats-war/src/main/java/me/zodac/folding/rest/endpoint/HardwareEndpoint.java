@@ -98,47 +98,47 @@ public class HardwareEndpoint extends AbstractCrudEndpoint<HardwareRequest, Hard
 
     @Override
     protected Hardware createElement(final Hardware hardware) throws FoldingException {
-        return businessLogic.createHardware(hardware);
+        return oldFacade.createHardware(hardware);
     }
 
     @Override
     protected Collection<Hardware> getAllElements() throws FoldingException {
-        return businessLogic.getAllHardware();
+        return oldFacade.getAllHardware();
     }
 
     @Override
     protected ValidationResponse<Hardware> validateCreateAndConvert(final HardwareRequest hardwareRequest) {
-        final HardwareValidator hardwareValidator = HardwareValidator.create(businessLogic);
+        final HardwareValidator hardwareValidator = HardwareValidator.create(oldFacade);
         return hardwareValidator.validateCreate(hardwareRequest);
     }
 
     @Override
     protected ValidationResponse<Hardware> validateUpdateAndConvert(final HardwareRequest hardwareRequest) {
-        final HardwareValidator hardwareValidator = HardwareValidator.create(businessLogic);
+        final HardwareValidator hardwareValidator = HardwareValidator.create(oldFacade);
         return hardwareValidator.validateUpdate(hardwareRequest);
     }
 
     @Override
     protected ValidationResponse<Hardware> validateDeleteAndConvert(final Hardware hardware) {
-        final HardwareValidator hardwareValidator = HardwareValidator.create(businessLogic);
+        final HardwareValidator hardwareValidator = HardwareValidator.create(oldFacade);
         return hardwareValidator.validateDelete(hardware);
     }
 
     @Override
     protected Hardware getElementById(final int hardwareId) throws FoldingException, NotFoundException {
-        return businessLogic.getHardware(hardwareId);
+        return oldFacade.getHardware(hardwareId);
     }
 
     @Override
     protected Hardware updateElementById(final int hardwareId, final Hardware hardware) throws FoldingException, NotFoundException, FoldingExternalServiceException {
         // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
         final Hardware hardwareWithId = Hardware.updateWithId(hardwareId, hardware);
-        businessLogic.updateHardware(hardwareWithId);
+        oldFacade.updateHardware(hardwareWithId);
         return hardwareWithId;
     }
 
     @Override
     protected void deleteElementById(final int hardwareId) throws FoldingException {
-        businessLogic.deleteHardware(hardwareId);
+        oldFacade.deleteHardware(hardwareId);
     }
 }

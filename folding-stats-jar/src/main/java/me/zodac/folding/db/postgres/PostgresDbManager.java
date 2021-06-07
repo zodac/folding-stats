@@ -1,7 +1,10 @@
 package me.zodac.folding.db.postgres;
 
+import me.zodac.folding.api.db.DbAuthenticationManager;
 import me.zodac.folding.api.db.DbConnectionPool;
+import me.zodac.folding.api.db.DbCrudManager;
 import me.zodac.folding.api.db.DbManager;
+import me.zodac.folding.api.db.DbStatsManager;
 import me.zodac.folding.api.db.SystemUserAuthentication;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.tc.Hardware;
@@ -61,7 +64,7 @@ import static org.jooq.impl.DSL.year;
  * <p>
  * Uses <b>jOOQ</b> for code generation for the DB tables/schemas, rather than direct SQL queries. See existing methods for examples.
  */
-public final class PostgresDbManager implements DbManager {
+public final class PostgresDbManager implements DbManager, DbAuthenticationManager, DbCrudManager, DbStatsManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PostgresDbManager.class);
     private static final int SINGLE_RESULT = 1;

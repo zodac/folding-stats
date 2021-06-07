@@ -102,49 +102,49 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
 
     @Override
     protected Team createElement(final Team team) throws FoldingException {
-        final Team teamWithId = businessLogic.createTeam(team);
+        final Team teamWithId = oldFacade.createTeam(team);
         teamCompetitionStatsScheduler.parseTcStatsForTeam(team, ExecutionType.SYNCHRONOUS);
         return teamWithId;
     }
 
     @Override
     protected Collection<Team> getAllElements() throws FoldingException {
-        return businessLogic.getAllTeams();
+        return oldFacade.getAllTeams();
     }
 
     @Override
     protected ValidationResponse<Team> validateCreateAndConvert(final TeamRequest teamRequest) {
-        final TeamValidator teamValidator = TeamValidator.create(businessLogic);
+        final TeamValidator teamValidator = TeamValidator.create(oldFacade);
         return teamValidator.validateCreate(teamRequest);
     }
 
     @Override
     protected ValidationResponse<Team> validateUpdateAndConvert(final TeamRequest teamRequest) {
-        final TeamValidator teamValidator = TeamValidator.create(businessLogic);
+        final TeamValidator teamValidator = TeamValidator.create(oldFacade);
         return teamValidator.validateUpdate(teamRequest);
     }
 
     @Override
     protected ValidationResponse<Team> validateDeleteAndConvert(final Team team) {
-        final TeamValidator teamValidator = TeamValidator.create(businessLogic);
+        final TeamValidator teamValidator = TeamValidator.create(oldFacade);
         return teamValidator.validateDelete(team);
     }
 
     @Override
     protected Team getElementById(final int teamId) throws FoldingException, NotFoundException {
-        return businessLogic.getTeam(teamId);
+        return oldFacade.getTeam(teamId);
     }
 
     @Override
     protected Team updateElementById(final int teamId, final Team team) throws FoldingException {
         // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
         final Team teamWithId = Team.updateWithId(teamId, team);
-        businessLogic.updateTeam(teamWithId);
+        oldFacade.updateTeam(teamWithId);
         return teamWithId;
     }
 
     @Override
     protected void deleteElementById(final int teamId) throws FoldingException {
-        businessLogic.deleteTeam(teamId);
+        oldFacade.deleteTeam(teamId);
     }
 }

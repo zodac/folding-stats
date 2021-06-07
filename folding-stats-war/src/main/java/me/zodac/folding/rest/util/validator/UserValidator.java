@@ -11,7 +11,7 @@ import me.zodac.folding.api.tc.exception.NotFoundException;
 import me.zodac.folding.api.tc.exception.TeamNotFoundException;
 import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.validator.ValidationResponse;
-import me.zodac.folding.ejb.BusinessLogic;
+import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.UrlValidator;
@@ -32,16 +32,16 @@ public final class UserValidator {
     private static final UrlValidator URL_VALIDATOR = new UrlValidator();
     private static final int EXPECTED_PASSKEY_LENGTH = 32;
 
-    private transient final BusinessLogic businessLogic;
+    private transient final OldFacade oldFacade;
     private transient final FoldingStatsRetriever foldingStatsRetriever;
 
-    private UserValidator(final BusinessLogic businessLogic, final FoldingStatsRetriever foldingStatsRetriever) {
-        this.businessLogic = businessLogic;
+    private UserValidator(final OldFacade oldFacade, final FoldingStatsRetriever foldingStatsRetriever) {
+        this.oldFacade = oldFacade;
         this.foldingStatsRetriever = foldingStatsRetriever;
     }
 
-    public static UserValidator create(final BusinessLogic businessLogic, final FoldingStatsRetriever foldingStatsRetriever) {
-        return new UserValidator(businessLogic, foldingStatsRetriever);
+    public static UserValidator create(final OldFacade oldFacade, final FoldingStatsRetriever foldingStatsRetriever) {
+        return new UserValidator(oldFacade, foldingStatsRetriever);
     }
 
     @SuppressWarnings("PMD.NPathComplexity") // Better than breaking into smaller functions
@@ -67,7 +67,7 @@ public final class UserValidator {
 
         // If foldingUserName and passkey are valid, ensure they don't already exist
         if (failureMessages.isEmpty()) {
-            final Optional<User> userWithMatchingFoldingUserNameAndPasskey = businessLogic.getUserWithFoldingUserNameAndPasskey(userRequest.getFoldingUserName(), userRequest.getPasskey());
+            final Optional<User> userWithMatchingFoldingUserNameAndPasskey = oldFacade.getUserWithFoldingUserNameAndPasskey(userRequest.getFoldingUserName(), userRequest.getPasskey());
 
             if (userWithMatchingFoldingUserNameAndPasskey.isPresent()) {
                 return ValidationResponse.conflictingWith(userRequest, userWithMatchingFoldingUserNameAndPasskey.get(), List.of("foldingUserName", "passkey"));
@@ -115,8 +115,8 @@ public final class UserValidator {
 
         if (failureMessages.isEmpty()) {
             try {
-                final Hardware hardware = businessLogic.getHardware(userRequest.getHardwareId());
-                final Team team = businessLogic.getTeam(userRequest.getTeamId());
+                final Hardware hardware = oldFacade.getHardware(userRequest.getHardwareId());
+                final Team team = oldFacade.getTeam(userRequest.getTeamId());
 
                 final User user = User.createWithoutId(userRequest.getFoldingUserName(), userRequest.getDisplayName(), userRequest.getPasskey(), category, userRequest.getProfileLink(), userRequest.getLiveStatsLink(), hardware, team, userRequest.isUserIsCaptain());
                 return ValidationResponse.success(user);
@@ -194,8 +194,8 @@ public final class UserValidator {
 
         if (failureMessages.isEmpty()) {
             try {
-                final Hardware hardware = businessLogic.getHardware(userRequest.getHardwareId());
-                final Team team = businessLogic.getTeam(userRequest.getTeamId());
+                final Hardware hardware = oldFacade.getHardware(userRequest.getHardwareId());
+                final Team team = oldFacade.getTeam(userRequest.getTeamId());
 
                 final User user = User.createWithoutId(userRequest.getFoldingUserName(), userRequest.getDisplayName(), userRequest.getPasskey(), category, userRequest.getProfileLink(), userRequest.getLiveStatsLink(), hardware, team, userRequest.isUserIsCaptain());
                 return ValidationResponse.success(user);
@@ -213,8 +213,8 @@ public final class UserValidator {
 
     private List<String> validateTeam(final UserRequest userRequest) {
         try {
-            if (userRequest.getTeamId() <= Team.EMPTY_TEAM_ID || businessLogic.doesNotContainTeam(userRequest.getTeamId())) {
-                final List<String> availableTeams = businessLogic
+            if (userRequest.getTeamId() <= Team.EMPTY_TEAM_ID || oldFacade.doesNotContainTeam(userRequest.getTeamId())) {
+                final List<String> availableTeams = oldFacade
                         .getAllTeams()
                         .stream()
                         .map(team -> String.format("%s: %s", team.getId(), team.getTeamName()))
@@ -232,8 +232,8 @@ public final class UserValidator {
 
     private List<String> validateHardware(final UserRequest userRequest) {
         try {
-            if (userRequest.getHardwareId() <= Hardware.EMPTY_HARDWARE_ID || businessLogic.doesNotContainHardware(userRequest.getHardwareId())) {
-                final List<String> availableHardware = businessLogic
+            if (userRequest.getHardwareId() <= Hardware.EMPTY_HARDWARE_ID || oldFacade.doesNotContainHardware(userRequest.getHardwareId())) {
+                final List<String> availableHardware = oldFacade
                         .getAllHardware()
                         .stream()
                         .map(hardware -> String.format("%s: %s", hardware.getId(), hardware.getHardwareName()))
@@ -272,8 +272,8 @@ public final class UserValidator {
         final List<String> failureMessages = new ArrayList<>();
 
         try {
-            final Team team = businessLogic.getTeam(userRequest.getTeamId());
-            final Collection<User> usersOnTeam = businessLogic.getUsersOnTeam(team);
+            final Team team = oldFacade.getTeam(userRequest.getTeamId());
+            final Collection<User> usersOnTeam = oldFacade.getUsersOnTeam(team);
 
             if (userRequest.isUserIsCaptain()) {
                 for (final User existingUserOnTeam : usersOnTeam) {
@@ -299,7 +299,7 @@ public final class UserValidator {
                 }
             } else {
                 // isUpdate
-                final User existingUser = businessLogic.getUser(userRequest.getId());
+                final User existingUser = oldFacade.getUser(userRequest.getId());
 
                 if (category != existingUser.getCategory()) {
                     final int permittedNumberForCategory = category.permittedAmount();

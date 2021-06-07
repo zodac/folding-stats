@@ -49,7 +49,7 @@ public class TeamCompetitionStatsScheduler {
     private static final String STATS_PARSING_SCHEDULE_SECOND = EnvironmentVariableUtils.get("STATS_PARSING_SCHEDULE_SECOND", "0");
 
     @EJB
-    private transient BusinessLogic businessLogic;
+    private transient OldFacade oldFacade;
 
     @EJB
     private transient UserTeamCompetitionStatsParser userTeamCompetitionStatsParser;
@@ -128,7 +128,7 @@ public class TeamCompetitionStatsScheduler {
 
     private Collection<Team> getTcTeams() {
         try {
-            return businessLogic.getAllTeams();
+            return oldFacade.getAllTeams();
         } catch (final FoldingException e) {
             LOGGER.debug("Error retrieving TC teams", e);
             LOGGER.warn("Error retrieving TC teams");
@@ -138,7 +138,7 @@ public class TeamCompetitionStatsScheduler {
 
     private Collection<User> getUsersOnTeam(final Team team) {
         try {
-            return businessLogic.getUsersOnTeam(team);
+            return oldFacade.getUsersOnTeam(team);
         } catch (final FoldingException e) {
             LOGGER.debug("Unable to find users for team: '{}'", team.getTeamName(), e);
             LOGGER.warn("Unable to find users for team: '{}'", team.getTeamName());

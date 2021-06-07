@@ -4,7 +4,7 @@ import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.OperatingSystem;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.validator.ValidationResponse;
-import me.zodac.folding.ejb.BusinessLogic;
+import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 
 import java.util.ArrayList;
@@ -21,14 +21,14 @@ public final class HardwareValidator {
     // Assuming multiplier cannot be less than 0, also assuming we might want a 0.1/0.5 at some point with future hardware
     private static final double INVALID_MULTIPLIER_VALUE = 0.0D;
 
-    private transient final BusinessLogic businessLogic;
+    private transient final OldFacade oldFacade;
 
-    private HardwareValidator(final BusinessLogic businessLogic) {
-        this.businessLogic = businessLogic;
+    private HardwareValidator(final OldFacade oldFacade) {
+        this.oldFacade = oldFacade;
     }
 
-    public static HardwareValidator create(final BusinessLogic businessLogic) {
-        return new HardwareValidator(businessLogic);
+    public static HardwareValidator create(final OldFacade oldFacade) {
+        return new HardwareValidator(oldFacade);
     }
 
     public ValidationResponse<Hardware> validateCreate(final HardwareRequest hardwareRequest) {
@@ -41,7 +41,7 @@ public final class HardwareValidator {
         if (isBlank(hardwareRequest.getHardwareName())) {
             failureMessages.add("Field 'hardwareName' must not be empty");
         } else {
-            final Optional<Hardware> hardwareWithMatchingName = businessLogic.getHardwareWithName(hardwareRequest.getHardwareName());
+            final Optional<Hardware> hardwareWithMatchingName = oldFacade.getHardwareWithName(hardwareRequest.getHardwareName());
 
             if (hardwareWithMatchingName.isPresent()) {
                 return ValidationResponse.conflictingWith(hardwareRequest, hardwareWithMatchingName.get(), List.of("hardwareName"));
@@ -102,7 +102,7 @@ public final class HardwareValidator {
     }
 
     public ValidationResponse<Hardware> validateDelete(final Hardware hardware) {
-        final Optional<User> userWithMatchingHardware = businessLogic.getUserWithHardware(hardware);
+        final Optional<User> userWithMatchingHardware = oldFacade.getUserWithHardware(hardware);
 
         if (userWithMatchingHardware.isPresent()) {
             return ValidationResponse.usedBy(hardware, userWithMatchingHardware.get());

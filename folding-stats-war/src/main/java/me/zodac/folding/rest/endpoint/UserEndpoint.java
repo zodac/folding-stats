@@ -99,23 +99,23 @@ public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
 
     @Override
     protected User createElement(final User user) throws FoldingException, FoldingExternalServiceException {
-        return businessLogic.createUser(user);
+        return oldFacade.createUser(user);
     }
 
     @Override
     protected Collection<User> getAllElements() throws FoldingException {
-        return businessLogic.getAllUsersWithPasskeys(false);
+        return oldFacade.getAllUsersWithPasskeys(false);
     }
 
     @Override
     protected ValidationResponse<User> validateCreateAndConvert(final UserRequest userRequest) {
-        final UserValidator userValidator = UserValidator.create(businessLogic, HttpFoldingStatsRetriever.create());
+        final UserValidator userValidator = UserValidator.create(oldFacade, HttpFoldingStatsRetriever.create());
         return userValidator.validateCreate(userRequest);
     }
 
     @Override
     protected ValidationResponse<User> validateUpdateAndConvert(final UserRequest userRequest) {
-        final UserValidator userValidator = UserValidator.create(businessLogic, HttpFoldingStatsRetriever.create());
+        final UserValidator userValidator = UserValidator.create(oldFacade, HttpFoldingStatsRetriever.create());
         return userValidator.validateUpdate(userRequest);
     }
 
@@ -126,19 +126,19 @@ public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
 
     @Override
     protected User getElementById(final int userId) throws FoldingException, NotFoundException {
-        return businessLogic.getUserWithPasskey(userId, false);
+        return oldFacade.getUserWithPasskey(userId, false);
     }
 
     @Override
     protected User updateElementById(final int userId, final User user) throws FoldingException, NotFoundException, FoldingExternalServiceException {
         // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
         final User userWithId = User.updateWithId(userId, user);
-        businessLogic.updateUser(userWithId);
+        oldFacade.updateUser(userWithId);
         return userWithId;
     }
 
     @Override
     protected void deleteElementById(final int userId) throws FoldingException {
-        businessLogic.deleteUser(userId);
+        oldFacade.deleteUser(userId);
     }
 }

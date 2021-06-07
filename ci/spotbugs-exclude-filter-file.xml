@@ -11,7 +11,7 @@
 
     <!-- False positive, unable to see that generic response from cache is actually a valid case -->
     <Match>
-        <Class name="me.zodac.folding.ejb.BusinessLogic"/>
+        <Class name="me.zodac.folding.ejb.OldFacade"/>
         <Bug pattern="BC_IMPOSSIBLE_CAST"/>
     </Match>
 </FindBugsFilter>

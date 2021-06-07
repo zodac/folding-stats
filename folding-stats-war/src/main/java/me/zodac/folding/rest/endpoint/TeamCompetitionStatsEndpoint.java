@@ -11,8 +11,8 @@ import me.zodac.folding.api.tc.exception.FoldingIdOutOfRangeException;
 import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.stats.OffsetStats;
 import me.zodac.folding.api.utils.ExecutionType;
-import me.zodac.folding.ejb.BusinessLogic;
 import me.zodac.folding.ejb.CompetitionResultGenerator;
+import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.ejb.TeamCompetitionResetScheduler;
 import me.zodac.folding.ejb.TeamCompetitionStatsScheduler;
 import me.zodac.folding.ejb.UserTeamCompetitionStatsParser;
@@ -68,7 +68,7 @@ public class TeamCompetitionStatsEndpoint {
     private transient UriInfo uriContext;
 
     @EJB
-    private transient BusinessLogic businessLogic;
+    private transient OldFacade oldFacade;
 
     @EJB
     private transient CompetitionResultGenerator competitionResultGenerator;
@@ -116,7 +116,7 @@ public class TeamCompetitionStatsEndpoint {
 
         try {
             final int parsedId = IdentityParser.parse(userId);
-            final User user = businessLogic.getUserWithPasskey(parsedId, false);
+            final User user = oldFacade.getUserWithPasskey(parsedId, false);
 
             final CompetitionResult competitionResult = competitionResultGenerator.generate();
             final Collection<UserResult> userResults = competitionResult.getTeams()
@@ -171,12 +171,12 @@ public class TeamCompetitionStatsEndpoint {
 
         try {
             final int parsedId = IdentityParser.parse(userId);
-            final User user = businessLogic.getUser(parsedId);
+            final User user = oldFacade.getUser(parsedId);
 
             final OffsetStats offsetStatsToUse = getValidUserStatsOffset(user, offsetStats);
-            businessLogic.addOrUpdateOffsetStats(parsedId, offsetStatsToUse);
+            oldFacade.addOrUpdateOffsetStats(parsedId, offsetStatsToUse);
             SystemStateManager.next(SystemState.UPDATING_STATS);
-            userTeamCompetitionStatsParser.parseTcStatsForUserAndWait(businessLogic.getUser(parsedId));
+            userTeamCompetitionStatsParser.parseTcStatsForUserAndWait(oldFacade.getUser(parsedId));
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             return ok();
         } catch (final FoldingIdInvalidException e) {

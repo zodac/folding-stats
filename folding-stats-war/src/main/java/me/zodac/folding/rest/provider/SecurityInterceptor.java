@@ -3,7 +3,7 @@ package me.zodac.folding.rest.provider;
 import me.zodac.folding.api.db.SystemUserAuthentication;
 import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.utils.EncodingUtils;
-import me.zodac.folding.ejb.BusinessLogic;
+import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.util.response.Responses;
 import org.slf4j.Logger;
@@ -69,7 +69,7 @@ public class SecurityInterceptor implements ContainerRequestFilter {
     private transient ResourceInfo resourceInfo;
 
     @EJB
-    private transient BusinessLogic businessLogic;
+    private transient OldFacade oldFacade;
 
     @Override
     public void filter(final ContainerRequestContext requestContext) {
@@ -108,7 +108,7 @@ public class SecurityInterceptor implements ContainerRequestFilter {
         final String userName = decodedUserNameAndPassword.get(EncodingUtils.DECODED_USERNAME_KEY);
         final String password = decodedUserNameAndPassword.get(EncodingUtils.DECODED_PASSWORD_KEY);
 
-        final SystemUserAuthentication systemUserAuthentication = businessLogic.authenticateSystemUser(userName, password);
+        final SystemUserAuthentication systemUserAuthentication = oldFacade.authenticateSystemUser(userName, password);
 
         if (!systemUserAuthentication.isUserExists()) {
             LOGGER.warn("User '{}' does not exist", userName);

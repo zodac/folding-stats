@@ -9,5 +9,5 @@ import javax.ejb.Singleton;
  */
 @Singleton
 public class StorageEjb implements Storage {
-    
+
 }

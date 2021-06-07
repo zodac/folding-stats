@@ -6,7 +6,7 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.exception.TeamNotFoundException;
 import me.zodac.folding.api.tc.exception.UserNotFoundException;
-import me.zodac.folding.ejb.BusinessLogic;
+import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +55,7 @@ public class HistoricStatsEndpoint {
     private transient UriInfo uriContext;
 
     @EJB
-    private transient BusinessLogic businessLogic;
+    private transient OldFacade oldFacade;
 
     @GET
     @PermitAll
@@ -73,7 +73,7 @@ public class HistoricStatsEndpoint {
             final int dayAsInt = Integer.parseInt(day);
             final int monthAsInt = Integer.parseInt(month);
             final int yearAsInt = Year.parse(year).getValue();
-            businessLogic.getUser(Integer.parseInt(userId)); // Check if user exists first, catch UserNotFoundException early
+            oldFacade.getUser(Integer.parseInt(userId)); // Check if user exists first, catch UserNotFoundException early
 
             final YearMonth date = YearMonth.of(yearAsInt, monthAsInt);
             if (!date.isValidDay(dayAsInt)) {
@@ -82,7 +82,7 @@ public class HistoricStatsEndpoint {
                 return badRequest(errorMessage);
             }
 
-            final Collection<HistoricStats> hourlyStats = businessLogic.getHistoricStatsHourly(Integer.parseInt(userId), Integer.parseInt(day), Month.of(Integer.parseInt(month)), Year.parse(year));
+            final Collection<HistoricStats> hourlyStats = oldFacade.getHistoricStatsHourly(Integer.parseInt(userId), Integer.parseInt(day), Month.of(Integer.parseInt(month)), Year.parse(year));
 
             final CacheControl cacheControl = new CacheControl();
             cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);
@@ -139,8 +139,8 @@ public class HistoricStatsEndpoint {
         }
 
         try {
-            businessLogic.getUser(Integer.parseInt(userId)); // Check if user exists first, catch UserNotFoundException early
-            final Collection<HistoricStats> dailyStats = businessLogic.getHistoricStatsDaily(Integer.parseInt(userId), Month.of(Integer.parseInt(month)), Year.parse(year));
+            oldFacade.getUser(Integer.parseInt(userId)); // Check if user exists first, catch UserNotFoundException early
+            final Collection<HistoricStats> dailyStats = oldFacade.getHistoricStatsDaily(Integer.parseInt(userId), Month.of(Integer.parseInt(month)), Year.parse(year));
 
             final CacheControl cacheControl = new CacheControl();
             cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);
@@ -197,8 +197,8 @@ public class HistoricStatsEndpoint {
         }
 
         try {
-            businessLogic.getUser(Integer.parseInt(userId)); // Check if user exists first, catch UserNotFoundException early
-            final Collection<HistoricStats> monthlyStats = businessLogic.getHistoricStatsMonthly(Integer.parseInt(userId), Year.parse(year));
+            oldFacade.getUser(Integer.parseInt(userId)); // Check if user exists first, catch UserNotFoundException early
+            final Collection<HistoricStats> monthlyStats = oldFacade.getHistoricStatsMonthly(Integer.parseInt(userId), Year.parse(year));
 
             LOGGER.info("Found(final): {}", monthlyStats);
 
@@ -264,13 +264,13 @@ public class HistoricStatsEndpoint {
                 return badRequest(errorMessage);
             }
 
-            final Team team = businessLogic.getTeam(Integer.parseInt(teamId));
+            final Team team = oldFacade.getTeam(Integer.parseInt(teamId));
             final List<HistoricStats> teamHourlyStats = new ArrayList<>();
-            final Collection<User> teamUsers = businessLogic.getUsersOnTeam(team);
+            final Collection<User> teamUsers = oldFacade.getUsersOnTeam(team);
 
             for (final User user : teamUsers) {
                 LOGGER.debug("Getting historic stats for user with ID: {}", user.getId());
-                final Collection<HistoricStats> dailyStats = businessLogic.getHistoricStatsHourly(user.getId(), Integer.parseInt(day), Month.of(Integer.parseInt(month)), Year.parse(year));
+                final Collection<HistoricStats> dailyStats = oldFacade.getHistoricStatsHourly(user.getId(), Integer.parseInt(day), Month.of(Integer.parseInt(month)), Year.parse(year));
                 teamHourlyStats.addAll(dailyStats);
             }
 
@@ -331,13 +331,13 @@ public class HistoricStatsEndpoint {
         }
 
         try {
-            final Team team = businessLogic.getTeam(Integer.parseInt(teamId));
+            final Team team = oldFacade.getTeam(Integer.parseInt(teamId));
             final List<HistoricStats> teamDailyStats = new ArrayList<>();
-            final Collection<User> teamUsers = businessLogic.getUsersOnTeam(team);
+            final Collection<User> teamUsers = oldFacade.getUsersOnTeam(team);
 
             for (final User user : teamUsers) {
                 LOGGER.debug("Getting historic stats for user with ID: {}", user.getId());
-                final Collection<HistoricStats> dailyStats = businessLogic.getHistoricStatsDaily(user.getId(), Month.of(Integer.parseInt(month)), Year.parse(year));
+                final Collection<HistoricStats> dailyStats = oldFacade.getHistoricStatsDaily(user.getId(), Month.of(Integer.parseInt(month)), Year.parse(year));
                 teamDailyStats.addAll(dailyStats);
             }
 
@@ -398,13 +398,13 @@ public class HistoricStatsEndpoint {
         }
 
         try {
-            final Team team = businessLogic.getTeam(Integer.parseInt(teamId));
+            final Team team = oldFacade.getTeam(Integer.parseInt(teamId));
             final List<HistoricStats> teamMonthlyStats = new ArrayList<>();
-            final Collection<User> teamUsers = businessLogic.getUsersOnTeam(team);
+            final Collection<User> teamUsers = oldFacade.getUsersOnTeam(team);
 
             for (final User user : teamUsers) {
                 LOGGER.debug("Getting historic stats for user with ID: {}", user.getId());
-                final Collection<HistoricStats> monthlyStats = businessLogic.getHistoricStatsMonthly(user.getId(), Year.parse(year));
+                final Collection<HistoricStats> monthlyStats = oldFacade.getHistoricStatsMonthly(user.getId(), Year.parse(year));
                 teamMonthlyStats.addAll(monthlyStats);
             }
 

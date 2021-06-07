@@ -36,7 +36,7 @@ public class RetiredUserResult {
     }
 
     public static RetiredUserResult createFromRetiredStats(final RetiredUserTcStats retiredUserTcStats) {
-        return new RetiredUserResult(retiredUserTcStats.getUserId(), retiredUserTcStats.getDisplayUserName(), retiredUserTcStats.getPoints(), retiredUserTcStats.getMultipliedPoints(), retiredUserTcStats.getUnits(), DEFAULT_USER_RANK);
+        return new RetiredUserResult(retiredUserTcStats.getUserId(), retiredUserTcStats.getDisplayName(), retiredUserTcStats.getPoints(), retiredUserTcStats.getMultipliedPoints(), retiredUserTcStats.getUnits(), DEFAULT_USER_RANK);
     }
 
     public static RetiredUserResult empty(final String userName) {

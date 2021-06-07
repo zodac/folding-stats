@@ -10,7 +10,9 @@ import lombok.Setter;
 import lombok.ToString;
 import me.zodac.folding.api.RequestPojo;
 
-
+/**
+ * * REST request to create/update a {@link me.zodac.folding.api.tc.Hardware}.
+ */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
@@ -19,8 +21,6 @@ import me.zodac.folding.api.RequestPojo;
 @EqualsAndHashCode
 @ToString(doNotUseGetters = true)
 public class HardwareRequest implements RequestPojo {
-    
-    public static final int EMPTY_HARDWARE_ID = 0;
 
     private int id;
     private String hardwareName;
