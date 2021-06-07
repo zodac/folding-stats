@@ -9,14 +9,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import me.zodac.folding.api.RequestPojo;
-import me.zodac.folding.api.tc.Category;
-import me.zodac.folding.api.tc.User;
 
 /**
- * POJO defining a single {@link TeamRequest} participating in the <code>Team Competition</code>. There is a limit on the number of users each team can have, defined by the
- * {@link Category} description.
- * <p>
- * While each {@link TeamRequest} is made up of {@link User}s we do not keep any reference to the {@link User} in this object.
+ * POJO defining a single {@link TeamRequest} participating in the <code>Team Competition</code>.
  */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)

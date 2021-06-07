@@ -4,8 +4,6 @@ import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.tc.exception.HardwareNotFoundException;
-import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.stats.OffsetStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
@@ -35,7 +33,7 @@ public interface DbManager {
 
     Optional<Hardware> getHardware(final int hardwareId) throws FoldingException;
 
-    void updateHardware(final Hardware hardware) throws FoldingException, HardwareNotFoundException;
+    void updateHardware(final Hardware hardware) throws FoldingException;
 
     void deleteHardware(final int hardwareId) throws FoldingException;
 
@@ -55,7 +53,7 @@ public interface DbManager {
 
     Optional<User> getUser(final int userId) throws FoldingException;
 
-    void updateUser(final User user) throws FoldingException, UserNotFoundException;
+    void updateUser(final User user) throws FoldingException;
 
     void deleteUser(final int userId) throws FoldingException;
 

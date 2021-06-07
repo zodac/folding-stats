@@ -45,9 +45,7 @@ import java.util.Optional;
 import static java.util.stream.Collectors.toList;
 
 /**
- * In order to decouple the REST layer from any business requirements, we move that logic into this {@link Singleton} EJB.
- * <p>
- * This should simplify the REST layer to simply validate incoming requests and forward to here.
+ * {@link Singleton} EJB implementation of {@link me.zodac.folding.api.ejb.BusinessLogic}.
  */
 // TODO: [zodac] Should replace the cache miss warnings with some metrics instead?
 // TODO: [zodac] Split into one Facade for POJOs and one for stats?

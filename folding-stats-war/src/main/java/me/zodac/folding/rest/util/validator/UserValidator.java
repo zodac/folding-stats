@@ -9,6 +9,7 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.exception.NotFoundException;
 import me.zodac.folding.api.tc.exception.TeamNotFoundException;
+import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.ejb.BusinessLogic;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
@@ -274,10 +275,6 @@ public final class UserValidator {
             final Team team = businessLogic.getTeam(userRequest.getTeamId());
             final Collection<User> usersOnTeam = businessLogic.getUsersOnTeam(team);
 
-            if (usersOnTeam.size() >= Category.maximumPermittedAmountForAllCategories()) {
-                failureMessages.add(String.format("Team '%s' has %s users, maximum permitted is %s", team.getTeamName(), usersOnTeam.size(), Category.maximumPermittedAmountForAllCategories()));
-            }
-
             if (userRequest.isUserIsCaptain()) {
                 for (final User existingUserOnTeam : usersOnTeam) {
                     if (existingUserOnTeam.isUserIsCaptain()) {
@@ -287,6 +284,10 @@ public final class UserValidator {
             }
 
             if (isCreate) {
+                if (usersOnTeam.size() >= Category.maximumPermittedAmountForAllCategories()) {
+                    failureMessages.add(String.format("Team '%s' has %s users, maximum permitted is %s", team.getTeamName(), usersOnTeam.size(), Category.maximumPermittedAmountForAllCategories()));
+                }
+
                 final int permittedNumberForCategory = category.permittedAmount();
                 final int numberOfUsersInTeamWithCategory = (int) usersOnTeam
                         .stream()
@@ -297,17 +298,22 @@ public final class UserValidator {
                     failureMessages.add(String.format("Found %s users of category '%s', only %s permitted", numberOfUsersInTeamWithCategory, category.displayName(), permittedNumberForCategory));
                 }
             } else {
-                final int permittedNumberForCategory = category.permittedAmount();
-                final int numberOfUsersInTeamWithCategory = (int) usersOnTeam
-                        .stream()
-                        .filter(user -> user.getCategory() == category)
-                        .count();
+                // isUpdate
+                final User existingUser = businessLogic.getUser(userRequest.getId());
 
-                if (numberOfUsersInTeamWithCategory > permittedNumberForCategory) {
-                    failureMessages.add(String.format("Found %s users of category '%s', only %s permitted", numberOfUsersInTeamWithCategory, category.displayName(), permittedNumberForCategory));
+                if (category != existingUser.getCategory()) {
+                    final int permittedNumberForCategory = category.permittedAmount();
+                    final int numberOfUsersInTeamWithCategory = (int) usersOnTeam
+                            .stream()
+                            .filter(user -> user.getId() != userRequest.getId() && user.getCategory() == category)
+                            .count();
+
+                    if (numberOfUsersInTeamWithCategory >= permittedNumberForCategory) {
+                        failureMessages.add(String.format("Found %s users of category '%s', only %s permitted", numberOfUsersInTeamWithCategory, category.displayName(), permittedNumberForCategory));
+                    }
                 }
             }
-        } catch (final FoldingException | TeamNotFoundException e) {
+        } catch (final FoldingException | TeamNotFoundException | UserNotFoundException e) {
             LOGGER.warn("Unable to validate current team users", e);
             failureMessages.add("Unable to validate current team users");
         }

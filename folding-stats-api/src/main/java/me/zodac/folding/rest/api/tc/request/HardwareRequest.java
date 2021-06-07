@@ -19,8 +19,7 @@ import me.zodac.folding.api.RequestPojo;
 @EqualsAndHashCode
 @ToString(doNotUseGetters = true)
 public class HardwareRequest implements RequestPojo {
-
-
+    
     public static final int EMPTY_HARDWARE_ID = 0;
 
     private int id;

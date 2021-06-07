@@ -289,7 +289,6 @@ class UserTest {
                 .userIsCaptain(createdUser.isUserIsCaptain())
                 .build();
 
-
         final HttpResponse<String> updateResponse = USER_REQUEST_SENDER.update(userToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(updateResponse.statusCode())
@@ -628,6 +627,75 @@ class UserTest {
         StubbedFoldingEndpointUtils.enableUser(secondCaptain);
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.create(secondCaptain, ADMIN_USER.userName(), ADMIN_USER.password());
+        assertThat(response.statusCode())
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+
+        assertThat(response.body())
+                .as("Did not receive an error message specifying the team already has a captain")
+                .contains("cannot have multiple captains");
+    }
+
+    @Test
+    void whenUpdatingUser_andUserIsChangingCategory_givenCategoryExceedsTotalPermittedAmount_thenUserIsNotUpdated_andResponseHasA400Status() throws FoldingRestException {
+        final Team team = TeamUtils.create(generateTeam());
+        final UserRequest firstUser = generateUserWithCategory(Category.NVIDIA_GPU);
+        firstUser.setTeamId(team.getId());
+        create(firstUser);
+        final UserRequest secondUser = generateUserWithCategory(Category.WILDCARD);
+        secondUser.setTeamId(team.getId());
+        create(secondUser);
+        final UserRequest thirdUser = generateUserWithCategory(Category.AMD_GPU);
+        thirdUser.setTeamId(team.getId());
+        final User createdUser = create(thirdUser);
+
+        final UserRequest userToUpdate = UserRequest.builder()
+                .id(createdUser.getId())
+                .foldingUserName(createdUser.getFoldingUserName())
+                .displayName(createdUser.getDisplayName())
+                .passkey(createdUser.getPasskey())
+                .category(Category.NVIDIA_GPU.displayName())
+                .profileLink(createdUser.getProfileLink())
+                .liveStatsLink(createdUser.getLiveStatsLink())
+                .hardwareId(createdUser.getHardware().getId())
+                .teamId(createdUser.getTeam().getId())
+                .userIsCaptain(createdUser.isUserIsCaptain())
+                .build();
+
+        final HttpResponse<String> response = USER_REQUEST_SENDER.update(userToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
+        assertThat(response.statusCode())
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+
+        assertThat(response.body())
+                .as("Did not receive an error message specifying the team is too large")
+                .contains("category '" + Category.NVIDIA_GPU.displayName() + "'");
+    }
+
+    @Test
+    void whenUpdateUser_andUserIsBecomingCaptain_givenTeamAlreadyHasACaptain_thenUserIsNotUpdated_andResponseHasA400Status() throws FoldingRestException {
+        final UserRequest firstCaptain = generateUserWithCategory(Category.NVIDIA_GPU);
+        firstCaptain.setUserIsCaptain(true);
+        create(firstCaptain);
+
+        final UserRequest secondCaptain = generateUserWithCategory(Category.AMD_GPU);
+        secondCaptain.setTeamId(firstCaptain.getTeamId());
+        final User createdUser = create(secondCaptain);
+
+        final UserRequest userToUpdate = UserRequest.builder()
+                .id(createdUser.getId())
+                .foldingUserName(createdUser.getFoldingUserName())
+                .displayName(createdUser.getDisplayName())
+                .passkey(createdUser.getPasskey())
+                .category(createdUser.getCategory().displayName())
+                .profileLink(createdUser.getProfileLink())
+                .liveStatsLink(createdUser.getLiveStatsLink())
+                .hardwareId(createdUser.getHardware().getId())
+                .teamId(createdUser.getTeam().getId())
+                .userIsCaptain(true)
+                .build();
+
+        final HttpResponse<String> response = USER_REQUEST_SENDER.update(userToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
                 .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);

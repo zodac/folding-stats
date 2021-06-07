@@ -9,14 +9,19 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import me.zodac.folding.api.RequestPojo;
-import me.zodac.folding.api.tc.Team;
-
 
 /**
- * POJO defining a single {@link UserRequest} Folding on a username+passkey combination to participate in the <code>Team Competition</code>. Ideally this username+passkey will only be used on a single piece of {@link HardwareRequest}.
- * Though we cannot verify that externally, we only allow each {@link UserRequest} a single {@link HardwareRequest} at a time.
+ * POJO defining a single {@link UserRequest} Folding on a username/passkey combination to participate in the
+ * <code>Team Competition</code>.
  * <p>
- * Each {@link UserRequest} can join a {@link Team} in order to have their Folding@Home stats retrieved, and they can contribute to the <code>Team Competition</code>.
+ * Ideally this username/passkey will only be used on a single piece of {@link me.zodac.folding.api.tc.Hardware}. Though we cannot verify
+ * that externally, we only allow each {@link UserRequest} a single {@link me.zodac.folding.api.tc.Hardware} at a time.
+ * <p>
+ * There is a limit on the number of users each team can have, defined by the {@link me.zodac.folding.api.tc.Category}
+ * description.
+ * <p>
+ * Each {@link UserRequest} can join a {@link me.zodac.folding.api.tc.Team} in order to have their Folding@Home stats retrieved, and they can
+ * contribute to the <code>Team Competition</code>.
  */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)

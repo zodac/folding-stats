@@ -14,10 +14,16 @@ import java.util.Objects;
 
 
 /**
- * POJO defining a single {@link User} Folding on a username+passkey combination to participate in the <code>Team Competition</code>. Ideally this username+passkey will only be used on a single piece of {@link Hardware}.
- * Though we cannot verify that externally, we only allow each {@link User} a single {@link Hardware} at a time.
+ * POJO defining a single {@link User} Folding on a username/passkey combination to participate in the
+ * <code>Team Competition</code>.
  * <p>
- * Each {@link User} can join a {@link Team} in order to have their Folding@Home stats retrieved, and they can contribute to the <code>Team Competition</code>.
+ * Ideally this username/passkey will only be used on a single piece of {@link Hardware}. Though we cannot verify
+ * that externally, we only allow each {@link User} a single {@link Hardware} at a time.
+ * <p>
+ * There is a limit on the number of users each team can have, defined by the {@link Category} description.
+ * <p>
+ * Each {@link User} can join a {@link Team} in order to have their Folding@Home stats retrieved, and they can
+ * contribute to the <code>Team Competition</code>.
  */
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder

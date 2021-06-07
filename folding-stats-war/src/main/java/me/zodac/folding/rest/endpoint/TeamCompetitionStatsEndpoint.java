@@ -202,10 +202,6 @@ public class TeamCompetitionStatsEndpoint {
     }
 
     private OffsetStats getValidUserStatsOffset(final User user, final OffsetStats offsetStats) throws FoldingException, UserNotFoundException {
-        if (!offsetStats.isMissingPointsOrMultipliedPoints()) {
-            return offsetStats;
-        }
-
         final Hardware hardware = user.getHardware();
         return OffsetStats.updateWithHardwareMultiplier(offsetStats, hardware.getMultiplier());
     }
