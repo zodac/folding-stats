@@ -1,4 +1,4 @@
-package me.zodac.folding.ejb;
+package me.zodac.folding.ejb.scheduled;
 
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.SystemState;
@@ -6,6 +6,8 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.utils.EnvironmentVariableUtils;
 import me.zodac.folding.api.utils.ExecutionType;
+import me.zodac.folding.ejb.OldFacade;
+import me.zodac.folding.ejb.UserTeamCompetitionStatsParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -123,5 +125,4 @@ public class TeamCompetitionStatsScheduler {
             }
         }
     }
-
 }

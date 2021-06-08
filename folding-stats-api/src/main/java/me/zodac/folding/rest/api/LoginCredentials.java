@@ -9,6 +9,7 @@ import lombok.Setter;
 import lombok.ToString;
 import me.zodac.folding.api.utils.EncodingUtils;
 
+
 /**
  * Simple POJO defining {@link java.util.Base64}-encoded credentials. The credentials are created by:
  * <ol>

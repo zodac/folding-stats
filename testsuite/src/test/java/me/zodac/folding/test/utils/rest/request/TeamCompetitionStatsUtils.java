@@ -3,10 +3,10 @@ package me.zodac.folding.test.utils.rest.request;
 import me.zodac.folding.client.java.request.TeamCompetitionStatsRequestSender;
 import me.zodac.folding.client.java.response.TeamCompetitionResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
-import me.zodac.folding.rest.api.tc.CompetitionResult;
-import me.zodac.folding.rest.api.tc.RetiredUserResult;
-import me.zodac.folding.rest.api.tc.TeamResult;
-import me.zodac.folding.rest.api.tc.UserResult;
+import me.zodac.folding.rest.api.tc.CompetitionSummary;
+import me.zodac.folding.rest.api.tc.RetiredUserSummary;
+import me.zodac.folding.rest.api.tc.TeamSummary;
+import me.zodac.folding.rest.api.tc.UserSummary;
 
 import java.net.HttpURLConnection;
 import java.net.http.HttpResponse;
@@ -29,10 +29,10 @@ public final class TeamCompetitionStatsUtils {
     /**
      * Get the overall TC results.
      *
-     * @return the TC {@link CompetitionResult}
+     * @return the TC {@link CompetitionSummary}
      * @throws FoldingRestException thrown if an error occurs sending the HTTP request
      */
-    public static CompetitionResult getStats() throws FoldingRestException {
+    public static CompetitionSummary getStats() throws FoldingRestException {
         final HttpResponse<String> response = TEAM_COMPETITION_REQUEST_SENDER.getStats();
         if (response.statusCode() == HttpURLConnection.HTTP_OK) {
             return TeamCompetitionResponseParser.getStats(response);
@@ -44,11 +44,11 @@ public final class TeamCompetitionStatsUtils {
     /**
      * Get the TC results for a single {@link me.zodac.folding.api.tc.User}.
      *
-     * @param userId the ID of the {@link me.zodac.folding.api.tc.User} whose {@link UserResult} is to be retrieved
-     * @return the TC {@link UserResult}
+     * @param userId the ID of the {@link me.zodac.folding.api.tc.User} whose {@link UserSummary} is to be retrieved
+     * @return the TC {@link UserSummary}
      * @throws FoldingRestException thrown if an error occurs sending the HTTP request
      */
-    public static UserResult getStatsForUser(final int userId) throws FoldingRestException {
+    public static UserSummary getStatsForUser(final int userId) throws FoldingRestException {
         final HttpResponse<String> response = TEAM_COMPETITION_REQUEST_SENDER.getStatsForUser(userId);
         if (response.statusCode() == HttpURLConnection.HTTP_OK) {
             return TeamCompetitionResponseParser.getStatsForUser(response);
@@ -58,54 +58,54 @@ public final class TeamCompetitionStatsUtils {
     }
 
     /**
-     * Retrieves the {@link TeamResult} with the given {@code teamName} from the {@link CompetitionResult}.
+     * Retrieves the {@link TeamSummary} with the given {@code teamName} from the {@link CompetitionSummary}.
      *
-     * @param competitionResult the {@link CompetitionResult} to check
-     * @param teamName          the name of the {@link TeamResult} to find
-     * @return the {@link TeamResult}
+     * @param competitionSummary the {@link CompetitionSummary} to check
+     * @param teamName           the name of the {@link TeamSummary} to find
+     * @return the {@link TeamSummary}
      * @throws FoldingRestException thrown if an error occurs sending the HTTP request
      */
-    public static TeamResult getTeamFromCompetition(final CompetitionResult competitionResult, final String teamName) throws FoldingRestException {
-        for (final TeamResult teamResult : competitionResult.getTeams()) {
-            if (teamResult.getTeamName().equalsIgnoreCase(teamName)) {
-                return teamResult;
+    public static TeamSummary getTeamFromCompetition(final CompetitionSummary competitionSummary, final String teamName) throws FoldingRestException {
+        for (final TeamSummary teamSummary : competitionSummary.getTeams()) {
+            if (teamSummary.getTeamName().equalsIgnoreCase(teamName)) {
+                return teamSummary;
             }
         }
-        throw new FoldingRestException(String.format("Unable to find team '%s' in competition teams: %s", teamName, competitionResult.getTeams()));
+        throw new FoldingRestException(String.format("Unable to find team '%s' in competition teams: %s", teamName, competitionSummary.getTeams()));
     }
 
     /**
-     * Retrieves the active {@link UserResult} with the given {@code userName} from the {@link TeamResult}.
+     * Retrieves the active {@link UserSummary} with the given {@code userName} from the {@link TeamSummary}.
      *
-     * @param teamResult the {@link TeamResult} to check
-     * @param userName   the name of the active {@link UserResult} to find
-     * @return the {@link UserResult}
+     * @param teamSummary the {@link TeamSummary} to check
+     * @param userName    the name of the active {@link UserSummary} to find
+     * @return the {@link UserSummary}
      * @throws FoldingRestException thrown if an error occurs sending the HTTP request
      */
-    public static UserResult getActiveUserFromTeam(final TeamResult teamResult, final String userName) throws FoldingRestException {
-        for (final UserResult userResult : teamResult.getActiveUsers()) {
+    public static UserSummary getActiveUserFromTeam(final TeamSummary teamSummary, final String userName) throws FoldingRestException {
+        for (final UserSummary userSummary : teamSummary.getActiveUsers()) {
+            if (userSummary.getDisplayName().equalsIgnoreCase(userName)) {
+                return userSummary;
+            }
+        }
+        throw new FoldingRestException(String.format("Unable to find user '%s' in active users: %s", userName, teamSummary.getActiveUsers()));
+    }
+
+    /**
+     * Retrieves the retired {@link UserSummary} with the given {@code userName} from the {@link TeamSummary}.
+     *
+     * @param teamSummary the {@link TeamSummary} to check
+     * @param userName    the name of the retired {@link UserSummary} to find
+     * @return the {@link UserSummary}
+     * @throws FoldingRestException thrown if an error occurs sending the HTTP request
+     */
+    public static RetiredUserSummary getRetiredUserFromTeam(final TeamSummary teamSummary, final String userName) throws FoldingRestException {
+        for (final RetiredUserSummary userResult : teamSummary.getRetiredUsers()) {
             if (userResult.getDisplayName().equalsIgnoreCase(userName)) {
                 return userResult;
             }
         }
-        throw new FoldingRestException(String.format("Unable to find user '%s' in active users: %s", userName, teamResult.getActiveUsers()));
-    }
-
-    /**
-     * Retrieves the retired {@link UserResult} with the given {@code userName} from the {@link TeamResult}.
-     *
-     * @param teamResult the {@link TeamResult} to check
-     * @param userName   the name of the retired {@link UserResult} to find
-     * @return the {@link UserResult}
-     * @throws FoldingRestException thrown if an error occurs sending the HTTP request
-     */
-    public static RetiredUserResult getRetiredUserFromTeam(final TeamResult teamResult, final String userName) throws FoldingRestException {
-        for (final RetiredUserResult userResult : teamResult.getRetiredUsers()) {
-            if (userResult.getDisplayName().equalsIgnoreCase(userName)) {
-                return userResult;
-            }
-        }
-        throw new FoldingRestException(String.format("Unable to find user '%s' in retired users: %s", userName, teamResult.getRetiredUsers()));
+        throw new FoldingRestException(String.format("Unable to find user '%s' in retired users: %s", userName, teamSummary.getRetiredUsers()));
     }
 
     /**

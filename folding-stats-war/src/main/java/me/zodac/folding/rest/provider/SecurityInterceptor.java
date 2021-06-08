@@ -4,7 +4,7 @@ import me.zodac.folding.api.SystemUserAuthentication;
 import me.zodac.folding.api.utils.EncodingUtils;
 import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.rest.api.header.RestHeader;
-import me.zodac.folding.rest.util.response.Responses;
+import me.zodac.folding.rest.response.Responses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,8 +27,8 @@ import java.util.Map;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
-import static me.zodac.folding.rest.util.response.Responses.forbidden;
-import static me.zodac.folding.rest.util.response.Responses.unauthorized;
+import static me.zodac.folding.rest.response.Responses.forbidden;
+import static me.zodac.folding.rest.response.Responses.unauthorized;
 
 /**
  * {@link Provider} that intercepts all requests and verifies that the request is authorized and authenticated. Each request

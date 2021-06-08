@@ -5,9 +5,24 @@ package me.zodac.folding.rest.api.header;
  */
 public enum RestHeader {
 
+    /**
+     * The <code>Authorization</code> header.
+     */
     AUTHORIZATION("Authorization"),
+
+    /**
+     * The <code>Cache-Control</code> header.
+     */
     CACHE_CONTROL("Cache-Control"),
+
+    /**
+     * The <code>Content-Type</code> header.
+     */
     CONTENT_TYPE("Content-Type"),
+
+    /**
+     * The <code>If-None-Match</code> header.
+     */
     IF_NONE_MATCH("If-None-Match");
 
     private final String headerName;

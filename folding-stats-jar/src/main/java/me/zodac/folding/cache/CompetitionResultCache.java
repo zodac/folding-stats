@@ -1,6 +1,6 @@
 package me.zodac.folding.cache;
 
-import me.zodac.folding.rest.api.tc.CompetitionResult;
+import me.zodac.folding.rest.api.tc.CompetitionSummary;
 
 import java.util.Optional;
 
@@ -8,7 +8,7 @@ public final class CompetitionResultCache {
 
     private static final CompetitionResultCache INSTANCE = new CompetitionResultCache();
 
-    private transient CompetitionResult cachedResult;
+    private transient CompetitionSummary cachedResult;
 
     private CompetitionResultCache() {
 
@@ -22,11 +22,11 @@ public final class CompetitionResultCache {
         return cachedResult != null;
     }
 
-    public void add(final CompetitionResult competitionResult) {
-        cachedResult = competitionResult;
+    public void add(final CompetitionSummary competitionSummary) {
+        cachedResult = competitionSummary;
     }
 
-    public Optional<CompetitionResult> getResult() {
+    public Optional<CompetitionSummary> getResult() {
         return Optional.ofNullable(cachedResult);
     }
 }

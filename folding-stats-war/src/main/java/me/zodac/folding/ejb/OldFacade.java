@@ -5,7 +5,6 @@ import me.zodac.folding.api.SystemUserAuthentication;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.exception.DatabaseConnectionException;
 import me.zodac.folding.api.exception.ExternalConnectionException;
-import me.zodac.folding.api.exception.HardwareNotFoundException;
 import me.zodac.folding.api.exception.NoStatsAvailableException;
 import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.api.exception.TeamNotFoundException;
@@ -44,11 +43,6 @@ import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 
-// TODO: [zodac] Should replace the cache miss warnings with some metrics instead?
-// TODO: [zodac] Split into one Facade for POJOs and one for stats?
-// TODO: [zodac] I really don't like how much logic is in here now, originally I planned for this just to avoid needing to specify
-//  both DB and cache in the REST/EJB layer. I think it's gotten too big and needs to be scaled back...
-// TODO: [zodac] Also don't like how the #get() methods don't use Optional, why am I relying on *NotFoundException?
 @Deprecated
 @Singleton
 public class OldFacade {
@@ -59,7 +53,7 @@ public class OldFacade {
     private transient final DbManager dbManager = DbManagerRetriever.get();
     private transient final TeamCache teamCache = TeamCache.get();
     private transient final UserCache userCache = UserCache.get();
-    private transient final HardwareCache hardwareCache = HardwareCache.get();
+    private transient final HardwareCache hardwareCache = HardwareCache.getInstance();
 
     private transient final InitialStatsCache initialStatsCache = InitialStatsCache.get();
     private transient final OffsetStatsCache offsetStatsCache = OffsetStatsCache.get();
@@ -70,79 +64,36 @@ public class OldFacade {
     @EJB
     private transient UserTeamCompetitionStatsParser userTeamCompetitionStatsParser;
 
-    public Hardware createHardware(final Hardware hardware) {
-        final Hardware hardwareWithId = dbManager.createHardware(hardware);
-        hardwareCache.add(hardwareWithId);
-        return hardwareWithId;
-    }
-
-    public Hardware getHardware(final int hardwareId) throws HardwareNotFoundException {
-        try {
-            return hardwareCache.get(hardwareId);
-        } catch (final NotFoundException e) {
-            LOGGER.debug("Unable to find hardware with ID {} in cache", hardwareId, e);
-        }
-
-        LOGGER.trace("Cache miss! Get hardware");
-        // Should be no need to get anything from the DB (since it should have been added to the cache when created)
-        // But adding this just in case we decide to add some cache eviction in future
-        final Hardware hardwareFromDb = dbManager.getHardware(hardwareId).orElseThrow(() -> new HardwareNotFoundException(hardwareId));
-        hardwareCache.add(hardwareFromDb);
-        return hardwareFromDb;
-    }
-
-    public Collection<Hardware> getAllHardware() {
-        final Collection<Hardware> allHardware = hardwareCache.getAll();
-
-        if (!allHardware.isEmpty()) {
-            return allHardware;
-        }
-
-        LOGGER.trace("Cache miss! Get all hardware");
-        // Should be no need to get anything from the DB (since it should have been added to the cache when created)
-        // But adding this just in case we decide to add some cache eviction in future
-        final Collection<Hardware> allHardwareFromDb = dbManager.getAllHardware();
-        hardwareCache.addAll(allHardwareFromDb);
-        return allHardwareFromDb;
-    }
-
-    public Optional<Hardware> getHardwareForUser(final User user) {
-        return getAllHardware()
-                .stream()
-                .filter(hardware -> hardware.getId() == user.getHardware().getId())
-                .findAny();
-    }
-
-    public void updateHardware(final Hardware updatedHardware) throws HardwareNotFoundException, ExternalConnectionException {
-        final Hardware existingHardware = getHardware(updatedHardware.getId());
+    public void updateHardware(final Hardware updatedHardware, final Hardware existingHardware) throws ExternalConnectionException {
+        LOGGER.info("Updating hardware: {} -> {}", existingHardware, updatedHardware);
         dbManager.updateHardware(updatedHardware);
         hardwareCache.add(updatedHardware);
 
-        // If the multiplier is changed then any users that use this hardware must have their initial stats updated
-        if (existingHardware.getMultiplier() != updatedHardware.getMultiplier()) {
-            final List<User> usersWithUpdatedHardware = getAllUsers()
-                    .stream()
-                    .filter(user -> user.getHardware().getId() == updatedHardware.getId())
-                    .collect(toList());
-            LOGGER.debug("Hardware had state change to multiplier {} -> {}, recalculating initial stats for {} users", existingHardware.getMultiplier(), updatedHardware.getMultiplier(), usersWithUpdatedHardware.size());
+        final List<User> usersUsingThisHardware = getAllUsers()
+                .stream()
+                .filter(user -> user.getHardware().getId() == updatedHardware.getId())
+                .collect(toList());
 
-            for (final User user : usersWithUpdatedHardware) {
+        final boolean isHardwareMultiplierChange = existingHardware.getMultiplier() != updatedHardware.getMultiplier();
+
+        LOGGER.info("Users using this hardware: {}", usersUsingThisHardware);
+        LOGGER.info("isHardwareMultiplierChange? {}", isHardwareMultiplierChange);
+
+        for (final User user : usersUsingThisHardware) {
+            UserCache.get().remove(user.getId()); // TODO: Don't use cache directly, use Storage#evictUserFromCache()
+
+            if (isHardwareMultiplierChange) {
                 LOGGER.debug("User {} had state change to hardware multiplier", user.getFoldingUserName());
+                LOGGER.info("User {} had state change to hardware multiplier", user.getFoldingUserName());
                 handleStateChangeForUser(user);
             }
         }
-    }
-
-    public void deleteHardware(final int hardwareId) {
-        dbManager.deleteHardware(hardwareId);
-        hardwareCache.remove(hardwareId);
     }
 
     public User createUser(final User user) throws ExternalConnectionException {
         final User userWithId = dbManager.createUser(user);
         userCache.add(userWithId);
 
-        // TODO: [zodac] Should the StorageFacade be responsible for making this stats call? Or should it be the caller requesting it?
         // When adding a new user, we configure the initial stats DB/cache
         persistInitialUserStats(userWithId);
         // When adding a new user, we give an empty offset to the offset cache
@@ -159,7 +110,7 @@ public class OldFacade {
 
     public User getUserWithPasskey(final int userId, final boolean showFullPasskeys) throws UserNotFoundException {
         try {
-            final User user = userCache.get(userId);
+            final User user = userCache.getOrError(userId);
             return showFullPasskeys ? user : User.hidePasskey(user);
         } catch (final NotFoundException e) {
             LOGGER.debug("Unable to find user with ID {} in cache", userId, e);
@@ -214,24 +165,28 @@ public class OldFacade {
         if (!existingUser.getHardware().equals(updatedUser.getHardware())) {
             LOGGER.debug("User had state change to hardware, {} -> {}, recalculating initial stats", existingUser.getHardware(), updatedUser.getHardware());
             handleStateChangeForUser(updatedUser);
+            userCache.add(updatedUser);
             return;
         }
 
         if (!existingUser.getTeam().equals(updatedUser.getTeam())) {
             LOGGER.debug("User had state change to team, {} -> {}, recalculating initial stats", existingUser.getTeam(), updatedUser.getTeam());
             handleStateChangeForUser(updatedUser);
+            userCache.add(updatedUser);
             return;
         }
 
         if (!existingUser.getFoldingUserName().equalsIgnoreCase(updatedUser.getFoldingUserName())) {
             LOGGER.debug("User had state change to Folding username, {} -> {}, recalculating initial stats", existingUser.getFoldingUserName(), updatedUser.getFoldingUserName());
             handleStateChangeForUser(updatedUser);
+            userCache.add(updatedUser);
             return;
         }
 
         if (!existingUser.getPasskey().equalsIgnoreCase(updatedUser.getPasskey())) {
             LOGGER.debug("User had state change to passkey, {} -> {}, recalculating initial stats", existingUser.getPasskey(), updatedUser.getPasskey());
             handleStateChangeForUser(updatedUser);
+            userCache.add(updatedUser);
             return;
         }
 
@@ -241,17 +196,17 @@ public class OldFacade {
     // If a user is updated and their Folding username, hardware ID or passkey is changed, we need to update their initial offset again
     // Also occurs if the hardware multiplier for a hardware used by a user is changed
     // We set the new initial stats to the user's current total stats, then give an offset of their current TC stats (multiplied)
-    private void handleStateChangeForUser(final User updatedUser) throws ExternalConnectionException {
-        final UserStats userTotalStats = FOLDING_STATS_RETRIEVER.getTotalStats(updatedUser);
-        final UserTcStats currentUserTcStats = getCurrentTcStatsForUserOrDefault(updatedUser);
+    private void handleStateChangeForUser(final User userWithStateChange) throws ExternalConnectionException {
+        final UserStats userTotalStats = FOLDING_STATS_RETRIEVER.getTotalStats(userWithStateChange);
+        final UserTcStats currentUserTcStats = getCurrentTcStatsForUserOrDefault(userWithStateChange);
 
         LOGGER.debug("Setting initial stats to: {}", userTotalStats);
         dbManager.persistInitialStats(userTotalStats);
-        initialStatsCache.add(updatedUser.getId(), userTotalStats.getStats());
+        initialStatsCache.add(userWithStateChange.getId(), userTotalStats.getStats());
 
         final OffsetStats offsetStats = OffsetStats.create(currentUserTcStats.getPoints(), currentUserTcStats.getMultipliedPoints(), currentUserTcStats.getUnits());
         LOGGER.debug("Adding offset stats of: {}", offsetStats);
-        addOffsetStats(updatedUser.getId(), offsetStats);
+        addOffsetStats(userWithStateChange.getId(), offsetStats);
     }
 
     private UserTcStats getCurrentTcStatsForUserOrDefault(final User updatedUser) {
@@ -297,7 +252,7 @@ public class OldFacade {
 
     public Team getTeam(final int teamId) throws TeamNotFoundException {
         try {
-            return teamCache.get(teamId);
+            return teamCache.getOrError(teamId);
         } catch (final NotFoundException e) {
             LOGGER.debug("Unable to find team with ID {} in cache", teamId, e);
         }
@@ -492,16 +447,6 @@ public class OldFacade {
         return systemUserAuthentication;
     }
 
-    public boolean doesNotContainHardware(final int hardwareId) {
-        try {
-            getHardware(hardwareId);
-            return false;
-        } catch (final DatabaseConnectionException | HardwareNotFoundException e) {
-            LOGGER.debug("Unable to find hardware with ID: {}", hardwareId, e);
-            return true;
-        }
-    }
-
     public boolean doesNotContainTeam(final int teamId) {
         try {
             getTeam(teamId);
@@ -524,18 +469,6 @@ public class OldFacade {
 
     public void deleteRetiredUserStats() {
         dbManager.deleteRetiredUserStats();
-    }
-
-    public Optional<Hardware> getHardwareWithName(final String hardwareName) {
-        try {
-            return getAllHardware()
-                    .stream()
-                    .filter(hardware -> hardware.getHardwareName().equalsIgnoreCase(hardwareName))
-                    .findAny();
-        } catch (final DatabaseConnectionException e) {
-            LOGGER.warn("Error getting hardware with hardwareName '{}'", hardwareName, e);
-            return Optional.empty();
-        }
     }
 
     public Optional<Team> getTeamWithName(final String teamName) {

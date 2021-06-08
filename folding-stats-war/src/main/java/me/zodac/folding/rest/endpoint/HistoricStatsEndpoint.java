@@ -34,11 +34,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static me.zodac.folding.rest.util.response.Responses.badRequest;
-import static me.zodac.folding.rest.util.response.Responses.notFound;
-import static me.zodac.folding.rest.util.response.Responses.okBuilder;
-import static me.zodac.folding.rest.util.response.Responses.serverError;
-import static me.zodac.folding.rest.util.response.Responses.serviceUnavailable;
+import static me.zodac.folding.rest.response.Responses.badRequest;
+import static me.zodac.folding.rest.response.Responses.notFound;
+import static me.zodac.folding.rest.response.Responses.okBuilder;
+import static me.zodac.folding.rest.response.Responses.serverError;
+import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
 
 // TODO: [zodac] Verify that all places that return a HTTP response also log something
 @Path("/historic/")
@@ -108,7 +108,7 @@ public class HistoricStatsEndpoint {
             LOGGER.error(errorMessage);
             return badRequest(errorMessage);
         } catch (final NumberFormatException e) {
-            final String errorMessage = String.format("The user ID '%s', month '%s' or day '%s' is not a valid format", userId, month, day);
+            final String errorMessage = String.format("The month '%s' or day '%s' is not a valid format", month, day);
             LOGGER.debug(errorMessage, e);
             LOGGER.error(errorMessage);
             return badRequest(errorMessage);
@@ -157,13 +157,8 @@ public class HistoricStatsEndpoint {
             LOGGER.debug(errorMessage, e);
             LOGGER.error(errorMessage);
             return badRequest(errorMessage);
-        } catch (final DateTimeException e) {
+        } catch (final DateTimeException | NumberFormatException e) {
             final String errorMessage = String.format("The month '%s' is not a valid format", month);
-            LOGGER.debug(errorMessage, e);
-            LOGGER.error(errorMessage);
-            return badRequest(errorMessage);
-        } catch (final NumberFormatException e) {
-            final String errorMessage = String.format("The user ID '%s' or month '%s' is not a valid format", userId, month);
             LOGGER.debug(errorMessage, e);
             LOGGER.error(errorMessage);
             return badRequest(errorMessage);
@@ -211,11 +206,6 @@ public class HistoricStatsEndpoint {
             return builder.build();
         } catch (final DateTimeParseException e) {
             final String errorMessage = String.format("The year '%s' is not a valid format", year);
-            LOGGER.debug(errorMessage, e);
-            LOGGER.error(errorMessage);
-            return badRequest(errorMessage);
-        } catch (final NumberFormatException e) {
-            final String errorMessage = String.format("The user ID '%s' is not a valid format", userId);
             LOGGER.debug(errorMessage, e);
             LOGGER.error(errorMessage);
             return badRequest(errorMessage);
@@ -291,7 +281,7 @@ public class HistoricStatsEndpoint {
             LOGGER.error(errorMessage);
             return badRequest(errorMessage);
         } catch (final NumberFormatException e) {
-            final String errorMessage = String.format("The team ID '%s', month '%s' or day '%s' is not a valid format", teamId, month, day);
+            final String errorMessage = String.format("The month '%s' or day '%s' is not a valid format", month, day);
             LOGGER.debug(errorMessage, e);
             LOGGER.error(errorMessage);
             return badRequest(errorMessage);
@@ -349,13 +339,8 @@ public class HistoricStatsEndpoint {
             LOGGER.debug(errorMessage, e);
             LOGGER.error(errorMessage);
             return badRequest(errorMessage);
-        } catch (final DateTimeException e) {
+        } catch (final DateTimeException | NumberFormatException e) {
             final String errorMessage = String.format("The month '%s' is not a valid format", month);
-            LOGGER.debug(errorMessage, e);
-            LOGGER.error(errorMessage);
-            return badRequest(errorMessage);
-        } catch (final NumberFormatException e) {
-            final String errorMessage = String.format("The team ID '%s' or month '%s' is not a valid format", teamId, month);
             LOGGER.debug(errorMessage, e);
             LOGGER.error(errorMessage);
             return badRequest(errorMessage);
@@ -409,11 +394,6 @@ public class HistoricStatsEndpoint {
             return builder.build();
         } catch (final DateTimeParseException e) {
             final String errorMessage = String.format("The year '%s' is not a valid format", year);
-            LOGGER.debug(errorMessage, e);
-            LOGGER.error(errorMessage);
-            return badRequest(errorMessage);
-        } catch (final NumberFormatException e) {
-            final String errorMessage = String.format("The team ID '%s' is not a valid format", teamId);
             LOGGER.debug(errorMessage, e);
             LOGGER.error(errorMessage);
             return badRequest(errorMessage);

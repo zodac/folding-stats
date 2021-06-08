@@ -19,14 +19,14 @@ import java.util.stream.Collector;
  *
  * @see <a href="https://stackoverflow.com/a/41608187/2000246">How to rank collection of objects</a>
  */
-class IntegerRankingCollector<T> implements Collector<T, List<T>, List<T>> {
+final class IntegerRankingCollector<T> implements Collector<T, List<T>, List<T>> {
 
     private static final Set<Characteristics> COLLECTOR_CHARACTERISTICS = Collections.unmodifiableSet(EnumSet.of(Characteristics.IDENTITY_FINISH));
     private transient final Comparator<? super T> comparator;
     private transient final BiFunction<T, Integer, T> creator;
     private transient final Function<T, Integer> ranker;
 
-    public IntegerRankingCollector(final Comparator<? super T> comparator, final Function<T, Integer> ranker, final BiFunction<T, Integer, T> creator) {
+    IntegerRankingCollector(final Comparator<? super T> comparator, final Function<T, Integer> ranker, final BiFunction<T, Integer, T> creator) {
         this.comparator = comparator;
         this.ranker = ranker;
         this.creator = creator;

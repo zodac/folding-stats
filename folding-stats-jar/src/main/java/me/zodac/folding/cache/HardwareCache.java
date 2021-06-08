@@ -15,7 +15,7 @@ public final class HardwareCache extends AbstractCache<Hardware> {
         return "hardware";
     }
 
-    public static HardwareCache get() {
+    public static HardwareCache getInstance() {
         return INSTANCE;
     }
 }

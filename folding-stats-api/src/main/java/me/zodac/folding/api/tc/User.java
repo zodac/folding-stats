@@ -114,6 +114,37 @@ public class User implements ResponsePojo {
     }
 
     /**
+     * Updates a {@link User} with the given {@link Hardware}.
+     * <p>
+     * If a {@link Hardware} has been updated, the {@link User} needs its reference updated too.
+     *
+     * @param user     the {@link User} to be updated with the new {@link Hardware}
+     * @param hardware the updated {@link Hardware}
+     * @return the updated {@link User}
+     */
+    public static User updateHardware(final User user, final Hardware hardware) {
+        final String profileLink = isEmpty(user.profileLink) ? null : user.profileLink;
+        final String liveStatsLink = isEmpty(user.liveStatsLink) ? null : user.liveStatsLink;
+        return new User(user.id, user.foldingUserName, user.displayName, user.passkey, user.category, profileLink, liveStatsLink, hardware, user.team, user.userIsCaptain);
+    }
+
+    /**
+     * Updates a {@link User} with the given {@link Team}.
+     * <p>
+     * If a {@link Team} has been updated, the {@link User} needs its reference updated too.
+     *
+     * @param user the {@link User} to be updated with the new {@link Team}
+     * @param team the updated {@link Team}
+     * @return the updated {@link User}
+     */
+    // TODO: [zodac] Implement
+    public static User updateTeam(final User user, final Team team) {
+        final String profileLink = isEmpty(user.profileLink) ? null : user.profileLink;
+        final String liveStatsLink = isEmpty(user.liveStatsLink) ? null : user.liveStatsLink;
+        return new User(user.id, user.foldingUserName, user.displayName, user.passkey, user.category, profileLink, liveStatsLink, user.hardware, team, user.userIsCaptain);
+    }
+
+    /**
      * Hides the {@code passkey} for the given {@link User}.
      * <p>
      * Since we do not want {@link User}s' passkeys to be made available through the REST API, we hide most of the passkey (we leave the first few digits visible).

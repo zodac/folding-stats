@@ -5,6 +5,9 @@ package me.zodac.folding.rest.api.header;
  */
 public enum ContentType {
 
+    /**
+     * The <code>application/json</code> value.
+     */
     JSON("application/json");
 
     private final String contentType;

@@ -6,6 +6,7 @@ import me.zodac.folding.api.exception.NotFoundException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 abstract class AbstractCache<V extends ResponsePojo> {
@@ -22,8 +23,13 @@ abstract class AbstractCache<V extends ResponsePojo> {
      * Add an element of type {@link V} to the cache.
      *
      * @param element the {@link V} element to add to the cache
+     * @throws IllegalArgumentException thrown if the input element is <code>null</code> or has an ID of <b>0</b>
      */
     public void add(final V element) {
+        if (element == null) {
+            throw new IllegalArgumentException("Element cannot be null");
+        }
+
         final int elementId = element.getId();
 
         if (elementId == 0) {
@@ -42,7 +48,17 @@ abstract class AbstractCache<V extends ResponsePojo> {
         elementsById.remove(elementId);
     }
 
-    public V get(final int id) throws NotFoundException {
+    public Optional<V> get(final int id) {
+        if (elementsById.containsKey(id)) {
+            return Optional.of(elementsById.get(id));
+        }
+
+        return Optional.empty();
+    }
+
+
+    @Deprecated
+    public V getOrError(final int id) throws NotFoundException {
         final V element = elementsById.get(id);
         if (element == null) {
             throw new NotFoundException(elementType(), id);
@@ -50,16 +66,9 @@ abstract class AbstractCache<V extends ResponsePojo> {
         return element;
     }
 
-    public V get(final String id) throws NotFoundException {
-        return get(Integer.parseInt(id));
-    }
-
-    public V getOrNull(final int id) {
-        try {
-            return get(id);
-        } catch (final NotFoundException e) {
-            return null;
-        }
+    @Deprecated
+    public V getOrError(final String id) throws NotFoundException {
+        return getOrError(Integer.parseInt(id));
     }
 
     public Collection<V> getAll() {

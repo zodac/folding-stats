@@ -9,11 +9,24 @@ public class ExternalConnectionException extends Exception {
 
     private final String url;
 
+    /**
+     * Constructor taking in the failing URL and an error message.
+     *
+     * @param url     the URL which was unable to be connected to
+     * @param message the error message
+     */
     public ExternalConnectionException(final String url, final String message) {
         super(message);
         this.url = url;
     }
 
+    /**
+     * Constructor taking in the failing URL, an error message and a cause {@link Throwable}.
+     *
+     * @param url       the URL which was unable to be connected to
+     * @param message   the error message
+     * @param throwable the cause {@link Throwable}
+     */
     public ExternalConnectionException(final String url, final String message, final Throwable throwable) {
         super(message, throwable);
         this.url = url;

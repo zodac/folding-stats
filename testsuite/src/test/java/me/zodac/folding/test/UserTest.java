@@ -1,10 +1,12 @@
 package me.zodac.folding.test;
 
 import me.zodac.folding.api.tc.Category;
+import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.client.java.response.UserResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
+import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 import me.zodac.folding.test.utils.TestConstants;
 import me.zodac.folding.test.utils.rest.request.StubbedFoldingEndpointUtils;
@@ -41,6 +43,7 @@ import static me.zodac.folding.test.utils.TestGenerator.generateUserWithHardware
 import static me.zodac.folding.test.utils.TestGenerator.generateUserWithId;
 import static me.zodac.folding.test.utils.TestGenerator.generateUserWithLiveStatsLink;
 import static me.zodac.folding.test.utils.TestGenerator.generateUserWithTeamId;
+import static me.zodac.folding.test.utils.rest.request.HardwareUtils.HARDWARE_REQUEST_SENDER;
 import static me.zodac.folding.test.utils.rest.request.UserUtils.USER_REQUEST_SENDER;
 import static me.zodac.folding.test.utils.rest.request.UserUtils.create;
 import static me.zodac.folding.test.utils.rest.response.HttpResponseHeaderUtils.getETag;
@@ -703,6 +706,36 @@ class UserTest {
         assertThat(response.body())
                 .as("Did not receive an error message specifying the team already has a captain")
                 .contains("cannot have multiple captains");
+    }
+
+    @Test
+    void whenUpdateHardware_givenUserReferencesHardware_thenUserIsUpdatedWithNewHardwareDetails_andResponseHasA200Status() throws FoldingRestException {
+        final User user = create(generateUser());
+
+        final Hardware originalHardware = user.getHardware();
+
+        final HardwareRequest hardwareToUpdate = HardwareRequest.builder()
+                .id(originalHardware.getId())
+                .hardwareName(originalHardware.getHardwareName())
+                .displayName("New Name")
+                .operatingSystem(originalHardware.getOperatingSystem().displayName())
+                .multiplier(originalHardware.getMultiplier())
+                .build();
+
+        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.update(hardwareToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
+        assertThat(response.statusCode())
+                .as("Did not receive a 200_OK HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_OK);
+
+        final User userAfterHardwareUpdate = UserResponseParser.get(USER_REQUEST_SENDER.get(user.getId()));
+
+        assertThat(userAfterHardwareUpdate.getHardware())
+                .as("Expected user's hardware to be changed: " + userAfterHardwareUpdate)
+                .isNotEqualTo(originalHardware);
+
+        assertThat(userAfterHardwareUpdate.getHardware().getDisplayName())
+                .as("Expected user's hardware display name to be updated to new one: " + userAfterHardwareUpdate)
+                .isEqualTo(hardwareToUpdate.getDisplayName());
     }
 
     @AfterAll

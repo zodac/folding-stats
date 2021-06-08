@@ -20,7 +20,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 /**
- * POJO defining historic <code>Team Competition</code> stats (hourly, daily, monthly, etc.) for a user.
+ * POJO defining historic <code>Team Competition</code> stats (hourly, daily, monthly, etc.) for a {@link me.zodac.folding.api.tc.User}.
  */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)

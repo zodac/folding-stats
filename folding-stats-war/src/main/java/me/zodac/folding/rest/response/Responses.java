@@ -1,4 +1,4 @@
-package me.zodac.folding.rest.util.response;
+package me.zodac.folding.rest.response;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -19,7 +19,7 @@ public final class Responses {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     private Responses() {
-        
+
     }
 
     /**

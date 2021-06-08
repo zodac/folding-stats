@@ -642,7 +642,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
                     .and(USER_TC_STATS_HOURLY.USER_ID.equal(userId))
                     .groupBy(month(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).cast(int.class))
                     .orderBy(month(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).cast(int.class).asc());
-            LOGGER.info("Executing SQL: '{}'", query);
+            LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.fetch()
                     .into(USER_TC_STATS_HOURLY)

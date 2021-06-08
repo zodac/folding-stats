@@ -1,5 +1,7 @@
-package me.zodac.folding.rest.util.validator;
+package me.zodac.folding.rest.validator;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.validator.ValidationResponse;
@@ -11,15 +13,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TeamValidator {
 
     private static final UrlValidator URL_VALIDATOR = new UrlValidator();
 
     private transient final OldFacade oldFacade;
-
-    private TeamValidator(final OldFacade oldFacade) {
-        this.oldFacade = oldFacade;
-    }
 
     public static TeamValidator create(final OldFacade oldFacade) {
         return new TeamValidator(oldFacade);

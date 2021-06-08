@@ -2,8 +2,6 @@ package me.zodac.folding.rest.endpoint;
 
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.SystemState;
-import me.zodac.folding.api.exception.IdOutOfRangeException;
-import me.zodac.folding.api.exception.InvalidIdException;
 import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
@@ -12,15 +10,16 @@ import me.zodac.folding.api.tc.stats.OffsetStats;
 import me.zodac.folding.api.utils.ExecutionType;
 import me.zodac.folding.ejb.CompetitionResultGenerator;
 import me.zodac.folding.ejb.OldFacade;
-import me.zodac.folding.ejb.TeamCompetitionResetScheduler;
-import me.zodac.folding.ejb.TeamCompetitionStatsScheduler;
 import me.zodac.folding.ejb.UserTeamCompetitionStatsParser;
-import me.zodac.folding.rest.api.tc.CompetitionResult;
-import me.zodac.folding.rest.api.tc.TeamResult;
-import me.zodac.folding.rest.api.tc.UserResult;
-import me.zodac.folding.rest.api.tc.leaderboard.TeamSummary;
-import me.zodac.folding.rest.api.tc.leaderboard.UserSummary;
-import me.zodac.folding.rest.util.IdentityParser;
+import me.zodac.folding.ejb.scheduled.TeamCompetitionResetScheduler;
+import me.zodac.folding.ejb.scheduled.TeamCompetitionStatsScheduler;
+import me.zodac.folding.rest.api.tc.CompetitionSummary;
+import me.zodac.folding.rest.api.tc.TeamSummary;
+import me.zodac.folding.rest.api.tc.UserSummary;
+import me.zodac.folding.rest.api.tc.leaderboard.TeamLeaderboardEntry;
+import me.zodac.folding.rest.api.tc.leaderboard.UserCategoryLeaderboardEntry;
+import me.zodac.folding.rest.parse.IntegerParser;
+import me.zodac.folding.rest.parse.ParseResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,12 +49,12 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import static java.util.stream.Collectors.toList;
-import static me.zodac.folding.rest.util.response.Responses.badRequest;
-import static me.zodac.folding.rest.util.response.Responses.notFound;
-import static me.zodac.folding.rest.util.response.Responses.nullRequest;
-import static me.zodac.folding.rest.util.response.Responses.ok;
-import static me.zodac.folding.rest.util.response.Responses.serverError;
-import static me.zodac.folding.rest.util.response.Responses.serviceUnavailable;
+import static me.zodac.folding.rest.response.Responses.badRequest;
+import static me.zodac.folding.rest.response.Responses.notFound;
+import static me.zodac.folding.rest.response.Responses.nullRequest;
+import static me.zodac.folding.rest.response.Responses.ok;
+import static me.zodac.folding.rest.response.Responses.serverError;
+import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
 
 @Path("/stats/")
 @RequestScoped
@@ -93,8 +92,8 @@ public class TeamCompetitionStatsEndpoint {
         }
 
         try {
-            final CompetitionResult competitionResult = competitionResultGenerator.generate();
-            return ok(competitionResult);
+            final CompetitionSummary competitionSummary = competitionResultGenerator.generate();
+            return ok(competitionSummary);
         } catch (final Exception e) {
             LOGGER.error("Unexpected error retrieving full TC stats", e);
             return serverError();
@@ -114,32 +113,32 @@ public class TeamCompetitionStatsEndpoint {
         }
 
         try {
-            final int parsedId = IdentityParser.parse(userId);
+            final ParseResult parseResult = IntegerParser.parsePositive(userId);
+            if (parseResult.isBadFormat()) {
+                final String errorMessage = String.format("The user ID '%s' is not a valid format", userId);
+                LOGGER.error(errorMessage);
+                return badRequest(errorMessage);
+            } else if (parseResult.isOutOfRange()) {
+                final String errorMessage = String.format("The user ID '%s' is out of range", userId);
+                LOGGER.error(errorMessage);
+                return badRequest(errorMessage);
+            }
+            final int parsedId = parseResult.getId();
             final User user = oldFacade.getUserWithPasskey(parsedId, false);
 
-            final CompetitionResult competitionResult = competitionResultGenerator.generate();
-            final Collection<UserResult> userResults = competitionResult.getTeams()
+            final CompetitionSummary competitionSummary = competitionResultGenerator.generate();
+            final Collection<UserSummary> userSummaries = competitionSummary.getTeams()
                     .stream()
                     .flatMap(teamResult -> teamResult.getActiveUsers().stream())
                     .collect(toList());
 
-            for (final UserResult userResult : userResults) {
-                if (userResult.getId() == user.getId()) {
-                    return ok(userResult);
+            for (final UserSummary userSummary : userSummaries) {
+                if (userSummary.getId() == user.getId()) {
+                    return ok(userSummary);
                 }
             }
 
             return notFound();
-        } catch (final InvalidIdException e) {
-            final String errorMessage = String.format("The user ID '%s' is not a valid format", e.getId());
-            LOGGER.debug(errorMessage, e);
-            LOGGER.error(errorMessage);
-            return badRequest(errorMessage);
-        } catch (final IdOutOfRangeException e) {
-            final String errorMessage = String.format("The user ID '%s' is out of range", e.getId());
-            LOGGER.debug(errorMessage, e);
-            LOGGER.error(errorMessage);
-            return badRequest(errorMessage);
         } catch (final UserNotFoundException e) {
             LOGGER.debug("Error getting {} with ID {}", e.getType(), e.getId(), e);
             LOGGER.error("Error getting {} with ID {}", e.getType(), e.getId());
@@ -169,7 +168,17 @@ public class TeamCompetitionStatsEndpoint {
         }
 
         try {
-            final int parsedId = IdentityParser.parse(userId);
+            final ParseResult parseResult = IntegerParser.parsePositive(userId);
+            if (parseResult.isBadFormat()) {
+                final String errorMessage = String.format("The user ID '%s' is not a valid format", userId);
+                LOGGER.error(errorMessage);
+                return badRequest(errorMessage);
+            } else if (parseResult.isOutOfRange()) {
+                final String errorMessage = String.format("The user ID '%s' is out of range", userId);
+                LOGGER.error(errorMessage);
+                return badRequest(errorMessage);
+            }
+            final int parsedId = parseResult.getId();
             final User user = oldFacade.getUser(parsedId);
 
             final OffsetStats offsetStatsToUse = getValidUserStatsOffset(user, offsetStats);
@@ -178,16 +187,6 @@ public class TeamCompetitionStatsEndpoint {
             userTeamCompetitionStatsParser.parseTcStatsForUserAndWait(oldFacade.getUser(parsedId));
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             return ok();
-        } catch (final InvalidIdException e) {
-            final String errorMessage = String.format("The user ID '%s' is not a valid format", e.getId());
-            LOGGER.debug(errorMessage, e);
-            LOGGER.error(errorMessage);
-            return badRequest(errorMessage);
-        } catch (final IdOutOfRangeException e) {
-            final String errorMessage = String.format("The user ID '%s' is out of range", e.getId());
-            LOGGER.debug(errorMessage, e);
-            LOGGER.error(errorMessage);
-            return badRequest(errorMessage);
         } catch (final UserNotFoundException e) {
             LOGGER.error("Error finding user with ID: {}", userId, e.getCause());
             return notFound();
@@ -215,10 +214,10 @@ public class TeamCompetitionStatsEndpoint {
         }
 
         try {
-            final CompetitionResult competitionResult = competitionResultGenerator.generate();
-            final List<TeamResult> teamResults = competitionResult.getTeams()
+            final CompetitionSummary competitionSummary = competitionResultGenerator.generate();
+            final List<TeamSummary> teamResults = competitionSummary.getTeams()
                     .stream()
-                    .sorted(Comparator.comparingLong(TeamResult::getTeamMultipliedPoints).reversed())
+                    .sorted(Comparator.comparingLong(TeamSummary::getTeamMultipliedPoints).reversed())
                     .collect(toList());
 
             if (teamResults.isEmpty()) {
@@ -226,21 +225,21 @@ public class TeamCompetitionStatsEndpoint {
                 return ok(Collections.emptyList());
             }
 
-            final TeamSummary leader = TeamSummary.createLeader(teamResults.get(0));
+            final TeamLeaderboardEntry leader = TeamLeaderboardEntry.createLeader(teamResults.get(0));
 
-            final List<TeamSummary> teamSummaries = new ArrayList<>(teamResults.size());
+            final List<TeamLeaderboardEntry> teamSummaries = new ArrayList<>(teamResults.size());
             teamSummaries.add(leader);
 
             for (int i = 1; i < teamResults.size(); i++) {
-                final TeamResult teamResult = teamResults.get(i);
-                final TeamResult teamAhead = teamResults.get(i - 1);
+                final TeamSummary teamSummary = teamResults.get(i);
+                final TeamSummary teamAhead = teamResults.get(i - 1);
 
-                final long diffToLeader = leader.getTeamMultipliedPoints() - teamResult.getTeamMultipliedPoints();
-                final long diffToNext = teamAhead.getTeamMultipliedPoints() - teamResult.getTeamMultipliedPoints();
+                final long diffToLeader = leader.getTeamMultipliedPoints() - teamSummary.getTeamMultipliedPoints();
+                final long diffToNext = teamAhead.getTeamMultipliedPoints() - teamSummary.getTeamMultipliedPoints();
 
                 final int rank = i + 1;
-                final TeamSummary teamSummary = TeamSummary.create(teamResult, rank, diffToLeader, diffToNext);
-                teamSummaries.add(teamSummary);
+                final TeamLeaderboardEntry teamLeaderboardEntry = TeamLeaderboardEntry.create(teamSummary, rank, diffToLeader, diffToNext);
+                teamSummaries.add(teamLeaderboardEntry);
             }
 
             return ok(teamSummaries);
@@ -263,55 +262,55 @@ public class TeamCompetitionStatsEndpoint {
         }
 
         try {
-            final CompetitionResult competitionResult = competitionResultGenerator.generate();
-            if (competitionResult.getTeams().isEmpty()) {
+            final CompetitionSummary competitionSummary = competitionResultGenerator.generate();
+            if (competitionSummary.getTeams().isEmpty()) {
                 LOGGER.warn("No TC teams to show");
                 return ok(Collections.emptyList());
             }
 
-            final Map<Category, List<UserResult>> userResultsByCategory = new EnumMap<>(Category.class);
+            final Map<Category, List<UserSummary>> userResultsByCategory = new EnumMap<>(Category.class);
             final Map<String, String> teamNameForFoldingUserName = new HashMap<>(); // Convenient way to determine the team name of a user
 
-            for (final TeamResult teamResult : competitionResult.getTeams()) {
-                final String teamName = teamResult.getTeamName();
+            for (final TeamSummary teamSummary : competitionSummary.getTeams()) {
+                final String teamName = teamSummary.getTeamName();
 
-                for (final UserResult userResult : teamResult.getActiveUsers()) {
-                    final Category category = Category.get(userResult.getCategory());
+                for (final UserSummary userSummary : teamSummary.getActiveUsers()) {
+                    final Category category = Category.get(userSummary.getCategory());
 
-                    final List<UserResult> existingUsersInCategory = userResultsByCategory.getOrDefault(category, new ArrayList<>(0));
-                    existingUsersInCategory.add(userResult);
+                    final List<UserSummary> existingUsersInCategory = userResultsByCategory.getOrDefault(category, new ArrayList<>(0));
+                    existingUsersInCategory.add(userSummary);
 
                     userResultsByCategory.put(category, existingUsersInCategory);
-                    teamNameForFoldingUserName.put(userResult.getFoldingName(), teamName);
+                    teamNameForFoldingUserName.put(userSummary.getFoldingName(), teamName);
                 }
             }
 
-            final Map<String, List<UserSummary>> categoryLeaderboard = new TreeMap<>();
+            final Map<String, List<UserCategoryLeaderboardEntry>> categoryLeaderboard = new TreeMap<>();
 
             for (final var entry : userResultsByCategory.entrySet()) {
                 final Category category = entry.getKey();
-                final List<UserResult> userResults = entry.getValue()
+                final List<UserSummary> userSummaries = entry.getValue()
                         .stream()
-                        .sorted(Comparator.comparingLong(UserResult::getMultipliedPoints).reversed())
+                        .sorted(Comparator.comparingLong(UserSummary::getMultipliedPoints).reversed())
                         .collect(toList());
 
-                final UserResult firstResult = userResults.get(0);
-                final UserSummary categoryLeader = UserSummary.createLeader(firstResult, teamNameForFoldingUserName.get(firstResult.getFoldingName()));
+                final UserSummary firstResult = userSummaries.get(0);
+                final UserCategoryLeaderboardEntry categoryLeader = UserCategoryLeaderboardEntry.createLeader(firstResult, teamNameForFoldingUserName.get(firstResult.getFoldingName()));
 
-                final List<UserSummary> userSummariesInCategory = new ArrayList<>(userResults.size());
+                final List<UserCategoryLeaderboardEntry> userSummariesInCategory = new ArrayList<>(userSummaries.size());
                 userSummariesInCategory.add(categoryLeader);
 
-                for (int i = 1; i < userResults.size(); i++) {
-                    final UserResult userResult = userResults.get(i);
-                    final UserResult userAhead = userResults.get(i - 1);
+                for (int i = 1; i < userSummaries.size(); i++) {
+                    final UserSummary userSummary = userSummaries.get(i);
+                    final UserSummary userAhead = userSummaries.get(i - 1);
 
-                    final long diffToLeader = categoryLeader.getMultipliedPoints() - userResult.getMultipliedPoints();
-                    final long diffToNext = userAhead.getMultipliedPoints() - userResult.getMultipliedPoints();
+                    final long diffToLeader = categoryLeader.getMultipliedPoints() - userSummary.getMultipliedPoints();
+                    final long diffToNext = userAhead.getMultipliedPoints() - userSummary.getMultipliedPoints();
 
-                    final String teamName = teamNameForFoldingUserName.get(userResult.getFoldingName());
+                    final String teamName = teamNameForFoldingUserName.get(userSummary.getFoldingName());
                     final int rank = i + 1;
-                    final UserSummary userSummary = UserSummary.create(userResult, teamName, rank, diffToLeader, diffToNext);
-                    userSummariesInCategory.add(userSummary);
+                    final UserCategoryLeaderboardEntry userCategoryLeaderboardEntry = UserCategoryLeaderboardEntry.create(userSummary, teamName, rank, diffToLeader, diffToNext);
+                    userSummariesInCategory.add(userCategoryLeaderboardEntry);
                 }
 
                 categoryLeaderboard.put(category.displayName(), userSummariesInCategory);

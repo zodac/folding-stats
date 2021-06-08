@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.Set;
 
 /**
- * POJO defining the authentication response for a user/password, and the roles for that user if successful.
+ * POJO defining the authentication response for a system user/password, and the roles for that user if successful.
  */
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter

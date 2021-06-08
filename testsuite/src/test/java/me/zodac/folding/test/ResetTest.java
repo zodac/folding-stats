@@ -4,9 +4,9 @@ import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
-import me.zodac.folding.rest.api.tc.CompetitionResult;
-import me.zodac.folding.rest.api.tc.TeamResult;
-import me.zodac.folding.rest.api.tc.UserResult;
+import me.zodac.folding.rest.api.tc.CompetitionSummary;
+import me.zodac.folding.rest.api.tc.TeamSummary;
+import me.zodac.folding.rest.api.tc.UserSummary;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 import me.zodac.folding.test.utils.rest.request.HardwareUtils;
 import me.zodac.folding.test.utils.rest.request.StubbedFoldingEndpointUtils;
@@ -38,7 +38,7 @@ import static me.zodac.folding.test.utils.rest.request.UserUtils.create;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests for the monthly reset of the <code>Team Competition</code> {@link CompetitionResult}.
+ * Tests for the monthly reset of the <code>Team Competition</code> {@link CompetitionSummary}.
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ResetTest {
@@ -94,15 +94,15 @@ class ResetTest {
 
         manuallyUpdateStats();
 
-        final CompetitionResult result = TeamCompetitionStatsUtils.getStats();
-        final TeamResult teamResult = getTeamFromCompetition(result, team.getTeamName());
+        final CompetitionSummary result = TeamCompetitionStatsUtils.getStats();
+        final TeamSummary teamSummary = getTeamFromCompetition(result, team.getTeamName());
 
-        assertThat(teamResult.getActiveUsers())
-                .as("Expected exactly 2 active users at start: " + teamResult)
+        assertThat(teamSummary.getActiveUsers())
+                .as("Expected exactly 2 active users at start: " + teamSummary)
                 .hasSize(2);
 
-        assertThat(teamResult.getRetiredUsers())
-                .as("Expected no retired users at start: " + teamResult)
+        assertThat(teamSummary.getRetiredUsers())
+                .as("Expected no retired users at start: " + teamSummary)
                 .isEmpty();
 
         // User must have points or else will not show as 'retired' for the team
@@ -112,28 +112,28 @@ class ResetTest {
         USER_REQUEST_SENDER.delete(userToRetireId, ADMIN_USER.userName(), ADMIN_USER.password());
         manuallyUpdateStats();
 
-        final CompetitionResult resultAfterRetirement = TeamCompetitionStatsUtils.getStats();
-        final TeamResult teamResultAfterRetirement = getTeamFromCompetition(resultAfterRetirement, team.getTeamName());
+        final CompetitionSummary resultAfterRetirement = TeamCompetitionStatsUtils.getStats();
+        final TeamSummary teamSummaryAfterRetirement = getTeamFromCompetition(resultAfterRetirement, team.getTeamName());
 
-        assertThat(teamResultAfterRetirement.getActiveUsers())
-                .as("Expected exactly 1 active users after retirement: " + teamResultAfterRetirement)
+        assertThat(teamSummaryAfterRetirement.getActiveUsers())
+                .as("Expected exactly 1 active users after retirement: " + teamSummaryAfterRetirement)
                 .hasSize(1);
 
-        assertThat(teamResultAfterRetirement.getRetiredUsers())
-                .as("Expected exactly 1 retired users after retirement: " + teamResultAfterRetirement)
+        assertThat(teamSummaryAfterRetirement.getRetiredUsers())
+                .as("Expected exactly 1 retired users after retirement: " + teamSummaryAfterRetirement)
                 .hasSize(1);
 
         manuallyResetStats();
 
-        final CompetitionResult resultAfterReset = TeamCompetitionStatsUtils.getStats();
-        final TeamResult teamResultAfterReset = getTeamFromCompetition(resultAfterReset, team.getTeamName());
+        final CompetitionSummary resultAfterReset = TeamCompetitionStatsUtils.getStats();
+        final TeamSummary teamSummaryAfterReset = getTeamFromCompetition(resultAfterReset, team.getTeamName());
 
-        assertThat(teamResultAfterReset.getActiveUsers())
-                .as("Expected exactly 1 active users after reset: " + teamResultAfterReset)
+        assertThat(teamSummaryAfterReset.getActiveUsers())
+                .as("Expected exactly 1 active users after reset: " + teamSummaryAfterReset)
                 .hasSize(1);
 
-        assertThat(teamResultAfterReset.getRetiredUsers())
-                .as("Expected no retired users after reset: " + teamResultAfterReset)
+        assertThat(teamSummaryAfterReset.getRetiredUsers())
+                .as("Expected no retired users after reset: " + teamSummaryAfterReset)
                 .isEmpty();
     }
 
@@ -164,70 +164,70 @@ class ResetTest {
         StubbedFoldingEndpointUtils.setPoints(thirdUser, thirdUserPoints);
         manuallyUpdateStats();
 
-        final CompetitionResult result = TeamCompetitionStatsUtils.getStats();
+        final CompetitionSummary result = TeamCompetitionStatsUtils.getStats();
         assertThat(result.getTotalPoints())
                 .as("Expected points from all three users: " + result)
                 .isEqualTo(firstUserPoints + secondUserPoints + thirdUserPoints);
 
-        final TeamResult firstTeamResult = getTeamFromCompetition(result, firstTeam.getTeamName());
-        final TeamResult secondTeamResult = getTeamFromCompetition(result, secondTeam.getTeamName());
+        final TeamSummary firstTeamSummary = getTeamFromCompetition(result, firstTeam.getTeamName());
+        final TeamSummary secondTeamSummary = getTeamFromCompetition(result, secondTeam.getTeamName());
 
-        assertThat(firstTeamResult.getTeamPoints())
-                .as("Expected points for team for first and second user: " + firstTeamResult)
+        assertThat(firstTeamSummary.getTeamPoints())
+                .as("Expected points for team for first and second user: " + firstTeamSummary)
                 .isEqualTo(firstUserPoints + secondUserPoints);
 
-        assertThat(secondTeamResult.getTeamPoints())
-                .as("Expected no points for team for third user only: " + secondTeamResult)
+        assertThat(secondTeamSummary.getTeamPoints())
+                .as("Expected no points for team for third user only: " + secondTeamSummary)
                 .isEqualTo(thirdUserPoints);
 
-        final UserResult firstUserResult = getActiveUserFromTeam(firstTeamResult, firstUser.getDisplayName());
-        final UserResult secondUserResult = getActiveUserFromTeam(firstTeamResult, secondUser.getDisplayName());
-        final UserResult thirdUserResult = getActiveUserFromTeam(secondTeamResult, thirdUser.getDisplayName());
+        final UserSummary firstUserSummary = getActiveUserFromTeam(firstTeamSummary, firstUser.getDisplayName());
+        final UserSummary secondUserSummary = getActiveUserFromTeam(firstTeamSummary, secondUser.getDisplayName());
+        final UserSummary thirdUserSummary = getActiveUserFromTeam(secondTeamSummary, thirdUser.getDisplayName());
 
-        assertThat(firstUserResult.getPoints())
-                .as("Expected points for user: " + firstUserResult)
+        assertThat(firstUserSummary.getPoints())
+                .as("Expected points for user: " + firstUserSummary)
                 .isEqualTo(firstUserPoints);
 
-        assertThat(secondUserResult.getPoints())
-                .as("Expected points for user: " + secondUserResult)
+        assertThat(secondUserSummary.getPoints())
+                .as("Expected points for user: " + secondUserSummary)
                 .isEqualTo(secondUserPoints);
 
-        assertThat(thirdUserResult.getPoints())
-                .as("Expected points for user: " + thirdUserResult)
+        assertThat(thirdUserSummary.getPoints())
+                .as("Expected points for user: " + thirdUserSummary)
                 .isEqualTo(thirdUserPoints);
 
         manuallyResetStats();
 
-        final CompetitionResult resultAfterReset = TeamCompetitionStatsUtils.getStats();
+        final CompetitionSummary resultAfterReset = TeamCompetitionStatsUtils.getStats();
         assertThat(resultAfterReset.getTotalPoints())
                 .as("Expected no points overall: " + result)
                 .isEqualTo(0L);
 
-        final TeamResult firstTeamResultAfterReset = getTeamFromCompetition(resultAfterReset, firstTeam.getTeamName());
-        final TeamResult secondTeamResultAfterReset = getTeamFromCompetition(resultAfterReset, secondTeam.getTeamName());
+        final TeamSummary firstTeamSummaryAfterReset = getTeamFromCompetition(resultAfterReset, firstTeam.getTeamName());
+        final TeamSummary secondTeamSummaryAfterReset = getTeamFromCompetition(resultAfterReset, secondTeam.getTeamName());
 
-        assertThat(firstTeamResultAfterReset.getTeamPoints())
-                .as("Expected no points for team: " + firstTeamResultAfterReset)
+        assertThat(firstTeamSummaryAfterReset.getTeamPoints())
+                .as("Expected no points for team: " + firstTeamSummaryAfterReset)
                 .isEqualTo(0L);
 
-        assertThat(secondTeamResultAfterReset.getTeamPoints())
-                .as("Expected no points for team: " + secondTeamResultAfterReset)
+        assertThat(secondTeamSummaryAfterReset.getTeamPoints())
+                .as("Expected no points for team: " + secondTeamSummaryAfterReset)
                 .isEqualTo(0L);
 
-        final UserResult firstUserResultAfterReset = getActiveUserFromTeam(firstTeamResultAfterReset, firstUser.getDisplayName());
-        final UserResult secondUserResultAfterReset = getActiveUserFromTeam(firstTeamResultAfterReset, secondUser.getDisplayName());
-        final UserResult thirdUserResultAfterReset = getActiveUserFromTeam(secondTeamResultAfterReset, thirdUser.getDisplayName());
+        final UserSummary firstUserSummaryAfterReset = getActiveUserFromTeam(firstTeamSummaryAfterReset, firstUser.getDisplayName());
+        final UserSummary secondUserSummaryAfterReset = getActiveUserFromTeam(firstTeamSummaryAfterReset, secondUser.getDisplayName());
+        final UserSummary thirdUserSummaryAfterReset = getActiveUserFromTeam(secondTeamSummaryAfterReset, thirdUser.getDisplayName());
 
-        assertThat(firstUserResultAfterReset.getPoints())
-                .as("Expected no points for user: " + firstUserResultAfterReset)
+        assertThat(firstUserSummaryAfterReset.getPoints())
+                .as("Expected no points for user: " + firstUserSummaryAfterReset)
                 .isEqualTo(0L);
 
-        assertThat(secondUserResultAfterReset.getPoints())
-                .as("Expected no points for user: " + secondUserResultAfterReset)
+        assertThat(secondUserSummaryAfterReset.getPoints())
+                .as("Expected no points for user: " + secondUserSummaryAfterReset)
                 .isEqualTo(0L);
 
-        assertThat(thirdUserResultAfterReset.getPoints())
-                .as("Expected no points for user: " + thirdUserResultAfterReset)
+        assertThat(thirdUserSummaryAfterReset.getPoints())
+                .as("Expected no points for user: " + thirdUserSummaryAfterReset)
                 .isEqualTo(0L);
     }
 

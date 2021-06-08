@@ -14,6 +14,12 @@ public class DatabaseConnectionException extends RuntimeException {
 
     private static final long serialVersionUID = 2662806281406745266L;
 
+    /**
+     * Constructor taking in an error message and a cause {@link Throwable}.
+     *
+     * @param message   the error message
+     * @param throwable the cause {@link Throwable}
+     */
     public DatabaseConnectionException(final String message, final Throwable throwable) {
         super(message, throwable);
     }

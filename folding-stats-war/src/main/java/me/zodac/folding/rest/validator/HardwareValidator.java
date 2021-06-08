@@ -1,5 +1,8 @@
-package me.zodac.folding.rest.util.validator;
+package me.zodac.folding.rest.validator;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.OperatingSystem;
 import me.zodac.folding.api.tc.User;
@@ -12,23 +15,18 @@ import java.util.List;
 import java.util.Optional;
 
 
-// TODO: [zodac] Validate constraints:
-//   - The 'hardwareName' is unique (for CREATE/UPDATE)
-//   - Hardware is not in use by user (for DELETE, doesn't use validator flow...)
-//   - Also for other validators
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HardwareValidator {
 
     // Assuming multiplier cannot be less than 0, also assuming we might want a 0.1/0.5 at some point with future hardware
     private static final double INVALID_MULTIPLIER_VALUE = 0.0D;
 
+    private transient final BusinessLogic businessLogic;
     private transient final OldFacade oldFacade;
 
-    private HardwareValidator(final OldFacade oldFacade) {
-        this.oldFacade = oldFacade;
-    }
 
-    public static HardwareValidator create(final OldFacade oldFacade) {
-        return new HardwareValidator(oldFacade);
+    public static HardwareValidator create(final BusinessLogic businessLogic, final OldFacade oldFacade) {
+        return new HardwareValidator(businessLogic, oldFacade);
     }
 
     public ValidationResponse<Hardware> validateCreate(final HardwareRequest hardwareRequest) {
@@ -41,7 +39,7 @@ public final class HardwareValidator {
         if (isBlank(hardwareRequest.getHardwareName())) {
             failureMessages.add("Field 'hardwareName' must not be empty");
         } else {
-            final Optional<Hardware> hardwareWithMatchingName = oldFacade.getHardwareWithName(hardwareRequest.getHardwareName());
+            final Optional<Hardware> hardwareWithMatchingName = businessLogic.getHardwareWithName(hardwareRequest.getHardwareName());
 
             if (hardwareWithMatchingName.isPresent()) {
                 return ValidationResponse.conflictingWith(hardwareRequest, hardwareWithMatchingName.get(), List.of("hardwareName"));

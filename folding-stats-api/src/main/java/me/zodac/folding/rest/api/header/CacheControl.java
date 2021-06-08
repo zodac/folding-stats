@@ -5,6 +5,9 @@ package me.zodac.folding.rest.api.header;
  */
 public enum CacheControl {
 
+    /**
+     * The <code>no-cache</code> value.
+     */
     NO_CACHE("no-cache");
 
     private final String contentType;

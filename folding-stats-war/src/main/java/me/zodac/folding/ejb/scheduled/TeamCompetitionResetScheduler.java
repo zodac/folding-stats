@@ -1,4 +1,4 @@
-package me.zodac.folding.ejb;
+package me.zodac.folding.ejb.scheduled;
 
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.SystemState;
@@ -10,6 +10,7 @@ import me.zodac.folding.api.utils.ExecutionType;
 import me.zodac.folding.cache.RetiredTcStatsCache;
 import me.zodac.folding.cache.TcStatsCache;
 import me.zodac.folding.cache.TotalStatsCache;
+import me.zodac.folding.ejb.OldFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

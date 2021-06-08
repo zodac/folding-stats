@@ -1,12 +1,15 @@
-package me.zodac.folding.ejb;
+package me.zodac.folding.ejb.startup;
 
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.db.DbManager;
+import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.utils.ExecutionType;
 import me.zodac.folding.db.DbManagerRetriever;
+import me.zodac.folding.ejb.OldFacade;
+import me.zodac.folding.ejb.scheduled.TeamCompetitionStatsScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +33,9 @@ public class Initialiser {
     private transient final DbManager dbManager = DbManagerRetriever.get();
 
     @EJB
+    private transient BusinessLogic businessLogic;
+
+    @EJB
     private transient OldFacade oldFacade;
 
     @EJB
@@ -45,7 +51,7 @@ public class Initialiser {
     }
 
     private void initCaches() {
-        oldFacade.getAllHardware();
+        businessLogic.getAllHardware();
         oldFacade.getAllTeams();
 
         final Collection<User> users = oldFacade.getAllUsers();

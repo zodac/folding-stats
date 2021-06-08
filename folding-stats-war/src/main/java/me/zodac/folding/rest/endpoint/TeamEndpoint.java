@@ -4,9 +4,9 @@ import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.utils.ExecutionType;
 import me.zodac.folding.api.validator.ValidationResponse;
-import me.zodac.folding.ejb.TeamCompetitionStatsScheduler;
+import me.zodac.folding.ejb.scheduled.TeamCompetitionStatsScheduler;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
-import me.zodac.folding.rest.util.validator.TeamValidator;
+import me.zodac.folding.rest.validator.TeamValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +27,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import java.util.Collection;
+import java.util.Optional;
 
 /**
  * REST endpoints for teams for <code>folding-stats</code>.
@@ -130,12 +131,17 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
     }
 
     @Override
-    protected Team getElementById(final int teamId) throws NotFoundException {
-        return oldFacade.getTeam(teamId);
+    protected Optional<Team> getElementById(final int teamId) {
+        try {
+            return Optional.of(oldFacade.getTeam(teamId));
+        } catch (final NotFoundException e) {
+            getLogger().warn("No team found with ID: {}", teamId, e);
+            return Optional.empty();
+        }
     }
 
     @Override
-    protected Team updateElementById(final int teamId, final Team team) {
+    protected Team updateElementById(final int teamId, final Team team, final Team existingTeam) {
         // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
         final Team teamWithId = Team.updateWithId(teamId, team);
         oldFacade.updateTeam(teamWithId);

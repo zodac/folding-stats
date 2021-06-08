@@ -4,9 +4,8 @@ import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.RequestPojo;
 import me.zodac.folding.api.ResponsePojo;
 import me.zodac.folding.api.SystemState;
+import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.exception.ExternalConnectionException;
-import me.zodac.folding.api.exception.IdOutOfRangeException;
-import me.zodac.folding.api.exception.InvalidIdException;
 import me.zodac.folding.api.exception.NoStatsAvailableException;
 import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.api.exception.TeamNotFoundException;
@@ -14,8 +13,9 @@ import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.api.validator.ValidationResult;
 import me.zodac.folding.ejb.OldFacade;
-import me.zodac.folding.rest.util.IdentityParser;
-import me.zodac.folding.rest.util.response.BatchCreateResponse;
+import me.zodac.folding.rest.parse.IntegerParser;
+import me.zodac.folding.rest.parse.ParseResult;
+import me.zodac.folding.rest.response.BatchCreateResponse;
 import org.slf4j.Logger;
 
 import javax.ejb.EJB;
@@ -30,18 +30,19 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import static me.zodac.folding.api.utils.DateTimeUtils.untilNextMonthUtc;
-import static me.zodac.folding.rest.util.response.Responses.badGateway;
-import static me.zodac.folding.rest.util.response.Responses.badRequest;
-import static me.zodac.folding.rest.util.response.Responses.conflict;
-import static me.zodac.folding.rest.util.response.Responses.created;
-import static me.zodac.folding.rest.util.response.Responses.notFound;
-import static me.zodac.folding.rest.util.response.Responses.nullRequest;
-import static me.zodac.folding.rest.util.response.Responses.ok;
-import static me.zodac.folding.rest.util.response.Responses.okBuilder;
-import static me.zodac.folding.rest.util.response.Responses.serverError;
-import static me.zodac.folding.rest.util.response.Responses.serviceUnavailable;
+import static me.zodac.folding.rest.response.Responses.badGateway;
+import static me.zodac.folding.rest.response.Responses.badRequest;
+import static me.zodac.folding.rest.response.Responses.conflict;
+import static me.zodac.folding.rest.response.Responses.created;
+import static me.zodac.folding.rest.response.Responses.notFound;
+import static me.zodac.folding.rest.response.Responses.nullRequest;
+import static me.zodac.folding.rest.response.Responses.ok;
+import static me.zodac.folding.rest.response.Responses.okBuilder;
+import static me.zodac.folding.rest.response.Responses.serverError;
+import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
 
 // TODO: [zodac] Decorator around REST methods, so we can catch generic exceptions in a single place?
 abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePojo> {
@@ -51,6 +52,9 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
 
     @Context
     protected transient UriInfo uriContext;
+
+    @EJB
+    protected BusinessLogic businessLogic;
 
     @EJB
     protected OldFacade oldFacade;
@@ -69,9 +73,9 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
 
     protected abstract ValidationResponse<O> validateDeleteAndConvert(final O element);
 
-    protected abstract O getElementById(final int elementId) throws NotFoundException;
+    protected abstract Optional<O> getElementById(final int elementId);
 
-    protected abstract O updateElementById(final int elementId, final O element) throws NotFoundException, ExternalConnectionException;
+    protected abstract O updateElementById(final int elementId, final O element, final O existingElement) throws NotFoundException, ExternalConnectionException;
 
     protected abstract void deleteElementById(final int elementId) throws UserNotFoundException, NoStatsAvailableException, TeamNotFoundException;
 
@@ -211,7 +215,24 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
         }
 
         try {
-            final O element = getElementById(IdentityParser.parse(elementId));
+            final ParseResult parseResult = IntegerParser.parsePositive(elementId);
+            if (parseResult.isBadFormat()) {
+                final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), elementId);
+                getLogger().error(errorMessage);
+                return badRequest(errorMessage);
+            } else if (parseResult.isOutOfRange()) {
+                final String errorMessage = String.format("The %s ID '%s' is out of range", elementType(), elementId);
+                getLogger().error(errorMessage);
+                return badRequest(errorMessage);
+            }
+            final int parsedId = parseResult.getId();
+
+            final Optional<O> optionalElement = getElementById(parsedId);
+            if (optionalElement.isEmpty()) {
+                getLogger().error("Error getting {} with ID {}", elementType(), elementId);
+                return notFound();
+            }
+            final O element = optionalElement.get();
 
             final CacheControl cacheControl = new CacheControl();
             cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);
@@ -227,26 +248,13 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
 
             builder.cacheControl(cacheControl);
             return builder.build();
-        } catch (final InvalidIdException e) {
-            final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), e.getId());
-            getLogger().debug(errorMessage, e);
-            getLogger().error(errorMessage);
-            return badRequest(errorMessage);
-        } catch (final IdOutOfRangeException e) {
-            final String errorMessage = String.format("The %s ID '%s' is out of range", elementType(), e.getId());
-            getLogger().debug(errorMessage, e);
-            getLogger().error(errorMessage);
-            return badRequest(errorMessage);
-        } catch (final NotFoundException e) {
-            getLogger().debug("Error getting {} with ID {}", e.getType(), e.getId(), e);
-            getLogger().error("Error getting {} with ID {}", e.getType(), e.getId());
-            return notFound();
         } catch (final Exception e) {
             getLogger().error("Unexpected error getting {} with ID: {}", elementType(), elementId, e);
             return serverError();
         }
     }
 
+    @SuppressWarnings("PMD.NPathComplexity") // Better than breaking into smaller functions
     protected Response updateById(final String elementId, final I inputRequest) {
         getLogger().debug("PUT request for {} received at '{}'", elementType(), uriContext.getAbsolutePath());
 
@@ -261,16 +269,33 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
         }
 
         try {
-            final int parsedId = IdentityParser.parse(elementId);
+            final ParseResult parseResult = IntegerParser.parsePositive(elementId);
+            if (parseResult.isBadFormat()) {
+                final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), elementId);
+                getLogger().error(errorMessage);
+                return badRequest(errorMessage);
+            } else if (parseResult.isOutOfRange()) {
+                final String errorMessage = String.format("The %s ID '%s' is out of range", elementType(), elementId);
+                getLogger().error(errorMessage);
+                return badRequest(errorMessage);
+            }
+            final int parsedId = parseResult.getId();
+
             // We want to make sure the payload is not trying to change the ID of the element
             // If no ID is provided, the POJO will default to a value of 0, which is acceptable
+            // TODO: [zodac] Remove 'id' from the payload, should only be supplied by the URL
             if (parsedId != inputRequest.getId() && inputRequest.getId() != 0) {
                 final String errorMessage = String.format("Path ID '%s' does not match ID '%s' of payload", elementId, inputRequest.getId());
                 getLogger().error(errorMessage);
                 return badRequest(errorMessage);
             }
 
-            final O existingElement = getElementById(parsedId);
+            final Optional<O> optionalElement = getElementById(parsedId);
+            if (optionalElement.isEmpty()) {
+                getLogger().error("Error getting {} with ID {}", elementType(), elementId);
+                return notFound();
+            }
+            final O existingElement = optionalElement.get();
 
             if (existingElement.isEqualRequest(inputRequest)) {
                 getLogger().debug("No change necessary");
@@ -282,23 +307,13 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
                 return badRequest(validationResponse);
             }
 
-            final O updatedElementWithId = updateElementById(parsedId, validationResponse.getOutput());
+            final O updatedElementWithId = updateElementById(parsedId, validationResponse.getOutput(), existingElement);
 
             final UriBuilder elementLocationBuilder = uriContext
                     .getRequestUriBuilder()
                     .path(String.valueOf(inputRequest.getId()));
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             return ok(updatedElementWithId, elementLocationBuilder);
-        } catch (final InvalidIdException e) {
-            final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), e.getId());
-            getLogger().debug(errorMessage, e);
-            getLogger().error(errorMessage);
-            return badRequest(errorMessage);
-        } catch (final IdOutOfRangeException e) {
-            final String errorMessage = String.format("The %s ID '%s' is out of range", elementType(), e.getId());
-            getLogger().debug(errorMessage, e);
-            getLogger().error(errorMessage);
-            return badRequest(errorMessage);
         } catch (final ExternalConnectionException e) {
             final String errorMessage = String.format("Error connecting to external service at '%s': %s", e.getUrl(), e.getMessage());
             getLogger().debug(errorMessage, e);
@@ -324,8 +339,24 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
 
 
         try {
-            final int parsedId = IdentityParser.parse(elementId);
-            final O element = getElementById(parsedId);
+            final ParseResult parseResult = IntegerParser.parsePositive(elementId);
+            if (parseResult.isBadFormat()) {
+                final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), elementId);
+                getLogger().error(errorMessage);
+                return badRequest(errorMessage);
+            } else if (parseResult.isOutOfRange()) {
+                final String errorMessage = String.format("The %s ID '%s' is out of range", elementType(), elementId);
+                getLogger().error(errorMessage);
+                return badRequest(errorMessage);
+            }
+            final int parsedId = parseResult.getId();
+
+            final Optional<O> optionalElement = getElementById(parsedId);
+            if (optionalElement.isEmpty()) {
+                getLogger().error("Error getting {} with ID {}", elementType(), elementId);
+                return notFound();
+            }
+            final O element = optionalElement.get();
 
             final ValidationResponse<O> validationResponse = validateDeleteAndConvert(element);
             if (validationResponse.getValidationResult() == ValidationResult.FAILURE_ON_VALIDATION) {
@@ -337,16 +368,6 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
             deleteElementById(parsedId);
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             return ok();
-        } catch (final InvalidIdException e) {
-            final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), e.getId());
-            getLogger().debug(errorMessage, e);
-            getLogger().error(errorMessage);
-            return badRequest(errorMessage);
-        } catch (final IdOutOfRangeException e) {
-            final String errorMessage = String.format("The %s ID '%s' is out of range", elementType(), e.getId());
-            getLogger().debug(errorMessage, e);
-            getLogger().error(errorMessage);
-            return badRequest(errorMessage);
         } catch (final NotFoundException e) {
             getLogger().debug("Error deleting {}, could not find {} with ID {}", elementType(), e.getType(), e.getId(), e);
             getLogger().error("Error deleting {}, could not find {} with ID {}", elementType(), e.getType(), e.getId());

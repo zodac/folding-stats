@@ -1,11 +1,10 @@
 package me.zodac.folding.rest.endpoint;
 
 import me.zodac.folding.api.exception.ExternalConnectionException;
-import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
-import me.zodac.folding.rest.util.validator.HardwareValidator;
+import me.zodac.folding.rest.validator.HardwareValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +24,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import java.util.Collection;
+import java.util.Optional;
 
 /**
  * REST endpoints for hardware for <code>folding-stats</code>.
@@ -97,47 +97,47 @@ public class HardwareEndpoint extends AbstractCrudEndpoint<HardwareRequest, Hard
 
     @Override
     protected Hardware createElement(final Hardware hardware) {
-        return oldFacade.createHardware(hardware);
+        return businessLogic.createHardware(hardware);
     }
 
     @Override
     protected Collection<Hardware> getAllElements() {
-        return oldFacade.getAllHardware();
+        return businessLogic.getAllHardware();
     }
 
     @Override
     protected ValidationResponse<Hardware> validateCreateAndConvert(final HardwareRequest hardwareRequest) {
-        final HardwareValidator hardwareValidator = HardwareValidator.create(oldFacade);
+        final HardwareValidator hardwareValidator = HardwareValidator.create(businessLogic, oldFacade);
         return hardwareValidator.validateCreate(hardwareRequest);
     }
 
     @Override
     protected ValidationResponse<Hardware> validateUpdateAndConvert(final HardwareRequest hardwareRequest) {
-        final HardwareValidator hardwareValidator = HardwareValidator.create(oldFacade);
+        final HardwareValidator hardwareValidator = HardwareValidator.create(businessLogic, oldFacade);
         return hardwareValidator.validateUpdate(hardwareRequest);
     }
 
     @Override
     protected ValidationResponse<Hardware> validateDeleteAndConvert(final Hardware hardware) {
-        final HardwareValidator hardwareValidator = HardwareValidator.create(oldFacade);
+        final HardwareValidator hardwareValidator = HardwareValidator.create(businessLogic, oldFacade);
         return hardwareValidator.validateDelete(hardware);
     }
 
     @Override
-    protected Hardware getElementById(final int hardwareId) throws NotFoundException {
-        return oldFacade.getHardware(hardwareId);
+    protected Optional<Hardware> getElementById(final int hardwareId) {
+        return businessLogic.getHardware(hardwareId);
     }
 
     @Override
-    protected Hardware updateElementById(final int hardwareId, final Hardware hardware) throws NotFoundException, ExternalConnectionException {
+    protected Hardware updateElementById(final int hardwareId, final Hardware hardware, final Hardware existingHardware) throws ExternalConnectionException {
         // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
         final Hardware hardwareWithId = Hardware.updateWithId(hardwareId, hardware);
-        oldFacade.updateHardware(hardwareWithId);
+        oldFacade.updateHardware(hardwareWithId, existingHardware);
         return hardwareWithId;
     }
 
     @Override
     protected void deleteElementById(final int hardwareId) {
-        oldFacade.deleteHardware(hardwareId);
+        businessLogic.deleteHardware(hardwareId);
     }
 }

@@ -5,7 +5,7 @@ import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
-import me.zodac.folding.rest.util.validator.UserValidator;
+import me.zodac.folding.rest.validator.UserValidator;
 import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +26,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import java.util.Collection;
+import java.util.Optional;
 
 /**
  * REST endpoints for users for <code>folding-stats</code>.
@@ -108,13 +109,13 @@ public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
 
     @Override
     protected ValidationResponse<User> validateCreateAndConvert(final UserRequest userRequest) {
-        final UserValidator userValidator = UserValidator.create(oldFacade, HttpFoldingStatsRetriever.create());
+        final UserValidator userValidator = UserValidator.create(businessLogic, oldFacade, HttpFoldingStatsRetriever.create());
         return userValidator.validateCreate(userRequest);
     }
 
     @Override
     protected ValidationResponse<User> validateUpdateAndConvert(final UserRequest userRequest) {
-        final UserValidator userValidator = UserValidator.create(oldFacade, HttpFoldingStatsRetriever.create());
+        final UserValidator userValidator = UserValidator.create(businessLogic, oldFacade, HttpFoldingStatsRetriever.create());
         return userValidator.validateUpdate(userRequest);
     }
 
@@ -124,12 +125,17 @@ public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
     }
 
     @Override
-    protected User getElementById(final int userId) throws NotFoundException {
-        return oldFacade.getUserWithPasskey(userId, false);
+    protected Optional<User> getElementById(final int userId) {
+        try {
+            return Optional.of(oldFacade.getUserWithPasskey(userId, false));
+        } catch (final NotFoundException e) {
+            getLogger().debug("No user found with ID: {}", userId, e);
+            return Optional.empty();
+        }
     }
 
     @Override
-    protected User updateElementById(final int userId, final User user) throws NotFoundException, ExternalConnectionException {
+    protected User updateElementById(final int userId, final User user, final User existingUser) throws NotFoundException, ExternalConnectionException {
         // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
         final User userWithId = User.updateWithId(userId, user);
         oldFacade.updateUser(userWithId);

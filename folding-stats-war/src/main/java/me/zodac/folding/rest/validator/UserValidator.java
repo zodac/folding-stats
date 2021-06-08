@@ -1,5 +1,8 @@
-package me.zodac.folding.rest.util.validator;
+package me.zodac.folding.rest.validator;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.api.exception.TeamNotFoundException;
 import me.zodac.folding.api.exception.UserNotFoundException;
@@ -26,22 +29,19 @@ import java.util.Optional;
 import static java.util.stream.Collectors.toList;
 
 // TODO: [zodac] In severe need of a clean up. Write tests for the validators first though, because you're an idiot
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class UserValidator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserValidator.class);
     private static final UrlValidator URL_VALIDATOR = new UrlValidator();
     private static final int EXPECTED_PASSKEY_LENGTH = 32;
 
+    private transient final BusinessLogic businessLogic;
     private transient final OldFacade oldFacade;
     private transient final FoldingStatsRetriever foldingStatsRetriever;
 
-    private UserValidator(final OldFacade oldFacade, final FoldingStatsRetriever foldingStatsRetriever) {
-        this.oldFacade = oldFacade;
-        this.foldingStatsRetriever = foldingStatsRetriever;
-    }
-
-    public static UserValidator create(final OldFacade oldFacade, final FoldingStatsRetriever foldingStatsRetriever) {
-        return new UserValidator(oldFacade, foldingStatsRetriever);
+    public static UserValidator create(final BusinessLogic businessLogic, final OldFacade oldFacade, final FoldingStatsRetriever foldingStatsRetriever) {
+        return new UserValidator(businessLogic, oldFacade, foldingStatsRetriever);
     }
 
     @SuppressWarnings("PMD.NPathComplexity") // Better than breaking into smaller functions
@@ -114,15 +114,19 @@ public final class UserValidator {
         }
 
         if (failureMessages.isEmpty()) {
-            try {
-                final Hardware hardware = oldFacade.getHardware(userRequest.getHardwareId());
-                final Team team = oldFacade.getTeam(userRequest.getTeamId());
+            final Optional<Hardware> hardware = businessLogic.getHardware(userRequest.getHardwareId());
 
-                final User user = User.createWithoutId(userRequest.getFoldingUserName(), userRequest.getDisplayName(), userRequest.getPasskey(), category, userRequest.getProfileLink(), userRequest.getLiveStatsLink(), hardware, team, userRequest.isUserIsCaptain());
-                return ValidationResponse.success(user);
-            } catch (final NotFoundException e) {
-                LOGGER.warn("{} with ID {} was validated successfully, but could not be retrieved", e.getType(), e.getId(), e);
-                failureMessages.add(String.format("Unable to find %s with ID %s", e.getType(), e.getId()));
+            if (hardware.isEmpty()) {
+                failureMessages.add(String.format("Unable to retrieve hardware with ID %s", userRequest.getHardwareId()));
+            } else {
+                try {
+                    final Team team = oldFacade.getTeam(userRequest.getTeamId());
+                    final User user = User.createWithoutId(userRequest.getFoldingUserName(), userRequest.getDisplayName(), userRequest.getPasskey(), category, userRequest.getProfileLink(), userRequest.getLiveStatsLink(), hardware.get(), team, userRequest.isUserIsCaptain());
+                    return ValidationResponse.success(user);
+                } catch (final NotFoundException e) {
+                    LOGGER.warn("{} with ID {} was validated successfully, but could not be retrieved", e.getType(), e.getId(), e);
+                    failureMessages.add(String.format("Unable to find %s with ID %s", e.getType(), e.getId()));
+                }
             }
         }
 
@@ -190,15 +194,20 @@ public final class UserValidator {
         }
 
         if (failureMessages.isEmpty()) {
-            try {
-                final Hardware hardware = oldFacade.getHardware(userRequest.getHardwareId());
-                final Team team = oldFacade.getTeam(userRequest.getTeamId());
+            final Optional<Hardware> hardware = businessLogic.getHardware(userRequest.getHardwareId());
 
-                final User user = User.createWithoutId(userRequest.getFoldingUserName(), userRequest.getDisplayName(), userRequest.getPasskey(), category, userRequest.getProfileLink(), userRequest.getLiveStatsLink(), hardware, team, userRequest.isUserIsCaptain());
-                return ValidationResponse.success(user);
-            } catch (final NotFoundException e) {
-                LOGGER.warn("{} with ID {} was validated successfully, but could not be retrieved", e.getType(), e.getId(), e);
-                failureMessages.add(String.format("Unable to find %s with ID %s", e.getType(), e.getId()));
+            if (hardware.isEmpty()) {
+                failureMessages.add(String.format("Unable to retrieve hardware with ID %s", userRequest.getHardwareId()));
+            } else {
+                try {
+                    final Team team = oldFacade.getTeam(userRequest.getTeamId());
+
+                    final User user = User.createWithoutId(userRequest.getFoldingUserName(), userRequest.getDisplayName(), userRequest.getPasskey(), category, userRequest.getProfileLink(), userRequest.getLiveStatsLink(), hardware.get(), team, userRequest.isUserIsCaptain());
+                    return ValidationResponse.success(user);
+                } catch (final NotFoundException e) {
+                    LOGGER.warn("{} with ID {} was validated successfully, but could not be retrieved", e.getType(), e.getId(), e);
+                    failureMessages.add(String.format("Unable to find %s with ID %s", e.getType(), e.getId()));
+                }
             }
         }
 
@@ -220,8 +229,8 @@ public final class UserValidator {
     }
 
     private List<String> validateHardware(final UserRequest userRequest) {
-        if (userRequest.getHardwareId() <= Hardware.EMPTY_HARDWARE_ID || oldFacade.doesNotContainHardware(userRequest.getHardwareId())) {
-            final List<String> availableHardware = oldFacade
+        if (userRequest.getHardwareId() <= Hardware.EMPTY_HARDWARE_ID || businessLogic.getHardware(userRequest.getHardwareId()).isEmpty()) {
+            final List<String> availableHardware = businessLogic
                     .getAllHardware()
                     .stream()
                     .map(hardware -> String.format("%s: %s", hardware.getId(), hardware.getHardwareName()))
@@ -267,6 +276,7 @@ public final class UserValidator {
                 }
             }
 
+            // What the hell, man?
             if (isCreate) {
                 if (usersOnTeam.size() >= Category.maximumPermittedAmountForAllCategories()) {
                     failureMessages.add(String.format("Team '%s' has %s users, maximum permitted is %s", team.getTeamName(), usersOnTeam.size(), Category.maximumPermittedAmountForAllCategories()));

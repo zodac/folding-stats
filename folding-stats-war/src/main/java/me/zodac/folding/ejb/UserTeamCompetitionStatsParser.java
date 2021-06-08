@@ -2,7 +2,6 @@ package me.zodac.folding.ejb;
 
 import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
-import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.OffsetStats;
 import me.zodac.folding.api.tc.stats.Stats;
@@ -17,7 +16,6 @@ import javax.ejb.Asynchronous;
 import javax.ejb.EJB;
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
-import java.util.Optional;
 
 import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
 
@@ -83,26 +81,22 @@ public class UserTeamCompetitionStatsParser {
         }
 
         oldFacade.persistTotalStatsForUser(totalStats);
-
-        final Optional<Hardware> hardware = oldFacade.getHardwareForUser(user);
-        if (hardware.isEmpty()) {
-            LOGGER.warn("Unable to find hardware multiplier for user: {}", user);
-            return;
-        }
-
-        calculateAndPersistTcStats(user, initialStats, offsetStats, totalStats, hardware.get());
+        calculateAndPersistTcStats(user, initialStats, offsetStats, totalStats);
     }
 
-    private void calculateAndPersistTcStats(final User user, final Stats initialStats, final OffsetStats offsetStats, final UserStats totalStats, final Hardware hardware) {
-        final double hardwareMultiplier = hardware.getMultiplier();
+    private void calculateAndPersistTcStats(final User user, final Stats initialStats, final OffsetStats offsetStats, final UserStats totalStats) {
+        LOGGER.info("User: {}", user);
+        final double hardwareMultiplier = user.getHardware().getMultiplier();
+        LOGGER.info("Multiplier: {}", hardwareMultiplier);
         final long points = Math.max(0, totalStats.getPoints() - initialStats.getPoints());
         final long multipliedPoints = Math.round(points * hardwareMultiplier);
         final int units = Math.max(0, totalStats.getUnits() - initialStats.getUnits());
-        final UserTcStats statsBeforeOffset = UserTcStats.create(user.getId(), totalStats.getTimestamp(), points, multipliedPoints, units);
 
+        final UserTcStats statsBeforeOffset = UserTcStats.create(user.getId(), totalStats.getTimestamp(), points, multipliedPoints, units);
         final UserTcStats hourlyUserTcStats = statsBeforeOffset.updateWithOffsets(offsetStats);
+
         LOGGER.debug("{}: {} total points (unmultiplied) | {} total units", user.getDisplayName(), formatWithCommas(totalStats.getPoints()), formatWithCommas(totalStats.getUnits()));
-        LOGGER.debug("{}: {} TC points (pre-offset) | {} TC units (pre-offset)", user.getDisplayName(), formatWithCommas(multipliedPoints), formatWithCommas(units));
+        LOGGER.debug("{}: {} TC multiplied points (pre-offset) | {} TC units (pre-offset)", user.getDisplayName(), formatWithCommas(multipliedPoints), formatWithCommas(units));
         LOGGER.info("{}: {} TC points | {} TC units", user.getDisplayName(), formatWithCommas(hourlyUserTcStats.getMultipliedPoints()), formatWithCommas(hourlyUserTcStats.getUnits()));
 
         oldFacade.persistHourlyTcStatsForUser(hourlyUserTcStats);

@@ -5,7 +5,6 @@ package me.zodac.folding.api;
  */
 public enum SystemState {
 
-
     /**
      * System is online and available for read/write requests.
      */
@@ -34,16 +33,25 @@ public enum SystemState {
     private final boolean isReadAllowed;
     private final boolean isWriteAllowed;
 
-
     SystemState(final boolean isReadAllowed, final boolean isWriteAllowed) {
         this.isReadAllowed = isReadAllowed;
         this.isWriteAllowed = isWriteAllowed;
     }
 
+    /**
+     * Checks if a read operation is blocked by the {@link SystemState}.
+     *
+     * @return <code>true</code> if read operations are blocked
+     */
     public boolean isReadBlocked() {
         return !isReadAllowed;
     }
 
+    /**
+     * Checks if a write operation is blocked by the {@link SystemState}.
+     *
+     * @return <code>true</code> if write operations are blocked
+     */
     public boolean isWriteBlocked() {
         return !isWriteAllowed;
     }
