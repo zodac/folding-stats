@@ -3,6 +3,7 @@ package me.zodac.folding.db.postgres;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import me.zodac.folding.api.db.DbConnectionPool;
+import me.zodac.folding.api.exception.DatabaseConnectionException;
 import me.zodac.folding.api.utils.EnvironmentVariableUtils;
 
 import java.sql.Connection;
@@ -43,7 +44,11 @@ public final class PostgresDbConnectionPool implements DbConnectionPool {
     }
 
     @Override
-    public Connection getConnection() throws SQLException {
-        return DATA_SOURCE_POOL.getConnection();
+    public Connection getConnection() {
+        try {
+            return DATA_SOURCE_POOL.getConnection();
+        } catch (final SQLException e) {
+            throw new DatabaseConnectionException("Error opening connection", e);
+        }
     }
 }

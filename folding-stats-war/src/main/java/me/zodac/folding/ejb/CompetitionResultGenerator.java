@@ -2,13 +2,12 @@ package me.zodac.folding.ejb;
 
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.SystemState;
-import me.zodac.folding.api.exception.FoldingException;
+import me.zodac.folding.api.exception.NoStatsAvailableException;
+import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.tc.exception.NoStatsAvailableException;
-import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.cache.CompetitionResultCache;
 import me.zodac.folding.rest.api.tc.CompetitionResult;
@@ -22,7 +21,6 @@ import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -79,22 +77,17 @@ public class CompetitionResultGenerator {
     }
 
     private List<TeamResult> getStatsForTeams() {
-        try {
-            final Collection<Team> teams = oldFacade.getAllTeams();
-            final List<TeamResult> teamResults = new ArrayList<>(teams.size());
+        final Collection<Team> teams = oldFacade.getAllTeams();
+        final List<TeamResult> teamResults = new ArrayList<>(teams.size());
 
-            for (final Team team : teams) {
-                teamResults.add(getTcTeamResult(team));
-            }
-
-            return teamResults;
-        } catch (final FoldingException e) {
-            LOGGER.warn("Error retrieving TC team stats", e.getCause());
-            return Collections.emptyList();
+        for (final Team team : teams) {
+            teamResults.add(getTcTeamResult(team));
         }
+
+        return teamResults;
     }
 
-    private TeamResult getTcTeamResult(final Team team) throws FoldingException {
+    private TeamResult getTcTeamResult(final Team team) {
         LOGGER.debug("Converting team '{}' for TC stats", team.getTeamName());
 
         final Collection<User> usersOnTeam = oldFacade.getUsersOnTeam(team);
@@ -135,9 +128,6 @@ public class CompetitionResultGenerator {
         } catch (final UserNotFoundException | NoStatsAvailableException e) {
             LOGGER.debug("No stats found for user ID: {}", user.getId(), e);
             LOGGER.warn("No stats found for user ID: {}", user.getId());
-            return UserResult.empty(user.getDisplayName(), user.getFoldingUserName(), category, hardware);
-        } catch (final FoldingException e) {
-            LOGGER.warn("Error getting TC stats for user: {}", user, e.getCause());
             return UserResult.empty(user.getDisplayName(), user.getFoldingUserName(), category, hardware);
         }
     }

@@ -1,4 +1,4 @@
-package me.zodac.folding.api.tc.exception;
+package me.zodac.folding.api.exception;
 
 public class UserNotFoundException extends NotFoundException {
 

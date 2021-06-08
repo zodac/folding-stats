@@ -1,9 +1,8 @@
 package me.zodac.folding.rest.endpoint;
 
-import me.zodac.folding.api.exception.FoldingException;
-import me.zodac.folding.api.exception.FoldingExternalServiceException;
+import me.zodac.folding.api.exception.ExternalConnectionException;
+import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.tc.exception.NotFoundException;
 import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 import me.zodac.folding.rest.util.validator.UserValidator;
@@ -98,12 +97,12 @@ public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
     }
 
     @Override
-    protected User createElement(final User user) throws FoldingException, FoldingExternalServiceException {
+    protected User createElement(final User user) throws ExternalConnectionException {
         return oldFacade.createUser(user);
     }
 
     @Override
-    protected Collection<User> getAllElements() throws FoldingException {
+    protected Collection<User> getAllElements() {
         return oldFacade.getAllUsersWithPasskeys(false);
     }
 
@@ -125,12 +124,12 @@ public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
     }
 
     @Override
-    protected User getElementById(final int userId) throws FoldingException, NotFoundException {
+    protected User getElementById(final int userId) throws NotFoundException {
         return oldFacade.getUserWithPasskey(userId, false);
     }
 
     @Override
-    protected User updateElementById(final int userId, final User user) throws FoldingException, NotFoundException, FoldingExternalServiceException {
+    protected User updateElementById(final int userId, final User user) throws NotFoundException, ExternalConnectionException {
         // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
         final User userWithId = User.updateWithId(userId, user);
         oldFacade.updateUser(userWithId);
@@ -138,7 +137,7 @@ public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
     }
 
     @Override
-    protected void deleteElementById(final int userId) throws FoldingException {
+    protected void deleteElementById(final int userId) {
         oldFacade.deleteUser(userId);
     }
 }

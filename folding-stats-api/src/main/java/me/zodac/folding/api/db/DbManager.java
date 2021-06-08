@@ -1,6 +1,7 @@
 package me.zodac.folding.api.db;
 
-import me.zodac.folding.api.exception.FoldingException;
+import me.zodac.folding.api.SystemUserAuthentication;
+import me.zodac.folding.api.exception.DatabaseConnectionException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
@@ -27,75 +28,75 @@ public interface DbManager {
      *
      * @param hardware the {@link Hardware} to persist
      * @return the {@link Hardware} updated with an ID
-     * @throws FoldingException thrown on error persisting the {@link Hardware}
+     * @throws DatabaseConnectionException thrown on error persisting the {@link Hardware}
      */
-    Hardware createHardware(final Hardware hardware) throws FoldingException;
+    Hardware createHardware(final Hardware hardware);
 
-    Collection<Hardware> getAllHardware() throws FoldingException;
+    Collection<Hardware> getAllHardware();
 
-    Optional<Hardware> getHardware(final int hardwareId) throws FoldingException;
+    Optional<Hardware> getHardware(final int hardwareId);
 
-    void updateHardware(final Hardware hardware) throws FoldingException;
+    void updateHardware(final Hardware hardware);
 
-    void deleteHardware(final int hardwareId) throws FoldingException;
+    void deleteHardware(final int hardwareId);
 
-    Team createTeam(final Team team) throws FoldingException;
+    Team createTeam(final Team team);
 
-    Collection<Team> getAllTeams() throws FoldingException;
+    Collection<Team> getAllTeams();
 
-    Optional<Team> getTeam(final int foldingTeamId) throws FoldingException;
+    Optional<Team> getTeam(final int foldingTeamId);
 
-    void updateTeam(final Team team) throws FoldingException;
+    void updateTeam(final Team team);
 
-    void deleteTeam(final int teamId) throws FoldingException;
+    void deleteTeam(final int teamId);
 
-    User createUser(final User user) throws FoldingException;
+    User createUser(final User user);
 
-    Collection<User> getAllUsers() throws FoldingException;
+    Collection<User> getAllUsers();
 
-    Optional<User> getUser(final int userId) throws FoldingException;
+    Optional<User> getUser(final int userId);
 
-    void updateUser(final User user) throws FoldingException;
+    void updateUser(final User user);
 
-    void deleteUser(final int userId) throws FoldingException;
+    void deleteUser(final int userId);
 
     // TC operations
 
-    void persistHourlyTcStats(final UserTcStats userTcStats) throws FoldingException;
+    void persistHourlyTcStats(final UserTcStats userTcStats);
 
-    boolean isAnyHourlyTcStats() throws FoldingException;
+    boolean isAnyHourlyTcStats();
 
     // Historic TC operations
 
-    Collection<HistoricStats> getHistoricStatsHourly(final int userId, final int day, final Month month, final Year year) throws FoldingException;
+    Collection<HistoricStats> getHistoricStatsHourly(final int userId, final int day, final Month month, final Year year);
 
-    Collection<HistoricStats> getHistoricStatsDaily(final int userId, final Month month, final Year year) throws FoldingException;
+    Collection<HistoricStats> getHistoricStatsDaily(final int userId, final Month month, final Year year);
 
-    Collection<HistoricStats> getHistoricStatsMonthly(final int userId, final Year year) throws FoldingException;
+    Collection<HistoricStats> getHistoricStatsMonthly(final int userId, final Year year);
 
-    void persistInitialStats(final UserStats userStats) throws FoldingException;
+    void persistInitialStats(final UserStats userStats);
 
-    Optional<UserStats> getInitialStats(final int userId) throws FoldingException;
+    Optional<UserStats> getInitialStats(final int userId);
 
-    Optional<UserTcStats> getHourlyTcStats(final int userId) throws FoldingException;
+    Optional<UserTcStats> getHourlyTcStats(final int userId);
 
-    void persistTotalStats(final UserStats stats) throws FoldingException;
+    void persistTotalStats(final UserStats stats);
 
-    Optional<UserStats> getTotalStats(final int userId) throws FoldingException;
+    Optional<UserStats> getTotalStats(final int userId);
 
-    void addOffsetStats(int userId, OffsetStats offsetStats) throws FoldingException;
+    void addOffsetStats(int userId, OffsetStats offsetStats);
 
-    Optional<OffsetStats> addOrUpdateOffsetStats(final int userId, final OffsetStats offsetStats) throws FoldingException;
+    Optional<OffsetStats> addOrUpdateOffsetStats(final int userId, final OffsetStats offsetStats);
 
-    Optional<OffsetStats> getOffsetStats(final int userId) throws FoldingException;
+    Optional<OffsetStats> getOffsetStats(final int userId);
 
-    void clearAllOffsetStats() throws FoldingException;
+    void clearAllOffsetStats();
 
-    int persistRetiredUserStats(final int teamId, final int userId, final String displayUserName, final UserTcStats retiredUserStats) throws FoldingException;
+    int persistRetiredUserStats(final int teamId, final int userId, final String displayUserName, final UserTcStats retiredUserStats);
 
-    Collection<RetiredUserTcStats> getRetiredUserStatsForTeam(final Team team) throws FoldingException;
+    Collection<RetiredUserTcStats> getRetiredUserStatsForTeam(final Team team);
 
-    void deleteRetiredUserStats() throws FoldingException;
+    void deleteRetiredUserStats();
 
-    SystemUserAuthentication authenticateSystemUser(final String userName, final String password) throws FoldingException;
+    SystemUserAuthentication authenticateSystemUser(final String userName, final String password);
 }

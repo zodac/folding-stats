@@ -1,8 +1,7 @@
 package me.zodac.folding.rest.endpoint;
 
-import me.zodac.folding.api.exception.FoldingException;
+import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.api.tc.Team;
-import me.zodac.folding.api.tc.exception.NotFoundException;
 import me.zodac.folding.api.utils.ExecutionType;
 import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.ejb.TeamCompetitionStatsScheduler;
@@ -101,14 +100,14 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
     }
 
     @Override
-    protected Team createElement(final Team team) throws FoldingException {
+    protected Team createElement(final Team team) {
         final Team teamWithId = oldFacade.createTeam(team);
         teamCompetitionStatsScheduler.parseTcStatsForTeam(team, ExecutionType.SYNCHRONOUS);
         return teamWithId;
     }
 
     @Override
-    protected Collection<Team> getAllElements() throws FoldingException {
+    protected Collection<Team> getAllElements() {
         return oldFacade.getAllTeams();
     }
 
@@ -131,12 +130,12 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
     }
 
     @Override
-    protected Team getElementById(final int teamId) throws FoldingException, NotFoundException {
+    protected Team getElementById(final int teamId) throws NotFoundException {
         return oldFacade.getTeam(teamId);
     }
 
     @Override
-    protected Team updateElementById(final int teamId, final Team team) throws FoldingException {
+    protected Team updateElementById(final int teamId, final Team team) {
         // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
         final Team teamWithId = Team.updateWithId(teamId, team);
         oldFacade.updateTeam(teamWithId);
@@ -144,7 +143,7 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
     }
 
     @Override
-    protected void deleteElementById(final int teamId) throws FoldingException {
+    protected void deleteElementById(final int teamId) {
         oldFacade.deleteTeam(teamId);
     }
 }

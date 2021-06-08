@@ -1,6 +1,6 @@
 package me.zodac.folding.stats;
 
-import me.zodac.folding.api.exception.FoldingExternalServiceException;
+import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.stats.FoldingStatsDetails;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
 import me.zodac.folding.api.tc.User;
@@ -39,7 +39,7 @@ public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
     }
 
     @Override
-    public Stats getStats(final FoldingStatsDetails foldingStatsDetails) throws FoldingExternalServiceException {
+    public Stats getStats(final FoldingStatsDetails foldingStatsDetails) throws ExternalConnectionException {
         LOGGER.debug(""); // Line break to differentiate different users
         LOGGER.debug("Getting stats for username/passkey '{}/{}'", foldingStatsDetails.getFoldingUserName(), foldingStatsDetails.getPasskey());
         final long userPoints = getPoints(foldingStatsDetails);
@@ -49,14 +49,14 @@ public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
 
 
     @Override
-    public UserStats getTotalStats(final User user) throws FoldingExternalServiceException {
+    public UserStats getTotalStats(final User user) throws ExternalConnectionException {
         final Timestamp currentUtcTime = DateTimeUtils.currentUtcTimestamp();
         final Stats userStats = getStats(FoldingStatsDetails.createFromUser(user));
         return UserStats.create(user.getId(), currentUtcTime, userStats.getPoints(), userStats.getUnits());
     }
 
     @Override
-    public long getPoints(final FoldingStatsDetails foldingStatsDetails) throws FoldingExternalServiceException {
+    public long getPoints(final FoldingStatsDetails foldingStatsDetails) throws ExternalConnectionException {
         final StatsRequestUrl pointsRequestUrl = new PointsUrlBuilder()
                 .forUser(foldingStatsDetails.getFoldingUserName())
                 .withPasskey(foldingStatsDetails.getPasskey())
@@ -71,7 +71,7 @@ public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
     }
 
     @Override
-    public int getUnits(final FoldingStatsDetails foldingStatsDetails) throws FoldingExternalServiceException {
+    public int getUnits(final FoldingStatsDetails foldingStatsDetails) throws ExternalConnectionException {
         final StatsRequestUrl unitsRequestUrl = new UnitsUrlBuilder()
                 .forUser(foldingStatsDetails.getFoldingUserName())
                 .withPasskey(foldingStatsDetails.getPasskey())

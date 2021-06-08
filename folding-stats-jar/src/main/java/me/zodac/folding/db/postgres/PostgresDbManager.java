@@ -1,16 +1,16 @@
 package me.zodac.folding.db.postgres;
 
+import me.zodac.folding.api.SystemUserAuthentication;
 import me.zodac.folding.api.db.DbAuthenticationManager;
 import me.zodac.folding.api.db.DbConnectionPool;
 import me.zodac.folding.api.db.DbCrudManager;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.db.DbStatsManager;
-import me.zodac.folding.api.db.SystemUserAuthentication;
-import me.zodac.folding.api.exception.FoldingException;
+import me.zodac.folding.api.exception.DatabaseConnectionException;
+import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.stats.OffsetStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
@@ -80,7 +80,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     }
 
     @Override
-    public Hardware createHardware(final Hardware hardware) throws FoldingException {
+    public Hardware createHardware(final Hardware hardware) {
         return executeQuery((queryContext) -> {
             final var query = queryContext
                     .insertInto(HARDWARE)
@@ -96,7 +96,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     }
 
     @Override
-    public Collection<Hardware> getAllHardware() throws FoldingException {
+    public Collection<Hardware> getAllHardware() {
         return executeQuery((queryContext) -> {
             final var query = queryContext
                     .select()
@@ -114,7 +114,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     }
 
     @Override
-    public Optional<Hardware> getHardware(final int hardwareId) throws FoldingException {
+    public Optional<Hardware> getHardware(final int hardwareId) {
         return executeQuery((queryContext) -> {
             final var query = queryContext
                     .select()
@@ -132,7 +132,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     }
 
     @Override
-    public void updateHardware(final Hardware hardware) throws FoldingException {
+    public void updateHardware(final Hardware hardware) {
         executeQuery((queryContext) -> {
             final var query = queryContext
                     .update(HARDWARE)
@@ -148,7 +148,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     }
 
     @Override
-    public void deleteHardware(final int hardwareId) throws FoldingException {
+    public void deleteHardware(final int hardwareId) {
         executeQuery((queryContext) -> {
             final var query = queryContext
                     .deleteFrom(HARDWARE)
@@ -160,7 +160,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     }
 
     @Override
-    public Team createTeam(final Team team) throws FoldingException {
+    public Team createTeam(final Team team) {
         return executeQuery((queryContext) -> {
             final var query = queryContext
                     .insertInto(TEAMS)
@@ -176,7 +176,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     }
 
     @Override
-    public Collection<Team> getAllTeams() throws FoldingException {
+    public Collection<Team> getAllTeams() {
         return executeQuery((queryContext) -> {
             final var query = queryContext
                     .select()
@@ -194,7 +194,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     }
 
     @Override
-    public Optional<Team> getTeam(final int teamId) throws FoldingException {
+    public Optional<Team> getTeam(final int teamId) {
         return executeQuery((queryContext) -> {
             final var query = queryContext
                     .select()
@@ -212,7 +212,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     }
 
     @Override
-    public void updateTeam(final Team team) throws FoldingException {
+    public void updateTeam(final Team team) {
         executeQuery((queryContext) -> {
             final var query = queryContext
                     .update(TEAMS)
@@ -227,7 +227,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     }
 
     @Override
-    public void deleteTeam(final int teamId) throws FoldingException {
+    public void deleteTeam(final int teamId) {
         LOGGER.debug("Deleting team {} from DB", teamId);
         executeQuery((queryContext) -> {
             final var query = queryContext
@@ -240,7 +240,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     }
 
     @Override
-    public User createUser(final User user) throws FoldingException {
+    public User createUser(final User user) {
         return executeQuery((queryContext) -> {
             final var query = queryContext
                     .insertInto(USERS)
@@ -256,7 +256,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     }
 
     @Override
-    public Collection<User> getAllUsers() throws FoldingException {
+    public Collection<User> getAllUsers() {
         return executeQuery((queryContext) -> {
             final var query = queryContext
                     .select()
@@ -277,7 +277,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     }
 
     @Override
-    public Optional<User> getUser(final int userId) throws FoldingException {
+    public Optional<User> getUser(final int userId) {
         return executeQuery((queryContext) -> {
             final var query = queryContext
                     .select()
@@ -298,7 +298,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     }
 
     @Override
-    public void updateUser(final User user) throws FoldingException {
+    public void updateUser(final User user) {
         executeQuery((queryContext) -> {
             final var query = queryContext
                     .update(USERS)
@@ -319,7 +319,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     }
 
     @Override
-    public void deleteUser(final int userId) throws FoldingException {
+    public void deleteUser(final int userId) {
         executeQuery((queryContext) -> {
             final var query = queryContext
                     .deleteFrom(USERS)
@@ -331,7 +331,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     }
 
     @Override
-    public void persistHourlyTcStats(final UserTcStats userTcStats) throws FoldingException {
+    public void persistHourlyTcStats(final UserTcStats userTcStats) {
         LOGGER.debug("Inserting TC stats for user ID: {}", userTcStats.getUserId());
 
         executeQuery((queryContext) -> {
@@ -346,7 +346,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     }
 
     @Override
-    public Optional<UserTcStats> getHourlyTcStats(final int userId) throws FoldingException {
+    public Optional<UserTcStats> getHourlyTcStats(final int userId) {
         LOGGER.debug("Getting current TC stats for user {}", userId);
 
         return executeQuery((queryContext) -> {
@@ -368,7 +368,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     }
 
     @Override
-    public boolean isAnyHourlyTcStats() throws FoldingException {
+    public boolean isAnyHourlyTcStats() {
         LOGGER.debug("Checking if any TC stats exist in the DB");
 
         return executeQuery((queryContext) -> {
@@ -383,7 +383,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     }
 
     @Override
-    public Collection<HistoricStats> getHistoricStatsHourly(final int userId, final int day, final Month month, final Year year) throws FoldingException {
+    public Collection<HistoricStats> getHistoricStatsHourly(final int userId, final int day, final Month month, final Year year) {
         LOGGER.info("Getting historic hourly user TC stats for {}/{}/{} for user {}", year, DateTimeUtils.formatMonth(month), day, userId);
 
         final String selectSqlStatement = "SELECT MAX(utc_timestamp) AS hourly_timestamp, " +
@@ -436,15 +436,15 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
                 return userStats;
             }
-        } catch (final FoldingException e) {
+        } catch (final DatabaseConnectionException e) {
             LOGGER.warn("Unable to get the stats for the first hour of {}/{}/{} for user {}", year, DateTimeUtils.formatMonth(month), day, userId);
             throw e;
         } catch (final SQLException e) {
-            throw new FoldingException("Error opening connection to the DB", e);
+            throw new DatabaseConnectionException("Error opening connection to the DB", e);
         }
     }
 
-    private UserTcStats getCurrentDayFirstHourTcStats(final int userId, final int day, final Month month, final Year year) throws FoldingException {
+    private UserTcStats getCurrentDayFirstHourTcStats(final int userId, final int day, final Month month, final Year year) {
         LOGGER.debug("Getting current day's first hour TC stats for user {} on {}/{}/{}", userId, year.getValue(), month.getValue(), day);
 
         return executeQuery((queryContext) -> {
@@ -477,7 +477,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
         });
     }
 
-    private UserTcStats getPreviousDayLastHourTcStats(final int userId, final int day, final Month month, final Year year) throws FoldingException {
+    private UserTcStats getPreviousDayLastHourTcStats(final int userId, final int day, final Month month, final Year year) {
         LOGGER.debug("Getting previous day's last hour TC stats for user {} on {}/{}/{}", userId, year.getValue(), month.getValue(), day);
 
         return executeQuery((queryContext) -> {
@@ -512,7 +512,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     }
 
 
-    private UserTcStats getTcStatsForFirstHourOfDay(final int userId, final int day, final Month month, final Year year) throws FoldingException {
+    private UserTcStats getTcStatsForFirstHourOfDay(final int userId, final int day, final Month month, final Year year) {
         final UserTcStats firstHourTcStatsCurrentDay = getCurrentDayFirstHourTcStats(userId, day, month, year);
 
         final boolean isFirstDay = day == 1;
@@ -545,7 +545,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
                         Math.max(0, firstHourTcStatsCurrentDay.getUnits() - initialStats.getUnits())
                 );
             } catch (final UserNotFoundException e) {
-                throw new FoldingException("Unable to find hardware or user to calculate hardware multiplier for initial stats", e);
+                throw new DatabaseConnectionException("Unable to find hardware or user to calculate hardware multiplier for initial stats", e);
             }
         }
 
@@ -561,7 +561,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
 
     @Override
-    public Collection<HistoricStats> getHistoricStatsDaily(final int userId, final Month month, final Year year) throws FoldingException {
+    public Collection<HistoricStats> getHistoricStatsDaily(final int userId, final Month month, final Year year) {
         LOGGER.debug("Getting historic daily user TC stats for {}/{} for user {}", DateTimeUtils.formatMonth(month), year, userId);
 
         final String selectSqlStatement = "SELECT utc_timestamp::DATE AS daily_timestamp, " +
@@ -620,16 +620,13 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
                 return userStats;
             }
-        } catch (final FoldingException e) {
-            LOGGER.warn("Unable to get the stats for the first day of {}/{} for user {}", DateTimeUtils.formatMonth(month), year, userId);
-            throw e;
         } catch (final SQLException e) {
-            throw new FoldingException("Error opening connection to the DB", e);
+            throw new DatabaseConnectionException("Error opening connection to the DB", e);
         }
     }
 
     @Override
-    public Collection<HistoricStats> getHistoricStatsMonthly(final int userId, final Year year) throws FoldingException {
+    public Collection<HistoricStats> getHistoricStatsMonthly(final int userId, final Year year) {
         LOGGER.debug("Getting historic monthly user TC stats for {} for user {}", year, userId);
 
         return executeQuery((queryContext) -> {
@@ -655,7 +652,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
         });
     }
 
-    private UserTcStats getTcStatsForFirstDayOfMonth(final LocalDateTime localDateTime, final int userId) throws FoldingException {
+    private UserTcStats getTcStatsForFirstDayOfMonth(final LocalDateTime localDateTime, final int userId) {
         LOGGER.debug("Getting TC stats for user {} on {}", userId, localDateTime);
 
         return executeQuery((queryContext) -> {
@@ -681,7 +678,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     }
 
     @Override
-    public void persistInitialStats(final UserStats userStats) throws FoldingException {
+    public void persistInitialStats(final UserStats userStats) {
         LOGGER.debug("Inserting initial stats for user {} to DB", userStats.getUserId());
 
         executeQuery((queryContext) -> {
@@ -696,7 +693,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     }
 
     @Override
-    public Optional<UserStats> getInitialStats(final int userId) throws FoldingException {
+    public Optional<UserStats> getInitialStats(final int userId) {
         LOGGER.debug("Getting initial stats for user ID: {}", userId);
 
         return executeQuery((queryContext) -> {
@@ -718,7 +715,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     }
 
     @Override
-    public void persistTotalStats(final UserStats userStats) throws FoldingException {
+    public void persistTotalStats(final UserStats userStats) {
         LOGGER.debug("Inserting total stats for user ID {} to DB", userStats.getUserId());
 
         executeQuery((queryContext) -> {
@@ -733,7 +730,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     }
 
     @Override
-    public Optional<UserStats> getTotalStats(final int userId) throws FoldingException {
+    public Optional<UserStats> getTotalStats(final int userId) {
         LOGGER.debug("Getting total stats for user ID: {}", userId);
 
         return executeQuery((queryContext) -> {
@@ -755,7 +752,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     }
 
     @Override
-    public void addOffsetStats(final int userId, final OffsetStats offsetStats) throws FoldingException {
+    public void addOffsetStats(final int userId, final OffsetStats offsetStats) {
         LOGGER.debug("Adding offset stats for user {}", userId);
 
         executeQuery((queryContext) -> {
@@ -778,7 +775,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     }
 
     @Override
-    public Optional<OffsetStats> addOrUpdateOffsetStats(final int userId, final OffsetStats offsetStats) throws FoldingException {
+    public Optional<OffsetStats> addOrUpdateOffsetStats(final int userId, final OffsetStats offsetStats) {
         LOGGER.debug("Adding/updating offset stats for user {}", userId);
 
         return executeQuery((queryContext) -> {
@@ -807,7 +804,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     }
 
     @Override
-    public Optional<OffsetStats> getOffsetStats(final int userId) throws FoldingException {
+    public Optional<OffsetStats> getOffsetStats(final int userId) {
         LOGGER.debug("Getting offset stats for user ID: {}", userId);
         return executeQuery((queryContext) -> {
             final var query = queryContext
@@ -827,7 +824,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     }
 
     @Override
-    public void clearAllOffsetStats() throws FoldingException {
+    public void clearAllOffsetStats() {
         LOGGER.debug("Clearing offset stats for all users");
 
         executeQuery((queryContext) -> {
@@ -840,7 +837,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     }
 
     @Override
-    public int persistRetiredUserStats(final int teamId, final int userId, final String displayUserName, final UserTcStats retiredUserStats) throws FoldingException {
+    public int persistRetiredUserStats(final int teamId, final int userId, final String displayUserName, final UserTcStats retiredUserStats) {
         LOGGER.debug("Persisting retired user ID {} for team ID {}", userId, teamId);
 
         return executeQuery((queryContext) -> {
@@ -871,7 +868,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     }
 
     @Override
-    public Collection<RetiredUserTcStats> getRetiredUserStatsForTeam(final Team team) throws FoldingException {
+    public Collection<RetiredUserTcStats> getRetiredUserStatsForTeam(final Team team) {
         LOGGER.debug("Getting retired user stats for team with ID: {}", team.getId());
         return executeQuery((queryContext) -> {
             final var query = queryContext
@@ -891,7 +888,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     }
 
     @Override
-    public void deleteRetiredUserStats() throws FoldingException {
+    public void deleteRetiredUserStats() {
         LOGGER.debug("Deleting all retired users");
 
         executeQuery((queryContext) -> {
@@ -904,7 +901,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     }
 
     @Override
-    public SystemUserAuthentication authenticateSystemUser(final String userName, final String password) throws FoldingException {
+    public SystemUserAuthentication authenticateSystemUser(final String userName, final String password) {
         LOGGER.debug("Checking if supplied user name '{}' and password is valid user, then returning roles", userName);
 
         return executeQuery((queryContext) -> {
@@ -938,12 +935,12 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
         });
     }
 
-    private <T> T executeQuery(final Function<DSLContext, T> sqlQuery) throws FoldingException {
+    private <T> T executeQuery(final Function<DSLContext, T> sqlQuery) {
         try (final Connection connection = dbConnectionPool.getConnection()) {
             final DSLContext queryContext = DSL.using(connection, SQLDialect.POSTGRES);
             return sqlQuery.apply(queryContext);
         } catch (final SQLException e) {
-            throw new FoldingException("Error opening connection to the DB", e);
+            throw new DatabaseConnectionException("Error closing connection", e);
         }
     }
 }

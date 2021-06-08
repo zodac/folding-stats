@@ -1,7 +1,7 @@
 package me.zodac.folding.cache;
 
 import me.zodac.folding.api.ResponsePojo;
-import me.zodac.folding.api.tc.exception.NotFoundException;
+import me.zodac.folding.api.exception.NotFoundException;
 
 import java.util.Collection;
 import java.util.Collections;

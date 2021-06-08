@@ -2,7 +2,6 @@ package me.zodac.folding.ejb;
 
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.SystemState;
-import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.utils.EnvironmentVariableUtils;
@@ -20,7 +19,6 @@ import javax.ejb.Timeout;
 import javax.ejb.Timer;
 import javax.ejb.TimerService;
 import java.util.Collection;
-import java.util.Collections;
 
 /**
  * {@link Startup} EJB which schedules the <code>Team Competition</code> stats retrieval for the system. By default, the
@@ -96,7 +94,7 @@ public class TeamCompetitionStatsScheduler {
         LOGGER.info("");
         LOGGER.info("Parsing TC Folding stats:");
 
-        final Collection<Team> tcTeams = getTcTeams();
+        final Collection<Team> tcTeams = oldFacade.getAllTeams();
         if (tcTeams.isEmpty()) {
             LOGGER.warn("No TC teams configured in system!");
             return;
@@ -110,7 +108,7 @@ public class TeamCompetitionStatsScheduler {
 
     public void parseTcStatsForTeam(final Team team, final ExecutionType executionType) {
         LOGGER.debug("Getting TC stats for users in team {}", team.getTeamName());
-        final Collection<User> teamUsers = getUsersOnTeam(team);
+        final Collection<User> teamUsers = oldFacade.getUsersOnTeam(team);
 
         if (teamUsers.isEmpty()) {
             LOGGER.warn("No users for team '{}'", team.getTeamName());
@@ -126,23 +124,4 @@ public class TeamCompetitionStatsScheduler {
         }
     }
 
-    private Collection<Team> getTcTeams() {
-        try {
-            return oldFacade.getAllTeams();
-        } catch (final FoldingException e) {
-            LOGGER.debug("Error retrieving TC teams", e);
-            LOGGER.warn("Error retrieving TC teams");
-            return Collections.emptyList();
-        }
-    }
-
-    private Collection<User> getUsersOnTeam(final Team team) {
-        try {
-            return oldFacade.getUsersOnTeam(team);
-        } catch (final FoldingException e) {
-            LOGGER.debug("Unable to find users for team: '{}'", team.getTeamName(), e);
-            LOGGER.warn("Unable to find users for team: '{}'", team.getTeamName());
-            return Collections.emptyList();
-        }
-    }
 }

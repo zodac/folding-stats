@@ -1,9 +1,8 @@
 package me.zodac.folding.rest.endpoint;
 
-import me.zodac.folding.api.exception.FoldingException;
-import me.zodac.folding.api.exception.FoldingExternalServiceException;
+import me.zodac.folding.api.exception.ExternalConnectionException;
+import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.api.tc.Hardware;
-import me.zodac.folding.api.tc.exception.NotFoundException;
 import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 import me.zodac.folding.rest.util.validator.HardwareValidator;
@@ -97,12 +96,12 @@ public class HardwareEndpoint extends AbstractCrudEndpoint<HardwareRequest, Hard
     }
 
     @Override
-    protected Hardware createElement(final Hardware hardware) throws FoldingException {
+    protected Hardware createElement(final Hardware hardware) {
         return oldFacade.createHardware(hardware);
     }
 
     @Override
-    protected Collection<Hardware> getAllElements() throws FoldingException {
+    protected Collection<Hardware> getAllElements() {
         return oldFacade.getAllHardware();
     }
 
@@ -125,12 +124,12 @@ public class HardwareEndpoint extends AbstractCrudEndpoint<HardwareRequest, Hard
     }
 
     @Override
-    protected Hardware getElementById(final int hardwareId) throws FoldingException, NotFoundException {
+    protected Hardware getElementById(final int hardwareId) throws NotFoundException {
         return oldFacade.getHardware(hardwareId);
     }
 
     @Override
-    protected Hardware updateElementById(final int hardwareId, final Hardware hardware) throws FoldingException, NotFoundException, FoldingExternalServiceException {
+    protected Hardware updateElementById(final int hardwareId, final Hardware hardware) throws NotFoundException, ExternalConnectionException {
         // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
         final Hardware hardwareWithId = Hardware.updateWithId(hardwareId, hardware);
         oldFacade.updateHardware(hardwareWithId);
@@ -138,7 +137,7 @@ public class HardwareEndpoint extends AbstractCrudEndpoint<HardwareRequest, Hard
     }
 
     @Override
-    protected void deleteElementById(final int hardwareId) throws FoldingException {
+    protected void deleteElementById(final int hardwareId) {
         oldFacade.deleteHardware(hardwareId);
     }
 }

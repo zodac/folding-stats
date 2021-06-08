@@ -2,10 +2,9 @@ package me.zodac.folding.ejb;
 
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.SystemState;
-import me.zodac.folding.api.exception.FoldingException;
+import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.utils.EnvironmentVariableUtils;
 import me.zodac.folding.api.utils.ExecutionType;
 import me.zodac.folding.cache.RetiredTcStatsCache;
@@ -20,7 +19,6 @@ import javax.ejb.Schedule;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import java.util.Collection;
-import java.util.Collections;
 
 /**
  * {@link Startup} EJB which schedules the monthly reset of the <code>Team Competition</code>. The reset will occur once
@@ -68,35 +66,35 @@ public class TeamCompetitionResetScheduler {
     }
 
     public void manualResetTeamCompetitionStats() {
-        final Collection<Team> teams;
         try {
-            teams = oldFacade.getAllTeams();
-            if (teams.isEmpty()) {
-                LOGGER.error("No TC teams configured in system!");
-                return;
-            }
-        } catch (final FoldingException e) {
-            LOGGER.error("Unable to get teams!");
+            resetTcStats();
+        } catch (final Exception e) {
+            LOGGER.warn("Unexpected error manually resetting TC stats");
+        }
+    }
+
+    private void resetTcStats() {
+        final Collection<Team> teams = oldFacade.getAllTeams();
+        if (teams.isEmpty()) {
+            LOGGER.error("No TC teams configured in system!");
             return;
         }
 
-        final Collection<User> users = getAllUsers();
+        final Collection<User> users = oldFacade.getAllUsers();
         if (users.isEmpty()) {
             LOGGER.error("No TC users configured in system to reset!");
             return;
         }
 
         resetStats(users);
-        clearOffsets();
+
+        LOGGER.info("Clearing offsets");
+        oldFacade.clearOffsetStats();
+
+        LOGGER.info("Deleting retired users");
+        oldFacade.deleteRetiredUserStats();
+
         resetCaches();
-
-        try {
-            LOGGER.info("Deleting retired users");
-            oldFacade.deleteRetiredUserStats();
-        } catch (final FoldingException e) {
-            LOGGER.error("Unable to reset retired stats", e);
-        }
-
         teamCompetitionStatsScheduler.manualTeamCompetitionStatsParsing(ExecutionType.SYNCHRONOUS);
     }
 
@@ -108,26 +106,6 @@ public class TeamCompetitionResetScheduler {
         RetiredTcStatsCache.get().clear();
     }
 
-    private Collection<User> getAllUsers() {
-        try {
-            return oldFacade.getAllUsers();
-        } catch (final FoldingException e) {
-            LOGGER.warn("Error getting all users to reset stats", e);
-            return Collections.emptyList();
-        }
-    }
-
-    private void clearOffsets() {
-        try {
-            LOGGER.info("Clearing offsets");
-            oldFacade.clearOffsetStats();
-        } catch (final FoldingException e) {
-            LOGGER.warn("Error clearing offset stats for users", e.getCause());
-        } catch (final Exception e) {
-            LOGGER.warn("Unexpected error clearing offset stats for users", e);
-        }
-    }
-
     private void resetStats(final Collection<User> usersToReset) {
         LOGGER.info("Resetting all TC stats");
         for (final User user : usersToReset) {
@@ -136,10 +114,6 @@ public class TeamCompetitionResetScheduler {
                 oldFacade.updateInitialStatsForUser(user);
             } catch (final UserNotFoundException e) {
                 LOGGER.warn("No user found to reset TC stats: {}", user);
-            } catch (final FoldingException e) {
-                LOGGER.warn("Error resetting TC stats for user: {}", user);
-            } catch (final Exception e) {
-                LOGGER.warn("Unexpected error resetting TC stats for user: {}", user);
             }
         }
     }

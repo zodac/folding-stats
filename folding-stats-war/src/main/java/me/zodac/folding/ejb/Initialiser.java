@@ -3,7 +3,6 @@ package me.zodac.folding.ejb;
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.db.DbManager;
-import me.zodac.folding.api.exception.FoldingException;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.utils.ExecutionType;
@@ -46,36 +45,24 @@ public class Initialiser {
     }
 
     private void initCaches() {
-        try {
-            oldFacade.getAllHardware();
-            oldFacade.getAllTeams();
+        oldFacade.getAllHardware();
+        oldFacade.getAllTeams();
 
-            final Collection<User> users = oldFacade.getAllUsers();
-            oldFacade.initialiseOffsetStats();
+        final Collection<User> users = oldFacade.getAllUsers();
+        oldFacade.initialiseOffsetStats();
 
-            for (final User user : users) {
-                try {
-                    final Stats initialStatsForUser = oldFacade.getInitialStatsForUser(user.getId());
-                    LOGGER.debug("Found initial stats for user {}: {}", user, initialStatsForUser);
-                } catch (final FoldingException e) {
-                    LOGGER.warn("Unable to get initial stats for user {}", user, e.getCause());
-                }
-            }
-
-            LOGGER.debug("Initialised initial stats cache");
-        } catch (final FoldingException e) {
-            LOGGER.warn("Error intialising caches", e.getCause());
+        for (final User user : users) {
+            final Stats initialStatsForUser = oldFacade.getInitialStatsForUser(user.getId());
+            LOGGER.debug("Found initial stats for user {}: {}", user, initialStatsForUser);
         }
+
+        LOGGER.debug("Initialised initial stats cache");
     }
 
     private void initTcStats() {
-        try {
-            if (!dbManager.isAnyHourlyTcStats()) {
-                LOGGER.warn("No TC stats data exists in the DB");
-                teamCompetitionStatsScheduler.manualTeamCompetitionStatsParsing(ExecutionType.ASYNCHRONOUS);
-            }
-        } catch (final FoldingException e) {
-            LOGGER.warn("Unable to check DB state", e.getCause());
+        if (!dbManager.isAnyHourlyTcStats()) {
+            LOGGER.warn("No TC stats data exists in the DB");
+            teamCompetitionStatsScheduler.manualTeamCompetitionStatsParsing(ExecutionType.ASYNCHRONOUS);
         }
     }
 }

@@ -1,14 +1,14 @@
-package me.zodac.folding.api.tc.exception;
+package me.zodac.folding.api.exception;
 
 /**
  *
  */
-public class FoldingIdInvalidException extends Exception {
+public class InvalidIdException extends Exception {
 
     private static final long serialVersionUID = 4818274484760492269L;
     private final String id;
 
-    public FoldingIdInvalidException(final String id, final Throwable throwable) {
+    public InvalidIdException(final String id, final Throwable throwable) {
         super(throwable);
         this.id = id;
     }

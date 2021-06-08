@@ -1,11 +1,10 @@
 package me.zodac.folding.rest.endpoint;
 
 import me.zodac.folding.SystemStateManager;
-import me.zodac.folding.api.exception.FoldingException;
+import me.zodac.folding.api.exception.TeamNotFoundException;
+import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.tc.exception.TeamNotFoundException;
-import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import org.slf4j.Logger;
@@ -117,9 +116,6 @@ public class HistoricStatsEndpoint {
             LOGGER.debug("No {} found with ID: {}", e.getType(), e.getId(), e);
             LOGGER.error("No {} found with ID: {}", e.getType(), e.getId());
             return notFound();
-        } catch (final FoldingException e) {
-            LOGGER.error("Error getting user with ID: {}", userId, e.getCause());
-            return serverError();
         } catch (final Exception e) {
             LOGGER.error("Unexpected error getting user with ID: {}", userId, e);
             return serverError();
@@ -175,9 +171,6 @@ public class HistoricStatsEndpoint {
             LOGGER.debug("No {} found with ID: {}", e.getType(), e.getId(), e);
             LOGGER.error("No {} found with ID: {}", e.getType(), e.getId());
             return notFound();
-        } catch (final FoldingException e) {
-            LOGGER.error("Error getting user with ID: {}", userId, e.getCause());
-            return serverError();
         } catch (final Exception e) {
             LOGGER.error("Unexpected error getting user with ID: {}", userId, e);
             return serverError();
@@ -230,9 +223,6 @@ public class HistoricStatsEndpoint {
             LOGGER.debug("No {} found with ID: {}", e.getType(), e.getId(), e);
             LOGGER.error("No {} found with ID: {}", e.getType(), e.getId());
             return notFound();
-        } catch (final FoldingException e) {
-            LOGGER.error("Error getting user with ID: {}", userId, e.getCause());
-            return serverError();
         } catch (final Exception e) {
             LOGGER.error("Unexpected error getting user with ID: {}", userId, e);
             return serverError();
@@ -309,9 +299,6 @@ public class HistoricStatsEndpoint {
             LOGGER.debug("No {} found with ID: {}", e.getType(), e.getId(), e);
             LOGGER.error("No {} found with ID: {}", e.getType(), e.getId());
             return notFound();
-        } catch (final FoldingException e) {
-            LOGGER.error("Error getting team with ID: {}", teamId, e.getCause());
-            return serverError();
         } catch (final Exception e) {
             LOGGER.error("Unexpected error getting team with ID: {}", teamId, e);
             return serverError();
@@ -376,9 +363,6 @@ public class HistoricStatsEndpoint {
             LOGGER.debug("No {} found with ID: {}", e.getType(), e.getId(), e);
             LOGGER.error("No {} found with ID: {}", e.getType(), e.getId());
             return notFound();
-        } catch (final FoldingException e) {
-            LOGGER.error("Error getting team with ID: {}", teamId, e.getCause());
-            return serverError();
         } catch (final Exception e) {
             LOGGER.error("Unexpected error getting team with ID: {}", teamId, e);
             return serverError();
@@ -437,9 +421,6 @@ public class HistoricStatsEndpoint {
             LOGGER.debug("No {} found with ID: {}", e.getType(), e.getId(), e);
             LOGGER.error("No {} found with ID: {}", e.getType(), e.getId());
             return notFound();
-        } catch (final FoldingException e) {
-            LOGGER.error("Error getting team with ID: {}", teamId, e.getCause());
-            return serverError();
         } catch (final Exception e) {
             LOGGER.error("Unexpected error getting team with ID: {}", teamId, e);
             return serverError();

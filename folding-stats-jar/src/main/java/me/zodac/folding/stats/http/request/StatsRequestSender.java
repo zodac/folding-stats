@@ -1,7 +1,6 @@
 package me.zodac.folding.stats.http.request;
 
-import me.zodac.folding.api.exception.FoldingException;
-import me.zodac.folding.api.exception.FoldingExternalServiceException;
+import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.rest.api.header.CacheControl;
 import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
@@ -62,9 +61,9 @@ public final class StatsRequestSender {
      *
      * @param statsRequestUrl the URL the stats request should be sent to
      * @return the {@link HttpResponse} to be parsed by {@link StatsResponseParser}
-     * @throws FoldingExternalServiceException thrown if an error occurs connecting to the external URL
+     * @throws ExternalConnectionException thrown if an error occurs connecting to the external URL
      */
-    public static HttpResponse<String> sendFoldingRequest(final StatsRequestUrl statsRequestUrl) throws FoldingExternalServiceException {
+    public static HttpResponse<String> sendFoldingRequest(final StatsRequestUrl statsRequestUrl) throws ExternalConnectionException {
         final String requestUrl = statsRequestUrl.getUrl();
 
         try {
@@ -73,25 +72,25 @@ public final class StatsRequestSender {
             // All user searches 'should' return a 200 response, even if the user/passkey is invalid
             // The response should be parsed and validated, which we do later
             if (response.statusCode() != HttpURLConnection.HTTP_OK) {
-                throw new FoldingException(String.format("Invalid response: %s", response));
+                throw new ExternalConnectionException(response.uri().toString(), String.format("Invalid response: %s", response));
             }
 
             if (StringUtils.isBlank(response.body())) {
-                throw new FoldingExternalServiceException(response.uri().toString(), "Empty Folding points response");
+                throw new ExternalConnectionException(response.uri().toString(), "Empty Folding points response");
             }
 
             return response;
         } catch (final ConnectException e) {
             LOGGER.debug("Connection error retrieving stats for user", e);
             LOGGER.warn("Connection error retrieving stats for user");
-            throw new FoldingExternalServiceException(requestUrl, "Unable to connect to Folding@Home API", e);
+            throw new ExternalConnectionException(requestUrl, "Unable to connect to Folding@Home API", e);
         } catch (final IOException | InterruptedException e) {
-            throw new FoldingExternalServiceException(requestUrl, "Unable to send HTTP request to Folding@Home API", e);
+            throw new ExternalConnectionException(requestUrl, "Unable to send HTTP request to Folding@Home API", e);
         } catch (final ClassCastException e) {
-            throw new FoldingExternalServiceException(requestUrl, "Unable to parse HTTP response from Folding@Home API correctly", e);
+            throw new ExternalConnectionException(requestUrl, "Unable to parse HTTP response from Folding@Home API correctly", e);
         } catch (final Exception e) {
             LOGGER.warn("Unexpected error retrieving stats for user", e);
-            throw new FoldingExternalServiceException(requestUrl, "Unexpected error retrieving stats for user", e);
+            throw new ExternalConnectionException(requestUrl, "Unexpected error retrieving stats for user", e);
         }
     }
 

@@ -1,6 +1,6 @@
 package me.zodac.folding.db.postgres;
 
-import me.zodac.folding.api.db.SystemUserAuthentication;
+import me.zodac.folding.api.SystemUserAuthentication;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.OperatingSystem;

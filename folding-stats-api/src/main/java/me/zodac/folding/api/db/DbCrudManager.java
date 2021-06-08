@@ -1,6 +1,7 @@
 package me.zodac.folding.api.db;
 
-import me.zodac.folding.api.exception.FoldingException;
+import me.zodac.folding.api.SystemUserAuthentication;
+import me.zodac.folding.api.exception.DatabaseConnectionException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
@@ -23,37 +24,37 @@ public interface DbCrudManager {
      *
      * @param hardware the {@link Hardware} to persist
      * @return the {@link Hardware} updated with an ID
-     * @throws FoldingException thrown on error persisting the {@link Hardware}
+     * @throws DatabaseConnectionException thrown on error persisting the {@link Hardware}
      */
-    Hardware createHardware(final Hardware hardware) throws FoldingException;
+    Hardware createHardware(final Hardware hardware);
 
-    Collection<Hardware> getAllHardware() throws FoldingException;
+    Collection<Hardware> getAllHardware();
 
-    Optional<Hardware> getHardware(final int hardwareId) throws FoldingException;
+    Optional<Hardware> getHardware(final int hardwareId);
 
-    void updateHardware(final Hardware hardware) throws FoldingException;
+    void updateHardware(final Hardware hardware);
 
-    void deleteHardware(final int hardwareId) throws FoldingException;
+    void deleteHardware(final int hardwareId);
 
-    Team createTeam(final Team team) throws FoldingException;
+    Team createTeam(final Team team);
 
-    Collection<Team> getAllTeams() throws FoldingException;
+    Collection<Team> getAllTeams();
 
-    Optional<Team> getTeam(final int foldingTeamId) throws FoldingException;
+    Optional<Team> getTeam(final int foldingTeamId);
 
-    void updateTeam(final Team team) throws FoldingException;
+    void updateTeam(final Team team);
 
-    void deleteTeam(final int teamId) throws FoldingException;
+    void deleteTeam(final int teamId);
 
-    User createUser(final User user) throws FoldingException;
+    User createUser(final User user);
 
-    Collection<User> getAllUsers() throws FoldingException;
+    Collection<User> getAllUsers();
 
-    Optional<User> getUser(final int userId) throws FoldingException;
+    Optional<User> getUser(final int userId);
 
-    void updateUser(final User user) throws FoldingException;
+    void updateUser(final User user);
 
-    void deleteUser(final int userId) throws FoldingException;
+    void deleteUser(final int userId);
 
-    SystemUserAuthentication authenticateSystemUser(final String userName, final String password) throws FoldingException;
+    SystemUserAuthentication authenticateSystemUser(final String userName, final String password);
 }

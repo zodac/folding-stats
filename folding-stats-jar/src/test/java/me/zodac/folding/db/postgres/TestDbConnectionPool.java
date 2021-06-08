@@ -2,6 +2,7 @@ package me.zodac.folding.db.postgres;
 
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
 import me.zodac.folding.api.db.DbConnectionPool;
+import me.zodac.folding.api.exception.DatabaseConnectionException;
 import org.junit.platform.commons.logging.Logger;
 import org.junit.platform.commons.logging.LoggerFactory;
 
@@ -44,8 +45,12 @@ public final class TestDbConnectionPool implements DbConnectionPool {
     }
 
     @Override
-    public Connection getConnection() throws SQLException {
-        return dataSource.getConnection();
+    public Connection getConnection() {
+        try {
+            return dataSource.getConnection();
+        } catch (final SQLException e) {
+            throw new DatabaseConnectionException("Error opening connection", e);
+        }
     }
 
     private void createDatabaseTables() throws IOException, URISyntaxException, SQLException {

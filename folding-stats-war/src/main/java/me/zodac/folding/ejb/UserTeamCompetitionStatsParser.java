@@ -1,7 +1,6 @@
 package me.zodac.folding.ejb;
 
-import me.zodac.folding.api.exception.FoldingException;
-import me.zodac.folding.api.exception.FoldingExternalServiceException;
+import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.User;
@@ -64,13 +63,13 @@ public class UserTeamCompetitionStatsParser {
             return;
         }
 
-        final Stats initialStats = getInitialStatsForUserOrEmpty(user);
+        final Stats initialStats = oldFacade.getInitialStatsForUser(user.getId());
         if (initialStats.isEmpty()) {
             LOGGER.warn("Retrieved empty initial stats for user: {}", user);
             return;
         }
 
-        final OffsetStats offsetStats = getOffsetStatsForUserOrEmpty(user);
+        final OffsetStats offsetStats = oldFacade.getOffsetStatsForUser(user.getId());
         if (offsetStats.isEmpty()) {
             LOGGER.trace("Retrieved empty stat offset for user: {}", user);
         } else {
@@ -83,12 +82,7 @@ public class UserTeamCompetitionStatsParser {
             return;
         }
 
-        try {
-            oldFacade.persistTotalStatsForUser(totalStats);
-        } catch (final FoldingException e) {
-            LOGGER.warn("Error persisting total user stats", e.getCause());
-            return;
-        }
+        oldFacade.persistTotalStatsForUser(totalStats);
 
         final Optional<Hardware> hardware = oldFacade.getHardwareForUser(user);
         if (hardware.isEmpty()) {
@@ -111,40 +105,16 @@ public class UserTeamCompetitionStatsParser {
         LOGGER.debug("{}: {} TC points (pre-offset) | {} TC units (pre-offset)", user.getDisplayName(), formatWithCommas(multipliedPoints), formatWithCommas(units));
         LOGGER.info("{}: {} TC points | {} TC units", user.getDisplayName(), formatWithCommas(hourlyUserTcStats.getMultipliedPoints()), formatWithCommas(hourlyUserTcStats.getUnits()));
 
-        try {
-            oldFacade.persistHourlyTcStatsForUser(hourlyUserTcStats);
-        } catch (final FoldingException e) {
-            LOGGER.error("Error persisting hourly TC stats", e.getCause());
-        }
+        oldFacade.persistHourlyTcStatsForUser(hourlyUserTcStats);
     }
 
     private static UserStats getTotalStatsForUserOrEmpty(final User user) {
         try {
             return FOLDING_STATS_RETRIEVER.getTotalStats(user);
-        } catch (final FoldingExternalServiceException e) {
+        } catch (final ExternalConnectionException e) {
             LOGGER.warn("Error connecting to Folding@Home API at '{}'", e.getUrl(), e);
         }
 
         return UserStats.empty();
-    }
-
-    private Stats getInitialStatsForUserOrEmpty(final User user) {
-        try {
-            return oldFacade.getInitialStatsForUser(user.getId());
-        } catch (final FoldingException e) {
-            LOGGER.warn("Error getting initial user stats for user: {}", user, e.getCause());
-        }
-
-        return Stats.empty();
-    }
-
-    private OffsetStats getOffsetStatsForUserOrEmpty(final User user) {
-        try {
-            return oldFacade.getOffsetStatsForUser(user.getId());
-        } catch (final FoldingException e) {
-            LOGGER.warn("Error getting user offset stats for user: {}", user, e.getCause());
-        }
-
-        return OffsetStats.empty();
     }
 }

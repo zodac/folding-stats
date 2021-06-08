@@ -386,7 +386,7 @@
                 <skip-tests>false</skip-tests>
             </properties>
         </profile>
-        
+
         <!-- Profile used to execute each module's linters (if any) -->
         <profile>
             <id>activate_linters</id>

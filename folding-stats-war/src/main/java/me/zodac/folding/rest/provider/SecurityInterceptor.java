@@ -1,7 +1,6 @@
 package me.zodac.folding.rest.provider;
 
-import me.zodac.folding.api.db.SystemUserAuthentication;
-import me.zodac.folding.api.exception.FoldingException;
+import me.zodac.folding.api.SystemUserAuthentication;
 import me.zodac.folding.api.utils.EncodingUtils;
 import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.rest.api.header.RestHeader;
@@ -76,14 +75,12 @@ public class SecurityInterceptor implements ContainerRequestFilter {
         LOGGER.trace("Validating REST request at '{}'", requestContext.getUriInfo().getAbsolutePath());
         try {
             validateRequest(requestContext);
-        } catch (final FoldingException e) {
-            LOGGER.warn("Error validating REST request at '{}'", requestContext.getUriInfo().getAbsolutePath());
         } catch (final Exception e) {
             LOGGER.warn("Unexpected error validating REST request at '{}'", requestContext.getUriInfo().getAbsolutePath());
         }
     }
 
-    private void validateRequest(final ContainerRequestContext requestContext) throws FoldingException {
+    private void validateRequest(final ContainerRequestContext requestContext) {
         final Method method = resourceInfo.getResourceMethod();
 
         if (method.isAnnotationPresent(DenyAll.class)) {

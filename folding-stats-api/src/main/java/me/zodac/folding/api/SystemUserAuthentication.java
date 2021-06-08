@@ -1,4 +1,4 @@
-package me.zodac.folding.api.db;
+package me.zodac.folding.api;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

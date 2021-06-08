@@ -1,15 +1,14 @@
 package me.zodac.folding.rest.util.validator;
 
-import me.zodac.folding.api.exception.FoldingException;
+import me.zodac.folding.api.exception.NotFoundException;
+import me.zodac.folding.api.exception.TeamNotFoundException;
+import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.stats.FoldingStatsDetails;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.tc.exception.NotFoundException;
-import me.zodac.folding.api.tc.exception.TeamNotFoundException;
-import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
@@ -26,6 +25,7 @@ import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 
+// TODO: [zodac] In severe need of a clean up. Write tests for the validators first though, because you're an idiot
 public final class UserValidator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserValidator.class);
@@ -123,9 +123,6 @@ public final class UserValidator {
             } catch (final NotFoundException e) {
                 LOGGER.warn("{} with ID {} was validated successfully, but could not be retrieved", e.getType(), e.getId(), e);
                 failureMessages.add(String.format("Unable to find %s with ID %s", e.getType(), e.getId()));
-            } catch (final FoldingException e) {
-                LOGGER.warn("Unexpected error retrieving hardware/team", e);
-                failureMessages.add("Unable to retrieve hardware/team");
             }
         }
 
@@ -202,9 +199,6 @@ public final class UserValidator {
             } catch (final NotFoundException e) {
                 LOGGER.warn("{} with ID {} was validated successfully, but could not be retrieved", e.getType(), e.getId(), e);
                 failureMessages.add(String.format("Unable to find %s with ID %s", e.getType(), e.getId()));
-            } catch (final FoldingException e) {
-                LOGGER.warn("Unexpected error retrieving hardware/team", e);
-                failureMessages.add("Unable to retrieve hardware/team");
             }
         }
 
@@ -212,38 +206,28 @@ public final class UserValidator {
     }
 
     private List<String> validateTeam(final UserRequest userRequest) {
-        try {
-            if (userRequest.getTeamId() <= Team.EMPTY_TEAM_ID || oldFacade.doesNotContainTeam(userRequest.getTeamId())) {
-                final List<String> availableTeams = oldFacade
-                        .getAllTeams()
-                        .stream()
-                        .map(team -> String.format("%s: %s", team.getId(), team.getTeamName()))
-                        .collect(toList());
+        if (userRequest.getTeamId() <= Team.EMPTY_TEAM_ID || oldFacade.doesNotContainTeam(userRequest.getTeamId())) {
+            final List<String> availableTeams = oldFacade
+                    .getAllTeams()
+                    .stream()
+                    .map(team -> String.format("%s: %s", team.getId(), team.getTeamName()))
+                    .collect(toList());
 
-                return List.of(String.format("Field 'teamId' must be one of: %s", availableTeams));
-            }
-        } catch (final FoldingException e) {
-            LOGGER.warn("Unable to get team for user {}", userRequest, e);
-            return List.of("Unable to check team for user");
+            return List.of(String.format("Field 'teamId' must be one of: %s", availableTeams));
         }
 
         return Collections.emptyList();
     }
 
     private List<String> validateHardware(final UserRequest userRequest) {
-        try {
-            if (userRequest.getHardwareId() <= Hardware.EMPTY_HARDWARE_ID || oldFacade.doesNotContainHardware(userRequest.getHardwareId())) {
-                final List<String> availableHardware = oldFacade
-                        .getAllHardware()
-                        .stream()
-                        .map(hardware -> String.format("%s: %s", hardware.getId(), hardware.getHardwareName()))
-                        .collect(toList());
+        if (userRequest.getHardwareId() <= Hardware.EMPTY_HARDWARE_ID || oldFacade.doesNotContainHardware(userRequest.getHardwareId())) {
+            final List<String> availableHardware = oldFacade
+                    .getAllHardware()
+                    .stream()
+                    .map(hardware -> String.format("%s: %s", hardware.getId(), hardware.getHardwareName()))
+                    .collect(toList());
 
-                return List.of(String.format("Field 'hardwareId' must be one of: %s", availableHardware));
-            }
-        } catch (final FoldingException e) {
-            LOGGER.warn("Unable to get hardware for user {}", userRequest, e);
-            return List.of("Unable to check hardware for user");
+            return List.of(String.format("Field 'hardwareId' must be one of: %s", availableHardware));
         }
 
         return Collections.emptyList();
@@ -313,7 +297,7 @@ public final class UserValidator {
                     }
                 }
             }
-        } catch (final FoldingException | TeamNotFoundException | UserNotFoundException e) {
+        } catch (final TeamNotFoundException | UserNotFoundException e) {
             LOGGER.warn("Unable to validate current team users", e);
             failureMessages.add("Unable to validate current team users");
         }

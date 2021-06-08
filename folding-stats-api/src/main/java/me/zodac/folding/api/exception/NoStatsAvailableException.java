@@ -1,4 +1,4 @@
-package me.zodac.folding.api.tc.exception;
+package me.zodac.folding.api.exception;
 
 /**
  * {@link Exception} used when retrieving {@link me.zodac.folding.api.tc.User}/{@link me.zodac.folding.api.tc.Team} {@link me.zodac.folding.api.tc.stats.Stats}, but none are available.

@@ -1,16 +1,15 @@
 package me.zodac.folding.db.postgres;
 
+import me.zodac.folding.api.SystemUserAuthentication;
 import me.zodac.folding.api.db.DbManager;
-import me.zodac.folding.api.db.SystemUserAuthentication;
-import me.zodac.folding.api.exception.FoldingException;
+import me.zodac.folding.api.exception.HardwareNotFoundException;
+import me.zodac.folding.api.exception.TeamNotFoundException;
+import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.OperatingSystem;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.tc.exception.HardwareNotFoundException;
-import me.zodac.folding.api.tc.exception.TeamNotFoundException;
-import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.stats.OffsetStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
@@ -43,7 +42,7 @@ class PostgresDbManagerTest {
 
     @Test
     @Order(1)
-    void hardwareTest() throws FoldingException, HardwareNotFoundException {
+    void hardwareTest() throws HardwareNotFoundException {
         final Hardware hardware = generateHardware();
         final Hardware createdHardware = POSTGRES_DB_MANAGER.createHardware(hardware);
         assertThat(createdHardware.getId())
@@ -83,7 +82,7 @@ class PostgresDbManagerTest {
 
     @Test
     @Order(2)
-    void teamTest() throws FoldingException, TeamNotFoundException {
+    void teamTest() throws TeamNotFoundException {
         final Team team = generateTeam();
         final Team createdTeam = POSTGRES_DB_MANAGER.createTeam(team);
 
@@ -123,7 +122,7 @@ class PostgresDbManagerTest {
 
     @Test
     @Order(3)
-    void userTest() throws FoldingException, UserNotFoundException {
+    void userTest() throws UserNotFoundException {
         final User user = generateUser();
         final User createdUser = POSTGRES_DB_MANAGER.createUser(user);
 
@@ -168,43 +167,47 @@ class PostgresDbManagerTest {
     }
 
     @Test
-    void initialUserStatsTest() throws FoldingException {
+    void initialUserStatsTest() {
         final int userId = createUser().getId();
 
-        assertThatThrownBy(() -> POSTGRES_DB_MANAGER.getInitialStats(userId).orElseThrow(FoldingException::new))
-                .isInstanceOf(FoldingException.class);
+        assertThat(POSTGRES_DB_MANAGER.getInitialStats(userId))
+                .isEmpty();
 
         final long points = 100L;
         final int units = 10;
         POSTGRES_DB_MANAGER.persistInitialStats(UserStats.create(userId, DateTimeUtils.currentUtcTimestamp(), points, units));
 
-        final UserStats userStatsAfterUpdate = POSTGRES_DB_MANAGER.getInitialStats(userId).orElseThrow(FoldingException::new);
-        assertThat(userStatsAfterUpdate.getPoints())
+        final Optional<UserStats> userStatsAfterUpdate = POSTGRES_DB_MANAGER.getInitialStats(userId);
+        assertThat(userStatsAfterUpdate)
+                .isPresent();
+        assertThat(userStatsAfterUpdate.get().getPoints())
                 .isEqualTo(points);
-        assertThat(userStatsAfterUpdate.getUnits())
+        assertThat(userStatsAfterUpdate.get().getUnits())
                 .isEqualTo(units);
     }
 
     @Test
-    void totalStatsTest() throws FoldingException {
+    void totalStatsTest() {
         final int userId = createUser().getId();
 
-        assertThatThrownBy(() -> POSTGRES_DB_MANAGER.getTotalStats(userId).orElseThrow(FoldingException::new))
-                .isInstanceOf(FoldingException.class);
+        assertThat(POSTGRES_DB_MANAGER.getTotalStats(userId))
+                .isEmpty();
 
         final long points = 100L;
         final int units = 10;
         POSTGRES_DB_MANAGER.persistTotalStats(UserStats.create(userId, DateTimeUtils.currentUtcTimestamp(), points, units));
 
-        final UserStats userStatsAfterUpdate = POSTGRES_DB_MANAGER.getTotalStats(userId).orElseThrow(FoldingException::new);
-        assertThat(userStatsAfterUpdate.getPoints())
+        final Optional<UserStats> userStatsAfterUpdate = POSTGRES_DB_MANAGER.getTotalStats(userId);
+        assertThat(userStatsAfterUpdate)
+                .isPresent();
+        assertThat(userStatsAfterUpdate.get().getPoints())
                 .isEqualTo(points);
-        assertThat(userStatsAfterUpdate.getUnits())
+        assertThat(userStatsAfterUpdate.get().getUnits())
                 .isEqualTo(units);
     }
 
     @Test
-    void retiredUserStatsTest() throws FoldingException {
+    void retiredUserStatsTest() {
         final User userToRetire = createUser();
         final Team team = userToRetire.getTeam();
 
@@ -236,7 +239,7 @@ class PostgresDbManagerTest {
     }
 
     @Test
-    void offsetStatsTest() throws FoldingException {
+    void offsetStatsTest() {
         final int userId = createUser().getId();
 
         assertThat(POSTGRES_DB_MANAGER.getOffsetStats(userId))
@@ -284,7 +287,7 @@ class PostgresDbManagerTest {
     }
 
     @Test
-    void hourlyTcStatsTest() throws FoldingException {
+    void hourlyTcStatsTest() {
         assertThat(POSTGRES_DB_MANAGER.isAnyHourlyTcStats())
                 .isFalse();
 
@@ -309,7 +312,7 @@ class PostgresDbManagerTest {
     }
 
     @Test
-    void historicTest() throws FoldingException {
+    void historicTest() {
         final int userId = createUser().getId();
 
         final Year year = Year.of(2020);
@@ -351,7 +354,7 @@ class PostgresDbManagerTest {
     }
 
     @Test
-    void validSystemUserTest() throws FoldingException {
+    void validSystemUserTest() {
         final SystemUserAuthentication invalidUserName = POSTGRES_DB_MANAGER.authenticateSystemUser("invalidUserName", "ADMIN_PASSWORD");
         assertThat(invalidUserName.isUserExists())
                 .isFalse();
@@ -389,17 +392,17 @@ class PostgresDbManagerTest {
         return Hardware.createWithoutId(nextHardwareName(), "hardware", OperatingSystem.WINDOWS, 1.0D);
     }
 
-    private Hardware createHardware() throws FoldingException {
+    private Hardware createHardware() {
         return POSTGRES_DB_MANAGER.createHardware(generateHardware());
     }
 
-    private User generateUser() throws FoldingException {
+    private User generateUser() {
         final Hardware hardware = createHardware();
         final Team team = createTeam();
         return User.createWithoutId(nextUserName(), "user", "passkey", Category.NVIDIA_GPU, "", "", hardware, team, true);
     }
 
-    private User createUser() throws FoldingException {
+    private User createUser() {
         return POSTGRES_DB_MANAGER.createUser(generateUser());
     }
 
@@ -407,7 +410,7 @@ class PostgresDbManagerTest {
         return Team.createWithoutId(nextTeamName(), "team", "");
     }
 
-    private Team createTeam() throws FoldingException {
+    private Team createTeam() {
         return POSTGRES_DB_MANAGER.createTeam(generateTeam());
     }
 }

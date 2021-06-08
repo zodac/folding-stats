@@ -4,14 +4,13 @@ import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.RequestPojo;
 import me.zodac.folding.api.ResponsePojo;
 import me.zodac.folding.api.SystemState;
-import me.zodac.folding.api.exception.FoldingException;
-import me.zodac.folding.api.exception.FoldingExternalServiceException;
-import me.zodac.folding.api.tc.exception.FoldingIdInvalidException;
-import me.zodac.folding.api.tc.exception.FoldingIdOutOfRangeException;
-import me.zodac.folding.api.tc.exception.NoStatsAvailableException;
-import me.zodac.folding.api.tc.exception.NotFoundException;
-import me.zodac.folding.api.tc.exception.TeamNotFoundException;
-import me.zodac.folding.api.tc.exception.UserNotFoundException;
+import me.zodac.folding.api.exception.ExternalConnectionException;
+import me.zodac.folding.api.exception.IdOutOfRangeException;
+import me.zodac.folding.api.exception.InvalidIdException;
+import me.zodac.folding.api.exception.NoStatsAvailableException;
+import me.zodac.folding.api.exception.NotFoundException;
+import me.zodac.folding.api.exception.TeamNotFoundException;
+import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.api.validator.ValidationResult;
 import me.zodac.folding.ejb.OldFacade;
@@ -44,6 +43,7 @@ import static me.zodac.folding.rest.util.response.Responses.okBuilder;
 import static me.zodac.folding.rest.util.response.Responses.serverError;
 import static me.zodac.folding.rest.util.response.Responses.serviceUnavailable;
 
+// TODO: [zodac] Decorator around REST methods, so we can catch generic exceptions in a single place?
 abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePojo> {
 
     // Expecting most changes to be at the monthly reset, so counting number of seconds until then
@@ -59,9 +59,9 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
 
     protected abstract String elementType();
 
-    protected abstract O createElement(final O element) throws FoldingException, NotFoundException, FoldingExternalServiceException;
+    protected abstract O createElement(final O element) throws NotFoundException, ExternalConnectionException;
 
-    protected abstract Collection<O> getAllElements() throws FoldingException;
+    protected abstract Collection<O> getAllElements();
 
     protected abstract ValidationResponse<O> validateCreateAndConvert(final I inputRequest);
 
@@ -69,11 +69,11 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
 
     protected abstract ValidationResponse<O> validateDeleteAndConvert(final O element);
 
-    protected abstract O getElementById(final int elementId) throws FoldingException, NotFoundException;
+    protected abstract O getElementById(final int elementId) throws NotFoundException;
 
-    protected abstract O updateElementById(final int elementId, final O element) throws FoldingException, NotFoundException, FoldingExternalServiceException;
+    protected abstract O updateElementById(final int elementId, final O element) throws NotFoundException, ExternalConnectionException;
 
-    protected abstract void deleteElementById(final int elementId) throws FoldingException, UserNotFoundException, NoStatsAvailableException, TeamNotFoundException;
+    protected abstract void deleteElementById(final int elementId) throws UserNotFoundException, NoStatsAvailableException, TeamNotFoundException;
 
     protected Response create(final I inputRequest) {
         getLogger().debug("POST request received to create {} at '{}' with request: {}", elementType(), uriContext.getAbsolutePath(), inputRequest);
@@ -99,7 +99,7 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
                     .path(String.valueOf(elementWithId.getId()));
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             return created(elementWithId, elementLocationBuilder);
-        } catch (final FoldingExternalServiceException e) {
+        } catch (final ExternalConnectionException e) {
             final String errorMessage = String.format("Error connecting to external service at '%s': %s", e.getUrl(), e.getMessage());
             getLogger().debug(errorMessage, e);
             getLogger().error(errorMessage);
@@ -107,9 +107,6 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
         } catch (final NotFoundException e) {
             getLogger().debug("Error creating {}, could not find {} with ID {}", elementType(), e.getType(), e.getId(), e);
             getLogger().error("Error creating {}, could not find {} with ID {}", elementType(), e.getType(), e.getId());
-            return serverError();
-        } catch (final FoldingException e) {
-            getLogger().error("Error creating {}: {}", elementType(), inputRequest, e.getCause());
             return serverError();
         } catch (final Exception e) {
             getLogger().error("Unexpected error creating {}: {}", elementType(), inputRequest, e);
@@ -151,9 +148,6 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
             try {
                 final O elementWithId = createElement(element);
                 successful.add(elementWithId);
-            } catch (final FoldingException | FoldingExternalServiceException e) {
-                getLogger().error("Error creating {}: {}", elementType(), element, e.getCause());
-                unsuccessful.add(element);
             } catch (final Exception e) {
                 getLogger().error("Unexpected error creating {}: {}", elementType(), element, e);
                 unsuccessful.add(element);
@@ -202,9 +196,6 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
 
             builder.cacheControl(cacheControl);
             return builder.build();
-        } catch (final FoldingException e) {
-            getLogger().error("Error getting all {}s", elementType(), e.getCause());
-            return serverError();
         } catch (final Exception e) {
             getLogger().error("Unexpected error getting all {}s", elementType(), e);
             return serverError();
@@ -236,12 +227,12 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
 
             builder.cacheControl(cacheControl);
             return builder.build();
-        } catch (final FoldingIdInvalidException e) {
+        } catch (final InvalidIdException e) {
             final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), e.getId());
             getLogger().debug(errorMessage, e);
             getLogger().error(errorMessage);
             return badRequest(errorMessage);
-        } catch (final FoldingIdOutOfRangeException e) {
+        } catch (final IdOutOfRangeException e) {
             final String errorMessage = String.format("The %s ID '%s' is out of range", elementType(), e.getId());
             getLogger().debug(errorMessage, e);
             getLogger().error(errorMessage);
@@ -250,9 +241,6 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
             getLogger().debug("Error getting {} with ID {}", e.getType(), e.getId(), e);
             getLogger().error("Error getting {} with ID {}", e.getType(), e.getId());
             return notFound();
-        } catch (final FoldingException e) {
-            getLogger().error("Error getting {} with ID: {}", elementType(), elementId, e.getCause());
-            return serverError();
         } catch (final Exception e) {
             getLogger().error("Unexpected error getting {} with ID: {}", elementType(), elementId, e);
             return serverError();
@@ -301,17 +289,17 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
                     .path(String.valueOf(inputRequest.getId()));
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             return ok(updatedElementWithId, elementLocationBuilder);
-        } catch (final FoldingIdInvalidException e) {
+        } catch (final InvalidIdException e) {
             final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), e.getId());
             getLogger().debug(errorMessage, e);
             getLogger().error(errorMessage);
             return badRequest(errorMessage);
-        } catch (final FoldingIdOutOfRangeException e) {
+        } catch (final IdOutOfRangeException e) {
             final String errorMessage = String.format("The %s ID '%s' is out of range", elementType(), e.getId());
             getLogger().debug(errorMessage, e);
             getLogger().error(errorMessage);
             return badRequest(errorMessage);
-        } catch (final FoldingExternalServiceException e) {
+        } catch (final ExternalConnectionException e) {
             final String errorMessage = String.format("Error connecting to external service at '%s': %s", e.getUrl(), e.getMessage());
             getLogger().debug(errorMessage, e);
             getLogger().error(errorMessage);
@@ -320,9 +308,6 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
             getLogger().debug("Error updating {}, could not find {} with ID {}", elementType(), e.getType(), e.getId(), e);
             getLogger().error("Error updating {}, could not find {} with ID {}", elementType(), e.getType(), e.getId());
             return notFound();
-        } catch (final FoldingException e) {
-            getLogger().error("Error updating {} with ID: {}", elementType(), elementId, e.getCause());
-            return serverError();
         } catch (final Exception e) {
             getLogger().error("Unexpected error updating {} with ID: {}", elementType(), elementId, e);
             return serverError();
@@ -352,12 +337,12 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
             deleteElementById(parsedId);
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             return ok();
-        } catch (final FoldingIdInvalidException e) {
+        } catch (final InvalidIdException e) {
             final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), e.getId());
             getLogger().debug(errorMessage, e);
             getLogger().error(errorMessage);
             return badRequest(errorMessage);
-        } catch (final FoldingIdOutOfRangeException e) {
+        } catch (final IdOutOfRangeException e) {
             final String errorMessage = String.format("The %s ID '%s' is out of range", elementType(), e.getId());
             getLogger().debug(errorMessage, e);
             getLogger().error(errorMessage);
@@ -366,9 +351,6 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
             getLogger().debug("Error deleting {}, could not find {} with ID {}", elementType(), e.getType(), e.getId(), e);
             getLogger().error("Error deleting {}, could not find {} with ID {}", elementType(), e.getType(), e.getId());
             return notFound();
-        } catch (final FoldingException e) {
-            getLogger().error("Error deleting {} with ID: {}", elementType(), elementId, e.getCause());
-            return serverError();
         } catch (final Exception e) {
             getLogger().error("Unexpected error deleting {} with ID: {}", elementType(), elementId, e);
             return serverError();

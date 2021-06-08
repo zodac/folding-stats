@@ -1,8 +1,7 @@
 package me.zodac.folding.rest.endpoint;
 
 import me.zodac.folding.SystemStateManager;
-import me.zodac.folding.api.db.SystemUserAuthentication;
-import me.zodac.folding.api.exception.FoldingException;
+import me.zodac.folding.api.SystemUserAuthentication;
 import me.zodac.folding.api.utils.EncodingUtils;
 import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.rest.api.LoginCredentials;
@@ -74,9 +73,6 @@ public class LoginEndpoint {
 
             LOGGER.info("Admin user '{}' logged in", userName);
             return ok();
-        } catch (final FoldingException e) {
-            LOGGER.error("Error validating user credentials", e.getCause());
-            return serverError();
         } catch (final IllegalArgumentException e) {
             LOGGER.error("Encoded user name and password was not a valid Base64 string", e);
             return badRequest(loginCredentials);

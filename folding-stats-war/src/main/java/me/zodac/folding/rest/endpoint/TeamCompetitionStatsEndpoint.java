@@ -2,13 +2,12 @@ package me.zodac.folding.rest.endpoint;
 
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.SystemState;
-import me.zodac.folding.api.exception.FoldingException;
+import me.zodac.folding.api.exception.IdOutOfRangeException;
+import me.zodac.folding.api.exception.InvalidIdException;
+import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.tc.exception.FoldingIdInvalidException;
-import me.zodac.folding.api.tc.exception.FoldingIdOutOfRangeException;
-import me.zodac.folding.api.tc.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.stats.OffsetStats;
 import me.zodac.folding.api.utils.ExecutionType;
 import me.zodac.folding.ejb.CompetitionResultGenerator;
@@ -131,12 +130,12 @@ public class TeamCompetitionStatsEndpoint {
             }
 
             return notFound();
-        } catch (final FoldingIdInvalidException e) {
+        } catch (final InvalidIdException e) {
             final String errorMessage = String.format("The user ID '%s' is not a valid format", e.getId());
             LOGGER.debug(errorMessage, e);
             LOGGER.error(errorMessage);
             return badRequest(errorMessage);
-        } catch (final FoldingIdOutOfRangeException e) {
+        } catch (final IdOutOfRangeException e) {
             final String errorMessage = String.format("The user ID '%s' is out of range", e.getId());
             LOGGER.debug(errorMessage, e);
             LOGGER.error(errorMessage);
@@ -179,12 +178,12 @@ public class TeamCompetitionStatsEndpoint {
             userTeamCompetitionStatsParser.parseTcStatsForUserAndWait(oldFacade.getUser(parsedId));
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             return ok();
-        } catch (final FoldingIdInvalidException e) {
+        } catch (final InvalidIdException e) {
             final String errorMessage = String.format("The user ID '%s' is not a valid format", e.getId());
             LOGGER.debug(errorMessage, e);
             LOGGER.error(errorMessage);
             return badRequest(errorMessage);
-        } catch (final FoldingIdOutOfRangeException e) {
+        } catch (final IdOutOfRangeException e) {
             final String errorMessage = String.format("The user ID '%s' is out of range", e.getId());
             LOGGER.debug(errorMessage, e);
             LOGGER.error(errorMessage);
@@ -192,16 +191,13 @@ public class TeamCompetitionStatsEndpoint {
         } catch (final UserNotFoundException e) {
             LOGGER.error("Error finding user with ID: {}", userId, e.getCause());
             return notFound();
-        } catch (final FoldingException e) {
-            LOGGER.error("Error updating user with ID: {}", userId, e.getCause());
-            return serverError();
         } catch (final Exception e) {
             LOGGER.error("Unexpected error updating user with ID: {}", userId, e);
             return serverError();
         }
     }
 
-    private OffsetStats getValidUserStatsOffset(final User user, final OffsetStats offsetStats) throws FoldingException, UserNotFoundException {
+    private OffsetStats getValidUserStatsOffset(final User user, final OffsetStats offsetStats) throws UserNotFoundException {
         final Hardware hardware = user.getHardware();
         return OffsetStats.updateWithHardwareMultiplier(offsetStats, hardware.getMultiplier());
     }
