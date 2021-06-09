@@ -40,6 +40,11 @@ public final class TestDbConnectionPool implements DbConnectionPool {
         }
     }
 
+    /**
+     * Creates an instance of {@link TestDbConnectionPool}.
+     *
+     * @return the created {@link TestDbConnectionPool}
+     */
     public static TestDbConnectionPool create() {
         return new TestDbConnectionPool();
     }

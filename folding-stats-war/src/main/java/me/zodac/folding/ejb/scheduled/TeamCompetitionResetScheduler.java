@@ -2,8 +2,6 @@ package me.zodac.folding.ejb.scheduled;
 
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.SystemState;
-import me.zodac.folding.api.exception.UserNotFoundException;
-import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.utils.EnvironmentVariableUtils;
 import me.zodac.folding.api.utils.ExecutionType;
@@ -45,6 +43,9 @@ public class TeamCompetitionResetScheduler {
     @EJB
     private transient TeamCompetitionStatsScheduler teamCompetitionStatsScheduler;
 
+    /**
+     * On system startup, checks if the reset is enabled, and logs a warning if it is not.
+     */
     @PostConstruct
     public void init() {
         if (!IS_MONTHLY_RESET_ENABLED) {
@@ -52,8 +53,14 @@ public class TeamCompetitionResetScheduler {
         }
     }
 
+    /**
+     * Schedules to execute at <b>00:15</b> on the 1st day of every month. Will reset the <code>Team Competition</code>
+     * stats.
+     *
+     * @see #resetTeamCompetitionStats()
+     */
     @Schedule(dayOfMonth = "1", minute = "15", info = "Monthly cache reset for TC teams")
-    public void resetTeamCompetitionStats() {
+    public void scheduleTeamCompetitionStatsReset() {
         if (!IS_MONTHLY_RESET_ENABLED) {
             LOGGER.warn("Monthly TC stats reset not enabled");
             return;
@@ -62,41 +69,45 @@ public class TeamCompetitionResetScheduler {
         LOGGER.info("Resetting TC stats for new month");
 
         SystemStateManager.next(SystemState.RESETTING_STATS);
-        manualResetTeamCompetitionStats();
+        resetTeamCompetitionStats();
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
     }
 
-    public void manualResetTeamCompetitionStats() {
+    /**
+     * Resets the <code>Team Competition</code> stats for all {@link User}s.
+     * <p>
+     * Actions performed:
+     * <ol>
+     * <li>Retrieves the current stats for all {@link User}s and updates their initial stats to these current values</li>
+     * <li>Remove offset stats for all users</li>
+     * <li>Delete all retired user stats</li>
+     * <li>Invalidate all stats caches ({@link TcStatsCache}/{@link TotalStatsCache}/{@link RetiredTcStatsCache})</li>
+     * <li>Execute a new stats update to set all values to <b>0</b></li>
+     * </ol>
+     *
+     * @see OldFacade#setCurrentStatsAsInitialStatsForUser(User)
+     * @see OldFacade#clearOffsetStats()
+     * @see OldFacade#deleteRetiredUserStats()
+     * @see TeamCompetitionStatsScheduler#manualTeamCompetitionStatsParsing(ExecutionType)
+     */
+    public void resetTeamCompetitionStats() {
         try {
-            resetTcStats();
+            final Collection<User> users = oldFacade.getAllUsers();
+            if (users.isEmpty()) {
+                LOGGER.error("No TC users configured in system to reset!");
+            } else {
+                resetStats(users);
+                LOGGER.info("Clearing offsets");
+                oldFacade.clearOffsetStats();
+            }
+
+            LOGGER.info("Deleting retired users");
+            oldFacade.deleteRetiredUserStats();
+            resetCaches();
+            teamCompetitionStatsScheduler.manualTeamCompetitionStatsParsing(ExecutionType.SYNCHRONOUS);
         } catch (final Exception e) {
             LOGGER.warn("Unexpected error manually resetting TC stats");
         }
-    }
-
-    private void resetTcStats() {
-        final Collection<Team> teams = oldFacade.getAllTeams();
-        if (teams.isEmpty()) {
-            LOGGER.error("No TC teams configured in system!");
-            return;
-        }
-
-        final Collection<User> users = oldFacade.getAllUsers();
-        if (users.isEmpty()) {
-            LOGGER.error("No TC users configured in system to reset!");
-            return;
-        }
-
-        resetStats(users);
-
-        LOGGER.info("Clearing offsets");
-        oldFacade.clearOffsetStats();
-
-        LOGGER.info("Deleting retired users");
-        oldFacade.deleteRetiredUserStats();
-
-        resetCaches();
-        teamCompetitionStatsScheduler.manualTeamCompetitionStatsParsing(ExecutionType.SYNCHRONOUS);
     }
 
     // TODO: [zodac] Go through Storage/BL, not direct to caches
@@ -110,12 +121,8 @@ public class TeamCompetitionResetScheduler {
     private void resetStats(final Collection<User> usersToReset) {
         LOGGER.info("Resetting all TC stats");
         for (final User user : usersToReset) {
-            try {
-                LOGGER.info("Resetting TC stats for {}", user.getDisplayName());
-                oldFacade.updateInitialStatsForUser(user);
-            } catch (final UserNotFoundException e) {
-                LOGGER.warn("No user found to reset TC stats: {}", user);
-            }
+            LOGGER.info("Resetting TC stats for {}", user.getDisplayName());
+            oldFacade.setCurrentStatsAsInitialStatsForUser(user);
         }
     }
 }

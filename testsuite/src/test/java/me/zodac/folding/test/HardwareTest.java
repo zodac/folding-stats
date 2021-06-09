@@ -130,7 +130,7 @@ class HardwareTest {
                 .id(createdHardware.getId())
                 .hardwareName(createdHardware.getHardwareName())
                 .displayName(createdHardware.getDisplayName())
-                .operatingSystem(OperatingSystem.LINUX.displayName())
+                .operatingSystem(OperatingSystem.LINUX.toString())
                 .multiplier(createdHardware.getMultiplier())
                 .build();
 
@@ -238,7 +238,7 @@ class HardwareTest {
                 .id(createdHardware.getId())
                 .hardwareName(createdHardware.getHardwareName())
                 .displayName(createdHardware.getDisplayName())
-                .operatingSystem(createdHardware.getOperatingSystem().displayName())
+                .operatingSystem(createdHardware.getOperatingSystem().toString())
                 .multiplier(createdHardware.getMultiplier())
                 .build();
 
@@ -385,7 +385,7 @@ class HardwareTest {
         final HardwareRequest updatedHardware = HardwareRequest.builder()
                 .hardwareName(createdHardware.getHardwareName())
                 .displayName(createdHardware.getDisplayName())
-                .operatingSystem(OperatingSystem.LINUX.displayName())
+                .operatingSystem(OperatingSystem.LINUX.toString())
                 .multiplier(createdHardware.getMultiplier())
                 .build();
 

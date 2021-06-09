@@ -49,7 +49,7 @@ public final class TestGenerator {
         return HardwareRequest.builder()
                 .hardwareName(hardwareName)
                 .displayName(hardwareName)
-                .operatingSystem(OperatingSystem.WINDOWS.displayName())
+                .operatingSystem(OperatingSystem.WINDOWS.toString())
                 .multiplier(1.0D)
                 .build();
     }
@@ -66,7 +66,7 @@ public final class TestGenerator {
         return HardwareRequest.builder()
                 .id(hardwareId)
                 .hardwareName(hardwareName)
-                .displayName(hardwareName).operatingSystem(OperatingSystem.WINDOWS.displayName())
+                .displayName(hardwareName).operatingSystem(OperatingSystem.WINDOWS.toString())
                 .multiplier(1.0D)
                 .build();
     }
@@ -82,7 +82,7 @@ public final class TestGenerator {
         return HardwareRequest.builder()
                 .hardwareName(hardwareName)
                 .displayName(hardwareName)
-                .operatingSystem(OperatingSystem.WINDOWS.displayName())
+                .operatingSystem(OperatingSystem.WINDOWS.toString())
                 .multiplier(multiplier)
                 .build();
     }
@@ -98,7 +98,7 @@ public final class TestGenerator {
         return HardwareRequest.builder()
                 .hardwareName(hardwareName)
                 .displayName(hardwareName)
-                .operatingSystem(operatingSystem.displayName())
+                .operatingSystem(operatingSystem.toString())
                 .multiplier(1.0D)
                 .build();
     }
@@ -138,7 +138,7 @@ public final class TestGenerator {
                 .foldingUserName(userName)
                 .displayName(userName)
                 .passkey("DummyPasskey12345678901234567890")
-                .category(Category.NVIDIA_GPU.displayName())
+                .category(Category.NVIDIA_GPU.toString())
                 .hardwareId(hardwareId)
                 .teamId(teamId)
                 .build();
@@ -153,7 +153,7 @@ public final class TestGenerator {
                 .foldingUserName(userName)
                 .displayName(userName)
                 .passkey("DummyPasskey12345678901234567890")
-                .category(category.displayName())
+                .category(category.toString())
                 .hardwareId(hardwareId)
                 .teamId(teamId)
                 .build();
@@ -169,7 +169,7 @@ public final class TestGenerator {
                 .foldingUserName(userName)
                 .displayName(userName)
                 .passkey("DummyPasskey12345678901234567890")
-                .category(Category.NVIDIA_GPU.displayName())
+                .category(Category.NVIDIA_GPU.toString())
                 .hardwareId(hardwareId)
                 .teamId(teamId)
                 .build();
@@ -183,7 +183,7 @@ public final class TestGenerator {
                 .foldingUserName(userName)
                 .displayName(userName)
                 .passkey("DummyPasskey12345678901234567890")
-                .category(Category.NVIDIA_GPU.displayName())
+                .category(Category.NVIDIA_GPU.toString())
                 .hardwareId(hardwareId)
                 .teamId(teamId)
                 .build();
@@ -197,7 +197,7 @@ public final class TestGenerator {
                 .foldingUserName(userName)
                 .displayName(userName)
                 .passkey("DummyPasskey12345678901234567890")
-                .category(Category.NVIDIA_GPU.displayName())
+                .category(Category.NVIDIA_GPU.toString())
                 .hardwareId(hardwareId)
                 .teamId(teamId)
                 .build();
@@ -211,7 +211,7 @@ public final class TestGenerator {
                 .foldingUserName(userName)
                 .displayName(userName)
                 .passkey("DummyPasskey12345678901234567890")
-                .category(category.displayName())
+                .category(category.toString())
                 .hardwareId(hardwareId)
                 .teamId(teamId)
                 .build();
@@ -226,7 +226,7 @@ public final class TestGenerator {
                 .foldingUserName(userName)
                 .displayName(userName)
                 .passkey("DummyPasskey12345678901234567890")
-                .category(Category.NVIDIA_GPU.displayName())
+                .category(Category.NVIDIA_GPU.toString())
                 .liveStatsLink(liveStatsLink)
                 .hardwareId(hardwareId)
                 .teamId(teamId)

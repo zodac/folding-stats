@@ -182,7 +182,7 @@ public class User implements ResponsePojo {
                 Objects.equals(foldingUserName, userRequest.getFoldingUserName()) &&
                 Objects.equals(displayName, userRequest.getDisplayName()) &&
                 Objects.equals(passkey, userRequest.getPasskey()) &&
-                Objects.equals(category.displayName(), userRequest.getCategory()) &&
+                Objects.equals(category.toString(), userRequest.getCategory()) &&
                 Objects.equals(profileLink, userRequest.getProfileLink()) &&
                 Objects.equals(liveStatsLink, userRequest.getLiveStatsLink());
     }

@@ -108,7 +108,7 @@ public class TeamCompetitionStatsScheduler {
         }
     }
 
-    public void parseTcStatsForTeam(final Team team, final ExecutionType executionType) {
+    private void parseTcStatsForTeam(final Team team, final ExecutionType executionType) {
         LOGGER.debug("Getting TC stats for users in team {}", team.getTeamName());
         final Collection<User> teamUsers = oldFacade.getUsersOnTeam(team);
 

@@ -23,7 +23,8 @@ abstract class AbstractCache<V extends ResponsePojo> {
      * Add an element of type {@link V} to the cache.
      *
      * @param element the {@link V} element to add to the cache
-     * @throws IllegalArgumentException thrown if the input element is <code>null</code> or has an ID of <b>0</b>
+     * @throws IllegalArgumentException thrown if the input element is <code>null</code> or has an ID of <b>0</b> or
+     *                                  lower
      */
     public void add(final V element) {
         if (element == null) {
@@ -32,7 +33,7 @@ abstract class AbstractCache<V extends ResponsePojo> {
 
         final int elementId = element.getId();
 
-        if (elementId == 0) {
+        if (elementId <= 0) {
             throw new IllegalArgumentException(String.format("ID cannot be 0: %s", element));
         }
         elementsById.put(elementId, element);

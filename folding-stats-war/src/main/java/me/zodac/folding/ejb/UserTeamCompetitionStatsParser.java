@@ -85,9 +85,7 @@ public class UserTeamCompetitionStatsParser {
     }
 
     private void calculateAndPersistTcStats(final User user, final Stats initialStats, final OffsetStats offsetStats, final UserStats totalStats) {
-        LOGGER.info("User: {}", user);
         final double hardwareMultiplier = user.getHardware().getMultiplier();
-        LOGGER.info("Multiplier: {}", hardwareMultiplier);
         final long points = Math.max(0, totalStats.getPoints() - initialStats.getPoints());
         final long multipliedPoints = Math.round(points * hardwareMultiplier);
         final int units = Math.max(0, totalStats.getUnits() - initialStats.getUnits());

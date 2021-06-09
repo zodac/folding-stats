@@ -8,8 +8,6 @@ import me.zodac.folding.api.tc.stats.OffsetStats;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
-import me.zodac.folding.rest.api.tc.CompetitionSummary;
-import me.zodac.folding.rest.api.tc.UserSummary;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -48,7 +46,7 @@ public final class TeamCompetitionStatsRequestSender {
     }
 
     /**
-     * Send a <b>GET</b> request to retrieve the overall <code>Team Competition</code> {@link CompetitionSummary}.
+     * Send a <b>GET</b> request to retrieve the overall <code>Team Competition</code> {@link me.zodac.folding.rest.api.tc.CompetitionSummary}.
      *
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
@@ -59,12 +57,12 @@ public final class TeamCompetitionStatsRequestSender {
     }
 
     /**
-     * Send a <b>GET</b> request to retrieve the overall <code>Team Competition</code> {@link CompetitionSummary}.
+     * Send a <b>GET</b> request to retrieve the overall <code>Team Competition</code> {@link me.zodac.folding.rest.api.tc.CompetitionSummary}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached {@link CompetitionSummary} based on the <code>ETag</code>, an empty {@link HttpResponse#body()} is returned.
+     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.rest.api.tc.CompetitionSummary} based on the <code>ETag</code>, an empty {@link HttpResponse#body()} is returned.
      *
-     * @param eTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached {@link CompetitionSummary}
+     * @param eTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached {@link me.zodac.folding.rest.api.tc.CompetitionSummary}
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      * @see #getStats()
@@ -89,9 +87,9 @@ public final class TeamCompetitionStatsRequestSender {
     }
 
     /**
-     * Send a <b>GET</b> request to retrieve the <code>Team Competition</code> {@link UserSummary} for a {@link me.zodac.folding.api.tc.User}.
+     * Send a <b>GET</b> request to retrieve the <code>Team Competition</code> {@link me.zodac.folding.rest.api.tc.UserSummary} for a {@link me.zodac.folding.api.tc.User}.
      *
-     * @param userId the ID of the {@link me.zodac.folding.api.tc.User} whose {@link UserSummary} is to be retrieved
+     * @param userId the ID of the {@link me.zodac.folding.api.tc.User} whose {@link me.zodac.folding.rest.api.tc.UserSummary} is to be retrieved
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      * @see #getStats(String)
@@ -101,13 +99,13 @@ public final class TeamCompetitionStatsRequestSender {
     }
 
     /**
-     * Send a <b>GET</b> request to retrieve the <code>Team Competition</code> {@link UserSummary} for a {@link me.zodac.folding.api.tc.User}.
+     * Send a <b>GET</b> request to retrieve the <code>Team Competition</code> {@link me.zodac.folding.rest.api.tc.UserSummary} for a {@link me.zodac.folding.api.tc.User}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached {@link UserSummary} based on the <code>ETag</code>, an empty {@link HttpResponse#body()} is returned.
+     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.rest.api.tc.UserSummary} based on the <code>ETag</code>, an empty {@link HttpResponse#body()} is returned.
      *
-     * @param userId the ID of the {@link me.zodac.folding.api.tc.User} whose {@link UserSummary} is to be retrieved
-     * @param eTag   the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached {@link UserSummary}
+     * @param userId the ID of the {@link me.zodac.folding.api.tc.User} whose {@link me.zodac.folding.rest.api.tc.UserSummary} is to be retrieved
+     * @param eTag   the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached {@link me.zodac.folding.rest.api.tc.UserSummary}
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      * @see #getStats()

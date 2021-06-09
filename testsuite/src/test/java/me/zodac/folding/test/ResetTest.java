@@ -74,7 +74,7 @@ class ResetTest {
                 .foldingUserName(nextUserName())
                 .displayName("displayName")
                 .passkey("DummyPasskey12345678901234567890")
-                .category(Category.NVIDIA_GPU.displayName())
+                .category(Category.NVIDIA_GPU.toString())
                 .hardwareId(hardware.getId())
                 .teamId(team.getId())
                 .userIsCaptain(true)
@@ -85,7 +85,7 @@ class ResetTest {
                 .foldingUserName(nextUserName())
                 .displayName("displayName")
                 .passkey("DummyPasskey12345678901234567890")
-                .category(Category.AMD_GPU.displayName())
+                .category(Category.AMD_GPU.toString())
                 .hardwareId(hardware.getId())
                 .teamId(team.getId())
                 .build();

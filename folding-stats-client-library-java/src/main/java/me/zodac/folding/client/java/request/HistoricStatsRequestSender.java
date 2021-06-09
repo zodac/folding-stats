@@ -328,9 +328,19 @@ public final class HistoricStatsRequestSender {
         }
     }
 
+    /**
+     * Defines the type of historic stats we want to retrieve.
+     */
     private enum HistoricStatsType {
 
+        /**
+         * Historic stats for a {@link me.zodac.folding.api.tc.Team}.
+         */
         TEAM("teams"),
+
+        /**
+         * Historic stats for a {@link me.zodac.folding.api.tc.User}.
+         */
         USER("users");
 
         private final String endpointUrl;

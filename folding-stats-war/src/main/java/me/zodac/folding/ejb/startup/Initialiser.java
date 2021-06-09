@@ -41,6 +41,18 @@ public class Initialiser {
     @EJB
     private transient TeamCompetitionStatsScheduler teamCompetitionStatsScheduler;
 
+    /**
+     * On system startup, we execute the following actions to initialise the system for requests:
+     * <ol>
+     *     <li>Initialise the {@link me.zodac.folding.api.tc.Hardware}, {@link User}, {@link me.zodac.folding.api.tc.Team},
+     *     {@link me.zodac.folding.api.tc.stats.OffsetStats} and initial {@link me.zodac.folding.api.tc.stats.UserStats} caches</li>
+     *     <li>If no <code>Team Competition</code> stats exist, performs a manual stats update</li>
+     *     <li>Sets the {@link SystemState} to {@link SystemState#AVAILABLE} when complete</li>
+     * </ol>
+     *
+     * @see DbManager#isAnyHourlyTcStats()
+     * @see TeamCompetitionStatsScheduler#manualTeamCompetitionStatsParsing(ExecutionType)
+     */
     @PostConstruct
     public void init() {
         initCaches();
@@ -55,6 +67,7 @@ public class Initialiser {
         oldFacade.getAllTeams();
 
         final Collection<User> users = oldFacade.getAllUsers();
+
         oldFacade.initialiseOffsetStats();
 
         for (final User user : users) {

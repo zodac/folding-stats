@@ -65,7 +65,6 @@ public class OldFacade {
     private transient UserTeamCompetitionStatsParser userTeamCompetitionStatsParser;
 
     public void updateHardware(final Hardware updatedHardware, final Hardware existingHardware) throws ExternalConnectionException {
-        LOGGER.info("Updating hardware: {} -> {}", existingHardware, updatedHardware);
         dbManager.updateHardware(updatedHardware);
         hardwareCache.add(updatedHardware);
 
@@ -76,15 +75,11 @@ public class OldFacade {
 
         final boolean isHardwareMultiplierChange = existingHardware.getMultiplier() != updatedHardware.getMultiplier();
 
-        LOGGER.info("Users using this hardware: {}", usersUsingThisHardware);
-        LOGGER.info("isHardwareMultiplierChange? {}", isHardwareMultiplierChange);
-
         for (final User user : usersUsingThisHardware) {
             UserCache.get().remove(user.getId()); // TODO: Don't use cache directly, use Storage#evictUserFromCache()
 
             if (isHardwareMultiplierChange) {
                 LOGGER.debug("User {} had state change to hardware multiplier", user.getFoldingUserName());
-                LOGGER.info("User {} had state change to hardware multiplier", user.getFoldingUserName());
                 handleStateChangeForUser(user);
             }
         }
@@ -212,9 +207,6 @@ public class OldFacade {
     private UserTcStats getCurrentTcStatsForUserOrDefault(final User updatedUser) {
         try {
             return getTcStatsForUser(updatedUser.getId());
-        } catch (final UserNotFoundException e) {
-            LOGGER.debug("Unable to find {} with ID: {}, using 0 values", e.getType(), e.getId(), e);
-            return UserTcStats.empty(updatedUser.getId());
         } catch (final NoStatsAvailableException e) {
             LOGGER.debug("No stats found for user with ID: {}, using 0 values", updatedUser.getId(), e);
             return UserTcStats.empty(updatedUser.getId());
@@ -321,7 +313,7 @@ public class OldFacade {
         tcStatsCache.add(userTcStats.getUserId(), userTcStats);
     }
 
-    public UserTcStats getTcStatsForUser(final int userId) throws UserNotFoundException, NoStatsAvailableException {
+    public UserTcStats getTcStatsForUser(final int userId) throws NoStatsAvailableException {
         final Optional<UserTcStats> optionalUserTcStats = tcStatsCache.get(userId);
 
         if (optionalUserTcStats.isPresent()) {
@@ -425,7 +417,7 @@ public class OldFacade {
         return userTotalStatsFromDb;
     }
 
-    public void updateInitialStatsForUser(final User user) throws UserNotFoundException {
+    public void setCurrentStatsAsInitialStatsForUser(final User user) {
         LOGGER.info("Updating initial stats for user: {}", user.getDisplayName());
         final Stats totalStats = getTotalStatsForUser(user.getId());
         persistInitialUserStats(UserStats.create(user.getId(), DateTimeUtils.currentUtcTimestamp(), totalStats.getPoints(), totalStats.getUnits()));

@@ -75,6 +75,12 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
         this.dbConnectionPool = dbConnectionPool;
     }
 
+    /**
+     * Creates an instance of {@link PostgresDbManager}.
+     *
+     * @param dbConnectionPool the {@link DbConnectionPool} for this instance
+     * @return the created {@link PostgresDbManager}
+     */
     public static PostgresDbManager create(final DbConnectionPool dbConnectionPool) {
         return new PostgresDbManager(dbConnectionPool);
     }
@@ -85,7 +91,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
             final var query = queryContext
                     .insertInto(HARDWARE)
                     .columns(HARDWARE.HARDWARE_NAME, HARDWARE.DISPLAY_NAME, HARDWARE.OPERATING_SYSTEM, HARDWARE.MULTIPLIER)
-                    .values(hardware.getHardwareName(), hardware.getDisplayName(), hardware.getOperatingSystem().displayName(), BigDecimal.valueOf(hardware.getMultiplier()))
+                    .values(hardware.getHardwareName(), hardware.getDisplayName(), hardware.getOperatingSystem().toString(), BigDecimal.valueOf(hardware.getMultiplier()))
                     .returning(HARDWARE.HARDWARE_ID);
             LOGGER.debug("Executing SQL: '{}'", query);
 
@@ -138,7 +144,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
                     .update(HARDWARE)
                     .set(HARDWARE.HARDWARE_NAME, hardware.getHardwareName())
                     .set(HARDWARE.DISPLAY_NAME, hardware.getDisplayName())
-                    .set(HARDWARE.OPERATING_SYSTEM, hardware.getOperatingSystem().displayName())
+                    .set(HARDWARE.OPERATING_SYSTEM, hardware.getOperatingSystem().toString())
                     .set(HARDWARE.MULTIPLIER, BigDecimal.valueOf(hardware.getMultiplier()))
                     .where(HARDWARE.HARDWARE_ID.equal(hardware.getId()));
             LOGGER.debug("Executing SQL: '{}'", query);
@@ -245,7 +251,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
             final var query = queryContext
                     .insertInto(USERS)
                     .columns(USERS.FOLDING_USERNAME, USERS.DISPLAY_USERNAME, USERS.PASSKEY, USERS.CATEGORY, USERS.PROFILE_LINK, USERS.LIVE_STATS_LINK, USERS.HARDWARE_ID, USERS.TEAM_ID, USERS.IS_CAPTAIN)
-                    .values(user.getFoldingUserName(), user.getDisplayName(), user.getPasskey(), user.getCategory().displayName(), user.getProfileLink(), user.getLiveStatsLink(), user.getHardware().getId(), user.getTeam().getId(), user.isUserIsCaptain())
+                    .values(user.getFoldingUserName(), user.getDisplayName(), user.getPasskey(), user.getCategory().toString(), user.getProfileLink(), user.getLiveStatsLink(), user.getHardware().getId(), user.getTeam().getId(), user.isUserIsCaptain())
                     .returning(USERS.USER_ID);
             LOGGER.debug("Executing SQL: '{}'", query);
 
@@ -305,7 +311,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
                     .set(USERS.FOLDING_USERNAME, user.getFoldingUserName())
                     .set(USERS.DISPLAY_USERNAME, user.getDisplayName())
                     .set(USERS.PASSKEY, user.getPasskey())
-                    .set(USERS.CATEGORY, user.getCategory().displayName())
+                    .set(USERS.CATEGORY, user.getCategory().toString())
                     .set(USERS.PROFILE_LINK, user.getProfileLink())
                     .set(USERS.LIVE_STATS_LINK, user.getLiveStatsLink())
                     .set(USERS.HARDWARE_ID, user.getHardware().getId())

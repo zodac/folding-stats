@@ -3,7 +3,6 @@ package me.zodac.folding.ejb;
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.exception.NoStatsAvailableException;
-import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
@@ -19,7 +18,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -74,14 +72,10 @@ public class CompetitionResultGenerator {
     }
 
     private List<TeamSummary> getStatsForTeams() {
-        final Collection<Team> teams = oldFacade.getAllTeams();
-        final List<TeamSummary> teamSummaries = new ArrayList<>(teams.size());
-
-        for (final Team team : teams) {
-            teamSummaries.add(getTcTeamResult(team));
-        }
-
-        return teamSummaries;
+        return oldFacade.getAllTeams()
+                .stream()
+                .map(this::getTcTeamResult)
+                .collect(toList());
     }
 
     private TeamSummary getTcTeamResult(final Team team) {
@@ -122,7 +116,7 @@ public class CompetitionResultGenerator {
             final UserTcStats userTcStats = oldFacade.getTcStatsForUser(user.getId());
             LOGGER.debug("Results for {}: {} points | {} multiplied points | {} units", user.getDisplayName(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits());
             return UserSummary.create(user.getId(), user.getDisplayName(), user.getFoldingUserName(), hardware, category, userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits(), user.getProfileLink(), user.getLiveStatsLink());
-        } catch (final UserNotFoundException | NoStatsAvailableException e) {
+        } catch (final NoStatsAvailableException e) {
             LOGGER.debug("No stats found for user ID: {}", user.getId(), e);
             LOGGER.warn("No stats found for user ID: {}", user.getId());
             return UserSummary.empty(user.getDisplayName(), user.getFoldingUserName(), category, hardware);

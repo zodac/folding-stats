@@ -34,6 +34,11 @@ public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
 
     }
 
+    /**
+     * Creates an instance of {@link HttpFoldingStatsRetriever}.
+     *
+     * @return the created {@link HttpFoldingStatsRetriever}
+     */
     public static HttpFoldingStatsRetriever create() {
         return new HttpFoldingStatsRetriever();
     }

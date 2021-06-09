@@ -147,7 +147,7 @@ class UserTest {
                 .foldingUserName(createdUser.getFoldingUserName())
                 .displayName(createdUser.getDisplayName())
                 .passkey(updatedPasskey)
-                .category(createdUser.getCategory().displayName())
+                .category(createdUser.getCategory().toString())
                 .profileLink(createdUser.getProfileLink())
                 .liveStatsLink(createdUser.getLiveStatsLink())
                 .hardwareId(createdUser.getHardware().getId())
@@ -284,7 +284,7 @@ class UserTest {
                 .foldingUserName(createdUser.getFoldingUserName())
                 .displayName(createdUser.getDisplayName())
                 .passkey(createdUser.getPasskey())
-                .category(createdUser.getCategory().displayName())
+                .category(createdUser.getCategory().toString())
                 .profileLink(createdUser.getProfileLink())
                 .liveStatsLink(createdUser.getLiveStatsLink())
                 .hardwareId(createdUser.getHardware().getId())
@@ -435,7 +435,7 @@ class UserTest {
                 .foldingUserName(createdUser.getFoldingUserName())
                 .displayName(createdUser.getDisplayName())
                 .passkey("updatedPasskey123456789012345678")
-                .category(createdUser.getCategory().displayName())
+                .category(createdUser.getCategory().toString())
                 .profileLink(createdUser.getProfileLink())
                 .liveStatsLink(createdUser.getLiveStatsLink())
                 .hardwareId(createdUser.getHardware().getId())
@@ -550,7 +550,7 @@ class UserTest {
                 .foldingUserName(createdUser.getFoldingUserName())
                 .displayName(createdUser.getDisplayName())
                 .passkey(createdUser.getPasskey())
-                .category(createdUser.getCategory().displayName())
+                .category(createdUser.getCategory().toString())
                 .profileLink(createdUser.getProfileLink())
                 .liveStatsLink("")
                 .hardwareId(createdUser.getHardware().getId())
@@ -575,11 +575,11 @@ class UserTest {
     void whenCreatingUser_givenUsersExceedingPermittedAmountForACategory_thenUserIsNotCreated_andResponseHasA400Status() throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
         final UserRequest firstUser = generateUserWithTeamId(team.getId());
-        firstUser.setCategory(Category.NVIDIA_GPU.displayName());
+        firstUser.setCategory(Category.NVIDIA_GPU.toString());
         create(firstUser);
 
         final UserRequest secondUser = generateUserWithTeamId(team.getId());
-        secondUser.setCategory(Category.NVIDIA_GPU.displayName());
+        secondUser.setCategory(Category.NVIDIA_GPU.toString());
         StubbedFoldingEndpointUtils.enableUser(secondUser);
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.create(secondUser, ADMIN_USER.userName(), ADMIN_USER.password());
@@ -589,7 +589,7 @@ class UserTest {
 
         assertThat(response.body())
                 .as("Did not receive an error message specifying too many users for a specific category")
-                .contains("category '" + Category.NVIDIA_GPU.displayName() + "'");
+                .contains("category '" + Category.NVIDIA_GPU + "'");
     }
 
     @Test
@@ -657,7 +657,7 @@ class UserTest {
                 .foldingUserName(createdUser.getFoldingUserName())
                 .displayName(createdUser.getDisplayName())
                 .passkey(createdUser.getPasskey())
-                .category(Category.NVIDIA_GPU.displayName())
+                .category(Category.NVIDIA_GPU.toString())
                 .profileLink(createdUser.getProfileLink())
                 .liveStatsLink(createdUser.getLiveStatsLink())
                 .hardwareId(createdUser.getHardware().getId())
@@ -672,7 +672,7 @@ class UserTest {
 
         assertThat(response.body())
                 .as("Did not receive an error message specifying the team is too large")
-                .contains("category '" + Category.NVIDIA_GPU.displayName() + "'");
+                .contains("category '" + Category.NVIDIA_GPU + "'");
     }
 
     @Test
@@ -690,7 +690,7 @@ class UserTest {
                 .foldingUserName(createdUser.getFoldingUserName())
                 .displayName(createdUser.getDisplayName())
                 .passkey(createdUser.getPasskey())
-                .category(createdUser.getCategory().displayName())
+                .category(createdUser.getCategory().toString())
                 .profileLink(createdUser.getProfileLink())
                 .liveStatsLink(createdUser.getLiveStatsLink())
                 .hardwareId(createdUser.getHardware().getId())
@@ -718,7 +718,7 @@ class UserTest {
                 .id(originalHardware.getId())
                 .hardwareName(originalHardware.getHardwareName())
                 .displayName("New Name")
-                .operatingSystem(originalHardware.getOperatingSystem().displayName())
+                .operatingSystem(originalHardware.getOperatingSystem().toString())
                 .multiplier(originalHardware.getMultiplier())
                 .build();
 
@@ -740,6 +740,6 @@ class UserTest {
 
     @AfterAll
     static void tearDown() throws FoldingRestException {
-        cleanSystemForSimpleTests();
+//        cleanSystemForSimpleTests();
     }
 }

@@ -18,7 +18,7 @@ public final class SystemStateManager {
     }
 
     /**
-     * Get the current {@link SystemState}.
+     * Get the current {@link SystemState}. On system startup, the {@link SystemState} is {@link SystemState#STARTING}.
      *
      * @return the current {@link SystemState}
      */

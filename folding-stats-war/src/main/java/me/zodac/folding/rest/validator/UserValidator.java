@@ -289,7 +289,7 @@ public final class UserValidator {
                         .count();
 
                 if (numberOfUsersInTeamWithCategory >= permittedNumberForCategory) {
-                    failureMessages.add(String.format("Found %s users of category '%s', only %s permitted", numberOfUsersInTeamWithCategory, category.displayName(), permittedNumberForCategory));
+                    failureMessages.add(String.format("Found %s users of category '%s', only %s permitted", numberOfUsersInTeamWithCategory, category, permittedNumberForCategory));
                 }
             } else {
                 // isUpdate
@@ -303,7 +303,7 @@ public final class UserValidator {
                             .count();
 
                     if (numberOfUsersInTeamWithCategory >= permittedNumberForCategory) {
-                        failureMessages.add(String.format("Found %s users of category '%s', only %s permitted", numberOfUsersInTeamWithCategory, category.displayName(), permittedNumberForCategory));
+                        failureMessages.add(String.format("Found %s users of category '%s', only %s permitted", numberOfUsersInTeamWithCategory, category, permittedNumberForCategory));
                     }
                 }
             }

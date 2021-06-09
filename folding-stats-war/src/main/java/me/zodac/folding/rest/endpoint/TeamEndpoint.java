@@ -103,7 +103,7 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
     @Override
     protected Team createElement(final Team team) {
         final Team teamWithId = oldFacade.createTeam(team);
-        teamCompetitionStatsScheduler.parseTcStatsForTeam(team, ExecutionType.SYNCHRONOUS);
+        teamCompetitionStatsScheduler.manualTeamCompetitionStatsParsing(ExecutionType.SYNCHRONOUS);
         return teamWithId;
     }
 

@@ -100,6 +100,6 @@ public class Hardware implements ResponsePojo {
                 Double.compare(multiplier, hardwareRequest.getMultiplier()) == 0 &&
                 Objects.equals(hardwareName, hardwareRequest.getHardwareName()) &&
                 Objects.equals(displayName, hardwareRequest.getDisplayName()) &&
-                Objects.equals(operatingSystem.displayName(), hardwareRequest.getOperatingSystem());
+                Objects.equals(operatingSystem.toString(), hardwareRequest.getOperatingSystem());
     }
 }

@@ -58,7 +58,7 @@ public class UserSummary {
      * @return the created {@link UserSummary}
      */
     public static UserSummary create(final int id, final String displayName, final String foldingName, final Hardware hardware, final Category category, final long points, final long multipliedPoints, final int units, final String profileLink, final String liveStatsLink) {
-        return new UserSummary(id, displayName, foldingName, hardware, category.displayName(), profileLink, liveStatsLink, points, multipliedPoints, units, DEFAULT_USER_RANK);
+        return new UserSummary(id, displayName, foldingName, hardware, category.toString(), profileLink, liveStatsLink, points, multipliedPoints, units, DEFAULT_USER_RANK);
     }
 
     /**
@@ -73,7 +73,7 @@ public class UserSummary {
      * @return the empty {@link UserSummary}
      */
     public static UserSummary empty(final String displayName, final String foldingName, final Category category, final Hardware hardware) {
-        return new UserSummary(0, displayName, foldingName, hardware, category.displayName(), null, null, DEFAULT_POINTS, DEFAULT_MULTIPLIED_POINTS, DEFAULT_UNITS, DEFAULT_USER_RANK);
+        return new UserSummary(0, displayName, foldingName, hardware, category.toString(), null, null, DEFAULT_POINTS, DEFAULT_MULTIPLIED_POINTS, DEFAULT_UNITS, DEFAULT_USER_RANK);
     }
 
     /**

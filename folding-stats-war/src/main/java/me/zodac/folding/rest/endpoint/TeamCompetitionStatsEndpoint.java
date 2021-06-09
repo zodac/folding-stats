@@ -313,7 +313,7 @@ public class TeamCompetitionStatsEndpoint {
                     userSummariesInCategory.add(userCategoryLeaderboardEntry);
                 }
 
-                categoryLeaderboard.put(category.displayName(), userSummariesInCategory);
+                categoryLeaderboard.put(category.toString(), userSummariesInCategory);
             }
 
             return ok(categoryLeaderboard);
@@ -357,7 +357,7 @@ public class TeamCompetitionStatsEndpoint {
 
         try {
             SystemStateManager.next(SystemState.RESETTING_STATS);
-            teamCompetitionResetScheduler.manualResetTeamCompetitionStats();
+            teamCompetitionResetScheduler.resetTeamCompetitionStats();
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             return ok();
         } catch (final Exception e) {
