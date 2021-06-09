@@ -62,21 +62,6 @@ public class UserSummary {
     }
 
     /**
-     * Creates an empty {@link UserSummary}. This is for a scenario where a {@link me.zodac.folding.api.tc.User} is
-     * defined, but their stats cannot be retrieved. This was we can still list them as part of a {@link me.zodac.folding.api.tc.Team},
-     * but give them no stats to contribute towards the <code>Team Competition</code>.
-     *
-     * @param displayName the display name of the {@link me.zodac.folding.api.tc.User}
-     * @param foldingName the Folding@Home user name of the {@link me.zodac.folding.api.tc.User}
-     * @param hardware    the {@link Hardware} used by the the {@link me.zodac.folding.api.tc.User}
-     * @param category    the {@link Category} of the {@link me.zodac.folding.api.tc.User}
-     * @return the empty {@link UserSummary}
-     */
-    public static UserSummary empty(final String displayName, final String foldingName, final Category category, final Hardware hardware) {
-        return new UserSummary(0, displayName, foldingName, hardware, category.toString(), null, null, DEFAULT_POINTS, DEFAULT_MULTIPLIED_POINTS, DEFAULT_UNITS, DEFAULT_USER_RANK);
-    }
-
-    /**
      * Updates a {@link UserSummary} with a rank, after it has been calculated.
      *
      * @param userSummary the {@link UserSummary} to update

@@ -5,7 +5,6 @@ import me.zodac.folding.api.SystemUserAuthentication;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.exception.DatabaseConnectionException;
 import me.zodac.folding.api.exception.ExternalConnectionException;
-import me.zodac.folding.api.exception.NoStatsAvailableException;
 import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.api.exception.TeamNotFoundException;
 import me.zodac.folding.api.exception.UserNotFoundException;
@@ -193,7 +192,7 @@ public class OldFacade {
     // We set the new initial stats to the user's current total stats, then give an offset of their current TC stats (multiplied)
     private void handleStateChangeForUser(final User userWithStateChange) throws ExternalConnectionException {
         final UserStats userTotalStats = FOLDING_STATS_RETRIEVER.getTotalStats(userWithStateChange);
-        final UserTcStats currentUserTcStats = getCurrentTcStatsForUserOrDefault(userWithStateChange);
+        final UserTcStats currentUserTcStats = getTcStatsForUser(userWithStateChange.getId());
 
         LOGGER.debug("Setting initial stats to: {}", userTotalStats);
         dbManager.persistInitialStats(userTotalStats);
@@ -202,15 +201,6 @@ public class OldFacade {
         final OffsetStats offsetStats = OffsetStats.create(currentUserTcStats.getPoints(), currentUserTcStats.getMultipliedPoints(), currentUserTcStats.getUnits());
         LOGGER.debug("Adding offset stats of: {}", offsetStats);
         addOffsetStats(userWithStateChange.getId(), offsetStats);
-    }
-
-    private UserTcStats getCurrentTcStatsForUserOrDefault(final User updatedUser) {
-        try {
-            return getTcStatsForUser(updatedUser.getId());
-        } catch (final NoStatsAvailableException e) {
-            LOGGER.debug("No stats found for user with ID: {}, using 0 values", updatedUser.getId(), e);
-            return UserTcStats.empty(updatedUser.getId());
-        }
     }
 
     public void deleteUser(final int userId) {
@@ -230,7 +220,7 @@ public class OldFacade {
             final Team team = user.getTeam();
             final int retiredUserId = dbManager.persistRetiredUserStats(team.getId(), user.getId(), user.getDisplayName(), userStats);
             retiredStatsCache.add(RetiredUserTcStats.create(retiredUserId, team.getId(), user.getDisplayName(), userStats));
-        } catch (final UserNotFoundException | NoStatsAvailableException e) {
+        } catch (final UserNotFoundException e) {
             LOGGER.debug("Error getting final stats for deleted user with ID: {}", userId, e);
             LOGGER.warn("Error getting final stats for deleted user with ID: {}", userId);
         }
@@ -313,7 +303,7 @@ public class OldFacade {
         tcStatsCache.add(userTcStats.getUserId(), userTcStats);
     }
 
-    public UserTcStats getTcStatsForUser(final int userId) throws NoStatsAvailableException {
+    public UserTcStats getTcStatsForUser(final int userId) {
         final Optional<UserTcStats> optionalUserTcStats = tcStatsCache.get(userId);
 
         if (optionalUserTcStats.isPresent()) {
@@ -323,7 +313,7 @@ public class OldFacade {
         LOGGER.trace("Cache miss! Current TC stats");
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
-        final UserTcStats userTcStatsFromDb = dbManager.getHourlyTcStats(userId).orElseThrow(() -> new NoStatsAvailableException("user", userId));
+        final UserTcStats userTcStatsFromDb = dbManager.getHourlyTcStats(userId).orElse(UserTcStats.empty(userId));
         tcStatsCache.add(userId, userTcStatsFromDb);
         return userTcStatsFromDb;
     }

@@ -209,7 +209,7 @@ class HardwareTest {
 
     @Test
     void whenUpdatingHardware_givenANonExistingHardwareId_thenNoJsonResponseIsReturned_andHasA404Status() throws FoldingRestException {
-        final HardwareRequest updatedHardware = TestGenerator.generateHardware();
+        final HardwareRequest updatedHardware = generateHardware();
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.update(TestConstants.INVALID_ID, updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
                 .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())

@@ -6,7 +6,6 @@ import me.zodac.folding.api.ResponsePojo;
 import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.exception.ExternalConnectionException;
-import me.zodac.folding.api.exception.NoStatsAvailableException;
 import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.api.exception.TeamNotFoundException;
 import me.zodac.folding.api.exception.UserNotFoundException;
@@ -77,7 +76,7 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
 
     protected abstract O updateElementById(final int elementId, final O element, final O existingElement) throws NotFoundException, ExternalConnectionException;
 
-    protected abstract void deleteElementById(final int elementId) throws UserNotFoundException, NoStatsAvailableException, TeamNotFoundException;
+    protected abstract void deleteElementById(final int elementId) throws UserNotFoundException, TeamNotFoundException;
 
     protected Response create(final I inputRequest) {
         getLogger().debug("POST request received to create {} at '{}' with request: {}", elementType(), uriContext.getAbsolutePath(), inputRequest);

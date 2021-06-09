@@ -2,7 +2,6 @@ package me.zodac.folding.ejb;
 
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.SystemState;
-import me.zodac.folding.api.exception.NoStatsAvailableException;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
@@ -112,14 +111,8 @@ public class CompetitionResultGenerator {
         final Hardware hardware = user.getHardware();
         final Category category = user.getCategory();
 
-        try {
-            final UserTcStats userTcStats = oldFacade.getTcStatsForUser(user.getId());
-            LOGGER.debug("Results for {}: {} points | {} multiplied points | {} units", user.getDisplayName(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits());
-            return UserSummary.create(user.getId(), user.getDisplayName(), user.getFoldingUserName(), hardware, category, userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits(), user.getProfileLink(), user.getLiveStatsLink());
-        } catch (final NoStatsAvailableException e) {
-            LOGGER.debug("No stats found for user ID: {}", user.getId(), e);
-            LOGGER.warn("No stats found for user ID: {}", user.getId());
-            return UserSummary.empty(user.getDisplayName(), user.getFoldingUserName(), category, hardware);
-        }
+        final UserTcStats userTcStats = oldFacade.getTcStatsForUser(user.getId());
+        LOGGER.debug("Results for {}: {} points | {} multiplied points | {} units", user.getDisplayName(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits());
+        return UserSummary.create(user.getId(), user.getDisplayName(), user.getFoldingUserName(), hardware, category, userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits(), user.getProfileLink(), user.getLiveStatsLink());
     }
 }
