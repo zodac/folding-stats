@@ -22,7 +22,6 @@ import me.zodac.folding.api.RequestPojo;
 @ToString(doNotUseGetters = true)
 public class UserRequest implements RequestPojo {
 
-    private int id;
     private String foldingUserName;
     private String displayName;
     private String passkey;

@@ -34,7 +34,6 @@ import static me.zodac.folding.test.utils.TestConstants.FOLDING_URL;
 import static me.zodac.folding.test.utils.TestConstants.HTTP_CLIENT;
 import static me.zodac.folding.test.utils.TestGenerator.generateInvalidTeam;
 import static me.zodac.folding.test.utils.TestGenerator.generateTeam;
-import static me.zodac.folding.test.utils.TestGenerator.generateTeamWithId;
 import static me.zodac.folding.test.utils.TestGenerator.nextTeamName;
 import static me.zodac.folding.test.utils.rest.request.TeamUtils.TEAM_REQUEST_SENDER;
 import static me.zodac.folding.test.utils.rest.request.TeamUtils.create;
@@ -130,15 +129,13 @@ class TeamTest {
         final Team createdTeam = create(generateTeam());
         final int initialSize = TeamUtils.getNumberOfTeams();
 
-
         final TeamRequest teamToUpdate = TeamRequest.builder()
-                .id(createdTeam.getId())
                 .teamName(createdTeam.getTeamName())
                 .teamDescription("Updated description")
                 .forumLink(createdTeam.getForumLink())
                 .build();
 
-        final HttpResponse<String> response = TEAM_REQUEST_SENDER.update(teamToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.update(createdTeam.getId(), teamToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -147,7 +144,7 @@ class TeamTest {
         assertThat(actual)
                 .as("Did not receive created object as JSON response: " + response.body())
                 .extracting("id", "teamName", "teamDescription", "forumLink")
-                .containsExactly(teamToUpdate.getId(), teamToUpdate.getTeamName(), teamToUpdate.getTeamDescription(), teamToUpdate.getForumLink());
+                .containsExactly(createdTeam.getId(), teamToUpdate.getTeamName(), teamToUpdate.getTeamDescription(), teamToUpdate.getForumLink());
 
 
         final int allTeamsAfterUpdate = TeamUtils.getNumberOfTeams();
@@ -225,9 +222,9 @@ class TeamTest {
 
     @Test
     void whenUpdatingTeam_givenANonExistingTeamId_thenNoJsonResponseIsReturned_andHasA404Status() throws FoldingRestException {
-        final TeamRequest updatedTeam = generateTeamWithId(TestConstants.INVALID_ID);
+        final TeamRequest updatedTeam = generateTeam();
 
-        final HttpResponse<String> response = TEAM_REQUEST_SENDER.update(updatedTeam, ADMIN_USER.userName(), ADMIN_USER.password());
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.update(TestConstants.INVALID_ID, updatedTeam, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
                 .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
@@ -251,13 +248,12 @@ class TeamTest {
         final Team createdTeam = create(generateTeam());
 
         final TeamRequest teamToUpdate = TeamRequest.builder()
-                .id(createdTeam.getId())
                 .teamName(createdTeam.getTeamName())
                 .teamDescription(createdTeam.getTeamDescription())
                 .forumLink(createdTeam.getForumLink())
                 .build();
 
-        final HttpResponse<String> updateResponse = TEAM_REQUEST_SENDER.update(teamToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
+        final HttpResponse<String> updateResponse = TEAM_REQUEST_SENDER.update(createdTeam.getId(), teamToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(updateResponse.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + updateResponse.body())
@@ -397,18 +393,15 @@ class TeamTest {
 
     @Test
     void whenUpdatingTeam_givenNoAuthentication_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
-        final int teamId = create(generateTeam()).getId();
-
-        final Team createdTeam = Team.updateWithId(teamId, TeamUtils.get(teamId));
+        final Team createdTeam = create(generateTeam());
 
         final TeamRequest teamToUpdate = TeamRequest.builder()
-                .id(teamId)
                 .teamName(createdTeam.getTeamName())
                 .teamDescription("Updated description")
                 .forumLink(createdTeam.getForumLink())
                 .build();
 
-        final HttpResponse<String> response = TEAM_REQUEST_SENDER.update(teamToUpdate);
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.update(createdTeam.getId(), teamToUpdate);
         assertThat(response.statusCode())
                 .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
@@ -515,21 +508,19 @@ class TeamTest {
                 .build();
 
         final Team createdTeam = create(team);
-        final int teamId = createdTeam.getId();
 
         final TeamRequest teamToUpdate = TeamRequest.builder()
-                .id(teamId)
                 .teamName(createdTeam.getTeamName())
                 .teamDescription(createdTeam.getTeamDescription())
                 .forumLink("")
                 .build();
 
-        final HttpResponse<String> response = TEAM_REQUEST_SENDER.update(teamToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.update(createdTeam.getId(), teamToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_OK);
 
-        final Team actual = TeamUtils.get(teamId);
+        final Team actual = TeamUtils.get(createdTeam.getId());
         assertThat(actual)
                 .as("Empty optional value should not be returned: " + response.body())
                 .extracting("forumLink")

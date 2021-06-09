@@ -127,14 +127,13 @@ class HardwareTest {
         final int initialSize = HardwareUtils.getNumberOfHardware();
 
         final HardwareRequest updatedHardware = HardwareRequest.builder()
-                .id(createdHardware.getId())
                 .hardwareName(createdHardware.getHardwareName())
                 .displayName(createdHardware.getDisplayName())
                 .operatingSystem(OperatingSystem.LINUX.toString())
                 .multiplier(createdHardware.getMultiplier())
                 .build();
 
-        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.update(updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
+        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.update(createdHardware.getId(), updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -210,8 +209,8 @@ class HardwareTest {
 
     @Test
     void whenUpdatingHardware_givenANonExistingHardwareId_thenNoJsonResponseIsReturned_andHasA404Status() throws FoldingRestException {
-        final HardwareRequest updatedHardware = TestGenerator.generateHardwareWithId(TestConstants.INVALID_ID);
-        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.update(updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
+        final HardwareRequest updatedHardware = TestGenerator.generateHardware();
+        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.update(TestConstants.INVALID_ID, updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
                 .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
@@ -235,14 +234,13 @@ class HardwareTest {
         final Hardware createdHardware = create(generateHardware());
 
         final HardwareRequest updatedHardware = HardwareRequest.builder()
-                .id(createdHardware.getId())
                 .hardwareName(createdHardware.getHardwareName())
                 .displayName(createdHardware.getDisplayName())
                 .operatingSystem(createdHardware.getOperatingSystem().toString())
                 .multiplier(createdHardware.getMultiplier())
                 .build();
 
-        final HttpResponse<String> updateResponse = HARDWARE_REQUEST_SENDER.update(updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
+        final HttpResponse<String> updateResponse = HARDWARE_REQUEST_SENDER.update(createdHardware.getId(), updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(updateResponse.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + updateResponse.body())
@@ -389,7 +387,7 @@ class HardwareTest {
                 .multiplier(createdHardware.getMultiplier())
                 .build();
 
-        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.update(updatedHardware);
+        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.update(createdHardware.getId(), updatedHardware);
         assertThat(response.statusCode())
                 .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);

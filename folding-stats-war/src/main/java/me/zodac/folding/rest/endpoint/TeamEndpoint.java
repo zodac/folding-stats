@@ -119,7 +119,7 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
     }
 
     @Override
-    protected ValidationResponse<Team> validateUpdateAndConvert(final TeamRequest teamRequest) {
+    protected ValidationResponse<Team> validateUpdateAndConvert(final TeamRequest teamRequest, final Team existingTeam) {
         final TeamValidator teamValidator = TeamValidator.create(oldFacade);
         return teamValidator.validateUpdate(teamRequest);
     }

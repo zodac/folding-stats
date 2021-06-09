@@ -212,27 +212,29 @@ public final class HardwareRequestSender {
     /**
      * Send a <b>PUT</b> request to update the given {@link HardwareRequest} in the system.
      *
-     * @param hardware the {@link HardwareRequest} to update
+     * @param hardwareId the ID of the {@link Hardware} to update
+     * @param hardware   the {@link HardwareRequest} to update
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
-    public HttpResponse<String> update(final HardwareRequest hardware) throws FoldingRestException {
-        return update(hardware, null, null);
+    public HttpResponse<String> update(final int hardwareId, final HardwareRequest hardware) throws FoldingRestException {
+        return update(hardwareId, hardware, null, null);
     }
 
     /**
      * Send a <b>PUT</b> request to update the given {@link HardwareRequest} in the system.
      *
-     * @param hardware the {@link HardwareRequest} to update
-     * @param userName the user name
-     * @param password the password
+     * @param hardwareId the ID of the {@link Hardware} to update
+     * @param hardware   the {@link HardwareRequest} to update
+     * @param userName   the user name
+     * @param password   the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
-    public HttpResponse<String> update(final HardwareRequest hardware, final String userName, final String password) throws FoldingRestException {
+    public HttpResponse<String> update(final int hardwareId, final HardwareRequest hardware, final String userName, final String password) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .PUT(HttpRequest.BodyPublishers.ofString(GSON.toJson(hardware)))
-                .uri(URI.create(hardwareUrl + '/' + hardware.getId()))
+                .uri(URI.create(hardwareUrl + '/' + hardwareId))
                 .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
         if (StringUtils.isNoneBlank(userName, password)) {

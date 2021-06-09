@@ -10,13 +10,13 @@ public enum CacheControl {
      */
     NO_CACHE("no-cache");
 
-    private final String contentType;
+    private final String cacheControl;
 
-    CacheControl(final String contentType) {
-        this.contentType = contentType;
+    CacheControl(final String cacheControl) {
+        this.cacheControl = cacheControl;
     }
 
     public String cacheControl() {
-        return contentType;
+        return cacheControl;
     }
 }

@@ -69,7 +69,7 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
 
     protected abstract ValidationResponse<O> validateCreateAndConvert(final I inputRequest);
 
-    protected abstract ValidationResponse<O> validateUpdateAndConvert(final I inputRequest);
+    protected abstract ValidationResponse<O> validateUpdateAndConvert(final I inputRequest, final O existingElement);
 
     protected abstract ValidationResponse<O> validateDeleteAndConvert(final O element);
 
@@ -281,15 +281,6 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
             }
             final int parsedId = parseResult.getId();
 
-            // We want to make sure the payload is not trying to change the ID of the element
-            // If no ID is provided, the POJO will default to a value of 0, which is acceptable
-            // TODO: [zodac] Remove 'id' from the payload, should only be supplied by the URL
-            if (parsedId != inputRequest.getId() && inputRequest.getId() != 0) {
-                final String errorMessage = String.format("Path ID '%s' does not match ID '%s' of payload", elementId, inputRequest.getId());
-                getLogger().error(errorMessage);
-                return badRequest(errorMessage);
-            }
-
             final Optional<O> optionalElement = getElementById(parsedId);
             if (optionalElement.isEmpty()) {
                 getLogger().error("Error getting {} with ID {}", elementType(), elementId);
@@ -302,7 +293,7 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
                 return ok(existingElement);
             }
 
-            final ValidationResponse<O> validationResponse = validateUpdateAndConvert(inputRequest);
+            final ValidationResponse<O> validationResponse = validateUpdateAndConvert(inputRequest, existingElement);
             if (validationResponse.isInvalid()) {
                 return badRequest(validationResponse);
             }
@@ -311,7 +302,7 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
 
             final UriBuilder elementLocationBuilder = uriContext
                     .getRequestUriBuilder()
-                    .path(String.valueOf(inputRequest.getId()));
+                    .path(String.valueOf(updatedElementWithId.getId()));
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             return ok(updatedElementWithId, elementLocationBuilder);
         } catch (final ExternalConnectionException e) {

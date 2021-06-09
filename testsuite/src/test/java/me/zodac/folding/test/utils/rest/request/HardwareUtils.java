@@ -38,10 +38,6 @@ public final class HardwareUtils {
             return HardwareResponseParser.create(response);
         }
 
-        if (response.statusCode() == HttpURLConnection.HTTP_CONFLICT) {
-            return get(hardware.getId());
-        }
-
         throw new FoldingRestException(String.format("Invalid response (%s) when creating hardware: %s", response.statusCode(), response.body()));
     }
 

@@ -1,10 +1,7 @@
 package me.zodac.folding.test.utils;
 
 import me.zodac.folding.api.tc.Category;
-import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.OperatingSystem;
-import me.zodac.folding.api.tc.Team;
-import me.zodac.folding.api.tc.User;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
@@ -15,7 +12,8 @@ import me.zodac.folding.test.utils.rest.request.TeamUtils;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Utility class used to generate {@link Hardware}, {@link User} and {@link Team} instances for test cases.
+ * Utility class used to generate {@link HardwareRequest}, {@link TeamRequest} and {@link UserRequest} instances for
+ * test cases.
  */
 public final class TestGenerator {
 
@@ -27,22 +25,37 @@ public final class TestGenerator {
 
     }
 
+    /**
+     * Gets an incremented {@link HardwareRequest} name.
+     *
+     * @return the {@link HardwareRequest} name
+     */
     public static String nextHardwareName() {
         return "DummyHardware" + HARDWARE_COUNT.getAndIncrement();
     }
 
+    /**
+     * Gets an incremented {@link TeamRequest} name.
+     *
+     * @return the {@link TeamRequest} name
+     */
     public static String nextTeamName() {
         return "DummyTeam" + TEAM_COUNT.getAndIncrement();
     }
 
+    /**
+     * Gets an incremented {@link UserRequest} name.
+     *
+     * @return the {@link UserRequest} name
+     */
     public static String nextUserName() {
         return "DummyUser" + USER_COUNT.getAndIncrement();
     }
 
     /**
-     * Generate a {@link Hardware} with a {@link Hardware#getMultiplier()} of <b>x1</b>.
+     * Generate a {@link HardwareRequest} with a multiplier of <b>x1</b>.
      *
-     * @return the generated {@link Hardware}
+     * @return the generated {@link HardwareRequest}
      */
     public static HardwareRequest generateHardware() {
         final String hardwareName = nextHardwareName();
@@ -53,29 +66,12 @@ public final class TestGenerator {
                 .multiplier(1.0D)
                 .build();
     }
-//
 
     /**
-     * Generate a {@link Hardware} with a {@link Hardware#getMultiplier()} of <b>x1</b>.
+     * Generate a {@link HardwareRequest}.
      *
-     * @param hardwareId the ID of the {@link Hardware}
-     * @return the generated {@link Hardware}
-     */
-    public static HardwareRequest generateHardwareWithId(final int hardwareId) {
-        final String hardwareName = nextHardwareName();
-        return HardwareRequest.builder()
-                .id(hardwareId)
-                .hardwareName(hardwareName)
-                .displayName(hardwareName).operatingSystem(OperatingSystem.WINDOWS.toString())
-                .multiplier(1.0D)
-                .build();
-    }
-
-    /**
-     * Generate a {@link Hardware}.
-     *
-     * @param multiplier the multiplier to be applied to the {@link Hardware}
-     * @return the generated {@link Hardware}
+     * @param multiplier the multiplier to be applied to the {@link HardwareRequest}
+     * @return the generated {@link HardwareRequest}
      */
     public static HardwareRequest generateHardwareWithMultiplier(final double multiplier) {
         final String hardwareName = nextHardwareName();
@@ -88,10 +84,10 @@ public final class TestGenerator {
     }
 
     /**
-     * Generate a {@link Hardware}.
+     * Generate a {@link HardwareRequest}.
      *
-     * @param operatingSystem the {@link OperatingSystem} of the {@link Hardware}
-     * @return the generated {@link Hardware}
+     * @param operatingSystem the {@link OperatingSystem} of the {@link HardwareRequest}
+     * @return the generated {@link HardwareRequest}
      */
     public static HardwareRequest generateHardwareWithOperatingSystem(final OperatingSystem operatingSystem) {
         final String hardwareName = nextHardwareName();
@@ -105,9 +101,9 @@ public final class TestGenerator {
 
 
     /**
-     * Generates a {@link Team}.
+     * Generates a {@link TeamRequest}.
      *
-     * @return the generated {@link Team}
+     * @return the generated {@link TeamRequest}
      */
     public static TeamRequest generateTeam() {
         return TeamRequest.builder()
@@ -115,13 +111,13 @@ public final class TestGenerator {
                 .build();
     }
 
-    public static TeamRequest generateTeamWithId(final int teamId) {
-        return TeamRequest.builder()
-                .id(teamId)
-                .teamName(nextTeamName())
-                .build();
-    }
-
+    /**
+     * Generates an invalid {@link TeamRequest}.
+     * <p>
+     * Uses an invalid URL as the forum link, so validation will fail.
+     *
+     * @return the generated {@link TeamRequest}
+     */
     public static TeamRequest generateInvalidTeam() {
         return TeamRequest.builder()
                 .teamName(nextTeamName())
@@ -129,6 +125,13 @@ public final class TestGenerator {
                 .build();
     }
 
+    /**
+     * Generates a {@link UserRequest}.
+     *
+     * @return the generated {@link UserRequest}
+     * @throws FoldingRestException thrown if an error occurs executing {@link HardwareUtils#create(HardwareRequest)}
+     *                              or {@link TeamUtils#create(TeamRequest)}
+     */
     public static UserRequest generateUser() throws FoldingRestException {
         final int hardwareId = HardwareUtils.create(generateHardware()).getId();
         final int teamId = TeamUtils.create(generateTeam()).getId();
@@ -144,6 +147,14 @@ public final class TestGenerator {
                 .build();
     }
 
+    /**
+     * Generates a {@link UserRequest} with a specified {@link Category}.
+     *
+     * @param category the {@link Category} of the {@link UserRequest}
+     * @return the generated {@link UserRequest}
+     * @throws FoldingRestException thrown if an error occurs executing {@link HardwareUtils#create(HardwareRequest)}
+     *                              or {@link TeamUtils#create(TeamRequest)}
+     */
     public static UserRequest generateUserWithCategory(final Category category) throws FoldingRestException {
         final int hardwareId = HardwareUtils.create(generateHardware()).getId();
         final int teamId = TeamUtils.create(generateTeam()).getId();
@@ -159,22 +170,14 @@ public final class TestGenerator {
                 .build();
     }
 
-    public static UserRequest generateUserWithId(final int userId) throws FoldingRestException {
-        final int hardwareId = HardwareUtils.create(generateHardware()).getId();
-        final int teamId = TeamUtils.create(generateTeam()).getId();
-        final String userName = nextUserName();
-
-        return UserRequest.builder()
-                .id(userId)
-                .foldingUserName(userName)
-                .displayName(userName)
-                .passkey("DummyPasskey12345678901234567890")
-                .category(Category.NVIDIA_GPU.toString())
-                .hardwareId(hardwareId)
-                .teamId(teamId)
-                .build();
-    }
-
+    /**
+     * Generates a {@link UserRequest} with a specified {@link me.zodac.folding.api.tc.Hardware} ID.
+     *
+     * @param hardwareId the {@link me.zodac.folding.api.tc.Hardware} ID
+     * @return the generated {@link UserRequest}
+     * @throws FoldingRestException thrown if an error occurs executing {@link HardwareUtils#create(HardwareRequest)}
+     *                              or {@link TeamUtils#create(TeamRequest)}
+     */
     public static UserRequest generateUserWithHardwareId(final int hardwareId) throws FoldingRestException {
         final int teamId = TeamUtils.create(generateTeam()).getId();
         final String userName = nextUserName();
@@ -189,6 +192,14 @@ public final class TestGenerator {
                 .build();
     }
 
+    /**
+     * Generates a {@link UserRequest} with a specified {@link me.zodac.folding.api.tc.Team} ID.
+     *
+     * @param teamId the {@link me.zodac.folding.api.tc.Team} ID
+     * @return the generated {@link UserRequest}
+     * @throws FoldingRestException thrown if an error occurs executing {@link HardwareUtils#create(HardwareRequest)}
+     *                              or {@link TeamUtils#create(TeamRequest)}
+     */
     public static UserRequest generateUserWithTeamId(final int teamId) throws FoldingRestException {
         final int hardwareId = HardwareUtils.create(generateHardware()).getId();
         final String userName = nextUserName();
@@ -203,6 +214,15 @@ public final class TestGenerator {
                 .build();
     }
 
+    /**
+     * Generates a {@link UserRequest} with a specified {@link me.zodac.folding.api.tc.Team} ID and {@link Category}.
+     *
+     * @param teamId   the {@link me.zodac.folding.api.tc.Team} ID
+     * @param category the {@link Category} of the {@link UserRequest}
+     * @return the generated {@link UserRequest}
+     * @throws FoldingRestException thrown if an error occurs executing {@link HardwareUtils#create(HardwareRequest)}
+     *                              or {@link TeamUtils#create(TeamRequest)}
+     */
     public static UserRequest generateUserWithTeamIdAndCategory(final int teamId, final Category category) throws FoldingRestException {
         final int hardwareId = HardwareUtils.create(generateHardware()).getId();
         final String userName = nextUserName();
@@ -217,6 +237,14 @@ public final class TestGenerator {
                 .build();
     }
 
+    /**
+     * Generates a {@link UserRequest} with a specified live stats link
+     *
+     * @param liveStatsLink the {@link me.zodac.folding.api.tc.User} live stats link
+     * @return the generated {@link UserRequest}
+     * @throws FoldingRestException thrown if an error occurs executing {@link HardwareUtils#create(HardwareRequest)}
+     *                              or {@link TeamUtils#create(TeamRequest)}
+     */
     public static UserRequest generateUserWithLiveStatsLink(final String liveStatsLink) throws FoldingRestException {
         final int hardwareId = HardwareUtils.create(generateHardware()).getId();
         final int teamId = TeamUtils.create(generateTeam()).getId();

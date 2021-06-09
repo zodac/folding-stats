@@ -112,7 +112,7 @@ public class HardwareEndpoint extends AbstractCrudEndpoint<HardwareRequest, Hard
     }
 
     @Override
-    protected ValidationResponse<Hardware> validateUpdateAndConvert(final HardwareRequest hardwareRequest) {
+    protected ValidationResponse<Hardware> validateUpdateAndConvert(final HardwareRequest hardwareRequest, final Hardware existingHardware) {
         final HardwareValidator hardwareValidator = HardwareValidator.create(businessLogic, oldFacade);
         return hardwareValidator.validateUpdate(hardwareRequest);
     }

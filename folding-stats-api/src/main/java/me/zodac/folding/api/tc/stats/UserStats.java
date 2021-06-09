@@ -17,6 +17,14 @@ public class UserStats extends Stats {
     private final int userId;
     private final Timestamp timestamp;
 
+    /**
+     * Constructor for {@link UserStats}.
+     *
+     * @param userId    the {@link me.zodac.folding.api.tc.User} ID
+     * @param timestamp the {@link Timestamp} the stats were retrieved
+     * @param points    the points
+     * @param units     the units
+     */
     protected UserStats(final int userId, final Timestamp timestamp, final long points, final int units) {
         super(points, units);
         this.userId = userId;

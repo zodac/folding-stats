@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import me.zodac.folding.api.tc.User;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
@@ -22,7 +21,7 @@ import java.util.Collection;
 import static me.zodac.folding.api.utils.EncodingUtils.encodeBasicAuthentication;
 
 /**
- * Convenience class to send HTTP requests to the {@link User} REST endpoint.
+ * Convenience class to send HTTP requests to the {@link me.zodac.folding.api.tc.User} REST endpoint.
  */
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class UserRequestSender {
@@ -48,7 +47,7 @@ public final class UserRequestSender {
     }
 
     /**
-     * Send a <b>GET</b> request to retrieve all {@link User}s in the system.
+     * Send a <b>GET</b> request to retrieve all {@link me.zodac.folding.api.tc.User}s in the system.
      *
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
@@ -59,11 +58,11 @@ public final class UserRequestSender {
     }
 
     /**
-     * Send a <b>GET</b> request to retrieve all {@link User}s in the system.
+     * Send a <b>GET</b> request to retrieve all {@link me.zodac.folding.api.tc.User}s in the system.
      * <p>
-     * <b>NOTE:</b> If the server has a cached {@link User} based on the <code>ETag</code>, an empty {@link HttpResponse#body()} is returned.
+     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.api.tc.User} based on the <code>ETag</code>, an empty {@link HttpResponse#body()} is returned.
      *
-     * @param eTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve cached {@link User}s
+     * @param eTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve cached {@link me.zodac.folding.api.tc.User}s
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      * @see #getAll()
@@ -88,9 +87,9 @@ public final class UserRequestSender {
     }
 
     /**
-     * Send a <b>GET</b> request to retrieve a single {@link User} with the given {@code userId}.
+     * Send a <b>GET</b> request to retrieve a single {@link me.zodac.folding.api.tc.User} with the given {@code userId}.
      *
-     * @param userId the ID of the {@link User} to be retrieved
+     * @param userId the ID of the {@link me.zodac.folding.api.tc.User} to be retrieved
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      * @see #get(int, String)
@@ -100,12 +99,12 @@ public final class UserRequestSender {
     }
 
     /**
-     * Send a <b>GET</b> request to retrieve a single {@link User} with the given {@code userId}.
+     * Send a <b>GET</b> request to retrieve a single {@link me.zodac.folding.api.tc.User} with the given {@code userId}.
      * <p>
-     * <b>NOTE:</b> If the server has a cached {@link User} based on the <code>ETag</code>, an empty {@link HttpResponse#body()} is returned.
+     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.api.tc.User} based on the <code>ETag</code>, an empty {@link HttpResponse#body()} is returned.
      *
-     * @param userId the ID of the {@link User} to be retrieved
-     * @param eTag   the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached {@link User}
+     * @param userId the ID of the {@link me.zodac.folding.api.tc.User} to be retrieved
+     * @param eTag   the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached {@link me.zodac.folding.api.tc.User}
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      * @see #get(int)
@@ -210,27 +209,29 @@ public final class UserRequestSender {
     /**
      * Send a <b>PUT</b> request to update the given {@link UserRequest} in the system.
      *
-     * @param user the {@link UserRequest} to update
+     * @param userId the ID of the {@link me.zodac.folding.api.tc.User} to update
+     * @param user   the {@link UserRequest} to update
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
-    public HttpResponse<String> update(final UserRequest user) throws FoldingRestException {
-        return update(user, null, null);
+    public HttpResponse<String> update(final int userId, final UserRequest user) throws FoldingRestException {
+        return update(userId, user, null, null);
     }
 
     /**
      * Send a <b>PUT</b> request to update the given {@link UserRequest} in the system.
      *
+     * @param userId   the ID of the {@link me.zodac.folding.api.tc.User} to update
      * @param user     the {@link UserRequest} to update
      * @param userName the user name
      * @param password the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
-    public HttpResponse<String> update(final UserRequest user, final String userName, final String password) throws FoldingRestException {
+    public HttpResponse<String> update(final int userId, final UserRequest user, final String userName, final String password) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .PUT(HttpRequest.BodyPublishers.ofString(GSON.toJson(user)))
-                .uri(URI.create(usersUrl + '/' + user.getId()))
+                .uri(URI.create(usersUrl + '/' + userId))
                 .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
         if (StringUtils.isNoneBlank(userName, password)) {
@@ -247,9 +248,9 @@ public final class UserRequestSender {
     }
 
     /**
-     * Send a <b>DELETE</b> request to remove a {@link User} with the given {@code userId}.
+     * Send a <b>DELETE</b> request to remove a {@link me.zodac.folding.api.tc.User} with the given {@code userId}.
      *
-     * @param userId the ID of the {@link User} to remove
+     * @param userId the ID of the {@link me.zodac.folding.api.tc.User} to remove
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
@@ -258,9 +259,9 @@ public final class UserRequestSender {
     }
 
     /**
-     * Send a <b>DELETE</b> request to remove a {@link User} with the given {@code userId}.
+     * Send a <b>DELETE</b> request to remove a {@link me.zodac.folding.api.tc.User} with the given {@code userId}.
      *
-     * @param userId   the ID of the {@link User} to remove
+     * @param userId   the ID of the {@link me.zodac.folding.api.tc.User} to remove
      * @param userName the user name
      * @param password the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}

@@ -53,7 +53,7 @@ public final class HardwareResponseParser {
     }
 
     /**
-     * Returns the {@link Hardware} updated by {@link me.zodac.folding.client.java.request.HardwareRequestSender#update(me.zodac.folding.rest.api.tc.request.HardwareRequest)}.
+     * Returns the {@link Hardware} updated by {@link me.zodac.folding.client.java.request.HardwareRequestSender#update(int, me.zodac.folding.rest.api.tc.request.HardwareRequest)}.
      *
      * @param response the {@link HttpResponse} to parse
      * @return the updated {@link Hardware}

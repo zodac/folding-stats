@@ -96,8 +96,7 @@ public class Team implements ResponsePojo {
         }
 
         final TeamRequest teamRequest = (TeamRequest) inputRequest;
-        return id == teamRequest.getId() &&
-                Objects.equals(teamName, teamRequest.getTeamName()) &&
+        return Objects.equals(teamName, teamRequest.getTeamName()) &&
                 Objects.equals(teamDescription, teamRequest.getTeamDescription()) &&
                 Objects.equals(forumLink, teamRequest.getForumLink());
     }

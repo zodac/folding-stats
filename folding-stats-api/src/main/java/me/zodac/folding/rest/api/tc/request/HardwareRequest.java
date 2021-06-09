@@ -22,7 +22,6 @@ import me.zodac.folding.api.RequestPojo;
 @ToString(doNotUseGetters = true)
 public class HardwareRequest implements RequestPojo {
 
-    private int id;
     private String hardwareName;
     private String displayName;
     private String operatingSystem;

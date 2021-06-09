@@ -17,7 +17,7 @@ public final class TeamResponseParser {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     private TeamResponseParser() {
-        
+
     }
 
     /**
@@ -53,7 +53,7 @@ public final class TeamResponseParser {
     }
 
     /**
-     * Returns the {@link Team} updated by {@link me.zodac.folding.client.java.request.TeamRequestSender#update(me.zodac.folding.rest.api.tc.request.TeamRequest)}.
+     * Returns the {@link Team} updated by {@link me.zodac.folding.client.java.request.TeamRequestSender#update(int, me.zodac.folding.rest.api.tc.request.TeamRequest)}.
      *
      * @param response the {@link HttpResponse} to parse
      * @return the updated {@link Team}

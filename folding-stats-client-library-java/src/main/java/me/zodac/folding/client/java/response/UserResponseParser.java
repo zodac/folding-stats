@@ -17,7 +17,7 @@ public final class UserResponseParser {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     private UserResponseParser() {
-        
+
     }
 
     /**
@@ -53,7 +53,7 @@ public final class UserResponseParser {
     }
 
     /**
-     * Returns the {@link User} updated by {@link me.zodac.folding.client.java.request.UserRequestSender#update(me.zodac.folding.rest.api.tc.request.UserRequest)}.
+     * Returns the {@link User} updated by {@link me.zodac.folding.client.java.request.UserRequestSender#update(int, me.zodac.folding.rest.api.tc.request.UserRequest)}.
      *
      * @param response the {@link HttpResponse} to parse
      * @return the updated {@link User}

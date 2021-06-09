@@ -175,8 +175,7 @@ public class User implements ResponsePojo {
 
         final UserRequest userRequest = (UserRequest) inputRequest;
 
-        return id == userRequest.getId() &&
-                hardware.getId() == userRequest.getHardwareId() &&
+        return hardware.getId() == userRequest.getHardwareId() &&
                 team.getId() == userRequest.getTeamId() &&
                 userIsCaptain == userRequest.isUserIsCaptain() &&
                 Objects.equals(foldingUserName, userRequest.getFoldingUserName()) &&

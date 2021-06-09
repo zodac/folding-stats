@@ -96,8 +96,7 @@ public class Hardware implements ResponsePojo {
 
         final HardwareRequest hardwareRequest = (HardwareRequest) inputRequest;
 
-        return id == hardwareRequest.getId() &&
-                Double.compare(multiplier, hardwareRequest.getMultiplier()) == 0 &&
+        return Double.compare(multiplier, hardwareRequest.getMultiplier()) == 0 &&
                 Objects.equals(hardwareName, hardwareRequest.getHardwareName()) &&
                 Objects.equals(displayName, hardwareRequest.getDisplayName()) &&
                 Objects.equals(operatingSystem.toString(), hardwareRequest.getOperatingSystem());

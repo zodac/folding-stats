@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.api.exception.TeamNotFoundException;
-import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.stats.FoldingStatsDetails;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
 import me.zodac.folding.api.tc.Category;
@@ -28,7 +27,7 @@ import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 
-// TODO: [zodac] In severe need of a clean up. Write tests for the validators first though, because you're an idiot
+// TODO: [zodac] In severe need of a clean up. Write tests for the validators first though, because you're a moron
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class UserValidator {
 
@@ -103,7 +102,7 @@ public final class UserValidator {
 
         // Since this is a heavy validation check, only do it if the rest of the user is valid
         if (failureMessages.isEmpty()) {
-            final List<String> teamFailureMessages = validateIfUserCanBeAddedToTeam(userRequest, category, true);
+            final List<String> teamFailureMessages = validateIfUserCanBeAddedToTeam(userRequest, category, null);
             failureMessages.addAll(teamFailureMessages);
         }
 
@@ -134,7 +133,7 @@ public final class UserValidator {
     }
 
     @SuppressWarnings("PMD.NPathComplexity") // Better than breaking into smaller functions
-    public ValidationResponse<User> validateUpdate(final UserRequest userRequest) {
+    public ValidationResponse<User> validateUpdate(final UserRequest userRequest, final User existingUser) {
         if (userRequest == null) {
             return ValidationResponse.nullObject();
         }
@@ -183,7 +182,7 @@ public final class UserValidator {
 
         // Since this is a heavy validation check, only do it if the rest of the user is valid
         if (failureMessages.isEmpty()) {
-            final List<String> teamFailureMessages = validateIfUserCanBeAddedToTeam(userRequest, category, false);
+            final List<String> teamFailureMessages = validateIfUserCanBeAddedToTeam(userRequest, category, existingUser);
             failureMessages.addAll(teamFailureMessages);
         }
 
@@ -261,7 +260,7 @@ public final class UserValidator {
         return Collections.emptyList();
     }
 
-    private List<String> validateIfUserCanBeAddedToTeam(final UserRequest userRequest, final Category category, final boolean isCreate) {
+    private List<String> validateIfUserCanBeAddedToTeam(final UserRequest userRequest, final Category category, final User existingUser) {
         final List<String> failureMessages = new ArrayList<>();
 
         try {
@@ -276,8 +275,8 @@ public final class UserValidator {
                 }
             }
 
-            // What the hell, man?
-            if (isCreate) {
+            // What the hell, man? Who approved this shit?
+            if (existingUser == null) { // Create
                 if (usersOnTeam.size() >= Category.maximumPermittedAmountForAllCategories()) {
                     failureMessages.add(String.format("Team '%s' has %s users, maximum permitted is %s", team.getTeamName(), usersOnTeam.size(), Category.maximumPermittedAmountForAllCategories()));
                 }
@@ -293,13 +292,11 @@ public final class UserValidator {
                 }
             } else {
                 // isUpdate
-                final User existingUser = oldFacade.getUser(userRequest.getId());
-
                 if (category != existingUser.getCategory()) {
                     final int permittedNumberForCategory = category.permittedAmount();
                     final int numberOfUsersInTeamWithCategory = (int) usersOnTeam
                             .stream()
-                            .filter(user -> user.getId() != userRequest.getId() && user.getCategory() == category)
+                            .filter(user -> user.getId() != existingUser.getId() && user.getCategory() == category)
                             .count();
 
                     if (numberOfUsersInTeamWithCategory >= permittedNumberForCategory) {
@@ -307,7 +304,7 @@ public final class UserValidator {
                     }
                 }
             }
-        } catch (final TeamNotFoundException | UserNotFoundException e) {
+        } catch (final TeamNotFoundException e) {
             LOGGER.warn("Unable to validate current team users", e);
             failureMessages.add("Unable to validate current team users");
         }

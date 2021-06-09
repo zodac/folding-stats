@@ -40,7 +40,6 @@ import static me.zodac.folding.test.utils.TestGenerator.generateTeam;
 import static me.zodac.folding.test.utils.TestGenerator.generateUser;
 import static me.zodac.folding.test.utils.TestGenerator.generateUserWithCategory;
 import static me.zodac.folding.test.utils.TestGenerator.generateUserWithHardwareId;
-import static me.zodac.folding.test.utils.TestGenerator.generateUserWithId;
 import static me.zodac.folding.test.utils.TestGenerator.generateUserWithLiveStatsLink;
 import static me.zodac.folding.test.utils.TestGenerator.generateUserWithTeamId;
 import static me.zodac.folding.test.utils.rest.request.HardwareUtils.HARDWARE_REQUEST_SENDER;
@@ -143,7 +142,6 @@ class UserTest {
 
         final String updatedPasskey = "updatedPasskey123456789012345678";
         final UserRequest userToUpdate = UserRequest.builder()
-                .id(createdUser.getId())
                 .foldingUserName(createdUser.getFoldingUserName())
                 .displayName(createdUser.getDisplayName())
                 .passkey(updatedPasskey)
@@ -157,7 +155,7 @@ class UserTest {
         StubbedFoldingEndpointUtils.enableUser(userToUpdate);
 
 
-        final HttpResponse<String> response = USER_REQUEST_SENDER.update(userToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
+        final HttpResponse<String> response = USER_REQUEST_SENDER.update(createdUser.getId(), userToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -254,10 +252,10 @@ class UserTest {
 
     @Test
     void whenUpdatingUser_givenANonExistingUserId_thenNoJsonResponseIsReturned_andHasA404Status() throws FoldingRestException {
-        final UserRequest updatedUser = generateUserWithId(TestConstants.INVALID_ID);
+        final UserRequest updatedUser = generateUser();
         StubbedFoldingEndpointUtils.enableUser(updatedUser);
 
-        final HttpResponse<String> response = USER_REQUEST_SENDER.update(updatedUser, ADMIN_USER.userName(), ADMIN_USER.password());
+        final HttpResponse<String> response = USER_REQUEST_SENDER.update(TestConstants.INVALID_ID, updatedUser, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
                 .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
@@ -280,7 +278,6 @@ class UserTest {
     void whenUpdatingUser_givenAValidUserId_andPayloadHasNoChanges_thenOriginalUserIsReturned_andHasA200Status() throws FoldingRestException {
         final User createdUser = create(generateUser());
         final UserRequest userToUpdate = UserRequest.builder()
-                .id(createdUser.getId())
                 .foldingUserName(createdUser.getFoldingUserName())
                 .displayName(createdUser.getDisplayName())
                 .passkey(createdUser.getPasskey())
@@ -292,7 +289,7 @@ class UserTest {
                 .userIsCaptain(createdUser.isUserIsCaptain())
                 .build();
 
-        final HttpResponse<String> updateResponse = USER_REQUEST_SENDER.update(userToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
+        final HttpResponse<String> updateResponse = USER_REQUEST_SENDER.update(createdUser.getId(), userToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(updateResponse.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + updateResponse.body())
@@ -431,7 +428,6 @@ class UserTest {
         final User createdUser = create(generateUser());
 
         final UserRequest userToUpdate = UserRequest.builder()
-                .id(createdUser.getId())
                 .foldingUserName(createdUser.getFoldingUserName())
                 .displayName(createdUser.getDisplayName())
                 .passkey("updatedPasskey123456789012345678")
@@ -444,10 +440,7 @@ class UserTest {
                 .build();
         StubbedFoldingEndpointUtils.enableUser(userToUpdate);
 
-
-        StubbedFoldingEndpointUtils.enableUser(userToUpdate);
-
-        final HttpResponse<String> response = USER_REQUEST_SENDER.update(userToUpdate);
+        final HttpResponse<String> response = USER_REQUEST_SENDER.update(createdUser.getId(), userToUpdate);
         assertThat(response.statusCode())
                 .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
@@ -546,7 +539,6 @@ class UserTest {
         final User createdUser = create(generateUserWithLiveStatsLink("http://google.com"));
 
         final UserRequest userToUpdate = UserRequest.builder()
-                .id(createdUser.getId())
                 .foldingUserName(createdUser.getFoldingUserName())
                 .displayName(createdUser.getDisplayName())
                 .passkey(createdUser.getPasskey())
@@ -558,7 +550,7 @@ class UserTest {
                 .userIsCaptain(createdUser.isUserIsCaptain())
                 .build();
 
-        final HttpResponse<String> response = USER_REQUEST_SENDER.update(userToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
+        final HttpResponse<String> response = USER_REQUEST_SENDER.update(createdUser.getId(), userToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -653,7 +645,6 @@ class UserTest {
         final User createdUser = create(thirdUser);
 
         final UserRequest userToUpdate = UserRequest.builder()
-                .id(createdUser.getId())
                 .foldingUserName(createdUser.getFoldingUserName())
                 .displayName(createdUser.getDisplayName())
                 .passkey(createdUser.getPasskey())
@@ -665,7 +656,7 @@ class UserTest {
                 .userIsCaptain(createdUser.isUserIsCaptain())
                 .build();
 
-        final HttpResponse<String> response = USER_REQUEST_SENDER.update(userToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
+        final HttpResponse<String> response = USER_REQUEST_SENDER.update(createdUser.getId(), userToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
                 .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
@@ -686,7 +677,6 @@ class UserTest {
         final User createdUser = create(secondCaptain);
 
         final UserRequest userToUpdate = UserRequest.builder()
-                .id(createdUser.getId())
                 .foldingUserName(createdUser.getFoldingUserName())
                 .displayName(createdUser.getDisplayName())
                 .passkey(createdUser.getPasskey())
@@ -698,7 +688,7 @@ class UserTest {
                 .userIsCaptain(true)
                 .build();
 
-        final HttpResponse<String> response = USER_REQUEST_SENDER.update(userToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
+        final HttpResponse<String> response = USER_REQUEST_SENDER.update(createdUser.getId(), userToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
                 .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
@@ -710,24 +700,23 @@ class UserTest {
 
     @Test
     void whenUpdateHardware_givenUserReferencesHardware_thenUserIsUpdatedWithNewHardwareDetails_andResponseHasA200Status() throws FoldingRestException {
-        final User user = create(generateUser());
+        final User createdUser = create(generateUser());
 
-        final Hardware originalHardware = user.getHardware();
+        final Hardware originalHardware = createdUser.getHardware();
 
         final HardwareRequest hardwareToUpdate = HardwareRequest.builder()
-                .id(originalHardware.getId())
                 .hardwareName(originalHardware.getHardwareName())
                 .displayName("New Name")
                 .operatingSystem(originalHardware.getOperatingSystem().toString())
                 .multiplier(originalHardware.getMultiplier())
                 .build();
 
-        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.update(hardwareToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
+        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.update(originalHardware.getId(), hardwareToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_OK);
 
-        final User userAfterHardwareUpdate = UserResponseParser.get(USER_REQUEST_SENDER.get(user.getId()));
+        final User userAfterHardwareUpdate = UserResponseParser.get(USER_REQUEST_SENDER.get(createdUser.getId()));
 
         assertThat(userAfterHardwareUpdate.getHardware())
                 .as("Expected user's hardware to be changed: " + userAfterHardwareUpdate)
@@ -740,6 +729,6 @@ class UserTest {
 
     @AfterAll
     static void tearDown() throws FoldingRestException {
-//        cleanSystemForSimpleTests();
+        cleanSystemForSimpleTests();
     }
 }

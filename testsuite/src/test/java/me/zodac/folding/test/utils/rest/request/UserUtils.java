@@ -43,10 +43,6 @@ public final class UserUtils {
             return UserResponseParser.create(response);
         }
 
-        if (response.statusCode() == HttpURLConnection.HTTP_CONFLICT) {
-            return get(user.getId());
-        }
-
         throw new FoldingRestException(String.format("Invalid response (%s) when creating user: %s", response.statusCode(), response.body()));
     }
 

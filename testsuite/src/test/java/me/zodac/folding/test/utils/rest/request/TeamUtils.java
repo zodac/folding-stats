@@ -37,11 +37,7 @@ public final class TeamUtils {
         if (response.statusCode() == HttpURLConnection.HTTP_CREATED) {
             return TeamResponseParser.create(response);
         }
-
-        if (response.statusCode() == HttpURLConnection.HTTP_CONFLICT) {
-            return get(team.getId());
-        }
-
+        
         throw new FoldingRestException(String.format("Invalid response (%s) when creating team: %s", response.statusCode(), response.body()));
     }
 

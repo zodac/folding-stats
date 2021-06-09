@@ -21,6 +21,16 @@ public final class TestStats {
         this.units = units;
     }
 
+    /**
+     * Creates an instance of {@link TestStats}.
+     *
+     * @param userId           the {@link me.zodac.folding.api.tc.User} ID
+     * @param timestamp        the {@link java.sql.Timestamp} the stats were retrieved, as a {@link String}
+     * @param points           the points
+     * @param multipliedPoints the multiplied points
+     * @param units            the units
+     * @return the created {@link TestStats}
+     */
     public static TestStats create(final int userId, final String timestamp, final long points, final long multipliedPoints, final int units) {
         return new TestStats(userId, timestamp, points, multipliedPoints, units);
     }

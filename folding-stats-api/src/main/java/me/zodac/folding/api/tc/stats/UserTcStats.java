@@ -22,6 +22,15 @@ public class UserTcStats extends UserStats {
 
     private final long multipliedPoints;
 
+    /**
+     * Constructor for {@link UserTcStats}.
+     *
+     * @param userId           the {@link me.zodac.folding.api.tc.User} ID
+     * @param timestamp        the {@link Timestamp} the stats were retrieved
+     * @param points           the points
+     * @param multipliedPoints the multiplied points
+     * @param units            the units
+     */
     protected UserTcStats(final int userId, final Timestamp timestamp, final long points, final long multipliedPoints, final int units) {
         super(userId, timestamp, points, units);
         this.multipliedPoints = multipliedPoints;

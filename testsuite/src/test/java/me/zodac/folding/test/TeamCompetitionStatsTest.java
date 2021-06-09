@@ -39,10 +39,10 @@ import static me.zodac.folding.test.utils.TestGenerator.generateHardwareWithMult
 import static me.zodac.folding.test.utils.TestGenerator.generateTeam;
 import static me.zodac.folding.test.utils.TestGenerator.generateUser;
 import static me.zodac.folding.test.utils.TestGenerator.generateUserWithHardwareId;
-import static me.zodac.folding.test.utils.TestGenerator.generateUserWithId;
 import static me.zodac.folding.test.utils.TestGenerator.generateUserWithTeamId;
 import static me.zodac.folding.test.utils.TestGenerator.generateUserWithTeamIdAndCategory;
 import static me.zodac.folding.test.utils.rest.request.HardwareUtils.HARDWARE_REQUEST_SENDER;
+import static me.zodac.folding.test.utils.rest.request.HardwareUtils.create;
 import static me.zodac.folding.test.utils.rest.request.TeamCompetitionStatsUtils.TEAM_COMPETITION_REQUEST_SENDER;
 import static me.zodac.folding.test.utils.rest.request.TeamCompetitionStatsUtils.getActiveUserFromTeam;
 import static me.zodac.folding.test.utils.rest.request.TeamCompetitionStatsUtils.getRetiredUserFromTeam;
@@ -340,7 +340,7 @@ class TeamCompetitionStatsTest {
     @Test
     void whenTeamExistsWithOneUser_andUserHasAHardwareMultiplier_thenUserPointsAreMultipliedCorrectly_andUserUnitsAreNotImpacted() throws FoldingRestException {
         final double hardwareMultiplier = 2.0D;
-        final int hardwareId = HardwareUtils.create(generateHardwareWithMultiplier(2.0D)).getId();
+        final int hardwareId = create(generateHardwareWithMultiplier(2.0D)).getId();
         final Team team = TeamUtils.create(generateTeam());
 
         final UserRequest user = generateUserWithHardwareId(hardwareId);
@@ -373,11 +373,10 @@ class TeamCompetitionStatsTest {
 
     @Test
     void whenTeamExistsWithOneUser_andUserIsUpdatedWithANewHardwareMultiplier_thenOriginalPointsAreNotChanged_andNewPointsAreMultipliedCorrectly() throws FoldingRestException {
-        final HardwareRequest hardware = generateHardware();
-        final int hardwareId = HardwareUtils.create(hardware).getId();
+        final Hardware createdHardware = HardwareUtils.create(generateHardware());
         final Team team = TeamUtils.create(generateTeam());
 
-        final UserRequest user = generateUserWithHardwareId(hardwareId);
+        final UserRequest user = generateUserWithHardwareId(createdHardware.getId());
         user.setTeamId(team.getId());
         final User createdUser = UserUtils.create(user);
 
@@ -398,9 +397,14 @@ class TeamCompetitionStatsTest {
                 .isEqualTo(firstPoints);
 
         // Change the multiplier on the hardware, no need to update the user
-        hardware.setMultiplier(2.0D);
-        hardware.setId(hardwareId);
-        HARDWARE_REQUEST_SENDER.update(hardware, ADMIN_USER.userName(), ADMIN_USER.password());
+        final HardwareRequest updatedHardware = HardwareRequest.builder()
+                .hardwareName(createdHardware.getHardwareName())
+                .displayName(createdHardware.getDisplayName())
+                .operatingSystem(createdHardware.getOperatingSystem().toString())
+                .multiplier(2.0D)
+                .build();
+
+        HARDWARE_REQUEST_SENDER.update(createdHardware.getId(), updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
 
         final long secondPoints = 5_000L;
         StubbedFoldingEndpointUtils.setPoints(createdUser, secondPoints);
@@ -416,12 +420,12 @@ class TeamCompetitionStatsTest {
 
         assertThat(userSummaryAfterUpdate.getMultipliedPoints())
                 .as("Expected user multiplied points to be multiplied only after the second update: " + userSummaryAfterUpdate)
-                .isEqualTo(firstPoints + (Math.round(secondPoints * hardware.getMultiplier())));
+                .isEqualTo(firstPoints + (Math.round(secondPoints * updatedHardware.getMultiplier())));
     }
 
     @Test
     void whenTeamExistsWithOneUser_andUserIsUpdatedWithANewHardware_thenOriginalPointsAreNotChanged_andNewPointsAreMultipliedCorrectly() throws FoldingRestException {
-        final int hardwareId = HardwareUtils.create(generateHardware()).getId();
+        final int hardwareId = create(generateHardware()).getId();
         final Team team = TeamUtils.create(generateTeam());
 
         final UserRequest user = generateUserWithHardwareId(hardwareId);
@@ -447,10 +451,10 @@ class TeamCompetitionStatsTest {
 
         // Update the user with a new hardware with a multiplier
         final HardwareRequest hardwareWithMultiplier = generateHardwareWithMultiplier(2.0D);
-        final int hardwareWithMultiplierId = HardwareUtils.create(hardwareWithMultiplier).getId();
+        final int hardwareWithMultiplierId = create(hardwareWithMultiplier).getId();
         user.setHardwareId(hardwareWithMultiplierId);
-        user.setId(createdUser.getId());
-        USER_REQUEST_SENDER.update(user, ADMIN_USER.userName(), ADMIN_USER.password());
+
+        USER_REQUEST_SENDER.update(createdUser.getId(), user, ADMIN_USER.userName(), ADMIN_USER.password());
 
         final long secondPoints = 5_000L;
         StubbedFoldingEndpointUtils.setPoints(createdUser, secondPoints);
@@ -806,7 +810,7 @@ class TeamCompetitionStatsTest {
 
     @Test
     void whenPatchingAUserWithPointsOffsets_givenThePayloadIsValid_thenResponseHasA200Status() throws FoldingRestException {
-        final Hardware hardware = HardwareUtils.create(generateHardware());
+        final Hardware hardware = create(generateHardware());
         final UserRequest user = generateUserWithHardwareId(hardware.getId());
 
         final int userId = UserUtils.create(user).getId();
@@ -826,8 +830,8 @@ class TeamCompetitionStatsTest {
 
     @Test
     void whenPatchingAUserWithPointsOffsets_givenNoAuthentication_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
-        final Hardware hardware = HardwareUtils.create(generateHardware());
-        final UserRequest user = generateUserWithId(hardware.getId());
+        final Hardware hardware = create(generateHardware());
+        final UserRequest user = generateUserWithHardwareId(hardware.getId());
 
         final int userId = UserUtils.create(user).getId();
         final HttpResponse<Void> response = TEAM_COMPETITION_REQUEST_SENDER.offset(userId, 100L, Math.round(100L * hardware.getMultiplier()), 10);
@@ -838,8 +842,8 @@ class TeamCompetitionStatsTest {
 
     @Test
     void whenPatchingAUserWithPointsOffsets_givenEmptyPayload_thenRequestFails_andResponseHasA400StatusCode() throws IOException, InterruptedException, FoldingRestException {
-        final Hardware hardware = HardwareUtils.create(generateHardware());
-        final UserRequest user = generateUserWithId(hardware.getId());
+        final Hardware hardware = create(generateHardware());
+        final UserRequest user = generateUserWithHardwareId(hardware.getId());
         final int userId = UserUtils.create(user).getId();
 
         final HttpRequest request = HttpRequest.newBuilder()
