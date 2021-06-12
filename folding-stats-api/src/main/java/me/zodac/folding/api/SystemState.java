@@ -21,7 +21,8 @@ public enum SystemState {
     STARTING(false, false),
 
     /**
-     * System is in the process of updating stats (for a single {@link me.zodac.folding.api.tc.User}, or all {@link me.zodac.folding.api.tc.User}s), system is ready for read requests, but not write requests.
+     * System is in the process of updating stats (for a single {@link me.zodac.folding.api.tc.User}, or all {@link me.zodac.folding.api.tc.User}s),
+     * system is ready for read requests, but not write requests.
      */
     UPDATING_STATS(true, false),
 

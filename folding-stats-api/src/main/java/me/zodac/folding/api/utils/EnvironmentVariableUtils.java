@@ -12,6 +12,7 @@ public final class EnvironmentVariableUtils {
     /**
      * Returns the {@code variableName} specified if it is set as a {@link System} property or as a {@link System} environment variable. The order of
      * the search is property first then environment variable.
+     *
      * <p>
      * If neither is set then null is returned.
      *
@@ -25,6 +26,7 @@ public final class EnvironmentVariableUtils {
     /**
      * Returns the {@code variableName} specified if it is set as a {@link System} property or as a {@link System} environment variable. The order of
      * the search is property first then environment variable.
+     *
      * <p>
      * If neither is set then the default value provided is returned.
      *

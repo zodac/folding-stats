@@ -1,5 +1,8 @@
 package me.zodac.folding.api.validator;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -8,10 +11,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import me.zodac.folding.api.ResponsePojo;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Simple POJO defining the result of a validation check.
@@ -74,7 +73,8 @@ public class ValidationResponse<E extends ResponsePojo> {
      * @param <E>                   the output type of the validated object
      * @return a {@link ValidationResponse} with the conflicting {@link Object}
      */
-    public static <E extends ResponsePojo> ValidationResponse<E> conflictingWith(final Object invalidObject, final Object conflictingObject, final Collection<String> conflictingAttributes) {
+    public static <E extends ResponsePojo> ValidationResponse<E> conflictingWith(final Object invalidObject, final Object conflictingObject,
+                                                                                 final Collection<String> conflictingAttributes) {
         final Collection<String> errors = List.of(String.format("Payload conflicts with an existing object on: %s", conflictingAttributes));
         return new ValidationResponse<>(invalidObject, conflictingObject, null, ValidationResult.FAILURE_DUE_TO_CONFLICT, errors);
     }
@@ -88,7 +88,8 @@ public class ValidationResponse<E extends ResponsePojo> {
      * @return a {@link ValidationResponse} with the conflicting {@link Object}
      */
     public static <E extends ResponsePojo> ValidationResponse<E> usedBy(final Object invalidObject, final Object conflictingObject) {
-        return new ValidationResponse<>(invalidObject, conflictingObject, null, ValidationResult.FAILURE_DUE_TO_CONFLICT, List.of("Payload conflicts with an existing object"));
+        return new ValidationResponse<>(invalidObject, conflictingObject, null, ValidationResult.FAILURE_DUE_TO_CONFLICT,
+            List.of("Payload conflicts with an existing object"));
     }
 
     /**

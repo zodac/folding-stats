@@ -3,17 +3,16 @@ package me.zodac.folding.client.java.response;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import me.zodac.folding.client.java.request.TeamCompetitionStatsRequestSender;
-import me.zodac.folding.rest.api.tc.CompetitionSummary;
-import me.zodac.folding.rest.api.tc.UserSummary;
-import me.zodac.folding.rest.api.tc.leaderboard.TeamLeaderboardEntry;
-import me.zodac.folding.rest.api.tc.leaderboard.UserCategoryLeaderboardEntry;
-
 import java.lang.reflect.Type;
 import java.net.http.HttpResponse;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import me.zodac.folding.client.java.request.TeamCompetitionStatsRequestSender;
+import me.zodac.folding.rest.api.tc.CompetitionSummary;
+import me.zodac.folding.rest.api.tc.UserSummary;
+import me.zodac.folding.rest.api.tc.leaderboard.TeamLeaderboardEntry;
+import me.zodac.folding.rest.api.tc.leaderboard.UserCategoryLeaderboardEntry;
 
 /**
  * Utility class used to parse a {@link HttpResponse} returned from {@link TeamCompetitionStatsRequestSender}.

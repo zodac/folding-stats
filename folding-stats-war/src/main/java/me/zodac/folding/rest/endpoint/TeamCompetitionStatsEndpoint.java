@@ -1,5 +1,37 @@
 package me.zodac.folding.rest.endpoint;
 
+import static java.util.stream.Collectors.toList;
+import static me.zodac.folding.rest.response.Responses.badRequest;
+import static me.zodac.folding.rest.response.Responses.notFound;
+import static me.zodac.folding.rest.response.Responses.nullRequest;
+import static me.zodac.folding.rest.response.Responses.ok;
+import static me.zodac.folding.rest.response.Responses.serverError;
+import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.EJB;
+import javax.enterprise.context.RequestScoped;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.PATCH;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.exception.UserNotFoundException;
@@ -22,39 +54,6 @@ import me.zodac.folding.rest.parse.IntegerParser;
 import me.zodac.folding.rest.parse.ParseResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.security.PermitAll;
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.EJB;
-import javax.enterprise.context.RequestScoped;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.PATCH;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
-import static java.util.stream.Collectors.toList;
-import static me.zodac.folding.rest.response.Responses.badRequest;
-import static me.zodac.folding.rest.response.Responses.notFound;
-import static me.zodac.folding.rest.response.Responses.nullRequest;
-import static me.zodac.folding.rest.response.Responses.ok;
-import static me.zodac.folding.rest.response.Responses.serverError;
-import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
 
 @Path("/stats/")
 @RequestScoped
@@ -128,9 +127,9 @@ public class TeamCompetitionStatsEndpoint {
 
             final CompetitionSummary competitionSummary = competitionResultGenerator.generate();
             final Collection<UserSummary> userSummaries = competitionSummary.getTeams()
-                    .stream()
-                    .flatMap(teamResult -> teamResult.getActiveUsers().stream())
-                    .collect(toList());
+                .stream()
+                .flatMap(teamResult -> teamResult.getActiveUsers().stream())
+                .collect(toList());
 
             for (final UserSummary userSummary : userSummaries) {
                 if (userSummary.getId() == user.getId()) {
@@ -216,9 +215,9 @@ public class TeamCompetitionStatsEndpoint {
         try {
             final CompetitionSummary competitionSummary = competitionResultGenerator.generate();
             final List<TeamSummary> teamResults = competitionSummary.getTeams()
-                    .stream()
-                    .sorted(Comparator.comparingLong(TeamSummary::getTeamMultipliedPoints).reversed())
-                    .collect(toList());
+                .stream()
+                .sorted(Comparator.comparingLong(TeamSummary::getTeamMultipliedPoints).reversed())
+                .collect(toList());
 
             if (teamResults.isEmpty()) {
                 LOGGER.warn("No TC teams to show");
@@ -290,12 +289,13 @@ public class TeamCompetitionStatsEndpoint {
             for (final var entry : userResultsByCategory.entrySet()) {
                 final Category category = entry.getKey();
                 final List<UserSummary> userSummaries = entry.getValue()
-                        .stream()
-                        .sorted(Comparator.comparingLong(UserSummary::getMultipliedPoints).reversed())
-                        .collect(toList());
+                    .stream()
+                    .sorted(Comparator.comparingLong(UserSummary::getMultipliedPoints).reversed())
+                    .collect(toList());
 
                 final UserSummary firstResult = userSummaries.get(0);
-                final UserCategoryLeaderboardEntry categoryLeader = UserCategoryLeaderboardEntry.createLeader(firstResult, teamNameForFoldingUserName.get(firstResult.getFoldingName()));
+                final UserCategoryLeaderboardEntry categoryLeader =
+                    UserCategoryLeaderboardEntry.createLeader(firstResult, teamNameForFoldingUserName.get(firstResult.getFoldingName()));
 
                 final List<UserCategoryLeaderboardEntry> userSummariesInCategory = new ArrayList<>(userSummaries.size());
                 userSummariesInCategory.add(categoryLeader);
@@ -309,7 +309,8 @@ public class TeamCompetitionStatsEndpoint {
 
                     final String teamName = teamNameForFoldingUserName.get(userSummary.getFoldingName());
                     final int rank = i + 1;
-                    final UserCategoryLeaderboardEntry userCategoryLeaderboardEntry = UserCategoryLeaderboardEntry.create(userSummary, teamName, rank, diffToLeader, diffToNext);
+                    final UserCategoryLeaderboardEntry userCategoryLeaderboardEntry =
+                        UserCategoryLeaderboardEntry.create(userSummary, teamName, rank, diffToLeader, diffToNext);
                     userSummariesInCategory.add(userCategoryLeaderboardEntry);
                 }
 

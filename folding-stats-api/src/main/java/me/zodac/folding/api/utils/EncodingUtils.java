@@ -31,8 +31,8 @@ public final class EncodingUtils {
     public static String encodeBasicAuthentication(final String userName, final String password) {
         final byte[] usernameAndPassword = (userName + DECODED_USERNAME_PASSWORD_DELIMITER + password).getBytes(StandardCharsets.ISO_8859_1);
         return BASIC_AUTHENTICATION_SCHEME + Base64
-                .getEncoder()
-                .encodeToString(usernameAndPassword);
+            .getEncoder()
+            .encodeToString(usernameAndPassword);
     }
 
     /**
@@ -73,8 +73,8 @@ public final class EncodingUtils {
         final String[] userNameAndPasswordTokens = decodedUserNameAndPassword.split(DECODED_USERNAME_PASSWORD_DELIMITER, 2);
 
         return Map.of(
-                DECODED_USERNAME_KEY, userNameAndPasswordTokens[0],
-                DECODED_PASSWORD_KEY, userNameAndPasswordTokens[1]
+            DECODED_USERNAME_KEY, userNameAndPasswordTokens[0],
+            DECODED_PASSWORD_KEY, userNameAndPasswordTokens[1]
         );
     }
 }

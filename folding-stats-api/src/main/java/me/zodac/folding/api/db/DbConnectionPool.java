@@ -1,8 +1,7 @@
 package me.zodac.folding.api.db;
 
-import me.zodac.folding.api.exception.DatabaseConnectionException;
-
 import java.sql.Connection;
+import me.zodac.folding.api.exception.DatabaseConnectionException;
 
 /**
  * Interface for a DB {@link Connection} pool.

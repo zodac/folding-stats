@@ -34,12 +34,13 @@ public class TeamLeaderboardEntry {
      *
      * @param teamSummary  the {@link TeamSummary} for the {@link me.zodac.folding.api.tc.Team}
      * @param rank         the rank of the {@link me.zodac.folding.api.tc.Team}
-     * @param diffToLeader the number of points between this {@link me.zodac.folding.api.tc.Team} and the {@link me.zodac.folding.api.tc.Team} in first place
-     * @param diffToNext   the number of points between this {@link me.zodac.folding.api.tc.Team} and the {@link me.zodac.folding.api.tc.Team} one place above
+     * @param diffToLeader the number of points between this {@link me.zodac.folding.api.tc.Team} and the one in first place
+     * @param diffToNext   the number of points between this {@link me.zodac.folding.api.tc.Team} and the one a single place above
      * @return the created {@link TeamLeaderboardEntry}
      */
     public static TeamLeaderboardEntry create(final TeamSummary teamSummary, final int rank, final long diffToLeader, final long diffToNext) {
-        return new TeamLeaderboardEntry(teamSummary.getTeamName(), teamSummary.getTeamPoints(), teamSummary.getTeamMultipliedPoints(), teamSummary.getTeamUnits(), rank, diffToLeader, diffToNext);
+        return new TeamLeaderboardEntry(teamSummary.getTeamName(), teamSummary.getTeamPoints(), teamSummary.getTeamMultipliedPoints(),
+            teamSummary.getTeamUnits(), rank, diffToLeader, diffToNext);
     }
 
     /**

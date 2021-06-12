@@ -1,13 +1,7 @@
 package me.zodac.folding.rest.endpoint;
 
-import me.zodac.folding.api.exception.ExternalConnectionException;
-import me.zodac.folding.api.tc.Hardware;
-import me.zodac.folding.api.validator.ValidationResponse;
-import me.zodac.folding.rest.api.tc.request.HardwareRequest;
-import me.zodac.folding.rest.validator.HardwareValidator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import java.util.Collection;
+import java.util.Optional;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.RequestScoped;
@@ -23,8 +17,13 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
-import java.util.Collection;
-import java.util.Optional;
+import me.zodac.folding.api.exception.ExternalConnectionException;
+import me.zodac.folding.api.tc.Hardware;
+import me.zodac.folding.api.validator.ValidationResponse;
+import me.zodac.folding.rest.api.tc.request.HardwareRequest;
+import me.zodac.folding.rest.validator.HardwareValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * REST endpoints for hardware for <code>folding-stats</code>.
@@ -129,7 +128,8 @@ public class HardwareEndpoint extends AbstractCrudEndpoint<HardwareRequest, Hard
     }
 
     @Override
-    protected Hardware updateElementById(final int hardwareId, final Hardware hardware, final Hardware existingHardware) throws ExternalConnectionException {
+    protected Hardware updateElementById(final int hardwareId, final Hardware hardware, final Hardware existingHardware)
+        throws ExternalConnectionException {
         // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
         final Hardware hardwareWithId = Hardware.updateWithId(hardwareId, hardware);
         oldFacade.updateHardware(hardwareWithId, existingHardware);

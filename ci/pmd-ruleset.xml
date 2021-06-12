@@ -74,23 +74,8 @@
         </properties>
     </rule>
 
-    <!-- TODO: [zodac] Sort out documentation first :) -->
-    <!--    <rule ref="category/java/documentation.xml">-->
-    <!--        <exclude name="CommentSize"/>-->
-    <!--    </rule>-->
-    <!--    <rule ref="category/java/documentation.xml/CommentRequired">-->
-    <!--        <properties>-->
-    <!--            <property name="methodWithOverrideCommentRequirement" value="Ignored"/>-->
-    <!--            <property name="accessorCommentRequirement" value="Ignored"/>-->
-    <!--            <property name="classCommentRequirement" value="Required"/>-->
-    <!--            <property name="fieldCommentRequirement" value="Ignored"/>-->
-    <!--            <property name="publicMethodCommentRequirement" value="Required"/>-->
-    <!--            <property name="protectedMethodCommentRequirement" value="Required"/>-->
-    <!--            <property name="enumCommentRequirement" value="Required"/>-->
-    <!--            <property name="serialVersionUIDCommentRequired" value="Ignored"/>-->
-    <!--            <property name="serialPersistentFieldsCommentRequired" value="Ignored"/>-->
-    <!--        </properties>-->
-    <!--    </rule>-->
+    <!-- Not checking this rule here, will be handled by Checkstyle -->
+    <!-- <rule ref="category/java/documentation.xml"/> -->
 
     <rule ref="category/java/errorprone.xml">
         <!-- Don't agree, not worth it -->

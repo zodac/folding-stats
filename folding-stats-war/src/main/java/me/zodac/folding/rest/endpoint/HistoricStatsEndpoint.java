@@ -1,17 +1,20 @@
 package me.zodac.folding.rest.endpoint;
 
-import me.zodac.folding.SystemStateManager;
-import me.zodac.folding.api.exception.TeamNotFoundException;
-import me.zodac.folding.api.exception.UserNotFoundException;
-import me.zodac.folding.api.tc.Team;
-import me.zodac.folding.api.tc.User;
-import me.zodac.folding.ejb.OldFacade;
-import me.zodac.folding.rest.api.tc.historic.HistoricStats;
-import me.zodac.folding.rest.parse.IntegerParser;
-import me.zodac.folding.rest.parse.ParseResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static me.zodac.folding.rest.response.Responses.badRequest;
+import static me.zodac.folding.rest.response.Responses.notFound;
+import static me.zodac.folding.rest.response.Responses.okBuilder;
+import static me.zodac.folding.rest.response.Responses.serverError;
+import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
 
+import java.time.DateTimeException;
+import java.time.Month;
+import java.time.Year;
+import java.time.YearMonth;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 import javax.annotation.security.PermitAll;
 import javax.ejb.EJB;
 import javax.enterprise.context.RequestScoped;
@@ -26,21 +29,17 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import java.time.DateTimeException;
-import java.time.Month;
-import java.time.Year;
-import java.time.YearMonth;
-import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import static me.zodac.folding.rest.response.Responses.badRequest;
-import static me.zodac.folding.rest.response.Responses.notFound;
-import static me.zodac.folding.rest.response.Responses.okBuilder;
-import static me.zodac.folding.rest.response.Responses.serverError;
-import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
+import me.zodac.folding.SystemStateManager;
+import me.zodac.folding.api.exception.TeamNotFoundException;
+import me.zodac.folding.api.exception.UserNotFoundException;
+import me.zodac.folding.api.tc.Team;
+import me.zodac.folding.api.tc.User;
+import me.zodac.folding.ejb.OldFacade;
+import me.zodac.folding.rest.api.tc.historic.HistoricStats;
+import me.zodac.folding.rest.parse.IntegerParser;
+import me.zodac.folding.rest.parse.ParseResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // TODO: [zodac] Verify that all places that return a HTTP response also log something
 @Path("/historic/")
@@ -62,7 +61,9 @@ public class HistoricStatsEndpoint {
     @PermitAll
     @Path("/users/{userId}/{year}/{month}/{day}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getUserHistoricStatsHourly(@PathParam("userId") final String userId, @PathParam("year") final String year, @PathParam("month") final String month, @PathParam("day") final String day, @Context final Request request) {
+    public Response getUserHistoricStatsHourly(@PathParam("userId") final String userId, @PathParam("year") final String year,
+                                               @PathParam("month") final String month, @PathParam("day") final String day,
+                                               @Context final Request request) {
         LOGGER.debug("GET request received to show hourly TC user stats at '{}'", uriContext.getAbsolutePath());
 
         if (SystemStateManager.current().isReadBlocked()) {
@@ -99,7 +100,8 @@ public class HistoricStatsEndpoint {
             oldFacade.getUser(parsedId); // Check if user exists first, catch UserNotFoundException early
 
 
-            final Collection<HistoricStats> hourlyStats = oldFacade.getHistoricStatsHourly(parsedId, Integer.parseInt(day), Month.of(Integer.parseInt(month)), Year.parse(year));
+            final Collection<HistoricStats> hourlyStats =
+                oldFacade.getHistoricStatsHourly(parsedId, Integer.parseInt(day), Month.of(Integer.parseInt(month)), Year.parse(year));
 
             final CacheControl cacheControl = new CacheControl();
             cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);
@@ -144,7 +146,8 @@ public class HistoricStatsEndpoint {
     @PermitAll
     @Path("/users/{userId}/{year}/{month}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getUserHistoricStatsDaily(@PathParam("userId") final String userId, @PathParam("year") final String year, @PathParam("month") final String month, @Context final Request request) {
+    public Response getUserHistoricStatsDaily(@PathParam("userId") final String userId, @PathParam("year") final String year,
+                                              @PathParam("month") final String month, @Context final Request request) {
         LOGGER.debug("GET request received to show daily TC user stats at '{}'", uriContext.getAbsolutePath());
 
         if (SystemStateManager.current().isReadBlocked()) {
@@ -166,7 +169,8 @@ public class HistoricStatsEndpoint {
             final int parsedId = parseResult.getId();
 
             oldFacade.getUser(parsedId); // Check if user exists first, catch UserNotFoundException early
-            final Collection<HistoricStats> dailyStats = oldFacade.getHistoricStatsDaily(parsedId, Month.of(Integer.parseInt(month)), Year.parse(year));
+            final Collection<HistoricStats> dailyStats =
+                oldFacade.getHistoricStatsDaily(parsedId, Month.of(Integer.parseInt(month)), Year.parse(year));
 
             final CacheControl cacheControl = new CacheControl();
             cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);
@@ -206,7 +210,8 @@ public class HistoricStatsEndpoint {
     @PermitAll
     @Path("/users/{userId}/{year}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getUserHistoricStatsMonthly(@PathParam("userId") final String userId, @PathParam("year") final String year, @Context final Request request) {
+    public Response getUserHistoricStatsMonthly(@PathParam("userId") final String userId, @PathParam("year") final String year,
+                                                @Context final Request request) {
         LOGGER.debug("GET request received to show monthly TC user stats at '{}'", uriContext.getAbsolutePath());
 
         if (SystemStateManager.current().isReadBlocked()) {
@@ -263,7 +268,10 @@ public class HistoricStatsEndpoint {
     @PermitAll
     @Path("/teams/{teamId}/{year}/{month}/{day}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getTeamHistoricStatsHourly(@PathParam("teamId") final String teamId, @PathParam("year") final String year, @PathParam("month") final String month, @PathParam("day") final String day, @Context final Request request) {
+    @SuppressWarnings("PMD.NcssCount") // TODO: [zodac] Revisit when TeamNotFoundException is removed
+    public Response getTeamHistoricStatsHourly(@PathParam("teamId") final String teamId, @PathParam("year") final String year,
+                                               @PathParam("month") final String month, @PathParam("day") final String day,
+                                               @Context final Request request) {
         LOGGER.debug("GET request received to show hourly TC user stats at '{}'", uriContext.getAbsolutePath());
 
         if (SystemStateManager.current().isReadBlocked()) {
@@ -301,7 +309,8 @@ public class HistoricStatsEndpoint {
 
             for (final User user : teamUsers) {
                 LOGGER.debug("Getting historic stats for user with ID: {}", user.getId());
-                final Collection<HistoricStats> dailyStats = oldFacade.getHistoricStatsHourly(user.getId(), Integer.parseInt(day), Month.of(Integer.parseInt(month)), Year.parse(year));
+                final Collection<HistoricStats> dailyStats =
+                    oldFacade.getHistoricStatsHourly(user.getId(), Integer.parseInt(day), Month.of(Integer.parseInt(month)), Year.parse(year));
                 teamHourlyStats.addAll(dailyStats);
             }
 
@@ -350,7 +359,8 @@ public class HistoricStatsEndpoint {
     @PermitAll
     @Path("/teams/{teamId}/{year}/{month}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getTeamHistoricStatsDaily(@PathParam("teamId") final String teamId, @PathParam("year") final String year, @PathParam("month") final String month, @Context final Request request) {
+    public Response getTeamHistoricStatsDaily(@PathParam("teamId") final String teamId, @PathParam("year") final String year,
+                                              @PathParam("month") final String month, @Context final Request request) {
         LOGGER.debug("GET request received to show daily TC user stats at '{}'", uriContext.getAbsolutePath());
 
         if (SystemStateManager.current().isReadBlocked()) {
@@ -377,7 +387,8 @@ public class HistoricStatsEndpoint {
 
             for (final User user : teamUsers) {
                 LOGGER.debug("Getting historic stats for user with ID: {}", user.getId());
-                final Collection<HistoricStats> dailyStats = oldFacade.getHistoricStatsDaily(user.getId(), Month.of(Integer.parseInt(month)), Year.parse(year));
+                final Collection<HistoricStats> dailyStats =
+                    oldFacade.getHistoricStatsDaily(user.getId(), Month.of(Integer.parseInt(month)), Year.parse(year));
                 teamDailyStats.addAll(dailyStats);
             }
 
@@ -421,7 +432,8 @@ public class HistoricStatsEndpoint {
     @PermitAll
     @Path("/teams/{teamId}/{year}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getTeamHistoricStatsMonthly(@PathParam("teamId") final String teamId, @PathParam("year") final String year, @Context final Request request) {
+    public Response getTeamHistoricStatsMonthly(@PathParam("teamId") final String teamId, @PathParam("year") final String year,
+                                                @Context final Request request) {
         LOGGER.info("GET request received to show monthly TC team stats at '{}'", uriContext.getAbsolutePath());
 
         if (SystemStateManager.current().isReadBlocked()) {

@@ -14,6 +14,7 @@ public interface ResponsePojo {
 
     /**
      * Checks if the input {@link RequestPojo} is equal to the {@link ResponsePojo}.
+     *
      * <p>
      * While the {@link RequestPojo} will likely not be a complete match, there should be enough fields to verify
      * if it is the same as an existing {@link ResponsePojo}.

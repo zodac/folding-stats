@@ -1,5 +1,6 @@
 package me.zodac.folding.api.tc;
 
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,14 +11,13 @@ import me.zodac.folding.api.RequestPojo;
 import me.zodac.folding.api.ResponsePojo;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 
-import java.util.Objects;
-
 
 /**
  * POJO defining a piece of {@link Hardware} for use in the <code>Team Competition</code>.
+ *
  * <p>
- * Each {@link Hardware} will have a multiplier which is calculated from the LARS PPD database, where the best piece of {@link Hardware} has a multiplier
- * of <b>1.0</b>, and each other piece of {@link Hardware}'s multiplier is:
+ * Each {@link Hardware} will have a multiplier which is calculated from the LARS PPD database, where the best piece of {@link Hardware} has a
+ * multiplier of <b>1.0</b>, and each other piece of {@link Hardware}'s multiplier is:
  * <pre>
  *     Best PPD / PPD for given {@link Hardware} on specified {@link OperatingSystem} (to 2 decimal places)
  * </pre>
@@ -45,6 +45,7 @@ public class Hardware implements ResponsePojo {
 
     /**
      * Creates a {@link Hardware}.
+     *
      * <p>
      * Since the DB auto-generates the ID, this function should be used when creating a {@link Hardware} from the DB response.
      *
@@ -55,12 +56,14 @@ public class Hardware implements ResponsePojo {
      * @param multiplier      the calculated multiplier
      * @return the created {@link Hardware}
      */
-    public static Hardware create(final int hardwareId, final String hardwareName, final String displayName, final OperatingSystem operatingSystem, final double multiplier) {
+    public static Hardware create(final int hardwareId, final String hardwareName, final String displayName, final OperatingSystem operatingSystem,
+                                  final double multiplier) {
         return new Hardware(hardwareId, hardwareName, displayName, operatingSystem, multiplier);
     }
 
     /**
      * Creates a {@link Hardware}.
+     *
      * <p>
      * Since we do not know the ID until the DB has persisted the {@link Hardware}, the {@link #EMPTY_HARDWARE_ID} will be used instead.
      *
@@ -70,12 +73,14 @@ public class Hardware implements ResponsePojo {
      * @param multiplier      the calculated multiplier
      * @return the created {@link Hardware}
      */
-    public static Hardware createWithoutId(final String hardwareName, final String displayName, final OperatingSystem operatingSystem, final double multiplier) {
+    public static Hardware createWithoutId(final String hardwareName, final String displayName, final OperatingSystem operatingSystem,
+                                           final double multiplier) {
         return new Hardware(EMPTY_HARDWARE_ID, hardwareName, displayName, operatingSystem, multiplier);
     }
 
     /**
      * Updates a {@link Hardware} with the given ID.
+     *
      * <p>
      * Once the {@link Hardware} has been persisted in the DB, we will know its ID. We create a new {@link Hardware} instance with this ID,
      * which can be used to retrieval/referencing later.
@@ -96,9 +101,9 @@ public class Hardware implements ResponsePojo {
 
         final HardwareRequest hardwareRequest = (HardwareRequest) inputRequest;
 
-        return Double.compare(multiplier, hardwareRequest.getMultiplier()) == 0 &&
-                Objects.equals(hardwareName, hardwareRequest.getHardwareName()) &&
-                Objects.equals(displayName, hardwareRequest.getDisplayName()) &&
-                Objects.equals(operatingSystem.toString(), hardwareRequest.getOperatingSystem());
+        return Double.compare(multiplier, hardwareRequest.getMultiplier()) == 0
+            && Objects.equals(hardwareName, hardwareRequest.getHardwareName())
+            && Objects.equals(displayName, hardwareRequest.getDisplayName())
+            && Objects.equals(operatingSystem.toString(), hardwareRequest.getOperatingSystem());
     }
 }

@@ -30,6 +30,7 @@ public class LoginCredentials {
 
     /**
      * Creates an instance of {@link LoginCredentials} given a {@link java.util.Base64}-encoded username/password credentials.
+     *
      * <p>
      * If the input does not start with {@link EncodingUtils#BASIC_AUTHENTICATION_SCHEME}, it will be prefixed.
      *
@@ -37,10 +38,10 @@ public class LoginCredentials {
      * @return the {@link LoginCredentials} for the given credentials
      */
     public static LoginCredentials createWithBasicAuthentication(final String encodedUserNameAndPassword) {
-        if (!encodedUserNameAndPassword.startsWith(EncodingUtils.BASIC_AUTHENTICATION_SCHEME)) {
-            return new LoginCredentials(EncodingUtils.BASIC_AUTHENTICATION_SCHEME + encodedUserNameAndPassword);
+        if (encodedUserNameAndPassword.startsWith(EncodingUtils.BASIC_AUTHENTICATION_SCHEME)) {
+            return new LoginCredentials(encodedUserNameAndPassword);
         }
 
-        return new LoginCredentials(encodedUserNameAndPassword);
+        return new LoginCredentials(EncodingUtils.BASIC_AUTHENTICATION_SCHEME + encodedUserNameAndPassword);
     }
 }

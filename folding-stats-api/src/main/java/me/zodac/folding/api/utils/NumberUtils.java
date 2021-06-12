@@ -14,6 +14,7 @@ public final class NumberUtils {
 
     /**
      * Formats the input long with commas, based on {@link Locale#UK}.
+     *
      * <p>
      * <b>NOTE:</b> This should only be used for logging. Any values making it to the frontend should be formatted there,
      * otherwise we may end up formatting with the incorrect style.

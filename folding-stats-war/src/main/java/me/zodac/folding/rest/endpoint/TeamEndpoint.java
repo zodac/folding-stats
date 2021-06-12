@@ -1,15 +1,7 @@
 package me.zodac.folding.rest.endpoint;
 
-import me.zodac.folding.api.exception.NotFoundException;
-import me.zodac.folding.api.tc.Team;
-import me.zodac.folding.api.utils.ExecutionType;
-import me.zodac.folding.api.validator.ValidationResponse;
-import me.zodac.folding.ejb.scheduled.TeamCompetitionStatsScheduler;
-import me.zodac.folding.rest.api.tc.request.TeamRequest;
-import me.zodac.folding.rest.validator.TeamValidator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import java.util.Collection;
+import java.util.Optional;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
@@ -26,8 +18,15 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
-import java.util.Collection;
-import java.util.Optional;
+import me.zodac.folding.api.exception.NotFoundException;
+import me.zodac.folding.api.tc.Team;
+import me.zodac.folding.api.utils.ExecutionType;
+import me.zodac.folding.api.validator.ValidationResponse;
+import me.zodac.folding.ejb.scheduled.TeamCompetitionStatsScheduler;
+import me.zodac.folding.rest.api.tc.request.TeamRequest;
+import me.zodac.folding.rest.validator.TeamValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * REST endpoints for teams for <code>folding-stats</code>.

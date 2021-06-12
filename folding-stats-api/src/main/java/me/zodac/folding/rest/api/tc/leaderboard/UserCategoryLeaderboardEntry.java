@@ -38,12 +38,14 @@ public class UserCategoryLeaderboardEntry {
      * @param userSummary  the {@link UserSummary} for the {@link me.zodac.folding.api.tc.User}
      * @param teamName     the name of {@link me.zodac.folding.api.tc.Team} the {@link me.zodac.folding.api.tc.User} is part of
      * @param rank         the rank of the {@link me.zodac.folding.api.tc.User} in their {@link me.zodac.folding.api.tc.Category}
-     * @param diffToLeader the number of points between this {@link me.zodac.folding.api.tc.User} and the {@link me.zodac.folding.api.tc.User} in first place
-     * @param diffToNext   the number of points between this {@link me.zodac.folding.api.tc.User} and the {@link me.zodac.folding.api.tc.User} one place above
+     * @param diffToLeader the number of points between this {@link me.zodac.folding.api.tc.User} and the one in first place
+     * @param diffToNext   the number of points between this {@link me.zodac.folding.api.tc.User} and the one a single place above
      * @return the created {@link UserCategoryLeaderboardEntry}
      */
-    public static UserCategoryLeaderboardEntry create(final UserSummary userSummary, final String teamName, final int rank, final long diffToLeader, final long diffToNext) {
-        return new UserCategoryLeaderboardEntry(userSummary.getDisplayName(), userSummary.getFoldingName(), teamName, userSummary.getPoints(), userSummary.getMultipliedPoints(), userSummary.getUnits(), rank, diffToLeader, diffToNext);
+    public static UserCategoryLeaderboardEntry create(final UserSummary userSummary, final String teamName, final int rank, final long diffToLeader,
+                                                      final long diffToNext) {
+        return new UserCategoryLeaderboardEntry(userSummary.getDisplayName(), userSummary.getFoldingName(), teamName, userSummary.getPoints(),
+            userSummary.getMultipliedPoints(), userSummary.getUnits(), rank, diffToLeader, diffToNext);
     }
 
     /**

@@ -58,17 +58,21 @@
         <maven-war-plugin.version>3.3.1</maven-war-plugin.version>
 
         <!-- Linter 3PP Versions -->
+        <checkstyle.version>8.43</checkstyle.version>
         <errorprone.version>2.7.1</errorprone.version>
         <spotbugs.version>4.2.3</spotbugs.version>
         <pmd.version>6.35.0</pmd.version>
 
         <!-- Linter Properties -->
         <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
+        <checkstyle-file>${project.parent.basedir}/ci/checkstyle.xml</checkstyle-file>
+        <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
         <spotbugs-exclude-file>${project.parent.basedir}/ci/spotbugs-exclude-filter-file.xml</spotbugs-exclude-file>
         <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
         <pmd-ruleset>${project.parent.basedir}/ci/pmd-ruleset.xml</pmd-ruleset>
 
         <!-- Linter Plugin Versions -->
+        <maven-checkstyle-plugin.version>3.1.2</maven-checkstyle-plugin.version>
         <maven-javadoc-plugin.version>3.3.0</maven-javadoc-plugin.version>
         <maven-pmd-plugin.version>3.14.0</maven-pmd-plugin.version>
         <spotbugs-maven-plugin.version>4.2.0</spotbugs-maven-plugin.version>
@@ -263,6 +267,38 @@
                 <!-- Linters -->
 
                 <!-- Manual execution: -->
+                <!-- mvn clean install checkstyle:checkstyle -Dskip-linters=false -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>${maven-checkstyle-plugin.version}</version>
+                    <configuration>
+                        <configLocation>${checkstyle-file}</configLocation>
+                        <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                        <skip>${skip-linters}</skip>
+                        <violationSeverity>info</violationSeverity>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>validate</id>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+
+                    <!-- Overwrite the default version of Checkstyle -->
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>${checkstyle.version}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+
+                <!-- Manual execution: -->
                 <!-- mvn clean install javadoc:javadoc -Dskip-linters=false -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -292,6 +328,8 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-pmd-plugin</artifactId>
                     <version>${maven-pmd-plugin.version}</version>
+
+                    <!-- Overwrite the default version of PMD -->
                     <dependencies>
                         <dependency>
                             <groupId>net.sourceforge.pmd</groupId>
@@ -360,7 +398,7 @@
                         </execution>
                     </executions>
                     <dependencies>
-                        <!-- Overwrite dependency on spotbugs if you want to specify the version of spotbugs -->
+                        <!-- Overwrite the default version of Spotbugs -->
                         <dependency>
                             <groupId>com.github.spotbugs</groupId>
                             <artifactId>spotbugs</artifactId>

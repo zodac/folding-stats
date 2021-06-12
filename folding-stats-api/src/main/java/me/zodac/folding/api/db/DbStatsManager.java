@@ -1,16 +1,15 @@
 package me.zodac.folding.api.db;
 
+import java.time.Month;
+import java.time.Year;
+import java.util.Collection;
+import java.util.Optional;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.stats.OffsetStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
-
-import java.time.Month;
-import java.time.Year;
-import java.util.Collection;
-import java.util.Optional;
 
 /**
  * Interface used to interact with the storage backend and perform stats operations on:

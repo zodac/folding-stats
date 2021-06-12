@@ -1,13 +1,13 @@
 package me.zodac.folding.rest.endpoint;
 
-import me.zodac.folding.SystemStateManager;
-import me.zodac.folding.api.SystemUserAuthentication;
-import me.zodac.folding.api.utils.EncodingUtils;
-import me.zodac.folding.ejb.OldFacade;
-import me.zodac.folding.rest.api.LoginCredentials;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static me.zodac.folding.rest.response.Responses.badRequest;
+import static me.zodac.folding.rest.response.Responses.forbidden;
+import static me.zodac.folding.rest.response.Responses.ok;
+import static me.zodac.folding.rest.response.Responses.serverError;
+import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
+import static me.zodac.folding.rest.response.Responses.unauthorized;
 
+import java.util.Map;
 import javax.annotation.security.PermitAll;
 import javax.ejb.EJB;
 import javax.enterprise.context.RequestScoped;
@@ -17,14 +17,13 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.Map;
-
-import static me.zodac.folding.rest.response.Responses.badRequest;
-import static me.zodac.folding.rest.response.Responses.forbidden;
-import static me.zodac.folding.rest.response.Responses.ok;
-import static me.zodac.folding.rest.response.Responses.serverError;
-import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
-import static me.zodac.folding.rest.response.Responses.unauthorized;
+import me.zodac.folding.SystemStateManager;
+import me.zodac.folding.api.SystemUserAuthentication;
+import me.zodac.folding.api.utils.EncodingUtils;
+import me.zodac.folding.ejb.OldFacade;
+import me.zodac.folding.rest.api.LoginCredentials;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Path("/login/")
 @RequestScoped
@@ -54,7 +53,8 @@ public class LoginEndpoint {
         }
 
         try {
-            final Map<String, String> decodedUserNameAndPassword = EncodingUtils.decodeBasicAuthentication(loginCredentials.getEncodedUserNameAndPassword());
+            final Map<String, String> decodedUserNameAndPassword =
+                EncodingUtils.decodeBasicAuthentication(loginCredentials.getEncodedUserNameAndPassword());
             final String userName = decodedUserNameAndPassword.get(EncodingUtils.DECODED_USERNAME_KEY);
             final String password = decodedUserNameAndPassword.get(EncodingUtils.DECODED_PASSWORD_KEY);
             LOGGER.debug("Login request received for user: '{}'", userName);

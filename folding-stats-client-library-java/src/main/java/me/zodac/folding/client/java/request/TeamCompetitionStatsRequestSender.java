@@ -1,7 +1,15 @@
 package me.zodac.folding.client.java.request;
 
+import static me.zodac.folding.api.utils.EncodingUtils.encodeBasicAuthentication;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import me.zodac.folding.api.tc.stats.OffsetStats;
@@ -9,15 +17,6 @@ import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
 import org.apache.commons.lang3.StringUtils;
-
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Duration;
-
-import static me.zodac.folding.api.utils.EncodingUtils.encodeBasicAuthentication;
 
 /**
  * Convenience class to send HTTP requests to the <code>Team Competition</code> stats REST endpoint.
@@ -27,12 +26,13 @@ public final class TeamCompetitionStatsRequestSender {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
-            .version(HttpClient.Version.HTTP_1_1)
-            .connectTimeout(Duration.ofSeconds(10))
-            .build();
+        .version(HttpClient.Version.HTTP_1_1)
+        .connectTimeout(Duration.ofSeconds(10))
+        .build();
 
     private final String statsUrl;
 
+    
     /**
      * Create an instance of {@link TeamCompetitionStatsRequestSender}.
      *
@@ -69,9 +69,9 @@ public final class TeamCompetitionStatsRequestSender {
      */
     public HttpResponse<String> getStats(final String eTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
-                .GET()
-                .uri(URI.create(statsUrl))
-                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
+            .GET()
+            .uri(URI.create(statsUrl))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
         if (StringUtils.isNotBlank(eTag)) {
             requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), eTag);
@@ -112,9 +112,9 @@ public final class TeamCompetitionStatsRequestSender {
      */
     public HttpResponse<String> getStatsForUser(final int userId, final String eTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
-                .GET()
-                .uri(URI.create(statsUrl + "/users/" + userId))
-                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
+            .GET()
+            .uri(URI.create(statsUrl + "/users/" + userId))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
         if (StringUtils.isNotBlank(eTag)) {
             requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), eTag);
@@ -153,9 +153,9 @@ public final class TeamCompetitionStatsRequestSender {
      */
     public HttpResponse<String> getTeamLeaderboard(final String eTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
-                .GET()
-                .uri(URI.create(statsUrl + "/leaderboard"))
-                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
+            .GET()
+            .uri(URI.create(statsUrl + "/leaderboard"))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
         if (StringUtils.isNotBlank(eTag)) {
             requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), eTag);
@@ -194,9 +194,9 @@ public final class TeamCompetitionStatsRequestSender {
      */
     public HttpResponse<String> getCategoryLeaderboard(final String eTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
-                .GET()
-                .uri(URI.create(statsUrl + "/category"))
-                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
+            .GET()
+            .uri(URI.create(statsUrl + "/category"))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
         if (StringUtils.isNotBlank(eTag)) {
             requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), eTag);
@@ -236,9 +236,9 @@ public final class TeamCompetitionStatsRequestSender {
      */
     public HttpResponse<Void> manualUpdate(final boolean async, final String userName, final String password) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
-                .GET()
-                .uri(URI.create(statsUrl + "/manual/update?async=" + async))
-                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
+            .GET()
+            .uri(URI.create(statsUrl + "/manual/update?async=" + async))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
         if (StringUtils.isNoneBlank(userName, password)) {
             requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
@@ -273,9 +273,9 @@ public final class TeamCompetitionStatsRequestSender {
      */
     public HttpResponse<Void> manualReset(final String userName, final String password) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
-                .GET()
-                .uri(URI.create(statsUrl + "/manual/reset"))
-                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
+            .GET()
+            .uri(URI.create(statsUrl + "/manual/reset"))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
         if (StringUtils.isNoneBlank(userName, password)) {
             requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
@@ -304,7 +304,8 @@ public final class TeamCompetitionStatsRequestSender {
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
-    public HttpResponse<Void> offset(final int userId, final long pointsOffset, final long multipliedPointsOffset, final int unitsOffset) throws FoldingRestException {
+    public HttpResponse<Void> offset(final int userId, final long pointsOffset, final long multipliedPointsOffset, final int unitsOffset)
+        throws FoldingRestException {
         return offset(userId, pointsOffset, multipliedPointsOffset, unitsOffset, null, null);
     }
 
@@ -323,13 +324,14 @@ public final class TeamCompetitionStatsRequestSender {
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
-    public HttpResponse<Void> offset(final int userId, final long pointsOffset, final long multipliedPointsOffset, final int unitsOffset, final String userName, final String password) throws FoldingRestException {
+    public HttpResponse<Void> offset(final int userId, final long pointsOffset, final long multipliedPointsOffset, final int unitsOffset,
+                                     final String userName, final String password) throws FoldingRestException {
         final OffsetStats offsetStats = OffsetStats.create(pointsOffset, multipliedPointsOffset, unitsOffset);
 
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
-                .method("PATCH", HttpRequest.BodyPublishers.ofString(GSON.toJson(offsetStats)))
-                .uri(URI.create(statsUrl + "/users/" + userId))
-                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
+            .method("PATCH", HttpRequest.BodyPublishers.ofString(GSON.toJson(offsetStats)))
+            .uri(URI.create(statsUrl + "/users/" + userId))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
         if (StringUtils.isNoneBlank(userName, password)) {
             requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));

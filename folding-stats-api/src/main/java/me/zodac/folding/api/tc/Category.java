@@ -1,12 +1,13 @@
 package me.zodac.folding.api.tc;
 
+import static java.util.stream.Collectors.toUnmodifiableList;
+
 import java.util.Collection;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toUnmodifiableList;
-
 /**
  * Lists the possible {@link Team} categories for a {@link User} taking part in the <code>Team Competition</code>.
+ *
  * <p>
  * None of these have a user-friendly display name defined, as those will be handled by the frontend.
  */
@@ -33,8 +34,8 @@ public enum Category {
     INVALID(0);
 
     private static final Collection<Category> ALL_VALUES = Stream.of(values())
-            .filter(value -> value != INVALID)
-            .collect(toUnmodifiableList());
+        .filter(value -> value != INVALID)
+        .collect(toUnmodifiableList());
 
     private final int permittedAmount;
 
@@ -42,12 +43,9 @@ public enum Category {
         this.permittedAmount = permittedAmount;
     }
 
-    public int permittedAmount() {
-        return permittedAmount;
-    }
-
     /**
      * Retrieve all available {@link Category}s (excluding {@link Category#INVALID}).
+     *
      * <p>
      * Should be used instead of {@link Category#values()}, as that recalculates the array for each call,
      * while this method uses a static {@link Collection}.
@@ -66,8 +64,8 @@ public enum Category {
      */
     public static int maximumPermittedAmountForAllCategories() {
         return ALL_VALUES.stream()
-                .mapToInt(value -> value.permittedAmount)
-                .sum();
+            .mapToInt(value -> value.permittedAmount)
+            .sum();
     }
 
     /**
@@ -78,9 +76,13 @@ public enum Category {
      */
     public static Category get(final String input) {
         return ALL_VALUES
-                .stream()
-                .filter(category -> category.toString().equalsIgnoreCase(input))
-                .findAny()
-                .orElse(Category.INVALID);
+            .stream()
+            .filter(category -> category.toString().equalsIgnoreCase(input))
+            .findAny()
+            .orElse(Category.INVALID);
+    }
+
+    public int permittedAmount() {
+        return permittedAmount;
     }
 }

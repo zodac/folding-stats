@@ -41,6 +41,7 @@ public class UserSummary {
 
     /**
      * Creates a {@link UserSummary}, summarising the stats for an active {@link me.zodac.folding.api.tc.User}.
+     *
      * <p>
      * The {@link UserSummary} is not ranked to begin with, since it is not aware of the other {@link UserSummary}s.
      * The rank can be updated later using {@link UserSummary#updateWithRankInTeam(UserSummary, int)}.
@@ -57,8 +58,11 @@ public class UserSummary {
      * @param units            the units of the {@link me.zodac.folding.api.tc.User}
      * @return the created {@link UserSummary}
      */
-    public static UserSummary create(final int id, final String displayName, final String foldingName, final Hardware hardware, final Category category, final long points, final long multipliedPoints, final int units, final String profileLink, final String liveStatsLink) {
-        return new UserSummary(id, displayName, foldingName, hardware, category.toString(), profileLink, liveStatsLink, points, multipliedPoints, units, DEFAULT_USER_RANK);
+    public static UserSummary create(final int id, final String displayName, final String foldingName, final Hardware hardware,
+                                     final Category category, final long points, final long multipliedPoints, final int units,
+                                     final String profileLink, final String liveStatsLink) {
+        return new UserSummary(id, displayName, foldingName, hardware, category.toString(), profileLink, liveStatsLink, points, multipliedPoints,
+            units, DEFAULT_USER_RANK);
     }
 
     /**
@@ -69,6 +73,7 @@ public class UserSummary {
      * @return the updated {@link UserSummary}
      */
     public static UserSummary updateWithRankInTeam(final UserSummary userSummary, final int rankInTeam) {
-        return new UserSummary(userSummary.id, userSummary.displayName, userSummary.foldingName, userSummary.hardware, userSummary.category, userSummary.profileLink, userSummary.liveStatsLink, userSummary.points, userSummary.multipliedPoints, userSummary.units, rankInTeam);
+        return new UserSummary(userSummary.id, userSummary.displayName, userSummary.foldingName, userSummary.hardware, userSummary.category,
+            userSummary.profileLink, userSummary.liveStatsLink, userSummary.points, userSummary.multipliedPoints, userSummary.units, rankInTeam);
     }
 }

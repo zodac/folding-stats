@@ -1,5 +1,30 @@
 package me.zodac.folding.rest.endpoint;
 
+import static me.zodac.folding.api.utils.DateTimeUtils.untilNextMonthUtc;
+import static me.zodac.folding.rest.response.Responses.badGateway;
+import static me.zodac.folding.rest.response.Responses.badRequest;
+import static me.zodac.folding.rest.response.Responses.conflict;
+import static me.zodac.folding.rest.response.Responses.created;
+import static me.zodac.folding.rest.response.Responses.notFound;
+import static me.zodac.folding.rest.response.Responses.nullRequest;
+import static me.zodac.folding.rest.response.Responses.ok;
+import static me.zodac.folding.rest.response.Responses.okBuilder;
+import static me.zodac.folding.rest.response.Responses.serverError;
+import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
+
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import javax.ejb.EJB;
+import javax.ws.rs.core.CacheControl;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.EntityTag;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.RequestPojo;
 import me.zodac.folding.api.ResponsePojo;
@@ -14,32 +39,6 @@ import me.zodac.folding.rest.parse.IntegerParser;
 import me.zodac.folding.rest.parse.ParseResult;
 import me.zodac.folding.rest.response.BatchCreateResponse;
 import org.slf4j.Logger;
-
-import javax.ejb.EJB;
-import javax.ws.rs.core.CacheControl;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.EntityTag;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-
-import static me.zodac.folding.api.utils.DateTimeUtils.untilNextMonthUtc;
-import static me.zodac.folding.rest.response.Responses.badGateway;
-import static me.zodac.folding.rest.response.Responses.badRequest;
-import static me.zodac.folding.rest.response.Responses.conflict;
-import static me.zodac.folding.rest.response.Responses.created;
-import static me.zodac.folding.rest.response.Responses.notFound;
-import static me.zodac.folding.rest.response.Responses.nullRequest;
-import static me.zodac.folding.rest.response.Responses.ok;
-import static me.zodac.folding.rest.response.Responses.okBuilder;
-import static me.zodac.folding.rest.response.Responses.serverError;
-import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
 
 // TODO: [zodac] Decorator around REST methods, so we can catch generic exceptions in a single place?
 abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePojo> {
@@ -72,7 +71,8 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
 
     protected abstract Optional<O> getElementById(final int elementId);
 
-    protected abstract O updateElementById(final int elementId, final O element, final O existingElement) throws NotFoundException, ExternalConnectionException;
+    protected abstract O updateElementById(final int elementId, final O element, final O existingElement)
+        throws NotFoundException, ExternalConnectionException;
 
     protected abstract void deleteElement(final O element);
 
@@ -96,8 +96,8 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
             final O elementWithId = createElement(elementToCreate);
 
             final UriBuilder elementLocationBuilder = uriContext
-                    .getRequestUriBuilder()
-                    .path(String.valueOf(elementWithId.getId()));
+                .getRequestUriBuilder()
+                .path(String.valueOf(elementWithId.getId()));
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             return created(elementWithId, elementLocationBuilder);
         } catch (final ExternalConnectionException e) {
@@ -116,7 +116,8 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
     }
 
     protected Response createBatchOf(final Collection<I> batchOfInputRequests) {
-        getLogger().debug("POST request received to create {} {}s at '{}' with request: {}", batchOfInputRequests.size(), elementType(), uriContext.getAbsolutePath(), batchOfInputRequests);
+        getLogger().debug("POST request received to create {} {}s at '{}' with request: {}", batchOfInputRequests.size(), elementType(),
+            uriContext.getAbsolutePath(), batchOfInputRequests);
 
         if (SystemStateManager.current().isWriteBlocked()) {
             getLogger().warn("System state {} does not allow write requests", SystemStateManager.current());
@@ -162,7 +163,8 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
         }
 
         if (!unsuccessful.isEmpty()) {
-            getLogger().error("{} {}s successfully created, {} {}s unsuccessful", successful.size(), elementType(), unsuccessful.size(), elementType());
+            getLogger()
+                .error("{} {}s successfully created, {} {}s unsuccessful", successful.size(), elementType(), unsuccessful.size(), elementType());
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             return ok(batchCreateResponse);
         }
@@ -298,8 +300,8 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
             final O updatedElementWithId = updateElementById(parsedId, validationResponse.getOutput(), existingElement);
 
             final UriBuilder elementLocationBuilder = uriContext
-                    .getRequestUriBuilder()
-                    .path(String.valueOf(updatedElementWithId.getId()));
+                .getRequestUriBuilder()
+                .path(String.valueOf(updatedElementWithId.getId()));
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             return ok(updatedElementWithId, elementLocationBuilder);
         } catch (final ExternalConnectionException e) {

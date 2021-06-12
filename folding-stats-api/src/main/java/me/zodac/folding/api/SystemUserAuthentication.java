@@ -1,13 +1,12 @@
 package me.zodac.folding.api;
 
+import java.util.Collections;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-
-import java.util.Collections;
-import java.util.Set;
 
 /**
  * POJO defining the authentication response for a system user/password, and the roles for that user if successful.

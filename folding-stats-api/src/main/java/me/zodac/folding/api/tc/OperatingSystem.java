@@ -1,13 +1,13 @@
 package me.zodac.folding.api.tc;
 
+import static java.util.stream.Collectors.toUnmodifiableList;
+
 import java.util.Collection;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toUnmodifiableList;
-
-
 /**
  * Lists the supported operating systems for {@link Hardware} permitted in the <code>Team Competition</code>.
+ *
  * <p>
  * None of these have a user-friendly display name defined, as those will be handled by the frontend.
  */
@@ -29,11 +29,12 @@ public enum OperatingSystem {
     INVALID;
 
     private static final Collection<OperatingSystem> ALL_VALUES = Stream.of(values())
-            .filter(value -> value != INVALID)
-            .collect(toUnmodifiableList());
+        .filter(value -> value != INVALID)
+        .collect(toUnmodifiableList());
 
     /**
      * Retrieve all available {@link OperatingSystem}s (excluding {@link OperatingSystem#INVALID}).
+     *
      * <p>
      * Should be used instead of {@link OperatingSystem#values()}, as that recalculates the array for each call,
      * while this method uses a static {@link Collection}.
@@ -52,9 +53,9 @@ public enum OperatingSystem {
      */
     public static OperatingSystem get(final String input) {
         return ALL_VALUES
-                .stream()
-                .filter(operatingSystem -> operatingSystem.toString().equalsIgnoreCase(input))
-                .findAny()
-                .orElse(OperatingSystem.INVALID);
+            .stream()
+            .filter(operatingSystem -> operatingSystem.toString().equalsIgnoreCase(input))
+            .findAny()
+            .orElse(OperatingSystem.INVALID);
     }
 }

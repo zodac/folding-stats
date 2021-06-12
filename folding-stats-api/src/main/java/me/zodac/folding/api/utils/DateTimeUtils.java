@@ -34,13 +34,14 @@ public final class DateTimeUtils {
         final String nextMonthAsDate = String.format("%s-%02d-01T00:00:00Z", nextMonthYear, nextMonth);
 
         return (int) chronoUnit.between(
-                Instant.now().atZone(ZoneOffset.UTC),
-                Instant.parse(nextMonthAsDate).atZone(ZoneOffset.UTC)
+            Instant.now().atZone(ZoneOffset.UTC),
+            Instant.parse(nextMonthAsDate).atZone(ZoneOffset.UTC)
         );
     }
 
     /**
      * Formats the input {@link Month} with correct capitalisation, based on {@link Locale#UK}.
+     *
      * <p>
      * <b>NOTE:</b> This should only be used for logging. Any values making it to the frontend should be formatted there,
      * otherwise we may end up formatting with the incorrect style.
@@ -64,7 +65,8 @@ public final class DateTimeUtils {
      * @param second the second
      * @return the {@link LocalDateTime}
      */
-    public static LocalDateTime getLocalDateTimeOf(final Year year, final Month month, final int day, final int hour, final int minute, final int second) {
+    public static LocalDateTime getLocalDateTimeOf(final Year year, final Month month, final int day, final int hour, final int minute,
+                                                   final int second) {
         return LocalDateTime.of(year.getValue(), month.getValue(), day, hour, minute, second);
     }
 
@@ -101,9 +103,9 @@ public final class DateTimeUtils {
      */
     public static LocalDateTime toUtcLocalDateTime(final Timestamp timestamp) {
         return timestamp
-                .toInstant()
-                .atOffset(ZoneOffset.UTC)
-                .toLocalDateTime();
+            .toInstant()
+            .atOffset(ZoneOffset.UTC)
+            .toLocalDateTime();
     }
 
     /**

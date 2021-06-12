@@ -1,13 +1,12 @@
 package me.zodac.folding.api.db;
 
+import java.util.Collection;
+import java.util.Optional;
 import me.zodac.folding.api.SystemUserAuthentication;
 import me.zodac.folding.api.exception.DatabaseConnectionException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-
-import java.util.Collection;
-import java.util.Optional;
 
 /**
  * Interface used to interact with the storage backend and perform CRUD operations on:

@@ -1,13 +1,5 @@
 package me.zodac.folding.rest.api.tc.historic;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
@@ -18,6 +10,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * POJO defining historic <code>Team Competition</code> stats (hourly, daily, monthly, etc.) for a {@link me.zodac.folding.api.tc.User}.
@@ -64,10 +63,12 @@ public class HistoricStats {
 
     /**
      * Combines the values of the provided {@link HistoricStats} instances.
+     *
      * <p>
      * Since each {@link me.zodac.folding.api.tc.User} may have stats on different days (meaning one may have stats on the 4th of the month, but
-     * another may not have been added until the 5th), we take the key {@link LocalDateTime} from each {@link HistoricStats} and combine them into a new {@link Map}
-     * with all available {@link LocalDateTime}s as keys.
+     * another may not have been added until the 5th), we take the key {@link LocalDateTime} from each {@link HistoricStats} and combine them into a
+     * new {@link Map} with all available {@link LocalDateTime}s as the {@link Map#keySet()}.
+     *
      * <p>
      * We then iterate over all instances for all users, and whenever one matches a key, we combine the results into a new {@link HistoricStats}
      * instance which is added to the output {@link Map}.
@@ -77,9 +78,9 @@ public class HistoricStats {
      */
     public static Collection<HistoricStats> combine(final Collection<HistoricStats> allStats) {
         final Set<LocalDateTime> keys = allStats.stream()
-                .map(HistoricStats::getDateTime)
-                .sorted()
-                .collect(Collectors.toCollection(TreeSet::new));
+            .map(HistoricStats::getDateTime)
+            .sorted()
+            .collect(Collectors.toCollection(TreeSet::new));
 
         final List<HistoricStats> combinedStats = new ArrayList<>();
 
@@ -87,8 +88,7 @@ public class HistoricStats {
             long combinedPoints = DEFAULT_POINTS;
             long combinedMultipliedPoints = DEFAULT_MULTIPLIED_POINTS;
             int combinedUnits = DEFAULT_UNITS;
-
-
+            
             for (final HistoricStats stats : allStats) {
                 if (stats.dateTime.equals(key)) {
                     combinedPoints += stats.points;

@@ -1,11 +1,10 @@
 package me.zodac.folding.api.tc.stats;
 
+import java.sql.Timestamp;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import me.zodac.folding.api.utils.DateTimeUtils;
-
-import java.sql.Timestamp;
 
 /**
  * POJO that extends {@link UserStats} adding multiplied points for a <code>Team Competition</code>
@@ -77,6 +76,7 @@ public class UserTcStats extends UserStats {
     /**
      * Creates a new instance of {@link UserTcStats} with {@link OffsetStats}. Can be used when retrieving a current
      * {@link me.zodac.folding.api.tc.User}'s {@link UserTcStats} and wanted to make an offset.
+     *
      * <p>
      * In case the {@link OffsetStats} values are greater than the {@link UserTcStats}, the values will not be negative
      * and will be set to <b>0L</b>

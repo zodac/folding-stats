@@ -55,6 +55,7 @@ public class OffsetStats {
      * to be set with either the {@code pointsOffset} or the {@code multipliedPointsOffset} as <b>0L</b>. In some cases,
      * we will still want to calculate the other based on a multiplier. We will do that calculation here, depending on
      * which field is not set.
+     *
      * <p>
      * If both {@code pointsOffset} and {@code multipliedPointsOffset} are set (meaning neither are <b>0L</b>, or the
      * provided {@link OffsetStats} instance is equal to {@link OffsetStats#empty()}, then no changes are made.
@@ -78,7 +79,8 @@ public class OffsetStats {
     }
 
     /**
-     * Checks if the {@link OffsetStats} instance has no offset values for {@code pointsOffset}, {@code multipliedPointsOffset} and {@code unitsOffset}.
+     * Checks if the {@link OffsetStats} instance has no offset values for {@code pointsOffset}, {@code multipliedPointsOffset} and
+     * {@code unitsOffset}.
      *
      * @return <code>true</code> if the {@link OffsetStats} instance is {@link OffsetStats#empty()}
      */

@@ -52,7 +52,7 @@
 
     <build>
         <plugins>
-            <!-- Execute linters (before the tests) -->
+            <!-- Execute linters -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>

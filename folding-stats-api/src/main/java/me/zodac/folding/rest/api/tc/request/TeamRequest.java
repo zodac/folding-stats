@@ -21,7 +21,7 @@ import me.zodac.folding.api.RequestPojo;
 @EqualsAndHashCode
 @ToString(doNotUseGetters = true)
 public class TeamRequest implements RequestPojo {
-    
+
     private String teamName;
     private String teamDescription;
     private String forumLink;

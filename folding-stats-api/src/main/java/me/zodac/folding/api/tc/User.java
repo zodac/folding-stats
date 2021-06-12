@@ -1,5 +1,6 @@
 package me.zodac.folding.api.tc;
 
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,17 +11,18 @@ import me.zodac.folding.api.RequestPojo;
 import me.zodac.folding.api.ResponsePojo;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 
-import java.util.Objects;
-
 
 /**
  * POJO defining a single {@link User} Folding on a username/passkey combination to participate in the
  * <code>Team Competition</code>.
+ *
  * <p>
  * Ideally this username/passkey will only be used on a single piece of {@link Hardware}. Though we cannot verify
  * that externally, we only allow each {@link User} a single {@link Hardware} at a time.
+ *
  * <p>
  * There is a limit on the number of users each team can have, defined by the {@link Category} description.
+ *
  * <p>
  * Each {@link User} can join a {@link Team} in order to have their Folding@Home stats retrieved, and they can
  * contribute to the <code>Team Competition</code>.
@@ -54,6 +56,7 @@ public class User implements ResponsePojo {
 
     /**
      * Creates a {@link User}.
+     *
      * <p>
      * Since the DB auto-generates the ID, this function should be used when creating a {@link User} from the DB response.
      *
@@ -69,7 +72,9 @@ public class User implements ResponsePojo {
      * @param isCaptain       whether the {@link User} is the captain of their {@link Team}
      * @return the created {@link User}
      */
-    public static User create(final int userId, final String foldingUserName, final String displayName, final String passkey, final Category category, final String profileLink, final String liveStatsLink, final Hardware hardware, final Team team, final boolean isCaptain) {
+    public static User create(final int userId, final String foldingUserName, final String displayName, final String passkey, final Category category,
+                              final String profileLink, final String liveStatsLink, final Hardware hardware, final Team team,
+                              final boolean isCaptain) {
         final String profileLinkOrNull = isEmpty(profileLink) ? null : profileLink;
         final String liveStatsLinkOrNull = isEmpty(liveStatsLink) ? null : liveStatsLink;
         return new User(userId, foldingUserName, displayName, passkey, category, profileLinkOrNull, liveStatsLinkOrNull, hardware, team, isCaptain);
@@ -77,6 +82,7 @@ public class User implements ResponsePojo {
 
     /**
      * Creates a {@link User}.
+     *
      * <p>
      * Since we do not know the ID until the DB has persisted the {@link User}, the {@link #EMPTY_USER_ID} will be used instead.
      *
@@ -91,14 +97,18 @@ public class User implements ResponsePojo {
      * @param isCaptain       whether the {@link User} is the captain of their {@link Team}
      * @return the created {@link User}
      */
-    public static User createWithoutId(final String foldingUserName, final String displayName, final String passkey, final Category category, final String profileLink, final String liveStatsLink, final Hardware hardware, final Team team, final boolean isCaptain) {
+    public static User createWithoutId(final String foldingUserName, final String displayName, final String passkey, final Category category,
+                                       final String profileLink, final String liveStatsLink, final Hardware hardware, final Team team,
+                                       final boolean isCaptain) {
         final String profileLinkOrNull = isEmpty(profileLink) ? null : profileLink;
         final String liveStatsLinkOrNull = isEmpty(liveStatsLink) ? null : liveStatsLink;
-        return new User(EMPTY_USER_ID, foldingUserName, displayName, passkey, category, profileLinkOrNull, liveStatsLinkOrNull, hardware, team, isCaptain);
+        return new User(EMPTY_USER_ID, foldingUserName, displayName, passkey, category, profileLinkOrNull, liveStatsLinkOrNull, hardware, team,
+            isCaptain);
     }
 
     /**
      * Updates a {@link User} with the given ID.
+     *
      * <p>
      * Once the {@link User} has been persisted in the DB, we will know its ID. We create a new {@link User} instance with this ID,
      * which can be used to retrieval/referencing later.
@@ -110,11 +120,13 @@ public class User implements ResponsePojo {
     public static User updateWithId(final int userId, final User user) {
         final String profileLink = isEmpty(user.profileLink) ? null : user.profileLink;
         final String liveStatsLink = isEmpty(user.liveStatsLink) ? null : user.liveStatsLink;
-        return new User(userId, user.foldingUserName, user.displayName, user.passkey, user.category, profileLink, liveStatsLink, user.hardware, user.team, user.userIsCaptain);
+        return new User(userId, user.foldingUserName, user.displayName, user.passkey, user.category, profileLink, liveStatsLink, user.hardware,
+            user.team, user.userIsCaptain);
     }
 
     /**
      * Updates a {@link User} with the given {@link Hardware}.
+     *
      * <p>
      * If a {@link Hardware} has been updated, the {@link User} needs its reference updated too.
      *
@@ -122,14 +134,17 @@ public class User implements ResponsePojo {
      * @param hardware the updated {@link Hardware}
      * @return the updated {@link User}
      */
+    // TODO: [zodac] Implement
     public static User updateHardware(final User user, final Hardware hardware) {
         final String profileLink = isEmpty(user.profileLink) ? null : user.profileLink;
         final String liveStatsLink = isEmpty(user.liveStatsLink) ? null : user.liveStatsLink;
-        return new User(user.id, user.foldingUserName, user.displayName, user.passkey, user.category, profileLink, liveStatsLink, hardware, user.team, user.userIsCaptain);
+        return new User(user.id, user.foldingUserName, user.displayName, user.passkey, user.category, profileLink, liveStatsLink, hardware, user.team,
+            user.userIsCaptain);
     }
 
     /**
      * Updates a {@link User} with the given {@link Team}.
+     *
      * <p>
      * If a {@link Team} has been updated, the {@link User} needs its reference updated too.
      *
@@ -141,13 +156,16 @@ public class User implements ResponsePojo {
     public static User updateTeam(final User user, final Team team) {
         final String profileLink = isEmpty(user.profileLink) ? null : user.profileLink;
         final String liveStatsLink = isEmpty(user.liveStatsLink) ? null : user.liveStatsLink;
-        return new User(user.id, user.foldingUserName, user.displayName, user.passkey, user.category, profileLink, liveStatsLink, user.hardware, team, user.userIsCaptain);
+        return new User(user.id, user.foldingUserName, user.displayName, user.passkey, user.category, profileLink, liveStatsLink, user.hardware, team,
+            user.userIsCaptain);
     }
 
     /**
      * Hides the {@code passkey} for the given {@link User}.
+     *
      * <p>
-     * Since we do not want {@link User}s' passkeys to be made available through the REST API, we hide most of the passkey (we leave the first few digits visible).
+     * Since we do not want {@link User}s' passkeys to be made available through the REST API, we hide most of the passkey, though we leave the first
+     * eight (8) digits visible.
      *
      * @param user the {@link User} whose passkey is to be hidden
      * @return the updated {@link User}
@@ -155,7 +173,8 @@ public class User implements ResponsePojo {
     public static User hidePasskey(final User user) {
         final String profileLink = isEmpty(user.profileLink) ? null : user.profileLink;
         final String liveStatsLink = isEmpty(user.liveStatsLink) ? null : user.liveStatsLink;
-        return new User(user.id, user.foldingUserName, user.displayName, hidePasskey(user.passkey), user.category, profileLink, liveStatsLink, user.hardware, user.team, user.userIsCaptain);
+        return new User(user.id, user.foldingUserName, user.displayName, hidePasskey(user.passkey), user.category, profileLink, liveStatsLink,
+            user.hardware, user.team, user.userIsCaptain);
     }
 
     private static String hidePasskey(final String passkey) {
@@ -175,14 +194,14 @@ public class User implements ResponsePojo {
 
         final UserRequest userRequest = (UserRequest) inputRequest;
 
-        return hardware.getId() == userRequest.getHardwareId() &&
-                team.getId() == userRequest.getTeamId() &&
-                userIsCaptain == userRequest.isUserIsCaptain() &&
-                Objects.equals(foldingUserName, userRequest.getFoldingUserName()) &&
-                Objects.equals(displayName, userRequest.getDisplayName()) &&
-                Objects.equals(passkey, userRequest.getPasskey()) &&
-                Objects.equals(category.toString(), userRequest.getCategory()) &&
-                Objects.equals(profileLink, userRequest.getProfileLink()) &&
-                Objects.equals(liveStatsLink, userRequest.getLiveStatsLink());
+        return hardware.getId() == userRequest.getHardwareId()
+            && team.getId() == userRequest.getTeamId()
+            && userIsCaptain == userRequest.isUserIsCaptain()
+            && Objects.equals(foldingUserName, userRequest.getFoldingUserName())
+            && Objects.equals(displayName, userRequest.getDisplayName())
+            && Objects.equals(passkey, userRequest.getPasskey())
+            && Objects.equals(category.toString(), userRequest.getCategory())
+            && Objects.equals(profileLink, userRequest.getProfileLink())
+            && Objects.equals(liveStatsLink, userRequest.getLiveStatsLink());
     }
 }

@@ -1,5 +1,6 @@
 package me.zodac.folding.api.tc;
 
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,11 +11,10 @@ import me.zodac.folding.api.RequestPojo;
 import me.zodac.folding.api.ResponsePojo;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
 
-import java.util.Objects;
-
 /**
- * POJO defining a single {@link Team} participating in the <code>Team Competition</code>. There is a limit on the number of users each team can have, defined by the
- * {@link Category} description.
+ * POJO defining a single {@link Team} participating in the <code>Team Competition</code>. There is a limit on the number of users each team can have,
+ * defined by the {@link Category}.
+ *
  * <p>
  * While each {@link Team} is made up of {@link User}s we do not keep any reference to the {@link User} in this object.
  */
@@ -38,6 +38,7 @@ public class Team implements ResponsePojo {
 
     /**
      * Creates a {@link Team}.
+     *
      * <p>
      * Since the DB auto-generates the ID, this function should be used when creating a {@link Team} from the DB response.
      *
@@ -55,6 +56,7 @@ public class Team implements ResponsePojo {
 
     /**
      * Creates a {@link Team}.
+     *
      * <p>
      * Since we do not know the ID until the DB has persisted the {@link Team}, the {@link #EMPTY_TEAM_ID} will be used instead.
      *
@@ -71,6 +73,7 @@ public class Team implements ResponsePojo {
 
     /**
      * Updates a {@link Team} with the given ID.
+     *
      * <p>
      * Once the {@link Team} has been persisted in the DB, we will know its ID. We create a new {@link Team} instance with this ID,
      * which can be used to retrieval/referencing later.
@@ -96,8 +99,8 @@ public class Team implements ResponsePojo {
         }
 
         final TeamRequest teamRequest = (TeamRequest) inputRequest;
-        return Objects.equals(teamName, teamRequest.getTeamName()) &&
-                Objects.equals(teamDescription, teamRequest.getTeamDescription()) &&
-                Objects.equals(forumLink, teamRequest.getForumLink());
+        return Objects.equals(teamName, teamRequest.getTeamName())
+            && Objects.equals(teamDescription, teamRequest.getTeamDescription())
+            && Objects.equals(forumLink, teamRequest.getForumLink());
     }
 }

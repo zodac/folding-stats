@@ -32,6 +32,7 @@ public class RetiredUserSummary {
 
     /**
      * Creates a {@link RetiredUserSummary}, summarising the stats for a now retired {@link me.zodac.folding.api.tc.User}.
+     *
      * <p>
      * The {@link RetiredUserSummary} is not ranked to begin with, since it is not aware of the other
      * {@link RetiredUserSummary}s or {@link UserSummary}s. The rank can be updated later using
@@ -41,7 +42,8 @@ public class RetiredUserSummary {
      * @return the created {@link RetiredUserSummary}
      */
     public static RetiredUserSummary create(final RetiredUserTcStats retiredUserTcStats) {
-        return new RetiredUserSummary(retiredUserTcStats.getUserId(), retiredUserTcStats.getDisplayName(), retiredUserTcStats.getPoints(), retiredUserTcStats.getMultipliedPoints(), retiredUserTcStats.getUnits(), DEFAULT_USER_RANK);
+        return new RetiredUserSummary(retiredUserTcStats.getUserId(), retiredUserTcStats.getDisplayName(), retiredUserTcStats.getPoints(),
+            retiredUserTcStats.getMultipliedPoints(), retiredUserTcStats.getUnits(), DEFAULT_USER_RANK);
     }
 
     /**
@@ -52,6 +54,7 @@ public class RetiredUserSummary {
      * @return the updated {@link RetiredUserSummary}
      */
     public static RetiredUserSummary updateWithRankInTeam(final RetiredUserSummary retiredUserSummary, final int rankInTeam) {
-        return new RetiredUserSummary(retiredUserSummary.id, retiredUserSummary.displayName, retiredUserSummary.points, retiredUserSummary.multipliedPoints, retiredUserSummary.units, rankInTeam);
+        return new RetiredUserSummary(retiredUserSummary.id, retiredUserSummary.displayName, retiredUserSummary.points,
+            retiredUserSummary.multipliedPoints, retiredUserSummary.units, rankInTeam);
     }
 }
