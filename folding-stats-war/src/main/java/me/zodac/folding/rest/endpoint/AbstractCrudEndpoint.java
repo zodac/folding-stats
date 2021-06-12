@@ -7,8 +7,6 @@ import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.exception.NotFoundException;
-import me.zodac.folding.api.exception.TeamNotFoundException;
-import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.api.validator.ValidationResult;
 import me.zodac.folding.ejb.OldFacade;
@@ -76,7 +74,7 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
 
     protected abstract O updateElementById(final int elementId, final O element, final O existingElement) throws NotFoundException, ExternalConnectionException;
 
-    protected abstract void deleteElementById(final int elementId) throws UserNotFoundException, TeamNotFoundException;
+    protected abstract void deleteElement(final O element);
 
     protected Response create(final I inputRequest) {
         getLogger().debug("POST request received to create {} at '{}' with request: {}", elementType(), uriContext.getAbsolutePath(), inputRequest);
@@ -355,13 +353,9 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
                 return conflict(validationResponse);
             }
 
-            deleteElementById(parsedId);
+            deleteElement(element);
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             return ok();
-        } catch (final NotFoundException e) {
-            getLogger().debug("Error deleting {}, could not find {} with ID {}", elementType(), e.getType(), e.getId(), e);
-            getLogger().error("Error deleting {}, could not find {} with ID {}", elementType(), e.getType(), e.getId());
-            return notFound();
         } catch (final Exception e) {
             getLogger().error("Unexpected error deleting {} with ID: {}", elementType(), elementId, e);
             return serverError();

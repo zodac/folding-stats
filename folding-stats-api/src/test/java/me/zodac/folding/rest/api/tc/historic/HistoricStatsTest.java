@@ -37,7 +37,6 @@ class HistoricStatsTest {
         final HistoricStats expectedFirst = HistoricStats.create(firstDateTime, 600L, 6_000L, 60);
         final HistoricStats expectedThird = HistoricStats.create(thirdDateTime, 200L, 2_000L, 20);
 
-
         final Iterator<HistoricStats> results = result.iterator();
         int count = 1;
 

@@ -5,6 +5,8 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.client.java.request.HistoricStatsRequestSender;
 import me.zodac.folding.client.java.response.HistoricStatsResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
+import me.zodac.folding.rest.api.header.ContentType;
+import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import me.zodac.folding.test.utils.TestConstants;
 import me.zodac.folding.test.utils.TestStats;
@@ -197,11 +199,42 @@ class HistoricTeamStatsTest {
     }
 
     @Test
-    void whenGettingHourlyStats_andInvalidTeamIdIsGiven_thenResponseHasA404Status() throws FoldingRestException {
-        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getHourlyTeamStats(TestConstants.INVALID_ID, Year.parse("2020"), Month.of(4), 12);
+    void whenGettingHourlyStats_givenNonExistingTeamId_thenResponseHasA404Status() throws FoldingRestException {
+        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getHourlyTeamStats(TestConstants.NON_EXISTING_ID, Year.parse("2020"), Month.of(4), 12);
         assertThat(response.statusCode())
                 .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
+    }
+
+    @Test
+    void whenGettingHourlyStats_givenOutOfRangeTeamId_thenResponseHasA400Status() throws FoldingRestException {
+        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getHourlyTeamStats(TestConstants.OUT_OF_RANGE_ID, Year.parse("2020"), Month.of(4), 12);
+        assertThat(response.statusCode())
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+
+        assertThat(response.body())
+                .as("Did not receive valid error message: " + response.body())
+                .contains("out of range");
+    }
+
+    @Test
+    void whenGettingHourlyStats_givenInvalidTeamId_thenResponseHasA400Status() throws IOException, InterruptedException {
+        final HttpRequest request = HttpRequest.newBuilder()
+                .GET()
+                .uri(URI.create(FOLDING_URL + "/historic/teams/" + TestConstants.INVALID_FORMAT_ID + '/' + Year.parse("2020") + '/' + Month.of(4) + '/' + 12))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+                .build();
+
+        final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+
+        assertThat(response.statusCode())
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+
+        assertThat(response.body())
+                .as("Did not receive valid error message: " + response.body())
+                .contains("not a valid format");
     }
 
     @Test
@@ -361,11 +394,42 @@ class HistoricTeamStatsTest {
     }
 
     @Test
-    void whenGettingDailyStats_andInvalidTeamIdIsGiven_thenResponseHasA404Status() throws FoldingRestException {
-        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getDailyTeamStats(TestConstants.INVALID_ID, Year.parse("2020"), Month.of(4));
+    void whenGettingDailyStats_givenNonExistingTeamId_thenResponseHasA404Status() throws FoldingRestException {
+        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getDailyTeamStats(TestConstants.NON_EXISTING_ID, Year.parse("2020"), Month.of(4));
         assertThat(response.statusCode())
                 .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
+    }
+
+    @Test
+    void whenGettingDailyStats_givenOutOfRangeTeamId_thenResponseHasA400Status() throws FoldingRestException {
+        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getDailyTeamStats(TestConstants.OUT_OF_RANGE_ID, Year.parse("2020"), Month.of(4));
+        assertThat(response.statusCode())
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+
+        assertThat(response.body())
+                .as("Did not receive valid error message: " + response.body())
+                .contains("out of range");
+    }
+
+    @Test
+    void whenGettingDailyStats_givenInvalidTeamId_thenResponseHasA400Status() throws IOException, InterruptedException {
+        final HttpRequest request = HttpRequest.newBuilder()
+                .GET()
+                .uri(URI.create(FOLDING_URL + "/historic/teams/" + TestConstants.INVALID_FORMAT_ID + '/' + Year.parse("2020") + '/' + Month.of(4)))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+                .build();
+
+        final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+
+        assertThat(response.statusCode())
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+
+        assertThat(response.body())
+                .as("Did not receive valid error message: " + response.body())
+                .contains("not a valid format");
     }
 
     @Test
@@ -387,7 +451,6 @@ class HistoricTeamStatsTest {
                 .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
-
 
     @Test
     void whenGettingMonthlyStats_andValidTeamIdIsGiven_andAllUsersHaveNoStats_thenNoStatsAreReturned_andResponseHas200Status() throws FoldingRestException {
@@ -534,11 +597,42 @@ class HistoricTeamStatsTest {
     }
 
     @Test
-    void whenGettingMonthlyStats_andInvalidTeamIdIsGiven_thenResponseHasA404Status() throws FoldingRestException {
-        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getMonthlyTeamStats(TestConstants.INVALID_ID, Year.parse("2020"));
+    void whenGettingMonthlyStats_givenNonExistingTeamId_thenResponseHasA404Status() throws FoldingRestException {
+        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getMonthlyTeamStats(TestConstants.NON_EXISTING_ID, Year.parse("2020"));
         assertThat(response.statusCode())
                 .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
+    }
+
+    @Test
+    void whenGettingMonthlyStats_givenOutOfRangeTeamId_thenResponseHasA400Status() throws FoldingRestException {
+        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getMonthlyTeamStats(TestConstants.OUT_OF_RANGE_ID, Year.parse("2020"));
+        assertThat(response.statusCode())
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+
+        assertThat(response.body())
+                .as("Did not receive valid error message: " + response.body())
+                .contains("out of range");
+    }
+
+    @Test
+    void whenGettingMonthlyStats_givenInvalidTeamId_thenResponseHasA400Status() throws IOException, InterruptedException {
+        final HttpRequest request = HttpRequest.newBuilder()
+                .GET()
+                .uri(URI.create(FOLDING_URL + "/historic/teams/" + TestConstants.INVALID_FORMAT_ID + '/' + Year.parse("2020")))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+                .build();
+
+        final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+
+        assertThat(response.statusCode())
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+
+        assertThat(response.body())
+                .as("Did not receive valid error message: " + response.body())
+                .contains("not a valid format");
     }
 
     @Test

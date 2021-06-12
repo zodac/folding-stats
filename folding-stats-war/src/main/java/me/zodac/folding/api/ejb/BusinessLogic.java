@@ -40,9 +40,9 @@ public interface BusinessLogic {
     /**
      * Deletes a {@link Hardware}.
      *
-     * @param hardwareId the ID of the {@link Hardware} to retrieve
+     * @param hardware the {@link Hardware} to delete
      */
-    void deleteHardware(final int hardwareId);
+    void deleteHardware(final Hardware hardware);
 
 
     // Complex CRUD

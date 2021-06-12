@@ -4,6 +4,8 @@ import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.OperatingSystem;
 import me.zodac.folding.client.java.response.HardwareResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
+import me.zodac.folding.rest.api.header.ContentType;
+import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 import me.zodac.folding.test.utils.TestConstants;
@@ -33,6 +35,7 @@ import static me.zodac.folding.test.utils.TestAuthenticationData.INVALID_PASSWOR
 import static me.zodac.folding.test.utils.TestAuthenticationData.INVALID_USERNAME;
 import static me.zodac.folding.test.utils.TestAuthenticationData.READ_ONLY_USER;
 import static me.zodac.folding.test.utils.TestConstants.FOLDING_URL;
+import static me.zodac.folding.test.utils.TestConstants.GSON;
 import static me.zodac.folding.test.utils.TestConstants.HTTP_CLIENT;
 import static me.zodac.folding.test.utils.TestGenerator.generateHardware;
 import static me.zodac.folding.test.utils.rest.request.HardwareUtils.HARDWARE_REQUEST_SENDER;
@@ -196,7 +199,7 @@ class HardwareTest {
 
     @Test
     void whenGettingHardware_givenANonExistingHardwareId_thenNoJsonResponseIsReturned_andHasA404Status() throws FoldingRestException {
-        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get(TestConstants.INVALID_ID);
+        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get(TestConstants.NON_EXISTING_ID);
 
         assertThat(response.statusCode())
                 .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
@@ -205,12 +208,43 @@ class HardwareTest {
         assertThat(response.body())
                 .as("Did not receive an empty JSON response: " + response.body())
                 .isEmpty();
+    }
+
+    @Test
+    void whenGettingHardware_givenAnOutOfRangeHardwareId_thenResponseHasA400Status() throws FoldingRestException {
+        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get(TestConstants.OUT_OF_RANGE_ID);
+
+        assertThat(response.statusCode())
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+
+        assertThat(response.body())
+                .as("Did not receive valid error message: " + response.body())
+                .contains("out of range");
+    }
+
+    @Test
+    void whenGettingHardware_givenAnInvalidHardwareId_thenResponseHasA400Status() throws IOException, InterruptedException {
+        final HttpRequest request = HttpRequest.newBuilder()
+                .GET()
+                .uri(URI.create(FOLDING_URL + "/hardware/" + TestConstants.INVALID_FORMAT_ID))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+                .build();
+
+        final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+        assertThat(response.statusCode())
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+
+        assertThat(response.body())
+                .as("Did not receive valid error message: " + response.body())
+                .contains("not a valid format");
     }
 
     @Test
     void whenUpdatingHardware_givenANonExistingHardwareId_thenNoJsonResponseIsReturned_andHasA404Status() throws FoldingRestException {
         final HardwareRequest updatedHardware = generateHardware();
-        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.update(TestConstants.INVALID_ID, updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
+        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.update(TestConstants.NON_EXISTING_ID, updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
                 .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
@@ -221,12 +255,81 @@ class HardwareTest {
     }
 
     @Test
+    void whenUpdatingHardware_givenAnOutOfRangeHardwareId_thenResponseHasA400Status() throws FoldingRestException {
+        final HardwareRequest updatedHardware = generateHardware();
+        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.update(TestConstants.OUT_OF_RANGE_ID, updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
+        assertThat(response.statusCode())
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+
+        assertThat(response.body())
+                .as("Did not receive valid error message: " + response.body())
+                .contains("out of range");
+    }
+
+    @Test
+    void whenUpdatingHardware_givenAnInvalidHardwareId_thenResponseHasA400Status() throws IOException, InterruptedException, FoldingRestException {
+        final Hardware createdHardware = create(generateHardware());
+
+        final HardwareRequest updatedHardware = HardwareRequest.builder()
+                .hardwareName(createdHardware.getHardwareName())
+                .displayName(createdHardware.getDisplayName())
+                .operatingSystem(OperatingSystem.LINUX.toString())
+                .multiplier(createdHardware.getMultiplier())
+                .build();
+
+        final HttpRequest request = HttpRequest.newBuilder()
+                .PUT(HttpRequest.BodyPublishers.ofString(GSON.toJson(updatedHardware)))
+                .uri(URI.create(FOLDING_URL + "/hardware/" + TestConstants.INVALID_FORMAT_ID))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+                .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
+                .build();
+
+        final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+        assertThat(response.statusCode())
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+
+        assertThat(response.body())
+                .as("Did not receive valid error message: " + response.body())
+                .contains("not a valid format");
+    }
+
+    @Test
     void whenDeletingHardware_givenANonExistingHardwareId_thenResponseHasA404Status() throws FoldingRestException {
-        final HttpResponse<Void> response = HARDWARE_REQUEST_SENDER.delete(TestConstants.INVALID_ID, ADMIN_USER.userName(), ADMIN_USER.password());
+        final HttpResponse<Void> response = HARDWARE_REQUEST_SENDER.delete(TestConstants.NON_EXISTING_ID, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(response.statusCode())
                 .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
+    }
+
+    @Test
+    void whenDeletingHardware_givenAnOutOfRangeHardwareId_thenResponseHasA400Status() throws FoldingRestException {
+        final HttpResponse<Void> response = HARDWARE_REQUEST_SENDER.delete(TestConstants.OUT_OF_RANGE_ID, ADMIN_USER.userName(), ADMIN_USER.password());
+
+        assertThat(response.statusCode())
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+    }
+
+    @Test
+    void whenDeletingHardware_givenAnInvalidHardwareId_thenResponseHasA400Status() throws IOException, InterruptedException {
+        final HttpRequest request = HttpRequest.newBuilder()
+                .DELETE()
+                .uri(URI.create(FOLDING_URL + "/hardware/" + TestConstants.INVALID_FORMAT_ID))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+                .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
+                .build();
+
+        final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+        assertThat(response.statusCode())
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+
+        assertThat(response.body())
+                .as("Did not receive valid error message: " + response.body())
+                .contains("not a valid format");
     }
 
     @Test

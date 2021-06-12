@@ -15,7 +15,7 @@ public final class UserCache extends AbstractCache<User> {
         return "user";
     }
 
-    public static UserCache get() {
+    public static UserCache getInstance() {
         return INSTANCE;
     }
 }

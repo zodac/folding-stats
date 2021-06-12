@@ -6,6 +6,8 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.client.java.response.TeamCompetitionResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
+import me.zodac.folding.rest.api.header.ContentType;
+import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.tc.CompetitionSummary;
 import me.zodac.folding.rest.api.tc.RetiredUserSummary;
 import me.zodac.folding.rest.api.tc.TeamSummary;
@@ -800,11 +802,42 @@ class TeamCompetitionStatsTest {
     }
 
     @Test
-    void whenGettingStatsForUser_andUserDoesNotExist_thenResponseHasA404Status() throws FoldingRestException {
-        final HttpResponse<String> response = TEAM_COMPETITION_REQUEST_SENDER.getStatsForUser(TestConstants.INVALID_ID);
+    void whenGettingStatsForUser_givenNonExistingUserId_thenResponseHasA404Status() throws FoldingRestException {
+        final HttpResponse<String> response = TEAM_COMPETITION_REQUEST_SENDER.getStatsForUser(TestConstants.NON_EXISTING_ID);
         assertThat(response.statusCode())
                 .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
+    }
+
+    @Test
+    void whenGettingStatsForUser_givenOutOfRangeUserId_thenResponseHasA400Status() throws FoldingRestException {
+        final HttpResponse<String> response = TEAM_COMPETITION_REQUEST_SENDER.getStatsForUser(TestConstants.OUT_OF_RANGE_ID);
+
+        assertThat(response.statusCode())
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+
+        assertThat(response.body())
+                .as("Did not receive valid error message: " + response.body())
+                .contains("out of range");
+    }
+
+    @Test
+    void whenGettingStatsForUser_givenAnInvalidUserId_thenResponseHasA400Status() throws IOException, InterruptedException {
+        final HttpRequest request = HttpRequest.newBuilder()
+                .GET()
+                .uri(URI.create(FOLDING_URL + "/stats/users/" + TestConstants.INVALID_FORMAT_ID))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+                .build();
+
+        final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+        assertThat(response.statusCode())
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+
+        assertThat(response.body())
+                .as("Did not receive valid error message: " + response.body())
+                .contains("not a valid format");
     }
 
     @Test
@@ -820,11 +853,34 @@ class TeamCompetitionStatsTest {
     }
 
     @Test
-    void whenPatchingAUserWithPointsOffsets_AndUserDoesNotExist_thenResponseHasA404Status() throws FoldingRestException {
-        final HttpResponse<Void> patchResponse = TEAM_COMPETITION_REQUEST_SENDER.offset(TestConstants.INVALID_ID, 100L, 1_000L, 10, ADMIN_USER.userName(), ADMIN_USER.password());
-        assertThat(patchResponse.statusCode())
-                .as("Was able to patch user, was expected user to not be found: " + patchResponse.body())
+    void whenPatchingAUserWithPointsOffsets_givenNonExistingUserId_thenResponseHasA404Status() throws FoldingRestException {
+        final HttpResponse<Void> response = TEAM_COMPETITION_REQUEST_SENDER.offset(TestConstants.NON_EXISTING_ID, 100L, 1_000L, 10, ADMIN_USER.userName(), ADMIN_USER.password());
+        assertThat(response.statusCode())
+                .as("Was able to patch user, was expected user to not be found: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
+    }
+
+    @Test
+    void whenPatchingAUserWithPointsOffsets_givenOutOfRangeUserId_thenResponseHasA400Status() throws FoldingRestException {
+        final HttpResponse<Void> response = TEAM_COMPETITION_REQUEST_SENDER.offset(TestConstants.OUT_OF_RANGE_ID, 100L, 1_000L, 10, ADMIN_USER.userName(), ADMIN_USER.password());
+        assertThat(response.statusCode())
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+    }
+
+    @Test
+    void whenPatchingAUserWithPointsOffsets_givenAnInvalidUserId_thenResponseHasA400Status() throws IOException, InterruptedException {
+        final HttpRequest request = HttpRequest.newBuilder()
+                .method("PATCH", HttpRequest.BodyPublishers.noBody())
+                .uri(URI.create(FOLDING_URL + "/stats/users/" + TestConstants.INVALID_FORMAT_ID))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+                .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
+                .build();
+
+        final HttpResponse<Void> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
+        assertThat(response.statusCode())
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
     @Test

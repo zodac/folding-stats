@@ -40,8 +40,8 @@ public class BusinessLogicEjb implements BusinessLogic {
     }
 
     @Override
-    public void deleteHardware(final int hardwareId) {
-        STORAGE.deleteHardware(hardwareId);
+    public void deleteHardware(final Hardware hardware) {
+        STORAGE.deleteHardware(hardware.getId());
     }
 
     // Complex CRUD

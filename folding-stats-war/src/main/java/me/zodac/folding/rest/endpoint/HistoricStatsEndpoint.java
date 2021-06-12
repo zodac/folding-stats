@@ -7,6 +7,8 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
+import me.zodac.folding.rest.parse.IntegerParser;
+import me.zodac.folding.rest.parse.ParseResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,7 +74,6 @@ public class HistoricStatsEndpoint {
             final int dayAsInt = Integer.parseInt(day);
             final int monthAsInt = Integer.parseInt(month);
             final int yearAsInt = Year.parse(year).getValue();
-            oldFacade.getUser(Integer.parseInt(userId)); // Check if user exists first, catch UserNotFoundException early
 
             final YearMonth date = YearMonth.of(yearAsInt, monthAsInt);
             if (!date.isValidDay(dayAsInt)) {
@@ -81,7 +82,24 @@ public class HistoricStatsEndpoint {
                 return badRequest(errorMessage);
             }
 
-            final Collection<HistoricStats> hourlyStats = oldFacade.getHistoricStatsHourly(Integer.parseInt(userId), Integer.parseInt(day), Month.of(Integer.parseInt(month)), Year.parse(year));
+
+            final ParseResult parseResult = IntegerParser.parsePositive(userId);
+            if (parseResult.isBadFormat()) {
+                final String errorMessage = String.format("The user ID '%s' is not a valid format", userId);
+                LOGGER.error(errorMessage);
+                return badRequest(errorMessage);
+            } else if (parseResult.isOutOfRange()) {
+                final String errorMessage = String.format("The user ID '%s' is out of range", userId);
+                LOGGER.error(errorMessage);
+                return badRequest(errorMessage);
+            }
+            final int parsedId = parseResult.getId();
+
+
+            oldFacade.getUser(parsedId); // Check if user exists first, catch UserNotFoundException early
+
+
+            final Collection<HistoricStats> hourlyStats = oldFacade.getHistoricStatsHourly(parsedId, Integer.parseInt(day), Month.of(Integer.parseInt(month)), Year.parse(year));
 
             final CacheControl cacheControl = new CacheControl();
             cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);
@@ -135,8 +153,20 @@ public class HistoricStatsEndpoint {
         }
 
         try {
-            oldFacade.getUser(Integer.parseInt(userId)); // Check if user exists first, catch UserNotFoundException early
-            final Collection<HistoricStats> dailyStats = oldFacade.getHistoricStatsDaily(Integer.parseInt(userId), Month.of(Integer.parseInt(month)), Year.parse(year));
+            final ParseResult parseResult = IntegerParser.parsePositive(userId);
+            if (parseResult.isBadFormat()) {
+                final String errorMessage = String.format("The user ID '%s' is not a valid format", userId);
+                LOGGER.error(errorMessage);
+                return badRequest(errorMessage);
+            } else if (parseResult.isOutOfRange()) {
+                final String errorMessage = String.format("The user ID '%s' is out of range", userId);
+                LOGGER.error(errorMessage);
+                return badRequest(errorMessage);
+            }
+            final int parsedId = parseResult.getId();
+
+            oldFacade.getUser(parsedId); // Check if user exists first, catch UserNotFoundException early
+            final Collection<HistoricStats> dailyStats = oldFacade.getHistoricStatsDaily(parsedId, Month.of(Integer.parseInt(month)), Year.parse(year));
 
             final CacheControl cacheControl = new CacheControl();
             cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);
@@ -185,10 +215,20 @@ public class HistoricStatsEndpoint {
         }
 
         try {
-            oldFacade.getUser(Integer.parseInt(userId)); // Check if user exists first, catch UserNotFoundException early
-            final Collection<HistoricStats> monthlyStats = oldFacade.getHistoricStatsMonthly(Integer.parseInt(userId), Year.parse(year));
+            final ParseResult parseResult = IntegerParser.parsePositive(userId);
+            if (parseResult.isBadFormat()) {
+                final String errorMessage = String.format("The user ID '%s' is not a valid format", userId);
+                LOGGER.error(errorMessage);
+                return badRequest(errorMessage);
+            } else if (parseResult.isOutOfRange()) {
+                final String errorMessage = String.format("The user ID '%s' is out of range", userId);
+                LOGGER.error(errorMessage);
+                return badRequest(errorMessage);
+            }
+            final int parsedId = parseResult.getId();
 
-            LOGGER.info("Found(final): {}", monthlyStats);
+            oldFacade.getUser(parsedId); // Check if user exists first, catch UserNotFoundException early
+            final Collection<HistoricStats> monthlyStats = oldFacade.getHistoricStatsMonthly(parsedId, Year.parse(year));
 
             final CacheControl cacheControl = new CacheControl();
             cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);
@@ -236,7 +276,6 @@ public class HistoricStatsEndpoint {
             final int monthAsInt = Integer.parseInt(month);
             final int yearAsInt = Year.parse(year).getValue();
 
-
             final YearMonth date = YearMonth.of(yearAsInt, monthAsInt);
             if (!date.isValidDay(dayAsInt)) {
                 final String errorMessage = String.format("The day '%s' is not a valid day for %s/%s", day, year, month);
@@ -244,9 +283,21 @@ public class HistoricStatsEndpoint {
                 return badRequest(errorMessage);
             }
 
-            final Team team = oldFacade.getTeam(Integer.parseInt(teamId));
-            final List<HistoricStats> teamHourlyStats = new ArrayList<>();
+            final ParseResult parseResult = IntegerParser.parsePositive(teamId);
+            if (parseResult.isBadFormat()) {
+                final String errorMessage = String.format("The team ID '%s' is not a valid format", teamId);
+                LOGGER.error(errorMessage);
+                return badRequest(errorMessage);
+            } else if (parseResult.isOutOfRange()) {
+                final String errorMessage = String.format("The team ID '%s' is out of range", teamId);
+                LOGGER.error(errorMessage);
+                return badRequest(errorMessage);
+            }
+            final int parsedId = parseResult.getId();
+
+            final Team team = oldFacade.getTeam(parsedId);
             final Collection<User> teamUsers = oldFacade.getUsersOnTeam(team);
+            final List<HistoricStats> teamHourlyStats = new ArrayList<>(teamUsers.size());
 
             for (final User user : teamUsers) {
                 LOGGER.debug("Getting historic stats for user with ID: {}", user.getId());
@@ -308,9 +359,21 @@ public class HistoricStatsEndpoint {
         }
 
         try {
-            final Team team = oldFacade.getTeam(Integer.parseInt(teamId));
-            final List<HistoricStats> teamDailyStats = new ArrayList<>();
+            final ParseResult parseResult = IntegerParser.parsePositive(teamId);
+            if (parseResult.isBadFormat()) {
+                final String errorMessage = String.format("The team ID '%s' is not a valid format", teamId);
+                LOGGER.error(errorMessage);
+                return badRequest(errorMessage);
+            } else if (parseResult.isOutOfRange()) {
+                final String errorMessage = String.format("The team ID '%s' is out of range", teamId);
+                LOGGER.error(errorMessage);
+                return badRequest(errorMessage);
+            }
+            final int parsedId = parseResult.getId();
+
+            final Team team = oldFacade.getTeam(parsedId);
             final Collection<User> teamUsers = oldFacade.getUsersOnTeam(team);
+            final List<HistoricStats> teamDailyStats = new ArrayList<>(teamUsers.size());
 
             for (final User user : teamUsers) {
                 LOGGER.debug("Getting historic stats for user with ID: {}", user.getId());
@@ -367,9 +430,21 @@ public class HistoricStatsEndpoint {
         }
 
         try {
-            final Team team = oldFacade.getTeam(Integer.parseInt(teamId));
-            final List<HistoricStats> teamMonthlyStats = new ArrayList<>();
+            final ParseResult parseResult = IntegerParser.parsePositive(teamId);
+            if (parseResult.isBadFormat()) {
+                final String errorMessage = String.format("The team ID '%s' is not a valid format", teamId);
+                LOGGER.error(errorMessage);
+                return badRequest(errorMessage);
+            } else if (parseResult.isOutOfRange()) {
+                final String errorMessage = String.format("The team ID '%s' is out of range", teamId);
+                LOGGER.error(errorMessage);
+                return badRequest(errorMessage);
+            }
+            final int parsedId = parseResult.getId();
+
+            final Team team = oldFacade.getTeam(parsedId);
             final Collection<User> teamUsers = oldFacade.getUsersOnTeam(team);
+            final List<HistoricStats> teamMonthlyStats = new ArrayList<>(teamUsers.size());
 
             for (final User user : teamUsers) {
                 LOGGER.debug("Getting historic stats for user with ID: {}", user.getId());

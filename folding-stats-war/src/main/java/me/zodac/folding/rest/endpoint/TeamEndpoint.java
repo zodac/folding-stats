@@ -149,7 +149,7 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
     }
 
     @Override
-    protected void deleteElementById(final int teamId) {
-        oldFacade.deleteTeam(teamId);
+    protected void deleteElement(final Team team) {
+        oldFacade.deleteTeam(team);
     }
 }

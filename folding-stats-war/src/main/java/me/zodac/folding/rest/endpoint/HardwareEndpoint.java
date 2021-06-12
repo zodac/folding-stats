@@ -137,7 +137,7 @@ public class HardwareEndpoint extends AbstractCrudEndpoint<HardwareRequest, Hard
     }
 
     @Override
-    protected void deleteElementById(final int hardwareId) {
-        businessLogic.deleteHardware(hardwareId);
+    protected void deleteElement(final Hardware hardware) {
+        businessLogic.deleteHardware(hardware);
     }
 }

@@ -31,7 +31,7 @@ final class Storage {
     private static final Storage INSTANCE = new Storage();
 
     private transient final HardwareCache hardwareCache = HardwareCache.getInstance();
-    private transient final UserCache userCache = UserCache.get();
+    private transient final UserCache userCache = UserCache.getInstance();
 
     private Storage() {
 
@@ -119,7 +119,7 @@ final class Storage {
      * <p>
      * Deletes it with the {@link DbManager}, then removes it to the {@link HardwareCache}.
      *
-     * @param hardwareId the ID of the {@link Hardware} to retrieve
+     * @param hardwareId the ID of the {@link Hardware} to delete
      * @see DbManager#deleteHardware(int)
      */
     public void deleteHardware(final int hardwareId) {

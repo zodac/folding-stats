@@ -51,7 +51,7 @@ public class OldFacade {
 
     private transient final DbManager dbManager = DbManagerRetriever.get();
     private transient final TeamCache teamCache = TeamCache.get();
-    private transient final UserCache userCache = UserCache.get();
+    private transient final UserCache userCache = UserCache.getInstance();
     private transient final HardwareCache hardwareCache = HardwareCache.getInstance();
 
     private transient final InitialStatsCache initialStatsCache = InitialStatsCache.get();
@@ -75,7 +75,7 @@ public class OldFacade {
         final boolean isHardwareMultiplierChange = existingHardware.getMultiplier() != updatedHardware.getMultiplier();
 
         for (final User user : usersUsingThisHardware) {
-            UserCache.get().remove(user.getId()); // TODO: Don't use cache directly, use Storage#evictUserFromCache()
+            UserCache.getInstance().remove(user.getId()); // TODO: Don't use cache directly, use Storage#evictUserFromCache()
 
             if (isHardwareMultiplierChange) {
                 LOGGER.debug("User {} had state change to hardware multiplier", user.getFoldingUserName());
@@ -203,27 +203,21 @@ public class OldFacade {
         addOffsetStats(userWithStateChange.getId(), offsetStats);
     }
 
-    public void deleteUser(final int userId) {
-        try {
-            final User user = getUser(userId);
+    public void deleteUser(final User user) {
+        final int userId = user.getId();
+        dbManager.deleteUser(userId);
+        userCache.remove(userId);
 
-            dbManager.deleteUser(userId);
-            userCache.remove(userId);
+        final UserTcStats userStats = getTcStatsForUser(userId);
 
-            final UserTcStats userStats = getTcStatsForUser(userId);
-
-            if (userStats.isEmpty()) {
-                LOGGER.warn("User '{}' has no stats, not saving any retired stats", user.getDisplayName());
-                return;
-            }
-
-            final Team team = user.getTeam();
-            final int retiredUserId = dbManager.persistRetiredUserStats(team.getId(), user.getId(), user.getDisplayName(), userStats);
-            retiredStatsCache.add(RetiredUserTcStats.create(retiredUserId, team.getId(), user.getDisplayName(), userStats));
-        } catch (final UserNotFoundException e) {
-            LOGGER.debug("Error getting final stats for deleted user with ID: {}", userId, e);
-            LOGGER.warn("Error getting final stats for deleted user with ID: {}", userId);
+        if (userStats.isEmpty()) {
+            LOGGER.warn("User '{}' has no stats, not saving any retired stats", user.getDisplayName());
+            return;
         }
+
+        final Team team = user.getTeam();
+        final int retiredUserId = dbManager.persistRetiredUserStats(team.getId(), user.getId(), user.getDisplayName(), userStats);
+        retiredStatsCache.add(RetiredUserTcStats.create(retiredUserId, team.getId(), user.getDisplayName(), userStats));
     }
 
     public Team createTeam(final Team team) {
@@ -267,9 +261,9 @@ public class OldFacade {
         teamCache.add(team);
     }
 
-    public void deleteTeam(final int teamId) {
-        dbManager.deleteTeam(teamId);
-        teamCache.remove(teamId);
+    public void deleteTeam(final Team team) {
+        dbManager.deleteTeam(team.getId());
+        teamCache.remove(team.getId());
     }
 
     public void persistInitialUserStats(final User user) throws ExternalConnectionException {

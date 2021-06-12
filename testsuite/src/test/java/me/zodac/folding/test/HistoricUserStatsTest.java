@@ -3,6 +3,8 @@ package me.zodac.folding.test;
 import me.zodac.folding.client.java.request.HistoricStatsRequestSender;
 import me.zodac.folding.client.java.response.HistoricStatsResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
+import me.zodac.folding.rest.api.header.ContentType;
+import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import me.zodac.folding.test.utils.TestConstants;
 import me.zodac.folding.test.utils.TestGenerator;
@@ -153,11 +155,42 @@ class HistoricUserStatsTest {
     }
 
     @Test
-    void whenGettingHourlyStats_andInvalidUserIdIsGiven_thenResponseHasA404Status() throws FoldingRestException {
-        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getHourlyUserStats(TestConstants.INVALID_ID, Year.parse("2020"), Month.of(4), 12);
+    void whenGettingHourlyStats_givenNonExistingUserId_thenResponseHasA404Status() throws FoldingRestException {
+        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getHourlyUserStats(TestConstants.NON_EXISTING_ID, Year.parse("2020"), Month.of(4), 12);
         assertThat(response.statusCode())
                 .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
+    }
+
+    @Test
+    void whenGettingHourlyStats_givenOutOfRangeUserId_thenResponseHasA400Status() throws FoldingRestException {
+        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getHourlyUserStats(TestConstants.OUT_OF_RANGE_ID, Year.parse("2020"), Month.of(4), 12);
+        assertThat(response.statusCode())
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+
+        assertThat(response.body())
+                .as("Did not receive valid error message: " + response.body())
+                .contains("out of range");
+    }
+
+    @Test
+    void whenGettingHourlyStats_givenInvalidUserId_thenResponseHasA400Status() throws IOException, InterruptedException {
+        final HttpRequest request = HttpRequest.newBuilder()
+                .GET()
+                .uri(URI.create(FOLDING_URL + "/historic/users/" + TestConstants.INVALID_FORMAT_ID + '/' + Year.parse("2020") + '/' + Month.of(4) + '/' + 12))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+                .build();
+
+        final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+
+        assertThat(response.statusCode())
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+
+        assertThat(response.body())
+                .as("Did not receive valid error message: " + response.body())
+                .contains("not a valid format");
     }
 
     @Test
@@ -280,11 +313,42 @@ class HistoricUserStatsTest {
     }
 
     @Test
-    void whenGettingDailyStats_andInvalidUserIdIsGiven_thenResponseHasA404Status() throws FoldingRestException {
-        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getDailyUserStats(TestConstants.INVALID_ID, Year.parse("2020"), Month.of(4));
+    void whenGettingDailyStats_givenNonExistingUserId_thenResponseHasA404Status() throws FoldingRestException {
+        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getDailyUserStats(TestConstants.NON_EXISTING_ID, Year.parse("2020"), Month.of(4));
         assertThat(response.statusCode())
                 .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
+    }
+
+    @Test
+    void whenGettingDailyStats_givenOutOfRangeUserId_thenResponseHasA400Status() throws FoldingRestException {
+        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getDailyUserStats(TestConstants.OUT_OF_RANGE_ID, Year.parse("2020"), Month.of(4));
+        assertThat(response.statusCode())
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+
+        assertThat(response.body())
+                .as("Did not receive valid error message: " + response.body())
+                .contains("out of range");
+    }
+
+    @Test
+    void whenGettingDailyStats_givenInvalidUserId_thenResponseHasA400Status() throws IOException, InterruptedException {
+        final HttpRequest request = HttpRequest.newBuilder()
+                .GET()
+                .uri(URI.create(FOLDING_URL + "/historic/users/" + TestConstants.INVALID_FORMAT_ID + '/' + Year.parse("2020") + '/' + Month.of(4)))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+                .build();
+
+        final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+
+        assertThat(response.statusCode())
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+
+        assertThat(response.body())
+                .as("Did not receive valid error message: " + response.body())
+                .contains("not a valid format");
     }
 
     @Test
@@ -416,11 +480,42 @@ class HistoricUserStatsTest {
     }
 
     @Test
-    void whenGettingMonthlyStats_andInvalidUserIdIsGiven_thenResponseHasA404Status() throws FoldingRestException {
-        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getMonthlyUserStats(TestConstants.INVALID_ID, Year.parse("2020"));
+    void whenGettingMonthlyStats_givenNonExistingUserId_thenResponseHasA404Status() throws FoldingRestException {
+        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getMonthlyUserStats(TestConstants.NON_EXISTING_ID, Year.parse("2020"));
         assertThat(response.statusCode())
                 .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
+    }
+
+    @Test
+    void whenGettingMonthlyStats_givenOutOfRangeUserId_thenResponseHasA400Status() throws FoldingRestException {
+        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getMonthlyUserStats(TestConstants.OUT_OF_RANGE_ID, Year.parse("2020"));
+        assertThat(response.statusCode())
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+
+        assertThat(response.body())
+                .as("Did not receive valid error message: " + response.body())
+                .contains("out of range");
+    }
+
+    @Test
+    void whenGettingMonthlyStats_givenInvalidUserId_thenResponseHasA400Status() throws IOException, InterruptedException {
+        final HttpRequest request = HttpRequest.newBuilder()
+                .GET()
+                .uri(URI.create(FOLDING_URL + "/historic/users/" + TestConstants.INVALID_FORMAT_ID + '/' + Year.parse("2020")))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+                .build();
+
+        final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+
+        assertThat(response.statusCode())
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+
+        assertThat(response.body())
+                .as("Did not receive valid error message: " + response.body())
+                .contains("not a valid format");
     }
 
     @Test

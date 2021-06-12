@@ -3,6 +3,8 @@ package me.zodac.folding.test;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.client.java.response.TeamResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
+import me.zodac.folding.rest.api.header.ContentType;
+import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
 import me.zodac.folding.test.utils.TestConstants;
 import me.zodac.folding.test.utils.TestGenerator;
@@ -31,6 +33,7 @@ import static me.zodac.folding.test.utils.TestAuthenticationData.INVALID_PASSWOR
 import static me.zodac.folding.test.utils.TestAuthenticationData.INVALID_USERNAME;
 import static me.zodac.folding.test.utils.TestAuthenticationData.READ_ONLY_USER;
 import static me.zodac.folding.test.utils.TestConstants.FOLDING_URL;
+import static me.zodac.folding.test.utils.TestConstants.GSON;
 import static me.zodac.folding.test.utils.TestConstants.HTTP_CLIENT;
 import static me.zodac.folding.test.utils.TestGenerator.generateInvalidTeam;
 import static me.zodac.folding.test.utils.TestGenerator.generateTeam;
@@ -209,7 +212,7 @@ class TeamTest {
 
     @Test
     void whenGettingTeam_givenANonExistingTeamId_thenNoJsonResponseIsReturned_andHasA404Status() throws FoldingRestException {
-        final HttpResponse<String> response = TEAM_REQUEST_SENDER.get(TestConstants.INVALID_ID);
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.get(TestConstants.NON_EXISTING_ID);
 
         assertThat(response.statusCode())
                 .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
@@ -218,13 +221,44 @@ class TeamTest {
         assertThat(response.body())
                 .as("Did not receive an empty JSON response: " + response.body())
                 .isEmpty();
+    }
+
+    @Test
+    void whenGettingTeam_givenAnOutOfRangeTeamId_thenResponseHasA400Status() throws FoldingRestException {
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.get(TestConstants.OUT_OF_RANGE_ID);
+
+        assertThat(response.statusCode())
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+
+        assertThat(response.body())
+                .as("Did not receive valid error message: " + response.body())
+                .contains("out of range");
+    }
+
+    @Test
+    void whenGettingTeam_givenAnInvalidTeamId_thenResponseHasA400Status() throws IOException, InterruptedException {
+        final HttpRequest request = HttpRequest.newBuilder()
+                .GET()
+                .uri(URI.create(FOLDING_URL + "/teams/" + TestConstants.INVALID_FORMAT_ID))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+                .build();
+
+        final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+        assertThat(response.statusCode())
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+
+        assertThat(response.body())
+                .as("Did not receive valid error message: " + response.body())
+                .contains("not a valid format");
     }
 
     @Test
     void whenUpdatingTeam_givenANonExistingTeamId_thenNoJsonResponseIsReturned_andHasA404Status() throws FoldingRestException {
         final TeamRequest updatedTeam = generateTeam();
 
-        final HttpResponse<String> response = TEAM_REQUEST_SENDER.update(TestConstants.INVALID_ID, updatedTeam, ADMIN_USER.userName(), ADMIN_USER.password());
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.update(TestConstants.NON_EXISTING_ID, updatedTeam, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
                 .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
@@ -235,12 +269,77 @@ class TeamTest {
     }
 
     @Test
+    void whenUpdatingTeam_givenAnOutOfRangeTeamId_thenResponseHasA400Status() throws FoldingRestException {
+        final TeamRequest updatedTeam = generateTeam();
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.update(TestConstants.OUT_OF_RANGE_ID, updatedTeam, ADMIN_USER.userName(), ADMIN_USER.password());
+        assertThat(response.statusCode())
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+
+        assertThat(response.body())
+                .as("Did not receive valid error message: " + response.body())
+                .contains("out of range");
+    }
+
+    @Test
+    void whenUpdatingTeam_givenAnInvalidTeamId_thenNoJsonResponseIsReturned_andHasA400Status() throws IOException, InterruptedException, FoldingRestException {
+        final Team createdTeam = create(generateTeam());
+
+        final TeamRequest teamToUpdate = TeamRequest.builder()
+                .teamName(createdTeam.getTeamName())
+                .teamDescription("Updated description")
+                .forumLink(createdTeam.getForumLink())
+                .build();
+
+
+        final HttpRequest request = HttpRequest.newBuilder()
+                .PUT(HttpRequest.BodyPublishers.ofString(GSON.toJson(teamToUpdate)))
+                .uri(URI.create(FOLDING_URL + "/teams/" + TestConstants.INVALID_FORMAT_ID))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+                .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
+                .build();
+
+        final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+        assertThat(response.statusCode())
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+
+        assertThat(response.body())
+                .as("Did not receive valid error message: " + response.body())
+                .contains("not a valid format");
+    }
+
+    @Test
     void whenDeletingTeam_givenANonExistingTeamId_thenResponseHasA404Status() throws FoldingRestException {
-        final HttpResponse<Void> response = TEAM_REQUEST_SENDER.delete(TestConstants.INVALID_ID, ADMIN_USER.userName(), ADMIN_USER.password());
+        final HttpResponse<Void> response = TEAM_REQUEST_SENDER.delete(TestConstants.NON_EXISTING_ID, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(response.statusCode())
                 .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
+    }
+
+    @Test
+    void whenDeletingTeam_givenAnOutOfRangeTeamId_thenResponseHasA400Status() throws FoldingRestException {
+        final HttpResponse<Void> response = TEAM_REQUEST_SENDER.delete(TestConstants.OUT_OF_RANGE_ID, ADMIN_USER.userName(), ADMIN_USER.password());
+
+        assertThat(response.statusCode())
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+    }
+
+    @Test
+    void whenDeletingTeam_givenAnInvalidTeamId_thenResponseHasA400Status() throws IOException, InterruptedException {
+        final HttpRequest request = HttpRequest.newBuilder()
+                .DELETE()
+                .uri(URI.create(FOLDING_URL + "/teams/" + TestConstants.INVALID_FORMAT_ID))
+                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+                .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
+                .build();
+
+        final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+        assertThat(response.statusCode())
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
     @Test

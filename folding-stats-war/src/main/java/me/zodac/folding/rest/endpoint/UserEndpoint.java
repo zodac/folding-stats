@@ -143,7 +143,7 @@ public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
     }
 
     @Override
-    protected void deleteElementById(final int userId) {
-        oldFacade.deleteUser(userId);
+    protected void deleteElement(final User user) {
+        oldFacade.deleteUser(user);
     }
 }
