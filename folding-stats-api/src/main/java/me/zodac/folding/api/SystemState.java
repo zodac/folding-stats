@@ -34,6 +34,12 @@ public enum SystemState {
     private final boolean isReadAllowed;
     private final boolean isWriteAllowed;
 
+    /**
+     * Constructs the {@link SystemState}.
+     *
+     * @param isReadAllowed  whether <b>read</b> operations are permitted for the {@link SystemState}
+     * @param isWriteAllowed whether <b>write</b> operations are permitted for the {@link SystemState}
+     */
     SystemState(final boolean isReadAllowed, final boolean isWriteAllowed) {
         this.isReadAllowed = isReadAllowed;
         this.isWriteAllowed = isWriteAllowed;

@@ -37,10 +37,15 @@ public enum Category {
         .filter(value -> value != INVALID)
         .collect(toUnmodifiableList());
 
-    private final int permittedAmount;
+    private final int permittedUsers;
 
-    Category(final int permittedAmount) {
-        this.permittedAmount = permittedAmount;
+    /**
+     * Constructs a {@link Category} with a maximum number of {@link User}s.
+     *
+     * @param permittedUsers the maximum number of {@link User}s permitted in the {@link Category}
+     */
+    Category(final int permittedUsers) {
+        this.permittedUsers = permittedUsers;
     }
 
     /**
@@ -64,7 +69,7 @@ public enum Category {
      */
     public static int maximumPermittedAmountForAllCategories() {
         return ALL_VALUES.stream()
-            .mapToInt(value -> value.permittedAmount)
+            .mapToInt(value -> value.permittedUsers)
             .sum();
     }
 
@@ -82,7 +87,12 @@ public enum Category {
             .orElse(Category.INVALID);
     }
 
-    public int permittedAmount() {
-        return permittedAmount;
+    /**
+     * Returns the number of permitted {@link User}s per team in the {@link Category}.
+     *
+     * @return the number of permitted {@link User}s
+     */
+    public int permittedUsers() {
+        return permittedUsers;
     }
 }

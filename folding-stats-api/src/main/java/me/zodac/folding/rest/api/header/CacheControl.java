@@ -12,10 +12,20 @@ public enum CacheControl {
 
     private final String cacheControl;
 
+    /**
+     * Constructs a {@link CacheControl} with the header value as a {@link String}.
+     *
+     * @param cacheControl the {@link CacheControl} value as a {@link String}
+     */
     CacheControl(final String cacheControl) {
         this.cacheControl = cacheControl;
     }
 
+    /**
+     * The value of the {@link CacheControl}.
+     *
+     * @return the {@link CacheControl} value
+     */
     public String cacheControl() {
         return cacheControl;
     }

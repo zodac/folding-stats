@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC "-//Puppy Crawl//DTD Suppressions 1.1//EN"
+        "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
+
+<!--
+    Checkstyle suppression configuration file to exclude classes/rules
+-->
+
+<suppressions>
+    <!-- TODO: [zodac] Remove these suppression when the Db files are split correctly -->
+    <suppress files="DbAuthenticationManager\.java" checks="[a-zA-Z0-9]*"/>
+    <suppress files="DbCrudManager\.java" checks="[a-zA-Z0-9]*"/>
+    <suppress files="DbManager\.java" checks="[a-zA-Z0-9]*"/>
+    <suppress files="DbStatsManager\.java" checks="[a-zA-Z0-9]*"/>
+</suppressions>

@@ -12,10 +12,20 @@ public enum ContentType {
 
     private final String contentType;
 
+    /**
+     * Constructs a {@link ContentType} with the header value as a {@link String}.
+     *
+     * @param contentType the {@link ContentType} value as a {@link String}
+     */
     ContentType(final String contentType) {
         this.contentType = contentType;
     }
 
+    /**
+     * The value of the {@link ContentType}.
+     *
+     * @return the {@link ContentType} value
+     */
     public String contentType() {
         return contentType;
     }

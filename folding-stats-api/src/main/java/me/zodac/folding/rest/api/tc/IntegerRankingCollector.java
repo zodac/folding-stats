@@ -17,6 +17,7 @@ import java.util.stream.Collector;
 /**
  * Ranking logic for teams/users to rank by a specified function (getting points, or units, etc).
  *
+ * @param <T> the type of the {@link Object}
  * @see <a href="https://stackoverflow.com/a/41608187/2000246">How to rank collection of objects</a>
  */
 final class IntegerRankingCollector<T> implements Collector<T, List<T>, List<T>> {
@@ -26,6 +27,13 @@ final class IntegerRankingCollector<T> implements Collector<T, List<T>, List<T>>
     private final transient BiFunction<T, Integer, T> creator;
     private final transient Function<T, Integer> ranker;
 
+    /**
+     * Constructs an {@link IntegerRankingCollector}.
+     *
+     * @param comparator a {@link Comparator} defining what value to be compared
+     * @param ranker     the existing rank of the object being ranked
+     * @param creator    the {@link BiFunction} defining the output rank of the object
+     */
     IntegerRankingCollector(final Comparator<? super T> comparator, final Function<T, Integer> ranker, final BiFunction<T, Integer, T> creator) {
         this.comparator = comparator;
         this.ranker = ranker;

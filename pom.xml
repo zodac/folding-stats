@@ -275,6 +275,8 @@
                     <configuration>
                         <configLocation>${checkstyle-file}</configLocation>
                         <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                        <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
+                        <propertyExpansion>checkstyle.config.path=${project.parent.basedir}/ci</propertyExpansion>
                         <skip>${skip-linters}</skip>
                         <violationSeverity>info</violationSeverity>
                     </configuration>

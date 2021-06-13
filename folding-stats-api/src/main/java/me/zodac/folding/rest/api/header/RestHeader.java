@@ -27,10 +27,20 @@ public enum RestHeader {
 
     private final String headerName;
 
+    /**
+     * Constructs a {@link RestHeader}.
+     *
+     * @param headerName the {@link RestHeader} name
+     */
     RestHeader(final String headerName) {
         this.headerName = headerName;
     }
 
+    /**
+     * The {@link RestHeader} name.
+     *
+     * @return the name of the {@link RestHeader}
+     */
     public String headerName() {
         return headerName;
     }

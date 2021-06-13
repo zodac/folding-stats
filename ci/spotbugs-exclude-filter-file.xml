@@ -4,7 +4,7 @@
         <Package name="~me.zodac.folding.db.postgres.gen.*"/>
     </Match>
 
-    <!-- Mostly using Lombok, so these non-null checks are file -->
+    <!-- Mostly using Lombok, so these non-null checks are fine -->
     <Match>
         <Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"/>
     </Match>

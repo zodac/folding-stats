@@ -64,7 +64,7 @@
         <exclude name="ExcessiveParameterList"/>
         <exclude name="TooManyMethods"/>
         <exclude name="UseObjectForClearerAPI"/>
-        <!-- TODO: Split BusinessLogic into Storage, then disable this rule -->
+        <!-- TODO: [zodac] Split OldFacade into BusinessLogic/Storage, then disable this rule -->
         <exclude name="ExcessivePublicCount"/>
     </rule>
     <!-- Default threshold is a bit high for some of our validation flows -->
