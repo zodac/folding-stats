@@ -1,7 +1,5 @@
 package me.zodac.folding.test.utils.db;
 
-import me.zodac.folding.test.utils.TestStats;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -9,13 +7,15 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.stream.Collectors;
+import me.zodac.folding.test.utils.TestConstants;
+import me.zodac.folding.test.utils.TestStats;
 
 /**
  * Utility class for database tables for tests.
  */
 public final class DatabaseUtils {
 
-    private static final String JDBC_CONNECTION_URL = "jdbc:postgresql://192.168.99.100:5433/folding_db";
+    private static final String JDBC_CONNECTION_URL = "jdbc:postgresql://" + TestConstants.TEST_IP_ADDRESS + ":5433/folding_db";
     private static final Properties JDBC_CONNECTION_PROPERTIES = new Properties();
 
     static {
@@ -54,7 +54,7 @@ public final class DatabaseUtils {
      */
     public static void insertStats(final String tableName, final TestStats... stats) {
         final String insertStatement = String.format("INSERT INTO %s VALUES %s;", tableName,
-                Arrays.stream(stats).map(TestStats::toString).collect(Collectors.joining(",")));
+            Arrays.stream(stats).map(TestStats::toString).collect(Collectors.joining(",")));
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
              final PreparedStatement preparedStatement = connection.prepareStatement(insertStatement)) {

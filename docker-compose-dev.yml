@@ -27,7 +27,6 @@ services:
       - development
     volumes:
       - /opt/jboss/wildfly/standalone/deployments/
-      - m2:/root/.m2
 
   wildfly_dev:
     build:
@@ -44,7 +43,7 @@ services:
       # Container configuration
       JAVA_OPTS: -Xms512m -Xmx2g -Djava.net.preferIPv4Stack=true
       # Stats parsing configuration
-      STATS_URL_ROOT: "http://192.168.99.100:8081"
+      STATS_URL_ROOT: "http://192.168.99.100:8081" # TODO: [zodac] Not working with 'wildfly_dev' as host
       # NOTE: The monthly reset will always occur at 00:15 on the first of the month
       ENABLE_STATS_MONTHLY_RESET: "false"
       # Scheduled stats parsing configuration
@@ -104,7 +103,3 @@ services:
 
 networks:
   development:
-
-volumes:
-  # Volume to save maven .m2 for subsequent builds
-  m2:
