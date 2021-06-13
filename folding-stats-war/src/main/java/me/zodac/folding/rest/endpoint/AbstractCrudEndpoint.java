@@ -327,7 +327,6 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
             return serviceUnavailable();
         }
 
-
         try {
             final ParseResult parseResult = IntegerParser.parsePositive(elementId);
             if (parseResult.isBadFormat()) {

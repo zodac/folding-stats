@@ -1,5 +1,8 @@
 package me.zodac.folding.rest;
 
+import java.util.Set;
+import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.core.Application;
 import me.zodac.folding.rest.endpoint.HardwareEndpoint;
 import me.zodac.folding.rest.endpoint.HistoricStatsEndpoint;
 import me.zodac.folding.rest.endpoint.LoginEndpoint;
@@ -8,11 +11,7 @@ import me.zodac.folding.rest.endpoint.TeamEndpoint;
 import me.zodac.folding.rest.endpoint.UserEndpoint;
 import me.zodac.folding.rest.provider.CorsFilter;
 import me.zodac.folding.rest.provider.InvalidUrlRedirecter;
-import me.zodac.folding.rest.provider.SecurityInterceptor;
-
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
-import java.util.Set;
+import me.zodac.folding.rest.provider.security.SecurityInterceptor;
 
 /**
  * A class extending {@link Application} and annotated with {@link ApplicationPath} is the Java EE 6 "no XML" approach to activating JAX-RS.
@@ -25,18 +24,18 @@ public class JaxRsApplication extends Application {
     @Override
     public Set<Class<?>> getClasses() {
         return Set.of(
-                // REST endpoints
-                HardwareEndpoint.class,
-                HistoricStatsEndpoint.class,
-                LoginEndpoint.class,
-                TeamCompetitionStatsEndpoint.class,
-                TeamEndpoint.class,
-                UserEndpoint.class,
+            // REST endpoints
+            HardwareEndpoint.class,
+            HistoricStatsEndpoint.class,
+            LoginEndpoint.class,
+            TeamCompetitionStatsEndpoint.class,
+            TeamEndpoint.class,
+            UserEndpoint.class,
 
-                // REST providers
-                CorsFilter.class,
-                InvalidUrlRedirecter.class,
-                SecurityInterceptor.class
+            // REST providers
+            CorsFilter.class,
+            InvalidUrlRedirecter.class,
+            SecurityInterceptor.class
         );
     }
 }

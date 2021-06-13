@@ -282,11 +282,10 @@
                     </configuration>
                     <executions>
                         <execution>
-                            <id>validate</id>
-                            <phase>validate</phase>
                             <goals>
                                 <goal>check</goal>
                             </goals>
+                            <phase>validate</phase>
                         </execution>
                     </executions>
 
@@ -307,12 +306,15 @@
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>${maven-javadoc-plugin.version}</version>
                     <configuration>
+                        <doclint>all</doclint>
                         <excludePackageNames>
                             me.zodac.folding.db.postgres.gen:me.zodac.folding.db.postgres.gen.*
                         </excludePackageNames>
                         <failOnWarnings>true</failOnWarnings>
                         <quiet>true</quiet>
+                        <serialwarn>true</serialwarn>
                         <skip>${skip-linters}</skip>
+                        <validateLinks>true</validateLinks>
                     </configuration>
                     <executions>
                         <execution>
@@ -393,10 +395,10 @@
                     </configuration>
                     <executions>
                         <execution>
-                            <phase>install</phase>
                             <goals>
                                 <goal>check</goal>
                             </goals>
+                            <phase>install</phase>
                         </execution>
                     </executions>
                     <dependencies>

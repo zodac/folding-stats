@@ -72,7 +72,7 @@ caching/persisting results. Could be persisted on a scheduled basis, or perhaps 
 cache those results. Need to do more profiling on a live system, see how much it is being used. (A good idea to bring in
 an ELK stack to instrument the system when we go live.)
 
-## Executing tests
+## Executing Tests
 
 TBC
 
@@ -109,7 +109,21 @@ the log file only):
     [standalone@localhost:9990 /] /subsystem=logging/console-handler=CONSOLE:write-attribute(name=level, value=DEBUG)
     {"outcome" => "success"}
 
-### How to extract Wildfly logs on container crash
+## Logging
+
+### Available Logs
+
+The system currently has two logs available. Both can be viewed either through the Wildfly Admin UI, connecting to the
+docker container and checking directory `/opt/jboss/wildfly/standalone/log`, or attaching to the `wildfly_logs` volume.
+
+- server.log
+    - This is the general application log, where most logging will be written to. It will also be printed to the
+      console.
+- audit.log
+    - This is where all logging for *SecurityInterceptor.java* is written, detailing login attempts or access requests
+      to WRITE operations. This is not printed to the console.
+
+### How To Extract Wildfly Logs On Container Crash
 
 A volume `wildfly_logs` should exist. We cannot retrieve the file directly from the volume. Instead, we create a
 lightweight docker container, and attach the volume to this container. We can then copy the file from the container to
@@ -127,4 +141,5 @@ Then create a simple container, attaching the `folding-stats_wildfly_logs` volum
 
     docker container create --name dummy -v folding-stats_wildfly_logs:/root:ro folding-stats_wildfly
     docker cp dummy:/root/server.log ./server.log
+    docker cp dummy:/root/audit.log ./audit.log
     docker rm dummy
