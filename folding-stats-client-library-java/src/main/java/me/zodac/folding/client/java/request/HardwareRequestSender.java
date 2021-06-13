@@ -1,37 +1,27 @@
 package me.zodac.folding.client.java.request;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import static me.zodac.folding.api.utils.EncodingUtils.encodeBasicAuthentication;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.Collection;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import me.zodac.folding.api.tc.Hardware;
+import me.zodac.folding.client.java.util.RestUtilConstants;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Duration;
-import java.util.Collection;
-
-import static me.zodac.folding.api.utils.EncodingUtils.encodeBasicAuthentication;
-
 /**
  * Convenience class to send HTTP requests to the {@link Hardware} REST endpoint.
  */
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HardwareRequestSender {
-
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-    private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
-            .version(HttpClient.Version.HTTP_1_1) // TODO: [zodac] What's wrong with HTTP_2?
-            .connectTimeout(Duration.ofSeconds(10))
-            .build();
 
     private final String hardwareUrl;
 
@@ -42,7 +32,7 @@ public final class HardwareRequestSender {
      *                   <pre>http://127.0.0.1:8080/folding</pre>
      * @return the created {@link HardwareRequestSender}
      */
-    public static HardwareRequestSender create(final String foldingUrl) {
+    public static HardwareRequestSender createWithUrl(final String foldingUrl) {
         final String hardwareUrl = foldingUrl + "/hardware";
         return new HardwareRequestSender(hardwareUrl);
     }
@@ -60,28 +50,29 @@ public final class HardwareRequestSender {
 
     /**
      * Send a <b>GET</b> request to retrieve all {@link Hardware}s in the system.
+     *
      * <p>
      * <b>NOTE:</b> If the server has a cached {@link Hardware} based on the <code>ETag</code>, an empty {@link HttpResponse#body()} is returned.
      *
-     * @param eTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve cached {@link Hardware}
+     * @param entityTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve cached {@link Hardware}
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      * @see #getAll()
      */
-    public HttpResponse<String> getAll(final String eTag) throws FoldingRestException {
+    public HttpResponse<String> getAll(final String entityTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
-                .GET()
-                .uri(URI.create(hardwareUrl))
-                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
+            .GET()
+            .uri(URI.create(hardwareUrl))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
-        if (StringUtils.isNotBlank(eTag)) {
-            requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), eTag);
+        if (StringUtils.isNotBlank(entityTag)) {
+            requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), entityTag);
         }
 
         final HttpRequest request = requestBuilder.build();
 
         try {
-            return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (final IOException | InterruptedException e) {
             throw new FoldingRestException("Error sending HTTP request to get all hardware", e);
         }
@@ -101,29 +92,30 @@ public final class HardwareRequestSender {
 
     /**
      * Send a <b>GET</b> request to retrieve a single {@link Hardware} with the given {@code hardwareId}.
+     *
      * <p>
      * <b>NOTE:</b> If the server has a cached {@link Hardware} based on the <code>ETag</code>, an empty {@link HttpResponse#body()} is returned.
      *
      * @param hardwareId the ID of the {@link Hardware} to be retrieved
-     * @param eTag       the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached {@link Hardware}
+     * @param entityTag  the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached {@link Hardware}
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      * @see #get(int)
      */
-    public HttpResponse<String> get(final int hardwareId, final String eTag) throws FoldingRestException {
+    public HttpResponse<String> get(final int hardwareId, final String entityTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
-                .GET()
-                .uri(URI.create(hardwareUrl + '/' + hardwareId))
-                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
+            .GET()
+            .uri(URI.create(hardwareUrl + '/' + hardwareId))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
-        if (StringUtils.isNotBlank(eTag)) {
-            requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), eTag);
+        if (StringUtils.isNotBlank(entityTag)) {
+            requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), entityTag);
         }
 
         final HttpRequest request = requestBuilder.build();
 
         try {
-            return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (final IOException | InterruptedException e) {
             throw new FoldingRestException("Error sending HTTP request to get hardware", e);
         }
@@ -152,10 +144,9 @@ public final class HardwareRequestSender {
      */
     public HttpResponse<String> create(final HardwareRequest hardware, final String userName, final String password) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
-                .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(hardware)))
-                .uri(URI.create(hardwareUrl))
-                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
-
+            .POST(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(hardware)))
+            .uri(URI.create(hardwareUrl))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
         if (StringUtils.isNoneBlank(userName, password)) {
             requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
@@ -164,7 +155,7 @@ public final class HardwareRequestSender {
         final HttpRequest request = requestBuilder.build();
 
         try {
-            return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (final IOException | InterruptedException e) {
             throw new FoldingRestException("Error sending HTTP request to create hardware", e);
         }
@@ -190,11 +181,12 @@ public final class HardwareRequestSender {
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
-    public HttpResponse<String> createBatchOf(final Collection<HardwareRequest> batchOfHardware, final String userName, final String password) throws FoldingRestException {
+    public HttpResponse<String> createBatchOf(final Collection<HardwareRequest> batchOfHardware, final String userName, final String password)
+        throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
-                .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(batchOfHardware)))
-                .uri(URI.create(hardwareUrl + "/batch"))
-                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
+            .POST(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(batchOfHardware)))
+            .uri(URI.create(hardwareUrl + "/batch"))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
         if (StringUtils.isNoneBlank(userName, password)) {
             requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
@@ -203,7 +195,7 @@ public final class HardwareRequestSender {
         final HttpRequest request = requestBuilder.build();
 
         try {
-            return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (final IOException | InterruptedException e) {
             throw new FoldingRestException("Error sending HTTP request to create batch of hardware", e);
         }
@@ -231,11 +223,12 @@ public final class HardwareRequestSender {
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
-    public HttpResponse<String> update(final int hardwareId, final HardwareRequest hardware, final String userName, final String password) throws FoldingRestException {
+    public HttpResponse<String> update(final int hardwareId, final HardwareRequest hardware, final String userName, final String password)
+        throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
-                .PUT(HttpRequest.BodyPublishers.ofString(GSON.toJson(hardware)))
-                .uri(URI.create(hardwareUrl + '/' + hardwareId))
-                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
+            .PUT(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(hardware)))
+            .uri(URI.create(hardwareUrl + '/' + hardwareId))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
         if (StringUtils.isNoneBlank(userName, password)) {
             requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
@@ -244,7 +237,7 @@ public final class HardwareRequestSender {
         final HttpRequest request = requestBuilder.build();
 
         try {
-            return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (final IOException | InterruptedException e) {
             throw new FoldingRestException("Error sending HTTP request to update hardware", e);
         }
@@ -272,9 +265,9 @@ public final class HardwareRequestSender {
      */
     public HttpResponse<Void> delete(final int hardwareId, final String userName, final String password) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
-                .DELETE()
-                .uri(URI.create(hardwareUrl + '/' + hardwareId))
-                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
+            .DELETE()
+            .uri(URI.create(hardwareUrl + '/' + hardwareId))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
         if (StringUtils.isNoneBlank(userName, password)) {
             requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
@@ -283,7 +276,7 @@ public final class HardwareRequestSender {
         final HttpRequest request = requestBuilder.build();
 
         try {
-            return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
+            return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
         } catch (final IOException | InterruptedException e) {
             throw new FoldingRestException("Error sending HTTP request to delete hardware", e);
         }

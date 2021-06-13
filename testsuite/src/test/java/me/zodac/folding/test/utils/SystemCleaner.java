@@ -1,5 +1,10 @@
 package me.zodac.folding.test.utils;
 
+import static me.zodac.folding.test.utils.TestAuthenticationData.ADMIN_USER;
+import static me.zodac.folding.test.utils.rest.request.HardwareUtils.HARDWARE_REQUEST_SENDER;
+import static me.zodac.folding.test.utils.rest.request.TeamUtils.TEAM_REQUEST_SENDER;
+import static me.zodac.folding.test.utils.rest.request.UserUtils.USER_REQUEST_SENDER;
+
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
@@ -10,11 +15,6 @@ import me.zodac.folding.test.utils.rest.request.StubbedFoldingEndpointUtils;
 import me.zodac.folding.test.utils.rest.request.TeamCompetitionStatsUtils;
 import me.zodac.folding.test.utils.rest.request.TeamUtils;
 import me.zodac.folding.test.utils.rest.request.UserUtils;
-
-import static me.zodac.folding.test.utils.TestAuthenticationData.ADMIN_USER;
-import static me.zodac.folding.test.utils.rest.request.HardwareUtils.HARDWARE_REQUEST_SENDER;
-import static me.zodac.folding.test.utils.rest.request.TeamUtils.TEAM_REQUEST_SENDER;
-import static me.zodac.folding.test.utils.rest.request.UserUtils.USER_REQUEST_SENDER;
 
 /**
  * Utility class to clean the system for tests.
@@ -27,10 +27,13 @@ public final class SystemCleaner {
 
     /**
      * Utility function that cleans the system for simple {@link Hardware}, {@link User} and {@link Team} tests to be executed.
+     *
      * <p>
      * Deletes hardware, users and teams through the REST endpoint, then clears the DB tables and resets the serial count for IDs to 0.
+     *
      * <p>
      * We delete through the REST endpoint rather than simply the DB because we need to clear the caches in the system.
+     *
      * <p>
      * The order of the cleanup is:
      * <ol>
@@ -64,8 +67,10 @@ public final class SystemCleaner {
 
     /**
      * Utility function that cleans the system for complex <code>Team Competition</code> stats-based tests to be executed.
+     *
      * <p>
-     * Cleans the stats DB tables, resets the stubbed Folding endpoints for units and points, then executes the {@link #cleanSystemForSimpleTests()}. The order of the DB cleanup is:
+     * Cleans the stats DB tables, resets the stubbed Folding endpoints for units and points, then executes the {@link #cleanSystemForSimpleTests()}.
+     * The order of the DB cleanup is:
      * <ol>
      *     <li>user_initial_stats</li>
      *     <li>user_offset_tc_stats</li>

@@ -1,14 +1,8 @@
 package me.zodac.folding.test.stub;
 
 import com.google.gson.Gson;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-
+import java.util.HashMap;
+import java.util.Map;
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -20,14 +14,22 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.HashMap;
-import java.util.Map;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 
 /**
- * Stubbed endpoint for the Folding@Home user 'stats' API. Used to retrieve the total points count for a user/passkey across all teams for tests, rather than going to the real API.
+ * Stubbed endpoint for the Folding@Home user 'stats' API. Used to retrieve the total points count for a user/passkey across all teams for tests,
+ * rather than going to the real API.
+ *
  * <p>
- * We expose additional endpoints to allow the tests to set the points for a given user. The endpoint is {@link ApplicationScoped} so we can store updates across multiple
+ * We expose additional endpoints to allow the tests to set the points for a given user. The endpoint is {@link ApplicationScoped} so we can store
+ * updates across multiple
  * HTTP requests and tests.
  *
  * @see <a href="ApplicationScoped">Real user statsAPI</a>
@@ -39,23 +41,42 @@ public class StubbedPointsEndpoint {
     private static final Gson GSON = new Gson();
     private static final long NO_POINTS = 0L;
 
-    private transient final Map<String, Long> pointsByUserAndPasskey = new HashMap<>();
+    private final transient Map<String, Long> pointsByUserAndPasskey = new HashMap<>();
 
+    /**
+     * Retrieves the points for a Folding@Home user.
+     *
+     * @param foldingUserName the Folding@Home user's username
+     * @param passkey         the Folding@Home user's passkey
+     * @return a <b>200_OK</b> {@link Response} with the Folding@Home user's points
+     */
     @GET
     @Path("/{foldingUserName}/stats")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUserPoints(@PathParam("foldingUserName") final String foldingUserName, @QueryParam("passkey") final String passkey) {
         return Response
-                .ok()
-                .entity(GSON.toJson(createResponse(foldingUserName, passkey)))
-                .build();
+            .ok()
+            .entity(GSON.toJson(createResponse(foldingUserName, passkey)))
+            .build();
     }
 
+    /**
+     * Sets the points for a Folding@Home user.
+     *
+     * <p>
+     * Since in the test environment we do not want a user to actually have to complete units and earn points, we can manually set them here.
+     *
+     * @param foldingUserName the Folding@Home user's username
+     * @param passkey         the Folding@Home user's passkey
+     * @param points          the points to set
+     * @return a <b>200_OK</b> {@link Response}
+     */
     @POST
     @Path("/{foldingUserName}/stats")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateUserPoints(@PathParam("foldingUserName") final String foldingUserName, @QueryParam("passkey") final String passkey, @QueryParam("points") final long points) {
+    public Response updateUserPoints(@PathParam("foldingUserName") final String foldingUserName, @QueryParam("passkey") final String passkey,
+                                     @QueryParam("points") final long points) {
         final String key = foldingUserName + passkey;
 
         if (points == NO_POINTS) {
@@ -66,18 +87,23 @@ public class StubbedPointsEndpoint {
         }
 
         return Response
-                .ok()
-                .build();
+            .ok()
+            .build();
     }
 
+    /**
+     * Resets the points for all Folding@Home users.
+     *
+     * @return a <b>200_OK</b> {@link Response}
+     */
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteUserPoints() {
         pointsByUserAndPasskey.clear();
         return Response
-                .ok()
-                .build();
+            .ok()
+            .build();
     }
 
     private PointsResponse createResponse(final String foldingUserName, final String passkey) {

@@ -1,14 +1,5 @@
 package me.zodac.folding.stats.http.request;
 
-import me.zodac.folding.api.exception.ExternalConnectionException;
-import me.zodac.folding.rest.api.header.CacheControl;
-import me.zodac.folding.rest.api.header.ContentType;
-import me.zodac.folding.rest.api.header.RestHeader;
-import me.zodac.folding.stats.http.response.StatsResponseParser;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
@@ -19,15 +10,25 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import me.zodac.folding.api.exception.ExternalConnectionException;
+import me.zodac.folding.rest.api.header.CacheControl;
+import me.zodac.folding.rest.api.header.ContentType;
+import me.zodac.folding.rest.api.header.RestHeader;
+import me.zodac.folding.stats.http.response.StatsResponseParser;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility class used to send REST requests to the Stanford Folding@Home REST endpoints.
+ *
  * <p>
  * The Folding@Home API, however, does seem to be caching responses for requests sent later. The {@link RestHeader#CACHE_CONTROL}
  * header is used to try and reduce the caching done on to the Folding@Home API, but is not guaranteed to work.
  * In addition to using this header, we keep a cache of the most recent response for each request URL, since the URL
  * will contain a unique username/passkey for each request. We will compare the response to this cached version, and if
  * there is no change, we will send a second REST request to the server.
+ *
  * <p>
  * While not ideal, I'm not sure of any other way of forcing an update since it seems to be a server-side decision. This
  * should at least help in reducing the number of duplicate requests that need to be sent.
@@ -36,9 +37,9 @@ public final class StatsRequestSender {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StatsRequestSender.class);
     private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
-            .version(HttpClient.Version.HTTP_1_1)
-            .connectTimeout(Duration.ofSeconds(10))
-            .build();
+        .version(HttpClient.Version.HTTP_1_1)
+        .connectTimeout(Duration.ofSeconds(10))
+        .build();
 
     private static final Map<String, String> CACHED_RESPONSE_BODIES = new HashMap<>();
 
@@ -52,6 +53,7 @@ public final class StatsRequestSender {
      *     <li>{@link PointsUrlBuilder}</li>
      *     <li>{@link UnitsUrlBuilder}</li>
      * </ul>
+     *
      * <p>
      * Includes the headers:
      * <ul>
@@ -96,11 +98,11 @@ public final class StatsRequestSender {
 
     private static HttpResponse<String> sendRequest(final String requestUrl) throws IOException, InterruptedException {
         final HttpRequest request = HttpRequest.newBuilder()
-                .GET()
-                .uri(URI.create(requestUrl))
-                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
-                .header(RestHeader.CACHE_CONTROL.headerName(), CacheControl.NO_CACHE.cacheControl())
-                .build();
+            .GET()
+            .uri(URI.create(requestUrl))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CACHE_CONTROL.headerName(), CacheControl.NO_CACHE.cacheControl())
+            .build();
 
         final String cachedResponseBody = CACHED_RESPONSE_BODIES.get(requestUrl);
 
@@ -109,7 +111,8 @@ public final class StatsRequestSender {
 
         if (firstResponse.body().equalsIgnoreCase(cachedResponseBody)) {
             final HttpResponse<String> secondResponse = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-            LOGGER.debug("Initial request returned a response equal to response in the cache, sent second request to Stanford: '{}' vs '{}'", firstResponse.body(), secondResponse.body());
+            LOGGER.debug("Initial request returned a response equal to response in the cache, sent second request to Stanford: '{}' vs '{}'",
+                firstResponse.body(), secondResponse.body());
 
             CACHED_RESPONSE_BODIES.put(requestUrl, secondResponse.body());
             return secondResponse;

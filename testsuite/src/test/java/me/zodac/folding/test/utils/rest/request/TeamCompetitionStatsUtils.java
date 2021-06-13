@@ -1,5 +1,11 @@
 package me.zodac.folding.test.utils.rest.request;
 
+import static me.zodac.folding.test.utils.TestAuthenticationData.ADMIN_USER;
+import static me.zodac.folding.test.utils.TestConstants.FOLDING_URL;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.net.HttpURLConnection;
+import java.net.http.HttpResponse;
 import me.zodac.folding.client.java.request.TeamCompetitionStatsRequestSender;
 import me.zodac.folding.client.java.response.TeamCompetitionResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
@@ -8,19 +14,13 @@ import me.zodac.folding.rest.api.tc.RetiredUserSummary;
 import me.zodac.folding.rest.api.tc.TeamSummary;
 import me.zodac.folding.rest.api.tc.UserSummary;
 
-import java.net.HttpURLConnection;
-import java.net.http.HttpResponse;
-
-import static me.zodac.folding.test.utils.TestAuthenticationData.ADMIN_USER;
-import static me.zodac.folding.test.utils.TestConstants.FOLDING_URL;
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
  * Utility class for TC stats-based tests.
  */
 public final class TeamCompetitionStatsUtils {
 
-    public static final TeamCompetitionStatsRequestSender TEAM_COMPETITION_REQUEST_SENDER = TeamCompetitionStatsRequestSender.create(FOLDING_URL);
+    public static final TeamCompetitionStatsRequestSender TEAM_COMPETITION_REQUEST_SENDER =
+        TeamCompetitionStatsRequestSender.createWithUrl(FOLDING_URL);
 
     private TeamCompetitionStatsUtils() {
 
@@ -38,7 +38,8 @@ public final class TeamCompetitionStatsUtils {
             return TeamCompetitionResponseParser.getStats(response);
         }
 
-        throw new FoldingRestException(String.format("Invalid response (%s) when getting all TC result with: %s", response.statusCode(), response.body()));
+        throw new FoldingRestException(
+            String.format("Invalid response (%s) when getting all TC result with: %s", response.statusCode(), response.body()));
     }
 
     /**
@@ -54,7 +55,8 @@ public final class TeamCompetitionStatsUtils {
             return TeamCompetitionResponseParser.getStatsForUser(response);
         }
 
-        throw new FoldingRestException(String.format("Invalid response (%s) when getting TC result for user with ID %s with: %s", response.statusCode(), userId, response.body()));
+        throw new FoldingRestException(String
+            .format("Invalid response (%s) when getting TC result for user with ID %s with: %s", response.statusCode(), userId, response.body()));
     }
 
     /**
@@ -116,8 +118,8 @@ public final class TeamCompetitionStatsUtils {
     public static void manuallyResetStats() throws FoldingRestException {
         final HttpResponse<Void> response = TEAM_COMPETITION_REQUEST_SENDER.manualReset(ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-                .as("Expected a 200_OK")
-                .isEqualTo(HttpURLConnection.HTTP_OK);
+            .as("Expected a 200_OK")
+            .isEqualTo(HttpURLConnection.HTTP_OK);
     }
 
     /**
@@ -128,7 +130,7 @@ public final class TeamCompetitionStatsUtils {
     public static void manuallyUpdateStats() throws FoldingRestException {
         final HttpResponse<Void> response = TEAM_COMPETITION_REQUEST_SENDER.manualUpdate(ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-                .as("Expected a 200_OK")
-                .isEqualTo(HttpURLConnection.HTTP_OK);
+            .as("Expected a 200_OK")
+            .isEqualTo(HttpURLConnection.HTTP_OK);
     }
 }

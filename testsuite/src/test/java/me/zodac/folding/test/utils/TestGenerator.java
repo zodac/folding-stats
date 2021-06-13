@@ -1,5 +1,6 @@
 package me.zodac.folding.test.utils;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.OperatingSystem;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
@@ -8,8 +9,6 @@ import me.zodac.folding.rest.api.tc.request.TeamRequest;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 import me.zodac.folding.test.utils.rest.request.HardwareUtils;
 import me.zodac.folding.test.utils.rest.request.TeamUtils;
-
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Utility class used to generate {@link HardwareRequest}, {@link TeamRequest} and {@link UserRequest} instances for
@@ -60,11 +59,11 @@ public final class TestGenerator {
     public static HardwareRequest generateHardware() {
         final String hardwareName = nextHardwareName();
         return HardwareRequest.builder()
-                .hardwareName(hardwareName)
-                .displayName(hardwareName)
-                .operatingSystem(OperatingSystem.WINDOWS.toString())
-                .multiplier(1.0D)
-                .build();
+            .hardwareName(hardwareName)
+            .displayName(hardwareName)
+            .operatingSystem(OperatingSystem.WINDOWS.toString())
+            .multiplier(1.0D)
+            .build();
     }
 
     /**
@@ -76,11 +75,11 @@ public final class TestGenerator {
     public static HardwareRequest generateHardwareWithMultiplier(final double multiplier) {
         final String hardwareName = nextHardwareName();
         return HardwareRequest.builder()
-                .hardwareName(hardwareName)
-                .displayName(hardwareName)
-                .operatingSystem(OperatingSystem.WINDOWS.toString())
-                .multiplier(multiplier)
-                .build();
+            .hardwareName(hardwareName)
+            .displayName(hardwareName)
+            .operatingSystem(OperatingSystem.WINDOWS.toString())
+            .multiplier(multiplier)
+            .build();
     }
 
     /**
@@ -92,13 +91,12 @@ public final class TestGenerator {
     public static HardwareRequest generateHardwareWithOperatingSystem(final OperatingSystem operatingSystem) {
         final String hardwareName = nextHardwareName();
         return HardwareRequest.builder()
-                .hardwareName(hardwareName)
-                .displayName(hardwareName)
-                .operatingSystem(operatingSystem.toString())
-                .multiplier(1.0D)
-                .build();
+            .hardwareName(hardwareName)
+            .displayName(hardwareName)
+            .operatingSystem(operatingSystem.toString())
+            .multiplier(1.0D)
+            .build();
     }
-
 
     /**
      * Generates a {@link TeamRequest}.
@@ -107,12 +105,13 @@ public final class TestGenerator {
      */
     public static TeamRequest generateTeam() {
         return TeamRequest.builder()
-                .teamName(nextTeamName())
-                .build();
+            .teamName(nextTeamName())
+            .build();
     }
 
     /**
      * Generates an invalid {@link TeamRequest}.
+     *
      * <p>
      * Uses an invalid URL as the forum link, so validation will fail.
      *
@@ -120,9 +119,9 @@ public final class TestGenerator {
      */
     public static TeamRequest generateInvalidTeam() {
         return TeamRequest.builder()
-                .teamName(nextTeamName())
-                .forumLink("invalidLink")
-                .build();
+            .teamName(nextTeamName())
+            .forumLink("invalidLink")
+            .build();
     }
 
     /**
@@ -138,13 +137,13 @@ public final class TestGenerator {
         final String userName = nextUserName();
 
         return UserRequest.builder()
-                .foldingUserName(userName)
-                .displayName(userName)
-                .passkey("DummyPasskey12345678901234567890")
-                .category(Category.NVIDIA_GPU.toString())
-                .hardwareId(hardwareId)
-                .teamId(teamId)
-                .build();
+            .foldingUserName(userName)
+            .displayName(userName)
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .hardwareId(hardwareId)
+            .teamId(teamId)
+            .build();
     }
 
     /**
@@ -161,13 +160,13 @@ public final class TestGenerator {
         final String userName = nextUserName();
 
         return UserRequest.builder()
-                .foldingUserName(userName)
-                .displayName(userName)
-                .passkey("DummyPasskey12345678901234567890")
-                .category(category.toString())
-                .hardwareId(hardwareId)
-                .teamId(teamId)
-                .build();
+            .foldingUserName(userName)
+            .displayName(userName)
+            .passkey("DummyPasskey12345678901234567890")
+            .category(category.toString())
+            .hardwareId(hardwareId)
+            .teamId(teamId)
+            .build();
     }
 
     /**
@@ -183,13 +182,13 @@ public final class TestGenerator {
         final String userName = nextUserName();
 
         return UserRequest.builder()
-                .foldingUserName(userName)
-                .displayName(userName)
-                .passkey("DummyPasskey12345678901234567890")
-                .category(Category.NVIDIA_GPU.toString())
-                .hardwareId(hardwareId)
-                .teamId(teamId)
-                .build();
+            .foldingUserName(userName)
+            .displayName(userName)
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .hardwareId(hardwareId)
+            .teamId(teamId)
+            .build();
     }
 
     /**
@@ -205,13 +204,13 @@ public final class TestGenerator {
         final String userName = nextUserName();
 
         return UserRequest.builder()
-                .foldingUserName(userName)
-                .displayName(userName)
-                .passkey("DummyPasskey12345678901234567890")
-                .category(Category.NVIDIA_GPU.toString())
-                .hardwareId(hardwareId)
-                .teamId(teamId)
-                .build();
+            .foldingUserName(userName)
+            .displayName(userName)
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .hardwareId(hardwareId)
+            .teamId(teamId)
+            .build();
     }
 
     /**
@@ -228,17 +227,17 @@ public final class TestGenerator {
         final String userName = nextUserName();
 
         return UserRequest.builder()
-                .foldingUserName(userName)
-                .displayName(userName)
-                .passkey("DummyPasskey12345678901234567890")
-                .category(category.toString())
-                .hardwareId(hardwareId)
-                .teamId(teamId)
-                .build();
+            .foldingUserName(userName)
+            .displayName(userName)
+            .passkey("DummyPasskey12345678901234567890")
+            .category(category.toString())
+            .hardwareId(hardwareId)
+            .teamId(teamId)
+            .build();
     }
 
     /**
-     * Generates a {@link UserRequest} with a specified live stats link
+     * Generates a {@link UserRequest} with a specified live stats link.
      *
      * @param liveStatsLink the {@link me.zodac.folding.api.tc.User} live stats link
      * @return the generated {@link UserRequest}
@@ -251,13 +250,13 @@ public final class TestGenerator {
         final String userName = nextUserName();
 
         return UserRequest.builder()
-                .foldingUserName(userName)
-                .displayName(userName)
-                .passkey("DummyPasskey12345678901234567890")
-                .category(Category.NVIDIA_GPU.toString())
-                .liveStatsLink(liveStatsLink)
-                .hardwareId(hardwareId)
-                .teamId(teamId)
-                .build();
+            .foldingUserName(userName)
+            .displayName(userName)
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .liveStatsLink(liveStatsLink)
+            .hardwareId(hardwareId)
+            .teamId(teamId)
+            .build();
     }
 }

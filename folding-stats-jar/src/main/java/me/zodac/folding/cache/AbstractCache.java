@@ -1,17 +1,16 @@
 package me.zodac.folding.cache;
 
-import me.zodac.folding.api.ResponsePojo;
-import me.zodac.folding.api.exception.NotFoundException;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import me.zodac.folding.api.ResponsePojo;
+import me.zodac.folding.api.exception.NotFoundException;
 
 abstract class AbstractCache<V extends ResponsePojo> {
 
-    private transient final Map<Integer, V> elementsById;
+    private final transient Map<Integer, V> elementsById;
 
     protected AbstractCache() {
         elementsById = new ConcurrentHashMap<>();

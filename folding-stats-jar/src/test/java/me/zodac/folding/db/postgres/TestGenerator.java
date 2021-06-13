@@ -3,7 +3,7 @@ package me.zodac.folding.db.postgres;
 /**
  * Utility class to generate IDs/names for tests.
  */
-public final class TestGenerator {
+final class TestGenerator {
 
     private static int hardwareCount;
     private static int userCount;
@@ -18,7 +18,7 @@ public final class TestGenerator {
      *
      * @return next name for {@link me.zodac.folding.api.tc.Hardware}
      */
-    public static String nextHardwareName() {
+    static String nextHardwareName() {
         return "hardware_" + hardwareCount++;
     }
 
@@ -27,7 +27,7 @@ public final class TestGenerator {
      *
      * @return next name for {@link me.zodac.folding.api.tc.User}
      */
-    public static String nextUserName() {
+    static String nextUserName() {
         return "user_" + userCount++;
     }
 
@@ -36,7 +36,7 @@ public final class TestGenerator {
      *
      * @return next name for {@link me.zodac.folding.api.tc.Team}
      */
-    public static String nextTeamName() {
+    static String nextTeamName() {
         return "team_" + teamCount++;
     }
 }

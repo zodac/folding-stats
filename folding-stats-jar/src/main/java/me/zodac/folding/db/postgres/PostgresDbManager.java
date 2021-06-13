@@ -1,5 +1,36 @@
 package me.zodac.folding.db.postgres;
 
+import static java.util.stream.Collectors.toList;
+import static me.zodac.folding.db.postgres.gen.Routines.crypt;
+import static me.zodac.folding.db.postgres.gen.tables.Hardware.HARDWARE;
+import static me.zodac.folding.db.postgres.gen.tables.RetiredUserStats.RETIRED_USER_STATS;
+import static me.zodac.folding.db.postgres.gen.tables.SystemUsers.SYSTEM_USERS;
+import static me.zodac.folding.db.postgres.gen.tables.Teams.TEAMS;
+import static me.zodac.folding.db.postgres.gen.tables.UserInitialStats.USER_INITIAL_STATS;
+import static me.zodac.folding.db.postgres.gen.tables.UserOffsetTcStats.USER_OFFSET_TC_STATS;
+import static me.zodac.folding.db.postgres.gen.tables.UserTcStatsHourly.USER_TC_STATS_HOURLY;
+import static me.zodac.folding.db.postgres.gen.tables.UserTotalStats.USER_TOTAL_STATS;
+import static me.zodac.folding.db.postgres.gen.tables.Users.USERS;
+import static org.jooq.impl.DSL.day;
+import static org.jooq.impl.DSL.field;
+import static org.jooq.impl.DSL.hour;
+import static org.jooq.impl.DSL.max;
+import static org.jooq.impl.DSL.month;
+import static org.jooq.impl.DSL.year;
+
+import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.Year;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 import me.zodac.folding.api.SystemUserAuthentication;
 import me.zodac.folding.api.db.DbAuthenticationManager;
 import me.zodac.folding.api.db.DbConnectionPool;
@@ -26,38 +57,6 @@ import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.Year;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
-
-import static java.util.stream.Collectors.toList;
-import static me.zodac.folding.db.postgres.gen.Routines.crypt;
-import static me.zodac.folding.db.postgres.gen.tables.Hardware.HARDWARE;
-import static me.zodac.folding.db.postgres.gen.tables.RetiredUserStats.RETIRED_USER_STATS;
-import static me.zodac.folding.db.postgres.gen.tables.SystemUsers.SYSTEM_USERS;
-import static me.zodac.folding.db.postgres.gen.tables.Teams.TEAMS;
-import static me.zodac.folding.db.postgres.gen.tables.UserInitialStats.USER_INITIAL_STATS;
-import static me.zodac.folding.db.postgres.gen.tables.UserOffsetTcStats.USER_OFFSET_TC_STATS;
-import static me.zodac.folding.db.postgres.gen.tables.UserTcStatsHourly.USER_TC_STATS_HOURLY;
-import static me.zodac.folding.db.postgres.gen.tables.UserTotalStats.USER_TOTAL_STATS;
-import static me.zodac.folding.db.postgres.gen.tables.Users.USERS;
-import static org.jooq.impl.DSL.day;
-import static org.jooq.impl.DSL.field;
-import static org.jooq.impl.DSL.hour;
-import static org.jooq.impl.DSL.max;
-import static org.jooq.impl.DSL.month;
-import static org.jooq.impl.DSL.year;
 
 /**
  * Implementation of {@link DbManager} for PostgreSQL databases.
@@ -89,10 +88,11 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     public Hardware createHardware(final Hardware hardware) {
         return executeQuery((queryContext) -> {
             final var query = queryContext
-                    .insertInto(HARDWARE)
-                    .columns(HARDWARE.HARDWARE_NAME, HARDWARE.DISPLAY_NAME, HARDWARE.OPERATING_SYSTEM, HARDWARE.MULTIPLIER)
-                    .values(hardware.getHardwareName(), hardware.getDisplayName(), hardware.getOperatingSystem().toString(), BigDecimal.valueOf(hardware.getMultiplier()))
-                    .returning(HARDWARE.HARDWARE_ID);
+                .insertInto(HARDWARE)
+                .columns(HARDWARE.HARDWARE_NAME, HARDWARE.DISPLAY_NAME, HARDWARE.OPERATING_SYSTEM, HARDWARE.MULTIPLIER)
+                .values(hardware.getHardwareName(), hardware.getDisplayName(), hardware.getOperatingSystem().toString(),
+                    BigDecimal.valueOf(hardware.getMultiplier()))
+                .returning(HARDWARE.HARDWARE_ID);
             LOGGER.debug("Executing SQL: '{}'", query);
 
             final Result<HardwareRecord> hardwareRecordResult = query.fetch();
@@ -105,17 +105,17 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     public Collection<Hardware> getAllHardware() {
         return executeQuery((queryContext) -> {
             final var query = queryContext
-                    .select()
-                    .from(HARDWARE)
-                    .orderBy(HARDWARE.HARDWARE_ID.asc());
+                .select()
+                .from(HARDWARE)
+                .orderBy(HARDWARE.HARDWARE_ID.asc());
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
-                    .fetch()
-                    .into(HARDWARE)
-                    .stream()
-                    .map(RecordConverter::toHardware)
-                    .collect(toList());
+                .fetch()
+                .into(HARDWARE)
+                .stream()
+                .map(RecordConverter::toHardware)
+                .collect(toList());
         });
     }
 
@@ -123,17 +123,17 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     public Optional<Hardware> getHardware(final int hardwareId) {
         return executeQuery((queryContext) -> {
             final var query = queryContext
-                    .select()
-                    .from(HARDWARE)
-                    .where(HARDWARE.HARDWARE_ID.equal(hardwareId));
+                .select()
+                .from(HARDWARE)
+                .where(HARDWARE.HARDWARE_ID.equal(hardwareId));
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
-                    .fetch()
-                    .into(HARDWARE)
-                    .stream()
-                    .map(RecordConverter::toHardware)
-                    .findAny();
+                .fetch()
+                .into(HARDWARE)
+                .stream()
+                .map(RecordConverter::toHardware)
+                .findAny();
         });
     }
 
@@ -141,12 +141,12 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     public void updateHardware(final Hardware hardware) {
         executeQuery((queryContext) -> {
             final var query = queryContext
-                    .update(HARDWARE)
-                    .set(HARDWARE.HARDWARE_NAME, hardware.getHardwareName())
-                    .set(HARDWARE.DISPLAY_NAME, hardware.getDisplayName())
-                    .set(HARDWARE.OPERATING_SYSTEM, hardware.getOperatingSystem().toString())
-                    .set(HARDWARE.MULTIPLIER, BigDecimal.valueOf(hardware.getMultiplier()))
-                    .where(HARDWARE.HARDWARE_ID.equal(hardware.getId()));
+                .update(HARDWARE)
+                .set(HARDWARE.HARDWARE_NAME, hardware.getHardwareName())
+                .set(HARDWARE.DISPLAY_NAME, hardware.getDisplayName())
+                .set(HARDWARE.OPERATING_SYSTEM, hardware.getOperatingSystem().toString())
+                .set(HARDWARE.MULTIPLIER, BigDecimal.valueOf(hardware.getMultiplier()))
+                .where(HARDWARE.HARDWARE_ID.equal(hardware.getId()));
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
@@ -157,8 +157,8 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     public void deleteHardware(final int hardwareId) {
         executeQuery((queryContext) -> {
             final var query = queryContext
-                    .deleteFrom(HARDWARE)
-                    .where(HARDWARE.HARDWARE_ID.equal(hardwareId));
+                .deleteFrom(HARDWARE)
+                .where(HARDWARE.HARDWARE_ID.equal(hardwareId));
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
@@ -169,10 +169,10 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     public Team createTeam(final Team team) {
         return executeQuery((queryContext) -> {
             final var query = queryContext
-                    .insertInto(TEAMS)
-                    .columns(TEAMS.TEAM_NAME, TEAMS.TEAM_DESCRIPTION, TEAMS.FORUM_LINK)
-                    .values(team.getTeamName(), team.getTeamDescription(), team.getForumLink())
-                    .returning(TEAMS.TEAM_ID);
+                .insertInto(TEAMS)
+                .columns(TEAMS.TEAM_NAME, TEAMS.TEAM_DESCRIPTION, TEAMS.FORUM_LINK)
+                .values(team.getTeamName(), team.getTeamDescription(), team.getForumLink())
+                .returning(TEAMS.TEAM_ID);
             LOGGER.debug("Executing SQL: '{}'", query);
 
             final Result<TeamsRecord> teamRecordResult = query.fetch();
@@ -185,17 +185,17 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     public Collection<Team> getAllTeams() {
         return executeQuery((queryContext) -> {
             final var query = queryContext
-                    .select()
-                    .from(TEAMS)
-                    .orderBy(TEAMS.TEAM_ID.asc());
+                .select()
+                .from(TEAMS)
+                .orderBy(TEAMS.TEAM_ID.asc());
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
-                    .fetch()
-                    .into(TEAMS)
-                    .stream()
-                    .map(RecordConverter::toTeam)
-                    .collect(toList());
+                .fetch()
+                .into(TEAMS)
+                .stream()
+                .map(RecordConverter::toTeam)
+                .collect(toList());
         });
     }
 
@@ -203,17 +203,17 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     public Optional<Team> getTeam(final int teamId) {
         return executeQuery((queryContext) -> {
             final var query = queryContext
-                    .select()
-                    .from(TEAMS)
-                    .where(TEAMS.TEAM_ID.equal(teamId));
+                .select()
+                .from(TEAMS)
+                .where(TEAMS.TEAM_ID.equal(teamId));
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
-                    .fetch()
-                    .into(TEAMS)
-                    .stream()
-                    .map(RecordConverter::toTeam)
-                    .findAny();
+                .fetch()
+                .into(TEAMS)
+                .stream()
+                .map(RecordConverter::toTeam)
+                .findAny();
         });
     }
 
@@ -221,11 +221,11 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     public void updateTeam(final Team team) {
         executeQuery((queryContext) -> {
             final var query = queryContext
-                    .update(TEAMS)
-                    .set(TEAMS.TEAM_NAME, team.getTeamName())
-                    .set(TEAMS.TEAM_DESCRIPTION, team.getTeamDescription())
-                    .set(TEAMS.FORUM_LINK, team.getForumLink())
-                    .where(TEAMS.TEAM_ID.equal(team.getId()));
+                .update(TEAMS)
+                .set(TEAMS.TEAM_NAME, team.getTeamName())
+                .set(TEAMS.TEAM_DESCRIPTION, team.getTeamDescription())
+                .set(TEAMS.FORUM_LINK, team.getForumLink())
+                .where(TEAMS.TEAM_ID.equal(team.getId()));
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
@@ -237,8 +237,8 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
         LOGGER.debug("Deleting team {} from DB", teamId);
         executeQuery((queryContext) -> {
             final var query = queryContext
-                    .deleteFrom(TEAMS)
-                    .where(TEAMS.TEAM_ID.equal(teamId));
+                .deleteFrom(TEAMS)
+                .where(TEAMS.TEAM_ID.equal(teamId));
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
@@ -249,10 +249,12 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     public User createUser(final User user) {
         return executeQuery((queryContext) -> {
             final var query = queryContext
-                    .insertInto(USERS)
-                    .columns(USERS.FOLDING_USERNAME, USERS.DISPLAY_USERNAME, USERS.PASSKEY, USERS.CATEGORY, USERS.PROFILE_LINK, USERS.LIVE_STATS_LINK, USERS.HARDWARE_ID, USERS.TEAM_ID, USERS.IS_CAPTAIN)
-                    .values(user.getFoldingUserName(), user.getDisplayName(), user.getPasskey(), user.getCategory().toString(), user.getProfileLink(), user.getLiveStatsLink(), user.getHardware().getId(), user.getTeam().getId(), user.isUserIsCaptain())
-                    .returning(USERS.USER_ID);
+                .insertInto(USERS)
+                .columns(USERS.FOLDING_USERNAME, USERS.DISPLAY_USERNAME, USERS.PASSKEY, USERS.CATEGORY, USERS.PROFILE_LINK, USERS.LIVE_STATS_LINK,
+                    USERS.HARDWARE_ID, USERS.TEAM_ID, USERS.IS_CAPTAIN)
+                .values(user.getFoldingUserName(), user.getDisplayName(), user.getPasskey(), user.getCategory().toString(), user.getProfileLink(),
+                    user.getLiveStatsLink(), user.getHardware().getId(), user.getTeam().getId(), user.isUserIsCaptain())
+                .returning(USERS.USER_ID);
             LOGGER.debug("Executing SQL: '{}'", query);
 
             final Result<UsersRecord> usersRecordResult = query.fetch();
@@ -265,20 +267,20 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     public Collection<User> getAllUsers() {
         return executeQuery((queryContext) -> {
             final var query = queryContext
-                    .select()
-                    .from(USERS)
-                    .leftJoin(HARDWARE)
-                    .on(USERS.HARDWARE_ID.equal(HARDWARE.HARDWARE_ID))
-                    .leftJoin(TEAMS)
-                    .on(USERS.TEAM_ID.equal(TEAMS.TEAM_ID))
-                    .orderBy(USERS.USER_ID.asc());
+                .select()
+                .from(USERS)
+                .leftJoin(HARDWARE)
+                .on(USERS.HARDWARE_ID.equal(HARDWARE.HARDWARE_ID))
+                .leftJoin(TEAMS)
+                .on(USERS.TEAM_ID.equal(TEAMS.TEAM_ID))
+                .orderBy(USERS.USER_ID.asc());
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
-                    .fetch()
-                    .stream()
-                    .map(RecordConverter::toUser)
-                    .collect(toList());
+                .fetch()
+                .stream()
+                .map(RecordConverter::toUser)
+                .collect(toList());
         });
     }
 
@@ -286,20 +288,20 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     public Optional<User> getUser(final int userId) {
         return executeQuery((queryContext) -> {
             final var query = queryContext
-                    .select()
-                    .from(USERS)
-                    .leftJoin(HARDWARE)
-                    .on(USERS.HARDWARE_ID.equal(HARDWARE.HARDWARE_ID))
-                    .leftJoin(TEAMS)
-                    .on(USERS.TEAM_ID.equal(TEAMS.TEAM_ID))
-                    .where(USERS.USER_ID.equal(userId));
+                .select()
+                .from(USERS)
+                .leftJoin(HARDWARE)
+                .on(USERS.HARDWARE_ID.equal(HARDWARE.HARDWARE_ID))
+                .leftJoin(TEAMS)
+                .on(USERS.TEAM_ID.equal(TEAMS.TEAM_ID))
+                .where(USERS.USER_ID.equal(userId));
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
-                    .fetch()
-                    .stream()
-                    .map(RecordConverter::toUser)
-                    .findAny();
+                .fetch()
+                .stream()
+                .map(RecordConverter::toUser)
+                .findAny();
         });
     }
 
@@ -307,17 +309,17 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     public void updateUser(final User user) {
         executeQuery((queryContext) -> {
             final var query = queryContext
-                    .update(USERS)
-                    .set(USERS.FOLDING_USERNAME, user.getFoldingUserName())
-                    .set(USERS.DISPLAY_USERNAME, user.getDisplayName())
-                    .set(USERS.PASSKEY, user.getPasskey())
-                    .set(USERS.CATEGORY, user.getCategory().toString())
-                    .set(USERS.PROFILE_LINK, user.getProfileLink())
-                    .set(USERS.LIVE_STATS_LINK, user.getLiveStatsLink())
-                    .set(USERS.HARDWARE_ID, user.getHardware().getId())
-                    .set(USERS.TEAM_ID, user.getTeam().getId())
-                    .set(USERS.IS_CAPTAIN, user.isUserIsCaptain())
-                    .where(USERS.USER_ID.equal(user.getId()));
+                .update(USERS)
+                .set(USERS.FOLDING_USERNAME, user.getFoldingUserName())
+                .set(USERS.DISPLAY_USERNAME, user.getDisplayName())
+                .set(USERS.PASSKEY, user.getPasskey())
+                .set(USERS.CATEGORY, user.getCategory().toString())
+                .set(USERS.PROFILE_LINK, user.getProfileLink())
+                .set(USERS.LIVE_STATS_LINK, user.getLiveStatsLink())
+                .set(USERS.HARDWARE_ID, user.getHardware().getId())
+                .set(USERS.TEAM_ID, user.getTeam().getId())
+                .set(USERS.IS_CAPTAIN, user.isUserIsCaptain())
+                .where(USERS.USER_ID.equal(user.getId()));
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
@@ -328,8 +330,8 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     public void deleteUser(final int userId) {
         executeQuery((queryContext) -> {
             final var query = queryContext
-                    .deleteFrom(USERS)
-                    .where(USERS.USER_ID.equal(userId));
+                .deleteFrom(USERS)
+                .where(USERS.USER_ID.equal(userId));
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
@@ -342,9 +344,11 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
         executeQuery((queryContext) -> {
             final var query = queryContext
-                    .insertInto(USER_TC_STATS_HOURLY)
-                    .columns(USER_TC_STATS_HOURLY.USER_ID, USER_TC_STATS_HOURLY.UTC_TIMESTAMP, USER_TC_STATS_HOURLY.TC_POINTS, USER_TC_STATS_HOURLY.TC_POINTS_MULTIPLIED, USER_TC_STATS_HOURLY.TC_UNITS)
-                    .values(userTcStats.getUserId(), DateTimeUtils.toUtcLocalDateTime(userTcStats.getTimestamp()), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits());
+                .insertInto(USER_TC_STATS_HOURLY)
+                .columns(USER_TC_STATS_HOURLY.USER_ID, USER_TC_STATS_HOURLY.UTC_TIMESTAMP, USER_TC_STATS_HOURLY.TC_POINTS,
+                    USER_TC_STATS_HOURLY.TC_POINTS_MULTIPLIED, USER_TC_STATS_HOURLY.TC_UNITS)
+                .values(userTcStats.getUserId(), DateTimeUtils.toUtcLocalDateTime(userTcStats.getTimestamp()), userTcStats.getPoints(),
+                    userTcStats.getMultipliedPoints(), userTcStats.getUnits());
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
@@ -357,19 +361,20 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
         return executeQuery((queryContext) -> {
             final var query = queryContext
-                    .select(USER_TC_STATS_HOURLY.USER_ID, USER_TC_STATS_HOURLY.UTC_TIMESTAMP, USER_TC_STATS_HOURLY.TC_POINTS, USER_TC_STATS_HOURLY.TC_POINTS_MULTIPLIED, USER_TC_STATS_HOURLY.TC_UNITS)
-                    .from(USER_TC_STATS_HOURLY)
-                    .where(USER_TC_STATS_HOURLY.USER_ID.equal(userId))
-                    .orderBy(USER_TC_STATS_HOURLY.UTC_TIMESTAMP.desc())
-                    .limit(SINGLE_RESULT);
+                .select(USER_TC_STATS_HOURLY.USER_ID, USER_TC_STATS_HOURLY.UTC_TIMESTAMP, USER_TC_STATS_HOURLY.TC_POINTS,
+                    USER_TC_STATS_HOURLY.TC_POINTS_MULTIPLIED, USER_TC_STATS_HOURLY.TC_UNITS)
+                .from(USER_TC_STATS_HOURLY)
+                .where(USER_TC_STATS_HOURLY.USER_ID.equal(userId))
+                .orderBy(USER_TC_STATS_HOURLY.UTC_TIMESTAMP.desc())
+                .limit(SINGLE_RESULT);
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
-                    .fetch()
-                    .into(USER_TC_STATS_HOURLY)
-                    .stream()
-                    .map(RecordConverter::toUserTcStats)
-                    .findAny();
+                .fetch()
+                .into(USER_TC_STATS_HOURLY)
+                .stream()
+                .map(RecordConverter::toUserTcStats)
+                .findAny();
         });
     }
 
@@ -379,8 +384,8 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
         return executeQuery((queryContext) -> {
             final var query = queryContext
-                    .selectCount()
-                    .from(USER_TC_STATS_HOURLY);
+                .selectCount()
+                .from(USER_TC_STATS_HOURLY);
             LOGGER.debug("Executing SQL: '{}'", query);
 
             final Integer count = query.fetchOne(0, Integer.class);
@@ -393,14 +398,14 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
         LOGGER.info("Getting historic hourly user TC stats for {}/{}/{} for user {}", year, DateTimeUtils.formatMonth(month), day, userId);
 
         final String selectSqlStatement = "SELECT MAX(utc_timestamp) AS hourly_timestamp, " +
-                "COALESCE(MAX(tc_points) - LAG(MAX(tc_points)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points, " +
-                "COALESCE(MAX(tc_points_multiplied) - LAG(MAX(tc_points_multiplied)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points_multiplied, " +
-                "COALESCE(MAX(tc_units) - LAG(MAX(tc_units)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_units " +
-                "FROM user_tc_stats_hourly " +
-                "WHERE utc_timestamp BETWEEN ? AND ? " +
-                "AND user_id = ? " +
-                "GROUP BY EXTRACT(HOUR FROM utc_timestamp) " +
-                "ORDER BY EXTRACT(HOUR FROM utc_timestamp) ASC";
+            "COALESCE(MAX(tc_points) - LAG(MAX(tc_points)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points, " +
+            "COALESCE(MAX(tc_points_multiplied) - LAG(MAX(tc_points_multiplied)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points_multiplied, " +
+            "COALESCE(MAX(tc_units) - LAG(MAX(tc_units)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_units " +
+            "FROM user_tc_stats_hourly " +
+            "WHERE utc_timestamp BETWEEN ? AND ? " +
+            "AND user_id = ? " +
+            "GROUP BY EXTRACT(HOUR FROM utc_timestamp) " +
+            "ORDER BY EXTRACT(HOUR FROM utc_timestamp) ASC";
 
         try (final Connection connection = dbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
@@ -419,24 +424,24 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
                     final UserTcStats userTcStats = getTcStatsForFirstHourOfDay(userId, day, month, year);
 
                     userStats.add(
-                            HistoricStats.create(
-                                    resultSet.getTimestamp("hourly_timestamp").toLocalDateTime(),
-                                    userTcStats.getPoints(),
-                                    userTcStats.getMultipliedPoints(),
-                                    userTcStats.getUnits()
-                            )
+                        HistoricStats.create(
+                            resultSet.getTimestamp("hourly_timestamp").toLocalDateTime(),
+                            userTcStats.getPoints(),
+                            userTcStats.getMultipliedPoints(),
+                            userTcStats.getUnits()
+                        )
                     );
                 }
 
                 // All remaining entries will be diff-ed from the previous entry
                 while (resultSet.next()) {
                     userStats.add(
-                            HistoricStats.create(
-                                    resultSet.getTimestamp("hourly_timestamp").toLocalDateTime(),
-                                    resultSet.getLong("diff_points"),
-                                    resultSet.getLong("diff_points_multiplied"),
-                                    resultSet.getInt("diff_units")
-                            )
+                        HistoricStats.create(
+                            resultSet.getTimestamp("hourly_timestamp").toLocalDateTime(),
+                            resultSet.getLong("diff_points"),
+                            resultSet.getLong("diff_points_multiplied"),
+                            resultSet.getInt("diff_units")
+                        )
                     );
                 }
 
@@ -458,28 +463,28 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
             final LocalDateTime end = DateTimeUtils.getLocalDateTimeOf(year, month, day, 0, 59, 59);
 
             final var query = queryContext
-                    .select(
-                            max(USER_TC_STATS_HOURLY.USER_ID).as(USER_TC_STATS_HOURLY.USER_ID),
-                            max(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).as(USER_TC_STATS_HOURLY.UTC_TIMESTAMP),
-                            max(USER_TC_STATS_HOURLY.TC_POINTS).as(USER_TC_STATS_HOURLY.TC_POINTS),
-                            max(USER_TC_STATS_HOURLY.TC_POINTS_MULTIPLIED).as(USER_TC_STATS_HOURLY.TC_POINTS_MULTIPLIED),
-                            max(USER_TC_STATS_HOURLY.TC_UNITS).as(USER_TC_STATS_HOURLY.TC_UNITS)
-                    )
-                    .from(USER_TC_STATS_HOURLY)
-                    .where(USER_TC_STATS_HOURLY.UTC_TIMESTAMP.between(start, end))
-                    .and(USER_TC_STATS_HOURLY.USER_ID.equal(userId))
-                    .groupBy(hour(USER_TC_STATS_HOURLY.UTC_TIMESTAMP))
-                    .orderBy(hour(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).asc())
-                    .limit(SINGLE_RESULT);
+                .select(
+                    max(USER_TC_STATS_HOURLY.USER_ID).as(USER_TC_STATS_HOURLY.USER_ID),
+                    max(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).as(USER_TC_STATS_HOURLY.UTC_TIMESTAMP),
+                    max(USER_TC_STATS_HOURLY.TC_POINTS).as(USER_TC_STATS_HOURLY.TC_POINTS),
+                    max(USER_TC_STATS_HOURLY.TC_POINTS_MULTIPLIED).as(USER_TC_STATS_HOURLY.TC_POINTS_MULTIPLIED),
+                    max(USER_TC_STATS_HOURLY.TC_UNITS).as(USER_TC_STATS_HOURLY.TC_UNITS)
+                )
+                .from(USER_TC_STATS_HOURLY)
+                .where(USER_TC_STATS_HOURLY.UTC_TIMESTAMP.between(start, end))
+                .and(USER_TC_STATS_HOURLY.USER_ID.equal(userId))
+                .groupBy(hour(USER_TC_STATS_HOURLY.UTC_TIMESTAMP))
+                .orderBy(hour(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).asc())
+                .limit(SINGLE_RESULT);
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
-                    .fetch()
-                    .into(USER_TC_STATS_HOURLY)
-                    .stream()
-                    .map(RecordConverter::toUserTcStats)
-                    .findAny()
-                    .orElse(UserTcStats.empty(userId));
+                .fetch()
+                .into(USER_TC_STATS_HOURLY)
+                .stream()
+                .map(RecordConverter::toUserTcStats)
+                .findAny()
+                .orElse(UserTcStats.empty(userId));
         });
     }
 
@@ -492,28 +497,28 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
 
             final var query = queryContext
-                    .select(
-                            max(USER_TC_STATS_HOURLY.USER_ID).as(USER_TC_STATS_HOURLY.USER_ID),
-                            max(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).as(USER_TC_STATS_HOURLY.UTC_TIMESTAMP),
-                            max(USER_TC_STATS_HOURLY.TC_POINTS).as(USER_TC_STATS_HOURLY.TC_POINTS),
-                            max(USER_TC_STATS_HOURLY.TC_POINTS_MULTIPLIED).as(USER_TC_STATS_HOURLY.TC_POINTS_MULTIPLIED),
-                            max(USER_TC_STATS_HOURLY.TC_UNITS).as(USER_TC_STATS_HOURLY.TC_UNITS)
-                    )
-                    .from(USER_TC_STATS_HOURLY)
-                    .where(USER_TC_STATS_HOURLY.UTC_TIMESTAMP.between(start, end))
-                    .and(USER_TC_STATS_HOURLY.USER_ID.equal(userId))
-                    .groupBy(hour(USER_TC_STATS_HOURLY.UTC_TIMESTAMP))
-                    .orderBy(hour(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).desc())
-                    .limit(SINGLE_RESULT);
+                .select(
+                    max(USER_TC_STATS_HOURLY.USER_ID).as(USER_TC_STATS_HOURLY.USER_ID),
+                    max(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).as(USER_TC_STATS_HOURLY.UTC_TIMESTAMP),
+                    max(USER_TC_STATS_HOURLY.TC_POINTS).as(USER_TC_STATS_HOURLY.TC_POINTS),
+                    max(USER_TC_STATS_HOURLY.TC_POINTS_MULTIPLIED).as(USER_TC_STATS_HOURLY.TC_POINTS_MULTIPLIED),
+                    max(USER_TC_STATS_HOURLY.TC_UNITS).as(USER_TC_STATS_HOURLY.TC_UNITS)
+                )
+                .from(USER_TC_STATS_HOURLY)
+                .where(USER_TC_STATS_HOURLY.UTC_TIMESTAMP.between(start, end))
+                .and(USER_TC_STATS_HOURLY.USER_ID.equal(userId))
+                .groupBy(hour(USER_TC_STATS_HOURLY.UTC_TIMESTAMP))
+                .orderBy(hour(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).desc())
+                .limit(SINGLE_RESULT);
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
-                    .fetch()
-                    .into(USER_TC_STATS_HOURLY)
-                    .stream()
-                    .map(RecordConverter::toUserTcStats)
-                    .findAny()
-                    .orElse(UserTcStats.empty(userId));
+                .fetch()
+                .into(USER_TC_STATS_HOURLY)
+                .stream()
+                .map(RecordConverter::toUserTcStats)
+                .findAny()
+                .orElse(UserTcStats.empty(userId));
         });
     }
 
@@ -523,7 +528,8 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
         final boolean isFirstDay = day == 1;
         final int previousDay = day - 1;
-        final UserTcStats lastHourTcStatsPreviousDay = isFirstDay ? UserTcStats.empty(userId) : getPreviousDayLastHourTcStats(userId, previousDay, month, year);
+        final UserTcStats lastHourTcStatsPreviousDay =
+            isFirstDay ? UserTcStats.empty(userId) : getPreviousDayLastHourTcStats(userId, previousDay, month, year);
 
         if (lastHourTcStatsPreviousDay.isEmpty()) {
 
@@ -544,24 +550,25 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
                 final double hardwareMultiplier = hardware.getMultiplier();
 
                 return UserTcStats.create(
-                        firstHourTcStatsCurrentDay.getUserId(),
-                        firstHourTcStatsCurrentDay.getTimestamp(),
-                        Math.max(0, firstHourTcStatsCurrentDay.getPoints() - initialStats.getPoints()),
-                        Math.max(0, firstHourTcStatsCurrentDay.getMultipliedPoints() - Math.round(hardwareMultiplier * initialStats.getPoints())),
-                        Math.max(0, firstHourTcStatsCurrentDay.getUnits() - initialStats.getUnits())
+                    firstHourTcStatsCurrentDay.getUserId(),
+                    firstHourTcStatsCurrentDay.getTimestamp(),
+                    Math.max(0, firstHourTcStatsCurrentDay.getPoints() - initialStats.getPoints()),
+                    Math.max(0, firstHourTcStatsCurrentDay.getMultipliedPoints() - Math.round(hardwareMultiplier * initialStats.getPoints())),
+                    Math.max(0, firstHourTcStatsCurrentDay.getUnits() - initialStats.getUnits())
                 );
             } catch (final UserNotFoundException e) {
                 throw new DatabaseConnectionException("Unable to find hardware or user to calculate hardware multiplier for initial stats", e);
             }
         }
 
-        LOGGER.debug("Removing previous day's last hour stats from current day's first hour stats: {} - {}", firstHourTcStatsCurrentDay, lastHourTcStatsPreviousDay);
+        LOGGER.debug("Removing previous day's last hour stats from current day's first hour stats: {} - {}", firstHourTcStatsCurrentDay,
+            lastHourTcStatsPreviousDay);
         return UserTcStats.create(
-                firstHourTcStatsCurrentDay.getUserId(),
-                firstHourTcStatsCurrentDay.getTimestamp(),
-                Math.max(0, firstHourTcStatsCurrentDay.getPoints() - lastHourTcStatsPreviousDay.getPoints()),
-                Math.max(0, firstHourTcStatsCurrentDay.getMultipliedPoints() - lastHourTcStatsPreviousDay.getMultipliedPoints()),
-                Math.max(0, firstHourTcStatsCurrentDay.getUnits() - lastHourTcStatsPreviousDay.getUnits())
+            firstHourTcStatsCurrentDay.getUserId(),
+            firstHourTcStatsCurrentDay.getTimestamp(),
+            Math.max(0, firstHourTcStatsCurrentDay.getPoints() - lastHourTcStatsPreviousDay.getPoints()),
+            Math.max(0, firstHourTcStatsCurrentDay.getMultipliedPoints() - lastHourTcStatsPreviousDay.getMultipliedPoints()),
+            Math.max(0, firstHourTcStatsCurrentDay.getUnits() - lastHourTcStatsPreviousDay.getUnits())
         );
     }
 
@@ -571,15 +578,15 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
         LOGGER.debug("Getting historic daily user TC stats for {}/{} for user {}", DateTimeUtils.formatMonth(month), year, userId);
 
         final String selectSqlStatement = "SELECT utc_timestamp::DATE AS daily_timestamp, " +
-                "COALESCE(MAX(tc_points) - LAG(MAX(tc_points)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points, " +
-                "COALESCE(MAX(tc_points_multiplied) - LAG(MAX(tc_points_multiplied)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points_multiplied, " +
-                "COALESCE(MAX(tc_units) - LAG(MAX(tc_units)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_units " +
-                "FROM user_tc_stats_hourly " +
-                "WHERE EXTRACT(MONTH FROM utc_timestamp) = ? " +
-                "AND EXTRACT(YEAR FROM utc_timestamp) = ? " +
-                "AND user_id = ? " +
-                "GROUP BY utc_timestamp::DATE " +
-                "ORDER BY utc_timestamp::DATE ASC;";
+            "COALESCE(MAX(tc_points) - LAG(MAX(tc_points)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points, " +
+            "COALESCE(MAX(tc_points_multiplied) - LAG(MAX(tc_points_multiplied)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points_multiplied, " +
+            "COALESCE(MAX(tc_units) - LAG(MAX(tc_units)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_units " +
+            "FROM user_tc_stats_hourly " +
+            "WHERE EXTRACT(MONTH FROM utc_timestamp) = ? " +
+            "AND EXTRACT(YEAR FROM utc_timestamp) = ? " +
+            "AND user_id = ? " +
+            "GROUP BY utc_timestamp::DATE " +
+            "ORDER BY utc_timestamp::DATE ASC;";
 
         try (final Connection connection = dbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
@@ -602,12 +609,12 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
                         LOGGER.warn("Error getting historic stats for first day of {} for user with ID {}", DateTimeUtils.formatMonth(month), userId);
                     } else {
                         userStats.add(
-                                HistoricStats.create(
-                                        localDateTime,
-                                        userTcStats.getPoints(),
-                                        userTcStats.getMultipliedPoints(),
-                                        userTcStats.getUnits()
-                                )
+                            HistoricStats.create(
+                                localDateTime,
+                                userTcStats.getPoints(),
+                                userTcStats.getMultipliedPoints(),
+                                userTcStats.getUnits()
+                            )
                         );
                     }
                 }
@@ -615,12 +622,12 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
                 // All remaining entries will be diff-ed from the previous entry
                 while (resultSet.next()) {
                     userStats.add(
-                            HistoricStats.create(
-                                    resultSet.getTimestamp("daily_timestamp").toLocalDateTime(),
-                                    resultSet.getLong("diff_points"),
-                                    resultSet.getLong("diff_points_multiplied"),
-                                    resultSet.getInt("diff_units")
-                            )
+                        HistoricStats.create(
+                            resultSet.getTimestamp("daily_timestamp").toLocalDateTime(),
+                            resultSet.getLong("diff_points"),
+                            resultSet.getLong("diff_points_multiplied"),
+                            resultSet.getInt("diff_units")
+                        )
                     );
                 }
 
@@ -637,24 +644,24 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
         return executeQuery((queryContext) -> {
             final var query = queryContext
-                    .select(
-                            max(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).as(USER_TC_STATS_HOURLY.UTC_TIMESTAMP.getName()),
-                            max(USER_TC_STATS_HOURLY.TC_POINTS).as(USER_TC_STATS_HOURLY.TC_POINTS.getName()),
-                            max(USER_TC_STATS_HOURLY.TC_POINTS_MULTIPLIED).as(USER_TC_STATS_HOURLY.TC_POINTS_MULTIPLIED.getName()),
-                            max(USER_TC_STATS_HOURLY.TC_UNITS).as(USER_TC_STATS_HOURLY.TC_UNITS.getName())
-                    )
-                    .from(USER_TC_STATS_HOURLY)
-                    .where(year(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).equal(year.getValue()))
-                    .and(USER_TC_STATS_HOURLY.USER_ID.equal(userId))
-                    .groupBy(month(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).cast(int.class))
-                    .orderBy(month(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).cast(int.class).asc());
+                .select(
+                    max(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).as(USER_TC_STATS_HOURLY.UTC_TIMESTAMP.getName()),
+                    max(USER_TC_STATS_HOURLY.TC_POINTS).as(USER_TC_STATS_HOURLY.TC_POINTS.getName()),
+                    max(USER_TC_STATS_HOURLY.TC_POINTS_MULTIPLIED).as(USER_TC_STATS_HOURLY.TC_POINTS_MULTIPLIED.getName()),
+                    max(USER_TC_STATS_HOURLY.TC_UNITS).as(USER_TC_STATS_HOURLY.TC_UNITS.getName())
+                )
+                .from(USER_TC_STATS_HOURLY)
+                .where(year(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).equal(year.getValue()))
+                .and(USER_TC_STATS_HOURLY.USER_ID.equal(userId))
+                .groupBy(month(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).cast(int.class))
+                .orderBy(month(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).cast(int.class).asc());
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.fetch()
-                    .into(USER_TC_STATS_HOURLY)
-                    .stream()
-                    .map(RecordConverter::toHistoricStats)
-                    .collect(toList());
+                .into(USER_TC_STATS_HOURLY)
+                .stream()
+                .map(RecordConverter::toHistoricStats)
+                .collect(toList());
         });
     }
 
@@ -663,23 +670,23 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
         return executeQuery((queryContext) -> {
             final var query = queryContext
-                    .select()
-                    .from(USER_TC_STATS_HOURLY)
-                    .where(day(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).equal(localDateTime.getDayOfMonth()))
-                    .and(month(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).equal(localDateTime.getMonth().getValue()))
-                    .and(year(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).equal(localDateTime.getYear()))
-                    .and(USER_TC_STATS_HOURLY.USER_ID.equal(userId))
-                    .orderBy(hour(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).desc())
-                    .limit(SINGLE_RESULT);
+                .select()
+                .from(USER_TC_STATS_HOURLY)
+                .where(day(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).equal(localDateTime.getDayOfMonth()))
+                .and(month(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).equal(localDateTime.getMonth().getValue()))
+                .and(year(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).equal(localDateTime.getYear()))
+                .and(USER_TC_STATS_HOURLY.USER_ID.equal(userId))
+                .orderBy(hour(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).desc())
+                .limit(SINGLE_RESULT);
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
-                    .fetch()
-                    .into(USER_TC_STATS_HOURLY)
-                    .stream()
-                    .map(RecordConverter::toUserTcStats)
-                    .findAny()
-                    .orElse(UserTcStats.empty(userId));
+                .fetch()
+                .into(USER_TC_STATS_HOURLY)
+                .stream()
+                .map(RecordConverter::toUserTcStats)
+                .findAny()
+                .orElse(UserTcStats.empty(userId));
         });
     }
 
@@ -689,9 +696,11 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
         executeQuery((queryContext) -> {
             final var query = queryContext
-                    .insertInto(USER_INITIAL_STATS)
-                    .columns(USER_INITIAL_STATS.USER_ID, USER_INITIAL_STATS.UTC_TIMESTAMP, USER_INITIAL_STATS.INITIAL_POINTS, USER_INITIAL_STATS.INITIAL_UNITS)
-                    .values(userStats.getUserId(), DateTimeUtils.toUtcLocalDateTime(userStats.getTimestamp()), userStats.getPoints(), userStats.getUnits());
+                .insertInto(USER_INITIAL_STATS)
+                .columns(USER_INITIAL_STATS.USER_ID, USER_INITIAL_STATS.UTC_TIMESTAMP, USER_INITIAL_STATS.INITIAL_POINTS,
+                    USER_INITIAL_STATS.INITIAL_UNITS)
+                .values(userStats.getUserId(), DateTimeUtils.toUtcLocalDateTime(userStats.getTimestamp()), userStats.getPoints(),
+                    userStats.getUnits());
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
@@ -704,19 +713,19 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
         return executeQuery((queryContext) -> {
             final var query = queryContext
-                    .select()
-                    .from(USER_INITIAL_STATS)
-                    .where(USER_INITIAL_STATS.USER_ID.equal(userId))
-                    .orderBy(USER_INITIAL_STATS.UTC_TIMESTAMP.desc())
-                    .limit(SINGLE_RESULT);
+                .select()
+                .from(USER_INITIAL_STATS)
+                .where(USER_INITIAL_STATS.USER_ID.equal(userId))
+                .orderBy(USER_INITIAL_STATS.UTC_TIMESTAMP.desc())
+                .limit(SINGLE_RESULT);
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
-                    .fetch()
-                    .into(USER_INITIAL_STATS)
-                    .stream()
-                    .map(RecordConverter::toUserStats)
-                    .findAny();
+                .fetch()
+                .into(USER_INITIAL_STATS)
+                .stream()
+                .map(RecordConverter::toUserStats)
+                .findAny();
         });
     }
 
@@ -726,9 +735,10 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
         executeQuery((queryContext) -> {
             final var query = queryContext
-                    .insertInto(USER_TOTAL_STATS)
-                    .columns(USER_TOTAL_STATS.USER_ID, USER_TOTAL_STATS.UTC_TIMESTAMP, USER_TOTAL_STATS.TOTAL_POINTS, USER_TOTAL_STATS.TOTAL_UNITS)
-                    .values(userStats.getUserId(), DateTimeUtils.toUtcLocalDateTime(userStats.getTimestamp()), userStats.getPoints(), userStats.getUnits());
+                .insertInto(USER_TOTAL_STATS)
+                .columns(USER_TOTAL_STATS.USER_ID, USER_TOTAL_STATS.UTC_TIMESTAMP, USER_TOTAL_STATS.TOTAL_POINTS, USER_TOTAL_STATS.TOTAL_UNITS)
+                .values(userStats.getUserId(), DateTimeUtils.toUtcLocalDateTime(userStats.getTimestamp()), userStats.getPoints(),
+                    userStats.getUnits());
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
@@ -741,19 +751,19 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
         return executeQuery((queryContext) -> {
             final var query = queryContext
-                    .select()
-                    .from(USER_TOTAL_STATS)
-                    .where(USER_TOTAL_STATS.USER_ID.equal(userId))
-                    .orderBy(USER_TOTAL_STATS.UTC_TIMESTAMP.desc())
-                    .limit(SINGLE_RESULT);
+                .select()
+                .from(USER_TOTAL_STATS)
+                .where(USER_TOTAL_STATS.USER_ID.equal(userId))
+                .orderBy(USER_TOTAL_STATS.UTC_TIMESTAMP.desc())
+                .limit(SINGLE_RESULT);
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
-                    .fetch()
-                    .into(USER_TOTAL_STATS)
-                    .stream()
-                    .map(RecordConverter::toUserStats)
-                    .findAny();
+                .fetch()
+                .into(USER_TOTAL_STATS)
+                .stream()
+                .map(RecordConverter::toUserStats)
+                .findAny();
         });
     }
 
@@ -765,15 +775,17 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
             final LocalDateTime currentUtcLocalDateTime = DateTimeUtils.toUtcLocalDateTime(DateTimeUtils.currentUtcTimestamp());
 
             final var query = queryContext
-                    .insertInto(USER_OFFSET_TC_STATS)
-                    .columns(USER_OFFSET_TC_STATS.USER_ID, USER_OFFSET_TC_STATS.UTC_TIMESTAMP, USER_OFFSET_TC_STATS.OFFSET_POINTS, USER_OFFSET_TC_STATS.OFFSET_MULTIPLIED_POINTS, USER_OFFSET_TC_STATS.OFFSET_UNITS)
-                    .values(userId, currentUtcLocalDateTime, offsetStats.getPointsOffset(), offsetStats.getMultipliedPointsOffset(), offsetStats.getUnitsOffset())
-                    .onConflict(USER_OFFSET_TC_STATS.USER_ID)
-                    .doUpdate()
-                    .set(USER_OFFSET_TC_STATS.UTC_TIMESTAMP, currentUtcLocalDateTime)
-                    .set(USER_OFFSET_TC_STATS.OFFSET_POINTS, offsetStats.getPointsOffset())
-                    .set(USER_OFFSET_TC_STATS.OFFSET_MULTIPLIED_POINTS, offsetStats.getMultipliedPointsOffset())
-                    .set(USER_OFFSET_TC_STATS.OFFSET_UNITS, offsetStats.getUnitsOffset());
+                .insertInto(USER_OFFSET_TC_STATS)
+                .columns(USER_OFFSET_TC_STATS.USER_ID, USER_OFFSET_TC_STATS.UTC_TIMESTAMP, USER_OFFSET_TC_STATS.OFFSET_POINTS,
+                    USER_OFFSET_TC_STATS.OFFSET_MULTIPLIED_POINTS, USER_OFFSET_TC_STATS.OFFSET_UNITS)
+                .values(userId, currentUtcLocalDateTime, offsetStats.getPointsOffset(), offsetStats.getMultipliedPointsOffset(),
+                    offsetStats.getUnitsOffset())
+                .onConflict(USER_OFFSET_TC_STATS.USER_ID)
+                .doUpdate()
+                .set(USER_OFFSET_TC_STATS.UTC_TIMESTAMP, currentUtcLocalDateTime)
+                .set(USER_OFFSET_TC_STATS.OFFSET_POINTS, offsetStats.getPointsOffset())
+                .set(USER_OFFSET_TC_STATS.OFFSET_MULTIPLIED_POINTS, offsetStats.getMultipliedPointsOffset())
+                .set(USER_OFFSET_TC_STATS.OFFSET_UNITS, offsetStats.getUnitsOffset());
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
@@ -788,24 +800,27 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
             final LocalDateTime currentUtcLocalDateTime = DateTimeUtils.toUtcLocalDateTime(DateTimeUtils.currentUtcTimestamp());
 
             final var query = queryContext
-                    .insertInto(USER_OFFSET_TC_STATS)
-                    .columns(USER_OFFSET_TC_STATS.USER_ID, USER_OFFSET_TC_STATS.UTC_TIMESTAMP, USER_OFFSET_TC_STATS.OFFSET_POINTS, USER_OFFSET_TC_STATS.OFFSET_MULTIPLIED_POINTS, USER_OFFSET_TC_STATS.OFFSET_UNITS)
-                    .values(userId, currentUtcLocalDateTime, offsetStats.getPointsOffset(), offsetStats.getMultipliedPointsOffset(), offsetStats.getUnitsOffset())
-                    .onConflict(USER_OFFSET_TC_STATS.USER_ID)
-                    .doUpdate()
-                    .set(USER_OFFSET_TC_STATS.UTC_TIMESTAMP, currentUtcLocalDateTime)
-                    .set(USER_OFFSET_TC_STATS.OFFSET_POINTS, USER_OFFSET_TC_STATS.OFFSET_POINTS.plus(offsetStats.getPointsOffset()))
-                    .set(USER_OFFSET_TC_STATS.OFFSET_MULTIPLIED_POINTS, USER_OFFSET_TC_STATS.OFFSET_MULTIPLIED_POINTS.plus(offsetStats.getMultipliedPointsOffset()))
-                    .set(USER_OFFSET_TC_STATS.OFFSET_UNITS, USER_OFFSET_TC_STATS.OFFSET_UNITS.plus(offsetStats.getUnitsOffset()))
-                    .returning();
+                .insertInto(USER_OFFSET_TC_STATS)
+                .columns(USER_OFFSET_TC_STATS.USER_ID, USER_OFFSET_TC_STATS.UTC_TIMESTAMP, USER_OFFSET_TC_STATS.OFFSET_POINTS,
+                    USER_OFFSET_TC_STATS.OFFSET_MULTIPLIED_POINTS, USER_OFFSET_TC_STATS.OFFSET_UNITS)
+                .values(userId, currentUtcLocalDateTime, offsetStats.getPointsOffset(), offsetStats.getMultipliedPointsOffset(),
+                    offsetStats.getUnitsOffset())
+                .onConflict(USER_OFFSET_TC_STATS.USER_ID)
+                .doUpdate()
+                .set(USER_OFFSET_TC_STATS.UTC_TIMESTAMP, currentUtcLocalDateTime)
+                .set(USER_OFFSET_TC_STATS.OFFSET_POINTS, USER_OFFSET_TC_STATS.OFFSET_POINTS.plus(offsetStats.getPointsOffset()))
+                .set(USER_OFFSET_TC_STATS.OFFSET_MULTIPLIED_POINTS,
+                    USER_OFFSET_TC_STATS.OFFSET_MULTIPLIED_POINTS.plus(offsetStats.getMultipliedPointsOffset()))
+                .set(USER_OFFSET_TC_STATS.OFFSET_UNITS, USER_OFFSET_TC_STATS.OFFSET_UNITS.plus(offsetStats.getUnitsOffset()))
+                .returning();
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
-                    .fetch()
-                    .into(USER_OFFSET_TC_STATS)
-                    .stream()
-                    .map(RecordConverter::toOffsetStats)
-                    .findAny();
+                .fetch()
+                .into(USER_OFFSET_TC_STATS)
+                .stream()
+                .map(RecordConverter::toOffsetStats)
+                .findAny();
         });
     }
 
@@ -814,18 +829,18 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
         LOGGER.debug("Getting offset stats for user ID: {}", userId);
         return executeQuery((queryContext) -> {
             final var query = queryContext
-                    .select(USER_OFFSET_TC_STATS.OFFSET_POINTS, USER_OFFSET_TC_STATS.OFFSET_MULTIPLIED_POINTS, USER_OFFSET_TC_STATS.OFFSET_UNITS)
-                    .from(USER_OFFSET_TC_STATS)
-                    .orderBy(USER_OFFSET_TC_STATS.UTC_TIMESTAMP.desc())
-                    .limit(SINGLE_RESULT);
+                .select(USER_OFFSET_TC_STATS.OFFSET_POINTS, USER_OFFSET_TC_STATS.OFFSET_MULTIPLIED_POINTS, USER_OFFSET_TC_STATS.OFFSET_UNITS)
+                .from(USER_OFFSET_TC_STATS)
+                .orderBy(USER_OFFSET_TC_STATS.UTC_TIMESTAMP.desc())
+                .limit(SINGLE_RESULT);
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
-                    .fetch()
-                    .into(USER_OFFSET_TC_STATS)
-                    .stream()
-                    .map(RecordConverter::toOffsetStats)
-                    .findAny();
+                .fetch()
+                .into(USER_OFFSET_TC_STATS)
+                .stream()
+                .map(RecordConverter::toOffsetStats)
+                .findAny();
         });
     }
 
@@ -835,7 +850,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
         executeQuery((queryContext) -> {
             final var query = queryContext
-                    .deleteFrom(USER_OFFSET_TC_STATS);
+                .deleteFrom(USER_OFFSET_TC_STATS);
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
@@ -850,26 +865,28 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
             final LocalDateTime currentUtcLocalDateTime = DateTimeUtils.toUtcLocalDateTime(DateTimeUtils.currentUtcTimestamp());
 
             final var query = queryContext
-                    .insertInto(RETIRED_USER_STATS)
-                    .columns(RETIRED_USER_STATS.TEAM_ID, RETIRED_USER_STATS.USER_ID, RETIRED_USER_STATS.DISPLAY_USERNAME, USER_OFFSET_TC_STATS.UTC_TIMESTAMP,
-                            RETIRED_USER_STATS.FINAL_POINTS, RETIRED_USER_STATS.FINAL_MULTIPLIED_POINTS, RETIRED_USER_STATS.FINAL_UNITS)
-                    .values(teamId, userId, displayUserName, currentUtcLocalDateTime, retiredUserStats.getPoints(), retiredUserStats.getMultipliedPoints(), retiredUserStats.getUnits())
-                    .onConflict(RETIRED_USER_STATS.USER_ID)
-                    .doUpdate()
-                    .set(RETIRED_USER_STATS.TEAM_ID, teamId)
-                    .set(RETIRED_USER_STATS.UTC_TIMESTAMP, currentUtcLocalDateTime)
-                    .set(RETIRED_USER_STATS.DISPLAY_USERNAME, displayUserName)
-                    .set(RETIRED_USER_STATS.FINAL_POINTS, retiredUserStats.getPoints())
-                    .set(RETIRED_USER_STATS.FINAL_MULTIPLIED_POINTS, retiredUserStats.getMultipliedPoints())
-                    .set(RETIRED_USER_STATS.FINAL_UNITS, retiredUserStats.getUnits())
-                    .returning();
+                .insertInto(RETIRED_USER_STATS)
+                .columns(RETIRED_USER_STATS.TEAM_ID, RETIRED_USER_STATS.USER_ID, RETIRED_USER_STATS.DISPLAY_USERNAME,
+                    USER_OFFSET_TC_STATS.UTC_TIMESTAMP,
+                    RETIRED_USER_STATS.FINAL_POINTS, RETIRED_USER_STATS.FINAL_MULTIPLIED_POINTS, RETIRED_USER_STATS.FINAL_UNITS)
+                .values(teamId, userId, displayUserName, currentUtcLocalDateTime, retiredUserStats.getPoints(),
+                    retiredUserStats.getMultipliedPoints(), retiredUserStats.getUnits())
+                .onConflict(RETIRED_USER_STATS.USER_ID)
+                .doUpdate()
+                .set(RETIRED_USER_STATS.TEAM_ID, teamId)
+                .set(RETIRED_USER_STATS.UTC_TIMESTAMP, currentUtcLocalDateTime)
+                .set(RETIRED_USER_STATS.DISPLAY_USERNAME, displayUserName)
+                .set(RETIRED_USER_STATS.FINAL_POINTS, retiredUserStats.getPoints())
+                .set(RETIRED_USER_STATS.FINAL_MULTIPLIED_POINTS, retiredUserStats.getMultipliedPoints())
+                .set(RETIRED_USER_STATS.FINAL_UNITS, retiredUserStats.getUnits())
+                .returning();
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
-                    .fetch()
-                    .into(RETIRED_USER_STATS)
-                    .get(0)
-                    .getRetiredUserId();
+                .fetch()
+                .into(RETIRED_USER_STATS)
+                .get(0)
+                .getRetiredUserId();
         });
     }
 
@@ -878,18 +895,18 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
         LOGGER.debug("Getting retired user stats for team with ID: {}", team.getId());
         return executeQuery((queryContext) -> {
             final var query = queryContext
-                    .select()
-                    .from(RETIRED_USER_STATS)
-                    .where(RETIRED_USER_STATS.TEAM_ID.equal(team.getId()))
-                    .orderBy(RETIRED_USER_STATS.RETIRED_USER_ID.asc());
+                .select()
+                .from(RETIRED_USER_STATS)
+                .where(RETIRED_USER_STATS.TEAM_ID.equal(team.getId()))
+                .orderBy(RETIRED_USER_STATS.RETIRED_USER_ID.asc());
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
-                    .fetch()
-                    .into(RETIRED_USER_STATS)
-                    .stream()
-                    .map(RecordConverter::toRetiredUserStats)
-                    .collect(toList());
+                .fetch()
+                .into(RETIRED_USER_STATS)
+                .stream()
+                .map(RecordConverter::toRetiredUserStats)
+                .collect(toList());
         });
     }
 
@@ -899,7 +916,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
         executeQuery((queryContext) -> {
             final var query = queryContext
-                    .deleteFrom(RETIRED_USER_STATS);
+                .deleteFrom(RETIRED_USER_STATS);
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
@@ -912,32 +929,32 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
         return executeQuery((queryContext) -> {
             final var query = queryContext
-                    .select(
-                            field(crypt(password, SYSTEM_USERS.USER_PASSWORD_HASH.getValue(
-                                    queryContext
-                                            .select()
-                                            .from(SYSTEM_USERS)
-                                            .where(SYSTEM_USERS.USER_NAME.equalIgnoreCase(userName))
-                                            .fetch()
-                                            .into(SYSTEM_USERS)
-                                            .stream()
-                                            .findAny()
-                                            .orElse(SYSTEM_USERS.newRecord())
-                                    )
-                            ).equal(SYSTEM_USERS.USER_PASSWORD_HASH)).as("is_password_match"),
-                            SYSTEM_USERS.USER_NAME,
-                            SYSTEM_USERS.ROLES
-                    )
-                    .from(SYSTEM_USERS)
-                    .where(SYSTEM_USERS.USER_NAME.equal(userName));
+                .select(
+                    field(crypt(password, SYSTEM_USERS.USER_PASSWORD_HASH.getValue(
+                        queryContext
+                            .select()
+                            .from(SYSTEM_USERS)
+                            .where(SYSTEM_USERS.USER_NAME.equalIgnoreCase(userName))
+                            .fetch()
+                            .into(SYSTEM_USERS)
+                            .stream()
+                            .findAny()
+                            .orElse(SYSTEM_USERS.newRecord())
+                        )
+                    ).equal(SYSTEM_USERS.USER_PASSWORD_HASH)).as("is_password_match"),
+                    SYSTEM_USERS.USER_NAME,
+                    SYSTEM_USERS.ROLES
+                )
+                .from(SYSTEM_USERS)
+                .where(SYSTEM_USERS.USER_NAME.equal(userName));
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
-                    .fetch()
-                    .stream()
-                    .map(RecordConverter::toSystemUserAuthentication)
-                    .findAny()
-                    .orElse(SystemUserAuthentication.userDoesNotExist());
+                .fetch()
+                .stream()
+                .map(RecordConverter::toSystemUserAuthentication)
+                .findAny()
+                .orElse(SystemUserAuthentication.userDoesNotExist());
         });
     }
 

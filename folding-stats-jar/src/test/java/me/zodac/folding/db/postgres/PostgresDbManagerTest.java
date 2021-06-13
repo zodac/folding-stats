@@ -1,5 +1,15 @@
 package me.zodac.folding.db.postgres;
 
+import static me.zodac.folding.db.postgres.TestGenerator.nextHardwareName;
+import static me.zodac.folding.db.postgres.TestGenerator.nextTeamName;
+import static me.zodac.folding.db.postgres.TestGenerator.nextUserName;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.time.Month;
+import java.time.Year;
+import java.util.Collection;
+import java.util.Optional;
 import me.zodac.folding.api.SystemUserAuthentication;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.exception.HardwareNotFoundException;
@@ -21,17 +31,6 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import java.time.Month;
-import java.time.Year;
-import java.util.Collection;
-import java.util.Optional;
-
-import static me.zodac.folding.db.postgres.TestGenerator.nextHardwareName;
-import static me.zodac.folding.db.postgres.TestGenerator.nextTeamName;
-import static me.zodac.folding.db.postgres.TestGenerator.nextUserName;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 /**
  * Unit tests for {@link PostgresDbManager}.
  */
@@ -46,38 +45,40 @@ class PostgresDbManagerTest {
         final Hardware hardware = generateHardware();
         final Hardware createdHardware = POSTGRES_DB_MANAGER.createHardware(hardware);
         assertThat(createdHardware.getId())
-                .isNotEqualTo(Hardware.EMPTY_HARDWARE_ID);
+            .isNotEqualTo(Hardware.EMPTY_HARDWARE_ID);
 
         // Not explicitly handling this case, the validator should ensure no duplicate creates are attempted
         assertThatThrownBy(() -> POSTGRES_DB_MANAGER.createHardware(hardware))
-                .isInstanceOf(DataAccessException.class);
+            .isInstanceOf(DataAccessException.class);
 
         final Collection<Hardware> allHardware = POSTGRES_DB_MANAGER.getAllHardware();
         assertThat(allHardware)
-                .hasSize(1);
+            .hasSize(1);
 
-        final Hardware retrievedHardware = POSTGRES_DB_MANAGER.getHardware(createdHardware.getId()).orElseThrow(() -> new HardwareNotFoundException(createdHardware.getId()));
+        final Hardware retrievedHardware =
+            POSTGRES_DB_MANAGER.getHardware(createdHardware.getId()).orElseThrow(() -> new HardwareNotFoundException(createdHardware.getId()));
         assertThat(retrievedHardware)
-                .isEqualTo(createdHardware);
+            .isEqualTo(createdHardware);
 
         final Hardware hardwareToUpdate = Hardware.builder()
-                .id(retrievedHardware.getId())
-                .hardwareName(retrievedHardware.getHardwareName())
-                .displayName(retrievedHardware.getDisplayName())
-                .operatingSystem(OperatingSystem.LINUX)
-                .multiplier(retrievedHardware.getMultiplier())
-                .build();
+            .id(retrievedHardware.getId())
+            .hardwareName(retrievedHardware.getHardwareName())
+            .displayName(retrievedHardware.getDisplayName())
+            .operatingSystem(OperatingSystem.LINUX)
+            .multiplier(retrievedHardware.getMultiplier())
+            .build();
 
         POSTGRES_DB_MANAGER.updateHardware(hardwareToUpdate);
-        final Hardware updatedHardware = POSTGRES_DB_MANAGER.getHardware(createdHardware.getId()).orElseThrow(() -> new HardwareNotFoundException(createdHardware.getId()));
+        final Hardware updatedHardware =
+            POSTGRES_DB_MANAGER.getHardware(createdHardware.getId()).orElseThrow(() -> new HardwareNotFoundException(createdHardware.getId()));
         assertThat(updatedHardware)
-                .isEqualTo(hardwareToUpdate);
+            .isEqualTo(hardwareToUpdate);
 
         POSTGRES_DB_MANAGER.deleteHardware(createdHardware.getId());
 
         final Collection<Hardware> allHardwareAfterDelete = POSTGRES_DB_MANAGER.getAllHardware();
         assertThat(allHardwareAfterDelete)
-                .isEmpty();
+            .isEmpty();
     }
 
     @Test
@@ -87,37 +88,37 @@ class PostgresDbManagerTest {
         final Team createdTeam = POSTGRES_DB_MANAGER.createTeam(team);
 
         assertThat(createdTeam.getId())
-                .isNotEqualTo(Team.EMPTY_TEAM_ID);
+            .isNotEqualTo(Team.EMPTY_TEAM_ID);
 
         // Not explicitly handling this case, the validator should ensure no duplicate creates are attempted
         assertThatThrownBy(() -> POSTGRES_DB_MANAGER.createTeam(team))
-                .isInstanceOf(DataAccessException.class);
+            .isInstanceOf(DataAccessException.class);
 
         final Collection<Team> allTeams = POSTGRES_DB_MANAGER.getAllTeams();
         assertThat(allTeams)
-                .hasSize(1);
+            .hasSize(1);
 
         final Team retrievedTeam = POSTGRES_DB_MANAGER.getTeam(createdTeam.getId()).orElseThrow(() -> new TeamNotFoundException(createdTeam.getId()));
         assertThat(retrievedTeam)
-                .isEqualTo(createdTeam);
+            .isEqualTo(createdTeam);
 
         final Team teamToUpdate = Team.builder()
-                .id(retrievedTeam.getId())
-                .teamName(retrievedTeam.getTeamName())
-                .teamDescription("Updated description")
-                .forumLink(retrievedTeam.getForumLink())
-                .build();
+            .id(retrievedTeam.getId())
+            .teamName(retrievedTeam.getTeamName())
+            .teamDescription("Updated description")
+            .forumLink(retrievedTeam.getForumLink())
+            .build();
 
         POSTGRES_DB_MANAGER.updateTeam(teamToUpdate);
         final Team updatedTeam = POSTGRES_DB_MANAGER.getTeam(createdTeam.getId()).orElseThrow(() -> new TeamNotFoundException(createdTeam.getId()));
         assertThat(updatedTeam)
-                .isEqualTo(teamToUpdate);
+            .isEqualTo(teamToUpdate);
 
         POSTGRES_DB_MANAGER.deleteTeam(createdTeam.getId());
 
         final Collection<Team> allTeamsAfterDelete = POSTGRES_DB_MANAGER.getAllTeams();
         assertThat(allTeamsAfterDelete)
-                .isEmpty();
+            .isEmpty();
     }
 
     @Test
@@ -127,43 +128,43 @@ class PostgresDbManagerTest {
         final User createdUser = POSTGRES_DB_MANAGER.createUser(user);
 
         assertThat(createdUser.getId())
-                .isNotEqualTo(User.EMPTY_USER_ID);
+            .isNotEqualTo(User.EMPTY_USER_ID);
 
         // Not explicitly handling this case, the validator should ensure no duplicate creates are attempted
         assertThatThrownBy(() -> POSTGRES_DB_MANAGER.createUser(user))
-                .isInstanceOf(DataAccessException.class);
+            .isInstanceOf(DataAccessException.class);
 
         final Collection<User> allUsers = POSTGRES_DB_MANAGER.getAllUsers();
         assertThat(allUsers)
-                .hasSize(1);
+            .hasSize(1);
 
         final User retrievedUser = POSTGRES_DB_MANAGER.getUser(createdUser.getId()).orElseThrow(() -> new UserNotFoundException(createdUser.getId()));
         assertThat(retrievedUser)
-                .isEqualTo(createdUser);
+            .isEqualTo(createdUser);
 
         final User userToUpdate = User.builder()
-                .id(retrievedUser.getId())
-                .foldingUserName(retrievedUser.getFoldingUserName())
-                .displayName(retrievedUser.getDisplayName())
-                .passkey(retrievedUser.getPasskey())
-                .category(Category.AMD_GPU)
-                .profileLink(retrievedUser.getProfileLink())
-                .liveStatsLink(retrievedUser.getLiveStatsLink())
-                .hardware(retrievedUser.getHardware())
-                .team(retrievedUser.getTeam())
-                .userIsCaptain(retrievedUser.isUserIsCaptain())
-                .build();
+            .id(retrievedUser.getId())
+            .foldingUserName(retrievedUser.getFoldingUserName())
+            .displayName(retrievedUser.getDisplayName())
+            .passkey(retrievedUser.getPasskey())
+            .category(Category.AMD_GPU)
+            .profileLink(retrievedUser.getProfileLink())
+            .liveStatsLink(retrievedUser.getLiveStatsLink())
+            .hardware(retrievedUser.getHardware())
+            .team(retrievedUser.getTeam())
+            .userIsCaptain(retrievedUser.isUserIsCaptain())
+            .build();
 
         POSTGRES_DB_MANAGER.updateUser(userToUpdate);
         final User updatedUser = POSTGRES_DB_MANAGER.getUser(createdUser.getId()).orElseThrow(() -> new UserNotFoundException(createdUser.getId()));
         assertThat(updatedUser)
-                .isEqualTo(userToUpdate);
+            .isEqualTo(userToUpdate);
 
         POSTGRES_DB_MANAGER.deleteUser(createdUser.getId());
 
         final Collection<User> allUsersAfterDelete = POSTGRES_DB_MANAGER.getAllUsers();
         assertThat(allUsersAfterDelete)
-                .isEmpty();
+            .isEmpty();
     }
 
     @Test
@@ -171,7 +172,7 @@ class PostgresDbManagerTest {
         final int userId = createUser().getId();
 
         assertThat(POSTGRES_DB_MANAGER.getInitialStats(userId))
-                .isEmpty();
+            .isEmpty();
 
         final long points = 100L;
         final int units = 10;
@@ -179,11 +180,11 @@ class PostgresDbManagerTest {
 
         final Optional<UserStats> userStatsAfterUpdate = POSTGRES_DB_MANAGER.getInitialStats(userId);
         assertThat(userStatsAfterUpdate)
-                .isPresent();
+            .isPresent();
         assertThat(userStatsAfterUpdate.get().getPoints())
-                .isEqualTo(points);
+            .isEqualTo(points);
         assertThat(userStatsAfterUpdate.get().getUnits())
-                .isEqualTo(units);
+            .isEqualTo(units);
     }
 
     @Test
@@ -191,7 +192,7 @@ class PostgresDbManagerTest {
         final int userId = createUser().getId();
 
         assertThat(POSTGRES_DB_MANAGER.getTotalStats(userId))
-                .isEmpty();
+            .isEmpty();
 
         final long points = 100L;
         final int units = 10;
@@ -199,11 +200,11 @@ class PostgresDbManagerTest {
 
         final Optional<UserStats> userStatsAfterUpdate = POSTGRES_DB_MANAGER.getTotalStats(userId);
         assertThat(userStatsAfterUpdate)
-                .isPresent();
+            .isPresent();
         assertThat(userStatsAfterUpdate.get().getPoints())
-                .isEqualTo(points);
+            .isEqualTo(points);
         assertThat(userStatsAfterUpdate.get().getUnits())
-                .isEqualTo(units);
+            .isEqualTo(units);
     }
 
     @Test
@@ -212,7 +213,7 @@ class PostgresDbManagerTest {
         final Team team = userToRetire.getTeam();
 
         assertThat(POSTGRES_DB_MANAGER.getRetiredUserStatsForTeam(team))
-                .isEmpty();
+            .isEmpty();
 
         POSTGRES_DB_MANAGER.deleteUser(userToRetire.getId());
 
@@ -221,21 +222,21 @@ class PostgresDbManagerTest {
         final int units = 5;
 
         POSTGRES_DB_MANAGER.persistRetiredUserStats(team.getId(), userToRetire.getId(), userToRetire.getDisplayName(),
-                UserTcStats.createNow(userToRetire.getId(), points, multipliedPoints, units));
+            UserTcStats.createNow(userToRetire.getId(), points, multipliedPoints, units));
 
         final Collection<RetiredUserTcStats> retiredUserStatsForTeam = POSTGRES_DB_MANAGER.getRetiredUserStatsForTeam(team);
 
         assertThat(retiredUserStatsForTeam)
-                .hasSize(1);
+            .hasSize(1);
 
         final RetiredUserTcStats retiredUserTcStats = retiredUserStatsForTeam.iterator().next();
 
         assertThat(retiredUserTcStats.getPoints())
-                .isEqualTo(points);
+            .isEqualTo(points);
         assertThat(retiredUserTcStats.getMultipliedPoints())
-                .isEqualTo(multipliedPoints);
+            .isEqualTo(multipliedPoints);
         assertThat(retiredUserTcStats.getUnits())
-                .isEqualTo(units);
+            .isEqualTo(units);
     }
 
     @Test
@@ -243,37 +244,37 @@ class PostgresDbManagerTest {
         final int userId = createUser().getId();
 
         assertThat(POSTGRES_DB_MANAGER.getOffsetStats(userId))
-                .isEmpty();
+            .isEmpty();
 
         final OffsetStats offsetStats = OffsetStats.create(100L, 1_000L, 5);
         POSTGRES_DB_MANAGER.addOffsetStats(userId, offsetStats);
         final Optional<OffsetStats> firstOffsetStats = POSTGRES_DB_MANAGER.getOffsetStats(userId);
         assertThat(firstOffsetStats)
-                .isPresent();
+            .isPresent();
         assertThat(firstOffsetStats.get())
-                .isEqualTo(offsetStats);
+            .isEqualTo(offsetStats);
 
         final OffsetStats overwriteOffsetStats = OffsetStats.create(500L, 5_000L, 25);
         POSTGRES_DB_MANAGER.addOffsetStats(userId, overwriteOffsetStats);
         final Optional<OffsetStats> secondOffsetStats = POSTGRES_DB_MANAGER.getOffsetStats(userId);
         assertThat(secondOffsetStats)
-                .isPresent();
+            .isPresent();
         assertThat(secondOffsetStats.get())
-                .isEqualTo(overwriteOffsetStats);
+            .isEqualTo(overwriteOffsetStats);
 
         final OffsetStats additionalOffsetStats = OffsetStats.create(250L, 2_500L, 12);
         POSTGRES_DB_MANAGER.addOrUpdateOffsetStats(userId, additionalOffsetStats);
 
         final OffsetStats expectedOffsetStats = OffsetStats.create(
-                overwriteOffsetStats.getPointsOffset() + additionalOffsetStats.getPointsOffset(),
-                overwriteOffsetStats.getMultipliedPointsOffset() + additionalOffsetStats.getMultipliedPointsOffset(),
-                overwriteOffsetStats.getUnitsOffset() + additionalOffsetStats.getUnitsOffset()
+            overwriteOffsetStats.getPointsOffset() + additionalOffsetStats.getPointsOffset(),
+            overwriteOffsetStats.getMultipliedPointsOffset() + additionalOffsetStats.getMultipliedPointsOffset(),
+            overwriteOffsetStats.getUnitsOffset() + additionalOffsetStats.getUnitsOffset()
         );
         final Optional<OffsetStats> thirdOffsetStats = POSTGRES_DB_MANAGER.getOffsetStats(userId);
         assertThat(thirdOffsetStats)
-                .isPresent();
+            .isPresent();
         assertThat(thirdOffsetStats.get())
-                .isEqualTo(expectedOffsetStats);
+            .isEqualTo(expectedOffsetStats);
 
         final int secondUserId = createUser().getId();
         POSTGRES_DB_MANAGER.addOffsetStats(secondUserId, offsetStats);
@@ -281,19 +282,19 @@ class PostgresDbManagerTest {
         POSTGRES_DB_MANAGER.clearAllOffsetStats();
 
         assertThat(POSTGRES_DB_MANAGER.getOffsetStats(userId))
-                .isEmpty();
+            .isEmpty();
         assertThat(POSTGRES_DB_MANAGER.getOffsetStats(secondUserId))
-                .isEmpty();
+            .isEmpty();
     }
 
     @Test
     void hourlyTcStatsTest() {
         assertThat(POSTGRES_DB_MANAGER.isAnyHourlyTcStats())
-                .isFalse();
+            .isFalse();
 
         final int userId = createUser().getId();
         assertThat(POSTGRES_DB_MANAGER.getHourlyTcStats(userId))
-                .isEmpty();
+            .isEmpty();
 
         final long points = 100L;
         final long multipliedPoints = 1_000L;
@@ -303,12 +304,12 @@ class PostgresDbManagerTest {
 
         final Optional<UserTcStats> retrievedUserTcStats = POSTGRES_DB_MANAGER.getHourlyTcStats(userId);
         assertThat(retrievedUserTcStats)
-                .isPresent();
+            .isPresent();
         assertThat(retrievedUserTcStats.get())
-                .isEqualTo(userTcStats);
+            .isEqualTo(userTcStats);
 
         assertThat(POSTGRES_DB_MANAGER.isAnyHourlyTcStats())
-                .isTrue();
+            .isTrue();
     }
 
     @Test
@@ -321,71 +322,77 @@ class PostgresDbManagerTest {
         final int day = 15;
 
         assertThat(POSTGRES_DB_MANAGER.getHistoricStatsHourly(userId, yesterday, month, year))
-                .isEmpty();
+            .isEmpty();
         assertThat(POSTGRES_DB_MANAGER.getHistoricStatsDaily(userId, month, year))
-                .isEmpty();
+            .isEmpty();
         assertThat(POSTGRES_DB_MANAGER.getHistoricStatsMonthly(userId, year))
-                .isEmpty();
+            .isEmpty();
 
         final long currentDayFirstPoints = 200L;
         final long currentDayFirstMultipliedPoints = 2_000L;
         final int currentDayFirstUnits = 10;
-        final UserTcStats currentDayFirstUserTcStats = UserTcStats.create(userId, DateTimeUtils.getTimestampOf(year, month, yesterday, 0, 0, 0), currentDayFirstPoints, currentDayFirstMultipliedPoints, currentDayFirstUnits);
+        final UserTcStats currentDayFirstUserTcStats = UserTcStats
+            .create(userId, DateTimeUtils.getTimestampOf(year, month, yesterday, 0, 0, 0), currentDayFirstPoints, currentDayFirstMultipliedPoints,
+                currentDayFirstUnits);
         POSTGRES_DB_MANAGER.persistHourlyTcStats(currentDayFirstUserTcStats);
 
         final long currentDaySecondPoints = 300L;
         final long currentDaySecondMultipliedPoints = 3_000L;
         final int currentDaySecondUnits = 15;
-        final UserTcStats currentDaySecondUserTcStats = UserTcStats.create(userId, DateTimeUtils.getTimestampOf(year, month, yesterday, 1, 0, 0), currentDaySecondPoints, currentDaySecondMultipliedPoints, currentDaySecondUnits);
+        final UserTcStats currentDaySecondUserTcStats = UserTcStats
+            .create(userId, DateTimeUtils.getTimestampOf(year, month, yesterday, 1, 0, 0), currentDaySecondPoints, currentDaySecondMultipliedPoints,
+                currentDaySecondUnits);
         POSTGRES_DB_MANAGER.persistHourlyTcStats(currentDaySecondUserTcStats);
 
         final long currentDayThirdPoints = 300L;
         final long currentDayThirdMultipliedPoints = 3_000L;
         final int currentDayThirdUnits = 15;
-        final UserTcStats currentDayThirdUserTcStats = UserTcStats.create(userId, DateTimeUtils.getTimestampOf(year, month, day, 1, 0, 0), currentDayThirdPoints, currentDayThirdMultipliedPoints, currentDayThirdUnits);
+        final UserTcStats currentDayThirdUserTcStats = UserTcStats
+            .create(userId, DateTimeUtils.getTimestampOf(year, month, day, 1, 0, 0), currentDayThirdPoints, currentDayThirdMultipliedPoints,
+                currentDayThirdUnits);
         POSTGRES_DB_MANAGER.persistHourlyTcStats(currentDayThirdUserTcStats);
 
         assertThat(POSTGRES_DB_MANAGER.getHistoricStatsHourly(userId, yesterday, month, year))
-                .isNotEmpty();
+            .isNotEmpty();
         assertThat(POSTGRES_DB_MANAGER.getHistoricStatsDaily(userId, month, year))
-                .isNotEmpty();
+            .isNotEmpty();
         assertThat(POSTGRES_DB_MANAGER.getHistoricStatsMonthly(userId, year))
-                .isNotEmpty();
+            .isNotEmpty();
     }
 
     @Test
     void validSystemUserTest() {
         final SystemUserAuthentication invalidUserName = POSTGRES_DB_MANAGER.authenticateSystemUser("invalidUserName", "ADMIN_PASSWORD");
         assertThat(invalidUserName.isUserExists())
-                .isFalse();
+            .isFalse();
         assertThat(invalidUserName.isPasswordMatch())
-                .isFalse();
+            .isFalse();
         assertThat(invalidUserName.getUserRoles())
-                .isEmpty();
+            .isEmpty();
 
         final SystemUserAuthentication invalidPassword = POSTGRES_DB_MANAGER.authenticateSystemUser("ADMIN_USERNAME", "invalidPassword");
         assertThat(invalidPassword.isUserExists())
-                .isTrue();
+            .isTrue();
         assertThat(invalidPassword.isPasswordMatch())
-                .isFalse();
+            .isFalse();
         assertThat(invalidPassword.getUserRoles())
-                .isEmpty();
+            .isEmpty();
 
         final SystemUserAuthentication admin = POSTGRES_DB_MANAGER.authenticateSystemUser("ADMIN_USERNAME", "ADMIN_PASSWORD");
         assertThat(admin.isUserExists())
-                .isTrue();
+            .isTrue();
         assertThat(admin.isPasswordMatch())
-                .isTrue();
+            .isTrue();
         assertThat(admin.getUserRoles())
-                .contains("admin");
+            .contains("admin");
 
         final SystemUserAuthentication readOnly = POSTGRES_DB_MANAGER.authenticateSystemUser("READ_ONLY_USERNAME", "READ_ONLY_PASSWORD");
         assertThat(readOnly.isUserExists())
-                .isTrue();
+            .isTrue();
         assertThat(readOnly.isPasswordMatch())
-                .isTrue();
+            .isTrue();
         assertThat(readOnly.getUserRoles())
-                .contains("read-only");
+            .contains("read-only");
     }
 
     private Hardware generateHardware() {

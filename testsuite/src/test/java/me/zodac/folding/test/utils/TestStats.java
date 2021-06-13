@@ -7,11 +7,11 @@ package me.zodac.folding.test.utils;
  */
 public final class TestStats {
 
-    private transient final int userId;
-    private transient final String timestamp;
-    private transient final long points;
-    private transient final long multipliedPoints;
-    private transient final int units;
+    private final transient int userId;
+    private final transient String timestamp;
+    private final transient long points;
+    private final transient long multipliedPoints;
+    private final transient int units;
 
     private TestStats(final int userId, final String timestamp, final long points, final long multipliedPoints, final int units) {
         this.userId = userId;

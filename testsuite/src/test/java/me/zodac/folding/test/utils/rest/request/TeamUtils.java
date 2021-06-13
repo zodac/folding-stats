@@ -1,25 +1,24 @@
 package me.zodac.folding.test.utils.rest.request;
 
+import static me.zodac.folding.test.utils.TestAuthenticationData.ADMIN_USER;
+import static me.zodac.folding.test.utils.TestConstants.FOLDING_URL;
+import static me.zodac.folding.test.utils.rest.response.HttpResponseHeaderUtils.getTotalCount;
+
+import java.net.HttpURLConnection;
+import java.net.http.HttpResponse;
+import java.util.Collection;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.client.java.request.TeamRequestSender;
 import me.zodac.folding.client.java.response.TeamResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
 
-import java.net.HttpURLConnection;
-import java.net.http.HttpResponse;
-import java.util.Collection;
-
-import static me.zodac.folding.test.utils.TestAuthenticationData.ADMIN_USER;
-import static me.zodac.folding.test.utils.TestConstants.FOLDING_URL;
-import static me.zodac.folding.test.utils.rest.response.HttpResponseHeaderUtils.getXTotalCount;
-
 /**
  * Utility class for {@link Team}-based tests.
  */
 public final class TeamUtils {
 
-    public static final TeamRequestSender TEAM_REQUEST_SENDER = TeamRequestSender.create(FOLDING_URL);
+    public static final TeamRequestSender TEAM_REQUEST_SENDER = TeamRequestSender.createWithUrl(FOLDING_URL);
 
     private TeamUtils() {
 
@@ -37,10 +36,9 @@ public final class TeamUtils {
         if (response.statusCode() == HttpURLConnection.HTTP_CREATED) {
             return TeamResponseParser.create(response);
         }
-        
+
         throw new FoldingRestException(String.format("Invalid response (%s) when creating team: %s", response.statusCode(), response.body()));
     }
-
 
     /**
      * Retrieves all {@link Team}s.
@@ -54,7 +52,8 @@ public final class TeamUtils {
             return TeamResponseParser.getAll(response);
         }
 
-        throw new FoldingRestException(String.format("Invalid response (%s) when getting all teams with: %s", response.statusCode(), response.body()));
+        throw new FoldingRestException(
+            String.format("Invalid response (%s) when getting all teams with: %s", response.statusCode(), response.body()));
     }
 
     /**
@@ -65,7 +64,7 @@ public final class TeamUtils {
      */
     public static int getNumberOfTeams() throws FoldingRestException {
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.getAll();
-        return getXTotalCount(response);
+        return getTotalCount(response);
     }
 
     /**
@@ -81,6 +80,7 @@ public final class TeamUtils {
             return TeamResponseParser.get(response);
         }
 
-        throw new FoldingRestException(String.format("Invalid response (%s) when getting team with ID %s: %s", response.statusCode(), teamId, response.body()));
+        throw new FoldingRestException(
+            String.format("Invalid response (%s) when getting team with ID %s: %s", response.statusCode(), teamId, response.body()));
     }
 }

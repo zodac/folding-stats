@@ -2,12 +2,11 @@ package me.zodac.folding.db.postgres;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 import me.zodac.folding.api.db.DbConnectionPool;
 import me.zodac.folding.api.exception.DatabaseConnectionException;
 import me.zodac.folding.api.utils.EnvironmentVariableUtils;
-
-import java.sql.Connection;
-import java.sql.SQLException;
 
 /**
  * {@link DbConnectionPool} for PostgreSQL DB {@link Connection}s.

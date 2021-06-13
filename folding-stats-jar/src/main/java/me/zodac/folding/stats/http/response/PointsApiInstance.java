@@ -1,15 +1,15 @@
 package me.zodac.folding.stats.http.response;
 
+import java.util.Comparator;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.Comparator;
-
 /**
  * Response returned from {@link me.zodac.folding.stats.http.request.PointsUrlBuilder} for a user/passkey.
+ *
  * <p>
  * Expected response:
  * <pre>
@@ -37,6 +37,6 @@ class PointsApiInstance implements Comparable<PointsApiInstance> {
     @Override
     public int compareTo(final PointsApiInstance other) {
         return Comparator.comparingLong(PointsApiInstance::getEarned)
-                .compare(other, this);
+            .compare(other, this);
     }
 }

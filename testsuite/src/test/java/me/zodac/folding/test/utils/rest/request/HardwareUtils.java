@@ -1,25 +1,24 @@
 package me.zodac.folding.test.utils.rest.request;
 
+import static me.zodac.folding.test.utils.TestAuthenticationData.ADMIN_USER;
+import static me.zodac.folding.test.utils.TestConstants.FOLDING_URL;
+import static me.zodac.folding.test.utils.rest.response.HttpResponseHeaderUtils.getTotalCount;
+
+import java.net.HttpURLConnection;
+import java.net.http.HttpResponse;
+import java.util.Collection;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.client.java.request.HardwareRequestSender;
 import me.zodac.folding.client.java.response.HardwareResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 
-import java.net.HttpURLConnection;
-import java.net.http.HttpResponse;
-import java.util.Collection;
-
-import static me.zodac.folding.test.utils.TestAuthenticationData.ADMIN_USER;
-import static me.zodac.folding.test.utils.TestConstants.FOLDING_URL;
-import static me.zodac.folding.test.utils.rest.response.HttpResponseHeaderUtils.getXTotalCount;
-
 /**
  * Utility class for {@link Hardware}-based tests.
  */
 public final class HardwareUtils {
 
-    public static final HardwareRequestSender HARDWARE_REQUEST_SENDER = HardwareRequestSender.create(FOLDING_URL);
+    public static final HardwareRequestSender HARDWARE_REQUEST_SENDER = HardwareRequestSender.createWithUrl(FOLDING_URL);
 
     private HardwareUtils() {
 
@@ -41,7 +40,6 @@ public final class HardwareUtils {
         throw new FoldingRestException(String.format("Invalid response (%s) when creating hardware: %s", response.statusCode(), response.body()));
     }
 
-
     /**
      * Retrieves all {@link Hardware}s.
      *
@@ -54,7 +52,8 @@ public final class HardwareUtils {
             return HardwareResponseParser.getAll(response);
         }
 
-        throw new FoldingRestException(String.format("Invalid response (%s) when getting all hardware with: %s", response.statusCode(), response.body()));
+        throw new FoldingRestException(
+            String.format("Invalid response (%s) when getting all hardware with: %s", response.statusCode(), response.body()));
     }
 
     /**
@@ -65,7 +64,7 @@ public final class HardwareUtils {
      */
     public static int getNumberOfHardware() throws FoldingRestException {
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.getAll();
-        return getXTotalCount(response);
+        return getTotalCount(response);
     }
 
     /**
@@ -81,6 +80,7 @@ public final class HardwareUtils {
             return HardwareResponseParser.get(response);
         }
 
-        throw new FoldingRestException(String.format("Invalid response (%s) when getting hardware with ID %s: %s", response.statusCode(), hardwareId, response.body()));
+        throw new FoldingRestException(
+            String.format("Invalid response (%s) when getting hardware with ID %s: %s", response.statusCode(), hardwareId, response.body()));
     }
 }

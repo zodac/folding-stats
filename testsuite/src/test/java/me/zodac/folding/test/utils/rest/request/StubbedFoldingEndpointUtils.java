@@ -1,16 +1,15 @@
 package me.zodac.folding.test.utils.rest.request;
 
-import me.zodac.folding.api.tc.User;
-import me.zodac.folding.rest.api.exception.FoldingRestException;
-import me.zodac.folding.rest.api.tc.request.UserRequest;
+import static me.zodac.folding.test.utils.TestConstants.HTTP_CLIENT;
+import static me.zodac.folding.test.utils.TestConstants.TEST_SERVICE_URL;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-
-import static me.zodac.folding.test.utils.TestConstants.HTTP_CLIENT;
-import static me.zodac.folding.test.utils.TestConstants.TEST_SERVICE_URL;
+import me.zodac.folding.api.tc.User;
+import me.zodac.folding.rest.api.exception.FoldingRestException;
+import me.zodac.folding.rest.api.tc.request.UserRequest;
 
 /**
  * Utility class for REST calls to the stubbed Folding@Home endpoints.
@@ -21,7 +20,6 @@ public final class StubbedFoldingEndpointUtils {
     private static final String POINTS_URL_FORMAT = POINTS_URL_ROOT + "/%s/stats?passkey=%s&points=%s";
     private static final String UNIT_URL_ROOT = TEST_SERVICE_URL + "/bonus";
     private static final String UNIT_URL_FORMAT = UNIT_URL_ROOT + "?user=%s&passkey=%s&units=%s";
-
 
     private StubbedFoldingEndpointUtils() {
 
@@ -69,10 +67,10 @@ public final class StubbedFoldingEndpointUtils {
 
     private static void setPoints(final String foldingUserName, final String passkey, final long points) throws FoldingRestException {
         final HttpRequest unitsRequest = HttpRequest.newBuilder()
-                .POST(HttpRequest.BodyPublishers.noBody())
-                .uri(URI.create(String.format(POINTS_URL_FORMAT, foldingUserName, passkey, points)))
-                .header("Content-Type", "application/json")
-                .build();
+            .POST(HttpRequest.BodyPublishers.noBody())
+            .uri(URI.create(String.format(POINTS_URL_FORMAT, foldingUserName, passkey, points)))
+            .header("Content-Type", "application/json")
+            .build();
 
         try {
             HTTP_CLIENT.send(unitsRequest, HttpResponse.BodyHandlers.discarding());
@@ -88,10 +86,10 @@ public final class StubbedFoldingEndpointUtils {
      */
     public static void deletePoints() throws FoldingRestException {
         final HttpRequest unitsRequest = HttpRequest.newBuilder()
-                .DELETE()
-                .uri(URI.create(POINTS_URL_ROOT))
-                .header("Content-Type", "application/json")
-                .build();
+            .DELETE()
+            .uri(URI.create(POINTS_URL_ROOT))
+            .header("Content-Type", "application/json")
+            .build();
 
         try {
             HTTP_CLIENT.send(unitsRequest, HttpResponse.BodyHandlers.discarding());
@@ -122,10 +120,10 @@ public final class StubbedFoldingEndpointUtils {
 
     private static void setUnits(final String foldingUserName, final String passkey, final int units) throws FoldingRestException {
         final HttpRequest unitsRequest = HttpRequest.newBuilder()
-                .POST(HttpRequest.BodyPublishers.noBody())
-                .uri(URI.create(String.format(UNIT_URL_FORMAT, foldingUserName, passkey, units)))
-                .header("Content-Type", "application/json")
-                .build();
+            .POST(HttpRequest.BodyPublishers.noBody())
+            .uri(URI.create(String.format(UNIT_URL_FORMAT, foldingUserName, passkey, units)))
+            .header("Content-Type", "application/json")
+            .build();
 
         try {
             HTTP_CLIENT.send(unitsRequest, HttpResponse.BodyHandlers.discarding());
@@ -134,7 +132,6 @@ public final class StubbedFoldingEndpointUtils {
         }
     }
 
-
     /**
      * Removes all units for all {@link UserRequest}s.
      *
@@ -142,10 +139,10 @@ public final class StubbedFoldingEndpointUtils {
      */
     public static void deleteUnits() throws FoldingRestException {
         final HttpRequest unitsRequest = HttpRequest.newBuilder()
-                .DELETE()
-                .uri(URI.create(UNIT_URL_ROOT))
-                .header("Content-Type", "application/json")
-                .build();
+            .DELETE()
+            .uri(URI.create(UNIT_URL_ROOT))
+            .header("Content-Type", "application/json")
+            .build();
 
         try {
             HTTP_CLIENT.send(unitsRequest, HttpResponse.BodyHandlers.discarding());

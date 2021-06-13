@@ -1,7 +1,5 @@
 package me.zodac.folding.client.java.response;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.net.http.HttpResponse;
@@ -9,6 +7,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import me.zodac.folding.client.java.request.TeamCompetitionStatsRequestSender;
+import me.zodac.folding.client.java.util.RestUtilConstants;
 import me.zodac.folding.rest.api.tc.CompetitionSummary;
 import me.zodac.folding.rest.api.tc.UserSummary;
 import me.zodac.folding.rest.api.tc.leaderboard.TeamLeaderboardEntry;
@@ -18,8 +17,6 @@ import me.zodac.folding.rest.api.tc.leaderboard.UserCategoryLeaderboardEntry;
  * Utility class used to parse a {@link HttpResponse} returned from {@link TeamCompetitionStatsRequestSender}.
  */
 public final class TeamCompetitionResponseParser {
-
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     private TeamCompetitionResponseParser() {
 
@@ -32,7 +29,7 @@ public final class TeamCompetitionResponseParser {
      * @return the retrieved {@link CompetitionSummary}
      */
     public static CompetitionSummary getStats(final HttpResponse<String> response) {
-        return GSON.fromJson(response.body(), CompetitionSummary.class);
+        return RestUtilConstants.GSON.fromJson(response.body(), CompetitionSummary.class);
     }
 
     /**
@@ -42,7 +39,7 @@ public final class TeamCompetitionResponseParser {
      * @return the retrieved {@link UserSummary}
      */
     public static UserSummary getStatsForUser(final HttpResponse<String> response) {
-        return GSON.fromJson(response.body(), UserSummary.class);
+        return RestUtilConstants.GSON.fromJson(response.body(), UserSummary.class);
     }
 
     /**
@@ -54,7 +51,7 @@ public final class TeamCompetitionResponseParser {
     public static Collection<TeamLeaderboardEntry> getTeamLeaderboard(final HttpResponse<String> response) {
         final Type collectionType = new TypeToken<Collection<TeamLeaderboardEntry>>() {
         }.getType();
-        return GSON.fromJson(response.body(), collectionType);
+        return RestUtilConstants.GSON.fromJson(response.body(), collectionType);
     }
 
     /**
@@ -66,6 +63,6 @@ public final class TeamCompetitionResponseParser {
     public static Map<String, List<UserCategoryLeaderboardEntry>> getCategoryLeaderboard(final HttpResponse<String> response) {
         final Type collectionType = new TypeToken<Map<String, List<UserCategoryLeaderboardEntry>>>() {
         }.getType();
-        return GSON.fromJson(response.body(), collectionType);
+        return RestUtilConstants.GSON.fromJson(response.body(), collectionType);
     }
 }

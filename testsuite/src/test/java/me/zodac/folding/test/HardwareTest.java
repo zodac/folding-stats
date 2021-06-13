@@ -1,5 +1,29 @@
 package me.zodac.folding.test;
 
+import static me.zodac.folding.api.utils.EncodingUtils.encodeBasicAuthentication;
+import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForSimpleTests;
+import static me.zodac.folding.test.utils.TestAuthenticationData.ADMIN_USER;
+import static me.zodac.folding.test.utils.TestAuthenticationData.INVALID_PASSWORD;
+import static me.zodac.folding.test.utils.TestAuthenticationData.INVALID_USERNAME;
+import static me.zodac.folding.test.utils.TestAuthenticationData.READ_ONLY_USER;
+import static me.zodac.folding.test.utils.TestConstants.FOLDING_URL;
+import static me.zodac.folding.test.utils.TestConstants.GSON;
+import static me.zodac.folding.test.utils.TestConstants.HTTP_CLIENT;
+import static me.zodac.folding.test.utils.TestGenerator.generateHardware;
+import static me.zodac.folding.test.utils.rest.request.HardwareUtils.HARDWARE_REQUEST_SENDER;
+import static me.zodac.folding.test.utils.rest.request.HardwareUtils.create;
+import static me.zodac.folding.test.utils.rest.response.HttpResponseHeaderUtils.getEntityTag;
+import static me.zodac.folding.test.utils.rest.response.HttpResponseHeaderUtils.getTotalCount;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.OperatingSystem;
 import me.zodac.folding.client.java.response.HardwareResponseParser;
@@ -19,31 +43,6 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import static me.zodac.folding.api.utils.EncodingUtils.encodeBasicAuthentication;
-import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForSimpleTests;
-import static me.zodac.folding.test.utils.TestAuthenticationData.ADMIN_USER;
-import static me.zodac.folding.test.utils.TestAuthenticationData.INVALID_PASSWORD;
-import static me.zodac.folding.test.utils.TestAuthenticationData.INVALID_USERNAME;
-import static me.zodac.folding.test.utils.TestAuthenticationData.READ_ONLY_USER;
-import static me.zodac.folding.test.utils.TestConstants.FOLDING_URL;
-import static me.zodac.folding.test.utils.TestConstants.GSON;
-import static me.zodac.folding.test.utils.TestConstants.HTTP_CLIENT;
-import static me.zodac.folding.test.utils.TestGenerator.generateHardware;
-import static me.zodac.folding.test.utils.rest.request.HardwareUtils.HARDWARE_REQUEST_SENDER;
-import static me.zodac.folding.test.utils.rest.request.HardwareUtils.create;
-import static me.zodac.folding.test.utils.rest.response.HttpResponseHeaderUtils.getETag;
-import static me.zodac.folding.test.utils.rest.response.HttpResponseHeaderUtils.getXTotalCount;
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
  * Tests for the {@link Hardware} REST endpoint at <code>/folding/hardware</code>.
  */
@@ -57,315 +56,328 @@ class HardwareTest {
 
     @Test
     @Order(1)
-    void whenGettingAllHardware_givenNoHardwareHasBeenCreated_thenAnEmptyJsonResponseIsReturned_andHasA200Status() throws FoldingRestException {
+    void whenGettingAllHardware_givenNoHardwareHasBeenCreated_thenEmptyJsonResponseIsReturned_andHas200Status() throws FoldingRestException {
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.getAll();
         assertThat(response.statusCode())
-                .as("Did not receive a 200_OK HTTP response: " + response.body())
-                .isEqualTo(HttpURLConnection.HTTP_OK);
+            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Collection<Hardware> allHardware = HardwareResponseParser.getAll(response);
-        final int xTotalCount = getXTotalCount(response);
+        final int xTotalCount = getTotalCount(response);
 
         assertThat(xTotalCount)
-                .isEqualTo(allHardware.size());
+            .isEqualTo(allHardware.size());
 
         assertThat(allHardware)
-                .isEmpty();
+            .isEmpty();
     }
 
     @Test
-    void whenCreatingHardware_givenPayloadIsValid_thenTheCreatedHardwareIsReturnedInResponse_andHasId_andResponseHasA201StatusCode() throws FoldingRestException {
+    void whenCreatingHardware_givenPayloadIsValid_thenTheCreatedHardwareIsReturnedInResponse_andHasId_andResponseHas201StatusCode()
+        throws FoldingRestException {
         final HardwareRequest hardwareToCreate = generateHardware();
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.create(hardwareToCreate, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-                .as("Did not receive a 201_CREATED HTTP response: " + response.body())
-                .isEqualTo(HttpURLConnection.HTTP_CREATED);
+            .as("Did not receive a 201_CREATED HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_CREATED);
 
         final Hardware actual = HardwareResponseParser.create(response);
         assertThat(actual)
-                .as("Did not receive created object as JSON response: " + response.body())
-                .extracting("hardwareName", "displayName", "operatingSystem", "multiplier")
-                .containsExactly(hardwareToCreate.getHardwareName(), hardwareToCreate.getDisplayName(), OperatingSystem.get(hardwareToCreate.getOperatingSystem()), hardwareToCreate.getMultiplier());
+            .as("Did not receive created object as JSON response: " + response.body())
+            .extracting("hardwareName", "displayName", "operatingSystem", "multiplier")
+            .containsExactly(hardwareToCreate.getHardwareName(), hardwareToCreate.getDisplayName(),
+                OperatingSystem.get(hardwareToCreate.getOperatingSystem()), hardwareToCreate.getMultiplier());
     }
 
     @Test
-    void whenCreatingBatchOfHardware_givenPayloadIsValid_thenTheHardwareIsCreated_andResponseHasA200Status() throws FoldingRestException {
+    void whenCreatingBatchOfHardware_givenPayloadIsValid_thenTheHardwareIsCreated_andResponseHas200Status() throws FoldingRestException {
         final int initialSize = HardwareUtils.getNumberOfHardware();
 
         final List<HardwareRequest> batchOfHardware = List.of(
-                generateHardware(),
-                generateHardware(),
-                generateHardware()
+            generateHardware(),
+            generateHardware(),
+            generateHardware()
         );
 
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.createBatchOf(batchOfHardware, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-                .as("Did not receive a 200_OK HTTP response: " + response.body())
-                .isEqualTo(HttpURLConnection.HTTP_OK);
+            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final int newSize = HardwareUtils.getNumberOfHardware();
         assertThat(newSize)
-                .as("Get all response did not return the initial hardware + new hardware: " + response.body())
-                .isEqualTo(initialSize + batchOfHardware.size());
+            .as("Get all response did not return the initial hardware + new hardware: " + response.body())
+            .isEqualTo(initialSize + batchOfHardware.size());
     }
 
     @Test
-    void whenGettingHardware_givenAValidHardwareId_thenHardwareIsReturned_andHasA200Status() throws FoldingRestException {
+    void whenGettingHardware_givenValidHardwareId_thenHardwareIsReturned_andHas200Status() throws FoldingRestException {
         final int hardwareId = create(generateHardware()).getId();
 
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get(hardwareId);
         assertThat(response.statusCode())
-                .as("Did not receive a 200_OK HTTP response: " + response.body())
-                .isEqualTo(HttpURLConnection.HTTP_OK);
+            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Hardware hardware = HardwareResponseParser.get(response);
         assertThat(hardware.getId())
-                .as("Did not receive the expected hardware: " + response.body())
-                .isEqualTo(hardwareId);
+            .as("Did not receive the expected hardware: " + response.body())
+            .isEqualTo(hardwareId);
     }
 
     @Test
-    void whenUpdatingHardware_givenAValidHardwareId_andAValidPayload_thenUpdatedHardwareIsReturned_andNoNewHardwareIsCreated_andHasA200Status() throws FoldingRestException {
+    void whenUpdatingHardware_givenValidHardwareId_andValidPayload_thenUpdatedHardwareIsReturned_andNoNewHardwareIsCreated_andHas200Status()
+        throws FoldingRestException {
         final Hardware createdHardware = create(generateHardware());
         final int initialSize = HardwareUtils.getNumberOfHardware();
 
         final HardwareRequest updatedHardware = HardwareRequest.builder()
-                .hardwareName(createdHardware.getHardwareName())
-                .displayName(createdHardware.getDisplayName())
-                .operatingSystem(OperatingSystem.LINUX.toString())
-                .multiplier(createdHardware.getMultiplier())
-                .build();
+            .hardwareName(createdHardware.getHardwareName())
+            .displayName(createdHardware.getDisplayName())
+            .operatingSystem(OperatingSystem.LINUX.toString())
+            .multiplier(createdHardware.getMultiplier())
+            .build();
 
-        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.update(createdHardware.getId(), updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
+        final HttpResponse<String> response =
+            HARDWARE_REQUEST_SENDER.update(createdHardware.getId(), updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-                .as("Did not receive a 200_OK HTTP response: " + response.body())
-                .isEqualTo(HttpURLConnection.HTTP_OK);
+            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Hardware actual = HardwareResponseParser.update(response);
         assertThat(actual.isEqualRequest(updatedHardware))
-                .as("Did not receive created object as JSON response: " + response.body())
-                .isTrue();
+            .as("Did not receive created object as JSON response: " + response.body())
+            .isTrue();
 
         final int allHardwareAfterUpdate = HardwareUtils.getNumberOfHardware();
         assertThat(allHardwareAfterUpdate)
-                .as("Expected no new hardware instances to be created")
-                .isEqualTo(initialSize);
+            .as("Expected no new hardware instances to be created")
+            .isEqualTo(initialSize);
     }
 
     @Test
-    void whenDeletingHardware_givenAValidHardwareId_thenHardwareIsDeleted_andHasA200Status_andHardwareCountIsReduced_andHardwareCannotBeRetrievedAgain() throws FoldingRestException {
+    void whenDeletingHardware_givenValidHardwareId_thenHardwareIsDeleted_andHas200Status_andHardwareCountIsReduced_andHardwareCannotBeRetrievedAgain()
+        throws FoldingRestException {
         final int hardwareId = create(generateHardware()).getId();
         final int initialSize = HardwareUtils.getNumberOfHardware();
 
         final HttpResponse<Void> response = HARDWARE_REQUEST_SENDER.delete(hardwareId, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-                .as("Did not receive a 200_OK HTTP response: " + response.body())
-                .isEqualTo(HttpURLConnection.HTTP_OK);
-
+            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final HttpResponse<String> getResponse = HARDWARE_REQUEST_SENDER.get(hardwareId);
         assertThat(getResponse.statusCode())
-                .as("Was able to retrieve the hardware instance, despite deleting it")
-                .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
+            .as("Was able to retrieve the hardware instance, despite deleting it")
+            .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
 
         final int newSize = HardwareUtils.getNumberOfHardware();
         assertThat(newSize)
-                .as("Get all response did not return the initial hardware - deleted hardware")
-                .isEqualTo(initialSize - 1);
+            .as("Get all response did not return the initial hardware - deleted hardware")
+            .isEqualTo(initialSize - 1);
     }
 
     // Negative/alternative test cases
 
     @Test
-    void whenCreatingHardware_givenAHardwareWithInvalidOperatingSystem_thenJsonResponseWithErrorIsReturned_andHasA400Status() throws FoldingRestException {
+    void whenCreatingHardware_givenHardwareWithInvalidOperatingSystem_thenJsonResponseWithErrorIsReturned_andHas400Status()
+        throws FoldingRestException {
         final HardwareRequest hardware = TestGenerator.generateHardwareWithOperatingSystem(OperatingSystem.INVALID);
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.create(hardware, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(response.statusCode())
-                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
-                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
     @Test
-    void whenCreatingHardware_givenHardwareWithTheSameNameAndOperatingSystemAlreadyExists_thenA409ResponseIsReturned() throws FoldingRestException {
+    void whenCreatingHardware_givenHardwareWithTheSameNameAndOperatingSystemAlreadyExists_then409ResponseIsReturned() throws FoldingRestException {
         final HardwareRequest hardwareToCreate = generateHardware();
-        HARDWARE_REQUEST_SENDER.create(hardwareToCreate, ADMIN_USER.userName(), ADMIN_USER.password()); // Send one request and ignore it (even if the user already exists, we can verify the conflict with the next one)
+        HARDWARE_REQUEST_SENDER.create(hardwareToCreate, ADMIN_USER.userName(),
+            ADMIN_USER.password()); // Send one request and ignore it (even if the user already exists, we can verify the conflict with the next one)
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.create(hardwareToCreate, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(response.statusCode())
-                .as("Did not receive a 409_CONFLICT HTTP response: " + response.body())
-                .isEqualTo(HttpURLConnection.HTTP_CONFLICT);
+            .as("Did not receive a 409_CONFLICT HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_CONFLICT);
     }
 
     @Test
-    void whenGettingHardware_givenANonExistingHardwareId_thenNoJsonResponseIsReturned_andHasA404Status() throws FoldingRestException {
+    void whenGettingHardware_givenNonExistingHardwareId_thenNoJsonResponseIsReturned_andHas404Status() throws FoldingRestException {
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get(TestConstants.NON_EXISTING_ID);
 
         assertThat(response.statusCode())
-                .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
-                .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
+            .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
 
         assertThat(response.body())
-                .as("Did not receive an empty JSON response: " + response.body())
-                .isEmpty();
+            .as("Did not receive an empty JSON response: " + response.body())
+            .isEmpty();
     }
 
     @Test
-    void whenGettingHardware_givenAnOutOfRangeHardwareId_thenResponseHasA400Status() throws FoldingRestException {
+    void whenGettingHardware_givenOutOfRangeHardwareId_thenResponseHas400Status() throws FoldingRestException {
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get(TestConstants.OUT_OF_RANGE_ID);
 
         assertThat(response.statusCode())
-                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
-                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
 
         assertThat(response.body())
-                .as("Did not receive valid error message: " + response.body())
-                .contains("out of range");
+            .as("Did not receive valid error message: " + response.body())
+            .contains("out of range");
     }
 
     @Test
-    void whenGettingHardware_givenAnInvalidHardwareId_thenResponseHasA400Status() throws IOException, InterruptedException {
+    void whenGettingHardware_givenInvalidHardwareId_thenResponseHas400Status() throws IOException, InterruptedException {
         final HttpRequest request = HttpRequest.newBuilder()
-                .GET()
-                .uri(URI.create(FOLDING_URL + "/hardware/" + TestConstants.INVALID_FORMAT_ID))
-                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
-                .build();
+            .GET()
+            .uri(URI.create(FOLDING_URL + "/hardware/" + TestConstants.INVALID_FORMAT_ID))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .build();
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
-                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
-                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
 
         assertThat(response.body())
-                .as("Did not receive valid error message: " + response.body())
-                .contains("not a valid format");
+            .as("Did not receive valid error message: " + response.body())
+            .contains("not a valid format");
     }
 
     @Test
-    void whenUpdatingHardware_givenANonExistingHardwareId_thenNoJsonResponseIsReturned_andHasA404Status() throws FoldingRestException {
+    void whenUpdatingHardware_givenNonExistingHardwareId_thenNoJsonResponseIsReturned_andHas404Status() throws FoldingRestException {
         final HardwareRequest updatedHardware = generateHardware();
-        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.update(TestConstants.NON_EXISTING_ID, updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
+        final HttpResponse<String> response =
+            HARDWARE_REQUEST_SENDER.update(TestConstants.NON_EXISTING_ID, updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-                .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
-                .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
+            .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
 
         assertThat(response.body())
-                .as("Did not receive an empty JSON response: " + response.body())
-                .isEmpty();
+            .as("Did not receive an empty JSON response: " + response.body())
+            .isEmpty();
     }
 
     @Test
-    void whenUpdatingHardware_givenAnOutOfRangeHardwareId_thenResponseHasA400Status() throws FoldingRestException {
+    void whenUpdatingHardware_givenOutOfRangeHardwareId_thenResponseHas400Status() throws FoldingRestException {
         final HardwareRequest updatedHardware = generateHardware();
-        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.update(TestConstants.OUT_OF_RANGE_ID, updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
+        final HttpResponse<String> response =
+            HARDWARE_REQUEST_SENDER.update(TestConstants.OUT_OF_RANGE_ID, updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
-                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
 
         assertThat(response.body())
-                .as("Did not receive valid error message: " + response.body())
-                .contains("out of range");
+            .as("Did not receive valid error message: " + response.body())
+            .contains("out of range");
     }
 
     @Test
-    void whenUpdatingHardware_givenAnInvalidHardwareId_thenResponseHasA400Status() throws IOException, InterruptedException, FoldingRestException {
+    void whenUpdatingHardware_givenInvalidHardwareId_thenResponseHas400Status() throws IOException, InterruptedException, FoldingRestException {
         final Hardware createdHardware = create(generateHardware());
 
         final HardwareRequest updatedHardware = HardwareRequest.builder()
-                .hardwareName(createdHardware.getHardwareName())
-                .displayName(createdHardware.getDisplayName())
-                .operatingSystem(OperatingSystem.LINUX.toString())
-                .multiplier(createdHardware.getMultiplier())
-                .build();
+            .hardwareName(createdHardware.getHardwareName())
+            .displayName(createdHardware.getDisplayName())
+            .operatingSystem(OperatingSystem.LINUX.toString())
+            .multiplier(createdHardware.getMultiplier())
+            .build();
 
         final HttpRequest request = HttpRequest.newBuilder()
-                .PUT(HttpRequest.BodyPublishers.ofString(GSON.toJson(updatedHardware)))
-                .uri(URI.create(FOLDING_URL + "/hardware/" + TestConstants.INVALID_FORMAT_ID))
-                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
-                .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
-                .build();
+            .PUT(HttpRequest.BodyPublishers.ofString(GSON.toJson(updatedHardware)))
+            .uri(URI.create(FOLDING_URL + "/hardware/" + TestConstants.INVALID_FORMAT_ID))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
+            .build();
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
-                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
-                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
 
         assertThat(response.body())
-                .as("Did not receive valid error message: " + response.body())
-                .contains("not a valid format");
+            .as("Did not receive valid error message: " + response.body())
+            .contains("not a valid format");
     }
 
     @Test
-    void whenDeletingHardware_givenANonExistingHardwareId_thenResponseHasA404Status() throws FoldingRestException {
-        final HttpResponse<Void> response = HARDWARE_REQUEST_SENDER.delete(TestConstants.NON_EXISTING_ID, ADMIN_USER.userName(), ADMIN_USER.password());
+    void whenDeletingHardware_givenNonExistingHardwareId_thenResponseHas404Status() throws FoldingRestException {
+        final HttpResponse<Void> response =
+            HARDWARE_REQUEST_SENDER.delete(TestConstants.NON_EXISTING_ID, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(response.statusCode())
-                .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
-                .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
+            .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
     }
 
     @Test
-    void whenDeletingHardware_givenAnOutOfRangeHardwareId_thenResponseHasA400Status() throws FoldingRestException {
-        final HttpResponse<Void> response = HARDWARE_REQUEST_SENDER.delete(TestConstants.OUT_OF_RANGE_ID, ADMIN_USER.userName(), ADMIN_USER.password());
+    void whenDeletingHardware_givenOutOfRangeHardwareId_thenResponseHas400Status() throws FoldingRestException {
+        final HttpResponse<Void> response =
+            HARDWARE_REQUEST_SENDER.delete(TestConstants.OUT_OF_RANGE_ID, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(response.statusCode())
-                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
-                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
     @Test
-    void whenDeletingHardware_givenAnInvalidHardwareId_thenResponseHasA400Status() throws IOException, InterruptedException {
+    void whenDeletingHardware_givenInvalidHardwareId_thenResponseHas400Status() throws IOException, InterruptedException {
         final HttpRequest request = HttpRequest.newBuilder()
-                .DELETE()
-                .uri(URI.create(FOLDING_URL + "/hardware/" + TestConstants.INVALID_FORMAT_ID))
-                .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
-                .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
-                .build();
+            .DELETE()
+            .uri(URI.create(FOLDING_URL + "/hardware/" + TestConstants.INVALID_FORMAT_ID))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
+            .build();
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
-                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
-                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
 
         assertThat(response.body())
-                .as("Did not receive valid error message: " + response.body())
-                .contains("not a valid format");
+            .as("Did not receive valid error message: " + response.body())
+            .contains("not a valid format");
     }
 
     @Test
-    void whenUpdatingHardware_givenAValidHardwareId_andPayloadHasNoChanges_thenOriginalHardwareIsReturned_andHasA200Status() throws FoldingRestException {
+    void whenUpdatingHardware_givenValidHardwareId_andPayloadHasNoChanges_thenOriginalHardwareIsReturned_andHas200Status()
+        throws FoldingRestException {
         final Hardware createdHardware = create(generateHardware());
 
         final HardwareRequest updatedHardware = HardwareRequest.builder()
-                .hardwareName(createdHardware.getHardwareName())
-                .displayName(createdHardware.getDisplayName())
-                .operatingSystem(createdHardware.getOperatingSystem().toString())
-                .multiplier(createdHardware.getMultiplier())
-                .build();
+            .hardwareName(createdHardware.getHardwareName())
+            .displayName(createdHardware.getDisplayName())
+            .operatingSystem(createdHardware.getOperatingSystem().toString())
+            .multiplier(createdHardware.getMultiplier())
+            .build();
 
-        final HttpResponse<String> updateResponse = HARDWARE_REQUEST_SENDER.update(createdHardware.getId(), updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
+        final HttpResponse<String> updateResponse =
+            HARDWARE_REQUEST_SENDER.update(createdHardware.getId(), updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(updateResponse.statusCode())
-                .as("Did not receive a 200_OK HTTP response: " + updateResponse.body())
-                .isEqualTo(HttpURLConnection.HTTP_OK);
+            .as("Did not receive a 200_OK HTTP response: " + updateResponse.body())
+            .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Hardware actual = HardwareResponseParser.update(updateResponse);
         assertThat(actual.isEqualRequest(updatedHardware))
-                .as("Did not receive the original hardware in response")
-                .isTrue();
+            .as("Did not receive the original hardware in response")
+            .isTrue();
     }
 
     @Test
-    void whenCreatingBatchOfHardware_givenPayloadIsPartiallyValid_thenOnlyValidHardwareIsCreated_andResponseHasA200Status() throws FoldingRestException {
+    void whenCreatingBatchOfHardware_givenPayloadIsPartiallyValid_thenOnlyValidHardwareIsCreated_andResponseHas200Status()
+        throws FoldingRestException {
         final int initialHardwareSize = HardwareUtils.getNumberOfHardware();
 
         final List<HardwareRequest> batchOfValidHardware = List.of(
-                generateHardware(),
-                generateHardware()
+            generateHardware(),
+            generateHardware()
         );
         final List<HardwareRequest> batchOfInvalidHardware = List.of(
-                TestGenerator.generateHardwareWithOperatingSystem(OperatingSystem.INVALID),
-                TestGenerator.generateHardwareWithOperatingSystem(OperatingSystem.INVALID)
+            TestGenerator.generateHardwareWithOperatingSystem(OperatingSystem.INVALID),
+            TestGenerator.generateHardwareWithOperatingSystem(OperatingSystem.INVALID)
         );
         final List<HardwareRequest> batchOfHardware = new ArrayList<>(batchOfValidHardware.size() + batchOfInvalidHardware.size());
         batchOfHardware.addAll(batchOfValidHardware);
@@ -373,196 +385,205 @@ class HardwareTest {
 
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.createBatchOf(batchOfHardware, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-                .as("Did not receive a 200_OK HTTP response: " + response.body())
-                .isEqualTo(HttpURLConnection.HTTP_OK);
+            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final int newHardwareSize = HardwareUtils.getNumberOfHardware();
         assertThat(newHardwareSize)
-                .as("Get all response did not return the initial hardware + new valid hardware")
-                .isEqualTo(initialHardwareSize + batchOfValidHardware.size());
+            .as("Get all response did not return the initial hardware + new valid hardware")
+            .isEqualTo(initialHardwareSize + batchOfValidHardware.size());
     }
 
     @Test
-    void whenCreatingBatchOfHardware_givenPayloadIsInvalid_thenResponseHasA400Status() throws FoldingRestException {
+    void whenCreatingBatchOfHardware_givenPayloadIsInvalid_thenResponseHas400Status() throws FoldingRestException {
         final int initialHardwareSize = HardwareUtils.getNumberOfHardware();
 
         final List<HardwareRequest> batchOfInvalidHardware = List.of(
-                TestGenerator.generateHardwareWithOperatingSystem(OperatingSystem.INVALID),
-                TestGenerator.generateHardwareWithOperatingSystem(OperatingSystem.INVALID)
+            TestGenerator.generateHardwareWithOperatingSystem(OperatingSystem.INVALID),
+            TestGenerator.generateHardwareWithOperatingSystem(OperatingSystem.INVALID)
         );
 
-        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.createBatchOf(batchOfInvalidHardware, ADMIN_USER.userName(), ADMIN_USER.password());
+        final HttpResponse<String> response =
+            HARDWARE_REQUEST_SENDER.createBatchOf(batchOfInvalidHardware, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
-                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
 
         final int newHardwareSize = HardwareUtils.getNumberOfHardware();
         assertThat(newHardwareSize)
-                .as("Get all response did not return only the initial hardware")
-                .isEqualTo(initialHardwareSize);
+            .as("Get all response did not return only the initial hardware")
+            .isEqualTo(initialHardwareSize);
     }
 
     @Test
-    void whenDeletingHardware_givenTheHardwareIsLinkedToAUser_thenResponseHasA409Status() throws FoldingRestException {
+    void whenDeletingHardware_givenTheHardwareIsLinkedToUser_thenResponseHas409Status() throws FoldingRestException {
         final int hardwareId = create(generateHardware()).getId();
         final UserRequest user = TestGenerator.generateUserWithHardwareId(hardwareId);
         UserUtils.create(user);
 
         final HttpResponse<Void> deleteHardwareResponse = HARDWARE_REQUEST_SENDER.delete(hardwareId, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(deleteHardwareResponse.statusCode())
-                .as("Expected to fail due to a 409_CONFLICT: " + deleteHardwareResponse)
-                .isEqualTo(HttpURLConnection.HTTP_CONFLICT);
+            .as("Expected to fail due to a 409_CONFLICT: " + deleteHardwareResponse)
+            .isEqualTo(HttpURLConnection.HTTP_CONFLICT);
     }
 
     @Test
-    void whenGettingHardwareById_givenRequestUsesPreviousETag_andHardwareHasNotChanged_thenResponseHasA304Status_andNoBody() throws FoldingRestException {
+    void whenGettingHardwareById_givenRequestUsesPreviousEntityTag_andHardwareHasNotChanged_thenResponseHas304Status_andNoBody()
+        throws FoldingRestException {
         final int hardwareId = create(generateHardware()).getId();
 
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get(hardwareId);
         assertThat(response.statusCode())
-                .as("Expected first request to have a 200_OK HTTP response")
-                .isEqualTo(HttpURLConnection.HTTP_OK);
+            .as("Expected first request to have a 200_OK HTTP response")
+            .isEqualTo(HttpURLConnection.HTTP_OK);
 
-        final String eTag = getETag(response);
+        final String eTag = getEntityTag(response);
 
         final HttpResponse<String> cachedResponse = HARDWARE_REQUEST_SENDER.get(hardwareId, eTag);
         assertThat(cachedResponse.statusCode())
-                .as("Expected second request to have a 304_NOT_MODIFIED HTTP response")
-                .isEqualTo(HttpURLConnection.HTTP_NOT_MODIFIED);
+            .as("Expected second request to have a 304_NOT_MODIFIED HTTP response")
+            .isEqualTo(HttpURLConnection.HTTP_NOT_MODIFIED);
 
         assertThat(HardwareResponseParser.get(cachedResponse))
-                .as("Expected cached response to have the same content as the non-cached response")
-                .isNull();
+            .as("Expected cached response to have the same content as the non-cached response")
+            .isNull();
     }
 
     @Test
-    void whenGettingAllHardware_givenRequestUsesPreviousETag_andHardwareHasNotChanged_thenResponseHasA304Status_andNoBody() throws FoldingRestException {
+    void whenGettingAllHardware_givenRequestUsesPreviousEntityTag_andHardwareHasNotChanged_thenResponseHas304Status_andNoBody()
+        throws FoldingRestException {
         create(generateHardware());
 
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.getAll();
         assertThat(response.statusCode())
-                .as("Expected first GET request to have a 200_OK HTTP response")
-                .isEqualTo(HttpURLConnection.HTTP_OK);
+            .as("Expected first GET request to have a 200_OK HTTP response")
+            .isEqualTo(HttpURLConnection.HTTP_OK);
 
-        final String eTag = getETag(response);
+        final String eTag = getEntityTag(response);
 
         final HttpResponse<String> cachedResponse = HARDWARE_REQUEST_SENDER.getAll(eTag);
         assertThat(cachedResponse.statusCode())
-                .as("Expected second request to have a 304_NOT_MODIFIED HTTP response")
-                .isEqualTo(HttpURLConnection.HTTP_NOT_MODIFIED);
+            .as("Expected second request to have a 304_NOT_MODIFIED HTTP response")
+            .isEqualTo(HttpURLConnection.HTTP_NOT_MODIFIED);
 
         assertThat(HardwareResponseParser.getAll(cachedResponse))
-                .as("Expected cached response to have the same content as the non-cached response")
-                .isNull();
+            .as("Expected cached response to have the same content as the non-cached response")
+            .isNull();
     }
 
     @Test
-    void whenCreatingHardware_givenNoAuthentication_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
+    void whenCreatingHardware_givenNoAuthentication_thenRequestFails_andResponseHas401StatusCode() throws FoldingRestException {
         final HardwareRequest hardwareToCreate = generateHardware();
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.create(hardwareToCreate);
         assertThat(response.statusCode())
-                .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
-                .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
+            .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
     @Test
-    void whenCreatingBatchOfHardware_givenNoAuthentication_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
+    void whenCreatingBatchOfHardware_givenNoAuthentication_thenRequestFails_andResponseHas401StatusCode() throws FoldingRestException {
         final List<HardwareRequest> batchOfHardware = List.of(
-                generateHardware(),
-                generateHardware(),
-                generateHardware()
+            generateHardware(),
+            generateHardware(),
+            generateHardware()
         );
 
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.createBatchOf(batchOfHardware);
         assertThat(response.statusCode())
-                .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
-                .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
+            .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
     @Test
-    void whenUpdatingHardware_givenNoAuthentication_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
+    void whenUpdatingHardware_givenNoAuthentication_thenRequestFails_andResponseHas401StatusCode() throws FoldingRestException {
         final Hardware createdHardware = create(generateHardware());
 
         final HardwareRequest updatedHardware = HardwareRequest.builder()
-                .hardwareName(createdHardware.getHardwareName())
-                .displayName(createdHardware.getDisplayName())
-                .operatingSystem(OperatingSystem.LINUX.toString())
-                .multiplier(createdHardware.getMultiplier())
-                .build();
+            .hardwareName(createdHardware.getHardwareName())
+            .displayName(createdHardware.getDisplayName())
+            .operatingSystem(OperatingSystem.LINUX.toString())
+            .multiplier(createdHardware.getMultiplier())
+            .build();
 
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.update(createdHardware.getId(), updatedHardware);
         assertThat(response.statusCode())
-                .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
-                .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
+            .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
     @Test
-    void whenDeletingHardware_givenNoAuthentication_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
+    void whenDeletingHardware_givenNoAuthentication_thenRequestFails_andResponseHas401StatusCode() throws FoldingRestException {
         final int hardwareId = create(generateHardware()).getId();
 
         final HttpResponse<Void> response = HARDWARE_REQUEST_SENDER.delete(hardwareId);
         assertThat(response.statusCode())
-                .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
-                .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
+            .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
     @Test
-    void whenCreatingHardware_givenAuthentication_andAuthenticationHasInvalidUser_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
+    void whenCreatingHardware_givenAuthentication_andAuthenticationHasInvalidUser_thenRequestFails_andResponseHas401StatusCode()
+        throws FoldingRestException {
         final HardwareRequest hardwareToCreate = generateHardware();
-        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.create(hardwareToCreate, INVALID_USERNAME.userName(), INVALID_USERNAME.password());
+        final HttpResponse<String> response =
+            HARDWARE_REQUEST_SENDER.create(hardwareToCreate, INVALID_USERNAME.userName(), INVALID_USERNAME.password());
         assertThat(response.statusCode())
-                .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
-                .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
+            .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
     @Test
-    void whenCreatingHardware_givenAuthentication_andAuthenticationHasInvalidPassword_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
+    void whenCreatingHardware_givenAuthentication_andAuthenticationHasInvalidPassword_thenRequestFails_andResponseHas401StatusCode()
+        throws FoldingRestException {
         final HardwareRequest hardwareToCreate = generateHardware();
-        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.create(hardwareToCreate, INVALID_PASSWORD.userName(), INVALID_PASSWORD.password());
+        final HttpResponse<String> response =
+            HARDWARE_REQUEST_SENDER.create(hardwareToCreate, INVALID_PASSWORD.userName(), INVALID_PASSWORD.password());
         assertThat(response.statusCode())
-                .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
-                .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
+            .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
     @Test
-    void whenCreatingHardware_givenAuthentication_andUserDoesNotHaveAdminRole_thenRequestFails_andResponseHasA403StatusCode() throws FoldingRestException {
+    void whenCreatingHardware_givenAuthentication_andUserDoesNotHaveAdminRole_thenRequestFails_andResponseHas403StatusCode()
+        throws FoldingRestException {
         final HardwareRequest hardwareToCreate = generateHardware();
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.create(hardwareToCreate, READ_ONLY_USER.userName(), READ_ONLY_USER.password());
         assertThat(response.statusCode())
-                .as("Did not receive a 403_FORBIDDEN HTTP response: " + response.body())
-                .isEqualTo(HttpURLConnection.HTTP_FORBIDDEN);
+            .as("Did not receive a 403_FORBIDDEN HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_FORBIDDEN);
     }
 
     @Test
-    void whenCreatingHardware_givenEmptyPayload_thenRequestFails_andResponseHasA400StatusCode() throws IOException, InterruptedException {
+    void whenCreatingHardware_givenEmptyPayload_thenRequestFails_andResponseHas400StatusCode() throws IOException, InterruptedException {
         final HttpRequest request = HttpRequest.newBuilder()
-                .POST(HttpRequest.BodyPublishers.noBody())
-                .uri(URI.create(FOLDING_URL + "/hardware"))
-                .header("Content-Type", "application/json")
-                .header("Authorization", encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
-                .build();
+            .POST(HttpRequest.BodyPublishers.noBody())
+            .uri(URI.create(FOLDING_URL + "/hardware"))
+            .header("Content-Type", "application/json")
+            .header("Authorization", encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
+            .build();
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
-                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
-                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
     @Test
-    void whenUpdatingHardware_givenEmptyPayload_thenRequestFails_andResponseHasA400StatusCode() throws FoldingRestException, IOException, InterruptedException {
+    void whenUpdatingHardware_givenEmptyPayload_thenRequestFails_andResponseHas400StatusCode()
+        throws FoldingRestException, IOException, InterruptedException {
         final int hardwareId = create(generateHardware()).getId();
 
         final HttpRequest request = HttpRequest.newBuilder()
-                .PUT(HttpRequest.BodyPublishers.noBody())
-                .uri(URI.create(FOLDING_URL + "/hardware/" + hardwareId))
-                .header("Content-Type", "application/json")
-                .header("Authorization", encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
-                .build();
+            .PUT(HttpRequest.BodyPublishers.noBody())
+            .uri(URI.create(FOLDING_URL + "/hardware/" + hardwareId))
+            .header("Content-Type", "application/json")
+            .header("Authorization", encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
+            .build();
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
-                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
-                .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
     @AfterAll

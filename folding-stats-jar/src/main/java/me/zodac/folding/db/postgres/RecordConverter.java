@@ -1,5 +1,11 @@
 package me.zodac.folding.db.postgres;
 
+import static me.zodac.folding.db.postgres.gen.tables.Hardware.HARDWARE;
+import static me.zodac.folding.db.postgres.gen.tables.SystemUsers.SYSTEM_USERS;
+import static me.zodac.folding.db.postgres.gen.tables.Teams.TEAMS;
+import static me.zodac.folding.db.postgres.gen.tables.Users.USERS;
+
+import java.util.Set;
 import me.zodac.folding.api.SystemUserAuthentication;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
@@ -22,13 +28,6 @@ import me.zodac.folding.db.postgres.gen.tables.records.UsersRecord;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import org.jooq.Record;
 
-import java.util.Set;
-
-import static me.zodac.folding.db.postgres.gen.tables.Hardware.HARDWARE;
-import static me.zodac.folding.db.postgres.gen.tables.SystemUsers.SYSTEM_USERS;
-import static me.zodac.folding.db.postgres.gen.tables.Teams.TEAMS;
-import static me.zodac.folding.db.postgres.gen.tables.Users.USERS;
-
 /**
  * Utility class that converts a {@link Record} into another POJO for {@link PostgresDbManager}.
  */
@@ -46,11 +45,11 @@ final class RecordConverter {
      */
     static Hardware toHardware(final HardwareRecord hardwareRecord) {
         return Hardware.create(
-                hardwareRecord.getHardwareId(),
-                hardwareRecord.getHardwareName(),
-                hardwareRecord.getDisplayName(),
-                OperatingSystem.get(hardwareRecord.getOperatingSystem()),
-                hardwareRecord.getMultiplier().doubleValue()
+            hardwareRecord.getHardwareId(),
+            hardwareRecord.getHardwareName(),
+            hardwareRecord.getDisplayName(),
+            OperatingSystem.get(hardwareRecord.getOperatingSystem()),
+            hardwareRecord.getMultiplier().doubleValue()
         );
     }
 
@@ -62,15 +61,16 @@ final class RecordConverter {
      */
     static Team toTeam(final TeamsRecord teamRecord) {
         return Team.create(
-                teamRecord.getTeamId(),
-                teamRecord.getTeamName(),
-                teamRecord.getTeamDescription(),
-                teamRecord.getForumLink()
+            teamRecord.getTeamId(),
+            teamRecord.getTeamName(),
+            teamRecord.getTeamDescription(),
+            teamRecord.getForumLink()
         );
     }
 
     /**
-     * Convert a {@link Record} into a {@link User}. The {@link Record} should contain info for the {@link User} and also the {@link Hardware} and {@link Team}.
+     * Convert a {@link Record} into a {@link User}. The {@link Record} should contain info for the {@link User} and also the {@link Hardware} and
+     * {@link Team}.
      *
      * @param joinedRecord the {@link Record} to convert
      * @return the converted {@link Hardware}
@@ -80,16 +80,16 @@ final class RecordConverter {
     static User toUser(final Record joinedRecord) {
         final UsersRecord userRecord = joinedRecord.into(USERS);
         return User.create(
-                userRecord.getUserId(),
-                userRecord.getFoldingUsername(),
-                userRecord.getDisplayUsername(),
-                userRecord.getPasskey(),
-                Category.get(userRecord.getCategory()),
-                userRecord.getProfileLink(),
-                userRecord.getLiveStatsLink(),
-                toHardware(joinedRecord.into(HARDWARE)),
-                toTeam(joinedRecord.into(TEAMS)),
-                userRecord.getIsCaptain()
+            userRecord.getUserId(),
+            userRecord.getFoldingUsername(),
+            userRecord.getDisplayUsername(),
+            userRecord.getPasskey(),
+            Category.get(userRecord.getCategory()),
+            userRecord.getProfileLink(),
+            userRecord.getLiveStatsLink(),
+            toHardware(joinedRecord.into(HARDWARE)),
+            toTeam(joinedRecord.into(TEAMS)),
+            userRecord.getIsCaptain()
         );
     }
 
@@ -101,11 +101,11 @@ final class RecordConverter {
      */
     static UserTcStats toUserTcStats(final UserTcStatsHourlyRecord userTcStatsHourlyRecord) {
         return UserTcStats.create(
-                userTcStatsHourlyRecord.getUserId(),
-                DateTimeUtils.toTimestamp(userTcStatsHourlyRecord.getUtcTimestamp()),
-                userTcStatsHourlyRecord.getTcPoints(),
-                userTcStatsHourlyRecord.getTcPointsMultiplied(),
-                userTcStatsHourlyRecord.getTcUnits()
+            userTcStatsHourlyRecord.getUserId(),
+            DateTimeUtils.toTimestamp(userTcStatsHourlyRecord.getUtcTimestamp()),
+            userTcStatsHourlyRecord.getTcPoints(),
+            userTcStatsHourlyRecord.getTcPointsMultiplied(),
+            userTcStatsHourlyRecord.getTcUnits()
         );
     }
 
@@ -117,10 +117,10 @@ final class RecordConverter {
      */
     static HistoricStats toHistoricStats(final UserTcStatsHourlyRecord userTcStatsHourlyRecord) {
         return HistoricStats.create(
-                userTcStatsHourlyRecord.getUtcTimestamp(),
-                userTcStatsHourlyRecord.getTcPoints(),
-                userTcStatsHourlyRecord.getTcPointsMultiplied(),
-                userTcStatsHourlyRecord.getTcUnits()
+            userTcStatsHourlyRecord.getUtcTimestamp(),
+            userTcStatsHourlyRecord.getTcPoints(),
+            userTcStatsHourlyRecord.getTcPointsMultiplied(),
+            userTcStatsHourlyRecord.getTcUnits()
         );
     }
 
@@ -132,10 +132,10 @@ final class RecordConverter {
      */
     static UserStats toUserStats(final UserTotalStatsRecord userTotalStatsRecord) {
         return UserStats.create(
-                userTotalStatsRecord.getUserId(),
-                DateTimeUtils.toTimestamp(userTotalStatsRecord.getUtcTimestamp()),
-                userTotalStatsRecord.getTotalPoints(),
-                userTotalStatsRecord.getTotalUnits()
+            userTotalStatsRecord.getUserId(),
+            DateTimeUtils.toTimestamp(userTotalStatsRecord.getUtcTimestamp()),
+            userTotalStatsRecord.getTotalPoints(),
+            userTotalStatsRecord.getTotalUnits()
         );
     }
 
@@ -147,10 +147,10 @@ final class RecordConverter {
      */
     static UserStats toUserStats(final UserInitialStatsRecord userInitialStatsRecord) {
         return UserStats.create(
-                userInitialStatsRecord.getUserId(),
-                DateTimeUtils.toTimestamp(userInitialStatsRecord.getUtcTimestamp()),
-                userInitialStatsRecord.getInitialPoints(),
-                userInitialStatsRecord.getInitialUnits()
+            userInitialStatsRecord.getUserId(),
+            DateTimeUtils.toTimestamp(userInitialStatsRecord.getUtcTimestamp()),
+            userInitialStatsRecord.getInitialPoints(),
+            userInitialStatsRecord.getInitialUnits()
         );
     }
 
@@ -162,9 +162,9 @@ final class RecordConverter {
      */
     static OffsetStats toOffsetStats(final UserOffsetTcStatsRecord userOffsetTcStatsRecord) {
         return OffsetStats.create(
-                userOffsetTcStatsRecord.getOffsetPoints(),
-                userOffsetTcStatsRecord.getOffsetMultipliedPoints(),
-                userOffsetTcStatsRecord.getOffsetUnits()
+            userOffsetTcStatsRecord.getOffsetPoints(),
+            userOffsetTcStatsRecord.getOffsetMultipliedPoints(),
+            userOffsetTcStatsRecord.getOffsetUnits()
         );
     }
 
@@ -176,16 +176,16 @@ final class RecordConverter {
      */
     static RetiredUserTcStats toRetiredUserStats(final RetiredUserStatsRecord retiredUserStatsRecord) {
         return RetiredUserTcStats.create(
-                retiredUserStatsRecord.getRetiredUserId(),
-                retiredUserStatsRecord.getTeamId(),
-                retiredUserStatsRecord.getDisplayUsername(),
-                UserTcStats.create(
-                        retiredUserStatsRecord.getUserId(),
-                        DateTimeUtils.toTimestamp(retiredUserStatsRecord.getUtcTimestamp()),
-                        retiredUserStatsRecord.getFinalPoints(),
-                        retiredUserStatsRecord.getFinalMultipliedPoints(),
-                        retiredUserStatsRecord.getFinalUnits()
-                )
+            retiredUserStatsRecord.getRetiredUserId(),
+            retiredUserStatsRecord.getTeamId(),
+            retiredUserStatsRecord.getDisplayUsername(),
+            UserTcStats.create(
+                retiredUserStatsRecord.getUserId(),
+                DateTimeUtils.toTimestamp(retiredUserStatsRecord.getUtcTimestamp()),
+                retiredUserStatsRecord.getFinalPoints(),
+                retiredUserStatsRecord.getFinalMultipliedPoints(),
+                retiredUserStatsRecord.getFinalUnits()
+            )
         );
     }
 
@@ -195,7 +195,7 @@ final class RecordConverter {
      * a supplied password matches a has in the DB.
      *
      * @param systemUsersRecord the {@link Record} to convert
-     * @return {@link SystemUserAuthentication#getUserRoles()} if a valid password was supplied, or else {@link SystemUserAuthentication#invalidPassword()}
+     * @return {@link SystemUserAuthentication#getUserRoles()} if valid password was supplied, else {@link SystemUserAuthentication#invalidPassword()}
      */
     static SystemUserAuthentication toSystemUserAuthentication(final Record systemUsersRecord) {
         if (systemUsersRecord.get("is_password_match", Boolean.class)) {

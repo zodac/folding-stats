@@ -1,26 +1,24 @@
 package me.zodac.folding.test.utils.rest.request;
 
+import static me.zodac.folding.test.utils.TestAuthenticationData.ADMIN_USER;
+import static me.zodac.folding.test.utils.TestConstants.FOLDING_URL;
+import static me.zodac.folding.test.utils.rest.response.HttpResponseHeaderUtils.getTotalCount;
+
+import java.net.HttpURLConnection;
+import java.net.http.HttpResponse;
+import java.util.Collection;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.client.java.request.UserRequestSender;
 import me.zodac.folding.client.java.response.UserResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 
-import java.net.HttpURLConnection;
-import java.net.http.HttpResponse;
-import java.util.Collection;
-
-import static me.zodac.folding.test.utils.TestAuthenticationData.ADMIN_USER;
-import static me.zodac.folding.test.utils.TestConstants.FOLDING_URL;
-import static me.zodac.folding.test.utils.rest.response.HttpResponseHeaderUtils.getXTotalCount;
-
-
 /**
  * Utility class for {@link User}-based tests.
  */
 public final class UserUtils {
 
-    public static final UserRequestSender USER_REQUEST_SENDER = UserRequestSender.create(FOLDING_URL);
+    public static final UserRequestSender USER_REQUEST_SENDER = UserRequestSender.createWithUrl(FOLDING_URL);
 
     private UserUtils() {
 
@@ -28,6 +26,7 @@ public final class UserUtils {
 
     /**
      * Creates the given {@link UserRequest}.
+     *
      * <p>
      * Will also call {@link StubbedFoldingEndpointUtils#enableUser(UserRequest)}, so if you wish to test an invalid number of
      * units, you must set that explicitly.
@@ -46,7 +45,6 @@ public final class UserUtils {
         throw new FoldingRestException(String.format("Invalid response (%s) when creating user: %s", response.statusCode(), response.body()));
     }
 
-
     /**
      * Retrieves all {@link User}s.
      *
@@ -59,7 +57,8 @@ public final class UserUtils {
             return UserResponseParser.getAll(response);
         }
 
-        throw new FoldingRestException(String.format("Invalid response (%s) when getting all users with: %s", response.statusCode(), response.body()));
+        throw new FoldingRestException(
+            String.format("Invalid response (%s) when getting all users with: %s", response.statusCode(), response.body()));
     }
 
     /**
@@ -70,7 +69,7 @@ public final class UserUtils {
      */
     public static int getNumberOfUsers() throws FoldingRestException {
         final HttpResponse<String> response = USER_REQUEST_SENDER.getAll();
-        return getXTotalCount(response);
+        return getTotalCount(response);
     }
 
     /**
@@ -86,6 +85,7 @@ public final class UserUtils {
             return UserResponseParser.get(response);
         }
 
-        throw new FoldingRestException(String.format("Invalid response (%s) when getting user with ID %s: %s", response.statusCode(), userId, response.body()));
+        throw new FoldingRestException(
+            String.format("Invalid response (%s) when getting user with ID %s: %s", response.statusCode(), userId, response.body()));
     }
 }

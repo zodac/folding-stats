@@ -1,10 +1,9 @@
 package me.zodac.folding.stats.http.response;
 
+import java.net.http.HttpResponse;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import java.net.http.HttpResponse;
 
 /**
  * Simple wrapper for a {@link String} to hold the status code and body for the {@link HttpResponse} for a

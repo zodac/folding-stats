@@ -1,5 +1,11 @@
 package me.zodac.folding.stats;
 
+import static me.zodac.folding.stats.http.request.StatsRequestSender.sendFoldingRequest;
+import static me.zodac.folding.stats.http.response.StatsResponseParser.getPointsFromResponse;
+import static me.zodac.folding.stats.http.response.StatsResponseParser.getUnitsFromResponse;
+
+import java.net.http.HttpResponse;
+import java.sql.Timestamp;
 import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.stats.FoldingStatsDetails;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
@@ -13,13 +19,6 @@ import me.zodac.folding.stats.http.request.UnitsUrlBuilder;
 import me.zodac.folding.stats.http.response.StatsResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.http.HttpResponse;
-import java.sql.Timestamp;
-
-import static me.zodac.folding.stats.http.request.StatsRequestSender.sendFoldingRequest;
-import static me.zodac.folding.stats.http.response.StatsResponseParser.getPointsFromResponse;
-import static me.zodac.folding.stats.http.response.StatsResponseParser.getUnitsFromResponse;
 
 /**
  * Concrete implementation of {@link FoldingStatsRetriever} that retrieves {@link UserStats} through HTTP calls to the Folding@Home REST API.
@@ -52,7 +51,6 @@ public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
         return Stats.create(userPoints, userUnits);
     }
 
-
     @Override
     public UserStats getTotalStats(final User user) throws ExternalConnectionException {
         final Timestamp currentUtcTime = DateTimeUtils.currentUtcTimestamp();
@@ -63,9 +61,9 @@ public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
     @Override
     public long getPoints(final FoldingStatsDetails foldingStatsDetails) throws ExternalConnectionException {
         final StatsRequestUrl pointsRequestUrl = new PointsUrlBuilder()
-                .forUser(foldingStatsDetails.getFoldingUserName())
-                .withPasskey(foldingStatsDetails.getPasskey())
-                .build();
+            .forUser(foldingStatsDetails.getFoldingUserName())
+            .withPasskey(foldingStatsDetails.getPasskey())
+            .build();
 
         LOGGER.debug("Sending points request to: {}", pointsRequestUrl);
         final HttpResponse<String> response = sendFoldingRequest(pointsRequestUrl);
@@ -78,9 +76,9 @@ public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
     @Override
     public int getUnits(final FoldingStatsDetails foldingStatsDetails) throws ExternalConnectionException {
         final StatsRequestUrl unitsRequestUrl = new UnitsUrlBuilder()
-                .forUser(foldingStatsDetails.getFoldingUserName())
-                .withPasskey(foldingStatsDetails.getPasskey())
-                .build();
+            .forUser(foldingStatsDetails.getFoldingUserName())
+            .withPasskey(foldingStatsDetails.getPasskey())
+            .build();
 
         LOGGER.debug("Sending units request to: {}", unitsRequestUrl);
         final HttpResponse<String> response = sendFoldingRequest(unitsRequestUrl);
