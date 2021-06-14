@@ -1,7 +1,15 @@
 package me.zodac.folding.ejb;
 
+import static java.util.stream.Collectors.toList;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import javax.ejb.EJB;
+import javax.ejb.Singleton;
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.SystemState;
+import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
@@ -15,14 +23,6 @@ import me.zodac.folding.rest.api.tc.UserSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ejb.EJB;
-import javax.ejb.Singleton;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-
-import static java.util.stream.Collectors.toList;
-
 /**
  * {@link Singleton} EJB used to generate a {@link CompetitionSummary} for the <code>Team Competition</code>.
  */
@@ -30,6 +30,9 @@ import static java.util.stream.Collectors.toList;
 public class CompetitionResultGenerator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CompetitionResultGenerator.class);
+
+    @EJB
+    private transient BusinessLogic businessLogic;
 
     @EJB
     private transient OldFacade oldFacade;
@@ -46,7 +49,6 @@ public class CompetitionResultGenerator {
         if (SystemStateManager.current() != SystemState.WRITE_EXECUTED && competitionResultCache.hasCachedResult()) {
             LOGGER.debug("System is not in state {} and has a cached TC result, using cache", SystemState.WRITE_EXECUTED);
 
-
             final Optional<CompetitionSummary> cachedCompetitionResult = competitionResultCache.getResult();
             if (cachedCompetitionResult.isPresent()) {
                 return cachedCompetitionResult.get();
@@ -55,7 +57,8 @@ public class CompetitionResultGenerator {
             }
         }
 
-        LOGGER.debug("Calculating latest TC result, system state: {}, TC cache populated: {}", SystemStateManager.current(), competitionResultCache.hasCachedResult());
+        LOGGER.debug("Calculating latest TC result, system state: {}, TC cache populated: {}", SystemStateManager.current(),
+            competitionResultCache.hasCachedResult());
 
         final List<TeamSummary> teamSummaries = getStatsForTeams();
         LOGGER.debug("Found {} TC teams", teamSummaries.size());
@@ -71,10 +74,10 @@ public class CompetitionResultGenerator {
     }
 
     private List<TeamSummary> getStatsForTeams() {
-        return oldFacade.getAllTeams()
-                .stream()
-                .map(this::getTcTeamResult)
-                .collect(toList());
+        return businessLogic.getAllTeams()
+            .stream()
+            .map(this::getTcTeamResult)
+            .collect(toList());
     }
 
     private TeamSummary getTcTeamResult(final Team team) {
@@ -83,17 +86,18 @@ public class CompetitionResultGenerator {
         final Collection<User> usersOnTeam = oldFacade.getUsersOnTeam(team);
 
         final Collection<UserSummary> activeUserSummaries = usersOnTeam
-                .stream()
-                .map(this::getTcStatsForUser)
-                .collect(toList());
+            .stream()
+            .map(this::getTcStatsForUser)
+            .collect(toList());
 
         final Collection<RetiredUserSummary> retiredUserSummaries = oldFacade.getRetiredUsersForTeam(team)
-                .stream()
-                .map(RetiredUserSummary::create)
-                .collect(toList());
+            .stream()
+            .map(RetiredUserSummary::create)
+            .collect(toList());
 
         final String captainDisplayName = getCaptainDisplayName(team.getTeamName(), usersOnTeam);
-        return TeamSummary.create(team.getTeamName(), team.getTeamDescription(), team.getForumLink(), captainDisplayName, activeUserSummaries, retiredUserSummaries);
+        return TeamSummary.create(team.getTeamName(), team.getTeamDescription(), team.getForumLink(), captainDisplayName, activeUserSummaries,
+            retiredUserSummaries);
     }
 
     private String getCaptainDisplayName(final String teamName, final Collection<User> usersOnTeam) {
@@ -112,7 +116,9 @@ public class CompetitionResultGenerator {
         final Category category = user.getCategory();
 
         final UserTcStats userTcStats = oldFacade.getTcStatsForUser(user.getId());
-        LOGGER.debug("Results for {}: {} points | {} multiplied points | {} units", user.getDisplayName(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits());
-        return UserSummary.create(user.getId(), user.getDisplayName(), user.getFoldingUserName(), hardware, category, userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits(), user.getProfileLink(), user.getLiveStatsLink());
+        LOGGER.debug("Results for {}: {} points | {} multiplied points | {} units", user.getDisplayName(), userTcStats.getPoints(),
+            userTcStats.getMultipliedPoints(), userTcStats.getUnits());
+        return UserSummary.create(user.getId(), user.getDisplayName(), user.getFoldingUserName(), hardware, category, userTcStats.getPoints(),
+            userTcStats.getMultipliedPoints(), userTcStats.getUnits(), user.getProfileLink(), user.getLiveStatsLink());
     }
 }

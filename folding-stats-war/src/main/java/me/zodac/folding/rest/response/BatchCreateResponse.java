@@ -1,5 +1,6 @@
 package me.zodac.folding.rest.response;
 
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -7,8 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.util.List;
 
 /**
  * Response POJO used to encapsulate the result of a batch create operation through the REST layer.

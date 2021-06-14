@@ -1,5 +1,10 @@
 package me.zodac.folding.ejb.startup;
 
+import java.util.Collection;
+import javax.annotation.PostConstruct;
+import javax.ejb.EJB;
+import javax.ejb.Singleton;
+import javax.ejb.Startup;
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.db.DbManager;
@@ -12,12 +17,6 @@ import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.ejb.scheduled.TeamCompetitionStatsScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.PostConstruct;
-import javax.ejb.EJB;
-import javax.ejb.Singleton;
-import javax.ejb.Startup;
-import java.util.Collection;
 
 /**
  * The {@link Startup} EJB which initialises the system when it comes online. This involves initalising any caches or
@@ -64,7 +63,7 @@ public class Initialiser {
 
     private void initCaches() {
         businessLogic.getAllHardware();
-        oldFacade.getAllTeams();
+        businessLogic.getAllTeams();
 
         final Collection<User> users = oldFacade.getAllUsers();
 

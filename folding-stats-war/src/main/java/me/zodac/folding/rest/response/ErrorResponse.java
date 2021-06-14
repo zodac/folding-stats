@@ -10,6 +10,7 @@ import lombok.ToString;
 
 /**
  * Simple POJO used for REST responses where an error message is required.
+ *
  * <p>
  * When using {@link com.google.gson.Gson}, the response will be in the form:
  * <pre>
@@ -28,6 +29,12 @@ public class ErrorResponse {
 
     private String error;
 
+    /**
+     * Creates an {@link ErrorResponse}.
+     *
+     * @param error the error message
+     * @return the created {@link ErrorResponse}
+     */
     public static ErrorResponse create(final String error) {
         return new ErrorResponse(error);
     }

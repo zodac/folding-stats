@@ -1,16 +1,6 @@
 package me.zodac.folding.ejb.scheduled;
 
-import me.zodac.folding.SystemStateManager;
-import me.zodac.folding.api.SystemState;
-import me.zodac.folding.api.tc.Team;
-import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.utils.EnvironmentVariableUtils;
-import me.zodac.folding.api.utils.ExecutionType;
-import me.zodac.folding.ejb.OldFacade;
-import me.zodac.folding.ejb.UserTeamCompetitionStatsParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import java.util.Collection;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.ejb.EJB;
@@ -20,11 +10,22 @@ import javax.ejb.Startup;
 import javax.ejb.Timeout;
 import javax.ejb.Timer;
 import javax.ejb.TimerService;
-import java.util.Collection;
+import me.zodac.folding.SystemStateManager;
+import me.zodac.folding.api.SystemState;
+import me.zodac.folding.api.ejb.BusinessLogic;
+import me.zodac.folding.api.tc.Team;
+import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.utils.EnvironmentVariableUtils;
+import me.zodac.folding.api.utils.ExecutionType;
+import me.zodac.folding.ejb.OldFacade;
+import me.zodac.folding.ejb.UserTeamCompetitionStatsParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link Startup} EJB which schedules the <code>Team Competition</code> stats retrieval for the system. By default, the
  * system will update stats using {@link UserTeamCompetitionStatsParser} every hour at <b>55</b> minutes past the hour.
+ *
  * <p>
  * However, this default time can be changed by setting the environment variables:
  * <ul>
@@ -41,12 +42,16 @@ import java.util.Collection;
 public class TeamCompetitionStatsScheduler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TeamCompetitionStatsScheduler.class);
-    private static final boolean IS_STATS_SCHEDULED_PARSING_ENABLED = Boolean.parseBoolean(EnvironmentVariableUtils.get("ENABLE_STATS_SCHEDULED_PARSING", "false"));
+    private static final boolean IS_STATS_SCHEDULED_PARSING_ENABLED =
+        Boolean.parseBoolean(EnvironmentVariableUtils.get("ENABLE_STATS_SCHEDULED_PARSING", "false"));
 
     // Default is to run every hour at 55 minutes past the hour
     private static final String STATS_PARSING_SCHEDULE_HOUR = EnvironmentVariableUtils.get("STATS_PARSING_SCHEDULE_HOUR", "*");
     private static final String STATS_PARSING_SCHEDULE_MINUTE = EnvironmentVariableUtils.get("STATS_PARSING_SCHEDULE_MINUTE", "55");
     private static final String STATS_PARSING_SCHEDULE_SECOND = EnvironmentVariableUtils.get("STATS_PARSING_SCHEDULE_SECOND", "0");
+
+    @EJB
+    private transient BusinessLogic businessLogic;
 
     @EJB
     private transient OldFacade oldFacade;
@@ -57,6 +62,9 @@ public class TeamCompetitionStatsScheduler {
     @Resource
     private transient TimerService timerService;
 
+    /**
+     * On system startup, checks if scheduled TC stats parsing is enabled. If so, starts a {@link Timer} for stats parsing.
+     */
     @PostConstruct
     public void init() {
         if (!IS_STATS_SCHEDULED_PARSING_ENABLED) {
@@ -73,6 +81,11 @@ public class TeamCompetitionStatsScheduler {
         LOGGER.info("Starting TC stats parser with schedule: {}", timer.getSchedule());
     }
 
+    /**
+     * Scheduled executing for parsing <code>Team Competition</code> stats.
+     *
+     * @param timer the {@link Timer} for scheduled execution
+     */
     @Timeout
     public void scheduledTeamCompetitionStatsParsing(final Timer timer) {
         LOGGER.trace("Timer fired at: {}", timer);
@@ -85,6 +98,12 @@ public class TeamCompetitionStatsScheduler {
         }
     }
 
+    /**
+     * Parses <code>Team Competition</code> stats. Sets the {@link SystemState} to {@link SystemState#UPDATING_STATS} while stats are being parsed,
+     * then finally to {@link SystemState#WRITE_EXECUTED} when complete.
+     *
+     * @param executionType the {@link ExecutionType}
+     */
     public void manualTeamCompetitionStatsParsing(final ExecutionType executionType) {
         LOGGER.debug("Manual stats parsing execution");
         SystemStateManager.next(SystemState.UPDATING_STATS);
@@ -96,12 +115,11 @@ public class TeamCompetitionStatsScheduler {
         LOGGER.info("");
         LOGGER.info("Parsing TC Folding stats:");
 
-        final Collection<Team> tcTeams = oldFacade.getAllTeams();
+        final Collection<Team> tcTeams = businessLogic.getAllTeams();
         if (tcTeams.isEmpty()) {
             LOGGER.warn("No TC teams configured in system!");
             return;
         }
-
 
         for (final Team team : tcTeams) {
             parseTcStatsForTeam(team, executionType);

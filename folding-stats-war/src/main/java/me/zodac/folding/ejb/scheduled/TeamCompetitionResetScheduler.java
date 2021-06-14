@@ -1,5 +1,11 @@
 package me.zodac.folding.ejb.scheduled;
 
+import java.util.Collection;
+import javax.annotation.PostConstruct;
+import javax.ejb.EJB;
+import javax.ejb.Schedule;
+import javax.ejb.Singleton;
+import javax.ejb.Startup;
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.tc.User;
@@ -11,13 +17,6 @@ import me.zodac.folding.cache.TotalStatsCache;
 import me.zodac.folding.ejb.OldFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.PostConstruct;
-import javax.ejb.EJB;
-import javax.ejb.Schedule;
-import javax.ejb.Singleton;
-import javax.ejb.Startup;
-import java.util.Collection;
 
 /**
  * {@link Startup} EJB which schedules the monthly reset of the <code>Team Competition</code>. The reset will occur once
@@ -54,7 +53,7 @@ public class TeamCompetitionResetScheduler {
     }
 
     /**
-     * Schedules to execute at <b>00:15</b> on the 1st day of every month. Will reset the <code>Team Competition</code>
+     * Scheduled to execute at <b>00:15</b> on the 1st day of every month. Will reset the <code>Team Competition</code>
      * stats.
      *
      * @see #resetTeamCompetitionStats()
@@ -75,6 +74,7 @@ public class TeamCompetitionResetScheduler {
 
     /**
      * Resets the <code>Team Competition</code> stats for all {@link User}s.
+     *
      * <p>
      * Actions performed:
      * <ol>

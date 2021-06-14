@@ -15,6 +15,7 @@ import me.zodac.folding.rest.provider.security.SecurityInterceptor;
 
 /**
  * A class extending {@link Application} and annotated with {@link ApplicationPath} is the Java EE 6 "no XML" approach to activating JAX-RS.
+ *
  * <p>
  * Resources are served relative to the servlet path specified in the {@link ApplicationPath} annotation.
  */

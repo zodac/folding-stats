@@ -1,10 +1,10 @@
 package me.zodac.folding.rest.provider;
 
+import java.net.URI;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
-import java.net.URI;
 
 /**
  * {@link Provider} used to handle invalid URL requests. Redirects to the main <code>Team Competition</code> homepage.
@@ -17,7 +17,7 @@ public class InvalidUrlRedirecter implements ExceptionMapper<NotFoundException> 
     @Override
     public Response toResponse(final NotFoundException e) {
         return Response
-                .seeOther(URI.create(TEAM_COMPETITION_HOME_PAGE))
-                .build();
+            .seeOther(URI.create(TEAM_COMPETITION_HOME_PAGE))
+            .build();
     }
 }

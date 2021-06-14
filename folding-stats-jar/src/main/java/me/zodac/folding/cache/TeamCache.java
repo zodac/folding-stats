@@ -16,7 +16,7 @@ public final class TeamCache extends AbstractCache<Team> {
         return "team";
     }
 
-    public static TeamCache get() {
+    public static TeamCache getInstance() {
         return INSTANCE;
     }
 }

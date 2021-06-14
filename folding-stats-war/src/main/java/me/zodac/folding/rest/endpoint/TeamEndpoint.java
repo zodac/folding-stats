@@ -18,7 +18,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
-import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.utils.ExecutionType;
 import me.zodac.folding.api.validator.ValidationResponse;
@@ -101,42 +100,37 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
 
     @Override
     protected Team createElement(final Team team) {
-        final Team teamWithId = oldFacade.createTeam(team);
+        final Team teamWithId = businessLogic.createTeam(team);
         teamCompetitionStatsScheduler.manualTeamCompetitionStatsParsing(ExecutionType.SYNCHRONOUS);
         return teamWithId;
     }
 
     @Override
     protected Collection<Team> getAllElements() {
-        return oldFacade.getAllTeams();
+        return businessLogic.getAllTeams();
     }
 
     @Override
     protected ValidationResponse<Team> validateCreateAndConvert(final TeamRequest teamRequest) {
-        final TeamValidator teamValidator = TeamValidator.create(oldFacade);
+        final TeamValidator teamValidator = TeamValidator.createValidator(businessLogic, oldFacade);
         return teamValidator.validateCreate(teamRequest);
     }
 
     @Override
     protected ValidationResponse<Team> validateUpdateAndConvert(final TeamRequest teamRequest, final Team existingTeam) {
-        final TeamValidator teamValidator = TeamValidator.create(oldFacade);
+        final TeamValidator teamValidator = TeamValidator.createValidator(businessLogic, oldFacade);
         return teamValidator.validateUpdate(teamRequest);
     }
 
     @Override
     protected ValidationResponse<Team> validateDeleteAndConvert(final Team team) {
-        final TeamValidator teamValidator = TeamValidator.create(oldFacade);
+        final TeamValidator teamValidator = TeamValidator.createValidator(businessLogic, oldFacade);
         return teamValidator.validateDelete(team);
     }
 
     @Override
     protected Optional<Team> getElementById(final int teamId) {
-        try {
-            return Optional.of(oldFacade.getTeam(teamId));
-        } catch (final NotFoundException e) {
-            getLogger().warn("No team found with ID: {}", teamId, e);
-            return Optional.empty();
-        }
+        return businessLogic.getTeam(teamId);
     }
 
     @Override
@@ -149,6 +143,6 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
 
     @Override
     protected void deleteElement(final Team team) {
-        oldFacade.deleteTeam(team);
+        businessLogic.deleteTeam(team);
     }
 }

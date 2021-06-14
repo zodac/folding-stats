@@ -10,8 +10,6 @@ import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import me.zodac.folding.api.ejb.BusinessLogic;
-import me.zodac.folding.api.exception.NotFoundException;
-import me.zodac.folding.api.exception.TeamNotFoundException;
 import me.zodac.folding.api.stats.FoldingStatsDetails;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
 import me.zodac.folding.api.tc.Category;
@@ -116,20 +114,17 @@ public final class UserValidator {
 
         if (failureMessages.isEmpty()) {
             final Optional<Hardware> hardware = businessLogic.getHardware(userRequest.getHardwareId());
+            final Optional<Team> team = businessLogic.getTeam(userRequest.getTeamId());
 
             if (hardware.isEmpty()) {
-                failureMessages.add(String.format("Unable to retrieve hardware with ID %s", userRequest.getHardwareId()));
+                failureMessages.add(String.format("Unable to retrieve hardware with ID '%s'", userRequest.getHardwareId()));
+            } else if (team.isEmpty()) {
+                failureMessages.add(String.format("Unable to retrieve team with ID '%s'", userRequest.getTeamId()));
             } else {
-                try {
-                    final Team team = oldFacade.getTeam(userRequest.getTeamId());
-                    final User user =
-                        User.createWithoutId(userRequest.getFoldingUserName(), userRequest.getDisplayName(), userRequest.getPasskey(), category,
-                            userRequest.getProfileLink(), userRequest.getLiveStatsLink(), hardware.get(), team, userRequest.isUserIsCaptain());
-                    return ValidationResponse.success(user);
-                } catch (final NotFoundException e) {
-                    LOGGER.warn("{} with ID {} was validated successfully, but could not be retrieved", e.getType(), e.getId(), e);
-                    failureMessages.add(String.format("Unable to find %s with ID %s", e.getType(), e.getId()));
-                }
+                final User user =
+                    User.createWithoutId(userRequest.getFoldingUserName(), userRequest.getDisplayName(), userRequest.getPasskey(), category,
+                        userRequest.getProfileLink(), userRequest.getLiveStatsLink(), hardware.get(), team.get(), userRequest.isUserIsCaptain());
+                return ValidationResponse.success(user);
             }
         }
 
@@ -198,21 +193,17 @@ public final class UserValidator {
 
         if (failureMessages.isEmpty()) {
             final Optional<Hardware> hardware = businessLogic.getHardware(userRequest.getHardwareId());
+            final Optional<Team> team = businessLogic.getTeam(userRequest.getTeamId());
 
             if (hardware.isEmpty()) {
-                failureMessages.add(String.format("Unable to retrieve hardware with ID %s", userRequest.getHardwareId()));
+                failureMessages.add(String.format("Unable to retrieve hardware with ID '%s'", userRequest.getHardwareId()));
+            } else if (team.isEmpty()) {
+                failureMessages.add(String.format("Unable to retrieve team with ID '%s'", userRequest.getTeamId()));
             } else {
-                try {
-                    final Team team = oldFacade.getTeam(userRequest.getTeamId());
-
-                    final User user =
-                        User.createWithoutId(userRequest.getFoldingUserName(), userRequest.getDisplayName(), userRequest.getPasskey(), category,
-                            userRequest.getProfileLink(), userRequest.getLiveStatsLink(), hardware.get(), team, userRequest.isUserIsCaptain());
-                    return ValidationResponse.success(user);
-                } catch (final NotFoundException e) {
-                    LOGGER.warn("{} with ID {} was validated successfully, but could not be retrieved", e.getType(), e.getId(), e);
-                    failureMessages.add(String.format("Unable to find %s with ID %s", e.getType(), e.getId()));
-                }
+                final User user =
+                    User.createWithoutId(userRequest.getFoldingUserName(), userRequest.getDisplayName(), userRequest.getPasskey(), category,
+                        userRequest.getProfileLink(), userRequest.getLiveStatsLink(), hardware.get(), team.get(), userRequest.isUserIsCaptain());
+                return ValidationResponse.success(user);
             }
         }
 
@@ -220,8 +211,8 @@ public final class UserValidator {
     }
 
     private List<String> validateTeam(final UserRequest userRequest) {
-        if (userRequest.getTeamId() <= Team.EMPTY_TEAM_ID || oldFacade.doesNotContainTeam(userRequest.getTeamId())) {
-            final List<String> availableTeams = oldFacade
+        if (userRequest.getTeamId() <= Team.EMPTY_TEAM_ID || businessLogic.getTeam(userRequest.getTeamId()).isEmpty()) {
+            final List<String> availableTeams = businessLogic
                 .getAllTeams()
                 .stream()
                 .map(team -> String.format("%s: %s", team.getId(), team.getTeamName()))
@@ -268,57 +259,56 @@ public final class UserValidator {
     }
 
     private List<String> validateIfUserCanBeAddedToTeam(final UserRequest userRequest, final Category category, final User existingUser) {
-        final List<String> failureMessages = new ArrayList<>();
+        final Optional<Team> team = businessLogic.getTeam(userRequest.getTeamId());
 
-        try {
-            final Team team = oldFacade.getTeam(userRequest.getTeamId());
-            final Collection<User> usersOnTeam = oldFacade.getUsersOnTeam(team);
+        if (team.isEmpty()) {
+            return List.of(String.format("Unable to retrieve team with ID '%s'", userRequest.getTeamId()));
+        }
 
-            if (userRequest.isUserIsCaptain()) {
-                for (final User existingUserOnTeam : usersOnTeam) {
-                    if (existingUserOnTeam.isUserIsCaptain()) {
-                        failureMessages.add(String.format("Team '%s' already has a captain (%s), cannot have multiple captains", team.getTeamName(),
-                            userRequest.getDisplayName()));
-                    }
+        final List<String> failureMessages = new ArrayList<>(4);
+        final Collection<User> usersOnTeam = oldFacade.getUsersOnTeam(team.get());
+
+        if (userRequest.isUserIsCaptain()) {
+            for (final User existingUserOnTeam : usersOnTeam) {
+                if (existingUserOnTeam.isUserIsCaptain()) {
+                    failureMessages.add(String.format("Team '%s' already has a captain (%s), cannot have multiple captains", team.get().getTeamName(),
+                        userRequest.getDisplayName()));
                 }
             }
+        }
 
-            // What the hell, man? Who approved this shit?
-            if (existingUser == null) { // Create
-                if (usersOnTeam.size() >= Category.maximumPermittedAmountForAllCategories()) {
-                    failureMessages.add(String.format("Team '%s' has %s users, maximum permitted is %s", team.getTeamName(), usersOnTeam.size(),
-                        Category.maximumPermittedAmountForAllCategories()));
-                }
+        // What the hell, man? Who approved this shit?
+        if (existingUser == null) { // Create
+            if (usersOnTeam.size() >= Category.maximumPermittedAmountForAllCategories()) {
+                failureMessages.add(String.format("Team '%s' has %s users, maximum permitted is %s", team.get().getTeamName(), usersOnTeam.size(),
+                    Category.maximumPermittedAmountForAllCategories()));
+            }
 
+            final int permittedNumberForCategory = category.permittedUsers();
+            final int numberOfUsersInTeamWithCategory = (int) usersOnTeam
+                .stream()
+                .filter(user -> user.getCategory() == category)
+                .count();
+
+            if (numberOfUsersInTeamWithCategory >= permittedNumberForCategory) {
+                failureMessages.add(String.format("Found %s users of category '%s', only %s permitted", numberOfUsersInTeamWithCategory, category,
+                    permittedNumberForCategory));
+            }
+        } else {
+            // isUpdate
+            if (category != existingUser.getCategory()) {
                 final int permittedNumberForCategory = category.permittedUsers();
                 final int numberOfUsersInTeamWithCategory = (int) usersOnTeam
                     .stream()
-                    .filter(user -> user.getCategory() == category)
+                    .filter(user -> user.getId() != existingUser.getId() && user.getCategory() == category)
                     .count();
 
                 if (numberOfUsersInTeamWithCategory >= permittedNumberForCategory) {
-                    failureMessages.add(String.format("Found %s users of category '%s', only %s permitted", numberOfUsersInTeamWithCategory, category,
-                        permittedNumberForCategory));
-                }
-            } else {
-                // isUpdate
-                if (category != existingUser.getCategory()) {
-                    final int permittedNumberForCategory = category.permittedUsers();
-                    final int numberOfUsersInTeamWithCategory = (int) usersOnTeam
-                        .stream()
-                        .filter(user -> user.getId() != existingUser.getId() && user.getCategory() == category)
-                        .count();
-
-                    if (numberOfUsersInTeamWithCategory >= permittedNumberForCategory) {
-                        failureMessages.add(String
-                            .format("Found %s users of category '%s', only %s permitted", numberOfUsersInTeamWithCategory, category,
-                                permittedNumberForCategory));
-                    }
+                    failureMessages.add(String
+                        .format("Found %s users of category '%s', only %s permitted", numberOfUsersInTeamWithCategory, category,
+                            permittedNumberForCategory));
                 }
             }
-        } catch (final TeamNotFoundException e) {
-            LOGGER.warn("Unable to validate current team users", e);
-            failureMessages.add("Unable to validate current team users");
         }
 
         return failureMessages;

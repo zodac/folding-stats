@@ -1,12 +1,20 @@
 package me.zodac.folding.ejb;
 
+import static java.util.stream.Collectors.toList;
 
+import java.time.Month;
+import java.time.Year;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import javax.ejb.EJB;
+import javax.ejb.Singleton;
 import me.zodac.folding.api.SystemUserAuthentication;
 import me.zodac.folding.api.db.DbManager;
+import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.exception.DatabaseConnectionException;
 import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.exception.NotFoundException;
-import me.zodac.folding.api.exception.TeamNotFoundException;
 import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
 import me.zodac.folding.api.tc.Hardware;
@@ -32,16 +40,6 @@ import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ejb.EJB;
-import javax.ejb.Singleton;
-import java.time.Month;
-import java.time.Year;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-
-import static java.util.stream.Collectors.toList;
-
 @Deprecated
 @Singleton
 public class OldFacade {
@@ -50,7 +48,7 @@ public class OldFacade {
     private static final FoldingStatsRetriever FOLDING_STATS_RETRIEVER = HttpFoldingStatsRetriever.create();
 
     private transient final DbManager dbManager = DbManagerRetriever.get();
-    private transient final TeamCache teamCache = TeamCache.get();
+    private transient final TeamCache teamCache = TeamCache.getInstance();
     private transient final UserCache userCache = UserCache.getInstance();
     private transient final HardwareCache hardwareCache = HardwareCache.getInstance();
 
@@ -61,6 +59,9 @@ public class OldFacade {
     private transient final TotalStatsCache totalStatsCache = TotalStatsCache.get();
 
     @EJB
+    private transient BusinessLogic businessLogic;
+
+    @EJB
     private transient UserTeamCompetitionStatsParser userTeamCompetitionStatsParser;
 
     public void updateHardware(final Hardware updatedHardware, final Hardware existingHardware) throws ExternalConnectionException {
@@ -68,13 +69,14 @@ public class OldFacade {
         hardwareCache.add(updatedHardware);
 
         final List<User> usersUsingThisHardware = getAllUsers()
-                .stream()
-                .filter(user -> user.getHardware().getId() == updatedHardware.getId())
-                .collect(toList());
+            .stream()
+            .filter(user -> user.getHardware().getId() == updatedHardware.getId())
+            .collect(toList());
 
         final boolean isHardwareMultiplierChange = existingHardware.getMultiplier() != updatedHardware.getMultiplier();
 
         for (final User user : usersUsingThisHardware) {
+            // All users are referencing the old hardware, rather than recreating them, just evict them from the cache
             UserCache.getInstance().remove(user.getId()); // TODO: Don't use cache directly, use Storage#evictUserFromCache()
 
             if (isHardwareMultiplierChange) {
@@ -132,8 +134,8 @@ public class OldFacade {
             }
 
             return allUsers.stream()
-                    .map(User::hidePasskey)
-                    .collect(toList());
+                .map(User::hidePasskey)
+                .collect(toList());
         }
 
         LOGGER.trace("Cache miss! Get all users");
@@ -147,8 +149,8 @@ public class OldFacade {
         }
 
         return allUsersFromDb.stream()
-                .map(User::hidePasskey)
-                .collect(toList());
+            .map(User::hidePasskey)
+            .collect(toList());
     }
 
     public void updateUser(final User updatedUser) throws UserNotFoundException, ExternalConnectionException {
@@ -157,7 +159,8 @@ public class OldFacade {
         userCache.add(updatedUser);
 
         if (!existingUser.getHardware().equals(updatedUser.getHardware())) {
-            LOGGER.debug("User had state change to hardware, {} -> {}, recalculating initial stats", existingUser.getHardware(), updatedUser.getHardware());
+            LOGGER.debug("User had state change to hardware, {} -> {}, recalculating initial stats", existingUser.getHardware(),
+                updatedUser.getHardware());
             handleStateChangeForUser(updatedUser);
             userCache.add(updatedUser);
             return;
@@ -171,14 +174,16 @@ public class OldFacade {
         }
 
         if (!existingUser.getFoldingUserName().equalsIgnoreCase(updatedUser.getFoldingUserName())) {
-            LOGGER.debug("User had state change to Folding username, {} -> {}, recalculating initial stats", existingUser.getFoldingUserName(), updatedUser.getFoldingUserName());
+            LOGGER.debug("User had state change to Folding username, {} -> {}, recalculating initial stats", existingUser.getFoldingUserName(),
+                updatedUser.getFoldingUserName());
             handleStateChangeForUser(updatedUser);
             userCache.add(updatedUser);
             return;
         }
 
         if (!existingUser.getPasskey().equalsIgnoreCase(updatedUser.getPasskey())) {
-            LOGGER.debug("User had state change to passkey, {} -> {}, recalculating initial stats", existingUser.getPasskey(), updatedUser.getPasskey());
+            LOGGER.debug("User had state change to passkey, {} -> {}, recalculating initial stats", existingUser.getPasskey(),
+                updatedUser.getPasskey());
             handleStateChangeForUser(updatedUser);
             userCache.add(updatedUser);
             return;
@@ -198,7 +203,8 @@ public class OldFacade {
         dbManager.persistInitialStats(userTotalStats);
         initialStatsCache.add(userWithStateChange.getId(), userTotalStats.getStats());
 
-        final OffsetStats offsetStats = OffsetStats.create(currentUserTcStats.getPoints(), currentUserTcStats.getMultipliedPoints(), currentUserTcStats.getUnits());
+        final OffsetStats offsetStats =
+            OffsetStats.create(currentUserTcStats.getPoints(), currentUserTcStats.getMultipliedPoints(), currentUserTcStats.getUnits());
         LOGGER.debug("Adding offset stats of: {}", offsetStats);
         addOffsetStats(userWithStateChange.getId(), offsetStats);
     }
@@ -220,50 +226,9 @@ public class OldFacade {
         retiredStatsCache.add(RetiredUserTcStats.create(retiredUserId, team.getId(), user.getDisplayName(), userStats));
     }
 
-    public Team createTeam(final Team team) {
-        final Team teamWithId = dbManager.createTeam(team);
-        teamCache.add(teamWithId);
-        return teamWithId;
-    }
-
-    public Team getTeam(final int teamId) throws TeamNotFoundException {
-        try {
-            return teamCache.getOrError(teamId);
-        } catch (final NotFoundException e) {
-            LOGGER.debug("Unable to find team with ID {} in cache", teamId, e);
-        }
-
-        LOGGER.trace("Cache miss! Get team");
-        // Should be no need to get anything from the DB (since it should have been added to the cache when created)
-        // But adding this just in case we decide to add some cache eviction in future
-        final Team teamFromDb = dbManager.getTeam(teamId).orElseThrow(() -> new TeamNotFoundException(teamId));
-        teamCache.add(teamFromDb);
-        return teamFromDb;
-    }
-
-    public Collection<Team> getAllTeams() {
-        final Collection<Team> allTeams = teamCache.getAll();
-
-        if (!allTeams.isEmpty()) {
-            return allTeams;
-        }
-
-        LOGGER.trace("Cache miss! Get all teams");
-        // Should be no need to get anything from the DB (since it should have been added to the cache when created)
-        // But adding this just in case we decide to add some cache eviction in future
-        final Collection<Team> allTeamsFromDb = dbManager.getAllTeams();
-        teamCache.addAll(allTeamsFromDb);
-        return allTeamsFromDb;
-    }
-
     public void updateTeam(final Team team) {
         dbManager.updateTeam(team);
         teamCache.add(team);
-    }
-
-    public void deleteTeam(final Team team) {
-        dbManager.deleteTeam(team.getId());
-        teamCache.remove(team.getId());
     }
 
     public void persistInitialUserStats(final User user) throws ExternalConnectionException {
@@ -286,8 +251,8 @@ public class OldFacade {
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
         final Stats initialStatsFromDb = dbManager.getInitialStats(userId)
-                .orElse(UserStats.empty())
-                .getStats();
+            .orElse(UserStats.empty())
+            .getStats();
         initialStatsCache.add(userId, initialStatsFromDb);
         return initialStatsFromDb;
     }
@@ -312,7 +277,8 @@ public class OldFacade {
         return userTcStatsFromDb;
     }
 
-    public Collection<HistoricStats> getHistoricStatsHourly(final int userId, final int day, final Month month, final Year year) throws UserNotFoundException {
+    public Collection<HistoricStats> getHistoricStatsHourly(final int userId, final int day, final Month month, final Year year)
+        throws UserNotFoundException {
         final Collection<HistoricStats> historicStats = dbManager.getHistoricStatsHourly(userId, day, month, year);
 
         if (historicStats.isEmpty()) {
@@ -395,8 +361,8 @@ public class OldFacade {
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
         final Stats userTotalStatsFromDb = dbManager.getTotalStats(userId)
-                .orElse(UserStats.empty())
-                .getStats();
+            .orElse(UserStats.empty())
+            .getStats();
         totalStatsCache.add(userId, userTotalStatsFromDb);
         return userTotalStatsFromDb;
     }
@@ -423,20 +389,10 @@ public class OldFacade {
         return systemUserAuthentication;
     }
 
-    public boolean doesNotContainTeam(final int teamId) {
-        try {
-            getTeam(teamId);
-            return false;
-        } catch (final DatabaseConnectionException | TeamNotFoundException e) {
-            LOGGER.debug("Unable to find team with ID: {}", teamId, e);
-            return true;
-        }
-    }
-
     public Collection<User> getUsersOnTeam(final Team team) {
         return getAllUsers().stream()
-                .filter(user -> user.getTeam().getId() == team.getId())
-                .collect(toList());
+            .filter(user -> user.getTeam().getId() == team.getId())
+            .collect(toList());
     }
 
     public Collection<RetiredUserTcStats> getRetiredUsersForTeam(final Team team) {
@@ -447,24 +403,12 @@ public class OldFacade {
         dbManager.deleteRetiredUserStats();
     }
 
-    public Optional<Team> getTeamWithName(final String teamName) {
-        try {
-            return getAllTeams()
-                    .stream()
-                    .filter(team -> team.getTeamName().equalsIgnoreCase(teamName))
-                    .findAny();
-        } catch (final DatabaseConnectionException e) {
-            LOGGER.warn("Error getting team with teamName '{}'", teamName, e);
-            return Optional.empty();
-        }
-    }
-
     public Optional<User> getUserWithFoldingUserNameAndPasskey(final String foldingUserName, final String passkey) {
         try {
             return getAllUsersWithPasskeys(true)
-                    .stream()
-                    .filter(user -> user.getFoldingUserName().equalsIgnoreCase(foldingUserName) && user.getPasskey().equalsIgnoreCase(passkey))
-                    .findAny();
+                .stream()
+                .filter(user -> user.getFoldingUserName().equalsIgnoreCase(foldingUserName) && user.getPasskey().equalsIgnoreCase(passkey))
+                .findAny();
         } catch (final DatabaseConnectionException e) {
             LOGGER.warn("Error getting user with foldingUserName '{}' and passkey '{}'", foldingUserName, passkey, e);
             return Optional.empty();
@@ -474,9 +418,9 @@ public class OldFacade {
     public Optional<User> getUserWithHardware(final Hardware hardware) {
         try {
             return getAllUsers()
-                    .stream()
-                    .filter(user -> user.getHardware().getId() == hardware.getId())
-                    .findAny();
+                .stream()
+                .filter(user -> user.getHardware().getId() == hardware.getId())
+                .findAny();
         } catch (final DatabaseConnectionException e) {
             LOGGER.warn("Error getting user with hardware '{}'", hardware, e);
             return Optional.empty();
@@ -486,9 +430,9 @@ public class OldFacade {
     public Optional<User> getUserWithTeam(final Team team) {
         try {
             return getAllUsers()
-                    .stream()
-                    .filter(user -> user.getTeam().getId() == team.getId())
-                    .findAny();
+                .stream()
+                .filter(user -> user.getTeam().getId() == team.getId())
+                .findAny();
         } catch (final DatabaseConnectionException e) {
             LOGGER.warn("Error getting user with team '{}'", team, e);
             return Optional.empty();
