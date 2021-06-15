@@ -56,7 +56,6 @@ abstract class AbstractCache<V extends ResponsePojo> {
         return Optional.empty();
     }
 
-
     @Deprecated
     public V getOrError(final int id) throws NotFoundException {
         final V element = elementsById.get(id);
@@ -64,11 +63,6 @@ abstract class AbstractCache<V extends ResponsePojo> {
             throw new NotFoundException(elementType(), id);
         }
         return element;
-    }
-
-    @Deprecated
-    public V getOrError(final String id) throws NotFoundException {
-        return getOrError(Integer.parseInt(id));
     }
 
     public Collection<V> getAll() {

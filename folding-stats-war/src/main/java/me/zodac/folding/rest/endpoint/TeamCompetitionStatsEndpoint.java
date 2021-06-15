@@ -123,7 +123,7 @@ public class TeamCompetitionStatsEndpoint {
                 return badRequest(errorMessage);
             }
             final int parsedId = parseResult.getId();
-            final User user = oldFacade.getUserWithPasskey(parsedId, false);
+            final User user = oldFacade.getUserWithoutPasskey(parsedId);
 
             final CompetitionSummary competitionSummary = competitionResultGenerator.generate();
             final Collection<UserSummary> userSummaries = competitionSummary.getTeams()
@@ -178,12 +178,12 @@ public class TeamCompetitionStatsEndpoint {
                 return badRequest(errorMessage);
             }
             final int parsedId = parseResult.getId();
-            final User user = oldFacade.getUser(parsedId);
+            final User user = oldFacade.getUserWithPasskey(parsedId);
 
             final OffsetStats offsetStatsToUse = getValidUserStatsOffset(user, offsetStats);
             oldFacade.addOrUpdateOffsetStats(parsedId, offsetStatsToUse);
             SystemStateManager.next(SystemState.UPDATING_STATS);
-            userTeamCompetitionStatsParser.parseTcStatsForUserAndWait(oldFacade.getUser(parsedId));
+            userTeamCompetitionStatsParser.parseTcStatsForUserAndWait(oldFacade.getUserWithPasskey(parsedId));
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             return ok();
         } catch (final UserNotFoundException e) {

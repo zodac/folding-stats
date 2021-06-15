@@ -1,6 +1,7 @@
 package me.zodac.folding.rest.validator;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import lombok.AccessLevel;
@@ -124,10 +125,12 @@ public final class TeamValidator {
      * @return the {@link ValidationResponse}
      */
     public ValidationResponse<Team> validateDelete(final Team team) {
-        final Optional<User> userWithMatchingTeam = oldFacade.getUserWithTeam(team);
+        final Collection<User> usersWithMatchingTeam = oldFacade.getUsersWithTeam(team);
 
-        return userWithMatchingTeam
-            .<ValidationResponse<Team>>map(user -> ValidationResponse.usedBy(team, user))
-            .orElseGet(() -> ValidationResponse.success(team));
+        if (usersWithMatchingTeam.isEmpty()) {
+            return ValidationResponse.success(team);
+        }
+
+        return ValidationResponse.usedBy(team, usersWithMatchingTeam);
     }
 }

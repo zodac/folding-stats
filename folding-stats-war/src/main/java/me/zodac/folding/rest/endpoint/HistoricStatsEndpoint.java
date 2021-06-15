@@ -99,7 +99,7 @@ public class HistoricStatsEndpoint {
             }
             final int parsedId = parseResult.getId();
 
-            oldFacade.getUser(parsedId); // Check if user exists first, catch UserNotFoundException early
+            oldFacade.getUserWithPasskey(parsedId); // Check if user exists first, catch UserNotFoundException early
 
             final Collection<HistoricStats> hourlyStats =
                 oldFacade.getHistoricStatsHourly(parsedId, Integer.parseInt(day), Month.of(Integer.parseInt(month)), Year.parse(year));
@@ -169,7 +169,7 @@ public class HistoricStatsEndpoint {
             }
             final int parsedId = parseResult.getId();
 
-            oldFacade.getUser(parsedId); // Check if user exists first, catch UserNotFoundException early
+            oldFacade.getUserWithPasskey(parsedId); // Check if user exists first, catch UserNotFoundException early
             final Collection<HistoricStats> dailyStats =
                 oldFacade.getHistoricStatsDaily(parsedId, Month.of(Integer.parseInt(month)), Year.parse(year));
 
@@ -233,7 +233,7 @@ public class HistoricStatsEndpoint {
             }
             final int parsedId = parseResult.getId();
 
-            oldFacade.getUser(parsedId); // Check if user exists first, catch UserNotFoundException early
+            oldFacade.getUserWithPasskey(parsedId); // Check if user exists first, catch UserNotFoundException early
             final Collection<HistoricStats> monthlyStats = oldFacade.getHistoricStatsMonthly(parsedId, Year.parse(year));
 
             final CacheControl cacheControl = new CacheControl();

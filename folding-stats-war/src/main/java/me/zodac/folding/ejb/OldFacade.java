@@ -11,7 +11,6 @@ import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import me.zodac.folding.api.SystemUserAuthentication;
 import me.zodac.folding.api.db.DbManager;
-import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.exception.DatabaseConnectionException;
 import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.exception.NotFoundException;
@@ -47,19 +46,16 @@ public class OldFacade {
     private static final Logger LOGGER = LoggerFactory.getLogger(OldFacade.class);
     private static final FoldingStatsRetriever FOLDING_STATS_RETRIEVER = HttpFoldingStatsRetriever.create();
 
-    private transient final DbManager dbManager = DbManagerRetriever.get();
-    private transient final TeamCache teamCache = TeamCache.getInstance();
-    private transient final UserCache userCache = UserCache.getInstance();
-    private transient final HardwareCache hardwareCache = HardwareCache.getInstance();
+    private final transient DbManager dbManager = DbManagerRetriever.get();
+    private final transient TeamCache teamCache = TeamCache.getInstance();
+    private final transient UserCache userCache = UserCache.getInstance();
+    private final transient HardwareCache hardwareCache = HardwareCache.getInstance();
 
-    private transient final InitialStatsCache initialStatsCache = InitialStatsCache.get();
-    private transient final OffsetStatsCache offsetStatsCache = OffsetStatsCache.get();
-    private transient final RetiredTcStatsCache retiredStatsCache = RetiredTcStatsCache.get();
-    private transient final TcStatsCache tcStatsCache = TcStatsCache.get();
-    private transient final TotalStatsCache totalStatsCache = TotalStatsCache.get();
-
-    @EJB
-    private transient BusinessLogic businessLogic;
+    private final transient InitialStatsCache initialStatsCache = InitialStatsCache.get();
+    private final transient OffsetStatsCache offsetStatsCache = OffsetStatsCache.get();
+    private final transient RetiredTcStatsCache retiredStatsCache = RetiredTcStatsCache.get();
+    private final transient TcStatsCache tcStatsCache = TcStatsCache.get();
+    private final transient TotalStatsCache totalStatsCache = TotalStatsCache.get();
 
     @EJB
     private transient UserTeamCompetitionStatsParser userTeamCompetitionStatsParser;
@@ -68,7 +64,7 @@ public class OldFacade {
         dbManager.updateHardware(updatedHardware);
         hardwareCache.add(updatedHardware);
 
-        final List<User> usersUsingThisHardware = getAllUsers()
+        final List<User> usersUsingThisHardware = getAllUsersWithPasskeys()
             .stream()
             .filter(user -> user.getHardware().getId() == updatedHardware.getId())
             .collect(toList());
@@ -100,14 +96,9 @@ public class OldFacade {
         return userWithId;
     }
 
-    public User getUser(final int userId) throws UserNotFoundException {
-        return getUserWithPasskey(userId, true);
-    }
-
-    public User getUserWithPasskey(final int userId, final boolean showFullPasskeys) throws UserNotFoundException {
+    public User getUserWithPasskey(final int userId) throws UserNotFoundException {
         try {
-            final User user = userCache.getOrError(userId);
-            return showFullPasskeys ? user : User.hidePasskey(user);
+            return userCache.getOrError(userId);
         } catch (final NotFoundException e) {
             LOGGER.debug("Unable to find user with ID {} in cache", userId, e);
         }
@@ -118,21 +109,45 @@ public class OldFacade {
         final User userFromDb = dbManager.getUser(userId).orElseThrow(() -> new UserNotFoundException(userId));
         userCache.add(userFromDb);
 
-        return showFullPasskeys ? userFromDb : User.hidePasskey(userFromDb);
+        return userFromDb;
     }
 
-    public Collection<User> getAllUsers() {
-        return getAllUsersWithPasskeys(true);
+    public User getUserWithoutPasskey(final int userId) throws UserNotFoundException {
+        try {
+            final User user = userCache.getOrError(userId);
+            return User.hidePasskey(user);
+        } catch (final NotFoundException e) {
+            LOGGER.debug("Unable to find user with ID {} in cache", userId, e);
+        }
+
+        LOGGER.trace("Cache miss! Get user");
+        // Should be no need to get anything from the DB (since it should have been added to the cache when created)
+        // But adding this just in case we decide to add some cache eviction in future
+        final User userFromDb = dbManager.getUser(userId).orElseThrow(() -> new UserNotFoundException(userId));
+        userCache.add(userFromDb);
+
+        return User.hidePasskey(userFromDb);
     }
 
-    public Collection<User> getAllUsersWithPasskeys(final boolean showFullPasskeys) {
+    public Collection<User> getAllUsersWithPasskeys() {
         final Collection<User> allUsers = userCache.getAll();
 
         if (!allUsers.isEmpty()) {
-            if (showFullPasskeys) {
-                return allUsers;
-            }
+            return allUsers;
+        }
 
+        LOGGER.trace("Cache miss! Get all users");
+        // Should be no need to get anything from the DB (since it should have been added to the cache when created)
+        // But adding this just in case we decide to add some cache eviction in future
+        final Collection<User> allUsersFromDb = dbManager.getAllUsers();
+        userCache.addAll(allUsersFromDb);
+        return allUsersFromDb;
+    }
+
+    public Collection<User> getAllUsersWithoutPasskeys() {
+        final Collection<User> allUsers = userCache.getAll();
+
+        if (!allUsers.isEmpty()) {
             return allUsers.stream()
                 .map(User::hidePasskey)
                 .collect(toList());
@@ -144,17 +159,13 @@ public class OldFacade {
         final Collection<User> allUsersFromDb = dbManager.getAllUsers();
         userCache.addAll(allUsersFromDb);
 
-        if (showFullPasskeys) {
-            return allUsersFromDb;
-        }
-
         return allUsersFromDb.stream()
             .map(User::hidePasskey)
             .collect(toList());
     }
 
     public void updateUser(final User updatedUser) throws UserNotFoundException, ExternalConnectionException {
-        final User existingUser = getUser(updatedUser.getId());
+        final User existingUser = getUserWithPasskey(updatedUser.getId());
         dbManager.updateUser(updatedUser);
         userCache.add(updatedUser);
 
@@ -334,7 +345,7 @@ public class OldFacade {
 
 
     public void initialiseOffsetStats() {
-        for (final User user : getAllUsers()) {
+        for (final User user : getAllUsersWithPasskeys()) {
             final OffsetStats offsetStats = dbManager.getOffsetStats(user.getId()).orElse(OffsetStats.empty());
             offsetStatsCache.add(user.getId(), offsetStats);
         }
@@ -390,7 +401,7 @@ public class OldFacade {
     }
 
     public Collection<User> getUsersOnTeam(final Team team) {
-        return getAllUsers().stream()
+        return getAllUsersWithPasskeys().stream()
             .filter(user -> user.getTeam().getId() == team.getId())
             .collect(toList());
     }
@@ -405,7 +416,7 @@ public class OldFacade {
 
     public Optional<User> getUserWithFoldingUserNameAndPasskey(final String foldingUserName, final String passkey) {
         try {
-            return getAllUsersWithPasskeys(true)
+            return getAllUsersWithPasskeys()
                 .stream()
                 .filter(user -> user.getFoldingUserName().equalsIgnoreCase(foldingUserName) && user.getPasskey().equalsIgnoreCase(passkey))
                 .findAny();
@@ -415,27 +426,17 @@ public class OldFacade {
         }
     }
 
-    public Optional<User> getUserWithHardware(final Hardware hardware) {
-        try {
-            return getAllUsers()
-                .stream()
-                .filter(user -> user.getHardware().getId() == hardware.getId())
-                .findAny();
-        } catch (final DatabaseConnectionException e) {
-            LOGGER.warn("Error getting user with hardware '{}'", hardware, e);
-            return Optional.empty();
-        }
+    public Collection<User> getUsersWithHardware(final Hardware hardware) {
+        return getAllUsersWithoutPasskeys()
+            .stream()
+            .filter(user -> user.getHardware().getId() == hardware.getId())
+            .collect(toList());
     }
 
-    public Optional<User> getUserWithTeam(final Team team) {
-        try {
-            return getAllUsers()
-                .stream()
-                .filter(user -> user.getTeam().getId() == team.getId())
-                .findAny();
-        } catch (final DatabaseConnectionException e) {
-            LOGGER.warn("Error getting user with team '{}'", team, e);
-            return Optional.empty();
-        }
+    public Collection<User> getUsersWithTeam(final Team team) {
+        return getAllUsersWithoutPasskeys()
+            .stream()
+            .filter(user -> user.getTeam().getId() == team.getId())
+            .collect(toList());
     }
 }

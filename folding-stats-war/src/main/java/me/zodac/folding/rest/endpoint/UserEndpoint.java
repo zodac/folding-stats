@@ -103,7 +103,7 @@ public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
 
     @Override
     protected Collection<User> getAllElements() {
-        return oldFacade.getAllUsersWithPasskeys(false);
+        return oldFacade.getAllUsersWithoutPasskeys();
     }
 
     @Override
@@ -126,7 +126,7 @@ public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
     @Override
     protected Optional<User> getElementById(final int userId) {
         try {
-            return Optional.of(oldFacade.getUserWithPasskey(userId, false));
+            return Optional.of(oldFacade.getUserWithoutPasskey(userId));
         } catch (final NotFoundException e) {
             getLogger().debug("No user found with ID: {}", userId, e);
             return Optional.empty();

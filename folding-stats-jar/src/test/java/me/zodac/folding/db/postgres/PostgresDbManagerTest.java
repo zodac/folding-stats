@@ -12,8 +12,6 @@ import java.util.Collection;
 import java.util.Optional;
 import me.zodac.folding.api.SystemUserAuthentication;
 import me.zodac.folding.api.db.DbManager;
-import me.zodac.folding.api.exception.HardwareNotFoundException;
-import me.zodac.folding.api.exception.TeamNotFoundException;
 import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
@@ -41,7 +39,7 @@ class PostgresDbManagerTest {
 
     @Test
     @Order(1)
-    void hardwareTest() throws HardwareNotFoundException {
+    void hardwareTest() {
         final Hardware hardware = generateHardware();
         final Hardware createdHardware = POSTGRES_DB_MANAGER.createHardware(hardware);
         assertThat(createdHardware.getId())
@@ -55,8 +53,11 @@ class PostgresDbManagerTest {
         assertThat(allHardware)
             .hasSize(1);
 
-        final Hardware retrievedHardware =
-            POSTGRES_DB_MANAGER.getHardware(createdHardware.getId()).orElseThrow(() -> new HardwareNotFoundException(createdHardware.getId()));
+        final Optional<Hardware> optionalRetrievedHardware = POSTGRES_DB_MANAGER.getHardware(createdHardware.getId());
+        assertThat(optionalRetrievedHardware)
+            .isPresent();
+
+        final Hardware retrievedHardware = optionalRetrievedHardware.get();
         assertThat(retrievedHardware)
             .isEqualTo(createdHardware);
 
@@ -69,8 +70,11 @@ class PostgresDbManagerTest {
             .build();
 
         POSTGRES_DB_MANAGER.updateHardware(hardwareToUpdate);
-        final Hardware updatedHardware =
-            POSTGRES_DB_MANAGER.getHardware(createdHardware.getId()).orElseThrow(() -> new HardwareNotFoundException(createdHardware.getId()));
+        final Optional<Hardware> optionalUpdatedHardware = POSTGRES_DB_MANAGER.getHardware(createdHardware.getId());
+        assertThat(optionalUpdatedHardware)
+            .isPresent();
+
+        final Hardware updatedHardware = optionalUpdatedHardware.get();
         assertThat(updatedHardware)
             .isEqualTo(hardwareToUpdate);
 
@@ -83,7 +87,7 @@ class PostgresDbManagerTest {
 
     @Test
     @Order(2)
-    void teamTest() throws TeamNotFoundException {
+    void teamTest() {
         final Team team = generateTeam();
         final Team createdTeam = POSTGRES_DB_MANAGER.createTeam(team);
 
@@ -98,7 +102,11 @@ class PostgresDbManagerTest {
         assertThat(allTeams)
             .hasSize(1);
 
-        final Team retrievedTeam = POSTGRES_DB_MANAGER.getTeam(createdTeam.getId()).orElseThrow(() -> new TeamNotFoundException(createdTeam.getId()));
+        final Optional<Team> optionalRetrievedTeam = POSTGRES_DB_MANAGER.getTeam(createdTeam.getId());
+        assertThat(optionalRetrievedTeam)
+            .isPresent();
+
+        final Team retrievedTeam = optionalRetrievedTeam.get();
         assertThat(retrievedTeam)
             .isEqualTo(createdTeam);
 
@@ -110,7 +118,11 @@ class PostgresDbManagerTest {
             .build();
 
         POSTGRES_DB_MANAGER.updateTeam(teamToUpdate);
-        final Team updatedTeam = POSTGRES_DB_MANAGER.getTeam(createdTeam.getId()).orElseThrow(() -> new TeamNotFoundException(createdTeam.getId()));
+        final Optional<Team> optionalUpdatedTeam = POSTGRES_DB_MANAGER.getTeam(createdTeam.getId());
+        assertThat(optionalUpdatedTeam)
+            .isPresent();
+
+        final Team updatedTeam = optionalUpdatedTeam.get();
         assertThat(updatedTeam)
             .isEqualTo(teamToUpdate);
 

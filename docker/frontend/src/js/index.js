@@ -334,6 +334,8 @@ function loadTeamStats() {
                         teamTableUserCell.setAttribute("title", "Multiplier: x" + activeUser["hardware"]["multiplier"].toLocaleString());
                         teamTableUserCell.innerHTML = activeUser[userProperty]["displayName"].toLocaleString();
                         new bootstrap.Tooltip(teamTableUserCell);
+                    } else if (userProperty === "category") {
+                        teamTableUserCell.innerHTML = getCategory(activeUser["category"]);
                     } else {
                         if (userProperty in activeUser) {
                             teamTableUserCell.innerHTML = activeUser[userProperty].toLocaleString();

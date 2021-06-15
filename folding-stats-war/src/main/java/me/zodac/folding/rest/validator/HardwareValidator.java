@@ -1,6 +1,7 @@
 package me.zodac.folding.rest.validator;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import lombok.AccessLevel;
@@ -150,10 +151,12 @@ public final class HardwareValidator {
      * @return the {@link ValidationResponse}
      */
     public ValidationResponse<Hardware> validateDelete(final Hardware hardware) {
-        final Optional<User> userWithMatchingHardware = oldFacade.getUserWithHardware(hardware);
+        final Collection<User> usersWithMatchingHardware = oldFacade.getUsersWithHardware(hardware);
 
-        return userWithMatchingHardware
-            .<ValidationResponse<Hardware>>map(user -> ValidationResponse.usedBy(hardware, user))
-            .orElseGet(() -> ValidationResponse.success(hardware));
+        if (usersWithMatchingHardware.isEmpty()) {
+            return ValidationResponse.success(hardware);
+        }
+
+        return ValidationResponse.usedBy(hardware, usersWithMatchingHardware);
     }
 }

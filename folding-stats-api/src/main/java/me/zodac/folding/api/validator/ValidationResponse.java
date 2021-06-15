@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import me.zodac.folding.api.RequestPojo;
 import me.zodac.folding.api.ResponsePojo;
 
 /**
@@ -26,7 +27,7 @@ import me.zodac.folding.api.ResponsePojo;
 public class ValidationResponse<E extends ResponsePojo> {
 
     private Object invalidObject;
-    private Object conflictingObject;
+    private Collection<? extends ResponsePojo> conflictingObjects;
     private E output;
     private ValidationResult validationResult;
     private Collection<String> errors;
@@ -65,30 +66,32 @@ public class ValidationResponse<E extends ResponsePojo> {
     }
 
     /**
-     * Validation failed due to a conflict with an existing {@link Object}.
+     * Validation failed due to the {@link RequestPojo} conflicting with an existing {@link ResponsePojo}.
      *
-     * @param invalidObject         the {@link Object} that failed validation
-     * @param conflictingObject     the conflicting {@link Object}
+     * @param invalidObject         the {@link ResponsePojo} that failed validation
+     * @param conflictingObject     the conflicting {@link ResponsePojo}
      * @param conflictingAttributes a {@link Collection} of the conflicting fields
      * @param <E>                   the output type of the validated object
      * @return a {@link ValidationResponse} with the conflicting {@link Object}
      */
-    public static <E extends ResponsePojo> ValidationResponse<E> conflictingWith(final Object invalidObject, final Object conflictingObject,
+    public static <E extends ResponsePojo> ValidationResponse<E> conflictingWith(final RequestPojo invalidObject,
+                                                                                 final ResponsePojo conflictingObject,
                                                                                  final Collection<String> conflictingAttributes) {
         final Collection<String> errors = List.of(String.format("Payload conflicts with an existing object on: %s", conflictingAttributes));
-        return new ValidationResponse<>(invalidObject, conflictingObject, null, ValidationResult.FAILURE_DUE_TO_CONFLICT, errors);
+        return new ValidationResponse<>(invalidObject, List.of(conflictingObject), null, ValidationResult.FAILURE_DUE_TO_CONFLICT, errors);
     }
 
     /**
-     * Validation failed due to a conflict with an existing {@link Object} using this {@link Object}.
+     * Validation failed due to a conflict with existing {@link ResponsePojo}s using this {@link ResponsePojo}.
      *
-     * @param invalidObject     the {@link Object} that failed validation
-     * @param conflictingObject the conflicting {@link Object}
-     * @param <E>               the output type of the validated object
+     * @param invalidObject the {@link ResponsePojo} that failed validation
+     * @param usedBy        the {@link Collection} of conflicting {@link ResponsePojo}s
+     * @param <E>           the output type of the validated object
      * @return a {@link ValidationResponse} with the conflicting {@link Object}
      */
-    public static <E extends ResponsePojo> ValidationResponse<E> usedBy(final Object invalidObject, final Object conflictingObject) {
-        return new ValidationResponse<>(invalidObject, conflictingObject, null, ValidationResult.FAILURE_DUE_TO_CONFLICT,
+    public static <E extends ResponsePojo> ValidationResponse<E> usedBy(final ResponsePojo invalidObject,
+                                                                        final Collection<? extends ResponsePojo> usedBy) {
+        return new ValidationResponse<>(invalidObject, usedBy, null, ValidationResult.FAILURE_DUE_TO_CONFLICT,
             List.of("Payload conflicts with an existing object"));
     }
 
