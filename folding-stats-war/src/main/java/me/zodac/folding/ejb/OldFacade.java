@@ -11,7 +11,6 @@ import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import me.zodac.folding.api.SystemUserAuthentication;
 import me.zodac.folding.api.db.DbManager;
-import me.zodac.folding.api.exception.DatabaseConnectionException;
 import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.api.exception.UserNotFoundException;
@@ -401,7 +400,8 @@ public class OldFacade {
     }
 
     public Collection<User> getUsersOnTeam(final Team team) {
-        return getAllUsersWithPasskeys().stream()
+        return getAllUsersWithPasskeys()
+            .stream()
             .filter(user -> user.getTeam().getId() == team.getId())
             .collect(toList());
     }
@@ -415,15 +415,10 @@ public class OldFacade {
     }
 
     public Optional<User> getUserWithFoldingUserNameAndPasskey(final String foldingUserName, final String passkey) {
-        try {
-            return getAllUsersWithPasskeys()
-                .stream()
-                .filter(user -> user.getFoldingUserName().equalsIgnoreCase(foldingUserName) && user.getPasskey().equalsIgnoreCase(passkey))
-                .findAny();
-        } catch (final DatabaseConnectionException e) {
-            LOGGER.warn("Error getting user with foldingUserName '{}' and passkey '{}'", foldingUserName, passkey, e);
-            return Optional.empty();
-        }
+        return getAllUsersWithPasskeys()
+            .stream()
+            .filter(user -> user.getFoldingUserName().equalsIgnoreCase(foldingUserName) && user.getPasskey().equalsIgnoreCase(passkey))
+            .findAny();
     }
 
     public Collection<User> getUsersWithHardware(final Hardware hardware) {

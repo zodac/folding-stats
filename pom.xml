@@ -45,7 +45,7 @@
         <!-- Test 3PP Versions -->
         <assertj-core.version>3.19.0</assertj-core.version>
         <embredded-postgres.version>1.2.6</embredded-postgres.version>
-        <!-- Version should be the same as the postgres docker image version -->
+        <!-- Version should be the same as the postgres docker image version, where possible -->
         <embredded-postgres-binaries-bom.version>13.2.0</embredded-postgres-binaries-bom.version>
         <flyway-core>6.5.1</flyway-core>
         <junit.version>5.7.1</junit.version>

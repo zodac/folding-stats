@@ -1,4 +1,4 @@
-function getOperatingSystem(value){
+function getOperatingSystem(value) {
     if (value.toLowerCase() === "linux") {
         return "Linux";
     }
@@ -10,12 +10,12 @@ function getOperatingSystem(value){
     return value;
 }
 
-function getCategory(value){
-    if (value.toLowerCase() === "amd_gpu" || value.toLowerCase() === "amd gpu") {
+function getCategory(value) {
+    if (value.toLowerCase() === "amd_gpu") {
         return "AMD GPU";
     }
 
-    if (value.toLowerCase() === "nvidia_gpu" || value.toLowerCase() === "nvidia gpu") {
+    if (value.toLowerCase() === "nvidia_gpu") {
         return "nVidia GPU";
     }
 

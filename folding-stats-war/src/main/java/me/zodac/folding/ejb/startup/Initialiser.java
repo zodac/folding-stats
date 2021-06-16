@@ -65,7 +65,7 @@ public class Initialiser {
         businessLogic.getAllHardware();
         businessLogic.getAllTeams();
 
-        final Collection<User> users = oldFacade.getAllUsersWithPasskeys();
+        final Collection<User> users = oldFacade.getAllUsersWithoutPasskeys();
 
         oldFacade.initialiseOffsetStats();
 

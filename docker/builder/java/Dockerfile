@@ -4,16 +4,17 @@ RUN mkdir --parents /folding-stats/
 WORKDIR /folding-stats/
 
 # Copy source code
+COPY ./pom.xml ./pom.xml
 COPY ./folding-stats-api ./folding-stats-api
 COPY ./folding-stats-client-library-java ./folding-stats-client-library-java
 COPY ./folding-stats-jar ./folding-stats-jar
 COPY ./folding-stats-war ./folding-stats-war
-# Test logic must be added, or else the 'mvn install' will fail
-COPY ./testsuite ./testsuite
+# Test logic must be added,  or else 'mvn install' will not even start
 COPY ./stubbed-folding-endpoints-war ./stubbed-folding-endpoints-war
+COPY ./testsuite ./testsuite
 
 # Build artifacts
-RUN mvn clean install
+RUN mvn install
 
 # Output
 RUN mkdir --parents /opt/jboss/wildfly/standalone/deployments/

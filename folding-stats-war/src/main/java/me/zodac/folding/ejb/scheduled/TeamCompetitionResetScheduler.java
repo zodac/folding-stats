@@ -92,7 +92,7 @@ public class TeamCompetitionResetScheduler {
      */
     public void resetTeamCompetitionStats() {
         try {
-            final Collection<User> users = oldFacade.getAllUsersWithPasskeys();
+            final Collection<User> users = oldFacade.getAllUsersWithoutPasskeys();
             if (users.isEmpty()) {
                 LOGGER.error("No TC users configured in system to reset!");
             } else {

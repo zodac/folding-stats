@@ -30,6 +30,7 @@ import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Pattern;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
@@ -126,7 +127,7 @@ class UserTest {
     }
 
     @Test
-    void whenGettingUser_givenValidUserId_thenUserIsReturned_andHas200Status() throws FoldingRestException {
+    void whenGettingUser_givenValidUserId_thenUserIsReturned_andPasskeyIsMasked_andHas200Status() throws FoldingRestException {
         final int userId = create(generateUser()).getId();
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.get(userId);
@@ -138,6 +139,17 @@ class UserTest {
         assertThat(user.getId())
             .as("Did not receive the expected user: " + response.body())
             .isEqualTo(userId);
+
+        final String firstPartOfPasskey = user.getPasskey().substring(0, 8); // First 8 characters only
+        final String secondPartOfPasskey = user.getPasskey().substring(8); // All other characters
+
+        assertThat(firstPartOfPasskey)
+            .as("Expected the first 8 characters of the passkey to be shown")
+            .doesNotContain("*");
+
+        assertThat(secondPartOfPasskey)
+            .as("Expected the remaining 24 characters of the passkey to be masked")
+            .doesNotContainPattern(Pattern.compile("[a-zA-Z]"));
     }
 
     @Test

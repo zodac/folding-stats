@@ -212,6 +212,53 @@ final class Storage {
     }
 
     /**
+     * Retrieves a {@link User}.
+     *
+     * <p>
+     * First attempts to retrieve from {@link UserCache}, then if none exists, attempts to retrieve from the
+     * {@link DbManager}.
+     *
+     * @param userId the ID of the {@link User} to retrieve
+     * @return an {@link Optional} of the retrieved {@link User}
+     * @see DbManager#getUser(int)
+     */
+    Optional<User> getUser(final int userId) {
+        final Optional<User> fromCache = userCache.get(userId);
+
+        if (fromCache.isPresent()) {
+            return fromCache;
+        }
+
+        LOGGER.trace("Cache miss! Get user");
+        final Optional<User> fromDb = DB_MANAGER.getUser(userId);
+        fromDb.ifPresent(userCache::add);
+        return fromDb;
+    }
+
+    /**
+     * Retrieves all {@link User}.
+     *
+     * <p>
+     * First attempts to retrieve from {@link UserCache}, then if none exists, attempts to retrieve from the
+     * {@link DbManager}.
+     *
+     * @return a {@link Collection} of the retrieved {@link User}
+     * @see DbManager#getAllUsers()
+     */
+    Collection<User> getAllUsers() {
+        final Collection<User> fromCache = userCache.getAll();
+
+        if (!fromCache.isEmpty()) {
+            return fromCache;
+        }
+
+        LOGGER.trace("Cache miss! Get all users");
+        final Collection<User> fromDb = DB_MANAGER.getAllUsers();
+        userCache.addAll(fromDb);
+        return fromDb;
+    }
+
+    /**
      * Evicts a {@link User} from the {@link UserCache}.
      *
      * <p>

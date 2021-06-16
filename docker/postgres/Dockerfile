@@ -1,4 +1,5 @@
-FROM postgres:13.2-alpine
+# If this version is updated, also update 'embredded-postgres-binaries-bom.version' in the pom.xml, where possible
+FROM postgres:13.3-alpine
 
 ARG ADMIN_USERNAME
 ARG ADMIN_PASSWORD
