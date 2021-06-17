@@ -38,9 +38,9 @@
         <javaee-web-api.version>8.0.1</javaee-web-api.version>
         <jersey.version>2.17</jersey.version>
         <jooq.version>3.14.11</jooq.version>
+        <log4j.version>2.14.1</log4j.version>
         <lombok.version>1.18.20</lombok.version>
         <postgresql-driver.version>42.2.19</postgresql-driver.version>
-        <slf4j.version>1.7.30</slf4j.version>
 
         <!-- Test 3PP Versions -->
         <assertj-core.version>3.19.0</assertj-core.version>
@@ -144,6 +144,11 @@
                 <version>${jooq.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-api</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
@@ -153,11 +158,6 @@
                 <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
                 <version>${postgresql-driver.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${slf4j.version}</version>
             </dependency>
 
             <!-- Test Dependencies -->

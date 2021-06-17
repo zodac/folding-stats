@@ -22,14 +22,14 @@ import me.zodac.folding.api.SystemUserAuthentication;
 import me.zodac.folding.api.utils.EncodingUtils;
 import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.rest.api.LoginCredentials;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @Path("/login/")
 @RequestScoped
 public class LoginEndpoint {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LoginEndpoint.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @EJB
     private transient OldFacade oldFacade;

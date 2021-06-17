@@ -1,15 +1,15 @@
 package me.zodac.folding;
 
 import me.zodac.folding.api.SystemState;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Utility class to manage the {@link SystemState}.
  */
 public final class SystemStateManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SystemStateManager.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static SystemState currentState = SystemState.STARTING;
 

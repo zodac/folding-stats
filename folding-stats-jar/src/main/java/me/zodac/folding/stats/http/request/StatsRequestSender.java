@@ -16,8 +16,8 @@ import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.stats.http.response.StatsResponseParser;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Utility class used to send REST requests to the Stanford Folding@Home REST endpoints.
@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class StatsRequestSender {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(StatsRequestSender.class);
+    private static final Logger LOGGER = LogManager.getLogger();
     private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
         .version(HttpClient.Version.HTTP_1_1)
         .connectTimeout(Duration.ofSeconds(10))
@@ -107,12 +107,12 @@ public final class StatsRequestSender {
         final String cachedResponseBody = CACHED_RESPONSE_BODIES.get(requestUrl);
 
         final HttpResponse<String> firstResponse = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-        LOGGER.trace("First response: {}", firstResponse.body());
+        LOGGER.trace("First response: {}", firstResponse::body);
 
         if (firstResponse.body().equalsIgnoreCase(cachedResponseBody)) {
             final HttpResponse<String> secondResponse = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
             LOGGER.debug("Initial request returned a response equal to response in the cache, sent second request to Stanford: '{}' vs '{}'",
-                firstResponse.body(), secondResponse.body());
+                firstResponse::body, secondResponse::body);
 
             CACHED_RESPONSE_BODIES.put(requestUrl, secondResponse.body());
             return secondResponse;

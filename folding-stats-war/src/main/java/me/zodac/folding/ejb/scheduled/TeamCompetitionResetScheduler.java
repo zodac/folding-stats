@@ -16,8 +16,8 @@ import me.zodac.folding.cache.RetiredTcStatsCache;
 import me.zodac.folding.cache.TcStatsCache;
 import me.zodac.folding.cache.TotalStatsCache;
 import me.zodac.folding.ejb.OldFacade;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * {@link Startup} EJB which schedules the monthly reset of the <code>Team Competition</code>. The reset will occur once
@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class TeamCompetitionResetScheduler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TeamCompetitionResetScheduler.class);
+    private static final Logger LOGGER = LogManager.getLogger();
     private static final boolean IS_MONTHLY_RESET_ENABLED = Boolean.parseBoolean(EnvironmentVariableUtils.get("ENABLE_STATS_MONTHLY_RESET", "false"));
 
     @EJB

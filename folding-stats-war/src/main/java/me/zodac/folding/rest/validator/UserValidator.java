@@ -20,19 +20,19 @@ import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.UrlValidator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 // TODO: [zodac] In severe need of a clean up. Write tests for the validators first though, because you're a moron
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class UserValidator {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserValidator.class);
+    private static final Logger LOGGER = LogManager.getLogger();
     private static final UrlValidator URL_VALIDATOR = new UrlValidator();
     private static final int EXPECTED_PASSKEY_LENGTH = 32;
 
-    private transient final BusinessLogic businessLogic;
-    private transient final FoldingStatsRetriever foldingStatsRetriever;
+    private final transient BusinessLogic businessLogic;
+    private final transient FoldingStatsRetriever foldingStatsRetriever;
 
     public static UserValidator createValidator(final BusinessLogic businessLogic, final FoldingStatsRetriever foldingStatsRetriever) {
         return new UserValidator(businessLogic, foldingStatsRetriever);

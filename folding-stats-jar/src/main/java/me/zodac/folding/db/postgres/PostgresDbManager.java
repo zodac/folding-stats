@@ -51,12 +51,12 @@ import me.zodac.folding.db.postgres.gen.tables.records.HardwareRecord;
 import me.zodac.folding.db.postgres.gen.tables.records.TeamsRecord;
 import me.zodac.folding.db.postgres.gen.tables.records.UsersRecord;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jooq.DSLContext;
 import org.jooq.Result;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link DbManager} for PostgreSQL databases.
@@ -65,7 +65,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class PostgresDbManager implements DbManager, DbAuthenticationManager, DbCrudManager, DbStatsManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PostgresDbManager.class);
+    private static final Logger LOGGER = LogManager.getLogger();
     private static final int SINGLE_RESULT = 1;
 
     private transient final DbConnectionPool dbConnectionPool;
@@ -340,7 +340,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
     @Override
     public void persistHourlyTcStats(final UserTcStats userTcStats) {
-        LOGGER.debug("Inserting TC stats for user ID: {}", userTcStats.getUserId());
+        LOGGER.debug("Inserting TC stats for user ID: {}", userTcStats::getUserId);
 
         executeQuery((queryContext) -> {
             final var query = queryContext
@@ -395,7 +395,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
     @Override
     public Collection<HistoricStats> getHistoricStatsHourly(final int userId, final int day, final Month month, final Year year) {
-        LOGGER.info("Getting historic hourly user TC stats for {}/{}/{} for user {}", year, DateTimeUtils.formatMonth(month), day, userId);
+        LOGGER.debug("Getting historic hourly user TC stats for {}/{}/{} for user {}", year, DateTimeUtils.formatMonth(month), day, userId);
 
         final String selectSqlStatement = "SELECT MAX(utc_timestamp) AS hourly_timestamp, " +
             "COALESCE(MAX(tc_points) - LAG(MAX(tc_points)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points, " +
@@ -892,7 +892,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
     @Override
     public Collection<RetiredUserTcStats> getRetiredUserStatsForTeam(final Team team) {
-        LOGGER.debug("Getting retired user stats for team with ID: {}", team.getId());
+        LOGGER.debug("Getting retired user stats for team with ID: {}", team::getId);
         return executeQuery((queryContext) -> {
             final var query = queryContext
                 .select()

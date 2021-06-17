@@ -24,8 +24,9 @@ import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.ejb.scheduled.TeamCompetitionStatsScheduler;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
 import me.zodac.folding.rest.validator.TeamValidator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 /**
  * REST endpoints for teams for <code>folding-stats</code>.
@@ -34,7 +35,7 @@ import org.slf4j.LoggerFactory;
 @RequestScoped
 public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TeamEndpoint.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @EJB
     private transient TeamCompetitionStatsScheduler teamCompetitionStatsScheduler;

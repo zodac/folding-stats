@@ -32,14 +32,14 @@ import me.zodac.folding.cache.UserCache;
 import me.zodac.folding.db.DbManagerRetriever;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import me.zodac.folding.stats.HttpFoldingStatsRetriever;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @Deprecated
 @Singleton
 public class OldFacade {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OldFacade.class);
+    private static final Logger LOGGER = LogManager.getLogger();
     private static final FoldingStatsRetriever FOLDING_STATS_RETRIEVER = HttpFoldingStatsRetriever.create();
 
     private final transient DbManager dbManager = DbManagerRetriever.get();

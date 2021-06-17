@@ -17,8 +17,8 @@ import me.zodac.folding.stats.http.request.PointsUrlBuilder;
 import me.zodac.folding.stats.http.request.StatsRequestUrl;
 import me.zodac.folding.stats.http.request.UnitsUrlBuilder;
 import me.zodac.folding.stats.http.response.StatsResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Concrete implementation of {@link FoldingStatsRetriever} that retrieves {@link UserStats} through HTTP calls to the Folding@Home REST API.
@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(HttpFoldingStatsRetriever.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private HttpFoldingStatsRetriever() {
 
@@ -45,7 +45,7 @@ public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
     @Override
     public Stats getStats(final FoldingStatsDetails foldingStatsDetails) throws ExternalConnectionException {
         LOGGER.debug(""); // Line break to differentiate different users
-        LOGGER.debug("Getting stats for username/passkey '{}/{}'", foldingStatsDetails.getFoldingUserName(), foldingStatsDetails.getPasskey());
+        LOGGER.debug("Getting stats for username/passkey '{}/{}'", foldingStatsDetails::getFoldingUserName, foldingStatsDetails::getPasskey);
         final long userPoints = getPoints(foldingStatsDetails);
         final int userUnits = getUnits(foldingStatsDetails);
         return Stats.create(userPoints, userUnits);
@@ -67,7 +67,7 @@ public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
 
         LOGGER.debug("Sending points request to: {}", pointsRequestUrl);
         final HttpResponse<String> response = sendFoldingRequest(pointsRequestUrl);
-        LOGGER.debug("Points response: {}", response.body());
+        LOGGER.debug("Points response: {}", response::body);
 
         final StatsResponse statsResponse = StatsResponse.create(response);
         return getPointsFromResponse(statsResponse);
@@ -82,7 +82,7 @@ public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
 
         LOGGER.debug("Sending units request to: {}", unitsRequestUrl);
         final HttpResponse<String> response = sendFoldingRequest(unitsRequestUrl);
-        LOGGER.debug("Units response: {}", response.body());
+        LOGGER.debug("Units response: {}", response::body);
 
         final StatsResponse statsResponse = StatsResponse.create(response);
         return getUnitsFromResponse(foldingStatsDetails, statsResponse);

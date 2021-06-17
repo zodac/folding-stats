@@ -15,8 +15,8 @@ import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Class that parses {@link Stats} for <code>Team Competition</code> {@link User}s.
@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 @Stateless
 public class UserTeamCompetitionStatsParser {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserTeamCompetitionStatsParser.class);
+    private static final Logger LOGGER = LogManager.getLogger();
     private static final FoldingStatsRetriever FOLDING_STATS_RETRIEVER = HttpFoldingStatsRetriever.create();
 
     @EJB
@@ -82,8 +82,8 @@ public class UserTeamCompetitionStatsParser {
         if (offsetStats.isEmpty()) {
             LOGGER.trace("Retrieved empty stat offset for user: {}", user);
         } else {
-            LOGGER.debug("{}: {} offset points | {} offset units", user.getDisplayName(), formatWithCommas(offsetStats.getMultipliedPointsOffset()),
-                formatWithCommas(offsetStats.getUnitsOffset()));
+            LOGGER.debug("{}: {} offset points | {} offset units", user.getDisplayName(),
+                formatWithCommas(offsetStats.getMultipliedPointsOffset()), formatWithCommas(offsetStats.getUnitsOffset()));
         }
 
         final UserStats totalStats = getTotalStatsForUserOrEmpty(user);
@@ -107,8 +107,8 @@ public class UserTeamCompetitionStatsParser {
 
         LOGGER.debug("{}: {} total points (unmultiplied) | {} total units", user.getDisplayName(), formatWithCommas(totalStats.getPoints()),
             formatWithCommas(totalStats.getUnits()));
-        LOGGER.debug("{}: {} TC multiplied points (pre-offset) | {} TC units (pre-offset)", user.getDisplayName(), formatWithCommas(multipliedPoints),
-            formatWithCommas(units));
+        LOGGER.debug("{}: {} TC multiplied points (pre-offset) | {} TC units (pre-offset)", user.getDisplayName(),
+            formatWithCommas(multipliedPoints), formatWithCommas(units));
         LOGGER.info("{}: {} TC points | {} TC units", user.getDisplayName(), formatWithCommas(hourlyUserTcStats.getMultipliedPoints()),
             formatWithCommas(hourlyUserTcStats.getUnits()));
 

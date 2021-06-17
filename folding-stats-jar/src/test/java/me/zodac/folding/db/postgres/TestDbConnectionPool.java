@@ -17,15 +17,15 @@ import java.util.Objects;
 import javax.sql.DataSource;
 import me.zodac.folding.api.db.DbConnectionPool;
 import me.zodac.folding.api.exception.DatabaseConnectionException;
-import org.junit.platform.commons.logging.Logger;
-import org.junit.platform.commons.logging.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Implementation of {@link DbConnectionPool} to use an {@link EmbeddedPostgres} DB for tests.
  */
 public final class TestDbConnectionPool implements DbConnectionPool {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TestDbConnectionPool.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private final transient DataSource dataSource;
 

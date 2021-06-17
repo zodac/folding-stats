@@ -3,6 +3,7 @@ package me.zodac.folding.stats.http.response;
 import static java.util.stream.Collectors.toList;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
@@ -12,16 +13,16 @@ import java.util.Collections;
 import java.util.List;
 import me.zodac.folding.api.stats.FoldingStatsDetails;
 import me.zodac.folding.stats.http.request.StatsRequestSender;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Utility class parsing a {@link PointsApiInstance} or {@link UnitsApiInstance} from the Stanford REST request.
  */
 public final class StatsResponseParser {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(StatsResponseParser.class);
-    private static final Gson GSON = new Gson();
+    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final int EXPECTED_NUMBER_OF_UNIT_RESPONSES = 1;
 
     private StatsResponseParser() {

@@ -38,15 +38,15 @@ import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import me.zodac.folding.rest.parse.IntegerParser;
 import me.zodac.folding.rest.parse.ParseResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 // TODO: [zodac] Verify that all places that return a HTTP response also log something
 @Path("/historic/")
 @RequestScoped
 public class HistoricStatsEndpoint {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(HistoricStatsEndpoint.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     // Stats updates occur every hour, so we must invalidate responses every hour
     private static final int CACHE_EXPIRATION_TIME = (int) TimeUnit.HOURS.toSeconds(1);

@@ -1,14 +1,14 @@
 package me.zodac.folding.rest.parse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Utility class used to parse {@link Integer}s for the REST endpoints.
  */
 public final class IntegerParser {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(IntegerParser.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private IntegerParser() {
 

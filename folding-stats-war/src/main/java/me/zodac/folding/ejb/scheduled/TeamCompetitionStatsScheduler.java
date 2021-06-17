@@ -18,8 +18,8 @@ import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.utils.EnvironmentVariableUtils;
 import me.zodac.folding.api.utils.ExecutionType;
 import me.zodac.folding.ejb.UserTeamCompetitionStatsParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * {@link Startup} EJB which schedules the <code>Team Competition</code> stats retrieval for the system. By default, the
@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class TeamCompetitionStatsScheduler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TeamCompetitionStatsScheduler.class);
+    private static final Logger LOGGER = LogManager.getLogger();
     private static final boolean IS_STATS_SCHEDULED_PARSING_ENABLED =
         Boolean.parseBoolean(EnvironmentVariableUtils.get("ENABLE_STATS_SCHEDULED_PARSING", "false"));
 
@@ -123,7 +123,7 @@ public class TeamCompetitionStatsScheduler {
     }
 
     private void parseTcStatsForTeam(final Team team, final ExecutionType executionType) {
-        LOGGER.debug("Getting TC stats for users in team {}", team.getTeamName());
+        LOGGER.debug("Getting TC stats for users in team {}", team::getTeamName);
         final Collection<User> teamUsers = businessLogic.getUsersOnTeam(team);
 
         if (teamUsers.isEmpty()) {

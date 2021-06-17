@@ -26,8 +26,8 @@ import me.zodac.folding.api.utils.EncodingUtils;
 import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.response.Responses;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * {@link Provider} that intercepts all requests and verifies that the request is authorized and authenticated. Each request
@@ -62,7 +62,7 @@ import org.slf4j.LoggerFactory;
 @Provider
 public class SecurityInterceptor implements ContainerRequestFilter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SecurityInterceptor.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Context
     private transient ResourceInfo resourceInfo;

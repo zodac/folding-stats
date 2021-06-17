@@ -1,6 +1,7 @@
 package me.zodac.folding.test.stub;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,7 +39,7 @@ import lombok.ToString;
 @ApplicationScoped
 public class StubbedUnitsEndpoint {
 
-    private static final Gson GSON = new Gson();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final int NO_UNITS = 0;
 
     private final transient Map<String, Integer> unitsByUserAndPasskey = new HashMap<>();

@@ -24,8 +24,8 @@ import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 import me.zodac.folding.rest.validator.UserValidator;
 import me.zodac.folding.stats.HttpFoldingStatsRetriever;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * REST endpoints for users for <code>folding-stats</code>.
@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 @RequestScoped
 public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserEndpoint.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @POST
     @RolesAllowed("admin")

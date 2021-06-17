@@ -53,14 +53,14 @@ import me.zodac.folding.rest.api.tc.leaderboard.TeamLeaderboardEntry;
 import me.zodac.folding.rest.api.tc.leaderboard.UserCategoryLeaderboardEntry;
 import me.zodac.folding.rest.parse.IntegerParser;
 import me.zodac.folding.rest.parse.ParseResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @Path("/stats/")
 @RequestScoped
 public class TeamCompetitionStatsEndpoint {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TeamCompetitionStatsEndpoint.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Context
     private transient UriInfo uriContext;

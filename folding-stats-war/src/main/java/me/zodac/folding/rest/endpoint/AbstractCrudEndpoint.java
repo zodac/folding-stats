@@ -38,7 +38,7 @@ import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.rest.parse.IntegerParser;
 import me.zodac.folding.rest.parse.ParseResult;
 import me.zodac.folding.rest.response.BatchCreateResponse;
-import org.slf4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 // TODO: [zodac] Decorator around REST methods, so we can catch generic exceptions in a single place?
 abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePojo> {

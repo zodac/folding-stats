@@ -22,8 +22,8 @@ import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 import me.zodac.folding.rest.validator.HardwareValidator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * REST endpoints for hardware for <code>folding-stats</code>.
@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 @RequestScoped
 public class HardwareEndpoint extends AbstractCrudEndpoint<HardwareRequest, Hardware> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(HardwareEndpoint.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @POST
     @RolesAllowed("admin")

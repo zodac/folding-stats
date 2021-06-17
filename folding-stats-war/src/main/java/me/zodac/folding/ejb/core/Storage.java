@@ -10,9 +10,8 @@ import me.zodac.folding.cache.HardwareCache;
 import me.zodac.folding.cache.TeamCache;
 import me.zodac.folding.cache.UserCache;
 import me.zodac.folding.db.DbManagerRetriever;
-import me.zodac.folding.ejb.OldFacade;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * In order to decouple both the REST layer and the {@link BusinessLogicEjb} from the persistence solution we use this interface for CRUD operations.
@@ -27,7 +26,7 @@ import org.slf4j.LoggerFactory;
 // TODO: [zodac] Should replace the cache miss warnings with some metrics instead?
 final class Storage {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OldFacade.class);
+    private static final Logger LOGGER = LogManager.getLogger();
     private static final DbManager DB_MANAGER = DbManagerRetriever.get();
     private static final Storage INSTANCE = new Storage();
 

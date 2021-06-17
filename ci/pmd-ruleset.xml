@@ -10,7 +10,7 @@
     </description>
 
     <rule ref="category/java/bestpractices.xml">
-        <!-- It would be nice to use a Supplier for String creation, but SLF4J support is not released yet -->
+        <!-- Don't think a rule is necessary, should take it on a case-by-case basis to use a Supplier -->
         <exclude name="GuardLogStatement"/>
         <!-- I have no problem with multiple asserts in my tests -->
         <exclude name="JUnitTestContainsTooManyAsserts"/>

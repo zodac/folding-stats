@@ -15,8 +15,8 @@ import me.zodac.folding.api.utils.ExecutionType;
 import me.zodac.folding.db.DbManagerRetriever;
 import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.ejb.scheduled.TeamCompetitionStatsScheduler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * The {@link Startup} EJB which initialises the system when it comes online. This involves initalising any caches or
@@ -27,9 +27,9 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class Initialiser {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Initialiser.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
-    private transient final DbManager dbManager = DbManagerRetriever.get();
+    private final transient DbManager dbManager = DbManagerRetriever.get();
 
     @EJB
     private transient BusinessLogic businessLogic;
@@ -77,7 +77,7 @@ public class Initialiser {
     }
 
     private void initTcStats() {
-        if (!dbManager.isAnyHourlyTcStats()) {
+        if (!dbManager.isAnyHourlyTcStats()) { // TODO: [zodac] Go through BL
             LOGGER.warn("No TC stats data exists in the DB");
             teamCompetitionStatsScheduler.manualTeamCompetitionStatsParsing(ExecutionType.ASYNCHRONOUS);
         }

@@ -20,8 +20,8 @@ import me.zodac.folding.rest.api.tc.CompetitionSummary;
 import me.zodac.folding.rest.api.tc.RetiredUserSummary;
 import me.zodac.folding.rest.api.tc.TeamSummary;
 import me.zodac.folding.rest.api.tc.UserSummary;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * {@link Singleton} EJB used to generate a {@link CompetitionSummary} for the <code>Team Competition</code>.
@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class CompetitionResultGenerator {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CompetitionResultGenerator.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @EJB
     private transient BusinessLogic businessLogic;
@@ -57,11 +57,11 @@ public class CompetitionResultGenerator {
             }
         }
 
-        LOGGER.debug("Calculating latest TC result, system state: {}, TC cache populated: {}", SystemStateManager.current(),
-            competitionResultCache.hasCachedResult());
+        LOGGER.debug("Calculating latest TC result, system state: {}, TC cache populated: {}", SystemStateManager::current,
+            competitionResultCache::hasCachedResult);
 
         final List<TeamSummary> teamSummaries = getStatsForTeams();
-        LOGGER.debug("Found {} TC teams", teamSummaries.size());
+        LOGGER.debug("Found {} TC teams", teamSummaries::size);
 
         if (teamSummaries.isEmpty()) {
             LOGGER.warn("No TC teams to show");
@@ -81,7 +81,7 @@ public class CompetitionResultGenerator {
     }
 
     private TeamSummary getTcTeamResult(final Team team) {
-        LOGGER.debug("Converting team '{}' for TC stats", team.getTeamName());
+        LOGGER.debug("Converting team '{}' for TC stats", team::getTeamName);
 
         final Collection<User> usersOnTeam = businessLogic.getUsersOnTeam(team);
 
@@ -116,8 +116,8 @@ public class CompetitionResultGenerator {
         final Category category = user.getCategory();
 
         final UserTcStats userTcStats = oldFacade.getTcStatsForUser(user.getId());
-        LOGGER.debug("Results for {}: {} points | {} multiplied points | {} units", user.getDisplayName(), userTcStats.getPoints(),
-            userTcStats.getMultipliedPoints(), userTcStats.getUnits());
+        LOGGER.debug("Results for {}: {} points | {} multiplied points | {} units", user::getDisplayName, userTcStats::getPoints,
+            userTcStats::getMultipliedPoints, userTcStats::getUnits);
         return UserSummary.create(user.getId(), user.getDisplayName(), user.getFoldingUserName(), hardware, category, userTcStats.getPoints(),
             userTcStats.getMultipliedPoints(), userTcStats.getUnits(), user.getProfileLink(), user.getLiveStatsLink());
     }
