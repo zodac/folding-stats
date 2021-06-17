@@ -17,7 +17,6 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.utils.EnvironmentVariableUtils;
 import me.zodac.folding.api.utils.ExecutionType;
-import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.ejb.UserTeamCompetitionStatsParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,9 +51,6 @@ public class TeamCompetitionStatsScheduler {
 
     @EJB
     private transient BusinessLogic businessLogic;
-
-    @EJB
-    private transient OldFacade oldFacade;
 
     @EJB
     private transient UserTeamCompetitionStatsParser userTeamCompetitionStatsParser;
@@ -128,7 +124,7 @@ public class TeamCompetitionStatsScheduler {
 
     private void parseTcStatsForTeam(final Team team, final ExecutionType executionType) {
         LOGGER.debug("Getting TC stats for users in team {}", team.getTeamName());
-        final Collection<User> teamUsers = oldFacade.getUsersOnTeam(team);
+        final Collection<User> teamUsers = businessLogic.getUsersOnTeam(team);
 
         if (teamUsers.isEmpty()) {
             LOGGER.warn("No users for team '{}'", team.getTeamName());

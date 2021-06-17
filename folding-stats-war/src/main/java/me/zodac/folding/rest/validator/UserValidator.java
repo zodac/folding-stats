@@ -17,7 +17,6 @@ import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.validator.ValidationResponse;
-import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.UrlValidator;
@@ -33,12 +32,10 @@ public final class UserValidator {
     private static final int EXPECTED_PASSKEY_LENGTH = 32;
 
     private transient final BusinessLogic businessLogic;
-    private transient final OldFacade oldFacade;
     private transient final FoldingStatsRetriever foldingStatsRetriever;
 
-    public static UserValidator create(final BusinessLogic businessLogic, final OldFacade oldFacade,
-                                       final FoldingStatsRetriever foldingStatsRetriever) {
-        return new UserValidator(businessLogic, oldFacade, foldingStatsRetriever);
+    public static UserValidator createValidator(final BusinessLogic businessLogic, final FoldingStatsRetriever foldingStatsRetriever) {
+        return new UserValidator(businessLogic, foldingStatsRetriever);
     }
 
     @SuppressWarnings("PMD.NPathComplexity") // Better than breaking into smaller functions
@@ -65,7 +62,7 @@ public final class UserValidator {
         // If foldingUserName and passkey are valid, ensure they don't already exist
         if (failureMessages.isEmpty()) {
             final Optional<User> userWithMatchingFoldingUserNameAndPasskey =
-                oldFacade.getUserWithFoldingUserNameAndPasskey(userRequest.getFoldingUserName(), userRequest.getPasskey());
+                businessLogic.getUserWithFoldingUserNameAndPasskey(userRequest.getFoldingUserName(), userRequest.getPasskey());
 
             if (userWithMatchingFoldingUserNameAndPasskey.isPresent()) {
                 return ValidationResponse
@@ -266,7 +263,7 @@ public final class UserValidator {
         }
 
         final List<String> failureMessages = new ArrayList<>(4);
-        final Collection<User> usersOnTeam = oldFacade.getUsersOnTeam(team.get());
+        final Collection<User> usersOnTeam = businessLogic.getUsersOnTeam(team.get());
 
         if (userRequest.isUserIsCaptain()) {
             for (final User existingUserOnTeam : usersOnTeam) {

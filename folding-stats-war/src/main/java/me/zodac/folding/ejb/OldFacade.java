@@ -1,18 +1,15 @@
 package me.zodac.folding.ejb;
 
-import static java.util.stream.Collectors.toList;
-
 import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import me.zodac.folding.api.SystemUserAuthentication;
 import me.zodac.folding.api.db.DbManager;
+import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.exception.ExternalConnectionException;
-import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
 import me.zodac.folding.api.tc.Hardware;
@@ -57,16 +54,16 @@ public class OldFacade {
     private final transient TotalStatsCache totalStatsCache = TotalStatsCache.get();
 
     @EJB
+    private transient BusinessLogic businessLogic;
+
+    @EJB
     private transient UserTeamCompetitionStatsParser userTeamCompetitionStatsParser;
 
     public void updateHardware(final Hardware updatedHardware, final Hardware existingHardware) throws ExternalConnectionException {
         dbManager.updateHardware(updatedHardware);
         hardwareCache.add(updatedHardware);
 
-        final List<User> usersUsingThisHardware = getAllUsersWithPasskeys()
-            .stream()
-            .filter(user -> user.getHardware().getId() == updatedHardware.getId())
-            .collect(toList());
+        final Collection<User> usersUsingThisHardware = businessLogic.getUsersWithHardware(updatedHardware);
 
         final boolean isHardwareMultiplierChange = existingHardware.getMultiplier() != updatedHardware.getMultiplier();
 
@@ -95,76 +92,9 @@ public class OldFacade {
         return userWithId;
     }
 
-    public User getUserWithPasskey(final int userId) throws UserNotFoundException {
-        try {
-            return userCache.getOrError(userId);
-        } catch (final NotFoundException e) {
-            LOGGER.debug("Unable to find user with ID {} in cache", userId, e);
-        }
-
-        LOGGER.trace("Cache miss! Get user");
-        // Should be no need to get anything from the DB (since it should have been added to the cache when created)
-        // But adding this just in case we decide to add some cache eviction in future
-        final User userFromDb = dbManager.getUser(userId).orElseThrow(() -> new UserNotFoundException(userId));
-        userCache.add(userFromDb);
-
-        return userFromDb;
-    }
-
-    public User getUserWithoutPasskey(final int userId) throws UserNotFoundException {
-        try {
-            final User user = userCache.getOrError(userId);
-            return User.hidePasskey(user);
-        } catch (final NotFoundException e) {
-            LOGGER.debug("Unable to find user with ID {} in cache", userId, e);
-        }
-
-        LOGGER.trace("Cache miss! Get user");
-        // Should be no need to get anything from the DB (since it should have been added to the cache when created)
-        // But adding this just in case we decide to add some cache eviction in future
-        final User userFromDb = dbManager.getUser(userId).orElseThrow(() -> new UserNotFoundException(userId));
-        userCache.add(userFromDb);
-
-        return User.hidePasskey(userFromDb);
-    }
-
-    public Collection<User> getAllUsersWithPasskeys() {
-        final Collection<User> allUsers = userCache.getAll();
-
-        if (!allUsers.isEmpty()) {
-            return allUsers;
-        }
-
-        LOGGER.trace("Cache miss! Get all users");
-        // Should be no need to get anything from the DB (since it should have been added to the cache when created)
-        // But adding this just in case we decide to add some cache eviction in future
-        final Collection<User> allUsersFromDb = dbManager.getAllUsers();
-        userCache.addAll(allUsersFromDb);
-        return allUsersFromDb;
-    }
-
-    public Collection<User> getAllUsersWithoutPasskeys() {
-        final Collection<User> allUsers = userCache.getAll();
-
-        if (!allUsers.isEmpty()) {
-            return allUsers.stream()
-                .map(User::hidePasskey)
-                .collect(toList());
-        }
-
-        LOGGER.trace("Cache miss! Get all users");
-        // Should be no need to get anything from the DB (since it should have been added to the cache when created)
-        // But adding this just in case we decide to add some cache eviction in future
-        final Collection<User> allUsersFromDb = dbManager.getAllUsers();
-        userCache.addAll(allUsersFromDb);
-
-        return allUsersFromDb.stream()
-            .map(User::hidePasskey)
-            .collect(toList());
-    }
-
     public void updateUser(final User updatedUser) throws UserNotFoundException, ExternalConnectionException {
-        final User existingUser = getUserWithPasskey(updatedUser.getId());
+        final User existingUser =
+            businessLogic.getUserWithPasskey(updatedUser.getId()).orElseThrow(() -> new UserNotFoundException(updatedUser.getId()));
         dbManager.updateUser(updatedUser);
         userCache.add(updatedUser);
 
@@ -287,8 +217,7 @@ public class OldFacade {
         return userTcStatsFromDb;
     }
 
-    public Collection<HistoricStats> getHistoricStatsHourly(final int userId, final int day, final Month month, final Year year)
-        throws UserNotFoundException {
+    public Collection<HistoricStats> getHistoricStatsHourly(final int userId, final int day, final Month month, final Year year) {
         final Collection<HistoricStats> historicStats = dbManager.getHistoricStatsHourly(userId, day, month, year);
 
         if (historicStats.isEmpty()) {
@@ -298,7 +227,7 @@ public class OldFacade {
         return historicStats;
     }
 
-    public Collection<HistoricStats> getHistoricStatsDaily(final int userId, final Month month, final Year year) throws UserNotFoundException {
+    public Collection<HistoricStats> getHistoricStatsDaily(final int userId, final Month month, final Year year) {
         final Collection<HistoricStats> historicStats = dbManager.getHistoricStatsDaily(userId, month, year);
 
         if (historicStats.isEmpty()) {
@@ -344,7 +273,7 @@ public class OldFacade {
 
 
     public void initialiseOffsetStats() {
-        for (final User user : getAllUsersWithPasskeys()) {
+        for (final User user : businessLogic.getAllUsersWithoutPasskeys()) {
             final OffsetStats offsetStats = dbManager.getOffsetStats(user.getId()).orElse(OffsetStats.empty());
             offsetStatsCache.add(user.getId(), offsetStats);
         }
@@ -399,39 +328,11 @@ public class OldFacade {
         return systemUserAuthentication;
     }
 
-    public Collection<User> getUsersOnTeam(final Team team) {
-        return getAllUsersWithPasskeys()
-            .stream()
-            .filter(user -> user.getTeam().getId() == team.getId())
-            .collect(toList());
-    }
-
     public Collection<RetiredUserTcStats> getRetiredUsersForTeam(final Team team) {
         return dbManager.getRetiredUserStatsForTeam(team);
     }
 
     public void deleteRetiredUserStats() {
         dbManager.deleteRetiredUserStats();
-    }
-
-    public Optional<User> getUserWithFoldingUserNameAndPasskey(final String foldingUserName, final String passkey) {
-        return getAllUsersWithPasskeys()
-            .stream()
-            .filter(user -> user.getFoldingUserName().equalsIgnoreCase(foldingUserName) && user.getPasskey().equalsIgnoreCase(passkey))
-            .findAny();
-    }
-
-    public Collection<User> getUsersWithHardware(final Hardware hardware) {
-        return getAllUsersWithoutPasskeys()
-            .stream()
-            .filter(user -> user.getHardware().getId() == hardware.getId())
-            .collect(toList());
-    }
-
-    public Collection<User> getUsersWithTeam(final Team team) {
-        return getAllUsersWithoutPasskeys()
-            .stream()
-            .filter(user -> user.getTeam().getId() == team.getId())
-            .collect(toList());
     }
 }

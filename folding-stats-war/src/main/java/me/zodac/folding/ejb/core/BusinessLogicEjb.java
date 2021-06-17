@@ -1,5 +1,7 @@
 package me.zodac.folding.ejb.core;
 
+import static java.util.stream.Collectors.toList;
+
 import java.util.Collection;
 import java.util.Optional;
 import javax.ejb.Singleton;
@@ -63,6 +65,35 @@ public class BusinessLogicEjb implements BusinessLogic {
         STORAGE.deleteTeam(team.getId());
     }
 
+    @Override
+    public Optional<User> getUserWithPasskey(final int userId) {
+        return STORAGE.getUser(userId);
+    }
+
+    @Override
+    public Optional<User> getUserWithoutPasskey(final int userId) {
+        final Optional<User> user = STORAGE.getUser(userId);
+
+        if (user.isEmpty()) {
+            return user;
+        }
+
+        return Optional.of(User.hidePasskey(user.get()));
+    }
+
+    @Override
+    public Collection<User> getAllUsersWithPasskeys() {
+        return STORAGE.getAllUsers();
+    }
+
+    @Override
+    public Collection<User> getAllUsersWithoutPasskeys() {
+        return STORAGE.getAllUsers()
+            .stream()
+            .map(User::hidePasskey)
+            .collect(toList());
+    }
+
     // Complex CRUD
 
     @Override
@@ -78,6 +109,30 @@ public class BusinessLogicEjb implements BusinessLogic {
         return getAllTeams()
             .stream()
             .filter(team -> team.getTeamName().equalsIgnoreCase(teamName))
+            .findAny();
+    }
+
+    @Override
+    public Collection<User> getUsersWithHardware(final Hardware hardware) {
+        return getAllUsersWithPasskeys()
+            .stream()
+            .filter(user -> user.getHardware().getId() == hardware.getId())
+            .collect(toList());
+    }
+
+    @Override
+    public Collection<User> getUsersOnTeam(final Team team) {
+        return getAllUsersWithPasskeys()
+            .stream()
+            .filter(user -> user.getTeam().getId() == team.getId())
+            .collect(toList());
+    }
+
+    @Override
+    public Optional<User> getUserWithFoldingUserNameAndPasskey(final String foldingUserName, final String passkey) {
+        return getAllUsersWithPasskeys()
+            .stream()
+            .filter(user -> user.getFoldingUserName().equalsIgnoreCase(foldingUserName) && user.getPasskey().equalsIgnoreCase(passkey))
             .findAny();
     }
 }

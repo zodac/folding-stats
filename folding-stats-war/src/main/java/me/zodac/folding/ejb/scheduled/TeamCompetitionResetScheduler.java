@@ -8,6 +8,7 @@ import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.SystemState;
+import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.utils.EnvironmentVariableUtils;
 import me.zodac.folding.api.utils.ExecutionType;
@@ -35,6 +36,9 @@ public class TeamCompetitionResetScheduler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TeamCompetitionResetScheduler.class);
     private static final boolean IS_MONTHLY_RESET_ENABLED = Boolean.parseBoolean(EnvironmentVariableUtils.get("ENABLE_STATS_MONTHLY_RESET", "false"));
+
+    @EJB
+    private transient BusinessLogic businessLogic;
 
     @EJB
     private transient OldFacade oldFacade;
@@ -92,7 +96,7 @@ public class TeamCompetitionResetScheduler {
      */
     public void resetTeamCompetitionStats() {
         try {
-            final Collection<User> users = oldFacade.getAllUsersWithoutPasskeys();
+            final Collection<User> users = businessLogic.getAllUsersWithoutPasskeys();
             if (users.isEmpty()) {
                 LOGGER.error("No TC users configured in system to reset!");
             } else {

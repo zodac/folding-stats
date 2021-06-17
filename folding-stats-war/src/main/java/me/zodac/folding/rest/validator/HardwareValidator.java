@@ -11,7 +11,6 @@ import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.OperatingSystem;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.validator.ValidationResponse;
-import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 import org.apache.commons.lang3.StringUtils;
 
@@ -25,17 +24,15 @@ public final class HardwareValidator {
     private static final double INVALID_MULTIPLIER_VALUE = 0.0D;
 
     private final transient BusinessLogic businessLogic;
-    private final transient OldFacade oldFacade;
 
     /**
      * Creates a {@link HardwareValidator}.
      *
      * @param businessLogic the {@link BusinessLogic} used for retrieval of {@link User}s for conflict checks
-     * @param oldFacade     the {@link OldFacade} used for retrieval of {@link User}s for conflict checks
      * @return the created {@link HardwareValidator}
      */
-    public static HardwareValidator create(final BusinessLogic businessLogic, final OldFacade oldFacade) {
-        return new HardwareValidator(businessLogic, oldFacade);
+    public static HardwareValidator createValidator(final BusinessLogic businessLogic) {
+        return new HardwareValidator(businessLogic);
     }
 
     /**
@@ -151,7 +148,7 @@ public final class HardwareValidator {
      * @return the {@link ValidationResponse}
      */
     public ValidationResponse<Hardware> validateDelete(final Hardware hardware) {
-        final Collection<User> usersWithMatchingHardware = oldFacade.getUsersWithHardware(hardware);
+        final Collection<User> usersWithMatchingHardware = businessLogic.getUsersWithHardware(hardware);
 
         if (usersWithMatchingHardware.isEmpty()) {
             return ValidationResponse.success(hardware);

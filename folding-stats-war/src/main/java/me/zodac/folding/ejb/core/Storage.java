@@ -175,13 +175,13 @@ final class Storage {
     }
 
     /**
-     * Retrieves all {@link Team}.
+     * Retrieves all {@link Team}s.
      *
      * <p>
      * First attempts to retrieve from {@link TeamCache}, then if none exists, attempts to retrieve from the
      * {@link DbManager}.
      *
-     * @return a {@link Collection} of the retrieved {@link Team}
+     * @return a {@link Collection} of the retrieved {@link Team}s
      * @see DbManager#getAllTeams()
      */
     Collection<Team> getAllTeams() {
@@ -236,13 +236,13 @@ final class Storage {
     }
 
     /**
-     * Retrieves all {@link User}.
+     * Retrieves all {@link User}s.
      *
      * <p>
      * First attempts to retrieve from {@link UserCache}, then if none exists, attempts to retrieve from the
      * {@link DbManager}.
      *
-     * @return a {@link Collection} of the retrieved {@link User}
+     * @return a {@link Collection} of the retrieved {@link User}s
      * @see DbManager#getAllUsers()
      */
     Collection<User> getAllUsers() {

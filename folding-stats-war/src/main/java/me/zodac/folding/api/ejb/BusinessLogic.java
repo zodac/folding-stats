@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Optional;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
+import me.zodac.folding.api.tc.User;
 
 /**
  * In order to decouple the REST layer from any business requirements, we move that logic into this interface, to be
@@ -62,7 +63,7 @@ public interface BusinessLogic {
     /**
      * Retrieves all {@link Team}.
      *
-     * @return a {@link Collection} of the retrieved {@link Team}
+     * @return a {@link Collection} of the retrieved {@link Team}s
      */
     Collection<Team> getAllTeams();
 
@@ -73,6 +74,35 @@ public interface BusinessLogic {
      */
     void deleteTeam(final Team team);
 
+    /**
+     * Retrieves a {@link User}, with the passkey unmodified.
+     *
+     * @param userId the ID of the {@link User} to retrieve
+     * @return an {@link Optional} of the retrieved {@link User}
+     */
+    Optional<User> getUserWithPasskey(final int userId);
+
+    /**
+     * Retrieves a {@link User}, with the passkey masked.
+     *
+     * @param userId the ID of the {@link User} to retrieve
+     * @return an {@link Optional} of the retrieved {@link User}
+     */
+    Optional<User> getUserWithoutPasskey(final int userId);
+
+    /**
+     * Retrieves all {@link User}, with the passkey unmodified.
+     *
+     * @return a {@link Collection} of the retrieved {@link User}s
+     */
+    Collection<User> getAllUsersWithPasskeys();
+
+    /**
+     * Retrieves all {@link User}, with the passkey masked.
+     *
+     * @return a {@link Collection} of the retrieved {@link User}s
+     */
+    Collection<User> getAllUsersWithoutPasskeys();
 
     // Complex CRUD
 
@@ -105,4 +135,31 @@ public interface BusinessLogic {
      * @return an {@link Optional} of the matching {@link Team}
      */
     Optional<Team> getTeamWithName(final String teamName);
+
+    /**
+     * Retrieves all {@link User}s currently referencing the provided {@link Hardware}.
+     *
+     * @param hardware the {@link Hardware} to check for
+     * @return a {@link Collection} of {@link User}s using the {@link Hardware}
+     */
+    Collection<User> getUsersWithHardware(final Hardware hardware);
+
+    /**
+     * Retrieves all {@link User}s currently referencing the provided {@link Team}.
+     *
+     * @param team the {@link Team} to check for
+     * @return a {@link Collection} of {@link User}s using the {@link Team}
+     */
+    Collection<User> getUsersOnTeam(final Team team);
+
+    /**
+     * Retrieves a {@link User} with the matching {@code foldingUserName} and {@code passkey}. Since these are unique fields for a
+     * {@link User} there should only be a single{@link User} returned (or none).
+     *
+     * @param foldingUserName the Folding@Home user name of the {@link User} to be found
+     * @param passkey         the passkey of the {@link User} to be found
+     * @return an {@link Optional} of the matching {@link User}
+     */
+    Optional<User> getUserWithFoldingUserNameAndPasskey(final String foldingUserName, final String passkey);
+
 }

@@ -16,6 +16,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -34,7 +35,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.SystemState;
-import me.zodac.folding.api.exception.UserNotFoundException;
+import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.User;
@@ -63,6 +64,9 @@ public class TeamCompetitionStatsEndpoint {
 
     @Context
     private transient UriInfo uriContext;
+
+    @EJB
+    private transient BusinessLogic businessLogic;
 
     @EJB
     private transient OldFacade oldFacade;
@@ -123,7 +127,13 @@ public class TeamCompetitionStatsEndpoint {
                 return badRequest(errorMessage);
             }
             final int parsedId = parseResult.getId();
-            final User user = oldFacade.getUserWithoutPasskey(parsedId);
+            final Optional<User> optionalUser = businessLogic.getUserWithoutPasskey(parsedId);
+
+            if (optionalUser.isEmpty()) {
+                LOGGER.error("No user found with ID: {}", parsedId);
+                return notFound();
+            }
+            final User user = optionalUser.get();
 
             final CompetitionSummary competitionSummary = competitionResultGenerator.generate();
             final Collection<UserSummary> userSummaries = competitionSummary.getTeams()
@@ -137,10 +147,6 @@ public class TeamCompetitionStatsEndpoint {
                 }
             }
 
-            return notFound();
-        } catch (final UserNotFoundException e) {
-            LOGGER.debug("Error getting {} with ID {}", e.getType(), e.getId(), e);
-            LOGGER.error("Error getting {} with ID {}", e.getType(), e.getId());
             return notFound();
         } catch (final Exception e) {
             LOGGER.error("Unexpected error retrieving TC stats for users", e);
@@ -178,24 +184,27 @@ public class TeamCompetitionStatsEndpoint {
                 return badRequest(errorMessage);
             }
             final int parsedId = parseResult.getId();
-            final User user = oldFacade.getUserWithPasskey(parsedId);
+            final Optional<User> optionalUser = businessLogic.getUserWithPasskey(parsedId);
+
+            if (optionalUser.isEmpty()) {
+                LOGGER.error("No user found with ID: {}", parsedId);
+                return notFound();
+            }
+            final User user = optionalUser.get();
 
             final OffsetStats offsetStatsToUse = getValidUserStatsOffset(user, offsetStats);
             oldFacade.addOrUpdateOffsetStats(parsedId, offsetStatsToUse);
             SystemStateManager.next(SystemState.UPDATING_STATS);
-            userTeamCompetitionStatsParser.parseTcStatsForUserAndWait(oldFacade.getUserWithPasskey(parsedId));
+            userTeamCompetitionStatsParser.parseTcStatsForUserAndWait(user);
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             return ok();
-        } catch (final UserNotFoundException e) {
-            LOGGER.error("Error finding user with ID: {}", userId, e.getCause());
-            return notFound();
         } catch (final Exception e) {
             LOGGER.error("Unexpected error updating user with ID: {}", userId, e);
             return serverError();
         }
     }
 
-    private OffsetStats getValidUserStatsOffset(final User user, final OffsetStats offsetStats) throws UserNotFoundException {
+    private OffsetStats getValidUserStatsOffset(final User user, final OffsetStats offsetStats) {
         final Hardware hardware = user.getHardware();
         return OffsetStats.updateWithHardwareMultiplier(offsetStats, hardware.getMultiplier());
     }

@@ -32,7 +32,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.ejb.BusinessLogic;
-import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.ejb.OldFacade;
@@ -99,7 +98,11 @@ public class HistoricStatsEndpoint {
             }
             final int parsedId = parseResult.getId();
 
-            oldFacade.getUserWithPasskey(parsedId); // Check if user exists first, catch UserNotFoundException early
+            final Optional<User> user = businessLogic.getUserWithPasskey(parsedId);
+            if (user.isEmpty()) {
+                LOGGER.error("No user found with ID: {}", parsedId);
+                return notFound();
+            }
 
             final Collection<HistoricStats> hourlyStats =
                 oldFacade.getHistoricStatsHourly(parsedId, Integer.parseInt(day), Month.of(Integer.parseInt(month)), Year.parse(year));
@@ -133,10 +136,6 @@ public class HistoricStatsEndpoint {
             LOGGER.debug(errorMessage, e);
             LOGGER.error(errorMessage);
             return badRequest(errorMessage);
-        } catch (final UserNotFoundException e) {
-            LOGGER.debug("No {} found with ID: {}", e.getType(), e.getId(), e);
-            LOGGER.error("No {} found with ID: {}", e.getType(), e.getId());
-            return notFound();
         } catch (final Exception e) {
             LOGGER.error("Unexpected error getting user with ID: {}", userId, e);
             return serverError();
@@ -169,7 +168,12 @@ public class HistoricStatsEndpoint {
             }
             final int parsedId = parseResult.getId();
 
-            oldFacade.getUserWithPasskey(parsedId); // Check if user exists first, catch UserNotFoundException early
+            final Optional<User> user = businessLogic.getUserWithPasskey(parsedId);
+            if (user.isEmpty()) {
+                LOGGER.error("No user found with ID: {}", parsedId);
+                return notFound();
+            }
+
             final Collection<HistoricStats> dailyStats =
                 oldFacade.getHistoricStatsDaily(parsedId, Month.of(Integer.parseInt(month)), Year.parse(year));
 
@@ -197,10 +201,6 @@ public class HistoricStatsEndpoint {
             LOGGER.debug(errorMessage, e);
             LOGGER.error(errorMessage);
             return badRequest(errorMessage);
-        } catch (final UserNotFoundException e) {
-            LOGGER.debug("No {} found with ID: {}", e.getType(), e.getId(), e);
-            LOGGER.error("No {} found with ID: {}", e.getType(), e.getId());
-            return notFound();
         } catch (final Exception e) {
             LOGGER.error("Unexpected error getting user with ID: {}", userId, e);
             return serverError();
@@ -233,7 +233,12 @@ public class HistoricStatsEndpoint {
             }
             final int parsedId = parseResult.getId();
 
-            oldFacade.getUserWithPasskey(parsedId); // Check if user exists first, catch UserNotFoundException early
+            final Optional<User> user = businessLogic.getUserWithPasskey(parsedId);
+            if (user.isEmpty()) {
+                LOGGER.error("No user found with ID: {}", parsedId);
+                return notFound();
+            }
+
             final Collection<HistoricStats> monthlyStats = oldFacade.getHistoricStatsMonthly(parsedId, Year.parse(year));
 
             final CacheControl cacheControl = new CacheControl();
@@ -255,10 +260,6 @@ public class HistoricStatsEndpoint {
             LOGGER.debug(errorMessage, e);
             LOGGER.error(errorMessage);
             return badRequest(errorMessage);
-        } catch (final UserNotFoundException e) {
-            LOGGER.debug("No {} found with ID: {}", e.getType(), e.getId(), e);
-            LOGGER.error("No {} found with ID: {}", e.getType(), e.getId());
-            return notFound();
         } catch (final Exception e) {
             LOGGER.error("Unexpected error getting user with ID: {}", userId, e);
             return serverError();
@@ -311,7 +312,7 @@ public class HistoricStatsEndpoint {
             }
             final Team team = teamOptional.get();
 
-            final Collection<User> teamUsers = oldFacade.getUsersOnTeam(team);
+            final Collection<User> teamUsers = businessLogic.getUsersOnTeam(team);
             final List<HistoricStats> teamHourlyStats = new ArrayList<>(teamUsers.size());
 
             for (final User user : teamUsers) {
@@ -391,7 +392,7 @@ public class HistoricStatsEndpoint {
             }
             final Team team = teamOptional.get();
 
-            final Collection<User> teamUsers = oldFacade.getUsersOnTeam(team);
+            final Collection<User> teamUsers = businessLogic.getUsersOnTeam(team);
             final List<HistoricStats> teamDailyStats = new ArrayList<>(teamUsers.size());
 
             for (final User user : teamUsers) {
@@ -466,7 +467,7 @@ public class HistoricStatsEndpoint {
             }
             final Team team = teamOptional.get();
 
-            final Collection<User> teamUsers = oldFacade.getUsersOnTeam(team);
+            final Collection<User> teamUsers = businessLogic.getUsersOnTeam(team);
             final List<HistoricStats> teamMonthlyStats = new ArrayList<>(teamUsers.size());
 
             for (final User user : teamUsers) {

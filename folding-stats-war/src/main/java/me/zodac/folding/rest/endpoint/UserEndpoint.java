@@ -103,18 +103,18 @@ public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
 
     @Override
     protected Collection<User> getAllElements() {
-        return oldFacade.getAllUsersWithoutPasskeys();
+        return businessLogic.getAllUsersWithoutPasskeys();
     }
 
     @Override
     protected ValidationResponse<User> validateCreateAndConvert(final UserRequest userRequest) {
-        final UserValidator userValidator = UserValidator.create(businessLogic, oldFacade, HttpFoldingStatsRetriever.create());
+        final UserValidator userValidator = UserValidator.createValidator(businessLogic, HttpFoldingStatsRetriever.create());
         return userValidator.validateCreate(userRequest);
     }
 
     @Override
     protected ValidationResponse<User> validateUpdateAndConvert(final UserRequest userRequest, final User existingUser) {
-        final UserValidator userValidator = UserValidator.create(businessLogic, oldFacade, HttpFoldingStatsRetriever.create());
+        final UserValidator userValidator = UserValidator.createValidator(businessLogic, HttpFoldingStatsRetriever.create());
         return userValidator.validateUpdate(userRequest, existingUser);
     }
 
@@ -125,12 +125,7 @@ public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
 
     @Override
     protected Optional<User> getElementById(final int userId) {
-        try {
-            return Optional.of(oldFacade.getUserWithoutPasskey(userId));
-        } catch (final NotFoundException e) {
-            getLogger().debug("No user found with ID: {}", userId, e);
-            return Optional.empty();
-        }
+        return businessLogic.getUserWithoutPasskey(userId);
     }
 
     @Override

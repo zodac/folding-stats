@@ -140,8 +140,9 @@ class UserTest {
             .as("Did not receive the expected user: " + response.body())
             .isEqualTo(userId);
 
-        final String firstPartOfPasskey = user.getPasskey().substring(0, 8); // First 8 characters only
-        final String secondPartOfPasskey = user.getPasskey().substring(8); // All other characters
+        final int lengthOfUnmaskedPasskey = 8;
+        final String firstPartOfPasskey = user.getPasskey().substring(0, lengthOfUnmaskedPasskey);
+        final String secondPartOfPasskey = user.getPasskey().substring(lengthOfUnmaskedPasskey);
 
         assertThat(firstPartOfPasskey)
             .as("Expected the first 8 characters of the passkey to be shown")

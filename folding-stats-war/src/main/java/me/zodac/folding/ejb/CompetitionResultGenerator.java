@@ -83,7 +83,7 @@ public class CompetitionResultGenerator {
     private TeamSummary getTcTeamResult(final Team team) {
         LOGGER.debug("Converting team '{}' for TC stats", team.getTeamName());
 
-        final Collection<User> usersOnTeam = oldFacade.getUsersOnTeam(team);
+        final Collection<User> usersOnTeam = businessLogic.getUsersOnTeam(team);
 
         final Collection<UserSummary> activeUserSummaries = usersOnTeam
             .stream()

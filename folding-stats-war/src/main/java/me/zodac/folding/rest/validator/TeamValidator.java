@@ -10,7 +10,6 @@ import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.validator.ValidationResponse;
-import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.UrlValidator;
@@ -24,17 +23,15 @@ public final class TeamValidator {
     private static final UrlValidator URL_VALIDATOR = new UrlValidator();
 
     private final transient BusinessLogic businessLogic;
-    private final transient OldFacade oldFacade;
 
     /**
      * Creates a {@link TeamValidator}.
      *
      * @param businessLogic the {@link BusinessLogic} used for retrieval of {@link User}s for conflict checks
-     * @param oldFacade     the {@link OldFacade} used for retrieval of {@link User}s for conflict checks
      * @return the created {@link TeamValidator}
      */
-    public static TeamValidator createValidator(final BusinessLogic businessLogic, final OldFacade oldFacade) {
-        return new TeamValidator(businessLogic, oldFacade);
+    public static TeamValidator createValidator(final BusinessLogic businessLogic) {
+        return new TeamValidator(businessLogic);
     }
 
     /**
@@ -125,7 +122,7 @@ public final class TeamValidator {
      * @return the {@link ValidationResponse}
      */
     public ValidationResponse<Team> validateDelete(final Team team) {
-        final Collection<User> usersWithMatchingTeam = oldFacade.getUsersWithTeam(team);
+        final Collection<User> usersWithMatchingTeam = businessLogic.getUsersOnTeam(team);
 
         if (usersWithMatchingTeam.isEmpty()) {
             return ValidationResponse.success(team);
