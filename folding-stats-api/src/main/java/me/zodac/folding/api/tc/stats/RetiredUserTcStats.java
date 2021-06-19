@@ -37,14 +37,13 @@ public class RetiredUserTcStats extends UserTcStats {
     /**
      * Creates an instance of {@link RetiredUserTcStats} for a {@link me.zodac.folding.api.tc.User} within a {@link me.zodac.folding.api.tc.Team}.
      *
-     * @param retiredUserId      the retired user ID
-     * @param teamId             the ID of the team the stats will be contributing to
-     * @param displayName        the display name for the points
-     * @param retiredUserTcStats the {@link UserTcStats}
+     * @param retiredUserId  the retired user ID
+     * @param teamId         the ID of the team the stats will be contributing to
+     * @param displayName    the display name for the points
+     * @param retiredTcStats the {@link UserTcStats}
      * @return the created {@link RetiredUserTcStats}
      */
-    public static RetiredUserTcStats create(final int retiredUserId, final int teamId, final String displayName,
-                                            final UserTcStats retiredUserTcStats) {
-        return new RetiredUserTcStats(retiredUserId, teamId, displayName, retiredUserTcStats);
+    public static RetiredUserTcStats create(final int retiredUserId, final int teamId, final String displayName, final UserTcStats retiredTcStats) {
+        return new RetiredUserTcStats(retiredUserId, teamId, displayName, retiredTcStats);
     }
 }

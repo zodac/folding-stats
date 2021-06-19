@@ -15,9 +15,7 @@ import me.zodac.folding.api.utils.DateTimeUtils;
 @ToString(doNotUseGetters = true, callSuper = true)
 public class UserTcStats extends UserStats {
 
-    private static final long DEFAULT_POINTS = 0L;
     private static final long DEFAULT_MULTIPLIED_POINTS = 0L;
-    private static final int DEFAULT_UNITS = 0;
 
     private final long multipliedPoints;
 

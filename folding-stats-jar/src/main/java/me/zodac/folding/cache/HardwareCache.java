@@ -2,7 +2,16 @@ package me.zodac.folding.cache;
 
 import me.zodac.folding.api.tc.Hardware;
 
-public final class HardwareCache extends AbstractCache<Hardware> {
+/**
+ * Implementation of {@link BaseCache} for {@link Hardware}s.
+ *
+ * <p>
+ * <b>key:</b> {@link Hardware} ID
+ *
+ * <p>
+ * <b>value:</b> {@link Hardware}
+ */
+public final class HardwareCache extends BaseCache<Hardware> {
 
     private static final HardwareCache INSTANCE = new HardwareCache();
 
@@ -10,11 +19,11 @@ public final class HardwareCache extends AbstractCache<Hardware> {
         super();
     }
 
-    @Override
-    protected String elementType() {
-        return "hardware";
-    }
-
+    /**
+     * Returns a singleton instance of {@link HardwareCache}.
+     *
+     * @return the {@link HardwareCache}
+     */
     public static HardwareCache getInstance() {
         return INSTANCE;
     }

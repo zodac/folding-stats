@@ -1,40 +1,30 @@
 package me.zodac.folding.cache;
 
-
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-
-public final class RetiredTcStatsCache {
+/**
+ * Implementation of {@link BaseCache} for {@link RetiredUserTcStats}s.
+ *
+ * <p>
+ * <b>key:</b> {@link RetiredUserTcStats} retired user ID
+ *
+ * <p>
+ * <b>value:</b> {@link RetiredUserTcStats}
+ */
+public final class RetiredTcStatsCache extends BaseCache<RetiredUserTcStats> {
 
     private static final RetiredTcStatsCache INSTANCE = new RetiredTcStatsCache();
 
-    private transient final Map<Integer, RetiredUserTcStats> retiredTcStatsByRetiredUserId = new ConcurrentHashMap<>();
-
     private RetiredTcStatsCache() {
-
+        super();
     }
 
-    public static RetiredTcStatsCache get() {
+    /**
+     * Returns a singleton instance of {@link RetiredTcStatsCache}.
+     *
+     * @return the {@link RetiredTcStatsCache}
+     */
+    public static RetiredTcStatsCache getInstance() {
         return INSTANCE;
-    }
-
-    public void add(final RetiredUserTcStats retiredTcStats) {
-        retiredTcStatsByRetiredUserId.put(retiredTcStats.getRetiredUserId(), retiredTcStats);
-    }
-
-    public Optional<RetiredUserTcStats> get(final int retiredUserId) {
-        return Optional.ofNullable(retiredTcStatsByRetiredUserId.get(retiredUserId));
-    }
-
-    public Collection<RetiredUserTcStats> getAll() {
-        return retiredTcStatsByRetiredUserId.values();
-    }
-
-    public void clear() {
-        retiredTcStatsByRetiredUserId.clear();
     }
 }

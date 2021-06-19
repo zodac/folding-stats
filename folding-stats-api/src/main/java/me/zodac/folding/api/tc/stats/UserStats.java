@@ -50,7 +50,7 @@ public class UserStats extends Stats {
      * @return the empty {@link UserStats}
      */
     public static UserStats empty() {
-        return new UserStats(User.EMPTY_USER_ID, DateTimeUtils.currentUtcTimestamp(), 0L, 0);
+        return new UserStats(User.EMPTY_USER_ID, DateTimeUtils.currentUtcTimestamp(), DEFAULT_POINTS, DEFAULT_UNITS);
     }
 
     public int getUserId() {
@@ -63,7 +63,7 @@ public class UserStats extends Stats {
 
     @Override
     public boolean isEmpty() {
-        return userId == 0 && super.isEmpty();
+        return userId == User.EMPTY_USER_ID && super.isEmpty();
     }
 
     public Stats getStats() {

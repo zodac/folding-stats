@@ -18,7 +18,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import me.zodac.folding.api.exception.ExternalConnectionException;
-import me.zodac.folding.api.exception.NotFoundException;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
@@ -28,7 +27,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * REST endpoints for users for <code>folding-stats</code>.
+ * REST endpoints for {@link User}s for <code>folding-stats</code>.
  */
 // TODO: [zodac] Add a GET endpoint with query, so we can see all instances of a user
 @Path("/users/")
@@ -129,11 +128,10 @@ public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
     }
 
     @Override
-    protected User updateElementById(final int userId, final User user, final User existingUser)
-        throws NotFoundException, ExternalConnectionException {
+    protected User updateElementById(final int userId, final User user, final User existingUser) throws ExternalConnectionException {
         // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
         final User userWithId = User.updateWithId(userId, user);
-        oldFacade.updateUser(userWithId);
+        oldFacade.updateUser(userWithId, existingUser);
         return userWithId;
     }
 

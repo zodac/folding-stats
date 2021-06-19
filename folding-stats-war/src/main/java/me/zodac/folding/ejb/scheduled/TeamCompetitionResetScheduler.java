@@ -117,9 +117,9 @@ public class TeamCompetitionResetScheduler {
     // TODO: [zodac] Go through Storage/BL, not direct to caches
     private void resetCaches() {
         LOGGER.info("Resetting caches");
-        TcStatsCache.get().clear();
-        TotalStatsCache.get().clear();
-        RetiredTcStatsCache.get().clear();
+        TcStatsCache.getInstance().removeAll();
+        TotalStatsCache.getInstance().removeAll();
+        RetiredTcStatsCache.getInstance().removeAll();
     }
 
     private void resetStats(final Collection<User> usersToReset) {

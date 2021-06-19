@@ -62,8 +62,7 @@ public enum Category {
     }
 
     /**
-     * Calculates the total number of {@link User}s permitted in a {@link Team} as the sum of the permitted amounts for
-     * each {@link Category}.
+     * Calculates the total number of {@link User}s permitted in a {@link Team} as the sum of the permitted amounts for each {@link Category}.
      *
      * @return the total number of {@link User}s for all {@link Category}s
      */

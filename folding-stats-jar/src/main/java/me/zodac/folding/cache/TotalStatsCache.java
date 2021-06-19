@@ -1,35 +1,30 @@
 package me.zodac.folding.cache;
 
-
 import me.zodac.folding.api.tc.stats.Stats;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-
-public final class TotalStatsCache {
+/**
+ * Implementation of {@link BaseCache} for total {@link me.zodac.folding.api.tc.User} {@link Stats}s.
+ *
+ * <p>
+ * <b>key:</b> the {@link me.zodac.folding.api.tc.User} ID
+ *
+ * <p>
+ * <b>value:</b> {@link Stats}
+ */
+public final class TotalStatsCache extends BaseCache<Stats> {
 
     private static final TotalStatsCache INSTANCE = new TotalStatsCache();
 
-    private transient final Map<Integer, Stats> totalStatsByUserId = new ConcurrentHashMap<>();
-
     private TotalStatsCache() {
-
+        super();
     }
 
-    public static TotalStatsCache get() {
+    /**
+     * Returns a singleton instance of {@link TotalStatsCache}.
+     *
+     * @return the {@link TotalStatsCache}
+     */
+    public static TotalStatsCache getInstance() {
         return INSTANCE;
-    }
-
-    public void add(final int userId, final Stats userTotalStats) {
-        totalStatsByUserId.put(userId, userTotalStats);
-    }
-
-    public Optional<Stats> get(final int userId) {
-        return Optional.ofNullable(totalStatsByUserId.get(userId));
-    }
-
-    public void clear() {
-        totalStatsByUserId.clear();
     }
 }

@@ -38,7 +38,6 @@ import me.zodac.folding.api.db.DbCrudManager;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.db.DbStatsManager;
 import me.zodac.folding.api.exception.DatabaseConnectionException;
-import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
@@ -541,24 +540,27 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
             // If no stats in previous day (meaning we are getting historic stats for the first day available), we need to remove the initial points from the current day's points
             final UserStats initialStats = getInitialStats(userId).orElse(UserStats.empty());
             LOGGER.debug("Removing initial stats from current day's first hour stats: {} - {}", firstHourTcStatsCurrentDay, initialStats);
+            
+            // Since we didn't get any previous day's stats, we don't need to worry about the hardware multiplier having been changed
+            // As a result, we will get the user's current hardware and use that multiplier
+            final Optional<User> optionalUser = getUser(userId);
 
-            try {
-                // Since we didn't get any previous day's stats, we don't need to worry about the hardware multiplier having been changed
-                // As a result, we will get the user's current hardware and use that multiplier
-                final User user = getUser(userId).orElseThrow(() -> new UserNotFoundException(userId));
-                final Hardware hardware = user.getHardware();
-                final double hardwareMultiplier = hardware.getMultiplier();
-
-                return UserTcStats.create(
-                    firstHourTcStatsCurrentDay.getUserId(),
-                    firstHourTcStatsCurrentDay.getTimestamp(),
-                    Math.max(0, firstHourTcStatsCurrentDay.getPoints() - initialStats.getPoints()),
-                    Math.max(0, firstHourTcStatsCurrentDay.getMultipliedPoints() - Math.round(hardwareMultiplier * initialStats.getPoints())),
-                    Math.max(0, firstHourTcStatsCurrentDay.getUnits() - initialStats.getUnits())
-                );
-            } catch (final UserNotFoundException e) {
-                throw new DatabaseConnectionException("Unable to find hardware or user to calculate hardware multiplier for initial stats", e);
+            if (optionalUser.isEmpty()) {
+                LOGGER.warn("Could not find user with ID {}, returning empty stats for first hour of day", userId);
+                return UserTcStats.empty(userId);
             }
+
+            final User user = optionalUser.get();
+            final Hardware hardware = user.getHardware();
+            final double hardwareMultiplier = hardware.getMultiplier();
+
+            return UserTcStats.create(
+                firstHourTcStatsCurrentDay.getUserId(),
+                firstHourTcStatsCurrentDay.getTimestamp(),
+                Math.max(0, firstHourTcStatsCurrentDay.getPoints() - initialStats.getPoints()),
+                Math.max(0, firstHourTcStatsCurrentDay.getMultipliedPoints() - Math.round(hardwareMultiplier * initialStats.getPoints())),
+                Math.max(0, firstHourTcStatsCurrentDay.getUnits() - initialStats.getUnits())
+            );
         }
 
         LOGGER.debug("Removing previous day's last hour stats from current day's first hour stats: {} - {}", firstHourTcStatsCurrentDay,

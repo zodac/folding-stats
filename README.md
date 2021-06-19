@@ -31,9 +31,10 @@ required for this are:
     - Add the new DB container (if containerised)
     - Update the `wildfly` container environment variables for "Database configuration"
 - Add support for the new DB container in code:
-    - Update *DbManagerRetriever.java* with a new SWITCH condition for the DB name
     - Implement the *DbManager.java* interface, with code stored in
       the `folding-stats-jar/src/main/java/me/zodac/folding/db/<DB_NAME>` package
+    - Update *DatabaseType.java* with an Enum for the new DB name
+    - Update *DbManagerRetriever.java* with a new SWITCH condition for the DB name
     - Optionally, use the instructions in --> jooQ Database Access <-- to run jOOQ code generation for easier SQL query
       building
 

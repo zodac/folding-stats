@@ -15,7 +15,7 @@ import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.UserTcStats;
-import me.zodac.folding.cache.CompetitionResultCache;
+import me.zodac.folding.cache.CompetitionSummaryCache;
 import me.zodac.folding.rest.api.tc.CompetitionSummary;
 import me.zodac.folding.rest.api.tc.RetiredUserSummary;
 import me.zodac.folding.rest.api.tc.TeamSummary;
@@ -45,11 +45,11 @@ public class CompetitionResultGenerator {
      */
     public CompetitionSummary generate() {
         // TODO: [zodac] This cache logic should not be here, should be in the Storage access layer (whatever that will be)
-        final CompetitionResultCache competitionResultCache = CompetitionResultCache.get();
-        if (SystemStateManager.current() != SystemState.WRITE_EXECUTED && competitionResultCache.hasCachedResult()) {
+        final CompetitionSummaryCache competitionSummaryCache = CompetitionSummaryCache.getInstance();
+        if (SystemStateManager.current() != SystemState.WRITE_EXECUTED && competitionSummaryCache.hasCachedResult()) {
             LOGGER.debug("System is not in state {} and has a cached TC result, using cache", SystemState.WRITE_EXECUTED);
 
-            final Optional<CompetitionSummary> cachedCompetitionResult = competitionResultCache.getResult();
+            final Optional<CompetitionSummary> cachedCompetitionResult = competitionSummaryCache.get();
             if (cachedCompetitionResult.isPresent()) {
                 return cachedCompetitionResult.get();
             } else {
@@ -58,7 +58,7 @@ public class CompetitionResultGenerator {
         }
 
         LOGGER.debug("Calculating latest TC result, system state: {}, TC cache populated: {}", SystemStateManager::current,
-            competitionResultCache::hasCachedResult);
+            competitionSummaryCache::hasCachedResult);
 
         final List<TeamSummary> teamSummaries = getStatsForTeams();
         LOGGER.debug("Found {} TC teams", teamSummaries::size);
@@ -68,7 +68,7 @@ public class CompetitionResultGenerator {
         }
 
         final CompetitionSummary competitionSummary = CompetitionSummary.create(teamSummaries);
-        competitionResultCache.add(competitionSummary);
+        competitionSummaryCache.add(competitionSummary);
         SystemStateManager.next(SystemState.AVAILABLE);
         return competitionSummary;
     }

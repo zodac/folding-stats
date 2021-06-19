@@ -13,9 +13,6 @@
     <suppress files="DbManager\.java" checks="[a-zA-Z0-9]*"/>
     <suppress files="DbStatsManager\.java" checks="[a-zA-Z0-9]*"/>
 
-    <!-- TODO: [zodac] Remove these suppressions when the *Cache files are split correctly -->
-    <suppress files=".*Cache\.java" checks="[a-zA-Z0-9]*"/>
-
     <!-- Ignore generated files -->
     <suppress files="[\\/]gen[\\/]" checks="[a-zA-Z0-9]*"/>
 </suppressions>

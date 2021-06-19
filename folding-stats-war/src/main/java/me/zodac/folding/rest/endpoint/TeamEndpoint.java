@@ -29,7 +29,7 @@ import org.apache.logging.log4j.Logger;
 
 
 /**
- * REST endpoints for teams for <code>folding-stats</code>.
+ * REST endpoints for {@link Team}s for <code>folding-stats</code>.
  */
 @Path("/teams/")
 @RequestScoped

@@ -54,7 +54,7 @@ final class Storage {
      */
     Hardware createHardware(final Hardware hardware) {
         final Hardware hardwareWithId = DB_MANAGER.createHardware(hardware);
-        hardwareCache.add(hardwareWithId);
+        hardwareCache.add(hardwareWithId.getId(), hardwareWithId);
         return hardwareWithId;
     }
 
@@ -78,7 +78,7 @@ final class Storage {
 
         LOGGER.trace("Cache miss! Get hardware");
         final Optional<Hardware> fromDb = DB_MANAGER.getHardware(hardwareId);
-        fromDb.ifPresent(hardwareCache::add);
+        fromDb.ifPresent(hardware -> hardwareCache.add(hardwareId, hardware));
         return fromDb;
     }
 
@@ -101,12 +101,16 @@ final class Storage {
 
         LOGGER.trace("Cache miss! Get all hardware");
         final Collection<Hardware> fromDb = DB_MANAGER.getAllHardware();
-        hardwareCache.addAll(fromDb);
+
+        for (final Hardware hardware : fromDb) {
+            hardwareCache.add(hardware.getId(), hardware);
+        }
+
         return fromDb;
     }
 
     /**
-     * Updates a {@link Hardware}.
+     * Updates a {@link Hardware}. Expects the {@link Hardware} to have a valid ID.
      *
      * <p>
      * Persists it with the {@link DbManager}, then updates it in the {@link HardwareCache}.
@@ -116,7 +120,7 @@ final class Storage {
      */
     void updateHardware(final Hardware updatedHardware) {
         DB_MANAGER.updateHardware(updatedHardware);
-        hardwareCache.add(updatedHardware);
+        hardwareCache.add(updatedHardware.getId(), updatedHardware);
     }
 
     /**
@@ -145,7 +149,7 @@ final class Storage {
      */
     Team createTeam(final Team team) {
         final Team teamWithId = DB_MANAGER.createTeam(team);
-        teamCache.add(teamWithId);
+        teamCache.add(teamWithId.getId(), teamWithId);
         return teamWithId;
     }
 
@@ -169,7 +173,7 @@ final class Storage {
 
         LOGGER.trace("Cache miss! Get team");
         final Optional<Team> fromDb = DB_MANAGER.getTeam(teamId);
-        fromDb.ifPresent(teamCache::add);
+        fromDb.ifPresent(team -> teamCache.add(teamId, team));
         return fromDb;
     }
 
@@ -192,7 +196,11 @@ final class Storage {
 
         LOGGER.trace("Cache miss! Get all teams");
         final Collection<Team> fromDb = DB_MANAGER.getAllTeams();
-        teamCache.addAll(fromDb);
+
+        for (final Team team : fromDb) {
+            teamCache.add(team.getId(), team);
+        }
+
         return fromDb;
     }
 
@@ -230,7 +238,7 @@ final class Storage {
 
         LOGGER.trace("Cache miss! Get user");
         final Optional<User> fromDb = DB_MANAGER.getUser(userId);
-        fromDb.ifPresent(userCache::add);
+        fromDb.ifPresent(user -> userCache.add(userId, user));
         return fromDb;
     }
 
@@ -253,7 +261,11 @@ final class Storage {
 
         LOGGER.trace("Cache miss! Get all users");
         final Collection<User> fromDb = DB_MANAGER.getAllUsers();
-        userCache.addAll(fromDb);
+
+        for (final User user : fromDb) {
+            userCache.add(user.getId(), user);
+        }
+
         return fromDb;
     }
 

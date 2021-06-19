@@ -26,7 +26,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * REST endpoints for hardware for <code>folding-stats</code>.
+ * REST endpoints for {@link Hardware}s for <code>folding-stats</code>.
  */
 // TODO: [zodac] Add GET query endpoint to retrieve all hardware instances with same name
 @Path("/hardware/")

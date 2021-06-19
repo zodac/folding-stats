@@ -12,7 +12,6 @@ import java.util.Collection;
 import java.util.Optional;
 import me.zodac.folding.api.SystemUserAuthentication;
 import me.zodac.folding.api.db.DbManager;
-import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.OperatingSystem;
@@ -135,7 +134,7 @@ class PostgresDbManagerTest {
 
     @Test
     @Order(3)
-    void userTest() throws UserNotFoundException {
+    void userTest() {
         final User user = generateUser();
         final User createdUser = POSTGRES_DB_MANAGER.createUser(user);
 
@@ -150,7 +149,11 @@ class PostgresDbManagerTest {
         assertThat(allUsers)
             .hasSize(1);
 
-        final User retrievedUser = POSTGRES_DB_MANAGER.getUser(createdUser.getId()).orElseThrow(() -> new UserNotFoundException(createdUser.getId()));
+        final Optional<User> optionalRetrievedUser = POSTGRES_DB_MANAGER.getUser(createdUser.getId());
+        assertThat(optionalRetrievedUser)
+            .isPresent();
+
+        final User retrievedUser = optionalRetrievedUser.get();
         assertThat(retrievedUser)
             .isEqualTo(createdUser);
 
@@ -168,7 +171,11 @@ class PostgresDbManagerTest {
             .build();
 
         POSTGRES_DB_MANAGER.updateUser(userToUpdate);
-        final User updatedUser = POSTGRES_DB_MANAGER.getUser(createdUser.getId()).orElseThrow(() -> new UserNotFoundException(createdUser.getId()));
+        final Optional<User> optionalUpdatedUser = POSTGRES_DB_MANAGER.getUser(createdUser.getId());
+        assertThat(optionalUpdatedUser)
+            .isPresent();
+
+        final User updatedUser = optionalUpdatedUser.get();
         assertThat(updatedUser)
             .isEqualTo(userToUpdate);
 

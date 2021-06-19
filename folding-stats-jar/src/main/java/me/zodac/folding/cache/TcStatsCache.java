@@ -1,35 +1,30 @@
 package me.zodac.folding.cache;
 
-
 import me.zodac.folding.api.tc.stats.UserTcStats;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-
-public final class TcStatsCache {
+/**
+ * Implementation of {@link BaseCache} for {@link UserTcStats}s.
+ *
+ * <p>
+ * <b>key:</b> {@link UserTcStats} ID
+ *
+ * <p>
+ * <b>value:</b> {@link UserTcStats}
+ */
+public final class TcStatsCache extends BaseCache<UserTcStats> {
 
     private static final TcStatsCache INSTANCE = new TcStatsCache();
 
-    private transient final Map<Integer, UserTcStats> tcStatsByUserId = new ConcurrentHashMap<>();
-
     private TcStatsCache() {
-
+        super();
     }
 
-    public static TcStatsCache get() {
+    /**
+     * Returns a singleton instance of {@link TcStatsCache}.
+     *
+     * @return the {@link TcStatsCache}
+     */
+    public static TcStatsCache getInstance() {
         return INSTANCE;
-    }
-
-    public void add(final int userId, final UserTcStats userTcStats) {
-        tcStatsByUserId.put(userId, userTcStats);
-    }
-
-    public Optional<UserTcStats> get(final int userId) {
-        return Optional.ofNullable(tcStatsByUserId.get(userId));
-    }
-
-    public void clear() {
-        tcStatsByUserId.clear();
     }
 }

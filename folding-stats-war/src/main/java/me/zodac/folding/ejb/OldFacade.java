@@ -10,7 +10,6 @@ import me.zodac.folding.api.SystemUserAuthentication;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.exception.ExternalConnectionException;
-import me.zodac.folding.api.exception.UserNotFoundException;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
@@ -47,11 +46,11 @@ public class OldFacade {
     private final transient UserCache userCache = UserCache.getInstance();
     private final transient HardwareCache hardwareCache = HardwareCache.getInstance();
 
-    private final transient InitialStatsCache initialStatsCache = InitialStatsCache.get();
-    private final transient OffsetStatsCache offsetStatsCache = OffsetStatsCache.get();
-    private final transient RetiredTcStatsCache retiredStatsCache = RetiredTcStatsCache.get();
-    private final transient TcStatsCache tcStatsCache = TcStatsCache.get();
-    private final transient TotalStatsCache totalStatsCache = TotalStatsCache.get();
+    private final transient InitialStatsCache initialStatsCache = InitialStatsCache.getInstance();
+    private final transient OffsetStatsCache offsetStatsCache = OffsetStatsCache.getInstance();
+    private final transient RetiredTcStatsCache retiredStatsCache = RetiredTcStatsCache.getInstance();
+    private final transient TcStatsCache tcStatsCache = TcStatsCache.getInstance();
+    private final transient TotalStatsCache totalStatsCache = TotalStatsCache.getInstance();
 
     @EJB
     private transient BusinessLogic businessLogic;
@@ -61,7 +60,7 @@ public class OldFacade {
 
     public void updateHardware(final Hardware updatedHardware, final Hardware existingHardware) throws ExternalConnectionException {
         dbManager.updateHardware(updatedHardware);
-        hardwareCache.add(updatedHardware);
+        hardwareCache.add(updatedHardware.getId(), updatedHardware);
 
         final Collection<User> usersUsingThisHardware = businessLogic.getUsersWithHardware(updatedHardware);
 
@@ -80,36 +79,34 @@ public class OldFacade {
 
     public User createUser(final User user) throws ExternalConnectionException {
         final User userWithId = dbManager.createUser(user);
-        userCache.add(userWithId);
+        userCache.add(userWithId.getId(), userWithId);
 
         // When adding a new user, we configure the initial stats DB/cache
         persistInitialUserStats(userWithId);
         // When adding a new user, we give an empty offset to the offset cache
         offsetStatsCache.add(userWithId.getId(), OffsetStats.empty());
 
-        userTeamCompetitionStatsParser.parseTcStatsForUser(user);
+        userTeamCompetitionStatsParser.parseTcStatsForUser(userWithId);
 
         return userWithId;
     }
 
-    public void updateUser(final User updatedUser) throws UserNotFoundException, ExternalConnectionException {
-        final User existingUser =
-            businessLogic.getUserWithPasskey(updatedUser.getId()).orElseThrow(() -> new UserNotFoundException(updatedUser.getId()));
+    public void updateUser(final User updatedUser, final User existingUser) throws ExternalConnectionException {
         dbManager.updateUser(updatedUser);
-        userCache.add(updatedUser);
+        userCache.add(updatedUser.getId(), updatedUser); // TODO: [zodac] Is this unnecessary, or the other 4?
 
         if (!existingUser.getHardware().equals(updatedUser.getHardware())) {
             LOGGER.debug("User had state change to hardware, {} -> {}, recalculating initial stats", existingUser.getHardware(),
                 updatedUser.getHardware());
             handleStateChangeForUser(updatedUser);
-            userCache.add(updatedUser);
+            userCache.add(updatedUser.getId(), updatedUser);
             return;
         }
 
         if (!existingUser.getTeam().equals(updatedUser.getTeam())) {
             LOGGER.debug("User had state change to team, {} -> {}, recalculating initial stats", existingUser.getTeam(), updatedUser.getTeam());
             handleStateChangeForUser(updatedUser);
-            userCache.add(updatedUser);
+            userCache.add(updatedUser.getId(), updatedUser);
             return;
         }
 
@@ -117,7 +114,7 @@ public class OldFacade {
             LOGGER.debug("User had state change to Folding username, {} -> {}, recalculating initial stats", existingUser.getFoldingUserName(),
                 updatedUser.getFoldingUserName());
             handleStateChangeForUser(updatedUser);
-            userCache.add(updatedUser);
+            userCache.add(updatedUser.getId(), updatedUser);
             return;
         }
 
@@ -125,7 +122,7 @@ public class OldFacade {
             LOGGER.debug("User had state change to passkey, {} -> {}, recalculating initial stats", existingUser.getPasskey(),
                 updatedUser.getPasskey());
             handleStateChangeForUser(updatedUser);
-            userCache.add(updatedUser);
+            userCache.add(updatedUser.getId(), updatedUser);
             return;
         }
 
@@ -163,12 +160,12 @@ public class OldFacade {
 
         final Team team = user.getTeam();
         final int retiredUserId = dbManager.persistRetiredUserStats(team.getId(), user.getId(), user.getDisplayName(), userStats);
-        retiredStatsCache.add(RetiredUserTcStats.create(retiredUserId, team.getId(), user.getDisplayName(), userStats));
+        retiredStatsCache.add(retiredUserId, RetiredUserTcStats.create(retiredUserId, team.getId(), user.getDisplayName(), userStats));
     }
 
     public void updateTeam(final Team team) {
         dbManager.updateTeam(team);
-        teamCache.add(team);
+        teamCache.add(team.getId(), team);
     }
 
     public void persistInitialUserStats(final User user) throws ExternalConnectionException {
@@ -281,7 +278,7 @@ public class OldFacade {
 
     public void clearOffsetStats() {
         dbManager.clearAllOffsetStats();
-        offsetStatsCache.clearOffsets();
+        offsetStatsCache.removeAll();
     }
 
     public void persistTotalStatsForUser(final UserStats stats) {

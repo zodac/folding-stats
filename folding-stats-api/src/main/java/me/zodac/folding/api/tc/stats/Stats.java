@@ -15,6 +15,9 @@ import lombok.ToString;
 @ToString(doNotUseGetters = true)
 public class Stats {
 
+    protected static final long DEFAULT_POINTS = 0L;
+    protected static final int DEFAULT_UNITS = 0;
+
     private final long points;
     private final int units;
 
@@ -36,7 +39,7 @@ public class Stats {
      * @return the empty {@link Stats}
      */
     public static Stats empty() {
-        return new Stats(0L, 0);
+        return new Stats(DEFAULT_POINTS, DEFAULT_UNITS);
     }
 
     /**
@@ -46,6 +49,6 @@ public class Stats {
      * @return <code>true</code> if the {@link Stats} instance is {@link Stats#empty()}
      */
     public boolean isEmpty() {
-        return points == 0L && units == 0;
+        return points == DEFAULT_POINTS && units == DEFAULT_UNITS;
     }
 }
