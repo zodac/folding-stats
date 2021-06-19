@@ -24,10 +24,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java-release>11</java-release>
 
-        <!-- Do not run tests by default -->
+        <!-- Test/Lint Properties -->
         <skip-tests>true</skip-tests>
-
-        <!-- Do not run linters by default -->
+        <skip-sonar>true</skip-sonar>
         <skip-linters>true</skip-linters>
 
         <!-- 3PP Versions -->
@@ -71,10 +70,16 @@
         <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
         <pmd-ruleset>${project.parent.basedir}/ci/pmd-ruleset.xml</pmd-ruleset>
 
+        <!-- SonarQube server properties -->
+        <!-- Using own local SonarQube, can't guarantee availability or credentials -->
+        <sonar.host.url>http://192.168.99.100:9005</sonar.host.url>
+        <sonar.login>6d6bed1c5fec1efbc656f4bcaf8eee6e8823db19</sonar.login>
+
         <!-- Linter Plugin Versions -->
         <maven-checkstyle-plugin.version>3.1.2</maven-checkstyle-plugin.version>
         <maven-javadoc-plugin.version>3.3.0</maven-javadoc-plugin.version>
         <maven-pmd-plugin.version>3.14.0</maven-pmd-plugin.version>
+        <sonar-maven-plugin.version>3.9.0.2155</sonar-maven-plugin.version>
         <spotbugs-maven-plugin.version>4.2.0</spotbugs-maven-plugin.version>
     </properties>
 
@@ -384,6 +389,25 @@
                 </plugin>
 
                 <!-- Manual execution: -->
+                <!-- mvn clean install mvn sonar:sonar -Dskip-sonar=false -->
+                <plugin>
+                    <groupId>org.sonarsource.scanner.maven</groupId>
+                    <artifactId>sonar-maven-plugin</artifactId>
+                    <version>${sonar-maven-plugin.version}</version>
+                    <configuration>
+                        <sonar.skip>${skip-sonar}</sonar.skip>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <phase>install</phase>
+                            <goals>
+                                <goal>sonar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <!-- Manual execution: -->
                 <!-- mvn clean install spotbugs:spotbugs -Dskip-linters=false -->
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
@@ -412,6 +436,13 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
     </build>
 
     <profiles>
@@ -425,6 +456,7 @@
             </activation>
             <properties>
                 <skip-linters>false</skip-linters>
+                <skip-sonar>false</skip-sonar>
                 <skip-tests>false</skip-tests>
             </properties>
         </profile>
@@ -439,6 +471,20 @@
             </activation>
             <properties>
                 <skip-linters>false</skip-linters>
+            </properties>
+        </profile>
+
+        <!-- Profile used to execute SonarQube analysis on the project -->
+        <!-- Using a separate profile to linters since the SonarQube server may not be available -->
+        <profile>
+            <id>activate_sonar</id>
+            <activation>
+                <property>
+                    <name>sonar</name>
+                </property>
+            </activation>
+            <properties>
+                <skip-sonar>false</skip-sonar>
             </properties>
         </profile>
 
