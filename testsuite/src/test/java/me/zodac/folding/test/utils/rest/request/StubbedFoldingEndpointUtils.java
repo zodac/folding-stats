@@ -74,7 +74,10 @@ public final class StubbedFoldingEndpointUtils {
 
         try {
             HTTP_CLIENT.send(unitsRequest, HttpResponse.BodyHandlers.discarding());
-        } catch (final IOException | InterruptedException e) {
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException(String.format("Error setting points count of user %s/%s to %s", foldingUserName, passkey, points), e);
+        } catch (final IOException e) {
             throw new FoldingRestException(String.format("Error setting points count of user %s/%s to %s", foldingUserName, passkey, points), e);
         }
     }
@@ -93,7 +96,10 @@ public final class StubbedFoldingEndpointUtils {
 
         try {
             HTTP_CLIENT.send(unitsRequest, HttpResponse.BodyHandlers.discarding());
-        } catch (final IOException | InterruptedException e) {
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException("Error resetting points count of users", e);
+        } catch (final IOException e) {
             throw new FoldingRestException("Error resetting points count of users", e);
         }
     }
@@ -127,7 +133,10 @@ public final class StubbedFoldingEndpointUtils {
 
         try {
             HTTP_CLIENT.send(unitsRequest, HttpResponse.BodyHandlers.discarding());
-        } catch (final IOException | InterruptedException e) {
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException(String.format("Error setting unit count of user %s/%s to %s", foldingUserName, passkey, units), e);
+        } catch (final IOException e) {
             throw new FoldingRestException(String.format("Error setting unit count of user %s/%s to %s", foldingUserName, passkey, units), e);
         }
     }
@@ -146,7 +155,10 @@ public final class StubbedFoldingEndpointUtils {
 
         try {
             HTTP_CLIENT.send(unitsRequest, HttpResponse.BodyHandlers.discarding());
-        } catch (final IOException | InterruptedException e) {
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException("Error resetting points count of users", e);
+        } catch (final IOException e) {
             throw new FoldingRestException("Error resetting points count of users", e);
         }
     }

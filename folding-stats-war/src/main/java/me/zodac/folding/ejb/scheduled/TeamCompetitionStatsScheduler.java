@@ -50,13 +50,13 @@ public class TeamCompetitionStatsScheduler {
     private static final String STATS_PARSING_SCHEDULE_SECOND = EnvironmentVariableUtils.get("STATS_PARSING_SCHEDULE_SECOND", "0");
 
     @EJB
-    private transient BusinessLogic businessLogic;
+    private BusinessLogic businessLogic;
 
     @EJB
-    private transient UserTeamCompetitionStatsParser userTeamCompetitionStatsParser;
+    private UserTeamCompetitionStatsParser userTeamCompetitionStatsParser;
 
     @Resource
-    private transient TimerService timerService;
+    private TimerService timerService;
 
     /**
      * On system startup, checks if scheduled TC stats parsing is enabled. If so, starts a {@link Timer} for stats parsing.

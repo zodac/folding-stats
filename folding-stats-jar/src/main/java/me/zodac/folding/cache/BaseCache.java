@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 class BaseCache<V> {
 
-    private final transient Map<Integer, V> elementsById;
+    private final Map<Integer, V> elementsById;
 
     /**
      * Instantiates the {@link BaseCache} with a {@link ConcurrentHashMap}.
@@ -55,7 +55,7 @@ class BaseCache<V> {
 
         return Optional.empty();
     }
-    
+
     /**
      * Retrieves all elements from the cache.
      *

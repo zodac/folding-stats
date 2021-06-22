@@ -52,13 +52,13 @@ public class HistoricStatsEndpoint {
     private static final int CACHE_EXPIRATION_TIME = (int) TimeUnit.HOURS.toSeconds(1);
 
     @Context
-    private transient UriInfo uriContext;
+    private UriInfo uriContext;
 
     @EJB
-    private transient BusinessLogic businessLogic;
+    private BusinessLogic businessLogic;
 
     @EJB
-    private transient OldFacade oldFacade;
+    private OldFacade oldFacade;
 
     @GET
     @PermitAll

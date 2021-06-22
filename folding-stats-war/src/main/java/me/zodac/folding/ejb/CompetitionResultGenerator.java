@@ -32,10 +32,10 @@ public class CompetitionResultGenerator {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @EJB
-    private transient BusinessLogic businessLogic;
+    private BusinessLogic businessLogic;
 
     @EJB
-    private transient OldFacade oldFacade;
+    private OldFacade oldFacade;
 
     /**
      * Generates a {@link CompetitionSummary} based on the latest <code>Team Competition</code> {@link UserTcStats}.
@@ -100,7 +100,7 @@ public class CompetitionResultGenerator {
             retiredUserSummaries);
     }
 
-    private String getCaptainDisplayName(final String teamName, final Collection<User> usersOnTeam) {
+    private static String getCaptainDisplayName(final String teamName, final Collection<User> usersOnTeam) {
         for (final User user : usersOnTeam) {
             if (user.isUserIsCaptain()) {
                 return user.getDisplayName();

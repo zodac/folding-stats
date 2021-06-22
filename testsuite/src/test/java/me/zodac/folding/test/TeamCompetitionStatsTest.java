@@ -85,15 +85,15 @@ class TeamCompetitionStatsTest {
 
         assertThat(result.getTotalPoints())
             .as("Expected no points: " + result)
-            .isEqualTo(0L);
+            .isZero();
 
         assertThat(result.getTotalMultipliedPoints())
             .as("Expected no multiplied points: " + result)
-            .isEqualTo(0L);
+            .isZero();
 
         assertThat(result.getTotalUnits())
             .as("Expected no units: " + result)
-            .isEqualTo(0);
+            .isZero();
     }
 
     @Test
@@ -106,15 +106,15 @@ class TeamCompetitionStatsTest {
 
         assertThat(resultBeforeStats.getTotalPoints())
             .as("Expected no points: " + resultBeforeStats)
-            .isEqualTo(0L);
+            .isZero();
 
         assertThat(resultBeforeStats.getTotalMultipliedPoints())
             .as("Expected no multiplied points: " + resultBeforeStats)
-            .isEqualTo(0L);
+            .isZero();
 
         assertThat(resultBeforeStats.getTotalUnits())
             .as("Expected no units: " + resultBeforeStats)
-            .isEqualTo(0);
+            .isZero();
 
         assertThat(resultBeforeStats.getTeams())
             .as("Expected exactly 1 team: " + resultBeforeStats)
@@ -124,15 +124,15 @@ class TeamCompetitionStatsTest {
 
         assertThat(teamSummaryBeforeStats.getTeamPoints())
             .as("Expected no points for team: " + teamSummaryBeforeStats)
-            .isEqualTo(0L);
+            .isZero();
 
         assertThat(teamSummaryBeforeStats.getTeamMultipliedPoints())
             .as("Expected no multiplied points for team: " + teamSummaryBeforeStats)
-            .isEqualTo(0L);
+            .isZero();
 
         assertThat(teamSummaryBeforeStats.getTeamUnits())
             .as("Expected no units for team: " + teamSummaryBeforeStats)
-            .isEqualTo(0);
+            .isZero();
 
         assertThat(teamSummaryBeforeStats.getActiveUsers())
             .as("Expected exactly 1 active user: " + teamSummaryBeforeStats)
@@ -146,15 +146,15 @@ class TeamCompetitionStatsTest {
 
         assertThat(userSummaryBeforeStats.getPoints())
             .as("Expected no points for user: " + userSummaryBeforeStats)
-            .isEqualTo(0L);
+            .isZero();
 
         assertThat(userSummaryBeforeStats.getMultipliedPoints())
             .as("Expected no multiplied points for user: " + userSummaryBeforeStats)
-            .isEqualTo(0L);
+            .isZero();
 
         assertThat(userSummaryBeforeStats.getUnits())
             .as("Expected no units for user: " + userSummaryBeforeStats)
-            .isEqualTo(0);
+            .isZero();
 
         final long newPoints = 10_000L;
         StubbedFoldingEndpointUtils.setPoints(user, newPoints);
@@ -725,15 +725,15 @@ class TeamCompetitionStatsTest {
 
         assertThat(userSummary.getPoints())
             .as("Expected user points to be 0: " + userSummary)
-            .isEqualTo(0L);
+            .isZero();
 
         assertThat(userSummary.getMultipliedPoints())
             .as("Expected user multiplied points to be 0: " + userSummary)
-            .isEqualTo(0L);
+            .isZero();
 
         assertThat(userSummary.getUnits())
             .as("Expected user units to be 0: " + userSummary)
-            .isEqualTo(0);
+            .isZero();
     }
 
     @Test
@@ -746,15 +746,15 @@ class TeamCompetitionStatsTest {
 
         assertThat(resultBeforeStats.getPoints())
             .as("Expected no points: " + resultBeforeStats)
-            .isEqualTo(0L);
+            .isZero();
 
         assertThat(resultBeforeStats.getMultipliedPoints())
             .as("Expected no multiplied points: " + resultBeforeStats)
-            .isEqualTo(0L);
+            .isZero();
 
         assertThat(resultBeforeStats.getUnits())
             .as("Expected no units: " + resultBeforeStats)
-            .isEqualTo(0);
+            .isZero();
 
         final long newPoints = 10_000L;
         StubbedFoldingEndpointUtils.setPoints(user, newPoints);

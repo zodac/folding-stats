@@ -18,8 +18,6 @@ import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 /**
  * Interface used to interact with the storage backend and perform CRUD operations.
  */
-// TODO: [zodac] Split into StatsDbManager and CrudDbManager
-@Deprecated
 public interface DbManager {
 
     /**

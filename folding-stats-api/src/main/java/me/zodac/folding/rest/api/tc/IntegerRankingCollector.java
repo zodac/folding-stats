@@ -23,9 +23,9 @@ import java.util.stream.Collector;
 final class IntegerRankingCollector<T> implements Collector<T, List<T>, List<T>> {
 
     private static final Set<Characteristics> COLLECTOR_CHARACTERISTICS = Collections.unmodifiableSet(EnumSet.of(Characteristics.IDENTITY_FINISH));
-    private final transient Comparator<? super T> comparator;
-    private final transient BiFunction<T, Integer, T> creator;
-    private final transient Function<T, Integer> ranker;
+    private final Comparator<? super T> comparator;
+    private final BiFunction<T, Integer, T> creator;
+    private final Function<T, Integer> ranker;
 
     /**
      * Constructs an {@link IntegerRankingCollector}.

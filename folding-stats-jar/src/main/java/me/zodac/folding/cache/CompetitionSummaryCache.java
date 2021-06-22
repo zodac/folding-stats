@@ -10,7 +10,7 @@ public final class CompetitionSummaryCache {
 
     private static final CompetitionSummaryCache INSTANCE = new CompetitionSummaryCache();
 
-    private transient CompetitionSummary competitionSummary;
+    private CompetitionSummary competitionSummary;
 
     private CompetitionSummaryCache() {
 

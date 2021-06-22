@@ -27,7 +27,7 @@ public class UserStats extends Stats {
     protected UserStats(final int userId, final Timestamp timestamp, final long points, final int units) {
         super(points, units);
         this.userId = userId;
-        this.timestamp = timestamp;
+        this.timestamp = new Timestamp(timestamp.getTime());
     }
 
     /**

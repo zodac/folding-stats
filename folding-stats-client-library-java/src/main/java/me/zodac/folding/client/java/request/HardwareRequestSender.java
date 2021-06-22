@@ -73,7 +73,10 @@ public final class HardwareRequestSender {
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (final IOException | InterruptedException e) {
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException("Error sending HTTP request to get all hardware", e);
+        } catch (final IOException e) {
             throw new FoldingRestException("Error sending HTTP request to get all hardware", e);
         }
     }
@@ -116,7 +119,10 @@ public final class HardwareRequestSender {
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (final IOException | InterruptedException e) {
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException("Error sending HTTP request to get hardware", e);
+        } catch (final IOException e) {
             throw new FoldingRestException("Error sending HTTP request to get hardware", e);
         }
     }
@@ -156,7 +162,10 @@ public final class HardwareRequestSender {
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (final IOException | InterruptedException e) {
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException("Error sending HTTP request to create hardware", e);
+        } catch (final IOException e) {
             throw new FoldingRestException("Error sending HTTP request to create hardware", e);
         }
     }
@@ -196,7 +205,10 @@ public final class HardwareRequestSender {
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (final IOException | InterruptedException e) {
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException("Error sending HTTP request to create batch of hardware", e);
+        } catch (final IOException e) {
             throw new FoldingRestException("Error sending HTTP request to create batch of hardware", e);
         }
     }
@@ -238,7 +250,10 @@ public final class HardwareRequestSender {
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (final IOException | InterruptedException e) {
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException("Error sending HTTP request to update hardware", e);
+        } catch (final IOException e) {
             throw new FoldingRestException("Error sending HTTP request to update hardware", e);
         }
     }
@@ -277,7 +292,10 @@ public final class HardwareRequestSender {
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
-        } catch (final IOException | InterruptedException e) {
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException("Error sending HTTP request to delete hardware", e);
+        } catch (final IOException e) {
             throw new FoldingRestException("Error sending HTTP request to delete hardware", e);
         }
     }

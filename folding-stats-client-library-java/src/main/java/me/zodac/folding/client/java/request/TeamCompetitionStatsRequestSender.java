@@ -73,7 +73,10 @@ public final class TeamCompetitionStatsRequestSender {
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (final IOException | InterruptedException e) {
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException("Error sending HTTP request to get TC stats", e);
+        } catch (final IOException e) {
             throw new FoldingRestException("Error sending HTTP request to get TC stats", e);
         }
     }
@@ -120,7 +123,10 @@ public final class TeamCompetitionStatsRequestSender {
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (final IOException | InterruptedException e) {
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException("Error sending HTTP request to get TC stats", e);
+        } catch (final IOException e) {
             throw new FoldingRestException("Error sending HTTP request to get TC stats", e);
         }
     }
@@ -161,7 +167,10 @@ public final class TeamCompetitionStatsRequestSender {
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (final IOException | InterruptedException e) {
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException("Error sending HTTP request to get TC team leaderboard", e);
+        } catch (final IOException e) {
             throw new FoldingRestException("Error sending HTTP request to get TC team leaderboard", e);
         }
     }
@@ -202,7 +211,10 @@ public final class TeamCompetitionStatsRequestSender {
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (final IOException | InterruptedException e) {
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException("Error sending HTTP request to get TC category leaderboard", e);
+        } catch (final IOException e) {
             throw new FoldingRestException("Error sending HTTP request to get TC category leaderboard", e);
         }
     }
@@ -248,7 +260,10 @@ public final class TeamCompetitionStatsRequestSender {
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
-        } catch (final IOException | InterruptedException e) {
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException("Error sending HTTP request to manually trigger update of TC stats", e);
+        } catch (final IOException e) {
             throw new FoldingRestException("Error sending HTTP request to manually trigger update of TC stats", e);
         }
     }
@@ -287,7 +302,10 @@ public final class TeamCompetitionStatsRequestSender {
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
-        } catch (final IOException | InterruptedException e) {
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException("Error sending HTTP request to manually trigger monthly reset of TC stats", e);
+        } catch (final IOException e) {
             throw new FoldingRestException("Error sending HTTP request to manually trigger monthly reset of TC stats", e);
         }
     }
@@ -344,7 +362,10 @@ public final class TeamCompetitionStatsRequestSender {
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
-        } catch (final IOException | InterruptedException e) {
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException("Error sending HTTP request to offset user stats", e);
+        } catch (final IOException e) {
             throw new FoldingRestException("Error sending HTTP request to offset user stats", e);
         }
     }

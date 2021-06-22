@@ -32,7 +32,7 @@ public class LoginEndpoint {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @EJB
-    private transient OldFacade oldFacade;
+    private OldFacade oldFacade;
 
     @POST
     @PermitAll

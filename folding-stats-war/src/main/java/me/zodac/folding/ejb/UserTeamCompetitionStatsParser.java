@@ -29,7 +29,7 @@ public class UserTeamCompetitionStatsParser {
     private static final FoldingStatsRetriever FOLDING_STATS_RETRIEVER = HttpFoldingStatsRetriever.create();
 
     @EJB
-    private transient OldFacade oldFacade;
+    private OldFacade oldFacade;
 
     private static UserStats getTotalStatsForUserOrEmpty(final User user) {
         try {
@@ -82,8 +82,8 @@ public class UserTeamCompetitionStatsParser {
         if (offsetStats.isEmpty()) {
             LOGGER.trace("Retrieved empty stat offset for user: {}", user);
         } else {
-            LOGGER.debug("{}: {} offset points | {} offset units", user.getDisplayName(),
-                formatWithCommas(offsetStats.getMultipliedPointsOffset()), formatWithCommas(offsetStats.getUnitsOffset()));
+            LOGGER.debug("{}: {} offset points | {} offset units", user::getDisplayName,
+                () -> formatWithCommas(offsetStats.getMultipliedPointsOffset()), () -> formatWithCommas(offsetStats.getUnitsOffset()));
         }
 
         final UserStats totalStats = getTotalStatsForUserOrEmpty(user);
@@ -105,10 +105,10 @@ public class UserTeamCompetitionStatsParser {
         final UserTcStats statsBeforeOffset = UserTcStats.create(user.getId(), totalStats.getTimestamp(), points, multipliedPoints, units);
         final UserTcStats hourlyUserTcStats = statsBeforeOffset.updateWithOffsets(offsetStats);
 
-        LOGGER.debug("{}: {} total points (unmultiplied) | {} total units", user.getDisplayName(), formatWithCommas(totalStats.getPoints()),
-            formatWithCommas(totalStats.getUnits()));
-        LOGGER.debug("{}: {} TC multiplied points (pre-offset) | {} TC units (pre-offset)", user.getDisplayName(),
-            formatWithCommas(multipliedPoints), formatWithCommas(units));
+        LOGGER.debug("{}: {} total points (unmultiplied) | {} total units", user::getDisplayName, () -> formatWithCommas(totalStats.getPoints()),
+            () -> formatWithCommas(totalStats.getUnits()));
+        LOGGER.debug("{}: {} TC multiplied points (pre-offset) | {} TC units (pre-offset)", user::getDisplayName,
+            () -> formatWithCommas(multipliedPoints), () -> formatWithCommas(units));
         LOGGER.info("{}: {} TC points | {} TC units", user.getDisplayName(), formatWithCommas(hourlyUserTcStats.getMultipliedPoints()),
             formatWithCommas(hourlyUserTcStats.getUnits()));
 

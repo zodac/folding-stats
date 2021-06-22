@@ -198,11 +198,19 @@ final class RecordConverter {
      * @return {@link SystemUserAuthentication#getUserRoles()} if valid password was supplied, else {@link SystemUserAuthentication#invalidPassword()}
      */
     static SystemUserAuthentication toSystemUserAuthentication(final Record systemUsersRecord) {
-        if (systemUsersRecord.get("is_password_match", Boolean.class)) {
+        final boolean isPasswordMatch = getPasswordMatchValue(systemUsersRecord);
+
+        if (isPasswordMatch) {
             final Set<String> roles = Set.of(systemUsersRecord.into(SYSTEM_USERS).getRoles());
             return SystemUserAuthentication.success(roles);
         }
 
         return SystemUserAuthentication.invalidPassword();
+    }
+
+    private static boolean getPasswordMatchValue(final Record systemUsersRecord) {
+        final String passwordMatchFieldName = "is_password_match";
+        return systemUsersRecord.get(passwordMatchFieldName) != null
+            && systemUsersRecord.get(passwordMatchFieldName, boolean.class);
     }
 }

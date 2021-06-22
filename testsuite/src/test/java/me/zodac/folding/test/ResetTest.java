@@ -205,18 +205,18 @@ class ResetTest {
         final CompetitionSummary resultAfterReset = TeamCompetitionStatsUtils.getStats();
         assertThat(resultAfterReset.getTotalPoints())
             .as("Expected no points overall: " + result)
-            .isEqualTo(0L);
+            .isZero();
 
         final TeamSummary firstTeamSummaryAfterReset = getTeamFromCompetition(resultAfterReset, firstTeam.getTeamName());
         final TeamSummary secondTeamSummaryAfterReset = getTeamFromCompetition(resultAfterReset, secondTeam.getTeamName());
 
         assertThat(firstTeamSummaryAfterReset.getTeamPoints())
             .as("Expected no points for team: " + firstTeamSummaryAfterReset)
-            .isEqualTo(0L);
+            .isZero();
 
         assertThat(secondTeamSummaryAfterReset.getTeamPoints())
             .as("Expected no points for team: " + secondTeamSummaryAfterReset)
-            .isEqualTo(0L);
+            .isZero();
 
         final UserSummary firstUserSummaryAfterReset = getActiveUserFromTeam(firstTeamSummaryAfterReset, firstUser.getDisplayName());
         final UserSummary secondUserSummaryAfterReset = getActiveUserFromTeam(firstTeamSummaryAfterReset, secondUser.getDisplayName());
@@ -224,14 +224,14 @@ class ResetTest {
 
         assertThat(firstUserSummaryAfterReset.getPoints())
             .as("Expected no points for user: " + firstUserSummaryAfterReset)
-            .isEqualTo(0L);
+            .isZero();
 
         assertThat(secondUserSummaryAfterReset.getPoints())
             .as("Expected no points for user: " + secondUserSummaryAfterReset)
-            .isEqualTo(0L);
+            .isZero();
 
         assertThat(thirdUserSummaryAfterReset.getPoints())
             .as("Expected no points for user: " + thirdUserSummaryAfterReset)
-            .isEqualTo(0L);
+            .isZero();
     }
 }

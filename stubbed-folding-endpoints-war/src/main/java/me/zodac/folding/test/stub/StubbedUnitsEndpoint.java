@@ -42,7 +42,7 @@ public class StubbedUnitsEndpoint {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final int NO_UNITS = 0;
 
-    private final transient Map<String, Integer> unitsByUserAndPasskey = new HashMap<>();
+    private final Map<String, Integer> unitsByUserAndPasskey = new HashMap<>();
 
     /**
      * Retrieves the units for a Folding@Home user.

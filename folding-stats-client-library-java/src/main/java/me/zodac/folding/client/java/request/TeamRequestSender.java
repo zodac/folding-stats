@@ -73,7 +73,10 @@ public final class TeamRequestSender {
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (final IOException | InterruptedException e) {
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException("Error sending HTTP request to get all teams", e);
+        } catch (final IOException e) {
             throw new FoldingRestException("Error sending HTTP request to get all teams", e);
         }
     }
@@ -117,7 +120,10 @@ public final class TeamRequestSender {
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (final IOException | InterruptedException e) {
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException("Error sending HTTP request to get team", e);
+        } catch (final IOException e) {
             throw new FoldingRestException("Error sending HTTP request to get team", e);
         }
     }
@@ -156,7 +162,10 @@ public final class TeamRequestSender {
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (final IOException | InterruptedException e) {
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException("Error sending HTTP request to create team", e);
+        } catch (final IOException e) {
             throw new FoldingRestException("Error sending HTTP request to create team", e);
         }
     }
@@ -196,7 +205,10 @@ public final class TeamRequestSender {
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (final IOException | InterruptedException e) {
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException("Error sending HTTP request to create batch of teams", e);
+        } catch (final IOException e) {
             throw new FoldingRestException("Error sending HTTP request to create batch of teams", e);
         }
     }
@@ -238,7 +250,10 @@ public final class TeamRequestSender {
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (final IOException | InterruptedException e) {
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException("Error sending HTTP request to update team", e);
+        } catch (final IOException e) {
             throw new FoldingRestException("Error sending HTTP request to update team", e);
         }
     }
@@ -277,7 +292,10 @@ public final class TeamRequestSender {
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
-        } catch (final IOException | InterruptedException e) {
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException("Error sending HTTP request to delete team", e);
+        } catch (final IOException e) {
             throw new FoldingRestException("Error sending HTTP request to delete team", e);
         }
     }

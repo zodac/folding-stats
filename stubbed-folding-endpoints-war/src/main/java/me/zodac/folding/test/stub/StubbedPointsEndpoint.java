@@ -42,7 +42,7 @@ public class StubbedPointsEndpoint {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final long NO_POINTS = 0L;
 
-    private final transient Map<String, Long> pointsByUserAndPasskey = new HashMap<>();
+    private final Map<String, Long> pointsByUserAndPasskey = new HashMap<>();
 
     /**
      * Retrieves the points for a Folding@Home user.

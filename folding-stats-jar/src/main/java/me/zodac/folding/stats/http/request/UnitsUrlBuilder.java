@@ -11,8 +11,8 @@ public class UnitsUrlBuilder {
     private static final String STATS_URL_ROOT = EnvironmentVariableUtils.get("STATS_URL_ROOT", "https://api2.foldingathome.org");
     private static final String UNITS_URL_ROOT = STATS_URL_ROOT + "/bonus";
 
-    private transient String user;
-    private transient String passkey;
+    private String user;
+    private String passkey;
 
     /**
      * Update the {@link UnitsUrlBuilder} with the 'user' for the URL.

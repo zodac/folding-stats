@@ -73,7 +73,10 @@ public final class UserRequestSender {
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (final IOException | InterruptedException e) {
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException("Error sending HTTP request to get all users", e);
+        } catch (final IOException e) {
             throw new FoldingRestException("Error sending HTTP request to get all users", e);
         }
     }
@@ -117,7 +120,10 @@ public final class UserRequestSender {
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (final IOException | InterruptedException e) {
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException("Error sending HTTP request to get user", e);
+        } catch (final IOException e) {
             throw new FoldingRestException("Error sending HTTP request to get user", e);
         }
     }
@@ -156,7 +162,10 @@ public final class UserRequestSender {
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (final IOException | InterruptedException e) {
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException("Error sending HTTP request to create user", e);
+        } catch (final IOException e) {
             throw new FoldingRestException("Error sending HTTP request to create user", e);
         }
     }
@@ -196,7 +205,10 @@ public final class UserRequestSender {
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (final IOException | InterruptedException e) {
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException("Error sending HTTP request to create batch of users", e);
+        } catch (final IOException e) {
             throw new FoldingRestException("Error sending HTTP request to create batch of users", e);
         }
     }
@@ -238,7 +250,10 @@ public final class UserRequestSender {
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (final IOException | InterruptedException e) {
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException("Error sending HTTP request to update user", e);
+        } catch (final IOException e) {
             throw new FoldingRestException("Error sending HTTP request to update user", e);
         }
     }
@@ -277,7 +292,10 @@ public final class UserRequestSender {
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
-        } catch (final IOException | InterruptedException e) {
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException("Error sending HTTP request to delete user", e);
+        } catch (final IOException e) {
             throw new FoldingRestException("Error sending HTTP request to delete user", e);
         }
     }

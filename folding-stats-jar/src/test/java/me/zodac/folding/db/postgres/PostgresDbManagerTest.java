@@ -270,7 +270,9 @@ class PostgresDbManagerTest {
         final Optional<OffsetStats> firstOffsetStats = POSTGRES_DB_MANAGER.getOffsetStats(userId);
         assertThat(firstOffsetStats)
             .isPresent();
-        assertThat(firstOffsetStats.get())
+
+        final OffsetStats firstOffsetStatsActual = firstOffsetStats.get();
+        assertThat(firstOffsetStatsActual)
             .isEqualTo(offsetStats);
 
         final OffsetStats overwriteOffsetStats = OffsetStats.create(500L, 5_000L, 25);
@@ -278,7 +280,9 @@ class PostgresDbManagerTest {
         final Optional<OffsetStats> secondOffsetStats = POSTGRES_DB_MANAGER.getOffsetStats(userId);
         assertThat(secondOffsetStats)
             .isPresent();
-        assertThat(secondOffsetStats.get())
+
+        final OffsetStats secondOffsetStatsActual = secondOffsetStats.get();
+        assertThat(secondOffsetStatsActual)
             .isEqualTo(overwriteOffsetStats);
 
         final OffsetStats additionalOffsetStats = OffsetStats.create(250L, 2_500L, 12);
@@ -292,7 +296,9 @@ class PostgresDbManagerTest {
         final Optional<OffsetStats> thirdOffsetStats = POSTGRES_DB_MANAGER.getOffsetStats(userId);
         assertThat(thirdOffsetStats)
             .isPresent();
-        assertThat(thirdOffsetStats.get())
+
+        final OffsetStats thirdOffsetStatsActual = thirdOffsetStats.get();
+        assertThat(thirdOffsetStatsActual)
             .isEqualTo(expectedOffsetStats);
 
         final int secondUserId = createUser().getId();
@@ -324,7 +330,9 @@ class PostgresDbManagerTest {
         final Optional<UserTcStats> retrievedUserTcStats = POSTGRES_DB_MANAGER.getHourlyTcStats(userId);
         assertThat(retrievedUserTcStats)
             .isPresent();
-        assertThat(retrievedUserTcStats.get())
+
+        final UserTcStats actual = retrievedUserTcStats.get();
+        assertThat(actual)
             .isEqualTo(userTcStats);
 
         assertThat(POSTGRES_DB_MANAGER.isAnyHourlyTcStats())

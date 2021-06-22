@@ -63,7 +63,10 @@ class LoginTest {
             assertThat(response.statusCode())
                 .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
-        } catch (final IOException | InterruptedException e) {
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException("Error sending HTTP request to login as admin", e);
+        } catch (final IOException e) {
             throw new FoldingRestException("Error sending HTTP request to login as admin", e);
         }
     }

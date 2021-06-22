@@ -10,7 +10,7 @@ public enum CacheControl {
      */
     NO_CACHE("no-cache");
 
-    private final String cacheControl;
+    private final String cacheControlValue;
 
     /**
      * Constructs a {@link CacheControl} with the header value as a {@link String}.
@@ -18,7 +18,7 @@ public enum CacheControl {
      * @param cacheControl the {@link CacheControl} value as a {@link String}
      */
     CacheControl(final String cacheControl) {
-        this.cacheControl = cacheControl;
+        cacheControlValue = cacheControl;
     }
 
     /**
@@ -27,6 +27,6 @@ public enum CacheControl {
      * @return the {@link CacheControl} value
      */
     public String cacheControl() {
-        return cacheControl;
+        return cacheControlValue;
     }
 }

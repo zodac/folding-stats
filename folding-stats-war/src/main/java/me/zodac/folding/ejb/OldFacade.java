@@ -1,5 +1,6 @@
 package me.zodac.folding.ejb;
 
+import java.math.BigDecimal;
 import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
@@ -64,7 +65,10 @@ public class OldFacade {
 
         final Collection<User> usersUsingThisHardware = businessLogic.getUsersWithHardware(updatedHardware);
 
-        final boolean isHardwareMultiplierChange = existingHardware.getMultiplier() != updatedHardware.getMultiplier();
+        // Using BigDecimal since equality checks with doubles can be imprecise
+        final BigDecimal existingMultiplier = BigDecimal.valueOf(existingHardware.getMultiplier());
+        final BigDecimal updatedMultiplier = BigDecimal.valueOf(updatedHardware.getMultiplier());
+        final boolean isHardwareMultiplierChange = !existingMultiplier.equals(updatedMultiplier);
 
         for (final User user : usersUsingThisHardware) {
             // All users are referencing the old hardware, rather than recreating them, just evict them from the cache

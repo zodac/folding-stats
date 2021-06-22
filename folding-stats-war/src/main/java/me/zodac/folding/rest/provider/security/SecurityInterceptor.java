@@ -1,14 +1,13 @@
 package me.zodac.folding.rest.provider.security;
 
 import static java.util.stream.Collectors.toSet;
+import static me.zodac.folding.api.utils.CollectionUtils.containsNoMatches;
 import static me.zodac.folding.rest.response.Responses.forbidden;
 import static me.zodac.folding.rest.response.Responses.unauthorized;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.security.DenyAll;
@@ -65,14 +64,10 @@ public class SecurityInterceptor implements ContainerRequestFilter {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Context
-    private transient ResourceInfo resourceInfo;
+    private ResourceInfo resourceInfo;
 
     @EJB
-    private transient OldFacade oldFacade;
-
-    private static <V> boolean containsNoMatches(final Collection<V> first, final Collection<V> second) {
-        return Collections.disjoint(first, second);
-    }
+    private OldFacade oldFacade;
 
     @Override
     public void filter(final ContainerRequestContext requestContext) {
@@ -80,6 +75,7 @@ public class SecurityInterceptor implements ContainerRequestFilter {
         try {
             validateRequest(requestContext);
         } catch (final Exception e) {
+            LOGGER.debug("Unexpected error validating REST request at '{}'", requestContext.getUriInfo().getAbsolutePath(), e);
             LOGGER.warn("Unexpected error validating REST request at '{}'", requestContext.getUriInfo().getAbsolutePath());
         }
     }

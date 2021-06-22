@@ -25,6 +25,7 @@
         <exclude name="OnlyOneReturn"/>
         <!-- I prefer to be explicit in TRY-WITH-RESOURCES blocks -->
         <!-- Would be nice to keep the check for other cases (interfaces/annotations), but not possible -->
+        <!-- Caught by SonarQube analysis -->
         <exclude name="UnnecessaryModifier"/>
 
         <!-- Issues for a style guide -->
@@ -34,6 +35,7 @@
         <exclude name="ShortMethodName"/>
         <exclude name="ShortVariable"/>
         <exclude name="TooManyStaticImports"/>
+        <exclude name="UselessParentheses"/>
     </rule>
     <!-- I don't want to stick to the convention for unit tests, reasonable for production methods though -->
     <rule ref="category/java/codestyle.xml/MethodNamingConventions">
@@ -52,6 +54,8 @@
         <exclude name="AvoidCatchingGenericException"/>
         <!-- TODO: [zodac] Look into re-adding this, maybe with a higher threshold -->
         <exclude name="CyclomaticComplexity"/>
+        <!-- A little hit & miss -->
+        <exclude name="GodClass"/>
         <!-- I like chaining methods... -->
         <exclude name="LawOfDemeter"/>
         <!-- Not necessary -->
@@ -64,7 +68,6 @@
         <exclude name="ExcessiveParameterList"/>
         <exclude name="TooManyMethods"/>
         <exclude name="UseObjectForClearerAPI"/>
-        <!-- TODO: [zodac] Split OldFacade into BusinessLogic/Storage, then disable this rule -->
         <exclude name="ExcessivePublicCount"/>
     </rule>
     <!-- Default threshold is a bit high for some of our validation flows -->
@@ -80,6 +83,10 @@
     <rule ref="category/java/errorprone.xml">
         <!-- Don't agree, not worth it -->
         <exclude name="AvoidDuplicateLiterals"/>
+
+        <!-- Quite a few false positives -->
+        <!-- Caught by SonarQube analysis -->
+        <exclude name="BeanMembersShouldSerialize"/>
     </rule>
 
     <rule ref="category/java/multithreading.xml">

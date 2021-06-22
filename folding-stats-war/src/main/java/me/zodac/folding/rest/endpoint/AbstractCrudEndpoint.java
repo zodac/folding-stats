@@ -46,7 +46,7 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
     private static final int CACHE_EXPIRATION_TIME = untilNextMonthUtc(ChronoUnit.SECONDS);
 
     @Context
-    protected transient UriInfo uriContext;
+    protected UriInfo uriContext;
 
     @EJB
     protected BusinessLogic businessLogic;
@@ -75,7 +75,8 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
     protected abstract void deleteElement(final O element);
 
     protected Response create(final I inputRequest) {
-        getLogger().debug("POST request received to create {} at '{}' with request: {}", elementType(), uriContext.getAbsolutePath(), inputRequest);
+        getLogger().debug("POST request received to create {} at '{}' with request: {}", this::elementType, uriContext::getAbsolutePath,
+            () -> inputRequest);
 
         if (SystemStateManager.current().isWriteBlocked()) {
             getLogger().warn("System state {} does not allow write requests", SystemStateManager.current());
@@ -110,8 +111,8 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
     }
 
     protected Response createBatchOf(final Collection<I> batchOfInputRequests) {
-        getLogger().debug("POST request received to create {} {}s at '{}' with request: {}", batchOfInputRequests.size(), elementType(),
-            uriContext.getAbsolutePath(), batchOfInputRequests);
+        getLogger().debug("POST request received to create {} {}s at '{}' with request: {}", batchOfInputRequests::size, this::elementType,
+            uriContext::getAbsolutePath, () -> batchOfInputRequests);
 
         if (SystemStateManager.current().isWriteBlocked()) {
             getLogger().warn("System state {} does not allow write requests", SystemStateManager.current());
@@ -163,13 +164,13 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
             return ok(batchCreateResponse);
         }
 
-        getLogger().debug("{} {}s successfully created", successful.size(), elementType());
+        getLogger().debug("{} {}s successfully created", successful::size, this::elementType);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
         return ok(batchCreateResponse.getSuccessful());
     }
 
     protected Response getAll(final Request request) {
-        getLogger().debug("GET request received for all {}s at '{}'", elementType(), uriContext.getAbsolutePath());
+        getLogger().debug("GET request received for all {}s at '{}'", this::elementType, uriContext::getAbsolutePath);
 
         if (SystemStateManager.current().isReadBlocked()) {
             getLogger().warn("System state {} does not allow read requests", SystemStateManager.current());
@@ -200,7 +201,7 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
     }
 
     protected Response getById(final String elementId, final Request request) {
-        getLogger().debug("GET request for {} received at '{}'", elementType(), uriContext.getAbsolutePath());
+        getLogger().debug("GET request for {} received at '{}'", this::elementType, uriContext::getAbsolutePath);
 
         if (SystemStateManager.current().isReadBlocked()) {
             getLogger().warn("System state {} does not allow read requests", SystemStateManager.current());
@@ -249,7 +250,7 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
 
     @SuppressWarnings("PMD.NPathComplexity") // Better than breaking into smaller functions
     protected Response updateById(final String elementId, final I inputRequest) {
-        getLogger().debug("PUT request for {} received at '{}'", elementType(), uriContext.getAbsolutePath());
+        getLogger().debug("PUT request for {} received at '{}'", this::elementType, uriContext::getAbsolutePath);
 
         if (SystemStateManager.current().isWriteBlocked()) {
             getLogger().warn("System state {} does not allow write requests", SystemStateManager.current());
@@ -310,7 +311,7 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
     }
 
     protected Response deleteById(final String elementId) {
-        getLogger().debug("DELETE request for {} received at '{}'", elementType(), uriContext.getAbsolutePath());
+        getLogger().debug("DELETE request for {} received at '{}'", this::elementType, uriContext::getAbsolutePath);
 
         if (SystemStateManager.current().isWriteBlocked()) {
             getLogger().warn("System state {} does not allow write requests", SystemStateManager.current());

@@ -74,6 +74,8 @@
         <!-- Using own local SonarQube, can't guarantee availability or credentials -->
         <sonar.host.url>http://192.168.99.100:9005</sonar.host.url>
         <sonar.login>6d6bed1c5fec1efbc656f4bcaf8eee6e8823db19</sonar.login>
+        <!-- Exclude generated files -->
+        <sonar.exclusions>**/gen/**/*</sonar.exclusions>
 
         <!-- Linter Plugin Versions -->
         <maven-checkstyle-plugin.version>3.1.2</maven-checkstyle-plugin.version>

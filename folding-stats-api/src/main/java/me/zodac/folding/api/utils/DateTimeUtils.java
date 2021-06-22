@@ -8,6 +8,7 @@ import java.time.OffsetDateTime;
 import java.time.Year;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.Locale;
 
 /**
@@ -27,9 +28,9 @@ public final class DateTimeUtils {
      */
     public static int untilNextMonthUtc(final ChronoUnit chronoUnit) {
         final int currentMonth = currentUtcMonth().getValue();
-        final int nextMonth = currentMonth == 12 ? 1 : currentMonth + 1;
+        final int nextMonth = currentMonth == 12 ? 1 : (currentMonth + 1);
         final int currentYear = currentUtcYear().getValue();
-        final int nextMonthYear = currentMonth == 12 ? currentYear + 1 : currentYear;
+        final int nextMonthYear = currentMonth == 12 ? (currentYear + 1) : currentYear;
 
         final String nextMonthAsDate = String.format("%s-%02d-01T00:00:00Z", nextMonthYear, nextMonth);
 
@@ -98,11 +99,11 @@ public final class DateTimeUtils {
     /**
      * Convert the given {@link Timestamp} into a {@link LocalDateTime} in {@link ZoneOffset#UTC}.
      *
-     * @param timestamp the {@link Timestamp} to convert
+     * @param date the {@link Date} to convert
      * @return the {@link ZoneOffset#UTC} {@link LocalDateTime}
      */
-    public static LocalDateTime toUtcLocalDateTime(final Timestamp timestamp) {
-        return timestamp
+    public static LocalDateTime toUtcLocalDateTime(final Date date) {
+        return date
             .toInstant()
             .atOffset(ZoneOffset.UTC)
             .toLocalDateTime();

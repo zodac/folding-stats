@@ -31,8 +31,8 @@ public final class UserValidator {
     private static final UrlValidator URL_VALIDATOR = new UrlValidator();
     private static final int EXPECTED_PASSKEY_LENGTH = 32;
 
-    private final transient BusinessLogic businessLogic;
-    private final transient FoldingStatsRetriever foldingStatsRetriever;
+    private final BusinessLogic businessLogic;
+    private final FoldingStatsRetriever foldingStatsRetriever;
 
     public static UserValidator createValidator(final BusinessLogic businessLogic, final FoldingStatsRetriever foldingStatsRetriever) {
         return new UserValidator(businessLogic, foldingStatsRetriever);

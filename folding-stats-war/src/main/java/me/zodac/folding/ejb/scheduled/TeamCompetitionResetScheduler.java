@@ -38,13 +38,21 @@ public class TeamCompetitionResetScheduler {
     private static final boolean IS_MONTHLY_RESET_ENABLED = Boolean.parseBoolean(EnvironmentVariableUtils.get("ENABLE_STATS_MONTHLY_RESET", "false"));
 
     @EJB
-    private transient BusinessLogic businessLogic;
+    private BusinessLogic businessLogic;
 
     @EJB
-    private transient OldFacade oldFacade;
+    private OldFacade oldFacade;
 
     @EJB
-    private transient TeamCompetitionStatsScheduler teamCompetitionStatsScheduler;
+    private TeamCompetitionStatsScheduler teamCompetitionStatsScheduler;
+
+    // TODO: [zodac] Go through Storage/BL, not direct to caches
+    private static void resetCaches() {
+        LOGGER.info("Resetting caches");
+        TcStatsCache.getInstance().removeAll();
+        TotalStatsCache.getInstance().removeAll();
+        RetiredTcStatsCache.getInstance().removeAll();
+    }
 
     /**
      * On system startup, checks if the reset is enabled, and logs a warning if it is not.
@@ -110,16 +118,9 @@ public class TeamCompetitionResetScheduler {
             resetCaches();
             teamCompetitionStatsScheduler.manualTeamCompetitionStatsParsing(ExecutionType.SYNCHRONOUS);
         } catch (final Exception e) {
-            LOGGER.warn("Unexpected error manually resetting TC stats");
+            LOGGER.debug("Unexpected error manually resetting TC stats", e);
+            LOGGER.warn("Unexpected error manually resetting TC stats"); // TODO: [zodac] Should be logging exception message too
         }
-    }
-
-    // TODO: [zodac] Go through Storage/BL, not direct to caches
-    private void resetCaches() {
-        LOGGER.info("Resetting caches");
-        TcStatsCache.getInstance().removeAll();
-        TotalStatsCache.getInstance().removeAll();
-        RetiredTcStatsCache.getInstance().removeAll();
     }
 
     private void resetStats(final Collection<User> usersToReset) {

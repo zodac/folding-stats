@@ -38,7 +38,7 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @EJB
-    private transient TeamCompetitionStatsScheduler teamCompetitionStatsScheduler;
+    private TeamCompetitionStatsScheduler teamCompetitionStatsScheduler;
 
     @POST
     @RolesAllowed("admin")

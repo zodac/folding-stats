@@ -10,7 +10,7 @@ public enum ContentType {
      */
     JSON("application/json");
 
-    private final String contentType;
+    private final String contentTypeValue;
 
     /**
      * Constructs a {@link ContentType} with the header value as a {@link String}.
@@ -18,7 +18,7 @@ public enum ContentType {
      * @param contentType the {@link ContentType} value as a {@link String}
      */
     ContentType(final String contentType) {
-        this.contentType = contentType;
+        contentTypeValue = contentType;
     }
 
     /**
@@ -27,6 +27,6 @@ public enum ContentType {
      * @return the {@link ContentType} value
      */
     public String contentType() {
-        return contentType;
+        return contentTypeValue;
     }
 }

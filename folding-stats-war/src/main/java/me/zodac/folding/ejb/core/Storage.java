@@ -30,9 +30,9 @@ final class Storage {
     private static final DbManager DB_MANAGER = DbManagerRetriever.get();
     private static final Storage INSTANCE = new Storage();
 
-    private final transient HardwareCache hardwareCache = HardwareCache.getInstance();
-    private final transient UserCache userCache = UserCache.getInstance();
-    private final transient TeamCache teamCache = TeamCache.getInstance();
+    private final HardwareCache hardwareCache = HardwareCache.getInstance();
+    private final UserCache userCache = UserCache.getInstance();
+    private final TeamCache teamCache = TeamCache.getInstance();
 
     private Storage() {
 

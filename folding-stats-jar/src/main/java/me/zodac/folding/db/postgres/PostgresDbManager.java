@@ -32,11 +32,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import me.zodac.folding.api.SystemUserAuthentication;
-import me.zodac.folding.api.db.DbAuthenticationManager;
 import me.zodac.folding.api.db.DbConnectionPool;
-import me.zodac.folding.api.db.DbCrudManager;
 import me.zodac.folding.api.db.DbManager;
-import me.zodac.folding.api.db.DbStatsManager;
 import me.zodac.folding.api.exception.DatabaseConnectionException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
@@ -62,12 +59,12 @@ import org.jooq.impl.DSL;
  * <p>
  * Uses <b>jOOQ</b> for code generation for the DB tables/schemas, rather than direct SQL queries. See existing methods for examples.
  */
-public final class PostgresDbManager implements DbManager, DbAuthenticationManager, DbCrudManager, DbStatsManager {
+public final class PostgresDbManager implements DbManager {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final int SINGLE_RESULT = 1;
 
-    private transient final DbConnectionPool dbConnectionPool;
+    private final DbConnectionPool dbConnectionPool;
 
     private PostgresDbManager(final DbConnectionPool dbConnectionPool) {
         this.dbConnectionPool = dbConnectionPool;
@@ -85,7 +82,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
     @Override
     public Hardware createHardware(final Hardware hardware) {
-        return executeQuery((queryContext) -> {
+        return executeQuery(queryContext -> {
             final var query = queryContext
                 .insertInto(HARDWARE)
                 .columns(HARDWARE.HARDWARE_NAME, HARDWARE.DISPLAY_NAME, HARDWARE.OPERATING_SYSTEM, HARDWARE.MULTIPLIER)
@@ -102,7 +99,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
     @Override
     public Collection<Hardware> getAllHardware() {
-        return executeQuery((queryContext) -> {
+        return executeQuery(queryContext -> {
             final var query = queryContext
                 .select()
                 .from(HARDWARE)
@@ -120,7 +117,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
     @Override
     public Optional<Hardware> getHardware(final int hardwareId) {
-        return executeQuery((queryContext) -> {
+        return executeQuery(queryContext -> {
             final var query = queryContext
                 .select()
                 .from(HARDWARE)
@@ -138,7 +135,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
     @Override
     public void updateHardware(final Hardware hardware) {
-        executeQuery((queryContext) -> {
+        executeQuery(queryContext -> {
             final var query = queryContext
                 .update(HARDWARE)
                 .set(HARDWARE.HARDWARE_NAME, hardware.getHardwareName())
@@ -154,7 +151,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
     @Override
     public void deleteHardware(final int hardwareId) {
-        executeQuery((queryContext) -> {
+        executeQuery(queryContext -> {
             final var query = queryContext
                 .deleteFrom(HARDWARE)
                 .where(HARDWARE.HARDWARE_ID.equal(hardwareId));
@@ -166,7 +163,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
     @Override
     public Team createTeam(final Team team) {
-        return executeQuery((queryContext) -> {
+        return executeQuery(queryContext -> {
             final var query = queryContext
                 .insertInto(TEAMS)
                 .columns(TEAMS.TEAM_NAME, TEAMS.TEAM_DESCRIPTION, TEAMS.FORUM_LINK)
@@ -182,7 +179,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
     @Override
     public Collection<Team> getAllTeams() {
-        return executeQuery((queryContext) -> {
+        return executeQuery(queryContext -> {
             final var query = queryContext
                 .select()
                 .from(TEAMS)
@@ -200,7 +197,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
     @Override
     public Optional<Team> getTeam(final int teamId) {
-        return executeQuery((queryContext) -> {
+        return executeQuery(queryContext -> {
             final var query = queryContext
                 .select()
                 .from(TEAMS)
@@ -218,7 +215,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
     @Override
     public void updateTeam(final Team team) {
-        executeQuery((queryContext) -> {
+        executeQuery(queryContext -> {
             final var query = queryContext
                 .update(TEAMS)
                 .set(TEAMS.TEAM_NAME, team.getTeamName())
@@ -234,7 +231,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     @Override
     public void deleteTeam(final int teamId) {
         LOGGER.debug("Deleting team {} from DB", teamId);
-        executeQuery((queryContext) -> {
+        executeQuery(queryContext -> {
             final var query = queryContext
                 .deleteFrom(TEAMS)
                 .where(TEAMS.TEAM_ID.equal(teamId));
@@ -246,7 +243,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
     @Override
     public User createUser(final User user) {
-        return executeQuery((queryContext) -> {
+        return executeQuery(queryContext -> {
             final var query = queryContext
                 .insertInto(USERS)
                 .columns(USERS.FOLDING_USERNAME, USERS.DISPLAY_USERNAME, USERS.PASSKEY, USERS.CATEGORY, USERS.PROFILE_LINK, USERS.LIVE_STATS_LINK,
@@ -264,7 +261,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
     @Override
     public Collection<User> getAllUsers() {
-        return executeQuery((queryContext) -> {
+        return executeQuery(queryContext -> {
             final var query = queryContext
                 .select()
                 .from(USERS)
@@ -285,7 +282,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
     @Override
     public Optional<User> getUser(final int userId) {
-        return executeQuery((queryContext) -> {
+        return executeQuery(queryContext -> {
             final var query = queryContext
                 .select()
                 .from(USERS)
@@ -306,7 +303,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
     @Override
     public void updateUser(final User user) {
-        executeQuery((queryContext) -> {
+        executeQuery(queryContext -> {
             final var query = queryContext
                 .update(USERS)
                 .set(USERS.FOLDING_USERNAME, user.getFoldingUserName())
@@ -327,7 +324,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
     @Override
     public void deleteUser(final int userId) {
-        executeQuery((queryContext) -> {
+        executeQuery(queryContext -> {
             final var query = queryContext
                 .deleteFrom(USERS)
                 .where(USERS.USER_ID.equal(userId));
@@ -341,7 +338,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     public void persistHourlyTcStats(final UserTcStats userTcStats) {
         LOGGER.debug("Inserting TC stats for user ID: {}", userTcStats::getUserId);
 
-        executeQuery((queryContext) -> {
+        executeQuery(queryContext -> {
             final var query = queryContext
                 .insertInto(USER_TC_STATS_HOURLY)
                 .columns(USER_TC_STATS_HOURLY.USER_ID, USER_TC_STATS_HOURLY.UTC_TIMESTAMP, USER_TC_STATS_HOURLY.TC_POINTS,
@@ -358,7 +355,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     public Optional<UserTcStats> getHourlyTcStats(final int userId) {
         LOGGER.debug("Getting current TC stats for user {}", userId);
 
-        return executeQuery((queryContext) -> {
+        return executeQuery(queryContext -> {
             final var query = queryContext
                 .select(USER_TC_STATS_HOURLY.USER_ID, USER_TC_STATS_HOURLY.UTC_TIMESTAMP, USER_TC_STATS_HOURLY.TC_POINTS,
                     USER_TC_STATS_HOURLY.TC_POINTS_MULTIPLIED, USER_TC_STATS_HOURLY.TC_UNITS)
@@ -381,7 +378,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     public boolean isAnyHourlyTcStats() {
         LOGGER.debug("Checking if any TC stats exist in the DB");
 
-        return executeQuery((queryContext) -> {
+        return executeQuery(queryContext -> {
             final var query = queryContext
                 .selectCount()
                 .from(USER_TC_STATS_HOURLY);
@@ -394,7 +391,8 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
     @Override
     public Collection<HistoricStats> getHistoricStatsHourly(final int userId, final int day, final Month month, final Year year) {
-        LOGGER.debug("Getting historic hourly user TC stats for {}/{}/{} for user {}", year, DateTimeUtils.formatMonth(month), day, userId);
+        LOGGER.debug("Getting historic hourly user TC stats for {}/{}/{} for user {}", () -> year, () -> DateTimeUtils.formatMonth(month), () -> day,
+            () -> userId);
 
         final String selectSqlStatement = "SELECT MAX(utc_timestamp) AS hourly_timestamp, " +
             "COALESCE(MAX(tc_points) - LAG(MAX(tc_points)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points, " +
@@ -455,9 +453,9 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     }
 
     private UserTcStats getCurrentDayFirstHourTcStats(final int userId, final int day, final Month month, final Year year) {
-        LOGGER.debug("Getting current day's first hour TC stats for user {} on {}/{}/{}", userId, year.getValue(), month.getValue(), day);
+        LOGGER.debug("Getting current day's first hour TC stats for user {} on {}/{}/{}", () -> userId, year::getValue, month::getValue, () -> day);
 
-        return executeQuery((queryContext) -> {
+        return executeQuery(queryContext -> {
             final LocalDateTime start = DateTimeUtils.getLocalDateTimeOf(year, month, day, 0, 0, 0);
             final LocalDateTime end = DateTimeUtils.getLocalDateTimeOf(year, month, day, 0, 59, 59);
 
@@ -488,9 +486,9 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     }
 
     private UserTcStats getPreviousDayLastHourTcStats(final int userId, final int day, final Month month, final Year year) {
-        LOGGER.debug("Getting previous day's last hour TC stats for user {} on {}/{}/{}", userId, year.getValue(), month.getValue(), day);
+        LOGGER.debug("Getting previous day's last hour TC stats for user {} on {}/{}/{}", () -> userId, year::getValue, month::getValue, () -> day);
 
-        return executeQuery((queryContext) -> {
+        return executeQuery(queryContext -> {
             final LocalDateTime start = DateTimeUtils.getLocalDateTimeOf(year, month, day, 23, 0, 0);
             final LocalDateTime end = DateTimeUtils.getLocalDateTimeOf(year, month, day, 23, 59, 59);
 
@@ -540,7 +538,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
             // If no stats in previous day (meaning we are getting historic stats for the first day available), we need to remove the initial points from the current day's points
             final UserStats initialStats = getInitialStats(userId).orElse(UserStats.empty());
             LOGGER.debug("Removing initial stats from current day's first hour stats: {} - {}", firstHourTcStatsCurrentDay, initialStats);
-            
+
             // Since we didn't get any previous day's stats, we don't need to worry about the hardware multiplier having been changed
             // As a result, we will get the user's current hardware and use that multiplier
             final Optional<User> optionalUser = getUser(userId);
@@ -577,7 +575,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
     @Override
     public Collection<HistoricStats> getHistoricStatsDaily(final int userId, final Month month, final Year year) {
-        LOGGER.debug("Getting historic daily user TC stats for {}/{} for user {}", DateTimeUtils.formatMonth(month), year, userId);
+        LOGGER.debug("Getting historic daily user TC stats for {}/{} for user {}", () -> DateTimeUtils.formatMonth(month), () -> year, () -> userId);
 
         final String selectSqlStatement = "SELECT utc_timestamp::DATE AS daily_timestamp, " +
             "COALESCE(MAX(tc_points) - LAG(MAX(tc_points)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points, " +
@@ -644,7 +642,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     public Collection<HistoricStats> getHistoricStatsMonthly(final int userId, final Year year) {
         LOGGER.debug("Getting historic monthly user TC stats for {} for user {}", year, userId);
 
-        return executeQuery((queryContext) -> {
+        return executeQuery(queryContext -> {
             final var query = queryContext
                 .select(
                     max(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).as(USER_TC_STATS_HOURLY.UTC_TIMESTAMP.getName()),
@@ -670,7 +668,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     private UserTcStats getTcStatsForFirstDayOfMonth(final LocalDateTime localDateTime, final int userId) {
         LOGGER.debug("Getting TC stats for user {} on {}", userId, localDateTime);
 
-        return executeQuery((queryContext) -> {
+        return executeQuery(queryContext -> {
             final var query = queryContext
                 .select()
                 .from(USER_TC_STATS_HOURLY)
@@ -694,9 +692,9 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
     @Override
     public void persistInitialStats(final UserStats userStats) {
-        LOGGER.debug("Inserting initial stats for user {} to DB", userStats.getUserId());
+        LOGGER.debug("Inserting initial stats for user {} to DB", userStats::getUserId);
 
-        executeQuery((queryContext) -> {
+        executeQuery(queryContext -> {
             final var query = queryContext
                 .insertInto(USER_INITIAL_STATS)
                 .columns(USER_INITIAL_STATS.USER_ID, USER_INITIAL_STATS.UTC_TIMESTAMP, USER_INITIAL_STATS.INITIAL_POINTS,
@@ -713,7 +711,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     public Optional<UserStats> getInitialStats(final int userId) {
         LOGGER.debug("Getting initial stats for user ID: {}", userId);
 
-        return executeQuery((queryContext) -> {
+        return executeQuery(queryContext -> {
             final var query = queryContext
                 .select()
                 .from(USER_INITIAL_STATS)
@@ -733,9 +731,9 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
 
     @Override
     public void persistTotalStats(final UserStats userStats) {
-        LOGGER.debug("Inserting total stats for user ID {} to DB", userStats.getUserId());
+        LOGGER.debug("Inserting total stats for user ID {} to DB", userStats::getUserId);
 
-        executeQuery((queryContext) -> {
+        executeQuery(queryContext -> {
             final var query = queryContext
                 .insertInto(USER_TOTAL_STATS)
                 .columns(USER_TOTAL_STATS.USER_ID, USER_TOTAL_STATS.UTC_TIMESTAMP, USER_TOTAL_STATS.TOTAL_POINTS, USER_TOTAL_STATS.TOTAL_UNITS)
@@ -751,7 +749,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     public Optional<UserStats> getTotalStats(final int userId) {
         LOGGER.debug("Getting total stats for user ID: {}", userId);
 
-        return executeQuery((queryContext) -> {
+        return executeQuery(queryContext -> {
             final var query = queryContext
                 .select()
                 .from(USER_TOTAL_STATS)
@@ -773,7 +771,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     public void addOffsetStats(final int userId, final OffsetStats offsetStats) {
         LOGGER.debug("Adding offset stats for user {}", userId);
 
-        executeQuery((queryContext) -> {
+        executeQuery(queryContext -> {
             final LocalDateTime currentUtcLocalDateTime = DateTimeUtils.toUtcLocalDateTime(DateTimeUtils.currentUtcTimestamp());
 
             final var query = queryContext
@@ -798,7 +796,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     public Optional<OffsetStats> addOrUpdateOffsetStats(final int userId, final OffsetStats offsetStats) {
         LOGGER.debug("Adding/updating offset stats for user {}", userId);
 
-        return executeQuery((queryContext) -> {
+        return executeQuery(queryContext -> {
             final LocalDateTime currentUtcLocalDateTime = DateTimeUtils.toUtcLocalDateTime(DateTimeUtils.currentUtcTimestamp());
 
             final var query = queryContext
@@ -829,7 +827,8 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     @Override
     public Optional<OffsetStats> getOffsetStats(final int userId) {
         LOGGER.debug("Getting offset stats for user ID: {}", userId);
-        return executeQuery((queryContext) -> {
+
+        return executeQuery(queryContext -> {
             final var query = queryContext
                 .select(USER_OFFSET_TC_STATS.OFFSET_POINTS, USER_OFFSET_TC_STATS.OFFSET_MULTIPLIED_POINTS, USER_OFFSET_TC_STATS.OFFSET_UNITS)
                 .from(USER_OFFSET_TC_STATS)
@@ -850,7 +849,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     public void clearAllOffsetStats() {
         LOGGER.debug("Clearing offset stats for all users");
 
-        executeQuery((queryContext) -> {
+        executeQuery(queryContext -> {
             final var query = queryContext
                 .deleteFrom(USER_OFFSET_TC_STATS);
             LOGGER.debug("Executing SQL: '{}'", query);
@@ -863,7 +862,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     public int persistRetiredUserStats(final int teamId, final int userId, final String displayUserName, final UserTcStats retiredUserStats) {
         LOGGER.debug("Persisting retired user ID {} for team ID {}", userId, teamId);
 
-        return executeQuery((queryContext) -> {
+        return executeQuery(queryContext -> {
             final LocalDateTime currentUtcLocalDateTime = DateTimeUtils.toUtcLocalDateTime(DateTimeUtils.currentUtcTimestamp());
 
             final var query = queryContext
@@ -895,7 +894,8 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     @Override
     public Collection<RetiredUserTcStats> getRetiredUserStatsForTeam(final Team team) {
         LOGGER.debug("Getting retired user stats for team with ID: {}", team::getId);
-        return executeQuery((queryContext) -> {
+
+        return executeQuery(queryContext -> {
             final var query = queryContext
                 .select()
                 .from(RETIRED_USER_STATS)
@@ -916,7 +916,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     public void deleteRetiredUserStats() {
         LOGGER.debug("Deleting all retired users");
 
-        executeQuery((queryContext) -> {
+        executeQuery(queryContext -> {
             final var query = queryContext
                 .deleteFrom(RETIRED_USER_STATS);
             LOGGER.debug("Executing SQL: '{}'", query);
@@ -929,7 +929,7 @@ public final class PostgresDbManager implements DbManager, DbAuthenticationManag
     public SystemUserAuthentication authenticateSystemUser(final String userName, final String password) {
         LOGGER.debug("Checking if supplied user name '{}' and password is valid user, then returning roles", userName);
 
-        return executeQuery((queryContext) -> {
+        return executeQuery(queryContext -> {
             final var query = queryContext
                 .select(
                     field(crypt(password, SYSTEM_USERS.USER_PASSWORD_HASH.getValue(

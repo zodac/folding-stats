@@ -609,7 +609,7 @@ class TeamTest {
         assertThat(actual)
             .as("Empty optional value should not be returned: " + response.body())
             .extracting("forumLink")
-            .isEqualTo(null);
+            .isNull();
     }
 
     @Test
@@ -637,6 +637,6 @@ class TeamTest {
         assertThat(actual)
             .as("Empty optional value should not be returned: " + response.body())
             .extracting("forumLink")
-            .isEqualTo(null);
+            .isNull();
     }
 }

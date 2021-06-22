@@ -63,25 +63,25 @@ public class TeamCompetitionStatsEndpoint {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Context
-    private transient UriInfo uriContext;
+    private UriInfo uriContext;
 
     @EJB
-    private transient BusinessLogic businessLogic;
+    private BusinessLogic businessLogic;
 
     @EJB
-    private transient OldFacade oldFacade;
+    private OldFacade oldFacade;
 
     @EJB
-    private transient CompetitionResultGenerator competitionResultGenerator;
+    private CompetitionResultGenerator competitionResultGenerator;
 
     @EJB
-    private transient TeamCompetitionResetScheduler teamCompetitionResetScheduler;
+    private TeamCompetitionResetScheduler teamCompetitionResetScheduler;
 
     @EJB
-    private transient TeamCompetitionStatsScheduler teamCompetitionStatsScheduler;
+    private TeamCompetitionStatsScheduler teamCompetitionStatsScheduler;
 
     @EJB
-    private transient UserTeamCompetitionStatsParser userTeamCompetitionStatsParser;
+    private UserTeamCompetitionStatsParser userTeamCompetitionStatsParser;
 
     @GET
     @PermitAll
@@ -192,7 +192,9 @@ public class TeamCompetitionStatsEndpoint {
             }
             final User user = optionalUser.get();
 
-            final OffsetStats offsetStatsToUse = getValidUserStatsOffset(user, offsetStats);
+            final Hardware hardware = user.getHardware();
+            final OffsetStats offsetStatsToUse = OffsetStats.updateWithHardwareMultiplier(offsetStats, hardware.getMultiplier());
+
             oldFacade.addOrUpdateOffsetStats(parsedId, offsetStatsToUse);
             SystemStateManager.next(SystemState.UPDATING_STATS);
             userTeamCompetitionStatsParser.parseTcStatsForUserAndWait(user);
@@ -202,11 +204,6 @@ public class TeamCompetitionStatsEndpoint {
             LOGGER.error("Unexpected error updating user with ID: {}", userId, e);
             return serverError();
         }
-    }
-
-    private OffsetStats getValidUserStatsOffset(final User user, final OffsetStats offsetStats) {
-        final Hardware hardware = user.getHardware();
-        return OffsetStats.updateWithHardwareMultiplier(offsetStats, hardware.getMultiplier());
     }
 
     @GET

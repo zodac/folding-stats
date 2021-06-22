@@ -665,7 +665,7 @@ class UserTest {
         assertThat(actual)
             .as("Empty optional value should not be returned: " + actual)
             .extracting("liveStatsLink")
-            .isEqualTo(null);
+            .isNull();
     }
 
     @Test
@@ -694,7 +694,7 @@ class UserTest {
         assertThat(actual)
             .as("Empty optional value should not be returned: " + response.body())
             .extracting("liveStatsLink")
-            .isEqualTo(null);
+            .isNull();
     }
 
     // TODO: [zodac] Category and captain checks can be done in UserValidatorTest class?

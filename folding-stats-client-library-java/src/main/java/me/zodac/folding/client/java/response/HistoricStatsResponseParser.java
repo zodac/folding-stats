@@ -13,7 +13,7 @@ import me.zodac.folding.rest.api.tc.historic.HistoricStats;
  * Utility class used to parse a {@link HttpResponse} returned from {@link me.zodac.folding.client.java.request.HistoricStatsRequestSender}.
  */
 public final class HistoricStatsResponseParser {
-    
+
     private HistoricStatsResponseParser() {
 
     }
@@ -26,9 +26,7 @@ public final class HistoricStatsResponseParser {
      * @return the retrieved {@link HistoricStats}
      */
     public static Collection<HistoricStats> getHourlyUserStats(final HttpResponse<String> response) {
-        final Type collectionType = new TypeToken<Collection<HistoricStats>>() {
-        }.getType();
-        return RestUtilConstants.GSON.fromJson(response.body(), collectionType);
+        return convertHistoricStats(response.body());
     }
 
     /**
@@ -39,9 +37,7 @@ public final class HistoricStatsResponseParser {
      * @return the retrieved {@link HistoricStats}
      */
     public static Collection<HistoricStats> getDailyUserStats(final HttpResponse<String> response) {
-        final Type collectionType = new TypeToken<Collection<HistoricStats>>() {
-        }.getType();
-        return RestUtilConstants.GSON.fromJson(response.body(), collectionType);
+        return convertHistoricStats(response.body());
     }
 
     /**
@@ -52,9 +48,7 @@ public final class HistoricStatsResponseParser {
      * @return the retrieved {@link HistoricStats}
      */
     public static Collection<HistoricStats> getMonthlyUserStats(final HttpResponse<String> response) {
-        final Type collectionType = new TypeToken<Collection<HistoricStats>>() {
-        }.getType();
-        return RestUtilConstants.GSON.fromJson(response.body(), collectionType);
+        return convertHistoricStats(response.body());
     }
 
     /**
@@ -65,9 +59,7 @@ public final class HistoricStatsResponseParser {
      * @return the retrieved {@link HistoricStats}
      */
     public static Collection<HistoricStats> getHourlyTeamStats(final HttpResponse<String> response) {
-        final Type collectionType = new TypeToken<Collection<HistoricStats>>() {
-        }.getType();
-        return RestUtilConstants.GSON.fromJson(response.body(), collectionType);
+        return convertHistoricStats(response.body());
     }
 
     /**
@@ -78,9 +70,7 @@ public final class HistoricStatsResponseParser {
      * @return the retrieved {@link HistoricStats}
      */
     public static Collection<HistoricStats> getDailyTeamStats(final HttpResponse<String> response) {
-        final Type collectionType = new TypeToken<Collection<HistoricStats>>() {
-        }.getType();
-        return RestUtilConstants.GSON.fromJson(response.body(), collectionType);
+        return convertHistoricStats(response.body());
     }
 
     /**
@@ -91,8 +81,12 @@ public final class HistoricStatsResponseParser {
      * @return the retrieved {@link HistoricStats}
      */
     public static Collection<HistoricStats> getMonthlyTeamStats(final HttpResponse<String> response) {
+        return convertHistoricStats(response.body());
+    }
+
+    private static Collection<HistoricStats> convertHistoricStats(final String responseBody) {
         final Type collectionType = new TypeToken<Collection<HistoricStats>>() {
         }.getType();
-        return RestUtilConstants.GSON.fromJson(response.body(), collectionType);
+        return RestUtilConstants.GSON.fromJson(responseBody, collectionType);
     }
 }

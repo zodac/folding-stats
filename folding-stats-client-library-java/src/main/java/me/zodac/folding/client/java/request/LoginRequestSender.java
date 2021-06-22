@@ -68,7 +68,10 @@ public final class LoginRequestSender {
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
-        } catch (final IOException | InterruptedException e) {
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException("Error sending HTTP request to login as admin", e);
+        } catch (final IOException e) {
             throw new FoldingRestException("Error sending HTTP request to login as admin", e);
         }
     }
