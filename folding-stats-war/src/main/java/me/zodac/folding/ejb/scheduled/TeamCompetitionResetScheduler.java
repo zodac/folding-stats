@@ -60,7 +60,7 @@ public class TeamCompetitionResetScheduler {
     @PostConstruct
     public void init() {
         if (!IS_MONTHLY_RESET_ENABLED) {
-            LOGGER.warn("Monthly TC stats reset not enabled");
+            LOGGER.error("Monthly TC stats reset not enabled");
         }
     }
 
@@ -73,11 +73,11 @@ public class TeamCompetitionResetScheduler {
     @Schedule(dayOfMonth = "1", minute = "15", info = "Monthly cache reset for TC teams")
     public void scheduleTeamCompetitionStatsReset() {
         if (!IS_MONTHLY_RESET_ENABLED) {
-            LOGGER.warn("Monthly TC stats reset not enabled");
+            LOGGER.error("Monthly TC stats reset not enabled");
             return;
         }
 
-        LOGGER.info("Resetting TC stats for new month");
+        LOGGER.warn("Resetting TC stats for new month");
 
         SystemStateManager.next(SystemState.RESETTING_STATS);
         resetTeamCompetitionStats();
@@ -124,7 +124,7 @@ public class TeamCompetitionResetScheduler {
     }
 
     private void resetStats(final Collection<User> usersToReset) {
-        LOGGER.info("Resetting all TC stats");
+        LOGGER.info("Resetting user stats");
         for (final User user : usersToReset) {
             LOGGER.info("Resetting TC stats for {}", user.getDisplayName());
             oldFacade.setCurrentStatsAsInitialStatsForUser(user);

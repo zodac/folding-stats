@@ -64,7 +64,7 @@ public class TeamCompetitionStatsScheduler {
     @PostConstruct
     public void init() {
         if (!IS_STATS_SCHEDULED_PARSING_ENABLED) {
-            LOGGER.warn("Scheduled TC stats parsing not enabled");
+            LOGGER.error("Scheduled TC stats parsing not enabled");
             return;
         }
 

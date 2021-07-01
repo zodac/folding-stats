@@ -23,8 +23,6 @@ public class BusinessLogicEjb implements BusinessLogic {
 
     private static final Storage STORAGE = Storage.getInstance();
 
-    // Simple CRUD
-
     @Override
     public Hardware createHardware(final Hardware hardware) {
         return STORAGE.createHardware(hardware);
@@ -93,9 +91,7 @@ public class BusinessLogicEjb implements BusinessLogic {
             .map(User::hidePasskey)
             .collect(toList());
     }
-
-    // Complex CRUD
-
+    
     @Override
     public Optional<Hardware> getHardwareWithName(final String hardwareName) {
         return getAllHardware()

@@ -308,7 +308,7 @@ public class OldFacade {
     }
 
     public void setCurrentStatsAsInitialStatsForUser(final User user) {
-        LOGGER.info("Updating initial stats for user: {}", user.getDisplayName());
+        LOGGER.debug("Setting current stats as initial stats for user: {}", user.getDisplayName());
         final Stats totalStats = getTotalStatsForUser(user.getId());
         persistInitialUserStats(UserStats.create(user.getId(), DateTimeUtils.currentUtcTimestamp(), totalStats.getPoints(), totalStats.getUnits()));
         initialStatsCache.add(user.getId(), totalStats);

@@ -12,8 +12,6 @@ import me.zodac.folding.api.tc.User;
  */
 public interface BusinessLogic {
 
-    // Simple CRUD
-
     /**
      * Creates a {@link Hardware}.
      *
@@ -103,9 +101,7 @@ public interface BusinessLogic {
      * @return a {@link Collection} of the retrieved {@link User}s
      */
     Collection<User> getAllUsersWithoutPasskeys();
-
-    // Complex CRUD
-
+    
     /**
      * Retrieves a {@link Hardware} with the given name.
      *
