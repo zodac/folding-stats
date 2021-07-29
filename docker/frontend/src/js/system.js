@@ -134,7 +134,7 @@ function loadHardware() {
                 if (hardwareProperty === "multiplier") {
                     hardwareTableBodyCell.innerHTML = "x" + hardwareItem[hardwareProperty].toLocaleString();
                 } else if (hardwareProperty === "operatingSystem") {
-                    hardwareTableBodyCell.innerHTML = getOperatingSystem(hardwareItem["operatingSystem"]);
+                    hardwareTableBodyCell.innerHTML = getOperatingSystemFrontend(hardwareItem["operatingSystem"]);
                 } else {
                     hardwareTableBodyCell.innerHTML = hardwareItem[hardwareProperty].toLocaleString();
                 }
@@ -173,10 +173,10 @@ function loadHardware() {
                 hardwareOption.setAttribute("hardware_id", hardwareItem['id']);
                 hardwareOption.setAttribute("hardware_name", hardwareItem['hardwareName']);
                 hardwareOption.setAttribute("display_name", hardwareItem['displayName']);
-                hardwareOption.setAttribute("operating_system", getOperatingSystem(hardwareItem['operatingSystem']));
+                hardwareOption.setAttribute("operating_system", getOperatingSystemFrontend(hardwareItem['operatingSystem']));
                 hardwareOption.setAttribute("multiplier", hardwareItem['multiplier']);
 
-                hardwareOption.innerHTML = hardwareItem["displayName"] + " (" + getOperatingSystem(hardwareItem["operatingSystem"]) + ")";
+                hardwareOption.innerHTML = hardwareItem["displayName"] + " (" + getOperatingSystemFrontend(hardwareItem["operatingSystem"]) + ")";
                 hardwareList.append(hardwareOption);
             });
         }
@@ -244,7 +244,7 @@ function loadUsers() {
                 } else if (usersProperty === "team") {
                     usersTableBodyCell.innerHTML = usersItem["team"]["teamName"].toLocaleString();
                 } else if (usersProperty === "category") {
-                    usersTableBodyCell.innerHTML = getCategory(usersItem["category"]);
+                    usersTableBodyCell.innerHTML = getCategoryFrontend(usersItem["category"]);
                 } else {
                     if (usersProperty in usersItem) {
                         usersTableBodyCell.innerHTML = usersItem[usersProperty].toLocaleString();
@@ -285,7 +285,7 @@ function loadUsers() {
                 userOption.setAttribute("user_folding_name", userItem['foldingUserName']);
                 userOption.setAttribute("user_display_name", userItem['displayName']);
                 userOption.setAttribute("user_passkey", userItem['passkey']);
-                userOption.setAttribute("user_category", getCategory(userItem['category']));
+                userOption.setAttribute("user_category", getCategoryFrontend(userItem['category']));
                 userOption.setAttribute("user_profile_link", userItem['profileLink']);
                 userOption.setAttribute("user_live_stats_link", userItem['liveStatsLink']);
                 userOption.setAttribute("user_hardware_id", userItem['hardware']['id']);

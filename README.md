@@ -44,7 +44,7 @@ The JS scripts and CSS stylesheets are stored in `docker/frontend/src`. They are
 plugin, which copies them into the 'live' folder `docker/frontend/site/res`. This is done by running the following
 command in the `folding-stats/docker` directory:
 
-    maven package -Dminify
+    mvn package -Dminify
 
 If this command is not running, changes will not be pushed to the frontend container.
 

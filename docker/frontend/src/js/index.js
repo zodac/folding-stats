@@ -160,7 +160,7 @@ function loadCategoryLeaderboard() {
             categoryDiv.append(categoryLeaderboardTitle);
 
             Object.keys(jsonResponse).forEach(function(key) {
-                var keyDisplay = getCategory(key);
+                var keyDisplay = getCategoryFrontend(key);
                 categoryTitle = document.createElement('h2');
                 categoryTitle.setAttribute("class", "navbar-brand");
                 categoryTitle.innerHTML = keyDisplay;
@@ -335,7 +335,7 @@ function loadTeamStats() {
                         teamTableUserCell.innerHTML = activeUser[userProperty]["displayName"].toLocaleString();
                         new bootstrap.Tooltip(teamTableUserCell);
                     } else if (userProperty === "category") {
-                        teamTableUserCell.innerHTML = getCategory(activeUser["category"]);
+                        teamTableUserCell.innerHTML = getCategoryFrontend(activeUser["category"]);
                     } else {
                         if (userProperty in activeUser) {
                             teamTableUserCell.innerHTML = activeUser[userProperty].toLocaleString();

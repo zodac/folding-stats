@@ -1,4 +1,4 @@
-function getOperatingSystem(value) {
+function getOperatingSystemFrontend(value) {
     if (value.toLowerCase() === "linux") {
         return "Linux";
     }
@@ -10,7 +10,19 @@ function getOperatingSystem(value) {
     return value;
 }
 
-function getCategory(value) {
+function getOperatingSystemBackend(value) {
+    if (value.toLowerCase() === "Linux") {
+        return "linux";
+    }
+
+    if (value.toLowerCase() === "Windows") {
+        return "windows";
+    }
+
+    return value;
+}
+
+function getCategoryFrontend(value) {
     if (value.toLowerCase() === "amd_gpu") {
         return "AMD GPU";
     }
@@ -21,6 +33,22 @@ function getCategory(value) {
 
     if (value.toLowerCase() === "wildcard") {
         return "Wildcard";
+    }
+
+    return value;
+}
+
+function getCategoryBackend(value) {
+    if (value.toLowerCase() === "AMD GPU") {
+        return "amd_gpu";
+    }
+
+    if (value.toLowerCase() === "nVidia GPU") {
+        return "nvidia_gpu";
+    }
+
+    if (value.toLowerCase() === "Wildcard") {
+        return "wildcard";
     }
 
     return value;

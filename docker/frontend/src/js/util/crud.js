@@ -8,7 +8,7 @@ function createHardware() {
         {
             "hardwareName": hardwareName,
             "displayName": displayName,
-            "operatingSystem": operatingSystem,
+            "operatingSystem": getOperatingSystemBackend(operatingSystem),
             "multiplier": multiplier
         }
     );
@@ -63,7 +63,7 @@ function updateHardware() {
         {
             "hardwareName": hardwareName,
             "displayName": displayName,
-            "operatingSystem": operatingSystem,
+            "operatingSystem": getOperatingSystemBackend(operatingSystem),
             "multiplier": multiplier
         }
     );
@@ -329,7 +329,7 @@ function createUser() {
             "foldingUserName": foldingUserName,
             "displayName": displayName,
             "passkey": passkey,
-            "category": category,
+            "category": getCategoryBackend(category),
             "profileLink": profileLink,
             "liveStatsLink": liveStatsLink,
             "hardwareId": hardwareId,
@@ -400,7 +400,7 @@ function updateUser() {
             "foldingUserName": foldingUserName,
             "displayName": displayName,
             "passkey": passkey,
-            "category": category,
+            "category": getCategoryBackend(category),
             "profileLink": profileLink,
             "liveStatsLink": liveStatsLink,
             "hardwareId": hardwareId,
