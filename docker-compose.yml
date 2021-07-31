@@ -35,8 +35,8 @@ services:
       context: .
       dockerfile: docker/wildfly/Dockerfile
       args:
-        ADMIN_USERNAME: "root"
-        ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
+        ADMIN_USERNAME: "${BACKEND_USER}"
+        ADMIN_PASSWORD: "${BACKEND_PASSWORD}"
     container_name: wildfly
     hostname: wildfly
     depends_on:
@@ -78,9 +78,9 @@ services:
       context: .
       dockerfile: docker/postgres/Dockerfile
       args:
-        ADMIN_USERNAME: "root"
+        ADMIN_USERNAME: "${ADMIN_USER}"
         ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
-        READ_ONLY_USERNAME: "root2"
+        READ_ONLY_USERNAME: "${READ_ONLY_USER}"
         READ_ONLY_PASSWORD: "${READ_ONLY_PASSWORD}"
     container_name: postgres
     hostname: postgres
