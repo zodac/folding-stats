@@ -14,3 +14,6 @@ docker/frontend/site/res/js/*.js
 # Generated jOOQ schema files
 docker/postgres/jooq/me/
 !docker/postgres/jooq/*.jar
+
+# Environment files
+.env

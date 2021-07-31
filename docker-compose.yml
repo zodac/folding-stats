@@ -16,7 +16,7 @@ services:
     networks:
       - production
     ports:
-      - 85:80
+      - "85:80"
 
   builder_java:
     build:
@@ -36,7 +36,7 @@ services:
       dockerfile: docker/wildfly/Dockerfile
       args:
         ADMIN_USERNAME: "root"
-        ADMIN_PASSWORD: "shroot"
+        ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
     container_name: wildfly
     hostname: wildfly
     depends_on:
@@ -57,8 +57,8 @@ services:
       # Database configuration
       DEPLOYED_DATABASE: "postgresql"
       JDBC_CONNECTION_URL: "jdbc:postgresql://postgres:5432/folding_db"
-      JDBC_CONNECTION_USER: "folding_user"
-      JDBC_CONNECTION_PASSWORD: "shroot"
+      JDBC_CONNECTION_USER: "${DB_USER}"
+      JDBC_CONNECTION_PASSWORD: "${DB_PASSWORD}"
       JDBC_CONNECTION_DRIVER: "org.postgresql.Driver"
     links:
       - builder_java
@@ -66,8 +66,8 @@ services:
     networks:
       - production
     ports:
-      - 8080:8080
-      - 9990:9990
+      - "8080:8080"
+      - "9990:9990"
     volumes:
       - wildfly_logs:/opt/jboss/wildfly/standalone/log
     volumes_from:
@@ -79,22 +79,22 @@ services:
       dockerfile: docker/postgres/Dockerfile
       args:
         ADMIN_USERNAME: "root"
-        ADMIN_PASSWORD: "shroot"
+        ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
         READ_ONLY_USERNAME: "root2"
-        READ_ONLY_PASSWORD: "shroot2"
+        READ_ONLY_PASSWORD: "${READ_ONLY_PASSWORD}"
     container_name: postgres
     hostname: postgres
     environment:
       # First 4 variables used to configure DB
       POSTGRES_DB: "folding_db"
-      POSTGRES_USER: "folding_user"
-      POSTGRES_PASSWORD: "shroot"
+      POSTGRES_USER: "${DB_USER}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
       POSTGRES_PORT: "5432"
       PGDATA: "/var/lib/postgresql/data/pgdata"
       # Next 3 variables needed to avoid "FATAL role 'root' does not exist" error
       PGDATABASE: "folding_db"
-      PGUSER: "folding_user"
-      PGPASSWORD: "shroot"
+      PGUSER: "${DB_USER}"
+      PGPASSWORD: "${DB_PASSWORD}"
     healthcheck:
       test: pg_isready --host localhost || exit 1
       interval: 15s
@@ -103,7 +103,7 @@ services:
     networks:
       - production
     ports:
-      - 5432:5432
+      - "5432:5432"
     restart: always
     volumes:
       - postgres_data:/var/lib/postgresql/data

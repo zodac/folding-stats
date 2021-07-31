@@ -15,7 +15,7 @@ services:
     networks:
       - development
     ports:
-      - 86:80
+      - "86:80"
 
   builder_java_dev:
     build:
@@ -63,8 +63,8 @@ services:
     networks:
       - development
     ports:
-      - 8081:8080
-      - 9991:9990
+      - "8081:8080"
+      - "9991:9990"
     volumes_from:
       - builder_java_dev
 
@@ -98,7 +98,7 @@ services:
     networks:
       - development
     ports:
-      - 5433:5432
+      - "5433:5432"
     restart: always
 
 networks:
