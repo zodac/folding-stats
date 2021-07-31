@@ -83,6 +83,26 @@ TBC
 
 ## Troubleshooting
 
+### Take Backup Of Database
+
+To take a backup of the database, the following commands can be run against the `postgres` container:
+
+    docker exec postgres pg_dump -U folding_user -F t folding_db -f export.tar
+    docker cp postgres:/export.tar ~/export_$(date +%F).tar
+
+The first line will create a backup of the DB in the `postgres` container, and the second will copy it out to the host.
+
+### Restore Database From Backup
+
+Assuming a backup was previously created using the instructions in --> Take Backup Of Database <--, it can be restored
+using the following commands against the `postgres` container:
+
+    docker cp ~/export_<TIMESTAMP>.tar postgres:/export.tar
+    docker exec postgres pg_restore -d folding_db export.tar -c -U folding_user
+
+The first line will copy the backup from the host to the `postgres` container, and the second will restore the DB using
+the *export.tar* file.
+
 ### Enabling DEBUG Logs
 
 This requires us to connect to the `wildfly` container, so we will need the container ID:

@@ -13,7 +13,7 @@ public final class CollectionUtils {
     }
 
     /**
-     * Checks that there are no matches between the two {@link Collections}.
+     * Checks that there are no matches between the two {@link Collection}s.
      *
      * @param first  the first {@link Collection}
      * @param second the second {@link Collection}
