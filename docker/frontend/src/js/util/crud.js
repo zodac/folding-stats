@@ -393,7 +393,7 @@ function updateUser() {
     var liveStatsLink = document.getElementById("user_update_live_stats_link").value.trim();
     var hardwareId = document.getElementById("user_update_hardware_selector").value.trim();
     var teamId = document.getElementById("user_update_team_selector").value.trim();
-    var isCaptain = selectedElement.getAttribute("user_is_captain").checked;
+    var isCaptain = selectedElement.getAttribute("user_update_is_captain").checked;
 
     var requestData = JSON.stringify(
         {
