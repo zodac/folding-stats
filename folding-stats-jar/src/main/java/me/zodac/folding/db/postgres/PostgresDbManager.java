@@ -832,6 +832,7 @@ public final class PostgresDbManager implements DbManager {
             final var query = queryContext
                 .select(USER_OFFSET_TC_STATS.OFFSET_POINTS, USER_OFFSET_TC_STATS.OFFSET_MULTIPLIED_POINTS, USER_OFFSET_TC_STATS.OFFSET_UNITS)
                 .from(USER_OFFSET_TC_STATS)
+                .where(USER_OFFSET_TC_STATS.USER_ID.equal(userId))
                 .orderBy(USER_OFFSET_TC_STATS.UTC_TIMESTAMP.desc())
                 .limit(SINGLE_RESULT);
             LOGGER.debug("Executing SQL: '{}'", query);
@@ -933,15 +934,15 @@ public final class PostgresDbManager implements DbManager {
             final var query = queryContext
                 .select(
                     field(crypt(password, SYSTEM_USERS.USER_PASSWORD_HASH.getValue(
-                        queryContext
-                            .select()
-                            .from(SYSTEM_USERS)
-                            .where(SYSTEM_USERS.USER_NAME.equalIgnoreCase(userName))
-                            .fetch()
-                            .into(SYSTEM_USERS)
-                            .stream()
-                            .findAny()
-                            .orElse(SYSTEM_USERS.newRecord())
+                            queryContext
+                                .select()
+                                .from(SYSTEM_USERS)
+                                .where(SYSTEM_USERS.USER_NAME.equalIgnoreCase(userName))
+                                .fetch()
+                                .into(SYSTEM_USERS)
+                                .stream()
+                                .findAny()
+                                .orElse(SYSTEM_USERS.newRecord())
                         )
                     ).equal(SYSTEM_USERS.USER_PASSWORD_HASH)).as("is_password_match"),
                     SYSTEM_USERS.USER_NAME,

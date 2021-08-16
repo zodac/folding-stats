@@ -275,8 +275,7 @@ public class OldFacade {
 
     public void initialiseOffsetStats() {
         for (final User user : businessLogic.getAllUsersWithoutPasskeys()) {
-            final OffsetStats offsetStats = dbManager.getOffsetStats(user.getId()).orElse(OffsetStats.empty());
-            offsetStatsCache.add(user.getId(), offsetStats);
+            getOffsetStatsForUser(user.getId());
         }
     }
 
