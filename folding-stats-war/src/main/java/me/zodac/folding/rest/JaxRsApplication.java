@@ -3,6 +3,7 @@ package me.zodac.folding.rest;
 import java.util.Set;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
+import me.zodac.folding.rest.endpoint.DebugEndpoint;
 import me.zodac.folding.rest.endpoint.HardwareEndpoint;
 import me.zodac.folding.rest.endpoint.HistoricStatsEndpoint;
 import me.zodac.folding.rest.endpoint.LoginEndpoint;
@@ -26,6 +27,7 @@ public class JaxRsApplication extends Application {
     public Set<Class<?>> getClasses() {
         return Set.of(
             // REST endpoints
+            DebugEndpoint.class,
             HardwareEndpoint.class,
             HistoricStatsEndpoint.class,
             LoginEndpoint.class,
