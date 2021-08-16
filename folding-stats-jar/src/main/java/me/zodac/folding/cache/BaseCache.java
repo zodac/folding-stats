@@ -66,6 +66,15 @@ class BaseCache<V> {
     }
 
     /**
+     * Retrieves all elements from the cache as a {@link Map}.
+     *
+     * @return an unmodifiable {@link Map} of all elements
+     */
+    public Map<Integer, V> getCacheContents() {
+        return Collections.unmodifiableMap(elementsById);
+    }
+
+    /**
      * Removes an element from the cache.
      *
      * @param elementId the ID of the element to remove

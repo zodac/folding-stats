@@ -38,16 +38,16 @@ public class DebugEndpoint {
         LOGGER.info("Printing cache contents");
 
         // POJOs
-        LOGGER.info("HardwareCache: {}", HardwareCache.getInstance().getAll());
-        LOGGER.info("TeamCache: {}", TeamCache.getInstance().getAll());
-        LOGGER.info("UserCache: {}", UserCache.getInstance().getAll());
+        LOGGER.info("HardwareCache: {}", HardwareCache.getInstance().getCacheContents());
+        LOGGER.info("TeamCache: {}", TeamCache.getInstance().getCacheContents());
+        LOGGER.info("UserCache: {}", UserCache.getInstance().getCacheContents());
 
         // Stats
-        LOGGER.info("InitialStatsCache: {}", InitialStatsCache.getInstance().getAll());
-        LOGGER.info("OffsetStatsCache: {}", OffsetStatsCache.getInstance().getAll());
-        LOGGER.info("RetiredTcStatsCache: {}", RetiredTcStatsCache.getInstance().getAll());
-        LOGGER.info("TcStatsCache: {}", TcStatsCache.getInstance().getAll());
-        LOGGER.info("TotalStatsCache: {}", TotalStatsCache.getInstance().getAll());
+        LOGGER.info("InitialStatsCache: {}", InitialStatsCache.getInstance().getCacheContents());
+        LOGGER.info("OffsetStatsCache: {}", OffsetStatsCache.getInstance().getCacheContents());
+        LOGGER.info("RetiredTcStatsCache: {}", RetiredTcStatsCache.getInstance().getCacheContents());
+        LOGGER.info("TcStatsCache: {}", TcStatsCache.getInstance().getCacheContents());
+        LOGGER.info("TotalStatsCache: {}", TotalStatsCache.getInstance().getCacheContents());
 
         // TC overall
         LOGGER.info("CompetitionSummaryCache: {}", CompetitionSummaryCache.getInstance().get());
