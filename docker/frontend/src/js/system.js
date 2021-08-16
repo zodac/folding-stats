@@ -83,6 +83,34 @@ function manualUpdate() {
     });
 }
 
+function printCache() {
+    show("loader");
+    fetch(ROOT_URL+'/debug/print_caches', {
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': sessionGet("Authorization")
+        }
+    })
+    .then(response => {
+        hide("loader");
+
+        if(response.status != 200){
+            failureToast("Printing caches failed with code: " + response.status);
+            response.json()
+            .then(response => {
+                console.error(JSON.stringify(response, null, 2));
+            });
+            return;
+        }
+        successToast("Caches printed");
+    })
+    .catch((error) => {
+        hide("loader");
+        console.error('Unexpected error printing caches: ', error);
+        return false;
+    });
+}
+
 function loadHardware() {
     fetch(ROOT_URL+'/hardware')
     .then(response => {

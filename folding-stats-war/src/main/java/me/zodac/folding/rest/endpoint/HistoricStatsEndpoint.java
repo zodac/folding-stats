@@ -48,7 +48,7 @@ public class HistoricStatsEndpoint {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    // Stats updates occur every hour, so we must invalidate responses every hour
+    // Stat updates occur every hour, so we must invalidate responses every hour
     private static final int CACHE_EXPIRATION_TIME = (int) TimeUnit.HOURS.toSeconds(1);
 
     @Context
