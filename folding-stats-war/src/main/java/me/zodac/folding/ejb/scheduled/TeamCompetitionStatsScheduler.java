@@ -24,17 +24,20 @@ import org.apache.logging.log4j.Logger;
 /**
  * {@link Startup} EJB which schedules the <code>Team Competition</code> stats retrieval for the system. By default, the
  * system will update stats using {@link UserTeamCompetitionStatsParser} every hour at <b>55</b> minutes past the hour.
+ * It will also only run from the 3rd of the month until the end of the month.
  *
  * <p>
- * However, this default time can be changed by setting the environment variables:
+ * However, these default dates/times can be changed by setting the environment variables:
  * <ul>
  *     <li>STATS_PARSING_SCHEDULE_HOUR</li>
  *     <li>STATS_PARSING_SCHEDULE_MINUTE</li>
  *     <li>STATS_PARSING_SCHEDULE_SECOND</li>
+ *     <li>STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH</li>
+ *     <li>STATS_PARSING_SCHEDULE_LAST_DAY_OF_MONTH</li>
  * </ul>
  *
  * <b>NOTE:</b> The {@link TeamCompetitionResetScheduler} schedule cannot be modified, so you should be careful not to
- * have the stats retrieval conflict with the reset time.
+ * have the {@link TeamCompetitionStatsScheduler} conflict with the reset time.
  */
 @Startup
 @Singleton
@@ -48,6 +51,10 @@ public class TeamCompetitionStatsScheduler {
     private static final String STATS_PARSING_SCHEDULE_HOUR = EnvironmentVariableUtils.get("STATS_PARSING_SCHEDULE_HOUR", "*");
     private static final String STATS_PARSING_SCHEDULE_MINUTE = EnvironmentVariableUtils.get("STATS_PARSING_SCHEDULE_MINUTE", "55");
     private static final String STATS_PARSING_SCHEDULE_SECOND = EnvironmentVariableUtils.get("STATS_PARSING_SCHEDULE_SECOND", "0");
+    private static final String STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH =
+        EnvironmentVariableUtils.get("STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH", "3");
+    private static final String STATS_PARSING_SCHEDULE_LAST_DAY_OF_MONTH =
+        EnvironmentVariableUtils.get("STATS_PARSING_SCHEDULE_LAST_DAY_OF_MONTH", "31");
 
     @EJB
     private BusinessLogic businessLogic;
@@ -72,6 +79,7 @@ public class TeamCompetitionStatsScheduler {
         schedule.hour(STATS_PARSING_SCHEDULE_HOUR);
         schedule.minute(STATS_PARSING_SCHEDULE_MINUTE);
         schedule.second(STATS_PARSING_SCHEDULE_SECOND);
+        schedule.dayOfMonth(STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH + "-" + STATS_PARSING_SCHEDULE_LAST_DAY_OF_MONTH);
         schedule.timezone("UTC");
         final Timer timer = timerService.createCalendarTimer(schedule);
         LOGGER.info("Starting TC stats parser with schedule: {}", timer.getSchedule());

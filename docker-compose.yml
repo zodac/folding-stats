@@ -1,6 +1,5 @@
 version: '2.3'
 
-# TODO: [zodac] Extract sensitive data to an env file, allow deployment to override with 'real' values
 services:
 
   frontend:
@@ -54,6 +53,8 @@ services:
       STATS_PARSING_SCHEDULE_HOUR: "*"
       STATS_PARSING_SCHEDULE_MINUTE: "55"
       STATS_PARSING_SCHEDULE_SECOND: "0"
+      STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH: "3"
+      STATS_PARSING_SCHEDULE_LAST_DAY_OF_MONTH: "31"
       # Database configuration
       DEPLOYED_DATABASE: "postgresql"
       JDBC_CONNECTION_URL: "jdbc:postgresql://postgres:5432/folding_db"
