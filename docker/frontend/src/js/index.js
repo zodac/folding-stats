@@ -151,8 +151,8 @@ function loadCategoryLeaderboard() {
         .then(function(jsonResponse){
             categoryDiv = document.getElementById("category_div");
 
-            const categoryHeaders = ["Rank", "User", "Points", "Units", "Points to Leader", "Points to Next"];
-            const categoryProperties = ["rank", "displayName", "multipliedPoints", "units", "diffToLeader", "diffToNext"];
+            const categoryHeaders = ["Rank", "User", "Points", "Hardware", "Units", "Points to Leader", "Points to Next"];
+            const categoryProperties = ["rank", "displayName", "hardware", "multipliedPoints", "units", "diffToLeader", "diffToNext"];
 
             categoryLeaderboardTitle = document.createElement('h2');
             categoryLeaderboardTitle.setAttribute("class", "navbar-brand");
