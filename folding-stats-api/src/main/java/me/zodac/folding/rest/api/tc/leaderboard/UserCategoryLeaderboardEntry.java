@@ -23,6 +23,7 @@ public class UserCategoryLeaderboardEntry {
 
     private String displayName;
     private String foldingName;
+    private String hardware;
     private String teamName;
     private long points;
     private long multipliedPoints;
@@ -44,8 +45,9 @@ public class UserCategoryLeaderboardEntry {
      */
     public static UserCategoryLeaderboardEntry create(final UserSummary userSummary, final String teamName, final int rank, final long diffToLeader,
                                                       final long diffToNext) {
-        return new UserCategoryLeaderboardEntry(userSummary.getDisplayName(), userSummary.getFoldingName(), teamName, userSummary.getPoints(),
-            userSummary.getMultipliedPoints(), userSummary.getUnits(), rank, diffToLeader, diffToNext);
+        return new UserCategoryLeaderboardEntry(userSummary.getDisplayName(), userSummary.getFoldingName(),
+            userSummary.getHardware().getDisplayName(), teamName, userSummary.getPoints(), userSummary.getMultipliedPoints(),
+            userSummary.getUnits(), rank, diffToLeader, diffToNext);
     }
 
     /**
