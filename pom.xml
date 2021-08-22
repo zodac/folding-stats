@@ -37,6 +37,7 @@
         <javaee-web-api.version>8.0.1</javaee-web-api.version>
         <jersey.version>2.17</jersey.version>
         <jooq.version>3.14.11</jooq.version>
+        <jsoup.version>1.14.2</jsoup.version>
         <log4j.version>2.14.1</log4j.version>
         <lombok.version>1.18.20</lombok.version>
         <postgresql-driver.version>42.2.19</postgresql-driver.version>
@@ -149,6 +150,11 @@
                 <groupId>org.jooq</groupId>
                 <artifactId>jooq-meta</artifactId>
                 <version>${jooq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jsoup</groupId>
+                <artifactId>jsoup</artifactId>
+                <version>${jsoup.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
