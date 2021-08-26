@@ -17,7 +17,7 @@ function getTeamHistoricStats(teamId, teamName, day, month, monthName, year) {
 
     if(teamName != null){
         selectedTeam = teamName;
-         teamDropdownTitle = document.getElementById("team_dropdown_root");
+        teamDropdownTitle = document.getElementById("team_dropdown_root");
         teamDropdownTitle.innerHTML = selectedTeam;
     }
 
