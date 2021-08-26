@@ -2,10 +2,14 @@ package me.zodac.folding.ejb.scheduled;
 
 import java.util.Collection;
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import javax.ejb.EJB;
-import javax.ejb.Schedule;
+import javax.ejb.ScheduleExpression;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
+import javax.ejb.Timeout;
+import javax.ejb.Timer;
+import javax.ejb.TimerService;
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.ejb.BusinessLogic;
@@ -37,6 +41,9 @@ public class TeamCompetitionResetScheduler {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final boolean IS_MONTHLY_RESET_ENABLED = Boolean.parseBoolean(EnvironmentVariableUtils.get("ENABLE_STATS_MONTHLY_RESET", "false"));
 
+    private static final String STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH =
+        EnvironmentVariableUtils.get("STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH", "3");
+
     @EJB
     private BusinessLogic businessLogic;
 
@@ -45,6 +52,9 @@ public class TeamCompetitionResetScheduler {
 
     @EJB
     private TeamCompetitionStatsScheduler teamCompetitionStatsScheduler;
+
+    @Resource
+    private TimerService timerService;
 
     // TODO: [zodac] Go through Storage/BL, not direct to caches
     private static void resetCaches() {
@@ -55,28 +65,34 @@ public class TeamCompetitionResetScheduler {
     }
 
     /**
-     * On system startup, checks if the reset is enabled, and logs a warning if it is not.
+     * On system startup, checks if the reset is enabled. If so, starts a {@link Timer} for stats reset.
      */
     @PostConstruct
     public void init() {
         if (!IS_MONTHLY_RESET_ENABLED) {
             LOGGER.error("Monthly TC stats reset not enabled");
         }
+
+        final ScheduleExpression schedule = new ScheduleExpression();
+        schedule.hour("0");
+        schedule.minute("15");
+        schedule.second("0");
+        schedule.dayOfMonth("1," + STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH);
+        schedule.timezone("UTC");
+        final Timer timer = timerService.createCalendarTimer(schedule);
+        LOGGER.info("Starting TC stats parser with schedule: {}", timer.getSchedule());
     }
 
     /**
-     * Scheduled to execute at <b>00:15</b> on the 1st day of every month. Will reset the <code>Team Competition</code>
+     * Scheduled execution to reset the <code>Team Competition</code>
      * stats.
      *
+     * @param timer the {@link Timer} for scheduled execution
      * @see #resetTeamCompetitionStats()
      */
-    @Schedule(dayOfMonth = "1", minute = "15", info = "Monthly cache reset for TC teams")
-    public void scheduleTeamCompetitionStatsReset() {
-        if (!IS_MONTHLY_RESET_ENABLED) {
-            LOGGER.error("Monthly TC stats reset not enabled");
-            return;
-        }
-
+    @Timeout
+    public void scheduleTeamCompetitionStatsReset(final Timer timer) {
+        LOGGER.trace("Timer fired at: {}", timer);
         LOGGER.warn("Resetting TC stats for new month");
 
         SystemStateManager.next(SystemState.RESETTING_STATS);

@@ -86,7 +86,7 @@ public class TeamCompetitionStatsScheduler {
     }
 
     /**
-     * Scheduled executing for parsing <code>Team Competition</code> stats.
+     * Scheduled execution to parse <code>Team Competition</code> stats.
      *
      * @param timer the {@link Timer} for scheduled execution
      */
