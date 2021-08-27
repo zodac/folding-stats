@@ -52,8 +52,6 @@
     <rule ref="category/java/design.xml">
         <!-- Disagree, useful to explicitly catch generic Exceptions in some scenarios -->
         <exclude name="AvoidCatchingGenericException"/>
-        <!-- TODO: [zodac] Look into re-adding this, maybe with a higher threshold -->
-        <exclude name="CyclomaticComplexity"/>
         <!-- A little hit & miss -->
         <exclude name="GodClass"/>
         <!-- I like chaining methods... -->
@@ -74,6 +72,13 @@
     <rule ref="category/java/design.xml/CognitiveComplexity">
         <properties>
             <property name="reportLevel" value="25"/>
+        </properties>
+    </rule>
+    <!-- Default threshold is a bit high for some of our classes -->
+    <rule ref="category/java/design.xml/CyclomaticComplexity">
+        <properties>
+            <property name="classReportLevel" value="75"/>
+            <property name="methodReportLevel" value="20"/>
         </properties>
     </rule>
 

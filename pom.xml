@@ -58,10 +58,10 @@
         <maven-war-plugin.version>3.3.1</maven-war-plugin.version>
 
         <!-- Linter 3PP Versions -->
-        <checkstyle.version>8.43</checkstyle.version>
-        <errorprone.version>2.7.1</errorprone.version>
-        <spotbugs.version>4.2.3</spotbugs.version>
-        <pmd.version>6.35.0</pmd.version>
+        <checkstyle.version>8.45.1</checkstyle.version>
+        <errorprone.version>2.9.0</errorprone.version>
+        <spotbugs.version>4.4.0</spotbugs.version>
+        <pmd.version>6.37.0</pmd.version>
 
         <!-- Linter Properties -->
         <!--suppress UnresolvedMavenProperty, file is only used in child modules -->

@@ -4,14 +4,29 @@
         <Package name="~me.zodac.folding.db.postgres.gen.*"/>
     </Match>
 
-    <!-- Mostly using Lombok, so these non-null checks are fine -->
+    <!-- Lombok-generated issues -->
     <Match>
         <Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"/>
+    </Match>
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP"/>
+    </Match>
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Bug pattern="MS_EXPOSE_REP"/>
     </Match>
 
     <!-- False positive, unable to see that generic response from cache is actually a valid case -->
     <Match>
         <Class name="me.zodac.folding.ejb.OldFacade"/>
         <Bug pattern="BC_IMPOSSIBLE_CAST"/>
+    </Match>
+
+    <!-- False positive, no null checks being made -->
+    <Match>
+        <Class name="me.zodac.folding.db.postgres.PostgresDbManager"/>
+        <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE"/>
     </Match>
 </FindBugsFilter>
