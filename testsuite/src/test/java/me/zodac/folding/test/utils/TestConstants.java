@@ -26,7 +26,7 @@ public class TestConstants {
         .disableHtmlEscaping()
         .create();
     public static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
-        .version(HttpClient.Version.HTTP_1_1)
+        .version(HttpClient.Version.HTTP_2)
         .connectTimeout(Duration.ofSeconds(10))
         .build();
 

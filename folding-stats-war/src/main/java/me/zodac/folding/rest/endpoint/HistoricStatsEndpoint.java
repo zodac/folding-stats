@@ -270,7 +270,6 @@ public class HistoricStatsEndpoint {
     @PermitAll
     @Path("/teams/{teamId}/{year}/{month}/{day}")
     @Produces(MediaType.APPLICATION_JSON)
-    @SuppressWarnings("PMD.NcssCount") // TODO: [zodac] Revisit when TeamNotFoundException is removed
     public Response getTeamHistoricStatsHourly(@PathParam("teamId") final String teamId, @PathParam("year") final String year,
                                                @PathParam("month") final String month, @PathParam("day") final String day,
                                                @Context final Request request) {

@@ -31,7 +31,7 @@ public final class HardwareValidator {
      * @param businessLogic the {@link BusinessLogic} used for retrieval of {@link User}s for conflict checks
      * @return the created {@link HardwareValidator}
      */
-    public static HardwareValidator createValidator(final BusinessLogic businessLogic) {
+    public static HardwareValidator create(final BusinessLogic businessLogic) {
         return new HardwareValidator(businessLogic);
     }
 

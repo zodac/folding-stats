@@ -37,7 +37,7 @@ public final class StatsRequestSender {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
-        .version(HttpClient.Version.HTTP_1_1)
+        .version(HttpClient.Version.HTTP_2)
         .connectTimeout(Duration.ofSeconds(10))
         .build();
 

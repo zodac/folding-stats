@@ -29,7 +29,6 @@ import org.apache.logging.log4j.Logger;
 /**
  * REST endpoints for {@link User}s for <code>folding-stats</code>.
  */
-// TODO: [zodac] Add a GET endpoint with query, so we can see all instances of a user
 @Path("/users/")
 @RequestScoped
 public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
