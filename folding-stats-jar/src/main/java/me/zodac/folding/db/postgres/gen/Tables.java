@@ -5,6 +5,7 @@ package me.zodac.folding.db.postgres.gen;
 
 
 import me.zodac.folding.db.postgres.gen.tables.Hardware;
+import me.zodac.folding.db.postgres.gen.tables.MonthlyResults;
 import me.zodac.folding.db.postgres.gen.tables.PgpArmorHeaders;
 import me.zodac.folding.db.postgres.gen.tables.RetiredUserStats;
 import me.zodac.folding.db.postgres.gen.tables.SystemUsers;
@@ -15,6 +16,7 @@ import me.zodac.folding.db.postgres.gen.tables.UserTcStatsHourly;
 import me.zodac.folding.db.postgres.gen.tables.UserTotalStats;
 import me.zodac.folding.db.postgres.gen.tables.Users;
 import me.zodac.folding.db.postgres.gen.tables.records.PgpArmorHeadersRecord;
+
 import org.jooq.Configuration;
 import org.jooq.Field;
 import org.jooq.Result;
@@ -23,12 +25,18 @@ import org.jooq.Result;
 /**
  * Convenience access to all tables in public.
  */
+@SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Tables {
 
     /**
      * The table <code>public.hardware</code>.
      */
     public static final Hardware HARDWARE = Hardware.HARDWARE;
+
+    /**
+     * The table <code>public.monthly_results</code>.
+     */
+    public static final MonthlyResults MONTHLY_RESULTS = MonthlyResults.MONTHLY_RESULTS;
 
     /**
      * The table <code>public.pgp_armor_headers</code>.
@@ -39,11 +47,11 @@ public class Tables {
      * Call <code>public.pgp_armor_headers</code>.
      */
     public static Result<PgpArmorHeadersRecord> PGP_ARMOR_HEADERS(
-            Configuration configuration
-            , String __1
+          Configuration configuration
+        , String __1
     ) {
         return configuration.dsl().selectFrom(me.zodac.folding.db.postgres.gen.tables.PgpArmorHeaders.PGP_ARMOR_HEADERS.call(
-                __1
+              __1
         )).fetch();
     }
 
@@ -51,10 +59,10 @@ public class Tables {
      * Get <code>public.pgp_armor_headers</code> as a table.
      */
     public static PgpArmorHeaders PGP_ARMOR_HEADERS(
-            String __1
+          String __1
     ) {
         return me.zodac.folding.db.postgres.gen.tables.PgpArmorHeaders.PGP_ARMOR_HEADERS.call(
-                __1
+              __1
         );
     }
 
@@ -62,10 +70,10 @@ public class Tables {
      * Get <code>public.pgp_armor_headers</code> as a table.
      */
     public static PgpArmorHeaders PGP_ARMOR_HEADERS(
-            Field<String> __1
+          Field<String> __1
     ) {
         return me.zodac.folding.db.postgres.gen.tables.PgpArmorHeaders.PGP_ARMOR_HEADERS.call(
-                __1
+              __1
         );
     }
 
