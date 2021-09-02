@@ -1,71 +1,83 @@
-package me.zodac.folding.ejb.core;
+package me.zodac.folding.rest.validator;
 
 import static java.util.stream.Collectors.toList;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
-import javax.ejb.Singleton;
 import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 
 /**
- * {@link Singleton} EJB implementation of {@link BusinessLogic}.
- *
- * <p>
- * For the most part, this will serve as a wrapper to {@link Storage}, which knows how to perform CRUD operations on the backend storage and caches.
- * But since some logic is needed for special cases (like retrieving the latest Folding@Home stats for a {@link User} when it is created), we
- * implement that logic here, and delegate any CRUD needs to {@link Storage}.
+ * Mock implementation of {@link BusinessLogic}. Has methods to set specific values for tests.
  */
-@Singleton
-public class BusinessLogicEjb implements BusinessLogic {
+class MockBusinessLogic implements BusinessLogic {
 
-    private static final Storage STORAGE = Storage.getInstance();
+    private final Map<Integer, Hardware> hardwares = new HashMap<>();
+    private final Map<Integer, Team> teams = new HashMap<>();
+    private final Map<Integer, User> users = new HashMap<>();
+
+    private MockBusinessLogic() {
+
+    }
+
+    /**
+     * Create an instance of {@link MockBusinessLogic}.
+     *
+     * @return the created {@link MockBusinessLogic} instance
+     */
+    static MockBusinessLogic create() {
+        return new MockBusinessLogic();
+    }
 
     @Override
     public Hardware createHardware(final Hardware hardware) {
-        return STORAGE.createHardware(hardware);
+        hardwares.put(hardware.getId(), hardware);
+        return hardware;
     }
 
     @Override
     public Optional<Hardware> getHardware(final int hardwareId) {
-        return STORAGE.getHardware(hardwareId);
+        return Optional.ofNullable(hardwares.get(hardwareId));
     }
 
     @Override
     public Collection<Hardware> getAllHardware() {
-        return STORAGE.getAllHardware();
+        return hardwares.values();
     }
 
     @Override
     public void deleteHardware(final Hardware hardware) {
-        STORAGE.deleteHardware(hardware.getId());
+        hardwares.remove(hardware.getId());
     }
 
     @Override
     public Team createTeam(final Team team) {
-        return STORAGE.createTeam(team);
+        teams.put(team.getId(), team);
+        return team;
     }
 
     @Override
     public Optional<Team> getTeam(final int teamId) {
-        return STORAGE.getTeam(teamId);
+        return Optional.ofNullable(teams.get(teamId));
     }
 
     @Override
     public Collection<Team> getAllTeams() {
-        return STORAGE.getAllTeams();
+        return teams.values();
     }
 
     @Override
     public void deleteTeam(final Team team) {
-        STORAGE.deleteTeam(team.getId());
+        teams.remove(team.getId());
     }
 
     @Override
     public Optional<User> getUserWithPasskey(final int userId) {
-        return STORAGE.getUser(userId);
+        return Optional.ofNullable(users.get(userId));
     }
 
     @Override
@@ -81,7 +93,7 @@ public class BusinessLogicEjb implements BusinessLogic {
 
     @Override
     public Collection<User> getAllUsersWithPasskeys() {
-        return STORAGE.getAllUsers();
+        return users.values();
     }
 
     @Override

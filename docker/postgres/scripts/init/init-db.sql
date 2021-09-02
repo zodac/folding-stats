@@ -137,3 +137,12 @@ CREATE TABLE user_tc_stats_hourly (
 
 CREATE INDEX index_user_tc_stats_hourly
     ON user_tc_stats_hourly(user_id, utc_timestamp);
+
+
+CREATE TABLE monthly_results (
+    utc_timestamp TIMESTAMP PRIMARY KEY,
+    json_result TEXT NOT NULL
+);
+
+CREATE INDEX index_monthly_results
+    ON monthly_results(utc_timestamp);

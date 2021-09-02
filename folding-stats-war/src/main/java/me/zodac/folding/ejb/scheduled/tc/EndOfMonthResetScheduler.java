@@ -1,4 +1,4 @@
-package me.zodac.folding.ejb.scheduled;
+package me.zodac.folding.ejb.scheduled.tc;
 
 import java.util.Collection;
 import javax.annotation.PostConstruct;
@@ -31,18 +31,15 @@ import org.apache.logging.log4j.Logger;
  *     <li>ENABLE_STATS_MONTHLY_RESET</li>
  * </ul>
  *
- * <b>NOTE:</b> The {@link TeamCompetitionStatsScheduler} <i>can</i> have its schedule changed, but should not be set to conflict
+ * <b>NOTE:</b> The {@link StatsScheduler} <i>can</i> have its schedule changed, but should not be set to conflict
  * with this reset time.
  */
 @Startup
 @Singleton
-public class TeamCompetitionResetScheduler {
+public class EndOfMonthResetScheduler {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final boolean IS_MONTHLY_RESET_ENABLED = Boolean.parseBoolean(EnvironmentVariableUtils.get("ENABLE_STATS_MONTHLY_RESET", "false"));
-
-    private static final String STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH =
-        EnvironmentVariableUtils.get("STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH", "3");
 
     @EJB
     private BusinessLogic businessLogic;
@@ -51,7 +48,7 @@ public class TeamCompetitionResetScheduler {
     private OldFacade oldFacade;
 
     @EJB
-    private TeamCompetitionStatsScheduler teamCompetitionStatsScheduler;
+    private StatsScheduler statsScheduler;
 
     @Resource
     private TimerService timerService;
@@ -77,10 +74,10 @@ public class TeamCompetitionResetScheduler {
         schedule.hour("0");
         schedule.minute("15");
         schedule.second("0");
-        schedule.dayOfMonth("1," + STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH);
+        schedule.dayOfMonth("1");
         schedule.timezone("UTC");
         final Timer timer = timerService.createCalendarTimer(schedule);
-        LOGGER.info("Starting TC stats parser with schedule: {}", timer.getSchedule());
+        LOGGER.info("Starting end of month TC stats reset with schedule: {}", timer.getSchedule());
     }
 
     /**
@@ -93,6 +90,9 @@ public class TeamCompetitionResetScheduler {
     @Timeout
     public void scheduleTeamCompetitionStatsReset(final Timer timer) {
         LOGGER.trace("Timer fired at: {}", timer);
+
+        // TODO: Save last results of the month
+
         LOGGER.warn("Resetting TC stats for new month");
 
         SystemStateManager.next(SystemState.RESETTING_STATS);
@@ -116,7 +116,7 @@ public class TeamCompetitionResetScheduler {
      * @see OldFacade#setCurrentStatsAsInitialStatsForUser(User)
      * @see OldFacade#clearOffsetStats()
      * @see OldFacade#deleteRetiredUserStats()
-     * @see TeamCompetitionStatsScheduler#manualTeamCompetitionStatsParsing(ExecutionType)
+     * @see StatsScheduler#manualTeamCompetitionStatsParsing(ExecutionType)
      */
     public void resetTeamCompetitionStats() {
         try {
@@ -132,7 +132,7 @@ public class TeamCompetitionResetScheduler {
             LOGGER.info("Deleting retired users");
             oldFacade.deleteRetiredUserStats();
             resetCaches();
-            teamCompetitionStatsScheduler.manualTeamCompetitionStatsParsing(ExecutionType.SYNCHRONOUS);
+            statsScheduler.manualTeamCompetitionStatsParsing(ExecutionType.SYNCHRONOUS);
         } catch (final Exception e) {
             LOGGER.debug("Unexpected error manually resetting TC stats", e);
             LOGGER.warn("Unexpected error manually resetting TC stats"); // TODO: [zodac] Should be logging exception message too

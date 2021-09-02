@@ -14,7 +14,7 @@ import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.utils.ExecutionType;
 import me.zodac.folding.db.DbManagerRetriever;
 import me.zodac.folding.ejb.OldFacade;
-import me.zodac.folding.ejb.scheduled.TeamCompetitionStatsScheduler;
+import me.zodac.folding.ejb.scheduled.tc.StatsScheduler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -37,7 +37,7 @@ public class Initialiser {
     private OldFacade oldFacade;
 
     @EJB
-    private TeamCompetitionStatsScheduler teamCompetitionStatsScheduler;
+    private StatsScheduler statsScheduler;
 
     /**
      * On system startup, we execute the following actions to initialise the system for requests:
@@ -49,7 +49,7 @@ public class Initialiser {
      * </ol>
      *
      * @see DbManager#isAnyHourlyTcStats()
-     * @see TeamCompetitionStatsScheduler#manualTeamCompetitionStatsParsing(ExecutionType)
+     * @see StatsScheduler#manualTeamCompetitionStatsParsing(ExecutionType)
      */
     @PostConstruct
     public void init() {
@@ -78,7 +78,7 @@ public class Initialiser {
     private void initTcStats() {
         if (!DB_MANAGER.isAnyHourlyTcStats()) { // TODO: [zodac] Go through BL
             LOGGER.warn("No TC stats data exists in the DB");
-            teamCompetitionStatsScheduler.manualTeamCompetitionStatsParsing(ExecutionType.ASYNCHRONOUS);
+            statsScheduler.manualTeamCompetitionStatsParsing(ExecutionType.ASYNCHRONOUS);
         }
     }
 }

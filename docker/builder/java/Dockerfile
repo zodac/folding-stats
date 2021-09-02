@@ -1,4 +1,4 @@
-FROM maven:3.8.1-openjdk-11
+FROM maven:3.8.2-openjdk-11
 
 RUN mkdir --parents /folding-stats/
 WORKDIR /folding-stats/

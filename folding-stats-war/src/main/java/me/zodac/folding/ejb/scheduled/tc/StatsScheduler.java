@@ -1,4 +1,4 @@
-package me.zodac.folding.ejb.scheduled;
+package me.zodac.folding.ejb.scheduled.tc;
 
 import java.util.Collection;
 import javax.annotation.PostConstruct;
@@ -36,12 +36,12 @@ import org.apache.logging.log4j.Logger;
  *     <li>STATS_PARSING_SCHEDULE_LAST_DAY_OF_MONTH</li>
  * </ul>
  *
- * <b>NOTE:</b> The {@link TeamCompetitionResetScheduler} schedule cannot be modified, so you should be careful not to
- * have the {@link TeamCompetitionStatsScheduler} conflict with the reset time.
+ * <b>NOTE:</b> The {@link EndOfMonthResetScheduler} schedule cannot be modified, so you should be careful not to
+ * have the {@link StatsScheduler} conflict with the reset time.
  */
 @Startup
 @Singleton
-public class TeamCompetitionStatsScheduler {
+public class StatsScheduler {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final boolean IS_STATS_SCHEDULED_PARSING_ENABLED =

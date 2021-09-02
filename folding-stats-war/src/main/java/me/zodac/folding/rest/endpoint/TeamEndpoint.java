@@ -21,7 +21,7 @@ import javax.ws.rs.core.Response;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.utils.ExecutionType;
 import me.zodac.folding.api.validator.ValidationResponse;
-import me.zodac.folding.ejb.scheduled.TeamCompetitionStatsScheduler;
+import me.zodac.folding.ejb.scheduled.tc.StatsScheduler;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
 import me.zodac.folding.rest.validator.TeamValidator;
 import org.apache.logging.log4j.LogManager;
@@ -38,7 +38,7 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @EJB
-    private TeamCompetitionStatsScheduler teamCompetitionStatsScheduler;
+    private StatsScheduler statsScheduler;
 
     @POST
     @RolesAllowed("admin")
@@ -102,7 +102,7 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
     @Override
     protected Team createElement(final Team team) {
         final Team teamWithId = businessLogic.createTeam(team);
-        teamCompetitionStatsScheduler.manualTeamCompetitionStatsParsing(ExecutionType.SYNCHRONOUS);
+        statsScheduler.manualTeamCompetitionStatsParsing(ExecutionType.SYNCHRONOUS);
         return teamWithId;
     }
 
