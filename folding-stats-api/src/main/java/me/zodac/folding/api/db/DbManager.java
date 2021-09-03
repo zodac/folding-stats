@@ -1,5 +1,6 @@
 package me.zodac.folding.api.db;
 
+import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
@@ -95,7 +96,7 @@ public interface DbManager {
 
     void deleteRetiredUserStats();
 
-    void persistMonthlyResult(final String result, final Month month, final Year year);
+    void persistMonthlyResult(final String result, final LocalDateTime utcTimestamp);
 
     Optional<String> getMonthlyResult(final Month month, final Year year);
 

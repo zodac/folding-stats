@@ -928,12 +928,10 @@ public final class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public void persistMonthlyResult(final String result, final Month month, final Year year) {
-        LOGGER.debug("Persisting monthly result for {}/{}", () -> year, () -> DateTimeUtils.formatMonth(month));
+    public void persistMonthlyResult(final String result, final LocalDateTime utcTimestamp) {
+        LOGGER.debug("Persisting monthly result for {}/{}", utcTimestamp::getYear, () -> DateTimeUtils.formatMonth(utcTimestamp.getMonth()));
 
         executeQuery(queryContext -> {
-            final LocalDateTime utcTimestamp = DateTimeUtils.getLocalDateTimeOf(year, month);
-
             final var query = queryContext
                 .insertInto(MONTHLY_RESULTS)
                 .columns(MONTHLY_RESULTS.UTC_TIMESTAMP, MONTHLY_RESULTS.JSON_RESULT)
@@ -944,7 +942,7 @@ public final class PostgresDbManager implements DbManager {
             return query.execute();
         });
     }
-    
+
     @Override
     public Optional<String> getMonthlyResult(final Month month, final Year year) {
         LOGGER.debug("Retrieving monthly result for {}/{}", () -> year, () -> DateTimeUtils.formatMonth(month));
@@ -955,6 +953,7 @@ public final class PostgresDbManager implements DbManager {
                 .from(MONTHLY_RESULTS)
                 .where(year(MONTHLY_RESULTS.UTC_TIMESTAMP).equal(year.getValue()))
                 .and(month(MONTHLY_RESULTS.UTC_TIMESTAMP).equal(month.getValue()))
+                .orderBy(MONTHLY_RESULTS.UTC_TIMESTAMP.desc())
                 .limit(SINGLE_RESULT);
 
             LOGGER.debug("Executing SQL: '{}'", query);

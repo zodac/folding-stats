@@ -1,6 +1,7 @@
 package me.zodac.folding.ejb;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
@@ -336,8 +337,8 @@ public class OldFacade {
         dbManager.deleteRetiredUserStats();
     }
 
-    public void persistMonthlyResult(final String result, final Month month, final Year year) {
-        dbManager.persistMonthlyResult(result, month, year);
+    public void persistMonthlyResult(final String result, final LocalDateTime utcTimestamp) {
+        dbManager.persistMonthlyResult(result, utcTimestamp);
     }
 
     public Optional<String> getMonthlyResult(final Month month, final Year year) {

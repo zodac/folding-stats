@@ -6,6 +6,7 @@ import static me.zodac.folding.db.postgres.TestGenerator.nextUserName;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
@@ -392,12 +393,14 @@ class PostgresDbManagerTest {
         final Year firstResultYear = Year.of(2020);
         final Month firstResultMonth = Month.APRIL;
         final String firstResult = "firstResult";
-        POSTGRES_DB_MANAGER.persistMonthlyResult(firstResult, firstResultMonth, firstResultYear);
+        final LocalDateTime firstResultUtcTimestamp = DateTimeUtils.getLocalDateTimeOf(firstResultYear, firstResultMonth);
+        POSTGRES_DB_MANAGER.persistMonthlyResult(firstResult, firstResultUtcTimestamp);
 
         final Year secondResultYear = Year.of(2019);
         final Month secondResultMonth = Month.SEPTEMBER;
         final String secondResult = "secondResult";
-        POSTGRES_DB_MANAGER.persistMonthlyResult(secondResult, secondResultMonth, secondResultYear);
+        final LocalDateTime secondResultUtcTimestamp = DateTimeUtils.getLocalDateTimeOf(secondResultYear, secondResultMonth);
+        POSTGRES_DB_MANAGER.persistMonthlyResult(secondResult, secondResultUtcTimestamp);
 
         final Optional<String> firstResultOutput = POSTGRES_DB_MANAGER.getMonthlyResult(firstResultMonth, firstResultYear);
         assertThat(firstResultOutput)
