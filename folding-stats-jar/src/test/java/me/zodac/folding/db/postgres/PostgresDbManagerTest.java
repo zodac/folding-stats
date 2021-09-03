@@ -388,6 +388,35 @@ class PostgresDbManagerTest {
     }
 
     @Test
+    void validMonthlyResultTest() {
+        final Year firstResultYear = Year.of(2020);
+        final Month firstResultMonth = Month.APRIL;
+        final String firstResult = "firstResult";
+        POSTGRES_DB_MANAGER.persistMonthlyResult(firstResult, firstResultMonth, firstResultYear);
+
+        final Year secondResultYear = Year.of(2019);
+        final Month secondResultMonth = Month.SEPTEMBER;
+        final String secondResult = "secondResult";
+        POSTGRES_DB_MANAGER.persistMonthlyResult(secondResult, secondResultMonth, secondResultYear);
+
+        final Optional<String> firstResultOutput = POSTGRES_DB_MANAGER.getMonthlyResult(firstResultMonth, firstResultYear);
+        assertThat(firstResultOutput)
+            .isPresent();
+        assertThat(firstResultOutput.get())
+            .isEqualTo(firstResult);
+
+        final Optional<String> secondResultOutput = POSTGRES_DB_MANAGER.getMonthlyResult(secondResultMonth, secondResultYear);
+        assertThat(secondResultOutput)
+            .isPresent();
+        assertThat(secondResultOutput.get())
+            .isEqualTo(secondResult);
+
+        final Optional<String> invalidResultOutput = POSTGRES_DB_MANAGER.getMonthlyResult(Month.JUNE, Year.of(1999));
+        assertThat(invalidResultOutput)
+            .isNotPresent();
+    }
+
+    @Test
     void validSystemUserTest() {
         final SystemUserAuthentication invalidUserName = POSTGRES_DB_MANAGER.authenticateSystemUser("invalidUserName", "ADMIN_PASSWORD");
         assertThat(invalidUserName.isUserExists())

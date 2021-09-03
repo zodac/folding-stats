@@ -72,6 +72,17 @@ public final class DateTimeUtils {
     }
 
     /**
+     * Get the {@link LocalDateTime} for the given values.
+     *
+     * @param year  the {@link Year}
+     * @param month the {@link Month}
+     * @return the {@link LocalDateTime}
+     */
+    public static LocalDateTime getLocalDateTimeOf(final Year year, final Month month) {
+        return LocalDateTime.of(year.getValue(), month.getValue(), 1, 0, 0, 0);
+    }
+
+    /**
      * Get the {@link Timestamp} in {@link ZoneOffset#UTC} for the given values.
      *
      * @param year   the {@link Year}

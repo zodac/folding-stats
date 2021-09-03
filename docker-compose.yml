@@ -47,6 +47,8 @@ services:
       STATS_URL_ROOT: "https://api2.foldingathome.org"
       # NOTE: The monthly reset will always occur at 00:15 on the first of the month
       ENABLE_STATS_MONTHLY_RESET: "true"
+      # NOTE: The monthly result will always occur at 00:00 on the first of the month
+      ENABLE_MONTHLY_RESULT_STORAGE: "true"
       # Scheduled stats parsing configuration
       # NOTE: This time is hardcoded in the frontend, will also need to update 'timer.js'
       ENABLE_STATS_SCHEDULED_PARSING: "true"

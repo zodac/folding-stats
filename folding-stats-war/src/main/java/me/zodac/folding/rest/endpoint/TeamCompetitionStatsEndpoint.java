@@ -40,6 +40,7 @@ import me.zodac.folding.ejb.LeaderboardStatsGenerator;
 import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.ejb.UserTeamCompetitionStatsParser;
 import me.zodac.folding.ejb.scheduled.tc.EndOfMonthResetScheduler;
+import me.zodac.folding.ejb.scheduled.tc.EndOfMonthResultStorageScheduler;
 import me.zodac.folding.ejb.scheduled.tc.StatsScheduler;
 import me.zodac.folding.rest.api.tc.CompetitionSummary;
 import me.zodac.folding.rest.api.tc.UserSummary;
@@ -67,6 +68,9 @@ public class TeamCompetitionStatsEndpoint {
 
     @EJB
     private EndOfMonthResetScheduler endOfMonthResetScheduler;
+
+    @EJB
+    private EndOfMonthResultStorageScheduler endOfMonthResultStorageScheduler;
 
     @EJB
     private LeaderboardStatsGenerator leaderboardStatsGenerator;
@@ -285,6 +289,26 @@ public class TeamCompetitionStatsEndpoint {
             return ok();
         } catch (final Exception e) {
             LOGGER.error("Unexpected error manually resetting TC stats", e);
+            return serverError();
+        }
+    }
+
+    @GET
+//    @RolesAllowed("admin")
+    @Path("/manual/store_result/")
+    public Response storeMonthlyResult() {
+        LOGGER.info("GET request received to manually store monthly TC result");
+
+        if (SystemStateManager.current().isReadBlocked()) {
+            LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
+            return serviceUnavailable();
+        }
+
+        try {
+            endOfMonthResultStorageScheduler.storeMonthlyResult();
+            return ok();
+        } catch (final Exception e) {
+            LOGGER.error("Unexpected error manually storing TC result", e);
             return serverError();
         }
     }

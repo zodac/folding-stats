@@ -18,6 +18,7 @@ import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.api.utils.DateTimeUtils;
 import me.zodac.folding.db.postgres.gen.tables.records.HardwareRecord;
+import me.zodac.folding.db.postgres.gen.tables.records.MonthlyResultsRecord;
 import me.zodac.folding.db.postgres.gen.tables.records.RetiredUserStatsRecord;
 import me.zodac.folding.db.postgres.gen.tables.records.TeamsRecord;
 import me.zodac.folding.db.postgres.gen.tables.records.UserInitialStatsRecord;
@@ -187,6 +188,16 @@ final class RecordConverter {
                 retiredUserStatsRecord.getFinalUnits()
             )
         );
+    }
+
+    /**
+     * Convert a {@link MonthlyResultsRecord} into a {@link String} containing the monthly result.
+     *
+     * @param monthlyResultsRecord the {@link MonthlyResultsRecord} to convert
+     * @return the converted {@link String}
+     */
+    static String toMonthlyResults(final MonthlyResultsRecord monthlyResultsRecord) {
+        return monthlyResultsRecord.getJsonResult();
     }
 
     /**

@@ -335,4 +335,12 @@ public class OldFacade {
     public void deleteRetiredUserStats() {
         dbManager.deleteRetiredUserStats();
     }
+
+    public void persistMonthlyResult(final String result, final Month month, final Year year) {
+        dbManager.persistMonthlyResult(result, month, year);
+    }
+
+    public Optional<String> getMonthlyResult(final Month month, final Year year) {
+        return dbManager.getMonthlyResult(month, year);
+    }
 }

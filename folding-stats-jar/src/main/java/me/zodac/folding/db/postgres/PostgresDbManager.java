@@ -3,6 +3,7 @@ package me.zodac.folding.db.postgres;
 import static java.util.stream.Collectors.toList;
 import static me.zodac.folding.db.postgres.gen.Routines.crypt;
 import static me.zodac.folding.db.postgres.gen.tables.Hardware.HARDWARE;
+import static me.zodac.folding.db.postgres.gen.tables.MonthlyResults.MONTHLY_RESULTS;
 import static me.zodac.folding.db.postgres.gen.tables.RetiredUserStats.RETIRED_USER_STATS;
 import static me.zodac.folding.db.postgres.gen.tables.SystemUsers.SYSTEM_USERS;
 import static me.zodac.folding.db.postgres.gen.tables.Teams.TEAMS;
@@ -923,6 +924,47 @@ public final class PostgresDbManager implements DbManager {
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
+        });
+    }
+
+    @Override
+    public void persistMonthlyResult(final String result, final Month month, final Year year) {
+        LOGGER.debug("Persisting monthly result for {}/{}", () -> year, () -> DateTimeUtils.formatMonth(month));
+
+        executeQuery(queryContext -> {
+            final LocalDateTime utcTimestamp = DateTimeUtils.getLocalDateTimeOf(year, month);
+
+            final var query = queryContext
+                .insertInto(MONTHLY_RESULTS)
+                .columns(MONTHLY_RESULTS.UTC_TIMESTAMP, MONTHLY_RESULTS.JSON_RESULT)
+                .values(utcTimestamp, result);
+
+            LOGGER.debug("Executing SQL: '{}'", query);
+
+            return query.execute();
+        });
+    }
+    
+    @Override
+    public Optional<String> getMonthlyResult(final Month month, final Year year) {
+        LOGGER.debug("Retrieving monthly result for {}/{}", () -> year, () -> DateTimeUtils.formatMonth(month));
+
+        return executeQuery(queryContext -> {
+            final var query = queryContext
+                .select(MONTHLY_RESULTS.JSON_RESULT)
+                .from(MONTHLY_RESULTS)
+                .where(year(MONTHLY_RESULTS.UTC_TIMESTAMP).equal(year.getValue()))
+                .and(month(MONTHLY_RESULTS.UTC_TIMESTAMP).equal(month.getValue()))
+                .limit(SINGLE_RESULT);
+
+            LOGGER.debug("Executing SQL: '{}'", query);
+
+            return query
+                .fetch()
+                .into(MONTHLY_RESULTS)
+                .stream()
+                .map(RecordConverter::toMonthlyResults)
+                .findAny();
         });
     }
 

@@ -32,7 +32,7 @@ import org.apache.logging.log4j.Logger;
  * </ul>
  *
  * <b>NOTE:</b> The {@link StatsScheduler} <i>can</i> have its schedule changed, but should not be set to conflict
- * with this reset time.
+ * with this time.
  */
 @Startup
 @Singleton
@@ -81,8 +81,7 @@ public class EndOfMonthResetScheduler {
     }
 
     /**
-     * Scheduled execution to reset the <code>Team Competition</code>
-     * stats.
+     * Scheduled execution to reset the <code>Team Competition</code> stats.
      *
      * @param timer the {@link Timer} for scheduled execution
      * @see #resetTeamCompetitionStats()
@@ -90,10 +89,7 @@ public class EndOfMonthResetScheduler {
     @Timeout
     public void scheduleTeamCompetitionStatsReset(final Timer timer) {
         LOGGER.trace("Timer fired at: {}", timer);
-
-        // TODO: Save last results of the month
-
-        LOGGER.warn("Resetting TC stats for new month");
+        LOGGER.warn("Resetting TC stats for end of month");
 
         SystemStateManager.next(SystemState.RESETTING_STATS);
         resetTeamCompetitionStats();

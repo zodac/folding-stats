@@ -543,6 +543,17 @@ traits:
             description: "System user does not have the correct role to perform this request"
           503:
             description: "The system is not in a valid state to execute write requests"
+    /store_result:
+      get:
+        is: [ "adminOnly" ]
+        description: "Requests the storage of the current month's TC stats"
+        responses:
+          401:
+            description: "System user cannot be successfully logged in with provided credentials"
+          403:
+            description: "System user does not have the correct role to perform this request"
+          503:
+            description: "The system is not in a valid state to execute read requests"
   /users/{userId}:
     uriParameters:
       userId:

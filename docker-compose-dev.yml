@@ -46,6 +46,8 @@ services:
       STATS_URL_ROOT: "http://192.168.99.100:8081" # TODO: [zodac] Not working with 'wildfly_dev' as host
       # NOTE: The monthly reset will always occur at 00:15 on the first of the month
       ENABLE_STATS_MONTHLY_RESET: "false"
+      # NOTE: The monthly result will always occur at 00:00 on the first of the month
+      ENABLE_MONTHLY_RESULT_STORAGE: "false"
       # Scheduled stats parsing configuration
       ENABLE_STATS_SCHEDULED_PARSING: "false"
       STATS_PARSING_SCHEDULE_HOUR: "*"

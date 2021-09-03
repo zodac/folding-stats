@@ -95,5 +95,9 @@ public interface DbManager {
 
     void deleteRetiredUserStats();
 
+    void persistMonthlyResult(final String result, final Month month, final Year year);
+
+    Optional<String> getMonthlyResult(final Month month, final Year year);
+
     SystemUserAuthentication authenticateSystemUser(final String userName, final String password);
 }
