@@ -124,6 +124,8 @@ public class StartOfMonthResetScheduler {
             if (users.isEmpty()) {
                 LOGGER.error("No TC users configured in system to reset!");
             } else {
+                // Pull stats one more time to get the latest values
+                statsScheduler.manualTeamCompetitionStatsParsing(ExecutionType.SYNCHRONOUS);
                 resetStats(users);
                 LOGGER.info("Clearing offsets");
                 oldFacade.clearOffsetStats();
