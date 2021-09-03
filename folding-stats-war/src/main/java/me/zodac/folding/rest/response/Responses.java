@@ -26,7 +26,7 @@ public final class Responses {
      * A <b>200_OK</b> {@link Response}.
      *
      * <p>
-     * Generally used for cases where a HTTP request is sent to request something from the system, but no response is
+     * Generally used for cases where an HTTP request is sent to request something from the system, but no response is
      * required, such as a delete request, for example.
      *
      * @return the <b>200_OK</b> {@link Response}
@@ -41,7 +41,7 @@ public final class Responses {
      * A <b>200_OK</b> {@link Response}.
      *
      * <p>
-     * Generally used for cases where a HTTP request is sent to retrieve a {@link Collection} of {@link ResponsePojo} resources.
+     * Generally used for cases where an HTTP request is sent to retrieve a {@link Collection} of {@link ResponsePojo} resources.
      *
      * @param entities the {@link Collection} of {@link ResponsePojo} resourced being retrieved
      * @return the <b>200_OK</b> {@link Response}
@@ -56,7 +56,7 @@ public final class Responses {
      * A <b>200_OK</b> {@link Response}.
      *
      * <p>
-     * Generally used for cases where a HTTP request is sent to retrieve a single {@link ResponsePojo} resource, or also
+     * Generally used for cases where an HTTP request is sent to retrieve a single {@link ResponsePojo} resource, or also
      * if a batch of resources is being created (since there are partial failure scenarios, we cannot return a <b>201_CREATED</b>).
      *
      * @param entity the {@link Object} being retrieved
@@ -72,7 +72,7 @@ public final class Responses {
      * A <b>200_OK</b> {@link Response}.
      *
      * <p>
-     * Generally used for cases where a HTTP request is sent to update a single {@link ResponsePojo} resource.
+     * Generally used for cases where an HTTP request is sent to update a single {@link ResponsePojo} resource.
      *
      * @param entity                the updated resource
      * @param entityLocationBuilder the {@link UriBuilder} defining the {@link java.net.URI} of the updated resource, to
@@ -90,7 +90,7 @@ public final class Responses {
      * A <b>200_OK</b> {@link Response.ResponseBuilder}.
      *
      * <p>
-     * Generally used for cases where a HTTP request is sent to create a batch of {@link ResponsePojo} resources, but
+     * Generally used for cases where an HTTP request is sent to create a batch of {@link ResponsePojo} resources, but
      * the REST layer might want to add additional logic like a {@link javax.ws.rs.core.CacheControl}.
      *
      * @param entities the {@link Collection} of {@link ResponsePojo} resourced being retrieved
@@ -108,7 +108,7 @@ public final class Responses {
      * A <b>200_OK</b> {@link Response}.
      *
      * <p>
-     * Generally used for cases where a HTTP request is sent to retrieve a single {@link ResponsePojo} resource, or also
+     * Generally used for cases where an HTTP request is sent to retrieve a single {@link ResponsePojo} resource, or also
      * if a batch of resources is being created (since there are partial failure scenarios, we cannot return a <b>201_CREATED</b>),
      * but the REST layer might want to add additional logic like a {@link javax.ws.rs.core.CacheControl}.
      *

@@ -7,6 +7,7 @@ import me.zodac.folding.rest.endpoint.DebugEndpoint;
 import me.zodac.folding.rest.endpoint.HardwareEndpoint;
 import me.zodac.folding.rest.endpoint.HistoricStatsEndpoint;
 import me.zodac.folding.rest.endpoint.LoginEndpoint;
+import me.zodac.folding.rest.endpoint.MonthlyResultEndpoint;
 import me.zodac.folding.rest.endpoint.TeamCompetitionStatsEndpoint;
 import me.zodac.folding.rest.endpoint.TeamEndpoint;
 import me.zodac.folding.rest.endpoint.UserEndpoint;
@@ -31,6 +32,7 @@ public class JaxRsApplication extends Application {
             HardwareEndpoint.class,
             HistoricStatsEndpoint.class,
             LoginEndpoint.class,
+            MonthlyResultEndpoint.class,
             TeamCompetitionStatsEndpoint.class,
             TeamEndpoint.class,
             UserEndpoint.class,

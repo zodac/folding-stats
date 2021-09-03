@@ -480,6 +480,47 @@ traits:
         503:
           description: "The system is not in a valid state to execute write requests"
 
+/result:
+  /{year}/{month}:
+    uriParameters:
+      year:
+        description: "The year of the monthly TC result to be retrieved"
+        type: integer
+        required: true
+      month:
+        description: "The month of the monthly TC result to be retrieved"
+        type: integer
+        required: true
+    get:
+      description: "Retrieves the TC result for the given month/year"
+      responses:
+        200:
+          description: "TC result is retrieved successfully"
+          body:
+            application/json:
+              example: !include responses/result/get.json
+        400:
+          description: "The year or month"
+          body:
+            application/json:
+              example: !include responses/result/getBadRequest.json
+        404:
+          description: "No TC result exists for the given month/year"
+
+  /manual/save:
+    get:
+      is: [ "adminOnly" ]
+      description: "Request a manual save of the current TC result"
+      responses:
+        200:
+          description: "TC result has been successfully saved"
+        401:
+          description: "System user cannot be successfully logged in with provided credentials"
+        403:
+          description: "System user does not have the correct role to perform this request"
+        503:
+          description: "The system is not in a valid state to execute read requests"
+
 /stats:
   get:
     description:
@@ -543,17 +584,6 @@ traits:
             description: "System user does not have the correct role to perform this request"
           503:
             description: "The system is not in a valid state to execute write requests"
-    /store_result:
-      get:
-        is: [ "adminOnly" ]
-        description: "Requests the storage of the current month's TC stats"
-        responses:
-          401:
-            description: "System user cannot be successfully logged in with provided credentials"
-          403:
-            description: "System user does not have the correct role to perform this request"
-          503:
-            description: "The system is not in a valid state to execute read requests"
   /users/{userId}:
     uriParameters:
       userId:
