@@ -4,7 +4,6 @@ var selectedUserId = 0;
 var selectedUser = "";
 var selectedYear = new Date().getUTCFullYear();
 
-
 function getUserHistoricStats(userId, userName, day, month, monthName, year) {
     if(userId != 0){
         selectedUserId = userId;

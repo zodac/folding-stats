@@ -1,5 +1,7 @@
 package me.zodac.folding.api.tc.result;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.AccessLevel;
@@ -35,5 +37,19 @@ public class MonthlyResult {
     public static MonthlyResult create(final List<TeamLeaderboardEntry> teamLeaderboard,
                                        final Map<Category, List<UserCategoryLeaderboardEntry>> userCategoryLeaderboard) {
         return new MonthlyResult(teamLeaderboard, userCategoryLeaderboard);
+    }
+
+    /**
+     * Creates an empty {@link MonthlyResult}.
+     *
+     * @return the empty {@link MonthlyResult}
+     */
+    public static MonthlyResult empty() {
+        final Map<Category, List<UserCategoryLeaderboardEntry>> emptyCategoryResult = new HashMap<>(Category.getAllValues().size());
+        for (final Category category : Category.getAllValues()) {
+            emptyCategoryResult.put(category, Collections.emptyList());
+        }
+        
+        return new MonthlyResult(Collections.emptyList(), emptyCategoryResult);
     }
 }

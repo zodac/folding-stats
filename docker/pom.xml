@@ -153,7 +153,7 @@
                                 <jsSourceFile>historic-user-hourly.js</jsSourceFile>
                                 <!-- Util files -->
                                 <jsSourceFile>util/display_toggle.js</jsSourceFile>
-                                <jsSourceFile>util/dropdown_populator.js</jsSourceFile>
+                                <jsSourceFile>util/historic_dropdown_populator.js</jsSourceFile>
                                 <jsSourceFile>util/ordinal_suffix.js</jsSourceFile>
                                 <jsSourceFile>util/padding.js</jsSourceFile>
                                 <jsSourceFile>util/table_sort.js</jsSourceFile>
@@ -184,7 +184,7 @@
                                 <jsSourceFile>historic-user-daily.js</jsSourceFile>
                                 <!-- Util files -->
                                 <jsSourceFile>util/display_toggle.js</jsSourceFile>
-                                <jsSourceFile>util/dropdown_populator.js</jsSourceFile>
+                                <jsSourceFile>util/historic_dropdown_populator.js</jsSourceFile>
                                 <jsSourceFile>util/ordinal_suffix.js</jsSourceFile>
                                 <jsSourceFile>util/table_sort.js</jsSourceFile>
                                 <jsSourceFile>util/timer.js</jsSourceFile>
@@ -214,7 +214,7 @@
                                 <jsSourceFile>historic-user-monthly.js</jsSourceFile>
                                 <!-- Util files -->
                                 <jsSourceFile>util/display_toggle.js</jsSourceFile>
-                                <jsSourceFile>util/dropdown_populator.js</jsSourceFile>
+                                <jsSourceFile>util/historic_dropdown_populator.js</jsSourceFile>
                                 <jsSourceFile>util/table_sort.js</jsSourceFile>
                                 <jsSourceFile>util/timer.js</jsSourceFile>
                                 <jsSourceFile>util/toast.js</jsSourceFile>
@@ -243,7 +243,7 @@
                                 <jsSourceFile>historic-team-hourly.js</jsSourceFile>
                                 <!-- Util files -->
                                 <jsSourceFile>util/display_toggle.js</jsSourceFile>
-                                <jsSourceFile>util/dropdown_populator.js</jsSourceFile>
+                                <jsSourceFile>util/historic_dropdown_populator.js</jsSourceFile>
                                 <jsSourceFile>util/ordinal_suffix.js</jsSourceFile>
                                 <jsSourceFile>util/padding.js</jsSourceFile>
                                 <jsSourceFile>util/table_sort.js</jsSourceFile>
@@ -274,7 +274,7 @@
                                 <jsSourceFile>historic-team-daily.js</jsSourceFile>
                                 <!-- Util files -->
                                 <jsSourceFile>util/display_toggle.js</jsSourceFile>
-                                <jsSourceFile>util/dropdown_populator.js</jsSourceFile>
+                                <jsSourceFile>util/historic_dropdown_populator.js</jsSourceFile>
                                 <jsSourceFile>util/ordinal_suffix.js</jsSourceFile>
                                 <jsSourceFile>util/table_sort.js</jsSourceFile>
                                 <jsSourceFile>util/timer.js</jsSourceFile>
@@ -304,12 +304,40 @@
                                 <jsSourceFile>historic-team-monthly.js</jsSourceFile>
                                 <!-- Util files -->
                                 <jsSourceFile>util/display_toggle.js</jsSourceFile>
-                                <jsSourceFile>util/dropdown_populator.js</jsSourceFile>
+                                <jsSourceFile>util/historic_dropdown_populator.js</jsSourceFile>
                                 <jsSourceFile>util/table_sort.js</jsSourceFile>
                                 <jsSourceFile>util/timer.js</jsSourceFile>
                                 <jsSourceFile>util/toast.js</jsSourceFile>
                             </jsSourceFiles>
                             <jsFinalFile>historic-team-monthly.js</jsFinalFile>
+                            <jsEngine>CLOSURE</jsEngine>
+
+                            <skipMerge>${skip-minify}</skipMerge>
+                            <skipMinify>${skip-minify}</skipMinify>
+                        </configuration>
+                        <goals>
+                            <goal>minify</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>minify-results-js</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <charset>UTF-8</charset>
+                            <webappSourceDir>${project.basedir}/frontend/src</webappSourceDir>
+                            <webappTargetDir>${project.basedir}/frontend/site/res</webappTargetDir>
+
+                            <jsSourceDir>js</jsSourceDir>
+                            <jsSourceFiles>
+                                <!-- Main JS file -->
+                                <jsSourceFile>results.js</jsSourceFile>
+                                <!-- Util files -->
+                                <jsSourceFile>util/display_toggle.js</jsSourceFile>
+                                <jsSourceFile>util/enum_mapper.js</jsSourceFile>
+                                <jsSourceFile>util/timer.js</jsSourceFile>
+                                <jsSourceFile>util/toast.js</jsSourceFile>
+                            </jsSourceFiles>
+                            <jsFinalFile>results.js</jsFinalFile>
                             <jsEngine>CLOSURE</jsEngine>
 
                             <skipMerge>${skip-minify}</skipMerge>

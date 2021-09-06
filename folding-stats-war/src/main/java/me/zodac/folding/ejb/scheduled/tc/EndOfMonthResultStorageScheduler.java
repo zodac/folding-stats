@@ -76,7 +76,7 @@ public class EndOfMonthResultStorageScheduler {
     @Timeout
     public void scheduleTeamCompetitionResultStorage(final Timer timer) {
         LOGGER.trace("Timer fired at: {}", timer);
-        LOGGER.warn("Storing TC stats for new month");
+        LOGGER.info("Storing TC stats for new month");
         storeMonthlyResult();
     }
 

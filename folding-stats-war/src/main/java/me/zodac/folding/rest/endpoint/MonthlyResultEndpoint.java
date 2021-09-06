@@ -1,7 +1,6 @@
 package me.zodac.folding.rest.endpoint;
 
 import static me.zodac.folding.rest.response.Responses.badRequest;
-import static me.zodac.folding.rest.response.Responses.notFound;
 import static me.zodac.folding.rest.response.Responses.ok;
 import static me.zodac.folding.rest.response.Responses.serverError;
 import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
@@ -64,7 +63,7 @@ public class MonthlyResultEndpoint {
             final Optional<String> result = oldFacade.getMonthlyResult(Month.of(Integer.parseInt(month)), Year.parse(year));
 
             if (result.isEmpty()) {
-                return notFound();
+                return ok(MonthlyResult.empty());
             }
 
             final MonthlyResult monthlyResult = GSON.fromJson(result.get(), MonthlyResult.class);

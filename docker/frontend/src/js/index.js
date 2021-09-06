@@ -145,73 +145,73 @@ function loadTeamLeaderboard() {
 
 function loadCategoryLeaderboard() {
     fetch(ROOT_URL+'/stats/category')
-        .then(response => {
-            return response.json();
-        })
-        .then(function(jsonResponse){
-            categoryDiv = document.getElementById("category_div");
+    .then(response => {
+        return response.json();
+    })
+    .then(function(jsonResponse){
+        categoryDiv = document.getElementById("category_div");
 
-            const categoryHeaders = ["Rank", "User", "Hardware", "Points", "Units", "Points to Leader", "Points to Next"];
-            const categoryProperties = ["rank", "displayName", "hardware", "multipliedPoints", "units", "diffToLeader", "diffToNext"];
+        const categoryHeaders = ["Rank", "User", "Hardware", "Points", "Units", "Points to Leader", "Points to Next"];
+        const categoryProperties = ["rank", "displayName", "hardware", "multipliedPoints", "units", "diffToLeader", "diffToNext"];
 
-            categoryLeaderboardTitle = document.createElement('h2');
-            categoryLeaderboardTitle.setAttribute("class", "navbar-brand");
-            categoryLeaderboardTitle.innerHTML = "Category Leaderboard";
-            categoryDiv.append(categoryLeaderboardTitle);
+        categoryLeaderboardTitle = document.createElement('h2');
+        categoryLeaderboardTitle.setAttribute("class", "navbar-brand");
+        categoryLeaderboardTitle.innerHTML = "Category Leaderboard";
+        categoryDiv.append(categoryLeaderboardTitle);
 
-            Object.keys(jsonResponse).forEach(function(key) {
-                var keyDisplay = getCategoryFrontend(key);
-                categoryTitle = document.createElement('h2');
-                categoryTitle.setAttribute("class", "navbar-brand");
-                categoryTitle.innerHTML = keyDisplay;
-                categoryDiv.append(categoryTitle);
+        Object.keys(jsonResponse).forEach(function(key) {
+            var keyDisplay = getCategoryFrontend(key);
+            categoryTitle = document.createElement('h2');
+            categoryTitle.setAttribute("class", "navbar-brand");
+            categoryTitle.innerHTML = keyDisplay;
+            categoryDiv.append(categoryTitle);
 
-                tableId = "category_" + key.replace(/\s+/g,"_").toLowerCase();
+            tableId = "category_" + key.replace(/\s+/g,"_").toLowerCase();
 
-                categoryTable = document.createElement('table');
-                categoryTable.setAttribute("id", tableId);
-                categoryTable.setAttribute("class", "table table-dark table-striped table-hover");
+            categoryTable = document.createElement('table');
+            categoryTable.setAttribute("id", tableId);
+            categoryTable.setAttribute("class", "table table-dark table-striped table-hover");
 
-                categoryTableHead = document.createElement('thead');
-                categoryTableHeaderRow = document.createElement('tr');
-                categoryHeaders.forEach(function (header, i) {
-                    categoryTableHeader = document.createElement("th");
-                    categoryTableHeader.setAttribute("onclick", "sortTable("+i+", '"+tableId+"')");
-                    categoryTableHeader.setAttribute("scope", "col");
-                    categoryTableHeader.innerHTML = header;
+            categoryTableHead = document.createElement('thead');
+            categoryTableHeaderRow = document.createElement('tr');
+            categoryHeaders.forEach(function (header, i) {
+                categoryTableHeader = document.createElement("th");
+                categoryTableHeader.setAttribute("onclick", "sortTable("+i+", '"+tableId+"')");
+                categoryTableHeader.setAttribute("scope", "col");
+                categoryTableHeader.innerHTML = header;
 
-                    categoryTableHeaderRow.append(categoryTableHeader);
-                });
-                categoryTableHead.append(categoryTableHeaderRow);
-                categoryTable.append(categoryTableHead);
-
-                categoryTableBody = document.createElement('tbody');
-
-                users = jsonResponse[key];
-                users.forEach(function(user){
-                    categoryTableBodyRow = document.createElement('tr');
-
-                    categoryProperties.forEach(function(property){
-                        categoryCell = document.createElement('td');
-
-                        if(property === "multipliedPoints") {
-                            categoryCell.setAttribute("data-bs-toggle", "tooltip");
-                            categoryCell.setAttribute("data-placement", "top");
-                            categoryCell.setAttribute("title", "Unmultiplied: " + user["points"].toLocaleString());
-                            new bootstrap.Tooltip(categoryCell);
-                        }
-
-                        categoryCell.innerHTML = user[property].toLocaleString();
-                        categoryTableBodyRow.append(categoryCell);
-                    });
-                    categoryTableBody.append(categoryTableBodyRow);
-                });
-                categoryTable.append(categoryTableBody);
-
-                categoryDiv.append(categoryTable);
-                categoryDiv.append(document.createElement('br'));
+                categoryTableHeaderRow.append(categoryTableHeader);
             });
+            categoryTableHead.append(categoryTableHeaderRow);
+            categoryTable.append(categoryTableHead);
+
+            categoryTableBody = document.createElement('tbody');
+
+            users = jsonResponse[key];
+            users.forEach(function(user){
+                categoryTableBodyRow = document.createElement('tr');
+
+                categoryProperties.forEach(function(property){
+                    categoryCell = document.createElement('td');
+
+                    if(property === "multipliedPoints") {
+                        categoryCell.setAttribute("data-bs-toggle", "tooltip");
+                        categoryCell.setAttribute("data-placement", "top");
+                        categoryCell.setAttribute("title", "Unmultiplied: " + user["points"].toLocaleString());
+                        new bootstrap.Tooltip(categoryCell);
+                    }
+
+                    categoryCell.innerHTML = user[property].toLocaleString();
+                    categoryTableBodyRow.append(categoryCell);
+                });
+                categoryTableBody.append(categoryTableBodyRow);
+            });
+            categoryTable.append(categoryTableBody);
+
+            categoryDiv.append(categoryTable);
+            categoryDiv.append(document.createElement('br'));
         });
+    });
 };
 
 function loadTeamStats() {
