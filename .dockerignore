@@ -1,4 +1,13 @@
-build
 Dockerfile
 .dockerignore
+
+# IntelliJ
+*.iml
+.idea/
+
+# Build
+target/
+build
+
+# git
 **/.git
