@@ -5,8 +5,9 @@ ARG ADMIN_PASSWORD
 
 RUN /opt/jboss/wildfly/bin/add-user.sh "${ADMIN_USERNAME}" "${ADMIN_PASSWORD}" --silent;
 
-# Configuration file is based off Wildfly 24.0.0.Final, may require updates as Wildfly version changes
+# Configuration files based off Wildfly 24.0.0.Final, may require updates as Wildfly version changes
 COPY ./docker/wildfly/config/standalone.xml /opt/jboss/wildfly/standalone/configuration/standalone.xml
+COPY ./docker/wildfly/config/standalone.conf /opt/jboss/wildfly/bin/standalone.conf
 
 # Set default directory to the log directory
 WORKDIR /opt/jboss/wildfly/standalone/log
