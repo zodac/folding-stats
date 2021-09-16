@@ -132,8 +132,7 @@ public class EndOfMonthResetScheduler {
             resetCaches();
             statsScheduler.manualTeamCompetitionStatsParsing(ExecutionType.SYNCHRONOUS);
         } catch (final Exception e) {
-            LOGGER.debug("Unexpected error manually resetting TC stats", e);
-            LOGGER.warn("Unexpected error manually resetting TC stats"); // TODO: [zodac] Should be logging exception message too
+            LOGGER.warn("Unexpected error manually resetting TC stats", e);
         }
     }
 

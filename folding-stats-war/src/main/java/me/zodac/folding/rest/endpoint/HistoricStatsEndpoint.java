@@ -41,7 +41,7 @@ import me.zodac.folding.rest.parse.ParseResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-// TODO: [zodac] Verify that all places that return a HTTP response also log something
+// TODO: [zodac] Verify that all places that return a HTTP response also log something (after removing AbstractCrudEndpoint)
 @Path("/historic/")
 @RequestScoped
 public class HistoricStatsEndpoint {
@@ -64,8 +64,10 @@ public class HistoricStatsEndpoint {
     @PermitAll
     @Path("/users/{userId}/{year}/{month}/{day}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getUserHistoricStatsHourly(@PathParam("userId") final String userId, @PathParam("year") final String year,
-                                               @PathParam("month") final String month, @PathParam("day") final String day,
+    public Response getUserHistoricStatsHourly(@PathParam("userId") final String userId,
+                                               @PathParam("year") final String year,
+                                               @PathParam("month") final String month,
+                                               @PathParam("day") final String day,
                                                @Context final Request request) {
         LOGGER.debug("GET request received to show hourly TC user stats at '{}'", uriContext.getAbsolutePath());
 
@@ -146,8 +148,10 @@ public class HistoricStatsEndpoint {
     @PermitAll
     @Path("/users/{userId}/{year}/{month}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getUserHistoricStatsDaily(@PathParam("userId") final String userId, @PathParam("year") final String year,
-                                              @PathParam("month") final String month, @Context final Request request) {
+    public Response getUserHistoricStatsDaily(@PathParam("userId") final String userId,
+                                              @PathParam("year") final String year,
+                                              @PathParam("month") final String month,
+                                              @Context final Request request) {
         LOGGER.debug("GET request received to show daily TC user stats at '{}'", uriContext.getAbsolutePath());
 
         if (SystemStateManager.current().isReadBlocked()) {
@@ -211,7 +215,8 @@ public class HistoricStatsEndpoint {
     @PermitAll
     @Path("/users/{userId}/{year}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getUserHistoricStatsMonthly(@PathParam("userId") final String userId, @PathParam("year") final String year,
+    public Response getUserHistoricStatsMonthly(@PathParam("userId") final String userId,
+                                                @PathParam("year") final String year,
                                                 @Context final Request request) {
         LOGGER.debug("GET request received to show monthly TC user stats at '{}'", uriContext.getAbsolutePath());
 
@@ -270,8 +275,10 @@ public class HistoricStatsEndpoint {
     @PermitAll
     @Path("/teams/{teamId}/{year}/{month}/{day}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getTeamHistoricStatsHourly(@PathParam("teamId") final String teamId, @PathParam("year") final String year,
-                                               @PathParam("month") final String month, @PathParam("day") final String day,
+    public Response getTeamHistoricStatsHourly(@PathParam("teamId") final String teamId,
+                                               @PathParam("year") final String year,
+                                               @PathParam("month") final String month,
+                                               @PathParam("day") final String day,
                                                @Context final Request request) {
         LOGGER.debug("GET request received to show hourly TC user stats at '{}'", uriContext.getAbsolutePath());
 
@@ -362,8 +369,10 @@ public class HistoricStatsEndpoint {
     @PermitAll
     @Path("/teams/{teamId}/{year}/{month}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getTeamHistoricStatsDaily(@PathParam("teamId") final String teamId, @PathParam("year") final String year,
-                                              @PathParam("month") final String month, @Context final Request request) {
+    public Response getTeamHistoricStatsDaily(@PathParam("teamId") final String teamId,
+                                              @PathParam("year") final String year,
+                                              @PathParam("month") final String month,
+                                              @Context final Request request) {
         LOGGER.debug("GET request received to show daily TC user stats at '{}'", uriContext.getAbsolutePath());
 
         if (SystemStateManager.current().isReadBlocked()) {
@@ -437,7 +446,8 @@ public class HistoricStatsEndpoint {
     @PermitAll
     @Path("/teams/{teamId}/{year}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getTeamHistoricStatsMonthly(@PathParam("teamId") final String teamId, @PathParam("year") final String year,
+    public Response getTeamHistoricStatsMonthly(@PathParam("teamId") final String teamId,
+                                                @PathParam("year") final String year,
                                                 @Context final Request request) {
         LOGGER.info("GET request received to show monthly TC team stats at '{}'", uriContext.getAbsolutePath());
 

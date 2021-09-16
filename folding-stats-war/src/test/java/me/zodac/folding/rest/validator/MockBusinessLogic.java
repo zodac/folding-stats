@@ -75,6 +75,14 @@ class MockBusinessLogic implements BusinessLogic {
         teams.remove(team.getId());
     }
 
+    public void createUser(final User user) {
+        users.put(user.getId(), user);
+    }
+
+    public void deleteUser(final User user) {
+        users.remove(user.getId());
+    }
+
     @Override
     public Optional<User> getUserWithPasskey(final int userId) {
         return Optional.ofNullable(users.get(userId));

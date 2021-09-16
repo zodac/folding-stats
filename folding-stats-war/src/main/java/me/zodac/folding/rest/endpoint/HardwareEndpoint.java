@@ -28,7 +28,6 @@ import org.apache.logging.log4j.Logger;
 /**
  * REST endpoints for {@link Hardware}s for <code>folding-stats</code>.
  */
-// TODO: [zodac] Add GET query endpoint to retrieve all hardware instances with same name
 @Path("/hardware/")
 @RequestScoped
 public class HardwareEndpoint extends AbstractCrudEndpoint<HardwareRequest, Hardware> {
@@ -113,7 +112,7 @@ public class HardwareEndpoint extends AbstractCrudEndpoint<HardwareRequest, Hard
     @Override
     protected ValidationResponse<Hardware> validateUpdateAndConvert(final HardwareRequest hardwareRequest, final Hardware existingHardware) {
         final HardwareValidator hardwareValidator = HardwareValidator.create(businessLogic);
-        return hardwareValidator.validateUpdate(hardwareRequest);
+        return hardwareValidator.validateUpdate(hardwareRequest, existingHardware);
     }
 
     @Override

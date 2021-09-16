@@ -78,7 +78,7 @@ public final class HardwareValidator {
         }
 
         if (hardwareRequest.getMultiplier() <= INVALID_MULTIPLIER_VALUE) {
-            failureMessages.add("Field 'multiplier' must be over 0.0");
+            failureMessages.add(String.format("Field 'multiplier' must be over %.2f", INVALID_MULTIPLIER_VALUE));
         }
 
         if (failureMessages.isEmpty()) {
@@ -98,17 +98,18 @@ public final class HardwareValidator {
      * Validation checks include:
      * <ul>
      *     <li>Field 'hardwareName' must not be empty</li>
-     *     <li>If field 'hardwareName' is not empty, it must not be used by another {@link Hardware}</li>
+     *     <li>If field 'hardwareName' is not empty, it must match the existing {@link Hardware}</li>
      *     <li>Field 'displayName' must not be empty</li>
      *     <li>Field 'operatingSystem' must be a valid {@link OperatingSystem}</li>
      *     <li>Field 'multiplier' must not be over <b>0.0</b></li>
      * </ul>
      *
-     * @param hardwareRequest the {@link HardwareRequest} to validate
+     * @param hardwareRequest  the {@link HardwareRequest} to validate
+     * @param existingHardware the already existing {@link Hardware} in the system to be updated
      * @return the {@link ValidationResponse}
      */
-    public ValidationResponse<Hardware> validateUpdate(final HardwareRequest hardwareRequest) {
-        if (hardwareRequest == null) {
+    public ValidationResponse<Hardware> validateUpdate(final HardwareRequest hardwareRequest, final Hardware existingHardware) {
+        if (hardwareRequest == null || existingHardware == null) {
             return ValidationResponse.nullObject();
         }
 
@@ -116,6 +117,12 @@ public final class HardwareValidator {
 
         if (StringUtils.isBlank(hardwareRequest.getHardwareName())) {
             failureMessages.add("Field 'hardwareName' must not be empty");
+        } else {
+            // Hardware name must be the same as the name of the existing hardware
+            if (!hardwareRequest.getHardwareName().equalsIgnoreCase(existingHardware.getHardwareName())) {
+                failureMessages.add(
+                    String.format("Field 'hardwareName' does not match existing hardware name '%s'", existingHardware.getHardwareName()));
+            }
         }
 
         if (StringUtils.isBlank(hardwareRequest.getDisplayName())) {
@@ -128,7 +135,7 @@ public final class HardwareValidator {
         }
 
         if (hardwareRequest.getMultiplier() <= INVALID_MULTIPLIER_VALUE) {
-            failureMessages.add("Field 'multiplier' must be over 0.0");
+            failureMessages.add(String.format("Field 'multiplier' must be over %.2f", INVALID_MULTIPLIER_VALUE));
         }
 
         if (failureMessages.isEmpty()) {

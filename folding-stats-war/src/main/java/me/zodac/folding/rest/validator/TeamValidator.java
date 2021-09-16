@@ -30,7 +30,7 @@ public final class TeamValidator {
      * @param businessLogic the {@link BusinessLogic} used for retrieval of {@link User}s for conflict checks
      * @return the created {@link TeamValidator}
      */
-    public static TeamValidator createValidator(final BusinessLogic businessLogic) {
+    public static TeamValidator create(final BusinessLogic businessLogic) {
         return new TeamValidator(businessLogic);
     }
 
@@ -85,15 +85,16 @@ public final class TeamValidator {
      * Validation checks include:
      * <ul>
      *     <li>Field 'teamName' must not be empty</li>
-     *     <li>If field 'teamName' is not empty, it must not be used by any other {@link Team}</li>
+     *     <li>If field 'teamName' is not empty, it must match the existing {@link Team}</li>
      *     <li>If field 'forumLink' is not empty, it must be a valid URL</li>
      * </ul>
      *
-     * @param teamRequest the {@link TeamRequest} to validate
+     * @param teamRequest  the {@link TeamRequest} to validate
+     * @param existingTeam the already existing {@link Team} in the system to be updated
      * @return the {@link ValidationResponse}
      */
-    public ValidationResponse<Team> validateUpdate(final TeamRequest teamRequest) {
-        if (teamRequest == null) {
+    public ValidationResponse<Team> validateUpdate(final TeamRequest teamRequest, final Team existingTeam) {
+        if (teamRequest == null || existingTeam == null) {
             return ValidationResponse.nullObject();
         }
 
@@ -101,10 +102,16 @@ public final class TeamValidator {
 
         if (StringUtils.isBlank(teamRequest.getTeamName())) {
             failureMessages.add("Field 'teamName' must not be empty");
+        } else {
+            // Team name must be the same as the name of the existing team
+            if (!teamRequest.getTeamName().equalsIgnoreCase(existingTeam.getTeamName())) {
+                failureMessages.add(
+                    String.format("Field 'teamName' does not match existing team name '%s'", existingTeam.getTeamName()));
+            }
         }
 
         if (StringUtils.isNotBlank(teamRequest.getForumLink()) && !URL_VALIDATOR.isValid(teamRequest.getForumLink())) {
-            failureMessages.add(String.format("Attribute 'forumLink' is not a valid link: '%s'", teamRequest.getForumLink()));
+            failureMessages.add(String.format("Field 'forumLink' is not a valid link: '%s'", teamRequest.getForumLink()));
         }
 
         if (failureMessages.isEmpty()) {

@@ -113,19 +113,19 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
 
     @Override
     protected ValidationResponse<Team> validateCreateAndConvert(final TeamRequest teamRequest) {
-        final TeamValidator teamValidator = TeamValidator.createValidator(businessLogic);
+        final TeamValidator teamValidator = TeamValidator.create(businessLogic);
         return teamValidator.validateCreate(teamRequest);
     }
 
     @Override
     protected ValidationResponse<Team> validateUpdateAndConvert(final TeamRequest teamRequest, final Team existingTeam) {
-        final TeamValidator teamValidator = TeamValidator.createValidator(businessLogic);
-        return teamValidator.validateUpdate(teamRequest);
+        final TeamValidator teamValidator = TeamValidator.create(businessLogic);
+        return teamValidator.validateUpdate(teamRequest, existingTeam);
     }
 
     @Override
     protected ValidationResponse<Team> validateDeleteAndConvert(final Team team) {
-        final TeamValidator teamValidator = TeamValidator.createValidator(businessLogic);
+        final TeamValidator teamValidator = TeamValidator.create(businessLogic);
         return teamValidator.validateDelete(team);
     }
 

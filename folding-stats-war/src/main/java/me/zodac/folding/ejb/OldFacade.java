@@ -98,20 +98,18 @@ public class OldFacade {
 
     public void updateUser(final User updatedUser, final User existingUser) throws ExternalConnectionException {
         dbManager.updateUser(updatedUser);
-        userCache.add(updatedUser.getId(), updatedUser); // TODO: [zodac] Is this unnecessary, or the other 4?
+        userCache.add(updatedUser.getId(), updatedUser);
 
         if (!existingUser.getHardware().equals(updatedUser.getHardware())) {
             LOGGER.debug("User had state change to hardware, {} -> {}, recalculating initial stats", existingUser.getHardware(),
                 updatedUser.getHardware());
             handleStateChangeForUser(updatedUser);
-            userCache.add(updatedUser.getId(), updatedUser);
             return;
         }
 
         if (!existingUser.getTeam().equals(updatedUser.getTeam())) {
             LOGGER.debug("User had state change to team, {} -> {}, recalculating initial stats", existingUser.getTeam(), updatedUser.getTeam());
             handleStateChangeForUser(updatedUser);
-            userCache.add(updatedUser.getId(), updatedUser);
             return;
         }
 
@@ -119,7 +117,6 @@ public class OldFacade {
             LOGGER.debug("User had state change to Folding username, {} -> {}, recalculating initial stats", existingUser.getFoldingUserName(),
                 updatedUser.getFoldingUserName());
             handleStateChangeForUser(updatedUser);
-            userCache.add(updatedUser.getId(), updatedUser);
             return;
         }
 
@@ -127,7 +124,6 @@ public class OldFacade {
             LOGGER.debug("User had state change to passkey, {} -> {}, recalculating initial stats", existingUser.getPasskey(),
                 updatedUser.getPasskey());
             handleStateChangeForUser(updatedUser);
-            userCache.add(updatedUser.getId(), updatedUser);
             return;
         }
 
