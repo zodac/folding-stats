@@ -44,6 +44,18 @@ public class ValidationResponse<E extends ResponsePojo> {
     }
 
     /**
+     * Validation failed due to a single error.
+     *
+     * @param invalidObject the {@link Object} that failed validation
+     * @param error         the validation error for the {@link Object}
+     * @param <E>           the output type of the validated object
+     * @return a {@link ValidationResponse} with the invalid object and a {@link Collection} of errors
+     */
+    public static <E extends ResponsePojo> ValidationResponse<E> failure(final Object invalidObject, final String error) {
+        return new ValidationResponse<>(invalidObject, null, null, ValidationResult.FAILURE_ON_VALIDATION, List.of(error));
+    }
+
+    /**
      * Validation failed due to one or more errors.
      *
      * @param invalidObject the {@link Object} that failed validation

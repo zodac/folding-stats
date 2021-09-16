@@ -15,7 +15,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collector;
 
 /**
- * Ranking logic for teams/users to rank by a specified function (getting points, or units, etc).
+ * Ranking logic for teams/users to rank by a specified function (getting points, or units, etc.).
  *
  * @param <T> the type of the {@link Object}
  * @see <a href="https://stackoverflow.com/a/41608187/2000246">How to rank collection of objects</a>

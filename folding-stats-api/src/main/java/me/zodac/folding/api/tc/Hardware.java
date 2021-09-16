@@ -56,7 +56,10 @@ public class Hardware implements ResponsePojo {
      * @param multiplier      the calculated multiplier
      * @return the created {@link Hardware}
      */
-    public static Hardware create(final int hardwareId, final String hardwareName, final String displayName, final OperatingSystem operatingSystem,
+    public static Hardware create(final int hardwareId,
+                                  final String hardwareName,
+                                  final String displayName,
+                                  final OperatingSystem operatingSystem,
                                   final double multiplier) {
         return new Hardware(hardwareId, hardwareName, displayName, operatingSystem, multiplier);
     }
@@ -73,9 +76,25 @@ public class Hardware implements ResponsePojo {
      * @param multiplier      the calculated multiplier
      * @return the created {@link Hardware}
      */
-    public static Hardware createWithoutId(final String hardwareName, final String displayName, final OperatingSystem operatingSystem,
+    public static Hardware createWithoutId(final String hardwareName,
+                                           final String displayName,
+                                           final OperatingSystem operatingSystem,
                                            final double multiplier) {
-        return new Hardware(EMPTY_HARDWARE_ID, hardwareName, displayName, operatingSystem, multiplier);
+        return create(EMPTY_HARDWARE_ID, hardwareName, displayName, operatingSystem, multiplier);
+    }
+
+    /**
+     * Creates a {@link Hardware}.
+     *
+     * <p>
+     * Since we do not know the ID until the DB has persisted the {@link Hardware}, the {@link #EMPTY_HARDWARE_ID} will be used instead.
+     *
+     * @param hardwareRequest the input {@link HardwareRequest} from the REST endpoint
+     * @return the created {@link Hardware}
+     */
+    public static Hardware createWithoutId(final HardwareRequest hardwareRequest) {
+        return createWithoutId(hardwareRequest.getHardwareName(), hardwareRequest.getDisplayName(),
+            OperatingSystem.get(hardwareRequest.getOperatingSystem()), hardwareRequest.getMultiplier());
     }
 
     /**

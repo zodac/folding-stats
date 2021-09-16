@@ -150,7 +150,33 @@ class HardwareValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'multiplier' must be over 0.00");
+            .contains("Field 'multiplier' must be 1.00 or higher");
+    }
+
+    @Test
+    void whenValidatingCreate_givenHardwareWithMultipleErrors_thenAllErrorsAreReturned() {
+        final HardwareRequest hardware = HardwareRequest.builder()
+            .hardwareName(null)
+            .displayName(null)
+            .operatingSystem(OperatingSystem.INVALID.toString())
+            .multiplier(-1.0D)
+            .build();
+
+        final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
+        final HardwareValidator hardwareValidator = HardwareValidator.create(mockBusinessLogic);
+        final ValidationResponse<Hardware> response = hardwareValidator.validateCreate(hardware);
+
+        assertThat(response.isInvalid())
+            .isTrue();
+
+        assertThat(response.getErrors())
+            .hasSize(4)
+            .contains(
+                "Field 'hardwareName' must not be empty",
+                "Field 'displayName' must not be empty",
+                "Field 'operatingSystem' must be one of: " + OperatingSystem.getAllValues().toString(),
+                "Field 'multiplier' must be 1.00 or higher"
+            );
     }
 
     @Test
@@ -242,7 +268,7 @@ class HardwareValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'hardwareName' must not be empty");
+            .contains("Field 'hardwareName' does not match existing hardware name (provided: 'null', expected: 'hardwareName')");
     }
 
     @Test
@@ -269,7 +295,7 @@ class HardwareValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'hardwareName' does not match existing hardware name 'differentName'");
+            .contains("Field 'hardwareName' does not match existing hardware name (provided: 'hardwareName', expected: 'differentName')");
     }
 
     @Test
@@ -350,7 +376,39 @@ class HardwareValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'multiplier' must be over 0.00");
+            .contains("Field 'multiplier' must be 1.00 or higher");
+    }
+
+    @Test
+    void whenValidatingUpdate_givenHardwareWithMultipleErrors_thenAllErrorsReturned() {
+        final HardwareRequest hardware = HardwareRequest.builder()
+            .hardwareName("hardwareName")
+            .displayName(null)
+            .operatingSystem(OperatingSystem.INVALID.toString())
+            .multiplier(-1.0D)
+            .build();
+
+        final Hardware existingHardware = Hardware.builder()
+            .hardwareName("hardwareName")
+            .displayName("displayName")
+            .operatingSystem(OperatingSystem.WINDOWS)
+            .multiplier(1.0D)
+            .build();
+
+        final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
+        final HardwareValidator hardwareValidator = HardwareValidator.create(mockBusinessLogic);
+        final ValidationResponse<Hardware> response = hardwareValidator.validateUpdate(hardware, existingHardware);
+
+        assertThat(response.isInvalid())
+            .isTrue();
+
+        assertThat(response.getErrors())
+            .hasSize(3)
+            .contains(
+                "Field 'displayName' must not be empty",
+                "Field 'operatingSystem' must be one of: " + OperatingSystem.getAllValues().toString(),
+                "Field 'multiplier' must be 1.00 or higher"
+            );
     }
 
     @Test

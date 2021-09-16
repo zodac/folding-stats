@@ -66,9 +66,20 @@ public class Team implements ResponsePojo {
      * @return the created {@link Team}
      */
     public static Team createWithoutId(final String teamName, final String teamDescription, final String forumLink) {
-        final String teamDescriptionOrNull = isEmpty(teamDescription) ? null : teamDescription;
-        final String forumLinkOrNull = isEmpty(forumLink) ? null : forumLink;
-        return new Team(EMPTY_TEAM_ID, teamName, teamDescriptionOrNull, forumLinkOrNull);
+        return create(EMPTY_TEAM_ID, teamName, teamDescription, forumLink);
+    }
+
+    /**
+     * Creates a {@link Team}.
+     *
+     * <p>
+     * Since we do not know the ID until the DB has persisted the {@link Team}, the {@link #EMPTY_TEAM_ID} will be used instead.
+     *
+     * @param teamRequest the input {@link TeamRequest} from the REST endpoint
+     * @return the created {@link Team}
+     */
+    public static Team createWithoutId(final TeamRequest teamRequest) {
+        return createWithoutId(teamRequest.getTeamName(), teamRequest.getTeamDescription(), teamRequest.getForumLink());
     }
 
     /**
@@ -83,9 +94,7 @@ public class Team implements ResponsePojo {
      * @return the updated {@link Team}
      */
     public static Team updateWithId(final int teamId, final Team team) {
-        final String teamDescription = isEmpty(team.teamDescription) ? null : team.teamDescription;
-        final String forumLink = isEmpty(team.forumLink) ? null : team.forumLink;
-        return new Team(teamId, team.teamName, teamDescription, forumLink);
+        return create(teamId, team.teamName, team.teamDescription, team.forumLink);
     }
 
     private static boolean isEmpty(final String input) {

@@ -24,7 +24,7 @@ public final class EncodingUtils {
      * and {@code password}, concatenates them with a <b>:</b> as separator, then encodes in {@link Base64}. This is then
      * prefixed by the {@link String} "Basic " (note the trailing space).
      *
-     * @param userName the user name
+     * @param userName the username
      * @param password the password
      * @return the {@link Base64}-encoded authentication {@link String}
      */
@@ -42,7 +42,7 @@ public final class EncodingUtils {
      * @return <code>true</code> if the value is a basic authentication payload
      */
     public static boolean isNotBasicAuthentication(final String authorizationPayload) {
-        return authorizationPayload == null || authorizationPayload.isEmpty() || !authorizationPayload.contains(BASIC_AUTHENTICATION_SCHEME);
+        return authorizationPayload == null || !authorizationPayload.contains(BASIC_AUTHENTICATION_SCHEME);
     }
 
     /**
@@ -62,9 +62,9 @@ public final class EncodingUtils {
     }
 
     /**
-     * Decodes the encoded user name and password.
+     * Decodes the encoded username and password.
      *
-     * @param encodedUserNameAndPassword the encoded user name and password to decode
+     * @param encodedUserNameAndPassword the encoded username and password to decode
      * @return a {@link Map} with two keys, the {@link #DECODED_USERNAME_KEY} and {@link #DECODED_PASSWORD_KEY}
      * @throws IllegalArgumentException thrown if the input is not a valid {@link Base64} {@link String}
      */

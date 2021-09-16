@@ -14,7 +14,7 @@ import me.zodac.folding.api.tc.User;
 /**
  * Mock implementation of {@link BusinessLogic}. Has methods to set specific values for tests.
  */
-class MockBusinessLogic implements BusinessLogic {
+final class MockBusinessLogic implements BusinessLogic {
 
     private final Map<Integer, Hardware> hardwares = new HashMap<>();
     private final Map<Integer, Team> teams = new HashMap<>();

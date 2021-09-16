@@ -222,7 +222,7 @@ class TeamValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'teamName' must not be empty");
+            .contains("Field 'teamName' does not match existing team name (provided: 'null', expected: 'teamName')");
     }
 
     @Test
@@ -247,7 +247,7 @@ class TeamValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'teamName' does not match existing team name 'differentName'");
+            .contains("Field 'teamName' does not match existing team name (provided: 'teamName', expected: 'differentName')");
     }
 
     @Test

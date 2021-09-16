@@ -1,9 +1,12 @@
 package me.zodac.folding.rest.validator;
 
-import java.util.ArrayList;
+import static java.util.stream.Collectors.toList;
+
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import me.zodac.folding.api.ejb.BusinessLogic;
@@ -20,8 +23,8 @@ import org.apache.commons.lang3.StringUtils;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HardwareValidator {
 
-    // Assuming multiplier cannot be less than 0, also assuming we might want a 0.1/0.5 at some point with future hardware
-    private static final double INVALID_MULTIPLIER_VALUE = 0.0D;
+    // Assuming the 'best' hardware will have a multiplier of 1.00, and all others will be based on that
+    private static final double MINIMUM_MULTIPLIER_VALUE = 1.00D;
 
     private final transient BusinessLogic businessLogic;
 
@@ -35,17 +38,37 @@ public final class HardwareValidator {
         return new HardwareValidator(businessLogic);
     }
 
+    private static String hardwareName(final HardwareRequest hardwareRequest) {
+        return StringUtils.isNotBlank(hardwareRequest.getHardwareName()) ? null : "Field 'hardwareName' must not be empty";
+    }
+
+    private static String displayName(final HardwareRequest hardwareRequest) {
+        return StringUtils.isNotBlank(hardwareRequest.getDisplayName()) ? null : "Field 'displayName' must not be empty";
+    }
+
+    private static String operatingSystem(final HardwareRequest hardwareRequest) {
+        final OperatingSystem operatingSystem = OperatingSystem.get(hardwareRequest.getOperatingSystem());
+        return operatingSystem == OperatingSystem.INVALID
+            ? String.format("Field 'operatingSystem' must be one of: %s", OperatingSystem.getAllValues()) : null;
+    }
+
+    private static String multiplier(final HardwareRequest hardwareRequest) {
+        return hardwareRequest.getMultiplier() >= MINIMUM_MULTIPLIER_VALUE ? null :
+            String.format("Field 'multiplier' must be %.2f or higher", MINIMUM_MULTIPLIER_VALUE);
+    }
+
     /**
      * Validates a {@link HardwareRequest} for a {@link Hardware} to be created on the system.
      *
      * <p>
      * Validation checks include:
      * <ul>
+     *     <li>Input {@code hardwareRequest} must not be <b>null</b></li>
      *     <li>Field 'hardwareName' must not be empty</li>
      *     <li>If field 'hardwareName' is not empty, it must not be used by another {@link Hardware}</li>
      *     <li>Field 'displayName' must not be empty</li>
      *     <li>Field 'operatingSystem' must be a valid {@link OperatingSystem}</li>
-     *     <li>Field 'multiplier' must not be over <b>0.0</b></li>
+     *     <li>Field 'multiplier' must be over <b>0.00</b></li>
      * </ul>
      *
      * @param hardwareRequest the {@link HardwareRequest} to validate
@@ -56,39 +79,27 @@ public final class HardwareValidator {
             return ValidationResponse.nullObject();
         }
 
-        final List<String> failureMessages = new ArrayList<>(4);
-
-        if (StringUtils.isBlank(hardwareRequest.getHardwareName())) {
-            failureMessages.add("Field 'hardwareName' must not be empty");
-        } else {
-            final Optional<Hardware> hardwareWithMatchingName = businessLogic.getHardwareWithName(hardwareRequest.getHardwareName());
-
-            if (hardwareWithMatchingName.isPresent()) {
-                return ValidationResponse.conflictingWith(hardwareRequest, hardwareWithMatchingName.get(), List.of("hardwareName"));
-            }
+        // Hardware name must be unique
+        final Optional<Hardware> hardwareWithMatchingName = businessLogic.getHardwareWithName(hardwareRequest.getHardwareName());
+        if (hardwareWithMatchingName.isPresent()) {
+            return ValidationResponse.conflictingWith(hardwareRequest, hardwareWithMatchingName.get(), List.of("hardwareName"));
         }
 
-        if (StringUtils.isBlank(hardwareRequest.getDisplayName())) {
-            failureMessages.add("Field 'displayName' must not be empty");
+        final List<String> failureMessages = Stream.of(
+                hardwareName(hardwareRequest),
+                displayName(hardwareRequest),
+                operatingSystem(hardwareRequest),
+                multiplier(hardwareRequest)
+            )
+            .filter(Objects::nonNull)
+            .collect(toList());
+
+        if (!failureMessages.isEmpty()) {
+            return ValidationResponse.failure(hardwareRequest, failureMessages);
         }
 
-        final OperatingSystem operatingSystem = OperatingSystem.get(hardwareRequest.getOperatingSystem());
-        if (OperatingSystem.INVALID == operatingSystem) {
-            failureMessages.add(String.format("Field 'operatingSystem' must be one of: %s", OperatingSystem.getAllValues()));
-        }
-
-        if (hardwareRequest.getMultiplier() <= INVALID_MULTIPLIER_VALUE) {
-            failureMessages.add(String.format("Field 'multiplier' must be over %.2f", INVALID_MULTIPLIER_VALUE));
-        }
-
-        if (failureMessages.isEmpty()) {
-            final Hardware convertedHardware = Hardware
-                .createWithoutId(hardwareRequest.getHardwareName(), hardwareRequest.getDisplayName(), operatingSystem,
-                    hardwareRequest.getMultiplier());
-            return ValidationResponse.success(convertedHardware);
-        }
-
-        return ValidationResponse.failure(hardwareRequest, failureMessages);
+        final Hardware convertedHardware = Hardware.createWithoutId(hardwareRequest);
+        return ValidationResponse.success(convertedHardware);
     }
 
     /**
@@ -97,11 +108,12 @@ public final class HardwareValidator {
      * <p>
      * Validation checks include:
      * <ul>
+     *     <li>Input {@code hardwareRequest} and {@code existingHardware} must not be <b>null</b></li>
      *     <li>Field 'hardwareName' must not be empty</li>
      *     <li>If field 'hardwareName' is not empty, it must match the existing {@link Hardware}</li>
      *     <li>Field 'displayName' must not be empty</li>
      *     <li>Field 'operatingSystem' must be a valid {@link OperatingSystem}</li>
-     *     <li>Field 'multiplier' must not be over <b>0.0</b></li>
+     *     <li>Field 'multiplier' must be over <b>0.00</b></li>
      * </ul>
      *
      * @param hardwareRequest  the {@link HardwareRequest} to validate
@@ -113,39 +125,28 @@ public final class HardwareValidator {
             return ValidationResponse.nullObject();
         }
 
-        final List<String> failureMessages = new ArrayList<>(4);
-
-        if (StringUtils.isBlank(hardwareRequest.getHardwareName())) {
-            failureMessages.add("Field 'hardwareName' must not be empty");
-        } else {
-            // Hardware name must be the same as the name of the existing hardware
-            if (!hardwareRequest.getHardwareName().equalsIgnoreCase(existingHardware.getHardwareName())) {
-                failureMessages.add(
-                    String.format("Field 'hardwareName' does not match existing hardware name '%s'", existingHardware.getHardwareName()));
-            }
+        // Hardware name must be the same as the name of the existing hardware
+        if (!existingHardware.getHardwareName().equalsIgnoreCase(hardwareRequest.getHardwareName())) {
+            return ValidationResponse.failure(hardwareRequest,
+                String.format("Field 'hardwareName' does not match existing hardware name (provided: '%s', expected: '%s')",
+                    hardwareRequest.getHardwareName(), existingHardware.getHardwareName()));
         }
 
-        if (StringUtils.isBlank(hardwareRequest.getDisplayName())) {
-            failureMessages.add("Field 'displayName' must not be empty");
+        final List<String> failureMessages = Stream.of(
+                hardwareName(hardwareRequest),
+                displayName(hardwareRequest),
+                operatingSystem(hardwareRequest),
+                multiplier(hardwareRequest)
+            )
+            .filter(Objects::nonNull)
+            .collect(toList());
+
+        if (!failureMessages.isEmpty()) {
+            return ValidationResponse.failure(hardwareRequest, failureMessages);
         }
 
-        final OperatingSystem operatingSystem = OperatingSystem.get(hardwareRequest.getOperatingSystem());
-        if (OperatingSystem.INVALID == operatingSystem) {
-            failureMessages.add(String.format("Field 'operatingSystem' must be one of: %s", OperatingSystem.getAllValues()));
-        }
-
-        if (hardwareRequest.getMultiplier() <= INVALID_MULTIPLIER_VALUE) {
-            failureMessages.add(String.format("Field 'multiplier' must be over %.2f", INVALID_MULTIPLIER_VALUE));
-        }
-
-        if (failureMessages.isEmpty()) {
-            final Hardware convertedHardware = Hardware
-                .createWithoutId(hardwareRequest.getHardwareName(), hardwareRequest.getDisplayName(), operatingSystem,
-                    hardwareRequest.getMultiplier());
-            return ValidationResponse.success(convertedHardware);
-        }
-
-        return ValidationResponse.failure(hardwareRequest, failureMessages);
+        final Hardware convertedHardware = Hardware.createWithoutId(hardwareRequest);
+        return ValidationResponse.success(convertedHardware);
     }
 
     /**
@@ -157,10 +158,10 @@ public final class HardwareValidator {
     public ValidationResponse<Hardware> validateDelete(final Hardware hardware) {
         final Collection<User> usersWithMatchingHardware = businessLogic.getUsersWithHardware(hardware);
 
-        if (usersWithMatchingHardware.isEmpty()) {
-            return ValidationResponse.success(hardware);
+        if (!usersWithMatchingHardware.isEmpty()) {
+            return ValidationResponse.usedBy(hardware, usersWithMatchingHardware);
         }
 
-        return ValidationResponse.usedBy(hardware, usersWithMatchingHardware);
+        return ValidationResponse.success(hardware);
     }
 }
