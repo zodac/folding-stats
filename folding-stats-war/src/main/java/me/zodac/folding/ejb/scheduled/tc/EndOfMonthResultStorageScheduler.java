@@ -11,11 +11,11 @@ import javax.ejb.Startup;
 import javax.ejb.Timeout;
 import javax.ejb.Timer;
 import javax.ejb.TimerService;
+import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.tc.result.MonthlyResult;
 import me.zodac.folding.api.utils.DateTimeUtils;
 import me.zodac.folding.api.utils.EnvironmentVariableUtils;
 import me.zodac.folding.ejb.LeaderboardStatsGenerator;
-import me.zodac.folding.ejb.OldFacade;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -40,7 +40,7 @@ public class EndOfMonthResultStorageScheduler {
     private static final Gson GSON = new Gson();
 
     @EJB
-    private OldFacade oldFacade;
+    private BusinessLogic businessLogic;
 
     @EJB
     private LeaderboardStatsGenerator leaderboardStatsGenerator;
@@ -175,6 +175,6 @@ public class EndOfMonthResultStorageScheduler {
         final String result = GSON.toJson(monthlyResult);
         final LocalDateTime currentUtcDateTime = DateTimeUtils.currentUtcDateTime().toLocalDateTime();
 
-        oldFacade.persistMonthlyResult(result, currentUtcDateTime);
+        businessLogic.createMonthlyResult(result, currentUtcDateTime);
     }
 }

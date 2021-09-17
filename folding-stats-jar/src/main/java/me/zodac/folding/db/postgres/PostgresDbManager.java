@@ -969,7 +969,7 @@ public final class PostgresDbManager implements DbManager {
 
     @Override
     public SystemUserAuthentication authenticateSystemUser(final String userName, final String password) {
-        LOGGER.debug("Checking if supplied user name '{}' and password is valid user, then returning roles", userName);
+        LOGGER.debug("Checking if supplied username '{}' and password is valid user, then returning roles", userName);
 
         return executeQuery(queryContext -> {
             final var query = queryContext

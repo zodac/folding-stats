@@ -38,9 +38,9 @@ public final class LoginRequestSender {
      * Send a <b>POST</b> request to login to the system as an admin.
      *
      * <p>
-     * The user name and password will be encoded using {@link EncodingUtils#encodeBasicAuthentication(String, String)}.
+     * The username and password will be encoded using {@link EncodingUtils#encodeBasicAuthentication(String, String)}.
      *
-     * @param userName the user name
+     * @param userName the username
      * @param password the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
@@ -53,7 +53,7 @@ public final class LoginRequestSender {
     /**
      * Send a <b>POST</b> request to login to the system as an admin.
      *
-     * @param encodedUserNameAndPassword the encoded user name and password
+     * @param encodedUserNameAndPassword the encoded username and password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */

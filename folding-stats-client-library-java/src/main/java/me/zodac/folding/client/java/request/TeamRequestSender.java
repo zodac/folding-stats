@@ -143,7 +143,7 @@ public final class TeamRequestSender {
      * Send a <b>POST</b> request to create the given {@link TeamRequest} in the system.
      *
      * @param team     the {@link TeamRequest} to create
-     * @param userName the user name
+     * @param userName the username
      * @param password the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
@@ -185,7 +185,7 @@ public final class TeamRequestSender {
      * Send a <b>POST</b> request to create the given {@link me.zodac.folding.api.tc.Team}s in the system.
      *
      * @param batchOfTeams the {@link Collection} of {@link me.zodac.folding.api.tc.Team}s to create
-     * @param userName     the user name
+     * @param userName     the username
      * @param password     the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
@@ -230,7 +230,7 @@ public final class TeamRequestSender {
      *
      * @param teamId   the ID of the {@link me.zodac.folding.api.tc.Team} to update
      * @param team     the {@link TeamRequest} to update
-     * @param userName the user name
+     * @param userName the username
      * @param password the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
@@ -273,7 +273,7 @@ public final class TeamRequestSender {
      * Send a <b>DELETE</b> request to remove a {@link me.zodac.folding.api.tc.Team} with the given {@code teamId}.
      *
      * @param teamId   the ID of the {@link me.zodac.folding.api.tc.Team} to remove
-     * @param userName the user name
+     * @param userName the username
      * @param password the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}

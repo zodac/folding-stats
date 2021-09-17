@@ -30,7 +30,7 @@ function getPastResult(month, monthName, year) {
     show("loader");
     hide("past_result");
 
-    fetch(ROOT_URL+'/result/' + selectedYear + '/' + selectedMonth)
+    fetch(ROOT_URL+'/results/result/' + selectedYear + '/' + selectedMonth)
     .then(response => {
         return response.json();
     })

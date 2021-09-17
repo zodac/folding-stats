@@ -32,7 +32,7 @@ public final class StubbedFoldingEndpointUtils {
      * @throws FoldingRestException thrown if an error occurs sending the HTTP request
      */
     public static void enableUser(final UserRequest user) throws FoldingRestException {
-        setUnits(user, 1);
+        addUnits(user, 1);
     }
 
     /**
@@ -42,30 +42,30 @@ public final class StubbedFoldingEndpointUtils {
      * @throws FoldingRestException thrown if an error occurs sending the HTTP request
      */
     public static void disableUser(final UserRequest user) throws FoldingRestException {
-        setUnits(user, 0);
+        addUnits(user, 0);
     }
 
     /**
-     * Sets the number of points for a {@link User}.
+     * Adds the number of points for a {@link User}.
      *
      * @param user the {@link User} to update
      * @throws FoldingRestException thrown if an error occurs sending the HTTP request
      */
-    public static void setPoints(final User user, final long points) throws FoldingRestException {
-        setPoints(user.getFoldingUserName(), user.getPasskey(), points);
+    public static void addPoints(final User user, final long points) throws FoldingRestException {
+        addPoints(user.getFoldingUserName(), user.getPasskey(), points);
     }
 
     /**
-     * Sets the number of points for a {@link UserRequest}.
+     * Adds the number of points for a {@link UserRequest}.
      *
      * @param user the {@link UserRequest} to update
      * @throws FoldingRestException thrown if an error occurs sending the HTTP request
      */
-    public static void setPoints(final UserRequest user, final long points) throws FoldingRestException {
-        setPoints(user.getFoldingUserName(), user.getPasskey(), points);
+    public static void addPoints(final UserRequest user, final long points) throws FoldingRestException {
+        addPoints(user.getFoldingUserName(), user.getPasskey(), points);
     }
 
-    private static void setPoints(final String foldingUserName, final String passkey, final long points) throws FoldingRestException {
+    private static void addPoints(final String foldingUserName, final String passkey, final long points) throws FoldingRestException {
         final HttpRequest unitsRequest = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.noBody())
             .uri(URI.create(String.format(POINTS_URL_FORMAT, foldingUserName, passkey, points)))
@@ -105,26 +105,26 @@ public final class StubbedFoldingEndpointUtils {
     }
 
     /**
-     * Sets the number of units for a {@link User}.
+     * Adds the number of units for a {@link User}.
      *
      * @param user the {@link User} to update
      * @throws FoldingRestException thrown if an error occurs sending the HTTP request
      */
-    public static void setUnits(final User user, final int units) throws FoldingRestException {
-        setUnits(user.getFoldingUserName(), user.getPasskey(), units);
+    public static void addUnits(final User user, final int units) throws FoldingRestException {
+        addUnits(user.getFoldingUserName(), user.getPasskey(), units);
     }
 
     /**
-     * Sets the number of units for a {@link UserRequest}.
+     * Adds the number of units for a {@link UserRequest}.
      *
      * @param user the {@link UserRequest} to update
      * @throws FoldingRestException thrown if an error occurs sending the HTTP request
      */
-    public static void setUnits(final UserRequest user, final int units) throws FoldingRestException {
-        setUnits(user.getFoldingUserName(), user.getPasskey(), units);
+    public static void addUnits(final UserRequest user, final int units) throws FoldingRestException {
+        addUnits(user.getFoldingUserName(), user.getPasskey(), units);
     }
 
-    private static void setUnits(final String foldingUserName, final String passkey, final int units) throws FoldingRestException {
+    private static void addUnits(final String foldingUserName, final String passkey, final int units) throws FoldingRestException {
         final HttpRequest unitsRequest = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.noBody())
             .uri(URI.create(String.format(UNIT_URL_FORMAT, foldingUserName, passkey, units)))

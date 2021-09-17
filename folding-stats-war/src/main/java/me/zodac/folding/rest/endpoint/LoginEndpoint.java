@@ -74,7 +74,7 @@ public class LoginEndpoint {
             LOGGER.info("Admin user '{}' logged in", userName);
             return ok();
         } catch (final IllegalArgumentException e) {
-            LOGGER.error("Encoded user name and password was not a valid Base64 string", e);
+            LOGGER.error("Encoded username and password was not a valid Base64 string", e);
             return badRequest(loginCredentials);
         } catch (final Exception e) {
             LOGGER.error("Unexpected error validating user credentials", e);

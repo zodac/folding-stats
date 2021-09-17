@@ -143,7 +143,7 @@ public final class UserRequestSender {
      * Send a <b>POST</b> request to create the given {@link UserRequest} in the system.
      *
      * @param user     the {@link UserRequest} to create
-     * @param userName the user name
+     * @param userName the username
      * @param password the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
@@ -185,7 +185,7 @@ public final class UserRequestSender {
      * Send a <b>POST</b> request to create the given {@link UserRequest}s in the system.
      *
      * @param batchOfUsers the {@link Collection} of {@link UserRequest}s to create
-     * @param userName     the user name
+     * @param userName     the username
      * @param password     the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
@@ -230,7 +230,7 @@ public final class UserRequestSender {
      *
      * @param userId   the ID of the {@link me.zodac.folding.api.tc.User} to update
      * @param user     the {@link UserRequest} to update
-     * @param userName the user name
+     * @param userName the username
      * @param password the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
@@ -273,7 +273,7 @@ public final class UserRequestSender {
      * Send a <b>DELETE</b> request to remove a {@link me.zodac.folding.api.tc.User} with the given {@code userId}.
      *
      * @param userId   the ID of the {@link me.zodac.folding.api.tc.User} to remove
-     * @param userName the user name
+     * @param userName the username
      * @param password the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}

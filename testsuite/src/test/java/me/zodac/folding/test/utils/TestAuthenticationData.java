@@ -1,8 +1,7 @@
 package me.zodac.folding.test.utils;
 
 /**
- * Simple {@link Enum} containing the user name and password data for test execution. Using default details that should
- * not be used in production.
+ * Simple {@link Enum} containing the username and password data for test execution. Using default details that should not be used in production.
  */
 public enum TestAuthenticationData {
 
@@ -17,7 +16,7 @@ public enum TestAuthenticationData {
     READ_ONLY_USER("root2", "shroot2"),
 
     /**
-     * An invalid user with an invalid user name.
+     * An invalid user with an invalid username.
      */
     INVALID_USERNAME("invalid", "shroot"),
 
@@ -32,7 +31,7 @@ public enum TestAuthenticationData {
     /**
      * Constructs a {@link TestAuthenticationData}.
      *
-     * @param userName the user name
+     * @param userName the username
      * @param password the password
      */
     TestAuthenticationData(final String userName, final String password) {
@@ -41,9 +40,9 @@ public enum TestAuthenticationData {
     }
 
     /**
-     * Retrieves the user name.
+     * Retrieves the username.
      *
-     * @return the user name
+     * @return the username
      */
     public String userName() {
         return userName;

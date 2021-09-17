@@ -143,7 +143,7 @@ public final class HardwareRequestSender {
      * and {@code password} for authentication.
      *
      * @param hardware the {@link HardwareRequest} to create
-     * @param userName the user name
+     * @param userName the username
      * @param password the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
@@ -185,7 +185,7 @@ public final class HardwareRequestSender {
      * Send a <b>POST</b> request to create the given {@link HardwareRequest}s in the system.
      *
      * @param batchOfHardware the {@link Collection} of {@link HardwareRequest}s to create
-     * @param userName        the user name
+     * @param userName        the username
      * @param password        the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
@@ -230,7 +230,7 @@ public final class HardwareRequestSender {
      *
      * @param hardwareId the ID of the {@link Hardware} to update
      * @param hardware   the {@link HardwareRequest} to update
-     * @param userName   the user name
+     * @param userName   the username
      * @param password   the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
@@ -273,7 +273,7 @@ public final class HardwareRequestSender {
      * Send a <b>DELETE</b> request to remove a {@link Hardware} with the given {@code hardwareId}.
      *
      * @param hardwareId the ID of the {@link Hardware} to remove
-     * @param userName   the user name
+     * @param userName   the username
      * @param password   the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}

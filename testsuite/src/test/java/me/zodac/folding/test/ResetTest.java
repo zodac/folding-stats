@@ -110,7 +110,7 @@ class ResetTest {
             .isEmpty();
 
         // User must have points or else will not show as 'retired' for the team
-        StubbedFoldingEndpointUtils.setPoints(userToRetire, 1_000L);
+        StubbedFoldingEndpointUtils.addPoints(userToRetire, 1_000L);
         manuallyUpdateStats();
 
         USER_REQUEST_SENDER.delete(userToRetireId, ADMIN_USER.userName(), ADMIN_USER.password());
@@ -163,9 +163,9 @@ class ResetTest {
         final long firstUserPoints = 10_000L;
         final long secondUserPoints = 7_000L;
         final long thirdUserPoints = 15_750L;
-        StubbedFoldingEndpointUtils.setPoints(firstUser, firstUserPoints);
-        StubbedFoldingEndpointUtils.setPoints(secondUser, secondUserPoints);
-        StubbedFoldingEndpointUtils.setPoints(thirdUser, thirdUserPoints);
+        StubbedFoldingEndpointUtils.addPoints(firstUser, firstUserPoints);
+        StubbedFoldingEndpointUtils.addPoints(secondUser, secondUserPoints);
+        StubbedFoldingEndpointUtils.addPoints(thirdUser, thirdUserPoints);
         manuallyUpdateStats();
 
         final CompetitionSummary result = TeamCompetitionStatsUtils.getStats();

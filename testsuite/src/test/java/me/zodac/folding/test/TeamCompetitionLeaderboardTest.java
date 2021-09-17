@@ -67,15 +67,15 @@ class TeamCompetitionLeaderboardTest {
         throws FoldingRestException {
         final Team firstTeam = TeamUtils.create(generateTeam());
         final User firstUser = UserUtils.create(generateUserWithTeamId(firstTeam.getId()));
-        StubbedFoldingEndpointUtils.setPoints(firstUser, 10_000L);
+        StubbedFoldingEndpointUtils.addPoints(firstUser, 10_000L);
 
         final Team secondTeam = TeamUtils.create(generateTeam());
         final User secondUser = UserUtils.create(generateUserWithTeamId(secondTeam.getId()));
-        StubbedFoldingEndpointUtils.setPoints(secondUser, 15_000L);
+        StubbedFoldingEndpointUtils.addPoints(secondUser, 15_000L);
 
         final Team thirdTeam = TeamUtils.create(generateTeam());
         final User thirdUser = UserUtils.create(generateUserWithTeamId(thirdTeam.getId()));
-        StubbedFoldingEndpointUtils.setPoints(thirdUser, 1_000L);
+        StubbedFoldingEndpointUtils.addPoints(thirdUser, 1_000L);
 
         manuallyUpdateStats();
         final HttpResponse<String> response = TEAM_COMPETITION_REQUEST_SENDER.getTeamLeaderboard();
@@ -129,17 +129,17 @@ class TeamCompetitionLeaderboardTest {
         throws FoldingRestException {
         final Team firstTeam = TeamUtils.create(generateTeam());
         final User firstUser = UserUtils.create(generateUserWithTeamIdAndCategory(firstTeam.getId(), Category.AMD_GPU));
-        StubbedFoldingEndpointUtils.setPoints(firstUser, 10_000L);
+        StubbedFoldingEndpointUtils.addPoints(firstUser, 10_000L);
 
         final Team secondTeam = TeamUtils.create(generateTeam());
         final User secondUser = UserUtils.create(generateUserWithTeamIdAndCategory(secondTeam.getId(), Category.AMD_GPU));
-        StubbedFoldingEndpointUtils.setPoints(secondUser, 15_000L);
+        StubbedFoldingEndpointUtils.addPoints(secondUser, 15_000L);
 
         final Team thirdTeam = TeamUtils.create(generateTeam());
         final User thirdUser = UserUtils.create(generateUserWithTeamIdAndCategory(thirdTeam.getId(), Category.AMD_GPU));
-        StubbedFoldingEndpointUtils.setPoints(thirdUser, 1_000L);
+        StubbedFoldingEndpointUtils.addPoints(thirdUser, 1_000L);
         final User fourthUser = UserUtils.create(generateUserWithTeamIdAndCategory(thirdTeam.getId(), Category.NVIDIA_GPU));
-        StubbedFoldingEndpointUtils.setPoints(fourthUser, 1_000L);
+        StubbedFoldingEndpointUtils.addPoints(fourthUser, 1_000L);
 
         manuallyUpdateStats();
         final HttpResponse<String> response = TEAM_COMPETITION_REQUEST_SENDER.getCategoryLeaderboard();

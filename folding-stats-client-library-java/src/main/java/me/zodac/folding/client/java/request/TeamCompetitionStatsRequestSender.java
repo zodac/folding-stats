@@ -227,7 +227,7 @@ public final class TeamCompetitionStatsRequestSender {
      * Request will be sent and only return when the update is complete. If an asynchronous update is required, look at
      * {@link #manualUpdate(boolean, String, String)}.
      *
-     * @param userName the user name
+     * @param userName the username
      * @param password the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
@@ -241,7 +241,7 @@ public final class TeamCompetitionStatsRequestSender {
      * {@link me.zodac.folding.api.tc.User}s and {@link me.zodac.folding.api.tc.Team}s.
      *
      * @param async    should the update be performed asynchronously, or wait for the result
-     * @param userName the user name
+     * @param userName the username
      * @param password the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
@@ -283,7 +283,7 @@ public final class TeamCompetitionStatsRequestSender {
      * Sends a <b>GET</b> request to manually reset the <code>Team Competition</code> stats for all {@link me.zodac.folding.api.tc.User}s and
      * {@link me.zodac.folding.api.tc.Team}s.
      *
-     * @param userName the user name
+     * @param userName the username
      * @param password the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
@@ -340,7 +340,7 @@ public final class TeamCompetitionStatsRequestSender {
      * @param pointsOffset           the additional (unmultiplied) points to add to the {@link me.zodac.folding.api.tc.User}
      * @param multipliedPointsOffset the additional (multiplied) points to add to the {@link me.zodac.folding.api.tc.User}
      * @param unitsOffset            the additional units to add to the {@link me.zodac.folding.api.tc.User}
-     * @param userName               the user name
+     * @param userName               the username
      * @param password               the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}

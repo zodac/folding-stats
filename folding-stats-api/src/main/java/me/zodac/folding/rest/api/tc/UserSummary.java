@@ -48,7 +48,7 @@ public class UserSummary {
      *
      * @param id               the ID of the {@link me.zodac.folding.api.tc.User}
      * @param displayName      the display name of the {@link me.zodac.folding.api.tc.User}
-     * @param foldingName      the Folding@Home user name of the {@link me.zodac.folding.api.tc.User}
+     * @param foldingName      the Folding@Home username of the {@link me.zodac.folding.api.tc.User}
      * @param hardware         the {@link Hardware} used by the the {@link me.zodac.folding.api.tc.User}
      * @param category         the {@link Category} of the {@link me.zodac.folding.api.tc.User}
      * @param profileLink      the ID of the {@link me.zodac.folding.api.tc.User}

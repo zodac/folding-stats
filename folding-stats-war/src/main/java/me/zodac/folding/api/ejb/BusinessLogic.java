@@ -1,5 +1,8 @@
 package me.zodac.folding.api.ejb;
 
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.Year;
 import java.util.Collection;
 import java.util.Optional;
 import me.zodac.folding.api.tc.Hardware;
@@ -101,7 +104,7 @@ public interface BusinessLogic {
      * @return a {@link Collection} of the retrieved {@link User}s
      */
     Collection<User> getAllUsersWithoutPasskeys();
-    
+
     /**
      * Retrieves a {@link Hardware} with the given name.
      *
@@ -150,12 +153,28 @@ public interface BusinessLogic {
 
     /**
      * Retrieves a {@link User} with the matching {@code foldingUserName} and {@code passkey}. Since these are unique fields for a
-     * {@link User} there should only be a single{@link User} returned (or none).
+     * {@link User} there should only be a single {@link User} returned (or none).
      *
-     * @param foldingUserName the Folding@Home user name of the {@link User} to be found
+     * @param foldingUserName the Folding@Home username of the {@link User} to be found
      * @param passkey         the passkey of the {@link User} to be found
      * @return an {@link Optional} of the matching {@link User}
      */
     Optional<User> getUserWithFoldingUserNameAndPasskey(final String foldingUserName, final String passkey);
 
+    /**
+     * Creates a monthly result for the <code>Team Competition</code>.
+     *
+     * @param monthlyResult the result for a month of the <code>Team Competition</code>
+     * @param utcTimestamp  the {@link java.time.ZoneOffset#UTC} timestamp for the result
+     */
+    void createMonthlyResult(final String monthlyResult, final LocalDateTime utcTimestamp);
+
+    /**
+     * Retrieves the result of the <code>Team Competition</code> for the given {@link Month} and {@link Year}.
+     *
+     * @param month the {@link Month} of the result to be retrieved
+     * @param year  the {@link Year} of the result to be retrieved
+     * @return an {@link Optional} of the <code>Team Competition</code> result
+     */
+    Optional<String> getMonthlyResult(final Month month, final Year year);
 }

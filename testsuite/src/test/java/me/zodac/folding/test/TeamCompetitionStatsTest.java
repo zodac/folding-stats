@@ -157,10 +157,10 @@ class TeamCompetitionStatsTest {
             .isZero();
 
         final long newPoints = 10_000L;
-        StubbedFoldingEndpointUtils.setPoints(user, newPoints);
+        StubbedFoldingEndpointUtils.addPoints(user, newPoints);
 
         final int newUnits = 5;
-        StubbedFoldingEndpointUtils.setUnits(user, newUnits);
+        StubbedFoldingEndpointUtils.addUnits(user, newUnits);
 
         final HttpResponse<Void> response = TEAM_COMPETITION_REQUEST_SENDER.manualUpdate(ADMIN_USER.userName(), ADMIN_USER.password());
 
@@ -249,8 +249,8 @@ class TeamCompetitionStatsTest {
             .as("Expected second user to be rank 1: " + secondUserSummary)
             .isEqualTo(1);
 
-        StubbedFoldingEndpointUtils.setPoints(firstUser, 10_000L);
-        StubbedFoldingEndpointUtils.setUnits(firstUser, 10);
+        StubbedFoldingEndpointUtils.addPoints(firstUser, 10_000L);
+        StubbedFoldingEndpointUtils.addUnits(firstUser, 10);
         manuallyUpdateStats();
 
         final CompetitionSummary resultAfterFirstUpdate = TeamCompetitionStatsUtils.getStats();
@@ -266,8 +266,8 @@ class TeamCompetitionStatsTest {
             .as("Expected second user to be rank 2: " + teamSummaryAfterFirstUpdate)
             .isEqualTo(2);
 
-        StubbedFoldingEndpointUtils.setPoints(secondUser, 20_000L);
-        StubbedFoldingEndpointUtils.setUnits(secondUser, 20);
+        StubbedFoldingEndpointUtils.addPoints(secondUser, 20_000L);
+        StubbedFoldingEndpointUtils.addUnits(secondUser, 20);
         manuallyUpdateStats();
 
         final CompetitionSummary resultAfterSecondUpdate = TeamCompetitionStatsUtils.getStats();
@@ -309,8 +309,8 @@ class TeamCompetitionStatsTest {
             .as("Expected second team to be rank 1: " + secondTeamSummary)
             .isEqualTo(1);
 
-        StubbedFoldingEndpointUtils.setPoints(firstUser, 10_000L);
-        StubbedFoldingEndpointUtils.setUnits(firstUser, 10);
+        StubbedFoldingEndpointUtils.addPoints(firstUser, 10_000L);
+        StubbedFoldingEndpointUtils.addUnits(firstUser, 10);
         manuallyUpdateStats();
 
         final CompetitionSummary resultAfterFirstUpdate = TeamCompetitionStatsUtils.getStats();
@@ -325,8 +325,8 @@ class TeamCompetitionStatsTest {
             .as("Expected second team to be rank 2: " + secondTeamSummaryAfterFirstUpdate)
             .isEqualTo(2);
 
-        StubbedFoldingEndpointUtils.setPoints(secondUser, 20_000L);
-        StubbedFoldingEndpointUtils.setUnits(secondUser, 20);
+        StubbedFoldingEndpointUtils.addPoints(secondUser, 20_000L);
+        StubbedFoldingEndpointUtils.addUnits(secondUser, 20);
         manuallyUpdateStats();
 
         final CompetitionSummary resultAfterSecondUpdate = TeamCompetitionStatsUtils.getStats();
@@ -355,8 +355,8 @@ class TeamCompetitionStatsTest {
 
         final long newPoints = 20_000L;
         final int newUnits = 20;
-        StubbedFoldingEndpointUtils.setPoints(createdUser, newPoints);
-        StubbedFoldingEndpointUtils.setUnits(createdUser, newUnits);
+        StubbedFoldingEndpointUtils.addPoints(createdUser, newPoints);
+        StubbedFoldingEndpointUtils.addUnits(createdUser, newUnits);
         manuallyUpdateStats();
 
         final CompetitionSummary result = TeamCompetitionStatsUtils.getStats();
@@ -387,7 +387,7 @@ class TeamCompetitionStatsTest {
         final User createdUser = UserUtils.create(user);
 
         final long firstPoints = 10_000L;
-        StubbedFoldingEndpointUtils.setPoints(createdUser, firstPoints);
+        StubbedFoldingEndpointUtils.addPoints(createdUser, firstPoints);
         manuallyUpdateStats();
 
         final CompetitionSummary result = TeamCompetitionStatsUtils.getStats();
@@ -413,7 +413,7 @@ class TeamCompetitionStatsTest {
         HARDWARE_REQUEST_SENDER.update(createdHardware.getId(), updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
 
         final long secondPoints = 5_000L;
-        StubbedFoldingEndpointUtils.setPoints(createdUser, secondPoints);
+        StubbedFoldingEndpointUtils.addPoints(createdUser, secondPoints);
         manuallyUpdateStats();
 
         final CompetitionSummary resultAfterUpdate = TeamCompetitionStatsUtils.getStats();
@@ -440,7 +440,7 @@ class TeamCompetitionStatsTest {
         final User createdUser = UserUtils.create(user);
 
         final long firstPoints = 10_000L;
-        StubbedFoldingEndpointUtils.setPoints(createdUser, firstPoints);
+        StubbedFoldingEndpointUtils.addPoints(createdUser, firstPoints);
         manuallyUpdateStats();
 
         final CompetitionSummary result = TeamCompetitionStatsUtils.getStats();
@@ -463,7 +463,7 @@ class TeamCompetitionStatsTest {
         USER_REQUEST_SENDER.update(createdUser.getId(), user, ADMIN_USER.userName(), ADMIN_USER.password());
 
         final long secondPoints = 5_000L;
-        StubbedFoldingEndpointUtils.setPoints(createdUser, secondPoints);
+        StubbedFoldingEndpointUtils.addPoints(createdUser, secondPoints);
         manuallyUpdateStats();
 
         final CompetitionSummary resultAfterUpdate = TeamCompetitionStatsUtils.getStats();
@@ -489,8 +489,8 @@ class TeamCompetitionStatsTest {
         final User createdUserToRetire = UserUtils.create(userToRetire);
 
         final long firstPoints = 10_000L;
-        StubbedFoldingEndpointUtils.setPoints(firstUser, firstPoints);
-        StubbedFoldingEndpointUtils.setPoints(createdUserToRetire, firstPoints);
+        StubbedFoldingEndpointUtils.addPoints(firstUser, firstPoints);
+        StubbedFoldingEndpointUtils.addPoints(createdUserToRetire, firstPoints);
         manuallyUpdateStats();
 
         final CompetitionSummary result = TeamCompetitionStatsUtils.getStats();
@@ -510,8 +510,8 @@ class TeamCompetitionStatsTest {
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final long secondPoints = 8_000L;
-        StubbedFoldingEndpointUtils.setPoints(firstUser, secondPoints);
-        StubbedFoldingEndpointUtils.setPoints(createdUserToRetire, secondPoints);
+        StubbedFoldingEndpointUtils.addPoints(firstUser, secondPoints);
+        StubbedFoldingEndpointUtils.addPoints(createdUserToRetire, secondPoints);
         manuallyUpdateStats();
 
         final CompetitionSummary resultAfterRetirement = TeamCompetitionStatsUtils.getStats();
@@ -543,8 +543,8 @@ class TeamCompetitionStatsTest {
 
         UserUtils.create(userToRetire);
         final long thirdPoints = 14_000L;
-        StubbedFoldingEndpointUtils.setPoints(firstUser, thirdPoints);
-        StubbedFoldingEndpointUtils.setPoints(createdUserToRetire, thirdPoints);
+        StubbedFoldingEndpointUtils.addPoints(firstUser, thirdPoints);
+        StubbedFoldingEndpointUtils.addPoints(createdUserToRetire, thirdPoints);
         manuallyUpdateStats();
 
         final CompetitionSummary resultAfterUnretirement = TeamCompetitionStatsUtils.getStats();
@@ -594,7 +594,7 @@ class TeamCompetitionStatsTest {
         UserUtils.create(generateUserWithTeamIdAndCategory(newTeam.getId(), Category.NVIDIA_GPU));
 
         final long firstPoints = 10_000L;
-        StubbedFoldingEndpointUtils.setPoints(createUserToRetire, firstPoints);
+        StubbedFoldingEndpointUtils.addPoints(createUserToRetire, firstPoints);
         manuallyUpdateStats();
 
         final CompetitionSummary result = TeamCompetitionStatsUtils.getStats();
@@ -623,14 +623,14 @@ class TeamCompetitionStatsTest {
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final long secondPoints = 8_000L;
-        StubbedFoldingEndpointUtils.setPoints(createUserToRetire, secondPoints);
+        StubbedFoldingEndpointUtils.addPoints(createUserToRetire, secondPoints);
         manuallyUpdateStats();
 
         userToRetire.setTeamId(newTeam.getId());
         UserUtils.create(userToRetire);
 
         final long thirdPoints = 14_000L;
-        StubbedFoldingEndpointUtils.setPoints(createUserToRetire, thirdPoints);
+        StubbedFoldingEndpointUtils.addPoints(createUserToRetire, thirdPoints);
         manuallyUpdateStats();
 
         final CompetitionSummary resultAfterUnretirement = TeamCompetitionStatsUtils.getStats();
@@ -681,7 +681,7 @@ class TeamCompetitionStatsTest {
         final int userId = user.getId();
 
         final long firstPoints = 2_500L;
-        StubbedFoldingEndpointUtils.setPoints(user, firstPoints);
+        StubbedFoldingEndpointUtils.addPoints(user, firstPoints);
         manuallyUpdateStats();
 
         final long pointsOffset = 1_000L;
@@ -710,8 +710,8 @@ class TeamCompetitionStatsTest {
 
         final long firstPoints = 2_500L;
         final int firstUnits = 25;
-        StubbedFoldingEndpointUtils.setPoints(user, firstPoints);
-        StubbedFoldingEndpointUtils.setUnits(user, firstUnits);
+        StubbedFoldingEndpointUtils.addPoints(user, firstPoints);
+        StubbedFoldingEndpointUtils.addUnits(user, firstUnits);
         manuallyUpdateStats();
 
         final long pointsOffset = -20_000L;
@@ -757,10 +757,10 @@ class TeamCompetitionStatsTest {
             .isZero();
 
         final long newPoints = 10_000L;
-        StubbedFoldingEndpointUtils.setPoints(user, newPoints);
+        StubbedFoldingEndpointUtils.addPoints(user, newPoints);
 
         final int newUnits = 5;
-        StubbedFoldingEndpointUtils.setUnits(user, newUnits);
+        StubbedFoldingEndpointUtils.addUnits(user, newUnits);
 
         manuallyUpdateStats();
 
@@ -796,9 +796,9 @@ class TeamCompetitionStatsTest {
             .as("Expected all users to start at rank 1: " + resultBeforeStats)
             .isEqualTo(1);
 
-        StubbedFoldingEndpointUtils.setPoints(firstInTeamFirstOverall, 10_000L);
-        StubbedFoldingEndpointUtils.setPoints(secondInTeamThirdOverall, 1_000L);
-        StubbedFoldingEndpointUtils.setPoints(firstInTeamSecondOverall, 5_000L);
+        StubbedFoldingEndpointUtils.addPoints(firstInTeamFirstOverall, 10_000L);
+        StubbedFoldingEndpointUtils.addPoints(secondInTeamThirdOverall, 1_000L);
+        StubbedFoldingEndpointUtils.addPoints(firstInTeamSecondOverall, 5_000L);
         manuallyUpdateStats();
 
         final UserSummary resultAfterStats = TeamCompetitionStatsUtils.getStatsForUser(secondInTeamThirdOverallId);

@@ -2,6 +2,9 @@ package me.zodac.folding.ejb.core;
 
 import static java.util.stream.Collectors.toList;
 
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.Year;
 import java.util.Collection;
 import java.util.Optional;
 import javax.ejb.Singleton;
@@ -130,5 +133,15 @@ public class BusinessLogicEjb implements BusinessLogic {
             .stream()
             .filter(user -> user.getFoldingUserName().equalsIgnoreCase(foldingUserName) && user.getPasskey().equalsIgnoreCase(passkey))
             .findAny();
+    }
+
+    @Override
+    public void createMonthlyResult(final String monthlyResult, final LocalDateTime utcTimestamp) {
+        STORAGE.createMonthlyResult(monthlyResult, utcTimestamp);
+    }
+
+    @Override
+    public Optional<String> getMonthlyResult(final Month month, final Year year) {
+        return STORAGE.getMonthlyResult(month, year);
     }
 }

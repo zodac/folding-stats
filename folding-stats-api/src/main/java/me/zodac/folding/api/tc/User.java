@@ -61,7 +61,7 @@ public class User implements ResponsePojo {
      * Since the DB auto-generates the ID, this function should be used when creating a {@link User} from the DB response.
      *
      * @param userId          the ID
-     * @param foldingUserName the Folding@Home user name
+     * @param foldingUserName the Folding@Home username
      * @param displayName     the display name for the <code>Team Competition</code>
      * @param passkey         the Folding@Home passkey for this user
      * @param category        the {@link Category} the user is eligible for when added to a {@link Team}
@@ -86,7 +86,7 @@ public class User implements ResponsePojo {
      * <p>
      * Since we do not know the ID until the DB has persisted the {@link User}, the {@link #EMPTY_USER_ID} will be used instead.
      *
-     * @param foldingUserName the Folding@Home user name
+     * @param foldingUserName the Folding@Home username
      * @param displayName     the display name for the <code>Team Competition</code>
      * @param passkey         the Folding@Home passkey for this user
      * @param category        the {@link Category} the user is eligible for when added to a {@link Team}

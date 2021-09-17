@@ -1,5 +1,8 @@
 package me.zodac.folding.ejb.core;
 
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.Year;
 import java.util.Collection;
 import java.util.Optional;
 import me.zodac.folding.api.db.DbManager;
@@ -282,5 +285,32 @@ final class Storage {
      */
     void evictUserFromCache(final int userId) {
         userCache.remove(userId);
+    }
+
+    /**
+     * Creates a monthly result for the <code>Team Competition</code>.
+     *
+     * <p>
+     * Persists it with the {@link DbManager}, but does not cache it.
+     *
+     * @param monthlyResult the result for a month of the <code>Team Competition</code>
+     * @param utcTimestamp  the {@link java.time.ZoneOffset#UTC} timestamp for the result
+     */
+    public void createMonthlyResult(final String monthlyResult, final LocalDateTime utcTimestamp) {
+        DB_MANAGER.persistMonthlyResult(monthlyResult, utcTimestamp);
+    }
+
+    /**
+     * Retrieves the result of the <code>Team Competition</code> for the given {@link Month} and {@link Year}.
+     *
+     * <p>
+     * Since these values are not cached, we go directly to the {@link DbManager} to retrieve it.
+     *
+     * @param month the {@link Month} of the result to be retrieved
+     * @param year  the {@link Year} of the result to be retrieved
+     * @return an {@link Optional} of the <code>Team Competition</code> result
+     */
+    public Optional<String> getMonthlyResult(final Month month, final Year year) {
+        return DB_MANAGER.getMonthlyResult(month, year);
     }
 }

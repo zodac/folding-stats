@@ -24,13 +24,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import me.zodac.folding.SystemStateManager;
+import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.tc.result.MonthlyResult;
-import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.ejb.scheduled.tc.EndOfMonthResultStorageScheduler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@Path("/result/")
+@Path("/results/")
 @RequestScoped
 public class MonthlyResultEndpoint {
 
@@ -41,14 +41,14 @@ public class MonthlyResultEndpoint {
     private UriInfo uriContext;
 
     @EJB
-    private OldFacade oldFacade;
+    private BusinessLogic businessLogic;
 
     @EJB
     private EndOfMonthResultStorageScheduler endOfMonthResultStorageScheduler;
 
     @GET
     @PermitAll
-    @Path("/{year}/{month}")
+    @Path("/result/{year}/{month}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getMonthlyResult(@PathParam("year") final String year,
                                      @PathParam("month") final String month) {
@@ -60,14 +60,15 @@ public class MonthlyResultEndpoint {
         }
 
         try {
-            final Optional<String> result = oldFacade.getMonthlyResult(Month.of(Integer.parseInt(month)), Year.parse(year));
+            final Optional<String> result = businessLogic.getMonthlyResult(Month.of(Integer.parseInt(month)), Year.parse(year));
 
             if (result.isEmpty()) {
                 return ok(MonthlyResult.empty());
             }
 
             final MonthlyResult monthlyResult = GSON.fromJson(result.get(), MonthlyResult.class);
-            return ok(monthlyResult);
+            final MonthlyResult updatedMonthlyResult = MonthlyResult.updateWithEmptyCategories(monthlyResult);
+            return ok(updatedMonthlyResult);
         } catch (final DateTimeParseException e) {
             final String errorMessage = String.format("The year '%s' is not a valid format", year);
             LOGGER.debug(errorMessage, e);
@@ -84,7 +85,7 @@ public class MonthlyResultEndpoint {
             LOGGER.error(errorMessage);
             return badRequest(errorMessage);
         } catch (final Exception e) {
-            LOGGER.error("Unexpected error manually storing TC result", e);
+            LOGGER.error("Unexpected error retrieving TC result", e);
             return serverError();
         }
     }
