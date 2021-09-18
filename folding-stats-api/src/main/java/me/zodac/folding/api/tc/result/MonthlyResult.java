@@ -43,7 +43,7 @@ public class MonthlyResult {
      * Creates an empty {@link MonthlyResult}.
      *
      * <p>
-     * Will contains an {@link Collections#emptyList()} for {@code teamLeaderboard}, and {@code userCategoryLeaderboard} will be populated with an
+     * Will contain an {@link Collections#emptyList()} for {@code teamLeaderboard}, and {@code userCategoryLeaderboard} will be populated with an
      * entry for each instance of {@link Category#getAllValues()}, with a default value of {@link Collections#emptyList()}.
      *
      * @return the empty {@link MonthlyResult}
@@ -54,7 +54,7 @@ public class MonthlyResult {
             emptyCategoryResult.put(category, Collections.emptyList());
         }
 
-        return new MonthlyResult(Collections.emptyList(), emptyCategoryResult);
+        return create(Collections.emptyList(), emptyCategoryResult);
     }
 
     /**
