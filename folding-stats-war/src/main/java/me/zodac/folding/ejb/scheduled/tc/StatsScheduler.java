@@ -125,6 +125,7 @@ public class StatsScheduler {
             return;
         }
 
+        LOGGER.debug("Found TC teams: {}", tcTeams);
         for (final Team team : tcTeams) {
             parseTcStatsForTeam(team, executionType);
         }
@@ -139,6 +140,7 @@ public class StatsScheduler {
             return;
         }
 
+        LOGGER.debug("Found users TC team {}: {}", team.getTeamName(), teamUsers);
         for (final User user : teamUsers) {
             if (executionType == ExecutionType.ASYNCHRONOUS) {
                 userTeamCompetitionStatsParser.parseTcStatsForUser(user);

@@ -54,6 +54,11 @@ class HardwareTest {
         cleanSystemForSimpleTests();
     }
 
+    @AfterAll
+    static void tearDown() throws FoldingRestException {
+        cleanSystemForSimpleTests();
+    }
+
     @Test
     @Order(1)
     void whenGettingAllHardware_givenNoHardwareHasBeenCreated_thenEmptyJsonResponseIsReturned_andHas200Status() throws FoldingRestException {
@@ -155,6 +160,8 @@ class HardwareTest {
             .isEqualTo(initialSize);
     }
 
+    // Negative/alternative test cases
+
     @Test
     void whenDeletingHardware_givenValidHardwareId_thenHardwareIsDeleted_andHas200Status_andHardwareCountIsReduced_andHardwareCannotBeRetrievedAgain()
         throws FoldingRestException {
@@ -176,8 +183,6 @@ class HardwareTest {
             .as("Get all response did not return the initial hardware - deleted hardware")
             .isEqualTo(initialSize - 1);
     }
-
-    // Negative/alternative test cases
 
     @Test
     void whenCreatingHardware_givenHardwareWithInvalidOperatingSystem_thenJsonResponseWithErrorIsReturned_andHas400Status()
@@ -584,10 +589,5 @@ class HardwareTest {
         assertThat(response.statusCode())
             .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
-    }
-
-    @AfterAll
-    static void tearDown() throws FoldingRestException {
-        cleanSystemForSimpleTests();
     }
 }

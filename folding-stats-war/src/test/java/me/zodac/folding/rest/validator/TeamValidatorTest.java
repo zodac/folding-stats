@@ -222,11 +222,11 @@ class TeamValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'teamName' does not match existing team name (provided: 'null', expected: 'teamName')");
+            .contains("Field 'teamName' must not be empty");
     }
 
     @Test
-    void whenValidatingUpdate_givenTeamWithNameNotMatchingExistingTeam_thenFailureResponseIsReturned() {
+    void whenValidatingUpdate_givenTeamWithNameAlreadyExists_thenFailureResponseIsReturned() {
         final TeamRequest team = TeamRequest.builder()
             .teamName("teamName")
             .teamDescription("teamDescription")
@@ -234,12 +234,21 @@ class TeamValidatorTest {
             .build();
 
         final Team existingTeam = Team.builder()
+            .id(1)
             .teamName("differentName")
             .teamDescription("teamDescription")
             .forumLink("http://www.google.com")
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
+        mockBusinessLogic.createTeam(Team.builder()
+            .id(20)
+            .teamName("teamName")
+            .teamDescription("teamDescription")
+            .forumLink("http://www.google.com")
+            .build()
+        );
+
         final TeamValidator teamValidator = TeamValidator.create(mockBusinessLogic);
         final ValidationResponse<Team> response = teamValidator.validateUpdate(team, existingTeam);
 
@@ -247,7 +256,38 @@ class TeamValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'teamName' does not match existing team name (provided: 'teamName', expected: 'differentName')");
+            .contains("Payload conflicts with an existing object on: [teamName]");
+    }
+
+    @Test
+    void whenValidatingUpdate_givenTeamWithNameAlreadyExists_andExistingTeamIsTheOneBeingUpdated_thenSuccessResponseIsReturned() {
+        final TeamRequest team = TeamRequest.builder()
+            .teamName("teamName")
+            .teamDescription("teamDescription")
+            .forumLink("http://www.google.com")
+            .build();
+
+        final Team existingTeam = Team.builder()
+            .id(1)
+            .teamName("teamName")
+            .teamDescription("teamDescription")
+            .forumLink("http://www.google.com")
+            .build();
+
+        final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
+        mockBusinessLogic.createTeam(Team.builder()
+            .id(1)
+            .teamName("teamName")
+            .teamDescription("teamDescription")
+            .forumLink("http://www.google.com")
+            .build()
+        );
+
+        final TeamValidator teamValidator = TeamValidator.create(mockBusinessLogic);
+        final ValidationResponse<Team> response = teamValidator.validateUpdate(team, existingTeam);
+
+        assertThat(response.isInvalid())
+            .isFalse();
     }
 
     @Test

@@ -110,7 +110,8 @@ public final class HardwareValidator {
      * <ul>
      *     <li>Input {@code hardwareRequest} and {@code existingHardware} must not be <b>null</b></li>
      *     <li>Field 'hardwareName' must not be empty</li>
-     *     <li>If field 'hardwareName' is not empty, it must match the existing {@link Hardware}</li>
+     *     <li>If field 'hardwareName' is not empty, it must not be used by another {@link Hardware}, unless it is the {@link Hardware} to be
+     *     updated</li>
      *     <li>Field 'displayName' must not be empty</li>
      *     <li>Field 'operatingSystem' must be a valid {@link OperatingSystem}</li>
      *     <li>Field 'multiplier' must be over <b>0.00</b></li>
@@ -125,11 +126,10 @@ public final class HardwareValidator {
             return ValidationResponse.nullObject();
         }
 
-        // Hardware name must be the same as the name of the existing hardware
-        if (!existingHardware.getHardwareName().equalsIgnoreCase(hardwareRequest.getHardwareName())) {
-            return ValidationResponse.failure(hardwareRequest,
-                String.format("Field 'hardwareName' does not match existing hardware name (provided: '%s', expected: '%s')",
-                    hardwareRequest.getHardwareName(), existingHardware.getHardwareName()));
+        // Hardware name must be unique
+        final Optional<Hardware> hardwareWithMatchingName = businessLogic.getHardwareWithName(hardwareRequest.getHardwareName());
+        if (hardwareWithMatchingName.isPresent() && hardwareWithMatchingName.get().getId() != existingHardware.getId()) {
+            return ValidationResponse.conflictingWith(hardwareRequest, hardwareWithMatchingName.get(), List.of("hardwareName"));
         }
 
         final List<String> failureMessages = Stream.of(

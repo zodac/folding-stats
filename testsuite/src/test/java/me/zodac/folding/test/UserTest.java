@@ -9,6 +9,7 @@ import static me.zodac.folding.test.utils.TestAuthenticationData.READ_ONLY_USER;
 import static me.zodac.folding.test.utils.TestConstants.FOLDING_URL;
 import static me.zodac.folding.test.utils.TestConstants.GSON;
 import static me.zodac.folding.test.utils.TestConstants.HTTP_CLIENT;
+import static me.zodac.folding.test.utils.TestGenerator.generateHardware;
 import static me.zodac.folding.test.utils.TestGenerator.generateTeam;
 import static me.zodac.folding.test.utils.TestGenerator.generateUser;
 import static me.zodac.folding.test.utils.TestGenerator.generateUserWithCategory;
@@ -16,6 +17,7 @@ import static me.zodac.folding.test.utils.TestGenerator.generateUserWithHardware
 import static me.zodac.folding.test.utils.TestGenerator.generateUserWithLiveStatsLink;
 import static me.zodac.folding.test.utils.TestGenerator.generateUserWithTeamId;
 import static me.zodac.folding.test.utils.rest.request.HardwareUtils.HARDWARE_REQUEST_SENDER;
+import static me.zodac.folding.test.utils.rest.request.TeamUtils.TEAM_REQUEST_SENDER;
 import static me.zodac.folding.test.utils.rest.request.UserUtils.USER_REQUEST_SENDER;
 import static me.zodac.folding.test.utils.rest.request.UserUtils.create;
 import static me.zodac.folding.test.utils.rest.response.HttpResponseHeaderUtils.getEntityTag;
@@ -35,13 +37,17 @@ import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.client.java.response.HardwareResponseParser;
+import me.zodac.folding.client.java.response.TeamResponseParser;
 import me.zodac.folding.client.java.response.UserResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
+import me.zodac.folding.rest.api.tc.request.TeamRequest;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 import me.zodac.folding.test.utils.TestConstants;
+import me.zodac.folding.test.utils.rest.request.HardwareUtils;
 import me.zodac.folding.test.utils.rest.request.StubbedFoldingEndpointUtils;
 import me.zodac.folding.test.utils.rest.request.TeamUtils;
 import me.zodac.folding.test.utils.rest.request.UserUtils;
@@ -60,6 +66,11 @@ class UserTest {
 
     @BeforeAll
     static void setUp() throws FoldingRestException {
+        cleanSystemForSimpleTests();
+    }
+
+    @AfterAll
+    static void tearDown() throws FoldingRestException {
         cleanSystemForSimpleTests();
     }
 
@@ -192,6 +203,8 @@ class UserTest {
             .isEqualTo(initialSize);
     }
 
+    // Negative/alternative test cases
+
     @Test
     void whenDeletingUser_givenValidUserId_thenUserIsDeleted_andHas200Status_andUserCountIsReduced_andUserCannotBeRetrievedAgain()
         throws FoldingRestException {
@@ -213,8 +226,6 @@ class UserTest {
             .as("Get all response did not return the initial users - deleted user")
             .isEqualTo(initialSize - 1);
     }
-
-    // Negative/alternative test cases
 
     @Test
     void whenCreatingUser_givenUserWithInvalidHardwareId_thenJsonResponseWithErrorIsReturned_andHas400Status() throws FoldingRestException {
@@ -839,38 +850,97 @@ class UserTest {
     }
 
     @Test
-    void whenUpdateHardware_givenUserReferencesHardware_thenUserIsUpdatedWithNewHardwareDetails_andResponseHas200Status()
-        throws FoldingRestException {
-        final User createdUser = create(generateUser());
+    void whenUpdatingHardware_givenUserUsesTheHardware_thenUserWillReflectTheChanges_andResponseHas200StatusCode() throws FoldingRestException {
+        final Hardware hardware = HardwareUtils.create(generateHardware());
+        final UserRequest userRequest = generateUserWithHardwareId(hardware.getId());
+        final User user = create(userRequest);
+        final User initialUser = UserUtils.get(user.getId());
 
-        final Hardware originalHardware = createdUser.getHardware();
+        assertThat(initialUser.getHardware())
+            .as("Expected user to contain initial hardware")
+            .isEqualTo(hardware);
 
-        final HardwareRequest hardwareToUpdate = HardwareRequest.builder()
-            .hardwareName(originalHardware.getHardwareName())
-            .displayName("New Name")
-            .operatingSystem(originalHardware.getOperatingSystem().toString())
-            .multiplier(originalHardware.getMultiplier())
+        final HardwareRequest hardwareUpdateRequest = HardwareRequest.builder()
+            .hardwareName("updatedHardwareName")
+            .displayName(hardware.getDisplayName())
+            .operatingSystem(hardware.getOperatingSystem().toString())
+            .multiplier(hardware.getMultiplier())
             .build();
 
         final HttpResponse<String> response =
-            HARDWARE_REQUEST_SENDER.update(originalHardware.getId(), hardwareToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
+            HARDWARE_REQUEST_SENDER.update(hardware.getId(), hardwareUpdateRequest, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
-        final User userAfterHardwareUpdate = UserResponseParser.get(USER_REQUEST_SENDER.get(createdUser.getId()));
+        final Hardware updatedHardware = HardwareResponseParser.update(response);
+        final User userAfterHardwareUpdate = UserUtils.get(user.getId());
 
         assertThat(userAfterHardwareUpdate.getHardware())
-            .as("Expected user's hardware to be changed: " + userAfterHardwareUpdate)
-            .isNotEqualTo(originalHardware);
+            .as("Expected user to contain updated hardware")
+            .isEqualTo(updatedHardware);
 
-        assertThat(userAfterHardwareUpdate.getHardware().getDisplayName())
-            .as("Expected user's hardware display name to be updated to new one: " + userAfterHardwareUpdate)
-            .isEqualTo(hardwareToUpdate.getDisplayName());
+        final Collection<User> usersAfterUpdate = UserUtils.getAll();
+        User foundUser = null;
+        for (final User userAfterUpdate : usersAfterUpdate) {
+            if (userAfterUpdate.getId() == user.getId()) {
+                foundUser = userAfterUpdate;
+                assertThat(foundUser.getHardware())
+                    .as("Expected user to contain updated team")
+                    .isEqualTo(updatedHardware);
+                break;
+            }
+        }
+
+        assertThat(foundUser)
+            .as("Could not find updated user after hardware was updated: " + usersAfterUpdate)
+            .isNotNull();
     }
 
-    @AfterAll
-    static void tearDown() throws FoldingRestException {
-        cleanSystemForSimpleTests();
+    @Test
+    void whenUpdatingTeam_givenUserIsOnTheTeam_thenUserWillReflectTheChanges_andResponseHas200StatusCode() throws FoldingRestException {
+        final Team team = TeamUtils.create(generateTeam());
+        final UserRequest userRequest = generateUserWithTeamId(team.getId());
+        final User user = create(userRequest);
+        final User initialUser = UserUtils.get(user.getId());
+
+        assertThat(initialUser.getTeam())
+            .as("Expected user to contain initial team")
+            .isEqualTo(team);
+
+        final TeamRequest teamUpdateRequest = TeamRequest.builder()
+            .teamName("updatedTeamName")
+            .teamDescription(team.getTeamDescription())
+            .forumLink(team.getForumLink())
+            .build();
+
+        final HttpResponse<String> response =
+            TEAM_REQUEST_SENDER.update(team.getId(), teamUpdateRequest, ADMIN_USER.userName(), ADMIN_USER.password());
+        assertThat(response.statusCode())
+            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_OK);
+
+        final Team updatedTeam = TeamResponseParser.update(response);
+        final User userAfterTeamUpdate = UserUtils.get(user.getId());
+
+        assertThat(userAfterTeamUpdate.getTeam())
+            .as("Expected user to contain updated team")
+            .isEqualTo(updatedTeam);
+
+        final Collection<User> usersAfterUpdate = UserUtils.getAll();
+        User foundUser = null;
+        for (final User userAfterUpdate : usersAfterUpdate) {
+            if (userAfterUpdate.getId() == user.getId()) {
+                foundUser = userAfterUpdate;
+                assertThat(foundUser.getTeam())
+                    .as("Expected user to contain updated team")
+                    .isEqualTo(updatedTeam);
+                break;
+            }
+        }
+
+        assertThat(foundUser)
+            .as("Could not find updated user after team was updated: " + usersAfterUpdate)
+            .isNotNull();
     }
 }

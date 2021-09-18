@@ -268,11 +268,11 @@ class HardwareValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'hardwareName' does not match existing hardware name (provided: 'null', expected: 'hardwareName')");
+            .contains("Field 'hardwareName' must not be empty");
     }
 
     @Test
-    void whenValidatingUpdate_givenHardwareWithNameNotMatchingExistingHardware_thenFailureResponseIsReturned() {
+    void whenValidatingUpdate_givenHardwareWithNameAlreadyExists_thenFailureResponseIsReturned() {
         final HardwareRequest hardware = HardwareRequest.builder()
             .hardwareName("hardwareName")
             .displayName("displayName")
@@ -281,6 +281,7 @@ class HardwareValidatorTest {
             .build();
 
         final Hardware existingHardware = Hardware.builder()
+            .id(1)
             .hardwareName("differentName")
             .displayName("displayName")
             .operatingSystem(OperatingSystem.WINDOWS)
@@ -288,6 +289,15 @@ class HardwareValidatorTest {
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
+        mockBusinessLogic.createHardware(Hardware.builder()
+            .id(20)
+            .hardwareName("hardwareName")
+            .displayName("displayName")
+            .operatingSystem(OperatingSystem.WINDOWS)
+            .multiplier(1.0D)
+            .build()
+        );
+
         final HardwareValidator hardwareValidator = HardwareValidator.create(mockBusinessLogic);
         final ValidationResponse<Hardware> response = hardwareValidator.validateUpdate(hardware, existingHardware);
 
@@ -295,7 +305,41 @@ class HardwareValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'hardwareName' does not match existing hardware name (provided: 'hardwareName', expected: 'differentName')");
+            .contains("Payload conflicts with an existing object on: [hardwareName]");
+    }
+
+    @Test
+    void whenValidatingUpdate_givenHardwareWithNameAlreadyExists_andExistingHardwareIsTheOneBeingUpdated_thenSuccessResponseIsReturned() {
+        final HardwareRequest hardware = HardwareRequest.builder()
+            .hardwareName("hardwareName")
+            .displayName("displayName")
+            .operatingSystem(OperatingSystem.WINDOWS.toString())
+            .multiplier(1.0D)
+            .build();
+
+        final Hardware existingHardware = Hardware.builder()
+            .id(1)
+            .hardwareName("hardwareName")
+            .displayName("displayName")
+            .operatingSystem(OperatingSystem.WINDOWS)
+            .multiplier(1.0D)
+            .build();
+
+        final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
+        mockBusinessLogic.createHardware(Hardware.builder()
+            .id(1)
+            .hardwareName("hardwareName")
+            .displayName("displayName")
+            .operatingSystem(OperatingSystem.WINDOWS)
+            .multiplier(1.0D)
+            .build()
+        );
+
+        final HardwareValidator hardwareValidator = HardwareValidator.create(mockBusinessLogic);
+        final ValidationResponse<Hardware> response = hardwareValidator.validateUpdate(hardware, existingHardware);
+
+        assertThat(response.isInvalid())
+            .isFalse();
     }
 
     @Test

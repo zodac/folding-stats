@@ -94,7 +94,7 @@ public final class TeamValidator {
      * Validation checks include:
      * <ul>
      *     <li>Field 'teamName' must not be empty</li>
-     *     <li>If field 'teamName' is not empty, it must match the existing {@link Team}</li>
+     *     <li>If field 'teamName' is not empty, it must not be used by another {@link Team}, unless it is the {@link Team} to be updated</li>
      *     <li>If field 'forumLink' is not empty, it must be a valid URL</li>
      * </ul>
      *
@@ -107,11 +107,10 @@ public final class TeamValidator {
             return ValidationResponse.nullObject();
         }
 
-        // Team name must be the same as the name of the existing team
-        if (!existingTeam.getTeamName().equalsIgnoreCase(teamRequest.getTeamName())) {
-            return ValidationResponse.failure(teamRequest,
-                String.format("Field 'teamName' does not match existing team name (provided: '%s', expected: '%s')", teamRequest.getTeamName(),
-                    existingTeam.getTeamName()));
+        // Team name must be unique
+        final Optional<Team> teamWithMatchingName = businessLogic.getTeamWithName(teamRequest.getTeamName());
+        if (teamWithMatchingName.isPresent() && teamWithMatchingName.get().getId() != existingTeam.getId()) {
+            return ValidationResponse.conflictingWith(teamRequest, teamWithMatchingName.get(), List.of("teamName"));
         }
 
         final List<String> failureMessages = Stream.of(

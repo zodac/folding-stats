@@ -71,13 +71,13 @@ public class OldFacade {
         final boolean isHardwareMultiplierChange = !existingMultiplier.equals(updatedMultiplier);
 
         for (final User user : usersUsingThisHardware) {
-            // All users are referencing the old hardware, rather than recreating them, just evict them from the cache
-            UserCache.getInstance().remove(user.getId()); // TODO: Don't use cache directly, use Storage#evictUserFromCache()
-
             if (isHardwareMultiplierChange) {
                 LOGGER.debug("User {} had state change to hardware multiplier", user.getFoldingUserName());
                 handleStateChangeForUser(user);
             }
+
+            final User updatedUser = User.updateHardware(user, updatedHardware);
+            userCache.add(updatedUser.getId(), updatedUser);
         }
     }
 
@@ -166,6 +166,13 @@ public class OldFacade {
     public void updateTeam(final Team team) {
         dbManager.updateTeam(team);
         teamCache.add(team.getId(), team);
+
+        final Collection<User> usersOnThisTeam = businessLogic.getUsersOnTeam(team);
+
+        for (final User user : usersOnThisTeam) {
+            final User updatedUser = User.updateTeam(user, team);
+            userCache.add(updatedUser.getId(), updatedUser);
+        }
     }
 
     public void persistInitialUserStats(final User user) throws ExternalConnectionException {

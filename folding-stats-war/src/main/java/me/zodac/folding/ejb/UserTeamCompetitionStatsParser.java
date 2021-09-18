@@ -67,6 +67,7 @@ public class UserTeamCompetitionStatsParser {
     }
 
     private void updateTcStatsForUser(final User user) {
+        LOGGER.debug("Updating stats for '{}': {}", user.getDisplayName(), user);
         if (StringUtils.isBlank(user.getPasskey())) {
             LOGGER.warn("Not parsing TC stats for user, missing passkey: {}", user);
             return;
