@@ -10,7 +10,9 @@ import javax.ejb.Startup;
 import javax.ejb.Timeout;
 import javax.ejb.Timer;
 import javax.ejb.TimerService;
+import me.zodac.folding.ParsingStateManager;
 import me.zodac.folding.SystemStateManager;
+import me.zodac.folding.api.ParsingState;
 import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.tc.Team;
@@ -94,6 +96,7 @@ public class StatsScheduler {
     public void scheduledTeamCompetitionStatsParsing(final Timer timer) {
         LOGGER.trace("Timer fired at: {}", timer);
         try {
+            ParsingStateManager.next(ParsingState.PARSING_TEAM_COMPETITION_STATS);
             SystemStateManager.next(SystemState.UPDATING_STATS);
             parseTeamCompetitionStats(ExecutionType.ASYNCHRONOUS);
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
@@ -110,6 +113,7 @@ public class StatsScheduler {
      */
     public void manualTeamCompetitionStatsParsing(final ExecutionType executionType) {
         LOGGER.debug("Manual stats parsing execution");
+        ParsingStateManager.next(ParsingState.PARSING_TEAM_COMPETITION_STATS);
         SystemStateManager.next(SystemState.UPDATING_STATS);
         parseTeamCompetitionStats(executionType);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);

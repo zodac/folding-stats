@@ -7,6 +7,8 @@ import java.util.Collection;
 import java.util.Optional;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
+import me.zodac.folding.ParsingStateManager;
+import me.zodac.folding.api.ParsingState;
 import me.zodac.folding.api.SystemUserAuthentication;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.ejb.BusinessLogic;
@@ -133,6 +135,11 @@ public class OldFacade {
     // Also occurs if the hardware multiplier for a hardware used by a user is changed
     // We set the new initial stats to the user's current total stats, then give an offset of their current TC stats (multiplied)
     private void handleStateChangeForUser(final User userWithStateChange) throws ExternalConnectionException {
+        if (ParsingStateManager.current() == ParsingState.NOT_PARSING_STATS) {
+            LOGGER.warn("Received a state change for user {}, but system is not currently parsing stats", userWithStateChange.getDisplayName());
+            return;
+        }
+
         final UserStats userTotalStats = FOLDING_STATS_RETRIEVER.getTotalStats(userWithStateChange);
         final UserTcStats currentUserTcStats = getTcStatsForUser(userWithStateChange.getId());
 

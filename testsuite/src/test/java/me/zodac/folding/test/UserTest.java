@@ -203,8 +203,6 @@ class UserTest {
             .isEqualTo(initialSize);
     }
 
-    // Negative/alternative test cases
-
     @Test
     void whenDeletingUser_givenValidUserId_thenUserIsDeleted_andHas200Status_andUserCountIsReduced_andUserCannotBeRetrievedAgain()
         throws FoldingRestException {
@@ -226,6 +224,8 @@ class UserTest {
             .as("Get all response did not return the initial users - deleted user")
             .isEqualTo(initialSize - 1);
     }
+
+    // Negative/alternative test cases
 
     @Test
     void whenCreatingUser_givenUserWithInvalidHardwareId_thenJsonResponseWithErrorIsReturned_andHas400Status() throws FoldingRestException {
@@ -850,7 +850,7 @@ class UserTest {
     }
 
     @Test
-    void whenUpdatingHardware_givenUserUsesTheHardware_thenUserWillReflectTheChanges_andResponseHas200StatusCode() throws FoldingRestException {
+    void whenUpdatingHardware_givenUserUsesTheHardware_thenUserWillReflectTheChanges_andResponseHas200Status() throws FoldingRestException {
         final Hardware hardware = HardwareUtils.create(generateHardware());
         final UserRequest userRequest = generateUserWithHardwareId(hardware.getId());
         final User user = create(userRequest);
@@ -898,7 +898,7 @@ class UserTest {
     }
 
     @Test
-    void whenUpdatingTeam_givenUserIsOnTheTeam_thenUserWillReflectTheChanges_andResponseHas200StatusCode() throws FoldingRestException {
+    void whenUpdatingTeam_givenUserIsOnTheTeam_thenUserWillReflectTheChanges_andResponseHas200Status() throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
         final UserRequest userRequest = generateUserWithTeamId(team.getId());
         final User user = create(userRequest);

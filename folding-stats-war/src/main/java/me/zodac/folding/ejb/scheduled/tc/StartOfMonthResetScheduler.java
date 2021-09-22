@@ -10,7 +10,9 @@ import javax.ejb.Startup;
 import javax.ejb.Timeout;
 import javax.ejb.Timer;
 import javax.ejb.TimerService;
+import me.zodac.folding.ParsingStateManager;
 import me.zodac.folding.SystemStateManager;
+import me.zodac.folding.api.ParsingState;
 import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.tc.User;
@@ -96,6 +98,7 @@ public class StartOfMonthResetScheduler {
         LOGGER.warn("Resetting TC stats for new month");
 
         SystemStateManager.next(SystemState.RESETTING_STATS);
+        ParsingStateManager.next(ParsingState.NOT_PARSING_STATS);
         resetTeamCompetitionStats();
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
     }
