@@ -32,7 +32,7 @@ import me.zodac.folding.cache.TeamCache;
 import me.zodac.folding.cache.TotalStatsCache;
 import me.zodac.folding.cache.UserCache;
 import me.zodac.folding.db.DbManagerRetriever;
-import me.zodac.folding.ejb.tc.UserTeamCompetitionStatsParser;
+import me.zodac.folding.ejb.tc.UserStatsParser;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.apache.logging.log4j.LogManager;
@@ -60,7 +60,7 @@ public class OldFacade {
     private transient BusinessLogic businessLogic;
 
     @EJB
-    private transient UserTeamCompetitionStatsParser userTeamCompetitionStatsParser;
+    private transient UserStatsParser userStatsParser;
 
     public void updateHardware(final Hardware updatedHardware, final Hardware existingHardware) throws ExternalConnectionException {
         dbManager.updateHardware(updatedHardware);
@@ -93,7 +93,7 @@ public class OldFacade {
         // When adding a new user, we give an empty offset to the offset cache
         offsetStatsCache.add(userWithId.getId(), OffsetStats.empty());
 
-        userTeamCompetitionStatsParser.parseTcStatsForUser(userWithId);
+        userStatsParser.parseTcStatsForUser(userWithId);
 
         return userWithId;
     }

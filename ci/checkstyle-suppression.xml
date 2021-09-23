@@ -7,8 +7,9 @@
 -->
 
 <suppressions>
-    <suppress files="DbManager\.java" checks="[a-zA-Z0-9]*"/>
+    <!-- TODO: [zodac] Re-enable after adding Javadoc -->
+    <suppress files="DbManager\.java" checks=".*"/>
 
     <!-- Ignore generated files -->
-    <suppress files="[\\/]gen[\\/]" checks="[a-zA-Z0-9]*"/>
+    <suppress files="[\\/]gen[\\/]" checks=".*"/>
 </suppressions>

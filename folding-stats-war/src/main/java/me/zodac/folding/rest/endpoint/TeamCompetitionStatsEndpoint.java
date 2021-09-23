@@ -38,8 +38,8 @@ import me.zodac.folding.api.utils.ExecutionType;
 import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.ejb.tc.CompetitionResultGenerator;
 import me.zodac.folding.ejb.tc.LeaderboardStatsGenerator;
-import me.zodac.folding.ejb.tc.UserTeamCompetitionStatsParser;
-import me.zodac.folding.ejb.tc.scheduled.EndOfMonthScheduler;
+import me.zodac.folding.ejb.tc.UserStatsParser;
+import me.zodac.folding.ejb.tc.UserStatsResetter;
 import me.zodac.folding.ejb.tc.scheduled.StatsScheduler;
 import me.zodac.folding.rest.api.tc.CompetitionSummary;
 import me.zodac.folding.rest.api.tc.UserSummary;
@@ -66,9 +66,6 @@ public class TeamCompetitionStatsEndpoint {
     private CompetitionResultGenerator competitionResultGenerator;
 
     @EJB
-    private EndOfMonthScheduler endOfMonthScheduler;
-
-    @EJB
     private LeaderboardStatsGenerator leaderboardStatsGenerator;
 
     @EJB
@@ -78,7 +75,10 @@ public class TeamCompetitionStatsEndpoint {
     private StatsScheduler statsScheduler;
 
     @EJB
-    private UserTeamCompetitionStatsParser userTeamCompetitionStatsParser;
+    private UserStatsParser userStatsParser;
+
+    @EJB
+    private UserStatsResetter userStatsResetter;
 
     @GET
     @PermitAll
@@ -194,7 +194,7 @@ public class TeamCompetitionStatsEndpoint {
 
             oldFacade.addOrUpdateOffsetStats(parsedId, offsetStatsToUse);
             SystemStateManager.next(SystemState.UPDATING_STATS);
-            userTeamCompetitionStatsParser.parseTcStatsForUserAndWait(user);
+            userStatsParser.parseTcStatsForUserAndWait(user);
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             return ok();
         } catch (final Exception e) {
@@ -280,7 +280,7 @@ public class TeamCompetitionStatsEndpoint {
 
         try {
             SystemStateManager.next(SystemState.RESETTING_STATS);
-            endOfMonthScheduler.resetTeamCompetitionStats();
+            userStatsResetter.resetTeamCompetitionStats();
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             return ok();
         } catch (final Exception e) {

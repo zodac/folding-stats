@@ -1,6 +1,5 @@
 package me.zodac.folding.ejb.tc.scheduled;
 
-import java.util.Collection;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.ejb.EJB;
@@ -14,14 +13,8 @@ import me.zodac.folding.ParsingStateManager;
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.ParsingState;
 import me.zodac.folding.api.SystemState;
-import me.zodac.folding.api.ejb.BusinessLogic;
-import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.utils.EnvironmentVariableUtils;
-import me.zodac.folding.api.utils.ExecutionType;
-import me.zodac.folding.cache.RetiredTcStatsCache;
-import me.zodac.folding.cache.TcStatsCache;
-import me.zodac.folding.cache.TotalStatsCache;
-import me.zodac.folding.ejb.OldFacade;
+import me.zodac.folding.ejb.tc.UserStatsResetter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -57,13 +50,7 @@ public class StartOfMonthScheduler {
         EnvironmentVariableUtils.get("STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH", "3");
 
     @EJB
-    private BusinessLogic businessLogic;
-
-    @EJB
-    private OldFacade oldFacade;
-
-    @EJB
-    private StatsScheduler statsScheduler;
+    private UserStatsResetter userStatsResetter;
 
     @Resource
     private TimerService timerService;
@@ -93,7 +80,7 @@ public class StartOfMonthScheduler {
      * stats.
      *
      * @param timer the {@link Timer} for scheduled execution
-     * @see #resetTeamCompetitionStats()
+     * @see UserStatsResetter#resetTeamCompetitionStats()
      */
     @Timeout
     public void startOfTeamCompetition(final Timer timer) {
@@ -102,63 +89,7 @@ public class StartOfMonthScheduler {
 
         SystemStateManager.next(SystemState.RESETTING_STATS);
         ParsingStateManager.next(ParsingState.NOT_PARSING_STATS);
-        resetTeamCompetitionStats();
+        userStatsResetter.resetTeamCompetitionStats();
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
-    }
-
-    /**
-     * Resets the <code>Team Competition</code> stats for all {@link User}s.
-     *
-     * <p>
-     * Actions performed:
-     * <ol>
-     * <li>Retrieves the current stats for all {@link User}s and updates their initial stats to these current values</li>
-     * <li>Remove offset stats for all users</li>
-     * <li>Delete all retired user stats</li>
-     * <li>Invalidate all stats caches ({@link TcStatsCache}/{@link TotalStatsCache}/{@link RetiredTcStatsCache})</li>
-     * <li>Execute a new stats update to set all values to <b>0</b></li>
-     * </ol>
-     *
-     * @see OldFacade#setCurrentStatsAsInitialStatsForUser(User)
-     * @see OldFacade#clearOffsetStats()
-     * @see OldFacade#deleteRetiredUserStats()
-     * @see StatsScheduler#manualTeamCompetitionStatsParsing(ExecutionType)
-     */
-    public void resetTeamCompetitionStats() {
-        try {
-            final Collection<User> users = businessLogic.getAllUsersWithoutPasskeys();
-            if (users.isEmpty()) {
-                LOGGER.error("No TC users configured in system to reset!");
-            } else {
-                // Pull stats one more time to get the latest values
-                statsScheduler.manualTeamCompetitionStatsParsing(ExecutionType.SYNCHRONOUS);
-                resetStats(users);
-                LOGGER.info("Clearing offsets");
-                oldFacade.clearOffsetStats();
-            }
-
-            LOGGER.info("Deleting retired users");
-            oldFacade.deleteRetiredUserStats();
-            resetCaches();
-            statsScheduler.manualTeamCompetitionStatsParsing(ExecutionType.SYNCHRONOUS);
-        } catch (final Exception e) {
-            LOGGER.warn("Unexpected error manually resetting TC stats", e);
-        }
-    }
-
-    private void resetStats(final Collection<User> usersToReset) {
-        LOGGER.info("Resetting user stats");
-        for (final User user : usersToReset) {
-            LOGGER.info("Resetting TC stats for {}", user.getDisplayName());
-            oldFacade.setCurrentStatsAsInitialStatsForUser(user);
-        }
-    }
-
-    // TODO: [zodac] Go through Storage/BL, not direct to caches
-    private static void resetCaches() {
-        LOGGER.info("Resetting caches");
-        TcStatsCache.getInstance().removeAll();
-        TotalStatsCache.getInstance().removeAll();
-        RetiredTcStatsCache.getInstance().removeAll();
     }
 }

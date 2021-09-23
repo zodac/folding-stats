@@ -24,7 +24,7 @@ import org.apache.logging.log4j.Logger;
  */
 @LocalBean
 @Stateless
-public class UserTeamCompetitionStatsParser {
+public class UserStatsParser {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final FoldingStatsRetriever FOLDING_STATS_RETRIEVER = HttpFoldingStatsRetriever.create();

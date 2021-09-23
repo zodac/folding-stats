@@ -19,13 +19,13 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.utils.EnvironmentVariableUtils;
 import me.zodac.folding.api.utils.ExecutionType;
-import me.zodac.folding.ejb.tc.UserTeamCompetitionStatsParser;
+import me.zodac.folding.ejb.tc.UserStatsParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
  * {@link Startup} EJB which schedules the <code>Team Competition</code> stats retrieval for the system. By default, the
- * system will update stats using {@link UserTeamCompetitionStatsParser} every hour at <b>55</b> minutes past the hour.
+ * system will update stats using {@link UserStatsParser} every hour at <b>55</b> minutes past the hour.
  * It will also only run from the 3rd of the month until the end of the month.
  *
  * <p>
@@ -62,7 +62,7 @@ public class StatsScheduler {
     private BusinessLogic businessLogic;
 
     @EJB
-    private UserTeamCompetitionStatsParser userTeamCompetitionStatsParser;
+    private UserStatsParser userStatsParser;
 
     @Resource
     private TimerService timerService;
@@ -147,9 +147,9 @@ public class StatsScheduler {
         LOGGER.debug("Found users TC team {}: {}", team.getTeamName(), teamUsers);
         for (final User user : teamUsers) {
             if (executionType == ExecutionType.ASYNCHRONOUS) {
-                userTeamCompetitionStatsParser.parseTcStatsForUser(user);
+                userStatsParser.parseTcStatsForUser(user);
             } else {
-                userTeamCompetitionStatsParser.parseTcStatsForUserAndWait(user);
+                userStatsParser.parseTcStatsForUserAndWait(user);
             }
         }
     }
