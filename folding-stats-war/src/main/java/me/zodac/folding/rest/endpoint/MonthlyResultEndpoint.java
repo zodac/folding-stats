@@ -26,7 +26,7 @@ import javax.ws.rs.core.UriInfo;
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.tc.result.MonthlyResult;
-import me.zodac.folding.ejb.scheduled.tc.EndOfMonthResultStorageScheduler;
+import me.zodac.folding.ejb.scheduled.tc.EndOfMonthScheduler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -44,7 +44,7 @@ public class MonthlyResultEndpoint {
     private BusinessLogic businessLogic;
 
     @EJB
-    private EndOfMonthResultStorageScheduler endOfMonthResultStorageScheduler;
+    private EndOfMonthScheduler endOfMonthScheduler;
 
     @GET
     @PermitAll
@@ -102,7 +102,7 @@ public class MonthlyResultEndpoint {
         }
 
         try {
-            endOfMonthResultStorageScheduler.storeMonthlyResult();
+            endOfMonthScheduler.storeMonthlyResult();
             return ok();
         } catch (final Exception e) {
             LOGGER.error("Unexpected error manually storing TC result", e);

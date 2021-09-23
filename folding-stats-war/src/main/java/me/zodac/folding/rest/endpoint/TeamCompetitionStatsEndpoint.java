@@ -39,7 +39,7 @@ import me.zodac.folding.ejb.CompetitionResultGenerator;
 import me.zodac.folding.ejb.LeaderboardStatsGenerator;
 import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.ejb.UserTeamCompetitionStatsParser;
-import me.zodac.folding.ejb.scheduled.tc.EndOfMonthResetScheduler;
+import me.zodac.folding.ejb.scheduled.tc.EndOfMonthScheduler;
 import me.zodac.folding.ejb.scheduled.tc.StatsScheduler;
 import me.zodac.folding.rest.api.tc.CompetitionSummary;
 import me.zodac.folding.rest.api.tc.UserSummary;
@@ -66,7 +66,7 @@ public class TeamCompetitionStatsEndpoint {
     private CompetitionResultGenerator competitionResultGenerator;
 
     @EJB
-    private EndOfMonthResetScheduler endOfMonthResetScheduler;
+    private EndOfMonthScheduler endOfMonthScheduler;
 
     @EJB
     private LeaderboardStatsGenerator leaderboardStatsGenerator;
@@ -280,7 +280,7 @@ public class TeamCompetitionStatsEndpoint {
 
         try {
             SystemStateManager.next(SystemState.RESETTING_STATS);
-            endOfMonthResetScheduler.resetTeamCompetitionStats();
+            endOfMonthScheduler.resetTeamCompetitionStats();
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             return ok();
         } catch (final Exception e) {

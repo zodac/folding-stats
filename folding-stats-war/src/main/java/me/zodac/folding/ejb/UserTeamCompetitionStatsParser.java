@@ -31,16 +31,6 @@ public class UserTeamCompetitionStatsParser {
     @EJB
     private OldFacade oldFacade;
 
-    private static UserStats getTotalStatsForUserOrEmpty(final User user) {
-        try {
-            return FOLDING_STATS_RETRIEVER.getTotalStats(user);
-        } catch (final ExternalConnectionException e) {
-            LOGGER.warn("Error connecting to Folding@Home API at '{}'", e.getUrl(), e);
-        }
-
-        return UserStats.empty();
-    }
-
     /**
      * Parses the latest TC stats for the given {@link User}.
      *
@@ -95,6 +85,16 @@ public class UserTeamCompetitionStatsParser {
 
         oldFacade.persistTotalStatsForUser(totalStats);
         calculateAndPersistTcStats(user, initialStats, offsetStats, totalStats);
+    }
+
+    private static UserStats getTotalStatsForUserOrEmpty(final User user) {
+        try {
+            return FOLDING_STATS_RETRIEVER.getTotalStats(user);
+        } catch (final ExternalConnectionException e) {
+            LOGGER.warn("Error connecting to Folding@Home API at '{}'", e.getUrl(), e);
+        }
+
+        return UserStats.empty();
     }
 
     private void calculateAndPersistTcStats(final User user, final Stats initialStats, final OffsetStats offsetStats, final UserStats totalStats) {

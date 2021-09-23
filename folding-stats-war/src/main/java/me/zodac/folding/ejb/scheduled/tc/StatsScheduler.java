@@ -38,7 +38,7 @@ import org.apache.logging.log4j.Logger;
  *     <li>STATS_PARSING_SCHEDULE_LAST_DAY_OF_MONTH</li>
  * </ul>
  *
- * <b>NOTE:</b> The {@link EndOfMonthResetScheduler} schedule cannot be modified, so you should be careful not to
+ * <b>NOTE:</b> The {@link EndOfMonthScheduler} schedule cannot be modified, so you should be careful not to
  * have the {@link StatsScheduler} conflict with the reset time.
  */
 @Startup

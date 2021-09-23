@@ -26,22 +26,35 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * {@link Startup} EJB which schedules the monthly reset of the <code>Team Competition</code>. The reset will occur once
- * a month on the 1st day of the month at <b>00:15</b>. This time cannot be changed, but the reset can be disabled using the
- * environment variable:
+ * {@link Startup} EJB which schedules the beginning of the <code>Team Competition</code> on the first day of the month. The day on which the month
+ * starts can be configured using the environment variable:
  * <ul>
- *     <li>ENABLE_STATS_MONTHLY_RESET</li>
+ *     <li>STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH</li>
  * </ul>
  *
- * <b>NOTE:</b> The {@link StatsScheduler} <i>can</i> have its schedule changed, but should not be set to conflict
- * with this time.
+ * <p>
+ * It performs the following actions:
+ * <ul>
+ *     <li> Resets the stats for all users.
+ *
+ * <p>
+ *          The reset will occur on the day configured to start stats parsing at <b>00:15</b>. This time cannot be changed, but the
+ *          reset can be disabled using the environment variable:
+ *          <ul>
+ *              <li>ENABLE_STATS_MONTHLY_RESET</li>
+ *          </ul>
+ *      <b>NOTE:</b> The {@link StatsScheduler} <i>can</i> have its schedule changed, but should not be set to conflict with this reset time.
+ *      </li>
+ * </ul>
  */
 @Startup
 @Singleton
-public class EndOfMonthResetScheduler {
+public class StartOfMonthScheduler {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final boolean IS_MONTHLY_RESET_ENABLED = Boolean.parseBoolean(EnvironmentVariableUtils.get("ENABLE_STATS_MONTHLY_RESET", "false"));
+    private static final String STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH =
+        EnvironmentVariableUtils.get("STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH", "3");
 
     @EJB
     private BusinessLogic businessLogic;
@@ -55,43 +68,37 @@ public class EndOfMonthResetScheduler {
     @Resource
     private TimerService timerService;
 
-    // TODO: [zodac] Go through Storage/BL, not direct to caches
-    private static void resetCaches() {
-        LOGGER.info("Resetting caches");
-        TcStatsCache.getInstance().removeAll();
-        TotalStatsCache.getInstance().removeAll();
-        RetiredTcStatsCache.getInstance().removeAll();
-    }
-
     /**
      * On system startup, checks if the reset is enabled. If so, starts a {@link Timer} for stats reset.
      */
     @PostConstruct
     public void init() {
         if (!IS_MONTHLY_RESET_ENABLED) {
-            LOGGER.error("Monthly TC stats reset not enabled");
+            LOGGER.error("Start of month reset not enabled");
+            return;
         }
 
         final ScheduleExpression schedule = new ScheduleExpression();
         schedule.hour("0");
         schedule.minute("15");
         schedule.second("0");
-        schedule.dayOfMonth("1");
+        schedule.dayOfMonth(STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH);
         schedule.timezone("UTC");
         final Timer timer = timerService.createCalendarTimer(schedule);
-        LOGGER.info("Starting end of month TC stats reset with schedule: {}", timer.getSchedule());
+        LOGGER.info("Scheduling start of TC stats: {}", timer.getSchedule());
     }
 
     /**
-     * Scheduled execution to reset the <code>Team Competition</code> stats.
+     * Scheduled execution to reset the <code>Team Competition</code>
+     * stats.
      *
      * @param timer the {@link Timer} for scheduled execution
      * @see #resetTeamCompetitionStats()
      */
     @Timeout
-    public void scheduleTeamCompetitionStatsReset(final Timer timer) {
+    public void startOfTeamCompetition(final Timer timer) {
         LOGGER.trace("Timer fired at: {}", timer);
-        LOGGER.warn("Resetting TC stats for end of month");
+        LOGGER.warn("Starting TC stats for new month");
 
         SystemStateManager.next(SystemState.RESETTING_STATS);
         ParsingStateManager.next(ParsingState.NOT_PARSING_STATS);
@@ -145,5 +152,13 @@ public class EndOfMonthResetScheduler {
             LOGGER.info("Resetting TC stats for {}", user.getDisplayName());
             oldFacade.setCurrentStatsAsInitialStatsForUser(user);
         }
+    }
+
+    // TODO: [zodac] Go through Storage/BL, not direct to caches
+    private static void resetCaches() {
+        LOGGER.info("Resetting caches");
+        TcStatsCache.getInstance().removeAll();
+        TotalStatsCache.getInstance().removeAll();
+        RetiredTcStatsCache.getInstance().removeAll();
     }
 }

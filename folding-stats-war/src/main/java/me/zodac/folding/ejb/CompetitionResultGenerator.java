@@ -100,17 +100,6 @@ public class CompetitionResultGenerator {
             retiredUserSummaries);
     }
 
-    private static String getCaptainDisplayName(final String teamName, final Collection<User> usersOnTeam) {
-        for (final User user : usersOnTeam) {
-            if (user.isUserIsCaptain()) {
-                return user.getDisplayName();
-            }
-        }
-
-        LOGGER.warn("No captain set for team '{}'", teamName);
-        return null;
-    }
-
     private UserSummary getTcStatsForUser(final User user) {
         final Hardware hardware = user.getHardware();
         final Category category = user.getCategory();
@@ -120,5 +109,16 @@ public class CompetitionResultGenerator {
             userTcStats::getMultipliedPoints, userTcStats::getUnits);
         return UserSummary.create(user.getId(), user.getDisplayName(), user.getFoldingUserName(), hardware, category, userTcStats.getPoints(),
             userTcStats.getMultipliedPoints(), userTcStats.getUnits(), user.getProfileLink(), user.getLiveStatsLink());
+    }
+
+    private static String getCaptainDisplayName(final String teamName, final Collection<User> usersOnTeam) {
+        for (final User user : usersOnTeam) {
+            if (user.isUserIsCaptain()) {
+                return user.getDisplayName();
+            }
+        }
+
+        LOGGER.warn("No captain set for team '{}'", teamName);
+        return null;
     }
 }
