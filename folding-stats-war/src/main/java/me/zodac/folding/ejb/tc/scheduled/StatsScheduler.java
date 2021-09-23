@@ -1,4 +1,4 @@
-package me.zodac.folding.ejb.scheduled.tc;
+package me.zodac.folding.ejb.tc.scheduled;
 
 import java.util.Collection;
 import javax.annotation.PostConstruct;
@@ -19,7 +19,7 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.utils.EnvironmentVariableUtils;
 import me.zodac.folding.api.utils.ExecutionType;
-import me.zodac.folding.ejb.UserTeamCompetitionStatsParser;
+import me.zodac.folding.ejb.tc.UserTeamCompetitionStatsParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

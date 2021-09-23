@@ -26,7 +26,7 @@ import javax.ws.rs.core.UriInfo;
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.tc.result.MonthlyResult;
-import me.zodac.folding.ejb.scheduled.tc.EndOfMonthScheduler;
+import me.zodac.folding.ejb.tc.scheduled.EndOfMonthScheduler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

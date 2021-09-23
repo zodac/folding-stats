@@ -32,6 +32,7 @@ import me.zodac.folding.cache.TeamCache;
 import me.zodac.folding.cache.TotalStatsCache;
 import me.zodac.folding.cache.UserCache;
 import me.zodac.folding.db.DbManagerRetriever;
+import me.zodac.folding.ejb.tc.UserTeamCompetitionStatsParser;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.apache.logging.log4j.LogManager;

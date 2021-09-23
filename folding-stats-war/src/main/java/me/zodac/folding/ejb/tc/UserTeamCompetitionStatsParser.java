@@ -1,4 +1,4 @@
-package me.zodac.folding.ejb;
+package me.zodac.folding.ejb.tc;
 
 import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
 
@@ -13,6 +13,7 @@ import me.zodac.folding.api.tc.stats.OffsetStats;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
+import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;

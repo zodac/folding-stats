@@ -21,7 +21,7 @@ import javax.ws.rs.core.Response;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.utils.ExecutionType;
 import me.zodac.folding.api.validator.ValidationResponse;
-import me.zodac.folding.ejb.scheduled.tc.StatsScheduler;
+import me.zodac.folding.ejb.tc.scheduled.StatsScheduler;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
 import me.zodac.folding.rest.validator.TeamValidator;
 import org.apache.logging.log4j.LogManager;

@@ -1,4 +1,4 @@
-package me.zodac.folding.ejb.scheduled.tc;
+package me.zodac.folding.ejb.tc.scheduled;
 
 import com.google.gson.Gson;
 import java.time.LocalDateTime;
@@ -25,8 +25,8 @@ import me.zodac.folding.api.utils.ExecutionType;
 import me.zodac.folding.cache.RetiredTcStatsCache;
 import me.zodac.folding.cache.TcStatsCache;
 import me.zodac.folding.cache.TotalStatsCache;
-import me.zodac.folding.ejb.LeaderboardStatsGenerator;
 import me.zodac.folding.ejb.OldFacade;
+import me.zodac.folding.ejb.tc.LeaderboardStatsGenerator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

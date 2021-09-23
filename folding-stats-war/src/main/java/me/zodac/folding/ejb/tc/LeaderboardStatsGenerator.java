@@ -1,4 +1,4 @@
-package me.zodac.folding.ejb;
+package me.zodac.folding.ejb.tc;
 
 import static java.util.stream.Collectors.toList;
 

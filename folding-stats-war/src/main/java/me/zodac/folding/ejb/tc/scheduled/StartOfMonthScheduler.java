@@ -1,4 +1,4 @@
-package me.zodac.folding.ejb.scheduled.tc;
+package me.zodac.folding.ejb.tc.scheduled;
 
 import java.util.Collection;
 import javax.annotation.PostConstruct;

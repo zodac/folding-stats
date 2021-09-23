@@ -1,4 +1,4 @@
-package me.zodac.folding.ejb;
+package me.zodac.folding.ejb.tc;
 
 import static java.util.stream.Collectors.toList;
 
@@ -16,6 +16,7 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.cache.CompetitionSummaryCache;
+import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.rest.api.tc.CompetitionSummary;
 import me.zodac.folding.rest.api.tc.RetiredUserSummary;
 import me.zodac.folding.rest.api.tc.TeamSummary;

@@ -14,7 +14,7 @@ import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.utils.ExecutionType;
 import me.zodac.folding.db.DbManagerRetriever;
 import me.zodac.folding.ejb.OldFacade;
-import me.zodac.folding.ejb.scheduled.tc.StatsScheduler;
+import me.zodac.folding.ejb.tc.scheduled.StatsScheduler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
