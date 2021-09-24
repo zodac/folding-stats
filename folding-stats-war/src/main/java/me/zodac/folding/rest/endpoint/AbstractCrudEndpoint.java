@@ -98,6 +98,7 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
                 .getRequestUriBuilder()
                 .path(String.valueOf(elementWithId.getId()));
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
+            getLogger().info("Created {} with ID {}", elementType(), elementWithId.getId());
             return created(elementWithId, elementLocationBuilder);
         } catch (final ExternalConnectionException e) {
             final String errorMessage = String.format("Error connecting to external service at '%s': %s", e.getUrl(), e.getMessage());
@@ -164,7 +165,7 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
             return ok(batchCreateResponse);
         }
 
-        getLogger().debug("{} {}s successfully created", successful::size, this::elementType);
+        getLogger().info("{} {}s successfully created", successful::size, this::elementType);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
         return ok(batchCreateResponse.getSuccessful());
     }
@@ -298,6 +299,7 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
                 .getRequestUriBuilder()
                 .path(String.valueOf(updatedElementWithId.getId()));
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
+            getLogger().info("Updated {} with ID {}", elementType(), updatedElementWithId.getId());
             return ok(updatedElementWithId, elementLocationBuilder);
         } catch (final ExternalConnectionException e) {
             final String errorMessage = String.format("Error connecting to external service at '%s': %s", e.getUrl(), e.getMessage());
@@ -347,6 +349,7 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
 
             deleteElement(element);
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
+            getLogger().info("Deleted {} with ID {}", elementType(), elementId);
             return ok();
         } catch (final Exception e) {
             getLogger().error("Unexpected error deleting {} with ID: {}", elementType(), elementId, e);

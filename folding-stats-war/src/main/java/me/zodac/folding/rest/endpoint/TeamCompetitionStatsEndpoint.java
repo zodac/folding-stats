@@ -196,6 +196,7 @@ public class TeamCompetitionStatsEndpoint {
             SystemStateManager.next(SystemState.UPDATING_STATS);
             userStatsParser.parseTcStatsForUserAndWait(user);
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
+            LOGGER.info("Updated user with ID {} with points offset: {}", userId, offsetStats);
             return ok();
         } catch (final Exception e) {
             LOGGER.error("Unexpected error updating user with ID: {}", userId, e);
