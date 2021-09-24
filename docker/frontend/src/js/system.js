@@ -204,7 +204,7 @@ function loadHardware() {
                 hardwareOption.setAttribute("operating_system", getOperatingSystemFrontend(hardwareItem['operatingSystem']));
                 hardwareOption.setAttribute("multiplier", hardwareItem['multiplier']);
 
-                hardwareOption.innerHTML = hardwareItem["displayName"] + " (" + getOperatingSystemFrontend(hardwareItem["operatingSystem"]) + ")";
+                hardwareOption.innerHTML = hardwareItem["hardware_name"];
                 hardwareList.append(hardwareOption);
             });
         }
