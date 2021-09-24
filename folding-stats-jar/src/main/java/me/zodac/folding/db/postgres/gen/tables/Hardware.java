@@ -19,7 +19,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row5;
+import org.jooq.Row8;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -65,6 +65,21 @@ public class Hardware extends TableImpl<HardwareRecord> {
      * The column <code>public.hardware.display_name</code>.
      */
     public final TableField<HardwareRecord, String> DISPLAY_NAME = createField(DSL.name("display_name"), SQLDataType.CLOB.nullable(false), this, "");
+
+    /**
+     * The column <code>public.hardware.hardware_make</code>.
+     */
+    public final TableField<HardwareRecord, String> HARDWARE_MAKE = createField(DSL.name("hardware_make"), SQLDataType.CLOB.nullable(false), this, "");
+
+    /**
+     * The column <code>public.hardware.hardware_type</code>.
+     */
+    public final TableField<HardwareRecord, String> HARDWARE_TYPE = createField(DSL.name("hardware_type"), SQLDataType.CLOB.nullable(false), this, "");
+
+    /**
+     * The column <code>public.hardware.average_ppd</code>.
+     */
+    public final TableField<HardwareRecord, BigDecimal> AVERAGE_PPD = createField(DSL.name("average_ppd"), SQLDataType.NUMERIC.nullable(false), this, "");
 
     /**
      * The column <code>public.hardware.operating_system</code>.
@@ -161,11 +176,11 @@ public class Hardware extends TableImpl<HardwareRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row5 type methods
+    // Row8 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row5<Integer, String, String, String, BigDecimal> fieldsRow() {
-        return (Row5) super.fieldsRow();
+    public Row8<Integer, String, String, String, String, BigDecimal, String, BigDecimal> fieldsRow() {
+        return (Row8) super.fieldsRow();
     }
 }

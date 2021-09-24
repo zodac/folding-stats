@@ -86,9 +86,11 @@ public final class PostgresDbManager implements DbManager {
         return executeQuery(queryContext -> {
             final var query = queryContext
                 .insertInto(HARDWARE)
-                .columns(HARDWARE.HARDWARE_NAME, HARDWARE.DISPLAY_NAME, HARDWARE.OPERATING_SYSTEM, HARDWARE.MULTIPLIER)
-                .values(hardware.getHardwareName(), hardware.getDisplayName(), hardware.getOperatingSystem().toString(),
-                    BigDecimal.valueOf(hardware.getMultiplier()))
+                .columns(HARDWARE.HARDWARE_NAME, HARDWARE.DISPLAY_NAME, HARDWARE.HARDWARE_MAKE, HARDWARE.HARDWARE_TYPE, HARDWARE.AVERAGE_PPD,
+                    HARDWARE.OPERATING_SYSTEM, HARDWARE.MULTIPLIER)
+                .values(hardware.getHardwareName(), hardware.getDisplayName(),
+                    "", "GPU", BigDecimal.valueOf(1.0D), // TODO: [zodac] Hardcoded for now until LARS automation implemented
+                    hardware.getOperatingSystem().toString(), BigDecimal.valueOf(hardware.getMultiplier()))
                 .returning(HARDWARE.HARDWARE_ID);
             LOGGER.debug("Executing SQL: '{}'", query);
 
@@ -143,6 +145,10 @@ public final class PostgresDbManager implements DbManager {
                 .set(HARDWARE.DISPLAY_NAME, hardware.getDisplayName())
                 .set(HARDWARE.OPERATING_SYSTEM, hardware.getOperatingSystem().toString())
                 .set(HARDWARE.MULTIPLIER, BigDecimal.valueOf(hardware.getMultiplier()))
+                // TODO: [zodac] Hardcoded for now until LARS automation implemented
+                .set(HARDWARE.HARDWARE_MAKE, "")
+                .set(HARDWARE.HARDWARE_TYPE, "GPU")
+                .set(HARDWARE.AVERAGE_PPD, BigDecimal.valueOf(1.0D))
                 .where(HARDWARE.HARDWARE_ID.equal(hardware.getId()));
             LOGGER.debug("Executing SQL: '{}'", query);
 
