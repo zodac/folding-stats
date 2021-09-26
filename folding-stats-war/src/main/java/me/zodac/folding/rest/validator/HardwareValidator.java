@@ -11,7 +11,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.tc.Hardware;
-import me.zodac.folding.api.tc.OperatingSystem;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
@@ -46,12 +45,6 @@ public final class HardwareValidator {
         return StringUtils.isNotBlank(hardwareRequest.getDisplayName()) ? null : "Field 'displayName' must not be empty";
     }
 
-    private static String operatingSystem(final HardwareRequest hardwareRequest) {
-        final OperatingSystem operatingSystem = OperatingSystem.get(hardwareRequest.getOperatingSystem());
-        return operatingSystem == OperatingSystem.INVALID
-            ? String.format("Field 'operatingSystem' must be one of: %s", OperatingSystem.getAllValues()) : null;
-    }
-
     private static String multiplier(final HardwareRequest hardwareRequest) {
         return hardwareRequest.getMultiplier() >= MINIMUM_MULTIPLIER_VALUE ? null :
             String.format("Field 'multiplier' must be %.2f or higher", MINIMUM_MULTIPLIER_VALUE);
@@ -67,7 +60,6 @@ public final class HardwareValidator {
      *     <li>Field 'hardwareName' must not be empty</li>
      *     <li>If field 'hardwareName' is not empty, it must not be used by another {@link Hardware}</li>
      *     <li>Field 'displayName' must not be empty</li>
-     *     <li>Field 'operatingSystem' must be a valid {@link OperatingSystem}</li>
      *     <li>Field 'multiplier' must be over <b>0.00</b></li>
      * </ul>
      *
@@ -88,7 +80,6 @@ public final class HardwareValidator {
         final List<String> failureMessages = Stream.of(
                 hardwareName(hardwareRequest),
                 displayName(hardwareRequest),
-                operatingSystem(hardwareRequest),
                 multiplier(hardwareRequest)
             )
             .filter(Objects::nonNull)
@@ -113,7 +104,6 @@ public final class HardwareValidator {
      *     <li>If field 'hardwareName' is not empty, it must not be used by another {@link Hardware}, unless it is the {@link Hardware} to be
      *     updated</li>
      *     <li>Field 'displayName' must not be empty</li>
-     *     <li>Field 'operatingSystem' must be a valid {@link OperatingSystem}</li>
      *     <li>Field 'multiplier' must be over <b>0.00</b></li>
      * </ul>
      *
@@ -135,7 +125,6 @@ public final class HardwareValidator {
         final List<String> failureMessages = Stream.of(
                 hardwareName(hardwareRequest),
                 displayName(hardwareRequest),
-                operatingSystem(hardwareRequest),
                 multiplier(hardwareRequest)
             )
             .filter(Objects::nonNull)

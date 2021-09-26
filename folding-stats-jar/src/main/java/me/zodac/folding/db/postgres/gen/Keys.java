@@ -43,8 +43,8 @@ public class Keys {
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
+    public static final UniqueKey<HardwareRecord> HARDWARE_HARDWARE_NAME_KEY = Internal.createUniqueKey(Hardware.HARDWARE, DSL.name("hardware_hardware_name_key"), new TableField[] { Hardware.HARDWARE.HARDWARE_NAME }, true);
     public static final UniqueKey<HardwareRecord> HARDWARE_PKEY = Internal.createUniqueKey(Hardware.HARDWARE, DSL.name("hardware_pkey"), new TableField[] { Hardware.HARDWARE.HARDWARE_ID }, true);
-    public static final UniqueKey<HardwareRecord> UNIQUE_HARDWARE = Internal.createUniqueKey(Hardware.HARDWARE, DSL.name("unique_hardware"), new TableField[] { Hardware.HARDWARE.HARDWARE_NAME, Hardware.HARDWARE.OPERATING_SYSTEM }, true);
     public static final UniqueKey<MonthlyResultsRecord> MONTHLY_RESULTS_PKEY = Internal.createUniqueKey(MonthlyResults.MONTHLY_RESULTS, DSL.name("monthly_results_pkey"), new TableField[] { MonthlyResults.MONTHLY_RESULTS.UTC_TIMESTAMP }, true);
     public static final UniqueKey<RetiredUserStatsRecord> RETIRED_USER_STATS_PKEY = Internal.createUniqueKey(RetiredUserStats.RETIRED_USER_STATS, DSL.name("retired_user_stats_pkey"), new TableField[] { RetiredUserStats.RETIRED_USER_STATS.RETIRED_USER_ID }, true);
     public static final UniqueKey<RetiredUserStatsRecord> RETIRED_USER_STATS_USER_ID_KEY = Internal.createUniqueKey(RetiredUserStats.RETIRED_USER_STATS, DSL.name("retired_user_stats_user_id_key"), new TableField[] { RetiredUserStats.RETIRED_USER_STATS.USER_ID }, true);

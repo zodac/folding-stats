@@ -119,8 +119,8 @@ function loadHardware() {
     .then(function(jsonResponse) {
         // Build hardware
         jsonResponse.sort(sortJsonByKey("id"));
-        const hardwareHeaders = ["ID", "Name", "Display Name", "Operating System", "Multiplier"];
-        const hardwareProperties = ["id", "hardwareName", "displayName", "operatingSystem", "multiplier"];
+        const hardwareHeaders = ["ID", "Name", "Display Name", "Multiplier"];
+        const hardwareProperties = ["id", "hardwareName", "displayName", "multiplier"];
 
         // Empty div of existing content, if any
         hardwareDiv = document.getElementById("hardware_div");
@@ -161,8 +161,6 @@ function loadHardware() {
 
                 if (hardwareProperty === "multiplier") {
                     hardwareTableBodyCell.innerHTML = "x" + hardwareItem[hardwareProperty].toLocaleString();
-                } else if (hardwareProperty === "operatingSystem") {
-                    hardwareTableBodyCell.innerHTML = getOperatingSystemFrontend(hardwareItem["operatingSystem"]);
                 } else {
                     hardwareTableBodyCell.innerHTML = hardwareItem[hardwareProperty].toLocaleString();
                 }
@@ -201,7 +199,6 @@ function loadHardware() {
                 hardwareOption.setAttribute("hardware_id", hardwareItem['id']);
                 hardwareOption.setAttribute("hardware_name", hardwareItem['hardwareName']);
                 hardwareOption.setAttribute("display_name", hardwareItem['displayName']);
-                hardwareOption.setAttribute("operating_system", getOperatingSystemFrontend(hardwareItem['operatingSystem']));
                 hardwareOption.setAttribute("multiplier", hardwareItem['multiplier']);
 
                 hardwareOption.innerHTML = hardwareItem["hardware_name"];

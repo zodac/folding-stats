@@ -3,14 +3,12 @@
     "id": 1,
     "hardwareName": "Hardware1",
     "displayName": "Hardware1",
-    "operatingSystem": "WINDOWS",
     "multiplier": 21.33
   },
   {
     "id": 2,
     "hardwareName": "Hardware2",
     "displayName": "Hardware2",
-    "operatingSystem": "LINUX",
     "multiplier": 3.62
   }
 ]

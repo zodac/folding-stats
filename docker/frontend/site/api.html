@@ -175,53 +175,45 @@ pre code {
     "id": 1,
     "hardwareName": "Hardware1",
     "displayName": "Hardware1",
-    "operatingSystem": "WINDOWS",
     "multiplier": 21.33
   },
   {
     "id": 2,
     "hardwareName": "Hardware2",
     "displayName": "Hardware2",
-    "operatingSystem": "LINUX",
     "multiplier": 3.62
   }
 ]</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/503" target="_blank">503</a></h2><p>The system is not in a valid state to execute read requests</p></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="hardware_post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post</span> <span class="parent"></span>/hardware</h4></div><div class="modal-body"><div class="alert alert-info"><p>Creates a new hardware with the given properties</p></div><ul class="nav nav-tabs"><li class="active"><a href="#hardware_post_request" data-toggle="tab">Request</a></li><li><a href="#hardware_post_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="hardware_post_request"><h3>Headers</h3><ul><li><strong>Authorization</strong>: <em><span class="required">required</span>(string)</em><p>Basic authentication encoded as a Base64 string, with the credentials in the form &#39;username:password&#39;</p></li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: any</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
   "hardwareName": "Hardware1",
   "displayName": "Hardware1",
-  "operatingSystem": "WINDOWS",
   "multiplier": 21.33
 }</code></pre></div></div><div class="tab-pane" id="hardware_post_response"><h2>HTTP status code <a href="http://httpstatus.es/201" target="_blank">201</a></h2><p>The hardware has been created</p><h3>Headers</h3><ul><li><strong>location</strong>: <em><span class="required">required</span>(string)</em><p>The URL to the created hardware</p></li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: any</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
   "id": 1,
   "hardwareName": "Hardware1",
   "displayName": "Hardware1",
-  "operatingSystem": "WINDOWS",
   "multiplier": 21.33
 }</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><p>The given payload is invalid</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: any</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
   "invalidObject": {
     "id": 0,
     "hardwareName": " ",
-    "operatingSystem": "invalid",
     "multiplier": -1.0
   },
   "errors": [
-    "Attribute &#39;hardwareName&#39; must not be empty",
-    "Attribute &#39;displayName&#39; must not be empty",
-    "Attribute &#39;operatingSystem&#39; must be one of: [WINDOWS, LINUX]",
-    "Attribute &#39;multiplier&#39; must be over 0.0"
+    "Field &#39;hardwareName&#39; must not be empty",
+    "Field &#39;displayName&#39; must not be empty",
+    "Field &#39;multiplier&#39; must be 1.00 or higher"
   ]
 }</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><p>System user cannot be successfully logged in with provided credentials</p><h2>HTTP status code <a href="http://httpstatus.es/403" target="_blank">403</a></h2><p>System user does not have the correct role to perform this request</p><h2>HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><p>A hardware with the same &#39;hardwareName&#39; already exists</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: any</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
   "invalidObject": {
     "id": 0,
     "hardwareName": "Hardware1",
     "displayName": "Hardware1",
-    "operatingSystem": "WINDOWS",
     "multiplier": 16.38
   },
   "conflictingObject": {
     "id": 1,
     "hardwareName": "Hardware1",
     "displayName": "Hardware1",
-    "operatingSystem": "WINDOWS",
     "multiplier": 16.38
   },
   "validationResult": "FAILURE_DUE_TO_CONFLICT",
@@ -233,7 +225,6 @@ pre code {
     "id": 1,
     "hardwareName": "Hardware1",
     "displayName": "Hardware1",
-    "operatingSystem": "WINDOWS",
     "multiplier": 16.38
   },
   "conflictingObject": {
@@ -246,7 +237,6 @@ pre code {
       "id": 1,
       "hardwareName": "Hardware1",
       "displayName": "Hardware1",
-      "operatingSystem": "WINDOWS",
       "multiplier": 16.38
     },
     "team": {
@@ -264,58 +254,49 @@ pre code {
   "id": 1,
   "hardwareName": "Hardware1",
   "displayName": "Hardware1",
-  "operatingSystem": "WINDOWS",
   "multiplier": 21.33
 }</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><p>The provided ID is an invalid integer, or out of range</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: any</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
   "error": "The hardware ID &#39;-1&#39; is out of range"
 }</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><p>No hardware exists with the given ID</p><h2>HTTP status code <a href="http://httpstatus.es/503" target="_blank">503</a></h2><p>The system is not in a valid state to execute read requests</p></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="hardware__hardwareid__put"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_put">put</span> <span class="parent">/hardware</span>/{hardwareId}</h4></div><div class="modal-body"><div class="alert alert-info"><p>Updates an existing hardware with the given properties</p></div><ul class="nav nav-tabs"><li class="active"><a href="#hardware__hardwareid__put_request" data-toggle="tab">Request</a></li><li><a href="#hardware__hardwareid__put_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="hardware__hardwareid__put_request"><h3>URI Parameters</h3><ul><li><strong>hardwareId</strong>: <em><span class="required">required</span>(integer)</em><p>The ID of the hardware</p></li></ul><h3>Headers</h3><ul><li><strong>Authorization</strong>: <em><span class="required">required</span>(string)</em><p>Basic authentication encoded as a Base64 string, with the credentials in the form &#39;username:password&#39;</p></li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: any</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
   "hardwareName": "Hardware1",
   "displayName": "Hardware1 (updated)",
-  "operatingSystem": "WINDOWS",
   "multiplier": 21.33
 }</code></pre></div></div><div class="tab-pane" id="hardware__hardwareid__put_response"><h2>HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><p>The hardware has been updated</p><h3>Headers</h3><ul><li><strong>location</strong>: <em>(string)</em><p>The URL to the updated hardware (unless there was no change to the hardware)</p></li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: any</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
   "id": 1,
   "hardwareName": "Hardware1",
   "displayName": "Hardware1 (updated)",
-  "operatingSystem": "WINDOWS",
   "multiplier": 21.33
 }</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><p>The given payload is invalid</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: any</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
   "invalidObject": {
     "id": 0,
     "hardwareName": " ",
-    "operatingSystem": "invalid",
     "multiplier": -1.0
   },
   "errors": [
-    "Attribute &#39;hardwareName&#39; must not be empty",
-    "Attribute &#39;displayName&#39; must not be empty",
-    "Attribute &#39;operatingSystem&#39; must be one of: [WINDOWS, LINUX]",
-    "Attribute &#39;multiplier&#39; must be over 0.0"
+    "Field &#39;hardwareName&#39; must not be empty",
+    "Field &#39;displayName&#39; must not be empty",
+    "Field &#39;multiplier&#39; must be 1.00 or higher"
   ]
 }</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><p>System user cannot be successfully logged in with provided credentials</p><h2>HTTP status code <a href="http://httpstatus.es/403" target="_blank">403</a></h2><p>System user does not have the correct role to perform this request</p><h2>HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><p>No hardware exists with the given ID</p><h2>HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><p>A hardware with the same &#39;hardwareName&#39; already exists</p><h2>HTTP status code <a href="http://httpstatus.es/502" target="_blank">502</a></h2><p>An error occurred connecting to an external system to verify the hardware</p><h2>HTTP status code <a href="http://httpstatus.es/503" target="_blank">503</a></h2><p>The system is not in a valid state to execute write requests</p></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_hardware_batch"><span class="parent">/hardware</span>/batch</a> <span class="methods"><a href="#hardware_batch_post"><span class="badge badge_post">post</span></a></span></h4></div><div id="panel_hardware_batch" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#hardware_batch_post'" class="list-group-item"><span class="badge badge_post">post</span><div class="method_description"><p>Creates a batch of hardware with the given properties</p></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="hardware_batch_post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post</span> <span class="parent">/hardware</span>/batch</h4></div><div class="modal-body"><div class="alert alert-info"><p>Creates a batch of hardware with the given properties</p></div><ul class="nav nav-tabs"><li class="active"><a href="#hardware_batch_post_request" data-toggle="tab">Request</a></li><li><a href="#hardware_batch_post_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="hardware_batch_post_request"><h3>Headers</h3><ul><li><strong>Authorization</strong>: <em><span class="required">required</span>(string)</em><p>Basic authentication encoded as a Base64 string, with the credentials in the form &#39;username:password&#39;</p></li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json-all-success</p><p><strong>Type</strong>: any</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>[
   {
     "hardwareName": "Hardware1",
     "displayName": "Hardware1",
-    "operatingSystem": "WINDOWS",
     "multiplier": 21.33
   },
   {
     "hardwareName": "Hardware2",
     "displayName": "Hardware2",
-    "operatingSystem": "LINUX",
     "multiplier": 3.62
   }
 ]</code></pre></div><p><strong>Media type</strong>: application/json-partial-success</p><p><strong>Type</strong>: any</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>[
   {
     "hardwareName": "Hardware1",
     "displayName": "Hardware1",
-    "operatingSystem": "WINDOWS",
     "multiplier": 21.33
   },
   {
     "hardwareName": "Hardware2",
     "displayName": "Hardware2",
-    "operatingSystem": "LINUX",
     "multiplier": 3.62
   }
 ]</code></pre></div></div><div class="tab-pane" id="hardware_batch_post_response"><h2>HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><p>At least one hardware in the payload is created</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: any</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>[
@@ -323,14 +304,12 @@ pre code {
     "id": 1,
     "hardwareName": "Hardware1",
     "displayName": "Hardware1",
-    "operatingSystem": "WINDOWS",
     "multiplier": 21.33
   },
   {
     "id": 2,
     "hardwareName": "Hardware2",
     "displayName": "Hardware2",
-    "operatingSystem": "LINUX",
     "multiplier": 3.62
   }
 ]</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><p>All given payloads are invalid</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: any</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>[
@@ -339,11 +318,10 @@ pre code {
       "id": 0,
       "hardwareName": "Hardware1",
       "displayName": "Hardware1",
-      "operatingSystem": "WINDOWS",
       "multiplier": -21.33
     },
     "errors": [
-      "Attribute &#39;multiplier&#39; must be over 0.0"
+      "Field &#39;multiplier&#39; must be 1.00 or higher"
     ]
   },
   {
@@ -351,11 +329,10 @@ pre code {
       "id": 0,
       "hardwareName": "Hardware2",
       "displayName": "Hardware2",
-      "operatingSystem": "LINUX",
       "multiplier": -3.62
     },
     "errors": [
-      "Attribute &#39;multiplier&#39; must be over 0.0"
+      "Field &#39;multiplier&#39; must be 1.00 or higher"
     ]
   }
 ]</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><p>System user cannot be successfully logged in with provided credentials</p><h2>HTTP status code <a href="http://httpstatus.es/403" target="_blank">403</a></h2><p>System user does not have the correct role to perform this request</p><h2>HTTP status code <a href="http://httpstatus.es/502" target="_blank">502</a></h2><p>An error occurred connecting to an external system to verify the hardware</p><h2>HTTP status code <a href="http://httpstatus.es/503" target="_blank">503</a></h2><p>The system is not in a valid state to execute write requests</p></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default"><div class="panel-heading"><h3 id="teams" class="panel-title">/teams</h3></div><div class="panel-body"><div class="panel-group"><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_teams"><span class="parent"></span>/teams</a> <span class="methods"><a href="#teams_get"><span class="badge badge_get">get</span></a> <a href="#teams_post"><span class="badge badge_post">post</span></a></span></h4></div><div id="panel_teams" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#teams_get'" class="list-group-item"><span class="badge badge_get">get</span><div class="method_description"><p>Retrieves all teams</p></div><div class="clearfix"></div></div><div onclick="window.location.href = '#teams_post'" class="list-group-item"><span class="badge badge_post">post</span><div class="method_description"><p>Creates a new team with the given properties</p></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="teams_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get</span> <span class="parent"></span>/teams</h4></div><div class="modal-body"><div class="alert alert-info"><p>Retrieves all teams</p></div><ul class="nav nav-tabs"><li class="active"><a href="#teams_get_request" data-toggle="tab">Request</a></li><li><a href="#teams_get_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="teams_get_request"><h3>Headers</h3><ul><li><strong>If-None-Match</strong>: <em>(string)</em><p>An EntityTag used to retrieve a cache version of the response</p></li></ul></div><div class="tab-pane" id="teams_get_response"><h2>HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><p>All teams have been retrieved</p><h3>Headers</h3><ul><li><strong>eTag</strong>: <em><span class="required">required</span>(string)</em><p>An EntityTag which can be used to retrieve a cached version of the response in future requests</p></li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: any</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>[
@@ -385,8 +362,8 @@ pre code {
     "forumLink": "invalidUrl"
   },
   "errors": [
-    "Attribute &#39;teamName&#39; must not be empty",
-    "Attribute &#39;forumLink&#39; is not a valid link: &#39;invalidUrl&#39;"
+    "Field &#39;teamName&#39; must not be empty",
+    "Field &#39;forumLink&#39; is not a valid link: &#39;invalidUrl&#39;"
   ]
 }</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><p>System user cannot be successfully logged in with provided credentials</p><h2>HTTP status code <a href="http://httpstatus.es/403" target="_blank">403</a></h2><p>System user does not have the correct role to perform this request</p><h2>HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><p>A team with the same &#39;teamName&#39; already exists</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: any</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
   "invalidObject": {
@@ -419,7 +396,6 @@ pre code {
       "id": 1,
       "hardwareName": "Hardware1",
       "displayName": "Hardware1",
-      "operatingSystem": "WINDOWS",
       "multiplier": 16.38
     },
     "team": {
@@ -456,8 +432,8 @@ pre code {
     "forumLink": "invalidUrl"
   },
   "errors": [
-    "Attribute &#39;teamName&#39; must not be empty",
-    "Attribute &#39;forumLink&#39; is not a valid link: &#39;invalidUrl&#39;"
+    "Field &#39;teamName&#39; must not be empty",
+    "Field &#39;forumLink&#39; is not a valid link: &#39;invalidUrl&#39;"
   ]
 }</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><p>System user cannot be successfully logged in with provided credentials</p><h2>HTTP status code <a href="http://httpstatus.es/403" target="_blank">403</a></h2><p>System user does not have the correct role to perform this request</p><h2>HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><p>No team exists with the given ID</p><h2>HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><p>A team with the same &#39;teamName&#39; already exists</p><h2>HTTP status code <a href="http://httpstatus.es/502" target="_blank">502</a></h2><p>An error occurred connecting to an external system to verify the team</p><h2>HTTP status code <a href="http://httpstatus.es/503" target="_blank">503</a></h2><p>The system is not in a valid state to execute write requests</p></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_teams_batch"><span class="parent">/teams</span>/batch</a> <span class="methods"><a href="#teams_batch_post"><span class="badge badge_post">post</span></a></span></h4></div><div id="panel_teams_batch" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#teams_batch_post'" class="list-group-item"><span class="badge badge_post">post</span><div class="method_description"><p>Creates a batch of team with the given properties</p></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="teams_batch_post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post</span> <span class="parent">/teams</span>/batch</h4></div><div class="modal-body"><div class="alert alert-info"><p>Creates a batch of team with the given properties</p></div><ul class="nav nav-tabs"><li class="active"><a href="#teams_batch_post_request" data-toggle="tab">Request</a></li><li><a href="#teams_batch_post_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="teams_batch_post_request"><h3>Headers</h3><ul><li><strong>Authorization</strong>: <em><span class="required">required</span>(string)</em><p>Basic authentication encoded as a Base64 string, with the credentials in the form &#39;username:password&#39;</p></li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json-all-success</p><p><strong>Type</strong>: any</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>[
   {
@@ -496,7 +472,7 @@ pre code {
       "forumLink": "https://forums.extremehw.net/forum/125-extreme-team-folding/"
     },
     "errors": [
-      "Attribute &#39;teamName&#39; must not be empty"
+      "Field &#39;teamName&#39; must not be empty"
     ]
   },
   {
@@ -506,7 +482,7 @@ pre code {
       "forumLink": "invalidUrl"
     },
     "errors": [
-      "Attribute &#39;forumLink&#39; is not a valid link: &#39;invalidUrl&#39;"
+      "Field &#39;forumLink&#39; is not a valid link: &#39;invalidUrl&#39;"
     ]
   }
 ]</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><p>System user cannot be successfully logged in with provided credentials</p><h2>HTTP status code <a href="http://httpstatus.es/403" target="_blank">403</a></h2><p>System user does not have the correct role to perform this request</p><h2>HTTP status code <a href="http://httpstatus.es/502" target="_blank">502</a></h2><p>An error occurred connecting to an external system to verify the team</p><h2>HTTP status code <a href="http://httpstatus.es/503" target="_blank">503</a></h2><p>The system is not in a valid state to execute write requests</p></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default"><div class="panel-heading"><h3 id="users" class="panel-title">/users</h3></div><div class="panel-body"><div class="panel-group"><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_users"><span class="parent"></span>/users</a> <span class="methods"><a href="#users_get"><span class="badge badge_get">get</span></a> <a href="#users_post"><span class="badge badge_post">post</span></a></span></h4></div><div id="panel_users" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#users_get'" class="list-group-item"><span class="badge badge_get">get</span><div class="method_description"><p>Retrieves all users</p></div><div class="clearfix"></div></div><div onclick="window.location.href = '#users_post'" class="list-group-item"><span class="badge badge_post">post</span><div class="method_description"><p>Creates a new user with the given properties</p></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="users_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get</span> <span class="parent"></span>/users</h4></div><div class="modal-body"><div class="alert alert-info"><p>Retrieves all users</p></div><ul class="nav nav-tabs"><li class="active"><a href="#users_get_request" data-toggle="tab">Request</a></li><li><a href="#users_get_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="users_get_request"><h3>Headers</h3><ul><li><strong>If-None-Match</strong>: <em>(string)</em><p>An EntityTag used to retrieve a cache version of the response</p></li></ul></div><div class="tab-pane" id="users_get_response"><h2>HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><p>All users have been retrieved</p><h3>Headers</h3><ul><li><strong>eTag</strong>: <em><span class="required">required</span>(string)</em><p>An EntityTag which can be used to retrieve a cached version of the response in future requests</p></li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: any</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>[
@@ -522,7 +498,6 @@ pre code {
       "id": 1,
       "hardwareName": "Hardware1",
       "displayName": "Hardware1",
-      "operatingSystem": "WINDOWS",
       "multiplier": 16.38
     },
     "team": {
@@ -541,7 +516,6 @@ pre code {
       "id": 2,
       "hardwareName": "Hardware2",
       "displayName": "Hardware2",
-      "operatingSystem": "LINUX",
       "multiplier": 3.62
     },
     "team": {
@@ -572,7 +546,6 @@ pre code {
     "id": 1,
     "hardwareName": "Hardware1",
     "displayName": "Hardware1",
-    "operatingSystem": "WINDOWS",
     "multiplier": 16.38
   },
   "team": {
@@ -617,7 +590,6 @@ pre code {
       "id": 1,
       "hardwareName": "Hardware1",
       "displayName": "Hardware1",
-      "operatingSystem": "WINDOWS",
       "multiplier": 16.38
     },
     "team": {
@@ -643,7 +615,6 @@ pre code {
     "id": 1,
     "hardwareName": "Hardware1",
     "displayName": "Hardware1",
-    "operatingSystem": "WINDOWS",
     "multiplier": 16.38
   },
   "team": {
@@ -686,9 +657,9 @@ pre code {
     "userIsCaptain": true
   },
   "errors": [
-    "Attribute &#39;passkey&#39; cannot contain &#39;*&#39; characters",
-    "Attribute &#39;hardwareId&#39; must be one of: [1: Hardware1, 2: Hardware2]",
-    "Attribute &#39;teamId&#39; must be one of: [1: Team1, 2: Team2]"
+    "Field &#39;passkey&#39; cannot contain &#39;*&#39; characters",
+    "Field &#39;hardwareId&#39; must be one of: [1: Hardware1, 2: Hardware2]",
+    "Field &#39;teamId&#39; must be one of: [1: Team1, 2: Team2]"
   ]
 }</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><p>System user cannot be successfully logged in with provided credentials</p><h2>HTTP status code <a href="http://httpstatus.es/403" target="_blank">403</a></h2><p>System user does not have the correct role to perform this request</p><h2>HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><p>No user exists with the given ID</p><h2>HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><p>A user with the same &#39;foldingUserName&#39; and &#39;passkey&#39; already exists</p><h2>HTTP status code <a href="http://httpstatus.es/502" target="_blank">502</a></h2><p>An error occurred connecting to an external system to verify the hardware</p><h2>HTTP status code <a href="http://httpstatus.es/503" target="_blank">503</a></h2><p>The system is not in a valid state to execute write requests</p></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_users_batch"><span class="parent">/users</span>/batch</a> <span class="methods"><a href="#users_batch_post"><span class="badge badge_post">post</span></a></span></h4></div><div id="panel_users_batch" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#users_batch_post'" class="list-group-item"><span class="badge badge_post">post</span><div class="method_description"><p>Creates a batch of users with the given properties</p></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="users_batch_post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post</span> <span class="parent">/users</span>/batch</h4></div><div class="modal-body"><div class="alert alert-info"><p>Creates a batch of users with the given properties</p></div><ul class="nav nav-tabs"><li class="active"><a href="#users_batch_post_request" data-toggle="tab">Request</a></li><li><a href="#users_batch_post_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="users_batch_post_request"><h3>Headers</h3><ul><li><strong>Authorization</strong>: <em><span class="required">required</span>(string)</em><p>Basic authentication encoded as a Base64 string, with the credentials in the form &#39;username:password&#39;</p></li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json-all-success</p><p><strong>Type</strong>: any</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>[
   {
@@ -745,7 +716,6 @@ pre code {
       "id": 1,
       "hardwareName": "Hardware1",
       "displayName": "Hardware1",
-      "operatingSystem": "WINDOWS",
       "multiplier": 16.38
     },
     "team": {
@@ -764,7 +734,6 @@ pre code {
       "id": 2,
       "hardwareName": "Hardware2",
       "displayName": "Hardware2",
-      "operatingSystem": "LINUX",
       "multiplier": 3.62
     },
     "team": {
@@ -905,7 +874,6 @@ pre code {
             "id": 1,
             "hardwareName": "Tesla M40",
             "displayName": "Tesla M40",
-            "operatingSystem": "WINDOWS",
             "multiplier": 6.99
           },
           "category": "AMD GPU",
@@ -922,7 +890,6 @@ pre code {
             "id": 2,
             "hardwareName": "RTX 2080 Ti",
             "displayName": "RTX 2080 Ti",
-            "operatingSystem": "WINDOWS",
             "multiplier": 1.46
           },
           "category": "nVidia GPU",
@@ -950,7 +917,6 @@ pre code {
             "id": 8,
             "hardwareName": "HD 7850",
             "displayName": "HD 7850",
-            "operatingSystem": "WINDOWS",
             "multiplier": 71.08
           },
           "category": "AMD GPU",
@@ -967,7 +933,6 @@ pre code {
             "id": 7,
             "hardwareName": "GTX 960",
             "displayName": "GTX 960",
-            "operatingSystem": "LINUX",
             "multiplier": 20.82
           },
           "category": "nVidia GPU",
@@ -984,7 +949,6 @@ pre code {
             "id": 1,
             "hardwareName": "RX 580",
             "displayName": "RX 580",
-            "operatingSystem": "WINDOWS",
             "multiplier": 16.38
           },
           "category": "Wildcard",
@@ -1012,7 +976,6 @@ pre code {
             "id": 3,
             "hardwareName": "GTX 960",
             "displayName": "GTX 960",
-            "operatingSystem": "WINDOWS",
             "multiplier": 21.33
           },
           "category": "Wildcard",
@@ -1029,7 +992,6 @@ pre code {
             "id": 2,
             "hardwareName": "RTX 2080 Ti",
             "displayName": "RTX 2080 Ti",
-            "operatingSystem": "WINDOWS",
             "multiplier": 1.46
           },
           "category": "nVidia GPU",
@@ -1046,7 +1008,6 @@ pre code {
             "id": 1,
             "hardwareName": "RX 580",
             "displayName": "RX 580",
-            "operatingSystem": "WINDOWS",
             "multiplier": 16.38
           },
           "category": "AMD GPU",
@@ -1074,7 +1035,6 @@ pre code {
             "id": 6,
             "hardwareName": "RX 5700",
             "displayName": "RX 5700",
-            "operatingSystem": "WINDOWS",
             "multiplier": 7.47
           },
           "category": "Wildcard",
@@ -1091,7 +1051,6 @@ pre code {
             "id": 4,
             "hardwareName": "Radeon VII",
             "displayName": "Radeon VII",
-            "operatingSystem": "LINUX",
             "multiplier": 3.62
           },
           "category": "AMD GPU",
@@ -1108,7 +1067,6 @@ pre code {
             "id": 5,
             "hardwareName": "Tesla M40",
             "displayName": "Tesla M40",
-            "operatingSystem": "WINDOWS",
             "multiplier": 6.99
           },
           "category": "nVidia GPU",
@@ -1294,7 +1252,6 @@ pre code {
     "id": 1,
     "hardwareName": "Hardware1",
     "displayName": "Hardware1",
-    "operatingSystem": "WINDOWS",
     "multiplier": 16.38
   },
   "category": "AMD GPU",

@@ -19,7 +19,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row8;
+import org.jooq.Row7;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -82,11 +82,6 @@ public class Hardware extends TableImpl<HardwareRecord> {
     public final TableField<HardwareRecord, BigDecimal> AVERAGE_PPD = createField(DSL.name("average_ppd"), SQLDataType.NUMERIC.nullable(false), this, "");
 
     /**
-     * The column <code>public.hardware.operating_system</code>.
-     */
-    public final TableField<HardwareRecord, String> OPERATING_SYSTEM = createField(DSL.name("operating_system"), SQLDataType.CLOB.nullable(false), this, "");
-
-    /**
      * The column <code>public.hardware.multiplier</code>.
      */
     public final TableField<HardwareRecord, BigDecimal> MULTIPLIER = createField(DSL.name("multiplier"), SQLDataType.NUMERIC.nullable(false), this, "");
@@ -146,7 +141,7 @@ public class Hardware extends TableImpl<HardwareRecord> {
 
     @Override
     public List<UniqueKey<HardwareRecord>> getKeys() {
-        return Arrays.<UniqueKey<HardwareRecord>>asList(Keys.HARDWARE_PKEY, Keys.UNIQUE_HARDWARE);
+        return Arrays.<UniqueKey<HardwareRecord>>asList(Keys.HARDWARE_PKEY, Keys.HARDWARE_HARDWARE_NAME_KEY);
     }
 
     @Override
@@ -176,11 +171,11 @@ public class Hardware extends TableImpl<HardwareRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row8 type methods
+    // Row7 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row8<Integer, String, String, String, String, BigDecimal, String, BigDecimal> fieldsRow() {
-        return (Row8) super.fieldsRow();
+    public Row7<Integer, String, String, String, String, BigDecimal, BigDecimal> fieldsRow() {
+        return (Row7) super.fieldsRow();
     }
 }

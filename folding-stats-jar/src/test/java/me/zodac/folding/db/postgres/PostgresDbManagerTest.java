@@ -15,7 +15,6 @@ import me.zodac.folding.api.SystemUserAuthentication;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
-import me.zodac.folding.api.tc.OperatingSystem;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.OffsetStats;
@@ -65,7 +64,6 @@ class PostgresDbManagerTest {
             .id(retrievedHardware.getId())
             .hardwareName(retrievedHardware.getHardwareName())
             .displayName(retrievedHardware.getDisplayName())
-            .operatingSystem(OperatingSystem.LINUX)
             .multiplier(retrievedHardware.getMultiplier())
             .build();
 
@@ -455,7 +453,7 @@ class PostgresDbManagerTest {
     }
 
     private Hardware generateHardware() {
-        return Hardware.createWithoutId(nextHardwareName(), "hardware", OperatingSystem.WINDOWS, 1.0D);
+        return Hardware.createWithoutId(nextHardwareName(), "hardware", 1.0D);
     }
 
     private Hardware createHardware() {

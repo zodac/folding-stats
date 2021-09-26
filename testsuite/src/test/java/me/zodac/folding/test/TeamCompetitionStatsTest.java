@@ -406,7 +406,6 @@ class TeamCompetitionStatsTest {
         final HardwareRequest updatedHardware = HardwareRequest.builder()
             .hardwareName(createdHardware.getHardwareName())
             .displayName(createdHardware.getDisplayName())
-            .operatingSystem(createdHardware.getOperatingSystem().toString())
             .multiplier(2.0D)
             .build();
 

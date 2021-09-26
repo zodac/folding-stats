@@ -2,13 +2,11 @@
   "invalidObject": {
     "id": 0,
     "hardwareName": " ",
-    "operatingSystem": "invalid",
     "multiplier": -1.0
   },
   "errors": [
-    "Attribute 'hardwareName' must not be empty",
-    "Attribute 'displayName' must not be empty",
-    "Attribute 'operatingSystem' must be one of: [WINDOWS, LINUX]",
-    "Attribute 'multiplier' must be over 0.0"
+    "Field 'hardwareName' must not be empty",
+    "Field 'displayName' must not be empty",
+    "Field 'multiplier' must be 1.00 or higher"
   ]
 }

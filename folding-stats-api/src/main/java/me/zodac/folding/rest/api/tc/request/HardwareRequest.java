@@ -24,6 +24,5 @@ public class HardwareRequest implements RequestPojo {
 
     private String hardwareName;
     private String displayName;
-    private String operatingSystem;
     private double multiplier;
 }

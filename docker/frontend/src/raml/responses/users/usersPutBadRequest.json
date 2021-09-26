@@ -10,8 +10,8 @@
     "userIsCaptain": true
   },
   "errors": [
-    "Attribute 'passkey' cannot contain '*' characters",
-    "Attribute 'hardwareId' must be one of: [1: Hardware1, 2: Hardware2]",
-    "Attribute 'teamId' must be one of: [1: Team1, 2: Team2]"
+    "Field 'passkey' cannot contain '*' characters",
+    "Field 'hardwareId' must be one of: [1: Hardware1, 2: Hardware2]",
+    "Field 'teamId' must be one of: [1: Team1, 2: Team2]"
   ]
 }

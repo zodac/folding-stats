@@ -10,7 +10,6 @@
         "id": 2,
         "hardwareName": "Hardware2",
         "displayName": "Hardware2",
-        "operatingSystem": "LINUX",
         "multiplier": 3.62
       },
       "team": {

@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import me.zodac.folding.api.tc.Hardware;
-import me.zodac.folding.api.tc.OperatingSystem;
 import me.zodac.folding.client.java.response.HardwareResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
@@ -89,9 +88,8 @@ class HardwareTest {
         final Hardware actual = HardwareResponseParser.create(response);
         assertThat(actual)
             .as("Did not receive created object as JSON response: " + response.body())
-            .extracting("hardwareName", "displayName", "operatingSystem", "multiplier")
-            .containsExactly(hardwareToCreate.getHardwareName(), hardwareToCreate.getDisplayName(),
-                OperatingSystem.get(hardwareToCreate.getOperatingSystem()), hardwareToCreate.getMultiplier());
+            .extracting("hardwareName", "displayName", "multiplier")
+            .containsExactly(hardwareToCreate.getHardwareName(), hardwareToCreate.getDisplayName(), hardwareToCreate.getMultiplier());
     }
 
     @Test
@@ -139,7 +137,6 @@ class HardwareTest {
         final HardwareRequest updatedHardware = HardwareRequest.builder()
             .hardwareName(createdHardware.getHardwareName())
             .displayName(createdHardware.getDisplayName())
-            .operatingSystem(OperatingSystem.LINUX.toString())
             .multiplier(createdHardware.getMultiplier())
             .build();
 
@@ -185,18 +182,7 @@ class HardwareTest {
     }
 
     @Test
-    void whenCreatingHardware_givenHardwareWithInvalidOperatingSystem_thenJsonResponseWithErrorIsReturned_andHas400Status()
-        throws FoldingRestException {
-        final HardwareRequest hardware = TestGenerator.generateHardwareWithOperatingSystem(OperatingSystem.INVALID);
-        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.create(hardware, ADMIN_USER.userName(), ADMIN_USER.password());
-
-        assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
-            .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
-    }
-
-    @Test
-    void whenCreatingHardware_givenHardwareWithTheSameNameAndOperatingSystemAlreadyExists_then409ResponseIsReturned() throws FoldingRestException {
+    void whenCreatingHardware_givenHardwareWithTheSameNameAlreadyExists_then409ResponseIsReturned() throws FoldingRestException {
         final HardwareRequest hardwareToCreate = generateHardware();
         HARDWARE_REQUEST_SENDER.create(hardwareToCreate, ADMIN_USER.userName(),
             ADMIN_USER.password()); // Send one request and ignore it (even if the user already exists, we can verify the conflict with the next one)
@@ -286,7 +272,6 @@ class HardwareTest {
         final HardwareRequest updatedHardware = HardwareRequest.builder()
             .hardwareName(createdHardware.getHardwareName())
             .displayName(createdHardware.getDisplayName())
-            .operatingSystem(OperatingSystem.LINUX.toString())
             .multiplier(createdHardware.getMultiplier())
             .build();
 
@@ -354,7 +339,6 @@ class HardwareTest {
         final HardwareRequest updatedHardware = HardwareRequest.builder()
             .hardwareName(createdHardware.getHardwareName())
             .displayName(createdHardware.getDisplayName())
-            .operatingSystem(createdHardware.getOperatingSystem().toString())
             .multiplier(createdHardware.getMultiplier())
             .build();
 
@@ -381,8 +365,8 @@ class HardwareTest {
             generateHardware()
         );
         final List<HardwareRequest> batchOfInvalidHardware = List.of(
-            TestGenerator.generateHardwareWithOperatingSystem(OperatingSystem.INVALID),
-            TestGenerator.generateHardwareWithOperatingSystem(OperatingSystem.INVALID)
+            TestGenerator.generateHardwareWithMultiplier(-1.0D),
+            TestGenerator.generateHardwareWithMultiplier(-1.0D)
         );
         final List<HardwareRequest> batchOfHardware = new ArrayList<>(batchOfValidHardware.size() + batchOfInvalidHardware.size());
         batchOfHardware.addAll(batchOfValidHardware);
@@ -404,8 +388,8 @@ class HardwareTest {
         final int initialHardwareSize = HardwareUtils.getNumberOfHardware();
 
         final List<HardwareRequest> batchOfInvalidHardware = List.of(
-            TestGenerator.generateHardwareWithOperatingSystem(OperatingSystem.INVALID),
-            TestGenerator.generateHardwareWithOperatingSystem(OperatingSystem.INVALID)
+            TestGenerator.generateHardwareWithMultiplier(-1.0D),
+            TestGenerator.generateHardwareWithMultiplier(-1.0D)
         );
 
         final HttpResponse<String> response =
@@ -506,7 +490,6 @@ class HardwareTest {
         final HardwareRequest updatedHardware = HardwareRequest.builder()
             .hardwareName(createdHardware.getHardwareName())
             .displayName(createdHardware.getDisplayName())
-            .operatingSystem(OperatingSystem.LINUX.toString())
             .multiplier(createdHardware.getMultiplier())
             .build();
 

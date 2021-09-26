@@ -6,7 +6,6 @@ function populateHardwareUpdate(){
     document.getElementById("hardware_update_id").value = selectedElement.getAttribute("hardware_id");
     document.getElementById("hardware_update_name").value = selectedElement.getAttribute("hardware_name");
     document.getElementById("hardware_update_display_name").value = selectedElement.getAttribute("display_name");
-    document.getElementById("hardware_update_operating_system").value = selectedElement.getAttribute("operating_system");
     document.getElementById("hardware_update_multiplier").value = selectedElement.getAttribute("multiplier");
 
     hardwareFields = document.querySelectorAll(".hardware_update");
@@ -24,7 +23,6 @@ function populateHardwareDelete(){
     document.getElementById("hardware_delete_id").value = selectedElement.getAttribute("hardware_id");
     document.getElementById("hardware_delete_name").value = selectedElement.getAttribute("hardware_name");
     document.getElementById("hardware_delete_display_name").value = selectedElement.getAttribute("display_name");
-    document.getElementById("hardware_delete_operating_system").value = selectedElement.getAttribute("operating_system");
     document.getElementById("hardware_delete_multiplier").value = selectedElement.getAttribute("multiplier");
 
     hardwareFields = document.querySelectorAll(".hardware_delete");

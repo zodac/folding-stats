@@ -4,11 +4,10 @@
       "id": 0,
       "hardwareName": "Hardware1",
       "displayName": "Hardware1",
-      "operatingSystem": "WINDOWS",
       "multiplier": -21.33
     },
     "errors": [
-      "Attribute 'multiplier' must be over 0.0"
+      "Field 'multiplier' must be 1.00 or higher"
     ]
   },
   {
@@ -16,11 +15,10 @@
       "id": 0,
       "hardwareName": "Hardware2",
       "displayName": "Hardware2",
-      "operatingSystem": "LINUX",
       "multiplier": -3.62
     },
     "errors": [
-      "Attribute 'multiplier' must be over 0.0"
+      "Field 'multiplier' must be 1.00 or higher"
     ]
   }
 ]

@@ -2,7 +2,6 @@ package me.zodac.folding.test.utils;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import me.zodac.folding.api.tc.Category;
-import me.zodac.folding.api.tc.OperatingSystem;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
@@ -61,7 +60,6 @@ public final class TestGenerator {
         return HardwareRequest.builder()
             .hardwareName(hardwareName)
             .displayName(hardwareName)
-            .operatingSystem(OperatingSystem.WINDOWS.toString())
             .multiplier(1.0D)
             .build();
     }
@@ -77,24 +75,7 @@ public final class TestGenerator {
         return HardwareRequest.builder()
             .hardwareName(hardwareName)
             .displayName(hardwareName)
-            .operatingSystem(OperatingSystem.WINDOWS.toString())
             .multiplier(multiplier)
-            .build();
-    }
-
-    /**
-     * Generate a {@link HardwareRequest}.
-     *
-     * @param operatingSystem the {@link OperatingSystem} of the {@link HardwareRequest}
-     * @return the generated {@link HardwareRequest}
-     */
-    public static HardwareRequest generateHardwareWithOperatingSystem(final OperatingSystem operatingSystem) {
-        final String hardwareName = nextHardwareName();
-        return HardwareRequest.builder()
-            .hardwareName(hardwareName)
-            .displayName(hardwareName)
-            .operatingSystem(operatingSystem.toString())
-            .multiplier(1.0D)
             .build();
     }
 

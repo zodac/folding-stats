@@ -1,13 +1,11 @@
 CREATE TABLE hardware (
     hardware_id SERIAL PRIMARY KEY,
-    hardware_name TEXT NOT NULL,
+    hardware_name TEXT NOT NULL UNIQUE,
     display_name TEXT NOT NULL,
     hardware_make TEXT NOT NULL,
     hardware_type TEXT NOT NULL,
     average_ppd NUMERIC NOT NULL,
-    operating_system TEXT NOT NULL,
-    multiplier NUMERIC NOT NULL,
-    CONSTRAINT unique_hardware UNIQUE(hardware_name, operating_system)
+    multiplier NUMERIC NOT NULL
 );
 
 CREATE INDEX index_hardware_id

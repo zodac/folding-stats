@@ -5,7 +5,7 @@
     "forumLink": "invalidUrl"
   },
   "errors": [
-    "Attribute 'teamName' must not be empty",
-    "Attribute 'forumLink' is not a valid link: 'invalidUrl'"
+    "Field 'teamName' must not be empty",
+    "Field 'forumLink' is not a valid link: 'invalidUrl'"
   ]
 }

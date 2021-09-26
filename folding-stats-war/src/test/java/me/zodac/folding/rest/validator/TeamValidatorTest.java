@@ -125,7 +125,7 @@ class TeamValidatorTest {
         final TeamRequest team = TeamRequest.builder()
             .teamName("teamName")
             .teamDescription("teamDescription")
-            .forumLink("invalidURL")
+            .forumLink("invalidUrl")
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -136,7 +136,7 @@ class TeamValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'forumLink' is not a valid link: 'invalidURL'");
+            .contains("Field 'forumLink' is not a valid link: 'invalidUrl'");
     }
 
     @Test
@@ -339,7 +339,7 @@ class TeamValidatorTest {
         final TeamRequest team = TeamRequest.builder()
             .teamName("teamName")
             .teamDescription("teamDescription")
-            .forumLink("invalidURL")
+            .forumLink("invalidUrl")
             .build();
 
         final Team existingTeam = Team.builder()
@@ -356,7 +356,7 @@ class TeamValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'forumLink' is not a valid link: 'invalidURL'");
+            .contains("Field 'forumLink' is not a valid link: 'invalidUrl'");
     }
 
     @Test

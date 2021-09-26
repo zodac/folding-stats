@@ -15,7 +15,7 @@
         "forumLink": "invalidUrl"
       },
       "errors": [
-        "Attribute 'forumLink' is not a valid link: 'invalidUrl'"
+        "Field 'forumLink' is not a valid link: 'invalidUrl'"
       ]
     }
   ]

@@ -863,7 +863,6 @@ class UserTest {
         final HardwareRequest hardwareUpdateRequest = HardwareRequest.builder()
             .hardwareName("updatedHardwareName")
             .displayName(hardware.getDisplayName())
-            .operatingSystem(hardware.getOperatingSystem().toString())
             .multiplier(hardware.getMultiplier())
             .build();
 
