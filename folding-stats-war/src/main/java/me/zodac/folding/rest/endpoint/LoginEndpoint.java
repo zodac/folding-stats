@@ -18,9 +18,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import me.zodac.folding.SystemStateManager;
-import me.zodac.folding.api.SystemUserAuthentication;
+import me.zodac.folding.api.UserAuthenticationResult;
+import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.utils.EncodingUtils;
-import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.rest.api.LoginCredentials;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,7 +32,7 @@ public class LoginEndpoint {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @EJB
-    private OldFacade oldFacade;
+    private BusinessLogic businessLogic;
 
     @POST
     @PermitAll
@@ -59,14 +59,14 @@ public class LoginEndpoint {
             final String password = decodedUserNameAndPassword.get(EncodingUtils.DECODED_PASSWORD_KEY);
             LOGGER.debug("Login request received for user: '{}'", userName);
 
-            final SystemUserAuthentication systemUserAuthentication = oldFacade.authenticateSystemUser(userName, password);
+            final UserAuthenticationResult userAuthenticationResult = businessLogic.authenticateSystemUser(userName, password);
 
-            if (!systemUserAuthentication.isUserExists() || !systemUserAuthentication.isPasswordMatch()) {
+            if (!userAuthenticationResult.isUserExists() || !userAuthenticationResult.isPasswordMatch()) {
                 LOGGER.warn("Invalid user credentials supplied: {}", loginCredentials);
                 return unauthorized();
             }
 
-            if (!systemUserAuthentication.isAdmin()) {
+            if (!userAuthenticationResult.isAdmin()) {
                 LOGGER.warn("User '{}' is not an admin", userName);
                 return forbidden();
             }

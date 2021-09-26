@@ -9,7 +9,7 @@ import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import me.zodac.folding.ParsingStateManager;
 import me.zodac.folding.api.ParsingState;
-import me.zodac.folding.api.SystemUserAuthentication;
+import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.exception.ExternalConnectionException;
@@ -25,7 +25,6 @@ import me.zodac.folding.api.utils.DateTimeUtils;
 import me.zodac.folding.cache.HardwareCache;
 import me.zodac.folding.cache.InitialStatsCache;
 import me.zodac.folding.cache.OffsetStatsCache;
-import me.zodac.folding.cache.RetiredTcStatsCache;
 import me.zodac.folding.cache.TcStatsCache;
 import me.zodac.folding.cache.TeamCache;
 import me.zodac.folding.cache.TotalStatsCache;
@@ -51,7 +50,6 @@ public class OldFacade {
 
     private final transient InitialStatsCache initialStatsCache = InitialStatsCache.getInstance();
     private final transient OffsetStatsCache offsetStatsCache = OffsetStatsCache.getInstance();
-    private final transient RetiredTcStatsCache retiredStatsCache = RetiredTcStatsCache.getInstance();
     private final transient TcStatsCache tcStatsCache = TcStatsCache.getInstance();
     private final transient TotalStatsCache totalStatsCache = TotalStatsCache.getInstance();
 
@@ -161,24 +159,12 @@ public class OldFacade {
         final UserTcStats userStats = getTcStatsForUser(userId);
 
         if (userStats.isEmptyStats()) {
-            LOGGER.warn("User '{}' has no stats, not saving any retired stats", user.getDisplayName());
+            LOGGER.warn("User '{} (ID: {})' has no stats, not saving any retired stats", user.getDisplayName(), user.getId());
             return;
         }
 
         final Team team = user.getTeam();
         businessLogic.createRetiredUser(team, user, userStats);
-    }
-
-    public void updateTeam(final Team team) {
-        dbManager.updateTeam(team);
-        teamCache.add(team.getId(), team);
-
-        final Collection<User> usersOnThisTeam = businessLogic.getUsersOnTeam(team);
-
-        for (final User user : usersOnThisTeam) {
-            final User updatedUser = User.updateTeam(user, team);
-            userCache.add(updatedUser.getId(), updatedUser);
-        }
     }
 
     public void persistInitialUserStats(final User user) throws ExternalConnectionException {
@@ -323,17 +309,17 @@ public class OldFacade {
     }
 
     @SuppressWarnings("PMD.ConfusingTernary") // False positive
-    public SystemUserAuthentication authenticateSystemUser(final String userName, final String password) {
-        final SystemUserAuthentication systemUserAuthentication = dbManager.authenticateSystemUser(userName, password);
+    public UserAuthenticationResult authenticateSystemUser(final String userName, final String password) {
+        final UserAuthenticationResult userAuthenticationResult = dbManager.authenticateSystemUser(userName, password);
 
-        if (systemUserAuthentication.isUserExists() && systemUserAuthentication.isPasswordMatch()) {
+        if (userAuthenticationResult.isUserExists() && userAuthenticationResult.isPasswordMatch()) {
             LOGGER.debug("System user '{}' successfully logged in", userName);
-        } else if (!systemUserAuthentication.isUserExists()) {
+        } else if (!userAuthenticationResult.isUserExists()) {
             LOGGER.debug("No system user with name: '{}'", userName);
-        } else if (!systemUserAuthentication.isPasswordMatch()) {
+        } else if (!userAuthenticationResult.isPasswordMatch()) {
             LOGGER.debug("Invalid password supplied for user: '{}'", userName);
         }
 
-        return systemUserAuthentication;
+        return userAuthenticationResult;
     }
 }

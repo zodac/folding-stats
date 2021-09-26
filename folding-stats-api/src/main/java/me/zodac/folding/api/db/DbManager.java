@@ -5,7 +5,7 @@ import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
 import java.util.Optional;
-import me.zodac.folding.api.SystemUserAuthentication;
+import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.exception.DatabaseConnectionException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
@@ -100,5 +100,5 @@ public interface DbManager {
 
     Optional<String> getMonthlyResult(final Month month, final Year year);
 
-    SystemUserAuthentication authenticateSystemUser(final String userName, final String password);
+    UserAuthenticationResult authenticateSystemUser(final String userName, final String password);
 }

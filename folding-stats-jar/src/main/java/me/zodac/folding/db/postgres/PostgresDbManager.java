@@ -32,7 +32,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import me.zodac.folding.api.SystemUserAuthentication;
+import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.db.DbConnectionPool;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.exception.DatabaseConnectionException;
@@ -972,7 +972,7 @@ public final class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public SystemUserAuthentication authenticateSystemUser(final String userName, final String password) {
+    public UserAuthenticationResult authenticateSystemUser(final String userName, final String password) {
         LOGGER.debug("Checking if supplied username '{}' and password is valid user, then returning roles", userName);
 
         return executeQuery(queryContext -> {
@@ -1002,7 +1002,7 @@ public final class PostgresDbManager implements DbManager {
                 .stream()
                 .map(RecordConverter::toSystemUserAuthentication)
                 .findAny()
-                .orElse(SystemUserAuthentication.userDoesNotExist());
+                .orElse(UserAuthenticationResult.userDoesNotExist());
         });
     }
 

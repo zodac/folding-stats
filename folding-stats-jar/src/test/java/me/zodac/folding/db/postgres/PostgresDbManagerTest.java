@@ -11,7 +11,7 @@ import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
 import java.util.Optional;
-import me.zodac.folding.api.SystemUserAuthentication;
+import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
@@ -419,7 +419,7 @@ class PostgresDbManagerTest {
 
     @Test
     void validSystemUserTest() {
-        final SystemUserAuthentication invalidUserName = POSTGRES_DB_MANAGER.authenticateSystemUser("invalidUserName", "ADMIN_PASSWORD");
+        final UserAuthenticationResult invalidUserName = POSTGRES_DB_MANAGER.authenticateSystemUser("invalidUserName", "ADMIN_PASSWORD");
         assertThat(invalidUserName.isUserExists())
             .isFalse();
         assertThat(invalidUserName.isPasswordMatch())
@@ -427,7 +427,7 @@ class PostgresDbManagerTest {
         assertThat(invalidUserName.getUserRoles())
             .isEmpty();
 
-        final SystemUserAuthentication invalidPassword = POSTGRES_DB_MANAGER.authenticateSystemUser("ADMIN_USERNAME", "invalidPassword");
+        final UserAuthenticationResult invalidPassword = POSTGRES_DB_MANAGER.authenticateSystemUser("ADMIN_USERNAME", "invalidPassword");
         assertThat(invalidPassword.isUserExists())
             .isTrue();
         assertThat(invalidPassword.isPasswordMatch())
@@ -435,7 +435,7 @@ class PostgresDbManagerTest {
         assertThat(invalidPassword.getUserRoles())
             .isEmpty();
 
-        final SystemUserAuthentication admin = POSTGRES_DB_MANAGER.authenticateSystemUser("ADMIN_USERNAME", "ADMIN_PASSWORD");
+        final UserAuthenticationResult admin = POSTGRES_DB_MANAGER.authenticateSystemUser("ADMIN_USERNAME", "ADMIN_PASSWORD");
         assertThat(admin.isUserExists())
             .isTrue();
         assertThat(admin.isPasswordMatch())
@@ -443,7 +443,7 @@ class PostgresDbManagerTest {
         assertThat(admin.getUserRoles())
             .contains("admin");
 
-        final SystemUserAuthentication readOnly = POSTGRES_DB_MANAGER.authenticateSystemUser("READ_ONLY_USERNAME", "READ_ONLY_PASSWORD");
+        final UserAuthenticationResult readOnly = POSTGRES_DB_MANAGER.authenticateSystemUser("READ_ONLY_USERNAME", "READ_ONLY_PASSWORD");
         assertThat(readOnly.isUserExists())
             .isTrue();
         assertThat(readOnly.isPasswordMatch())

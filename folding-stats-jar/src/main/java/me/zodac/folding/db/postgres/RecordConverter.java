@@ -6,7 +6,7 @@ import static me.zodac.folding.db.postgres.gen.tables.Teams.TEAMS;
 import static me.zodac.folding.db.postgres.gen.tables.Users.USERS;
 
 import java.util.Set;
-import me.zodac.folding.api.SystemUserAuthentication;
+import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
@@ -199,22 +199,24 @@ final class RecordConverter {
     }
 
     /**
-     * Convert a {@link Record} into an appropriate {@link SystemUserAuthentication}.
+     * Convert a {@link Record} into an appropriate {@link UserAuthenticationResult}.
+     *
+     * <p>
      * Expects a field called <code>is_password_match</code> as a {@link Boolean} value determining whether
-     * a supplied password matches a has in the DB.
+     * a supplied password matches the hashed value in the DB.
      *
      * @param systemUsersRecord the {@link Record} to convert
-     * @return {@link SystemUserAuthentication#getUserRoles()} if valid password was supplied, else {@link SystemUserAuthentication#invalidPassword()}
+     * @return {@link UserAuthenticationResult#getUserRoles()} for a valid password, else {@link UserAuthenticationResult#invalidPassword()}
      */
-    static SystemUserAuthentication toSystemUserAuthentication(final Record systemUsersRecord) {
+    static UserAuthenticationResult toSystemUserAuthentication(final Record systemUsersRecord) {
         final boolean isPasswordMatch = getPasswordMatchValue(systemUsersRecord);
 
         if (isPasswordMatch) {
             final Set<String> roles = Set.of(systemUsersRecord.into(SYSTEM_USERS).getRoles());
-            return SystemUserAuthentication.success(roles);
+            return UserAuthenticationResult.success(roles);
         }
 
-        return SystemUserAuthentication.invalidPassword();
+        return UserAuthenticationResult.invalidPassword();
     }
 
     private static boolean getPasswordMatchValue(final Record systemUsersRecord) {

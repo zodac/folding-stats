@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
@@ -74,6 +75,11 @@ final class MockBusinessLogic implements BusinessLogic {
     @Override
     public Collection<Team> getAllTeams() {
         return teams.values();
+    }
+
+    @Override
+    public Team updateTeam(final Team team) {
+        return team;
     }
 
     @Override
@@ -181,5 +187,10 @@ final class MockBusinessLogic implements BusinessLogic {
     @Override
     public void deleteAllRetiredUserStats() {
 
+    }
+
+    @Override
+    public UserAuthenticationResult authenticateSystemUser(final String userName, final String password) {
+        return UserAuthenticationResult.userDoesNotExist();
     }
 }

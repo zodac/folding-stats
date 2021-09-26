@@ -20,9 +20,9 @@ import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
-import me.zodac.folding.api.SystemUserAuthentication;
+import me.zodac.folding.api.UserAuthenticationResult;
+import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.utils.EncodingUtils;
-import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.response.Responses;
 import org.apache.logging.log4j.LogManager;
@@ -57,6 +57,8 @@ import org.apache.logging.log4j.Logger;
  *         </ul>
  *     </li>
  * </ul>
+ *
+ * @see BusinessLogic#authenticateSystemUser(String, String)
  */
 @Provider
 public class SecurityInterceptor implements ContainerRequestFilter {
@@ -67,7 +69,7 @@ public class SecurityInterceptor implements ContainerRequestFilter {
     private ResourceInfo resourceInfo;
 
     @EJB
-    private OldFacade oldFacade;
+    private BusinessLogic businessLogic;
 
     @Override
     public void filter(final ContainerRequestContext requestContext) {
@@ -107,21 +109,21 @@ public class SecurityInterceptor implements ContainerRequestFilter {
         final String userName = decodedUserNameAndPassword.get(EncodingUtils.DECODED_USERNAME_KEY);
         final String password = decodedUserNameAndPassword.get(EncodingUtils.DECODED_PASSWORD_KEY);
 
-        final SystemUserAuthentication systemUserAuthentication = oldFacade.authenticateSystemUser(userName, password);
+        final UserAuthenticationResult userAuthenticationResult = businessLogic.authenticateSystemUser(userName, password);
 
-        if (!systemUserAuthentication.isUserExists()) {
+        if (!userAuthenticationResult.isUserExists()) {
             LOGGER.warn("User '{}' does not exist", userName);
             requestContext.abortWith(unauthorized());
             return;
         }
 
-        if (!systemUserAuthentication.isPasswordMatch()) {
+        if (!userAuthenticationResult.isPasswordMatch()) {
             LOGGER.warn("Invalid password supplied for user '{}'", userName);
             requestContext.abortWith(unauthorized());
             return;
         }
 
-        final Set<String> userRoles = systemUserAuthentication.getUserRoles().stream().map(String::toLowerCase).collect(toSet());
+        final Set<String> userRoles = userAuthenticationResult.getUserRoles().stream().map(String::toLowerCase).collect(toSet());
 
         final RolesAllowed rolesAnnotation = method.getAnnotation(RolesAllowed.class);
         final Set<String> permittedRoles = Arrays.stream(rolesAnnotation.value()).map(String::toLowerCase).collect(toSet());

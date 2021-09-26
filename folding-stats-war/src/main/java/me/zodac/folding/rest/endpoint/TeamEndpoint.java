@@ -138,7 +138,7 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
     protected Team updateElementById(final int teamId, final Team team, final Team existingTeam) {
         // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
         final Team teamWithId = Team.updateWithId(teamId, team);
-        oldFacade.updateTeam(teamWithId);
+        businessLogic.updateTeam(teamWithId);
         return teamWithId;
     }
 

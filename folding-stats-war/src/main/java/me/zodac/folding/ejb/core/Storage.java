@@ -5,7 +5,7 @@ import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
@@ -24,7 +24,7 @@ import org.apache.logging.log4j.Logger;
  * In order to decouple both the REST layer and the {@link BusinessLogicEjb} from the persistence solution we use this interface for CRUD operations.
  *
  * <p>
- * Since some of the persisted data can be cached, we don't want any other modules of the codebase to need to worry about DB vs cache access, and
+ * Since some persisted data can be cached, we don't want any other modules of the codebase to need to worry about DB vs cache access, and
  * instead encapsulate all of that logic here.
  *
  * <p>
@@ -215,6 +215,31 @@ final class Storage {
     }
 
     /**
+     * Updates a {@link Team}. Expects the {@link Team} to have a valid ID.
+     *
+     * <p>
+     * Persists it with the {@link DbManager}, then updates it in the {@link TeamCache}.
+     *
+     * <p>
+     * Also updates the {@link UserCache} with an updated version of any {@link User} that references this {@link Team}.
+     *
+     * @param teamToUpdate the {@link Team} to update
+     * @see DbManager#updateTeam(Team)
+     */
+    public Team updateTeam(final Team teamToUpdate) {
+        DB_MANAGER.updateTeam(teamToUpdate);
+        teamCache.add(teamToUpdate.getId(), teamToUpdate);
+
+        getAllUsers()
+            .stream()
+            .filter(user -> user.getTeam().getId() == teamToUpdate.getId())
+            .map(user -> User.updateTeam(user, teamToUpdate))
+            .forEach(updatedUser -> userCache.add(updatedUser.getId(), updatedUser));
+
+        return teamToUpdate;
+    }
+
+    /**
      * Deletes a {@link Team}.
      *
      * <p>
@@ -285,8 +310,8 @@ final class Storage {
      * <p>
      * Used in scenarios where something a {@link User} references, like a {@link Hardware} or {@link Team} has been
      * updated. The {@link User} itself does not require an update in the DB (since we only store a reference to the ID of the
-     * {@link Hardware}/{@link Team}. This will force the next retrieval to go direct to the DB and retrieve the updated {@link Hardware}/{@link Team}
-     * details for the {@link User}.
+     * {@link Hardware}/{@link Team}). This will force the next retrieval to go directly to the DB and retrieve the updated
+     * {@link Hardware}/{@link Team} details for the {@link User}.
      *
      * @param userId the ID of the {@link User} to evict
      */
@@ -335,8 +360,10 @@ final class Storage {
      */
     public RetiredUserTcStats createRetiredUser(final int teamId, final int userId, final String userDisplayName, final UserTcStats userTcStats) {
         final int retiredUserId = DB_MANAGER.persistRetiredUserStats(teamId, userId, userDisplayName, userTcStats);
-        retiredStatsCache.add(retiredUserId, RetiredUserTcStats.create(retiredUserId, teamId, userDisplayName, userTcStats));
-        return RetiredUserTcStats.create(retiredUserId, teamId, userDisplayName, userTcStats);
+        final RetiredUserTcStats retiredUserTcStats = RetiredUserTcStats.create(retiredUserId, teamId, userDisplayName, userTcStats);
+
+        retiredStatsCache.add(retiredUserId, retiredUserTcStats);
+        return retiredUserTcStats;
     }
 
     /**
@@ -362,23 +389,21 @@ final class Storage {
     }
 
     /**
-     * Retrieves all {@link RetiredUserTcStats} for the given {@link Team}.
-     *
-     * @param teamId the ID of {@link Team} whose retired users are to be found
-     * @return a {@link Collection} of the retrieved {@link RetiredUserTcStats} for the {@link Team}
-     */
-    public Collection<RetiredUserTcStats> getAllRetiredUserStatsForTeam(final int teamId) {
-        return getAllRetiredUsers()
-            .stream()
-            .filter(retiredUserTcStats -> retiredUserTcStats.getTeamId() == teamId)
-            .collect(Collectors.toList());
-    }
-
-    /**
      * Deletes all {@link RetiredUserTcStats} for all {@link Team}s.
      */
     public void deleteAllRetiredUserStats() {
         DB_MANAGER.deleteAllRetiredUserStats();
         retiredStatsCache.removeAll();
+    }
+
+    /**
+     * Authenticates a system user with {@link DbManager}.
+     *
+     * @param userName the system user username
+     * @param password the system user password
+     * @return the {@link UserAuthenticationResult}
+     */
+    public UserAuthenticationResult authenticateSystemUser(final String userName, final String password) {
+        return DB_MANAGER.authenticateSystemUser(userName, password);
     }
 }

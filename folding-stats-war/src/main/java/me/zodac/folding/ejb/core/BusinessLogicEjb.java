@@ -8,12 +8,15 @@ import java.time.Year;
 import java.util.Collection;
 import java.util.Optional;
 import javax.ejb.Singleton;
+import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * {@link Singleton} EJB implementation of {@link BusinessLogic}.
@@ -26,6 +29,7 @@ import me.zodac.folding.api.tc.stats.UserTcStats;
 @Singleton
 public class BusinessLogicEjb implements BusinessLogic {
 
+    private static final Logger LOGGER = LogManager.getLogger();
     private static final Storage STORAGE = Storage.getInstance();
 
     @Override
@@ -61,6 +65,11 @@ public class BusinessLogicEjb implements BusinessLogic {
     @Override
     public Collection<Team> getAllTeams() {
         return STORAGE.getAllTeams();
+    }
+
+    @Override
+    public Team updateTeam(final Team teamToUpdate) {
+        return STORAGE.updateTeam(teamToUpdate);
     }
 
     @Override
@@ -154,11 +163,27 @@ public class BusinessLogicEjb implements BusinessLogic {
 
     @Override
     public Collection<RetiredUserTcStats> getAllRetiredUsersForTeam(final Team team) {
-        return STORAGE.getAllRetiredUserStatsForTeam(team.getId());
+        return STORAGE.getAllRetiredUsers()
+            .stream()
+            .filter(retiredUserTcStats -> retiredUserTcStats.getTeamId() == team.getId())
+            .collect(toList());
     }
 
     @Override
     public void deleteAllRetiredUserStats() {
         STORAGE.deleteAllRetiredUserStats();
+    }
+
+    @Override
+    public UserAuthenticationResult authenticateSystemUser(final String userName, final String password) {
+        final UserAuthenticationResult userAuthenticationResult = STORAGE.authenticateSystemUser(userName, password);
+
+        if (userAuthenticationResult.isUserExists() && userAuthenticationResult.isPasswordMatch()) {
+            LOGGER.debug("System user '{}' successfully logged in", userName);
+        } else {
+            LOGGER.debug("Error authenticating system user '{}': {}", userName, userAuthenticationResult);
+        }
+
+        return userAuthenticationResult;
     }
 }

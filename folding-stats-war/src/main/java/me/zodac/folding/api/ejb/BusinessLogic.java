@@ -5,6 +5,7 @@ import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
 import java.util.Optional;
+import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
@@ -69,6 +70,14 @@ public interface BusinessLogic {
      * @return a {@link Collection} of the retrieved {@link Team}s
      */
     Collection<Team> getAllTeams();
+
+    /**
+     * Updates an existing {@link Team}.
+     *
+     * @param updatedTeam the {@link Team} with updated values
+     * @return the updated {@link Team}
+     */
+    Team updateTeam(final Team updatedTeam);
 
     /**
      * Deletes a {@link Team}.
@@ -202,4 +211,21 @@ public interface BusinessLogic {
      * Deletes all {@link RetiredUserTcStats} for all {@link Team}s.
      */
     void deleteAllRetiredUserStats();
+
+    /**
+     * Authenticates a system user and retrieves its roles.
+     *
+     * <p>
+     * The following scenarios are considered:
+     * <ul>
+     *     <li>The user does not exist</li>
+     *     <li>The user exists but the password is incorrect</li>
+     *     <li>The user exists, and the password is correct</li>
+     * </ul>
+     *
+     * @param userName the system user username
+     * @param password the system user password
+     * @return the {@link UserAuthenticationResult}
+     */
+    UserAuthenticationResult authenticateSystemUser(final String userName, final String password);
 }

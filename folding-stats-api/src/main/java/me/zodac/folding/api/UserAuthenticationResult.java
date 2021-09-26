@@ -15,7 +15,7 @@ import lombok.ToString;
 @Getter
 @EqualsAndHashCode
 @ToString(doNotUseGetters = true)
-public class SystemUserAuthentication {
+public class UserAuthenticationResult {
 
     private static final String ADMIN_ROLE = "admin";
 
@@ -24,35 +24,35 @@ public class SystemUserAuthentication {
     private final Set<String> userRoles;
 
     /**
-     * User does not exist {@link SystemUserAuthentication}.
+     * User does not exist {@link UserAuthenticationResult}.
      *
-     * @return the {@link SystemUserAuthentication}
+     * @return the {@link UserAuthenticationResult}
      */
-    public static SystemUserAuthentication userDoesNotExist() {
-        return new SystemUserAuthentication(false, false, Collections.emptySet());
+    public static UserAuthenticationResult userDoesNotExist() {
+        return new UserAuthenticationResult(false, false, Collections.emptySet());
     }
 
     /**
-     * User exists, but invalid password provided {@link SystemUserAuthentication}.
+     * User exists, but invalid password provided {@link UserAuthenticationResult}.
      *
-     * @return the {@link SystemUserAuthentication}
+     * @return the {@link UserAuthenticationResult}
      */
-    public static SystemUserAuthentication invalidPassword() {
-        return new SystemUserAuthentication(true, false, Collections.emptySet());
+    public static UserAuthenticationResult invalidPassword() {
+        return new UserAuthenticationResult(true, false, Collections.emptySet());
     }
 
     /**
-     * Successful {@link SystemUserAuthentication} with retrieved user roles.
+     * Successful {@link UserAuthenticationResult} with retrieved user roles.
      *
      * @param userRoles the roles of the user that has been successfully logged in
-     * @return the {@link SystemUserAuthentication}
+     * @return the {@link UserAuthenticationResult}
      */
-    public static SystemUserAuthentication success(final Set<String> userRoles) {
-        return new SystemUserAuthentication(true, true, userRoles);
+    public static UserAuthenticationResult success(final Set<String> userRoles) {
+        return new UserAuthenticationResult(true, true, userRoles);
     }
 
     /**
-     * Checks if the {@code userRoles} of the {@link SystemUserAuthentication} contain the 'admin' user role.
+     * Checks if the {@code userRoles} of the {@link UserAuthenticationResult} contain the 'admin' user role.
      *
      * @return <code>true</code> if the {@code userRoles} contains the 'admin' user role
      */
