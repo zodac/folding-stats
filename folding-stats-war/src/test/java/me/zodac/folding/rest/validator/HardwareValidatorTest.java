@@ -142,6 +142,7 @@ class HardwareValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
+            .as("Did not receive expected error messages")
             .hasSize(3)
             .contains(
                 "Field 'hardwareName' must not be empty",
@@ -373,6 +374,7 @@ class HardwareValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
+            .as("Did not receive expected error messages")
             .hasSize(2)
             .contains(
                 "Field 'displayName' must not be empty",

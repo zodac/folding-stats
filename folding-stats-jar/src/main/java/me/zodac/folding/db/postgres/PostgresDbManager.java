@@ -899,14 +899,13 @@ public final class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public Collection<RetiredUserTcStats> getRetiredUserStatsForTeam(final Team team) {
-        LOGGER.debug("Getting retired user stats for team with ID: {}", team::getId);
+    public Collection<RetiredUserTcStats> getAllRetiredUserStats() {
+        LOGGER.debug("Getting all retired user stats");
 
         return executeQuery(queryContext -> {
             final var query = queryContext
                 .select()
                 .from(RETIRED_USER_STATS)
-                .where(RETIRED_USER_STATS.TEAM_ID.equal(team.getId()))
                 .orderBy(RETIRED_USER_STATS.RETIRED_USER_ID.asc());
             LOGGER.debug("Executing SQL: '{}'", query);
 
@@ -920,7 +919,7 @@ public final class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public void deleteRetiredUserStats() {
+    public void deleteAllRetiredUserStats() {
         LOGGER.debug("Deleting all retired users");
 
         executeQuery(queryContext -> {

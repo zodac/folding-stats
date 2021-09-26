@@ -92,9 +92,9 @@ public interface DbManager {
 
     int persistRetiredUserStats(final int teamId, final int userId, final String displayUserName, final UserTcStats retiredUserStats);
 
-    Collection<RetiredUserTcStats> getRetiredUserStatsForTeam(final Team team);
+    Collection<RetiredUserTcStats> getAllRetiredUserStats();
 
-    void deleteRetiredUserStats();
+    void deleteAllRetiredUserStats();
 
     void persistMonthlyResult(final String result, final LocalDateTime utcTimestamp);
 

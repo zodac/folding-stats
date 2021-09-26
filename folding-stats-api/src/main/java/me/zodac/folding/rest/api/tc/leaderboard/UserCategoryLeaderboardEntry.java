@@ -21,6 +21,9 @@ import me.zodac.folding.rest.api.tc.UserSummary;
 @ToString(doNotUseGetters = true)
 public class UserCategoryLeaderboardEntry {
 
+    private static final long DEFAULT_DIFF = 0L;
+    private static final int DEFAULT_RANK = 1;
+
     private String displayName;
     private String foldingName;
     private String hardware;
@@ -43,7 +46,10 @@ public class UserCategoryLeaderboardEntry {
      * @param diffToNext   the number of points between this {@link me.zodac.folding.api.tc.User} and the one a single place above
      * @return the created {@link UserCategoryLeaderboardEntry}
      */
-    public static UserCategoryLeaderboardEntry create(final UserSummary userSummary, final String teamName, final int rank, final long diffToLeader,
+    public static UserCategoryLeaderboardEntry create(final UserSummary userSummary,
+                                                      final String teamName,
+                                                      final int rank,
+                                                      final long diffToLeader,
                                                       final long diffToNext) {
         return new UserCategoryLeaderboardEntry(userSummary.getDisplayName(), userSummary.getFoldingName(),
             userSummary.getHardware().getDisplayName(), teamName, userSummary.getPoints(), userSummary.getMultipliedPoints(),
@@ -59,6 +65,6 @@ public class UserCategoryLeaderboardEntry {
      * @return the created {@link UserCategoryLeaderboardEntry}
      */
     public static UserCategoryLeaderboardEntry createLeader(final UserSummary userSummary, final String teamName) {
-        return create(userSummary, teamName, 1, 0L, 0L);
+        return create(userSummary, teamName, DEFAULT_RANK, DEFAULT_DIFF, DEFAULT_DIFF);
     }
 }

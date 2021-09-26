@@ -3,6 +3,7 @@ package me.zodac.folding.api.tc;
 import static java.util.stream.Collectors.toUnmodifiableList;
 
 import java.util.Collection;
+import java.util.Set;
 import java.util.stream.Stream;
 
 /**
@@ -14,19 +15,19 @@ import java.util.stream.Stream;
 public enum Category {
 
     /**
-     * {@link User} is using an AMD GPU as their {@link Hardware}.
+     * {@link User} is using an <b>AMD</b> {@link HardwareType#GPU} as their {@link Hardware}.
      */
-    AMD_GPU(1),
+    AMD_GPU(1, HardwareType.GPU),
 
     /**
-     * {@link User} is using an nVidia GPU as their {@link Hardware}.
+     * {@link User} is using an <b>nVidia</b> {@link HardwareType#GPU} as their {@link Hardware}.
      */
-    NVIDIA_GPU(1),
+    NVIDIA_GPU(1, HardwareType.GPU),
 
     /**
-     * {@link User} is permitted to use any GPU or CPU as their {@link Hardware}.
+     * {@link User} is permitted to use any {@link HardwareType} as their {@link Hardware}.
      */
-    WILDCARD(1),
+    WILDCARD(1, HardwareType.GPU, HardwareType.CPU),
 
     /**
      * Not a valid {@link Category}.
@@ -38,14 +39,16 @@ public enum Category {
         .collect(toUnmodifiableList());
 
     private final int permittedUsers;
+    private final Set<HardwareType> supportedHardwareTypes;
 
     /**
      * Constructs a {@link Category} with a maximum number of {@link User}s.
      *
      * @param permittedUsers the maximum number of {@link User}s permitted in the {@link Category}
      */
-    Category(final int permittedUsers) {
+    Category(final int permittedUsers, final HardwareType... hardwareTypes) {
         this.permittedUsers = permittedUsers;
+        supportedHardwareTypes = Set.of(hardwareTypes);
     }
 
     /**
@@ -93,5 +96,14 @@ public enum Category {
      */
     public int permittedUsers() {
         return permittedUsers;
+    }
+
+    /**
+     * Returns the supported {@link HardwareType}s in the {@link Category}.
+     *
+     * @return a {@link Set} of the supported {@link HardwareType}s
+     */
+    public Set<HardwareType> supportedHardwareTypes() {
+        return supportedHardwareTypes;
     }
 }

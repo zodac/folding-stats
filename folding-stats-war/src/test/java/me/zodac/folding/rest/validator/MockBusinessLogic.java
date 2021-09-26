@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -13,6 +14,8 @@ import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
+import me.zodac.folding.api.tc.stats.UserTcStats;
 
 /**
  * Mock implementation of {@link BusinessLogic}. Has methods to set specific values for tests.
@@ -163,5 +166,20 @@ final class MockBusinessLogic implements BusinessLogic {
     @Override
     public Optional<String> getMonthlyResult(final Month month, final Year year) {
         return Optional.empty();
+    }
+
+    @Override
+    public RetiredUserTcStats createRetiredUser(final Team team, final User user, final UserTcStats userTcStats) {
+        return RetiredUserTcStats.empty();
+    }
+
+    @Override
+    public Collection<RetiredUserTcStats> getAllRetiredUsersForTeam(final Team team) {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public void deleteAllRetiredUserStats() {
+
     }
 }

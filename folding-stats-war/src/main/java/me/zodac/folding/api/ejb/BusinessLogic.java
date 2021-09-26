@@ -8,6 +8,8 @@ import java.util.Optional;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
+import me.zodac.folding.api.tc.stats.UserTcStats;
 
 /**
  * In order to decouple the REST layer from any business requirements, we move that logic into this interface, to be
@@ -177,4 +179,27 @@ public interface BusinessLogic {
      * @return an {@link Optional} of the <code>Team Competition</code> result
      */
     Optional<String> getMonthlyResult(final Month month, final Year year);
+
+    /**
+     * Creates a {@link RetiredUserTcStats} for a {@link User} that has been deleted from a {@link Team}.
+     *
+     * @param team        the {@link Team} that the {@link User} has been deleted from
+     * @param user        the {@link User} who is being deleted
+     * @param userTcStats the {@link UserTcStats} at the time of deletion
+     * @return the {@link RetiredUserTcStats}
+     */
+    RetiredUserTcStats createRetiredUser(final Team team, final User user, final UserTcStats userTcStats);
+
+    /**
+     * Retrieves all {@link RetiredUserTcStats} for the given {@link Team}.
+     *
+     * @param team the {@link Team} whose retired users are to be found
+     * @return a {@link Collection} of the retrieved {@link RetiredUserTcStats}
+     */
+    Collection<RetiredUserTcStats> getAllRetiredUsersForTeam(final Team team);
+
+    /**
+     * Deletes all {@link RetiredUserTcStats} for all {@link Team}s.
+     */
+    void deleteAllRetiredUserStats();
 }

@@ -9,7 +9,7 @@ package me.zodac.folding.api.exception;
  * I'll live with it.
  *
  * <p>
- * It does mean we need to ensure that our boundaries (schedules EJBs, REST request handlers, etc) are at least handling
+ * It does mean we need to ensure that our boundaries (schedules EJBs, REST request handlers, etc.) are at least handling
  * generic {@link Exception}s, or even handling this one explicitly.
  */
 public class DatabaseConnectionException extends RuntimeException {

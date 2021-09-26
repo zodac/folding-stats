@@ -14,6 +14,8 @@
         <exclude name="GuardLogStatement"/>
         <!-- I have no problem with multiple asserts in my tests -->
         <exclude name="JUnitTestContainsTooManyAsserts"/>
+        <!-- False positives with AssertJ using #as() to include an error message -->
+        <exclude name="JUnitAssertionsShouldIncludeMessage"/>
     </rule>
 
     <rule ref="category/java/codestyle.xml">

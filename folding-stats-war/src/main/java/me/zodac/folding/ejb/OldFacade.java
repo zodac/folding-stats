@@ -18,7 +18,6 @@ import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.OffsetStats;
-import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
@@ -161,14 +160,13 @@ public class OldFacade {
 
         final UserTcStats userStats = getTcStatsForUser(userId);
 
-        if (userStats.isEmpty()) {
+        if (userStats.isEmptyStats()) {
             LOGGER.warn("User '{}' has no stats, not saving any retired stats", user.getDisplayName());
             return;
         }
 
         final Team team = user.getTeam();
-        final int retiredUserId = dbManager.persistRetiredUserStats(team.getId(), user.getId(), user.getDisplayName(), userStats);
-        retiredStatsCache.add(retiredUserId, RetiredUserTcStats.create(retiredUserId, team.getId(), user.getDisplayName(), userStats));
+        businessLogic.createRetiredUser(team, user, userStats);
     }
 
     public void updateTeam(final Team team) {
@@ -337,13 +335,5 @@ public class OldFacade {
         }
 
         return systemUserAuthentication;
-    }
-
-    public Collection<RetiredUserTcStats> getRetiredUsersForTeam(final Team team) {
-        return dbManager.getRetiredUserStatsForTeam(team);
-    }
-
-    public void deleteRetiredUserStats() {
-        dbManager.deleteRetiredUserStats();
     }
 }

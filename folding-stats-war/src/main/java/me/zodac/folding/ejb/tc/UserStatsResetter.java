@@ -46,7 +46,7 @@ public class UserStatsResetter {
      *
      * @see OldFacade#setCurrentStatsAsInitialStatsForUser(User)
      * @see OldFacade#clearOffsetStats()
-     * @see OldFacade#deleteRetiredUserStats()
+     * @see BusinessLogic#deleteAllRetiredUserStats()
      * @see StatsScheduler#manualTeamCompetitionStatsParsing(ExecutionType)
      */
     public void resetTeamCompetitionStats() {
@@ -63,7 +63,7 @@ public class UserStatsResetter {
             }
 
             LOGGER.info("Deleting retired users");
-            oldFacade.deleteRetiredUserStats();
+            businessLogic.deleteAllRetiredUserStats();
             resetCaches();
             statsScheduler.manualTeamCompetitionStatsParsing(ExecutionType.SYNCHRONOUS);
         } catch (final Exception e) {
@@ -84,6 +84,5 @@ public class UserStatsResetter {
         LOGGER.info("Resetting caches");
         TcStatsCache.getInstance().removeAll();
         TotalStatsCache.getInstance().removeAll();
-        RetiredTcStatsCache.getInstance().removeAll();
     }
 }

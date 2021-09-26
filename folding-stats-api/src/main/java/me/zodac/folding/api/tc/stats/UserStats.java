@@ -50,7 +50,7 @@ public class UserStats extends Stats {
      * @return the empty {@link UserStats}
      */
     public static UserStats empty() {
-        return new UserStats(User.EMPTY_USER_ID, DateTimeUtils.currentUtcTimestamp(), DEFAULT_POINTS, DEFAULT_UNITS);
+        return create(User.EMPTY_USER_ID, DateTimeUtils.currentUtcTimestamp(), DEFAULT_POINTS, DEFAULT_UNITS);
     }
 
     public int getUserId() {
@@ -64,6 +64,18 @@ public class UserStats extends Stats {
     @Override
     public boolean isEmpty() {
         return userId == User.EMPTY_USER_ID && super.isEmpty();
+    }
+
+    /**
+     * Checks whether the {@link UserStats} has no points or units.
+     *
+     * <p>
+     * This is distinct from {@link #isEmpty()}, as it does not check the {@code userId}.
+     *
+     * @return <code>true</code> is there are <b>0</b> stats
+     */
+    public boolean isEmptyStats() {
+        return super.isEmpty();
     }
 
     public Stats getStats() {

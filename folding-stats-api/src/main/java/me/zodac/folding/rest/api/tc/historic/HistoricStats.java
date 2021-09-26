@@ -32,7 +32,6 @@ public class HistoricStats {
     private static final long DEFAULT_POINTS = 0L;
     private static final long DEFAULT_MULTIPLIED_POINTS = 0L;
     private static final int DEFAULT_UNITS = 0;
-    private static final HistoricStats EMPTY_HISTORIC_STATS = empty();
 
     private LocalDateTime dateTime;
     private long points;
@@ -58,7 +57,7 @@ public class HistoricStats {
      * @return {@link HistoricStats} with default values
      */
     public static HistoricStats empty() {
-        return new HistoricStats(LocalDateTime.now(ZoneOffset.UTC), DEFAULT_POINTS, DEFAULT_MULTIPLIED_POINTS, DEFAULT_UNITS);
+        return create(LocalDateTime.now(ZoneOffset.UTC), DEFAULT_POINTS, DEFAULT_MULTIPLIED_POINTS, DEFAULT_UNITS);
     }
 
     /**
@@ -88,7 +87,7 @@ public class HistoricStats {
             long combinedPoints = DEFAULT_POINTS;
             long combinedMultipliedPoints = DEFAULT_MULTIPLIED_POINTS;
             int combinedUnits = DEFAULT_UNITS;
-            
+
             for (final HistoricStats stats : allStats) {
                 if (stats.dateTime.equals(key)) {
                     combinedPoints += stats.points;

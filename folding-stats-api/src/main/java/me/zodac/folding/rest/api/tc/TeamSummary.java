@@ -36,6 +36,7 @@ public class TeamSummary {
     private long teamMultipliedPoints;
     private int teamUnits;
     private int rank; // Rank in 'division', but we only have one division so no need to be more explicit with the name
+
     private Collection<UserSummary> activeUsers;
     private Collection<RetiredUserSummary> retiredUsers;
 
@@ -62,12 +63,16 @@ public class TeamSummary {
      * @param retiredUsers    the retired {@link me.zodac.folding.api.tc.User} {@link RetiredUserSummary}
      * @return the created {@link TeamSummary}
      */
-    public static TeamSummary create(final String teamName, final String teamDescription, final String forumLink, final String captainName,
-                                     final Collection<UserSummary> activeUsers, final Collection<RetiredUserSummary> retiredUsers) {
+    public static TeamSummary createWithDefaultRank(final String teamName,
+                                                    final String teamDescription,
+                                                    final String forumLink,
+                                                    final String captainName,
+                                                    final Collection<UserSummary> activeUsers,
+                                                    final Collection<RetiredUserSummary> retiredUsers) {
         int teamUnits = 0;
         long teamPoints = 0L;
         long teamMultipliedPoints = 0L;
-        
+
         for (final UserSummary activeUser : activeUsers) {
             teamUnits += activeUser.getUnits();
             teamPoints += activeUser.getPoints();

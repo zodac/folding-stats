@@ -5,11 +5,15 @@ import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
+import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.cache.HardwareCache;
+import me.zodac.folding.cache.RetiredTcStatsCache;
 import me.zodac.folding.cache.TeamCache;
 import me.zodac.folding.cache.UserCache;
 import me.zodac.folding.db.DbManagerRetriever;
@@ -26,16 +30,19 @@ import org.apache.logging.log4j.Logger;
  * <p>
  * <b>NOTE:</b> Should only be used by {@link BusinessLogicEjb}, other classes should not go use this class.
  */
-// TODO: [zodac] Should replace the cache miss warnings with some metrics instead?
 final class Storage {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final DbManager DB_MANAGER = DbManagerRetriever.get();
     private static final Storage INSTANCE = new Storage();
 
+    // POJO caches
     private final HardwareCache hardwareCache = HardwareCache.getInstance();
     private final UserCache userCache = UserCache.getInstance();
     private final TeamCache teamCache = TeamCache.getInstance();
+
+    // Stat caches
+    private final RetiredTcStatsCache retiredStatsCache = RetiredTcStatsCache.getInstance();
 
     private Storage() {
 
@@ -312,5 +319,66 @@ final class Storage {
      */
     public Optional<String> getMonthlyResult(final Month month, final Year year) {
         return DB_MANAGER.getMonthlyResult(month, year);
+    }
+
+    /**
+     * Creates a {@link RetiredUserTcStats} for a {@link User} that has been deleted from a {@link Team}.
+     *
+     * <p>
+     * Persists it with the {@link DbManager}, then adds it to the {@link HardwareCache}.
+     *
+     * @param teamId          the ID of the {@link Team} that the {@link User} has been deleted from
+     * @param userId          the ID of the {@link User} who is being deleted
+     * @param userDisplayName the display name of the {@link User} who is being deleted
+     * @param userTcStats     the {@link UserTcStats} at the time of deletion
+     * @return the {@link RetiredUserTcStats}
+     */
+    public RetiredUserTcStats createRetiredUser(final int teamId, final int userId, final String userDisplayName, final UserTcStats userTcStats) {
+        final int retiredUserId = DB_MANAGER.persistRetiredUserStats(teamId, userId, userDisplayName, userTcStats);
+        retiredStatsCache.add(retiredUserId, RetiredUserTcStats.create(retiredUserId, teamId, userDisplayName, userTcStats));
+        return RetiredUserTcStats.create(retiredUserId, teamId, userDisplayName, userTcStats);
+    }
+
+    /**
+     * Retrieves all {@link RetiredUserTcStats}.
+     *
+     * @return a {@link Collection} of the retrieved {@link RetiredUserTcStats}
+     */
+    public Collection<RetiredUserTcStats> getAllRetiredUsers() {
+        final Collection<RetiredUserTcStats> fromCache = retiredStatsCache.getAll();
+
+        if (!fromCache.isEmpty()) {
+            return fromCache;
+        }
+
+        LOGGER.trace("Cache miss! Get all retired users");
+        final Collection<RetiredUserTcStats> fromDb = DB_MANAGER.getAllRetiredUserStats();
+
+        for (final RetiredUserTcStats retiredUserTcStats : fromDb) {
+            retiredStatsCache.add(retiredUserTcStats.getRetiredUserId(), retiredUserTcStats);
+        }
+
+        return fromDb;
+    }
+
+    /**
+     * Retrieves all {@link RetiredUserTcStats} for the given {@link Team}.
+     *
+     * @param teamId the ID of {@link Team} whose retired users are to be found
+     * @return a {@link Collection} of the retrieved {@link RetiredUserTcStats} for the {@link Team}
+     */
+    public Collection<RetiredUserTcStats> getAllRetiredUserStatsForTeam(final int teamId) {
+        return getAllRetiredUsers()
+            .stream()
+            .filter(retiredUserTcStats -> retiredUserTcStats.getTeamId() == teamId)
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * Deletes all {@link RetiredUserTcStats} for all {@link Team}s.
+     */
+    public void deleteAllRetiredUserStats() {
+        DB_MANAGER.deleteAllRetiredUserStats();
+        retiredStatsCache.removeAll();
     }
 }

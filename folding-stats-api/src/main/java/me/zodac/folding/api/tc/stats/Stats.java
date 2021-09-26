@@ -39,7 +39,7 @@ public class Stats {
      * @return the empty {@link Stats}
      */
     public static Stats empty() {
-        return new Stats(DEFAULT_POINTS, DEFAULT_UNITS);
+        return create(DEFAULT_POINTS, DEFAULT_UNITS);
     }
 
     /**

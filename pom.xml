@@ -266,6 +266,7 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${maven-surefire-plugin.version}</version>
                     <configuration>
+                        <failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
                         <skipTests>${skip-tests}</skipTests>
                         <includes>
                             <include>**/*Test.java</include>

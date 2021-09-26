@@ -587,13 +587,13 @@ class TeamCompetitionStatsTest {
 
         UserUtils.create(generateUserWithTeamIdAndCategory(originalTeam.getId(), Category.NVIDIA_GPU));
         final UserRequest userToRetire = generateUserWithTeamIdAndCategory(originalTeam.getId(), Category.AMD_GPU);
-        final User createUserToRetire = UserUtils.create(userToRetire);
+        final User createdUserToRetire = UserUtils.create(userToRetire);
 
         final Team newTeam = TeamUtils.create(generateTeam());
         UserUtils.create(generateUserWithTeamIdAndCategory(newTeam.getId(), Category.NVIDIA_GPU));
 
         final long firstPoints = 10_000L;
-        StubbedFoldingEndpointUtils.addPoints(createUserToRetire, firstPoints);
+        StubbedFoldingEndpointUtils.addPoints(createdUserToRetire, firstPoints);
         manuallyUpdateStats();
 
         final CompetitionSummary result = TeamCompetitionStatsUtils.getStats();
@@ -616,20 +616,20 @@ class TeamCompetitionStatsTest {
             .as("Expected new team to have no retired users at the start: " + newTeamSummary)
             .isEmpty();
 
-        final HttpResponse<Void> response = USER_REQUEST_SENDER.delete(createUserToRetire.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
+        final HttpResponse<Void> response = USER_REQUEST_SENDER.delete(createdUserToRetire.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
             .as("Expected user to be deleted: " + response)
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final long secondPoints = 8_000L;
-        StubbedFoldingEndpointUtils.addPoints(createUserToRetire, secondPoints);
+        StubbedFoldingEndpointUtils.addPoints(createdUserToRetire, secondPoints);
         manuallyUpdateStats();
 
         userToRetire.setTeamId(newTeam.getId());
         UserUtils.create(userToRetire);
 
         final long thirdPoints = 14_000L;
-        StubbedFoldingEndpointUtils.addPoints(createUserToRetire, thirdPoints);
+        StubbedFoldingEndpointUtils.addPoints(createdUserToRetire, thirdPoints);
         manuallyUpdateStats();
 
         final CompetitionSummary resultAfterUnretirement = TeamCompetitionStatsUtils.getStats();

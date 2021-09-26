@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.utils.DateTimeUtils;
 
 /**
@@ -57,7 +58,7 @@ public class UserTcStats extends UserStats {
      * @return the created {@link UserTcStats}
      */
     public static UserTcStats createNow(final int userId, final long points, final long multipliedPoints, final int units) {
-        return new UserTcStats(userId, DateTimeUtils.currentUtcTimestamp(), points, multipliedPoints, units);
+        return create(userId, DateTimeUtils.currentUtcTimestamp(), points, multipliedPoints, units);
     }
 
     /**
@@ -68,7 +69,16 @@ public class UserTcStats extends UserStats {
      * @return the empty {@link UserTcStats}
      */
     public static UserTcStats empty(final int userId) {
-        return new UserTcStats(userId, DateTimeUtils.currentUtcTimestamp(), DEFAULT_POINTS, DEFAULT_MULTIPLIED_POINTS, DEFAULT_UNITS);
+        return create(userId, DateTimeUtils.currentUtcTimestamp(), DEFAULT_POINTS, DEFAULT_MULTIPLIED_POINTS, DEFAULT_UNITS);
+    }
+
+    /**
+     * Creates an empty instance of {@link UserTcStats}, with no values.
+     *
+     * @return the empty {@link UserTcStats}
+     */
+    public static UserTcStats empty() {
+        return empty(User.EMPTY_USER_ID);
     }
 
     /**
@@ -87,7 +97,7 @@ public class UserTcStats extends UserStats {
         final long offsetMultipliedPoints = Math.max(multipliedPoints + offsetStats.getMultipliedPointsOffset(), DEFAULT_MULTIPLIED_POINTS);
         final int offsetUnits = Math.max(getUnits() + offsetStats.getUnitsOffset(), DEFAULT_UNITS);
 
-        return new UserTcStats(getUserId(), getTimestamp(), offsetPoints, offsetMultipliedPoints, offsetUnits);
+        return create(getUserId(), getTimestamp(), offsetPoints, offsetMultipliedPoints, offsetUnits);
     }
 
     @Override

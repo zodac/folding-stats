@@ -12,6 +12,8 @@ import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
+import me.zodac.folding.api.tc.stats.UserTcStats;
 
 /**
  * {@link Singleton} EJB implementation of {@link BusinessLogic}.
@@ -143,5 +145,20 @@ public class BusinessLogicEjb implements BusinessLogic {
     @Override
     public Optional<String> getMonthlyResult(final Month month, final Year year) {
         return STORAGE.getMonthlyResult(month, year);
+    }
+
+    @Override
+    public RetiredUserTcStats createRetiredUser(final Team team, final User user, final UserTcStats userTcStats) {
+        return STORAGE.createRetiredUser(team.getId(), user.getId(), user.getDisplayName(), userTcStats);
+    }
+
+    @Override
+    public Collection<RetiredUserTcStats> getAllRetiredUsersForTeam(final Team team) {
+        return STORAGE.getAllRetiredUserStatsForTeam(team.getId());
+    }
+
+    @Override
+    public void deleteAllRetiredUserStats() {
+        STORAGE.deleteAllRetiredUserStats();
     }
 }

@@ -20,6 +20,9 @@ import me.zodac.folding.rest.api.tc.TeamSummary;
 @ToString(doNotUseGetters = true)
 public class TeamLeaderboardEntry {
 
+    private static final long DEFAULT_DIFF = 0L;
+    private static final int DEFAULT_RANK = 1;
+
     private String teamName;
     private long teamPoints;
     private long teamMultipliedPoints;
@@ -51,6 +54,6 @@ public class TeamLeaderboardEntry {
      * @return the created {@link TeamLeaderboardEntry}
      */
     public static TeamLeaderboardEntry createLeader(final TeamSummary teamSummary) {
-        return create(teamSummary, 1, 0L, 0L);
+        return create(teamSummary, DEFAULT_RANK, DEFAULT_DIFF, DEFAULT_DIFF);
     }
 }

@@ -47,7 +47,7 @@ public class OffsetStats {
      * @return the empty {@link OffsetStats}
      */
     public static OffsetStats empty() {
-        return new OffsetStats(DEFAULT_POINTS, DEFAULT_MULTIPLIED_POINTS, DEFAULT_UNITS);
+        return create(DEFAULT_POINTS, DEFAULT_MULTIPLIED_POINTS, DEFAULT_UNITS);
     }
 
     /**
@@ -71,10 +71,10 @@ public class OffsetStats {
 
         if (offsetStats.pointsOffset == DEFAULT_POINTS) {
             final long pointsOffset = Math.round(offsetStats.multipliedPointsOffset / multiplier);
-            return new OffsetStats(pointsOffset, offsetStats.multipliedPointsOffset, offsetStats.unitsOffset);
+            return create(pointsOffset, offsetStats.multipliedPointsOffset, offsetStats.unitsOffset);
         } else {
             final long multipliedPointsOffset = Math.round(offsetStats.pointsOffset * multiplier);
-            return new OffsetStats(offsetStats.pointsOffset, multipliedPointsOffset, offsetStats.unitsOffset);
+            return create(offsetStats.pointsOffset, multipliedPointsOffset, offsetStats.unitsOffset);
         }
     }
 

@@ -91,14 +91,14 @@ public class CompetitionResultGenerator {
             .map(this::getTcStatsForUser)
             .collect(toList());
 
-        final Collection<RetiredUserSummary> retiredUserSummaries = oldFacade.getRetiredUsersForTeam(team)
+        final Collection<RetiredUserSummary> retiredUserSummaries = businessLogic.getAllRetiredUsersForTeam(team)
             .stream()
-            .map(RetiredUserSummary::create)
+            .map(RetiredUserSummary::createWithDefaultRank)
             .collect(toList());
 
         final String captainDisplayName = getCaptainDisplayName(team.getTeamName(), usersOnTeam);
-        return TeamSummary.create(team.getTeamName(), team.getTeamDescription(), team.getForumLink(), captainDisplayName, activeUserSummaries,
-            retiredUserSummaries);
+        return TeamSummary.createWithDefaultRank(team.getTeamName(), team.getTeamDescription(), team.getForumLink(), captainDisplayName,
+            activeUserSummaries, retiredUserSummaries);
     }
 
     private UserSummary getTcStatsForUser(final User user) {
@@ -108,8 +108,8 @@ public class CompetitionResultGenerator {
         final UserTcStats userTcStats = oldFacade.getTcStatsForUser(user.getId());
         LOGGER.debug("Results for {}: {} points | {} multiplied points | {} units", user::getDisplayName, userTcStats::getPoints,
             userTcStats::getMultipliedPoints, userTcStats::getUnits);
-        return UserSummary.create(user.getId(), user.getDisplayName(), user.getFoldingUserName(), hardware, category, userTcStats.getPoints(),
-            userTcStats.getMultipliedPoints(), userTcStats.getUnits(), user.getProfileLink(), user.getLiveStatsLink());
+        return UserSummary.createWithDefaultRank(user.getId(), user.getDisplayName(), user.getFoldingUserName(), hardware, category,
+            user.getProfileLink(), user.getLiveStatsLink(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits());
     }
 
     private static String getCaptainDisplayName(final String teamName, final Collection<User> usersOnTeam) {

@@ -230,7 +230,7 @@ class PostgresDbManagerTest {
         final User userToRetire = createUser();
         final Team team = userToRetire.getTeam();
 
-        assertThat(POSTGRES_DB_MANAGER.getRetiredUserStatsForTeam(team))
+        assertThat(POSTGRES_DB_MANAGER.getAllRetiredUserStats())
             .isEmpty();
 
         POSTGRES_DB_MANAGER.deleteUser(userToRetire.getId());
@@ -242,7 +242,7 @@ class PostgresDbManagerTest {
         POSTGRES_DB_MANAGER.persistRetiredUserStats(team.getId(), userToRetire.getId(), userToRetire.getDisplayName(),
             UserTcStats.createNow(userToRetire.getId(), points, multipliedPoints, units));
 
-        final Collection<RetiredUserTcStats> retiredUserStatsForTeam = POSTGRES_DB_MANAGER.getRetiredUserStatsForTeam(team);
+        final Collection<RetiredUserTcStats> retiredUserStatsForTeam = POSTGRES_DB_MANAGER.getAllRetiredUserStats();
 
         assertThat(retiredUserStatsForTeam)
             .hasSize(1);
