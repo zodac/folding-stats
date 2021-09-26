@@ -201,7 +201,7 @@ function loadHardware() {
                 hardwareOption.setAttribute("display_name", hardwareItem['displayName']);
                 hardwareOption.setAttribute("multiplier", hardwareItem['multiplier']);
 
-                hardwareOption.innerHTML = hardwareItem["hardware_name"];
+                hardwareOption.innerHTML = hardwareItem["hardwareName (" + hardwareItem['displayName'] + ")"];
                 hardwareList.append(hardwareOption);
             });
         }
