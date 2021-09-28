@@ -96,7 +96,7 @@ public class StatsScheduler {
     public void scheduledTeamCompetitionStatsParsing(final Timer timer) {
         LOGGER.trace("Timer fired at: {}", timer);
         try {
-            ParsingStateManager.next(ParsingState.PARSING_TEAM_COMPETITION_STATS);
+            ParsingStateManager.next(ParsingState.ENABLED_TEAM_COMPETITION);
             SystemStateManager.next(SystemState.UPDATING_STATS);
             parseTeamCompetitionStats(ExecutionType.ASYNCHRONOUS);
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
@@ -113,7 +113,7 @@ public class StatsScheduler {
      */
     public void manualTeamCompetitionStatsParsing(final ExecutionType executionType) {
         LOGGER.debug("Manual stats parsing execution");
-        ParsingStateManager.next(ParsingState.PARSING_TEAM_COMPETITION_STATS);
+        ParsingStateManager.next(ParsingState.ENABLED_TEAM_COMPETITION);
         SystemStateManager.next(SystemState.UPDATING_STATS);
         parseTeamCompetitionStats(executionType);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);

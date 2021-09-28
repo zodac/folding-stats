@@ -127,12 +127,10 @@ public class HardwareEndpoint extends AbstractCrudEndpoint<HardwareRequest, Hard
     }
 
     @Override
-    protected Hardware updateElementById(final int hardwareId, final Hardware hardware, final Hardware existingHardware)
-        throws ExternalConnectionException {
+    protected Hardware updateElementById(final Hardware hardware, final Hardware existingHardware) throws ExternalConnectionException {
         // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
-        final Hardware hardwareWithId = Hardware.updateWithId(hardwareId, hardware);
-        oldFacade.updateHardware(hardwareWithId, existingHardware);
-        return hardwareWithId;
+        final Hardware hardwareWithId = Hardware.updateWithId(existingHardware.getId(), hardware);
+        return oldFacade.updateHardware(hardwareWithId, existingHardware);
     }
 
     @Override

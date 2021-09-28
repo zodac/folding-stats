@@ -70,7 +70,7 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
 
     protected abstract Optional<O> getElementById(final int elementId);
 
-    protected abstract O updateElementById(final int elementId, final O element, final O existingElement) throws ExternalConnectionException;
+    protected abstract O updateElementById(final O element, final O existingElement) throws ExternalConnectionException;
 
     protected abstract void deleteElement(final O element);
 
@@ -293,7 +293,7 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
                 return badRequest(validationResponse);
             }
 
-            final O updatedElementWithId = updateElementById(parsedId, validationResponse.getOutput(), existingElement);
+            final O updatedElementWithId = updateElementById(validationResponse.getOutput(), existingElement);
 
             final UriBuilder elementLocationBuilder = uriContext
                 .getRequestUriBuilder()

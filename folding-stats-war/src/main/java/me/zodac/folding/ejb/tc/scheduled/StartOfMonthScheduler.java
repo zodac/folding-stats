@@ -88,7 +88,7 @@ public class StartOfMonthScheduler {
         LOGGER.warn("Starting TC stats for new month");
 
         SystemStateManager.next(SystemState.RESETTING_STATS);
-        ParsingStateManager.next(ParsingState.NOT_PARSING_STATS);
+        ParsingStateManager.next(ParsingState.DISABLED);
         userStatsResetter.resetTeamCompetitionStats();
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
     }

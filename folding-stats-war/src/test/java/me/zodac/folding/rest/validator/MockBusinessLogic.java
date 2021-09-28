@@ -17,6 +17,7 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
+import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 
 /**
  * Mock implementation of {@link BusinessLogic}. Has methods to set specific values for tests.
@@ -192,5 +193,20 @@ final class MockBusinessLogic implements BusinessLogic {
     @Override
     public UserAuthenticationResult authenticateSystemUser(final String userName, final String password) {
         return UserAuthenticationResult.userDoesNotExist();
+    }
+
+    @Override
+    public Collection<HistoricStats> getHistoricStats(final User user, final Year year, final Month month, final int day) {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Collection<HistoricStats> getHistoricStats(final User user, final Year year, final Month month) {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Collection<HistoricStats> getHistoricStats(final User user, final Year year) {
+        return Collections.emptyList();
     }
 }

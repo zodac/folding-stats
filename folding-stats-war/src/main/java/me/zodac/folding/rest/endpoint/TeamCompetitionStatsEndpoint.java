@@ -192,7 +192,7 @@ public class TeamCompetitionStatsEndpoint {
             final Hardware hardware = user.getHardware();
             final OffsetStats offsetStatsToUse = OffsetStats.updateWithHardwareMultiplier(offsetStats, hardware.getMultiplier());
 
-            oldFacade.addOrUpdateOffsetStats(parsedId, offsetStatsToUse);
+            oldFacade.createOrUpdateOffsetStats(parsedId, offsetStatsToUse);
             SystemStateManager.next(SystemState.UPDATING_STATS);
             userStatsParser.parseTcStatsForUserAndWait(user);
             SystemStateManager.next(SystemState.WRITE_EXECUTED);

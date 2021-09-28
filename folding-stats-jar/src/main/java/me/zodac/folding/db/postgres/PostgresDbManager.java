@@ -396,7 +396,7 @@ public final class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public Collection<HistoricStats> getHistoricStatsHourly(final int userId, final int day, final Month month, final Year year) {
+    public Collection<HistoricStats> getHistoricStatsHourly(final int userId, final Year year, final Month month, final int day) {
         LOGGER.debug("Getting historic hourly user TC stats for {}/{}/{} for user {}", () -> year, () -> DateTimeUtils.formatMonth(month), () -> day,
             () -> userId);
 
@@ -424,7 +424,7 @@ public final class PostgresDbManager implements DbManager {
 
                 // First entry will be zeroed, so we need to manually get the first hour's stats for the user
                 if (resultSet.next()) {
-                    final UserTcStats userTcStats = getTcStatsForFirstHourOfDay(userId, day, month, year);
+                    final UserTcStats userTcStats = getTcStatsForFirstHourOfDay(userId, year, month, day);
 
                     userStats.add(
                         HistoricStats.create(
@@ -526,7 +526,7 @@ public final class PostgresDbManager implements DbManager {
     }
 
 
-    private UserTcStats getTcStatsForFirstHourOfDay(final int userId, final int day, final Month month, final Year year) {
+    private UserTcStats getTcStatsForFirstHourOfDay(final int userId, final Year year, final Month month, final int day) {
         final UserTcStats firstHourTcStatsCurrentDay = getCurrentDayFirstHourTcStats(userId, day, month, year);
 
         final boolean isFirstDay = day == 1;
@@ -580,7 +580,7 @@ public final class PostgresDbManager implements DbManager {
 
 
     @Override
-    public Collection<HistoricStats> getHistoricStatsDaily(final int userId, final Month month, final Year year) {
+    public Collection<HistoricStats> getHistoricStatsDaily(final int userId, final Year year, final Month month) {
         LOGGER.debug("Getting historic daily user TC stats for {}/{} for user {}", () -> DateTimeUtils.formatMonth(month), () -> year, () -> userId);
 
         final String selectSqlStatement = "SELECT utc_timestamp::DATE AS daily_timestamp, " +
@@ -736,7 +736,7 @@ public final class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public void persistTotalStats(final UserStats userStats) {
+    public void createTotalStats(final UserStats userStats) {
         LOGGER.debug("Inserting total stats for user ID {} to DB", userStats::getUserId);
 
         executeQuery(queryContext -> {
@@ -774,7 +774,7 @@ public final class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public void addOffsetStats(final int userId, final OffsetStats offsetStats) {
+    public void createOffsetStats(final int userId, final OffsetStats offsetStats) {
         LOGGER.debug("Adding offset stats for user {}", userId);
 
         executeQuery(queryContext -> {
@@ -799,7 +799,7 @@ public final class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public Optional<OffsetStats> addOrUpdateOffsetStats(final int userId, final OffsetStats offsetStats) {
+    public Optional<OffsetStats> createOrUpdateOffsetStats(final int userId, final OffsetStats offsetStats) {
         LOGGER.debug("Adding/updating offset stats for user {}", userId);
 
         return executeQuery(queryContext -> {

@@ -11,14 +11,14 @@ public final class ParsingStateManager {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static ParsingState currentState = ParsingState.NOT_PARSING_STATS;
+    private static ParsingState currentState = ParsingState.DISABLED;
 
     private ParsingStateManager() {
 
     }
 
     /**
-     * Get the current {@link ParsingState}. On system startup, the {@link ParsingState} is {@link ParsingState#NOT_PARSING_STATS}.
+     * Get the current {@link ParsingState}. On system startup, the {@link ParsingState} is {@link ParsingState#DISABLED}.
      *
      * @return the current {@link ParsingState}
      */

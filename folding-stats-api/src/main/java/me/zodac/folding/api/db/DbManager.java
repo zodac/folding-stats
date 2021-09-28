@@ -66,9 +66,9 @@ public interface DbManager {
 
     // Historic TC operations
 
-    Collection<HistoricStats> getHistoricStatsHourly(final int userId, final int day, final Month month, final Year year);
+    Collection<HistoricStats> getHistoricStatsHourly(final int userId, final Year year, final Month month, final int day);
 
-    Collection<HistoricStats> getHistoricStatsDaily(final int userId, final Month month, final Year year);
+    Collection<HistoricStats> getHistoricStatsDaily(final int userId, final Year year, final Month month);
 
     Collection<HistoricStats> getHistoricStatsMonthly(final int userId, final Year year);
 
@@ -78,13 +78,13 @@ public interface DbManager {
 
     Optional<UserTcStats> getHourlyTcStats(final int userId);
 
-    void persistTotalStats(final UserStats stats);
+    void createTotalStats(final UserStats stats);
 
     Optional<UserStats> getTotalStats(final int userId);
 
-    void addOffsetStats(int userId, OffsetStats offsetStats);
+    void createOffsetStats(int userId, OffsetStats offsetStats);
 
-    Optional<OffsetStats> addOrUpdateOffsetStats(final int userId, final OffsetStats offsetStats);
+    Optional<OffsetStats> createOrUpdateOffsetStats(final int userId, final OffsetStats offsetStats);
 
     Optional<OffsetStats> getOffsetStats(final int userId);
 

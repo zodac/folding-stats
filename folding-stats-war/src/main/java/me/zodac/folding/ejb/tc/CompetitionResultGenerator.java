@@ -105,7 +105,7 @@ public class CompetitionResultGenerator {
         final Hardware hardware = user.getHardware();
         final Category category = user.getCategory();
 
-        final UserTcStats userTcStats = oldFacade.getTcStatsForUser(user.getId());
+        final UserTcStats userTcStats = oldFacade.getHourlyTcStatsForUser(user.getId());
         LOGGER.debug("Results for {}: {} points | {} multiplied points | {} units", user::getDisplayName, userTcStats::getPoints,
             userTcStats::getMultipliedPoints, userTcStats::getUnits);
         return UserSummary.createWithDefaultRank(user.getId(), user.getDisplayName(), user.getFoldingUserName(), hardware, category,

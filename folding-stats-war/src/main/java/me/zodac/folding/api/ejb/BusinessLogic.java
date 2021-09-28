@@ -11,6 +11,7 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
+import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 
 /**
  * In order to decouple the REST layer from any business requirements, we move that logic into this interface, to be
@@ -228,4 +229,34 @@ public interface BusinessLogic {
      * @return the {@link UserAuthenticationResult}
      */
     UserAuthenticationResult authenticateSystemUser(final String userName, final String password);
+
+    /**
+     * Retrieves the {@link HistoricStats} for a given {@link User} for a specific {@code day}.
+     *
+     * @param user  the {@link User} whose {@link HistoricStats} are to be retrieved
+     * @param year  the {@link Year} of the {@link HistoricStats}
+     * @param month the {@link Month} of the {@link HistoricStats}
+     * @param day   the day of the {@link Month} of the {@link HistoricStats}
+     * @return the hourly {@link HistoricStats} for the {@link User}
+     */
+    Collection<HistoricStats> getHistoricStats(final User user, final Year year, final Month month, final int day);
+
+    /**
+     * Retrieves the {@link HistoricStats} for a given {@link User} for a specific {@link Month}.
+     *
+     * @param user  the {@link User} whose {@link HistoricStats} are to be retrieved
+     * @param year  the {@link Year} of the {@link HistoricStats}
+     * @param month the {@link Month} of the {@link HistoricStats}
+     * @return the daily {@link HistoricStats} for the {@link User}
+     */
+    Collection<HistoricStats> getHistoricStats(final User user, final Year year, final Month month);
+
+    /**
+     * Retrieves the {@link HistoricStats} for a given {@link User} for a specific {@link Year}.
+     *
+     * @param user the {@link User} whose {@link HistoricStats} are to be retrieved
+     * @param year the {@link Year} of the {@link HistoricStats}
+     * @return the monthly {@link HistoricStats} for the {@link User}
+     */
+    Collection<HistoricStats> getHistoricStats(final User user, final Year year);
 }

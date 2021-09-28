@@ -1,15 +1,12 @@
 package me.zodac.folding.ejb;
 
 import java.math.BigDecimal;
-import java.time.Month;
-import java.time.Year;
 import java.util.Collection;
 import java.util.Optional;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import me.zodac.folding.ParsingStateManager;
 import me.zodac.folding.api.ParsingState;
-import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.exception.ExternalConnectionException;
@@ -26,12 +23,10 @@ import me.zodac.folding.cache.HardwareCache;
 import me.zodac.folding.cache.InitialStatsCache;
 import me.zodac.folding.cache.OffsetStatsCache;
 import me.zodac.folding.cache.TcStatsCache;
-import me.zodac.folding.cache.TeamCache;
 import me.zodac.folding.cache.TotalStatsCache;
 import me.zodac.folding.cache.UserCache;
 import me.zodac.folding.db.DbManagerRetriever;
 import me.zodac.folding.ejb.tc.UserStatsParser;
-import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -44,7 +39,6 @@ public class OldFacade {
     private static final FoldingStatsRetriever FOLDING_STATS_RETRIEVER = HttpFoldingStatsRetriever.create();
 
     private final transient DbManager dbManager = DbManagerRetriever.get();
-    private final transient TeamCache teamCache = TeamCache.getInstance();
     private final transient UserCache userCache = UserCache.getInstance();
     private final transient HardwareCache hardwareCache = HardwareCache.getInstance();
 
@@ -59,7 +53,7 @@ public class OldFacade {
     @EJB
     private transient UserStatsParser userStatsParser;
 
-    public void updateHardware(final Hardware updatedHardware, final Hardware existingHardware) throws ExternalConnectionException {
+    public Hardware updateHardware(final Hardware updatedHardware, final Hardware existingHardware) throws ExternalConnectionException {
         dbManager.updateHardware(updatedHardware);
         hardwareCache.add(updatedHardware.getId(), updatedHardware);
 
@@ -79,6 +73,8 @@ public class OldFacade {
             final User updatedUser = User.updateHardware(user, updatedHardware);
             userCache.add(updatedUser.getId(), updatedUser);
         }
+
+        return updatedHardware;
     }
 
     public User createUser(final User user) throws ExternalConnectionException {
@@ -86,7 +82,7 @@ public class OldFacade {
         userCache.add(userWithId.getId(), userWithId);
 
         // When adding a new user, we configure the initial stats DB/cache
-        persistInitialUserStats(userWithId);
+        createInitialUserStats(userWithId);
         // When adding a new user, we give an empty offset to the offset cache
         offsetStatsCache.add(userWithId.getId(), OffsetStats.empty());
 
@@ -95,7 +91,7 @@ public class OldFacade {
         return userWithId;
     }
 
-    public void updateUser(final User updatedUser, final User existingUser) throws ExternalConnectionException {
+    public User updateUser(final User updatedUser, final User existingUser) throws ExternalConnectionException {
         dbManager.updateUser(updatedUser);
         userCache.add(updatedUser.getId(), updatedUser);
 
@@ -103,43 +99,44 @@ public class OldFacade {
             LOGGER.debug("User had state change to hardware, {} -> {}, recalculating initial stats", existingUser.getHardware(),
                 updatedUser.getHardware());
             handleStateChangeForUser(updatedUser);
-            return;
+            return updatedUser;
         }
 
         if (!existingUser.getTeam().equals(updatedUser.getTeam())) {
             LOGGER.debug("User had state change to team, {} -> {}, recalculating initial stats", existingUser.getTeam(), updatedUser.getTeam());
             handleStateChangeForUser(updatedUser);
-            return;
+            return updatedUser;
         }
 
         if (!existingUser.getFoldingUserName().equalsIgnoreCase(updatedUser.getFoldingUserName())) {
             LOGGER.debug("User had state change to Folding username, {} -> {}, recalculating initial stats", existingUser.getFoldingUserName(),
                 updatedUser.getFoldingUserName());
             handleStateChangeForUser(updatedUser);
-            return;
+            return updatedUser;
         }
 
         if (!existingUser.getPasskey().equalsIgnoreCase(updatedUser.getPasskey())) {
             LOGGER.debug("User had state change to passkey, {} -> {}, recalculating initial stats", existingUser.getPasskey(),
                 updatedUser.getPasskey());
             handleStateChangeForUser(updatedUser);
-            return;
+            return updatedUser;
         }
 
         LOGGER.trace("User updated with any required state changes");
+        return updatedUser;
     }
 
     // If a user is updated and their Folding username, hardware ID or passkey is changed, we need to update their initial offset again
     // Also occurs if the hardware multiplier for a hardware used by a user is changed
     // We set the new initial stats to the user's current total stats, then give an offset of their current TC stats (multiplied)
     private void handleStateChangeForUser(final User userWithStateChange) throws ExternalConnectionException {
-        if (ParsingStateManager.current() == ParsingState.NOT_PARSING_STATS) {
+        if (ParsingStateManager.current() == ParsingState.DISABLED) {
             LOGGER.warn("Received a state change for user {}, but system is not currently parsing stats", userWithStateChange.getDisplayName());
             return;
         }
 
         final UserStats userTotalStats = FOLDING_STATS_RETRIEVER.getTotalStats(userWithStateChange);
-        final UserTcStats currentUserTcStats = getTcStatsForUser(userWithStateChange.getId());
+        final UserTcStats currentUserTcStats = getHourlyTcStatsForUser(userWithStateChange.getId());
 
         LOGGER.debug("Setting initial stats to: {}", userTotalStats);
         dbManager.persistInitialStats(userTotalStats);
@@ -148,7 +145,7 @@ public class OldFacade {
         final OffsetStats offsetStats =
             OffsetStats.create(currentUserTcStats.getPoints(), currentUserTcStats.getMultipliedPoints(), currentUserTcStats.getUnits());
         LOGGER.debug("Adding offset stats of: {}", offsetStats);
-        addOffsetStats(userWithStateChange.getId(), offsetStats);
+        createOffsetStats(userWithStateChange.getId(), offsetStats);
     }
 
     public void deleteUser(final User user) {
@@ -156,7 +153,7 @@ public class OldFacade {
         dbManager.deleteUser(userId);
         userCache.remove(userId);
 
-        final UserTcStats userStats = getTcStatsForUser(userId);
+        final UserTcStats userStats = getHourlyTcStatsForUser(userId);
 
         if (userStats.isEmptyStats()) {
             LOGGER.warn("User '{} (ID: {})' has no stats, not saving any retired stats", user.getDisplayName(), user.getId());
@@ -167,12 +164,12 @@ public class OldFacade {
         businessLogic.createRetiredUser(team, user, userStats);
     }
 
-    public void persistInitialUserStats(final User user) throws ExternalConnectionException {
+    public void createInitialUserStats(final User user) throws ExternalConnectionException {
         final UserStats currentUserStats = FOLDING_STATS_RETRIEVER.getTotalStats(user);
-        persistInitialUserStats(currentUserStats);
+        createInitialUserStats(currentUserStats);
     }
 
-    public void persistInitialUserStats(final UserStats userStats) {
+    public void createInitialUserStats(final UserStats userStats) {
         dbManager.persistInitialStats(userStats);
         initialStatsCache.add(userStats.getUserId(), userStats.getStats());
     }
@@ -193,12 +190,12 @@ public class OldFacade {
         return initialStatsFromDb;
     }
 
-    public void persistHourlyTcStatsForUser(final UserTcStats userTcStats) {
+    public void createHourlyTcStatsForUser(final UserTcStats userTcStats) {
         dbManager.persistHourlyTcStats(userTcStats);
         tcStatsCache.add(userTcStats.getUserId(), userTcStats);
     }
 
-    public UserTcStats getTcStatsForUser(final int userId) {
+    public UserTcStats getHourlyTcStatsForUser(final int userId) {
         final Optional<UserTcStats> optionalUserTcStats = tcStatsCache.get(userId);
 
         if (optionalUserTcStats.isPresent()) {
@@ -213,43 +210,13 @@ public class OldFacade {
         return userTcStatsFromDb;
     }
 
-    public Collection<HistoricStats> getHistoricStatsHourly(final int userId, final int day, final Month month, final Year year) {
-        final Collection<HistoricStats> historicStats = dbManager.getHistoricStatsHourly(userId, day, month, year);
-
-        if (historicStats.isEmpty()) {
-            LOGGER.warn("No stats retrieved for user with ID {} on {}/{}/{}, returning empty", userId, year.getValue(), month.getValue(), day);
-        }
-
-        return historicStats;
-    }
-
-    public Collection<HistoricStats> getHistoricStatsDaily(final int userId, final Month month, final Year year) {
-        final Collection<HistoricStats> historicStats = dbManager.getHistoricStatsDaily(userId, month, year);
-
-        if (historicStats.isEmpty()) {
-            LOGGER.warn("No stats retrieved for user with ID {} on {}/{}, returning empty", userId, year.getValue(), month.getValue());
-        }
-
-        return historicStats;
-    }
-
-    public Collection<HistoricStats> getHistoricStatsMonthly(final int userId, final Year year) {
-        final Collection<HistoricStats> historicStats = dbManager.getHistoricStatsMonthly(userId, year);
-
-        if (historicStats.isEmpty()) {
-            LOGGER.warn("No stats retrieved for user with ID {} on {}, returning empty", userId, year.getValue());
-        }
-
-        return historicStats;
-    }
-
-    public void addOffsetStats(final int userId, final OffsetStats offsetStats) {
-        dbManager.addOffsetStats(userId, offsetStats);
+    public void createOffsetStats(final int userId, final OffsetStats offsetStats) {
+        dbManager.createOffsetStats(userId, offsetStats);
         offsetStatsCache.add(userId, offsetStats);
     }
 
-    public void addOrUpdateOffsetStats(final int userId, final OffsetStats offsetStats) {
-        final Optional<OffsetStats> offsetStatsFromDb = dbManager.addOrUpdateOffsetStats(userId, offsetStats);
+    public void createOrUpdateOffsetStats(final int userId, final OffsetStats offsetStats) {
+        final Optional<OffsetStats> offsetStatsFromDb = dbManager.createOrUpdateOffsetStats(userId, offsetStats);
         offsetStatsFromDb.ifPresent(stats -> offsetStatsCache.add(userId, stats));
     }
 
@@ -274,13 +241,13 @@ public class OldFacade {
         }
     }
 
-    public void clearOffsetStats() {
+    public void deleteAllOffsetStats() {
         dbManager.clearAllOffsetStats();
         offsetStatsCache.removeAll();
     }
 
-    public void persistTotalStatsForUser(final UserStats stats) {
-        dbManager.persistTotalStats(stats);
+    public void createTotalStatsForUser(final UserStats stats) {
+        dbManager.createTotalStats(stats);
         totalStatsCache.add(stats.getUserId(), stats.getStats());
     }
 
@@ -304,22 +271,7 @@ public class OldFacade {
     public void setCurrentStatsAsInitialStatsForUser(final User user) {
         LOGGER.debug("Setting current stats as initial stats for user: {}", user.getDisplayName());
         final Stats totalStats = getTotalStatsForUser(user.getId());
-        persistInitialUserStats(UserStats.create(user.getId(), DateTimeUtils.currentUtcTimestamp(), totalStats.getPoints(), totalStats.getUnits()));
+        createInitialUserStats(UserStats.create(user.getId(), DateTimeUtils.currentUtcTimestamp(), totalStats.getPoints(), totalStats.getUnits()));
         initialStatsCache.add(user.getId(), totalStats);
-    }
-
-    @SuppressWarnings("PMD.ConfusingTernary") // False positive
-    public UserAuthenticationResult authenticateSystemUser(final String userName, final String password) {
-        final UserAuthenticationResult userAuthenticationResult = dbManager.authenticateSystemUser(userName, password);
-
-        if (userAuthenticationResult.isUserExists() && userAuthenticationResult.isPasswordMatch()) {
-            LOGGER.debug("System user '{}' successfully logged in", userName);
-        } else if (!userAuthenticationResult.isUserExists()) {
-            LOGGER.debug("No system user with name: '{}'", userName);
-        } else if (!userAuthenticationResult.isPasswordMatch()) {
-            LOGGER.debug("Invalid password supplied for user: '{}'", userName);
-        }
-
-        return userAuthenticationResult;
     }
 }

@@ -1,5 +1,6 @@
 package me.zodac.folding.rest.endpoint;
 
+import static java.lang.Integer.parseInt;
 import static me.zodac.folding.rest.response.Responses.badRequest;
 import static me.zodac.folding.rest.response.Responses.notFound;
 import static me.zodac.folding.rest.response.Responses.okBuilder;
@@ -34,7 +35,6 @@ import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import me.zodac.folding.rest.parse.IntegerParser;
 import me.zodac.folding.rest.parse.ParseResult;
@@ -57,9 +57,6 @@ public class HistoricStatsEndpoint {
     @EJB
     private BusinessLogic businessLogic;
 
-    @EJB
-    private OldFacade oldFacade;
-
     @GET
     @PermitAll
     @Path("/users/{userId}/{year}/{month}/{day}")
@@ -77,8 +74,8 @@ public class HistoricStatsEndpoint {
         }
 
         try {
-            final int dayAsInt = Integer.parseInt(day);
-            final int monthAsInt = Integer.parseInt(month);
+            final int dayAsInt = parseInt(day);
+            final int monthAsInt = parseInt(month);
             final int yearAsInt = Year.parse(year).getValue();
 
             final YearMonth date = YearMonth.of(yearAsInt, monthAsInt);
@@ -106,8 +103,8 @@ public class HistoricStatsEndpoint {
                 return notFound();
             }
 
-            final Collection<HistoricStats> hourlyStats =
-                oldFacade.getHistoricStatsHourly(parsedId, Integer.parseInt(day), Month.of(Integer.parseInt(month)), Year.parse(year));
+            final Collection<HistoricStats> hourlyStats = businessLogic.getHistoricStats(user.get(), Year.parse(year), Month.of(monthAsInt),
+                dayAsInt);
 
             final CacheControl cacheControl = new CacheControl();
             cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);
@@ -178,8 +175,7 @@ public class HistoricStatsEndpoint {
                 return notFound();
             }
 
-            final Collection<HistoricStats> dailyStats =
-                oldFacade.getHistoricStatsDaily(parsedId, Month.of(Integer.parseInt(month)), Year.parse(year));
+            final Collection<HistoricStats> dailyStats = businessLogic.getHistoricStats(user.get(), Year.parse(year), Month.of(parseInt(month)));
 
             final CacheControl cacheControl = new CacheControl();
             cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);
@@ -244,7 +240,7 @@ public class HistoricStatsEndpoint {
                 return notFound();
             }
 
-            final Collection<HistoricStats> monthlyStats = oldFacade.getHistoricStatsMonthly(parsedId, Year.parse(year));
+            final Collection<HistoricStats> monthlyStats = businessLogic.getHistoricStats(user.get(), Year.parse(year));
 
             final CacheControl cacheControl = new CacheControl();
             cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);
@@ -288,8 +284,8 @@ public class HistoricStatsEndpoint {
         }
 
         try {
-            final int dayAsInt = Integer.parseInt(day);
-            final int monthAsInt = Integer.parseInt(month);
+            final int dayAsInt = parseInt(day);
+            final int monthAsInt = parseInt(month);
             final int yearAsInt = Year.parse(year).getValue();
 
             final YearMonth date = YearMonth.of(yearAsInt, monthAsInt);
@@ -323,8 +319,7 @@ public class HistoricStatsEndpoint {
 
             for (final User user : teamUsers) {
                 LOGGER.debug("Getting historic stats for user with ID: {}", user.getId());
-                final Collection<HistoricStats> dailyStats =
-                    oldFacade.getHistoricStatsHourly(user.getId(), Integer.parseInt(day), Month.of(Integer.parseInt(month)), Year.parse(year));
+                final Collection<HistoricStats> dailyStats = businessLogic.getHistoricStats(user, Year.parse(year), Month.of(monthAsInt), dayAsInt);
                 teamHourlyStats.addAll(dailyStats);
             }
 
@@ -405,8 +400,7 @@ public class HistoricStatsEndpoint {
 
             for (final User user : teamUsers) {
                 LOGGER.debug("Getting historic stats for user with ID: {}", user.getId());
-                final Collection<HistoricStats> dailyStats =
-                    oldFacade.getHistoricStatsDaily(user.getId(), Month.of(Integer.parseInt(month)), Year.parse(year));
+                final Collection<HistoricStats> dailyStats = businessLogic.getHistoricStats(user, Year.parse(year), Month.of(parseInt(month)));
                 teamDailyStats.addAll(dailyStats);
             }
 
@@ -481,7 +475,7 @@ public class HistoricStatsEndpoint {
 
             for (final User user : teamUsers) {
                 LOGGER.debug("Getting historic stats for user with ID: {}", user.getId());
-                final Collection<HistoricStats> monthlyStats = oldFacade.getHistoricStatsMonthly(user.getId(), Year.parse(year));
+                final Collection<HistoricStats> monthlyStats = businessLogic.getHistoricStats(user, Year.parse(year));
                 teamMonthlyStats.addAll(monthlyStats);
             }
 

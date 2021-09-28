@@ -15,6 +15,7 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
+import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -185,5 +186,35 @@ public class BusinessLogicEjb implements BusinessLogic {
         }
 
         return userAuthenticationResult;
+    }
+
+    @Override
+    public Collection<HistoricStats> getHistoricStats(final User user, final Year year, final Month month, final int day) {
+        final Collection<HistoricStats> historicStats = STORAGE.getHistoricStats(user.getId(), year, month, day);
+        if (historicStats.isEmpty()) {
+            LOGGER.warn("No stats retrieved for user with ID {} on {}/{}/{}, returning empty", user.getId(), year.getValue(), month.getValue(), day);
+        }
+
+        return historicStats;
+    }
+
+    @Override
+    public Collection<HistoricStats> getHistoricStats(final User user, final Year year, final Month month) {
+        final Collection<HistoricStats> historicStats = STORAGE.getHistoricStats(user.getId(), year, month, 0);
+        if (historicStats.isEmpty()) {
+            LOGGER.warn("No stats retrieved for user with ID {} on {}/{}, returning empty", user.getId(), year.getValue(), month.getValue());
+        }
+
+        return historicStats;
+    }
+
+    @Override
+    public Collection<HistoricStats> getHistoricStats(final User user, final Year year) {
+        final Collection<HistoricStats> historicStats = STORAGE.getHistoricStats(user.getId(), year, null, 0);
+        if (historicStats.isEmpty()) {
+            LOGGER.warn("No stats retrieved for user with ID {} on {}, returning empty", user.getId(), year.getValue());
+        }
+
+        return historicStats;
     }
 }

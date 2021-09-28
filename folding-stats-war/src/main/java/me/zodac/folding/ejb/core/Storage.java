@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.db.DbManager;
@@ -17,6 +18,7 @@ import me.zodac.folding.cache.RetiredTcStatsCache;
 import me.zodac.folding.cache.TeamCache;
 import me.zodac.folding.cache.UserCache;
 import me.zodac.folding.db.DbManagerRetriever;
+import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -405,5 +407,39 @@ final class Storage {
      */
     public UserAuthenticationResult authenticateSystemUser(final String userName, final String password) {
         return DB_MANAGER.authenticateSystemUser(userName, password);
+    }
+
+    /**
+     * Retrieves the {@link HistoricStats} for a given {@link User} ID for a specific {@code day}, {@link Month} or {@link Year}.
+     *
+     * <p>
+     * Based on the values of the input parameters, a different {@link Collection} of {@link HistoricStats} will be returned:
+     * <ul>
+     *     <li>If the {@code year} is null, an empty {@link Collection} is returned</li>
+     *     <li>If the {@code month} is null, the monthly {@link HistoricStats} is returned for the given {@link Year}</li>
+     *     <li>If the {@code day} is <b>0</b>, the daily {@link HistoricStats} is returned for the given {@link Year}/{@link Month}</li>
+     *     <li>Otherwise, the hourly {@link HistoricStats} is returned for the given {@link Year}/{@link Month}/{@code day}</li>
+     * </ul>
+     *
+     * @param userId the ID of the {@link User} whose {@link HistoricStats} are to be retrieved
+     * @param year   the {@link Year} of the {@link HistoricStats}
+     * @param month  the {@link Month} of the {@link HistoricStats}
+     * @param day    the day of the {@link Month} of the {@link HistoricStats}
+     * @return the {@link HistoricStats} for the {@link User}
+     */
+    public Collection<HistoricStats> getHistoricStats(final int userId, final Year year, final Month month, final int day) {
+        if (year == null) {
+            return Collections.emptyList();
+        }
+
+        if (month == null) {
+            return DB_MANAGER.getHistoricStatsMonthly(userId, year);
+        }
+
+        if (day == 0) {
+            return DB_MANAGER.getHistoricStatsDaily(userId, year, month);
+        }
+
+        return DB_MANAGER.getHistoricStatsHourly(userId, year, month, day);
     }
 }

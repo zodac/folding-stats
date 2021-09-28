@@ -102,7 +102,7 @@ public class EndOfMonthScheduler {
         if (IS_MONTHLY_RESET_ENABLED) {
             LOGGER.warn("Resetting TC stats for end of month");
             SystemStateManager.next(SystemState.RESETTING_STATS);
-            ParsingStateManager.next(ParsingState.NOT_PARSING_STATS);
+            ParsingStateManager.next(ParsingState.DISABLED);
             userStatsResetter.resetTeamCompetitionStats();
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
         }

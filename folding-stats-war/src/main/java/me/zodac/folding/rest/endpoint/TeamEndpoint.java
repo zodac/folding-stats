@@ -135,11 +135,10 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
     }
 
     @Override
-    protected Team updateElementById(final int teamId, final Team team, final Team existingTeam) {
+    protected Team updateElementById(final Team team, final Team existingTeam) {
         // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
-        final Team teamWithId = Team.updateWithId(teamId, team);
-        businessLogic.updateTeam(teamWithId);
-        return teamWithId;
+        final Team teamWithId = Team.updateWithId(existingTeam.getId(), team);
+        return businessLogic.updateTeam(teamWithId);
     }
 
     @Override

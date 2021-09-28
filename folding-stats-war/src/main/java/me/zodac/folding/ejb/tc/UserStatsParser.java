@@ -84,7 +84,7 @@ public class UserStatsParser {
             return;
         }
 
-        oldFacade.persistTotalStatsForUser(totalStats);
+        oldFacade.createTotalStatsForUser(totalStats);
         calculateAndPersistTcStats(user, initialStats, offsetStats, totalStats);
     }
 
@@ -114,6 +114,6 @@ public class UserStatsParser {
         LOGGER.info("{}: {} TC points | {} TC units", user.getDisplayName(), formatWithCommas(hourlyUserTcStats.getMultipliedPoints()),
             formatWithCommas(hourlyUserTcStats.getUnits()));
 
-        oldFacade.persistHourlyTcStatsForUser(hourlyUserTcStats);
+        oldFacade.createHourlyTcStatsForUser(hourlyUserTcStats);
     }
 }

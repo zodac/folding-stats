@@ -45,7 +45,7 @@ public class UserStatsResetter {
      * </ol>
      *
      * @see OldFacade#setCurrentStatsAsInitialStatsForUser(User)
-     * @see OldFacade#clearOffsetStats()
+     * @see OldFacade#deleteAllOffsetStats()
      * @see BusinessLogic#deleteAllRetiredUserStats()
      * @see StatsScheduler#manualTeamCompetitionStatsParsing(ExecutionType)
      */
@@ -59,7 +59,7 @@ public class UserStatsResetter {
                 statsScheduler.manualTeamCompetitionStatsParsing(ExecutionType.SYNCHRONOUS);
                 resetStats(users);
                 LOGGER.info("Clearing offsets");
-                oldFacade.clearOffsetStats();
+                oldFacade.deleteAllOffsetStats();
             }
 
             LOGGER.info("Deleting retired users");

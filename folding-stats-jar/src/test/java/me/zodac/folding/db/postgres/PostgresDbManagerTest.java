@@ -214,7 +214,7 @@ class PostgresDbManagerTest {
 
         final long points = 100L;
         final int units = 10;
-        POSTGRES_DB_MANAGER.persistTotalStats(UserStats.create(userId, DateTimeUtils.currentUtcTimestamp(), points, units));
+        POSTGRES_DB_MANAGER.createTotalStats(UserStats.create(userId, DateTimeUtils.currentUtcTimestamp(), points, units));
 
         final Optional<UserStats> userStatsAfterUpdate = POSTGRES_DB_MANAGER.getTotalStats(userId);
         assertThat(userStatsAfterUpdate)
@@ -265,7 +265,7 @@ class PostgresDbManagerTest {
             .isEmpty();
 
         final OffsetStats offsetStats = OffsetStats.create(100L, 1_000L, 5);
-        POSTGRES_DB_MANAGER.addOffsetStats(userId, offsetStats);
+        POSTGRES_DB_MANAGER.createOffsetStats(userId, offsetStats);
         final Optional<OffsetStats> firstOffsetStats = POSTGRES_DB_MANAGER.getOffsetStats(userId);
         assertThat(firstOffsetStats)
             .isPresent();
@@ -275,7 +275,7 @@ class PostgresDbManagerTest {
             .isEqualTo(offsetStats);
 
         final OffsetStats overwriteOffsetStats = OffsetStats.create(500L, 5_000L, 25);
-        POSTGRES_DB_MANAGER.addOffsetStats(userId, overwriteOffsetStats);
+        POSTGRES_DB_MANAGER.createOffsetStats(userId, overwriteOffsetStats);
         final Optional<OffsetStats> secondOffsetStats = POSTGRES_DB_MANAGER.getOffsetStats(userId);
         assertThat(secondOffsetStats)
             .isPresent();
@@ -285,7 +285,7 @@ class PostgresDbManagerTest {
             .isEqualTo(overwriteOffsetStats);
 
         final OffsetStats additionalOffsetStats = OffsetStats.create(250L, 2_500L, 12);
-        POSTGRES_DB_MANAGER.addOrUpdateOffsetStats(userId, additionalOffsetStats);
+        POSTGRES_DB_MANAGER.createOrUpdateOffsetStats(userId, additionalOffsetStats);
 
         final OffsetStats expectedOffsetStats = OffsetStats.create(
             overwriteOffsetStats.getPointsOffset() + additionalOffsetStats.getPointsOffset(),
@@ -301,7 +301,7 @@ class PostgresDbManagerTest {
             .isEqualTo(expectedOffsetStats);
 
         final int secondUserId = createUser().getId();
-        POSTGRES_DB_MANAGER.addOffsetStats(secondUserId, offsetStats);
+        POSTGRES_DB_MANAGER.createOffsetStats(secondUserId, offsetStats);
 
         POSTGRES_DB_MANAGER.clearAllOffsetStats();
 
@@ -347,9 +347,9 @@ class PostgresDbManagerTest {
         final int yesterday = 14;
         final int day = 15;
 
-        assertThat(POSTGRES_DB_MANAGER.getHistoricStatsHourly(userId, yesterday, month, year))
+        assertThat(POSTGRES_DB_MANAGER.getHistoricStatsHourly(userId, year, month, yesterday))
             .isEmpty();
-        assertThat(POSTGRES_DB_MANAGER.getHistoricStatsDaily(userId, month, year))
+        assertThat(POSTGRES_DB_MANAGER.getHistoricStatsDaily(userId, year, month))
             .isEmpty();
         assertThat(POSTGRES_DB_MANAGER.getHistoricStatsMonthly(userId, year))
             .isEmpty();
@@ -378,9 +378,9 @@ class PostgresDbManagerTest {
                 currentDayThirdUnits);
         POSTGRES_DB_MANAGER.persistHourlyTcStats(currentDayThirdUserTcStats);
 
-        assertThat(POSTGRES_DB_MANAGER.getHistoricStatsHourly(userId, yesterday, month, year))
+        assertThat(POSTGRES_DB_MANAGER.getHistoricStatsHourly(userId, year, month, yesterday))
             .isNotEmpty();
-        assertThat(POSTGRES_DB_MANAGER.getHistoricStatsDaily(userId, month, year))
+        assertThat(POSTGRES_DB_MANAGER.getHistoricStatsDaily(userId, year, month))
             .isNotEmpty();
         assertThat(POSTGRES_DB_MANAGER.getHistoricStatsMonthly(userId, year))
             .isNotEmpty();
