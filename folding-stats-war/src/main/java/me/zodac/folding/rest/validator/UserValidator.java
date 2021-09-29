@@ -246,7 +246,7 @@ public final class UserValidator {
                     userRequest.getPasskey()
                 ));
             }
-        } catch (final Exception e) {
+        } catch (final Exception e) { // TODO: [zodac] Handle ExternalConnectionException here, otherwise will return 400 response instead of 502
             LOGGER.warn("Unable to get Folding stats for user {}", userRequest, e);
             return List.of("Unable to check stats for user");
         }

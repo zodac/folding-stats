@@ -20,7 +20,9 @@ services:
   builder_java_dev:
     build:
       context: .
-      dockerfile: docker/builder_dev/java/Dockerfile
+      dockerfile: docker/builder/java/Dockerfile
+      args:
+        DEPLOYMENT_TYPE: "test"
     container_name: builder_java_dev
     hostname: builder_java_dev
     networks:

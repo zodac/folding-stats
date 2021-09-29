@@ -24,10 +24,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java-release>11</java-release>
 
-        <!-- Test/Lint Properties -->
-        <skip-tests>true</skip-tests>
-        <skip-sonar>true</skip-sonar>
+        <!-- Lint Properties -->
         <skip-linters>true</skip-linters>
+        <skip-sonar>true</skip-sonar>
+
+        <!-- Test Properties -->
+        <skip-integration-tests>true</skip-integration-tests>
+        <skip-unit-tests>true</skip-unit-tests>
 
         <!-- 3PP Versions -->
         <commons-lang3.version>3.12.0</commons-lang3.version>
@@ -267,7 +270,7 @@
                     <version>${maven-surefire-plugin.version}</version>
                     <configuration>
                         <failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
-                        <skipTests>${skip-tests}</skipTests>
+                        <skipTests>${skip-unit-tests}</skipTests>
                         <includes>
                             <include>**/*Test.java</include>
                         </includes>
@@ -465,9 +468,10 @@
                 </property>
             </activation>
             <properties>
+                <skip-integration-tests>false</skip-integration-tests>
                 <skip-linters>false</skip-linters>
                 <skip-sonar>false</skip-sonar>
-                <skip-tests>false</skip-tests>
+                <skip-unit-tests>false</skip-unit-tests>
             </properties>
         </profile>
 
@@ -507,7 +511,36 @@
                 </property>
             </activation>
             <properties>
-                <skip-tests>false</skip-tests>
+                <skip-integration-tests>false</skip-integration-tests>
+                <skip-unit-tests>false</skip-unit-tests>
+            </properties>
+        </profile>
+
+        <!-- Profile used to execute each module's unit testsuite (if any) -->
+        <profile>
+            <id>activate_unit_tests</id>
+            <activation>
+                <property>
+                    <name>unit-tests</name>
+                </property>
+            </activation>
+            <properties>
+                <skip-integration-tests>true</skip-integration-tests>
+                <skip-unit-tests>false</skip-unit-tests>
+            </properties>
+        </profile>
+
+        <!-- Profile used to execute each module's integration testsuite (if any) -->
+        <profile>
+            <id>activate_integration_tests</id>
+            <activation>
+                <property>
+                    <name>integration-tests</name>
+                </property>
+            </activation>
+            <properties>
+                <skip-integration-tests>false</skip-integration-tests>
+                <skip-unit-tests>true</skip-unit-tests>
             </properties>
         </profile>
     </profiles>

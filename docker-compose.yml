@@ -21,6 +21,8 @@ services:
     build:
       context: .
       dockerfile: docker/builder/java/Dockerfile
+      args:
+        DEPLOYMENT_TYPE: "production"
     container_name: builder_java
     hostname: builder_java
     networks:

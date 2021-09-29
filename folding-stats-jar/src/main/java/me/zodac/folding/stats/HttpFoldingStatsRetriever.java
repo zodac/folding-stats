@@ -44,7 +44,7 @@ public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
 
     @Override
     public Stats getStats(final FoldingStatsDetails foldingStatsDetails) throws ExternalConnectionException {
-        LOGGER.debug(""); // Line break to differentiate different users
+        LOGGER.debug(""); // Line-break to differentiate different users
         LOGGER.debug("Getting stats for username/passkey '{}/{}'", foldingStatsDetails::getFoldingUserName, foldingStatsDetails::getPasskey);
         final long userPoints = getPoints(foldingStatsDetails);
         final int userUnits = getUnits(foldingStatsDetails);

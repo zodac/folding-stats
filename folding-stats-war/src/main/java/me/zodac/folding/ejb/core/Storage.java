@@ -421,11 +421,17 @@ final class Storage {
      *     <li>Otherwise, the hourly {@link HistoricStats} is returned for the given {@link Year}/{@link Month}/{@code day}</li>
      * </ul>
      *
+     * <p>
+     * Since these values are not cached, we go directly to the {@link DbManager} to retrieve it.
+     *
      * @param userId the ID of the {@link User} whose {@link HistoricStats} are to be retrieved
      * @param year   the {@link Year} of the {@link HistoricStats}
      * @param month  the {@link Month} of the {@link HistoricStats}
      * @param day    the day of the {@link Month} of the {@link HistoricStats}
      * @return the {@link HistoricStats} for the {@link User}
+     * @see DbManager#getHistoricStatsHourly(int, Year, Month, int)
+     * @see DbManager#getHistoricStatsDaily(int, Year, Month)
+     * @see DbManager#getHistoricStatsMonthly(int, Year)
      */
     public Collection<HistoricStats> getHistoricStats(final int userId, final Year year, final Month month, final int day) {
         if (year == null) {
