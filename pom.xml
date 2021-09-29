@@ -61,10 +61,10 @@
         <maven-war-plugin.version>3.3.1</maven-war-plugin.version>
 
         <!-- Linter 3PP Versions -->
-        <checkstyle.version>8.45.1</checkstyle.version>
+        <checkstyle.version>9.0</checkstyle.version>
         <errorprone.version>2.9.0</errorprone.version>
-        <spotbugs.version>4.4.0</spotbugs.version>
-        <pmd.version>6.37.0</pmd.version>
+        <spotbugs.version>4.4.1</spotbugs.version>
+        <pmd.version>6.39.0</pmd.version>
 
         <!-- Linter Properties -->
         <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
@@ -83,10 +83,10 @@
 
         <!-- Linter Plugin Versions -->
         <maven-checkstyle-plugin.version>3.1.2</maven-checkstyle-plugin.version>
-        <maven-javadoc-plugin.version>3.3.0</maven-javadoc-plugin.version>
-        <maven-pmd-plugin.version>3.14.0</maven-pmd-plugin.version>
+        <maven-javadoc-plugin.version>3.3.1</maven-javadoc-plugin.version>
+        <maven-pmd-plugin.version>3.15.0</maven-pmd-plugin.version>
         <sonar-maven-plugin.version>3.9.0.2155</sonar-maven-plugin.version>
-        <spotbugs-maven-plugin.version>4.2.0</spotbugs-maven-plugin.version>
+        <spotbugs-maven-plugin.version>4.4.1</spotbugs-maven-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -328,7 +328,8 @@
                         <excludePackageNames>
                             me.zodac.folding.db.postgres.gen:me.zodac.folding.db.postgres.gen.*
                         </excludePackageNames>
-                        <failOnWarnings>true</failOnWarnings>
+                        <!-- We only want to validate the Javadoc is valid, Checkstyle will verify the content -->
+                        <failOnWarnings>false</failOnWarnings>
                         <quiet>true</quiet>
                         <serialwarn>true</serialwarn>
                         <skip>${skip-linters}</skip>
