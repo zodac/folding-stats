@@ -1,4 +1,4 @@
-package me.zodac.folding.client.java.util;
+package me.zodac.folding.rest.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -16,11 +16,11 @@ public final class RestUtilConstants {
      * <ul>
      *     <li>Pretty-printing enabled</li>
      *     <li>HTML escaping disabled</li>
-     *     <li>Custom {@link GsonLocalDateTimeDeserializer} for {@link LocalDateTime}</li>
+     *     <li>Custom {@link LocalDateTimeGsonTypeAdapter} for {@link LocalDateTime}</li>
      * </ul>
      */
     public static final Gson GSON = new GsonBuilder()
-        .registerTypeAdapter(LocalDateTime.class, GsonLocalDateTimeDeserializer.getInstance())
+        .registerTypeAdapter(LocalDateTime.class, LocalDateTimeGsonTypeAdapter.getInstance())
         .setPrettyPrinting()
         .disableHtmlEscaping()
         .create();

@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.utils.DateTimeUtils;
+import me.zodac.folding.api.util.DateTimeUtils;
 
 /**
  * POJO that extends {@link UserStats} adding multiplied points for a <code>Team Competition</code>

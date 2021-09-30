@@ -43,7 +43,7 @@ import me.zodac.folding.api.tc.stats.OffsetStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
-import me.zodac.folding.api.utils.DateTimeUtils;
+import me.zodac.folding.api.util.DateTimeUtils;
 import me.zodac.folding.db.postgres.gen.tables.records.HardwareRecord;
 import me.zodac.folding.db.postgres.gen.tables.records.TeamsRecord;
 import me.zodac.folding.db.postgres.gen.tables.records.UsersRecord;

@@ -18,7 +18,7 @@ import me.zodac.folding.api.tc.stats.OffsetStats;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
-import me.zodac.folding.api.utils.DateTimeUtils;
+import me.zodac.folding.api.util.DateTimeUtils;
 import me.zodac.folding.cache.HardwareCache;
 import me.zodac.folding.cache.InitialStatsCache;
 import me.zodac.folding.cache.OffsetStatsCache;

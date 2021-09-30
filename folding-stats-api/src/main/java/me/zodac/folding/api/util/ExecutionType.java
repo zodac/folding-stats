@@ -1,4 +1,4 @@
-package me.zodac.folding.api.utils;
+package me.zodac.folding.api.util;
 
 /**
  * Defines the possible types of executions for long-running tasks.

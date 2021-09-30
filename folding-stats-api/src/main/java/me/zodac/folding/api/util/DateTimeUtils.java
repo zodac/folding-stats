@@ -1,4 +1,4 @@
-package me.zodac.folding.api.utils;
+package me.zodac.folding.api.util;
 
 import java.sql.Timestamp;
 import java.time.Instant;

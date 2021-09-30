@@ -1,4 +1,4 @@
-package me.zodac.folding.test.utils.rest.response;
+package me.zodac.folding.test.util.rest.response;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

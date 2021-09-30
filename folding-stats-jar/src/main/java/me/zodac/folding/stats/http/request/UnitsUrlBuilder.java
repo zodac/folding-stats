@@ -1,6 +1,6 @@
 package me.zodac.folding.stats.http.request;
 
-import me.zodac.folding.api.utils.EnvironmentVariableUtils;
+import me.zodac.folding.api.util.EnvironmentVariableUtils;
 import org.apache.commons.lang3.StringUtils;
 
 /**

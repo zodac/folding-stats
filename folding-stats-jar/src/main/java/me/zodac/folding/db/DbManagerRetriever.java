@@ -3,7 +3,7 @@ package me.zodac.folding.db;
 import java.util.EnumMap;
 import java.util.Map;
 import me.zodac.folding.api.db.DbManager;
-import me.zodac.folding.api.utils.EnvironmentVariableUtils;
+import me.zodac.folding.api.util.EnvironmentVariableUtils;
 import me.zodac.folding.db.postgres.PostgresDbConnectionPool;
 import me.zodac.folding.db.postgres.PostgresDbManager;
 

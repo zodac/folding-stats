@@ -1,7 +1,7 @@
 package me.zodac.folding.rest.provider.security;
 
 import static java.util.stream.Collectors.toSet;
-import static me.zodac.folding.api.utils.CollectionUtils.containsNoMatches;
+import static me.zodac.folding.api.util.CollectionUtils.containsNoMatches;
 import static me.zodac.folding.rest.response.Responses.forbidden;
 import static me.zodac.folding.rest.response.Responses.unauthorized;
 
@@ -22,7 +22,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.ejb.BusinessLogic;
-import me.zodac.folding.api.utils.EncodingUtils;
+import me.zodac.folding.api.util.EncodingUtils;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.response.Responses;
 import org.apache.logging.log4j.LogManager;

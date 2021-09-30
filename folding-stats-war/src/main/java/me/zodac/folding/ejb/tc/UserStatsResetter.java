@@ -5,7 +5,7 @@ import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.utils.ExecutionType;
+import me.zodac.folding.api.util.ExecutionType;
 import me.zodac.folding.cache.RetiredTcStatsCache;
 import me.zodac.folding.cache.TcStatsCache;
 import me.zodac.folding.cache.TotalStatsCache;

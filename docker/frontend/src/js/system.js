@@ -85,7 +85,7 @@ function manualUpdate() {
 
 function printCache() {
     show("loader");
-    fetch(ROOT_URL+'/debug/print_caches', {
+    fetch(ROOT_URL+'/debug/caches', {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': sessionGet("Authorization")

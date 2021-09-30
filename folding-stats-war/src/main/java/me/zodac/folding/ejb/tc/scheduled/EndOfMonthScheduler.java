@@ -13,7 +13,7 @@ import me.zodac.folding.ParsingStateManager;
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.ParsingState;
 import me.zodac.folding.api.SystemState;
-import me.zodac.folding.api.utils.EnvironmentVariableUtils;
+import me.zodac.folding.api.util.EnvironmentVariableUtils;
 import me.zodac.folding.ejb.tc.UserStatsResetter;
 import me.zodac.folding.ejb.tc.UserStatsStorer;
 import org.apache.logging.log4j.LogManager;

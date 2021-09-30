@@ -1,7 +1,7 @@
-package me.zodac.folding.test.utils.rest.request;
+package me.zodac.folding.test.util.rest.request;
 
-import static me.zodac.folding.test.utils.TestConstants.HTTP_CLIENT;
-import static me.zodac.folding.test.utils.TestConstants.TEST_SERVICE_URL;
+import static me.zodac.folding.rest.util.RestUtilConstants.HTTP_CLIENT;
+import static me.zodac.folding.test.util.TestConstants.TEST_SERVICE_URL;
 
 import java.io.IOException;
 import java.net.URI;

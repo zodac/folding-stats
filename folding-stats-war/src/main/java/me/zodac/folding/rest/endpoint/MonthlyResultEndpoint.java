@@ -4,8 +4,8 @@ import static me.zodac.folding.rest.response.Responses.badRequest;
 import static me.zodac.folding.rest.response.Responses.ok;
 import static me.zodac.folding.rest.response.Responses.serverError;
 import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
+import static me.zodac.folding.rest.util.RestUtilConstants.GSON;
 
-import com.google.gson.Gson;
 import java.time.DateTimeException;
 import java.time.Month;
 import java.time.Year;
@@ -35,7 +35,6 @@ import org.apache.logging.log4j.Logger;
 public class MonthlyResultEndpoint {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final Gson GSON = new Gson();
 
     @Context
     private UriInfo uriContext;

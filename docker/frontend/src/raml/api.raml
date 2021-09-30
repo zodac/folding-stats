@@ -764,3 +764,10 @@ traits:
         description: "System user is a valid user, but not an admin"
       503:
         description: "The system is not in a valid state to execute write requests"
+
+/debug/caches:
+    get:
+        description: "Debugging endpoint to print contents of caches to system log"
+    responses:
+        200:
+            description: "Cache contents have been printed to system log"

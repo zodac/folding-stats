@@ -1,4 +1,4 @@
-package me.zodac.folding.test.utils.db;
+package me.zodac.folding.test.util.db;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -7,8 +7,8 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.stream.Collectors;
-import me.zodac.folding.test.utils.TestConstants;
-import me.zodac.folding.test.utils.TestStats;
+import me.zodac.folding.test.util.TestConstants;
+import me.zodac.folding.test.util.TestStats;
 
 /**
  * Utility class for database tables for tests.

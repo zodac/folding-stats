@@ -1,9 +1,9 @@
 package me.zodac.folding.test;
 
-import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForComplexTests;
-import static me.zodac.folding.test.utils.TestConstants.FOLDING_URL;
-import static me.zodac.folding.test.utils.TestConstants.HTTP_CLIENT;
-import static me.zodac.folding.test.utils.rest.response.HttpResponseHeaderUtils.getEntityTag;
+import static me.zodac.folding.rest.util.RestUtilConstants.HTTP_CLIENT;
+import static me.zodac.folding.test.util.SystemCleaner.cleanSystemForComplexTests;
+import static me.zodac.folding.test.util.TestConstants.FOLDING_URL;
+import static me.zodac.folding.test.util.rest.response.HttpResponseHeaderUtils.getEntityTag;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
@@ -22,11 +22,11 @@ import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
-import me.zodac.folding.test.utils.TestConstants;
-import me.zodac.folding.test.utils.TestGenerator;
-import me.zodac.folding.test.utils.TestStats;
-import me.zodac.folding.test.utils.db.DatabaseUtils;
-import me.zodac.folding.test.utils.rest.request.UserUtils;
+import me.zodac.folding.test.util.TestConstants;
+import me.zodac.folding.test.util.TestGenerator;
+import me.zodac.folding.test.util.TestStats;
+import me.zodac.folding.test.util.db.DatabaseUtils;
+import me.zodac.folding.test.util.rest.request.UserUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -540,11 +540,10 @@ class HistoricUserStatsTest {
     @Test
     void whenGettingMonthlyStats_andInvalidDateIsGiven_thenResponseHas400Status() throws FoldingRestException, IOException, InterruptedException {
         final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
-        final int invalidYear = -100;
 
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(FOLDING_URL + "/historic/users/" + userId + '/' + invalidYear))
+            .uri(URI.create(FOLDING_URL + "/historic/users/" + userId + "/invalidYear"))
             .header("Content-Type", "application/json");
 
         final HttpRequest request = requestBuilder.build();

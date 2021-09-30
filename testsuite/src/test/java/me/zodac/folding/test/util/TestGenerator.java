@@ -1,4 +1,4 @@
-package me.zodac.folding.test.utils;
+package me.zodac.folding.test.util;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import me.zodac.folding.api.tc.Category;
@@ -6,8 +6,8 @@ import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
-import me.zodac.folding.test.utils.rest.request.HardwareUtils;
-import me.zodac.folding.test.utils.rest.request.TeamUtils;
+import me.zodac.folding.test.util.rest.request.HardwareUtils;
+import me.zodac.folding.test.util.rest.request.TeamUtils;
 
 /**
  * Utility class used to generate {@link HardwareRequest}, {@link TeamRequest} and {@link UserRequest} instances for

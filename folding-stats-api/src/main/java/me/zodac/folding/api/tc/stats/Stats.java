@@ -15,7 +15,14 @@ import lombok.ToString;
 @ToString(doNotUseGetters = true)
 public class Stats {
 
+    /**
+     * Initial value for points.
+     */
     protected static final long DEFAULT_POINTS = 0L;
+
+    /**
+     * Initial value for units.
+     */
     protected static final int DEFAULT_UNITS = 0;
 
     private final long points;

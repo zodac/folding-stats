@@ -1,12 +1,12 @@
 package me.zodac.folding.test;
 
-import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForComplexTests;
-import static me.zodac.folding.test.utils.TestAuthenticationData.ADMIN_USER;
-import static me.zodac.folding.test.utils.TestConstants.FOLDING_URL;
-import static me.zodac.folding.test.utils.TestConstants.HTTP_CLIENT;
-import static me.zodac.folding.test.utils.TestGenerator.generateTeam;
-import static me.zodac.folding.test.utils.TestGenerator.generateUserWithTeamIdAndCategory;
-import static me.zodac.folding.test.utils.rest.request.TeamCompetitionStatsUtils.manuallyUpdateStats;
+import static me.zodac.folding.rest.util.RestUtilConstants.HTTP_CLIENT;
+import static me.zodac.folding.test.util.SystemCleaner.cleanSystemForComplexTests;
+import static me.zodac.folding.test.util.TestAuthenticationData.ADMIN_USER;
+import static me.zodac.folding.test.util.TestConstants.FOLDING_URL;
+import static me.zodac.folding.test.util.TestGenerator.generateTeam;
+import static me.zodac.folding.test.util.TestGenerator.generateUserWithTeamIdAndCategory;
+import static me.zodac.folding.test.util.rest.request.TeamCompetitionStatsUtils.manuallyUpdateStats;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
@@ -29,9 +29,9 @@ import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.tc.leaderboard.TeamLeaderboardEntry;
 import me.zodac.folding.rest.api.tc.leaderboard.UserCategoryLeaderboardEntry;
-import me.zodac.folding.test.utils.rest.request.StubbedFoldingEndpointUtils;
-import me.zodac.folding.test.utils.rest.request.TeamUtils;
-import me.zodac.folding.test.utils.rest.request.UserUtils;
+import me.zodac.folding.test.util.rest.request.StubbedFoldingEndpointUtils;
+import me.zodac.folding.test.util.rest.request.TeamUtils;
+import me.zodac.folding.test.util.rest.request.UserUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

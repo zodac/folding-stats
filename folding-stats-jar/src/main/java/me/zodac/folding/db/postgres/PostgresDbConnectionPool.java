@@ -6,7 +6,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import me.zodac.folding.api.db.DbConnectionPool;
 import me.zodac.folding.api.exception.DatabaseConnectionException;
-import me.zodac.folding.api.utils.EnvironmentVariableUtils;
+import me.zodac.folding.api.util.EnvironmentVariableUtils;
 
 /**
  * {@link DbConnectionPool} for PostgreSQL DB {@link Connection}s.

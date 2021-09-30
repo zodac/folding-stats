@@ -1,7 +1,7 @@
 package me.zodac.folding.rest.response;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import static me.zodac.folding.rest.util.RestUtilConstants.GSON;
+
 import java.util.Collection;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -15,8 +15,6 @@ import me.zodac.folding.api.ResponsePojo;
  * to allow the REST function to decide to add additional logic (like a {@link javax.ws.rs.core.CacheControl} or similar).
  */
 public final class Responses {
-
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     private Responses() {
 

@@ -21,7 +21,7 @@ import me.zodac.folding.api.tc.stats.OffsetStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
-import me.zodac.folding.api.utils.DateTimeUtils;
+import me.zodac.folding.api.util.DateTimeUtils;
 import org.jooq.exception.DataAccessException;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;

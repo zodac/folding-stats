@@ -7,12 +7,12 @@ import java.net.http.HttpResponse;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import me.zodac.folding.api.tc.Hardware;
-import me.zodac.folding.api.utils.EncodingUtils;
-import me.zodac.folding.client.java.util.RestUtilConstants;
+import me.zodac.folding.api.util.EncodingUtils;
 import me.zodac.folding.rest.api.LoginCredentials;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
+import me.zodac.folding.rest.util.RestUtilConstants;
 
 /**
  * Convenience class to send HTTP requests to the {@link Hardware} REST endpoint.

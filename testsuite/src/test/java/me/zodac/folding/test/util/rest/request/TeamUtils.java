@@ -1,8 +1,8 @@
-package me.zodac.folding.test.utils.rest.request;
+package me.zodac.folding.test.util.rest.request;
 
-import static me.zodac.folding.test.utils.TestAuthenticationData.ADMIN_USER;
-import static me.zodac.folding.test.utils.TestConstants.FOLDING_URL;
-import static me.zodac.folding.test.utils.rest.response.HttpResponseHeaderUtils.getTotalCount;
+import static me.zodac.folding.test.util.TestAuthenticationData.ADMIN_USER;
+import static me.zodac.folding.test.util.TestConstants.FOLDING_URL;
+import static me.zodac.folding.test.util.rest.response.HttpResponseHeaderUtils.getTotalCount;
 
 import java.net.HttpURLConnection;
 import java.net.http.HttpResponse;

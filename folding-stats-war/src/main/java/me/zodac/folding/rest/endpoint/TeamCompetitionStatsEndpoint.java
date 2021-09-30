@@ -34,7 +34,7 @@ import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.OffsetStats;
-import me.zodac.folding.api.utils.ExecutionType;
+import me.zodac.folding.api.util.ExecutionType;
 import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.ejb.tc.CompetitionResultGenerator;
 import me.zodac.folding.ejb.tc.LeaderboardStatsGenerator;

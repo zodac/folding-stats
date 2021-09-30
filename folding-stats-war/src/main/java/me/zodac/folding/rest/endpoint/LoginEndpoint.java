@@ -20,7 +20,7 @@ import javax.ws.rs.core.Response;
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.ejb.BusinessLogic;
-import me.zodac.folding.api.utils.EncodingUtils;
+import me.zodac.folding.api.util.EncodingUtils;
 import me.zodac.folding.rest.api.LoginCredentials;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

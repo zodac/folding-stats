@@ -1,12 +1,12 @@
 package me.zodac.folding.test;
 
 import static java.util.stream.Collectors.toList;
-import static me.zodac.folding.test.utils.SystemCleaner.cleanSystemForComplexTests;
-import static me.zodac.folding.test.utils.TestGenerator.generateTeam;
-import static me.zodac.folding.test.utils.TestGenerator.generateUserWithTeamId;
-import static me.zodac.folding.test.utils.TestGenerator.generateUserWithTeamIdAndCategory;
-import static me.zodac.folding.test.utils.rest.request.TeamCompetitionStatsUtils.TEAM_COMPETITION_REQUEST_SENDER;
-import static me.zodac.folding.test.utils.rest.request.TeamCompetitionStatsUtils.manuallyUpdateStats;
+import static me.zodac.folding.test.util.SystemCleaner.cleanSystemForComplexTests;
+import static me.zodac.folding.test.util.TestGenerator.generateTeam;
+import static me.zodac.folding.test.util.TestGenerator.generateUserWithTeamId;
+import static me.zodac.folding.test.util.TestGenerator.generateUserWithTeamIdAndCategory;
+import static me.zodac.folding.test.util.rest.request.TeamCompetitionStatsUtils.TEAM_COMPETITION_REQUEST_SENDER;
+import static me.zodac.folding.test.util.rest.request.TeamCompetitionStatsUtils.manuallyUpdateStats;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.HttpURLConnection;
@@ -22,9 +22,9 @@ import me.zodac.folding.client.java.response.TeamCompetitionResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.tc.leaderboard.TeamLeaderboardEntry;
 import me.zodac.folding.rest.api.tc.leaderboard.UserCategoryLeaderboardEntry;
-import me.zodac.folding.test.utils.rest.request.StubbedFoldingEndpointUtils;
-import me.zodac.folding.test.utils.rest.request.TeamUtils;
-import me.zodac.folding.test.utils.rest.request.UserUtils;
+import me.zodac.folding.test.util.rest.request.StubbedFoldingEndpointUtils;
+import me.zodac.folding.test.util.rest.request.TeamUtils;
+import me.zodac.folding.test.util.rest.request.UserUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

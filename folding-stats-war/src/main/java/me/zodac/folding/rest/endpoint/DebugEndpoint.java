@@ -32,7 +32,7 @@ public class DebugEndpoint {
 
     @GET
     @RolesAllowed("admin")
-    @Path("print_caches")
+    @Path("/caches")
     @Produces(MediaType.APPLICATION_JSON)
     public Response printCaches() {
         LOGGER.info("Printing cache contents");

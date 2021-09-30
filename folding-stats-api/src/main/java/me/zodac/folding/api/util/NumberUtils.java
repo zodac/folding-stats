@@ -1,4 +1,4 @@
-package me.zodac.folding.api.utils;
+package me.zodac.folding.api.util;
 
 import java.text.NumberFormat;
 import java.util.Locale;

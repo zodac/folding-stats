@@ -1,6 +1,6 @@
 package me.zodac.folding.rest.endpoint;
 
-import static me.zodac.folding.api.utils.DateTimeUtils.untilNextMonthUtc;
+import static me.zodac.folding.api.util.DateTimeUtils.untilNextMonthUtc;
 import static me.zodac.folding.rest.response.Responses.badGateway;
 import static me.zodac.folding.rest.response.Responses.badRequest;
 import static me.zodac.folding.rest.response.Responses.conflict;

@@ -1,6 +1,6 @@
 package me.zodac.folding.client.java.request;
 
-import static me.zodac.folding.api.utils.EncodingUtils.encodeBasicAuthentication;
+import static me.zodac.folding.api.util.EncodingUtils.encodeBasicAuthentication;
 
 import java.io.IOException;
 import java.net.URI;
@@ -9,10 +9,10 @@ import java.net.http.HttpResponse;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import me.zodac.folding.api.tc.stats.OffsetStats;
-import me.zodac.folding.client.java.util.RestUtilConstants;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
+import me.zodac.folding.rest.util.RestUtilConstants;
 import org.apache.commons.lang3.StringUtils;
 
 /**

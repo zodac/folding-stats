@@ -1,9 +1,8 @@
 package me.zodac.folding.stats.http.response;
 
 import static java.util.stream.Collectors.toList;
+import static me.zodac.folding.rest.util.RestUtilConstants.GSON;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
@@ -22,7 +21,6 @@ import org.apache.logging.log4j.Logger;
 public final class StatsResponseParser {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final int EXPECTED_NUMBER_OF_UNIT_RESPONSES = 1;
 
     private StatsResponseParser() {

@@ -1,4 +1,4 @@
-package me.zodac.folding.test.utils;
+package me.zodac.folding.test.util;
 
 /**
  * Simple {@link Enum} containing the username and password data for test execution. Using default details that should not be used in production.

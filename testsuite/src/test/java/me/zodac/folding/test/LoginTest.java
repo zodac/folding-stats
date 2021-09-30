@@ -1,10 +1,10 @@
 package me.zodac.folding.test;
 
-import static me.zodac.folding.test.utils.TestAuthenticationData.ADMIN_USER;
-import static me.zodac.folding.test.utils.TestAuthenticationData.INVALID_USERNAME;
-import static me.zodac.folding.test.utils.TestAuthenticationData.READ_ONLY_USER;
-import static me.zodac.folding.test.utils.TestConstants.FOLDING_URL;
-import static me.zodac.folding.test.utils.TestConstants.HTTP_CLIENT;
+import static me.zodac.folding.rest.util.RestUtilConstants.HTTP_CLIENT;
+import static me.zodac.folding.test.util.TestAuthenticationData.ADMIN_USER;
+import static me.zodac.folding.test.util.TestAuthenticationData.INVALID_USERNAME;
+import static me.zodac.folding.test.util.TestAuthenticationData.READ_ONLY_USER;
+import static me.zodac.folding.test.util.TestConstants.FOLDING_URL;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;

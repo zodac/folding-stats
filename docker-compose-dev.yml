@@ -17,19 +17,6 @@ services:
     ports:
       - "86:80"
 
-  builder_java_dev:
-    build:
-      context: .
-      dockerfile: docker/builder/java/Dockerfile
-      args:
-        DEPLOYMENT_TYPE: "test"
-    container_name: builder_java_dev
-    hostname: builder_java_dev
-    networks:
-      - development
-    volumes:
-      - /opt/jboss/wildfly/standalone/deployments/
-
   wildfly_dev:
     build:
       context: .
@@ -37,10 +24,9 @@ services:
       args:
         ADMIN_USERNAME: "root"
         ADMIN_PASSWORD: "shroot"
+        DEPLOYMENT_TYPE: "test"
     container_name: wildfly_dev
     hostname: wildfly_dev
-    depends_on:
-      - builder_java_dev
     environment:
       # Container configuration
       JAVA_OPTS: -Xms512m -Xmx2g -Djava.net.preferIPv4Stack=true
@@ -62,15 +48,12 @@ services:
       JDBC_CONNECTION_PASSWORD: "shroot"
       JDBC_CONNECTION_DRIVER: "org.postgresql.Driver"
     links:
-      - builder_java_dev
       - postgres_dev
     networks:
       - development
     ports:
       - "8081:8080"
       - "9991:9990"
-    volumes_from:
-      - builder_java_dev
 
   postgres_dev:
     build:

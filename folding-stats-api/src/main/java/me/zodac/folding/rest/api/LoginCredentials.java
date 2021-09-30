@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import me.zodac.folding.api.utils.EncodingUtils;
+import me.zodac.folding.api.util.EncodingUtils;
 
 
 /**

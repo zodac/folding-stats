@@ -1,4 +1,4 @@
-package me.zodac.folding.test.utils;
+package me.zodac.folding.test.util;
 
 /**
  * Simple POJO defining the stats for a user to be persisted in a test DB for stats-based tests.

@@ -1,12 +1,13 @@
 package me.zodac.folding.ejb.tc;
 
-import com.google.gson.Gson;
+import static me.zodac.folding.rest.util.RestUtilConstants.GSON;
+
 import java.time.LocalDateTime;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.tc.result.MonthlyResult;
-import me.zodac.folding.api.utils.DateTimeUtils;
+import me.zodac.folding.api.util.DateTimeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -18,7 +19,6 @@ import org.apache.logging.log4j.Logger;
 public class UserStatsStorer {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final Gson GSON = new Gson();
 
     @EJB
     private BusinessLogic businessLogic;

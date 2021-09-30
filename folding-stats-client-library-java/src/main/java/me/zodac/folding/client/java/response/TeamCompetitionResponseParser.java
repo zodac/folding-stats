@@ -7,11 +7,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import me.zodac.folding.client.java.request.TeamCompetitionStatsRequestSender;
-import me.zodac.folding.client.java.util.RestUtilConstants;
 import me.zodac.folding.rest.api.tc.CompetitionSummary;
 import me.zodac.folding.rest.api.tc.UserSummary;
 import me.zodac.folding.rest.api.tc.leaderboard.TeamLeaderboardEntry;
 import me.zodac.folding.rest.api.tc.leaderboard.UserCategoryLeaderboardEntry;
+import me.zodac.folding.rest.util.RestUtilConstants;
 
 /**
  * Utility class used to parse a {@link HttpResponse} returned from {@link TeamCompetitionStatsRequestSender}.

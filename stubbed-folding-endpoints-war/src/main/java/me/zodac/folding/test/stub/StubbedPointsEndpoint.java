@@ -1,7 +1,6 @@
 package me.zodac.folding.test.stub;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import java.util.HashMap;
 import java.util.Map;
 import javax.enterprise.context.ApplicationScoped;
@@ -39,7 +38,7 @@ import lombok.ToString;
 @ApplicationScoped
 public class StubbedPointsEndpoint {
 
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    private static final Gson GSON = new Gson();
     private static final long NO_POINTS = 0L;
 
     private final Map<String, Long> pointsByUserAndPasskey = new HashMap<>();

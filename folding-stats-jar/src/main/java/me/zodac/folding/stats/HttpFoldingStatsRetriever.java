@@ -12,7 +12,7 @@ import me.zodac.folding.api.stats.FoldingStatsRetriever;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
-import me.zodac.folding.api.utils.DateTimeUtils;
+import me.zodac.folding.api.util.DateTimeUtils;
 import me.zodac.folding.stats.http.request.PointsUrlBuilder;
 import me.zodac.folding.stats.http.request.StatsRequestUrl;
 import me.zodac.folding.stats.http.request.UnitsUrlBuilder;

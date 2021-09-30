@@ -1,4 +1,4 @@
-package me.zodac.folding.api.utils;
+package me.zodac.folding.api.util;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -9,8 +9,19 @@ import java.util.Map;
  */
 public final class EncodingUtils {
 
+    /**
+     * Key for the <code>username</code>> value returned by {@link #decodeAuthentication(String)} and {@link #decodeBasicAuthentication(String)}.
+     */
     public static final String DECODED_USERNAME_KEY = "userName";
+
+    /**
+     * Key for the <code>password</code>> value returned by {@link #decodeAuthentication(String)} and {@link #decodeBasicAuthentication(String)}.
+     */
     public static final String DECODED_PASSWORD_KEY = "password";
+
+    /**
+     * Prefix defining the <b>Basic</b> authentication scheme.
+     */
     public static final String BASIC_AUTHENTICATION_SCHEME = "Basic ";
 
     private static final String DECODED_USERNAME_PASSWORD_DELIMITER = ":";

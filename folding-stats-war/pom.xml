@@ -16,12 +16,16 @@
     <dependencies>
         <!-- Project Dependencies -->
         <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>${project.parent.artifactId}-api</artifactId>
+            <groupId>me.zodac</groupId>
+            <artifactId>folding-stats-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>${project.parent.artifactId}-jar</artifactId>
+            <groupId>me.zodac</groupId>
+            <artifactId>folding-stats-client-library-java</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>me.zodac</groupId>
+            <artifactId>folding-stats-jar</artifactId>
         </dependency>
 
         <!-- 3PP Dependencies -->

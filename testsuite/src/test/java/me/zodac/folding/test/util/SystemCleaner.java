@@ -1,20 +1,20 @@
-package me.zodac.folding.test.utils;
+package me.zodac.folding.test.util;
 
-import static me.zodac.folding.test.utils.TestAuthenticationData.ADMIN_USER;
-import static me.zodac.folding.test.utils.rest.request.HardwareUtils.HARDWARE_REQUEST_SENDER;
-import static me.zodac.folding.test.utils.rest.request.TeamUtils.TEAM_REQUEST_SENDER;
-import static me.zodac.folding.test.utils.rest.request.UserUtils.USER_REQUEST_SENDER;
+import static me.zodac.folding.test.util.TestAuthenticationData.ADMIN_USER;
+import static me.zodac.folding.test.util.rest.request.HardwareUtils.HARDWARE_REQUEST_SENDER;
+import static me.zodac.folding.test.util.rest.request.TeamUtils.TEAM_REQUEST_SENDER;
+import static me.zodac.folding.test.util.rest.request.UserUtils.USER_REQUEST_SENDER;
 
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
-import me.zodac.folding.test.utils.db.DatabaseUtils;
-import me.zodac.folding.test.utils.rest.request.HardwareUtils;
-import me.zodac.folding.test.utils.rest.request.StubbedFoldingEndpointUtils;
-import me.zodac.folding.test.utils.rest.request.TeamCompetitionStatsUtils;
-import me.zodac.folding.test.utils.rest.request.TeamUtils;
-import me.zodac.folding.test.utils.rest.request.UserUtils;
+import me.zodac.folding.test.util.db.DatabaseUtils;
+import me.zodac.folding.test.util.rest.request.HardwareUtils;
+import me.zodac.folding.test.util.rest.request.StubbedFoldingEndpointUtils;
+import me.zodac.folding.test.util.rest.request.TeamCompetitionStatsUtils;
+import me.zodac.folding.test.util.rest.request.TeamUtils;
+import me.zodac.folding.test.util.rest.request.UserUtils;
 
 /**
  * Utility class to clean the system for tests.

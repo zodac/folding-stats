@@ -1,6 +1,6 @@
 package me.zodac.folding.ejb.tc;
 
-import static me.zodac.folding.api.utils.NumberUtils.formatWithCommas;
+import static me.zodac.folding.api.util.NumberUtils.formatWithCommas;
 
 import javax.ejb.Asynchronous;
 import javax.ejb.EJB;

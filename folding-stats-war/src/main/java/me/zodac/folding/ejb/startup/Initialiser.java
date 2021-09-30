@@ -11,7 +11,7 @@ import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.Stats;
-import me.zodac.folding.api.utils.ExecutionType;
+import me.zodac.folding.api.util.ExecutionType;
 import me.zodac.folding.db.DbManagerRetriever;
 import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.ejb.tc.scheduled.StatsScheduler;
