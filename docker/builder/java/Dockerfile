@@ -1,4 +1,4 @@
-FROM openjdk:11-jdk-slim AS jdk
+FROM openjdk:17-jdk-slim AS jdk
 
 RUN apt-get update && \
     apt-get install --yes binutils && \
@@ -14,6 +14,7 @@ java.net.http,\
 jdk.compiler,\
 jdk.sctp,\
 java.scripting,\
+jdk.unsupported,\
 java.base,\
 java.compiler,\
 java.desktop,\
@@ -31,13 +32,10 @@ java.sql.rowset,\
 java.transaction.xa,\
 java.xml,\
 java.xml.crypto,\
-jdk.unsupported,\
 jdk.xml.dom,\
 jdk.crypto.ec,\
 jdk.crypto.cryptoki,\
 jdk.jfr,\
-jdk.jcmd,\
-jdk.jdwp.agent,\
 jdk.naming.dns,\
 jdk.zipfs,\
 jdk.management.agent \
