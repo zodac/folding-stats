@@ -1,6 +1,6 @@
 name: Java CI
 
-on: [push]
+on: [ push ]
 
 jobs:
   build:
@@ -13,6 +13,13 @@ jobs:
         with:
           java-version: '17'
           distribution: 'adopt'
+      - name: Cache local .m2
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**.pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
       - name: Run lints with Maven
         run: mvn clean install -Dlint
       - name: Run unit tests with Maven
