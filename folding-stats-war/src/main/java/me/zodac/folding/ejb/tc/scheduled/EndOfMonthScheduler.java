@@ -1,5 +1,8 @@
 package me.zodac.folding.ejb.tc.scheduled;
 
+import static java.lang.Boolean.parseBoolean;
+
+import java.util.Calendar;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.ejb.EJB;
@@ -20,11 +23,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * {@link Startup} EJB which schedules the end of the <code>Team Competition</code>. The day on which the month ends
- * can be configured using the environment variable:
- * <ul>
- *     <li>STATS_PARSING_SCHEDULE_LAST_DAY_OF_MONTH</li>
- * </ul>
+ * {@link Startup} EJB which schedules the end of the <code>Team Competition</code>.
  *
  * <p>
  * It performs the following actions:
@@ -54,11 +53,8 @@ import org.apache.logging.log4j.Logger;
 public class EndOfMonthScheduler {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final String STATS_PARSING_SCHEDULE_LAST_DAY_OF_MONTH =
-        EnvironmentVariableUtils.get("STATS_PARSING_SCHEDULE_LAST_DAY_OF_MONTH", "31");
-    private static final boolean IS_MONTHLY_RESET_ENABLED = Boolean.parseBoolean(EnvironmentVariableUtils.get("ENABLE_STATS_MONTHLY_RESET", "false"));
-    private static final boolean IS_MONTHLY_RESULT_ENABLED =
-        Boolean.parseBoolean(EnvironmentVariableUtils.get("ENABLE_MONTHLY_RESULT_STORAGE", "false"));
+    private static final boolean IS_MONTHLY_RESET_ENABLED = parseBoolean(EnvironmentVariableUtils.get("ENABLE_STATS_MONTHLY_RESET", "false"));
+    private static final boolean IS_MONTHLY_RESULT_ENABLED = parseBoolean(EnvironmentVariableUtils.get("ENABLE_MONTHLY_RESULT_STORAGE", "false"));
 
     @EJB
     private UserStatsResetter userStatsResetter;
@@ -83,7 +79,7 @@ public class EndOfMonthScheduler {
         schedule.hour("23");
         schedule.minute("57"); // Stats are assumed to run at 23:55
         schedule.second("0");
-        schedule.dayOfMonth(STATS_PARSING_SCHEDULE_LAST_DAY_OF_MONTH);
+        schedule.dayOfMonth("28-31"); // We want to run on the last day of the month, but cannot specify it here, so we choose all "last days"
         schedule.timezone("UTC");
         final Timer timer = timerService.createCalendarTimer(schedule);
         LOGGER.info("Scheduling end of TC stats: {}", timer.getSchedule());
@@ -99,6 +95,14 @@ public class EndOfMonthScheduler {
     public void endOfTeamCompetition(final Timer timer) {
         LOGGER.trace("Timer fired at: {}", timer);
 
+        // Because we cannot set up a cron schedule with last day, we use the range '28-31'.
+        // We then check if the current day in the month is the last day of the month.
+        // If not, we skip the reset.
+        if (!isLastDayInMonth()) {
+            LOGGER.warn("End of month reset triggered, but not actually end of the month, skipping");
+            return;
+        }
+
         if (IS_MONTHLY_RESET_ENABLED) {
             LOGGER.warn("Resetting TC stats for end of month");
             SystemStateManager.next(SystemState.RESETTING_STATS);
@@ -111,5 +115,10 @@ public class EndOfMonthScheduler {
             LOGGER.info("Storing TC stats for new month");
             userStatsStorer.storeMonthlyResult();
         }
+    }
+
+    private static boolean isLastDayInMonth() {
+        final Calendar calendar = Calendar.getInstance();
+        return calendar.get(Calendar.DATE) == calendar.getActualMaximum(Calendar.DATE);
     }
 }
