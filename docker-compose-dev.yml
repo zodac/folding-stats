@@ -17,6 +17,15 @@ services:
     ports:
       - "86:80"
 
+  jdk_dev:
+    build:
+      context: .
+      dockerfile: docker/builder/jdk/17/Dockerfile
+    container_name: jdk_dev
+    hostname: jdk_dev
+    networks:
+      - development
+
   wildfly_dev:
     build:
       context: .
@@ -33,8 +42,8 @@ services:
       # Stats parsing configuration
       STATS_URL_ROOT: "http://192.168.99.100:8081" # TODO: [zodac] Not working with 'wildfly_dev' as host
       # NOTE: The monthly reset & result storage will always occur at 23:57 on the last day of the month
-      ENABLE_STATS_MONTHLY_RESET: "true"
-      ENABLE_MONTHLY_RESULT_STORAGE: "true"
+      ENABLE_STATS_MONTHLY_RESET: "false"
+      ENABLE_MONTHLY_RESULT_STORAGE: "false"
       # Scheduled stats parsing configuration
       ENABLE_STATS_SCHEDULED_PARSING: "false"
       STATS_PARSING_SCHEDULE_HOUR: "*"

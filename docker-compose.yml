@@ -17,6 +17,15 @@ services:
     ports:
       - "85:80"
 
+  jdk:
+    build:
+      context: .
+      dockerfile: docker/builder/jdk/17/Dockerfile
+    container_name: jdk
+    hostname: jdk
+    networks:
+      - production
+
   wildfly:
     build:
       context: .

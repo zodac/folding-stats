@@ -7,7 +7,6 @@ Dockerfile
 
 # Build
 target/
-build
 
 # git
-**/.git
+.git/
