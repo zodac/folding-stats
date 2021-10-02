@@ -4,6 +4,13 @@
 
 ## Development
 
+### Dependency Management
+
+All dependencies can be updated using the `versions-maven-plugin`. By using the following command, all version will be
+updated to the latest version available online:
+
+    mvn versions:update-properties
+
 ### jOOQ Database Access
 
 We use **jOOQ** for generating PostgreSQL queries (as seen in *PostgresDbManager.java*). We use **jOOQ** code generation
