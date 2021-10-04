@@ -3,6 +3,8 @@ package me.zodac.folding.api.tc;
 import static java.util.stream.Collectors.toUnmodifiableList;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -15,40 +17,57 @@ import java.util.stream.Stream;
 public enum Category {
 
     /**
-     * {@link User} is using an <b>AMD</b> {@link HardwareType#GPU} as their {@link Hardware}.
+     * {@link User} is using an {@link HardwareMake#AMD} {@link HardwareType#GPU} as their {@link Hardware}.
      */
-    AMD_GPU(1, HardwareType.GPU),
+    AMD_GPU(1, HardwareMake.AMD, HardwareType.GPU),
 
     /**
-     * {@link User} is using an <b>nVidia</b> {@link HardwareType#GPU} as their {@link Hardware}.
+     * {@link User} is using an {@link HardwareMake#NVIDIA} {@link HardwareType#GPU} as their {@link Hardware}.
      */
-    NVIDIA_GPU(1, HardwareType.GPU),
+    NVIDIA_GPU(1, HardwareMake.NVIDIA, HardwareType.GPU),
 
     /**
-     * {@link User} is permitted to use any {@link HardwareType} as their {@link Hardware}.
+     * {@link User} is permitted to use any {@link HardwareMake} and {@link HardwareType} as their {@link Hardware}.
      */
-    WILDCARD(1, HardwareType.GPU, HardwareType.CPU),
+    WILDCARD(1, HardwareMake.getAllValues(), HardwareType.getAllValues()),
 
     /**
      * Not a valid {@link Category}.
      */
-    INVALID(0);
+    INVALID(0, Collections.emptySet(), Collections.emptySet());
 
     private static final Collection<Category> ALL_VALUES = Stream.of(values())
         .filter(value -> value != INVALID)
         .collect(toUnmodifiableList());
 
     private final int permittedUsers;
+    private final Set<HardwareMake> supportedHardwareMakes;
     private final Set<HardwareType> supportedHardwareTypes;
 
     /**
-     * Constructs a {@link Category} with a maximum number of {@link User}s.
+     * Constructs a {@link Category}.
      *
      * @param permittedUsers the maximum number of {@link User}s permitted in the {@link Category}
+     * @param hardwareMakes  the supported {@link HardwareMake}s for a piece of {@link Hardware} used by a {@link User}
+     * @param hardwareTypes  the supported {@link HardwareType}s for a piece of {@link Hardware} used by a {@link User}
      */
-    Category(final int permittedUsers, final HardwareType... hardwareTypes) {
+    Category(final int permittedUsers, final Collection<HardwareMake> hardwareMakes, final Collection<HardwareType> hardwareTypes) {
         this.permittedUsers = permittedUsers;
-        supportedHardwareTypes = Set.of(hardwareTypes);
+        supportedHardwareMakes = new HashSet<>(hardwareMakes);
+        supportedHardwareTypes = new HashSet<>(hardwareTypes);
+    }
+
+    /**
+     * Constructs a {@link Category}.
+     *
+     * @param permittedUsers the maximum number of {@link User}s permitted in the {@link Category}
+     * @param hardwareMake   a supported {@link HardwareMake} for a piece of {@link Hardware} used by a {@link User}
+     * @param hardwareType   a supported {@link HardwareType} for a piece of {@link Hardware} used by a {@link User}
+     */
+    Category(final int permittedUsers, final HardwareMake hardwareMake, final HardwareType hardwareType) {
+        this.permittedUsers = permittedUsers;
+        supportedHardwareMakes = Set.of(hardwareMake);
+        supportedHardwareTypes = Set.of(hardwareType);
     }
 
     /**
@@ -96,6 +115,15 @@ public enum Category {
      */
     public int permittedUsers() {
         return permittedUsers;
+    }
+
+    /**
+     * Returns the supported {@link HardwareMake}s in the {@link Category}.
+     *
+     * @return a {@link Set} of the supported {@link HardwareMake}s
+     */
+    public Set<HardwareMake> supportedHardwareMakes() {
+        return supportedHardwareMakes;
     }
 
     /**

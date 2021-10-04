@@ -17,12 +17,12 @@ services:
     ports:
       - "86:80"
 
-  jdk_dev:
+  jdk:
     build:
       context: .
       dockerfile: docker/builder/jdk/17/Dockerfile
-    container_name: jdk_dev
-    hostname: jdk_dev
+    container_name: jdk
+    hostname: jdk
     networks:
       - development
 

@@ -105,5 +105,4 @@ jdk.xml.dom,\
 jdk.zipfs \
     && strip --strip-unneeded /opt/jdk/lib/server/libjvm.so
 
-# Image is only to be used for building, not running
-CMD ["echo", "JDK image built"]
+CMD ["echo", "JDK image only to be used for building, killing container"]

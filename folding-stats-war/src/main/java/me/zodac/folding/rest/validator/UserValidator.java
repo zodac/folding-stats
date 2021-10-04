@@ -24,6 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 // TODO: [zodac] In severe need of a clean up. Write tests for the validators first though, because you're a moron
+// TODO: [zodac] Validate the linked hardware matches the user's category
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class UserValidator {
 

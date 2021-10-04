@@ -41,4 +41,18 @@ public enum HardwareType {
     public static Collection<HardwareType> getAllValues() {
         return ALL_VALUES;
     }
+
+    /**
+     * Retrieve a {@link HardwareType} based on the input {@link String}. The search is case-insensitive.
+     *
+     * @param input the {@link HardwareType} as a {@link String}
+     * @return the matching {@link HardwareType}, or {@link HardwareType#INVALID} if none is found
+     */
+    public static HardwareType get(final String input) {
+        return ALL_VALUES
+            .stream()
+            .filter(hardwareType -> hardwareType.toString().equalsIgnoreCase(input))
+            .findAny()
+            .orElse(HardwareType.INVALID);
+    }
 }
