@@ -2,6 +2,8 @@ package me.zodac.folding.test.util;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import me.zodac.folding.api.tc.Category;
+import me.zodac.folding.api.tc.HardwareMake;
+import me.zodac.folding.api.tc.HardwareType;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
@@ -60,7 +62,10 @@ public final class TestGenerator {
         return HardwareRequest.builder()
             .hardwareName(hardwareName)
             .displayName(hardwareName)
-            .multiplier(1.0D)
+            .hardwareMake(HardwareMake.NVIDIA.toString())
+            .hardwareType(HardwareType.GPU.toString())
+            .multiplier(1.00D)
+            .averagePpd(1.00D)
             .build();
     }
 
@@ -75,7 +80,10 @@ public final class TestGenerator {
         return HardwareRequest.builder()
             .hardwareName(hardwareName)
             .displayName(hardwareName)
+            .hardwareMake(HardwareMake.NVIDIA.toString())
+            .hardwareType(HardwareType.GPU.toString())
             .multiplier(multiplier)
+            .averagePpd(1.00D)
             .build();
     }
 

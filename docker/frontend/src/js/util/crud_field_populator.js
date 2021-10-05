@@ -6,7 +6,10 @@ function populateHardwareUpdate(){
     document.getElementById("hardware_update_id").value = selectedElement.getAttribute("hardware_id");
     document.getElementById("hardware_update_name").value = selectedElement.getAttribute("hardware_name");
     document.getElementById("hardware_update_display_name").value = selectedElement.getAttribute("display_name");
+    document.getElementById("hardware_update_hardware_make").value = selectedElement.getAttribute("hardware_make");
+    document.getElementById("hardware_update_hardware_type").value = selectedElement.getAttribute("hardware_type");
     document.getElementById("hardware_update_multiplier").value = selectedElement.getAttribute("multiplier");
+    document.getElementById("hardware_update_average_ppd").value = selectedElement.getAttribute("average_ppd");
 
     hardwareFields = document.querySelectorAll(".hardware_update");
     for (var i = 0, hardwareField; hardwareField = hardwareFields[i]; i++) {
@@ -23,7 +26,10 @@ function populateHardwareDelete(){
     document.getElementById("hardware_delete_id").value = selectedElement.getAttribute("hardware_id");
     document.getElementById("hardware_delete_name").value = selectedElement.getAttribute("hardware_name");
     document.getElementById("hardware_delete_display_name").value = selectedElement.getAttribute("display_name");
+    document.getElementById("hardware_delete_hardware_make").value = selectedElement.getAttribute("hardware_make");
+    document.getElementById("hardware_delete_hardware_type").value = selectedElement.getAttribute("hardware_type");
     document.getElementById("hardware_delete_multiplier").value = selectedElement.getAttribute("multiplier");
+    document.getElementById("hardware_delete_average_ppd").value = selectedElement.getAttribute("average_ppd");
 
     hardwareFields = document.querySelectorAll(".hardware_delete");
     for (var i = 0, hardwareField; hardwareField = hardwareFields[i]; i++) {

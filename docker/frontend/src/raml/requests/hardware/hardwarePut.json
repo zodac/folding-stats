@@ -1,5 +1,8 @@
 {
   "hardwareName": "Hardware1",
   "displayName": "Hardware1 (updated)",
-  "multiplier": 21.33
+  "hardwareMake": "NVIDIA",
+  "hardwareType": "GPU",
+  "multiplier": 21.33,
+  "averagePpd": 1.00
 }

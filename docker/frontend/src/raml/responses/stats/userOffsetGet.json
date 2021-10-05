@@ -6,7 +6,14 @@
     "id": 1,
     "hardwareName": "Hardware1",
     "displayName": "Hardware1",
-    "multiplier": 16.38
+    "hardwareMake": "NVIDIA",
+    "hardwareType": "GPU",
+    "multiplier": 21.33,
+    "averagePpd": 1.00
+  },
+  "team": {
+    "id": 1,
+    "teamName": "Team1"
   },
   "category": "AMD GPU",
   "points": 540033,

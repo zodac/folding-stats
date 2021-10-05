@@ -345,8 +345,8 @@ class TeamCompetitionStatsTest {
     @Test
     void whenTeamExistsWithOneUser_andUserHasHardwareMultiplier_thenUserPointsAreMultipliedCorrectly_andUserUnitsAreNotImpacted()
         throws FoldingRestException {
-        final double hardwareMultiplier = 2.0D;
-        final int hardwareId = HardwareUtils.create(generateHardwareWithMultiplier(2.0D)).getId();
+        final double hardwareMultiplier = 2.00D;
+        final int hardwareId = HardwareUtils.create(generateHardwareWithMultiplier(hardwareMultiplier)).getId();
         final Team team = TeamUtils.create(generateTeam());
 
         final UserRequest user = generateUserWithHardwareId(hardwareId);
@@ -406,7 +406,10 @@ class TeamCompetitionStatsTest {
         final HardwareRequest updatedHardware = HardwareRequest.builder()
             .hardwareName(createdHardware.getHardwareName())
             .displayName(createdHardware.getDisplayName())
-            .multiplier(2.0D)
+            .hardwareMake(createdHardware.getHardwareMake().toString())
+            .hardwareType(createdHardware.getHardwareType().toString())
+            .multiplier(2.00D)
+            .averagePpd(createdHardware.getAveragePpd())
             .build();
 
         HARDWARE_REQUEST_SENDER.update(createdHardware.getId(), updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
@@ -455,7 +458,7 @@ class TeamCompetitionStatsTest {
             .isEqualTo(firstPoints);
 
         // Update the user with a new hardware with a multiplier
-        final HardwareRequest hardwareWithMultiplier = generateHardwareWithMultiplier(2.0D);
+        final HardwareRequest hardwareWithMultiplier = generateHardwareWithMultiplier(2.00D);
         final int hardwareWithMultiplierId = HardwareUtils.create(hardwareWithMultiplier).getId();
         user.setHardwareId(hardwareWithMultiplierId);
 

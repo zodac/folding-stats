@@ -30,6 +30,11 @@ public class DebugEndpoint {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    /**
+     * <b>GET</b> request to print the contents of all caches to the system log.
+     *
+     * @return an {@link me.zodac.folding.rest.response.Responses#ok()} response
+     */
     @GET
     @RolesAllowed("admin")
     @Path("/caches")

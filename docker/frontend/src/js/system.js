@@ -119,8 +119,8 @@ function loadHardware() {
     .then(function(jsonResponse) {
         // Build hardware
         jsonResponse.sort(sortJsonByKey("id"));
-        const hardwareHeaders = ["ID", "Name", "Display Name", "Multiplier"];
-        const hardwareProperties = ["id", "hardwareName", "displayName", "multiplier"];
+        const hardwareHeaders = ["ID", "Name", "Display Name", "Make", "Type", "Multiplier", "Average PPD"];
+        const hardwareProperties = ["id", "hardwareName", "displayName", "hardwareMake", "hardwareType", "multiplier", "averagePpd"];
 
         // Empty div of existing content, if any
         hardwareDiv = document.getElementById("hardware_div");
@@ -161,6 +161,10 @@ function loadHardware() {
 
                 if (hardwareProperty === "multiplier") {
                     hardwareTableBodyCell.innerHTML = "x" + hardwareItem[hardwareProperty].toLocaleString();
+                } else if (hardwareProperty === "hardwareMake") {
+                    hardwareTableBodyCell.innerHTML = getHardwareMakeFrontend(hardwareItem[hardwareProperty]);
+                } else if (hardwareProperty === "hardwareType") {
+                    hardwareTableBodyCell.innerHTML = getHardwareTypeFrontend(hardwareItem[hardwareProperty]);
                 } else {
                     hardwareTableBodyCell.innerHTML = hardwareItem[hardwareProperty].toLocaleString();
                 }
@@ -199,7 +203,10 @@ function loadHardware() {
                 hardwareOption.setAttribute("hardware_id", hardwareItem['id']);
                 hardwareOption.setAttribute("hardware_name", hardwareItem['hardwareName']);
                 hardwareOption.setAttribute("display_name", hardwareItem['displayName']);
+                hardwareOption.setAttribute("hardware_make", hardwareItem['hardwareMake']);
+                hardwareOption.setAttribute("hardware_type", hardwareItem['hardwareType']);
                 hardwareOption.setAttribute("multiplier", hardwareItem['multiplier']);
+                hardwareOption.setAttribute("average_ppd", hardwareItem['averagePpd']);
 
                 hardwareOption.innerHTML = hardwareItem['hardwareName'] + " (" + hardwareItem['displayName'] + ")";
                 hardwareList.append(hardwareOption);
@@ -269,7 +276,7 @@ function loadUsers() {
                 } else if (usersProperty === "team") {
                     usersTableBodyCell.innerHTML = usersItem["team"]["teamName"].toLocaleString();
                 } else if (usersProperty === "category") {
-                    usersTableBodyCell.innerHTML = getCategoryFrontend(usersItem["category"]);
+                    usersTableBodyCell.innerHTML = getCategoryFrontend(usersItem[usersProperty]);
                 } else {
                     if (usersProperty in usersItem) {
                         usersTableBodyCell.innerHTML = usersItem[usersProperty].toLocaleString();

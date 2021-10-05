@@ -15,6 +15,8 @@ import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
+import me.zodac.folding.api.tc.HardwareMake;
+import me.zodac.folding.api.tc.HardwareType;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.OffsetStats;
@@ -64,7 +66,10 @@ class PostgresDbManagerTest {
             .id(retrievedHardware.getId())
             .hardwareName(retrievedHardware.getHardwareName())
             .displayName(retrievedHardware.getDisplayName())
+            .hardwareMake(retrievedHardware.getHardwareMake())
+            .hardwareType(retrievedHardware.getHardwareType())
             .multiplier(retrievedHardware.getMultiplier())
+            .averagePpd(retrievedHardware.getAveragePpd())
             .build();
 
         POSTGRES_DB_MANAGER.updateHardware(hardwareToUpdate);
@@ -453,7 +458,7 @@ class PostgresDbManagerTest {
     }
 
     private Hardware generateHardware() {
-        return Hardware.createWithoutId(nextHardwareName(), "hardware", 1.0D);
+        return Hardware.createWithoutId(nextHardwareName(), "hardware", HardwareMake.NVIDIA, HardwareType.GPU, 1.00D, 1.00D);
     }
 
     private Hardware createHardware() {

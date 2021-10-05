@@ -40,7 +40,10 @@ public class Hardware implements ResponsePojo {
     private final int id;
     private final String hardwareName;
     private final String displayName;
+    private final HardwareMake hardwareMake;
+    private final HardwareType hardwareType;
     private final double multiplier;
+    private final double averagePpd;
 
     /**
      * Creates a {@link Hardware}.
@@ -51,14 +54,20 @@ public class Hardware implements ResponsePojo {
      * @param hardwareId   the ID
      * @param hardwareName the LARS DB name
      * @param displayName  the display name for the <code>Team Competition</code>
+     * @param hardwareMake the {@link HardwareMake} of the {@link Hardware}
+     * @param hardwareType the {@link HardwareType} of the {@link Hardware}
      * @param multiplier   the calculated multiplier
+     * @param averagePpd   the average PPD of the {@link Hardware}
      * @return the created {@link Hardware}
      */
     public static Hardware create(final int hardwareId,
                                   final String hardwareName,
                                   final String displayName,
-                                  final double multiplier) {
-        return new Hardware(hardwareId, hardwareName, displayName, multiplier);
+                                  final HardwareMake hardwareMake,
+                                  final HardwareType hardwareType,
+                                  final double multiplier,
+                                  final double averagePpd) {
+        return new Hardware(hardwareId, hardwareName, displayName, hardwareMake, hardwareType, multiplier, averagePpd);
     }
 
     /**
@@ -69,13 +78,19 @@ public class Hardware implements ResponsePojo {
      *
      * @param hardwareName the LARS DB name
      * @param displayName  the display name for the <code>Team Competition</code>
+     * @param hardwareMake the {@link HardwareMake} of the {@link Hardware}
+     * @param hardwareType the {@link HardwareType} of the {@link Hardware}
      * @param multiplier   the calculated multiplier
+     * @param averagePpd   the average PPD of the {@link Hardware}
      * @return the created {@link Hardware}
      */
     public static Hardware createWithoutId(final String hardwareName,
                                            final String displayName,
-                                           final double multiplier) {
-        return create(EMPTY_HARDWARE_ID, hardwareName, displayName, multiplier);
+                                           final HardwareMake hardwareMake,
+                                           final HardwareType hardwareType,
+                                           final double multiplier,
+                                           final double averagePpd) {
+        return create(EMPTY_HARDWARE_ID, hardwareName, displayName, hardwareMake, hardwareType, multiplier, averagePpd);
     }
 
     /**
@@ -88,7 +103,14 @@ public class Hardware implements ResponsePojo {
      * @return the created {@link Hardware}
      */
     public static Hardware createWithoutId(final HardwareRequest hardwareRequest) {
-        return createWithoutId(hardwareRequest.getHardwareName(), hardwareRequest.getDisplayName(), hardwareRequest.getMultiplier());
+        return createWithoutId(
+            hardwareRequest.getHardwareName(),
+            hardwareRequest.getDisplayName(),
+            HardwareMake.get(hardwareRequest.getHardwareMake()),
+            HardwareType.get(hardwareRequest.getHardwareType()),
+            hardwareRequest.getMultiplier(),
+            hardwareRequest.getAveragePpd()
+        );
     }
 
     /**
@@ -103,7 +125,15 @@ public class Hardware implements ResponsePojo {
      * @return the updated {@link Hardware}
      */
     public static Hardware updateWithId(final int hardwareId, final Hardware hardware) {
-        return new Hardware(hardwareId, hardware.hardwareName, hardware.displayName, hardware.multiplier);
+        return create(
+            hardwareId,
+            hardware.hardwareName,
+            hardware.displayName,
+            hardware.hardwareMake,
+            hardware.hardwareType,
+            hardware.multiplier,
+            hardware.averagePpd
+        );
     }
 
     @Override
@@ -116,6 +146,9 @@ public class Hardware implements ResponsePojo {
 
         return Double.compare(multiplier, hardwareRequest.getMultiplier()) == 0
             && Objects.equals(hardwareName, hardwareRequest.getHardwareName())
-            && Objects.equals(displayName, hardwareRequest.getDisplayName());
+            && Objects.equals(displayName, hardwareRequest.getDisplayName())
+            && Objects.equals(hardwareMake.toString(), hardwareRequest.getHardwareMake())
+            && Objects.equals(hardwareType.toString(), hardwareRequest.getHardwareType())
+            && Double.compare(averagePpd, hardwareRequest.getAveragePpd()) == 0;
     }
 }

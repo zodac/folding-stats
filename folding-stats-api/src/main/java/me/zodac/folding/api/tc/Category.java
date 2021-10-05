@@ -4,7 +4,7 @@ import static java.util.stream.Collectors.toUnmodifiableList;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -41,8 +41,8 @@ public enum Category {
         .collect(toUnmodifiableList());
 
     private final int permittedUsers;
-    private final Set<HardwareMake> supportedHardwareMakes;
-    private final Set<HardwareType> supportedHardwareTypes;
+    private final EnumSet<HardwareMake> supportedHardwareMakes;
+    private final EnumSet<HardwareType> supportedHardwareTypes;
 
     /**
      * Constructs a {@link Category}.
@@ -53,8 +53,8 @@ public enum Category {
      */
     Category(final int permittedUsers, final Collection<HardwareMake> hardwareMakes, final Collection<HardwareType> hardwareTypes) {
         this.permittedUsers = permittedUsers;
-        supportedHardwareMakes = new HashSet<>(hardwareMakes);
-        supportedHardwareTypes = new HashSet<>(hardwareTypes);
+        supportedHardwareMakes = hardwareMakes.isEmpty() ? EnumSet.noneOf(HardwareMake.class) : EnumSet.copyOf(hardwareMakes);
+        supportedHardwareTypes = hardwareTypes.isEmpty() ? EnumSet.noneOf(HardwareType.class) : EnumSet.copyOf(hardwareTypes);
     }
 
     /**
@@ -66,8 +66,8 @@ public enum Category {
      */
     Category(final int permittedUsers, final HardwareMake hardwareMake, final HardwareType hardwareType) {
         this.permittedUsers = permittedUsers;
-        supportedHardwareMakes = Set.of(hardwareMake);
-        supportedHardwareTypes = Set.of(hardwareType);
+        supportedHardwareMakes = EnumSet.of(hardwareMake);
+        supportedHardwareTypes = EnumSet.of(hardwareType);
     }
 
     /**

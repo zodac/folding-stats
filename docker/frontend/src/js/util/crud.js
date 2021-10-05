@@ -1,13 +1,19 @@
 function createHardware() {
     var hardwareName = document.getElementById("hardware_create_name").value.trim();
     var displayName = document.getElementById("hardware_create_display_name").value.trim();
+    var hardwareMake = document.getElementById("hardware_create_hardware_make").value.trim();
+    var hardwareType = document.getElementById("hardware_create_hardware_type").value.trim();
     var multiplier = document.getElementById("hardware_create_multiplier").value.trim();
+    var averagePpd = document.getElementById("hardware_create_average_ppd").value.trim();
 
     var requestData = JSON.stringify(
         {
             "hardwareName": hardwareName,
             "displayName": displayName,
-            "multiplier": multiplier
+            "hardwareMake": getHardwareMakeBackend(hardwareMake),
+            "hardwareType": getHardwareTypeBackend(hardwareType),
+            "multiplier": multiplier,
+            "averagePpd": averagePpd,
         }
     );
 
@@ -34,7 +40,10 @@ function createHardware() {
 
         document.getElementById("hardware_create_name").value = '';
         document.getElementById("hardware_create_display_name").value = '';
+        document.getElementById("hardware_create_hardware_make").value = '';
+        document.getElementById("hardware_create_hardware_type").value = '';
         document.getElementById("hardware_create_multiplier").value = '';
+        document.getElementById("hardware_create_average_ppd").value = '';
         successToast("Hardware '" + displayName + "' created");
         loadHardware();
     })
@@ -53,13 +62,19 @@ function updateHardware() {
 
     var hardwareName = document.getElementById("hardware_update_name").value.trim();
     var displayName = document.getElementById("hardware_update_display_name").value.trim();
+    var hardwareMake = document.getElementById("hardware_update_hardware_make").value.trim();
+    var hardwareType = document.getElementById("hardware_update_hardware_type").value.trim();
     var multiplier = document.getElementById("hardware_update_multiplier").value.trim();
+    var averagePpd = document.getElementById("hardware_update_average_ppd").value.trim();
 
     var requestData = JSON.stringify(
         {
             "hardwareName": hardwareName,
             "displayName": displayName,
-            "multiplier": multiplier
+            "hardwareMake": getHardwareMakeBackend(hardwareMake),
+            "hardwareType": getHardwareTypeBackend(hardwareType),
+            "multiplier": multiplier,
+            "averagePpd": averagePpd,
         }
     );
 
@@ -87,7 +102,10 @@ function updateHardware() {
         document.getElementById("hardware_update_id").value = '';
         document.getElementById("hardware_update_name").value = '';
         document.getElementById("hardware_update_display_name").value = '';
+        document.getElementById("hardware_update_hardware_make").value = '';
+        document.getElementById("hardware_update_hardware_type").value = '';
         document.getElementById("hardware_update_multiplier").value = '';
+        document.getElementById("hardware_update_average_ppd").value = '';
 
         hardwareFields = document.querySelectorAll(".hardware_update");
         for (var i = 0, hardwareField; hardwareField = hardwareFields[i]; i++) {
@@ -135,7 +153,10 @@ function deleteHardware() {
         document.getElementById("hardware_delete_id").value = '';
         document.getElementById("hardware_delete_name").value = '';
         document.getElementById("hardware_delete_display_name").value = '';
+        document.getElementById("hardware_delete_hardware_make").value = '';
+        document.getElementById("hardware_delete_hardware_type").value = '';
         document.getElementById("hardware_delete_multiplier").value = '';
+        document.getElementById("hardware_delete_average_ppd").value = '';
 
         hardwareFields = document.querySelectorAll(".hardware_delete");
         for (var i = 0, hardwareField; hardwareField = hardwareFields[i]; i++) {

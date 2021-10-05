@@ -4,7 +4,10 @@
       "id": 0,
       "hardwareName": "Hardware1",
       "displayName": "Hardware1",
-      "multiplier": -21.33
+      "hardwareMake": "NVIDIA",
+      "hardwareType": "GPU",
+      "multiplier": -21.33,
+      "averagePpd": 1.00
     },
     "errors": [
       "Field 'multiplier' must be 1.00 or higher"
@@ -15,7 +18,10 @@
       "id": 0,
       "hardwareName": "Hardware2",
       "displayName": "Hardware2",
-      "multiplier": -3.62
+      "hardwareMake": "AMD",
+      "hardwareType": "GPU",
+      "multiplier": -3.62,
+      "averagePpd": 25.30
     },
     "errors": [
       "Field 'multiplier' must be 1.00 or higher"

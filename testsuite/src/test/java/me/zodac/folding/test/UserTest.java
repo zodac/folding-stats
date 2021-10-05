@@ -863,7 +863,10 @@ class UserTest {
         final HardwareRequest hardwareUpdateRequest = HardwareRequest.builder()
             .hardwareName("updatedHardwareName")
             .displayName(hardware.getDisplayName())
+            .hardwareMake(hardware.getHardwareMake().toString())
+            .hardwareType(hardware.getHardwareType().toString())
             .multiplier(hardware.getMultiplier())
+            .averagePpd(hardware.getAveragePpd())
             .build();
 
         final HttpResponse<String> response =

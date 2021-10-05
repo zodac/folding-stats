@@ -11,7 +11,10 @@
       "id": 1,
       "hardwareName": "Hardware1",
       "displayName": "Hardware1",
-      "multiplier": 16.38
+      "hardwareMake": "NVIDIA",
+      "hardwareType": "GPU",
+      "multiplier": 21.33,
+      "averagePpd": 1.00
     },
     "team": {
       "id": 1,
@@ -20,7 +23,7 @@
     "userIsCaptain": true
   },
   {
-    "id": 1,
+    "id": 2,
     "foldingUserName": "User2",
     "displayName": "User2",
     "passkey": "fc7d6837************************",
@@ -29,7 +32,10 @@
       "id": 2,
       "hardwareName": "Hardware2",
       "displayName": "Hardware2",
-      "multiplier": 3.62
+      "hardwareMake": "AMD",
+      "hardwareType": "GPU",
+      "multiplier": 14.6,
+      "averagePpd": 1.00
     },
     "team": {
       "id": 1,

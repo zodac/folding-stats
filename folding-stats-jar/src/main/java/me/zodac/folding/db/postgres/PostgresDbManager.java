@@ -86,11 +86,22 @@ public final class PostgresDbManager implements DbManager {
         return executeQuery(queryContext -> {
             final var query = queryContext
                 .insertInto(HARDWARE)
-                .columns(HARDWARE.HARDWARE_NAME, HARDWARE.DISPLAY_NAME, HARDWARE.HARDWARE_MAKE, HARDWARE.HARDWARE_TYPE, HARDWARE.AVERAGE_PPD,
-                    HARDWARE.MULTIPLIER)
-                .values(hardware.getHardwareName(), hardware.getDisplayName(),
-                    "", "GPU", BigDecimal.valueOf(1.0D), // TODO: [zodac] Hardcoded for now until LARS automation implemented
-                    BigDecimal.valueOf(hardware.getMultiplier()))
+                .columns(
+                    HARDWARE.HARDWARE_NAME,
+                    HARDWARE.DISPLAY_NAME,
+                    HARDWARE.HARDWARE_MAKE,
+                    HARDWARE.HARDWARE_TYPE,
+                    HARDWARE.MULTIPLIER,
+                    HARDWARE.AVERAGE_PPD
+                )
+                .values(
+                    hardware.getHardwareName(),
+                    hardware.getDisplayName(),
+                    hardware.getHardwareMake().toString(),
+                    hardware.getHardwareType().toString(),
+                    BigDecimal.valueOf(hardware.getMultiplier()),
+                    BigDecimal.valueOf(hardware.getAveragePpd())
+                )
                 .returning(HARDWARE.HARDWARE_ID);
             LOGGER.debug("Executing SQL: '{}'", query);
 
@@ -143,11 +154,10 @@ public final class PostgresDbManager implements DbManager {
                 .update(HARDWARE)
                 .set(HARDWARE.HARDWARE_NAME, hardware.getHardwareName())
                 .set(HARDWARE.DISPLAY_NAME, hardware.getDisplayName())
+                .set(HARDWARE.HARDWARE_MAKE, hardware.getHardwareMake().toString())
+                .set(HARDWARE.HARDWARE_TYPE, hardware.getHardwareType().toString())
                 .set(HARDWARE.MULTIPLIER, BigDecimal.valueOf(hardware.getMultiplier()))
-                // TODO: [zodac] Hardcoded for now until LARS automation implemented
-                .set(HARDWARE.HARDWARE_MAKE, "")
-                .set(HARDWARE.HARDWARE_TYPE, "GPU")
-                .set(HARDWARE.AVERAGE_PPD, BigDecimal.valueOf(1.0D))
+                .set(HARDWARE.AVERAGE_PPD, BigDecimal.valueOf(hardware.getAveragePpd()))
                 .where(HARDWARE.HARDWARE_ID.equal(hardware.getId()));
             LOGGER.debug("Executing SQL: '{}'", query);
 
@@ -252,10 +262,28 @@ public final class PostgresDbManager implements DbManager {
         return executeQuery(queryContext -> {
             final var query = queryContext
                 .insertInto(USERS)
-                .columns(USERS.FOLDING_USERNAME, USERS.DISPLAY_USERNAME, USERS.PASSKEY, USERS.CATEGORY, USERS.PROFILE_LINK, USERS.LIVE_STATS_LINK,
-                    USERS.HARDWARE_ID, USERS.TEAM_ID, USERS.IS_CAPTAIN)
-                .values(user.getFoldingUserName(), user.getDisplayName(), user.getPasskey(), user.getCategory().toString(), user.getProfileLink(),
-                    user.getLiveStatsLink(), user.getHardware().getId(), user.getTeam().getId(), user.isUserIsCaptain())
+                .columns(
+                    USERS.FOLDING_USERNAME,
+                    USERS.DISPLAY_USERNAME,
+                    USERS.PASSKEY,
+                    USERS.CATEGORY,
+                    USERS.PROFILE_LINK,
+                    USERS.LIVE_STATS_LINK,
+                    USERS.HARDWARE_ID,
+                    USERS.TEAM_ID,
+                    USERS.IS_CAPTAIN
+                )
+                .values(
+                    user.getFoldingUserName(),
+                    user.getDisplayName(),
+                    user.getPasskey(),
+                    user.getCategory().toString(),
+                    user.getProfileLink(),
+                    user.getLiveStatsLink(),
+                    user.getHardware().getId(),
+                    user.getTeam().getId(),
+                    user.isUserIsCaptain()
+                )
                 .returning(USERS.USER_ID);
             LOGGER.debug("Executing SQL: '{}'", query);
 
@@ -347,10 +375,20 @@ public final class PostgresDbManager implements DbManager {
         executeQuery(queryContext -> {
             final var query = queryContext
                 .insertInto(USER_TC_STATS_HOURLY)
-                .columns(USER_TC_STATS_HOURLY.USER_ID, USER_TC_STATS_HOURLY.UTC_TIMESTAMP, USER_TC_STATS_HOURLY.TC_POINTS,
-                    USER_TC_STATS_HOURLY.TC_POINTS_MULTIPLIED, USER_TC_STATS_HOURLY.TC_UNITS)
-                .values(userTcStats.getUserId(), DateTimeUtils.toUtcLocalDateTime(userTcStats.getTimestamp()), userTcStats.getPoints(),
-                    userTcStats.getMultipliedPoints(), userTcStats.getUnits());
+                .columns(
+                    USER_TC_STATS_HOURLY.USER_ID,
+                    USER_TC_STATS_HOURLY.UTC_TIMESTAMP,
+                    USER_TC_STATS_HOURLY.TC_POINTS,
+                    USER_TC_STATS_HOURLY.TC_POINTS_MULTIPLIED,
+                    USER_TC_STATS_HOURLY.TC_UNITS
+                )
+                .values(
+                    userTcStats.getUserId(),
+                    DateTimeUtils.toUtcLocalDateTime(userTcStats.getTimestamp()),
+                    userTcStats.getPoints(),
+                    userTcStats.getMultipliedPoints(),
+                    userTcStats.getUnits()
+                );
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
@@ -363,8 +401,13 @@ public final class PostgresDbManager implements DbManager {
 
         return executeQuery(queryContext -> {
             final var query = queryContext
-                .select(USER_TC_STATS_HOURLY.USER_ID, USER_TC_STATS_HOURLY.UTC_TIMESTAMP, USER_TC_STATS_HOURLY.TC_POINTS,
-                    USER_TC_STATS_HOURLY.TC_POINTS_MULTIPLIED, USER_TC_STATS_HOURLY.TC_UNITS)
+                .select(
+                    USER_TC_STATS_HOURLY.USER_ID,
+                    USER_TC_STATS_HOURLY.UTC_TIMESTAMP,
+                    USER_TC_STATS_HOURLY.TC_POINTS,
+                    USER_TC_STATS_HOURLY.TC_POINTS_MULTIPLIED,
+                    USER_TC_STATS_HOURLY.TC_UNITS
+                )
                 .from(USER_TC_STATS_HOURLY)
                 .where(USER_TC_STATS_HOURLY.USER_ID.equal(userId))
                 .orderBy(USER_TC_STATS_HOURLY.UTC_TIMESTAMP.desc())
@@ -782,10 +825,20 @@ public final class PostgresDbManager implements DbManager {
 
             final var query = queryContext
                 .insertInto(USER_OFFSET_TC_STATS)
-                .columns(USER_OFFSET_TC_STATS.USER_ID, USER_OFFSET_TC_STATS.UTC_TIMESTAMP, USER_OFFSET_TC_STATS.OFFSET_POINTS,
-                    USER_OFFSET_TC_STATS.OFFSET_MULTIPLIED_POINTS, USER_OFFSET_TC_STATS.OFFSET_UNITS)
-                .values(userId, currentUtcLocalDateTime, offsetStats.getPointsOffset(), offsetStats.getMultipliedPointsOffset(),
-                    offsetStats.getUnitsOffset())
+                .columns(
+                    USER_OFFSET_TC_STATS.USER_ID,
+                    USER_OFFSET_TC_STATS.UTC_TIMESTAMP,
+                    USER_OFFSET_TC_STATS.OFFSET_POINTS,
+                    USER_OFFSET_TC_STATS.OFFSET_MULTIPLIED_POINTS,
+                    USER_OFFSET_TC_STATS.OFFSET_UNITS
+                )
+                .values(
+                    userId,
+                    currentUtcLocalDateTime,
+                    offsetStats.getPointsOffset(),
+                    offsetStats.getMultipliedPointsOffset(),
+                    offsetStats.getUnitsOffset()
+                )
                 .onConflict(USER_OFFSET_TC_STATS.USER_ID)
                 .doUpdate()
                 .set(USER_OFFSET_TC_STATS.UTC_TIMESTAMP, currentUtcLocalDateTime)
@@ -807,10 +860,19 @@ public final class PostgresDbManager implements DbManager {
 
             final var query = queryContext
                 .insertInto(USER_OFFSET_TC_STATS)
-                .columns(USER_OFFSET_TC_STATS.USER_ID, USER_OFFSET_TC_STATS.UTC_TIMESTAMP, USER_OFFSET_TC_STATS.OFFSET_POINTS,
-                    USER_OFFSET_TC_STATS.OFFSET_MULTIPLIED_POINTS, USER_OFFSET_TC_STATS.OFFSET_UNITS)
-                .values(userId, currentUtcLocalDateTime, offsetStats.getPointsOffset(), offsetStats.getMultipliedPointsOffset(),
-                    offsetStats.getUnitsOffset())
+                .columns(
+                    USER_OFFSET_TC_STATS.USER_ID,
+                    USER_OFFSET_TC_STATS.UTC_TIMESTAMP,
+                    USER_OFFSET_TC_STATS.OFFSET_POINTS,
+                    USER_OFFSET_TC_STATS.OFFSET_MULTIPLIED_POINTS,
+                    USER_OFFSET_TC_STATS.OFFSET_UNITS
+                )
+                .values(
+                    userId, currentUtcLocalDateTime,
+                    offsetStats.getPointsOffset(),
+                    offsetStats.getMultipliedPointsOffset(),
+                    offsetStats.getUnitsOffset()
+                )
                 .onConflict(USER_OFFSET_TC_STATS.USER_ID)
                 .doUpdate()
                 .set(USER_OFFSET_TC_STATS.UTC_TIMESTAMP, currentUtcLocalDateTime)
@@ -874,11 +936,24 @@ public final class PostgresDbManager implements DbManager {
 
             final var query = queryContext
                 .insertInto(RETIRED_USER_STATS)
-                .columns(RETIRED_USER_STATS.TEAM_ID, RETIRED_USER_STATS.USER_ID, RETIRED_USER_STATS.DISPLAY_USERNAME,
-                    USER_OFFSET_TC_STATS.UTC_TIMESTAMP,
-                    RETIRED_USER_STATS.FINAL_POINTS, RETIRED_USER_STATS.FINAL_MULTIPLIED_POINTS, RETIRED_USER_STATS.FINAL_UNITS)
-                .values(teamId, userId, displayUserName, currentUtcLocalDateTime, retiredUserStats.getPoints(),
-                    retiredUserStats.getMultipliedPoints(), retiredUserStats.getUnits())
+                .columns(
+                    RETIRED_USER_STATS.TEAM_ID,
+                    RETIRED_USER_STATS.USER_ID,
+                    RETIRED_USER_STATS.DISPLAY_USERNAME,
+                    RETIRED_USER_STATS.UTC_TIMESTAMP,
+                    RETIRED_USER_STATS.FINAL_POINTS,
+                    RETIRED_USER_STATS.FINAL_MULTIPLIED_POINTS,
+                    RETIRED_USER_STATS.FINAL_UNITS
+                )
+                .values(
+                    teamId,
+                    userId,
+                    displayUserName,
+                    currentUtcLocalDateTime,
+                    retiredUserStats.getPoints(),
+                    retiredUserStats.getMultipliedPoints(),
+                    retiredUserStats.getUnits()
+                )
                 .onConflict(RETIRED_USER_STATS.USER_ID)
                 .doUpdate()
                 .set(RETIRED_USER_STATS.TEAM_ID, teamId)

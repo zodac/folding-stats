@@ -3,13 +3,19 @@
     "id": 0,
     "hardwareName": "Hardware1",
     "displayName": "Hardware1",
-    "multiplier": 16.38
+    "hardwareMake": "NVIDIA",
+    "hardwareType": "GPU",
+    "multiplier": 16.38,
+    "averagePpd": 1.00
   },
   "conflictingObject": {
     "id": 1,
     "hardwareName": "Hardware1",
     "displayName": "Hardware1",
-    "multiplier": 16.38
+    "hardwareMake": "NVIDIA",
+    "hardwareType": "GPU",
+    "multiplier": 16.38,
+    "averagePpd": 1.00
   },
   "validationResult": "FAILURE_DUE_TO_CONFLICT",
   "errors": [

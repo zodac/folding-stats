@@ -3,6 +3,8 @@ package me.zodac.folding.rest.validator;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import me.zodac.folding.api.tc.Hardware;
+import me.zodac.folding.api.tc.HardwareMake;
+import me.zodac.folding.api.tc.HardwareType;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
@@ -18,7 +20,10 @@ class HardwareValidatorTest {
         final HardwareRequest hardware = HardwareRequest.builder()
             .hardwareName("hardwareName")
             .displayName("displayName")
-            .multiplier(1.0D)
+            .hardwareMake(HardwareMake.AMD.toString())
+            .hardwareType(HardwareType.GPU.toString())
+            .multiplier(1.00D)
+            .averagePpd(1.00D)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -48,7 +53,10 @@ class HardwareValidatorTest {
         final HardwareRequest hardware = HardwareRequest.builder()
             .hardwareName(null)
             .displayName("displayName")
-            .multiplier(1.0D)
+            .hardwareMake(HardwareMake.AMD.toString())
+            .hardwareType(HardwareType.GPU.toString())
+            .multiplier(1.00D)
+            .averagePpd(1.00D)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -68,7 +76,10 @@ class HardwareValidatorTest {
         mockBusinessLogic.createHardware(Hardware.builder()
             .hardwareName("existingName")
             .displayName("displayName")
-            .multiplier(1.0D)
+            .hardwareMake(HardwareMake.AMD)
+            .hardwareType(HardwareType.GPU)
+            .multiplier(1.00D)
+            .averagePpd(1.00D)
             .build()
         );
 
@@ -76,7 +87,10 @@ class HardwareValidatorTest {
         final HardwareRequest hardware = HardwareRequest.builder()
             .hardwareName("existingName")
             .displayName("displayName")
-            .multiplier(1.0D)
+            .hardwareMake(HardwareMake.AMD.toString())
+            .hardwareType(HardwareType.GPU.toString())
+            .multiplier(1.00D)
+            .averagePpd(1.00D)
             .build();
 
         final ValidationResponse<Hardware> response = hardwareValidator.validateCreate(hardware);
@@ -93,7 +107,10 @@ class HardwareValidatorTest {
         final HardwareRequest hardware = HardwareRequest.builder()
             .hardwareName("hardwareName")
             .displayName(null)
-            .multiplier(1.0D)
+            .hardwareMake(HardwareMake.AMD.toString())
+            .hardwareType(HardwareType.GPU.toString())
+            .multiplier(1.00D)
+            .averagePpd(1.00D)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -108,11 +125,58 @@ class HardwareValidatorTest {
     }
 
     @Test
+    void whenValidatingCreate_givenHardwareWithInvalidMake_thenFailureResponseIsReturned() {
+        final HardwareRequest hardware = HardwareRequest.builder()
+            .hardwareName("hardwareName")
+            .displayName("displayName")
+            .hardwareMake(HardwareMake.INVALID.toString())
+            .hardwareType(HardwareType.GPU.toString())
+            .multiplier(1.00D)
+            .averagePpd(1.00D)
+            .build();
+
+        final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
+        final HardwareValidator hardwareValidator = HardwareValidator.create(mockBusinessLogic);
+        final ValidationResponse<Hardware> response = hardwareValidator.validateCreate(hardware);
+
+        assertThat(response.isInvalid())
+            .isTrue();
+
+        assertThat(response.getErrors())
+            .contains("Field 'hardwareMake' must be one of: " + HardwareMake.getAllValues());
+    }
+
+    @Test
+    void whenValidatingCreate_givenHardwareWithInvalidType_thenFailureResponseIsReturned() {
+        final HardwareRequest hardware = HardwareRequest.builder()
+            .hardwareName("hardwareName")
+            .displayName("displayName")
+            .hardwareMake(HardwareMake.AMD.toString())
+            .hardwareType(HardwareType.INVALID.toString())
+            .multiplier(1.00D)
+            .averagePpd(1.00D)
+            .build();
+
+        final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
+        final HardwareValidator hardwareValidator = HardwareValidator.create(mockBusinessLogic);
+        final ValidationResponse<Hardware> response = hardwareValidator.validateCreate(hardware);
+
+        assertThat(response.isInvalid())
+            .isTrue();
+
+        assertThat(response.getErrors())
+            .contains("Field 'hardwareType' must be one of: " + HardwareType.getAllValues());
+    }
+
+    @Test
     void whenValidatingCreate_givenHardwareWithNegativeMultiplier_thenFailureResponseIsReturned() {
         final HardwareRequest hardware = HardwareRequest.builder()
             .hardwareName("hardwareName")
             .displayName("displayName")
-            .multiplier(-1.0D)
+            .hardwareMake(HardwareMake.AMD.toString())
+            .hardwareType(HardwareType.GPU.toString())
+            .multiplier(-1.00D)
+            .averagePpd(1.00D)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -127,11 +191,36 @@ class HardwareValidatorTest {
     }
 
     @Test
+    void whenValidatingCreate_givenHardwareWithNegativeAveragePpd_thenFailureResponseIsReturned() {
+        final HardwareRequest hardware = HardwareRequest.builder()
+            .hardwareName("hardwareName")
+            .displayName("displayName")
+            .hardwareMake(HardwareMake.AMD.toString())
+            .hardwareType(HardwareType.GPU.toString())
+            .multiplier(1.00D)
+            .averagePpd(-1.00D)
+            .build();
+
+        final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
+        final HardwareValidator hardwareValidator = HardwareValidator.create(mockBusinessLogic);
+        final ValidationResponse<Hardware> response = hardwareValidator.validateCreate(hardware);
+
+        assertThat(response.isInvalid())
+            .isTrue();
+
+        assertThat(response.getErrors())
+            .contains("Field 'averagePpd' must be 1.00 or higher");
+    }
+
+    @Test
     void whenValidatingCreate_givenHardwareWithMultipleErrors_thenAllErrorsAreReturned() {
         final HardwareRequest hardware = HardwareRequest.builder()
             .hardwareName(null)
             .displayName(null)
-            .multiplier(-1.0D)
+            .hardwareMake(HardwareMake.INVALID.toString())
+            .hardwareType(HardwareType.INVALID.toString())
+            .multiplier(-1.00D)
+            .averagePpd(-1.00D)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -143,11 +232,14 @@ class HardwareValidatorTest {
 
         assertThat(response.getErrors())
             .as("Did not receive expected error messages")
-            .hasSize(3)
+            .hasSize(6)
             .contains(
                 "Field 'hardwareName' must not be empty",
                 "Field 'displayName' must not be empty",
-                "Field 'multiplier' must be 1.00 or higher"
+                "Field 'hardwareMake' must be one of: " + HardwareMake.getAllValues(),
+                "Field 'hardwareType' must be one of: " + HardwareType.getAllValues(),
+                "Field 'multiplier' must be 1.00 or higher",
+                "Field 'averagePpd' must be 1.00 or higher"
             );
     }
 
@@ -156,13 +248,19 @@ class HardwareValidatorTest {
         final HardwareRequest hardware = HardwareRequest.builder()
             .hardwareName("hardwareName")
             .displayName("displayName")
-            .multiplier(2.0D)
+            .hardwareMake(HardwareMake.AMD.toString())
+            .hardwareType(HardwareType.GPU.toString())
+            .multiplier(2.00D)
+            .averagePpd(1.00D)
             .build();
 
         final Hardware existingHardware = Hardware.builder()
             .hardwareName("hardwareName")
             .displayName("displayName")
-            .multiplier(1.0D)
+            .hardwareMake(HardwareMake.AMD)
+            .hardwareType(HardwareType.GPU)
+            .multiplier(1.00D)
+            .averagePpd(1.00D)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -179,7 +277,10 @@ class HardwareValidatorTest {
         final Hardware existingHardware = Hardware.builder()
             .hardwareName("existingName")
             .displayName("displayName")
-            .multiplier(1.0D)
+            .hardwareMake(HardwareMake.AMD)
+            .hardwareType(HardwareType.GPU)
+            .multiplier(1.00D)
+            .averagePpd(1.00D)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -198,7 +299,10 @@ class HardwareValidatorTest {
         final HardwareRequest hardware = HardwareRequest.builder()
             .hardwareName(null)
             .displayName("displayName")
-            .multiplier(1.0D)
+            .hardwareMake(HardwareMake.AMD.toString())
+            .hardwareType(HardwareType.GPU.toString())
+            .multiplier(1.00D)
+            .averagePpd(1.00D)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -217,13 +321,19 @@ class HardwareValidatorTest {
         final HardwareRequest hardware = HardwareRequest.builder()
             .hardwareName(null)
             .displayName("displayName")
-            .multiplier(1.0D)
+            .hardwareMake(HardwareMake.AMD.toString())
+            .hardwareType(HardwareType.GPU.toString())
+            .multiplier(1.00D)
+            .averagePpd(1.00D)
             .build();
 
         final Hardware existingHardware = Hardware.builder()
             .hardwareName("hardwareName")
             .displayName("displayName")
-            .multiplier(1.0D)
+            .hardwareMake(HardwareMake.AMD)
+            .hardwareType(HardwareType.GPU)
+            .multiplier(1.00D)
+            .averagePpd(1.00D)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -242,14 +352,20 @@ class HardwareValidatorTest {
         final HardwareRequest hardware = HardwareRequest.builder()
             .hardwareName("hardwareName")
             .displayName("displayName")
-            .multiplier(1.0D)
+            .hardwareMake(HardwareMake.AMD.toString())
+            .hardwareType(HardwareType.GPU.toString())
+            .multiplier(1.00D)
+            .averagePpd(1.00D)
             .build();
 
         final Hardware existingHardware = Hardware.builder()
             .id(1)
             .hardwareName("differentName")
             .displayName("displayName")
-            .multiplier(1.0D)
+            .hardwareMake(HardwareMake.AMD)
+            .hardwareType(HardwareType.GPU)
+            .multiplier(1.00D)
+            .averagePpd(1.00D)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -257,7 +373,10 @@ class HardwareValidatorTest {
             .id(20)
             .hardwareName("hardwareName")
             .displayName("displayName")
-            .multiplier(1.0D)
+            .hardwareMake(HardwareMake.AMD)
+            .hardwareType(HardwareType.GPU)
+            .multiplier(1.00D)
+            .averagePpd(1.00D)
             .build()
         );
 
@@ -276,14 +395,20 @@ class HardwareValidatorTest {
         final HardwareRequest hardware = HardwareRequest.builder()
             .hardwareName("hardwareName")
             .displayName("displayName")
-            .multiplier(1.0D)
+            .hardwareMake(HardwareMake.AMD.toString())
+            .hardwareType(HardwareType.GPU.toString())
+            .multiplier(1.00D)
+            .averagePpd(1.00D)
             .build();
 
         final Hardware existingHardware = Hardware.builder()
             .id(1)
             .hardwareName("hardwareName")
             .displayName("displayName")
-            .multiplier(1.0D)
+            .hardwareMake(HardwareMake.AMD)
+            .hardwareType(HardwareType.GPU)
+            .multiplier(1.00D)
+            .averagePpd(1.00D)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -291,7 +416,10 @@ class HardwareValidatorTest {
             .id(1)
             .hardwareName("hardwareName")
             .displayName("displayName")
-            .multiplier(1.0D)
+            .hardwareMake(HardwareMake.AMD)
+            .hardwareType(HardwareType.GPU)
+            .multiplier(1.00D)
+            .averagePpd(1.00D)
             .build()
         );
 
@@ -307,13 +435,19 @@ class HardwareValidatorTest {
         final HardwareRequest hardware = HardwareRequest.builder()
             .hardwareName("hardwareName")
             .displayName(null)
-            .multiplier(1.0D)
+            .hardwareMake(HardwareMake.AMD.toString())
+            .hardwareType(HardwareType.GPU.toString())
+            .multiplier(1.00D)
+            .averagePpd(1.00D)
             .build();
 
         final Hardware existingHardware = Hardware.builder()
             .hardwareName("hardwareName")
             .displayName("displayName")
-            .multiplier(1.0D)
+            .hardwareMake(HardwareMake.AMD)
+            .hardwareType(HardwareType.GPU)
+            .multiplier(1.00D)
+            .averagePpd(1.00D)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -328,17 +462,85 @@ class HardwareValidatorTest {
     }
 
     @Test
-    void whenValidatingUpdate_givenHardwareWithNegativeMultiplier_thenFailureResponseIsReturned() {
+    void whenValidatingUpdate_givenHardwareWithInvalidMake_thenFailureResponseIsReturned() {
         final HardwareRequest hardware = HardwareRequest.builder()
             .hardwareName("hardwareName")
             .displayName("displayName")
-            .multiplier(-1.0D)
+            .hardwareMake(HardwareMake.INVALID.toString())
+            .hardwareType(HardwareType.GPU.toString())
+            .multiplier(1.00D)
+            .averagePpd(1.00D)
             .build();
 
         final Hardware existingHardware = Hardware.builder()
             .hardwareName("hardwareName")
             .displayName("displayName")
-            .multiplier(1.0D)
+            .hardwareMake(HardwareMake.AMD)
+            .hardwareType(HardwareType.GPU)
+            .multiplier(1.00D)
+            .averagePpd(1.00D)
+            .build();
+
+        final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
+        final HardwareValidator hardwareValidator = HardwareValidator.create(mockBusinessLogic);
+        final ValidationResponse<Hardware> response = hardwareValidator.validateUpdate(hardware, existingHardware);
+
+        assertThat(response.isInvalid())
+            .isTrue();
+
+        assertThat(response.getErrors())
+            .contains("Field 'hardwareMake' must be one of: " + HardwareMake.getAllValues());
+    }
+
+    @Test
+    void whenValidatingUpdate_givenHardwareWithInvalidType_thenFailureResponseIsReturned() {
+        final HardwareRequest hardware = HardwareRequest.builder()
+            .hardwareName("hardwareName")
+            .displayName("displayName")
+            .hardwareMake(HardwareMake.AMD.toString())
+            .hardwareType(HardwareType.INVALID.toString())
+            .multiplier(1.00D)
+            .averagePpd(1.00D)
+            .build();
+
+        final Hardware existingHardware = Hardware.builder()
+            .hardwareName("hardwareName")
+            .displayName("displayName")
+            .hardwareMake(HardwareMake.AMD)
+            .hardwareType(HardwareType.GPU)
+            .multiplier(1.00D)
+            .averagePpd(1.00D)
+            .build();
+
+        final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
+        final HardwareValidator hardwareValidator = HardwareValidator.create(mockBusinessLogic);
+        final ValidationResponse<Hardware> response = hardwareValidator.validateUpdate(hardware, existingHardware);
+
+        assertThat(response.isInvalid())
+            .isTrue();
+
+        assertThat(response.getErrors())
+            .contains("Field 'hardwareType' must be one of: " + HardwareType.getAllValues());
+    }
+
+    @Test
+    void whenValidatingUpdate_givenHardwareWithNegativeMultiplier_thenFailureResponseIsReturned() {
+        final HardwareRequest hardware = HardwareRequest.builder()
+            .hardwareName("hardwareName")
+            .displayName("displayName")
+            .hardwareMake(HardwareMake.AMD.toString())
+            .hardwareType(HardwareType.GPU.toString())
+            .multiplier(-1.00D)
+            .averagePpd(1.00D)
+            .build();
+
+        final Hardware existingHardware = Hardware.builder()
+            .hardwareName("hardwareName")
+            .displayName("displayName")
+            .hardwareMake(HardwareMake.AMD)
+            .hardwareType(HardwareType.GPU)
+            .multiplier(1.00D)
+            .averagePpd(1.00D)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -353,17 +555,54 @@ class HardwareValidatorTest {
     }
 
     @Test
-    void whenValidatingUpdate_givenHardwareWithMultipleErrors_thenAllErrorsReturned() {
+    void whenValidatingUpdate_givenHardwareWithNegativeAveragePpd_thenFailureResponseIsReturned() {
         final HardwareRequest hardware = HardwareRequest.builder()
             .hardwareName("hardwareName")
-            .displayName(null)
-            .multiplier(-1.0D)
+            .displayName("displayName")
+            .hardwareMake(HardwareMake.AMD.toString())
+            .hardwareType(HardwareType.GPU.toString())
+            .multiplier(1.00D)
+            .averagePpd(-1.00D)
             .build();
 
         final Hardware existingHardware = Hardware.builder()
             .hardwareName("hardwareName")
             .displayName("displayName")
-            .multiplier(1.0D)
+            .hardwareMake(HardwareMake.AMD)
+            .hardwareType(HardwareType.GPU)
+            .multiplier(1.00D)
+            .averagePpd(1.00D)
+            .build();
+
+        final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
+        final HardwareValidator hardwareValidator = HardwareValidator.create(mockBusinessLogic);
+        final ValidationResponse<Hardware> response = hardwareValidator.validateUpdate(hardware, existingHardware);
+
+        assertThat(response.isInvalid())
+            .isTrue();
+
+        assertThat(response.getErrors())
+            .contains("Field 'averagePpd' must be 1.00 or higher");
+    }
+
+    @Test
+    void whenValidatingUpdate_givenHardwareWithMultipleErrors_thenAllErrorsReturned() {
+        final HardwareRequest hardware = HardwareRequest.builder()
+            .hardwareName("hardwareName")
+            .displayName(null)
+            .hardwareMake(HardwareMake.INVALID.toString())
+            .hardwareType(HardwareType.INVALID.toString())
+            .multiplier(-1.00D)
+            .averagePpd(-1.00D)
+            .build();
+
+        final Hardware existingHardware = Hardware.builder()
+            .hardwareName("hardwareName")
+            .displayName("displayName")
+            .hardwareMake(HardwareMake.AMD)
+            .hardwareType(HardwareType.GPU)
+            .multiplier(1.00D)
+            .averagePpd(1.00D)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -375,10 +614,13 @@ class HardwareValidatorTest {
 
         assertThat(response.getErrors())
             .as("Did not receive expected error messages")
-            .hasSize(2)
+            .hasSize(5)
             .contains(
                 "Field 'displayName' must not be empty",
-                "Field 'multiplier' must be 1.00 or higher"
+                "Field 'hardwareMake' must be one of: " + HardwareMake.getAllValues(),
+                "Field 'hardwareType' must be one of: " + HardwareType.getAllValues(),
+                "Field 'multiplier' must be 1.00 or higher",
+                "Field 'averagePpd' must be 1.00 or higher"
             );
     }
 
@@ -387,7 +629,10 @@ class HardwareValidatorTest {
         final Hardware existingHardware = Hardware.builder()
             .hardwareName("hardwareName")
             .displayName("displayName")
-            .multiplier(1.0D)
+            .hardwareMake(HardwareMake.AMD)
+            .hardwareType(HardwareType.GPU)
+            .multiplier(1.00D)
+            .averagePpd(1.00D)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -405,7 +650,10 @@ class HardwareValidatorTest {
             .id(1)
             .hardwareName("hardwareName")
             .displayName("displayName")
-            .multiplier(1.0D)
+            .hardwareMake(HardwareMake.AMD)
+            .hardwareType(HardwareType.GPU)
+            .multiplier(1.00D)
+            .averagePpd(1.00D)
             .build();
 
         final User userUsingHardware = User.builder()

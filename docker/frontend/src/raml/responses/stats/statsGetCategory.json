@@ -3,6 +3,7 @@
     {
       "displayName": "User1",
       "foldingName": "User1",
+      "hardware": "Hardware1",
       "teamName": "Team1",
       "points": 35765379,
       "multipliedPoints": 250000000,
@@ -14,6 +15,7 @@
     {
       "displayName": "User3",
       "foldingName": "User3",
+      "hardware": "Hardware3",
       "teamName": "Team2",
       "points": 226055,
       "multipliedPoints": 16067989,
@@ -25,6 +27,7 @@
     {
       "displayName": "User8",
       "foldingName": "User8",
+      "hardware": "Hardware8",
       "teamName": "Team3",
       "points": 540033,
       "multipliedPoints": 8845741,
@@ -36,6 +39,7 @@
     {
       "displayName": "User10",
       "foldingName": "User10",
+      "hardware": "Hardware3",
       "teamName": "Team4",
       "points": 1863462,
       "multipliedPoints": 6745732,
@@ -49,6 +53,7 @@
     {
       "displayName": "User6",
       "foldingName": "User6",
+      "hardware": "Hardware6",
       "teamName": "Team3",
       "points": 480103,
       "multipliedPoints": 10240597,
@@ -60,6 +65,7 @@
     {
       "displayName": "User5",
       "foldingName": "User5",
+      "hardware": "Hardware5",
       "teamName": "Team2",
       "points": 533639,
       "multipliedPoints": 8741007,
@@ -71,6 +77,7 @@
     {
       "displayName": "User9",
       "foldingName": "User9",
+      "hardware": "Hardware9",
       "teamName": "Team4",
       "points": 972294,
       "multipliedPoints": 7263036,
@@ -84,6 +91,7 @@
     {
       "displayName": "User2",
       "foldingName": "User2",
+      "hardware": "Hardware2",
       "teamName": "Team1",
       "points": 171232877,
       "multipliedPoints": 250000000,
@@ -95,6 +103,7 @@
     {
       "displayName": "User7",
       "foldingName": "User7",
+      "hardware": "Hardware7",
       "teamName": "Team3",
       "points": 6372742,
       "multipliedPoints": 9304203,
@@ -106,6 +115,7 @@
     {
       "displayName": "User4",
       "foldingName": "User4",
+      "hardware": "Hardware4",
       "teamName": "Team2",
       "points": 424706,
       "multipliedPoints": 8842379,
@@ -117,6 +127,7 @@
     {
       "displayName": "User11",
       "foldingName": "User11",
+      "hardware": "Hardware11",
       "teamName": "Team4",
       "points": 0,
       "multipliedPoints": 0,

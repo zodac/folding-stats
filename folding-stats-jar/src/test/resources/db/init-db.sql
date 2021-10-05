@@ -4,8 +4,8 @@ CREATE TABLE hardware (
     display_name TEXT NOT NULL,
     hardware_make TEXT NOT NULL,
     hardware_type TEXT NOT NULL,
-    average_ppd NUMERIC NOT NULL,
-    multiplier NUMERIC NOT NULL
+    multiplier NUMERIC NOT NULL,
+    average_ppd NUMERIC NOT NULL
 );
 
 CREATE INDEX index_hardware_id

@@ -9,6 +9,8 @@ import java.util.Set;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
+import me.zodac.folding.api.tc.HardwareMake;
+import me.zodac.folding.api.tc.HardwareType;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.OffsetStats;
@@ -48,7 +50,10 @@ final class RecordConverter {
             hardwareRecord.getHardwareId(),
             hardwareRecord.getHardwareName(),
             hardwareRecord.getDisplayName(),
-            hardwareRecord.getMultiplier().doubleValue()
+            HardwareMake.get(hardwareRecord.getHardwareMake()),
+            HardwareType.get(hardwareRecord.getHardwareType()),
+            hardwareRecord.getMultiplier().doubleValue(),
+            hardwareRecord.getAveragePpd().doubleValue()
         );
     }
 

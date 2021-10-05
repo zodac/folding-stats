@@ -185,9 +185,31 @@
                                        aria-label="Display Name" required>
                             </div>
                             <div class="col-auto">
+                                <select id="hardware_create_hardware_make" class="form-select"
+                                        aria-label="hardware_create_hardware_make" required>
+                                    <option selected disabled value="">Make</option>
+                                    <option value="AMD">AMD</option>
+                                    <option value="NVIDIA">nVidia</option>
+                                    <option value="INTEL">Intel</option>
+                                </select>
+                            </div>
+                            <div class="col-auto">
+                                <select id="hardware_create_hardware_type" class="form-select"
+                                        aria-label="hardware_create_hardware_type" required>
+                                    <option selected disabled value="">Type</option>
+                                    <option value="GPU">GPU</option>
+                                    <option value="CPU">CPU</option>
+                                </select>
+                            </div>
+                            <div class="col-auto">
                                 <label for="hardware_create_multiplier" class="visually-hidden">Multiplier</label>
                                 <input id="hardware_create_multiplier" class="form-control" type="number" step="0.01"
                                        placeholder="Multiplier" aria-label="Multiplier" required>
+                            </div>
+                            <div class="col-auto">
+                                <label for="hardware_create_average_ppd" class="visually-hidden">Multiplier</label>
+                                <input id="hardware_create_average_ppd" class="form-control" type="number" step="0.01"
+                                       placeholder="Average PPD" aria-label="Average PPD" required>
                             </div>
                         </form>
                     </div>
@@ -236,9 +258,31 @@
                                        aria-label="Display Name" required>
                             </div>
                             <div class="col-auto hardware_update" style="display:none;">
+                                <select id="hardware_update_hardware_make" class="form-select"
+                                        aria-label="hardware_update_hardware_make" required>
+                                    <option selected disabled value="">Make</option>
+                                    <option value="AMD">AMD</option>
+                                    <option value="NVIDIA">nVidia</option>
+                                    <option value="INTEL">Intel</option>
+                                </select>
+                            </div>
+                            <div class="col-auto hardware_update" style="display:none;">
+                                <select id="hardware_update_hardware_type" class="form-select"
+                                        aria-label="hardware_update_hardware_type" required>
+                                    <option selected disabled value="">Type</option>
+                                    <option value="GPU">GPU</option>
+                                    <option value="CPU">CPU</option>
+                                </select>
+                            </div>
+                            <div class="col-auto hardware_update" style="display:none;">
                                 <label for="hardware_update_multiplier" class="visually-hidden">Multiplier</label>
                                 <input id="hardware_update_multiplier" class="form-control" type="number" step="0.01"
                                        placeholder="Multiplier" aria-label="Multiplier" required>
+                            </div>
+                            <div class="col-auto hardware_update" style="display:none;">
+                                <label for="hardware_update_average_ppd" class="visually-hidden">Multiplier</label>
+                                <input id="hardware_update_average_ppd" class="form-control" type="number" step="0.01"
+                                       placeholder="Average PPD" aria-label="Average PPD" required>
                             </div>
                         </form>
                     </div>
@@ -284,9 +328,31 @@
                                        placeholder="Display Name" aria-label="Display Name" disabled>
                             </div>
                             <div class="col-auto hardware_delete" style="display:none;">
+                                <select id="hardware_delete_hardware_make" class="form-select"
+                                        aria-label="hardware_delete_hardware_make" disabled>
+                                    <option selected disabled value="">Make</option>
+                                    <option value="AMD">AMD</option>
+                                    <option value="NVIDIA">nVidia</option>
+                                    <option value="INTEL">Intel</option>
+                                </select>
+                            </div>
+                            <div class="col-auto hardware_delete" style="display:none;">
+                                <select id="hardware_delete_hardware_type" class="form-select"
+                                        aria-label="hardware_delete_hardware_type" disabled>
+                                    <option selected disabled value="">Type</option>
+                                    <option value="GPU">GPU</option>
+                                    <option value="CPU">CPU</option>
+                                </select>
+                            </div>
+                            <div class="col-auto hardware_delete" style="display:none;">
                                 <label for="hardware_delete_multiplier" class="visually-hidden">Multiplier</label>
                                 <input id="hardware_delete_multiplier" class="form-control" type="number" step="0.01"
                                        placeholder="Multiplier" aria-label="Multiplier" disabled>
+                            </div>
+                            <div class="col-auto hardware_delete" style="display:none;">
+                                <label for="hardware_delete_average_ppd" class="visually-hidden">Multiplier</label>
+                                <input id="hardware_delete_average_ppd" class="form-control" type="number" step="0.01"
+                                       placeholder="Average PPD" aria-label="Average PPD" disabled>
                             </div>
                         </form>
                     </div>
@@ -471,7 +537,6 @@
                                 <input id="user_create_passkey" class="form-control" type="text" maxlength="32"
                                        minlength="32" placeholder="Passkey" aria-label="Passkey" required>
                             </div>
-                            <!-- TODO: [zodac] Could expose a REST endpoint defining the available categories? -->
                             <div class="col-auto">
                                 <select id="user_create_category" class="form-select"
                                         aria-label="user_create_category_list" required>
@@ -638,6 +703,15 @@
                                 <label for="user_delete_passkey" class="visually-hidden">Passkey</label>
                                 <input id="user_delete_passkey" class="form-control" type="text" maxlength="32"
                                        minlength="32" placeholder="Passkey" aria-label="Passkey" required disabled>
+                            </div>
+                            <div class="col-auto user_delete" style="display:none;">
+                                <select id="user_delete_category" class="form-select"
+                                        aria-label="user_delete_category_list" required disabled>
+                                    <option selected disabled value="">Category</option>
+                                    <option value="AMD GPU">AMD GPU</option>
+                                    <option value="nVidia GPU">nVidia GPU</option>
+                                    <option value="Wildcard">Wildcard</option>
+                                </select>
                             </div>
                             <div class="col user_delete" style="display:none;">
                                 <label for="user_delete_profile_link" class="visually-hidden">Profile Link</label>

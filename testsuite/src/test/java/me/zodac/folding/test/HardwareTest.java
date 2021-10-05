@@ -137,7 +137,10 @@ class HardwareTest {
         final HardwareRequest updatedHardware = HardwareRequest.builder()
             .hardwareName(createdHardware.getHardwareName())
             .displayName(createdHardware.getDisplayName())
+            .hardwareMake(createdHardware.getHardwareMake().toString())
+            .hardwareType(createdHardware.getHardwareType().toString())
             .multiplier(createdHardware.getMultiplier())
+            .averagePpd(createdHardware.getAveragePpd())
             .build();
 
         final HttpResponse<String> response =
@@ -339,7 +342,10 @@ class HardwareTest {
         final HardwareRequest updatedHardware = HardwareRequest.builder()
             .hardwareName(createdHardware.getHardwareName())
             .displayName(createdHardware.getDisplayName())
+            .hardwareMake(createdHardware.getHardwareMake().toString())
+            .hardwareType(createdHardware.getHardwareType().toString())
             .multiplier(createdHardware.getMultiplier())
+            .averagePpd(createdHardware.getAveragePpd())
             .build();
 
         final HttpResponse<String> updateResponse =
@@ -365,8 +371,8 @@ class HardwareTest {
             generateHardware()
         );
         final List<HardwareRequest> batchOfInvalidHardware = List.of(
-            TestGenerator.generateHardwareWithMultiplier(-1.0D),
-            TestGenerator.generateHardwareWithMultiplier(-1.0D)
+            TestGenerator.generateHardwareWithMultiplier(-1.00D),
+            TestGenerator.generateHardwareWithMultiplier(-1.00D)
         );
         final List<HardwareRequest> batchOfHardware = new ArrayList<>(batchOfValidHardware.size() + batchOfInvalidHardware.size());
         batchOfHardware.addAll(batchOfValidHardware);
@@ -388,8 +394,8 @@ class HardwareTest {
         final int initialHardwareSize = HardwareUtils.getNumberOfHardware();
 
         final List<HardwareRequest> batchOfInvalidHardware = List.of(
-            TestGenerator.generateHardwareWithMultiplier(-1.0D),
-            TestGenerator.generateHardwareWithMultiplier(-1.0D)
+            TestGenerator.generateHardwareWithMultiplier(-1.00D),
+            TestGenerator.generateHardwareWithMultiplier(-1.00D)
         );
 
         final HttpResponse<String> response =

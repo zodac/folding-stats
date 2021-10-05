@@ -10,7 +10,10 @@
         "id": 2,
         "hardwareName": "Hardware2",
         "displayName": "Hardware2",
-        "multiplier": 3.62
+        "hardwareMake": "NVIDIA",
+        "hardwareType": "GPU",
+        "multiplier": 21.33,
+        "averagePpd": 1.00
       },
       "team": {
         "id": 1,

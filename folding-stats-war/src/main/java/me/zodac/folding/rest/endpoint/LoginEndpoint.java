@@ -25,6 +25,9 @@ import me.zodac.folding.rest.api.LoginCredentials;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * REST endpoints to log in as a system user.
+ */
 @Path("/login/")
 @RequestScoped
 public class LoginEndpoint {
@@ -34,6 +37,23 @@ public class LoginEndpoint {
     @EJB
     private BusinessLogic businessLogic;
 
+    /**
+     * <b>POST</b> request to log in as an admin system user.
+     *
+     * <p>
+     * The {@link Response} will be one of:
+     * <ul>
+     *     <li>{@link me.zodac.folding.rest.response.Responses#ok()}</li>
+     *     <li>{@link me.zodac.folding.rest.response.Responses#serviceUnavailable()}</li>
+     *     <li>{@link me.zodac.folding.rest.response.Responses#badRequest(Object)}</li>
+     *     <li>{@link me.zodac.folding.rest.response.Responses#unauthorized()}</li>
+     *     <li>{@link me.zodac.folding.rest.response.Responses#forbidden()}</li>
+     *     <li>{@link me.zodac.folding.rest.response.Responses#serverError()}</li>
+     * </ul>
+     *
+     * @param loginCredentials the {@link LoginCredentials}
+     * @return one of the above {@link Response}s
+     */
     @POST
     @PermitAll
     @Path("/admin/")
