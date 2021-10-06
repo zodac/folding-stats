@@ -41,9 +41,11 @@ services:
       JAVA_OPTS: -Xms512m -Xmx2g -Djava.net.preferIPv4Stack=true
       # Stats parsing configuration
       STATS_URL_ROOT: "https://api2.foldingathome.org"
-      # NOTE: The monthly reset & result storage will always occur at 23:57 on the last day of the month
+      LARS_URL_ROOT: "https://folding.lar.systems/"
+      # NOTE: The monthly reset, result storage and LARS update will always occur at 23:57 on the last day of the month
       ENABLE_STATS_MONTHLY_RESET: "true"
       ENABLE_MONTHLY_RESULT_STORAGE: "true"
+      ENABLE_LARS_HARDWARE_UPDATE: "true"
       # Scheduled stats parsing configuration
       # NOTE: This time is hardcoded in the frontend, will also need to update 'timer.js'
       ENABLE_STATS_SCHEDULED_PARSING: "true"

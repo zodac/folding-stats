@@ -19,6 +19,7 @@ import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
 import me.zodac.folding.ejb.tc.UserStatsResetter;
 import me.zodac.folding.ejb.tc.UserStatsStorer;
+import me.zodac.folding.ejb.tc.lars.LarsHardwareUpdater;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -46,6 +47,7 @@ import org.apache.logging.log4j.Logger;
  *              <li>ENABLE_MONTHLY_RESULT_STORAGE</li>
  *          </ul>
  *      </li>
+ *      <li>Updates the value of all {@link me.zodac.folding.api.tc.Hardware} from the LARS PPD database.</li>
  * </ul>
  */
 @Startup
@@ -55,6 +57,10 @@ public class EndOfMonthScheduler {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final boolean IS_MONTHLY_RESET_ENABLED = parseBoolean(EnvironmentVariableUtils.get("ENABLE_STATS_MONTHLY_RESET", "false"));
     private static final boolean IS_MONTHLY_RESULT_ENABLED = parseBoolean(EnvironmentVariableUtils.get("ENABLE_MONTHLY_RESULT_STORAGE", "false"));
+    private static final boolean IS_LARS_UPDATE_ENABLED = parseBoolean(EnvironmentVariableUtils.get("ENABLE_LARS_HARDWARE_UPDATE", "false"));
+
+    @EJB
+    private LarsHardwareUpdater larsHardwareUpdater;
 
     @EJB
     private UserStatsResetter userStatsResetter;
@@ -70,8 +76,8 @@ public class EndOfMonthScheduler {
      */
     @PostConstruct
     public void init() {
-        if (!IS_MONTHLY_RESET_ENABLED && !IS_MONTHLY_RESULT_ENABLED) {
-            LOGGER.error("End of month reset and storage not enabled");
+        if (!IS_MONTHLY_RESET_ENABLED && !IS_MONTHLY_RESULT_ENABLED && !IS_LARS_UPDATE_ENABLED) {
+            LOGGER.error("End of month actions not enabled");
             return;
         }
 
@@ -114,6 +120,11 @@ public class EndOfMonthScheduler {
         if (IS_MONTHLY_RESULT_ENABLED) {
             LOGGER.info("Storing TC stats for new month");
             userStatsStorer.storeMonthlyResult();
+        }
+
+        if (IS_LARS_UPDATE_ENABLED) {
+            LOGGER.info("Updating hardware from LARS DB");
+            larsHardwareUpdater.retrieveHardwareAndPersist();
         }
     }
 

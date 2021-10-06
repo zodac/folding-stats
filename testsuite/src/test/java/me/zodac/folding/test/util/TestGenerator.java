@@ -65,7 +65,7 @@ public final class TestGenerator {
             .hardwareMake(HardwareMake.NVIDIA.toString())
             .hardwareType(HardwareType.GPU.toString())
             .multiplier(1.00D)
-            .averagePpd(1.00D)
+            .averagePpd(1L)
             .build();
     }
 
@@ -83,7 +83,7 @@ public final class TestGenerator {
             .hardwareMake(HardwareMake.NVIDIA.toString())
             .hardwareType(HardwareType.GPU.toString())
             .multiplier(multiplier)
-            .averagePpd(1.00D)
+            .averagePpd(1L)
             .build();
     }
 

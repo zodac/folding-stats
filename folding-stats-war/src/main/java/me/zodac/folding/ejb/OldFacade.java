@@ -66,7 +66,7 @@ public class OldFacade {
 
         for (final User user : usersUsingThisHardware) {
             if (isHardwareMultiplierChange) {
-                LOGGER.debug("User {} had state change to hardware multiplier", user.getFoldingUserName());
+                LOGGER.info("User {} had state change to hardware multiplier", user.getFoldingUserName());
                 handleStateChangeForUser(user);
             }
 
@@ -131,7 +131,7 @@ public class OldFacade {
     // We set the new initial stats to the user's current total stats, then give an offset of their current TC stats (multiplied)
     private void handleStateChangeForUser(final User userWithStateChange) throws ExternalConnectionException {
         if (ParsingStateManager.current() == ParsingState.DISABLED) {
-            LOGGER.warn("Received a state change for user {}, but system is not currently parsing stats", userWithStateChange.getDisplayName());
+            LOGGER.debug("Received a state change for user {}, but system is not currently parsing stats", userWithStateChange.getDisplayName());
             return;
         }
 
@@ -146,6 +146,7 @@ public class OldFacade {
             OffsetStats.create(currentUserTcStats.getPoints(), currentUserTcStats.getMultipliedPoints(), currentUserTcStats.getUnits());
         LOGGER.debug("Adding offset stats of: {}", offsetStats);
         createOffsetStats(userWithStateChange.getId(), offsetStats);
+        LOGGER.info("Handled state change for user {}", userWithStateChange.getDisplayName());
     }
 
     public void deleteUser(final User user) {

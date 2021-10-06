@@ -26,7 +26,7 @@ public final class HardwareValidator {
 
     // Assuming the 'best' hardware will have a multiplier of <b>1.00</b>, and all others will be based on that
     private static final double MINIMUM_MULTIPLIER_VALUE = 1.00D;
-    private static final double MINIMUM_AVERAGE_PPD_VALUE = 1.00D;
+    private static final long MINIMUM_AVERAGE_PPD_VALUE = 1L;
 
     private final transient BusinessLogic businessLogic;
 
@@ -70,9 +70,9 @@ public final class HardwareValidator {
         final List<String> failureMessages = Stream.of(
                 hardwareName(hardwareRequest),
                 displayName(hardwareRequest),
-                multiplier(hardwareRequest),
                 hardwareMake(hardwareRequest),
                 hardwareType(hardwareRequest),
+                multiplier(hardwareRequest),
                 averagePpd(hardwareRequest)
             )
             .filter(Objects::nonNull)
@@ -118,9 +118,9 @@ public final class HardwareValidator {
         final List<String> failureMessages = Stream.of(
                 hardwareName(hardwareRequest),
                 displayName(hardwareRequest),
-                multiplier(hardwareRequest),
                 hardwareMake(hardwareRequest),
                 hardwareType(hardwareRequest),
+                multiplier(hardwareRequest),
                 averagePpd(hardwareRequest)
             )
             .filter(Objects::nonNull)
@@ -162,12 +162,6 @@ public final class HardwareValidator {
             : "Field 'displayName' must not be empty";
     }
 
-    private static String multiplier(final HardwareRequest hardwareRequest) {
-        return hardwareRequest.getMultiplier() >= MINIMUM_MULTIPLIER_VALUE
-            ? null
-            : String.format("Field 'multiplier' must be %.2f or higher", MINIMUM_MULTIPLIER_VALUE);
-    }
-
     private static String hardwareMake(final HardwareRequest hardwareRequest) {
         return HardwareMake.get(hardwareRequest.getHardwareMake()) == HardwareMake.INVALID
             ? String.format("Field 'hardwareMake' must be one of: %s", HardwareMake.getAllValues())
@@ -180,9 +174,15 @@ public final class HardwareValidator {
             : null;
     }
 
+    private static String multiplier(final HardwareRequest hardwareRequest) {
+        return hardwareRequest.getMultiplier() >= MINIMUM_MULTIPLIER_VALUE
+            ? null
+            : String.format("Field 'multiplier' must be %.2f or higher", MINIMUM_MULTIPLIER_VALUE);
+    }
+
     private static String averagePpd(final HardwareRequest hardwareRequest) {
         return hardwareRequest.getAveragePpd() >= MINIMUM_AVERAGE_PPD_VALUE
             ? null
-            : String.format("Field 'averagePpd' must be %.2f or higher", MINIMUM_MULTIPLIER_VALUE);
+            : String.format("Field 'averagePpd' must be %d or higher", MINIMUM_AVERAGE_PPD_VALUE);
     }
 }

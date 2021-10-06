@@ -41,9 +41,11 @@ services:
       JAVA_OPTS: -Xms512m -Xmx2g -Djava.net.preferIPv4Stack=true
       # Stats parsing configuration
       STATS_URL_ROOT: "http://192.168.99.100:8081" # TODO: [zodac] Not working with 'wildfly_dev' as host
-      # NOTE: The monthly reset & result storage will always occur at 23:57 on the last day of the month
+      LARS_URL_ROOT: "https://folding.lar.systems/"
+      # NOTE: The monthly reset, result storage and LARS update will always occur at 23:57 on the last day of the month
       ENABLE_STATS_MONTHLY_RESET: "false"
       ENABLE_MONTHLY_RESULT_STORAGE: "false"
+      ENABLE_LARS_HARDWARE_UPDATE: "false"
       # Scheduled stats parsing configuration
       ENABLE_STATS_SCHEDULED_PARSING: "false"
       STATS_PARSING_SCHEDULE_HOUR: "*"

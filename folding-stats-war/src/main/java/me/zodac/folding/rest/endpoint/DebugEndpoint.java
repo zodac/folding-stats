@@ -1,8 +1,10 @@
 package me.zodac.folding.rest.endpoint;
 
 import static me.zodac.folding.rest.response.Responses.ok;
+import static me.zodac.folding.rest.response.Responses.serverError;
 
 import javax.annotation.security.RolesAllowed;
+import javax.ejb.EJB;
 import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -18,17 +20,45 @@ import me.zodac.folding.cache.TcStatsCache;
 import me.zodac.folding.cache.TeamCache;
 import me.zodac.folding.cache.TotalStatsCache;
 import me.zodac.folding.cache.UserCache;
+import me.zodac.folding.ejb.tc.lars.LarsHardwareUpdater;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
  * REST endpoints for debugging.
+ *
+ * <p>
+ * <b>NOTE:</b> There are no client-libraries for these endpoints.
  */
 @Path("/debug/")
 @RequestScoped
 public class DebugEndpoint {
 
     private static final Logger LOGGER = LogManager.getLogger();
+
+    @EJB
+    private LarsHardwareUpdater larsHardwareUpdater;
+
+    /**
+     * <b>GET</b> request to print the contents of all caches to the system log.
+     *
+     * @return an {@link me.zodac.folding.rest.response.Responses#ok()} response
+     * @see LarsHardwareUpdater
+     */
+    @GET
+    @RolesAllowed("admin")
+    @Path("/lars")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response startLarsUpdate() {
+        LOGGER.info("GET request received to manually update hardware from LARS DB");
+        try {
+            larsHardwareUpdater.retrieveHardwareAndPersist();
+            return ok();
+        } catch (final Exception e) {
+            LOGGER.error("Unexpected error updating hardware from LARS", e);
+            return serverError();
+        }
+    }
 
     /**
      * <b>GET</b> request to print the contents of all caches to the system log.

@@ -43,7 +43,7 @@ public class Hardware implements ResponsePojo {
     private final HardwareMake hardwareMake;
     private final HardwareType hardwareType;
     private final double multiplier;
-    private final double averagePpd;
+    private final long averagePpd;
 
     /**
      * Creates a {@link Hardware}.
@@ -66,7 +66,7 @@ public class Hardware implements ResponsePojo {
                                   final HardwareMake hardwareMake,
                                   final HardwareType hardwareType,
                                   final double multiplier,
-                                  final double averagePpd) {
+                                  final long averagePpd) {
         return new Hardware(hardwareId, hardwareName, displayName, hardwareMake, hardwareType, multiplier, averagePpd);
     }
 
@@ -89,7 +89,7 @@ public class Hardware implements ResponsePojo {
                                            final HardwareMake hardwareMake,
                                            final HardwareType hardwareType,
                                            final double multiplier,
-                                           final double averagePpd) {
+                                           final long averagePpd) {
         return create(EMPTY_HARDWARE_ID, hardwareName, displayName, hardwareMake, hardwareType, multiplier, averagePpd);
     }
 
@@ -149,6 +149,6 @@ public class Hardware implements ResponsePojo {
             && Objects.equals(displayName, hardwareRequest.getDisplayName())
             && Objects.equals(hardwareMake.toString(), hardwareRequest.getHardwareMake())
             && Objects.equals(hardwareType.toString(), hardwareRequest.getHardwareType())
-            && Double.compare(averagePpd, hardwareRequest.getAveragePpd()) == 0;
+            && Long.compare(averagePpd, hardwareRequest.getAveragePpd()) == 0;
     }
 }

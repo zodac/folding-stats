@@ -27,5 +27,5 @@ public class HardwareRequest implements RequestPojo {
     private String hardwareMake;
     private String hardwareType;
     private double multiplier;
-    private double averagePpd;
+    private long averagePpd;
 }

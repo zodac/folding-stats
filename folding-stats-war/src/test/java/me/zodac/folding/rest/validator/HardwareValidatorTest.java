@@ -23,7 +23,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.AMD.toString())
             .hardwareType(HardwareType.GPU.toString())
             .multiplier(1.00D)
-            .averagePpd(1.00D)
+            .averagePpd(1L)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -56,7 +56,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.AMD.toString())
             .hardwareType(HardwareType.GPU.toString())
             .multiplier(1.00D)
-            .averagePpd(1.00D)
+            .averagePpd(1L)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -79,7 +79,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.AMD)
             .hardwareType(HardwareType.GPU)
             .multiplier(1.00D)
-            .averagePpd(1.00D)
+            .averagePpd(1L)
             .build()
         );
 
@@ -90,7 +90,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.AMD.toString())
             .hardwareType(HardwareType.GPU.toString())
             .multiplier(1.00D)
-            .averagePpd(1.00D)
+            .averagePpd(1L)
             .build();
 
         final ValidationResponse<Hardware> response = hardwareValidator.validateCreate(hardware);
@@ -110,7 +110,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.AMD.toString())
             .hardwareType(HardwareType.GPU.toString())
             .multiplier(1.00D)
-            .averagePpd(1.00D)
+            .averagePpd(1L)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -132,7 +132,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.INVALID.toString())
             .hardwareType(HardwareType.GPU.toString())
             .multiplier(1.00D)
-            .averagePpd(1.00D)
+            .averagePpd(1L)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -154,7 +154,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.AMD.toString())
             .hardwareType(HardwareType.INVALID.toString())
             .multiplier(1.00D)
-            .averagePpd(1.00D)
+            .averagePpd(1L)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -176,7 +176,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.AMD.toString())
             .hardwareType(HardwareType.GPU.toString())
             .multiplier(-1.00D)
-            .averagePpd(1.00D)
+            .averagePpd(1L)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -198,7 +198,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.AMD.toString())
             .hardwareType(HardwareType.GPU.toString())
             .multiplier(1.00D)
-            .averagePpd(-1.00D)
+            .averagePpd(-1L)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -209,7 +209,7 @@ class HardwareValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'averagePpd' must be 1.00 or higher");
+            .contains("Field 'averagePpd' must be 1 or higher");
     }
 
     @Test
@@ -220,7 +220,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.INVALID.toString())
             .hardwareType(HardwareType.INVALID.toString())
             .multiplier(-1.00D)
-            .averagePpd(-1.00D)
+            .averagePpd(-1L)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -239,7 +239,7 @@ class HardwareValidatorTest {
                 "Field 'hardwareMake' must be one of: " + HardwareMake.getAllValues(),
                 "Field 'hardwareType' must be one of: " + HardwareType.getAllValues(),
                 "Field 'multiplier' must be 1.00 or higher",
-                "Field 'averagePpd' must be 1.00 or higher"
+                "Field 'averagePpd' must be 1 or higher"
             );
     }
 
@@ -251,7 +251,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.AMD.toString())
             .hardwareType(HardwareType.GPU.toString())
             .multiplier(2.00D)
-            .averagePpd(1.00D)
+            .averagePpd(1L)
             .build();
 
         final Hardware existingHardware = Hardware.builder()
@@ -260,7 +260,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.AMD)
             .hardwareType(HardwareType.GPU)
             .multiplier(1.00D)
-            .averagePpd(1.00D)
+            .averagePpd(1L)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -280,7 +280,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.AMD)
             .hardwareType(HardwareType.GPU)
             .multiplier(1.00D)
-            .averagePpd(1.00D)
+            .averagePpd(1L)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -302,7 +302,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.AMD.toString())
             .hardwareType(HardwareType.GPU.toString())
             .multiplier(1.00D)
-            .averagePpd(1.00D)
+            .averagePpd(1L)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -324,7 +324,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.AMD.toString())
             .hardwareType(HardwareType.GPU.toString())
             .multiplier(1.00D)
-            .averagePpd(1.00D)
+            .averagePpd(1L)
             .build();
 
         final Hardware existingHardware = Hardware.builder()
@@ -333,7 +333,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.AMD)
             .hardwareType(HardwareType.GPU)
             .multiplier(1.00D)
-            .averagePpd(1.00D)
+            .averagePpd(1L)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -355,7 +355,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.AMD.toString())
             .hardwareType(HardwareType.GPU.toString())
             .multiplier(1.00D)
-            .averagePpd(1.00D)
+            .averagePpd(1L)
             .build();
 
         final Hardware existingHardware = Hardware.builder()
@@ -365,7 +365,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.AMD)
             .hardwareType(HardwareType.GPU)
             .multiplier(1.00D)
-            .averagePpd(1.00D)
+            .averagePpd(1L)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -376,7 +376,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.AMD)
             .hardwareType(HardwareType.GPU)
             .multiplier(1.00D)
-            .averagePpd(1.00D)
+            .averagePpd(1L)
             .build()
         );
 
@@ -398,7 +398,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.AMD.toString())
             .hardwareType(HardwareType.GPU.toString())
             .multiplier(1.00D)
-            .averagePpd(1.00D)
+            .averagePpd(1L)
             .build();
 
         final Hardware existingHardware = Hardware.builder()
@@ -408,7 +408,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.AMD)
             .hardwareType(HardwareType.GPU)
             .multiplier(1.00D)
-            .averagePpd(1.00D)
+            .averagePpd(1L)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -419,7 +419,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.AMD)
             .hardwareType(HardwareType.GPU)
             .multiplier(1.00D)
-            .averagePpd(1.00D)
+            .averagePpd(1L)
             .build()
         );
 
@@ -438,7 +438,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.AMD.toString())
             .hardwareType(HardwareType.GPU.toString())
             .multiplier(1.00D)
-            .averagePpd(1.00D)
+            .averagePpd(1L)
             .build();
 
         final Hardware existingHardware = Hardware.builder()
@@ -447,7 +447,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.AMD)
             .hardwareType(HardwareType.GPU)
             .multiplier(1.00D)
-            .averagePpd(1.00D)
+            .averagePpd(1L)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -469,7 +469,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.INVALID.toString())
             .hardwareType(HardwareType.GPU.toString())
             .multiplier(1.00D)
-            .averagePpd(1.00D)
+            .averagePpd(1L)
             .build();
 
         final Hardware existingHardware = Hardware.builder()
@@ -478,7 +478,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.AMD)
             .hardwareType(HardwareType.GPU)
             .multiplier(1.00D)
-            .averagePpd(1.00D)
+            .averagePpd(1L)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -500,7 +500,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.AMD.toString())
             .hardwareType(HardwareType.INVALID.toString())
             .multiplier(1.00D)
-            .averagePpd(1.00D)
+            .averagePpd(1L)
             .build();
 
         final Hardware existingHardware = Hardware.builder()
@@ -509,7 +509,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.AMD)
             .hardwareType(HardwareType.GPU)
             .multiplier(1.00D)
-            .averagePpd(1.00D)
+            .averagePpd(1L)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -531,7 +531,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.AMD.toString())
             .hardwareType(HardwareType.GPU.toString())
             .multiplier(-1.00D)
-            .averagePpd(1.00D)
+            .averagePpd(1L)
             .build();
 
         final Hardware existingHardware = Hardware.builder()
@@ -540,7 +540,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.AMD)
             .hardwareType(HardwareType.GPU)
             .multiplier(1.00D)
-            .averagePpd(1.00D)
+            .averagePpd(1L)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -562,7 +562,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.AMD.toString())
             .hardwareType(HardwareType.GPU.toString())
             .multiplier(1.00D)
-            .averagePpd(-1.00D)
+            .averagePpd(-1L)
             .build();
 
         final Hardware existingHardware = Hardware.builder()
@@ -571,7 +571,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.AMD)
             .hardwareType(HardwareType.GPU)
             .multiplier(1.00D)
-            .averagePpd(1.00D)
+            .averagePpd(1L)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -582,7 +582,7 @@ class HardwareValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'averagePpd' must be 1.00 or higher");
+            .contains("Field 'averagePpd' must be 1 or higher");
     }
 
     @Test
@@ -593,7 +593,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.INVALID.toString())
             .hardwareType(HardwareType.INVALID.toString())
             .multiplier(-1.00D)
-            .averagePpd(-1.00D)
+            .averagePpd(-1L)
             .build();
 
         final Hardware existingHardware = Hardware.builder()
@@ -602,7 +602,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.AMD)
             .hardwareType(HardwareType.GPU)
             .multiplier(1.00D)
-            .averagePpd(1.00D)
+            .averagePpd(1L)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -632,7 +632,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.AMD)
             .hardwareType(HardwareType.GPU)
             .multiplier(1.00D)
-            .averagePpd(1.00D)
+            .averagePpd(1L)
             .build();
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
@@ -653,7 +653,7 @@ class HardwareValidatorTest {
             .hardwareMake(HardwareMake.AMD)
             .hardwareType(HardwareType.GPU)
             .multiplier(1.00D)
-            .averagePpd(1.00D)
+            .averagePpd(1L)
             .build();
 
         final User userUsingHardware = User.builder()

@@ -53,7 +53,7 @@ final class RecordConverter {
             HardwareMake.get(hardwareRecord.getHardwareMake()),
             HardwareType.get(hardwareRecord.getHardwareType()),
             hardwareRecord.getMultiplier().doubleValue(),
-            hardwareRecord.getAveragePpd().doubleValue()
+            hardwareRecord.getAveragePpd().longValue()
         );
     }
 

@@ -458,7 +458,7 @@ class PostgresDbManagerTest {
     }
 
     private Hardware generateHardware() {
-        return Hardware.createWithoutId(nextHardwareName(), "hardware", HardwareMake.NVIDIA, HardwareType.GPU, 1.00D, 1.00D);
+        return Hardware.createWithoutId(nextHardwareName(), "hardware", HardwareMake.NVIDIA, HardwareType.GPU, 1.00D, 1L);
     }
 
     private Hardware createHardware() {

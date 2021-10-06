@@ -765,9 +765,22 @@ traits:
       503:
         description: "The system is not in a valid state to execute write requests"
 
-/debug/caches:
+/debug/:
+  /caches:
+    is: [ "adminOnly" ]
     get:
-        description: "Debugging endpoint to print contents of caches to system log"
+      description: "Debugging endpoint to print contents of caches to system log"
     responses:
-        200:
-            description: "Cache contents have been printed to system log"
+      200:
+        description: "Cache contents have been printed to system log"
+  /lars:
+    is: [ "adminOnly" ]
+    get:
+      description: "Debugging endpoint to manually start the LARS hardware update"
+    responses:
+      200:
+        description: "LARS update successfully run and results printed to system log"
+      401:
+        description: "System user cannot be successfully logged in with provided credentials"
+      403:
+        description: "System user does not have the correct role to perform this request"
