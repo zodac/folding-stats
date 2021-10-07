@@ -4,9 +4,9 @@ import static java.util.stream.Collectors.toList;
 
 import java.util.List;
 import java.util.Objects;
+import me.zodac.folding.api.tc.lars.LarsGpu;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jsoup.nodes.Attributes;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
@@ -16,8 +16,7 @@ import org.jsoup.select.Elements;
 final class LarsGpuParser {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final int EXPECTED_A_ELEMENTS = 2;
-    private static final int EXPECTED_SPAN_ELEMENTS = 1;
+    private static final int EXPECTED_SPAN_ELEMENTS = 3;
     private static final int MINIMUM_TD_ELEMENTS = 3;
 
     private LarsGpuParser() {
@@ -67,40 +66,28 @@ final class LarsGpuParser {
     }
 
     private static String parseDisplayName(final Element gpuEntry) throws ParseException {
-        final Elements aElements = gpuEntry.getElementsByTag("a");
-
-        if (aElements.size() != EXPECTED_A_ELEMENTS) {
-            throw new ParseException(String.format("Expected %d 'a' elements, found %d", EXPECTED_A_ELEMENTS, aElements.size()));
+        final Elements modelNames = gpuEntry.getElementsByClass("model-name");
+        if (modelNames.isEmpty()) {
+            throw new ParseException(String.format("Expected at least 1 'model-name' elements, found none for GPU entry: %s", gpuEntry));
         }
 
-        final Element firstElement = aElements.get(0);
-        final Attributes firstElementAttributes = firstElement.attributes();
-        final String title = firstElementAttributes.get("title");
-        final String displayName = title.split("\\[", 2)[1].split("]")[0];
-        if (displayName.isEmpty()) {
-            throw new ParseException(String.format("No display name for GPU entry: %s", gpuEntry));
+        final String modelName = modelNames.get(0).ownText();
+        if (modelName.isEmpty()) {
+            throw new ParseException(String.format("Empty 'model-name' for GPU entry: %s", gpuEntry));
         }
 
-        return displayName;
+        return modelName;
     }
 
     private static String parseManufacturer(final Element gpuEntry, final String displayName) throws ParseException {
-        final Elements aElements = gpuEntry.getElementsByTag("a");
-
-        if (aElements.size() != EXPECTED_A_ELEMENTS) {
-            throw new ParseException(String.format("Expected %d 'a' elements, found %d for GPU '%s'", EXPECTED_A_ELEMENTS, aElements.size(),
-                displayName));
-        }
-
-        final Element secondElement = aElements.get(1);
-        final Elements spans = secondElement.getElementsByTag("span");
+        final Elements spans = gpuEntry.getElementsByTag("span");
 
         if (spans.size() != EXPECTED_SPAN_ELEMENTS) {
             throw new ParseException(String.format("Expected %d 'span' element for manufacturer, found %d for GPU '%s'", EXPECTED_SPAN_ELEMENTS,
                 spans.size(), displayName));
         }
 
-        final String manufacturer = spans.get(0).ownText();
+        final String manufacturer = spans.get(2).ownText();
         if (manufacturer.isEmpty()) {
             throw new ParseException(String.format("No manufacturer for GPU '%s'", displayName));
         }

@@ -1,9 +1,11 @@
-package me.zodac.folding.ejb.tc.lars;
+package me.zodac.folding.api.tc.lars;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 /**
@@ -11,17 +13,19 @@ import lombok.ToString;
  *
  * @see <a href="https://folding.lar.systems/gpu_ppd/overall_ranks">LARS GPU PPD database</a>
  */
+@NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@Setter
 @EqualsAndHashCode
 @ToString(doNotUseGetters = true)
 public class LarsGpu {
 
-    private final String displayName;
-    private final String manufacturer;
-    private final String modelInfo;
-    private final int rank;
-    private final long averagePpd;
+    private String displayName;
+    private String manufacturer;
+    private String modelInfo;
+    private int rank;
+    private long averagePpd;
 
     /**
      * Create a {@link LarsGpu}.

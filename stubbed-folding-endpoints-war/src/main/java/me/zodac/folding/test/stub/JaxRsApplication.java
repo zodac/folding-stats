@@ -16,6 +16,7 @@ public class JaxRsApplication extends Application {
     @Override
     public Set<Class<?>> getClasses() {
         return Set.of(
+            StubbedLarsEndpoint.class,
             StubbedPointsEndpoint.class,
             StubbedUnitsEndpoint.class
         );

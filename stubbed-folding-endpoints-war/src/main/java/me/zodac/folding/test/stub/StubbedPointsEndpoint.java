@@ -1,6 +1,7 @@
 package me.zodac.folding.test.stub;
 
 import com.google.gson.Gson;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import javax.enterprise.context.ApplicationScoped;
@@ -29,10 +30,9 @@ import lombok.ToString;
  *
  * <p>
  * We expose additional endpoints to allow the tests to set the points for a given user. The endpoint is {@link ApplicationScoped} so we can store
- * updates across multiple
- * HTTP requests and tests.
+ * updates across multiple HTTP requests and tests.
  *
- * @see <a href="ApplicationScoped">Real user statsAPI</a>
+ * @see <a href="https://api2.foldingathome.org/#GET-/user/:name/stats">Real user stats API</a>
  */
 @Path("/user/")
 @ApplicationScoped
@@ -57,6 +57,16 @@ public class StubbedPointsEndpoint {
         return Response
             .ok()
             .entity(GSON.toJson(createResponse(foldingUserName, passkey)))
+            .build();
+    }
+    
+    @GET
+    @Path("/stats")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response get() {
+        return Response
+            .ok()
+            .entity(GSON.toJson(Collections.emptyList()))
             .build();
     }
 

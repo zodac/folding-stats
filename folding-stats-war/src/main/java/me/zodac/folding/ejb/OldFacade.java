@@ -66,7 +66,7 @@ public class OldFacade {
 
         for (final User user : usersUsingThisHardware) {
             if (isHardwareMultiplierChange) {
-                LOGGER.info("User {} had state change to hardware multiplier", user.getFoldingUserName());
+                LOGGER.info("User '{}' (ID: {}) had state change to hardware multiplier", user.getDisplayName(), user.getId());
                 handleStateChangeForUser(user);
             }
 
@@ -96,28 +96,29 @@ public class OldFacade {
         userCache.add(updatedUser.getId(), updatedUser);
 
         if (!existingUser.getHardware().equals(updatedUser.getHardware())) {
-            LOGGER.debug("User had state change to hardware, {} -> {}, recalculating initial stats", existingUser.getHardware(),
-                updatedUser.getHardware());
+            LOGGER.debug("User '{}' (ID: {}) had state change to hardware, {} -> {}, recalculating initial stats", existingUser.getDisplayName(),
+                existingUser.getId(), existingUser.getHardware(), updatedUser.getHardware());
             handleStateChangeForUser(updatedUser);
             return updatedUser;
         }
 
         if (!existingUser.getTeam().equals(updatedUser.getTeam())) {
-            LOGGER.debug("User had state change to team, {} -> {}, recalculating initial stats", existingUser.getTeam(), updatedUser.getTeam());
+            LOGGER.debug("User '{}' (ID: {}) had state change to team, {} -> {}, recalculating initial stats", existingUser.getDisplayName(),
+                existingUser.getId(), existingUser.getTeam(), updatedUser.getTeam());
             handleStateChangeForUser(updatedUser);
             return updatedUser;
         }
 
         if (!existingUser.getFoldingUserName().equalsIgnoreCase(updatedUser.getFoldingUserName())) {
-            LOGGER.debug("User had state change to Folding username, {} -> {}, recalculating initial stats", existingUser.getFoldingUserName(),
-                updatedUser.getFoldingUserName());
+            LOGGER.debug("User '{}' (ID: {}) had state change to Folding username, {} -> {}, recalculating initial stats",
+                existingUser.getDisplayName(), existingUser.getId(), existingUser.getFoldingUserName(), updatedUser.getFoldingUserName());
             handleStateChangeForUser(updatedUser);
             return updatedUser;
         }
 
         if (!existingUser.getPasskey().equalsIgnoreCase(updatedUser.getPasskey())) {
-            LOGGER.debug("User had state change to passkey, {} -> {}, recalculating initial stats", existingUser.getPasskey(),
-                updatedUser.getPasskey());
+            LOGGER.debug("User '{}' (ID: {}) had state change to passkey, {} -> {}, recalculating initial stats", existingUser.getDisplayName(),
+                existingUser.getId(), existingUser.getPasskey(), updatedUser.getPasskey());
             handleStateChangeForUser(updatedUser);
             return updatedUser;
         }
@@ -131,7 +132,8 @@ public class OldFacade {
     // We set the new initial stats to the user's current total stats, then give an offset of their current TC stats (multiplied)
     private void handleStateChangeForUser(final User userWithStateChange) throws ExternalConnectionException {
         if (ParsingStateManager.current() == ParsingState.DISABLED) {
-            LOGGER.debug("Received a state change for user {}, but system is not currently parsing stats", userWithStateChange.getDisplayName());
+            LOGGER.debug("Received a state change for user '{}' (ID: {}), but system is not currently parsing stats",
+                userWithStateChange.getDisplayName(), userWithStateChange.getId());
             return;
         }
 
@@ -146,7 +148,7 @@ public class OldFacade {
             OffsetStats.create(currentUserTcStats.getPoints(), currentUserTcStats.getMultipliedPoints(), currentUserTcStats.getUnits());
         LOGGER.debug("Adding offset stats of: {}", offsetStats);
         createOffsetStats(userWithStateChange.getId(), offsetStats);
-        LOGGER.info("Handled state change for user {}", userWithStateChange.getDisplayName());
+        LOGGER.info("Handled state change for user '{}'", userWithStateChange.getDisplayName());
     }
 
     public void deleteUser(final User user) {
@@ -157,7 +159,7 @@ public class OldFacade {
         final UserTcStats userStats = getHourlyTcStatsForUser(userId);
 
         if (userStats.isEmptyStats()) {
-            LOGGER.warn("User '{} (ID: {})' has no stats, not saving any retired stats", user.getDisplayName(), user.getId());
+            LOGGER.warn("User '{}' (ID: {}) has no stats, not saving any retired stats", user.getDisplayName(), user.getId());
             return;
         }
 

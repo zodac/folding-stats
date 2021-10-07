@@ -14,6 +14,12 @@
     <name>[${project.parent.artifactId}] Stubbed Folding Endpoints WAR module</name>
 
     <dependencies>
+        <!-- Project Dependencies -->
+        <dependency>
+            <groupId>me.zodac</groupId>
+            <artifactId>folding-stats-api</artifactId>
+        </dependency>
+
         <!-- 3PP Dependencies -->
         <dependency>
             <groupId>com.google.code.gson</groupId>

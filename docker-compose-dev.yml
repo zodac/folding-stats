@@ -40,8 +40,9 @@ services:
       # Container configuration
       JAVA_OPTS: -Xms512m -Xmx2g -Djava.net.preferIPv4Stack=true
       # Stats parsing configuration
-      STATS_URL_ROOT: "http://192.168.99.100:8081" # TODO: [zodac] Not working with 'wildfly_dev' as host
-      LARS_URL_ROOT: "https://folding.lar.systems/"
+      # TODO: [zodac] Not working with 'wildfly_dev' as host
+      STATS_URL_ROOT: "http://192.168.99.100:8081"
+      LARS_URL_ROOT: "http://192.168.99.100:8081"
       # NOTE: The monthly reset, result storage and LARS update will always occur at 23:57 on the last day of the month
       ENABLE_STATS_MONTHLY_RESET: "false"
       ENABLE_MONTHLY_RESULT_STORAGE: "false"
@@ -53,7 +54,8 @@ services:
       STATS_PARSING_SCHEDULE_SECOND: "0"
       # Database configuration
       DEPLOYED_DATABASE: "postgresql"
-      JDBC_CONNECTION_URL: "jdbc:postgresql://192.168.99.100:5433/folding_db" # TODO: [zodac] Not working with 'postgres_dev' as host
+      # TODO: [zodac] Not working with 'postgres_dev' as host
+      JDBC_CONNECTION_URL: "jdbc:postgresql://192.168.99.100:5433/folding_db"
       JDBC_CONNECTION_USER: "folding_user"
       JDBC_CONNECTION_PASSWORD: "shroot"
       JDBC_CONNECTION_DRIVER: "org.postgresql.Driver"

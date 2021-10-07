@@ -620,7 +620,7 @@ class HardwareValidatorTest {
                 "Field 'hardwareMake' must be one of: " + HardwareMake.getAllValues(),
                 "Field 'hardwareType' must be one of: " + HardwareType.getAllValues(),
                 "Field 'multiplier' must be 1.00 or higher",
-                "Field 'averagePpd' must be 1.00 or higher"
+                "Field 'averagePpd' must be 1 or higher"
             );
     }
 

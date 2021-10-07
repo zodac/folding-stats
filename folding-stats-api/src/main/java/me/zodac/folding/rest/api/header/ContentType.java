@@ -8,7 +8,12 @@ public enum ContentType {
     /**
      * The <code>application/json</code> value.
      */
-    JSON("application/json");
+    JSON("application/json"),
+
+    /**
+     * The <code>text/plain</code> value.
+     */
+    TEXT("text/plain");
 
     private final String contentTypeValue;
 

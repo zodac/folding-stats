@@ -3,7 +3,6 @@ package me.zodac.folding.ejb.tc.lars;
 import static java.util.stream.Collectors.toList;
 import static me.zodac.folding.api.util.NumberUtils.formatWithCommas;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +13,7 @@ import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.HardwareMake;
 import me.zodac.folding.api.tc.HardwareType;
+import me.zodac.folding.api.tc.lars.LarsGpu;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
 import me.zodac.folding.ejb.OldFacade;
 import org.apache.logging.log4j.LogManager;
@@ -76,7 +76,7 @@ public class LarsHardwareUpdater {
             .stream()
             .map(larsGpu -> toHardware(larsGpu, bestPpd))
             .collect(toList());
-        final Collection<Hardware> existing = new ArrayList<>(businessLogic.getAllHardware());
+        final Collection<Hardware> existing = businessLogic.getAllHardware();
 
         for (final Hardware hardware : HardwareSplitter.toDelete(lars, existing)) {
             businessLogic.deleteHardware(hardware);
