@@ -1,7 +1,6 @@
 package me.zodac.folding.test.stub;
 
 import com.google.gson.Gson;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import javax.enterprise.context.ApplicationScoped;
@@ -59,16 +58,6 @@ public class StubbedPointsEndpoint {
             .entity(GSON.toJson(createResponse(foldingUserName, passkey)))
             .build();
     }
-    
-    @GET
-    @Path("/stats")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response get() {
-        return Response
-            .ok()
-            .entity(GSON.toJson(Collections.emptyList()))
-            .build();
-    }
 
     /**
      * Sets the points for a Folding@Home user.
@@ -85,7 +74,8 @@ public class StubbedPointsEndpoint {
     @Path("/{foldingUserName}/stats")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateUserPoints(@PathParam("foldingUserName") final String foldingUserName, @QueryParam("passkey") final String passkey,
+    public Response updateUserPoints(@PathParam("foldingUserName") final String foldingUserName,
+                                     @QueryParam("passkey") final String passkey,
                                      @QueryParam("points") final long points) {
         final String key = foldingUserName + passkey;
 

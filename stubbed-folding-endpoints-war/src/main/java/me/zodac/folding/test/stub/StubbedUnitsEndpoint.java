@@ -73,7 +73,8 @@ public class StubbedUnitsEndpoint {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateUserUnits(@QueryParam("user") final String foldingUserName, @QueryParam("passkey") final String passkey,
+    public Response updateUserUnits(@QueryParam("user") final String foldingUserName,
+                                    @QueryParam("passkey") final String passkey,
                                     @QueryParam("units") final int units) {
         final String key = foldingUserName + passkey;
 

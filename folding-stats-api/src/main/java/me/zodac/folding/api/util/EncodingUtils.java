@@ -10,12 +10,12 @@ import java.util.Map;
 public final class EncodingUtils {
 
     /**
-     * Key for the <code>username</code>> value returned by {@link #decodeAuthentication(String)} and {@link #decodeBasicAuthentication(String)}.
+     * Key for the <code>username</code> value returned by {@link #decodeAuthentication(String)} and {@link #decodeBasicAuthentication(String)}.
      */
     public static final String DECODED_USERNAME_KEY = "userName";
 
     /**
-     * Key for the <code>password</code>> value returned by {@link #decodeAuthentication(String)} and {@link #decodeBasicAuthentication(String)}.
+     * Key for the <code>password</code> value returned by {@link #decodeAuthentication(String)} and {@link #decodeBasicAuthentication(String)}.
      */
     public static final String DECODED_PASSWORD_KEY = "password";
 

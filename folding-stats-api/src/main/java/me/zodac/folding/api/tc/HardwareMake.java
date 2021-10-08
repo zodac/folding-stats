@@ -21,7 +21,7 @@ public enum HardwareMake {
     INTEL,
 
     /**
-     * The {@link Hardware} is by <b>nVidia</b>>.
+     * The {@link Hardware} is by <b>nVidia</b>.
      */
     NVIDIA,
 

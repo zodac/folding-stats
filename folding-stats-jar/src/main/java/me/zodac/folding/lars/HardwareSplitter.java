@@ -1,4 +1,4 @@
-package me.zodac.folding.ejb.tc.lars;
+package me.zodac.folding.lars;
 
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -15,7 +15,7 @@ import org.apache.logging.log4j.Logger;
  * <p>
  * Since we know the {@code hardwareName} of a {@link Hardware} is unique, we can use {@link HardwareNameComparator} to compare.
  */
-final class HardwareSplitter {
+public final class HardwareSplitter {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -30,7 +30,7 @@ final class HardwareSplitter {
      * @param inDb     the {@link Hardware} already existing in the DB
      * @return a {@link Collection} of the {@link Hardware} to be created
      */
-    static Collection<Hardware> toCreate(final Collection<Hardware> fromLars, final Collection<Hardware> inDb) {
+    public static Collection<Hardware> toCreate(final Collection<Hardware> fromLars, final Collection<Hardware> inDb) {
         final TreeSet<Hardware> lars = new TreeSet<>(HardwareNameComparator.create());
         lars.addAll(fromLars);
 
@@ -49,7 +49,7 @@ final class HardwareSplitter {
      * @param inDb     the {@link Hardware} already existing in the DB
      * @return a {@link Collection} of the {@link Hardware} to be deleted
      */
-    static Collection<Hardware> toDelete(final Collection<Hardware> fromLars, final Collection<Hardware> inDb) {
+    public static Collection<Hardware> toDelete(final Collection<Hardware> fromLars, final Collection<Hardware> inDb) {
         final TreeSet<Hardware> lars = new TreeSet<>(HardwareNameComparator.create());
         lars.addAll(fromLars);
 
@@ -69,7 +69,7 @@ final class HardwareSplitter {
      * @param inDb     the {@link Hardware} already existing in the DB
      * @return a {@link Map} of the {@link Hardware} to be updated, where the key is the LARS {@link Hardware} and value is the DB {@link Hardware}
      */
-    static Map<Hardware, Hardware> toUpdate(final Collection<Hardware> fromLars, final Collection<Hardware> inDb) {
+    public static Map<Hardware, Hardware> toUpdate(final Collection<Hardware> fromLars, final Collection<Hardware> inDb) {
         final Map<Hardware, Hardware> larsHardwareAlreadyInDb = new HashMap<>();
 
         // TODO: [zodac] Make this less shit

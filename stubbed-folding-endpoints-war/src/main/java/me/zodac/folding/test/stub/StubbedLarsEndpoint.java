@@ -2,8 +2,15 @@ package me.zodac.folding.test.stub;
 
 import static java.util.stream.Collectors.toList;
 
+import java.io.File;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
+import java.util.Objects;
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -13,6 +20,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import me.zodac.folding.api.tc.lars.LarsGpu;
+import org.apache.commons.text.StringSubstitutor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Stubbed endpoint for the LARS PPD DB. Used to retrieve metadata about a piece of hardware, rather than going to the real API.
@@ -31,7 +41,9 @@ import me.zodac.folding.api.tc.lars.LarsGpu;
 @ApplicationScoped
 public class StubbedLarsEndpoint {
 
-    private static final Collection<LarsGpu> gpuEntries = new ArrayList<>();
+    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Collection<LarsGpu> LARS_GPUS = new ArrayList<>();
+    private static final String LARS_GPU_TEMPLATE_FILEPATH = "lars" + File.separator + "validGpuTemplate.txt";
 
     /**
      * Endpoint that allows tests to <b>POST</b> a {@link Collection} of {@link LarsGpu} to be added to the stubbed response.
@@ -44,10 +56,10 @@ public class StubbedLarsEndpoint {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response addGpus(final Collection<LarsGpu> larsGpus) {
-        gpuEntries.addAll(larsGpus);
+        LARS_GPUS.addAll(larsGpus);
 
         return Response
-            .ok()
+            .created(URI.create(""))
             .build();
     }
 
@@ -71,10 +83,8 @@ public class StubbedLarsEndpoint {
     }
 
     private static String createGpuPage() {
-        final StringBuilder htmlPage = new StringBuilder()
-            .append("<html>")
-            .append("<table id=\"primary-datatable\"")
-            .append("<tbody>");
+        final StringBuilder htmlPage = new StringBuilder(67) // String literals have at least 67 characters
+            .append("<html><table id=\"primary-datatable\"<tbody>");
 
         final Collection<String> trElementsForHardwares = createTrElementsForHardwares();
         for (final String trElementForHardware : trElementsForHardwares) {
@@ -82,29 +92,37 @@ public class StubbedLarsEndpoint {
         }
 
         return htmlPage
-            .append("</tbody>")
-            .append("</table>")
-            .append("</html>")
+            .append("</tbody></table></html>")
             .toString();
     }
 
     private static Collection<String> createTrElementsForHardwares() {
-        return gpuEntries
+        return LARS_GPUS
             .stream()
             .map(StubbedLarsEndpoint::createTrElementForHardware)
+            .filter(string -> !string.isBlank())
             .collect(toList());
     }
 
     private static String createTrElementForHardware(final LarsGpu larsGpu) {
-        return "<tr>"
-            + String.format("<td class=\"rank-num\">%s</td>", larsGpu.getRank())
-            + String.format("<td><span class=\"model-name\">%s</span><span class=\"model-info\">%s</span></td>", larsGpu.getDisplayName(),
-            larsGpu.getModelInfo())
-            + String.format("<td>%s</td>", larsGpu.getAveragePpd())
-            + "<td>linuxAveragePpd_ignored</td>"
-            + "<td>windowsAveragePpd_ignored</td>"
-            + String.format("<td><span>%s</span></td>", larsGpu.getManufacturer())
-            + "<td>model_ignored</td>"
-            + "</tr>";
+        try {
+            final URI fileUri =
+                Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource(LARS_GPU_TEMPLATE_FILEPATH)).toURI();
+            final String template = Files.readString(Paths.get(fileUri), StandardCharsets.UTF_8);
+
+            final Map<String, String> substitutionValues = Map.of(
+                "displayName", larsGpu.getDisplayName(),
+                "manufacturer", larsGpu.getManufacturer(),
+                "modelInfo", larsGpu.getModelInfo(),
+                "rank", String.valueOf(larsGpu.getRank()),
+                "averagePpd", String.valueOf(larsGpu.getAveragePpd())
+            );
+
+            final StringSubstitutor substitutor = new StringSubstitutor(substitutionValues);
+            return substitutor.replace(template);
+        } catch (final Exception e) {
+            LOGGER.warn("Unexpected error creating element for LARS GPU: {}", larsGpu, e);
+            return "";
+        }
     }
 }

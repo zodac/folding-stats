@@ -1,4 +1,4 @@
-package me.zodac.folding.ejb.tc.lars;
+package me.zodac.folding.lars;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

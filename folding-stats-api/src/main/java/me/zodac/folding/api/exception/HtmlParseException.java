@@ -1,9 +1,9 @@
-package me.zodac.folding.ejb.tc.lars;
+package me.zodac.folding.api.exception;
 
 /**
- * Marker {@link Exception} to handle control flow (yes, I know) in {@link LarsGpuParser}.
+ * {@link Exception} for when errors occur when parsing HTML content.
  */
-class ParseException extends Exception {
+public class HtmlParseException extends Exception {
 
     private static final long serialVersionUID = -4059920979584050749L;
 
@@ -12,7 +12,7 @@ class ParseException extends Exception {
      *
      * @param message the error message
      */
-    ParseException(final String message) {
+    public HtmlParseException(final String message) {
         super(message);
     }
 
@@ -22,7 +22,7 @@ class ParseException extends Exception {
      * @param message   the error message
      * @param throwable the cause {@link Throwable}
      */
-    ParseException(final String message, final Throwable throwable) {
+    public HtmlParseException(final String message, final Throwable throwable) {
         super(message, throwable);
     }
 }

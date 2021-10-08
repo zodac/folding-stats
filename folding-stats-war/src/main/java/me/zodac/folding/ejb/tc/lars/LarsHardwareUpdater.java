@@ -16,6 +16,8 @@ import me.zodac.folding.api.tc.HardwareType;
 import me.zodac.folding.api.tc.lars.LarsGpu;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
 import me.zodac.folding.ejb.OldFacade;
+import me.zodac.folding.lars.HardwareSplitter;
+import me.zodac.folding.lars.LarsGpuRetriever;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
