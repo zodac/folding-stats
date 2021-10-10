@@ -47,7 +47,7 @@ public class StubbedPointsEndpoint {
      *
      * @param foldingUserName the Folding@Home user's username
      * @param passkey         the Folding@Home user's passkey
-     * @return a <b>200_OK</b> {@link Response} with the Folding@Home user's points
+     * @return {@link Response.Status#OK} with the Folding@Home user's points
      */
     @GET
     @Path("/{foldingUserName}/stats")
@@ -68,7 +68,7 @@ public class StubbedPointsEndpoint {
      * @param foldingUserName the Folding@Home user's username
      * @param passkey         the Folding@Home user's passkey
      * @param points          the points to set
-     * @return a <b>200_OK</b> {@link Response}
+     * @return {@link Response.Status#OK}
      */
     @POST
     @Path("/{foldingUserName}/stats")
@@ -94,11 +94,10 @@ public class StubbedPointsEndpoint {
     /**
      * Resets the points for all Folding@Home users.
      *
-     * @return a <b>200_OK</b> {@link Response}
+     * @return {@link Response.Status#OK}
      */
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteUserPoints() {
         pointsByUserAndPasskey.clear();
         return Response

@@ -2,17 +2,14 @@ package me.zodac.folding.test.stub;
 
 import static java.util.stream.Collectors.toList;
 
-import java.io.File;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -37,29 +34,63 @@ import org.apache.logging.log4j.Logger;
  *
  * @see <a href="https://folding.lar.systems/">LARS PPD DB</a>
  */
-@Path("/")
+@Path("/gpu_ppd/overall_ranks")
 @ApplicationScoped
 public class StubbedLarsEndpoint {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final Collection<LarsGpu> LARS_GPUS = new ArrayList<>();
-    private static final String LARS_GPU_TEMPLATE_FILEPATH = "lars" + File.separator + "validGpuTemplate.txt";
+    private static final Map<String, LarsGpu> LARS_GPUS_BY_MODEL_INFO = new HashMap<>();
+
+    private static final String LARS_GPU_TEMPLATE = "<tr>\n"
+        + "<td class=\"rank-num\">${rank}</td>\n"
+        + "<td>\n"
+        + "<a title=\"${displayName} folding PPD information: ${modelInfo}\" href=\"/gpu_ppd/brands/${manufacturer}/folding_profile/${modelInfo}\">\n"
+        + "<span class=\"text-${manufacturer} model-name\">${displayName}</span> <i class=\"uil-link mr-1\"></i>\n"
+        + "</a>\n"
+        + "<br />\n"
+        + "<span class=\"model-info\">${modelInfo}</span>\n"
+        + "</td>\n"
+        + "<td>${averagePpd}</td>\n"
+        + "<td>linuxAveragePpd_ignored</td>\n"
+        + "<td>windowsAveragePpd_ignored</td>\n"
+        + "<td>\n"
+        + "<a href=\"/gpu_ppd/brands/${manufacturer}\">\n"
+        + "<span class=\"text-${manufacturer}\">${manufacturer}</span> <i class=\"uil-link mr-1\"></i>\n"
+        + "</a>\n"
+        + "</td>\n"
+        + "<td class=\"text-uppercase\">model_ignored</td>\n"
+        + "</tr>";
 
     /**
      * Endpoint that allows tests to <b>POST</b> a {@link Collection} of {@link LarsGpu} to be added to the stubbed response.
      *
      * @param larsGpus the {@link LarsGpu}s to add
-     * @return an {@link Response#ok()} {@link Response}
+     * @return {@link Response.Status#CREATED}
      */
     @POST
-    @Path("/gpu_ppd/overall_ranks")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response addGpus(final Collection<LarsGpu> larsGpus) {
-        LARS_GPUS.addAll(larsGpus);
+        for (final LarsGpu larsGpu : larsGpus) {
+            LARS_GPUS_BY_MODEL_INFO.put(larsGpu.getModelInfo(), larsGpu);
+        }
 
         return Response
             .created(URI.create(""))
+            .build();
+    }
+
+    /**
+     * Removes all {@link LarsGpu}s from the stubbed endpoint.
+     *
+     * @return {@link Response.Status#OK}
+     */
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteGpus() {
+        LARS_GPUS_BY_MODEL_INFO.clear();
+        return Response
+            .ok()
             .build();
     }
 
@@ -69,11 +100,10 @@ public class StubbedLarsEndpoint {
      * <p>
      * Used by production code, not by tests directly, though tests should populate the hardware using {@link #addGpus(Collection)}.
      *
-     * @return an {@link Response#ok()} {@link Response} with the HTML output
+     * @return {@link Response.Status#OK} with the HTML output
      * @see StubbedLarsEndpoint#addGpus(Collection)
      */
     @GET
-    @Path("/gpu_ppd/overall_ranks")
     @Produces(MediaType.TEXT_PLAIN)
     public Response getGpus() {
         return Response
@@ -97,18 +127,16 @@ public class StubbedLarsEndpoint {
     }
 
     private static Collection<String> createTrElementsForHardwares() {
-        return LARS_GPUS
+        return LARS_GPUS_BY_MODEL_INFO
+            .values()
             .stream()
             .map(StubbedLarsEndpoint::createTrElementForHardware)
-            .filter(string -> !string.isBlank())
+            .filter(Objects::nonNull)
             .collect(toList());
     }
 
     private static String createTrElementForHardware(final LarsGpu larsGpu) {
         try {
-            final URI fileUri =
-                Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource(LARS_GPU_TEMPLATE_FILEPATH)).toURI();
-            final String template = Files.readString(Paths.get(fileUri), StandardCharsets.UTF_8);
 
             final Map<String, String> substitutionValues = Map.of(
                 "displayName", larsGpu.getDisplayName(),
@@ -119,10 +147,10 @@ public class StubbedLarsEndpoint {
             );
 
             final StringSubstitutor substitutor = new StringSubstitutor(substitutionValues);
-            return substitutor.replace(template);
+            return substitutor.replace(LARS_GPU_TEMPLATE);
         } catch (final Exception e) {
             LOGGER.warn("Unexpected error creating element for LARS GPU: {}", larsGpu, e);
-            return "";
+            return null;
         }
     }
 }

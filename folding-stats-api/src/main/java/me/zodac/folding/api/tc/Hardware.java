@@ -149,6 +149,6 @@ public class Hardware implements ResponsePojo {
             && Objects.equals(displayName, hardwareRequest.getDisplayName())
             && Objects.equals(hardwareMake.toString(), hardwareRequest.getHardwareMake())
             && Objects.equals(hardwareType.toString(), hardwareRequest.getHardwareType())
-            && Long.compare(averagePpd, hardwareRequest.getAveragePpd()) == 0;
+            && averagePpd == hardwareRequest.getAveragePpd();
     }
 }

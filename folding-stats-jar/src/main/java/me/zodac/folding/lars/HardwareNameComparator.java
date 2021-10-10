@@ -20,7 +20,7 @@ final class HardwareNameComparator implements Comparator<Hardware>, Serializable
      *
      * @return the created {@link HardwareNameComparator}
      */
-    public static HardwareNameComparator create() {
+    static HardwareNameComparator create() {
         return new HardwareNameComparator();
     }
 

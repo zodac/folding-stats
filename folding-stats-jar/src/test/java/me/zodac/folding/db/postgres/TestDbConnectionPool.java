@@ -31,8 +31,10 @@ public final class TestDbConnectionPool implements DbConnectionPool {
 
     private TestDbConnectionPool() {
         try {
-            LOGGER.info(() -> "Configuring test DB...");
-            dataSource = EmbeddedPostgres.builder().start().getPostgresDatabase();
+            LOGGER.info("Configuring test DB...");
+            dataSource = EmbeddedPostgres.builder()
+                .start()
+                .getPostgresDatabase();
             createDatabaseTables();
         } catch (final Exception e) {
             throw new AssertionError("Unable to start test DB", e);
@@ -65,8 +67,8 @@ public final class TestDbConnectionPool implements DbConnectionPool {
                 Paths.get(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("db/" + sqlFile)).toURI());
 
             final List<String> createStatements = Arrays.stream(Files
-                .readString(initScript)
-                .split("((\\n\\r)|(\\r\\n)){2}|(\\r){2}|(\\n){2}")) // Split on blank line(s)
+                    .readString(initScript)
+                    .split("((\\n\\r)|(\\r\\n)){2}|(\\r){2}|(\\n){2}")) // Split on blank line(s)
                 .map(String::trim)
                 .collect(toList());
 

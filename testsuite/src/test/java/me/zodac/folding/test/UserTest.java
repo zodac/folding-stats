@@ -930,19 +930,22 @@ class UserTest {
             .isEqualTo(updatedTeam);
 
         final Collection<User> usersAfterUpdate = UserUtils.getAll();
-        User foundUser = null;
-        for (final User userAfterUpdate : usersAfterUpdate) {
-            if (userAfterUpdate.getId() == user.getId()) {
-                foundUser = userAfterUpdate;
-                assertThat(foundUser.getTeam())
-                    .as("Expected user to contain updated team")
-                    .isEqualTo(updatedTeam);
-                break;
-            }
-        }
+        final User userWithId = findUserById(usersAfterUpdate, user.getId());
 
-        assertThat(foundUser)
+        assertThat(userWithId)
             .as("Could not find updated user after team was updated: " + usersAfterUpdate)
             .isNotNull();
+        assertThat(userWithId.getTeam())
+            .as("Expected user to contain updated team")
+            .isEqualTo(updatedTeam);
+    }
+
+    private static User findUserById(final Collection<User> users, final int id) {
+        for (final User user : users) {
+            if (user.getId() == id) {
+                return user;
+            }
+        }
+        return null;
     }
 }

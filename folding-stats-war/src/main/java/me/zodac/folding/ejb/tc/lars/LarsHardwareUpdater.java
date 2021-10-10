@@ -69,7 +69,13 @@ public class LarsHardwareUpdater {
     public void retrieveHardwareAndPersist() {
         final String gpuDbUrl = LARS_URL_ROOT + "/gpu_ppd/overall_ranks";
         final List<LarsGpu> larsGpus = LarsGpuRetriever.retrieveGpus(gpuDbUrl);
+        LOGGER.debug("Retrieved GPUs from LARS DB: {}", larsGpus);
         LOGGER.info("Retrieved {} GPUs from LARS DB", larsGpus.size());
+
+        if (larsGpus.isEmpty()) {
+            LOGGER.warn("No GPUs retrieved from LARs DB");
+            return;
+        }
 
         final long bestPpd = larsGpus.get(0).getAveragePpd();
         LOGGER.info("Best PPD is '{}', will compare to this", formatWithCommas(bestPpd));

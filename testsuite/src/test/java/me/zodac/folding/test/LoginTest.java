@@ -14,14 +14,11 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import me.zodac.folding.client.java.request.LoginRequestSender;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
-import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 
 /**
  * Tests for the login REST endpoint at <code>/folding/login</code>.
  */
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class LoginTest {
 
     private static final LoginRequestSender LOGIN_REQUEST_SENDER = LoginRequestSender.createWithUrl(FOLDING_URL);

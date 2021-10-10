@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import me.zodac.folding.api.exception.HtmlParseException;
+import me.zodac.folding.api.exception.LarsParseException;
 import me.zodac.folding.api.tc.lars.LarsGpu;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,10 +31,10 @@ public final class LarsGpuRetriever {
      * Will retrieve the {@link me.zodac.folding.api.tc.HardwareType#GPU} data from the supplied DB URL.
      *
      * <p>
-     * If an error occurs retrieving any {@link LarsGpu}s, it will be
+     * If an error occurs retrieving any individual {@link LarsGpu}, it will be logged, and we continue processing the remainder.
      *
      * @param gpuDatabaseUrl the URL to the LARS GPU database
-     * @return a {@link Collection} of parsed {@link LarsGpu}s sorted by {@link LarsGpu#getRank()}
+     * @return a {@link Collection} of parsed {@link LarsGpu}s sorted by {@link LarsGpu#getAveragePpd()}
      */
     public static List<LarsGpu> retrieveGpus(final String gpuDatabaseUrl) {
         LOGGER.debug("Retrieving LARS GPU data from: '{}'", gpuDatabaseUrl);
@@ -65,6 +65,7 @@ public final class LarsGpuRetriever {
                 .stream()
                 .map(LarsGpuRetriever::safeParse)
                 .filter(Objects::nonNull)
+                .sorted(LarsGpuAveragePpdComparator.create())
                 .collect(toList());
         } catch (final IOException e) {
             LOGGER.debug("Unable to connect to LARS GPU DB at '{}'", gpuDatabaseUrl, e);
@@ -79,7 +80,7 @@ public final class LarsGpuRetriever {
     private static LarsGpu safeParse(final Element element) {
         try {
             return LarsGpuParser.parseSingleGpuEntry(element);
-        } catch (final HtmlParseException e) {
+        } catch (final LarsParseException e) {
             LOGGER.debug("Error parsing GPU entry: {}", element, e);
             LOGGER.warn("Error parsing GPU entry: {}", e.getMessage());
             return null;

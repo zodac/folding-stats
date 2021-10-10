@@ -12,7 +12,7 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
-import me.zodac.folding.api.exception.HtmlParseException;
+import me.zodac.folding.api.exception.LarsParseException;
 import me.zodac.folding.api.tc.lars.LarsGpu;
 import org.apache.commons.text.StringSubstitutor;
 import org.jsoup.Jsoup;
@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 class LarsGpuParserTest {
 
     @Test
-    void validGpu() throws URISyntaxException, IOException, HtmlParseException {
+    void validGpu() throws URISyntaxException, IOException, LarsParseException {
         final LarsGpu inputLarsGpu = LarsGpu.create("displayName", "manufacturer", "modelInfo", 1, 1_000_000L);
         final Map<String, String> substitutionValues = Map.of(
             "displayName", inputLarsGpu.getDisplayName(),
@@ -47,7 +47,7 @@ class LarsGpuParserTest {
         final Document inputHtml = readFromFile("noModelNameSpanElement.txt");
 
         assertThatThrownBy(() -> LarsGpuParser.parseSingleGpuEntry(inputHtml))
-            .isInstanceOf(HtmlParseException.class)
+            .isInstanceOf(LarsParseException.class)
             .hasMessageContaining("Expected at least 1 'model-name' elements");
     }
 
@@ -64,7 +64,7 @@ class LarsGpuParserTest {
 
         final Document inputHtml = readFromFile("validGpuTemplate.txt", substitutionValues);
         assertThatThrownBy(() -> LarsGpuParser.parseSingleGpuEntry(inputHtml))
-            .isInstanceOf(HtmlParseException.class)
+            .isInstanceOf(LarsParseException.class)
             .hasMessageContaining("Empty 'model-name' for GPU entry");
     }
 
@@ -73,7 +73,7 @@ class LarsGpuParserTest {
         final Document inputHtml = readFromFile("noManufacturerSpanElement.txt");
 
         assertThatThrownBy(() -> LarsGpuParser.parseSingleGpuEntry(inputHtml))
-            .isInstanceOf(HtmlParseException.class)
+            .isInstanceOf(LarsParseException.class)
             .hasMessageContainingAll(
                 "Expected ",
                 "'span' elements for manufacturer"
@@ -93,7 +93,7 @@ class LarsGpuParserTest {
 
         final Document inputHtml = readFromFile("validGpuTemplate.txt", substitutionValues);
         assertThatThrownBy(() -> LarsGpuParser.parseSingleGpuEntry(inputHtml))
-            .isInstanceOf(HtmlParseException.class)
+            .isInstanceOf(LarsParseException.class)
             .hasMessageContaining("No manufacturer for GPU '" + inputLarsGpu.getDisplayName() + "'");
     }
 
@@ -102,7 +102,7 @@ class LarsGpuParserTest {
         final Document inputHtml = readFromFile("noModelInfoSpanElement.txt");
 
         assertThatThrownBy(() -> LarsGpuParser.parseSingleGpuEntry(inputHtml))
-            .isInstanceOf(HtmlParseException.class)
+            .isInstanceOf(LarsParseException.class)
             .hasMessageContaining("Expected at least 1 'model-info' elements");
     }
 
@@ -119,7 +119,7 @@ class LarsGpuParserTest {
 
         final Document inputHtml = readFromFile("validGpuTemplate.txt", substitutionValues);
         assertThatThrownBy(() -> LarsGpuParser.parseSingleGpuEntry(inputHtml))
-            .isInstanceOf(HtmlParseException.class)
+            .isInstanceOf(LarsParseException.class)
             .hasMessageContaining("Empty 'model-info' for GPU '" + inputLarsGpu.getDisplayName() + "'");
     }
 
@@ -128,8 +128,25 @@ class LarsGpuParserTest {
         final Document inputHtml = readFromFile("noRankElement.txt");
 
         assertThatThrownBy(() -> LarsGpuParser.parseSingleGpuEntry(inputHtml))
-            .isInstanceOf(HtmlParseException.class)
+            .isInstanceOf(LarsParseException.class)
             .hasMessageContaining("No 'rank-num' class element found for GPU");
+    }
+
+    @Test
+    void negativeRank() throws URISyntaxException, IOException {
+        final LarsGpu inputLarsGpu = LarsGpu.create("displayName", "manufacturer", "modelInfo", 1, 1_000_000L);
+        final Map<String, String> substitutionValues = Map.of(
+            "displayName", inputLarsGpu.getDisplayName(),
+            "manufacturer", inputLarsGpu.getManufacturer(),
+            "modelInfo", inputLarsGpu.getModelInfo(),
+            "rank", "-1",
+            "averagePpd", String.valueOf(inputLarsGpu.getAveragePpd())
+        );
+
+        final Document inputHtml = readFromFile("validGpuTemplate.txt", substitutionValues);
+        assertThatThrownBy(() -> LarsGpuParser.parseSingleGpuEntry(inputHtml))
+            .isInstanceOf(LarsParseException.class)
+            .hasMessageContaining(String.format("Unable to use GPU '%s' as it has a rank of '-1'", inputLarsGpu.getDisplayName()));
     }
 
     @Test
@@ -145,7 +162,7 @@ class LarsGpuParserTest {
 
         final Document inputHtml = readFromFile("validGpuTemplate.txt", substitutionValues);
         assertThatThrownBy(() -> LarsGpuParser.parseSingleGpuEntry(inputHtml))
-            .isInstanceOf(HtmlParseException.class)
+            .isInstanceOf(LarsParseException.class)
             .hasMessageContaining("Unable to convert rank into an integer for GPU '" + inputLarsGpu.getDisplayName() + "'");
     }
 
@@ -154,11 +171,28 @@ class LarsGpuParserTest {
         final Document inputHtml = readFromFile("noAveragePpdElement.txt");
 
         assertThatThrownBy(() -> LarsGpuParser.parseSingleGpuEntry(inputHtml))
-            .isInstanceOf(HtmlParseException.class)
+            .isInstanceOf(LarsParseException.class)
             .hasMessageContainingAll(
                 "Expected at least ",
                 "'td' elements"
             );
+    }
+
+    @Test
+    void negativeAveragePpd() throws URISyntaxException, IOException {
+        final LarsGpu inputLarsGpu = LarsGpu.create("displayName", "manufacturer", "modelInfo", 1, 1_000_000L);
+        final Map<String, String> substitutionValues = Map.of(
+            "displayName", inputLarsGpu.getDisplayName(),
+            "manufacturer", inputLarsGpu.getManufacturer(),
+            "modelInfo", inputLarsGpu.getModelInfo(),
+            "rank", String.valueOf(inputLarsGpu.getRank()),
+            "averagePpd", "-1"
+        );
+
+        final Document inputHtml = readFromFile("validGpuTemplate.txt", substitutionValues);
+        assertThatThrownBy(() -> LarsGpuParser.parseSingleGpuEntry(inputHtml))
+            .isInstanceOf(LarsParseException.class)
+            .hasMessageContaining(String.format("Unable to use GPU '%s' as it has an averagePpd of '-1'", inputLarsGpu.getDisplayName()));
     }
 
     @Test
@@ -174,7 +208,7 @@ class LarsGpuParserTest {
 
         final Document inputHtml = readFromFile("validGpuTemplate.txt", substitutionValues);
         assertThatThrownBy(() -> LarsGpuParser.parseSingleGpuEntry(inputHtml))
-            .isInstanceOf(HtmlParseException.class)
+            .isInstanceOf(LarsParseException.class)
             .hasMessageContaining("Unable to convert averagePpd into a long for GPU '" + inputLarsGpu.getDisplayName() + "'");
     }
 

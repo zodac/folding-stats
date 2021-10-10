@@ -1,9 +1,9 @@
 package me.zodac.folding.api.exception;
 
 /**
- * {@link Exception} for when errors occur when parsing HTML content.
+ * {@link Exception} for when errors occur when parsing LARS DB content.
  */
-public class HtmlParseException extends Exception {
+public class LarsParseException extends Exception {
 
     private static final long serialVersionUID = -4059920979584050749L;
 
@@ -12,7 +12,7 @@ public class HtmlParseException extends Exception {
      *
      * @param message the error message
      */
-    public HtmlParseException(final String message) {
+    public LarsParseException(final String message) {
         super(message);
     }
 
@@ -22,7 +22,7 @@ public class HtmlParseException extends Exception {
      * @param message   the error message
      * @param throwable the cause {@link Throwable}
      */
-    public HtmlParseException(final String message, final Throwable throwable) {
+    public LarsParseException(final String message, final Throwable throwable) {
         super(message, throwable);
     }
 }

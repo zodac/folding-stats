@@ -48,7 +48,7 @@ public class StubbedUnitsEndpoint {
      *
      * @param foldingUserName the Folding@Home user's username
      * @param passkey         the Folding@Home user's passkey
-     * @return a <b>200_OK</b> {@link Response} with the Folding@Home user's units
+     * @return {@link Response.Status#OK} with the Folding@Home user's units
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -68,7 +68,7 @@ public class StubbedUnitsEndpoint {
      * @param foldingUserName the Folding@Home user's username
      * @param passkey         the Folding@Home user's passkey
      * @param units           the units to set
-     * @return a <b>200_OK</b> {@link Response}
+     * @return {@link Response.Status#OK}
      */
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -93,11 +93,10 @@ public class StubbedUnitsEndpoint {
     /**
      * Resets the units for all Folding@Home users.
      *
-     * @return a <b>200_OK</b> {@link Response}
+     * @return {@link Response.Status#OK}
      */
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteUserUnits() {
         unitsByUserAndPasskey.clear();
 
