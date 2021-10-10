@@ -66,7 +66,7 @@ public class OldFacade {
 
         for (final User user : usersUsingThisHardware) {
             if (isHardwareMultiplierChange) {
-                LOGGER.info("User '{}' (ID: {}) had state change to hardware multiplier", user.getDisplayName(), user.getId());
+                LOGGER.debug("User '{}' (ID: {}) had state change to hardware multiplier", user.getDisplayName(), user.getId());
                 handleStateChangeForUser(user);
             }
 
@@ -148,7 +148,7 @@ public class OldFacade {
             OffsetStats.create(currentUserTcStats.getPoints(), currentUserTcStats.getMultipliedPoints(), currentUserTcStats.getUnits());
         LOGGER.debug("Adding offset stats of: {}", offsetStats);
         createOffsetStats(userWithStateChange.getId(), offsetStats);
-        LOGGER.info("Handled state change for user '{}'", userWithStateChange.getDisplayName());
+        LOGGER.info("Handled state change for user '{}' (ID: {})", userWithStateChange.getDisplayName(), userWithStateChange.getId());
     }
 
     public void deleteUser(final User user) {
