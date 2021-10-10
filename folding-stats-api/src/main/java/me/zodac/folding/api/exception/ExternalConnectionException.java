@@ -3,7 +3,6 @@ package me.zodac.folding.api.exception;
 /**
  * {@link Exception} for errors when connecting to an external service, or when an unexpected response is returned.
  */
-// TODO: [zodac] Replace with java.rmi.ConnectException?
 public class ExternalConnectionException extends Exception {
 
     private static final long serialVersionUID = 2084075114898438910L;
