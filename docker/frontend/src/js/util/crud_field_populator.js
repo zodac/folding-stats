@@ -186,6 +186,9 @@ function populateUserOffset(){
     document.getElementById("user_offset_id").value = userId;
     document.getElementById("user_offset_folding_name").value = selectedElement.getAttribute("user_folding_name");
     document.getElementById("user_offset_display_name").value = selectedElement.getAttribute("user_display_name");
+    document.getElementById("user_offset_category").value = selectedElement.getAttribute("user_category");
+    document.getElementById("user_offset_hardware_selector").value = selectedElement.getAttribute("user_hardware_id");
+    document.getElementById("user_offset_team_selector").value = selectedElement.getAttribute("user_team_id");
 
     fetch(ROOT_URL+'/stats/users/' + userId)
     .then(response => {

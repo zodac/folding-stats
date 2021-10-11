@@ -783,12 +783,33 @@
                                        placeholder="Display Name" aria-label="Display Name" required disabled>
                             </div>
                             <div class="col-auto user_offset" style="display:none;">
+                                <select id="user_offset_category" class="form-select"
+                                        aria-label="user_offset_category" required disabled>
+                                    <option selected disabled value="">Category</option>
+                                    <option value="AMD GPU">AMD GPU</option>
+                                    <option value="nVidia GPU">nVidia GPU</option>
+                                    <option value="Wildcard">Wildcard</option>
+                                </select>
+                            </div>
+                            <div class="col-auto user_offset" style="display:none;">
+                                <select id="user_offset_hardware_selector" class="form-select hardware_list"
+                                        aria-label="user_offset_hardware_selector" disabled>
+                                    <!-- Will be populated by system.js -->
+                                </select>
+                            </div>
+                            <div class="col-auto user_offset" style="display:none;">
+                                <select id="user_offset_team_selector" class="form-select team_list"
+                                        aria-label="user_offset_team_selector" disabled>
+                                    <!-- Will be populated by system.js -->
+                                </select>
+                            </div>
+                            <div class="col-auto user_offset" style="display:none;">
                                 <label for="user_offset_points" class="visually-hidden">Points</label>
                                 <input id="user_offset_points" class="form-control" type="number" step="1"
                                        placeholder="Points" aria-label="Points">
                             </div>
                             <div class="col-auto user_offset" style="display:none;">
-                                <label for="user_offset_units" class="visually-hidden">Points</label>
+                                <label for="user_offset_units" class="visually-hidden">Units</label>
                                 <input id="user_offset_units" class="form-control" type="number" step="1"
                                        placeholder="Units" aria-label="Units">
                             </div>

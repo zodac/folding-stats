@@ -461,7 +461,7 @@ final class Storage {
      * @return an {@link Optional} of the retrieved {@link UserStats}
      * @see DbManager#getTotalStats(int)
      */
-    public Optional<UserStats> getTotalStats(final int userId) {
+    Optional<UserStats> getTotalStats(final int userId) {
         final Optional<UserStats> optionalTotalStats = totalStatsCache.get(userId);
 
         if (optionalTotalStats.isPresent()) {
