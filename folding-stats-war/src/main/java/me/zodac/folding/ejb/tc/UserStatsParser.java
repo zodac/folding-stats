@@ -6,6 +6,7 @@ import javax.ejb.Asynchronous;
 import javax.ejb.EJB;
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
+import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
 import me.zodac.folding.api.tc.User;
@@ -28,6 +29,9 @@ public class UserStatsParser {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final FoldingStatsRetriever FOLDING_STATS_RETRIEVER = HttpFoldingStatsRetriever.create();
+
+    @EJB
+    private BusinessLogic businessLogic;
 
     @EJB
     private OldFacade oldFacade;
@@ -84,7 +88,7 @@ public class UserStatsParser {
             return;
         }
 
-        oldFacade.createTotalStatsForUser(totalStats);
+        businessLogic.createTotalStats(totalStats);
         calculateAndPersistTcStats(user, initialStats, offsetStats, totalStats);
     }
 

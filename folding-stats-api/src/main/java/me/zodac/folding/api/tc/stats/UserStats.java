@@ -77,8 +77,4 @@ public class UserStats extends Stats {
     public boolean isEmptyStats() {
         return super.isEmpty();
     }
-
-    public Stats getStats() {
-        return Stats.create(getPoints(), getUnits());
-    }
 }

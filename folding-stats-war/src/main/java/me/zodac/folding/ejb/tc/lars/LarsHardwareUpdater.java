@@ -99,8 +99,8 @@ public class LarsHardwareUpdater {
 
                 oldFacade.updateHardware(updatedHardwareWithId, existingHardware);
                 LOGGER.info("Updated hardware '{}' (ID: {})\nmultiplier: {} -> {}\naverage PPD: {} -> {}", updatedHardware.getHardwareName(),
-                    existingHardware.getId(), existingHardware.getMultiplier(), updatedHardware.getMultiplier(), existingHardware.getAveragePpd(),
-                    updatedHardware.getAveragePpd());
+                    existingHardware.getId(), existingHardware.getMultiplier(), updatedHardware.getMultiplier(),
+                    formatWithCommas(existingHardware.getAveragePpd()), formatWithCommas(updatedHardware.getAveragePpd()));
             } catch (final ExternalConnectionException e) {
                 LOGGER.warn("Error connecting to Folding@Home stats to verify new hardware", e);
             }

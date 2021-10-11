@@ -10,6 +10,7 @@ import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
+import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 
@@ -259,4 +260,19 @@ public interface BusinessLogic {
      * @return the monthly {@link HistoricStats} for the {@link User}
      */
     Collection<HistoricStats> getHistoricStats(final User user, final Year year);
+
+    /**
+     * Creates a {@link UserStats} for the total overall stats for a {@link User}.
+     *
+     * @param userStats the {@link UserStats} to be created
+     */
+    void createTotalStats(final UserStats userStats);
+
+    /**
+     * Retrieves the {@link UserStats} for the provided {@link User}.
+     *
+     * @param user the {@link User} whose {@link UserStats} are to be retrieved
+     * @return the {@link UserStats} for the {@link User}, or {@link UserStats#empty()} if none can be found
+     */
+    UserStats getTotalStats(final User user);
 }

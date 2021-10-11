@@ -1,17 +1,17 @@
 package me.zodac.folding.cache;
 
-import me.zodac.folding.api.tc.stats.Stats;
+import me.zodac.folding.api.tc.stats.UserStats;
 
 /**
- * Implementation of {@link BaseCache} for total {@link me.zodac.folding.api.tc.User} {@link Stats}s.
+ * Implementation of {@link BaseCache} for total {@link UserStats}.
  *
  * <p>
  * <b>key:</b> the {@link me.zodac.folding.api.tc.User} ID
  *
  * <p>
- * <b>value:</b> {@link Stats}
+ * <b>value:</b> {@link UserStats}
  */
-public final class TotalStatsCache extends BaseCache<Stats> {
+public final class TotalStatsCache extends BaseCache<UserStats> {
 
     private static final TotalStatsCache INSTANCE = new TotalStatsCache();
 

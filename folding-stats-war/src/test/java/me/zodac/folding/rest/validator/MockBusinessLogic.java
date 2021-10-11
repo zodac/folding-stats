@@ -16,6 +16,7 @@ import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
+import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 
@@ -208,5 +209,15 @@ final class MockBusinessLogic implements BusinessLogic {
     @Override
     public Collection<HistoricStats> getHistoricStats(final User user, final Year year) {
         return Collections.emptyList();
+    }
+
+    @Override
+    public void createTotalStats(final UserStats userStats) {
+
+    }
+
+    @Override
+    public UserStats getTotalStats(final User user) {
+        return UserStats.empty();
     }
 }

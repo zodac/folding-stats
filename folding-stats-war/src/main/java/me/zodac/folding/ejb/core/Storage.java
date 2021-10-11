@@ -12,10 +12,12 @@ import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
+import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.cache.HardwareCache;
 import me.zodac.folding.cache.RetiredTcStatsCache;
 import me.zodac.folding.cache.TeamCache;
+import me.zodac.folding.cache.TotalStatsCache;
 import me.zodac.folding.cache.UserCache;
 import me.zodac.folding.db.DbManagerRetriever;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
@@ -45,6 +47,7 @@ final class Storage {
 
     // Stat caches
     private final RetiredTcStatsCache retiredStatsCache = RetiredTcStatsCache.getInstance();
+    private final TotalStatsCache totalStatsCache = TotalStatsCache.getInstance();
 
     private Storage() {
 
@@ -307,21 +310,6 @@ final class Storage {
     }
 
     /**
-     * Evicts a {@link User} from the {@link UserCache}.
-     *
-     * <p>
-     * Used in scenarios where something a {@link User} references, like a {@link Hardware} or {@link Team} has been
-     * updated. The {@link User} itself does not require an update in the DB (since we only store a reference to the ID of the
-     * {@link Hardware}/{@link Team}). This will force the next retrieval to go directly to the DB and retrieve the updated
-     * {@link Hardware}/{@link Team} details for the {@link User}.
-     *
-     * @param userId the ID of the {@link User} to evict
-     */
-    void evictUserFromCache(final int userId) {
-        userCache.remove(userId);
-    }
-
-    /**
      * Creates a monthly result for the <code>Team Competition</code>.
      *
      * <p>
@@ -330,7 +318,7 @@ final class Storage {
      * @param monthlyResult the result for a month of the <code>Team Competition</code>
      * @param utcTimestamp  the {@link java.time.ZoneOffset#UTC} timestamp for the result
      */
-    public void createMonthlyResult(final String monthlyResult, final LocalDateTime utcTimestamp) {
+    void createMonthlyResult(final String monthlyResult, final LocalDateTime utcTimestamp) {
         DB_MANAGER.persistMonthlyResult(monthlyResult, utcTimestamp);
     }
 
@@ -344,7 +332,7 @@ final class Storage {
      * @param year  the {@link Year} of the result to be retrieved
      * @return an {@link Optional} of the <code>Team Competition</code> result
      */
-    public Optional<String> getMonthlyResult(final Month month, final Year year) {
+    Optional<String> getMonthlyResult(final Month month, final Year year) {
         return DB_MANAGER.getMonthlyResult(month, year);
     }
 
@@ -360,7 +348,7 @@ final class Storage {
      * @param userTcStats     the {@link UserTcStats} at the time of deletion
      * @return the {@link RetiredUserTcStats}
      */
-    public RetiredUserTcStats createRetiredUser(final int teamId, final int userId, final String userDisplayName, final UserTcStats userTcStats) {
+    RetiredUserTcStats createRetiredUser(final int teamId, final int userId, final String userDisplayName, final UserTcStats userTcStats) {
         final int retiredUserId = DB_MANAGER.persistRetiredUserStats(teamId, userId, userDisplayName, userTcStats);
         final RetiredUserTcStats retiredUserTcStats = RetiredUserTcStats.create(retiredUserId, teamId, userDisplayName, userTcStats);
 
@@ -373,7 +361,7 @@ final class Storage {
      *
      * @return a {@link Collection} of the retrieved {@link RetiredUserTcStats}
      */
-    public Collection<RetiredUserTcStats> getAllRetiredUsers() {
+    Collection<RetiredUserTcStats> getAllRetiredUsers() {
         final Collection<RetiredUserTcStats> fromCache = retiredStatsCache.getAll();
 
         if (!fromCache.isEmpty()) {
@@ -393,7 +381,7 @@ final class Storage {
     /**
      * Deletes all {@link RetiredUserTcStats} for all {@link Team}s.
      */
-    public void deleteAllRetiredUserStats() {
+    void deleteAllRetiredUserStats() {
         DB_MANAGER.deleteAllRetiredUserStats();
         retiredStatsCache.removeAll();
     }
@@ -405,7 +393,7 @@ final class Storage {
      * @param password the system user password
      * @return the {@link UserAuthenticationResult}
      */
-    public UserAuthenticationResult authenticateSystemUser(final String userName, final String password) {
+    UserAuthenticationResult authenticateSystemUser(final String userName, final String password) {
         return DB_MANAGER.authenticateSystemUser(userName, password);
     }
 
@@ -433,7 +421,7 @@ final class Storage {
      * @see DbManager#getHistoricStatsDaily(int, Year, Month)
      * @see DbManager#getHistoricStatsMonthly(int, Year)
      */
-    public Collection<HistoricStats> getHistoricStats(final int userId, final Year year, final Month month, final int day) {
+    Collection<HistoricStats> getHistoricStats(final int userId, final Year year, final Month month, final int day) {
         if (year == null) {
             return Collections.emptyList();
         }
@@ -447,5 +435,42 @@ final class Storage {
         }
 
         return DB_MANAGER.getHistoricStatsHourly(userId, year, month, day);
+    }
+
+    /**
+     * Creates a {@link UserStats} for the total overall stats for a {@link User}.
+     *
+     * <p>
+     * Persists it with the {@link DbManager}, then adds it to the {@link TotalStatsCache}.
+     *
+     * @param userStats the {@link UserStats} to be created
+     */
+    void createTotalStats(final UserStats userStats) {
+        DB_MANAGER.createTotalStats(userStats);
+        totalStatsCache.add(userStats.getUserId(), userStats);
+    }
+
+    /**
+     * Retrieves the {@link UserStats} for a {@link User} with the provided ID..
+     *
+     * <p>
+     * First attempts to retrieve from {@link TotalStatsCache}, then if none exists, attempts to retrieve from the
+     * {@link DbManager}.
+     *
+     * @param userId the ID of the {@link User} to retrieve
+     * @return an {@link Optional} of the retrieved {@link UserStats}
+     * @see DbManager#getTotalStats(int)
+     */
+    public Optional<UserStats> getTotalStats(final int userId) {
+        final Optional<UserStats> optionalTotalStats = totalStatsCache.get(userId);
+
+        if (optionalTotalStats.isPresent()) {
+            return optionalTotalStats;
+        }
+
+        LOGGER.trace("Cache miss! Total stats");
+        final Optional<UserStats> fromDb = DB_MANAGER.getTotalStats(userId);
+        fromDb.ifPresent(userStats -> totalStatsCache.add(userId, userStats));
+        return fromDb;
     }
 }

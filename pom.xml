@@ -10,14 +10,11 @@
     <packaging>pom</packaging>
     <name>[${project.artifactId}] project</name>
 
-    <modules>
-        <module>${project.artifactId}-api</module>
-        <module>${project.artifactId}-client-library-java</module>
-        <module>${project.artifactId}-jar</module>
-        <module>${project.artifactId}-war</module>
-        <module>stubbed-folding-endpoints-war</module>
-        <module>testsuite</module>
-    </modules>
+    <!-- Not defining any modules at the top-level -->
+    <!-- Instead, we will define a profile which is activated by default -->
+    <!-- This allows us to use another profile with fewer (or no) modules in CI -->
+    <!-- However, it does force us to add all modules to any other profile we might define -->
+    <modules/>
 
     <properties>
         <!-- Project Settings -->
@@ -477,6 +474,36 @@
     </build>
 
     <profiles>
+        <!-- Default profile with all child modules listed -->
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+                <property>
+                    <name>default</name>
+                </property>
+            </activation>
+            <modules>
+                <module>folding-stats-api</module>
+                <module>folding-stats-client-library-java</module>
+                <module>folding-stats-jar</module>
+                <module>folding-stats-war</module>
+                <module>stubbed-folding-endpoints-war</module>
+                <module>testsuite</module>
+            </modules>
+        </profile>
+
+        <!-- Profile used to build the parent in docker, without needing to rely on the child modules -->
+        <profile>
+            <id>docker</id>
+            <activation>
+                <property>
+                    <name>docker</name>
+                </property>
+            </activation>
+            <modules/>
+        </profile>
+
         <!-- Profile to run both tests and linters -->
         <profile>
             <id>activate_all</id>
@@ -485,6 +512,14 @@
                     <name>ts</name> <!-- Name means 'testsuite', but it's just what I'm used to running from work -->
                 </property>
             </activation>
+            <modules>
+                <module>folding-stats-api</module>
+                <module>folding-stats-client-library-java</module>
+                <module>folding-stats-jar</module>
+                <module>folding-stats-war</module>
+                <module>stubbed-folding-endpoints-war</module>
+                <module>testsuite</module>
+            </modules>
             <properties>
                 <skip-integration-tests>false</skip-integration-tests>
                 <skip-linters>false</skip-linters>
@@ -501,6 +536,14 @@
                     <name>lint</name>
                 </property>
             </activation>
+            <modules>
+                <module>folding-stats-api</module>
+                <module>folding-stats-client-library-java</module>
+                <module>folding-stats-jar</module>
+                <module>folding-stats-war</module>
+                <module>stubbed-folding-endpoints-war</module>
+                <module>testsuite</module>
+            </modules>
             <properties>
                 <skip-linters>false</skip-linters>
             </properties>
@@ -515,6 +558,14 @@
                     <name>sonar</name>
                 </property>
             </activation>
+            <modules>
+                <module>folding-stats-api</module>
+                <module>folding-stats-client-library-java</module>
+                <module>folding-stats-jar</module>
+                <module>folding-stats-war</module>
+                <module>stubbed-folding-endpoints-war</module>
+                <module>testsuite</module>
+            </modules>
             <properties>
                 <skip-sonar>false</skip-sonar>
             </properties>
@@ -528,6 +579,14 @@
                     <name>tests</name>
                 </property>
             </activation>
+            <modules>
+                <module>folding-stats-api</module>
+                <module>folding-stats-client-library-java</module>
+                <module>folding-stats-jar</module>
+                <module>folding-stats-war</module>
+                <module>stubbed-folding-endpoints-war</module>
+                <module>testsuite</module>
+            </modules>
             <properties>
                 <skip-integration-tests>false</skip-integration-tests>
                 <skip-unit-tests>false</skip-unit-tests>
@@ -542,6 +601,14 @@
                     <name>unit-tests</name>
                 </property>
             </activation>
+            <modules>
+                <module>folding-stats-api</module>
+                <module>folding-stats-client-library-java</module>
+                <module>folding-stats-jar</module>
+                <module>folding-stats-war</module>
+                <module>stubbed-folding-endpoints-war</module>
+                <module>testsuite</module>
+            </modules>
             <properties>
                 <skip-integration-tests>true</skip-integration-tests>
                 <skip-unit-tests>false</skip-unit-tests>

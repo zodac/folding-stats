@@ -15,6 +15,7 @@ import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.OffsetStats;
+import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
@@ -23,7 +24,6 @@ import me.zodac.folding.cache.HardwareCache;
 import me.zodac.folding.cache.InitialStatsCache;
 import me.zodac.folding.cache.OffsetStatsCache;
 import me.zodac.folding.cache.TcStatsCache;
-import me.zodac.folding.cache.TotalStatsCache;
 import me.zodac.folding.cache.UserCache;
 import me.zodac.folding.db.DbManagerRetriever;
 import me.zodac.folding.ejb.tc.UserStatsParser;
@@ -45,7 +45,6 @@ public class OldFacade {
     private final transient InitialStatsCache initialStatsCache = InitialStatsCache.getInstance();
     private final transient OffsetStatsCache offsetStatsCache = OffsetStatsCache.getInstance();
     private final transient TcStatsCache tcStatsCache = TcStatsCache.getInstance();
-    private final transient TotalStatsCache totalStatsCache = TotalStatsCache.getInstance();
 
     @EJB
     private transient BusinessLogic businessLogic;
@@ -142,7 +141,7 @@ public class OldFacade {
 
         LOGGER.debug("Setting initial stats to: {}", userTotalStats);
         dbManager.persistInitialStats(userTotalStats);
-        initialStatsCache.add(userWithStateChange.getId(), userTotalStats.getStats());
+        initialStatsCache.add(userWithStateChange.getId(), userTotalStats);
 
         final OffsetStats offsetStats =
             OffsetStats.create(currentUserTcStats.getPoints(), currentUserTcStats.getMultipliedPoints(), currentUserTcStats.getUnits());
@@ -164,7 +163,9 @@ public class OldFacade {
         }
 
         final Team team = user.getTeam();
-        businessLogic.createRetiredUser(team, user, userStats);
+        final RetiredUserTcStats retiredUserTcStats = businessLogic.createRetiredUser(team, user, userStats);
+        LOGGER.info("User '{}' (ID: {}) retired with retired stats ID: {}", user.getDisplayName(), user.getId(),
+            retiredUserTcStats.getRetiredUserId());
     }
 
     public void createInitialUserStats(final User user) throws ExternalConnectionException {
@@ -174,7 +175,7 @@ public class OldFacade {
 
     public void createInitialUserStats(final UserStats userStats) {
         dbManager.persistInitialStats(userStats);
-        initialStatsCache.add(userStats.getUserId(), userStats.getStats());
+        initialStatsCache.add(userStats.getUserId(), userStats);
     }
 
     public Stats getInitialStatsForUser(final int userId) {
@@ -186,9 +187,8 @@ public class OldFacade {
         LOGGER.trace("Cache miss! getInitialStatsForUser");
         // Should be no need to get anything from the DB (since it should have been added to the cache when created)
         // But adding this just in case we decide to add some cache eviction in future
-        final Stats initialStatsFromDb = dbManager.getInitialStats(userId)
-            .orElse(UserStats.empty())
-            .getStats();
+        final UserStats initialStatsFromDb = dbManager.getInitialStats(userId)
+            .orElse(UserStats.empty());
         initialStatsCache.add(userId, initialStatsFromDb);
         return initialStatsFromDb;
     }
@@ -249,31 +249,9 @@ public class OldFacade {
         offsetStatsCache.removeAll();
     }
 
-    public void createTotalStatsForUser(final UserStats stats) {
-        dbManager.createTotalStats(stats);
-        totalStatsCache.add(stats.getUserId(), stats.getStats());
-    }
-
-    public Stats getTotalStatsForUser(final int userId) {
-        final Optional<Stats> optionalTotalStats = totalStatsCache.get(userId);
-
-        if (optionalTotalStats.isPresent()) {
-            return optionalTotalStats.get();
-        }
-
-        LOGGER.trace("Cache miss! Total stats");
-        // Should be no need to get anything from the DB (since it should have been added to the cache when created)
-        // But adding this just in case we decide to add some cache eviction in future
-        final Stats userTotalStatsFromDb = dbManager.getTotalStats(userId)
-            .orElse(UserStats.empty())
-            .getStats();
-        totalStatsCache.add(userId, userTotalStatsFromDb);
-        return userTotalStatsFromDb;
-    }
-
     public void setCurrentStatsAsInitialStatsForUser(final User user) {
-        LOGGER.debug("Setting current stats as initial stats for user: {}", user.getDisplayName());
-        final Stats totalStats = getTotalStatsForUser(user.getId());
+        LOGGER.debug("Setting current stats as initial stats for user '{}' (ID: {})", user.getDisplayName(), user.getId());
+        final UserStats totalStats = businessLogic.getTotalStats(user);
         createInitialUserStats(UserStats.create(user.getId(), DateTimeUtils.currentUtcTimestamp(), totalStats.getPoints(), totalStats.getUnits()));
         initialStatsCache.add(user.getId(), totalStats);
     }

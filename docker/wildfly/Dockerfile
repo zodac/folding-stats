@@ -10,20 +10,27 @@ ARG PATH=${PATH}:${MAVEN_HOME}
 RUN mkdir --parents /folding-stats/
 
 # Copy source code
+# Adding and building each module incrementally so we can retain some docker caches when building for tests
 COPY ./pom.xml /folding-stats/pom.xml
-COPY ./folding-stats-api /folding-stats/folding-stats-api
-COPY ./folding-stats-client-library-java /folding-stats/folding-stats-client-library-java
-COPY ./folding-stats-jar /folding-stats/folding-stats-jar
-COPY ./folding-stats-war /folding-stats/folding-stats-war
-COPY ./stubbed-folding-endpoints-war /folding-stats/stubbed-folding-endpoints-war
-# Unused poms must also be added, or else 'mvn install' will not even start
-COPY ./testsuite/pom.xml /folding-stats/testsuite/pom.xml
+RUN cd /folding-stats/ && mvn install -Pdocker && cd /
 
-# Build and output artifacts
-RUN cd  /folding-stats/ && \
-    mvn install && \
-    cd / && \
-    mkdir --parents /opt/jboss/wildfly/standalone/deployments/ && \
+COPY ./folding-stats-api /folding-stats/folding-stats-api
+RUN cd /folding-stats/folding-stats-api && mvn install --projects . && cd /
+
+COPY ./folding-stats-client-library-java /folding-stats/folding-stats-client-library-java
+RUN cd /folding-stats/folding-stats-client-library-java && mvn install --projects . && cd /
+
+COPY ./folding-stats-jar /folding-stats/folding-stats-jar
+RUN cd /folding-stats/folding-stats-jar && mvn install --projects . && cd /
+
+COPY ./folding-stats-war /folding-stats/folding-stats-war
+RUN cd /folding-stats/folding-stats-war && mvn install --projects . && cd /
+
+COPY ./stubbed-folding-endpoints-war /folding-stats/stubbed-folding-endpoints-war
+RUN cd /folding-stats/stubbed-folding-endpoints-war && mvn install --projects . && cd /
+
+# Build and output final artifacts
+RUN mkdir --parents /opt/jboss/wildfly/standalone/deployments/ && \
     mv /folding-stats/folding-stats-war/target/folding-stats-war*.war /opt/jboss/wildfly/standalone/deployments/folding-stats-war.war && \
     mv /folding-stats/stubbed-folding-endpoints-war/target/stubbed-folding-endpoints-war*.war /opt/jboss/wildfly/standalone/deployments/stubbed-folding-endpoints-war.war && \
     rm -rf /folding-stats/ "${MAVEN_CONFIG}" "${MAVEN_HOME}"
@@ -39,7 +46,7 @@ ENV LANG C.UTF-8
 # Configure artifacts
 COPY --from=maven /opt/jboss/wildfly/standalone/deployments/ /opt/jboss/wildfly/standalone/deployments/
 
-# Only add the stubbed endpoints if this is a test deployment
+# Remove the stubbed endpoints if this is not a test deployment
 ARG DEPLOYMENT_TYPE
 RUN if [ "${DEPLOYMENT_TYPE}" != "test" ]; then \
        rm -rf /opt/jboss/wildfly/standalone/deployments/stubbed-folding-endpoints-war.war; \

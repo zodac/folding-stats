@@ -14,6 +14,7 @@ import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
+import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import org.apache.logging.log4j.LogManager;
@@ -216,5 +217,16 @@ public class BusinessLogicEjb implements BusinessLogic {
         }
 
         return historicStats;
+    }
+
+    @Override
+    public void createTotalStats(final UserStats userStats) {
+        STORAGE.createTotalStats(userStats);
+    }
+
+    @Override
+    public UserStats getTotalStats(final User user) {
+        return STORAGE.getTotalStats(user.getId())
+            .orElse(UserStats.empty());
     }
 }
