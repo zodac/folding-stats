@@ -7,6 +7,9 @@ public class ExternalConnectionException extends Exception {
 
     private static final long serialVersionUID = 2084075114898438910L;
 
+    /**
+     * The URL that was unable to be connected to.
+     */
     private final String url;
 
     /**
@@ -32,6 +35,11 @@ public class ExternalConnectionException extends Exception {
         this.url = url;
     }
 
+    /**
+     * The URL that could not be connected to, causing the {@link ExternalConnectionException} to be thrown.
+     *
+     * @return the failing URL
+     */
     public String getUrl() {
         return url;
     }

@@ -82,8 +82,6 @@ public interface DbManager {
 
     Optional<UserStats> getTotalStats(final int userId);
 
-    void createOffsetStats(int userId, OffsetStats offsetStats);
-
     Optional<OffsetStats> createOrUpdateOffsetStats(final int userId, final OffsetStats offsetStats);
 
     Optional<OffsetStats> getOffsetStats(final int userId);
