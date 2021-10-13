@@ -32,6 +32,7 @@ import me.zodac.folding.rest.api.tc.leaderboard.UserCategoryLeaderboardEntry;
 import me.zodac.folding.test.util.rest.request.StubbedFoldingEndpointUtils;
 import me.zodac.folding.test.util.rest.request.TeamUtils;
 import me.zodac.folding.test.util.rest.request.UserUtils;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -44,6 +45,11 @@ class MonthlyResultTest {
 
     @BeforeEach
     void setUp() throws FoldingRestException {
+        cleanSystemForComplexTests();
+    }
+
+    @AfterAll
+    static void tearDown() throws FoldingRestException {
         cleanSystemForComplexTests();
     }
 

@@ -37,13 +37,13 @@ import org.junit.jupiter.api.Test;
  */
 class TeamCompetitionLeaderboardTest {
 
-    @AfterAll
-    static void tearDown() throws FoldingRestException {
+    @BeforeEach
+    void setUp() throws FoldingRestException {
         cleanSystemForComplexTests();
     }
 
-    @BeforeEach
-    void setUp() throws FoldingRestException {
+    @AfterAll
+    static void tearDown() throws FoldingRestException {
         cleanSystemForComplexTests();
     }
 

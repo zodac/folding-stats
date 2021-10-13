@@ -98,7 +98,7 @@ public class LarsHardwareUpdater {
                 final Hardware updatedHardwareWithId = Hardware.updateWithId(existingHardware.getId(), updatedHardware);
 
                 oldFacade.updateHardware(updatedHardwareWithId, existingHardware);
-                LOGGER.info("Updated hardware '{}' (ID: {})\nmultiplier: {} -> {}\naverage PPD: {} -> {}", updatedHardware.getHardwareName(),
+                LOGGER.info("LARS updated hardware\n'{}' (ID: {})\nMultiplier: {} -> {}\nAverage PPD: {} -> {}\n", updatedHardware.getHardwareName(),
                     existingHardware.getId(), existingHardware.getMultiplier(), updatedHardware.getMultiplier(),
                     formatWithCommas(existingHardware.getAveragePpd()), formatWithCommas(updatedHardware.getAveragePpd()));
             } catch (final ExternalConnectionException e) {
@@ -107,8 +107,8 @@ public class LarsHardwareUpdater {
         }
 
         for (final Hardware hardware : HardwareSplitter.toCreate(lars, existing)) {
-            businessLogic.createHardware(hardware);
-            LOGGER.debug("Created hardware '{}'", hardware.getHardwareName());
+            final Hardware createdHardware = businessLogic.createHardware(hardware);
+            LOGGER.debug("Created hardware '{}' (ID: {})", createdHardware.getHardwareName(), createdHardware.getId());
         }
     }
 

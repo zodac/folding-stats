@@ -14,19 +14,24 @@ RUN mkdir --parents /folding-stats/
 COPY ./pom.xml /folding-stats/pom.xml
 RUN cd /folding-stats/ && mvn install -Pdocker && cd /
 
-COPY ./folding-stats-api /folding-stats/folding-stats-api
+COPY ./folding-stats-api/pom.xml /folding-stats/folding-stats-api/pom.xml
+COPY ./folding-stats-api/src /folding-stats/folding-stats-api/src
 RUN cd /folding-stats/folding-stats-api && mvn install --projects . && cd /
 
-COPY ./folding-stats-client-library-java /folding-stats/folding-stats-client-library-java
+COPY ./folding-stats-client-library-java/pom.xml /folding-stats/folding-stats-client-library-java/pom.xml
+COPY ./folding-stats-client-library-java/src /folding-stats/folding-stats-client-library-java/src
 RUN cd /folding-stats/folding-stats-client-library-java && mvn install --projects . && cd /
 
-COPY ./folding-stats-jar /folding-stats/folding-stats-jar
+COPY ./folding-stats-jar/pom.xml /folding-stats/folding-stats-jar/pom.xml
+COPY ./folding-stats-jar/src /folding-stats/folding-stats-jar/src
 RUN cd /folding-stats/folding-stats-jar && mvn install --projects . && cd /
 
-COPY ./folding-stats-war /folding-stats/folding-stats-war
+COPY ./folding-stats-war/pom.xml /folding-stats/folding-stats-war/pom.xml
+COPY ./folding-stats-war/src /folding-stats/folding-stats-war/src
 RUN cd /folding-stats/folding-stats-war && mvn install --projects . && cd /
 
-COPY ./stubbed-folding-endpoints-war /folding-stats/stubbed-folding-endpoints-war
+COPY ./stubbed-folding-endpoints-war/pom.xml /folding-stats/stubbed-folding-endpoints-war/pom.xml
+COPY ./stubbed-folding-endpoints-war/src /folding-stats/stubbed-folding-endpoints-war/src
 RUN cd /folding-stats/stubbed-folding-endpoints-war && mvn install --projects . && cd /
 
 # Build and output final artifacts
@@ -36,12 +41,6 @@ RUN mkdir --parents /opt/jboss/wildfly/standalone/deployments/ && \
     rm -rf /folding-stats/ "${MAVEN_CONFIG}" "${MAVEN_HOME}"
 
 FROM jboss/wildfly:24.0.0.Final AS wildfly
-
-# Configure JDK
-COPY --from=folding-stats_jdk /opt/jdk /opt/jdk
-ENV JAVA_HOME /opt/jdk
-ENV PATH ${PATH}:/opt/jdk/bin
-ENV LANG C.UTF-8
 
 # Configure artifacts
 COPY --from=maven /opt/jboss/wildfly/standalone/deployments/ /opt/jboss/wildfly/standalone/deployments/

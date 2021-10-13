@@ -186,10 +186,29 @@ public final class TestGenerator {
      * @param teamId the {@link me.zodac.folding.api.tc.Team} ID
      * @return the generated {@link UserRequest}
      * @throws FoldingRestException thrown if an error occurs executing {@link HardwareUtils#create(HardwareRequest)}
-     *                              or {@link TeamUtils#create(TeamRequest)}
      */
     public static UserRequest generateUserWithTeamId(final int teamId) throws FoldingRestException {
         final int hardwareId = HardwareUtils.create(generateHardware()).getId();
+        final String userName = nextUserName();
+
+        return UserRequest.builder()
+            .foldingUserName(userName)
+            .displayName(userName)
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .hardwareId(hardwareId)
+            .teamId(teamId)
+            .build();
+    }
+
+    /**
+     * Generates a {@link UserRequest} with a specified {@link me.zodac.folding.api.tc.Hardware} ID and {@link me.zodac.folding.api.tc.Team} ID.
+     *
+     * @param hardwareId the {@link me.zodac.folding.api.tc.Hardware} ID
+     * @param teamId     the {@link me.zodac.folding.api.tc.Team} ID
+     * @return the generated {@link UserRequest}
+     */
+    public static UserRequest generateUserWithHardwareIdAndTeamId(final int hardwareId, final int teamId) {
         final String userName = nextUserName();
 
         return UserRequest.builder()

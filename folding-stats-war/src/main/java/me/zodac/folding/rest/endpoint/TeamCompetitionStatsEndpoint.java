@@ -163,7 +163,7 @@ public class TeamCompetitionStatsEndpoint {
             LOGGER.warn("System state {} does not allow write requests", SystemStateManager.current());
             return serviceUnavailable();
         }
-
+        
         if (offsetStats == null) {
             LOGGER.error("Payload is null");
             return nullRequest();

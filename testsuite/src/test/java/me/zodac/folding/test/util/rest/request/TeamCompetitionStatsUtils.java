@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.HttpURLConnection;
 import java.net.http.HttpResponse;
+import me.zodac.folding.api.tc.User;
 import me.zodac.folding.client.java.request.TeamCompetitionStatsRequestSender;
 import me.zodac.folding.client.java.response.TeamCompetitionResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
@@ -131,6 +132,22 @@ public final class TeamCompetitionStatsUtils {
         final HttpResponse<Void> response = TEAM_COMPETITION_REQUEST_SENDER.manualUpdate(ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
             .as("Expected a 200_OK")
+            .isEqualTo(HttpURLConnection.HTTP_OK);
+    }
+
+    /**
+     * Offsets a {@link User}'s points with the provided value.
+     *
+     * @param user   the {@link User} whose points are to be offset
+     * @param points the points to offset by
+     * @throws FoldingRestException thrown if an error occurs sending the HTTP request
+     */
+    public static void offsetUserPoints(final User user, final long points) throws FoldingRestException {
+        final HttpResponse<Void> response =
+            TEAM_COMPETITION_REQUEST_SENDER.offset(user.getId(), points, Math.round(points * user.getHardware().getMultiplier()), 0,
+                ADMIN_USER.userName(), ADMIN_USER.password());
+        assertThat(response.statusCode())
+            .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
     }
 }

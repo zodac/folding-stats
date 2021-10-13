@@ -137,12 +137,11 @@ public class OldFacade {
         }
 
         final UserStats userTotalStats = FOLDING_STATS_RETRIEVER.getTotalStats(userWithStateChange);
-        final UserTcStats currentUserTcStats = getHourlyTcStatsForUser(userWithStateChange.getId());
-
         LOGGER.debug("Setting initial stats to: {}", userTotalStats);
         dbManager.persistInitialStats(userTotalStats);
         initialStatsCache.add(userWithStateChange.getId(), userTotalStats);
 
+        final UserTcStats currentUserTcStats = getHourlyTcStatsForUser(userWithStateChange.getId());
         final OffsetStats offsetStats =
             OffsetStats.create(currentUserTcStats.getPoints(), currentUserTcStats.getMultipliedPoints(), currentUserTcStats.getUnits());
         LOGGER.debug("Adding offset stats of: {}", offsetStats);
@@ -166,6 +165,13 @@ public class OldFacade {
         final RetiredUserTcStats retiredUserTcStats = businessLogic.createRetiredUser(team, user, userStats);
         LOGGER.info("User '{}' (ID: {}) retired with retired stats ID: {}", user.getDisplayName(), user.getId(),
             retiredUserTcStats.getRetiredUserId());
+    }
+
+    public void setCurrentStatsAsInitialStatsForUser(final User user) {
+        LOGGER.debug("Setting current stats as initial stats for user '{}' (ID: {})", user.getDisplayName(), user.getId());
+        final UserStats totalStats = businessLogic.getTotalStats(user);
+        createInitialUserStats(UserStats.create(user.getId(), DateTimeUtils.currentUtcTimestamp(), totalStats.getPoints(), totalStats.getUnits()));
+        initialStatsCache.add(user.getId(), totalStats);
     }
 
     public void createInitialUserStats(final User user) throws ExternalConnectionException {
@@ -237,22 +243,8 @@ public class OldFacade {
         return offsetStatsFromDb;
     }
 
-
-    public void initialiseOffsetStats() {
-        for (final User user : businessLogic.getAllUsersWithoutPasskeys()) {
-            getOffsetStatsForUser(user.getId());
-        }
-    }
-
     public void deleteAllOffsetStats() {
         dbManager.clearAllOffsetStats();
         offsetStatsCache.removeAll();
-    }
-
-    public void setCurrentStatsAsInitialStatsForUser(final User user) {
-        LOGGER.debug("Setting current stats as initial stats for user '{}' (ID: {})", user.getDisplayName(), user.getId());
-        final UserStats totalStats = businessLogic.getTotalStats(user);
-        createInitialUserStats(UserStats.create(user.getId(), DateTimeUtils.currentUtcTimestamp(), totalStats.getPoints(), totalStats.getUnits()));
-        initialStatsCache.add(user.getId(), totalStats);
     }
 }

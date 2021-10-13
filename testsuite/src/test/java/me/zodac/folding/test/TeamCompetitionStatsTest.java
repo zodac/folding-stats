@@ -10,6 +10,7 @@ import static me.zodac.folding.test.util.TestGenerator.generateHardwareWithMulti
 import static me.zodac.folding.test.util.TestGenerator.generateTeam;
 import static me.zodac.folding.test.util.TestGenerator.generateUser;
 import static me.zodac.folding.test.util.TestGenerator.generateUserWithHardwareId;
+import static me.zodac.folding.test.util.TestGenerator.generateUserWithHardwareIdAndTeamId;
 import static me.zodac.folding.test.util.TestGenerator.generateUserWithTeamId;
 import static me.zodac.folding.test.util.TestGenerator.generateUserWithTeamIdAndCategory;
 import static me.zodac.folding.test.util.rest.request.HardwareUtils.HARDWARE_REQUEST_SENDER;
@@ -18,6 +19,7 @@ import static me.zodac.folding.test.util.rest.request.TeamCompetitionStatsUtils.
 import static me.zodac.folding.test.util.rest.request.TeamCompetitionStatsUtils.getRetiredUserFromTeam;
 import static me.zodac.folding.test.util.rest.request.TeamCompetitionStatsUtils.getTeamFromCompetition;
 import static me.zodac.folding.test.util.rest.request.TeamCompetitionStatsUtils.manuallyUpdateStats;
+import static me.zodac.folding.test.util.rest.request.TeamCompetitionStatsUtils.offsetUserPoints;
 import static me.zodac.folding.test.util.rest.request.UserUtils.USER_REQUEST_SENDER;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -47,7 +49,6 @@ import me.zodac.folding.test.util.rest.request.StubbedFoldingEndpointUtils;
 import me.zodac.folding.test.util.rest.request.TeamCompetitionStatsUtils;
 import me.zodac.folding.test.util.rest.request.TeamUtils;
 import me.zodac.folding.test.util.rest.request.UserUtils;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -59,15 +60,15 @@ import org.junit.jupiter.api.Test;
  */
 class TeamCompetitionStatsTest {
 
-    @AfterAll
-    static void tearDown() throws FoldingRestException {
-        cleanSystemForComplexTests();
-    }
-
     @BeforeEach
     void setUp() throws FoldingRestException {
         cleanSystemForComplexTests();
     }
+
+//    @AfterAll
+//    static void tearDown() throws FoldingRestException {
+//        cleanSystemForComplexTests();
+//    }
 
     @Test
     void whenNoTeamsExistInTheSystem_thenResponseIsReturnedWithNoStats_andNoTeams() throws FoldingRestException {
@@ -163,7 +164,6 @@ class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.addUnits(user, newUnits);
 
         final HttpResponse<Void> response = TEAM_COMPETITION_REQUEST_SENDER.manualUpdate(ADMIN_USER.userName(), ADMIN_USER.password());
-
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -704,6 +704,48 @@ class TeamCompetitionStatsTest {
     }
 
     @Test
+    void whenOneTeamHasOneUser_andUserHasMultipleOffsetsApplied_thenUserOffsetIsAppendedToStats() throws FoldingRestException {
+        final Team team = TeamUtils.create(generateTeam());
+        final User user = UserUtils.create(generateUserWithTeamId(team.getId()));
+
+        final long initialPoints = 2_500L;
+        StubbedFoldingEndpointUtils.addPoints(user, initialPoints);
+        manuallyUpdateStats();
+
+        final long firstPointsOffset = 1_000L;
+        offsetUserPoints(user, firstPointsOffset);
+        manuallyUpdateStats();
+
+        final CompetitionSummary resultAfterFirstOffset = TeamCompetitionStatsUtils.getStats();
+        final TeamSummary teamSummaryAfterFirstOffset = getTeamFromCompetition(resultAfterFirstOffset, team.getTeamName());
+        final UserSummary userSummaryAfterFirstOffset = getActiveUserFromTeam(teamSummaryAfterFirstOffset, user.getDisplayName());
+
+        assertThat(userSummaryAfterFirstOffset.getPoints())
+            .as("Expected user points to be stats + first offset: " + userSummaryAfterFirstOffset)
+            .isEqualTo(initialPoints + firstPointsOffset);
+
+        assertThat(userSummaryAfterFirstOffset.getMultipliedPoints())
+            .as("Expected user multiplied points to be stats + first offset: " + userSummaryAfterFirstOffset)
+            .isEqualTo(initialPoints + firstPointsOffset);
+
+        final long secondPointsOffset = 250L;
+        offsetUserPoints(user, secondPointsOffset);
+        manuallyUpdateStats();
+
+        final CompetitionSummary resultAfterSecondOffset = TeamCompetitionStatsUtils.getStats();
+        final TeamSummary teamSummaryAfterSecondOffset = getTeamFromCompetition(resultAfterSecondOffset, team.getTeamName());
+        final UserSummary userSummaryAfterSecondOffset = getActiveUserFromTeam(teamSummaryAfterSecondOffset, user.getDisplayName());
+
+        assertThat(userSummaryAfterSecondOffset.getPoints())
+            .as("Expected user points to be stats + both offsets: " + userSummaryAfterSecondOffset)
+            .isEqualTo(initialPoints + firstPointsOffset + secondPointsOffset);
+
+        assertThat(userSummaryAfterSecondOffset.getMultipliedPoints())
+            .as("Expected user multiplied points to be stats + both offsets: " + userSummaryAfterSecondOffset)
+            .isEqualTo(initialPoints + firstPointsOffset + secondPointsOffset);
+    }
+
+    @Test
     void whenOneTeamHasOneUser_andUserHasOffsetApplied_andOffsetIsNegative_andOffsetIsGreaterThanCurrentUserStats_thenUserHasZeroStats()
         throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
@@ -925,5 +967,77 @@ class TeamCompetitionStatsTest {
         assertThat(response.statusCode())
             .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+    }
+
+    @Test
+    void whenChangingHardwareMultiplier_givenUserIsUsingHardware_andUserHasAnOffsetApplied_andAnotherOffsetIsAdded_thenInitialOffsetShouldBeIgnored()
+        throws FoldingRestException {
+        final Hardware hardware = HardwareUtils.create(generateHardwareWithMultiplier(1.00D));
+        final Team team = TeamUtils.create(generateTeam());
+        final User user = UserUtils.create(generateUserWithHardwareIdAndTeamId(hardware.getId(), team.getId()));
+
+        final long firstPoints = 10_000L;
+        StubbedFoldingEndpointUtils.addPoints(user, firstPoints);
+        manuallyUpdateStats();
+
+        final CompetitionSummary resultAfterFirstUpdate = TeamCompetitionStatsUtils.getStats();
+        final TeamSummary teamAfterFirstUpdate = getTeamFromCompetition(resultAfterFirstUpdate, team.getTeamName());
+        final UserSummary userAfterFirstUpdate = getActiveUserFromTeam(teamAfterFirstUpdate, user.getDisplayName());
+
+        assertThat(userAfterFirstUpdate.getPoints())
+            .as("Expected initial points for user: " + userAfterFirstUpdate)
+            .isEqualTo(firstPoints);
+
+        final long firstOffsetPoints = 2_000L;
+        offsetUserPoints(user, firstOffsetPoints);
+        manuallyUpdateStats();
+
+        final CompetitionSummary resultAfterSecondUpdate = TeamCompetitionStatsUtils.getStats();
+        final TeamSummary teamAfterSecondUpdate = getTeamFromCompetition(resultAfterSecondUpdate, team.getTeamName());
+        final UserSummary userAfterSecondUpdate = getActiveUserFromTeam(teamAfterSecondUpdate, user.getDisplayName());
+
+        assertThat(userAfterSecondUpdate.getPoints())
+            .as("Expected initial points + first offset points for user: " + userAfterSecondUpdate)
+            .isEqualTo(firstPoints + firstOffsetPoints);
+
+        // Update hardware, should clear all offsets from the user
+        final double newMultiplier = 2.00D;
+        final HardwareRequest updatedHardware = HardwareRequest.builder()
+            .hardwareName(hardware.getHardwareName())
+            .displayName(hardware.getDisplayName())
+            .hardwareMake(hardware.getHardwareMake().toString())
+            .hardwareType(hardware.getHardwareType().toString())
+            .multiplier(newMultiplier)
+            .averagePpd(hardware.getAveragePpd())
+            .build();
+        final HttpResponse<String> hardwareUpdateResponse =
+            HARDWARE_REQUEST_SENDER.update(hardware.getId(), updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
+        assertThat(hardwareUpdateResponse.statusCode())
+            .as("Did not receive a 200_OK HTTP response: " + hardwareUpdateResponse.body())
+            .isEqualTo(HttpURLConnection.HTTP_OK);
+
+        final long secondPoints = 333L;
+        StubbedFoldingEndpointUtils.addPoints(user, secondPoints);
+        manuallyUpdateStats();
+
+        final CompetitionSummary resultAfterThirdUpdate = TeamCompetitionStatsUtils.getStats();
+        final TeamSummary teamAfterThirdUpdate = getTeamFromCompetition(resultAfterThirdUpdate, team.getTeamName());
+        final UserSummary userAfterThirdUpdate = getActiveUserFromTeam(teamAfterThirdUpdate, user.getDisplayName());
+
+        assertThat(userAfterThirdUpdate.getPoints())
+            .as("Expected initial points + first offset points + second points for user: " + userAfterThirdUpdate)
+            .isEqualTo(firstPoints + firstOffsetPoints + secondPoints);
+
+        final long secondOffsetPoints = 95L;
+        offsetUserPoints(user, secondOffsetPoints);
+        manuallyUpdateStats();
+
+        final CompetitionSummary resultAfterFourthUpdate = TeamCompetitionStatsUtils.getStats();
+        final TeamSummary teamAfterFourthUpdate = getTeamFromCompetition(resultAfterFourthUpdate, team.getTeamName());
+        final UserSummary userAfterFourthUpdate = getActiveUserFromTeam(teamAfterFourthUpdate, user.getDisplayName());
+
+        assertThat(userAfterFourthUpdate.getPoints())
+            .as("Expected initial points + first offset points + second points for user: " + userAfterFourthUpdate)
+            .isEqualTo(firstPoints + firstOffsetPoints + secondPoints + secondOffsetPoints);
     }
 }
