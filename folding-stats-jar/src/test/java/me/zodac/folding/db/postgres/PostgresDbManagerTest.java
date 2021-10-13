@@ -270,36 +270,41 @@ class PostgresDbManagerTest {
             .isEmpty();
 
         final OffsetStats offsetStats = OffsetStats.create(100L, 1_000L, 5);
-        POSTGRES_DB_MANAGER.createOrUpdateOffsetStats(userId, offsetStats);
+        POSTGRES_DB_MANAGER.createOffsetStats(userId, offsetStats);
         final Optional<OffsetStats> firstOffsetStats = POSTGRES_DB_MANAGER.getOffsetStats(userId);
         assertThat(firstOffsetStats)
             .isPresent();
-
         final OffsetStats firstOffsetStatsActual = firstOffsetStats.get();
         assertThat(firstOffsetStatsActual)
             .isEqualTo(offsetStats);
 
-        final OffsetStats additionalOffsetStats = OffsetStats.create(500L, 5_000L, 25);
-        POSTGRES_DB_MANAGER.createOrUpdateOffsetStats(userId, additionalOffsetStats);
+        final OffsetStats overwriteOffsetStats = OffsetStats.create(500L, 5_000L, 25);
+        POSTGRES_DB_MANAGER.createOffsetStats(userId, overwriteOffsetStats);
         final Optional<OffsetStats> secondOffsetStats = POSTGRES_DB_MANAGER.getOffsetStats(userId);
         assertThat(secondOffsetStats)
             .isPresent();
 
+        final OffsetStats secondOffsetStatsActual = secondOffsetStats.get();
+        assertThat(secondOffsetStatsActual)
+            .isEqualTo(overwriteOffsetStats);
+
+        final OffsetStats additionalOffsetStats = OffsetStats.create(250L, 2_500L, 12);
+        POSTGRES_DB_MANAGER.createOrUpdateOffsetStats(userId, additionalOffsetStats);
+
         final OffsetStats expectedOffsetStats = OffsetStats.create(
-            offsetStats.getPointsOffset() + additionalOffsetStats.getPointsOffset(),
-            offsetStats.getMultipliedPointsOffset() + additionalOffsetStats.getMultipliedPointsOffset(),
-            offsetStats.getUnitsOffset() + additionalOffsetStats.getUnitsOffset()
+            overwriteOffsetStats.getPointsOffset() + additionalOffsetStats.getPointsOffset(),
+            overwriteOffsetStats.getMultipliedPointsOffset() + additionalOffsetStats.getMultipliedPointsOffset(),
+            overwriteOffsetStats.getUnitsOffset() + additionalOffsetStats.getUnitsOffset()
         );
         final Optional<OffsetStats> thirdOffsetStats = POSTGRES_DB_MANAGER.getOffsetStats(userId);
         assertThat(thirdOffsetStats)
             .isPresent();
-
         final OffsetStats thirdOffsetStatsActual = thirdOffsetStats.get();
         assertThat(thirdOffsetStatsActual)
             .isEqualTo(expectedOffsetStats);
 
         final int secondUserId = createUser().getId();
-        POSTGRES_DB_MANAGER.createOrUpdateOffsetStats(secondUserId, offsetStats);
+        POSTGRES_DB_MANAGER.createOffsetStats(secondUserId, offsetStats);
 
         POSTGRES_DB_MANAGER.clearAllOffsetStats();
 
