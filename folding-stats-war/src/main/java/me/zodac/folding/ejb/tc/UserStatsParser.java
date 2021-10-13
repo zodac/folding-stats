@@ -10,7 +10,7 @@ import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.tc.stats.OffsetStats;
+import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
@@ -74,12 +74,12 @@ public class UserStatsParser {
             return;
         }
 
-        final OffsetStats offsetStats = oldFacade.getOffsetStatsForUser(user.getId());
-        if (offsetStats.isEmpty()) {
-            LOGGER.trace("Retrieved empty stat offset for user: {}", user);
+        final OffsetTcStats offsetTcStats = businessLogic.getOffsetStats(user);
+        if (offsetTcStats.isEmpty()) {
+            LOGGER.trace("Retrieved empty stats offset for user: {}", () -> user);
         } else {
             LOGGER.debug("{}: {} offset points | {} offset units", user::getDisplayName,
-                () -> formatWithCommas(offsetStats.getMultipliedPointsOffset()), () -> formatWithCommas(offsetStats.getUnitsOffset()));
+                () -> formatWithCommas(offsetTcStats.getMultipliedPointsOffset()), () -> formatWithCommas(offsetTcStats.getUnitsOffset()));
         }
 
         final UserStats totalStats = getTotalStatsForUserOrEmpty(user);
@@ -88,8 +88,8 @@ public class UserStatsParser {
             return;
         }
 
-        businessLogic.createTotalStats(totalStats);
-        calculateAndPersistTcStats(user, initialStats, offsetStats, totalStats);
+        final UserStats createdTotalStats = businessLogic.createTotalStats(totalStats);
+        calculateAndPersistTcStats(user, initialStats, offsetTcStats, createdTotalStats);
     }
 
     private static UserStats getTotalStatsForUserOrEmpty(final User user) {
@@ -102,14 +102,15 @@ public class UserStatsParser {
         return UserStats.empty();
     }
 
-    private void calculateAndPersistTcStats(final User user, final Stats initialStats, final OffsetStats offsetStats, final UserStats totalStats) {
+    private void calculateAndPersistTcStats(final User user, final Stats initialStats, final OffsetTcStats offsetTcStats,
+                                            final UserStats totalStats) {
         final double hardwareMultiplier = user.getHardware().getMultiplier();
         final long points = Math.max(0, totalStats.getPoints() - initialStats.getPoints());
         final long multipliedPoints = Math.round(points * hardwareMultiplier);
         final int units = Math.max(0, totalStats.getUnits() - initialStats.getUnits());
 
         final UserTcStats statsBeforeOffset = UserTcStats.create(user.getId(), totalStats.getTimestamp(), points, multipliedPoints, units);
-        final UserTcStats hourlyUserTcStats = statsBeforeOffset.updateWithOffsets(offsetStats);
+        final UserTcStats hourlyUserTcStats = statsBeforeOffset.updateWithOffsets(offsetTcStats);
 
         LOGGER.debug("{}: {} total points (unmultiplied) | {} total units", user::getDisplayName, () -> formatWithCommas(totalStats.getPoints()),
             () -> formatWithCommas(totalStats.getUnits()));

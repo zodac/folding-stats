@@ -82,20 +82,20 @@ public class UserTcStats extends UserStats {
     }
 
     /**
-     * Creates a new instance of {@link UserTcStats} with {@link OffsetStats}. Can be used when retrieving a current
+     * Creates a new instance of {@link UserTcStats} with {@link OffsetTcStats}. Can be used when retrieving a current
      * {@link me.zodac.folding.api.tc.User}'s {@link UserTcStats} and wanted to make an offset.
      *
      * <p>
-     * In case the {@link OffsetStats} values are greater than the {@link UserTcStats}, the values will not be negative
+     * In case the {@link OffsetTcStats} values are greater than the {@link UserTcStats}, the values will not be negative
      * and will be set to <b>0L</b>
      *
-     * @param offsetStats the {@link OffsetStats} to apply
-     * @return the new {@link UserTcStats} instances with {@link OffsetStats} applied
+     * @param offsetTcStats the {@link OffsetTcStats} to apply
+     * @return the new {@link UserTcStats} instances with {@link OffsetTcStats} applied
      */
-    public UserTcStats updateWithOffsets(final OffsetStats offsetStats) {
-        final long offsetPoints = Math.max(getPoints() + offsetStats.getPointsOffset(), DEFAULT_POINTS);
-        final long offsetMultipliedPoints = Math.max(multipliedPoints + offsetStats.getMultipliedPointsOffset(), DEFAULT_MULTIPLIED_POINTS);
-        final int offsetUnits = Math.max(getUnits() + offsetStats.getUnitsOffset(), DEFAULT_UNITS);
+    public UserTcStats updateWithOffsets(final OffsetTcStats offsetTcStats) {
+        final long offsetPoints = Math.max(getPoints() + offsetTcStats.getPointsOffset(), DEFAULT_POINTS);
+        final long offsetMultipliedPoints = Math.max(multipliedPoints + offsetTcStats.getMultipliedPointsOffset(), DEFAULT_MULTIPLIED_POINTS);
+        final int offsetUnits = Math.max(getUnits() + offsetTcStats.getUnitsOffset(), DEFAULT_UNITS);
 
         return create(getUserId(), getTimestamp(), offsetPoints, offsetMultipliedPoints, offsetUnits);
     }

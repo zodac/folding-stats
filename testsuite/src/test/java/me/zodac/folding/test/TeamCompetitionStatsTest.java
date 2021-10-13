@@ -49,6 +49,7 @@ import me.zodac.folding.test.util.rest.request.StubbedFoldingEndpointUtils;
 import me.zodac.folding.test.util.rest.request.TeamCompetitionStatsUtils;
 import me.zodac.folding.test.util.rest.request.TeamUtils;
 import me.zodac.folding.test.util.rest.request.UserUtils;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -65,10 +66,10 @@ class TeamCompetitionStatsTest {
         cleanSystemForComplexTests();
     }
 
-//    @AfterAll
-//    static void tearDown() throws FoldingRestException {
-//        cleanSystemForComplexTests();
-//    }
+    @AfterAll
+    static void tearDown() throws FoldingRestException {
+        cleanSystemForComplexTests();
+    }
 
     @Test
     void whenNoTeamsExistInTheSystem_thenResponseIsReturnedWithNoStats_andNoTeams() throws FoldingRestException {

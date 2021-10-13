@@ -13,6 +13,7 @@ import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
@@ -220,13 +221,36 @@ public class BusinessLogicEjb implements BusinessLogic {
     }
 
     @Override
-    public void createTotalStats(final UserStats userStats) {
-        STORAGE.createTotalStats(userStats);
+    public UserStats createTotalStats(final UserStats userStats) {
+        return STORAGE.createTotalStats(userStats)
+            .orElse(UserStats.empty());
     }
 
     @Override
     public UserStats getTotalStats(final User user) {
         return STORAGE.getTotalStats(user.getId())
             .orElse(UserStats.empty());
+    }
+
+    @Override
+    public OffsetTcStats createOrUpdateOffsetStats(final User user, final OffsetTcStats offsetTcStats) {
+        return STORAGE.createOrUpdateOffsetStats(user.getId(), offsetTcStats)
+            .orElse(OffsetTcStats.empty());
+    }
+
+    @Override
+    public OffsetTcStats getOffsetStats(final User user) {
+        return STORAGE.getOffsetStats(user.getId())
+            .orElse(OffsetTcStats.empty());
+    }
+
+    @Override
+    public void deleteOffsetStats(final User user) {
+        STORAGE.deleteOffsetStats(user.getId());
+    }
+
+    @Override
+    public void deleteAllOffsetStats() {
+        STORAGE.deleteAllOffsetStats();
     }
 }

@@ -15,6 +15,7 @@ import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
@@ -212,12 +213,32 @@ final class MockBusinessLogic implements BusinessLogic {
     }
 
     @Override
-    public void createTotalStats(final UserStats userStats) {
-
+    public UserStats createTotalStats(final UserStats userStats) {
+        return UserStats.empty();
     }
 
     @Override
     public UserStats getTotalStats(final User user) {
         return UserStats.empty();
+    }
+
+    @Override
+    public OffsetTcStats createOrUpdateOffsetStats(final User user, final OffsetTcStats offsetTcStats) {
+        return OffsetTcStats.empty();
+    }
+
+    @Override
+    public OffsetTcStats getOffsetStats(final User user) {
+        return OffsetTcStats.empty();
+    }
+
+    @Override
+    public void deleteOffsetStats(final User user) {
+
+    }
+
+    @Override
+    public void deleteAllOffsetStats() {
+
     }
 }

@@ -14,7 +14,7 @@ import javax.ws.rs.core.Response;
 import me.zodac.folding.cache.CompetitionSummaryCache;
 import me.zodac.folding.cache.HardwareCache;
 import me.zodac.folding.cache.InitialStatsCache;
-import me.zodac.folding.cache.OffsetStatsCache;
+import me.zodac.folding.cache.OffsetTcStatsCache;
 import me.zodac.folding.cache.RetiredTcStatsCache;
 import me.zodac.folding.cache.TcStatsCache;
 import me.zodac.folding.cache.TeamCache;
@@ -79,7 +79,7 @@ public class DebugEndpoint {
 
         // Stats
         LOGGER.info("InitialStatsCache: {}", InitialStatsCache.getInstance().getCacheContents());
-        LOGGER.info("OffsetStatsCache: {}", OffsetStatsCache.getInstance().getCacheContents());
+        LOGGER.info("OffsetStatsCache: {}", OffsetTcStatsCache.getInstance().getCacheContents());
         LOGGER.info("RetiredTcStatsCache: {}", RetiredTcStatsCache.getInstance().getCacheContents());
         LOGGER.info("TcStatsCache: {}", TcStatsCache.getInstance().getCacheContents());
         LOGGER.info("TotalStatsCache: {}", TotalStatsCache.getInstance().getCacheContents());

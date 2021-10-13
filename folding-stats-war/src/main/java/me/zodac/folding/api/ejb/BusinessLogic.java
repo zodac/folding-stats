@@ -9,6 +9,7 @@ import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
@@ -183,7 +184,7 @@ public interface BusinessLogic {
     void createMonthlyResult(final String monthlyResult, final LocalDateTime utcTimestamp);
 
     /**
-     * Retrieves the result of the <code>Team Competition</code> for the given {@link Month} and {@link Year}.
+     * Retrieves the result of the <code>Team Competition</code> for the provided {@link Month} and {@link Year}.
      *
      * @param month the {@link Month} of the result to be retrieved
      * @param year  the {@link Year} of the result to be retrieved
@@ -202,7 +203,7 @@ public interface BusinessLogic {
     RetiredUserTcStats createRetiredUser(final Team team, final User user, final UserTcStats userTcStats);
 
     /**
-     * Retrieves all {@link RetiredUserTcStats} for the given {@link Team}.
+     * Retrieves all {@link RetiredUserTcStats} for the provided {@link Team}.
      *
      * @param team the {@link Team} whose retired users are to be found
      * @return a {@link Collection} of the retrieved {@link RetiredUserTcStats}
@@ -232,7 +233,7 @@ public interface BusinessLogic {
     UserAuthenticationResult authenticateSystemUser(final String userName, final String password);
 
     /**
-     * Retrieves the {@link HistoricStats} for a given {@link User} for a specific {@code day}.
+     * Retrieves the {@link HistoricStats} for the provided {@link User} for a specific {@code day}.
      *
      * @param user  the {@link User} whose {@link HistoricStats} are to be retrieved
      * @param year  the {@link Year} of the {@link HistoricStats}
@@ -243,7 +244,7 @@ public interface BusinessLogic {
     Collection<HistoricStats> getHistoricStats(final User user, final Year year, final Month month, final int day);
 
     /**
-     * Retrieves the {@link HistoricStats} for a given {@link User} for a specific {@link Month}.
+     * Retrieves the {@link HistoricStats} for the provided {@link User} for a specific {@link Month}.
      *
      * @param user  the {@link User} whose {@link HistoricStats} are to be retrieved
      * @param year  the {@link Year} of the {@link HistoricStats}
@@ -253,7 +254,7 @@ public interface BusinessLogic {
     Collection<HistoricStats> getHistoricStats(final User user, final Year year, final Month month);
 
     /**
-     * Retrieves the {@link HistoricStats} for a given {@link User} for a specific {@link Year}.
+     * Retrieves the {@link HistoricStats} for the provided {@link User} for a specific {@link Year}.
      *
      * @param user the {@link User} whose {@link HistoricStats} are to be retrieved
      * @param year the {@link Year} of the {@link HistoricStats}
@@ -262,11 +263,12 @@ public interface BusinessLogic {
     Collection<HistoricStats> getHistoricStats(final User user, final Year year);
 
     /**
-     * Creates a {@link UserStats} for the total overall stats for a {@link User}.
+     * Creates a {@link UserStats} for the total overall stats for the provided {@link User}.
      *
      * @param userStats the {@link UserStats} to be created
+     * @return the created {@link UserStats}, or {@link UserStats#empty()}
      */
-    void createTotalStats(final UserStats userStats);
+    UserStats createTotalStats(final UserStats userStats);
 
     /**
      * Retrieves the {@link UserStats} for the provided {@link User}.
@@ -275,4 +277,41 @@ public interface BusinessLogic {
      * @return the {@link UserStats} for the {@link User}, or {@link UserStats#empty()} if none can be found
      */
     UserStats getTotalStats(final User user);
+
+    /**
+     * Creates an {@link OffsetTcStats} defining the offset points/units for the provided {@link User}.
+     *
+     * <p>
+     * If an {@link OffsetTcStats} already exists for the {@link User}, the existing values are updated to be the addition of both
+     * {@link OffsetTcStats}.
+     *
+     * @param user          the {@link User} for whom the {@link OffsetTcStats} are being created
+     * @param offsetTcStats the {@link OffsetTcStats} to be created
+     * @return the created/updated {@link OffsetTcStats}, or {@link OffsetTcStats#empty()}
+     */
+    OffsetTcStats createOrUpdateOffsetStats(final User user, final OffsetTcStats offsetTcStats);
+
+    /**
+     * Retrieves the {@link OffsetTcStats} for the provided {@link User}.
+     *
+     * <p>
+     * If an {@link OffsetTcStats} already exists for the {@link User}, the existing values are updated to be the addition of both
+     * {@link OffsetTcStats}.
+     *
+     * @param user the {@link User} whose {@link OffsetTcStats} are to be retrieved
+     * @return the {@link OffsetTcStats} for the {@link User}, or {@link OffsetTcStats#empty()} if none can be found
+     */
+    OffsetTcStats getOffsetStats(final User user);
+
+    /**
+     * Deletes the {@link OffsetTcStats} for the provided {@link User}.
+     *
+     * @param user the {@link User} whose {@link OffsetTcStats} are to be deleted
+     */
+    void deleteOffsetStats(final User user);
+
+    /**
+     * Deletes the {@link OffsetTcStats} for all {@link User}s in the system.
+     */
+    void deleteAllOffsetStats();
 }

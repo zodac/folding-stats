@@ -14,7 +14,7 @@ import me.zodac.folding.api.stats.FoldingStatsRetriever;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.tc.stats.OffsetStats;
+import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
@@ -22,7 +22,7 @@ import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.api.util.DateTimeUtils;
 import me.zodac.folding.cache.HardwareCache;
 import me.zodac.folding.cache.InitialStatsCache;
-import me.zodac.folding.cache.OffsetStatsCache;
+import me.zodac.folding.cache.OffsetTcStatsCache;
 import me.zodac.folding.cache.TcStatsCache;
 import me.zodac.folding.cache.UserCache;
 import me.zodac.folding.db.DbManagerRetriever;
@@ -43,7 +43,7 @@ public class OldFacade {
     private final transient HardwareCache hardwareCache = HardwareCache.getInstance();
 
     private final transient InitialStatsCache initialStatsCache = InitialStatsCache.getInstance();
-    private final transient OffsetStatsCache offsetStatsCache = OffsetStatsCache.getInstance();
+    private final transient OffsetTcStatsCache offsetTcStatsCache = OffsetTcStatsCache.getInstance();
     private final transient TcStatsCache tcStatsCache = TcStatsCache.getInstance();
 
     @EJB
@@ -83,7 +83,7 @@ public class OldFacade {
         // When adding a new user, we configure the initial stats DB/cache
         createInitialUserStats(userWithId);
         // When adding a new user, we give an empty offset to the offset cache
-        offsetStatsCache.add(userWithId.getId(), OffsetStats.empty());
+        offsetTcStatsCache.add(userWithId.getId(), OffsetTcStats.empty());
 
         userStatsParser.parseTcStatsForUser(userWithId);
 
@@ -142,10 +142,12 @@ public class OldFacade {
         initialStatsCache.add(userWithStateChange.getId(), userTotalStats);
 
         final UserTcStats currentUserTcStats = getHourlyTcStatsForUser(userWithStateChange.getId());
-        final OffsetStats offsetStats =
-            OffsetStats.create(currentUserTcStats.getPoints(), currentUserTcStats.getMultipliedPoints(), currentUserTcStats.getUnits());
-        LOGGER.debug("Adding offset stats of: {}", offsetStats);
-        createOffsetStats(userWithStateChange.getId(), offsetStats);
+        final OffsetTcStats offsetTcStats =
+            OffsetTcStats.create(currentUserTcStats.getPoints(), currentUserTcStats.getMultipliedPoints(), currentUserTcStats.getUnits());
+        LOGGER.debug("Adding offset stats of: {}", offsetTcStats);
+        businessLogic.deleteOffsetStats(userWithStateChange);
+        final OffsetTcStats createdOffsetStats = businessLogic.createOrUpdateOffsetStats(userWithStateChange, offsetTcStats);
+        LOGGER.debug("User now has offset stats of: {}", createdOffsetStats);
         LOGGER.info("Handled state change for user '{}' (ID: {})", userWithStateChange.getDisplayName(), userWithStateChange.getId());
     }
 
@@ -217,34 +219,5 @@ public class OldFacade {
         final UserTcStats userTcStatsFromDb = dbManager.getHourlyTcStats(userId).orElse(UserTcStats.empty(userId));
         tcStatsCache.add(userId, userTcStatsFromDb);
         return userTcStatsFromDb;
-    }
-
-    public void createOffsetStats(final int userId, final OffsetStats offsetStats) {
-        dbManager.createOffsetStats(userId, offsetStats);
-        offsetStatsCache.add(userId, offsetStats);
-    }
-
-    public void createOrUpdateOffsetStats(final int userId, final OffsetStats offsetStats) {
-        final Optional<OffsetStats> offsetStatsFromDb = dbManager.createOrUpdateOffsetStats(userId, offsetStats);
-        offsetStatsFromDb.ifPresent(stats -> offsetStatsCache.add(userId, stats));
-    }
-
-    public OffsetStats getOffsetStatsForUser(final int userId) {
-        final Optional<OffsetStats> offsetStats = offsetStatsCache.get(userId);
-        if (offsetStats.isPresent()) {
-            return offsetStats.get();
-        }
-
-        LOGGER.trace("Cache miss! getOffsetStatsForUser");
-        // Should be no need to get anything from the DB (since it should have been added to the cache when created)
-        // But adding this just in case we decide to add some cache eviction in future
-        final OffsetStats offsetStatsFromDb = dbManager.getOffsetStats(userId).orElse(OffsetStats.empty());
-        offsetStatsCache.add(userId, offsetStatsFromDb);
-        return offsetStatsFromDb;
-    }
-
-    public void deleteAllOffsetStats() {
-        dbManager.clearAllOffsetStats();
-        offsetStatsCache.removeAll();
     }
 }

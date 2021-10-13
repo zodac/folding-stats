@@ -8,7 +8,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import me.zodac.folding.api.tc.stats.OffsetStats;
+import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
@@ -347,10 +347,10 @@ public final class TeamCompetitionStatsRequestSender {
      */
     public HttpResponse<Void> offset(final int userId, final long pointsOffset, final long multipliedPointsOffset, final int unitsOffset,
                                      final String userName, final String password) throws FoldingRestException {
-        final OffsetStats offsetStats = OffsetStats.create(pointsOffset, multipliedPointsOffset, unitsOffset);
+        final OffsetTcStats offsetTcStats = OffsetTcStats.create(pointsOffset, multipliedPointsOffset, unitsOffset);
 
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
-            .method("PATCH", HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(offsetStats)))
+            .method("PATCH", HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(offsetTcStats)))
             .uri(URI.create(statsUrl + "/users/" + userId))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 

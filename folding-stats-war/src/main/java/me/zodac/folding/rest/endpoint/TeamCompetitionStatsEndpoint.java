@@ -33,9 +33,8 @@ import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.tc.stats.OffsetStats;
+import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.util.ExecutionType;
-import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.ejb.tc.CompetitionResultGenerator;
 import me.zodac.folding.ejb.tc.LeaderboardStatsGenerator;
 import me.zodac.folding.ejb.tc.UserStatsParser;
@@ -67,9 +66,6 @@ public class TeamCompetitionStatsEndpoint {
 
     @EJB
     private LeaderboardStatsGenerator leaderboardStatsGenerator;
-
-    @EJB
-    private OldFacade oldFacade;
 
     @EJB
     private StatsScheduler statsScheduler;
@@ -156,15 +152,15 @@ public class TeamCompetitionStatsEndpoint {
     @Path("/users/{userId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateUserWithOffset(@PathParam("userId") final String userId, final OffsetStats offsetStats) {
-        LOGGER.debug("PATCH request to update offset for user received at '{}': {}", uriContext.getAbsolutePath(), offsetStats);
+    public Response updateUserWithOffset(@PathParam("userId") final String userId, final OffsetTcStats offsetTcStats) {
+        LOGGER.debug("PATCH request to update offset for user received at '{}': {}", uriContext.getAbsolutePath(), offsetTcStats);
 
         if (SystemStateManager.current().isWriteBlocked()) {
             LOGGER.warn("System state {} does not allow write requests", SystemStateManager.current());
             return serviceUnavailable();
         }
-        
-        if (offsetStats == null) {
+
+        if (offsetTcStats == null) {
             LOGGER.error("Payload is null");
             return nullRequest();
         }
@@ -187,16 +183,16 @@ public class TeamCompetitionStatsEndpoint {
                 LOGGER.error("No user found with ID: {}", parsedId);
                 return notFound();
             }
+
             final User user = optionalUser.get();
-
             final Hardware hardware = user.getHardware();
-            final OffsetStats offsetStatsToUse = OffsetStats.updateWithHardwareMultiplier(offsetStats, hardware.getMultiplier());
+            final OffsetTcStats offsetTcStatsToPersist = OffsetTcStats.updateWithHardwareMultiplier(offsetTcStats, hardware.getMultiplier());
+            final OffsetTcStats createdOffsetStats = businessLogic.createOrUpdateOffsetStats(user, offsetTcStatsToPersist);
 
-            oldFacade.createOrUpdateOffsetStats(parsedId, offsetStatsToUse);
             SystemStateManager.next(SystemState.UPDATING_STATS);
             userStatsParser.parseTcStatsForUserAndWait(user);
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
-            LOGGER.info("Updated user with ID {} with points offset: {}", userId, offsetStats);
+            LOGGER.info("Updated user with ID {} with points offset: {}", userId, createdOffsetStats);
             return ok();
         } catch (final Exception e) {
             LOGGER.error("Unexpected error updating user with ID: {}", userId, e);

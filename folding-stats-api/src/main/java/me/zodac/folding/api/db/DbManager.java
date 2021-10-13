@@ -10,7 +10,7 @@ import me.zodac.folding.api.exception.DatabaseConnectionException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.tc.stats.OffsetStats;
+import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
@@ -78,17 +78,17 @@ public interface DbManager {
 
     Optional<UserTcStats> getHourlyTcStats(final int userId);
 
-    void createTotalStats(final UserStats stats);
+    Optional<UserStats> createTotalStats(final UserStats stats);
 
     Optional<UserStats> getTotalStats(final int userId);
 
-    void createOffsetStats(int userId, OffsetStats offsetStats);
+    Optional<OffsetTcStats> createOrUpdateOffsetStats(final int userId, final OffsetTcStats offsetTcStats);
 
-    Optional<OffsetStats> createOrUpdateOffsetStats(final int userId, final OffsetStats offsetStats);
+    Optional<OffsetTcStats> getOffsetStats(final int userId);
 
-    Optional<OffsetStats> getOffsetStats(final int userId);
+    void deleteOffsetStats(final int userId);
 
-    void clearAllOffsetStats();
+    void deleteAllOffsetStats();
 
     int persistRetiredUserStats(final int teamId, final int userId, final String displayUserName, final UserTcStats retiredUserStats);
 

@@ -13,7 +13,7 @@ import me.zodac.folding.api.tc.HardwareMake;
 import me.zodac.folding.api.tc.HardwareType;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.tc.stats.OffsetStats;
+import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
@@ -159,13 +159,13 @@ final class RecordConverter {
     }
 
     /**
-     * Convert a {@link UserOffsetTcStatsRecord} into a {@link OffsetStats}.
+     * Convert a {@link UserOffsetTcStatsRecord} into a {@link OffsetTcStats}.
      *
      * @param userOffsetTcStatsRecord the {@link UserOffsetTcStatsRecord} to convert
-     * @return the converted {@link OffsetStats}
+     * @return the converted {@link OffsetTcStats}
      */
-    static OffsetStats toOffsetStats(final UserOffsetTcStatsRecord userOffsetTcStatsRecord) {
-        return OffsetStats.create(
+    static OffsetTcStats toOffsetStats(final UserOffsetTcStatsRecord userOffsetTcStatsRecord) {
+        return OffsetTcStats.create(
             userOffsetTcStatsRecord.getOffsetPoints(),
             userOffsetTcStatsRecord.getOffsetMultipliedPoints(),
             userOffsetTcStatsRecord.getOffsetUnits()

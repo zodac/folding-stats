@@ -11,10 +11,12 @@ import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.cache.HardwareCache;
+import me.zodac.folding.cache.OffsetTcStatsCache;
 import me.zodac.folding.cache.RetiredTcStatsCache;
 import me.zodac.folding.cache.TeamCache;
 import me.zodac.folding.cache.TotalStatsCache;
@@ -47,6 +49,7 @@ final class Storage {
 
     // Stat caches
     private final RetiredTcStatsCache retiredStatsCache = RetiredTcStatsCache.getInstance();
+    private final OffsetTcStatsCache offsetTcStatsCache = OffsetTcStatsCache.getInstance();
     private final TotalStatsCache totalStatsCache = TotalStatsCache.getInstance();
 
     private Storage() {
@@ -77,8 +80,7 @@ final class Storage {
      * Retrieves a {@link Hardware}.
      *
      * <p>
-     * First attempts to retrieve from {@link HardwareCache}, then if none exists, attempts to retrieve from the
-     * {@link DbManager}.
+     * First attempts to retrieve from {@link HardwareCache}, then if none exists, attempts to retrieve from the {@link DbManager}.
      *
      * @param hardwareId the ID of the {@link Hardware} to retrieve
      * @return an {@link Optional} of the retrieved {@link Hardware}
@@ -101,8 +103,7 @@ final class Storage {
      * Retrieves all {@link Hardware}.
      *
      * <p>
-     * First attempts to retrieve from {@link HardwareCache}, then if none exists, attempts to retrieve from the
-     * {@link DbManager}.
+     * First attempts to retrieve from {@link HardwareCache}, then if none exist, attempts to retrieve from the {@link DbManager}.
      *
      * @return a {@link Collection} of the retrieved {@link Hardware}
      * @see DbManager#getAllHardware()
@@ -172,8 +173,7 @@ final class Storage {
      * Retrieves a {@link Team}.
      *
      * <p>
-     * First attempts to retrieve from {@link TeamCache}, then if none exists, attempts to retrieve from the
-     * {@link DbManager}.
+     * First attempts to retrieve from {@link TeamCache}, then if none exists, attempts to retrieve from the {@link DbManager}.
      *
      * @param teamId the ID of the {@link Team} to retrieve
      * @return an {@link Optional} of the retrieved {@link Team}
@@ -196,8 +196,7 @@ final class Storage {
      * Retrieves all {@link Team}s.
      *
      * <p>
-     * First attempts to retrieve from {@link TeamCache}, then if none exists, attempts to retrieve from the
-     * {@link DbManager}.
+     * First attempts to retrieve from {@link TeamCache}, then if none exist, attempts to retrieve from the {@link DbManager}.
      *
      * @return a {@link Collection} of the retrieved {@link Team}s
      * @see DbManager#getAllTeams()
@@ -262,8 +261,7 @@ final class Storage {
      * Retrieves a {@link User}.
      *
      * <p>
-     * First attempts to retrieve from {@link UserCache}, then if none exists, attempts to retrieve from the
-     * {@link DbManager}.
+     * First attempts to retrieve from {@link UserCache}, then if none exists, attempts to retrieve from the {@link DbManager}.
      *
      * @param userId the ID of the {@link User} to retrieve
      * @return an {@link Optional} of the retrieved {@link User}
@@ -286,8 +284,7 @@ final class Storage {
      * Retrieves all {@link User}s.
      *
      * <p>
-     * First attempts to retrieve from {@link UserCache}, then if none exists, attempts to retrieve from the
-     * {@link DbManager}.
+     * First attempts to retrieve from {@link UserCache}, then if none exist, attempts to retrieve from the {@link DbManager}.
      *
      * @return a {@link Collection} of the retrieved {@link User}s
      * @see DbManager#getAllUsers()
@@ -359,7 +356,11 @@ final class Storage {
     /**
      * Retrieves all {@link RetiredUserTcStats}.
      *
+     * <p>
+     * First attempts to retrieve from {@link RetiredTcStatsCache}, then if none exist, attempts to retrieve from the {@link DbManager}.
+     *
      * @return a {@link Collection} of the retrieved {@link RetiredUserTcStats}
+     * @see DbManager#getAllRetiredUserStats()
      */
     Collection<RetiredUserTcStats> getAllRetiredUsers() {
         final Collection<RetiredUserTcStats> fromCache = retiredStatsCache.getAll();
@@ -380,6 +381,9 @@ final class Storage {
 
     /**
      * Deletes all {@link RetiredUserTcStats} for all {@link Team}s.
+     *
+     * <p>
+     * Also evicts the {@link RetiredTcStatsCache}.
      */
     void deleteAllRetiredUserStats() {
         DB_MANAGER.deleteAllRetiredUserStats();
@@ -444,20 +448,22 @@ final class Storage {
      * Persists it with the {@link DbManager}, then adds it to the {@link TotalStatsCache}.
      *
      * @param userStats the {@link UserStats} to be created
+     * @return an {@link Optional} of the created {@link UserStats}
      */
-    void createTotalStats(final UserStats userStats) {
-        DB_MANAGER.createTotalStats(userStats);
-        totalStatsCache.add(userStats.getUserId(), userStats);
+    Optional<UserStats> createTotalStats(final UserStats userStats) {
+        final Optional<UserStats> fromDb = DB_MANAGER.createTotalStats(userStats);
+        fromDb.ifPresent(stats -> totalStatsCache.add(stats.getUserId(), stats));
+        return fromDb;
     }
 
     /**
-     * Retrieves the {@link UserStats} for a {@link User} with the provided ID..
+     * Retrieves the {@link UserStats} for a {@link User} with the provided ID.
      *
      * <p>
      * First attempts to retrieve from {@link TotalStatsCache}, then if none exists, attempts to retrieve from the
      * {@link DbManager}.
      *
-     * @param userId the ID of the {@link User} to retrieve
+     * @param userId the ID of the {@link User} to whose {@link UserStats} are to be retrieved
      * @return an {@link Optional} of the retrieved {@link UserStats}
      * @see DbManager#getTotalStats(int)
      */
@@ -472,5 +478,72 @@ final class Storage {
         final Optional<UserStats> fromDb = DB_MANAGER.getTotalStats(userId);
         fromDb.ifPresent(userStats -> totalStatsCache.add(userId, userStats));
         return fromDb;
+    }
+
+    /**
+     * Creates an {@link OffsetTcStats} defining the offset points/units for the provided {@link User}.
+     *
+     * <p>
+     * Persists it with the {@link DbManager}, then adds it to the {@link OffsetTcStatsCache}.
+     *
+     * <p>
+     * If an {@link OffsetTcStats} already exists for the {@link User}, the existing values are updated to be the addition of both
+     * {@link OffsetTcStats}.
+     *
+     * @param userId        the ID of the {@link User} for whom the {@link OffsetTcStats} are being created
+     * @param offsetTcStats the {@link OffsetTcStats} to be created
+     * @return an {@link Optional} of the created/updated {@link OffsetTcStats}
+     */
+    Optional<OffsetTcStats> createOrUpdateOffsetStats(final int userId, final OffsetTcStats offsetTcStats) {
+        final Optional<OffsetTcStats> fromDb = DB_MANAGER.createOrUpdateOffsetStats(userId, offsetTcStats);
+        fromDb.ifPresent(stats -> offsetTcStatsCache.add(userId, stats));
+        return fromDb;
+    }
+
+    /**
+     * Retrieves the {@link OffsetTcStats} for a {@link User} with the provided ID.
+     *
+     * <p>
+     * First attempts to retrieve from {@link OffsetTcStatsCache}, then if none exists, attempts to retrieve from the {@link DbManager}.
+     *
+     * @param userId the ID of the {@link User} to whose {@link OffsetTcStats} are to be retrieved
+     * @return an {@link Optional} of the retrieved {@link OffsetTcStats}
+     * @see DbManager#getOffsetStats(int)
+     */
+    Optional<OffsetTcStats> getOffsetStats(final int userId) {
+        final Optional<OffsetTcStats> offsetStats = offsetTcStatsCache.get(userId);
+
+        if (offsetStats.isPresent()) {
+            return offsetStats;
+        }
+
+        LOGGER.trace("Cache miss! Offset stats");
+        final Optional<OffsetTcStats> fromDb = DB_MANAGER.getOffsetStats(userId);
+        fromDb.ifPresent(offsetTcStats -> offsetTcStatsCache.add(userId, offsetTcStats));
+        return fromDb;
+    }
+
+    /**
+     * Deletes the {@link OffsetTcStats} for a {@link User} with the provided ID.
+     *
+     * <p>
+     * Also evicts the {@link User} ID from the {@link OffsetTcStatsCache}.
+     *
+     * @param userId the ID of the {@link User} to whose {@link OffsetTcStats} are to be deleted
+     */
+    void deleteOffsetStats(final int userId) {
+        DB_MANAGER.deleteOffsetStats(userId);
+        offsetTcStatsCache.remove(userId);
+    }
+
+    /**
+     * Deletes the {@link OffsetTcStats} for all {@link User}s in the system.
+     *
+     * <p>
+     * Also evicts the {@link OffsetTcStatsCache}.
+     */
+    void deleteAllOffsetStats() {
+        DB_MANAGER.deleteAllOffsetStats();
+        offsetTcStatsCache.removeAll();
     }
 }

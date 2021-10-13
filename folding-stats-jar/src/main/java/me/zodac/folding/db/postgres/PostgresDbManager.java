@@ -39,7 +39,7 @@ import me.zodac.folding.api.exception.DatabaseConnectionException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.tc.stats.OffsetStats;
+import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
@@ -779,7 +779,7 @@ public final class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public void createTotalStats(final UserStats userStats) {
+    public Optional<UserStats> createTotalStats(final UserStats userStats) {
         LOGGER.debug("Inserting total stats for user ID {} to DB", userStats::getUserId);
 
         executeQuery(queryContext -> {
@@ -792,6 +792,9 @@ public final class PostgresDbManager implements DbManager {
 
             return query.execute();
         });
+
+        // The DB makes no change to this object, so we simply return the provided one
+        return Optional.of(userStats);
     }
 
     @Override
@@ -817,42 +820,7 @@ public final class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public void createOffsetStats(final int userId, final OffsetStats offsetStats) {
-        LOGGER.debug("Adding offset stats for user {}", userId);
-
-        executeQuery(queryContext -> {
-            final LocalDateTime currentUtcLocalDateTime = DateTimeUtils.toUtcLocalDateTime(DateTimeUtils.currentUtcTimestamp());
-
-            final var query = queryContext
-                .insertInto(USER_OFFSET_TC_STATS)
-                .columns(
-                    USER_OFFSET_TC_STATS.USER_ID,
-                    USER_OFFSET_TC_STATS.UTC_TIMESTAMP,
-                    USER_OFFSET_TC_STATS.OFFSET_POINTS,
-                    USER_OFFSET_TC_STATS.OFFSET_MULTIPLIED_POINTS,
-                    USER_OFFSET_TC_STATS.OFFSET_UNITS
-                )
-                .values(
-                    userId,
-                    currentUtcLocalDateTime,
-                    offsetStats.getPointsOffset(),
-                    offsetStats.getMultipliedPointsOffset(),
-                    offsetStats.getUnitsOffset()
-                )
-                .onConflict(USER_OFFSET_TC_STATS.USER_ID)
-                .doUpdate()
-                .set(USER_OFFSET_TC_STATS.UTC_TIMESTAMP, currentUtcLocalDateTime)
-                .set(USER_OFFSET_TC_STATS.OFFSET_POINTS, offsetStats.getPointsOffset())
-                .set(USER_OFFSET_TC_STATS.OFFSET_MULTIPLIED_POINTS, offsetStats.getMultipliedPointsOffset())
-                .set(USER_OFFSET_TC_STATS.OFFSET_UNITS, offsetStats.getUnitsOffset());
-            LOGGER.debug("Executing SQL: '{}'", query);
-
-            return query.execute();
-        });
-    }
-
-    @Override
-    public Optional<OffsetStats> createOrUpdateOffsetStats(final int userId, final OffsetStats offsetStats) {
+    public Optional<OffsetTcStats> createOrUpdateOffsetStats(final int userId, final OffsetTcStats offsetTcStats) {
         LOGGER.debug("Adding/updating offset stats for user {}", userId);
 
         return executeQuery(queryContext -> {
@@ -869,17 +837,17 @@ public final class PostgresDbManager implements DbManager {
                 )
                 .values(
                     userId, currentUtcLocalDateTime,
-                    offsetStats.getPointsOffset(),
-                    offsetStats.getMultipliedPointsOffset(),
-                    offsetStats.getUnitsOffset()
+                    offsetTcStats.getPointsOffset(),
+                    offsetTcStats.getMultipliedPointsOffset(),
+                    offsetTcStats.getUnitsOffset()
                 )
                 .onConflict(USER_OFFSET_TC_STATS.USER_ID)
                 .doUpdate()
                 .set(USER_OFFSET_TC_STATS.UTC_TIMESTAMP, currentUtcLocalDateTime)
-                .set(USER_OFFSET_TC_STATS.OFFSET_POINTS, USER_OFFSET_TC_STATS.OFFSET_POINTS.plus(offsetStats.getPointsOffset()))
+                .set(USER_OFFSET_TC_STATS.OFFSET_POINTS, USER_OFFSET_TC_STATS.OFFSET_POINTS.plus(offsetTcStats.getPointsOffset()))
                 .set(USER_OFFSET_TC_STATS.OFFSET_MULTIPLIED_POINTS,
-                    USER_OFFSET_TC_STATS.OFFSET_MULTIPLIED_POINTS.plus(offsetStats.getMultipliedPointsOffset()))
-                .set(USER_OFFSET_TC_STATS.OFFSET_UNITS, USER_OFFSET_TC_STATS.OFFSET_UNITS.plus(offsetStats.getUnitsOffset()))
+                    USER_OFFSET_TC_STATS.OFFSET_MULTIPLIED_POINTS.plus(offsetTcStats.getMultipliedPointsOffset()))
+                .set(USER_OFFSET_TC_STATS.OFFSET_UNITS, USER_OFFSET_TC_STATS.OFFSET_UNITS.plus(offsetTcStats.getUnitsOffset()))
                 .returning();
             LOGGER.debug("Executing SQL: '{}'", query);
 
@@ -893,7 +861,7 @@ public final class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public Optional<OffsetStats> getOffsetStats(final int userId) {
+    public Optional<OffsetTcStats> getOffsetStats(final int userId) {
         LOGGER.debug("Getting offset stats for user ID: {}", userId);
 
         return executeQuery(queryContext -> {
@@ -915,8 +883,22 @@ public final class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public void clearAllOffsetStats() {
-        LOGGER.debug("Clearing offset stats for all users");
+    public void deleteOffsetStats(final int userId) {
+        LOGGER.debug("Deleting offset stats for user ID {}", userId);
+
+        executeQuery(queryContext -> {
+            final var query = queryContext
+                .deleteFrom(USER_OFFSET_TC_STATS)
+                .where(USER_OFFSET_TC_STATS.USER_ID.equal(userId));
+            LOGGER.debug("Executing SQL: '{}'", query);
+
+            return query.execute();
+        });
+    }
+
+    @Override
+    public void deleteAllOffsetStats() {
+        LOGGER.debug("Deleting offset stats for all users");
 
         executeQuery(queryContext -> {
             final var query = queryContext
