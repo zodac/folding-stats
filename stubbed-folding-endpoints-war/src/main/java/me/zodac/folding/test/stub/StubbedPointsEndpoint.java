@@ -130,7 +130,7 @@ public class StubbedPointsEndpoint {
         }
 
         public static PointsResponse empty() {
-            return create(NO_POINTS);
+            return new PointsResponse(NO_POINTS);
         }
     }
 }

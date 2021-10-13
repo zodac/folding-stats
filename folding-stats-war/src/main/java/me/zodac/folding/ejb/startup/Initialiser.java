@@ -10,7 +10,6 @@ import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.tc.stats.OffsetStats;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.util.ExecutionType;
 import me.zodac.folding.db.DbManagerRetriever;
@@ -66,10 +65,9 @@ public class Initialiser {
         businessLogic.getAllTeams();
         final Collection<User> users = businessLogic.getAllUsersWithoutPasskeys();
 
-        for (final User user : users) {
-            final OffsetStats offsetStatsForUser = oldFacade.getOffsetStatsForUser(user.getId());
-            LOGGER.debug("Found offset stats for user {}: {}", user, offsetStatsForUser);
+        oldFacade.initialiseOffsetStats();
 
+        for (final User user : users) {
             final Stats initialStatsForUser = oldFacade.getInitialStatsForUser(user.getId());
             LOGGER.debug("Found initial stats for user {}: {}", user, initialStatsForUser);
         }

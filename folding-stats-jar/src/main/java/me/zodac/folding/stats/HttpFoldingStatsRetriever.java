@@ -58,7 +58,8 @@ public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
         return UserStats.create(user.getId(), currentUtcTime, userStats.getPoints(), userStats.getUnits());
     }
 
-    private static long getPoints(final FoldingStatsDetails foldingStatsDetails) throws ExternalConnectionException {
+    @Override
+    public long getPoints(final FoldingStatsDetails foldingStatsDetails) throws ExternalConnectionException {
         final StatsRequestUrl pointsRequestUrl = new PointsUrlBuilder()
             .forUser(foldingStatsDetails.getFoldingUserName())
             .withPasskey(foldingStatsDetails.getPasskey())
@@ -72,7 +73,8 @@ public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
         return getPointsFromResponse(statsResponse);
     }
 
-    private static int getUnits(final FoldingStatsDetails foldingStatsDetails) throws ExternalConnectionException {
+    @Override
+    public int getUnits(final FoldingStatsDetails foldingStatsDetails) throws ExternalConnectionException {
         final StatsRequestUrl unitsRequestUrl = new UnitsUrlBuilder()
             .forUser(foldingStatsDetails.getFoldingUserName())
             .withPasskey(foldingStatsDetails.getPasskey())

@@ -16,7 +16,6 @@ import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 import org.apache.commons.lang3.StringUtils;
@@ -239,12 +238,13 @@ public final class UserValidator {
     private List<String> validateUserUnits(final UserRequest userRequest) {
         try {
             final FoldingStatsDetails foldingStatsDetails = FoldingStatsDetails.create(userRequest.getFoldingUserName(), userRequest.getPasskey());
-            final Stats statsForUserAndPasskey = foldingStatsRetriever.getStats(foldingStatsDetails);
+            final int unitsForUserAndPasskey = foldingStatsRetriever.getUnits(foldingStatsDetails);
 
-            if (statsForUserAndPasskey.getUnits() == 0) {
+            if (unitsForUserAndPasskey == 0) {
                 return List.of(String.format(
                     "User '%s' has 0 completed Work Units with passkey '%s', there must be at least one valid Work Unit submitted on the passkey before adding the user",
-                    userRequest.getFoldingUserName(), userRequest.getPasskey()
+                    userRequest.getFoldingUserName(),
+                    userRequest.getPasskey()
                 ));
             }
         } catch (final Exception e) { // TODO: [zodac] Handle ExternalConnectionException here, otherwise will return 400 response instead of 502

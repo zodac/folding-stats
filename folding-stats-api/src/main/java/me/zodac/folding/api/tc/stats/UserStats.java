@@ -53,20 +53,10 @@ public class UserStats extends Stats {
         return create(User.EMPTY_USER_ID, DateTimeUtils.currentUtcTimestamp(), DEFAULT_POINTS, DEFAULT_UNITS);
     }
 
-    /**
-     * Retrieve the ID of the {@link User}.
-     *
-     * @return the {@link User} ID
-     */
     public int getUserId() {
         return userId;
     }
 
-    /**
-     * The {@link Timestamp} for when the {@link UserStats} were created.
-     *
-     * @return the {@link Timestamp}
-     */
     public Timestamp getTimestamp() {
         return new Timestamp(timestamp.getTime());
     }
