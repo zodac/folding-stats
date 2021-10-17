@@ -198,7 +198,7 @@ class PostgresDbManagerTest {
 
         final long points = 100L;
         final int units = 10;
-        POSTGRES_DB_MANAGER.persistInitialStats(UserStats.create(userId, DateTimeUtils.currentUtcTimestamp(), points, units));
+        POSTGRES_DB_MANAGER.createInitialStats(UserStats.create(userId, DateTimeUtils.currentUtcTimestamp(), points, units));
 
         final Optional<UserStats> userStatsAfterUpdate = POSTGRES_DB_MANAGER.getInitialStats(userId);
         assertThat(userStatsAfterUpdate)
@@ -243,7 +243,7 @@ class PostgresDbManagerTest {
         final long multipliedPoints = 1_000L;
         final int units = 5;
 
-        POSTGRES_DB_MANAGER.persistRetiredUserStats(team.getId(), userToRetire.getId(), userToRetire.getDisplayName(),
+        POSTGRES_DB_MANAGER.createRetiredUserStats(team.getId(), userToRetire.getId(), userToRetire.getDisplayName(),
             UserTcStats.createNow(userToRetire.getId(), points, multipliedPoints, units));
 
         final Collection<RetiredUserTcStats> retiredUserStatsForTeam = POSTGRES_DB_MANAGER.getAllRetiredUserStats();
@@ -392,13 +392,13 @@ class PostgresDbManagerTest {
         final Month firstResultMonth = Month.APRIL;
         final String firstResult = "firstResult";
         final LocalDateTime firstResultUtcTimestamp = DateTimeUtils.getLocalDateTimeOf(firstResultYear, firstResultMonth);
-        POSTGRES_DB_MANAGER.persistMonthlyResult(firstResult, firstResultUtcTimestamp);
+        POSTGRES_DB_MANAGER.createMonthlyResult(firstResult, firstResultUtcTimestamp);
 
         final Year secondResultYear = Year.of(2019);
         final Month secondResultMonth = Month.SEPTEMBER;
         final String secondResult = "secondResult";
         final LocalDateTime secondResultUtcTimestamp = DateTimeUtils.getLocalDateTimeOf(secondResultYear, secondResultMonth);
-        POSTGRES_DB_MANAGER.persistMonthlyResult(secondResult, secondResultUtcTimestamp);
+        POSTGRES_DB_MANAGER.createMonthlyResult(secondResult, secondResultUtcTimestamp);
 
         final Optional<String> firstResultOutput = POSTGRES_DB_MANAGER.getMonthlyResult(firstResultMonth, firstResultYear);
         assertThat(firstResultOutput)

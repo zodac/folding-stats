@@ -748,20 +748,30 @@ public final class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public void persistInitialStats(final UserStats userStats) {
+    public Optional<UserStats> createInitialStats(final UserStats userStats) {
         LOGGER.debug("Inserting initial stats for user {} to DB", userStats::getUserId);
 
         executeQuery(queryContext -> {
             final var query = queryContext
                 .insertInto(USER_INITIAL_STATS)
-                .columns(USER_INITIAL_STATS.USER_ID, USER_INITIAL_STATS.UTC_TIMESTAMP, USER_INITIAL_STATS.INITIAL_POINTS,
-                    USER_INITIAL_STATS.INITIAL_UNITS)
-                .values(userStats.getUserId(), DateTimeUtils.toUtcLocalDateTime(userStats.getTimestamp()), userStats.getPoints(),
+                .columns(
+                    USER_INITIAL_STATS.USER_ID,
+                    USER_INITIAL_STATS.UTC_TIMESTAMP,
+                    USER_INITIAL_STATS.INITIAL_POINTS,
+                    USER_INITIAL_STATS.INITIAL_UNITS
+                )
+                .values(
+                    userStats.getUserId(),
+                    DateTimeUtils.toUtcLocalDateTime(userStats.getTimestamp()),
+                    userStats.getPoints(),
                     userStats.getUnits());
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
         });
+
+        // The DB makes no change to this object, so we simply return the provided one
+        return Optional.of(userStats);
     }
 
     @Override
@@ -918,7 +928,7 @@ public final class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public int persistRetiredUserStats(final int teamId, final int userId, final String displayUserName, final UserTcStats retiredUserStats) {
+    public int createRetiredUserStats(final int teamId, final int userId, final String displayUserName, final UserTcStats retiredUserStats) {
         LOGGER.debug("Persisting retired user ID {} for team ID {}", userId, teamId);
 
         return executeQuery(queryContext -> {
@@ -997,7 +1007,7 @@ public final class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public void persistMonthlyResult(final String result, final LocalDateTime utcTimestamp) {
+    public void createMonthlyResult(final String result, final LocalDateTime utcTimestamp) {
         LOGGER.debug("Persisting monthly result for {}/{}", utcTimestamp::getYear, () -> DateTimeUtils.formatMonth(utcTimestamp.getMonth()));
 
         executeQuery(queryContext -> {

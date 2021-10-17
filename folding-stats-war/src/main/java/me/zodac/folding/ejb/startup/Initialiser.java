@@ -11,8 +11,8 @@ import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.Stats;
+import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.util.ExecutionType;
-import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.ejb.tc.scheduled.StatsScheduler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,9 +30,6 @@ public class Initialiser {
 
     @EJB
     private BusinessLogic businessLogic;
-
-    @EJB
-    private OldFacade oldFacade;
 
     @EJB
     private StatsScheduler statsScheduler;
@@ -67,7 +64,7 @@ public class Initialiser {
             final OffsetTcStats offsetTcStatsForUser = businessLogic.getOffsetStats(user);
             LOGGER.debug("Found offset stats for user {}: {}", user, offsetTcStatsForUser);
 
-            final Stats initialStatsForUser = oldFacade.getInitialStatsForUser(user.getId());
+            final UserStats initialStatsForUser = businessLogic.getInitialStats(user);
             LOGGER.debug("Found initial stats for user {}: {}", user, initialStatsForUser);
         }
 

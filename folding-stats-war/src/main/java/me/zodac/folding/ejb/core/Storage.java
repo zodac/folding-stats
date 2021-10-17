@@ -16,6 +16,7 @@ import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.cache.HardwareCache;
+import me.zodac.folding.cache.InitialStatsCache;
 import me.zodac.folding.cache.OffsetTcStatsCache;
 import me.zodac.folding.cache.RetiredTcStatsCache;
 import me.zodac.folding.cache.TcStatsCache;
@@ -49,8 +50,9 @@ final class Storage {
     private final TeamCache teamCache = TeamCache.getInstance();
 
     // Stat caches
-    private final RetiredTcStatsCache retiredStatsCache = RetiredTcStatsCache.getInstance();
+    private final InitialStatsCache initialStatsCache = InitialStatsCache.getInstance();
     private final OffsetTcStatsCache offsetTcStatsCache = OffsetTcStatsCache.getInstance();
+    private final RetiredTcStatsCache retiredStatsCache = RetiredTcStatsCache.getInstance();
     private final TcStatsCache tcStatsCache = TcStatsCache.getInstance();
     private final TotalStatsCache totalStatsCache = TotalStatsCache.getInstance();
 
@@ -72,7 +74,7 @@ final class Storage {
      * @return the created {@link Hardware}, with ID
      * @see DbManager#createHardware(Hardware)
      */
-    @Cached
+    @Cached(HardwareCache.class)
     Hardware createHardware(final Hardware hardware) {
         final Hardware hardwareWithId = DB_MANAGER.createHardware(hardware);
         hardwareCache.add(hardwareWithId.getId(), hardwareWithId);
@@ -89,7 +91,7 @@ final class Storage {
      * @return an {@link Optional} of the retrieved {@link Hardware}
      * @see DbManager#getHardware(int)
      */
-    @Cached
+    @Cached(HardwareCache.class)
     Optional<Hardware> getHardware(final int hardwareId) {
         final Optional<Hardware> fromCache = hardwareCache.get(hardwareId);
 
@@ -112,7 +114,7 @@ final class Storage {
      * @return a {@link Collection} of the retrieved {@link Hardware}
      * @see DbManager#getAllHardware()
      */
-    @Cached
+    @Cached(HardwareCache.class)
     Collection<Hardware> getAllHardware() {
         final Collection<Hardware> fromCache = hardwareCache.getAll();
 
@@ -139,7 +141,7 @@ final class Storage {
      * @param hardwareId the ID of the {@link Hardware} to delete
      * @see DbManager#deleteHardware(int)
      */
-    @Cached
+    @Cached(HardwareCache.class)
     void deleteHardware(final int hardwareId) {
         DB_MANAGER.deleteHardware(hardwareId);
         hardwareCache.remove(hardwareId);
@@ -155,7 +157,7 @@ final class Storage {
      * @return the created {@link Team}, with ID
      * @see DbManager#createTeam(Team)
      */
-    @Cached
+    @Cached(TeamCache.class)
     Team createTeam(final Team team) {
         final Team teamWithId = DB_MANAGER.createTeam(team);
         teamCache.add(teamWithId.getId(), teamWithId);
@@ -172,7 +174,7 @@ final class Storage {
      * @return an {@link Optional} of the retrieved {@link Team}
      * @see DbManager#getTeam(int)
      */
-    @Cached
+    @Cached(TeamCache.class)
     Optional<Team> getTeam(final int teamId) {
         final Optional<Team> fromCache = teamCache.get(teamId);
 
@@ -195,7 +197,7 @@ final class Storage {
      * @return a {@link Collection} of the retrieved {@link Team}s
      * @see DbManager#getAllTeams()
      */
-    @Cached
+    @Cached(TeamCache.class)
     Collection<Team> getAllTeams() {
         final Collection<Team> fromCache = teamCache.getAll();
 
@@ -225,7 +227,7 @@ final class Storage {
      * @param teamToUpdate the {@link Team} to update
      * @see DbManager#updateTeam(Team)
      */
-    @Cached
+    @Cached(TeamCache.class)
     public Team updateTeam(final Team teamToUpdate) {
         DB_MANAGER.updateTeam(teamToUpdate);
         teamCache.add(teamToUpdate.getId(), teamToUpdate);
@@ -248,7 +250,7 @@ final class Storage {
      * @param teamId the ID of the {@link Team} to delete
      * @see DbManager#deleteTeam(int)
      */
-    @Cached
+    @Cached(TeamCache.class)
     void deleteTeam(final int teamId) {
         DB_MANAGER.deleteTeam(teamId);
         teamCache.remove(teamId);
@@ -264,7 +266,7 @@ final class Storage {
      * @return an {@link Optional} of the retrieved {@link User}
      * @see DbManager#getUser(int)
      */
-    @Cached
+    @Cached(UserCache.class)
     Optional<User> getUser(final int userId) {
         final Optional<User> fromCache = userCache.get(userId);
 
@@ -287,7 +289,7 @@ final class Storage {
      * @return a {@link Collection} of the retrieved {@link User}s
      * @see DbManager#getAllUsers()
      */
-    @Cached
+    @Cached(UserCache.class)
     Collection<User> getAllUsers() {
         final Collection<User> fromCache = userCache.getAll();
 
@@ -316,7 +318,7 @@ final class Storage {
      */
     @NotCached
     void createMonthlyResult(final String monthlyResult, final LocalDateTime utcTimestamp) {
-        DB_MANAGER.persistMonthlyResult(monthlyResult, utcTimestamp);
+        DB_MANAGER.createMonthlyResult(monthlyResult, utcTimestamp);
     }
 
     /**
@@ -338,7 +340,7 @@ final class Storage {
      * Creates a {@link RetiredUserTcStats} for a {@link User} that has been deleted from a {@link Team}.
      *
      * <p>
-     * Persists it with the {@link DbManager}, then adds it to the {@link HardwareCache}.
+     * Persists it with the {@link DbManager}, then adds it to the {@link RetiredTcStatsCache}.
      *
      * @param teamId          the ID of the {@link Team} that the {@link User} has been deleted from
      * @param userId          the ID of the {@link User} who is being deleted
@@ -346,9 +348,9 @@ final class Storage {
      * @param userTcStats     the {@link UserTcStats} at the time of deletion
      * @return the {@link RetiredUserTcStats}
      */
-    @Cached
+    @Cached(RetiredTcStatsCache.class)
     RetiredUserTcStats createRetiredUser(final int teamId, final int userId, final String userDisplayName, final UserTcStats userTcStats) {
-        final int retiredUserId = DB_MANAGER.persistRetiredUserStats(teamId, userId, userDisplayName, userTcStats);
+        final int retiredUserId = DB_MANAGER.createRetiredUserStats(teamId, userId, userDisplayName, userTcStats);
         final RetiredUserTcStats retiredUserTcStats = RetiredUserTcStats.create(retiredUserId, teamId, userDisplayName, userTcStats);
 
         retiredStatsCache.add(retiredUserId, retiredUserTcStats);
@@ -364,7 +366,7 @@ final class Storage {
      * @return a {@link Collection} of the retrieved {@link RetiredUserTcStats}
      * @see DbManager#getAllRetiredUserStats()
      */
-    @Cached
+    @Cached(RetiredTcStatsCache.class)
     Collection<RetiredUserTcStats> getAllRetiredUsers() {
         final Collection<RetiredUserTcStats> fromCache = retiredStatsCache.getAll();
 
@@ -388,8 +390,8 @@ final class Storage {
      * <p>
      * Also evicts the {@link RetiredTcStatsCache}.
      */
-    @Cached
-    void deleteAllRetiredUserStats() {
+    @Cached(RetiredTcStatsCache.class)
+    void deleteAllRetiredUserTcStats() {
         DB_MANAGER.deleteAllRetiredUserStats();
         retiredStatsCache.removeAll();
     }
@@ -456,7 +458,7 @@ final class Storage {
      * @param userStats the {@link UserStats} to be created
      * @return an {@link Optional} of the created {@link UserStats}
      */
-    @Cached
+    @Cached(TotalStatsCache.class)
     Optional<UserStats> createTotalStats(final UserStats userStats) {
         final Optional<UserStats> fromDb = DB_MANAGER.createTotalStats(userStats);
         fromDb.ifPresent(stats -> totalStatsCache.add(stats.getUserId(), stats));
@@ -467,14 +469,13 @@ final class Storage {
      * Retrieves the {@link UserStats} for a {@link User} with the provided ID.
      *
      * <p>
-     * First attempts to retrieve from {@link TotalStatsCache}, then if none exists, attempts to retrieve from the
-     * {@link DbManager}.
+     * First attempts to retrieve from {@link TotalStatsCache}, then if none exists, attempts to retrieve from the {@link DbManager}.
      *
      * @param userId the ID of the {@link User} to whose {@link UserStats} are to be retrieved
      * @return an {@link Optional} of the retrieved {@link UserStats}
      * @see DbManager#getTotalStats(int)
      */
-    @Cached
+    @Cached(TotalStatsCache.class)
     Optional<UserStats> getTotalStats(final int userId) {
         final Optional<UserStats> fromCache = totalStatsCache.get(userId);
 
@@ -502,7 +503,7 @@ final class Storage {
      * @param offsetTcStats the {@link OffsetTcStats} to be created
      * @return an {@link Optional} of the created/updated {@link OffsetTcStats}
      */
-    @Cached
+    @Cached(OffsetTcStatsCache.class)
     Optional<OffsetTcStats> createOrUpdateOffsetStats(final int userId, final OffsetTcStats offsetTcStats) {
         final Optional<OffsetTcStats> fromDb = DB_MANAGER.createOrUpdateOffsetStats(userId, offsetTcStats);
         fromDb.ifPresent(stats -> offsetTcStatsCache.add(userId, stats));
@@ -519,7 +520,7 @@ final class Storage {
      * @return an {@link Optional} of the retrieved {@link OffsetTcStats}
      * @see DbManager#getOffsetStats(int)
      */
-    @Cached
+    @Cached(OffsetTcStatsCache.class)
     Optional<OffsetTcStats> getOffsetStats(final int userId) {
         final Optional<OffsetTcStats> fromCache = offsetTcStatsCache.get(userId);
 
@@ -541,7 +542,7 @@ final class Storage {
      *
      * @param userId the ID of the {@link User} to whose {@link OffsetTcStats} are to be deleted
      */
-    @Cached
+    @Cached(OffsetTcStatsCache.class)
     void deleteOffsetStats(final int userId) {
         DB_MANAGER.deleteOffsetStats(userId);
         offsetTcStatsCache.remove(userId);
@@ -553,8 +554,8 @@ final class Storage {
      * <p>
      * Also evicts the {@link OffsetTcStatsCache}.
      */
-    @Cached
-    void deleteAllOffsetStats() {
+    @Cached(OffsetTcStatsCache.class)
+    void deleteAllOffsetTcStats() {
         DB_MANAGER.deleteAllOffsetStats();
         offsetTcStatsCache.removeAll();
     }
@@ -568,7 +569,7 @@ final class Storage {
      * @param userTcStats the {@link UserTcStats} to be created
      * @return an {@link Optional} of the created {@link UserTcStats}
      */
-    @Cached
+    @Cached(TcStatsCache.class)
     Optional<UserTcStats> createHourlyTcStats(final UserTcStats userTcStats) {
         final Optional<UserTcStats> fromDb = DB_MANAGER.persistHourlyTcStats(userTcStats);
         fromDb.ifPresent(stats -> tcStatsCache.add(userTcStats.getUserId(), stats));
@@ -579,13 +580,12 @@ final class Storage {
      * Retrieves the latest {@link UserTcStats} for the provided {@link User}.
      *
      * <p>
-     * First attempts to retrieve from {@link TcStatsCache}, then if none exists, attempts to retrieve from the
-     * {@link DbManager}.
+     * First attempts to retrieve from {@link TcStatsCache}, then if none exists, attempts to retrieve from the {@link DbManager}.
      *
      * @param userId the ID of the {@link User} whose {@link UserTcStats} are to be retrieved
      * @return an {@link Optional} of the retrieved {@link UserTcStats}
      */
-    @Cached
+    @Cached(TcStatsCache.class)
     Optional<UserTcStats> getHourlyTcStats(final int userId) {
         final Optional<UserTcStats> fromCache = tcStatsCache.get(userId);
 
@@ -593,7 +593,7 @@ final class Storage {
             return fromCache;
         }
 
-        LOGGER.trace("Cache miss! Offset stats");
+        LOGGER.trace("Cache miss! Hourly TC stats");
         final Optional<UserTcStats> fromDb = DB_MANAGER.getHourlyTcStats(userId);
         fromDb.ifPresent(userTcStats -> tcStatsCache.add(userId, userTcStats));
         return fromDb;
@@ -610,5 +610,60 @@ final class Storage {
     @NotCached
     Optional<UserTcStats> getFirstHourlyTcStats() {
         return DB_MANAGER.getFirstHourlyTcStats();
+    }
+
+    /**
+     * Creates a {@link UserStats} for the initial overall stats for the provided {@link User} at the start of the monitoring period.
+     *
+     * <p>
+     * Persists it with the {@link DbManager}, then adds it to the {@link InitialStatsCache}.
+     *
+     * @param userStats the {@link UserStats} to be created
+     * @return am {@link Optional} of the created {@link UserStats}
+     */
+    @Cached(InitialStatsCache.class)
+    Optional<UserStats> createInitialStats(final UserStats userStats) {
+        final Optional<UserStats> fromDb = DB_MANAGER.createInitialStats(userStats);
+        fromDb.ifPresent(stats -> initialStatsCache.add(stats.getUserId(), stats));
+        return fromDb;
+    }
+
+    /**
+     * Retrieves the initial {@link UserStats} for the provided {@link User} ID.
+     *
+     * <p>
+     * First attempts to retrieve from {@link InitialStatsCache}, then if none exists, attempts to retrieve from the {@link DbManager}.
+     *
+     * @param userId the ID of the {@link User} whose {@link UserStats} are to be retrieved
+     * @return an {@link Optional} of the retrieved {@link UserStats}
+     */
+    @Cached(InitialStatsCache.class)
+    Optional<UserStats> getInitialStats(final int userId) {
+        final Optional<UserStats> fromCache = initialStatsCache.get(userId);
+
+        if (fromCache.isPresent()) {
+            return fromCache;
+        }
+
+        LOGGER.trace("Cache miss! Initial stats");
+        final Optional<UserStats> fromDb = DB_MANAGER.getInitialStats(userId);
+        fromDb.ifPresent(userStats -> initialStatsCache.add(userId, userStats));
+        return fromDb;
+    }
+
+    /**
+     * Evicts all {@link User}s from the {@link TotalStatsCache}.
+     */
+    @Cached(TotalStatsCache.class)
+    void evictTcStatsCache() {
+        tcStatsCache.removeAll();
+    }
+
+    /**
+     * Evicts all {@link User}s from the {@link InitialStatsCache}.
+     */
+    @Cached(InitialStatsCache.class)
+    void evictInitialStatsCache() {
+        initialStatsCache.removeAll();
     }
 }

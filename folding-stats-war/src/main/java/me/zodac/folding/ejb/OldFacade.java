@@ -2,7 +2,6 @@ package me.zodac.folding.ejb;
 
 import java.math.BigDecimal;
 import java.util.Collection;
-import java.util.Optional;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import me.zodac.folding.ParsingStateManager;
@@ -16,13 +15,9 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
-import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
-import me.zodac.folding.api.util.DateTimeUtils;
 import me.zodac.folding.cache.HardwareCache;
-import me.zodac.folding.cache.InitialStatsCache;
-import me.zodac.folding.cache.OffsetTcStatsCache;
 import me.zodac.folding.cache.UserCache;
 import me.zodac.folding.db.DbManagerRetriever;
 import me.zodac.folding.ejb.tc.UserStatsParser;
@@ -40,10 +35,6 @@ public class OldFacade {
     private final transient DbManager dbManager = DbManagerRetriever.get();
     private final transient UserCache userCache = UserCache.getInstance();
     private final transient HardwareCache hardwareCache = HardwareCache.getInstance();
-
-    private final transient InitialStatsCache initialStatsCache = InitialStatsCache.getInstance();
-    private final transient OffsetTcStatsCache offsetTcStatsCache = OffsetTcStatsCache.getInstance();
-
 
     @EJB
     private transient BusinessLogic businessLogic;
@@ -80,10 +71,9 @@ public class OldFacade {
         userCache.add(userWithId.getId(), userWithId);
 
         // When adding a new user, we configure the initial stats DB/cache
-        createInitialUserStats(userWithId);
-        // When adding a new user, we give an empty offset to the offset cache
-        offsetTcStatsCache.add(userWithId.getId(), OffsetTcStats.empty());
-
+        final UserStats currentUserStats = FOLDING_STATS_RETRIEVER.getTotalStats(userWithId);
+        final UserStats initialStats = businessLogic.createInitialStats(currentUserStats);
+        LOGGER.info("User '{}' (ID: {}) created with initial stats: {}", userWithId.getDisplayName(), userWithId.getId(), initialStats);
         userStatsParser.parseTcStatsForUser(userWithId);
 
         return userWithId;
@@ -137,8 +127,7 @@ public class OldFacade {
 
         final UserStats userTotalStats = FOLDING_STATS_RETRIEVER.getTotalStats(userWithStateChange);
         LOGGER.debug("Setting initial stats to: {}", userTotalStats);
-        dbManager.persistInitialStats(userTotalStats);
-        initialStatsCache.add(userWithStateChange.getId(), userTotalStats);
+        businessLogic.createInitialStats(userTotalStats);
 
         final UserTcStats currentUserTcStats = businessLogic.getHourlyTcStats(userWithStateChange);
         final OffsetTcStats offsetTcStats =
@@ -166,37 +155,5 @@ public class OldFacade {
         final RetiredUserTcStats retiredUserTcStats = businessLogic.createRetiredUser(team, user, userStats);
         LOGGER.info("User '{}' (ID: {}) retired with retired stats ID: {}", user.getDisplayName(), user.getId(),
             retiredUserTcStats.getRetiredUserId());
-    }
-
-    public void setCurrentStatsAsInitialStatsForUser(final User user) {
-        LOGGER.debug("Setting current stats as initial stats for user '{}' (ID: {})", user.getDisplayName(), user.getId());
-        final UserStats totalStats = businessLogic.getTotalStats(user);
-        createInitialUserStats(UserStats.create(user.getId(), DateTimeUtils.currentUtcTimestamp(), totalStats.getPoints(), totalStats.getUnits()));
-        initialStatsCache.add(user.getId(), totalStats);
-    }
-
-    public void createInitialUserStats(final User user) throws ExternalConnectionException {
-        final UserStats currentUserStats = FOLDING_STATS_RETRIEVER.getTotalStats(user);
-        createInitialUserStats(currentUserStats);
-    }
-
-    public void createInitialUserStats(final UserStats userStats) {
-        dbManager.persistInitialStats(userStats);
-        initialStatsCache.add(userStats.getUserId(), userStats);
-    }
-
-    public Stats getInitialStatsForUser(final int userId) {
-        final Optional<Stats> initialStats = initialStatsCache.get(userId);
-        if (initialStats.isPresent()) {
-            return initialStats.get();
-        }
-
-        LOGGER.trace("Cache miss! getInitialStatsForUser");
-        // Should be no need to get anything from the DB (since it should have been added to the cache when created)
-        // But adding this just in case we decide to add some cache eviction in future
-        final UserStats initialStatsFromDb = dbManager.getInitialStats(userId)
-            .orElse(UserStats.empty());
-        initialStatsCache.add(userId, initialStatsFromDb);
-        return initialStatsFromDb;
     }
 }

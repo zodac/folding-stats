@@ -14,7 +14,6 @@ import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
-import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -32,9 +31,6 @@ public class UserStatsParser {
 
     @EJB
     private BusinessLogic businessLogic;
-
-    @EJB
-    private OldFacade oldFacade;
 
     /**
      * Parses the latest TC stats for the given {@link User}.
@@ -68,7 +64,7 @@ public class UserStatsParser {
             return;
         }
 
-        final Stats initialStats = oldFacade.getInitialStatsForUser(user.getId());
+        final Stats initialStats = businessLogic.getInitialStats(user);
         if (initialStats.isEmpty()) {
             LOGGER.warn("Retrieved empty initial stats for user: {}", user);
             return;

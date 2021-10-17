@@ -211,11 +211,6 @@ public interface BusinessLogic {
     Collection<RetiredUserTcStats> getAllRetiredUsersForTeam(final Team team);
 
     /**
-     * Deletes all {@link RetiredUserTcStats} for all {@link Team}s.
-     */
-    void deleteAllRetiredUserStats();
-
-    /**
      * Authenticates a system user and retrieves its roles.
      *
      * <p>
@@ -271,7 +266,7 @@ public interface BusinessLogic {
     UserStats createTotalStats(final UserStats userStats);
 
     /**
-     * Retrieves the {@link UserStats} for the provided {@link User}.
+     * Retrieves the total {@link UserStats} for the provided {@link User}.
      *
      * @param user the {@link User} whose {@link UserStats} are to be retrieved
      * @return the {@link UserStats} for the {@link User}, or {@link UserStats#empty()} if none can be found
@@ -307,11 +302,6 @@ public interface BusinessLogic {
     void deleteOffsetStats(final User user);
 
     /**
-     * Deletes the {@link OffsetTcStats} for all {@link User}s in the system.
-     */
-    void deleteAllOffsetStats();
-
-    /**
      * Creates a {@link UserTcStats} for a {@link User}'s <code>Team Competition</code> stats for a specific hour.
      *
      * @param userTcStats the {@link UserTcStats} to be created
@@ -333,4 +323,42 @@ public interface BusinessLogic {
      * @return <code>true</code> if any {@link UserTcStats} have been created
      */
     boolean isAnyHourlyTcStatsExist();
+
+    /**
+     * Creates a {@link UserStats} for the initial overall stats for the provided {@link User} at the start of the monitoring period.
+     *
+     * @param userStats the {@link UserStats} to be created
+     * @return the created {@link UserStats}, or {@link UserStats#empty()}
+     */
+    UserStats createInitialStats(final UserStats userStats);
+
+    /**
+     * Retrieves the initial {@link UserStats} for the provided {@link User}.
+     *
+     * @param user the {@link User} whose {@link UserStats} are to be retrieved
+     * @return the {@link UserStats} for the {@link User}, or {@link UserStats#empty()} if none can be found
+     */
+    UserStats getInitialStats(final User user);
+
+    /**
+     * Resets all {@link User}s for the <code>Team Competition</code>. Performs the following actions:
+     *
+     * <ul>
+     *      <li>
+     *          Zeroes out each {@link User}'s {@link UserTcStats} by setting their initial {@link UserStats} to their current total {@link UserStats}
+     *          <b>NOTE:</b> This does not retrieve the latest online {@link UserStats} for the {@link User}, it simply retrieves the latest total
+     *          {@link UserStats} available on the system from {@link #getTotalStats(User)}.
+     *      </li>
+     *      <li>
+     *          Deletes any {@link OffsetTcStats} for the {@link User}s.
+     *      </li>
+     *      <li>
+     *          Deletes any {@link RetiredUserTcStats}.
+     *      </li>
+     *      <li>
+     *          Resets the {@link UserStats} and {@link UserTcStats} caches (if any are used).
+     *      </li>
+     * </ul>
+     */
+    void resetAllTeamCompetitionUserStats();
 }

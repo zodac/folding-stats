@@ -19,6 +19,7 @@ import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 /**
  * Interface used to interact with the storage backend and perform CRUD operations.
  */
+// TODO: [zodac] Should #create*() functions return an object, or the ID and let the caller build the object?
 public interface DbManager {
 
     /**
@@ -74,7 +75,7 @@ public interface DbManager {
 
     Collection<HistoricStats> getHistoricStatsMonthly(final int userId, final Year year);
 
-    void persistInitialStats(final UserStats userStats);
+    Optional<UserStats> createInitialStats(final UserStats userStats);
 
     Optional<UserStats> getInitialStats(final int userId);
 
@@ -90,13 +91,13 @@ public interface DbManager {
 
     void deleteAllOffsetStats();
 
-    int persistRetiredUserStats(final int teamId, final int userId, final String displayUserName, final UserTcStats retiredUserStats);
+    int createRetiredUserStats(final int teamId, final int userId, final String displayUserName, final UserTcStats retiredUserStats);
 
     Collection<RetiredUserTcStats> getAllRetiredUserStats();
 
     void deleteAllRetiredUserStats();
 
-    void persistMonthlyResult(final String result, final LocalDateTime utcTimestamp);
+    void createMonthlyResult(final String result, final LocalDateTime utcTimestamp);
 
     Optional<String> getMonthlyResult(final Month month, final Year year);
 

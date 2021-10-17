@@ -173,11 +173,6 @@ public class BusinessLogicEjb implements BusinessLogic {
     }
 
     @Override
-    public void deleteAllRetiredUserStats() {
-        STORAGE.deleteAllRetiredUserStats();
-    }
-
-    @Override
     public UserAuthenticationResult authenticateSystemUser(final String userName, final String password) {
         final UserAuthenticationResult userAuthenticationResult = STORAGE.authenticateSystemUser(userName, password);
 
@@ -250,11 +245,6 @@ public class BusinessLogicEjb implements BusinessLogic {
     }
 
     @Override
-    public void deleteAllOffsetStats() {
-        STORAGE.deleteAllOffsetStats();
-    }
-
-    @Override
     public UserTcStats createHourlyTcStats(final UserTcStats userTcStats) {
         return STORAGE.createHourlyTcStats(userTcStats)
             .orElse(UserTcStats.empty(userTcStats.getUserId()));
@@ -269,5 +259,36 @@ public class BusinessLogicEjb implements BusinessLogic {
     @Override
     public boolean isAnyHourlyTcStatsExist() {
         return STORAGE.getFirstHourlyTcStats().isPresent();
+    }
+
+    @Override
+    public UserStats createInitialStats(final UserStats userStats) {
+        return STORAGE.createInitialStats(userStats)
+            .orElse(UserStats.empty());
+    }
+
+    @Override
+    public UserStats getInitialStats(final User user) {
+        return STORAGE.getInitialStats(user.getId())
+            .orElse(UserStats.empty());
+    }
+
+    @Override
+    public void resetAllTeamCompetitionUserStats() {
+        for (final User user : getAllUsersWithoutPasskeys()) {
+            LOGGER.info("Resetting TC stats for {}", user.getDisplayName());
+            final UserStats totalStats = getTotalStats(user);
+            createInitialStats(totalStats);
+        }
+
+        LOGGER.info("Deleting retired user TC stats");
+        STORAGE.deleteAllRetiredUserTcStats();
+
+        LOGGER.info("Deleting offset TC stats");
+        STORAGE.deleteAllOffsetTcStats();
+
+        LOGGER.info("Evicting TC and initial stats caches");
+        STORAGE.evictTcStatsCache();
+        STORAGE.evictInitialStatsCache();
     }
 }

@@ -188,11 +188,6 @@ final class MockBusinessLogic implements BusinessLogic {
     }
 
     @Override
-    public void deleteAllRetiredUserStats() {
-
-    }
-
-    @Override
     public UserAuthenticationResult authenticateSystemUser(final String userName, final String password) {
         return UserAuthenticationResult.userDoesNotExist();
     }
@@ -238,11 +233,6 @@ final class MockBusinessLogic implements BusinessLogic {
     }
 
     @Override
-    public void deleteAllOffsetStats() {
-
-    }
-
-    @Override
     public UserTcStats createHourlyTcStats(final UserTcStats userTcStats) {
         return UserTcStats.empty();
     }
@@ -255,5 +245,20 @@ final class MockBusinessLogic implements BusinessLogic {
     @Override
     public boolean isAnyHourlyTcStatsExist() {
         return false;
+    }
+
+    @Override
+    public UserStats createInitialStats(final UserStats userStats) {
+        return UserStats.empty();
+    }
+
+    @Override
+    public UserStats getInitialStats(final User user) {
+        return UserStats.empty();
+    }
+
+    @Override
+    public void resetAllTeamCompetitionUserStats() {
+
     }
 }
