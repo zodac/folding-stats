@@ -241,4 +241,19 @@ final class MockBusinessLogic implements BusinessLogic {
     public void deleteAllOffsetStats() {
 
     }
+
+    @Override
+    public UserTcStats createHourlyTcStats(final UserTcStats userTcStats) {
+        return UserTcStats.empty();
+    }
+
+    @Override
+    public UserTcStats getHourlyTcStats(final User user) {
+        return UserTcStats.empty();
+    }
+
+    @Override
+    public boolean isAnyHourlyTcStatsExist() {
+        return false;
+    }
 }

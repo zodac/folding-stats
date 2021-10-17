@@ -16,7 +16,6 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.cache.CompetitionSummaryCache;
-import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.rest.api.tc.CompetitionSummary;
 import me.zodac.folding.rest.api.tc.RetiredUserSummary;
 import me.zodac.folding.rest.api.tc.TeamSummary;
@@ -34,9 +33,6 @@ public class CompetitionResultGenerator {
 
     @EJB
     private BusinessLogic businessLogic;
-
-    @EJB
-    private OldFacade oldFacade;
 
     /**
      * Generates a {@link CompetitionSummary} based on the latest <code>Team Competition</code> {@link UserTcStats}.
@@ -105,7 +101,7 @@ public class CompetitionResultGenerator {
         final Hardware hardware = user.getHardware();
         final Category category = user.getCategory();
 
-        final UserTcStats userTcStats = oldFacade.getHourlyTcStatsForUser(user.getId());
+        final UserTcStats userTcStats = businessLogic.getHourlyTcStats(user);
         LOGGER.debug("Results for {}: {} points | {} multiplied points | {} units", user::getDisplayName, userTcStats::getPoints,
             userTcStats::getMultipliedPoints, userTcStats::getUnits);
         return UserSummary.createWithDefaultRank(user.getId(), user.getDisplayName(), user.getFoldingUserName(), hardware, category,

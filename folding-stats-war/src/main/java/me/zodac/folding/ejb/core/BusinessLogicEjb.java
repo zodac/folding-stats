@@ -253,4 +253,21 @@ public class BusinessLogicEjb implements BusinessLogic {
     public void deleteAllOffsetStats() {
         STORAGE.deleteAllOffsetStats();
     }
+
+    @Override
+    public UserTcStats createHourlyTcStats(final UserTcStats userTcStats) {
+        return STORAGE.createHourlyTcStats(userTcStats)
+            .orElse(UserTcStats.empty(userTcStats.getUserId()));
+    }
+
+    @Override
+    public UserTcStats getHourlyTcStats(final User user) {
+        return STORAGE.getHourlyTcStats(user.getId())
+            .orElse(UserTcStats.empty(user.getId()));
+    }
+
+    @Override
+    public boolean isAnyHourlyTcStatsExist() {
+        return STORAGE.getFirstHourlyTcStats().isPresent();
+    }
 }

@@ -23,7 +23,6 @@ import me.zodac.folding.api.util.DateTimeUtils;
 import me.zodac.folding.cache.HardwareCache;
 import me.zodac.folding.cache.InitialStatsCache;
 import me.zodac.folding.cache.OffsetTcStatsCache;
-import me.zodac.folding.cache.TcStatsCache;
 import me.zodac.folding.cache.UserCache;
 import me.zodac.folding.db.DbManagerRetriever;
 import me.zodac.folding.ejb.tc.UserStatsParser;
@@ -44,7 +43,7 @@ public class OldFacade {
 
     private final transient InitialStatsCache initialStatsCache = InitialStatsCache.getInstance();
     private final transient OffsetTcStatsCache offsetTcStatsCache = OffsetTcStatsCache.getInstance();
-    private final transient TcStatsCache tcStatsCache = TcStatsCache.getInstance();
+
 
     @EJB
     private transient BusinessLogic businessLogic;
@@ -141,7 +140,7 @@ public class OldFacade {
         dbManager.persistInitialStats(userTotalStats);
         initialStatsCache.add(userWithStateChange.getId(), userTotalStats);
 
-        final UserTcStats currentUserTcStats = getHourlyTcStatsForUser(userWithStateChange.getId());
+        final UserTcStats currentUserTcStats = businessLogic.getHourlyTcStats(userWithStateChange);
         final OffsetTcStats offsetTcStats =
             OffsetTcStats.create(currentUserTcStats.getPoints(), currentUserTcStats.getMultipliedPoints(), currentUserTcStats.getUnits());
         LOGGER.debug("Adding offset stats of: {}", offsetTcStats);
@@ -156,7 +155,7 @@ public class OldFacade {
         dbManager.deleteUser(userId);
         userCache.remove(userId);
 
-        final UserTcStats userStats = getHourlyTcStatsForUser(userId);
+        final UserTcStats userStats = businessLogic.getHourlyTcStats(user);
 
         if (userStats.isEmptyStats()) {
             LOGGER.warn("User '{}' (ID: {}) has no stats, not saving any retired stats", user.getDisplayName(), user.getId());
@@ -199,25 +198,5 @@ public class OldFacade {
             .orElse(UserStats.empty());
         initialStatsCache.add(userId, initialStatsFromDb);
         return initialStatsFromDb;
-    }
-
-    public void createHourlyTcStatsForUser(final UserTcStats userTcStats) {
-        dbManager.persistHourlyTcStats(userTcStats);
-        tcStatsCache.add(userTcStats.getUserId(), userTcStats);
-    }
-
-    public UserTcStats getHourlyTcStatsForUser(final int userId) {
-        final Optional<UserTcStats> optionalUserTcStats = tcStatsCache.get(userId);
-
-        if (optionalUserTcStats.isPresent()) {
-            return optionalUserTcStats.get();
-        }
-
-        LOGGER.trace("Cache miss! Current TC stats");
-        // Should be no need to get anything from the DB (since it should have been added to the cache when created)
-        // But adding this just in case we decide to add some cache eviction in future
-        final UserTcStats userTcStatsFromDb = dbManager.getHourlyTcStats(userId).orElse(UserTcStats.empty(userId));
-        tcStatsCache.add(userId, userTcStatsFromDb);
-        return userTcStatsFromDb;
     }
 }

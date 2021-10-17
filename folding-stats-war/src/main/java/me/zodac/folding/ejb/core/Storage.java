@@ -18,6 +18,7 @@ import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.cache.HardwareCache;
 import me.zodac.folding.cache.OffsetTcStatsCache;
 import me.zodac.folding.cache.RetiredTcStatsCache;
+import me.zodac.folding.cache.TcStatsCache;
 import me.zodac.folding.cache.TeamCache;
 import me.zodac.folding.cache.TotalStatsCache;
 import me.zodac.folding.cache.UserCache;
@@ -50,6 +51,7 @@ final class Storage {
     // Stat caches
     private final RetiredTcStatsCache retiredStatsCache = RetiredTcStatsCache.getInstance();
     private final OffsetTcStatsCache offsetTcStatsCache = OffsetTcStatsCache.getInstance();
+    private final TcStatsCache tcStatsCache = TcStatsCache.getInstance();
     private final TotalStatsCache totalStatsCache = TotalStatsCache.getInstance();
 
     private Storage() {
@@ -474,10 +476,10 @@ final class Storage {
      */
     @Cached
     Optional<UserStats> getTotalStats(final int userId) {
-        final Optional<UserStats> optionalTotalStats = totalStatsCache.get(userId);
+        final Optional<UserStats> fromCache = totalStatsCache.get(userId);
 
-        if (optionalTotalStats.isPresent()) {
-            return optionalTotalStats;
+        if (fromCache.isPresent()) {
+            return fromCache;
         }
 
         LOGGER.trace("Cache miss! Total stats");
@@ -519,10 +521,10 @@ final class Storage {
      */
     @Cached
     Optional<OffsetTcStats> getOffsetStats(final int userId) {
-        final Optional<OffsetTcStats> offsetStats = offsetTcStatsCache.get(userId);
+        final Optional<OffsetTcStats> fromCache = offsetTcStatsCache.get(userId);
 
-        if (offsetStats.isPresent()) {
-            return offsetStats;
+        if (fromCache.isPresent()) {
+            return fromCache;
         }
 
         LOGGER.trace("Cache miss! Offset stats");
@@ -555,5 +557,58 @@ final class Storage {
     void deleteAllOffsetStats() {
         DB_MANAGER.deleteAllOffsetStats();
         offsetTcStatsCache.removeAll();
+    }
+
+    /**
+     * Creates a {@link UserTcStats} for a {@link User}'s <code>Team Competition</code> stats for a specific hour.
+     *
+     * <p>
+     * Persists it with the {@link DbManager}, then adds it to the {@link TcStatsCache}.
+     *
+     * @param userTcStats the {@link UserTcStats} to be created
+     * @return an {@link Optional} of the created {@link UserTcStats}
+     */
+    @Cached
+    Optional<UserTcStats> createHourlyTcStats(final UserTcStats userTcStats) {
+        final Optional<UserTcStats> fromDb = DB_MANAGER.persistHourlyTcStats(userTcStats);
+        fromDb.ifPresent(stats -> tcStatsCache.add(userTcStats.getUserId(), stats));
+        return fromDb;
+    }
+
+    /**
+     * Retrieves the latest {@link UserTcStats} for the provided {@link User}.
+     *
+     * <p>
+     * First attempts to retrieve from {@link TcStatsCache}, then if none exists, attempts to retrieve from the
+     * {@link DbManager}.
+     *
+     * @param userId the ID of the {@link User} whose {@link UserTcStats} are to be retrieved
+     * @return an {@link Optional} of the retrieved {@link UserTcStats}
+     */
+    @Cached
+    Optional<UserTcStats> getHourlyTcStats(final int userId) {
+        final Optional<UserTcStats> fromCache = tcStatsCache.get(userId);
+
+        if (fromCache.isPresent()) {
+            return fromCache;
+        }
+
+        LOGGER.trace("Cache miss! Offset stats");
+        final Optional<UserTcStats> fromDb = DB_MANAGER.getHourlyTcStats(userId);
+        fromDb.ifPresent(userTcStats -> tcStatsCache.add(userId, userTcStats));
+        return fromDb;
+    }
+
+    /**
+     * Retrieves the first {@link UserTcStats} for any users in the system.
+     *
+     * <p>
+     * We want to check the status of the system, so we do not go to the {@link TcStatsCache}, and instead go directly though {@link DbManager}.
+     *
+     * @return an {@link Optional} of the first {@link UserTcStats}
+     */
+    @NotCached
+    Optional<UserTcStats> getFirstHourlyTcStats() {
+        return DB_MANAGER.getFirstHourlyTcStats();
     }
 }

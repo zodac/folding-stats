@@ -313,8 +313,8 @@ class PostgresDbManagerTest {
 
     @Test
     void hourlyTcStatsTest() {
-        assertThat(POSTGRES_DB_MANAGER.isAnyHourlyTcStats())
-            .isFalse();
+        assertThat(POSTGRES_DB_MANAGER.getFirstHourlyTcStats())
+            .isEmpty();
 
         final int userId = createUser().getId();
         assertThat(POSTGRES_DB_MANAGER.getHourlyTcStats(userId))
@@ -334,8 +334,8 @@ class PostgresDbManagerTest {
         assertThat(actual)
             .isEqualTo(userTcStats);
 
-        assertThat(POSTGRES_DB_MANAGER.isAnyHourlyTcStats())
-            .isTrue();
+        assertThat(POSTGRES_DB_MANAGER.getFirstHourlyTcStats())
+            .isPresent();
     }
 
     @Test

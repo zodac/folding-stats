@@ -7,13 +7,11 @@ import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.SystemState;
-import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.util.ExecutionType;
-import me.zodac.folding.db.DbManagerRetriever;
 import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.ejb.tc.scheduled.StatsScheduler;
 import org.apache.logging.log4j.LogManager;
@@ -29,7 +27,6 @@ import org.apache.logging.log4j.Logger;
 public class Initialiser {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final DbManager DB_MANAGER = DbManagerRetriever.get();
 
     @EJB
     private BusinessLogic businessLogic;
@@ -49,7 +46,7 @@ public class Initialiser {
      *     <li>Sets the {@link SystemState} to {@link SystemState#AVAILABLE} when complete</li>
      * </ol>
      *
-     * @see DbManager#isAnyHourlyTcStats()
+     * @see BusinessLogic#isAnyHourlyTcStatsExist()
      * @see StatsScheduler#manualTeamCompetitionStatsParsing(ExecutionType)
      */
     @PostConstruct
@@ -78,7 +75,7 @@ public class Initialiser {
     }
 
     private void initTcStats() {
-        if (!DB_MANAGER.isAnyHourlyTcStats()) { // TODO: [zodac] Go through BL
+        if (!businessLogic.isAnyHourlyTcStatsExist()) {
             LOGGER.warn("No TC stats data exists in the DB");
             statsScheduler.manualTeamCompetitionStatsParsing(ExecutionType.ASYNCHRONOUS);
         }

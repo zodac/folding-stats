@@ -294,10 +294,6 @@ public interface BusinessLogic {
     /**
      * Retrieves the {@link OffsetTcStats} for the provided {@link User}.
      *
-     * <p>
-     * If an {@link OffsetTcStats} already exists for the {@link User}, the existing values are updated to be the addition of both
-     * {@link OffsetTcStats}.
-     *
      * @param user the {@link User} whose {@link OffsetTcStats} are to be retrieved
      * @return the {@link OffsetTcStats} for the {@link User}, or {@link OffsetTcStats#empty()} if none can be found
      */
@@ -314,4 +310,27 @@ public interface BusinessLogic {
      * Deletes the {@link OffsetTcStats} for all {@link User}s in the system.
      */
     void deleteAllOffsetStats();
+
+    /**
+     * Creates a {@link UserTcStats} for a {@link User}'s <code>Team Competition</code> stats for a specific hour.
+     *
+     * @param userTcStats the {@link UserTcStats} to be created
+     * @return the created {@link UserTcStats}, or {@link UserTcStats#empty(int)}
+     */
+    UserTcStats createHourlyTcStats(final UserTcStats userTcStats);
+
+    /**
+     * Retrieves the latest {@link UserTcStats} for the provided {@link User}.
+     *
+     * @param user the {@link User} whose {@link UserTcStats} are to be retrieved
+     * @return the {@link UserTcStats} for the {@link User}, or {@link UserTcStats#empty(int)} if none can be found
+     */
+    UserTcStats getHourlyTcStats(final User user);
+
+    /**
+     * Checks if any {@link UserTcStats} for the <code>Team Competition</code> exist in the system.
+     *
+     * @return <code>true</code> if any {@link UserTcStats} have been created
+     */
+    boolean isAnyHourlyTcStatsExist();
 }

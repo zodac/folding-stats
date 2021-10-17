@@ -369,7 +369,7 @@ public final class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public void persistHourlyTcStats(final UserTcStats userTcStats) {
+    public Optional<UserTcStats> persistHourlyTcStats(final UserTcStats userTcStats) {
         LOGGER.debug("Inserting TC stats for user ID: {}", userTcStats::getUserId);
 
         executeQuery(queryContext -> {
@@ -393,6 +393,9 @@ public final class PostgresDbManager implements DbManager {
 
             return query.execute();
         });
+
+        // The DB makes no change to this object, so we simply return the provided one
+        return Optional.of(userTcStats);
     }
 
     @Override
@@ -424,17 +427,22 @@ public final class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public boolean isAnyHourlyTcStats() {
+    public Optional<UserTcStats> getFirstHourlyTcStats() {
         LOGGER.debug("Checking if any TC stats exist in the DB");
 
         return executeQuery(queryContext -> {
             final var query = queryContext
-                .selectCount()
-                .from(USER_TC_STATS_HOURLY);
+                .select()
+                .from(USER_TC_STATS_HOURLY)
+                .limit(SINGLE_RESULT);
             LOGGER.debug("Executing SQL: '{}'", query);
 
-            final Integer count = query.fetchOne(0, Integer.class);
-            return count != null && count > 0;
+            return query
+                .fetch()
+                .into(USER_TC_STATS_HOURLY)
+                .stream()
+                .map(RecordConverter::toUserTcStats)
+                .findAny();
         });
     }
 

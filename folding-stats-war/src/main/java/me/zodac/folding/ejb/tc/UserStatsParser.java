@@ -102,7 +102,9 @@ public class UserStatsParser {
         return UserStats.empty();
     }
 
-    private void calculateAndPersistTcStats(final User user, final Stats initialStats, final OffsetTcStats offsetTcStats,
+    private void calculateAndPersistTcStats(final User user,
+                                            final Stats initialStats,
+                                            final OffsetTcStats offsetTcStats,
                                             final UserStats totalStats) {
         final double hardwareMultiplier = user.getHardware().getMultiplier();
         final long points = Math.max(0, totalStats.getPoints() - initialStats.getPoints());
@@ -116,9 +118,9 @@ public class UserStatsParser {
             () -> formatWithCommas(totalStats.getUnits()));
         LOGGER.debug("{}: {} TC multiplied points (pre-offset) | {} TC units (pre-offset)", user::getDisplayName,
             () -> formatWithCommas(multipliedPoints), () -> formatWithCommas(units));
-        LOGGER.info("{}: {} TC points | {} TC units", user.getDisplayName(), formatWithCommas(hourlyUserTcStats.getMultipliedPoints()),
-            formatWithCommas(hourlyUserTcStats.getUnits()));
 
-        oldFacade.createHourlyTcStatsForUser(hourlyUserTcStats);
+        final UserTcStats createdHourlyTcStats = businessLogic.createHourlyTcStats(hourlyUserTcStats);
+        LOGGER.info("{}: {} TC points | {} TC units", user.getDisplayName(), formatWithCommas(createdHourlyTcStats.getMultipliedPoints()),
+            formatWithCommas(createdHourlyTcStats.getUnits()));
     }
 }

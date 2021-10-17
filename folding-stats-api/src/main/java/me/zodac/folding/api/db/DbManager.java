@@ -60,9 +60,11 @@ public interface DbManager {
 
     // TC operations
 
-    void persistHourlyTcStats(final UserTcStats userTcStats);
+    Optional<UserTcStats> persistHourlyTcStats(final UserTcStats userTcStats);
 
-    boolean isAnyHourlyTcStats();
+    Optional<UserTcStats> getHourlyTcStats(final int userId);
+
+    Optional<UserTcStats> getFirstHourlyTcStats();
 
     // Historic TC operations
 
@@ -75,8 +77,6 @@ public interface DbManager {
     void persistInitialStats(final UserStats userStats);
 
     Optional<UserStats> getInitialStats(final int userId);
-
-    Optional<UserTcStats> getHourlyTcStats(final int userId);
 
     Optional<UserStats> createTotalStats(final UserStats stats);
 
