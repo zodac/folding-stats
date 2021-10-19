@@ -11,7 +11,6 @@ import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
 import me.zodac.folding.api.tc.Hardware;
-import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
@@ -83,14 +82,14 @@ public class OldFacade {
         dbManager.updateUser(updatedUser);
         userCache.add(updatedUser.getId(), updatedUser);
 
-        if (!existingUser.getHardware().equals(updatedUser.getHardware())) {
+        if (existingUser.getHardware().getId() != updatedUser.getHardware().getId()) {
             LOGGER.debug("User '{}' (ID: {}) had state change to hardware, {} -> {}, recalculating initial stats", existingUser.getDisplayName(),
                 existingUser.getId(), existingUser.getHardware(), updatedUser.getHardware());
             handleStateChangeForUser(updatedUser);
             return updatedUser;
         }
 
-        if (!existingUser.getTeam().equals(updatedUser.getTeam())) {
+        if (existingUser.getTeam().getId() != updatedUser.getTeam().getId()) {
             LOGGER.debug("User '{}' (ID: {}) had state change to team, {} -> {}, recalculating initial stats", existingUser.getDisplayName(),
                 existingUser.getId(), existingUser.getTeam(), updatedUser.getTeam());
             handleStateChangeForUser(updatedUser);
@@ -151,9 +150,9 @@ public class OldFacade {
             return;
         }
 
-        final Team team = user.getTeam();
-        final RetiredUserTcStats retiredUserTcStats = businessLogic.createRetiredUser(team, user, userStats);
+        final RetiredUserTcStats retiredUserTcStats = RetiredUserTcStats.createWithoutId(user.getTeam().getId(), user.getDisplayName(), userStats);
+        final RetiredUserTcStats createdRetiredUserTcStats = businessLogic.createRetiredUserStats(retiredUserTcStats);
         LOGGER.info("User '{}' (ID: {}) retired with retired stats ID: {}", user.getDisplayName(), user.getId(),
-            retiredUserTcStats.getRetiredUserId());
+            createdRetiredUserTcStats.getRetiredUserId());
     }
 }

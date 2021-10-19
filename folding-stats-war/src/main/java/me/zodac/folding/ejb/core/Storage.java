@@ -1,6 +1,5 @@
 package me.zodac.folding.ejb.core;
 
-import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
@@ -11,6 +10,7 @@ import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.result.MonthlyResult;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
@@ -308,31 +308,31 @@ final class Storage {
     }
 
     /**
-     * Creates a monthly result for the <code>Team Competition</code>.
+     * Creates a {@link MonthlyResult} for the <code>Team Competition</code>.
      *
      * <p>
      * Persists it with the {@link DbManager}, but does not cache it.
      *
-     * @param monthlyResult the result for a month of the <code>Team Competition</code>
-     * @param utcTimestamp  the {@link java.time.ZoneOffset#UTC} timestamp for the result
+     * @param monthlyResult a {@link MonthlyResult} for the <code>Team Competition</code>
+     * @return the <code>Team Competition</code> {@link MonthlyResult}
      */
     @NotCached
-    void createMonthlyResult(final String monthlyResult, final LocalDateTime utcTimestamp) {
-        DB_MANAGER.createMonthlyResult(monthlyResult, utcTimestamp);
+    MonthlyResult createMonthlyResult(final MonthlyResult monthlyResult) {
+        return DB_MANAGER.createMonthlyResult(monthlyResult);
     }
 
     /**
-     * Retrieves the result of the <code>Team Competition</code> for the given {@link Month} and {@link Year}.
+     * Retrieves the {@link MonthlyResult} of the <code>Team Competition</code> for the given {@link Month} and {@link Year}.
      *
      * <p>
      * Since these values are not cached, we go directly to the {@link DbManager} to retrieve it.
      *
-     * @param month the {@link Month} of the result to be retrieved
-     * @param year  the {@link Year} of the result to be retrieved
-     * @return an {@link Optional} of the <code>Team Competition</code> result
+     * @param month the {@link Month} of the {@link MonthlyResult} to be retrieved
+     * @param year  the {@link Year} of the {@link MonthlyResult} to be retrieved
+     * @return an {@link Optional} of the <code>Team Competition</code> {@link MonthlyResult}
      */
     @NotCached
-    Optional<String> getMonthlyResult(final Month month, final Year year) {
+    Optional<MonthlyResult> getMonthlyResult(final Month month, final Year year) {
         return DB_MANAGER.getMonthlyResult(month, year);
     }
 
@@ -342,19 +342,14 @@ final class Storage {
      * <p>
      * Persists it with the {@link DbManager}, then adds it to the {@link RetiredTcStatsCache}.
      *
-     * @param teamId          the ID of the {@link Team} that the {@link User} has been deleted from
-     * @param userId          the ID of the {@link User} who is being deleted
-     * @param userDisplayName the display name of the {@link User} who is being deleted
-     * @param userTcStats     the {@link UserTcStats} at the time of deletion
+     * @param retiredUserTcStats the {@link RetiredUserTcStats} for the deleted {@link User}
      * @return the {@link RetiredUserTcStats}
      */
     @Cached(RetiredTcStatsCache.class)
-    RetiredUserTcStats createRetiredUser(final int teamId, final int userId, final String userDisplayName, final UserTcStats userTcStats) {
-        final int retiredUserId = DB_MANAGER.createRetiredUserStats(teamId, userId, userDisplayName, userTcStats);
-        final RetiredUserTcStats retiredUserTcStats = RetiredUserTcStats.create(retiredUserId, teamId, userDisplayName, userTcStats);
-
-        retiredStatsCache.add(retiredUserId, retiredUserTcStats);
-        return retiredUserTcStats;
+    RetiredUserTcStats createRetiredUserStats(final RetiredUserTcStats retiredUserTcStats) {
+        final RetiredUserTcStats createdRetiredUserTcStats = DB_MANAGER.createRetiredUserStats(retiredUserTcStats);
+        retiredStatsCache.add(createdRetiredUserTcStats.getRetiredUserId(), createdRetiredUserTcStats);
+        return createdRetiredUserTcStats;
     }
 
     /**
@@ -456,12 +451,12 @@ final class Storage {
      * Persists it with the {@link DbManager}, then adds it to the {@link TotalStatsCache}.
      *
      * @param userStats the {@link UserStats} to be created
-     * @return an {@link Optional} of the created {@link UserStats}
+     * @return the created {@link UserStats}
      */
     @Cached(TotalStatsCache.class)
-    Optional<UserStats> createTotalStats(final UserStats userStats) {
-        final Optional<UserStats> fromDb = DB_MANAGER.createTotalStats(userStats);
-        fromDb.ifPresent(stats -> totalStatsCache.add(stats.getUserId(), stats));
+    UserStats createTotalStats(final UserStats userStats) {
+        final UserStats fromDb = DB_MANAGER.createTotalStats(userStats);
+        totalStatsCache.add(fromDb.getUserId(), fromDb);
         return fromDb;
     }
 
@@ -501,12 +496,12 @@ final class Storage {
      *
      * @param userId        the ID of the {@link User} for whom the {@link OffsetTcStats} are being created
      * @param offsetTcStats the {@link OffsetTcStats} to be created
-     * @return an {@link Optional} of the created/updated {@link OffsetTcStats}
+     * @return the created/updated {@link OffsetTcStats}, or {@link OffsetTcStats#empty()}
      */
     @Cached(OffsetTcStatsCache.class)
-    Optional<OffsetTcStats> createOrUpdateOffsetStats(final int userId, final OffsetTcStats offsetTcStats) {
-        final Optional<OffsetTcStats> fromDb = DB_MANAGER.createOrUpdateOffsetStats(userId, offsetTcStats);
-        fromDb.ifPresent(stats -> offsetTcStatsCache.add(userId, stats));
+    OffsetTcStats createOrUpdateOffsetStats(final int userId, final OffsetTcStats offsetTcStats) {
+        final OffsetTcStats fromDb = DB_MANAGER.createOrUpdateOffsetStats(userId, offsetTcStats);
+        offsetTcStatsCache.add(userId, fromDb);
         return fromDb;
     }
 
@@ -567,12 +562,12 @@ final class Storage {
      * Persists it with the {@link DbManager}, then adds it to the {@link TcStatsCache}.
      *
      * @param userTcStats the {@link UserTcStats} to be created
-     * @return an {@link Optional} of the created {@link UserTcStats}
+     * @return the created {@link UserTcStats}
      */
     @Cached(TcStatsCache.class)
-    Optional<UserTcStats> createHourlyTcStats(final UserTcStats userTcStats) {
-        final Optional<UserTcStats> fromDb = DB_MANAGER.persistHourlyTcStats(userTcStats);
-        fromDb.ifPresent(stats -> tcStatsCache.add(userTcStats.getUserId(), stats));
+    UserTcStats createHourlyTcStats(final UserTcStats userTcStats) {
+        final UserTcStats fromDb = DB_MANAGER.createHourlyTcStats(userTcStats);
+        tcStatsCache.add(userTcStats.getUserId(), fromDb);
         return fromDb;
     }
 
@@ -619,12 +614,12 @@ final class Storage {
      * Persists it with the {@link DbManager}, then adds it to the {@link InitialStatsCache}.
      *
      * @param userStats the {@link UserStats} to be created
-     * @return am {@link Optional} of the created {@link UserStats}
+     * @return the created {@link UserStats}
      */
     @Cached(InitialStatsCache.class)
-    Optional<UserStats> createInitialStats(final UserStats userStats) {
-        final Optional<UserStats> fromDb = DB_MANAGER.createInitialStats(userStats);
-        fromDb.ifPresent(stats -> initialStatsCache.add(stats.getUserId(), stats));
+    UserStats createInitialStats(final UserStats userStats) {
+        final UserStats fromDb = DB_MANAGER.createInitialStats(userStats);
+        initialStatsCache.add(fromDb.getUserId(), fromDb);
         return fromDb;
     }
 

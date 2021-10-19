@@ -2,7 +2,6 @@ package me.zodac.folding.rest.validator;
 
 import static java.util.stream.Collectors.toList;
 
-import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
@@ -15,6 +14,7 @@ import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.result.MonthlyResult;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
@@ -168,17 +168,17 @@ final class MockBusinessLogic implements BusinessLogic {
     }
 
     @Override
-    public void createMonthlyResult(final String monthlyResult, final LocalDateTime utcTimestamp) {
-
+    public MonthlyResult createMonthlyResult(final MonthlyResult monthlyResult) {
+        return MonthlyResult.empty();
     }
 
     @Override
-    public Optional<String> getMonthlyResult(final Month month, final Year year) {
+    public Optional<MonthlyResult> getMonthlyResult(final Month month, final Year year) {
         return Optional.empty();
     }
 
     @Override
-    public RetiredUserTcStats createRetiredUser(final Team team, final User user, final UserTcStats userTcStats) {
+    public RetiredUserTcStats createRetiredUserStats(final RetiredUserTcStats retiredUserTcStats) {
         return RetiredUserTcStats.empty();
     }
 

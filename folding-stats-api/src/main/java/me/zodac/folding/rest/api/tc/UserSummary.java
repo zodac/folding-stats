@@ -89,6 +89,7 @@ public class UserSummary {
      * @param units            the units of the {@link me.zodac.folding.api.tc.User}
      * @return the created {@link UserSummary}
      */
+    // TODO: [zodac] Use User here?
     public static UserSummary createWithDefaultRank(final int id,
                                                     final String displayName,
                                                     final String foldingName,

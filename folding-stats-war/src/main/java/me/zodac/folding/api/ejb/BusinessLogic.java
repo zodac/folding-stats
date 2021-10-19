@@ -1,6 +1,5 @@
 package me.zodac.folding.api.ejb;
 
-import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
@@ -9,6 +8,7 @@ import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.result.MonthlyResult;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
@@ -176,31 +176,29 @@ public interface BusinessLogic {
     Optional<User> getUserWithFoldingUserNameAndPasskey(final String foldingUserName, final String passkey);
 
     /**
-     * Creates a monthly result for the <code>Team Competition</code>.
+     * Creates a {@link MonthlyResult} for the <code>Team Competition</code>.
      *
-     * @param monthlyResult the result for a month of the <code>Team Competition</code>
-     * @param utcTimestamp  the {@link java.time.ZoneOffset#UTC} timestamp for the result
+     * @param monthlyResult a {@link MonthlyResult} for the <code>Team Competition</code>
+     * @return the <code>Team Competition</code> {@link MonthlyResult}
      */
-    void createMonthlyResult(final String monthlyResult, final LocalDateTime utcTimestamp);
+    MonthlyResult createMonthlyResult(final MonthlyResult monthlyResult);
 
     /**
-     * Retrieves the result of the <code>Team Competition</code> for the provided {@link Month} and {@link Year}.
+     * Retrieves the {@link MonthlyResult} of the <code>Team Competition</code> for the provided {@link Month} and {@link Year}.
      *
-     * @param month the {@link Month} of the result to be retrieved
-     * @param year  the {@link Year} of the result to be retrieved
-     * @return an {@link Optional} of the <code>Team Competition</code> result
+     * @param month the {@link Month} of the {@link MonthlyResult} to be retrieved
+     * @param year  the {@link Year} of the {@link MonthlyResult} to be retrieved
+     * @return an {@link Optional} of the <code>Team Competition</code> {@link MonthlyResult}
      */
-    Optional<String> getMonthlyResult(final Month month, final Year year);
+    Optional<MonthlyResult> getMonthlyResult(final Month month, final Year year);
 
     /**
      * Creates a {@link RetiredUserTcStats} for a {@link User} that has been deleted from a {@link Team}.
      *
-     * @param team        the {@link Team} that the {@link User} has been deleted from
-     * @param user        the {@link User} who is being deleted
-     * @param userTcStats the {@link UserTcStats} at the time of deletion
+     * @param retiredUserTcStats the {@link RetiredUserTcStats} for the deleted {@link User}
      * @return the {@link RetiredUserTcStats}
      */
-    RetiredUserTcStats createRetiredUser(final Team team, final User user, final UserTcStats userTcStats);
+    RetiredUserTcStats createRetiredUserStats(final RetiredUserTcStats retiredUserTcStats);
 
     /**
      * Retrieves all {@link RetiredUserTcStats} for the provided {@link Team}.
@@ -261,7 +259,7 @@ public interface BusinessLogic {
      * Creates a {@link UserStats} for the total overall stats for the provided {@link User}.
      *
      * @param userStats the {@link UserStats} to be created
-     * @return the created {@link UserStats}, or {@link UserStats#empty()}
+     * @return the created {@link UserStats}
      */
     UserStats createTotalStats(final UserStats userStats);
 
@@ -305,7 +303,7 @@ public interface BusinessLogic {
      * Creates a {@link UserTcStats} for a {@link User}'s <code>Team Competition</code> stats for a specific hour.
      *
      * @param userTcStats the {@link UserTcStats} to be created
-     * @return the created {@link UserTcStats}, or {@link UserTcStats#empty(int)}
+     * @return the created {@link UserTcStats}
      */
     UserTcStats createHourlyTcStats(final UserTcStats userTcStats);
 
@@ -328,7 +326,7 @@ public interface BusinessLogic {
      * Creates a {@link UserStats} for the initial overall stats for the provided {@link User} at the start of the monitoring period.
      *
      * @param userStats the {@link UserStats} to be created
-     * @return the created {@link UserStats}, or {@link UserStats#empty()}
+     * @return the created {@link UserStats}
      */
     UserStats createInitialStats(final UserStats userStats);
 

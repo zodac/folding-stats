@@ -744,7 +744,7 @@ traits:
             404:
               description: "No team exists with the given ID"
 
-/login/admin/:
+/login/admin:
   post:
     description: "Accepts user credentials and verifies whether they have admin access to the system"
     body:
@@ -765,7 +765,7 @@ traits:
       503:
         description: "The system is not in a valid state to execute write requests"
 
-/debug/:
+/debug:
   /caches:
     is: [ "adminOnly" ]
     get:

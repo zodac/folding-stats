@@ -2,7 +2,6 @@ package me.zodac.folding.ejb.core;
 
 import static java.util.stream.Collectors.toList;
 
-import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
@@ -13,6 +12,7 @@ import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.result.MonthlyResult;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
@@ -150,18 +150,18 @@ public class BusinessLogicEjb implements BusinessLogic {
     }
 
     @Override
-    public void createMonthlyResult(final String monthlyResult, final LocalDateTime utcTimestamp) {
-        STORAGE.createMonthlyResult(monthlyResult, utcTimestamp);
+    public MonthlyResult createMonthlyResult(final MonthlyResult monthlyResult) {
+        return STORAGE.createMonthlyResult(monthlyResult);
     }
 
     @Override
-    public Optional<String> getMonthlyResult(final Month month, final Year year) {
+    public Optional<MonthlyResult> getMonthlyResult(final Month month, final Year year) {
         return STORAGE.getMonthlyResult(month, year);
     }
 
     @Override
-    public RetiredUserTcStats createRetiredUser(final Team team, final User user, final UserTcStats userTcStats) {
-        return STORAGE.createRetiredUser(team.getId(), user.getId(), user.getDisplayName(), userTcStats);
+    public RetiredUserTcStats createRetiredUserStats(final RetiredUserTcStats retiredUserTcStats) {
+        return STORAGE.createRetiredUserStats(retiredUserTcStats);
     }
 
     @Override
@@ -217,8 +217,7 @@ public class BusinessLogicEjb implements BusinessLogic {
 
     @Override
     public UserStats createTotalStats(final UserStats userStats) {
-        return STORAGE.createTotalStats(userStats)
-            .orElse(UserStats.empty());
+        return STORAGE.createTotalStats(userStats);
     }
 
     @Override
@@ -229,8 +228,7 @@ public class BusinessLogicEjb implements BusinessLogic {
 
     @Override
     public OffsetTcStats createOrUpdateOffsetStats(final User user, final OffsetTcStats offsetTcStats) {
-        return STORAGE.createOrUpdateOffsetStats(user.getId(), offsetTcStats)
-            .orElse(OffsetTcStats.empty());
+        return STORAGE.createOrUpdateOffsetStats(user.getId(), offsetTcStats);
     }
 
     @Override
@@ -246,8 +244,7 @@ public class BusinessLogicEjb implements BusinessLogic {
 
     @Override
     public UserTcStats createHourlyTcStats(final UserTcStats userTcStats) {
-        return STORAGE.createHourlyTcStats(userTcStats)
-            .orElse(UserTcStats.empty(userTcStats.getUserId()));
+        return STORAGE.createHourlyTcStats(userTcStats);
     }
 
     @Override
@@ -263,8 +260,7 @@ public class BusinessLogicEjb implements BusinessLogic {
 
     @Override
     public UserStats createInitialStats(final UserStats userStats) {
-        return STORAGE.createInitialStats(userStats)
-            .orElse(UserStats.empty());
+        return STORAGE.createInitialStats(userStats);
     }
 
     @Override

@@ -5,11 +5,7 @@
 <!--
     Checkstyle suppression configuration file to exclude classes/rules
 -->
-
 <suppressions>
-    <!-- TODO: [zodac] Re-enable after adding Javadoc -->
-    <suppress files="DbManager\.java" checks=".*"/>
-
     <!-- Ignore generated files -->
     <suppress files="[\\/]gen[\\/]" checks=".*"/>
 </suppressions>

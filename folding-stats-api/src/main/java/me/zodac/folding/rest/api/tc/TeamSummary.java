@@ -63,6 +63,7 @@ public class TeamSummary {
      * @param retiredUsers    the retired {@link me.zodac.folding.api.tc.User} {@link RetiredUserSummary}
      * @return the created {@link TeamSummary}
      */
+    // TODO: [zodac] Use Team here for first 3 params?
     public static TeamSummary createWithDefaultRank(final String teamName,
                                                     final String teamDescription,
                                                     final String forumLink,

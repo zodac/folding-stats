@@ -5,6 +5,9 @@ import static me.zodac.folding.db.postgres.gen.tables.SystemUsers.SYSTEM_USERS;
 import static me.zodac.folding.db.postgres.gen.tables.Teams.TEAMS;
 import static me.zodac.folding.db.postgres.gen.tables.Users.USERS;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import java.time.LocalDateTime;
 import java.util.Set;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.tc.Category;
@@ -13,6 +16,7 @@ import me.zodac.folding.api.tc.HardwareMake;
 import me.zodac.folding.api.tc.HardwareType;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.result.MonthlyResult;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
@@ -28,12 +32,18 @@ import me.zodac.folding.db.postgres.gen.tables.records.UserTcStatsHourlyRecord;
 import me.zodac.folding.db.postgres.gen.tables.records.UserTotalStatsRecord;
 import me.zodac.folding.db.postgres.gen.tables.records.UsersRecord;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
+import me.zodac.folding.rest.util.LocalDateTimeGsonTypeAdapter;
 import org.jooq.Record;
 
 /**
  * Utility class that converts a {@link Record} into another POJO for {@link PostgresDbManager}.
  */
 final class RecordConverter {
+
+    static final Gson MONTHLY_RESULT_GSON = new GsonBuilder()
+        .registerTypeAdapter(LocalDateTime.class, LocalDateTimeGsonTypeAdapter.getInstance())
+        .disableHtmlEscaping()
+        .create();
 
     private RecordConverter() {
 
@@ -194,13 +204,14 @@ final class RecordConverter {
     }
 
     /**
-     * Convert a {@link MonthlyResultsRecord} into a {@link String} containing the monthly result.
+     * Convert a {@link MonthlyResultsRecord} into a {@link MonthlyResult}.
      *
      * @param monthlyResultsRecord the {@link MonthlyResultsRecord} to convert
-     * @return the converted {@link String}
+     * @return the converted {@link MonthlyResult}
      */
-    static String toMonthlyResults(final MonthlyResultsRecord monthlyResultsRecord) {
-        return monthlyResultsRecord.getJsonResult();
+    static MonthlyResult toMonthlyResult(final MonthlyResultsRecord monthlyResultsRecord) {
+        final MonthlyResult monthlyResult = MONTHLY_RESULT_GSON.fromJson(monthlyResultsRecord.getJsonResult(), MonthlyResult.class);
+        return MonthlyResult.updateWithEmptyCategories(monthlyResult);
     }
 
     /**

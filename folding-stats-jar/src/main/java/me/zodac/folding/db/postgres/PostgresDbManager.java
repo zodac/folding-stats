@@ -1,6 +1,7 @@
 package me.zodac.folding.db.postgres;
 
 import static java.util.stream.Collectors.toList;
+import static me.zodac.folding.db.postgres.RecordConverter.MONTHLY_RESULT_GSON;
 import static me.zodac.folding.db.postgres.gen.Routines.crypt;
 import static me.zodac.folding.db.postgres.gen.tables.Hardware.HARDWARE;
 import static me.zodac.folding.db.postgres.gen.tables.MonthlyResults.MONTHLY_RESULTS;
@@ -39,24 +40,22 @@ import me.zodac.folding.api.exception.DatabaseConnectionException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.result.MonthlyResult;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.api.util.DateTimeUtils;
-import me.zodac.folding.db.postgres.gen.tables.records.HardwareRecord;
-import me.zodac.folding.db.postgres.gen.tables.records.TeamsRecord;
-import me.zodac.folding.db.postgres.gen.tables.records.UsersRecord;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jooq.DSLContext;
-import org.jooq.Result;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 
 /**
  * Implementation of {@link DbManager} for PostgreSQL databases.
+ *
  * <p>
  * Uses <b>jOOQ</b> for code generation for the DB tables/schemas, rather than direct SQL queries. See existing methods for examples.
  */
@@ -105,8 +104,10 @@ public final class PostgresDbManager implements DbManager {
                 .returning(HARDWARE.HARDWARE_ID);
             LOGGER.debug("Executing SQL: '{}'", query);
 
-            final Result<HardwareRecord> hardwareRecordResult = query.fetch();
-            final int hardwareId = hardwareRecordResult.get(0).getHardwareId();
+            final int hardwareId = query
+                .fetch()
+                .get(0)
+                .getHardwareId();
             return Hardware.updateWithId(hardwareId, hardware);
         });
     }
@@ -187,8 +188,10 @@ public final class PostgresDbManager implements DbManager {
                 .returning(TEAMS.TEAM_ID);
             LOGGER.debug("Executing SQL: '{}'", query);
 
-            final Result<TeamsRecord> teamRecordResult = query.fetch();
-            final int teamId = teamRecordResult.get(0).getTeamId();
+            final int teamId = query
+                .fetch()
+                .get(0)
+                .getTeamId();
             return Team.updateWithId(teamId, team);
         });
     }
@@ -287,8 +290,10 @@ public final class PostgresDbManager implements DbManager {
                 .returning(USERS.USER_ID);
             LOGGER.debug("Executing SQL: '{}'", query);
 
-            final Result<UsersRecord> usersRecordResult = query.fetch();
-            final int userId = usersRecordResult.get(0).getUserId();
+            final int userId = query
+                .fetch()
+                .get(0)
+                .getUserId();
             return User.updateWithId(userId, user);
         });
     }
@@ -369,7 +374,7 @@ public final class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public Optional<UserTcStats> persistHourlyTcStats(final UserTcStats userTcStats) {
+    public UserTcStats createHourlyTcStats(final UserTcStats userTcStats) {
         LOGGER.debug("Inserting TC stats for user ID: {}", userTcStats::getUserId);
 
         executeQuery(queryContext -> {
@@ -395,7 +400,7 @@ public final class PostgresDbManager implements DbManager {
         });
 
         // The DB makes no change to this object, so we simply return the provided one
-        return Optional.of(userTcStats);
+        return userTcStats;
     }
 
     @Override
@@ -451,15 +456,15 @@ public final class PostgresDbManager implements DbManager {
         LOGGER.debug("Getting historic hourly user TC stats for {}/{}/{} for user {}", () -> year, () -> DateTimeUtils.formatMonth(month), () -> day,
             () -> userId);
 
-        final String selectSqlStatement = "SELECT MAX(utc_timestamp) AS hourly_timestamp, " +
-            "COALESCE(MAX(tc_points) - LAG(MAX(tc_points)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points, " +
-            "COALESCE(MAX(tc_points_multiplied) - LAG(MAX(tc_points_multiplied)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points_multiplied, " +
-            "COALESCE(MAX(tc_units) - LAG(MAX(tc_units)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_units " +
-            "FROM user_tc_stats_hourly " +
-            "WHERE utc_timestamp BETWEEN ? AND ? " +
-            "AND user_id = ? " +
-            "GROUP BY EXTRACT(HOUR FROM utc_timestamp) " +
-            "ORDER BY EXTRACT(HOUR FROM utc_timestamp) ASC";
+        final String selectSqlStatement = "SELECT MAX(utc_timestamp) AS hourly_timestamp, "
+            + "COALESCE(MAX(tc_points) - LAG(MAX(tc_points)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points, "
+            + "COALESCE(MAX(tc_points_multiplied) - LAG(MAX(tc_points_multiplied)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points_multiplied, "
+            + "COALESCE(MAX(tc_units) - LAG(MAX(tc_units)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_units "
+            + "FROM user_tc_stats_hourly "
+            + "WHERE utc_timestamp BETWEEN ? AND ? "
+            + "AND user_id = ? "
+            + "GROUP BY EXTRACT(HOUR FROM utc_timestamp) "
+            + "ORDER BY EXTRACT(HOUR FROM utc_timestamp) ASC";
 
         try (final Connection connection = dbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
@@ -549,7 +554,6 @@ public final class PostgresDbManager implements DbManager {
             final LocalDateTime start = DateTimeUtils.getLocalDateTimeOf(year, month, day, 23, 0, 0);
             final LocalDateTime end = DateTimeUtils.getLocalDateTimeOf(year, month, day, 23, 59, 59);
 
-
             final var query = queryContext
                 .select(
                     max(USER_TC_STATS_HOURLY.USER_ID).as(USER_TC_STATS_HOURLY.USER_ID),
@@ -576,7 +580,6 @@ public final class PostgresDbManager implements DbManager {
         });
     }
 
-
     private UserTcStats getTcStatsForFirstHourOfDay(final int userId, final Year year, final Month month, final int day) {
         final UserTcStats firstHourTcStatsCurrentDay = getCurrentDayFirstHourTcStats(userId, day, month, year);
 
@@ -591,8 +594,8 @@ public final class PostgresDbManager implements DbManager {
                 return UserTcStats.empty(userId);
             }
 
-
-            // If no stats in previous day (meaning we are getting historic stats for the first day available), we need to remove the initial points from the current day's points
+            // If no stats in previous day (meaning we are getting historic stats for the first day available),
+            // we need to remove the initial points from the current day's points
             final UserStats initialStats = getInitialStats(userId).orElse(UserStats.empty());
             LOGGER.debug("Removing initial stats from current day's first hour stats: {} - {}", firstHourTcStatsCurrentDay, initialStats);
 
@@ -629,21 +632,20 @@ public final class PostgresDbManager implements DbManager {
         );
     }
 
-
     @Override
     public Collection<HistoricStats> getHistoricStatsDaily(final int userId, final Year year, final Month month) {
         LOGGER.debug("Getting historic daily user TC stats for {}/{} for user {}", () -> DateTimeUtils.formatMonth(month), () -> year, () -> userId);
 
-        final String selectSqlStatement = "SELECT utc_timestamp::DATE AS daily_timestamp, " +
-            "COALESCE(MAX(tc_points) - LAG(MAX(tc_points)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points, " +
-            "COALESCE(MAX(tc_points_multiplied) - LAG(MAX(tc_points_multiplied)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points_multiplied, " +
-            "COALESCE(MAX(tc_units) - LAG(MAX(tc_units)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_units " +
-            "FROM user_tc_stats_hourly " +
-            "WHERE EXTRACT(MONTH FROM utc_timestamp) = ? " +
-            "AND EXTRACT(YEAR FROM utc_timestamp) = ? " +
-            "AND user_id = ? " +
-            "GROUP BY utc_timestamp::DATE " +
-            "ORDER BY utc_timestamp::DATE ASC;";
+        final String selectSqlStatement = "SELECT utc_timestamp::DATE AS daily_timestamp, "
+            + "COALESCE(MAX(tc_points) - LAG(MAX(tc_points)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points, "
+            + "COALESCE(MAX(tc_points_multiplied) - LAG(MAX(tc_points_multiplied)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points_multiplied, "
+            + "COALESCE(MAX(tc_units) - LAG(MAX(tc_units)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_units "
+            + "FROM user_tc_stats_hourly "
+            + "WHERE EXTRACT(MONTH FROM utc_timestamp) = ? "
+            + "AND EXTRACT(YEAR FROM utc_timestamp) = ? "
+            + "AND user_id = ? "
+            + "GROUP BY utc_timestamp::DATE "
+            + "ORDER BY utc_timestamp::DATE ASC;";
 
         try (final Connection connection = dbConnectionPool.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
@@ -748,7 +750,7 @@ public final class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public Optional<UserStats> createInitialStats(final UserStats userStats) {
+    public UserStats createInitialStats(final UserStats userStats) {
         LOGGER.debug("Inserting initial stats for user {} to DB", userStats::getUserId);
 
         executeQuery(queryContext -> {
@@ -770,8 +772,7 @@ public final class PostgresDbManager implements DbManager {
             return query.execute();
         });
 
-        // The DB makes no change to this object, so we simply return the provided one
-        return Optional.of(userStats);
+        return userStats;
     }
 
     @Override
@@ -797,7 +798,7 @@ public final class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public Optional<UserStats> createTotalStats(final UserStats userStats) {
+    public UserStats createTotalStats(final UserStats userStats) {
         LOGGER.debug("Inserting total stats for user ID {} to DB", userStats::getUserId);
 
         executeQuery(queryContext -> {
@@ -812,7 +813,7 @@ public final class PostgresDbManager implements DbManager {
         });
 
         // The DB makes no change to this object, so we simply return the provided one
-        return Optional.of(userStats);
+        return userStats;
     }
 
     @Override
@@ -838,7 +839,7 @@ public final class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public Optional<OffsetTcStats> createOrUpdateOffsetStats(final int userId, final OffsetTcStats offsetTcStats) {
+    public OffsetTcStats createOrUpdateOffsetStats(final int userId, final OffsetTcStats offsetTcStats) {
         LOGGER.debug("Adding/updating offset stats for user {}", userId);
 
         return executeQuery(queryContext -> {
@@ -874,7 +875,8 @@ public final class PostgresDbManager implements DbManager {
                 .into(USER_OFFSET_TC_STATS)
                 .stream()
                 .map(RecordConverter::toOffsetStats)
-                .findAny();
+                .findAny()
+                .orElse(OffsetTcStats.empty());
         });
     }
 
@@ -928,8 +930,8 @@ public final class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public int createRetiredUserStats(final int teamId, final int userId, final String displayUserName, final UserTcStats retiredUserStats) {
-        LOGGER.debug("Persisting retired user ID {} for team ID {}", userId, teamId);
+    public RetiredUserTcStats createRetiredUserStats(final RetiredUserTcStats retiredUserTcStats) {
+        LOGGER.debug("Persisting retired user ID {} for team ID {}", retiredUserTcStats.getUserId(), retiredUserTcStats.getTeamId());
 
         return executeQuery(queryContext -> {
             final LocalDateTime currentUtcLocalDateTime = DateTimeUtils.toUtcLocalDateTime(DateTimeUtils.currentUtcTimestamp());
@@ -946,30 +948,30 @@ public final class PostgresDbManager implements DbManager {
                     RETIRED_USER_STATS.FINAL_UNITS
                 )
                 .values(
-                    teamId,
-                    userId,
-                    displayUserName,
+                    retiredUserTcStats.getTeamId(),
+                    retiredUserTcStats.getUserId(),
+                    retiredUserTcStats.getDisplayName(),
                     currentUtcLocalDateTime,
-                    retiredUserStats.getPoints(),
-                    retiredUserStats.getMultipliedPoints(),
-                    retiredUserStats.getUnits()
+                    retiredUserTcStats.getPoints(),
+                    retiredUserTcStats.getMultipliedPoints(),
+                    retiredUserTcStats.getUnits()
                 )
                 .onConflict(RETIRED_USER_STATS.USER_ID)
                 .doUpdate()
-                .set(RETIRED_USER_STATS.TEAM_ID, teamId)
+                .set(RETIRED_USER_STATS.TEAM_ID, retiredUserTcStats.getTeamId())
                 .set(RETIRED_USER_STATS.UTC_TIMESTAMP, currentUtcLocalDateTime)
-                .set(RETIRED_USER_STATS.DISPLAY_USERNAME, displayUserName)
-                .set(RETIRED_USER_STATS.FINAL_POINTS, retiredUserStats.getPoints())
-                .set(RETIRED_USER_STATS.FINAL_MULTIPLIED_POINTS, retiredUserStats.getMultipliedPoints())
-                .set(RETIRED_USER_STATS.FINAL_UNITS, retiredUserStats.getUnits())
+                .set(RETIRED_USER_STATS.DISPLAY_USERNAME, retiredUserTcStats.getDisplayName())
+                .set(RETIRED_USER_STATS.FINAL_POINTS, retiredUserTcStats.getPoints())
+                .set(RETIRED_USER_STATS.FINAL_MULTIPLIED_POINTS, retiredUserTcStats.getMultipliedPoints())
+                .set(RETIRED_USER_STATS.FINAL_UNITS, retiredUserTcStats.getUnits())
                 .returning();
             LOGGER.debug("Executing SQL: '{}'", query);
 
-            return query
+            final int retiredUserId = query
                 .fetch()
-                .into(RETIRED_USER_STATS)
                 .get(0)
                 .getRetiredUserId();
+            return RetiredUserTcStats.updateWithId(retiredUserId, retiredUserTcStats);
         });
     }
 
@@ -1007,23 +1009,29 @@ public final class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public void createMonthlyResult(final String result, final LocalDateTime utcTimestamp) {
-        LOGGER.debug("Persisting monthly result for {}/{}", utcTimestamp::getYear, () -> DateTimeUtils.formatMonth(utcTimestamp.getMonth()));
+    public MonthlyResult createMonthlyResult(final MonthlyResult monthlyResult) {
+        LOGGER.debug("Persisting monthly result for {}/{}",
+            () -> monthlyResult.getUtcTimestamp().getYear(),
+            () -> DateTimeUtils.formatMonth(monthlyResult.getUtcTimestamp().getMonth())
+        );
 
         executeQuery(queryContext -> {
             final var query = queryContext
                 .insertInto(MONTHLY_RESULTS)
                 .columns(MONTHLY_RESULTS.UTC_TIMESTAMP, MONTHLY_RESULTS.JSON_RESULT)
-                .values(utcTimestamp, result);
+                .values(monthlyResult.getUtcTimestamp(), MONTHLY_RESULT_GSON.toJson(monthlyResult));
 
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
         });
+
+        // The DB makes no change to this object, so we simply return the provided one
+        return monthlyResult;
     }
 
     @Override
-    public Optional<String> getMonthlyResult(final Month month, final Year year) {
+    public Optional<MonthlyResult> getMonthlyResult(final Month month, final Year year) {
         LOGGER.debug("Retrieving monthly result for {}/{}", () -> year, () -> DateTimeUtils.formatMonth(month));
 
         return executeQuery(queryContext -> {
@@ -1041,7 +1049,7 @@ public final class PostgresDbManager implements DbManager {
                 .fetch()
                 .into(MONTHLY_RESULTS)
                 .stream()
-                .map(RecordConverter::toMonthlyResults)
+                .map(RecordConverter::toMonthlyResult)
                 .findAny();
         });
     }

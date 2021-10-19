@@ -1,5 +1,6 @@
 package me.zodac.folding.api.tc.result;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +12,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import me.zodac.folding.api.tc.Category;
+import me.zodac.folding.api.util.DateTimeUtils;
 import me.zodac.folding.rest.api.tc.leaderboard.TeamLeaderboardEntry;
 import me.zodac.folding.rest.api.tc.leaderboard.UserCategoryLeaderboardEntry;
 
@@ -26,9 +28,27 @@ public class MonthlyResult {
 
     private final List<TeamLeaderboardEntry> teamLeaderboard;
     private final Map<Category, List<UserCategoryLeaderboardEntry>> userCategoryLeaderboard;
+    private final LocalDateTime utcTimestamp;
 
     /**
      * Creates a {@link MonthlyResult}.
+     *
+     * @param teamLeaderboard         the leaderboard for {@link me.zodac.folding.api.tc.Team}s
+     * @param userCategoryLeaderboard the leaderboard for {@link me.zodac.folding.api.tc.User} {@link Category}s
+     * @param utcTimestamp            the {@link java.time.ZoneOffset#UTC} {@link LocalDateTime} for the {@link MonthlyResult}
+     * @return the created {@link MonthlyResult}
+     */
+    public static MonthlyResult create(final List<TeamLeaderboardEntry> teamLeaderboard,
+                                       final Map<Category, List<UserCategoryLeaderboardEntry>> userCategoryLeaderboard,
+                                       final LocalDateTime utcTimestamp) {
+        return new MonthlyResult(teamLeaderboard, userCategoryLeaderboard, utcTimestamp);
+    }
+
+    /**
+     * Creates a {@link MonthlyResult}.
+     *
+     * <p>
+     * Uses the current {@link java.time.ZoneOffset#UTC} {@link LocalDateTime} from {@link DateTimeUtils#currentUtcDateTime()}.
      *
      * @param teamLeaderboard         the leaderboard for {@link me.zodac.folding.api.tc.Team}s
      * @param userCategoryLeaderboard the leaderboard for {@link me.zodac.folding.api.tc.User} {@link Category}s
@@ -36,7 +56,7 @@ public class MonthlyResult {
      */
     public static MonthlyResult create(final List<TeamLeaderboardEntry> teamLeaderboard,
                                        final Map<Category, List<UserCategoryLeaderboardEntry>> userCategoryLeaderboard) {
-        return new MonthlyResult(teamLeaderboard, userCategoryLeaderboard);
+        return create(teamLeaderboard, userCategoryLeaderboard, DateTimeUtils.currentUtcDateTime().toLocalDateTime());
     }
 
     /**
@@ -77,6 +97,6 @@ public class MonthlyResult {
             }
         }
 
-        return create(monthlyResult.teamLeaderboard, categories);
+        return create(monthlyResult.teamLeaderboard, categories, monthlyResult.utcTimestamp);
     }
 }

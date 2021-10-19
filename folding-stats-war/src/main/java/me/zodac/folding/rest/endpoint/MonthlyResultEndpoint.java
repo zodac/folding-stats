@@ -4,7 +4,6 @@ import static me.zodac.folding.rest.response.Responses.badRequest;
 import static me.zodac.folding.rest.response.Responses.ok;
 import static me.zodac.folding.rest.response.Responses.serverError;
 import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
-import static me.zodac.folding.rest.util.RestUtilConstants.GSON;
 
 import java.time.DateTimeException;
 import java.time.Month;
@@ -59,15 +58,8 @@ public class MonthlyResultEndpoint {
         }
 
         try {
-            final Optional<String> result = businessLogic.getMonthlyResult(Month.of(Integer.parseInt(month)), Year.parse(year));
-
-            if (result.isEmpty()) {
-                return ok(MonthlyResult.empty());
-            }
-
-            final MonthlyResult monthlyResult = GSON.fromJson(result.get(), MonthlyResult.class);
-            final MonthlyResult updatedMonthlyResult = MonthlyResult.updateWithEmptyCategories(monthlyResult);
-            return ok(updatedMonthlyResult);
+            final Optional<MonthlyResult> monthlyResult = businessLogic.getMonthlyResult(Month.of(Integer.parseInt(month)), Year.parse(year));
+            return ok(monthlyResult.orElse(MonthlyResult.empty()));
         } catch (final DateTimeParseException e) {
             final String errorMessage = String.format("The year '%s' is not a valid format", year);
             LOGGER.debug(errorMessage, e);

@@ -6,10 +6,12 @@ import static me.zodac.folding.db.postgres.TestGenerator.nextUserName;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.tc.Category;
@@ -18,11 +20,16 @@ import me.zodac.folding.api.tc.HardwareMake;
 import me.zodac.folding.api.tc.HardwareType;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.result.MonthlyResult;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.api.util.DateTimeUtils;
+import me.zodac.folding.rest.api.tc.TeamSummary;
+import me.zodac.folding.rest.api.tc.UserSummary;
+import me.zodac.folding.rest.api.tc.leaderboard.TeamLeaderboardEntry;
+import me.zodac.folding.rest.api.tc.leaderboard.UserCategoryLeaderboardEntry;
 import org.jooq.exception.DataAccessException;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -243,15 +250,15 @@ class PostgresDbManagerTest {
         final long multipliedPoints = 1_000L;
         final int units = 5;
 
-        POSTGRES_DB_MANAGER.createRetiredUserStats(team.getId(), userToRetire.getId(), userToRetire.getDisplayName(),
+        final RetiredUserTcStats initialRetiredUserTcStats = RetiredUserTcStats.createWithoutId(team.getId(), userToRetire.getDisplayName(),
             UserTcStats.createNow(userToRetire.getId(), points, multipliedPoints, units));
+        POSTGRES_DB_MANAGER.createRetiredUserStats(initialRetiredUserTcStats);
 
-        final Collection<RetiredUserTcStats> retiredUserStatsForTeam = POSTGRES_DB_MANAGER.getAllRetiredUserStats();
-
-        assertThat(retiredUserStatsForTeam)
+        final Collection<RetiredUserTcStats> retiredUserStats = POSTGRES_DB_MANAGER.getAllRetiredUserStats();
+        assertThat(retiredUserStats)
             .hasSize(1);
 
-        final RetiredUserTcStats retiredUserTcStats = retiredUserStatsForTeam.iterator().next();
+        final RetiredUserTcStats retiredUserTcStats = retiredUserStats.iterator().next();
 
         assertThat(retiredUserTcStats.getPoints())
             .isEqualTo(points);
@@ -259,6 +266,11 @@ class PostgresDbManagerTest {
             .isEqualTo(multipliedPoints);
         assertThat(retiredUserTcStats.getUnits())
             .isEqualTo(units);
+
+        POSTGRES_DB_MANAGER.deleteAllRetiredUserStats();
+        final Collection<RetiredUserTcStats> retiredUserStatsAfterDelete = POSTGRES_DB_MANAGER.getAllRetiredUserStats();
+        assertThat(retiredUserStatsAfterDelete)
+            .isEmpty();
     }
 
     @Test
@@ -324,7 +336,7 @@ class PostgresDbManagerTest {
         final long multipliedPoints = 1_000L;
         final int units = 5;
         final UserTcStats userTcStats = UserTcStats.createNow(userId, points, multipliedPoints, units);
-        POSTGRES_DB_MANAGER.persistHourlyTcStats(userTcStats);
+        POSTGRES_DB_MANAGER.createHourlyTcStats(userTcStats);
 
         final Optional<UserTcStats> retrievedUserTcStats = POSTGRES_DB_MANAGER.getHourlyTcStats(userId);
         assertThat(retrievedUserTcStats)
@@ -360,7 +372,7 @@ class PostgresDbManagerTest {
         final UserTcStats currentDayFirstUserTcStats = UserTcStats
             .create(userId, DateTimeUtils.getTimestampOf(year, month, yesterday, 0, 0, 0), currentDayFirstPoints, currentDayFirstMultipliedPoints,
                 currentDayFirstUnits);
-        POSTGRES_DB_MANAGER.persistHourlyTcStats(currentDayFirstUserTcStats);
+        POSTGRES_DB_MANAGER.createHourlyTcStats(currentDayFirstUserTcStats);
 
         final long currentDaySecondPoints = 300L;
         final long currentDaySecondMultipliedPoints = 3_000L;
@@ -368,7 +380,7 @@ class PostgresDbManagerTest {
         final UserTcStats currentDaySecondUserTcStats = UserTcStats
             .create(userId, DateTimeUtils.getTimestampOf(year, month, yesterday, 1, 0, 0), currentDaySecondPoints, currentDaySecondMultipliedPoints,
                 currentDaySecondUnits);
-        POSTGRES_DB_MANAGER.persistHourlyTcStats(currentDaySecondUserTcStats);
+        POSTGRES_DB_MANAGER.createHourlyTcStats(currentDaySecondUserTcStats);
 
         final long currentDayThirdPoints = 300L;
         final long currentDayThirdMultipliedPoints = 3_000L;
@@ -376,7 +388,7 @@ class PostgresDbManagerTest {
         final UserTcStats currentDayThirdUserTcStats = UserTcStats
             .create(userId, DateTimeUtils.getTimestampOf(year, month, day, 1, 0, 0), currentDayThirdPoints, currentDayThirdMultipliedPoints,
                 currentDayThirdUnits);
-        POSTGRES_DB_MANAGER.persistHourlyTcStats(currentDayThirdUserTcStats);
+        POSTGRES_DB_MANAGER.createHourlyTcStats(currentDayThirdUserTcStats);
 
         assertThat(POSTGRES_DB_MANAGER.getHistoricStatsHourly(userId, year, month, yesterday))
             .isNotEmpty();
@@ -387,38 +399,120 @@ class PostgresDbManagerTest {
     }
 
     @Test
-    void validMonthlyResultTest() {
+    void monthlyResultTest() {
         final Year firstResultYear = Year.of(2020);
         final Month firstResultMonth = Month.APRIL;
-        final String firstResult = "firstResult";
-        final LocalDateTime firstResultUtcTimestamp = DateTimeUtils.getLocalDateTimeOf(firstResultYear, firstResultMonth);
-        POSTGRES_DB_MANAGER.createMonthlyResult(firstResult, firstResultUtcTimestamp);
+        final MonthlyResult firstResult = MonthlyResult.create(
+            List.of(
+                TeamLeaderboardEntry.create(
+                    TeamSummary.createWithDefaultRank(
+                        "Team1",
+                        "Test team 1",
+                        "",
+                        "",
+                        Collections.emptyList(),
+                        Collections.emptyList()
+                    ),
+                    1, 0L, 0L
+                )
+            ),
+            Map.of(Category.AMD_GPU, List.of(
+                    UserCategoryLeaderboardEntry.create(
+                        UserSummary.createWithDefaultRank(
+                            1,
+                            "User1",
+                            "User1",
+                            Hardware.createWithoutId(
+                                "Hardware1",
+                                "Hardware1",
+                                HardwareMake.AMD,
+                                HardwareType.GPU,
+                                1.00D,
+                                1L
+                            ),
+                            Category.AMD_GPU,
+                            "",
+                            "",
+                            0L,
+                            0L,
+                            0
+                        ),
+                        "Team1", 1, 0L, 0L
+                    )
+                ),
+                Category.NVIDIA_GPU, Collections.emptyList(),
+                Category.WILDCARD, Collections.emptyList()
+            ),
+            DateTimeUtils.getLocalDateTimeOf(firstResultYear, firstResultMonth)
+        );
+        POSTGRES_DB_MANAGER.createMonthlyResult(firstResult);
 
         final Year secondResultYear = Year.of(2019);
         final Month secondResultMonth = Month.SEPTEMBER;
-        final String secondResult = "secondResult";
-        final LocalDateTime secondResultUtcTimestamp = DateTimeUtils.getLocalDateTimeOf(secondResultYear, secondResultMonth);
-        POSTGRES_DB_MANAGER.createMonthlyResult(secondResult, secondResultUtcTimestamp);
+        final MonthlyResult secondResult = MonthlyResult.create(
+            List.of(
+                TeamLeaderboardEntry.create(
+                    TeamSummary.createWithDefaultRank(
+                        "Team2",
+                        "Test team 2",
+                        "",
+                        "",
+                        Collections.emptyList(),
+                        Collections.emptyList()
+                    ),
+                    1, 0L, 0L
+                )
+            ),
+            Map.of(Category.NVIDIA_GPU, List.of(
+                    UserCategoryLeaderboardEntry.create(
+                        UserSummary.createWithDefaultRank(
+                            1,
+                            "User2",
+                            "User2",
+                            Hardware.createWithoutId(
+                                "Hardware2",
+                                "Hardware2",
+                                HardwareMake.NVIDIA,
+                                HardwareType.GPU,
+                                1.00D,
+                                1L
+                            ),
+                            Category.AMD_GPU,
+                            "",
+                            "",
+                            0L,
+                            0L,
+                            0
+                        ),
+                        "Team2", 1, 0L, 0L
+                    )
+                ),
+                Category.AMD_GPU, Collections.emptyList(),
+                Category.WILDCARD, Collections.emptyList()
+            ),
+            DateTimeUtils.getLocalDateTimeOf(secondResultYear, secondResultMonth)
+        );
+        POSTGRES_DB_MANAGER.createMonthlyResult(secondResult);
 
-        final Optional<String> firstResultOutput = POSTGRES_DB_MANAGER.getMonthlyResult(firstResultMonth, firstResultYear);
+        final Optional<MonthlyResult> firstResultOutput = POSTGRES_DB_MANAGER.getMonthlyResult(firstResultMonth, firstResultYear);
         assertThat(firstResultOutput)
             .isPresent();
         assertThat(firstResultOutput.get())
             .isEqualTo(firstResult);
 
-        final Optional<String> secondResultOutput = POSTGRES_DB_MANAGER.getMonthlyResult(secondResultMonth, secondResultYear);
+        final Optional<MonthlyResult> secondResultOutput = POSTGRES_DB_MANAGER.getMonthlyResult(secondResultMonth, secondResultYear);
         assertThat(secondResultOutput)
             .isPresent();
         assertThat(secondResultOutput.get())
             .isEqualTo(secondResult);
 
-        final Optional<String> invalidResultOutput = POSTGRES_DB_MANAGER.getMonthlyResult(Month.JUNE, Year.of(1999));
+        final Optional<MonthlyResult> invalidResultOutput = POSTGRES_DB_MANAGER.getMonthlyResult(Month.JUNE, Year.of(1999));
         assertThat(invalidResultOutput)
             .isNotPresent();
     }
 
     @Test
-    void validSystemUserTest() {
+    void systemUserTest() {
         final UserAuthenticationResult invalidUserName = POSTGRES_DB_MANAGER.authenticateSystemUser("invalidUserName", "ADMIN_PASSWORD");
         assertThat(invalidUserName.isUserExists())
             .isFalse();
