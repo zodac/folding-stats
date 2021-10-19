@@ -40,6 +40,8 @@ import org.jooq.Record;
  */
 final class RecordConverter {
 
+    // We don't try and reuse the GSON instance available in RestUtilConstants
+    // This is because we do not want pretty-print enabled since that would increase the size of the JSON string being persisted in the DB
     static final Gson MONTHLY_RESULT_GSON = new GsonBuilder()
         .registerTypeAdapter(LocalDateTime.class, LocalDateTimeGsonTypeAdapter.getInstance())
         .disableHtmlEscaping()
