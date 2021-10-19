@@ -6,11 +6,8 @@
 target/
 pom.xml.versionsBackup
 
-# Merged JS/CSS files (ignore full files, keep minified files)
-docker/frontend/site/res/css/*.css
-!docker/frontend/site/res/css/*.min.css
-docker/frontend/site/res/js/*.js
-!docker/frontend/site/res/js/*.min.js
+# Generated webpages
+docker/frontend/site/
 
 # Generated jOOQ schema files
 docker/postgres/jooq/me/

@@ -12,39 +12,12 @@
         <!-- Do not merge or minify JS/CSS by default -->
         <skip-minify>true</skip-minify>
 
-        <!-- Do not generate RAML HTML output by default -->
-        <skip-raml>true</skip-raml>
-
         <!-- Plugin Versions -->
-        <exec-maven-plugin.version>3.0.0</exec-maven-plugin.version>
         <minify-maven-plugin.version>1.7.6</minify-maven-plugin.version>
     </properties>
 
     <build>
         <plugins>
-            <!-- Generate RAML API -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>${exec-maven-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <executable>raml2html</executable>
-                    <commandlineArgs>
-                        --input ${project.basedir}/frontend/src/raml/api.raml
-                        --output ${project.basedir}/frontend/site/api.html
-                    </commandlineArgs>
-                    <skip>${skip-raml}</skip>
-                </configuration>
-            </plugin>
-
             <!-- Minify and merge JS/CSS -->
             <plugin>
                 <groupId>com.samaxes.maven</groupId>
@@ -363,19 +336,6 @@
             </activation>
             <properties>
                 <skip-minify>false</skip-minify>
-            </properties>
-        </profile>
-
-        <!-- Profile used to generate the RAML HTML output -->
-        <profile>
-            <id>enable_raml</id>
-            <activation>
-                <property>
-                    <name>raml</name>
-                </property>
-            </activation>
-            <properties>
-                <skip-raml>false</skip-raml>
             </properties>
         </profile>
     </profiles>
