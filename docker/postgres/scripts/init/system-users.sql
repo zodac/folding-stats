@@ -10,5 +10,5 @@ CREATE TABLE system_users (
 
 INSERT INTO system_users (user_name, user_password_hash, roles)
 VALUES
-('ADMIN_USERNAME', crypt('ADMIN_PASSWORD', gen_salt('bf')), ARRAY ['admin']),
-('READ_ONLY_USERNAME', crypt('READ_ONLY_PASSWORD', gen_salt('bf')), ARRAY ['read-only']);
+('%ADMIN_USERNAME%', crypt('%ADMIN_PASSWORD%', gen_salt('bf')), ARRAY ['admin']),
+('%READ_ONLY_USERNAME%', crypt('%READ_ONLY_PASSWORD%', gen_salt('bf')), ARRAY ['read-only']);

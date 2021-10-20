@@ -1,4 +1,4 @@
-const ROOT_URL='http://internal.axihub.ca/folding';
+const ROOT_URL="%ROOT_URL%";
 
 var currentDate = new Date();
 var currentUtcDate = new Date(currentDate.getUTCFullYear(), currentDate.getUTCMonth(), currentDate.getUTCDate(), currentDate.getUTCHours(), currentDate.getUTCMinutes(), currentDate.getUTCSeconds());

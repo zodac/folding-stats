@@ -1,4 +1,5 @@
-const ROOT_URL='http://internal.axihub.ca/folding';
+const ROOT_URL="%ROOT_URL%";
+
 const NUMBER_OF_MONTHS = 12;
 const NUMBER_OF_YEARS_TO_SHOW = 2;
 const YEAR_START = new Date().getUTCFullYear();

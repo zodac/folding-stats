@@ -8,6 +8,7 @@ CREATE TABLE system_users (
     roles TEXT[] DEFAULT '{}'
 );
 
+-- Not actually substituting values here for the test, so these values are fine
 INSERT INTO system_users (user_name, user_password_hash, roles)
 VALUES
 ('ADMIN_USERNAME', crypt('ADMIN_PASSWORD', gen_salt('bf')), ARRAY ['admin']),

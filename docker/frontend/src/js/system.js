@@ -1,4 +1,4 @@
-const ROOT_URL='http://internal.axihub.ca/folding';
+const ROOT_URL="%ROOT_URL%";
 
 // The 'toggle' functions below simply change the colour of the buttons. There must be a smarter way to do this...
 function toggleMainButtonStyle(id, classList){

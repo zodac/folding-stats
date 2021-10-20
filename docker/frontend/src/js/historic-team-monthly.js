@@ -1,4 +1,4 @@
-const ROOT_URL='http://internal.axihub.ca/folding';
+const ROOT_URL="%ROOT_URL%";
 
 var selectedUserId = 0;
 var selectedUser = "";
