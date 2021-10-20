@@ -60,6 +60,11 @@ final class MockBusinessLogic implements BusinessLogic {
     }
 
     @Override
+    public Hardware updateHardware(final Hardware hardwareToUpdate, final Hardware existingHardware) {
+        return hardwareToUpdate;
+    }
+
+    @Override
     public void deleteHardware(final Hardware hardware) {
         hardwares.remove(hardware.getId());
     }
@@ -81,8 +86,8 @@ final class MockBusinessLogic implements BusinessLogic {
     }
 
     @Override
-    public Team updateTeam(final Team team) {
-        return team;
+    public Team updateTeam(final Team teamToUpdate) {
+        return teamToUpdate;
     }
 
     @Override
@@ -215,6 +220,11 @@ final class MockBusinessLogic implements BusinessLogic {
     @Override
     public UserStats getTotalStats(final User user) {
         return UserStats.empty();
+    }
+
+    @Override
+    public OffsetTcStats createOffsetStats(final User user, final OffsetTcStats offsetTcStats) {
+        return OffsetTcStats.empty();
     }
 
     @Override

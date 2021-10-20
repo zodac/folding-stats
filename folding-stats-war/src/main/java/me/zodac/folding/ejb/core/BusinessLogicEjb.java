@@ -6,6 +6,7 @@ import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
 import java.util.Optional;
+import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.ejb.BusinessLogic;
@@ -17,6 +18,7 @@ import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
+import me.zodac.folding.ejb.tc.user.UserStateChangeHandler;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,6 +37,9 @@ public class BusinessLogicEjb implements BusinessLogic {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Storage STORAGE = Storage.getInstance();
 
+    @EJB
+    private UserStateChangeHandler userStateChangeHandler;
+
     @Override
     public Hardware createHardware(final Hardware hardware) {
         return STORAGE.createHardware(hardware);
@@ -48,6 +53,22 @@ public class BusinessLogicEjb implements BusinessLogic {
     @Override
     public Collection<Hardware> getAllHardware() {
         return STORAGE.getAllHardware();
+    }
+
+    @Override
+    public Hardware updateHardware(final Hardware hardwareToUpdate, final Hardware existingHardware) {
+        final Hardware updatedHardware = STORAGE.updateHardware(hardwareToUpdate);
+
+        if (userStateChangeHandler.isHardwareStateChange(updatedHardware, existingHardware)) {
+            final Collection<User> usersUsingThisHardware = getUsersWithHardware(updatedHardware);
+
+            for (final User user : usersUsingThisHardware) {
+                LOGGER.debug("User '{}' (ID: {}) had state change to hardware multiplier", user.getDisplayName(), user.getId());
+                userStateChangeHandler.handleStateChange(user);
+            }
+        }
+
+        return updatedHardware;
     }
 
     @Override
@@ -224,6 +245,12 @@ public class BusinessLogicEjb implements BusinessLogic {
     public UserStats getTotalStats(final User user) {
         return STORAGE.getTotalStats(user.getId())
             .orElse(UserStats.empty());
+    }
+
+    @Override
+    public OffsetTcStats createOffsetStats(final User user, final OffsetTcStats offsetTcStats) {
+        STORAGE.deleteOffsetStats(user.getId());
+        return STORAGE.createOrUpdateOffsetStats(user.getId(), offsetTcStats);
     }
 
     @Override

@@ -50,9 +50,10 @@ public interface DbManager {
     /**
      * Updates an existing {@link Hardware} in the system, matching on {@link Hardware#getId()}.
      *
-     * @param hardware the updated {@link Hardware} to be persisted in the DB
+     * @param hardwareToUpdate the updated {@link Hardware} to be persisted in the DB
+     * @return the updated {@link Hardware}
      */
-    void updateHardware(final Hardware hardware);
+    Hardware updateHardware(final Hardware hardwareToUpdate);
 
     /**
      * Deletes an existing {@link Hardware} from the system.
@@ -87,9 +88,10 @@ public interface DbManager {
     /**
      * Updates an existing {@link Team} in the system, matching on {@link Team#getId()}.
      *
-     * @param team the updated {@link Team} to be persisted in the DB
+     * @param teamToUpdate the updated {@link Team} to be persisted in the DB
+     * @return the updated {@link Team}
      */
-    void updateTeam(final Team team);
+    Team updateTeam(final Team teamToUpdate);
 
     /**
      * Deletes an existing {@link Team} from the system.
@@ -124,9 +126,10 @@ public interface DbManager {
     /**
      * Updates an existing {@link User} in the system, matching on {@link User#getId()}.
      *
-     * @param user the updated {@link User} to be persisted in the DB
+     * @param userToUpdate the updated {@link User} to be persisted in the DB
+     * @return the updated {@link User}
      */
-    void updateUser(final User user);
+    User updateUser(final User userToUpdate);
 
     /**
      * Deletes an existing {@link User} from the system.
@@ -221,7 +224,7 @@ public interface DbManager {
     Optional<UserStats> getTotalStats(final int userId);
 
     /**
-     * Creates an {@link OffsetTcStats} defining the offset points/units for the provided {@link User}.
+     * Creates an {@link OffsetTcStats}, defining the offset points/units for the provided {@link User}.
      *
      * <p>
      * If an {@link OffsetTcStats} already exists for the {@link User}, the existing values are updated to be the addition of both

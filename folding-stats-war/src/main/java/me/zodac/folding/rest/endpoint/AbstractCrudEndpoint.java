@@ -70,7 +70,7 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
 
     protected abstract Optional<O> getElementById(final int elementId);
 
-    protected abstract O updateElementById(final O element, final O existingElement) throws ExternalConnectionException;
+    protected abstract O updateElementById(final O element, final O existingElement);
 
     protected abstract void deleteElement(final O element);
 
@@ -301,11 +301,6 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             getLogger().info("Updated {} with ID {}", elementType(), updatedElementWithId.getId());
             return ok(updatedElementWithId, elementLocationBuilder);
-        } catch (final ExternalConnectionException e) {
-            final String errorMessage = String.format("Error connecting to external service at '%s': %s", e.getUrl(), e.getMessage());
-            getLogger().debug(errorMessage, e);
-            getLogger().error(errorMessage);
-            return badGateway();
         } catch (final Exception e) {
             getLogger().error("Unexpected error updating {} with ID: {}", elementType(), elementId, e);
             return serverError();

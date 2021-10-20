@@ -8,9 +8,9 @@ import me.zodac.folding.cache.BaseCache;
 @interface Cached {
 
     /**
-     * The implementation of {@link BaseCache} used to perform the caching.
+     * The implementations of {@link BaseCache} used to perform the caching.
      *
-     * @return the {@link BaseCache} implementation
+     * @return the {@link BaseCache} implementations
      */
-    Class<? extends BaseCache<?>> value();
+    Class<? extends BaseCache<?>>[] value();
 }

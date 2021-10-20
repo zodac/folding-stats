@@ -17,7 +17,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
-import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
@@ -127,10 +126,10 @@ public class HardwareEndpoint extends AbstractCrudEndpoint<HardwareRequest, Hard
     }
 
     @Override
-    protected Hardware updateElementById(final Hardware hardware, final Hardware existingHardware) throws ExternalConnectionException {
+    protected Hardware updateElementById(final Hardware hardware, final Hardware existingHardware) {
         // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
         final Hardware hardwareWithId = Hardware.updateWithId(existingHardware.getId(), hardware);
-        return oldFacade.updateHardware(hardwareWithId, existingHardware);
+        return businessLogic.updateHardware(hardwareWithId, existingHardware);
     }
 
     @Override

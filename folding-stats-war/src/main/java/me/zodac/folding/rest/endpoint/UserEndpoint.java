@@ -127,7 +127,7 @@ public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
     }
 
     @Override
-    protected User updateElementById(final User user, final User existingUser) throws ExternalConnectionException {
+    protected User updateElementById(final User user, final User existingUser) {
         // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
         final User userWithId = User.updateWithId(existingUser.getId(), user);
         return oldFacade.updateUser(userWithId, existingUser);

@@ -149,21 +149,24 @@ public final class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public void updateHardware(final Hardware hardware) {
+    public Hardware updateHardware(final Hardware hardwareToUpdate) {
         executeQuery(queryContext -> {
             final var query = queryContext
                 .update(HARDWARE)
-                .set(HARDWARE.HARDWARE_NAME, hardware.getHardwareName())
-                .set(HARDWARE.DISPLAY_NAME, hardware.getDisplayName())
-                .set(HARDWARE.HARDWARE_MAKE, hardware.getHardwareMake().toString())
-                .set(HARDWARE.HARDWARE_TYPE, hardware.getHardwareType().toString())
-                .set(HARDWARE.MULTIPLIER, BigDecimal.valueOf(hardware.getMultiplier()))
-                .set(HARDWARE.AVERAGE_PPD, BigDecimal.valueOf(hardware.getAveragePpd()))
-                .where(HARDWARE.HARDWARE_ID.equal(hardware.getId()));
+                .set(HARDWARE.HARDWARE_NAME, hardwareToUpdate.getHardwareName())
+                .set(HARDWARE.DISPLAY_NAME, hardwareToUpdate.getDisplayName())
+                .set(HARDWARE.HARDWARE_MAKE, hardwareToUpdate.getHardwareMake().toString())
+                .set(HARDWARE.HARDWARE_TYPE, hardwareToUpdate.getHardwareType().toString())
+                .set(HARDWARE.MULTIPLIER, BigDecimal.valueOf(hardwareToUpdate.getMultiplier()))
+                .set(HARDWARE.AVERAGE_PPD, BigDecimal.valueOf(hardwareToUpdate.getAveragePpd()))
+                .where(HARDWARE.HARDWARE_ID.equal(hardwareToUpdate.getId()));
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
         });
+
+        // The DB makes no change to this object, so we simply return the provided one
+        return hardwareToUpdate;
     }
 
     @Override
@@ -233,18 +236,21 @@ public final class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public void updateTeam(final Team team) {
+    public Team updateTeam(final Team teamToUpdate) {
         executeQuery(queryContext -> {
             final var query = queryContext
                 .update(TEAMS)
-                .set(TEAMS.TEAM_NAME, team.getTeamName())
-                .set(TEAMS.TEAM_DESCRIPTION, team.getTeamDescription())
-                .set(TEAMS.FORUM_LINK, team.getForumLink())
-                .where(TEAMS.TEAM_ID.equal(team.getId()));
+                .set(TEAMS.TEAM_NAME, teamToUpdate.getTeamName())
+                .set(TEAMS.TEAM_DESCRIPTION, teamToUpdate.getTeamDescription())
+                .set(TEAMS.FORUM_LINK, teamToUpdate.getForumLink())
+                .where(TEAMS.TEAM_ID.equal(teamToUpdate.getId()));
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
         });
+
+        // The DB makes no change to this object, so we simply return the provided one
+        return teamToUpdate;
     }
 
     @Override
@@ -341,24 +347,27 @@ public final class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public void updateUser(final User user) {
+    public User updateUser(final User userToUpdate) {
         executeQuery(queryContext -> {
             final var query = queryContext
                 .update(USERS)
-                .set(USERS.FOLDING_USERNAME, user.getFoldingUserName())
-                .set(USERS.DISPLAY_USERNAME, user.getDisplayName())
-                .set(USERS.PASSKEY, user.getPasskey())
-                .set(USERS.CATEGORY, user.getCategory().toString())
-                .set(USERS.PROFILE_LINK, user.getProfileLink())
-                .set(USERS.LIVE_STATS_LINK, user.getLiveStatsLink())
-                .set(USERS.HARDWARE_ID, user.getHardware().getId())
-                .set(USERS.TEAM_ID, user.getTeam().getId())
-                .set(USERS.IS_CAPTAIN, user.isUserIsCaptain())
-                .where(USERS.USER_ID.equal(user.getId()));
+                .set(USERS.FOLDING_USERNAME, userToUpdate.getFoldingUserName())
+                .set(USERS.DISPLAY_USERNAME, userToUpdate.getDisplayName())
+                .set(USERS.PASSKEY, userToUpdate.getPasskey())
+                .set(USERS.CATEGORY, userToUpdate.getCategory().toString())
+                .set(USERS.PROFILE_LINK, userToUpdate.getProfileLink())
+                .set(USERS.LIVE_STATS_LINK, userToUpdate.getLiveStatsLink())
+                .set(USERS.HARDWARE_ID, userToUpdate.getHardware().getId())
+                .set(USERS.TEAM_ID, userToUpdate.getTeam().getId())
+                .set(USERS.IS_CAPTAIN, userToUpdate.isUserIsCaptain())
+                .where(USERS.USER_ID.equal(userToUpdate.getId()));
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
         });
+
+        // The DB makes no change to this object, so we simply return the provided one
+        return userToUpdate;
     }
 
     @Override

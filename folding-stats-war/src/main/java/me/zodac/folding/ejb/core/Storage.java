@@ -133,6 +133,32 @@ final class Storage {
     }
 
     /**
+     * Updates a {@link Hardware}. Expects the {@link Hardware} to have a valid ID.
+     *
+     * <p>
+     * Persists it with the {@link DbManager}, then updates it in the {@link HardwareCache}.
+     *
+     * <p>
+     * Also updates the {@link UserCache} with an updated version of any {@link User} that references this {@link Hardware}.
+     *
+     * @param hardwareToUpdate the {@link Hardware} to update
+     * @see DbManager#updateHardware(Hardware)
+     */
+    @Cached({HardwareCache.class, UserCache.class})
+    public Hardware updateHardware(final Hardware hardwareToUpdate) {
+        final Hardware updatedHardware = DB_MANAGER.updateHardware(hardwareToUpdate);
+        hardwareCache.add(hardwareToUpdate.getId(), updatedHardware);
+
+        getAllUsers()
+            .stream()
+            .filter(user -> user.getHardware().getId() == hardwareToUpdate.getId())
+            .map(user -> User.updateHardware(user, hardwareToUpdate))
+            .forEach(updatedUser -> userCache.add(updatedUser.getId(), updatedUser));
+
+        return updatedHardware;
+    }
+
+    /**
      * Deletes a {@link Hardware}.
      *
      * <p>
@@ -227,10 +253,10 @@ final class Storage {
      * @param teamToUpdate the {@link Team} to update
      * @see DbManager#updateTeam(Team)
      */
-    @Cached(TeamCache.class)
+    @Cached({TeamCache.class, UserCache.class})
     public Team updateTeam(final Team teamToUpdate) {
-        DB_MANAGER.updateTeam(teamToUpdate);
-        teamCache.add(teamToUpdate.getId(), teamToUpdate);
+        final Team updatedTeam = DB_MANAGER.updateTeam(teamToUpdate);
+        teamCache.add(teamToUpdate.getId(), updatedTeam);
 
         getAllUsers()
             .stream()
@@ -238,7 +264,7 @@ final class Storage {
             .map(user -> User.updateTeam(user, teamToUpdate))
             .forEach(updatedUser -> userCache.add(updatedUser.getId(), updatedUser));
 
-        return teamToUpdate;
+        return updatedTeam;
     }
 
     /**
@@ -485,7 +511,7 @@ final class Storage {
     }
 
     /**
-     * Creates an {@link OffsetTcStats} defining the offset points/units for the provided {@link User}.
+     * Creates an {@link OffsetTcStats}, defining the offset points/units for the provided {@link User}.
      *
      * <p>
      * Persists it with the {@link DbManager}, then adds it to the {@link OffsetTcStatsCache}.

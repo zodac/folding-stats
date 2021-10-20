@@ -45,6 +45,15 @@ public interface BusinessLogic {
     Collection<Hardware> getAllHardware();
 
     /**
+     * Updates an existing {@link Hardware}.
+     *
+     * @param hardwareToUpdate the {@link Hardware} with updated values
+     * @param existingHardware the existing {@link Hardware}
+     * @return the updated {@link Hardware}
+     */
+    Hardware updateHardware(final Hardware hardwareToUpdate, final Hardware existingHardware);
+
+    /**
      * Deletes a {@link Hardware}.
      *
      * @param hardware the {@link Hardware} to delete
@@ -77,10 +86,10 @@ public interface BusinessLogic {
     /**
      * Updates an existing {@link Team}.
      *
-     * @param updatedTeam the {@link Team} with updated values
+     * @param teamToUpdate the {@link Team} with updated values
      * @return the updated {@link Team}
      */
-    Team updateTeam(final Team updatedTeam);
+    Team updateTeam(final Team teamToUpdate);
 
     /**
      * Deletes a {@link Team}.
@@ -272,7 +281,19 @@ public interface BusinessLogic {
     UserStats getTotalStats(final User user);
 
     /**
-     * Creates an {@link OffsetTcStats} defining the offset points/units for the provided {@link User}.
+     * Creates an {@link OffsetTcStats}, defining the offset points/units for the provided {@link User}.
+     *
+     * <p>
+     * If an {@link OffsetTcStats} already exists for the {@link User}, the existing values are overwritten.
+     *
+     * @param user          the {@link User} for whom the {@link OffsetTcStats} are being created
+     * @param offsetTcStats the {@link OffsetTcStats} to be created
+     * @return the created {@link OffsetTcStats}, or {@link OffsetTcStats#empty()}
+     */
+    OffsetTcStats createOffsetStats(final User user, final OffsetTcStats offsetTcStats);
+
+    /**
+     * Creates an {@link OffsetTcStats}, defining the offset points/units for the provided {@link User}.
      *
      * <p>
      * If an {@link OffsetTcStats} already exists for the {@link User}, the existing values are updated to be the addition of both

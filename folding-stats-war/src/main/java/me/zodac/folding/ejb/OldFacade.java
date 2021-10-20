@@ -1,21 +1,18 @@
 package me.zodac.folding.ejb;
 
-import java.util.Collection;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
-import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
-import me.zodac.folding.cache.HardwareCache;
 import me.zodac.folding.cache.UserCache;
 import me.zodac.folding.db.DbManagerRetriever;
-import me.zodac.folding.ejb.tc.user.UserStateChangeChecker;
+import me.zodac.folding.ejb.tc.user.UserStateChangeHandler;
 import me.zodac.folding.ejb.tc.user.UserStatsParser;
 import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.apache.logging.log4j.LogManager;
@@ -30,7 +27,6 @@ public class OldFacade {
 
     private final transient DbManager dbManager = DbManagerRetriever.get();
     private final transient UserCache userCache = UserCache.getInstance();
-    private final transient HardwareCache hardwareCache = HardwareCache.getInstance();
 
     @EJB
     private transient BusinessLogic businessLogic;
@@ -39,25 +35,7 @@ public class OldFacade {
     private transient UserStatsParser userStatsParser;
 
     @EJB
-    private transient UserStateChangeChecker userStateChangeHandler;
-
-    public Hardware updateHardware(final Hardware updatedHardware, final Hardware existingHardware) throws ExternalConnectionException {
-        dbManager.updateHardware(updatedHardware);
-        hardwareCache.add(updatedHardware.getId(), updatedHardware);
-
-        final Collection<User> usersUsingThisHardware = businessLogic.getUsersWithHardware(updatedHardware);
-        for (final User user : usersUsingThisHardware) {
-            if (userStateChangeHandler.isHardwareStateChange(updatedHardware, existingHardware)) {
-                LOGGER.debug("User '{}' (ID: {}) had state change to hardware multiplier", user.getDisplayName(), user.getId());
-                userStateChangeHandler.handleStateChange(user);
-            }
-
-            final User updatedUser = User.updateHardware(user, updatedHardware);
-            userCache.add(updatedUser.getId(), updatedUser);
-        }
-
-        return updatedHardware;
-    }
+    private transient UserStateChangeHandler userStateChangeHandler;
 
     public User createUser(final User user) throws ExternalConnectionException {
         final User userWithId = dbManager.createUser(user);
@@ -72,7 +50,7 @@ public class OldFacade {
         return userWithId;
     }
 
-    public User updateUser(final User updatedUser, final User existingUser) throws ExternalConnectionException {
+    public User updateUser(final User updatedUser, final User existingUser) {
         dbManager.updateUser(updatedUser);
         userCache.add(updatedUser.getId(), updatedUser);
 

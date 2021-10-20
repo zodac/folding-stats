@@ -9,13 +9,11 @@ import java.util.Map;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import me.zodac.folding.api.ejb.BusinessLogic;
-import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.HardwareMake;
 import me.zodac.folding.api.tc.HardwareType;
 import me.zodac.folding.api.tc.lars.LarsGpu;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
-import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.lars.HardwareSplitter;
 import me.zodac.folding.lars.LarsGpuRetriever;
 import org.apache.logging.log4j.LogManager;
@@ -33,9 +31,6 @@ public class LarsHardwareUpdater {
 
     @EJB
     private BusinessLogic businessLogic;
-
-    @EJB
-    private OldFacade oldFacade;
 
     /**
      * Retrieves {@link me.zodac.folding.api.tc.HardwareType} data from LARS, creates {@link Hardware} instances, then updates to the DB.
@@ -97,12 +92,12 @@ public class LarsHardwareUpdater {
                 final Hardware existingHardware = entry.getValue();
                 final Hardware updatedHardwareWithId = Hardware.updateWithId(existingHardware.getId(), updatedHardware);
 
-                oldFacade.updateHardware(updatedHardwareWithId, existingHardware);
+                businessLogic.updateHardware(updatedHardwareWithId, existingHardware);
                 LOGGER.info("LARS updated hardware\n'{}' (ID: {})\nMultiplier: {} -> {}\nAverage PPD: {} -> {}\n", updatedHardware.getHardwareName(),
                     existingHardware.getId(), existingHardware.getMultiplier(), updatedHardware.getMultiplier(),
                     formatWithCommas(existingHardware.getAveragePpd()), formatWithCommas(updatedHardware.getAveragePpd()));
-            } catch (final ExternalConnectionException e) {
-                LOGGER.warn("Error connecting to Folding@Home stats to verify new hardware", e);
+            } catch (final Exception e) {
+                LOGGER.warn("Unexpected error connecting to Folding@Home stats to verify new hardware", e);
             }
         }
 

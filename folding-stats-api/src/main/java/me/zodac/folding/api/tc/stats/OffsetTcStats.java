@@ -41,6 +41,16 @@ public class OffsetTcStats {
     }
 
     /**
+     * Creates an instance of {@link OffsetTcStats}.
+     *
+     * @param userTcStats existing {@link UserTcStats}
+     * @return the created {@link OffsetTcStats}
+     */
+    public static OffsetTcStats create(final UserTcStats userTcStats) {
+        return create(userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits());
+    }
+
+    /**
      * Creates an empty instance of {@link OffsetTcStats}, with no offsets. Can be used where no offset is necessary, but
      * an {@link java.util.Optional} is not clean enough.
      *
