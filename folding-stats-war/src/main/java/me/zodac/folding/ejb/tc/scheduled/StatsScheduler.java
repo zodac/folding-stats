@@ -19,7 +19,7 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
 import me.zodac.folding.api.util.ExecutionType;
-import me.zodac.folding.ejb.tc.UserStatsParser;
+import me.zodac.folding.ejb.tc.user.UserStatsParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

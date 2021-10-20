@@ -14,7 +14,7 @@ import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.ParsingState;
 import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
-import me.zodac.folding.ejb.tc.UserStatsResetter;
+import me.zodac.folding.ejb.tc.user.UserStatsResetter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

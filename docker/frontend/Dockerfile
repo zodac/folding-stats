@@ -10,9 +10,9 @@ COPY ./docker/pom.xml /docker/pom.xml
 COPY ./docker/frontend/src/css /docker/frontend/src/css
 COPY ./docker/frontend/src/js /docker/frontend/src/js
 
-# Replace '%ROOT_URL%' in the JS files with the actual URL for the deployment (changing sed delimiter for URL slashes)
-# Then run the minification and merging of JS and CSS files
-# Then finally remove any files that are not minified (do not include 'min' in their filename)
+# 1 - Replace '%ROOT_URL%' in the JS files with the actual URL for the deployment (changing sed delimiter for URL slashes)
+# 2 - Run the minification and merging of JS and CSS files
+# 3 - Remove any files that are not minified (do not include 'min' in their filename)
 RUN grep -rl '%ROOT_URL%' . | xargs sed -i "s|%ROOT_URL%|${ROOT_URL}|g" && \
     mvn package -Dminify && \
     find ./frontend/site/res -iname *.js -o -iname *.css | grep -v "min" | xargs rm
@@ -20,8 +20,8 @@ RUN grep -rl '%ROOT_URL%' . | xargs sed -i "s|%ROOT_URL%|${ROOT_URL}|g" && \
 FROM node:lts-alpine3.14 AS node
 COPY ./docker/frontend/src/raml/ /docker/frontend/src/raml/
 
-# Install raml2html
-# Run raml2html to create the RAML API output file
+# 1 - Install raml2html
+# 2 - Run raml2html to create the RAML API output file
 RUN npm i -g raml2html && \
     raml2html --input /docker/frontend/src/raml/api.raml --output /docker/frontend/api.html
 
@@ -32,7 +32,7 @@ WORKDIR /usr/local/apache2/htdocs/
 COPY --from=node /docker/frontend/api.html ./api.html
 COPY --from=maven /docker/frontend/site/res ./res
 
-#Copy the static content (images, 3PP JS/CSS files)
+# Copy the static content (images, 3PP JS/CSS files)
 COPY ./docker/frontend/src/img ./res/img
 COPY ./docker/frontend/src/js/final/*.js ./res/js/
 COPY ./docker/frontend/src/css/final/*.css ./res/css/

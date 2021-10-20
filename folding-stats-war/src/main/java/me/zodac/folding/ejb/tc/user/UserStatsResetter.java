@@ -1,4 +1,4 @@
-package me.zodac.folding.ejb.tc;
+package me.zodac.folding.ejb.tc.user;
 
 import javax.ejb.EJB;
 import javax.ejb.Singleton;

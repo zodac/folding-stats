@@ -1,4 +1,4 @@
-package me.zodac.folding.ejb.tc;
+package me.zodac.folding.ejb.tc.user;
 
 import static me.zodac.folding.api.util.NumberUtils.formatWithCommas;
 
