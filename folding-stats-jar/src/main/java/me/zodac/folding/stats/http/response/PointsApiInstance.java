@@ -14,8 +14,8 @@ import lombok.ToString;
  * Expected response:
  * <pre>
  *     {
- *         "earned": 97802740,      <-- This is the total points earned by the user/passkey combo, for all teams, which is what we want
- *         "contributed": 76694831, <-- This is the total points earned by the user/passkey combo, but only for the specified team (can be null)
+ *         "earned": 97802740,      This is the total points earned by the user/passkey combo, for all teams, which is what we want
+ *         "contributed": 76694831, This is the total points earned by the user/passkey combo, but only for the specified team (can be null)
  *         "team_total": 5526874925,
  *         "team_name": "ExtremeHW",
  *         "team_url": "https://extremehw.net/",

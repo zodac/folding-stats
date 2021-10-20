@@ -251,7 +251,8 @@
                         </annotationProcessorPaths>
                         <fork>true</fork>
                         <compilerArgs>
-                            <arg>-Xlint:deprecation</arg>
+                            <arg>-Xlint:all</arg>
+                            <arg>-Xdoclint:all</arg>
                             <arg>-XDcompilePolicy=simple</arg>
                             <arg>-Xplugin:ErrorProne</arg>
                             <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
