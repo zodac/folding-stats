@@ -1,7 +1,6 @@
 package me.zodac.folding.rest.endpoint;
 
 import static me.zodac.folding.api.util.DateTimeUtils.untilNextMonthUtc;
-import static me.zodac.folding.rest.response.Responses.badGateway;
 import static me.zodac.folding.rest.response.Responses.badRequest;
 import static me.zodac.folding.rest.response.Responses.conflict;
 import static me.zodac.folding.rest.response.Responses.created;
@@ -30,10 +29,8 @@ import me.zodac.folding.api.RequestPojo;
 import me.zodac.folding.api.ResponsePojo;
 import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.ejb.BusinessLogic;
-import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.api.validator.ValidationResult;
-import me.zodac.folding.ejb.OldFacade;
 import me.zodac.folding.rest.parse.IntegerParser;
 import me.zodac.folding.rest.parse.ParseResult;
 import me.zodac.folding.rest.response.BatchCreateResponse;
@@ -51,14 +48,11 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
     @EJB
     protected BusinessLogic businessLogic;
 
-    @EJB
-    protected OldFacade oldFacade;
-
     protected abstract Logger getLogger();
 
     protected abstract String elementType();
 
-    protected abstract O createElement(final O element) throws ExternalConnectionException;
+    protected abstract O createElement(final O element);
 
     protected abstract Collection<O> getAllElements();
 
@@ -100,11 +94,6 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             getLogger().info("Created {} with ID {}", elementType(), elementWithId.getId());
             return created(elementWithId, elementLocationBuilder);
-        } catch (final ExternalConnectionException e) {
-            final String errorMessage = String.format("Error connecting to external service at '%s': %s", e.getUrl(), e.getMessage());
-            getLogger().debug(errorMessage, e);
-            getLogger().error(errorMessage);
-            return badGateway();
         } catch (final Exception e) {
             getLogger().error("Unexpected error creating {}: {}", elementType(), inputRequest, e);
             return serverError();

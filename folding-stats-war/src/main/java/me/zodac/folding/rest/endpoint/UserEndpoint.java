@@ -17,7 +17,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
-import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
@@ -95,8 +94,8 @@ public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
     }
 
     @Override
-    protected User createElement(final User user) throws ExternalConnectionException {
-        return oldFacade.createUser(user);
+    protected User createElement(final User user) {
+        return businessLogic.createUser(user);
     }
 
     @Override
@@ -130,11 +129,11 @@ public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
     protected User updateElementById(final User user, final User existingUser) {
         // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
         final User userWithId = User.updateWithId(existingUser.getId(), user);
-        return oldFacade.updateUser(userWithId, existingUser);
+        return businessLogic.updateUser(userWithId, existingUser);
     }
 
     @Override
     protected void deleteElement(final User user) {
-        oldFacade.deleteUser(user);
+        businessLogic.deleteUser(user);
     }
 }

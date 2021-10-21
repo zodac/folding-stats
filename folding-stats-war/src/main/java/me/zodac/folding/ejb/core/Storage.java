@@ -147,12 +147,12 @@ final class Storage {
     @Cached({HardwareCache.class, UserCache.class})
     public Hardware updateHardware(final Hardware hardwareToUpdate) {
         final Hardware updatedHardware = DB_MANAGER.updateHardware(hardwareToUpdate);
-        hardwareCache.add(hardwareToUpdate.getId(), updatedHardware);
+        hardwareCache.add(updatedHardware.getId(), updatedHardware);
 
         getAllUsers()
             .stream()
-            .filter(user -> user.getHardware().getId() == hardwareToUpdate.getId())
-            .map(user -> User.updateHardware(user, hardwareToUpdate))
+            .filter(user -> user.getHardware().getId() == updatedHardware.getId())
+            .map(user -> User.updateHardware(user, updatedHardware))
             .forEach(updatedUser -> userCache.add(updatedUser.getId(), updatedUser));
 
         return updatedHardware;
@@ -256,12 +256,12 @@ final class Storage {
     @Cached({TeamCache.class, UserCache.class})
     public Team updateTeam(final Team teamToUpdate) {
         final Team updatedTeam = DB_MANAGER.updateTeam(teamToUpdate);
-        teamCache.add(teamToUpdate.getId(), updatedTeam);
+        teamCache.add(updatedTeam.getId(), updatedTeam);
 
         getAllUsers()
             .stream()
-            .filter(user -> user.getTeam().getId() == teamToUpdate.getId())
-            .map(user -> User.updateTeam(user, teamToUpdate))
+            .filter(user -> user.getTeam().getId() == updatedTeam.getId())
+            .map(user -> User.updateTeam(user, updatedTeam))
             .forEach(updatedUser -> userCache.add(updatedUser.getId(), updatedUser));
 
         return updatedTeam;
@@ -280,6 +280,23 @@ final class Storage {
     void deleteTeam(final int teamId) {
         DB_MANAGER.deleteTeam(teamId);
         teamCache.remove(teamId);
+    }
+
+    /**
+     * Creates a {@link User}.
+     *
+     * <p>
+     * Persists it with the {@link DbManager}, then adds it to the {@link UserCache}.
+     *
+     * @param user the {@link User} to create
+     * @return the created {@link User}, with ID
+     * @see DbManager#createUser(User)
+     */
+    @Cached(UserCache.class)
+    User createUser(final User user) {
+        final User userWithId = DB_MANAGER.createUser(user);
+        userCache.add(userWithId.getId(), userWithId);
+        return userWithId;
     }
 
     /**
@@ -331,6 +348,37 @@ final class Storage {
         }
 
         return fromDb;
+    }
+
+    /**
+     * Updates a {@link User}. Expects the {@link User} to have a valid ID.
+     *
+     * <p>
+     * Persists it with the {@link DbManager}, then updates it in the {@link UserCache}.
+     *
+     * @param userToUpdate the {@link User} to update
+     * @see DbManager#updateUser(User)
+     */
+    @Cached(UserCache.class)
+    public User updateUser(final User userToUpdate) {
+        final User updatedUser = DB_MANAGER.updateUser(userToUpdate);
+        userCache.add(updatedUser.getId(), updatedUser);
+        return updatedUser;
+    }
+
+    /**
+     * Deletes a {@link User}.
+     *
+     * <p>
+     * Deletes it with the {@link DbManager}, then removes it to the {@link UserCache}.
+     *
+     * @param userId the ID of the {@link User} to delete
+     * @see DbManager#deleteUser(int)
+     */
+    @Cached(UserCache.class)
+    void deleteUser(final int userId) {
+        DB_MANAGER.deleteUser(userId);
+        userCache.remove(userId);
     }
 
     /**

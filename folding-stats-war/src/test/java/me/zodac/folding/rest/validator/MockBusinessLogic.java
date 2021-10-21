@@ -95,14 +95,6 @@ final class MockBusinessLogic implements BusinessLogic {
         teams.remove(team.getId());
     }
 
-    public void createUser(final User user) {
-        users.put(user.getId(), user);
-    }
-
-    public void deleteUser(final User user) {
-        users.remove(user.getId());
-    }
-
     @Override
     public Optional<User> getUserWithPasskey(final int userId) {
         return Optional.ofNullable(users.get(userId));
@@ -130,6 +122,22 @@ final class MockBusinessLogic implements BusinessLogic {
             .stream()
             .map(User::hidePasskey)
             .collect(toList());
+    }
+
+    @Override
+    public User createUser(final User user) {
+        users.put(user.getId(), user);
+        return user;
+    }
+
+    @Override
+    public User updateUser(final User userToUpdate, final User existingUser) {
+        return userToUpdate;
+    }
+
+    @Override
+    public void deleteUser(final User user) {
+        users.remove(user.getId());
     }
 
     @Override
@@ -183,11 +191,6 @@ final class MockBusinessLogic implements BusinessLogic {
     }
 
     @Override
-    public RetiredUserTcStats createRetiredUserStats(final RetiredUserTcStats retiredUserTcStats) {
-        return RetiredUserTcStats.empty();
-    }
-
-    @Override
     public Collection<RetiredUserTcStats> getAllRetiredUsersForTeam(final Team team) {
         return Collections.emptyList();
     }
@@ -235,11 +238,6 @@ final class MockBusinessLogic implements BusinessLogic {
     @Override
     public OffsetTcStats getOffsetStats(final User user) {
         return OffsetTcStats.empty();
-    }
-
-    @Override
-    public void deleteOffsetStats(final User user) {
-
     }
 
     @Override

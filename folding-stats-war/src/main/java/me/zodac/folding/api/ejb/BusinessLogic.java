@@ -47,9 +47,13 @@ public interface BusinessLogic {
     /**
      * Updates an existing {@link Hardware}.
      *
+     * <p>
+     * Also handles state change to any {@link User}s using this {@link Hardware} if necessary.
+     *
      * @param hardwareToUpdate the {@link Hardware} with updated values
      * @param existingHardware the existing {@link Hardware}
      * @return the updated {@link Hardware}
+     * @see me.zodac.folding.ejb.tc.user.UserStateChangeHandler#isHardwareStateChange(Hardware, Hardware)
      */
     Hardware updateHardware(final Hardware hardwareToUpdate, final Hardware existingHardware);
 
@@ -99,6 +103,18 @@ public interface BusinessLogic {
     void deleteTeam(final Team team);
 
     /**
+     * Creates a {@link User}.
+     *
+     * <p>
+     * Creates initial {@link UserStats} on creation. Also triggers a new <code>Team Competition</code> stats parse.
+     *
+     * @param user the {@link User} to create
+     * @return the created {@link User}, with ID
+     * @see me.zodac.folding.ejb.tc.user.UserStatsParser#parseTcStatsForUser(User)
+     */
+    User createUser(final User user);
+
+    /**
      * Retrieves a {@link User}, with the passkey unmodified.
      *
      * @param userId the ID of the {@link User} to retrieve
@@ -127,6 +143,30 @@ public interface BusinessLogic {
      * @return a {@link Collection} of the retrieved {@link User}s
      */
     Collection<User> getAllUsersWithoutPasskeys();
+
+    /**
+     * Updates an existing {@link User}.
+     *
+     * <p>
+     * Also handles state change to this {@link User} if necessary.
+     *
+     * @param userToUpdate the {@link User} with updated values
+     * @param existingUser the existing {@link User}
+     * @return the updated {@link User}
+     * @see me.zodac.folding.ejb.tc.user.UserStateChangeHandler#isUserStateChange(User, User)
+     */
+    User updateUser(final User userToUpdate, final User existingUser);
+
+    /**
+     * Deletes a {@link User}.
+     *
+     * <p>
+     * If the {@link User} has any <code>Team Competition</code> {@link UserTcStats}, those are retained for their {@link Team} as
+     * {@link RetiredUserTcStats}.
+     *
+     * @param user the {@link User} to delete
+     */
+    void deleteUser(final User user);
 
     /**
      * Retrieves a {@link Hardware} with the given name.
@@ -200,14 +240,6 @@ public interface BusinessLogic {
      * @return an {@link Optional} of the <code>Team Competition</code> {@link MonthlyResult}
      */
     Optional<MonthlyResult> getMonthlyResult(final Month month, final Year year);
-
-    /**
-     * Creates a {@link RetiredUserTcStats} for a {@link User} that has been deleted from a {@link Team}.
-     *
-     * @param retiredUserTcStats the {@link RetiredUserTcStats} for the deleted {@link User}
-     * @return the {@link RetiredUserTcStats}
-     */
-    RetiredUserTcStats createRetiredUserStats(final RetiredUserTcStats retiredUserTcStats);
 
     /**
      * Retrieves all {@link RetiredUserTcStats} for the provided {@link Team}.
@@ -312,13 +344,6 @@ public interface BusinessLogic {
      * @return the {@link OffsetTcStats} for the {@link User}, or {@link OffsetTcStats#empty()} if none can be found
      */
     OffsetTcStats getOffsetStats(final User user);
-
-    /**
-     * Deletes the {@link OffsetTcStats} for the provided {@link User}.
-     *
-     * @param user the {@link User} whose {@link OffsetTcStats} are to be deleted
-     */
-    void deleteOffsetStats(final User user);
 
     /**
      * Creates a {@link UserTcStats} for a {@link User}'s <code>Team Competition</code> stats for a specific hour.

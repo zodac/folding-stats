@@ -18,12 +18,6 @@
         <Bug pattern="MS_EXPOSE_REP"/>
     </Match>
 
-    <!-- False positive, unable to see that generic response from cache is actually a valid case -->
-    <Match>
-        <Class name="me.zodac.folding.ejb.OldFacade"/>
-        <Bug pattern="BC_IMPOSSIBLE_CAST"/>
-    </Match>
-
     <!-- False positive, no null checks being made -->
     <Match>
         <Class name="me.zodac.folding.db.postgres.PostgresDbManager"/>

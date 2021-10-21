@@ -10,6 +10,8 @@ import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.ejb.BusinessLogic;
+import me.zodac.folding.api.exception.ExternalConnectionException;
+import me.zodac.folding.api.stats.FoldingStatsRetriever;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
@@ -19,7 +21,9 @@ import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.ejb.tc.user.UserStateChangeHandler;
+import me.zodac.folding.ejb.tc.user.UserStatsParser;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
+import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -36,9 +40,13 @@ public class BusinessLogicEjb implements BusinessLogic {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Storage STORAGE = Storage.getInstance();
+    private static final FoldingStatsRetriever FOLDING_STATS_RETRIEVER = HttpFoldingStatsRetriever.create();
 
     @EJB
     private UserStateChangeHandler userStateChangeHandler;
+
+    @EJB
+    private UserStatsParser userStatsParser;
 
     @Override
     public Hardware createHardware(final Hardware hardware) {
@@ -63,7 +71,7 @@ public class BusinessLogicEjb implements BusinessLogic {
             final Collection<User> usersUsingThisHardware = getUsersWithHardware(updatedHardware);
 
             for (final User user : usersUsingThisHardware) {
-                LOGGER.debug("User '{}' (ID: {}) had state change to hardware multiplier", user.getDisplayName(), user.getId());
+                LOGGER.debug("User '{}' (ID: {}) had state change to hardware", user.getDisplayName(), user.getId());
                 userStateChangeHandler.handleStateChange(user);
             }
         }
@@ -102,6 +110,23 @@ public class BusinessLogicEjb implements BusinessLogic {
     }
 
     @Override
+    public User createUser(final User user) {
+        final User createdUser = STORAGE.createUser(user);
+
+        try {
+            // When adding a new user, we configure the initial stats DB/cache
+            final UserStats currentUserStats = FOLDING_STATS_RETRIEVER.getTotalStats(createdUser);
+            final UserStats initialStats = createInitialStats(currentUserStats);
+            LOGGER.info("User '{}' (ID: {}) created with initial stats: {}", createdUser.getDisplayName(), createdUser.getId(), initialStats);
+            userStatsParser.parseTcStatsForUser(createdUser);
+        } catch (final ExternalConnectionException e) {
+            LOGGER.error("Error retrieving initial stats for user '{}' (ID: {})", createdUser.getDisplayName(), createdUser.getId(), e);
+        }
+
+        return createdUser;
+    }
+
+    @Override
     public Optional<User> getUserWithPasskey(final int userId) {
         return STORAGE.getUser(userId);
     }
@@ -128,6 +153,35 @@ public class BusinessLogicEjb implements BusinessLogic {
             .stream()
             .map(User::hidePasskey)
             .collect(toList());
+    }
+
+    @Override
+    public User updateUser(final User userToUpdate, final User existingUser) {
+        final User updatedUser = STORAGE.updateUser(userToUpdate);
+
+        if (userStateChangeHandler.isUserStateChange(updatedUser, existingUser)) {
+            userStateChangeHandler.handleStateChange(updatedUser);
+            LOGGER.trace("User updated with required state change");
+        }
+
+        return updatedUser;
+    }
+
+    @Override
+    public void deleteUser(final User user) {
+        STORAGE.deleteUser(user.getId());
+
+        final UserTcStats userStats = getHourlyTcStats(user);
+
+        if (userStats.isEmptyStats()) {
+            LOGGER.warn("User '{}' (ID: {}) has no stats, not saving any retired stats", user.getDisplayName(), user.getId());
+            return;
+        }
+
+        final RetiredUserTcStats retiredUserTcStats = RetiredUserTcStats.createWithoutId(user.getTeam().getId(), user.getDisplayName(), userStats);
+        final RetiredUserTcStats createdRetiredUserTcStats = STORAGE.createRetiredUserStats(retiredUserTcStats);
+        LOGGER.info("User '{}' (ID: {}) retired with retired stats ID: {}", user.getDisplayName(), user.getId(),
+            createdRetiredUserTcStats.getRetiredUserId());
     }
 
     @Override
@@ -178,11 +232,6 @@ public class BusinessLogicEjb implements BusinessLogic {
     @Override
     public Optional<MonthlyResult> getMonthlyResult(final Month month, final Year year) {
         return STORAGE.getMonthlyResult(month, year);
-    }
-
-    @Override
-    public RetiredUserTcStats createRetiredUserStats(final RetiredUserTcStats retiredUserTcStats) {
-        return STORAGE.createRetiredUserStats(retiredUserTcStats);
     }
 
     @Override
@@ -262,11 +311,6 @@ public class BusinessLogicEjb implements BusinessLogic {
     public OffsetTcStats getOffsetStats(final User user) {
         return STORAGE.getOffsetStats(user.getId())
             .orElse(OffsetTcStats.empty());
-    }
-
-    @Override
-    public void deleteOffsetStats(final User user) {
-        STORAGE.deleteOffsetStats(user.getId());
     }
 
     @Override
