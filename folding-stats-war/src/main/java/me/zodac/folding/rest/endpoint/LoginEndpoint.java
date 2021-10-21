@@ -4,7 +4,6 @@ import static me.zodac.folding.rest.response.Responses.badRequest;
 import static me.zodac.folding.rest.response.Responses.forbidden;
 import static me.zodac.folding.rest.response.Responses.ok;
 import static me.zodac.folding.rest.response.Responses.serverError;
-import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
 import static me.zodac.folding.rest.response.Responses.unauthorized;
 
 import java.util.Map;
@@ -17,9 +16,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.ejb.BusinessLogic;
+import me.zodac.folding.api.state.ReadRequired;
 import me.zodac.folding.api.util.EncodingUtils;
 import me.zodac.folding.rest.api.LoginCredentials;
 import org.apache.logging.log4j.LogManager;
@@ -44,7 +43,6 @@ public class LoginEndpoint {
      * The {@link Response} will be one of:
      * <ul>
      *     <li>{@link me.zodac.folding.rest.response.Responses#ok()}</li>
-     *     <li>{@link me.zodac.folding.rest.response.Responses#serviceUnavailable()}</li>
      *     <li>{@link me.zodac.folding.rest.response.Responses#badRequest(Object)}</li>
      *     <li>{@link me.zodac.folding.rest.response.Responses#unauthorized()}</li>
      *     <li>{@link me.zodac.folding.rest.response.Responses#forbidden()}</li>
@@ -55,17 +53,13 @@ public class LoginEndpoint {
      * @return one of the above {@link Response}s
      */
     @POST
+    @ReadRequired
     @PermitAll
     @Path("/admin/")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response loginAsAdmin(final LoginCredentials loginCredentials) {
         LOGGER.debug("Login request received");
-
-        if (SystemStateManager.current().isReadBlocked()) {
-            LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
-            return serviceUnavailable();
-        }
 
         if (loginCredentials == null || EncodingUtils.isNotBasicAuthentication(loginCredentials.getEncodedUserNameAndPassword())) {
             LOGGER.error("Invalid payload: {}", loginCredentials);

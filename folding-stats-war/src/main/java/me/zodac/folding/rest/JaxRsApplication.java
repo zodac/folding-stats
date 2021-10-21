@@ -13,7 +13,8 @@ import me.zodac.folding.rest.endpoint.TeamEndpoint;
 import me.zodac.folding.rest.endpoint.UserEndpoint;
 import me.zodac.folding.rest.provider.CorsFilter;
 import me.zodac.folding.rest.provider.InvalidUrlRedirecter;
-import me.zodac.folding.rest.provider.security.SecurityInterceptor;
+import me.zodac.folding.rest.provider.interceptor.StateInterceptor;
+import me.zodac.folding.rest.provider.interceptor.security.SecurityInterceptor;
 
 /**
  * A class extending {@link Application} and annotated with {@link ApplicationPath} is the Java EE 6 "no XML" approach to activating JAX-RS.
@@ -40,7 +41,8 @@ public class JaxRsApplication extends Application {
             // REST providers
             CorsFilter.class,
             InvalidUrlRedirecter.class,
-            SecurityInterceptor.class
+            SecurityInterceptor.class,
+            StateInterceptor.class
         );
     }
 }

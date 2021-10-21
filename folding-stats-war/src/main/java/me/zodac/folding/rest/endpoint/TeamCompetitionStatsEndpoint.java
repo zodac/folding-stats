@@ -6,7 +6,6 @@ import static me.zodac.folding.rest.response.Responses.notFound;
 import static me.zodac.folding.rest.response.Responses.nullRequest;
 import static me.zodac.folding.rest.response.Responses.ok;
 import static me.zodac.folding.rest.response.Responses.serverError;
-import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
 
 import java.util.Collection;
 import java.util.List;
@@ -28,18 +27,20 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import me.zodac.folding.SystemStateManager;
-import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.ejb.BusinessLogic;
+import me.zodac.folding.api.state.ReadRequired;
+import me.zodac.folding.api.state.SystemState;
+import me.zodac.folding.api.state.WriteRequired;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
-import me.zodac.folding.api.util.ExecutionType;
+import me.zodac.folding.api.util.ProcessingType;
 import me.zodac.folding.ejb.tc.CompetitionResultGenerator;
 import me.zodac.folding.ejb.tc.LeaderboardStatsGenerator;
+import me.zodac.folding.ejb.tc.scheduled.StatsScheduler;
 import me.zodac.folding.ejb.tc.user.UserStatsParser;
 import me.zodac.folding.ejb.tc.user.UserStatsResetter;
-import me.zodac.folding.ejb.tc.scheduled.StatsScheduler;
 import me.zodac.folding.rest.api.tc.CompetitionSummary;
 import me.zodac.folding.rest.api.tc.UserSummary;
 import me.zodac.folding.rest.api.tc.leaderboard.TeamLeaderboardEntry;
@@ -77,15 +78,11 @@ public class TeamCompetitionStatsEndpoint {
     private UserStatsResetter userStatsResetter;
 
     @GET
+    @ReadRequired
     @PermitAll
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTeamCompetitionStats() {
         LOGGER.debug("GET request received to show TC stats");
-
-        if (SystemStateManager.current().isReadBlocked()) {
-            LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
-            return serviceUnavailable();
-        }
 
         try {
             final CompetitionSummary competitionSummary = competitionResultGenerator.generate();
@@ -97,16 +94,12 @@ public class TeamCompetitionStatsEndpoint {
     }
 
     @GET
+    @ReadRequired
     @PermitAll
     @Path("/users/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTeamCompetitionStatsForUser(@PathParam("userId") final String userId) {
         LOGGER.debug("GET request received to show TC stats for user received at '{}'", uriContext.getAbsolutePath());
-
-        if (SystemStateManager.current().isReadBlocked()) {
-            LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
-            return serviceUnavailable();
-        }
 
         try {
             final ParseResult parseResult = IntegerParser.parsePositive(userId);
@@ -148,6 +141,7 @@ public class TeamCompetitionStatsEndpoint {
     }
 
     @PATCH
+    @WriteRequired
     @RolesAllowed("admin")
     @Path("/users/{userId}")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -155,12 +149,7 @@ public class TeamCompetitionStatsEndpoint {
     public Response updateUserWithOffset(@PathParam("userId") final String userId, final OffsetTcStats offsetTcStats) {
         LOGGER.debug("PATCH request to update offset for user received at '{}': {}", uriContext.getAbsolutePath(), offsetTcStats);
 
-        if (SystemStateManager.current().isWriteBlocked()) {
-            LOGGER.warn("System state {} does not allow write requests", SystemStateManager.current());
-            return serviceUnavailable();
-        }
-
-        if (offsetTcStats == null) {
+        if (offsetTcStats == null || offsetTcStats.isEmpty()) {
             LOGGER.error("Payload is null");
             return nullRequest();
         }
@@ -201,16 +190,12 @@ public class TeamCompetitionStatsEndpoint {
     }
 
     @GET
+    @ReadRequired
     @PermitAll
     @Path("/leaderboard/")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTeamLeaderboard() {
         LOGGER.debug("GET request received to show TC leaderboard");
-
-        if (SystemStateManager.current().isReadBlocked()) {
-            LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
-            return serviceUnavailable();
-        }
 
         try {
             final List<TeamLeaderboardEntry> teamSummaries = leaderboardStatsGenerator.generateTeamLeaderboards();
@@ -222,16 +207,12 @@ public class TeamCompetitionStatsEndpoint {
     }
 
     @GET
+    @ReadRequired
     @PermitAll
     @Path("/category/")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCategoryLeaderboard() {
         LOGGER.debug("GET request received to show TC category leaderboard");
-
-        if (SystemStateManager.current().isReadBlocked()) {
-            LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
-            return serviceUnavailable();
-        }
 
         try {
             final Map<Category, List<UserCategoryLeaderboardEntry>> categoryLeaderboard =
@@ -244,19 +225,15 @@ public class TeamCompetitionStatsEndpoint {
     }
 
     @GET
+    @WriteRequired
     @RolesAllowed("admin")
     @Path("/manual/update")
     public Response updateStats(@QueryParam("async") final boolean async) {
         LOGGER.info("GET request received to manually update TC stats");
 
-        if (SystemStateManager.current().isReadBlocked()) {
-            LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
-            return serviceUnavailable();
-        }
-
         try {
-            final ExecutionType executionType = async ? ExecutionType.ASYNCHRONOUS : ExecutionType.SYNCHRONOUS;
-            statsScheduler.manualTeamCompetitionStatsParsing(executionType);
+            final ProcessingType processingType = async ? ProcessingType.ASYNCHRONOUS : ProcessingType.SYNCHRONOUS;
+            statsScheduler.manualTeamCompetitionStatsParsing(processingType);
             return ok();
         } catch (final Exception e) {
             LOGGER.error("Unexpected error manually parsing TC stats", e);
@@ -265,15 +242,11 @@ public class TeamCompetitionStatsEndpoint {
     }
 
     @GET
+    @WriteRequired
     @RolesAllowed("admin")
     @Path("/manual/reset/")
     public Response resetStats() {
         LOGGER.info("GET request received to manually reset TC stats");
-
-        if (SystemStateManager.current().isReadBlocked()) {
-            LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
-            return serviceUnavailable();
-        }
 
         try {
             SystemStateManager.next(SystemState.RESETTING_STATS);

@@ -12,13 +12,13 @@ import javax.ejb.Timer;
 import javax.ejb.TimerService;
 import me.zodac.folding.ParsingStateManager;
 import me.zodac.folding.SystemStateManager;
-import me.zodac.folding.api.ParsingState;
-import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.ejb.BusinessLogic;
+import me.zodac.folding.api.state.ParsingState;
+import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
-import me.zodac.folding.api.util.ExecutionType;
+import me.zodac.folding.api.util.ProcessingType;
 import me.zodac.folding.ejb.tc.user.UserStatsParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -98,7 +98,7 @@ public class StatsScheduler {
         try {
             ParsingStateManager.next(ParsingState.ENABLED_TEAM_COMPETITION);
             SystemStateManager.next(SystemState.UPDATING_STATS);
-            parseTeamCompetitionStats(ExecutionType.ASYNCHRONOUS);
+            parseTeamCompetitionStats(ProcessingType.ASYNCHRONOUS);
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
         } catch (final Exception e) {
             LOGGER.error("Unexpected error updating TC stats", e);
@@ -109,17 +109,17 @@ public class StatsScheduler {
      * Parses <code>Team Competition</code> stats. Sets the {@link SystemState} to {@link SystemState#UPDATING_STATS} while stats are being parsed,
      * then finally to {@link SystemState#WRITE_EXECUTED} when complete.
      *
-     * @param executionType the {@link ExecutionType}
+     * @param processingType the {@link ProcessingType}
      */
-    public void manualTeamCompetitionStatsParsing(final ExecutionType executionType) {
+    public void manualTeamCompetitionStatsParsing(final ProcessingType processingType) {
         LOGGER.debug("Manual stats parsing execution");
         ParsingStateManager.next(ParsingState.ENABLED_TEAM_COMPETITION);
         SystemStateManager.next(SystemState.UPDATING_STATS);
-        parseTeamCompetitionStats(executionType);
+        parseTeamCompetitionStats(processingType);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
     }
 
-    private void parseTeamCompetitionStats(final ExecutionType executionType) {
+    private void parseTeamCompetitionStats(final ProcessingType processingType) {
         LOGGER.info("");
         LOGGER.info("Parsing TC Folding stats:");
 
@@ -131,11 +131,11 @@ public class StatsScheduler {
 
         LOGGER.debug("Found TC teams: {}", tcTeams);
         for (final Team team : tcTeams) {
-            parseTcStatsForTeam(team, executionType);
+            parseTcStatsForTeam(team, processingType);
         }
     }
 
-    private void parseTcStatsForTeam(final Team team, final ExecutionType executionType) {
+    private void parseTcStatsForTeam(final Team team, final ProcessingType processingType) {
         LOGGER.debug("Getting TC stats for users in team {}", team::getTeamName);
         final Collection<User> teamUsers = businessLogic.getUsersOnTeam(team);
 
@@ -146,7 +146,7 @@ public class StatsScheduler {
 
         LOGGER.debug("Found users TC team {}: {}", team.getTeamName(), teamUsers);
         for (final User user : teamUsers) {
-            if (executionType == ExecutionType.ASYNCHRONOUS) {
+            if (processingType == ProcessingType.ASYNCHRONOUS) {
                 userStatsParser.parseTcStatsForUser(user);
             } else {
                 userStatsParser.parseTcStatsForUserAndWait(user);

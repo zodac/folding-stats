@@ -17,6 +17,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import me.zodac.folding.api.state.ReadRequired;
+import me.zodac.folding.api.state.WriteRequired;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
@@ -35,6 +37,7 @@ public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @POST
+    @WriteRequired
     @RolesAllowed("admin")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -43,6 +46,7 @@ public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
     }
 
     @POST
+    @WriteRequired
     @RolesAllowed("admin")
     @Path("/batch")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -52,6 +56,7 @@ public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
     }
 
     @GET
+    @ReadRequired
     @PermitAll
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllUsers(@Context final Request request) {
@@ -59,6 +64,7 @@ public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
     }
 
     @GET
+    @ReadRequired
     @PermitAll
     @Path("/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -67,6 +73,7 @@ public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
     }
 
     @PUT
+    @WriteRequired
     @RolesAllowed("admin")
     @Path("/{userId}")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -76,6 +83,7 @@ public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
     }
 
     @DELETE
+    @WriteRequired
     @RolesAllowed("admin")
     @Path("/{userId}")
     @Produces(MediaType.APPLICATION_JSON)

@@ -6,13 +6,13 @@ import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import me.zodac.folding.SystemStateManager;
-import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.ejb.BusinessLogic;
+import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
-import me.zodac.folding.api.util.ExecutionType;
+import me.zodac.folding.api.util.ProcessingType;
 import me.zodac.folding.ejb.tc.scheduled.StatsScheduler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -44,7 +44,7 @@ public class Initialiser {
      * </ol>
      *
      * @see BusinessLogic#isAnyHourlyTcStatsExist()
-     * @see StatsScheduler#manualTeamCompetitionStatsParsing(ExecutionType)
+     * @see StatsScheduler#manualTeamCompetitionStatsParsing(ProcessingType)
      */
     @PostConstruct
     public void init() {
@@ -74,7 +74,7 @@ public class Initialiser {
     private void initTcStats() {
         if (!businessLogic.isAnyHourlyTcStatsExist()) {
             LOGGER.warn("No TC stats data exists in the DB");
-            statsScheduler.manualTeamCompetitionStatsParsing(ExecutionType.ASYNCHRONOUS);
+            statsScheduler.manualTeamCompetitionStatsParsing(ProcessingType.ASYNCHRONOUS);
         }
     }
 }

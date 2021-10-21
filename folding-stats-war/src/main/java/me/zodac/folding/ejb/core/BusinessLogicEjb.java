@@ -40,6 +40,7 @@ public class BusinessLogicEjb implements BusinessLogic {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Storage STORAGE = Storage.getInstance();
+    // TODO: [zodac] After AbstractCrud and UserValidator are sorted, make this the only place to retrieve stats?
     private static final FoldingStatsRetriever FOLDING_STATS_RETRIEVER = HttpFoldingStatsRetriever.create();
 
     @EJB

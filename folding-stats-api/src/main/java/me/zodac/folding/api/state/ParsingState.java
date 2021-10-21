@@ -1,4 +1,4 @@
-package me.zodac.folding.api;
+package me.zodac.folding.api.state;
 
 /**
  * The various states that the system is performing with stats parsing.

@@ -18,8 +18,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import me.zodac.folding.api.state.ReadRequired;
+import me.zodac.folding.api.state.WriteRequired;
 import me.zodac.folding.api.tc.Team;
-import me.zodac.folding.api.util.ExecutionType;
+import me.zodac.folding.api.util.ProcessingType;
 import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.ejb.tc.scheduled.StatsScheduler;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
@@ -41,6 +43,7 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
     private StatsScheduler statsScheduler;
 
     @POST
+    @WriteRequired
     @RolesAllowed("admin")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -49,6 +52,7 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
     }
 
     @POST
+    @WriteRequired
     @RolesAllowed("admin")
     @Path("/batch")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -58,6 +62,7 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
     }
 
     @GET
+    @ReadRequired
     @PermitAll
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllTeams(@Context final Request request) {
@@ -65,6 +70,7 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
     }
 
     @GET
+    @ReadRequired
     @PermitAll
     @Path("/{teamId}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -73,6 +79,7 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
     }
 
     @PUT
+    @WriteRequired
     @RolesAllowed("admin")
     @Path("/{teamId}")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -82,6 +89,7 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
     }
 
     @DELETE
+    @WriteRequired
     @RolesAllowed("admin")
     @Path("/{teamId}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -102,7 +110,7 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
     @Override
     protected Team createElement(final Team team) {
         final Team teamWithId = businessLogic.createTeam(team);
-        statsScheduler.manualTeamCompetitionStatsParsing(ExecutionType.SYNCHRONOUS);
+        statsScheduler.manualTeamCompetitionStatsParsing(ProcessingType.SYNCHRONOUS);
         return teamWithId;
     }
 

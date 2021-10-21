@@ -1,4 +1,4 @@
-package me.zodac.folding.rest.provider.security;
+package me.zodac.folding.rest.provider.interceptor.security;
 
 import static java.util.stream.Collectors.toSet;
 import static me.zodac.folding.api.util.CollectionUtils.containsNoMatches;
@@ -77,8 +77,7 @@ public class SecurityInterceptor implements ContainerRequestFilter {
         try {
             validateRequest(requestContext);
         } catch (final Exception e) {
-            LOGGER.debug("Unexpected error validating REST request at '{}'", requestContext.getUriInfo().getAbsolutePath(), e);
-            LOGGER.warn("Unexpected error validating REST request at '{}'", requestContext.getUriInfo().getAbsolutePath());
+            LOGGER.warn("Unexpected error validating REST request at '{}'", requestContext.getUriInfo().getAbsolutePath(), e);
         }
     }
 

@@ -5,7 +5,6 @@ import static me.zodac.folding.rest.response.Responses.badRequest;
 import static me.zodac.folding.rest.response.Responses.notFound;
 import static me.zodac.folding.rest.response.Responses.okBuilder;
 import static me.zodac.folding.rest.response.Responses.serverError;
-import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
 
 import java.time.DateTimeException;
 import java.time.Month;
@@ -31,8 +30,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.ejb.BusinessLogic;
+import me.zodac.folding.api.state.ReadRequired;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
@@ -58,6 +57,7 @@ public class HistoricStatsEndpoint {
     private BusinessLogic businessLogic;
 
     @GET
+    @ReadRequired
     @PermitAll
     @Path("/users/{userId}/{year}/{month}/{day}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -67,11 +67,6 @@ public class HistoricStatsEndpoint {
                                                @PathParam("day") final String day,
                                                @Context final Request request) {
         LOGGER.debug("GET request received to show hourly TC user stats at '{}'", uriContext.getAbsolutePath());
-
-        if (SystemStateManager.current().isReadBlocked()) {
-            LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
-            return serviceUnavailable();
-        }
 
         try {
             final int dayAsInt = parseInt(day);
@@ -142,6 +137,7 @@ public class HistoricStatsEndpoint {
     }
 
     @GET
+    @ReadRequired
     @PermitAll
     @Path("/users/{userId}/{year}/{month}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -150,11 +146,6 @@ public class HistoricStatsEndpoint {
                                               @PathParam("month") final String month,
                                               @Context final Request request) {
         LOGGER.debug("GET request received to show daily TC user stats at '{}'", uriContext.getAbsolutePath());
-
-        if (SystemStateManager.current().isReadBlocked()) {
-            LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
-            return serviceUnavailable();
-        }
 
         try {
             final ParseResult parseResult = IntegerParser.parsePositive(userId);
@@ -208,6 +199,7 @@ public class HistoricStatsEndpoint {
     }
 
     @GET
+    @ReadRequired
     @PermitAll
     @Path("/users/{userId}/{year}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -215,11 +207,6 @@ public class HistoricStatsEndpoint {
                                                 @PathParam("year") final String year,
                                                 @Context final Request request) {
         LOGGER.debug("GET request received to show monthly TC user stats at '{}'", uriContext.getAbsolutePath());
-
-        if (SystemStateManager.current().isReadBlocked()) {
-            LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
-            return serviceUnavailable();
-        }
 
         try {
             final ParseResult parseResult = IntegerParser.parsePositive(userId);
@@ -268,6 +255,7 @@ public class HistoricStatsEndpoint {
     }
 
     @GET
+    @ReadRequired
     @PermitAll
     @Path("/teams/{teamId}/{year}/{month}/{day}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -277,11 +265,6 @@ public class HistoricStatsEndpoint {
                                                @PathParam("day") final String day,
                                                @Context final Request request) {
         LOGGER.debug("GET request received to show hourly TC user stats at '{}'", uriContext.getAbsolutePath());
-
-        if (SystemStateManager.current().isReadBlocked()) {
-            LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
-            return serviceUnavailable();
-        }
 
         try {
             final int dayAsInt = parseInt(day);
@@ -361,6 +344,7 @@ public class HistoricStatsEndpoint {
     }
 
     @GET
+    @ReadRequired
     @PermitAll
     @Path("/teams/{teamId}/{year}/{month}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -369,11 +353,6 @@ public class HistoricStatsEndpoint {
                                               @PathParam("month") final String month,
                                               @Context final Request request) {
         LOGGER.debug("GET request received to show daily TC user stats at '{}'", uriContext.getAbsolutePath());
-
-        if (SystemStateManager.current().isReadBlocked()) {
-            LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
-            return serviceUnavailable();
-        }
 
         try {
             final ParseResult parseResult = IntegerParser.parsePositive(teamId);
@@ -437,6 +416,7 @@ public class HistoricStatsEndpoint {
     }
 
     @GET
+    @ReadRequired
     @PermitAll
     @Path("/teams/{teamId}/{year}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -444,11 +424,6 @@ public class HistoricStatsEndpoint {
                                                 @PathParam("year") final String year,
                                                 @Context final Request request) {
         LOGGER.info("GET request received to show monthly TC team stats at '{}'", uriContext.getAbsolutePath());
-
-        if (SystemStateManager.current().isReadBlocked()) {
-            LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
-            return serviceUnavailable();
-        }
 
         try {
             final ParseResult parseResult = IntegerParser.parsePositive(teamId);

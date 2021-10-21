@@ -1,6 +1,6 @@
 package me.zodac.folding;
 
-import me.zodac.folding.api.SystemState;
+import me.zodac.folding.api.state.SystemState;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

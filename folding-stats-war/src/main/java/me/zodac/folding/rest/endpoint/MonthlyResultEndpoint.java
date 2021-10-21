@@ -3,7 +3,6 @@ package me.zodac.folding.rest.endpoint;
 import static me.zodac.folding.rest.response.Responses.badRequest;
 import static me.zodac.folding.rest.response.Responses.ok;
 import static me.zodac.folding.rest.response.Responses.serverError;
-import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
 
 import java.time.DateTimeException;
 import java.time.Month;
@@ -22,8 +21,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.ejb.BusinessLogic;
+import me.zodac.folding.api.state.ReadRequired;
+import me.zodac.folding.api.state.WriteRequired;
 import me.zodac.folding.api.tc.result.MonthlyResult;
 import me.zodac.folding.ejb.tc.user.UserStatsStorer;
 import org.apache.logging.log4j.LogManager;
@@ -45,17 +45,13 @@ public class MonthlyResultEndpoint {
     private UserStatsStorer userStatsStorer;
 
     @GET
+    @ReadRequired
     @PermitAll
     @Path("/result/{year}/{month}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getMonthlyResult(@PathParam("year") final String year,
                                      @PathParam("month") final String month) {
         LOGGER.debug("GET request received to retrieve monthly TC result at '{}'", uriContext.getAbsolutePath());
-
-        if (SystemStateManager.current().isReadBlocked()) {
-            LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());
-            return serviceUnavailable();
-        }
 
         try {
             final Optional<MonthlyResult> monthlyResult = businessLogic.getMonthlyResult(Month.of(Integer.parseInt(month)), Year.parse(year));
@@ -82,15 +78,11 @@ public class MonthlyResultEndpoint {
     }
 
     @GET
+    @WriteRequired
     @RolesAllowed("admin")
     @Path("/manual/save/")
     public Response saveMonthlyResult() {
         LOGGER.info("GET request received to manually store monthly TC result");
-
-        if (SystemStateManager.current().isWriteBlocked()) {
-            LOGGER.warn("System state {} does not allow write requests", SystemStateManager.current());
-            return serviceUnavailable();
-        }
 
         try {
             userStatsStorer.storeMonthlyResult();

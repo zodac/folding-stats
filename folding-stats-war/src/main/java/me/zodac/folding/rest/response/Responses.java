@@ -6,6 +6,7 @@ import java.util.Collection;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import me.zodac.folding.api.ResponsePojo;
+import me.zodac.folding.api.state.SystemState;
 
 /**
  * Utility class to simplify returning a {@link Response} in the REST layer.
@@ -306,7 +307,7 @@ public final class Responses {
      * A <b>503_SERVICE_UNAVAILABLE</b> {@link Response}.
      *
      * <p>
-     * Generally used for cases where either this service is unavailable due to the {@link me.zodac.folding.api.SystemState},
+     * Generally used for cases where either this service is unavailable due to the {@link SystemState},
      * or if an external service (such as the Folding@Home API) is unavailable.
      *
      * @return the <b>503_SERVICE_UNAVAILABLE</b> {@link Response}

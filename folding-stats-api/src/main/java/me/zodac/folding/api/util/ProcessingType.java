@@ -3,7 +3,7 @@ package me.zodac.folding.api.util;
 /**
  * Defines the possible types of executions for long-running tasks.
  */
-public enum ExecutionType {
+public enum ProcessingType {
 
     /**
      * Marks a specific function, method or task to be run in a background process, if possible.

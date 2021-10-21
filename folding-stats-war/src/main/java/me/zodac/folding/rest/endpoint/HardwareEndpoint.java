@@ -17,6 +17,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import me.zodac.folding.api.state.ReadRequired;
+import me.zodac.folding.api.state.WriteRequired;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
@@ -34,6 +36,7 @@ public class HardwareEndpoint extends AbstractCrudEndpoint<HardwareRequest, Hard
     private static final Logger LOGGER = LogManager.getLogger();
 
     @POST
+    @WriteRequired
     @RolesAllowed("admin")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -42,6 +45,7 @@ public class HardwareEndpoint extends AbstractCrudEndpoint<HardwareRequest, Hard
     }
 
     @POST
+    @WriteRequired
     @RolesAllowed("admin")
     @Path("/batch")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -51,6 +55,7 @@ public class HardwareEndpoint extends AbstractCrudEndpoint<HardwareRequest, Hard
     }
 
     @GET
+    @ReadRequired
     @PermitAll
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllHardware(@Context final Request request) {
@@ -58,6 +63,7 @@ public class HardwareEndpoint extends AbstractCrudEndpoint<HardwareRequest, Hard
     }
 
     @GET
+    @ReadRequired
     @PermitAll
     @Path("/{hardwareId}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -66,15 +72,17 @@ public class HardwareEndpoint extends AbstractCrudEndpoint<HardwareRequest, Hard
     }
 
     @PUT
+    @WriteRequired
     @RolesAllowed("admin")
     @Path("/{hardwareId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateFoldingTeamById(@PathParam("hardwareId") final String hardwareId, final HardwareRequest hardwareRequest) {
+    public Response updateHardwareById(@PathParam("hardwareId") final String hardwareId, final HardwareRequest hardwareRequest) {
         return super.updateById(hardwareId, hardwareRequest);
     }
 
     @DELETE
+    @WriteRequired
     @RolesAllowed("admin")
     @Path("/{hardwareId}")
     @Produces(MediaType.APPLICATION_JSON)

@@ -4,7 +4,7 @@ import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.util.ExecutionType;
+import me.zodac.folding.api.util.ProcessingType;
 import me.zodac.folding.cache.RetiredTcStatsCache;
 import me.zodac.folding.cache.TcStatsCache;
 import me.zodac.folding.cache.TotalStatsCache;
@@ -40,18 +40,18 @@ public class UserStatsResetter {
      * </ol>
      *
      * @see BusinessLogic#resetAllTeamCompetitionUserStats()
-     * @see StatsScheduler#manualTeamCompetitionStatsParsing(ExecutionType)
+     * @see StatsScheduler#manualTeamCompetitionStatsParsing(ProcessingType)
      */
     public void resetTeamCompetitionStats() {
         try {
             // Pull stats one more time to get the latest values
-            statsScheduler.manualTeamCompetitionStatsParsing(ExecutionType.SYNCHRONOUS);
+            statsScheduler.manualTeamCompetitionStatsParsing(ProcessingType.SYNCHRONOUS);
 
             LOGGER.info("Resetting Team Competition stats");
             businessLogic.resetAllTeamCompetitionUserStats();
 
             // Pull stats for new month
-            statsScheduler.manualTeamCompetitionStatsParsing(ExecutionType.SYNCHRONOUS);
+            statsScheduler.manualTeamCompetitionStatsParsing(ProcessingType.SYNCHRONOUS);
         } catch (final Exception e) {
             LOGGER.warn("Unexpected error manually resetting TC stats", e);
         }

@@ -9,7 +9,6 @@ import static me.zodac.folding.rest.response.Responses.nullRequest;
 import static me.zodac.folding.rest.response.Responses.ok;
 import static me.zodac.folding.rest.response.Responses.okBuilder;
 import static me.zodac.folding.rest.response.Responses.serverError;
-import static me.zodac.folding.rest.response.Responses.serviceUnavailable;
 
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -27,8 +26,8 @@ import javax.ws.rs.core.UriInfo;
 import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.RequestPojo;
 import me.zodac.folding.api.ResponsePojo;
-import me.zodac.folding.api.SystemState;
 import me.zodac.folding.api.ejb.BusinessLogic;
+import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.api.validator.ValidationResult;
 import me.zodac.folding.rest.parse.IntegerParser;
@@ -72,11 +71,6 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
         getLogger().debug("POST request received to create {} at '{}' with request: {}", this::elementType, uriContext::getAbsolutePath,
             () -> inputRequest);
 
-        if (SystemStateManager.current().isWriteBlocked()) {
-            getLogger().warn("System state {} does not allow write requests", SystemStateManager.current());
-            return serviceUnavailable();
-        }
-
         final ValidationResponse<O> validationResponse = validateCreateAndConvert(inputRequest);
         if (validationResponse.getValidationResult() == ValidationResult.FAILURE_ON_VALIDATION) {
             return badRequest(validationResponse);
@@ -103,11 +97,6 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
     protected Response createBatchOf(final Collection<I> batchOfInputRequests) {
         getLogger().debug("POST request received to create {} {}s at '{}' with request: {}", batchOfInputRequests::size, this::elementType,
             uriContext::getAbsolutePath, () -> batchOfInputRequests);
-
-        if (SystemStateManager.current().isWriteBlocked()) {
-            getLogger().warn("System state {} does not allow write requests", SystemStateManager.current());
-            return serviceUnavailable();
-        }
 
         final Collection<O> validElements = new ArrayList<>(batchOfInputRequests.size() / 2);
         final Collection<ValidationResponse<O>> failedValidationResponses = new ArrayList<>(batchOfInputRequests.size() / 2);
@@ -162,11 +151,6 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
     protected Response getAll(final Request request) {
         getLogger().debug("GET request received for all {}s at '{}'", this::elementType, uriContext::getAbsolutePath);
 
-        if (SystemStateManager.current().isReadBlocked()) {
-            getLogger().warn("System state {} does not allow read requests", SystemStateManager.current());
-            return serviceUnavailable();
-        }
-
         try {
             final Collection<O> elements = getAllElements();
 
@@ -192,11 +176,6 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
 
     protected Response getById(final String elementId, final Request request) {
         getLogger().debug("GET request for {} received at '{}'", this::elementType, uriContext::getAbsolutePath);
-
-        if (SystemStateManager.current().isReadBlocked()) {
-            getLogger().warn("System state {} does not allow read requests", SystemStateManager.current());
-            return serviceUnavailable();
-        }
 
         try {
             final ParseResult parseResult = IntegerParser.parsePositive(elementId);
@@ -241,11 +220,6 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
     @SuppressWarnings("PMD.NPathComplexity") // Better than breaking into smaller functions
     protected Response updateById(final String elementId, final I inputRequest) {
         getLogger().debug("PUT request for {} received at '{}'", this::elementType, uriContext::getAbsolutePath);
-
-        if (SystemStateManager.current().isWriteBlocked()) {
-            getLogger().warn("System state {} does not allow write requests", SystemStateManager.current());
-            return serviceUnavailable();
-        }
 
         if (inputRequest == null) {
             getLogger().error("No payload provided");
@@ -298,11 +272,6 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
 
     protected Response deleteById(final String elementId) {
         getLogger().debug("DELETE request for {} received at '{}'", this::elementType, uriContext::getAbsolutePath);
-
-        if (SystemStateManager.current().isWriteBlocked()) {
-            getLogger().warn("System state {} does not allow write requests", SystemStateManager.current());
-            return serviceUnavailable();
-        }
 
         try {
             final ParseResult parseResult = IntegerParser.parsePositive(elementId);
