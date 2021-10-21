@@ -30,8 +30,8 @@ import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.api.validator.ValidationResult;
-import me.zodac.folding.rest.parse.IntegerParser;
-import me.zodac.folding.rest.parse.ParseResult;
+import me.zodac.folding.rest.endpoint.util.IdResult;
+import me.zodac.folding.rest.endpoint.util.IntegerParser;
 import me.zodac.folding.rest.response.BatchCreateResponse;
 import org.apache.logging.log4j.Logger;
 
@@ -178,17 +178,11 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
         getLogger().debug("GET request for {} received at '{}'", this::elementType, uriContext::getAbsolutePath);
 
         try {
-            final ParseResult parseResult = IntegerParser.parsePositive(elementId);
-            if (parseResult.isBadFormat()) {
-                final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), elementId);
-                getLogger().error(errorMessage);
-                return badRequest(errorMessage);
-            } else if (parseResult.isOutOfRange()) {
-                final String errorMessage = String.format("The %s ID '%s' is out of range", elementType(), elementId);
-                getLogger().error(errorMessage);
-                return badRequest(errorMessage);
+            final IdResult idResult = IntegerParser.parsePositive(elementId);
+            if (idResult.isFailure()) {
+                return idResult.getFailureResponse();
             }
-            final int parsedId = parseResult.getId();
+            final int parsedId = idResult.getId();
 
             final Optional<O> optionalElement = getElementById(parsedId);
             if (optionalElement.isEmpty()) {
@@ -227,17 +221,11 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
         }
 
         try {
-            final ParseResult parseResult = IntegerParser.parsePositive(elementId);
-            if (parseResult.isBadFormat()) {
-                final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), elementId);
-                getLogger().error(errorMessage);
-                return badRequest(errorMessage);
-            } else if (parseResult.isOutOfRange()) {
-                final String errorMessage = String.format("The %s ID '%s' is out of range", elementType(), elementId);
-                getLogger().error(errorMessage);
-                return badRequest(errorMessage);
+            final IdResult idResult = IntegerParser.parsePositive(elementId);
+            if (idResult.isFailure()) {
+                return idResult.getFailureResponse();
             }
-            final int parsedId = parseResult.getId();
+            final int parsedId = idResult.getId();
 
             final Optional<O> optionalElement = getElementById(parsedId);
             if (optionalElement.isEmpty()) {
@@ -274,17 +262,11 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
         getLogger().debug("DELETE request for {} received at '{}'", this::elementType, uriContext::getAbsolutePath);
 
         try {
-            final ParseResult parseResult = IntegerParser.parsePositive(elementId);
-            if (parseResult.isBadFormat()) {
-                final String errorMessage = String.format("The %s ID '%s' is not a valid format", elementType(), elementId);
-                getLogger().error(errorMessage);
-                return badRequest(errorMessage);
-            } else if (parseResult.isOutOfRange()) {
-                final String errorMessage = String.format("The %s ID '%s' is out of range", elementType(), elementId);
-                getLogger().error(errorMessage);
-                return badRequest(errorMessage);
+            final IdResult idResult = IntegerParser.parsePositive(elementId);
+            if (idResult.isFailure()) {
+                return idResult.getFailureResponse();
             }
-            final int parsedId = parseResult.getId();
+            final int parsedId = idResult.getId();
 
             final Optional<O> optionalElement = getElementById(parsedId);
             if (optionalElement.isEmpty()) {

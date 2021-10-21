@@ -37,15 +37,6 @@ public final class TeamValidator {
         return new TeamValidator(businessLogic);
     }
 
-    private static String teamName(final TeamRequest teamRequest) {
-        return StringUtils.isNotBlank(teamRequest.getTeamName()) ? null : "Field 'teamName' must not be empty";
-    }
-
-    private static String forumLink(final TeamRequest teamRequest) {
-        return (StringUtils.isBlank(teamRequest.getForumLink()) || URL_VALIDATOR.isValid(teamRequest.getForumLink())) ? null :
-            String.format("Field 'forumLink' is not a valid link: '%s'", teamRequest.getForumLink());
-    }
-
     /**
      * Validates a {@link TeamRequest} for a {@link Team} to be created on the system.
      *
@@ -142,5 +133,14 @@ public final class TeamValidator {
         }
 
         return ValidationResponse.success(team);
+    }
+
+    private static String teamName(final TeamRequest teamRequest) {
+        return StringUtils.isNotBlank(teamRequest.getTeamName()) ? null : "Field 'teamName' must not be empty";
+    }
+
+    private static String forumLink(final TeamRequest teamRequest) {
+        return (StringUtils.isBlank(teamRequest.getForumLink()) || URL_VALIDATOR.isValid(teamRequest.getForumLink())) ? null :
+            String.format("Field 'forumLink' is not a valid link: '%s'", teamRequest.getForumLink());
     }
 }

@@ -1,7 +1,6 @@
 package me.zodac.folding.rest.endpoint;
 
 import static java.util.stream.Collectors.toList;
-import static me.zodac.folding.rest.response.Responses.badRequest;
 import static me.zodac.folding.rest.response.Responses.notFound;
 import static me.zodac.folding.rest.response.Responses.nullRequest;
 import static me.zodac.folding.rest.response.Responses.ok;
@@ -45,8 +44,8 @@ import me.zodac.folding.rest.api.tc.CompetitionSummary;
 import me.zodac.folding.rest.api.tc.UserSummary;
 import me.zodac.folding.rest.api.tc.leaderboard.TeamLeaderboardEntry;
 import me.zodac.folding.rest.api.tc.leaderboard.UserCategoryLeaderboardEntry;
-import me.zodac.folding.rest.parse.IntegerParser;
-import me.zodac.folding.rest.parse.ParseResult;
+import me.zodac.folding.rest.endpoint.util.IdResult;
+import me.zodac.folding.rest.endpoint.util.IntegerParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -102,19 +101,13 @@ public class TeamCompetitionStatsEndpoint {
         LOGGER.debug("GET request received to show TC stats for user received at '{}'", uriContext.getAbsolutePath());
 
         try {
-            final ParseResult parseResult = IntegerParser.parsePositive(userId);
-            if (parseResult.isBadFormat()) {
-                final String errorMessage = String.format("The user ID '%s' is not a valid format", userId);
-                LOGGER.error(errorMessage);
-                return badRequest(errorMessage);
-            } else if (parseResult.isOutOfRange()) {
-                final String errorMessage = String.format("The user ID '%s' is out of range", userId);
-                LOGGER.error(errorMessage);
-                return badRequest(errorMessage);
+            final IdResult idResult = IntegerParser.parsePositive(userId);
+            if (idResult.isFailure()) {
+                return idResult.getFailureResponse();
             }
-            final int parsedId = parseResult.getId();
-            final Optional<User> optionalUser = businessLogic.getUserWithoutPasskey(parsedId);
+            final int parsedId = idResult.getId();
 
+            final Optional<User> optionalUser = businessLogic.getUserWithoutPasskey(parsedId);
             if (optionalUser.isEmpty()) {
                 LOGGER.error("No user found with ID: {}", parsedId);
                 return notFound();
@@ -155,19 +148,13 @@ public class TeamCompetitionStatsEndpoint {
         }
 
         try {
-            final ParseResult parseResult = IntegerParser.parsePositive(userId);
-            if (parseResult.isBadFormat()) {
-                final String errorMessage = String.format("The user ID '%s' is not a valid format", userId);
-                LOGGER.error(errorMessage);
-                return badRequest(errorMessage);
-            } else if (parseResult.isOutOfRange()) {
-                final String errorMessage = String.format("The user ID '%s' is out of range", userId);
-                LOGGER.error(errorMessage);
-                return badRequest(errorMessage);
+            final IdResult idResult = IntegerParser.parsePositive(userId);
+            if (idResult.isFailure()) {
+                return idResult.getFailureResponse();
             }
-            final int parsedId = parseResult.getId();
-            final Optional<User> optionalUser = businessLogic.getUserWithPasskey(parsedId);
+            final int parsedId = idResult.getId();
 
+            final Optional<User> optionalUser = businessLogic.getUserWithPasskey(parsedId);
             if (optionalUser.isEmpty()) {
                 LOGGER.error("No user found with ID: {}", parsedId);
                 return notFound();

@@ -35,8 +35,8 @@ import me.zodac.folding.api.state.ReadRequired;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
-import me.zodac.folding.rest.parse.IntegerParser;
-import me.zodac.folding.rest.parse.ParseResult;
+import me.zodac.folding.rest.endpoint.util.IdResult;
+import me.zodac.folding.rest.endpoint.util.IntegerParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -80,17 +80,11 @@ public class HistoricStatsEndpoint {
                 return badRequest(errorMessage);
             }
 
-            final ParseResult parseResult = IntegerParser.parsePositive(userId);
-            if (parseResult.isBadFormat()) {
-                final String errorMessage = String.format("The user ID '%s' is not a valid format", userId);
-                LOGGER.error(errorMessage);
-                return badRequest(errorMessage);
-            } else if (parseResult.isOutOfRange()) {
-                final String errorMessage = String.format("The user ID '%s' is out of range", userId);
-                LOGGER.error(errorMessage);
-                return badRequest(errorMessage);
+            final IdResult idResult = IntegerParser.parsePositive(userId);
+            if (idResult.isFailure()) {
+                return idResult.getFailureResponse();
             }
-            final int parsedId = parseResult.getId();
+            final int parsedId = idResult.getId();
 
             final Optional<User> user = businessLogic.getUserWithPasskey(parsedId);
             if (user.isEmpty()) {
@@ -148,17 +142,11 @@ public class HistoricStatsEndpoint {
         LOGGER.debug("GET request received to show daily TC user stats at '{}'", uriContext.getAbsolutePath());
 
         try {
-            final ParseResult parseResult = IntegerParser.parsePositive(userId);
-            if (parseResult.isBadFormat()) {
-                final String errorMessage = String.format("The user ID '%s' is not a valid format", userId);
-                LOGGER.error(errorMessage);
-                return badRequest(errorMessage);
-            } else if (parseResult.isOutOfRange()) {
-                final String errorMessage = String.format("The user ID '%s' is out of range", userId);
-                LOGGER.error(errorMessage);
-                return badRequest(errorMessage);
+            final IdResult idResult = IntegerParser.parsePositive(userId);
+            if (idResult.isFailure()) {
+                return idResult.getFailureResponse();
             }
-            final int parsedId = parseResult.getId();
+            final int parsedId = idResult.getId();
 
             final Optional<User> user = businessLogic.getUserWithPasskey(parsedId);
             if (user.isEmpty()) {
@@ -209,17 +197,11 @@ public class HistoricStatsEndpoint {
         LOGGER.debug("GET request received to show monthly TC user stats at '{}'", uriContext.getAbsolutePath());
 
         try {
-            final ParseResult parseResult = IntegerParser.parsePositive(userId);
-            if (parseResult.isBadFormat()) {
-                final String errorMessage = String.format("The user ID '%s' is not a valid format", userId);
-                LOGGER.error(errorMessage);
-                return badRequest(errorMessage);
-            } else if (parseResult.isOutOfRange()) {
-                final String errorMessage = String.format("The user ID '%s' is out of range", userId);
-                LOGGER.error(errorMessage);
-                return badRequest(errorMessage);
+            final IdResult idResult = IntegerParser.parsePositive(userId);
+            if (idResult.isFailure()) {
+                return idResult.getFailureResponse();
             }
-            final int parsedId = parseResult.getId();
+            final int parsedId = idResult.getId();
 
             final Optional<User> user = businessLogic.getUserWithPasskey(parsedId);
             if (user.isEmpty()) {
@@ -278,17 +260,11 @@ public class HistoricStatsEndpoint {
                 return badRequest(errorMessage);
             }
 
-            final ParseResult parseResult = IntegerParser.parsePositive(teamId);
-            if (parseResult.isBadFormat()) {
-                final String errorMessage = String.format("The team ID '%s' is not a valid format", teamId);
-                LOGGER.error(errorMessage);
-                return badRequest(errorMessage);
-            } else if (parseResult.isOutOfRange()) {
-                final String errorMessage = String.format("The team ID '%s' is out of range", teamId);
-                LOGGER.error(errorMessage);
-                return badRequest(errorMessage);
+            final IdResult idResult = IntegerParser.parsePositive(teamId);
+            if (idResult.isFailure()) {
+                return idResult.getFailureResponse();
             }
-            final int parsedId = parseResult.getId();
+            final int parsedId = idResult.getId();
 
             final Optional<Team> teamOptional = businessLogic.getTeam(parsedId);
             if (teamOptional.isEmpty()) {
@@ -355,17 +331,11 @@ public class HistoricStatsEndpoint {
         LOGGER.debug("GET request received to show daily TC user stats at '{}'", uriContext.getAbsolutePath());
 
         try {
-            final ParseResult parseResult = IntegerParser.parsePositive(teamId);
-            if (parseResult.isBadFormat()) {
-                final String errorMessage = String.format("The team ID '%s' is not a valid format", teamId);
-                LOGGER.error(errorMessage);
-                return badRequest(errorMessage);
-            } else if (parseResult.isOutOfRange()) {
-                final String errorMessage = String.format("The team ID '%s' is out of range", teamId);
-                LOGGER.error(errorMessage);
-                return badRequest(errorMessage);
+            final IdResult idResult = IntegerParser.parsePositive(teamId);
+            if (idResult.isFailure()) {
+                return idResult.getFailureResponse();
             }
-            final int parsedId = parseResult.getId();
+            final int parsedId = idResult.getId();
 
             final Optional<Team> teamOptional = businessLogic.getTeam(parsedId);
             if (teamOptional.isEmpty()) {
@@ -426,17 +396,11 @@ public class HistoricStatsEndpoint {
         LOGGER.info("GET request received to show monthly TC team stats at '{}'", uriContext.getAbsolutePath());
 
         try {
-            final ParseResult parseResult = IntegerParser.parsePositive(teamId);
-            if (parseResult.isBadFormat()) {
-                final String errorMessage = String.format("The team ID '%s' is not a valid format", teamId);
-                LOGGER.error(errorMessage);
-                return badRequest(errorMessage);
-            } else if (parseResult.isOutOfRange()) {
-                final String errorMessage = String.format("The team ID '%s' is out of range", teamId);
-                LOGGER.error(errorMessage);
-                return badRequest(errorMessage);
+            final IdResult idResult = IntegerParser.parsePositive(teamId);
+            if (idResult.isFailure()) {
+                return idResult.getFailureResponse();
             }
-            final int parsedId = parseResult.getId();
+            final int parsedId = idResult.getId();
 
             final Optional<Team> teamOptional = businessLogic.getTeam(parsedId);
             if (teamOptional.isEmpty()) {
