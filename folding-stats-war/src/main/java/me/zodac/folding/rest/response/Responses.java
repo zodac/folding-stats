@@ -3,10 +3,11 @@ package me.zodac.folding.rest.response;
 import static me.zodac.folding.rest.util.RestUtilConstants.GSON;
 
 import java.util.Collection;
+import javax.ws.rs.core.CacheControl;
+import javax.ws.rs.core.EntityTag;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
-import me.zodac.folding.api.ResponsePojo;
-import me.zodac.folding.api.state.SystemState;
 
 /**
  * Utility class to simplify returning a {@link Response} in the REST layer.
@@ -40,13 +41,13 @@ public final class Responses {
      * A <b>200_OK</b> {@link Response}.
      *
      * <p>
-     * Generally used for cases where an HTTP request is sent to retrieve a {@link Collection} of {@link ResponsePojo} resources.
+     * Generally used for cases where an HTTP request is sent to retrieve a {@link Collection} of {@link me.zodac.folding.api.ResponsePojo} resources.
      *
-     * @param entities the {@link Collection} of {@link ResponsePojo} resourced being retrieved
+     * @param entities the {@link Collection} of entities being retrieved
      * @return the <b>200_OK</b> {@link Response}
      * @see #okBuilder(Collection)
      */
-    public static Response ok(final Collection<? extends ResponsePojo> entities) {
+    public static Response ok(final Collection<?> entities) {
         return okBuilder(entities)
             .build();
     }
@@ -55,7 +56,7 @@ public final class Responses {
      * A <b>200_OK</b> {@link Response}.
      *
      * <p>
-     * Generally used for cases where an HTTP request is sent to retrieve a single {@link ResponsePojo} resource, or also
+     * Generally used for cases where an HTTP request is sent to retrieve a single {@link me.zodac.folding.api.ResponsePojo} resource, or also
      * if a batch of resources is being created (since there are partial failure scenarios, we cannot return a <b>201_CREATED</b>).
      *
      * @param entity the {@link Object} being retrieved
@@ -71,7 +72,7 @@ public final class Responses {
      * A <b>200_OK</b> {@link Response}.
      *
      * <p>
-     * Generally used for cases where an HTTP request is sent to update a single {@link ResponsePojo} resource.
+     * Generally used for cases where an HTTP request is sent to update a single {@link me.zodac.folding.api.ResponsePojo} resource.
      *
      * @param entity                the updated resource
      * @param entityLocationBuilder the {@link UriBuilder} defining the {@link java.net.URI} of the updated resource, to
@@ -86,36 +87,71 @@ public final class Responses {
     }
 
     /**
-     * A <b>200_OK</b> {@link Response.ResponseBuilder}.
+     * A cached <b>200_OK</b> {@link Response}.
      *
      * <p>
-     * Generally used for cases where an HTTP request is sent to create a batch of {@link ResponsePojo} resources, but
-     * the REST layer might want to add additional logic like a {@link javax.ws.rs.core.CacheControl}.
+     * Similar to {@link #ok(Object)}, but we check for an entity tag by hashing the entity and performing
+     * {@link Request#evaluatePreconditions(EntityTag)} on the value. If the new entity tag matches the old one, we simply sent a
+     * <b>304_NOT_MODIFIED</b> {@link Response}. Otherwise, we send the <b>200_OK</b> {@link Response} with the new content.
      *
-     * @param entities the {@link Collection} of {@link ResponsePojo} resourced being retrieved
-     * @return the <b>200_OK</b> {@link Response}
-     * @see #ok(Collection)
+     * @param entity                  the {@link Object} being retrieved
+     * @param request                 the {@link Request} to validate the entity tag against
+     * @param expirationTimeInSeconds the cache expiration time for the {@link Response}
+     * @return the <b>200_OK</b> or <b>304_NOT_MODIFIED</b> {@link Response}
      */
-    public static Response.ResponseBuilder okBuilder(final Collection<? extends ResponsePojo> entities) {
+    public static Response cachedOk(final Object entity, final Request request, final int expirationTimeInSeconds) {
+        final CacheControl cacheControl = new CacheControl();
+        cacheControl.setMaxAge(expirationTimeInSeconds);
+
+        final EntityTag entityTag = new EntityTag(String.valueOf(entity.hashCode()));
+        Response.ResponseBuilder builder = request.evaluatePreconditions(entityTag);
+
+        if (builder == null) {
+            builder = okBuilder(entity);
+            builder.tag(entityTag);
+        }
+
+        builder.cacheControl(cacheControl);
+        return builder.build();
+    }
+
+    /**
+     * A cached <b>200_OK</b> {@link Response}.
+     *
+     * <p>
+     * Similar to {@link #ok(Collection)}, but we check for an entity tag by hashing the entities and performing
+     * {@link Request#evaluatePreconditions(EntityTag)} on the value. If the new entity tag matches the old one, we simply sent a
+     * <b>304_NOT_MODIFIED</b> {@link Response}. Otherwise, we send the <b>200_OK</b> {@link Response} with the new content.
+     *
+     * @param entities                the {@link Collection} of entities being retrieved
+     * @param request                 the {@link Request} to validate the entity tag against
+     * @param expirationTimeInSeconds the cache expiration time for the {@link Response}
+     * @return the <b>200_OK</b> or <b>304_NOT_MODIFIED</b> {@link Response}
+     */
+    public static Response cachedOk(final Collection<?> entities, final Request request, final int expirationTimeInSeconds) {
+        final CacheControl cacheControl = new CacheControl();
+        cacheControl.setMaxAge(expirationTimeInSeconds);
+
+        final EntityTag entityTag = new EntityTag(String.valueOf(entities.stream().mapToInt(Object::hashCode).sum()));
+        Response.ResponseBuilder builder = request.evaluatePreconditions(entityTag);
+
+        if (builder == null) {
+            builder = okBuilder(entities);
+            builder.tag(entityTag);
+        }
+
+        builder.cacheControl(cacheControl);
+        return builder.build();
+    }
+
+    private static Response.ResponseBuilder okBuilder(final Collection<?> entities) {
         return Response
             .ok()
             .header("X-Total-Count", entities.size())
             .entity(GSON.toJson(entities));
     }
 
-    /**
-     * A <b>200_OK</b> {@link Response}.
-     *
-     * <p>
-     * Generally used for cases where an HTTP request is sent to retrieve a single {@link ResponsePojo} resource, or also
-     * if a batch of resources is being created (since there are partial failure scenarios, we cannot return a <b>201_CREATED</b>),
-     * but the REST layer might want to add additional logic like a {@link javax.ws.rs.core.CacheControl}.
-     *
-     * @param entity the {@link Object} being retrieved
-     * @return the <b>200_OK</b> {@link Response}
-     * @see #ok(Object)
-     */
-    public static Response.ResponseBuilder okBuilder(final Object entity) {
+    private static Response.ResponseBuilder okBuilder(final Object entity) {
         return Response
             .ok()
             .entity(GSON.toJson(entity));
@@ -307,7 +343,7 @@ public final class Responses {
      * A <b>503_SERVICE_UNAVAILABLE</b> {@link Response}.
      *
      * <p>
-     * Generally used for cases where either this service is unavailable due to the {@link SystemState},
+     * Generally used for cases where either this service is unavailable due to the {@link me.zodac.folding.api.state.SystemState},
      * or if an external service (such as the Folding@Home API) is unavailable.
      *
      * @return the <b>503_SERVICE_UNAVAILABLE</b> {@link Response}

@@ -2,12 +2,12 @@ package me.zodac.folding.rest.endpoint;
 
 import static me.zodac.folding.api.util.DateTimeUtils.untilNextMonthUtc;
 import static me.zodac.folding.rest.response.Responses.badRequest;
+import static me.zodac.folding.rest.response.Responses.cachedOk;
 import static me.zodac.folding.rest.response.Responses.conflict;
 import static me.zodac.folding.rest.response.Responses.created;
 import static me.zodac.folding.rest.response.Responses.notFound;
 import static me.zodac.folding.rest.response.Responses.nullRequest;
 import static me.zodac.folding.rest.response.Responses.ok;
-import static me.zodac.folding.rest.response.Responses.okBuilder;
 import static me.zodac.folding.rest.response.Responses.serverError;
 
 import java.time.temporal.ChronoUnit;
@@ -16,9 +16,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import javax.ejb.EJB;
-import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -37,9 +35,6 @@ import org.apache.logging.log4j.Logger;
 
 // TODO: [zodac] Decorator around REST methods, so we can catch generic exceptions in a single place?
 abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePojo> {
-
-    // Expecting most changes to be at the monthly reset, so counting number of seconds until then
-    private static final int CACHE_EXPIRATION_TIME = untilNextMonthUtc(ChronoUnit.SECONDS);
 
     @Context
     protected UriInfo uriContext;
@@ -153,21 +148,7 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
 
         try {
             final Collection<O> elements = getAllElements();
-
-            final CacheControl cacheControl = new CacheControl();
-            cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);
-
-            final EntityTag entityTag = new EntityTag(String.valueOf(elements.stream().mapToInt(O::hashCode).sum()));
-            Response.ResponseBuilder builder = request.evaluatePreconditions(entityTag);
-
-            if (builder == null) {
-                getLogger().debug("Cached resources have changed");
-                builder = okBuilder(elements);
-                builder.tag(entityTag);
-            }
-
-            builder.cacheControl(cacheControl);
-            return builder.build();
+            return cachedOk(elements, request, untilNextMonthUtc(ChronoUnit.SECONDS));
         } catch (final Exception e) {
             getLogger().error("Unexpected error getting all {}s", elementType(), e);
             return serverError();
@@ -189,22 +170,9 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
                 getLogger().error("Error getting {} with ID {}", elementType(), elementId);
                 return notFound();
             }
+
             final O element = optionalElement.get();
-
-            final CacheControl cacheControl = new CacheControl();
-            cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);
-
-            final EntityTag entityTag = new EntityTag(String.valueOf(element.hashCode()));
-            Response.ResponseBuilder builder = request.evaluatePreconditions(entityTag);
-
-            if (builder == null) {
-                getLogger().debug("Cached resource has changed");
-                builder = okBuilder(element);
-                builder.tag(entityTag);
-            }
-
-            builder.cacheControl(cacheControl);
-            return builder.build();
+            return cachedOk(element, request, untilNextMonthUtc(ChronoUnit.SECONDS));
         } catch (final Exception e) {
             getLogger().error("Unexpected error getting {} with ID: {}", elementType(), elementId, e);
             return serverError();
@@ -282,7 +250,7 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
                 return conflict(validationResponse);
             }
 
-            deleteElement(element);
+            deleteElement(validationResponse.getOutput());
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             getLogger().info("Deleted {} with ID {}", elementType(), elementId);
             return ok();

@@ -2,8 +2,8 @@ package me.zodac.folding.rest.endpoint;
 
 import static java.lang.Integer.parseInt;
 import static me.zodac.folding.rest.response.Responses.badRequest;
+import static me.zodac.folding.rest.response.Responses.cachedOk;
 import static me.zodac.folding.rest.response.Responses.notFound;
-import static me.zodac.folding.rest.response.Responses.okBuilder;
 import static me.zodac.folding.rest.response.Responses.serverError;
 
 import java.time.DateTimeException;
@@ -23,9 +23,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
@@ -92,23 +90,9 @@ public class HistoricStatsEndpoint {
                 return notFound();
             }
 
-            final Collection<HistoricStats> hourlyStats = businessLogic.getHistoricStats(user.get(), Year.parse(year), Month.of(monthAsInt),
+            final Collection<HistoricStats> historicStats = businessLogic.getHistoricStats(user.get(), Year.parse(year), Month.of(monthAsInt),
                 dayAsInt);
-
-            final CacheControl cacheControl = new CacheControl();
-            cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);
-
-            final EntityTag entityTag = new EntityTag(String.valueOf(hourlyStats.stream().mapToInt(HistoricStats::hashCode).sum()));
-            Response.ResponseBuilder builder = request.evaluatePreconditions(entityTag);
-
-            if (builder == null) {
-                LOGGER.debug("Cached resources have changed");
-                builder = okBuilder(hourlyStats);
-                builder.tag(entityTag);
-            }
-
-            builder.cacheControl(cacheControl);
-            return builder.build();
+            return cachedOk(historicStats, request, CACHE_EXPIRATION_TIME);
         } catch (final DateTimeParseException e) {
             final String errorMessage = String.format("The year '%s' is not a valid format", year);
             LOGGER.debug(errorMessage, e);
@@ -154,22 +138,8 @@ public class HistoricStatsEndpoint {
                 return notFound();
             }
 
-            final Collection<HistoricStats> dailyStats = businessLogic.getHistoricStats(user.get(), Year.parse(year), Month.of(parseInt(month)));
-
-            final CacheControl cacheControl = new CacheControl();
-            cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);
-
-            final EntityTag entityTag = new EntityTag(String.valueOf(dailyStats.stream().mapToInt(HistoricStats::hashCode).sum()));
-            Response.ResponseBuilder builder = request.evaluatePreconditions(entityTag);
-
-            if (builder == null) {
-                LOGGER.debug("Cached resources have changed");
-                builder = okBuilder(dailyStats);
-                builder.tag(entityTag);
-            }
-
-            builder.cacheControl(cacheControl);
-            return builder.build();
+            final Collection<HistoricStats> historicStats = businessLogic.getHistoricStats(user.get(), Year.parse(year), Month.of(parseInt(month)));
+            return cachedOk(historicStats, request, CACHE_EXPIRATION_TIME);
         } catch (final DateTimeParseException e) {
             final String errorMessage = String.format("The year '%s' is not a valid format", year);
             LOGGER.debug(errorMessage, e);
@@ -209,22 +179,8 @@ public class HistoricStatsEndpoint {
                 return notFound();
             }
 
-            final Collection<HistoricStats> monthlyStats = businessLogic.getHistoricStats(user.get(), Year.parse(year));
-
-            final CacheControl cacheControl = new CacheControl();
-            cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);
-
-            final EntityTag entityTag = new EntityTag(String.valueOf(monthlyStats.stream().mapToInt(HistoricStats::hashCode).sum()));
-            Response.ResponseBuilder builder = request.evaluatePreconditions(entityTag);
-
-            if (builder == null) {
-                LOGGER.debug("Cached resources have changed");
-                builder = okBuilder(monthlyStats);
-                builder.tag(entityTag);
-            }
-
-            builder.cacheControl(cacheControl);
-            return builder.build();
+            final Collection<HistoricStats> historicStats = businessLogic.getHistoricStats(user.get(), Year.parse(year));
+            return cachedOk(historicStats, request, CACHE_EXPIRATION_TIME);
         } catch (final DateTimeParseException e) {
             final String errorMessage = String.format("The year '%s' is not a valid format", year);
             LOGGER.debug(errorMessage, e);
@@ -282,22 +238,8 @@ public class HistoricStatsEndpoint {
                 teamHourlyStats.addAll(dailyStats);
             }
 
-            final Collection<HistoricStats> combinedTeamHourlyStats = HistoricStats.combine(teamHourlyStats);
-
-            final CacheControl cacheControl = new CacheControl();
-            cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);
-
-            final EntityTag entityTag = new EntityTag(String.valueOf(combinedTeamHourlyStats.stream().mapToInt(HistoricStats::hashCode).sum()));
-            Response.ResponseBuilder builder = request.evaluatePreconditions(entityTag);
-
-            if (builder == null) {
-                LOGGER.debug("Cached resources have changed");
-                builder = okBuilder(combinedTeamHourlyStats);
-                builder.tag(entityTag);
-            }
-
-            builder.cacheControl(cacheControl);
-            return builder.build();
+            final Collection<HistoricStats> combinedHistoricStats = HistoricStats.combine(teamHourlyStats);
+            return cachedOk(combinedHistoricStats, request, CACHE_EXPIRATION_TIME);
         } catch (final DateTimeParseException e) {
             final String errorMessage = String.format("The year '%s' is not a valid format", year);
             LOGGER.debug(errorMessage, e);
@@ -353,22 +295,8 @@ public class HistoricStatsEndpoint {
                 teamDailyStats.addAll(dailyStats);
             }
 
-            final Collection<HistoricStats> combinedTeamDailyStats = HistoricStats.combine(teamDailyStats);
-
-            final CacheControl cacheControl = new CacheControl();
-            cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);
-
-            final EntityTag entityTag = new EntityTag(String.valueOf(combinedTeamDailyStats.stream().mapToInt(HistoricStats::hashCode).sum()));
-            Response.ResponseBuilder builder = request.evaluatePreconditions(entityTag);
-
-            if (builder == null) {
-                LOGGER.debug("Cached resources have changed");
-                builder = okBuilder(combinedTeamDailyStats);
-                builder.tag(entityTag);
-            }
-
-            builder.cacheControl(cacheControl);
-            return builder.build();
+            final Collection<HistoricStats> combinedHistoricStats = HistoricStats.combine(teamDailyStats);
+            return cachedOk(combinedHistoricStats, request, CACHE_EXPIRATION_TIME);
         } catch (final DateTimeParseException e) {
             final String errorMessage = String.format("The year '%s' is not a valid format", year);
             LOGGER.debug(errorMessage, e);
@@ -418,21 +346,8 @@ public class HistoricStatsEndpoint {
                 teamMonthlyStats.addAll(monthlyStats);
             }
 
-            final Collection<HistoricStats> combinedTeamMonthlyStats = HistoricStats.combine(teamMonthlyStats);
-
-            final CacheControl cacheControl = new CacheControl();
-            cacheControl.setMaxAge(CACHE_EXPIRATION_TIME);
-            final EntityTag entityTag = new EntityTag(String.valueOf(combinedTeamMonthlyStats.stream().mapToInt(HistoricStats::hashCode).sum()));
-            Response.ResponseBuilder builder = request.evaluatePreconditions(entityTag);
-
-            if (builder == null) {
-                LOGGER.debug("Cached resources have changed");
-                builder = okBuilder(combinedTeamMonthlyStats);
-                builder.tag(entityTag);
-            }
-
-            builder.cacheControl(cacheControl);
-            return builder.build();
+            final Collection<HistoricStats> combinedHistoricStats = HistoricStats.combine(teamMonthlyStats);
+            return cachedOk(combinedHistoricStats, request, CACHE_EXPIRATION_TIME);
         } catch (final DateTimeParseException e) {
             final String errorMessage = String.format("The year '%s' is not a valid format", year);
             LOGGER.debug(errorMessage, e);
