@@ -3,13 +3,11 @@ package me.zodac.folding.rest.validator;
 import static java.util.stream.Collectors.toList;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.HardwareMake;
 import me.zodac.folding.api.tc.HardwareType;
@@ -20,23 +18,14 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * Validator class to validate a {@link Hardware} or {@link HardwareRequest}.
  */
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HardwareValidator {
 
     // Assuming the 'best' hardware will have a multiplier of <b>1.00</b>, and all others will be based on that
     private static final double MINIMUM_MULTIPLIER_VALUE = 1.00D;
     private static final long MINIMUM_AVERAGE_PPD_VALUE = 1L;
 
-    private final transient BusinessLogic businessLogic;
+    private HardwareValidator() {
 
-    /**
-     * Creates a {@link HardwareValidator}.
-     *
-     * @param businessLogic the {@link BusinessLogic} used for retrieval of {@link User}s for conflict checks
-     * @return the created {@link HardwareValidator}
-     */
-    public static HardwareValidator create(final BusinessLogic businessLogic) {
-        return new HardwareValidator(businessLogic);
     }
 
     /**
@@ -53,15 +42,16 @@ public final class HardwareValidator {
      * </ul>
      *
      * @param hardwareRequest the {@link HardwareRequest} to validate
+     *                        @param allHardware      all existing {@link Hardware}s in the system
      * @return the {@link ValidationResult}
      */
-    public ValidationResult<Hardware> validateCreate(final HardwareRequest hardwareRequest) {
+    public static ValidationResult<Hardware> validateCreate(final HardwareRequest hardwareRequest, final Collection<Hardware> allHardware) {
         if (hardwareRequest == null) {
             return ValidationResult.nullObject();
         }
 
         // Hardware name must be unique
-        final Optional<Hardware> hardwareWithMatchingName = businessLogic.getHardwareWithName(hardwareRequest.getHardwareName());
+        final Optional<Hardware> hardwareWithMatchingName = getHardwareWithName(hardwareRequest.getHardwareName(), allHardware);
         if (hardwareWithMatchingName.isPresent()) {
             return ValidationResult.conflictingWith(hardwareRequest, hardwareWithMatchingName.get(), List.of("hardwareName"));
         }
@@ -101,15 +91,18 @@ public final class HardwareValidator {
      *
      * @param hardwareRequest  the {@link HardwareRequest} to validate
      * @param existingHardware the already existing {@link Hardware} in the system to be updated
+     * @param allHardware      all existing {@link Hardware}s in the system
      * @return the {@link ValidationResult}
      */
-    public ValidationResult<Hardware> validateUpdate(final HardwareRequest hardwareRequest, final Hardware existingHardware) {
+    public static ValidationResult<Hardware> validateUpdate(final HardwareRequest hardwareRequest,
+                                                            final Hardware existingHardware,
+                                                            final Collection<Hardware> allHardware) {
         if (hardwareRequest == null || existingHardware == null) {
             return ValidationResult.nullObject();
         }
 
         // Hardware name must be unique
-        final Optional<Hardware> hardwareWithMatchingName = businessLogic.getHardwareWithName(hardwareRequest.getHardwareName());
+        final Optional<Hardware> hardwareWithMatchingName = getHardwareWithName(hardwareRequest.getHardwareName(), allHardware);
         if (hardwareWithMatchingName.isPresent() && hardwareWithMatchingName.get().getId() != existingHardware.getId()) {
             return ValidationResult.conflictingWith(hardwareRequest, hardwareWithMatchingName.get(), List.of("hardwareName"));
         }
@@ -137,16 +130,39 @@ public final class HardwareValidator {
      * Validates a {@link Hardware} to be deleted from the system.
      *
      * @param hardware the {@link Hardware} to validate
+     * @param allUsers all existing {@link User}s in the system
      * @return the {@link ValidationResult}
      */
-    public ValidationResult<Hardware> validateDelete(final Hardware hardware) {
-        final Collection<User> usersWithMatchingHardware = businessLogic.getUsersWithHardware(hardware);
+    public static ValidationResult<Hardware> validateDelete(final Hardware hardware, final Collection<User> allUsers) {
+        final Collection<User> usersWithMatchingHardware = getUsersWithHardware(hardware.getId(), allUsers);
 
         if (!usersWithMatchingHardware.isEmpty()) {
             return ValidationResult.usedBy(hardware, usersWithMatchingHardware);
         }
 
         return ValidationResult.success(hardware);
+    }
+
+    private static Optional<Hardware> getHardwareWithName(final String hardwareName, final Collection<Hardware> allHardware) {
+        if (StringUtils.isBlank(hardwareName)) {
+            return Optional.empty();
+        }
+
+        return allHardware
+            .stream()
+            .filter(hardware -> hardware.getHardwareName().equalsIgnoreCase(hardwareName))
+            .findAny();
+    }
+
+    private static Collection<User> getUsersWithHardware(final int hardwareId, final Collection<User> allUsers) {
+        if (hardwareId == Hardware.EMPTY_HARDWARE_ID) {
+            return Collections.emptyList();
+        }
+
+        return allUsers
+            .stream()
+            .filter(user -> user.getHardware().getId() == hardwareId)
+            .collect(toList());
     }
 
     private static String hardwareName(final HardwareRequest hardwareRequest) {

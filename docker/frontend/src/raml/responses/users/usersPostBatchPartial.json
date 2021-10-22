@@ -36,7 +36,7 @@
         "userIsCaptain": true
       },
       "errors": [
-        "User 'User1' has 0 completed Work Units with passkey 'fc7d6837269d86784d8bfd0b386d6bca', there must be at least one valid Work Unit submitted on the passkey before adding the user"
+        "User 'User1' has 0 Work Units with passkey 'fc7d6837269d86784d8bfd0b386d6bca', there must be at least one completed Work Unit before adding the user"
       ]
     }
   ]

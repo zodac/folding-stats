@@ -7,9 +7,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.stats.FoldingStatsDetails;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
 import me.zodac.folding.api.tc.Category;
@@ -18,6 +15,7 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
+import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.logging.log4j.LogManager;
@@ -25,22 +23,22 @@ import org.apache.logging.log4j.Logger;
 
 // TODO: [zodac] In severe need of a clean up. Write tests for the validators first though, because you're a moron
 // TODO: [zodac] Validate the linked hardware matches the user's category
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class UserValidator {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final UrlValidator URL_VALIDATOR = new UrlValidator();
     private static final int EXPECTED_PASSKEY_LENGTH = 32;
+    private static final FoldingStatsRetriever HTTP_FOLDING_STATS_RETRIEVER = HttpFoldingStatsRetriever.create();
 
-    private final BusinessLogic businessLogic;
-    private final FoldingStatsRetriever foldingStatsRetriever;
+    private UserValidator() {
 
-    public static UserValidator createValidator(final BusinessLogic businessLogic, final FoldingStatsRetriever foldingStatsRetriever) {
-        return new UserValidator(businessLogic, foldingStatsRetriever);
     }
 
     @SuppressWarnings("PMD.NPathComplexity") // Better than breaking into smaller functions
-    public ValidationResult<User> validateCreate(final UserRequest userRequest) {
+    public static ValidationResult<User> validateCreate(final UserRequest userRequest,
+                                                        final Collection<User> allUsers,
+                                                        final Collection<Hardware> allHardware,
+                                                        final Collection<Team> allTeams) {
         if (userRequest == null) {
             return ValidationResult.nullObject();
         }
@@ -62,12 +60,11 @@ public final class UserValidator {
 
         // If foldingUserName and passkey are valid, ensure they don't already exist
         if (failureMessages.isEmpty()) {
-            final Optional<User> userWithMatchingFoldingUserNameAndPasskey =
-                businessLogic.getUserWithFoldingUserNameAndPasskey(userRequest.getFoldingUserName(), userRequest.getPasskey());
+            final Optional<User> matchingUser = getUserWithFoldingUserNameAndPasskey(userRequest, allUsers);
 
-            if (userWithMatchingFoldingUserNameAndPasskey.isPresent()) {
+            if (matchingUser.isPresent()) {
                 return ValidationResult
-                    .conflictingWith(userRequest, userWithMatchingFoldingUserNameAndPasskey.get(), List.of("foldingUserName", "passkey"));
+                    .conflictingWith(userRequest, matchingUser.get(), List.of("foldingUserName", "passkey"));
             }
         }
 
@@ -92,15 +89,15 @@ public final class UserValidator {
             failureMessages.add(String.format("Field 'liveStatsLink' is not a valid link: '%s'", userRequest.getLiveStatsLink()));
         }
 
-        final List<String> hardwareValidationFailureMessages = validateHardware(userRequest);
+        final List<String> hardwareValidationFailureMessages = validateHardware(userRequest, allHardware);
         failureMessages.addAll(hardwareValidationFailureMessages);
 
-        final List<String> teamValidationFailureMessages = validateTeam(userRequest);
+        final List<String> teamValidationFailureMessages = validateTeam(userRequest, allTeams);
         failureMessages.addAll(teamValidationFailureMessages);
 
         // Since this is a heavy validation check, only do it if the rest of the user is valid
         if (failureMessages.isEmpty()) {
-            final List<String> teamFailureMessages = validateIfUserCanBeAddedToTeam(userRequest, category, null);
+            final List<String> teamFailureMessages = validateIfUserCanBeAddedToTeam(userRequest, category, null, allUsers, allTeams);
             failureMessages.addAll(teamFailureMessages);
         }
 
@@ -111,8 +108,8 @@ public final class UserValidator {
         }
 
         if (failureMessages.isEmpty()) {
-            final Optional<Hardware> hardware = businessLogic.getHardware(userRequest.getHardwareId());
-            final Optional<Team> team = businessLogic.getTeam(userRequest.getTeamId());
+            final Optional<Hardware> hardware = getHardware(userRequest.getHardwareId(), allHardware);
+            final Optional<Team> team = getTeam(userRequest.getTeamId(), allTeams);
 
             if (hardware.isEmpty()) {
                 failureMessages.add(String.format("Unable to retrieve hardware with ID '%s'", userRequest.getHardwareId()));
@@ -130,7 +127,11 @@ public final class UserValidator {
     }
 
     @SuppressWarnings("PMD.NPathComplexity") // Better than breaking into smaller functions
-    public ValidationResult<User> validateUpdate(final UserRequest userRequest, final User existingUser) {
+    public static ValidationResult<User> validateUpdate(final UserRequest userRequest,
+                                                        final User existingUser,
+                                                        final Collection<User> allUsers,
+                                                        final Collection<Hardware> allHardware,
+                                                        final Collection<Team> allTeams) {
         if (userRequest == null) {
             return ValidationResult.nullObject();
         }
@@ -170,15 +171,15 @@ public final class UserValidator {
             failureMessages.add(String.format("Field 'liveStatsLink' is not a valid link: '%s'", userRequest.getLiveStatsLink()));
         }
 
-        final List<String> hardwareValidationFailureMessages = validateHardware(userRequest);
+        final List<String> hardwareValidationFailureMessages = validateHardware(userRequest, allHardware);
         failureMessages.addAll(hardwareValidationFailureMessages);
 
-        final List<String> teamValidationFailureMessages = validateTeam(userRequest);
+        final List<String> teamValidationFailureMessages = validateTeam(userRequest, allTeams);
         failureMessages.addAll(teamValidationFailureMessages);
 
         // Since this is a heavy validation check, only do it if the rest of the user is valid
         if (failureMessages.isEmpty()) {
-            final List<String> teamFailureMessages = validateIfUserCanBeAddedToTeam(userRequest, category, existingUser);
+            final List<String> teamFailureMessages = validateIfUserCanBeAddedToTeam(userRequest, category, existingUser, allUsers, allTeams);
             failureMessages.addAll(teamFailureMessages);
         }
 
@@ -189,8 +190,8 @@ public final class UserValidator {
         }
 
         if (failureMessages.isEmpty()) {
-            final Optional<Hardware> hardware = businessLogic.getHardware(userRequest.getHardwareId());
-            final Optional<Team> team = businessLogic.getTeam(userRequest.getTeamId());
+            final Optional<Hardware> hardware = getHardware(userRequest.getHardwareId(), allHardware);
+            final Optional<Team> team = getTeam(userRequest.getTeamId(), allTeams);
 
             if (hardware.isEmpty()) {
                 failureMessages.add(String.format("Unable to retrieve hardware with ID '%s'", userRequest.getHardwareId()));
@@ -207,10 +208,9 @@ public final class UserValidator {
         return ValidationResult.failure(userRequest, failureMessages);
     }
 
-    private List<String> validateTeam(final UserRequest userRequest) {
-        if (userRequest.getTeamId() <= Team.EMPTY_TEAM_ID || businessLogic.getTeam(userRequest.getTeamId()).isEmpty()) {
-            final List<String> availableTeams = businessLogic
-                .getAllTeams()
+    private static List<String> validateTeam(final UserRequest userRequest, final Collection<Team> allTeams) {
+        if (userRequest.getTeamId() <= Team.EMPTY_TEAM_ID || getTeam(userRequest.getTeamId(), allTeams).isEmpty()) {
+            final List<String> availableTeams = allTeams
                 .stream()
                 .map(team -> String.format("%s: %s", team.getId(), team.getTeamName()))
                 .collect(toList());
@@ -221,10 +221,9 @@ public final class UserValidator {
         return Collections.emptyList();
     }
 
-    private List<String> validateHardware(final UserRequest userRequest) {
-        if (userRequest.getHardwareId() <= Hardware.EMPTY_HARDWARE_ID || businessLogic.getHardware(userRequest.getHardwareId()).isEmpty()) {
-            final List<String> availableHardware = businessLogic
-                .getAllHardware()
+    private static List<String> validateHardware(final UserRequest userRequest, final Collection<Hardware> allHardware) {
+        if (userRequest.getHardwareId() <= Hardware.EMPTY_HARDWARE_ID || getHardware(userRequest.getHardwareId(), allHardware).isEmpty()) {
+            final List<String> availableHardware = allHardware
                 .stream()
                 .map(hardware -> String.format("%s: %s", hardware.getId(), hardware.getHardwareName()))
                 .collect(toList());
@@ -235,14 +234,14 @@ public final class UserValidator {
         return Collections.emptyList();
     }
 
-    private List<String> validateUserUnits(final UserRequest userRequest) {
+    private static List<String> validateUserUnits(final UserRequest userRequest) {
         try {
             final FoldingStatsDetails foldingStatsDetails = FoldingStatsDetails.create(userRequest.getFoldingUserName(), userRequest.getPasskey());
-            final Stats statsForUserAndPasskey = foldingStatsRetriever.getStats(foldingStatsDetails);
+            final Stats statsForUserAndPasskey = HTTP_FOLDING_STATS_RETRIEVER.getStats(foldingStatsDetails);
 
             if (statsForUserAndPasskey.getUnits() == 0) {
                 return List.of(String.format(
-                    "User '%s' has 0 completed Work Units with passkey '%s', there must be at least one valid Work Unit submitted on the passkey before adding the user",
+                    "User '%s' has 0 Work Units with passkey '%s', there must be at least one completed Work Unit before adding the user",
                     userRequest.getFoldingUserName(), userRequest.getPasskey()
                 ));
             }
@@ -254,15 +253,19 @@ public final class UserValidator {
         return Collections.emptyList();
     }
 
-    private List<String> validateIfUserCanBeAddedToTeam(final UserRequest userRequest, final Category category, final User existingUser) {
-        final Optional<Team> team = businessLogic.getTeam(userRequest.getTeamId());
+    private static List<String> validateIfUserCanBeAddedToTeam(final UserRequest userRequest,
+                                                               final Category category,
+                                                               final User existingUser,
+                                                               final Collection<User> allUsers,
+                                                               final Collection<Team> allTeams) {
+        final Optional<Team> team = getTeam(userRequest.getTeamId(), allTeams);
 
         if (team.isEmpty()) {
             return List.of(String.format("Unable to retrieve team with ID '%s'", userRequest.getTeamId()));
         }
 
         final List<String> failureMessages = new ArrayList<>(4);
-        final Collection<User> usersOnTeam = businessLogic.getUsersOnTeam(team.get());
+        final Collection<User> usersOnTeam = getUsersOnTeam(team.get().getId(), allUsers);
 
         if (userRequest.isUserIsCaptain()) {
             for (final User existingUserOnTeam : usersOnTeam) {
@@ -308,5 +311,44 @@ public final class UserValidator {
         }
 
         return failureMessages;
+    }
+
+    private static Optional<User> getUserWithFoldingUserNameAndPasskey(final UserRequest userRequest, final Collection<User> allUsers) {
+        final String foldingUserName = userRequest.getFoldingUserName();
+        final String passkey = userRequest.getPasskey();
+
+        if (StringUtils.isAnyBlank(foldingUserName, passkey)) {
+            return Optional.empty();
+        }
+
+        return allUsers
+            .stream()
+            .filter(user -> user.getFoldingUserName().equalsIgnoreCase(foldingUserName) && user.getPasskey().equalsIgnoreCase(passkey))
+            .findAny();
+    }
+
+    private static Collection<User> getUsersOnTeam(final int teamId, final Collection<User> allUsers) {
+        if (teamId == Team.EMPTY_TEAM_ID) {
+            return Collections.emptyList();
+        }
+
+        return allUsers
+            .stream()
+            .filter(user -> user.getTeam().getId() == teamId)
+            .collect(toList());
+    }
+
+    private static Optional<Hardware> getHardware(final int hardwareId, final Collection<Hardware> allHardware) {
+        return allHardware
+            .stream()
+            .filter(hardware -> hardware.getId() == hardwareId)
+            .findAny();
+    }
+
+    private static Optional<Team> getTeam(final int teamId, final Collection<Team> allTeams) {
+        return allTeams
+            .stream()
+            .filter(team -> team.getId() == teamId)
+            .findAny();
     }
 }

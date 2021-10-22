@@ -2,6 +2,9 @@ package me.zodac.folding.rest.validator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.HardwareMake;
 import me.zodac.folding.api.tc.HardwareType;
@@ -25,9 +28,7 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
-        final HardwareValidator hardwareValidator = HardwareValidator.create(mockBusinessLogic);
-        final ValidationResult<Hardware> response = hardwareValidator.validateCreate(hardware);
+        final ValidationResult<Hardware> response = HardwareValidator.validateCreate(hardware, Collections.emptyList());
 
         assertThat(response.isFailure())
             .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
@@ -36,9 +37,7 @@ class HardwareValidatorTest {
 
     @Test
     void whenValidatingCreate_givenNullHardware_thenFailureResponseIsReturned() {
-        final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
-        final HardwareValidator hardwareValidator = HardwareValidator.create(mockBusinessLogic);
-        final ValidationResult<Hardware> response = hardwareValidator.validateCreate(null);
+        final ValidationResult<Hardware> response = HardwareValidator.validateCreate(null, Collections.emptyList());
 
         assertThat(response.isFailure())
             .isTrue();
@@ -58,9 +57,7 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
-        final HardwareValidator hardwareValidator = HardwareValidator.create(mockBusinessLogic);
-        final ValidationResult<Hardware> response = hardwareValidator.validateCreate(hardware);
+        final ValidationResult<Hardware> response = HardwareValidator.validateCreate(hardware, Collections.emptyList());
 
         assertThat(response.isFailure())
             .isTrue();
@@ -71,8 +68,7 @@ class HardwareValidatorTest {
 
     @Test
     void whenValidatingCreate_givenHardwareWithNameAlreadyExists_thenFailureResponseIsReturned() {
-        final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
-        mockBusinessLogic.createHardware(Hardware.builder()
+        final Collection<Hardware> allHardware = List.of(Hardware.builder()
             .hardwareName("existingName")
             .displayName("displayName")
             .hardwareMake(HardwareMake.AMD)
@@ -82,7 +78,6 @@ class HardwareValidatorTest {
             .build()
         );
 
-        final HardwareValidator hardwareValidator = HardwareValidator.create(mockBusinessLogic);
         final HardwareRequest hardware = HardwareRequest.builder()
             .hardwareName("existingName")
             .displayName("displayName")
@@ -92,7 +87,7 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final ValidationResult<Hardware> response = hardwareValidator.validateCreate(hardware);
+        final ValidationResult<Hardware> response = HardwareValidator.validateCreate(hardware, allHardware);
 
         assertThat(response.isFailure())
             .isTrue();
@@ -112,9 +107,7 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
-        final HardwareValidator hardwareValidator = HardwareValidator.create(mockBusinessLogic);
-        final ValidationResult<Hardware> response = hardwareValidator.validateCreate(hardware);
+        final ValidationResult<Hardware> response = HardwareValidator.validateCreate(hardware, Collections.emptyList());
 
         assertThat(response.isFailure())
             .isTrue();
@@ -134,9 +127,7 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
-        final HardwareValidator hardwareValidator = HardwareValidator.create(mockBusinessLogic);
-        final ValidationResult<Hardware> response = hardwareValidator.validateCreate(hardware);
+        final ValidationResult<Hardware> response = HardwareValidator.validateCreate(hardware, Collections.emptyList());
 
         assertThat(response.isFailure())
             .isTrue();
@@ -156,9 +147,7 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
-        final HardwareValidator hardwareValidator = HardwareValidator.create(mockBusinessLogic);
-        final ValidationResult<Hardware> response = hardwareValidator.validateCreate(hardware);
+        final ValidationResult<Hardware> response = HardwareValidator.validateCreate(hardware, Collections.emptyList());
 
         assertThat(response.isFailure())
             .isTrue();
@@ -178,9 +167,7 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
-        final HardwareValidator hardwareValidator = HardwareValidator.create(mockBusinessLogic);
-        final ValidationResult<Hardware> response = hardwareValidator.validateCreate(hardware);
+        final ValidationResult<Hardware> response = HardwareValidator.validateCreate(hardware, Collections.emptyList());
 
         assertThat(response.isFailure())
             .isTrue();
@@ -200,9 +187,7 @@ class HardwareValidatorTest {
             .averagePpd(-1L)
             .build();
 
-        final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
-        final HardwareValidator hardwareValidator = HardwareValidator.create(mockBusinessLogic);
-        final ValidationResult<Hardware> response = hardwareValidator.validateCreate(hardware);
+        final ValidationResult<Hardware> response = HardwareValidator.validateCreate(hardware, Collections.emptyList());
 
         assertThat(response.isFailure())
             .isTrue();
@@ -222,9 +207,7 @@ class HardwareValidatorTest {
             .averagePpd(-1L)
             .build();
 
-        final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
-        final HardwareValidator hardwareValidator = HardwareValidator.create(mockBusinessLogic);
-        final ValidationResult<Hardware> response = hardwareValidator.validateCreate(hardware);
+        final ValidationResult<Hardware> response = HardwareValidator.validateCreate(hardware, Collections.emptyList());
 
         assertThat(response.isFailure())
             .isTrue();
@@ -262,9 +245,7 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
-        final HardwareValidator hardwareValidator = HardwareValidator.create(mockBusinessLogic);
-        final ValidationResult<Hardware> response = hardwareValidator.validateUpdate(hardware, existingHardware);
+        final ValidationResult<Hardware> response = HardwareValidator.validateUpdate(hardware, existingHardware, Collections.emptyList());
 
         assertThat(response.isFailure())
             .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
@@ -282,9 +263,7 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
-        final HardwareValidator hardwareValidator = HardwareValidator.create(mockBusinessLogic);
-        final ValidationResult<Hardware> response = hardwareValidator.validateUpdate(null, existingHardware);
+        final ValidationResult<Hardware> response = HardwareValidator.validateUpdate(null, existingHardware, Collections.emptyList());
 
         assertThat(response.isFailure())
             .isTrue();
@@ -304,9 +283,7 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
-        final HardwareValidator hardwareValidator = HardwareValidator.create(mockBusinessLogic);
-        final ValidationResult<Hardware> response = hardwareValidator.validateUpdate(hardware, null);
+        final ValidationResult<Hardware> response = HardwareValidator.validateUpdate(hardware, null, Collections.emptyList());
 
         assertThat(response.isFailure())
             .isTrue();
@@ -335,9 +312,7 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
-        final HardwareValidator hardwareValidator = HardwareValidator.create(mockBusinessLogic);
-        final ValidationResult<Hardware> response = hardwareValidator.validateUpdate(hardware, existingHardware);
+        final ValidationResult<Hardware> response = HardwareValidator.validateUpdate(hardware, existingHardware, Collections.emptyList());
 
         assertThat(response.isFailure())
             .isTrue();
@@ -367,8 +342,7 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
-        mockBusinessLogic.createHardware(Hardware.builder()
+        final Collection<Hardware> allHardware = List.of(Hardware.builder()
             .id(20)
             .hardwareName("hardwareName")
             .displayName("displayName")
@@ -379,8 +353,7 @@ class HardwareValidatorTest {
             .build()
         );
 
-        final HardwareValidator hardwareValidator = HardwareValidator.create(mockBusinessLogic);
-        final ValidationResult<Hardware> response = hardwareValidator.validateUpdate(hardware, existingHardware);
+        final ValidationResult<Hardware> response = HardwareValidator.validateUpdate(hardware, existingHardware, allHardware);
 
         assertThat(response.isFailure())
             .isTrue();
@@ -410,8 +383,7 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
-        mockBusinessLogic.createHardware(Hardware.builder()
+        final Collection<Hardware> allHardware = List.of(Hardware.builder()
             .id(1)
             .hardwareName("hardwareName")
             .displayName("displayName")
@@ -422,8 +394,7 @@ class HardwareValidatorTest {
             .build()
         );
 
-        final HardwareValidator hardwareValidator = HardwareValidator.create(mockBusinessLogic);
-        final ValidationResult<Hardware> response = hardwareValidator.validateUpdate(hardware, existingHardware);
+        final ValidationResult<Hardware> response = HardwareValidator.validateUpdate(hardware, existingHardware, allHardware);
 
         assertThat(response.isFailure())
             .isFalse();
@@ -449,9 +420,7 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
-        final HardwareValidator hardwareValidator = HardwareValidator.create(mockBusinessLogic);
-        final ValidationResult<Hardware> response = hardwareValidator.validateUpdate(hardware, existingHardware);
+        final ValidationResult<Hardware> response = HardwareValidator.validateUpdate(hardware, existingHardware, Collections.emptyList());
 
         assertThat(response.isFailure())
             .isTrue();
@@ -480,9 +449,7 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
-        final HardwareValidator hardwareValidator = HardwareValidator.create(mockBusinessLogic);
-        final ValidationResult<Hardware> response = hardwareValidator.validateUpdate(hardware, existingHardware);
+        final ValidationResult<Hardware> response = HardwareValidator.validateUpdate(hardware, existingHardware, Collections.emptyList());
 
         assertThat(response.isFailure())
             .isTrue();
@@ -511,9 +478,7 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
-        final HardwareValidator hardwareValidator = HardwareValidator.create(mockBusinessLogic);
-        final ValidationResult<Hardware> response = hardwareValidator.validateUpdate(hardware, existingHardware);
+        final ValidationResult<Hardware> response = HardwareValidator.validateUpdate(hardware, existingHardware, Collections.emptyList());
 
         assertThat(response.isFailure())
             .isTrue();
@@ -542,9 +507,7 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
-        final HardwareValidator hardwareValidator = HardwareValidator.create(mockBusinessLogic);
-        final ValidationResult<Hardware> response = hardwareValidator.validateUpdate(hardware, existingHardware);
+        final ValidationResult<Hardware> response = HardwareValidator.validateUpdate(hardware, existingHardware, Collections.emptyList());
 
         assertThat(response.isFailure())
             .isTrue();
@@ -573,9 +536,7 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
-        final HardwareValidator hardwareValidator = HardwareValidator.create(mockBusinessLogic);
-        final ValidationResult<Hardware> response = hardwareValidator.validateUpdate(hardware, existingHardware);
+        final ValidationResult<Hardware> response = HardwareValidator.validateUpdate(hardware, existingHardware, Collections.emptyList());
 
         assertThat(response.isFailure())
             .isTrue();
@@ -604,9 +565,7 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
-        final HardwareValidator hardwareValidator = HardwareValidator.create(mockBusinessLogic);
-        final ValidationResult<Hardware> response = hardwareValidator.validateUpdate(hardware, existingHardware);
+        final ValidationResult<Hardware> response = HardwareValidator.validateUpdate(hardware, existingHardware, Collections.emptyList());
 
         assertThat(response.isFailure())
             .isTrue();
@@ -634,9 +593,7 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
-        final HardwareValidator hardwareValidator = HardwareValidator.create(mockBusinessLogic);
-        final ValidationResult<Hardware> response = hardwareValidator.validateDelete(existingHardware);
+        final ValidationResult<Hardware> response = HardwareValidator.validateDelete(existingHardware, Collections.emptyList());
 
         assertThat(response.isFailure())
             .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
@@ -655,14 +612,12 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final User userUsingHardware = User.builder()
+        final Collection<User> allUsers = List.of(User.builder()
             .hardware(existingHardware)
-            .build();
+            .build()
+        );
 
-        final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
-        mockBusinessLogic.createUser(userUsingHardware);
-        final HardwareValidator hardwareValidator = HardwareValidator.create(mockBusinessLogic);
-        final ValidationResult<Hardware> response = hardwareValidator.validateDelete(existingHardware);
+        final ValidationResult<Hardware> response = HardwareValidator.validateDelete(existingHardware, allUsers);
 
         assertThat(response.isFailure())
             .isTrue();

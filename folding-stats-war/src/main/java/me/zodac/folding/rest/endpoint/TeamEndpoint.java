@@ -1,6 +1,18 @@
 package me.zodac.folding.rest.endpoint;
 
+import static me.zodac.folding.api.util.DateTimeUtils.untilNextMonthUtc;
+import static me.zodac.folding.rest.response.Responses.badRequest;
+import static me.zodac.folding.rest.response.Responses.cachedOk;
+import static me.zodac.folding.rest.response.Responses.created;
+import static me.zodac.folding.rest.response.Responses.notFound;
+import static me.zodac.folding.rest.response.Responses.nullRequest;
+import static me.zodac.folding.rest.response.Responses.ok;
+import static me.zodac.folding.rest.response.Responses.serverError;
+
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -18,13 +30,20 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
+import me.zodac.folding.SystemStateManager;
+import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.state.ReadRequired;
+import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.state.WriteRequired;
 import me.zodac.folding.api.tc.Team;
-import me.zodac.folding.api.util.ProcessingType;
-import me.zodac.folding.ejb.tc.scheduled.StatsScheduler;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
+import me.zodac.folding.rest.endpoint.util.IdResult;
+import me.zodac.folding.rest.endpoint.util.IntegerParser;
+import me.zodac.folding.rest.response.BatchCreateResponse;
 import me.zodac.folding.rest.validator.TeamValidator;
+import me.zodac.folding.rest.validator.ValidationFailure;
 import me.zodac.folding.rest.validator.ValidationResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,12 +57,15 @@ import org.apache.logging.log4j.Logger;
  */
 @Path("/teams/")
 @RequestScoped
-public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
+public class TeamEndpoint {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    @Context
+    private UriInfo uriContext;
+
     @EJB
-    private StatsScheduler statsScheduler;
+    private BusinessLogic businessLogic;
 
     /**
      * {@link POST} request to create a {@link Team} based on the input request.
@@ -51,14 +73,33 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
      * @param teamRequest the {@link TeamRequest} to create a {@link Team}
      * @return {@link Response.Status#CREATED} containing the created {@link Team}
      */
-    @Override
     @POST
     @WriteRequired
     @RolesAllowed("admin")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response create(final TeamRequest teamRequest) {
-        return super.create(teamRequest);
+        LOGGER.debug("POST request received to create team at '{}' with request: {}", uriContext::getAbsolutePath, () -> teamRequest);
+
+        final ValidationResult<Team> validationResult = validateCreate(teamRequest);
+        if (validationResult.isFailure()) {
+            return validationResult.getFailureResponse();
+        }
+        final Team validatedTeam = validationResult.getOutput();
+
+        try {
+            final Team elementWithId = businessLogic.createTeam(validatedTeam);
+
+            final UriBuilder elementLocationBuilder = uriContext
+                .getRequestUriBuilder()
+                .path(String.valueOf(elementWithId.getId()));
+            SystemStateManager.next(SystemState.WRITE_EXECUTED);
+            LOGGER.info("Created team with ID {}", elementWithId.getId());
+            return created(elementWithId, elementLocationBuilder);
+        } catch (final Exception e) {
+            LOGGER.error("Unexpected error creating team: {}", teamRequest, e);
+            return serverError();
+        }
     }
 
     /**
@@ -70,7 +111,6 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
      * @param teamRequests the {@link TeamRequest}s to create {@link Team}s
      * @return {@link Response.Status#OK} containing the created/failed {@link Team}s
      */
-    @Override
     @POST
     @WriteRequired
     @RolesAllowed("admin")
@@ -78,7 +118,56 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createBatchOf(final Collection<TeamRequest> teamRequests) {
-        return super.createBatchOf(teamRequests);
+        LOGGER.debug("POST request received to create {} teams at '{}' with request: {}", teamRequests::size, uriContext::getAbsolutePath,
+            () -> teamRequests);
+
+        final Collection<Team> validTeams = new ArrayList<>(teamRequests.size() / 2);
+        final Collection<ValidationFailure> failedValidationResponses = new ArrayList<>(teamRequests.size() / 2);
+
+        for (final TeamRequest teamRequest : teamRequests) {
+            final ValidationResult<Team> validationResult = validateCreate(teamRequest);
+
+            if (validationResult.isFailure()) {
+                LOGGER.error("Found validation error for {}: {}", teamRequest, validationResult);
+                failedValidationResponses.add(validationResult.getValidationFailure());
+            } else {
+                validTeams.add(validationResult.getOutput());
+            }
+        }
+
+        if (validTeams.isEmpty()) {
+            LOGGER.error("All teams contain validation errors: {}", failedValidationResponses);
+            return badRequest(failedValidationResponses);
+        }
+
+        final List<Object> successful = new ArrayList<>();
+        final List<Object> unsuccessful = new ArrayList<>(failedValidationResponses);
+
+        for (final Team validTeam : validTeams) {
+            try {
+                final Team teamWithId = businessLogic.createTeam(validTeam);
+                successful.add(teamWithId);
+            } catch (final Exception e) {
+                LOGGER.error("Unexpected error creating team: {}", validTeam, e);
+                unsuccessful.add(validTeam);
+            }
+        }
+
+        final BatchCreateResponse batchCreateResponse = BatchCreateResponse.create(successful, unsuccessful);
+
+        if (successful.isEmpty()) {
+            return badRequest(batchCreateResponse);
+        }
+
+        if (!unsuccessful.isEmpty()) {
+            LOGGER.error("{} teams successfully created, {} teams unsuccessful", successful.size(), unsuccessful.size());
+            SystemStateManager.next(SystemState.WRITE_EXECUTED);
+            return ok(batchCreateResponse);
+        }
+
+        LOGGER.info("{} teams successfully created", successful.size());
+        SystemStateManager.next(SystemState.WRITE_EXECUTED);
+        return ok(batchCreateResponse.getSuccessful());
     }
 
     /**
@@ -87,13 +176,20 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
      * @param request the {@link Request}, to be used for {@link javax.ws.rs.core.CacheControl}
      * @return {@link Response.Status#OK} containing the {@link Team}s
      */
-    @Override
     @GET
     @ReadRequired
     @PermitAll
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAll(@Context final Request request) {
-        return super.getAll(request);
+        LOGGER.debug("GET request received for all teams at '{}'", uriContext::getAbsolutePath);
+
+        try {
+            final Collection<Team> elements = businessLogic.getAllTeams();
+            return cachedOk(elements, request, untilNextMonthUtc(ChronoUnit.SECONDS));
+        } catch (final Exception e) {
+            LOGGER.error("Unexpected error getting all teams", e);
+            return serverError();
+        }
     }
 
     /**
@@ -103,14 +199,33 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
      * @param request the {@link Request}, to be used for {@link javax.ws.rs.core.CacheControl}
      * @return {@link Response.Status#OK} containing the {@link Team}
      */
-    @Override
     @GET
     @ReadRequired
     @PermitAll
     @Path("/{teamId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getById(@PathParam("teamId") final String teamId, @Context final Request request) {
-        return super.getById(teamId, request);
+        LOGGER.debug("GET request for team received at '{}'", uriContext::getAbsolutePath);
+
+        try {
+            final IdResult idResult = IntegerParser.parsePositive(teamId);
+            if (idResult.isFailure()) {
+                return idResult.getFailureResponse();
+            }
+            final int parsedId = idResult.getId();
+
+            final Optional<Team> optionalElement = businessLogic.getTeam(parsedId);
+            if (optionalElement.isEmpty()) {
+                LOGGER.error("No team found with ID {}", teamId);
+                return notFound();
+            }
+
+            final Team element = optionalElement.get();
+            return cachedOk(element, request, untilNextMonthUtc(ChronoUnit.SECONDS));
+        } catch (final Exception e) {
+            LOGGER.error("Unexpected error getting team with ID: {}", teamId, e);
+            return serverError();
+        }
     }
 
     /**
@@ -120,7 +235,6 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
      * @param teamRequest the {@link TeamRequest} to update a {@link Team}
      * @return {@link Response.Status#OK} containing the updated {@link Team}
      */
-    @Override
     @PUT
     @WriteRequired
     @RolesAllowed("admin")
@@ -128,7 +242,52 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateById(@PathParam("teamId") final String teamId, final TeamRequest teamRequest) {
-        return super.updateById(teamId, teamRequest);
+        LOGGER.debug("PUT request for team received at '{}'", uriContext::getAbsolutePath);
+
+        if (teamRequest == null) {
+            LOGGER.error("No payload provided");
+            return nullRequest();
+        }
+
+        try {
+            final IdResult idResult = IntegerParser.parsePositive(teamId);
+            if (idResult.isFailure()) {
+                return idResult.getFailureResponse();
+            }
+            final int parsedId = idResult.getId();
+
+            final Optional<Team> optionalElement = businessLogic.getTeam(parsedId);
+            if (optionalElement.isEmpty()) {
+                LOGGER.error("No team found with ID {}", teamId);
+                return notFound();
+            }
+            final Team existingTeam = optionalElement.get();
+
+            if (existingTeam.isEqualRequest(teamRequest)) {
+                LOGGER.debug("No change necessary");
+                return ok(existingTeam);
+            }
+
+            final ValidationResult<Team> validationResult = validateUpdate(teamRequest, existingTeam);
+            if (validationResult.isFailure()) {
+                return validationResult.getFailureResponse();
+            }
+            final Team validatedHardware = validationResult.getOutput();
+
+            // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
+            final Team teamWithId = Team.updateWithId(existingTeam.getId(), validatedHardware);
+            final Team updatedTeamWithId = businessLogic.updateTeam(teamWithId);
+
+            final UriBuilder elementLocationBuilder = uriContext
+                .getRequestUriBuilder()
+                .path(String.valueOf(updatedTeamWithId.getId()));
+            SystemStateManager.next(SystemState.WRITE_EXECUTED);
+            LOGGER.info("Updated team with ID {}", updatedTeamWithId.getId());
+            return ok(updatedTeamWithId, elementLocationBuilder);
+        } catch (final Exception e) {
+            LOGGER.error("Unexpected error updating team with ID: {}", teamId, e);
+            return serverError();
+        }
     }
 
     /**
@@ -137,70 +296,53 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
      * @param teamId the ID of the {@link Team} to be deleted
      * @return {@link Response.Status#OK}
      */
-    @Override
     @DELETE
     @WriteRequired
     @RolesAllowed("admin")
     @Path("/{teamId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteById(@PathParam("teamId") final String teamId) {
-        return super.deleteById(teamId);
+        LOGGER.debug("DELETE request for team received at '{}'", uriContext::getAbsolutePath);
+
+        try {
+            final IdResult idResult = IntegerParser.parsePositive(teamId);
+            if (idResult.isFailure()) {
+                return idResult.getFailureResponse();
+            }
+            final int parsedId = idResult.getId();
+
+            final Optional<Team> optionalElement = businessLogic.getTeam(parsedId);
+            if (optionalElement.isEmpty()) {
+                LOGGER.error("No team found with ID {}", teamId);
+                return notFound();
+            }
+            final Team team = optionalElement.get();
+
+            final ValidationResult<Team> validationResult = validateDelete(team);
+            if (validationResult.isFailure()) {
+                return validationResult.getFailureResponse();
+            }
+            final Team validatedTeam = validationResult.getOutput();
+
+            businessLogic.deleteTeam(validatedTeam);
+            SystemStateManager.next(SystemState.WRITE_EXECUTED);
+            LOGGER.info("Deleted team with ID {}", teamId);
+            return ok();
+        } catch (final Exception e) {
+            LOGGER.error("Unexpected error deleting team with ID: {}", teamId, e);
+            return serverError();
+        }
     }
 
-    @Override
-    protected Logger getLogger() {
-        return LOGGER;
+    private ValidationResult<Team> validateCreate(final TeamRequest teamRequest) {
+        return TeamValidator.validateCreate(teamRequest, businessLogic.getAllTeams());
     }
 
-    @Override
-    protected String elementType() {
-        return "team";
+    private ValidationResult<Team> validateUpdate(final TeamRequest teamRequest, final Team existingTeam) {
+        return TeamValidator.validateUpdate(teamRequest, existingTeam, businessLogic.getAllTeams());
     }
 
-    @Override
-    protected Team createElement(final Team team) {
-        final Team teamWithId = businessLogic.createTeam(team);
-        statsScheduler.manualTeamCompetitionStatsParsing(ProcessingType.SYNCHRONOUS);
-        return teamWithId;
-    }
-
-    @Override
-    protected Collection<Team> getAllElements() {
-        return businessLogic.getAllTeams();
-    }
-
-    @Override
-    protected ValidationResult<Team> validateCreateAndConvert(final TeamRequest teamRequest) {
-        final TeamValidator teamValidator = TeamValidator.create(businessLogic);
-        return teamValidator.validateCreate(teamRequest);
-    }
-
-    @Override
-    protected ValidationResult<Team> validateUpdateAndConvert(final TeamRequest teamRequest, final Team existingTeam) {
-        final TeamValidator teamValidator = TeamValidator.create(businessLogic);
-        return teamValidator.validateUpdate(teamRequest, existingTeam);
-    }
-
-    @Override
-    protected ValidationResult<Team> validateDeleteAndConvert(final Team team) {
-        final TeamValidator teamValidator = TeamValidator.create(businessLogic);
-        return teamValidator.validateDelete(team);
-    }
-
-    @Override
-    protected Optional<Team> getElementById(final int teamId) {
-        return businessLogic.getTeam(teamId);
-    }
-
-    @Override
-    protected Team updateElementById(final Team team, final Team existingTeam) {
-        // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
-        final Team teamWithId = Team.updateWithId(existingTeam.getId(), team);
-        return businessLogic.updateTeam(teamWithId);
-    }
-
-    @Override
-    protected void deleteElement(final Team team) {
-        businessLogic.deleteTeam(team);
+    private ValidationResult<Team> validateDelete(final Team team) {
+        return TeamValidator.validateDelete(team, businessLogic.getAllUsersWithoutPasskeys());
     }
 }

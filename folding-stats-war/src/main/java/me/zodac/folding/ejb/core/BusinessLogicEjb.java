@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.toList;
 import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
@@ -20,10 +21,13 @@ import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
+import me.zodac.folding.api.util.ProcessingType;
+import me.zodac.folding.ejb.tc.scheduled.StatsScheduler;
 import me.zodac.folding.ejb.tc.user.UserStateChangeHandler;
 import me.zodac.folding.ejb.tc.user.UserStatsParser;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import me.zodac.folding.stats.HttpFoldingStatsRetriever;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -42,6 +46,9 @@ public class BusinessLogicEjb implements BusinessLogic {
     private static final Storage STORAGE = Storage.getInstance();
     // TODO: [zodac] After AbstractCrud and UserValidator are sorted, make this the only place to retrieve stats?
     private static final FoldingStatsRetriever FOLDING_STATS_RETRIEVER = HttpFoldingStatsRetriever.create();
+
+    @EJB
+    private StatsScheduler statsScheduler;
 
     @EJB
     private UserStateChangeHandler userStateChangeHandler;
@@ -87,7 +94,9 @@ public class BusinessLogicEjb implements BusinessLogic {
 
     @Override
     public Team createTeam(final Team team) {
-        return STORAGE.createTeam(team);
+        final Team createdTeam = STORAGE.createTeam(team);
+        statsScheduler.manualTeamCompetitionStatsParsing(ProcessingType.SYNCHRONOUS);
+        return createdTeam;
     }
 
     @Override
@@ -187,6 +196,10 @@ public class BusinessLogicEjb implements BusinessLogic {
 
     @Override
     public Optional<Hardware> getHardwareWithName(final String hardwareName) {
+        if (StringUtils.isBlank(hardwareName)) {
+            return Optional.empty();
+        }
+
         return getAllHardware()
             .stream()
             .filter(hardware -> hardware.getHardwareName().equalsIgnoreCase(hardwareName))
@@ -195,6 +208,10 @@ public class BusinessLogicEjb implements BusinessLogic {
 
     @Override
     public Optional<Team> getTeamWithName(final String teamName) {
+        if (StringUtils.isBlank(teamName)) {
+            return Optional.empty();
+        }
+
         return getAllTeams()
             .stream()
             .filter(team -> team.getTeamName().equalsIgnoreCase(teamName))
@@ -203,6 +220,10 @@ public class BusinessLogicEjb implements BusinessLogic {
 
     @Override
     public Collection<User> getUsersWithHardware(final Hardware hardware) {
+        if (hardware.getId() == Hardware.EMPTY_HARDWARE_ID) {
+            return Collections.emptyList();
+        }
+
         return getAllUsersWithPasskeys()
             .stream()
             .filter(user -> user.getHardware().getId() == hardware.getId())
@@ -211,6 +232,10 @@ public class BusinessLogicEjb implements BusinessLogic {
 
     @Override
     public Collection<User> getUsersOnTeam(final Team team) {
+        if (team.getId() == Team.EMPTY_TEAM_ID) {
+            return Collections.emptyList();
+        }
+
         return getAllUsersWithPasskeys()
             .stream()
             .filter(user -> user.getTeam().getId() == team.getId())
@@ -219,6 +244,10 @@ public class BusinessLogicEjb implements BusinessLogic {
 
     @Override
     public Optional<User> getUserWithFoldingUserNameAndPasskey(final String foldingUserName, final String passkey) {
+        if (StringUtils.isAnyBlank(foldingUserName, passkey)) {
+            return Optional.empty();
+        }
+
         return getAllUsersWithPasskeys()
             .stream()
             .filter(user -> user.getFoldingUserName().equalsIgnoreCase(foldingUserName) && user.getPasskey().equalsIgnoreCase(passkey))
