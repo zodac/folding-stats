@@ -10,7 +10,6 @@
   "unsuccessful": [
     {
       "invalidObject": {
-        "id": 0,
         "teamName": "Team2",
         "forumLink": "invalidUrl"
       },

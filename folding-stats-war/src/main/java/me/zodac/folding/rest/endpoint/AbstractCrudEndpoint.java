@@ -3,7 +3,6 @@ package me.zodac.folding.rest.endpoint;
 import static me.zodac.folding.api.util.DateTimeUtils.untilNextMonthUtc;
 import static me.zodac.folding.rest.response.Responses.badRequest;
 import static me.zodac.folding.rest.response.Responses.cachedOk;
-import static me.zodac.folding.rest.response.Responses.conflict;
 import static me.zodac.folding.rest.response.Responses.created;
 import static me.zodac.folding.rest.response.Responses.notFound;
 import static me.zodac.folding.rest.response.Responses.nullRequest;
@@ -26,11 +25,11 @@ import me.zodac.folding.api.RequestPojo;
 import me.zodac.folding.api.ResponsePojo;
 import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.state.SystemState;
-import me.zodac.folding.api.validator.ValidationResponse;
-import me.zodac.folding.api.validator.ValidationResult;
 import me.zodac.folding.rest.endpoint.util.IdResult;
 import me.zodac.folding.rest.endpoint.util.IntegerParser;
 import me.zodac.folding.rest.response.BatchCreateResponse;
+import me.zodac.folding.rest.validator.ValidationResponse;
+import me.zodac.folding.rest.validator.ValidationResult;
 import org.apache.logging.log4j.Logger;
 
 // TODO: [zodac] Decorator around REST methods, so we can catch generic exceptions in a single place?
@@ -50,11 +49,11 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
 
     protected abstract Collection<O> getAllElements();
 
-    protected abstract ValidationResponse<O> validateCreateAndConvert(final I inputRequest);
+    protected abstract ValidationResult<O> validateCreateAndConvert(final I inputRequest);
 
-    protected abstract ValidationResponse<O> validateUpdateAndConvert(final I inputRequest, final O existingElement);
+    protected abstract ValidationResult<O> validateUpdateAndConvert(final I inputRequest, final O existingElement);
 
-    protected abstract ValidationResponse<O> validateDeleteAndConvert(final O element);
+    protected abstract ValidationResult<O> validateDeleteAndConvert(final O element);
 
     protected abstract Optional<O> getElementById(final int elementId);
 
@@ -66,16 +65,14 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
         getLogger().debug("POST request received to create {} at '{}' with request: {}", this::elementType, uriContext::getAbsolutePath,
             () -> inputRequest);
 
-        final ValidationResponse<O> validationResponse = validateCreateAndConvert(inputRequest);
-        if (validationResponse.getValidationResult() == ValidationResult.FAILURE_ON_VALIDATION) {
-            return badRequest(validationResponse);
-        } else if (validationResponse.getValidationResult() == ValidationResult.FAILURE_DUE_TO_CONFLICT) {
-            return conflict(validationResponse);
+        final ValidationResult<O> validationResult = validateCreateAndConvert(inputRequest);
+        if (validationResult.isFailure()) {
+            return validationResult.getFailureResponse();
         }
+        final O validatedElement = validationResult.getOutput();
 
         try {
-            final O elementToCreate = validationResponse.getOutput();
-            final O elementWithId = createElement(elementToCreate);
+            final O elementWithId = createElement(validatedElement);
 
             final UriBuilder elementLocationBuilder = uriContext
                 .getRequestUriBuilder()
@@ -94,16 +91,16 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
             uriContext::getAbsolutePath, () -> batchOfInputRequests);
 
         final Collection<O> validElements = new ArrayList<>(batchOfInputRequests.size() / 2);
-        final Collection<ValidationResponse<O>> failedValidationResponses = new ArrayList<>(batchOfInputRequests.size() / 2);
+        final Collection<ValidationResponse> failedValidationResponses = new ArrayList<>(batchOfInputRequests.size() / 2);
 
         for (final I inputRequest : batchOfInputRequests) {
-            final ValidationResponse<O> validationResponse = validateCreateAndConvert(inputRequest);
+            final ValidationResult<O> validationResult = validateCreateAndConvert(inputRequest);
 
-            if (validationResponse.isInvalid()) {
-                getLogger().error("Found validation error for {}: {}", inputRequest, validationResponse);
-                failedValidationResponses.add(validationResponse);
+            if (validationResult.isFailure()) {
+                getLogger().error("Found validation error for {}: {}", inputRequest, validationResult);
+                failedValidationResponses.add(validationResult.getValidationResponse());
             } else {
-                validElements.add(validationResponse.getOutput());
+                validElements.add(validationResult.getOutput());
             }
         }
 
@@ -207,12 +204,13 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
                 return ok(existingElement);
             }
 
-            final ValidationResponse<O> validationResponse = validateUpdateAndConvert(inputRequest, existingElement);
-            if (validationResponse.isInvalid()) {
-                return badRequest(validationResponse);
+            final ValidationResult<O> validationResult = validateUpdateAndConvert(inputRequest, existingElement);
+            if (validationResult.isFailure()) {
+                return validationResult.getFailureResponse();
             }
+            final O validatedElement = validationResult.getOutput();
 
-            final O updatedElementWithId = updateElementById(validationResponse.getOutput(), existingElement);
+            final O updatedElementWithId = updateElementById(validatedElement, existingElement);
 
             final UriBuilder elementLocationBuilder = uriContext
                 .getRequestUriBuilder()
@@ -243,14 +241,13 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
             }
             final O element = optionalElement.get();
 
-            final ValidationResponse<O> validationResponse = validateDeleteAndConvert(element);
-            if (validationResponse.getValidationResult() == ValidationResult.FAILURE_ON_VALIDATION) {
-                return badRequest(validationResponse);
-            } else if (validationResponse.getValidationResult() == ValidationResult.FAILURE_DUE_TO_CONFLICT) {
-                return conflict(validationResponse);
+            final ValidationResult<O> validationResult = validateDeleteAndConvert(element);
+            if (validationResult.isFailure()) {
+                return validationResult.getFailureResponse();
             }
+            final O validatedElement = validationResult.getOutput();
 
-            deleteElement(validationResponse.getOutput());
+            deleteElement(validatedElement);
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             getLogger().info("Deleted {} with ID {}", elementType(), elementId);
             return ok();

@@ -20,9 +20,9 @@ import javax.ws.rs.core.Response;
 import me.zodac.folding.api.state.ReadRequired;
 import me.zodac.folding.api.state.WriteRequired;
 import me.zodac.folding.api.tc.Hardware;
-import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 import me.zodac.folding.rest.validator.HardwareValidator;
+import me.zodac.folding.rest.validator.ValidationResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -111,19 +111,19 @@ public class HardwareEndpoint extends AbstractCrudEndpoint<HardwareRequest, Hard
     }
 
     @Override
-    protected ValidationResponse<Hardware> validateCreateAndConvert(final HardwareRequest hardwareRequest) {
+    protected ValidationResult<Hardware> validateCreateAndConvert(final HardwareRequest hardwareRequest) {
         final HardwareValidator hardwareValidator = HardwareValidator.create(businessLogic);
         return hardwareValidator.validateCreate(hardwareRequest);
     }
 
     @Override
-    protected ValidationResponse<Hardware> validateUpdateAndConvert(final HardwareRequest hardwareRequest, final Hardware existingHardware) {
+    protected ValidationResult<Hardware> validateUpdateAndConvert(final HardwareRequest hardwareRequest, final Hardware existingHardware) {
         final HardwareValidator hardwareValidator = HardwareValidator.create(businessLogic);
         return hardwareValidator.validateUpdate(hardwareRequest, existingHardware);
     }
 
     @Override
-    protected ValidationResponse<Hardware> validateDeleteAndConvert(final Hardware hardware) {
+    protected ValidationResult<Hardware> validateDeleteAndConvert(final Hardware hardware) {
         final HardwareValidator hardwareValidator = HardwareValidator.create(businessLogic);
         return hardwareValidator.validateDelete(hardware);
     }

@@ -14,7 +14,6 @@ import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.HardwareMake;
 import me.zodac.folding.api.tc.HardwareType;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 import org.apache.commons.lang3.StringUtils;
 
@@ -54,17 +53,17 @@ public final class HardwareValidator {
      * </ul>
      *
      * @param hardwareRequest the {@link HardwareRequest} to validate
-     * @return the {@link ValidationResponse}
+     * @return the {@link ValidationResult}
      */
-    public ValidationResponse<Hardware> validateCreate(final HardwareRequest hardwareRequest) {
+    public ValidationResult<Hardware> validateCreate(final HardwareRequest hardwareRequest) {
         if (hardwareRequest == null) {
-            return ValidationResponse.nullObject();
+            return ValidationResult.nullObject();
         }
 
         // Hardware name must be unique
         final Optional<Hardware> hardwareWithMatchingName = businessLogic.getHardwareWithName(hardwareRequest.getHardwareName());
         if (hardwareWithMatchingName.isPresent()) {
-            return ValidationResponse.conflictingWith(hardwareRequest, hardwareWithMatchingName.get(), List.of("hardwareName"));
+            return ValidationResult.conflictingWith(hardwareRequest, hardwareWithMatchingName.get(), List.of("hardwareName"));
         }
 
         final List<String> failureMessages = Stream.of(
@@ -79,11 +78,11 @@ public final class HardwareValidator {
             .collect(toList());
 
         if (!failureMessages.isEmpty()) {
-            return ValidationResponse.failure(hardwareRequest, failureMessages);
+            return ValidationResult.failure(hardwareRequest, failureMessages);
         }
 
         final Hardware convertedHardware = Hardware.createWithoutId(hardwareRequest);
-        return ValidationResponse.success(convertedHardware);
+        return ValidationResult.success(convertedHardware);
     }
 
     /**
@@ -102,17 +101,17 @@ public final class HardwareValidator {
      *
      * @param hardwareRequest  the {@link HardwareRequest} to validate
      * @param existingHardware the already existing {@link Hardware} in the system to be updated
-     * @return the {@link ValidationResponse}
+     * @return the {@link ValidationResult}
      */
-    public ValidationResponse<Hardware> validateUpdate(final HardwareRequest hardwareRequest, final Hardware existingHardware) {
+    public ValidationResult<Hardware> validateUpdate(final HardwareRequest hardwareRequest, final Hardware existingHardware) {
         if (hardwareRequest == null || existingHardware == null) {
-            return ValidationResponse.nullObject();
+            return ValidationResult.nullObject();
         }
 
         // Hardware name must be unique
         final Optional<Hardware> hardwareWithMatchingName = businessLogic.getHardwareWithName(hardwareRequest.getHardwareName());
         if (hardwareWithMatchingName.isPresent() && hardwareWithMatchingName.get().getId() != existingHardware.getId()) {
-            return ValidationResponse.conflictingWith(hardwareRequest, hardwareWithMatchingName.get(), List.of("hardwareName"));
+            return ValidationResult.conflictingWith(hardwareRequest, hardwareWithMatchingName.get(), List.of("hardwareName"));
         }
 
         final List<String> failureMessages = Stream.of(
@@ -127,27 +126,27 @@ public final class HardwareValidator {
             .collect(toList());
 
         if (!failureMessages.isEmpty()) {
-            return ValidationResponse.failure(hardwareRequest, failureMessages);
+            return ValidationResult.failure(hardwareRequest, failureMessages);
         }
 
         final Hardware convertedHardware = Hardware.createWithoutId(hardwareRequest);
-        return ValidationResponse.success(convertedHardware);
+        return ValidationResult.success(convertedHardware);
     }
 
     /**
      * Validates a {@link Hardware} to be deleted from the system.
      *
      * @param hardware the {@link Hardware} to validate
-     * @return the {@link ValidationResponse}
+     * @return the {@link ValidationResult}
      */
-    public ValidationResponse<Hardware> validateDelete(final Hardware hardware) {
+    public ValidationResult<Hardware> validateDelete(final Hardware hardware) {
         final Collection<User> usersWithMatchingHardware = businessLogic.getUsersWithHardware(hardware);
 
         if (!usersWithMatchingHardware.isEmpty()) {
-            return ValidationResponse.usedBy(hardware, usersWithMatchingHardware);
+            return ValidationResult.usedBy(hardware, usersWithMatchingHardware);
         }
 
-        return ValidationResponse.success(hardware);
+        return ValidationResult.success(hardware);
     }
 
     private static String hardwareName(final HardwareRequest hardwareRequest) {

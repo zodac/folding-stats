@@ -1,7 +1,6 @@
 [
   {
     "invalidObject": {
-      "id": 0,
       "teamDescription": "Team1",
       "forumLink": "https://forums.extremehw.net/forum/125-extreme-team-folding/"
     },
@@ -11,7 +10,6 @@
   },
   {
     "invalidObject": {
-      "id": 0,
       "teamName": "Team2",
       "forumLink": "invalidUrl"
     },

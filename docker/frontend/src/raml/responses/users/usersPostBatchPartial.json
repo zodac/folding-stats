@@ -25,7 +25,6 @@
   "unsuccessful": [
     {
       "invalidObject": {
-        "id": 0,
         "foldingUserName": "User1",
         "displayName": "User1",
         "passkey": "fc7d6837269d86784d8bfd0b386d6bca",

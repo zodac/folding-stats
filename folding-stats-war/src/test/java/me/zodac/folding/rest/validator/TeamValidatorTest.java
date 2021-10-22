@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
 import org.junit.jupiter.api.Test;
 
@@ -23,9 +22,9 @@ class TeamValidatorTest {
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
         final TeamValidator teamValidator = TeamValidator.create(mockBusinessLogic);
-        final ValidationResponse<Team> response = teamValidator.validateCreate(team);
+        final ValidationResult<Team> response = teamValidator.validateCreate(team);
 
-        assertThat(response.isInvalid())
+        assertThat(response.isFailure())
             .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
             .isFalse();
     }
@@ -34,9 +33,9 @@ class TeamValidatorTest {
     void whenValidatingCreate_givenNullTeam_thenFailureResponseIsReturned() {
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
         final TeamValidator teamValidator = TeamValidator.create(mockBusinessLogic);
-        final ValidationResponse<Team> response = teamValidator.validateCreate(null);
+        final ValidationResult<Team> response = teamValidator.validateCreate(null);
 
-        assertThat(response.isInvalid())
+        assertThat(response.isFailure())
             .isTrue();
 
         assertThat(response.getErrors())
@@ -53,9 +52,9 @@ class TeamValidatorTest {
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
         final TeamValidator teamValidator = TeamValidator.create(mockBusinessLogic);
-        final ValidationResponse<Team> response = teamValidator.validateCreate(team);
+        final ValidationResult<Team> response = teamValidator.validateCreate(team);
 
-        assertThat(response.isInvalid())
+        assertThat(response.isFailure())
             .isTrue();
 
         assertThat(response.getErrors())
@@ -79,9 +78,9 @@ class TeamValidatorTest {
             .forumLink("http://www.google.com")
             .build();
 
-        final ValidationResponse<Team> response = teamValidator.validateCreate(team);
+        final ValidationResult<Team> response = teamValidator.validateCreate(team);
 
-        assertThat(response.isInvalid())
+        assertThat(response.isFailure())
             .isTrue();
 
         assertThat(response.getErrors())
@@ -98,9 +97,9 @@ class TeamValidatorTest {
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
         final TeamValidator teamValidator = TeamValidator.create(mockBusinessLogic);
-        final ValidationResponse<Team> response = teamValidator.validateCreate(team);
+        final ValidationResult<Team> response = teamValidator.validateCreate(team);
 
-        assertThat(response.isInvalid())
+        assertThat(response.isFailure())
             .isFalse();
     }
 
@@ -114,9 +113,9 @@ class TeamValidatorTest {
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
         final TeamValidator teamValidator = TeamValidator.create(mockBusinessLogic);
-        final ValidationResponse<Team> response = teamValidator.validateCreate(team);
+        final ValidationResult<Team> response = teamValidator.validateCreate(team);
 
-        assertThat(response.isInvalid())
+        assertThat(response.isFailure())
             .isFalse();
     }
 
@@ -130,9 +129,9 @@ class TeamValidatorTest {
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
         final TeamValidator teamValidator = TeamValidator.create(mockBusinessLogic);
-        final ValidationResponse<Team> response = teamValidator.validateCreate(team);
+        final ValidationResult<Team> response = teamValidator.validateCreate(team);
 
-        assertThat(response.isInvalid())
+        assertThat(response.isFailure())
             .isTrue();
 
         assertThat(response.getErrors())
@@ -155,9 +154,9 @@ class TeamValidatorTest {
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
         final TeamValidator teamValidator = TeamValidator.create(mockBusinessLogic);
-        final ValidationResponse<Team> response = teamValidator.validateUpdate(team, existingTeam);
+        final ValidationResult<Team> response = teamValidator.validateUpdate(team, existingTeam);
 
-        assertThat(response.isInvalid())
+        assertThat(response.isFailure())
             .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
             .isFalse();
     }
@@ -172,9 +171,9 @@ class TeamValidatorTest {
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
         final TeamValidator teamValidator = TeamValidator.create(mockBusinessLogic);
-        final ValidationResponse<Team> response = teamValidator.validateUpdate(null, existingTeam);
+        final ValidationResult<Team> response = teamValidator.validateUpdate(null, existingTeam);
 
-        assertThat(response.isInvalid())
+        assertThat(response.isFailure())
             .isTrue();
 
         assertThat(response.getErrors())
@@ -191,9 +190,9 @@ class TeamValidatorTest {
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
         final TeamValidator teamValidator = TeamValidator.create(mockBusinessLogic);
-        final ValidationResponse<Team> response = teamValidator.validateUpdate(team, null);
+        final ValidationResult<Team> response = teamValidator.validateUpdate(team, null);
 
-        assertThat(response.isInvalid())
+        assertThat(response.isFailure())
             .isTrue();
 
         assertThat(response.getErrors())
@@ -216,9 +215,9 @@ class TeamValidatorTest {
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
         final TeamValidator teamValidator = TeamValidator.create(mockBusinessLogic);
-        final ValidationResponse<Team> response = teamValidator.validateUpdate(team, existingTeam);
+        final ValidationResult<Team> response = teamValidator.validateUpdate(team, existingTeam);
 
-        assertThat(response.isInvalid())
+        assertThat(response.isFailure())
             .isTrue();
 
         assertThat(response.getErrors())
@@ -250,9 +249,9 @@ class TeamValidatorTest {
         );
 
         final TeamValidator teamValidator = TeamValidator.create(mockBusinessLogic);
-        final ValidationResponse<Team> response = teamValidator.validateUpdate(team, existingTeam);
+        final ValidationResult<Team> response = teamValidator.validateUpdate(team, existingTeam);
 
-        assertThat(response.isInvalid())
+        assertThat(response.isFailure())
             .isTrue();
 
         assertThat(response.getErrors())
@@ -284,9 +283,9 @@ class TeamValidatorTest {
         );
 
         final TeamValidator teamValidator = TeamValidator.create(mockBusinessLogic);
-        final ValidationResponse<Team> response = teamValidator.validateUpdate(team, existingTeam);
+        final ValidationResult<Team> response = teamValidator.validateUpdate(team, existingTeam);
 
-        assertThat(response.isInvalid())
+        assertThat(response.isFailure())
             .isFalse();
     }
 
@@ -306,9 +305,9 @@ class TeamValidatorTest {
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
         final TeamValidator teamValidator = TeamValidator.create(mockBusinessLogic);
-        final ValidationResponse<Team> response = teamValidator.validateUpdate(team, existingTeam);
+        final ValidationResult<Team> response = teamValidator.validateUpdate(team, existingTeam);
 
-        assertThat(response.isInvalid())
+        assertThat(response.isFailure())
             .isFalse();
     }
 
@@ -328,9 +327,9 @@ class TeamValidatorTest {
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
         final TeamValidator teamValidator = TeamValidator.create(mockBusinessLogic);
-        final ValidationResponse<Team> response = teamValidator.validateUpdate(team, existingTeam);
+        final ValidationResult<Team> response = teamValidator.validateUpdate(team, existingTeam);
 
-        assertThat(response.isInvalid())
+        assertThat(response.isFailure())
             .isFalse();
     }
 
@@ -350,9 +349,9 @@ class TeamValidatorTest {
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
         final TeamValidator teamValidator = TeamValidator.create(mockBusinessLogic);
-        final ValidationResponse<Team> response = teamValidator.validateUpdate(team, existingTeam);
+        final ValidationResult<Team> response = teamValidator.validateUpdate(team, existingTeam);
 
-        assertThat(response.isInvalid())
+        assertThat(response.isFailure())
             .isTrue();
 
         assertThat(response.getErrors())
@@ -369,9 +368,9 @@ class TeamValidatorTest {
 
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
         final TeamValidator teamValidator = TeamValidator.create(mockBusinessLogic);
-        final ValidationResponse<Team> response = teamValidator.validateDelete(existingTeam);
+        final ValidationResult<Team> response = teamValidator.validateDelete(existingTeam);
 
-        assertThat(response.isInvalid())
+        assertThat(response.isFailure())
             .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
             .isFalse();
     }
@@ -391,9 +390,9 @@ class TeamValidatorTest {
         final MockBusinessLogic mockBusinessLogic = MockBusinessLogic.create();
         mockBusinessLogic.createUser(userUsingHardware);
         final TeamValidator teamValidator = TeamValidator.create(mockBusinessLogic);
-        final ValidationResponse<Team> response = teamValidator.validateDelete(existingTeam);
+        final ValidationResult<Team> response = teamValidator.validateDelete(existingTeam);
 
-        assertThat(response.isInvalid())
+        assertThat(response.isFailure())
             .isTrue();
     }
 }

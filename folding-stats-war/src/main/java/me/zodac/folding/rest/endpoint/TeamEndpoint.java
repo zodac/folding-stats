@@ -22,10 +22,10 @@ import me.zodac.folding.api.state.ReadRequired;
 import me.zodac.folding.api.state.WriteRequired;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.util.ProcessingType;
-import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.ejb.tc.scheduled.StatsScheduler;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
 import me.zodac.folding.rest.validator.TeamValidator;
+import me.zodac.folding.rest.validator.ValidationResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -120,19 +120,19 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
     }
 
     @Override
-    protected ValidationResponse<Team> validateCreateAndConvert(final TeamRequest teamRequest) {
+    protected ValidationResult<Team> validateCreateAndConvert(final TeamRequest teamRequest) {
         final TeamValidator teamValidator = TeamValidator.create(businessLogic);
         return teamValidator.validateCreate(teamRequest);
     }
 
     @Override
-    protected ValidationResponse<Team> validateUpdateAndConvert(final TeamRequest teamRequest, final Team existingTeam) {
+    protected ValidationResult<Team> validateUpdateAndConvert(final TeamRequest teamRequest, final Team existingTeam) {
         final TeamValidator teamValidator = TeamValidator.create(businessLogic);
         return teamValidator.validateUpdate(teamRequest, existingTeam);
     }
 
     @Override
-    protected ValidationResponse<Team> validateDeleteAndConvert(final Team team) {
+    protected ValidationResult<Team> validateDeleteAndConvert(final Team team) {
         final TeamValidator teamValidator = TeamValidator.create(businessLogic);
         return teamValidator.validateDelete(team);
     }

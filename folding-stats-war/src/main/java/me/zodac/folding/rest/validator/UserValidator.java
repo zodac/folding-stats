@@ -17,7 +17,6 @@ import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.Stats;
-import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.UrlValidator;
@@ -41,9 +40,9 @@ public final class UserValidator {
     }
 
     @SuppressWarnings("PMD.NPathComplexity") // Better than breaking into smaller functions
-    public ValidationResponse<User> validateCreate(final UserRequest userRequest) {
+    public ValidationResult<User> validateCreate(final UserRequest userRequest) {
         if (userRequest == null) {
-            return ValidationResponse.nullObject();
+            return ValidationResult.nullObject();
         }
 
         final List<String> failureMessages = new ArrayList<>();
@@ -67,7 +66,7 @@ public final class UserValidator {
                 businessLogic.getUserWithFoldingUserNameAndPasskey(userRequest.getFoldingUserName(), userRequest.getPasskey());
 
             if (userWithMatchingFoldingUserNameAndPasskey.isPresent()) {
-                return ValidationResponse
+                return ValidationResult
                     .conflictingWith(userRequest, userWithMatchingFoldingUserNameAndPasskey.get(), List.of("foldingUserName", "passkey"));
             }
         }
@@ -123,17 +122,17 @@ public final class UserValidator {
                 final User user =
                     User.createWithoutId(userRequest.getFoldingUserName(), userRequest.getDisplayName(), userRequest.getPasskey(), category,
                         userRequest.getProfileLink(), userRequest.getLiveStatsLink(), hardware.get(), team.get(), userRequest.isUserIsCaptain());
-                return ValidationResponse.success(user);
+                return ValidationResult.success(user);
             }
         }
 
-        return ValidationResponse.failure(userRequest, failureMessages);
+        return ValidationResult.failure(userRequest, failureMessages);
     }
 
     @SuppressWarnings("PMD.NPathComplexity") // Better than breaking into smaller functions
-    public ValidationResponse<User> validateUpdate(final UserRequest userRequest, final User existingUser) {
+    public ValidationResult<User> validateUpdate(final UserRequest userRequest, final User existingUser) {
         if (userRequest == null) {
-            return ValidationResponse.nullObject();
+            return ValidationResult.nullObject();
         }
 
         final List<String> failureMessages = new ArrayList<>();
@@ -201,11 +200,11 @@ public final class UserValidator {
                 final User user =
                     User.createWithoutId(userRequest.getFoldingUserName(), userRequest.getDisplayName(), userRequest.getPasskey(), category,
                         userRequest.getProfileLink(), userRequest.getLiveStatsLink(), hardware.get(), team.get(), userRequest.isUserIsCaptain());
-                return ValidationResponse.success(user);
+                return ValidationResult.success(user);
             }
         }
 
-        return ValidationResponse.failure(userRequest, failureMessages);
+        return ValidationResult.failure(userRequest, failureMessages);
     }
 
     private List<String> validateTeam(final UserRequest userRequest) {

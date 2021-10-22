@@ -37,6 +37,7 @@
         <hikariCP.version>5.0.0</hikariCP.version>
         <javaee-web-api.version>8.0.1</javaee-web-api.version>
         <jersey.version>3.0.3</jersey.version>
+        <jersey-server.version>1.19.4</jersey-server.version>
         <jooq.version>3.15.3</jooq.version>
         <jsoup.version>1.14.3</jsoup.version>
         <log4j.version>2.14.1</log4j.version>
@@ -208,6 +209,12 @@
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-core</artifactId>
                 <version>${flyway-core}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.jersey</groupId>
+                <artifactId>jersey-server</artifactId>
+                <version>${jersey-server.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>

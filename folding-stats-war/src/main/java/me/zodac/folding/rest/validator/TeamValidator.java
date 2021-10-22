@@ -12,7 +12,6 @@ import lombok.AllArgsConstructor;
 import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.UrlValidator;
@@ -49,18 +48,18 @@ public final class TeamValidator {
      * </ul>
      *
      * @param teamRequest the {@link TeamRequest} to validate
-     * @return the {@link ValidationResponse}
+     * @return the {@link ValidationResult}
      * @see UrlValidator#isValid(String)
      */
-    public ValidationResponse<Team> validateCreate(final TeamRequest teamRequest) {
+    public ValidationResult<Team> validateCreate(final TeamRequest teamRequest) {
         if (teamRequest == null) {
-            return ValidationResponse.nullObject();
+            return ValidationResult.nullObject();
         }
 
         // Team name must be unique
         final Optional<Team> teamWithMatchingName = businessLogic.getTeamWithName(teamRequest.getTeamName());
         if (teamWithMatchingName.isPresent()) {
-            return ValidationResponse.conflictingWith(teamRequest, teamWithMatchingName.get(), List.of("teamName"));
+            return ValidationResult.conflictingWith(teamRequest, teamWithMatchingName.get(), List.of("teamName"));
         }
 
         final List<String> failureMessages = Stream.of(
@@ -71,11 +70,11 @@ public final class TeamValidator {
             .collect(toList());
 
         if (!failureMessages.isEmpty()) {
-            return ValidationResponse.failure(teamRequest, failureMessages);
+            return ValidationResult.failure(teamRequest, failureMessages);
         }
 
         final Team convertedTeam = Team.createWithoutId(teamRequest);
-        return ValidationResponse.success(convertedTeam);
+        return ValidationResult.success(convertedTeam);
     }
 
     /**
@@ -91,17 +90,17 @@ public final class TeamValidator {
      *
      * @param teamRequest  the {@link TeamRequest} to validate
      * @param existingTeam the already existing {@link Team} in the system to be updated
-     * @return the {@link ValidationResponse}
+     * @return the {@link ValidationResult}
      */
-    public ValidationResponse<Team> validateUpdate(final TeamRequest teamRequest, final Team existingTeam) {
+    public ValidationResult<Team> validateUpdate(final TeamRequest teamRequest, final Team existingTeam) {
         if (teamRequest == null || existingTeam == null) {
-            return ValidationResponse.nullObject();
+            return ValidationResult.nullObject();
         }
 
         // Team name must be unique
         final Optional<Team> teamWithMatchingName = businessLogic.getTeamWithName(teamRequest.getTeamName());
         if (teamWithMatchingName.isPresent() && teamWithMatchingName.get().getId() != existingTeam.getId()) {
-            return ValidationResponse.conflictingWith(teamRequest, teamWithMatchingName.get(), List.of("teamName"));
+            return ValidationResult.conflictingWith(teamRequest, teamWithMatchingName.get(), List.of("teamName"));
         }
 
         final List<String> failureMessages = Stream.of(
@@ -112,27 +111,27 @@ public final class TeamValidator {
             .collect(toList());
 
         if (!failureMessages.isEmpty()) {
-            return ValidationResponse.failure(teamRequest, failureMessages);
+            return ValidationResult.failure(teamRequest, failureMessages);
         }
 
         final Team convertedTeam = Team.createWithoutId(teamRequest);
-        return ValidationResponse.success(convertedTeam);
+        return ValidationResult.success(convertedTeam);
     }
 
     /**
      * Validates a {@link Team} to be deleted from the system.
      *
      * @param team the {@link Team} to validate
-     * @return the {@link ValidationResponse}
+     * @return the {@link ValidationResult}
      */
-    public ValidationResponse<Team> validateDelete(final Team team) {
+    public ValidationResult<Team> validateDelete(final Team team) {
         final Collection<User> usersWithMatchingTeam = businessLogic.getUsersOnTeam(team);
 
         if (!usersWithMatchingTeam.isEmpty()) {
-            return ValidationResponse.usedBy(team, usersWithMatchingTeam);
+            return ValidationResult.usedBy(team, usersWithMatchingTeam);
         }
 
-        return ValidationResponse.success(team);
+        return ValidationResult.success(team);
     }
 
     private static String teamName(final TeamRequest teamRequest) {

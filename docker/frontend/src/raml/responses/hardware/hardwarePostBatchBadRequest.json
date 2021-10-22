@@ -15,7 +15,6 @@
   },
   {
     "invalidObject": {
-      "id": 0,
       "hardwareName": "Hardware2",
       "displayName": "Hardware2",
       "hardwareMake": "AMD",

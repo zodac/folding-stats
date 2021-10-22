@@ -20,9 +20,9 @@ import javax.ws.rs.core.Response;
 import me.zodac.folding.api.state.ReadRequired;
 import me.zodac.folding.api.state.WriteRequired;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.validator.ValidationResponse;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 import me.zodac.folding.rest.validator.UserValidator;
+import me.zodac.folding.rest.validator.ValidationResult;
 import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -112,20 +112,20 @@ public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
     }
 
     @Override
-    protected ValidationResponse<User> validateCreateAndConvert(final UserRequest userRequest) {
+    protected ValidationResult<User> validateCreateAndConvert(final UserRequest userRequest) {
         final UserValidator userValidator = UserValidator.createValidator(businessLogic, HttpFoldingStatsRetriever.create());
         return userValidator.validateCreate(userRequest);
     }
 
     @Override
-    protected ValidationResponse<User> validateUpdateAndConvert(final UserRequest userRequest, final User existingUser) {
+    protected ValidationResult<User> validateUpdateAndConvert(final UserRequest userRequest, final User existingUser) {
         final UserValidator userValidator = UserValidator.createValidator(businessLogic, HttpFoldingStatsRetriever.create());
         return userValidator.validateUpdate(userRequest, existingUser);
     }
 
     @Override
-    protected ValidationResponse<User> validateDeleteAndConvert(final User user) {
-        return ValidationResponse.success(user);
+    protected ValidationResult<User> validateDeleteAndConvert(final User user) {
+        return ValidationResult.success(user);
     }
 
     @Override
