@@ -58,6 +58,7 @@ function adminLogin(){
 function manualUpdate() {
     show("loader");
     fetch(ROOT_URL+'/stats/manual/update', {
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': sessionGet("Authorization")
@@ -86,6 +87,7 @@ function manualUpdate() {
 function printCache() {
     show("loader");
     fetch(ROOT_URL+'/debug/caches', {
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': sessionGet("Authorization")

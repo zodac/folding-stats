@@ -77,7 +77,7 @@ class HardwareTest {
     }
 
     @Test
-    void whenCreatingHardware_givenPayloadIsValid_thenTheCreatedHardwareIsReturnedInResponse_andHasId_andResponseHas201StatusCode()
+    void whenCreatingHardware_givenPayloadIsValid_thenTheCreatedHardwareIsReturnedInResponse_andHasId_andResponseHas201Status()
         throws FoldingRestException {
         final HardwareRequest hardwareToCreate = generateHardware();
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.create(hardwareToCreate, ADMIN_USER.userName(), ADMIN_USER.password());
@@ -467,7 +467,7 @@ class HardwareTest {
     }
 
     @Test
-    void whenCreatingHardware_givenNoAuthentication_thenRequestFails_andResponseHas401StatusCode() throws FoldingRestException {
+    void whenCreatingHardware_givenNoAuthentication_thenRequestFails_andResponseHas401Status() throws FoldingRestException {
         final HardwareRequest hardwareToCreate = generateHardware();
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.create(hardwareToCreate);
         assertThat(response.statusCode())
@@ -476,7 +476,7 @@ class HardwareTest {
     }
 
     @Test
-    void whenCreatingBatchOfHardware_givenNoAuthentication_thenRequestFails_andResponseHas401StatusCode() throws FoldingRestException {
+    void whenCreatingBatchOfHardware_givenNoAuthentication_thenRequestFails_andResponseHas401Status() throws FoldingRestException {
         final List<HardwareRequest> batchOfHardware = List.of(
             generateHardware(),
             generateHardware(),
@@ -490,7 +490,7 @@ class HardwareTest {
     }
 
     @Test
-    void whenUpdatingHardware_givenNoAuthentication_thenRequestFails_andResponseHas401StatusCode() throws FoldingRestException {
+    void whenUpdatingHardware_givenNoAuthentication_thenRequestFails_andResponseHas401Status() throws FoldingRestException {
         final Hardware createdHardware = create(generateHardware());
 
         final HardwareRequest updatedHardware = HardwareRequest.builder()
@@ -506,7 +506,7 @@ class HardwareTest {
     }
 
     @Test
-    void whenDeletingHardware_givenNoAuthentication_thenRequestFails_andResponseHas401StatusCode() throws FoldingRestException {
+    void whenDeletingHardware_givenNoAuthentication_thenRequestFails_andResponseHas401Status() throws FoldingRestException {
         final int hardwareId = create(generateHardware()).getId();
 
         final HttpResponse<Void> response = HARDWARE_REQUEST_SENDER.delete(hardwareId);
@@ -516,7 +516,7 @@ class HardwareTest {
     }
 
     @Test
-    void whenCreatingHardware_givenAuthentication_andAuthenticationHasInvalidUser_thenRequestFails_andResponseHas401StatusCode()
+    void whenCreatingHardware_givenAuthentication_andAuthenticationHasInvalidUser_thenRequestFails_andResponseHas401Status()
         throws FoldingRestException {
         final HardwareRequest hardwareToCreate = generateHardware();
         final HttpResponse<String> response =
@@ -527,7 +527,7 @@ class HardwareTest {
     }
 
     @Test
-    void whenCreatingHardware_givenAuthentication_andAuthenticationHasInvalidPassword_thenRequestFails_andResponseHas401StatusCode()
+    void whenCreatingHardware_givenAuthentication_andAuthenticationHasInvalidPassword_thenRequestFails_andResponseHas401Status()
         throws FoldingRestException {
         final HardwareRequest hardwareToCreate = generateHardware();
         final HttpResponse<String> response =
@@ -538,7 +538,7 @@ class HardwareTest {
     }
 
     @Test
-    void whenCreatingHardware_givenAuthentication_andUserDoesNotHaveAdminRole_thenRequestFails_andResponseHas403StatusCode()
+    void whenCreatingHardware_givenAuthentication_andUserDoesNotHaveAdminRole_thenRequestFails_andResponseHas403Status()
         throws FoldingRestException {
         final HardwareRequest hardwareToCreate = generateHardware();
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.create(hardwareToCreate, READ_ONLY_USER.userName(), READ_ONLY_USER.password());
@@ -548,7 +548,7 @@ class HardwareTest {
     }
 
     @Test
-    void whenCreatingHardware_givenEmptyPayload_thenRequestFails_andResponseHas400StatusCode() throws IOException, InterruptedException {
+    void whenCreatingHardware_givenEmptyPayload_thenRequestFails_andResponseHas400Status() throws IOException, InterruptedException {
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.noBody())
             .uri(URI.create(FOLDING_URL + "/hardware"))
@@ -563,7 +563,7 @@ class HardwareTest {
     }
 
     @Test
-    void whenUpdatingHardware_givenEmptyPayload_thenRequestFails_andResponseHas400StatusCode()
+    void whenUpdatingHardware_givenEmptyPayload_thenRequestFails_andResponseHas400Status()
         throws FoldingRestException, IOException, InterruptedException {
         final int hardwareId = create(generateHardware()).getId();
 

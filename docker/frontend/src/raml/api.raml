@@ -506,7 +506,7 @@ traits:
               example: !include responses/result/getBadRequest.json
 
   /manual/save:
-    get:
+    post:
       is: [ "adminOnly" ]
       description: "Request a manual save of the current TC result"
       responses:
@@ -554,7 +554,7 @@ traits:
           description: "The system is not in a valid state to execute read requests"
   /manual:
     /reset:
-      get:
+      post:
         is: [ "adminOnly" ]
         description: "Resets all user/team stats"
         responses:
@@ -565,7 +565,7 @@ traits:
           503:
             description: "The system is not in a valid state to execute write requests"
     /update:
-      get:
+      post:
         is: [ "adminOnly" ]
         description: "Requests an update of all user/team stats"
         queryParameters:
@@ -768,14 +768,14 @@ traits:
 /debug:
   /caches:
     is: [ "adminOnly" ]
-    get:
+    post:
       description: "Debugging endpoint to print contents of caches to system log"
     responses:
       200:
         description: "Cache contents have been printed to system log"
   /lars:
     is: [ "adminOnly" ]
-    get:
+    post:
       description: "Debugging endpoint to manually start the LARS hardware update"
     responses:
       200:

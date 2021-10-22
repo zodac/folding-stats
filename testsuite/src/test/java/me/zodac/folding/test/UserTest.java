@@ -93,7 +93,7 @@ class UserTest {
     }
 
     @Test
-    void whenCreatingUser_givenPayloadIsValid_thenTheCreatedUserIsReturnedInResponse_andHasId_andResponseHas201StatusCode()
+    void whenCreatingUser_givenPayloadIsValid_thenTheCreatedUserIsReturnedInResponse_andHasId_andResponseHas201Status()
         throws FoldingRestException {
         final UserRequest userToCreate = generateUser();
         StubbedFoldingEndpointUtils.enableUser(userToCreate);
@@ -536,7 +536,7 @@ class UserTest {
     }
 
     @Test
-    void whenCreatingUser_givenNoAuthentication_thenRequestFails_andResponseHas401StatusCode() throws FoldingRestException {
+    void whenCreatingUser_givenNoAuthentication_thenRequestFails_andResponseHas401Status() throws FoldingRestException {
         final UserRequest userToCreate = generateUser();
         StubbedFoldingEndpointUtils.enableUser(userToCreate);
 
@@ -547,7 +547,7 @@ class UserTest {
     }
 
     @Test
-    void whenCreatingBatchOfUsers_givenNoAuthentication_thenRequestFails_andResponseHas401StatusCode() throws FoldingRestException {
+    void whenCreatingBatchOfUsers_givenNoAuthentication_thenRequestFails_andResponseHas401Status() throws FoldingRestException {
         final List<UserRequest> batchOfUsers = List.of(
             generateUser(),
             generateUser(),
@@ -565,7 +565,7 @@ class UserTest {
     }
 
     @Test
-    void whenUpdatingUser_givenNoAuthentication_thenRequestFails_andResponseHas401StatusCode() throws FoldingRestException {
+    void whenUpdatingUser_givenNoAuthentication_thenRequestFails_andResponseHas401Status() throws FoldingRestException {
         final User createdUser = create(generateUser());
 
         final UserRequest userToUpdate = UserRequest.builder()
@@ -588,7 +588,7 @@ class UserTest {
     }
 
     @Test
-    void whenDeletingUser_givenNoAuthentication_thenRequestFails_andResponseHas401StatusCode() throws FoldingRestException {
+    void whenDeletingUser_givenNoAuthentication_thenRequestFails_andResponseHas401Status() throws FoldingRestException {
         final int userId = create(generateUser()).getId();
 
         final HttpResponse<Void> response = USER_REQUEST_SENDER.delete(userId);
@@ -598,7 +598,7 @@ class UserTest {
     }
 
     @Test
-    void whenCreatingUser_givenAuthentication_andAuthenticationHasInvalidUser_thenRequestFails_andResponseHas401StatusCode()
+    void whenCreatingUser_givenAuthentication_andAuthenticationHasInvalidUser_thenRequestFails_andResponseHas401Status()
         throws FoldingRestException {
         final UserRequest userToCreate = generateUser();
         StubbedFoldingEndpointUtils.enableUser(userToCreate);
@@ -610,7 +610,7 @@ class UserTest {
     }
 
     @Test
-    void whenCreatingUser_givenAuthentication_andAuthenticationHasInvalidPassword_thenRequestFails_andResponseHas401StatusCode()
+    void whenCreatingUser_givenAuthentication_andAuthenticationHasInvalidPassword_thenRequestFails_andResponseHas401Status()
         throws FoldingRestException {
         final UserRequest userToCreate = generateUser();
         StubbedFoldingEndpointUtils.enableUser(userToCreate);
@@ -622,7 +622,7 @@ class UserTest {
     }
 
     @Test
-    void whenCreatingUser_givenAuthentication_andUserDoesNotHaveAdminRole_thenRequestFails_andResponseHas403StatusCode()
+    void whenCreatingUser_givenAuthentication_andUserDoesNotHaveAdminRole_thenRequestFails_andResponseHas403Status()
         throws FoldingRestException {
         final UserRequest userToCreate = generateUser();
         StubbedFoldingEndpointUtils.enableUser(userToCreate);
@@ -634,7 +634,7 @@ class UserTest {
     }
 
     @Test
-    void whenCreatingUser_givenEmptyPayload_thenRequestFails_andResponseHas400StatusCode() throws IOException, InterruptedException {
+    void whenCreatingUser_givenEmptyPayload_thenRequestFails_andResponseHas400Status() throws IOException, InterruptedException {
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.noBody())
             .uri(URI.create(FOLDING_URL + "/users"))
@@ -649,7 +649,7 @@ class UserTest {
     }
 
     @Test
-    void whenUpdatingUser_givenEmptyPayload_thenRequestFails_andResponseHas400StatusCode()
+    void whenUpdatingUser_givenEmptyPayload_thenRequestFails_andResponseHas400Status()
         throws FoldingRestException, IOException, InterruptedException {
         final User createdUser = create(generateUser());
 

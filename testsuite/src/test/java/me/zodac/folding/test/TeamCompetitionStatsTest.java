@@ -938,7 +938,7 @@ class TeamCompetitionStatsTest {
     }
 
     @Test
-    void whenPatchingUserWithPointsOffsets_givenNoAuthentication_thenRequestFails_andResponseHas401StatusCode() throws FoldingRestException {
+    void whenPatchingUserWithPointsOffsets_givenNoAuthentication_thenRequestFails_andResponseHas401Status() throws FoldingRestException {
         final Hardware hardware = HardwareUtils.create(generateHardware());
         final UserRequest user = generateUserWithHardwareId(hardware.getId());
 
@@ -950,7 +950,7 @@ class TeamCompetitionStatsTest {
     }
 
     @Test
-    void whenPatchingUserWithPointsOffsets_givenEmptyPayload_thenRequestFails_andResponseHas400StatusCode()
+    void whenPatchingUserWithPointsOffsets_givenEmptyPayload_thenRequestFails_andResponseHas400Status()
         throws IOException, InterruptedException, FoldingRestException {
         final Hardware hardware = HardwareUtils.create(generateHardware());
         final UserRequest user = generateUserWithHardwareId(hardware.getId());

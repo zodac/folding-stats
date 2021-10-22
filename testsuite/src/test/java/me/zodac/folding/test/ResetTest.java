@@ -62,7 +62,7 @@ class ResetTest {
     }
 
     @Test
-    void whenResetOccurs_givenNoAuthentication_thenRequestFails_andResponseHasA401StatusCode() throws FoldingRestException {
+    void whenResetOccurs_givenNoAuthentication_thenRequestFails_andResponseHasA401Status() throws FoldingRestException {
         final HttpResponse<Void> response = TEAM_COMPETITION_REQUEST_SENDER.manualReset();
         assertThat(response.statusCode())
             .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())

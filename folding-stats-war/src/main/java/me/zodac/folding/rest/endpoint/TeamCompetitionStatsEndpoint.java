@@ -17,6 +17,7 @@ import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PATCH;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -246,12 +247,12 @@ public class TeamCompetitionStatsEndpoint {
     }
 
     /**
-     * {@link GET} request to manually update the <code>Team Competition</code> stats.
+     * {@link POST} request to manually update the <code>Team Competition</code> stats.
      *
      * @param async whether the execution should be performed asynchronously or synchronously
      * @return {@link Response.Status#OK}
      */
-    @GET
+    @POST
     @WriteRequired
     @RolesAllowed("admin")
     @Path("/manual/update")
@@ -269,11 +270,11 @@ public class TeamCompetitionStatsEndpoint {
     }
 
     /**
-     * {@link GET} request to manually reset the <code>Team Competition</code> stats.
+     * {@link POST} request to manually reset the <code>Team Competition</code> stats.
      *
      * @return {@link Response.Status#OK}
      */
-    @GET
+    @POST
     @WriteRequired
     @RolesAllowed("admin")
     @Path("/manual/reset/")

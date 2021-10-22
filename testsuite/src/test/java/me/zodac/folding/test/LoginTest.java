@@ -24,7 +24,7 @@ class LoginTest {
     private static final LoginRequestSender LOGIN_REQUEST_SENDER = LoginRequestSender.createWithUrl(FOLDING_URL);
 
     @Test
-    void whenLoggingIn_givenCredentialsAreCorrect_andUserIsAdmin_thenResponseHas200StatusCode() throws FoldingRestException {
+    void whenLoggingIn_givenCredentialsAreCorrect_andUserIsAdmin_thenResponseHas200Status() throws FoldingRestException {
         final HttpResponse<Void> response = LOGIN_REQUEST_SENDER.loginAsAdmin(ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
@@ -32,7 +32,7 @@ class LoginTest {
     }
 
     @Test
-    void whenLoggingIn_givenCredentialsAreCorrect_andUserIsNotAdmin_thenResponseHas403StatusCode() throws FoldingRestException {
+    void whenLoggingIn_givenCredentialsAreCorrect_andUserIsNotAdmin_thenResponseHas403Status() throws FoldingRestException {
         final HttpResponse<Void> response = LOGIN_REQUEST_SENDER.loginAsAdmin(READ_ONLY_USER.userName(), READ_ONLY_USER.password());
         assertThat(response.statusCode())
             .as("Did not receive a 403_FORBIDDEN HTTP response: " + response.body())
@@ -40,7 +40,7 @@ class LoginTest {
     }
 
     @Test
-    void whenLoggingIn_givenCredentialsAreIncorrect_thenResponseHas401StatusCode() throws FoldingRestException {
+    void whenLoggingIn_givenCredentialsAreIncorrect_thenResponseHas401Status() throws FoldingRestException {
         final HttpResponse<Void> response = LOGIN_REQUEST_SENDER.loginAsAdmin(INVALID_USERNAME.userName(), INVALID_USERNAME.password());
         assertThat(response.statusCode())
             .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
@@ -48,7 +48,7 @@ class LoginTest {
     }
 
     @Test
-    void whenLoggingIn_givenInvalidCredentials_thenResponseHas400StatusCode() throws FoldingRestException {
+    void whenLoggingIn_givenInvalidCredentials_thenResponseHas400Status() throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.noBody())
             .uri(URI.create(FOLDING_URL + "/login/admin"))

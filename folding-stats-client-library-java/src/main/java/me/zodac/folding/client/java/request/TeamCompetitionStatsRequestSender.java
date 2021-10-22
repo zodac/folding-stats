@@ -220,7 +220,7 @@ public final class TeamCompetitionStatsRequestSender {
     }
 
     /**
-     * Sends a <b>GET</b> request to manually trigger an update of the <code>Team Competition</code> stats for all
+     * Sends a <b>POST</b> request to manually trigger an update of the <code>Team Competition</code> stats for all
      * {@link me.zodac.folding.api.tc.User}s and {@link me.zodac.folding.api.tc.Team}s.
      *
      * <p>
@@ -237,7 +237,7 @@ public final class TeamCompetitionStatsRequestSender {
     }
 
     /**
-     * Sends a <b>GET</b> request to manually trigger an update of the <code>Team Competition</code> stats for all
+     * Sends a <b>POST</b> request to manually trigger an update of the <code>Team Competition</code> stats for all
      * {@link me.zodac.folding.api.tc.User}s and {@link me.zodac.folding.api.tc.Team}s.
      *
      * @param async    should the update be performed asynchronously, or wait for the result
@@ -248,7 +248,7 @@ public final class TeamCompetitionStatsRequestSender {
      */
     public HttpResponse<Void> manualUpdate(final boolean async, final String userName, final String password) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
-            .GET()
+            .POST(HttpRequest.BodyPublishers.noBody())
             .uri(URI.create(statsUrl + "/manual/update?async=" + async))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
@@ -269,7 +269,7 @@ public final class TeamCompetitionStatsRequestSender {
     }
 
     /**
-     * Sends a <b>GET</b> request to manually reset the <code>Team Competition</code> stats for all {@link me.zodac.folding.api.tc.User}s and
+     * Sends a <b>POST</b> request to manually reset the <code>Team Competition</code> stats for all {@link me.zodac.folding.api.tc.User}s and
      * {@link me.zodac.folding.api.tc.Team}s.
      *
      * @return the {@link HttpResponse} from the {@link HttpRequest}
@@ -280,7 +280,7 @@ public final class TeamCompetitionStatsRequestSender {
     }
 
     /**
-     * Sends a <b>GET</b> request to manually reset the <code>Team Competition</code> stats for all {@link me.zodac.folding.api.tc.User}s and
+     * Sends a <b>POST</b> request to manually reset the <code>Team Competition</code> stats for all {@link me.zodac.folding.api.tc.User}s and
      * {@link me.zodac.folding.api.tc.Team}s.
      *
      * @param userName the username
@@ -290,7 +290,7 @@ public final class TeamCompetitionStatsRequestSender {
      */
     public HttpResponse<Void> manualReset(final String userName, final String password) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
-            .GET()
+            .POST(HttpRequest.BodyPublishers.noBody())
             .uri(URI.create(statsUrl + "/manual/reset"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 

@@ -170,9 +170,9 @@ public class BusinessLogicEjb implements BusinessLogic {
 
     @Override
     public void deleteUser(final User user) {
-        STORAGE.deleteUser(user.getId());
-
+        // Retrieve the user's stats before deleting the user, so we can use the values for the retried user stats
         final UserTcStats userStats = getHourlyTcStats(user);
+        STORAGE.deleteUser(user.getId());
 
         if (userStats.isEmptyStats()) {
             LOGGER.warn("User '{}' (ID: {}) has no stats, not saving any retired stats", user.getDisplayName(), user.getId());

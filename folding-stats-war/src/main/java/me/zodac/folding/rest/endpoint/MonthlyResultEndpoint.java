@@ -14,6 +14,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -91,11 +92,11 @@ public class MonthlyResultEndpoint {
     }
 
     /**
-     * {@link GET} request that performs a manual save of the current {@link MonthlyResult}.
+     * {@link POST} request that performs a manual save of the current {@link MonthlyResult}.
      *
      * @return {@link Response.Status#OK}
      */
-    @GET
+    @POST
     @WriteRequired
     @RolesAllowed("admin")
     @Path("/manual/save/")

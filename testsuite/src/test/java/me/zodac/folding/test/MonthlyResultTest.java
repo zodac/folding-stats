@@ -306,4 +306,20 @@ class MonthlyResultTest {
             .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
+
+    @Test
+    void whenManualSaveOccurs_givenNoStatsExist_thenRequestSucceeds_andResponseHasA400Status() throws FoldingRestException {
+        final HttpResponse<Void> response = MONTHLY_RESULT_REQUEST_SENDER.manualSave(ADMIN_USER.userName(), ADMIN_USER.password());
+        assertThat(response.statusCode())
+            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_OK);
+    }
+
+    @Test
+    void whenManualSaveOccurs_givenNoAuthentication_thenRequestFails_andResponseHasA401Status() throws FoldingRestException {
+        final HttpResponse<Void> response = MONTHLY_RESULT_REQUEST_SENDER.manualSave();
+        assertThat(response.statusCode())
+            .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
+    }
 }

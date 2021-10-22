@@ -28,13 +28,13 @@ public final class LarsUtils {
     }
 
     /**
-     * Executes a manual updated of {@link me.zodac.folding.api.tc.Hardware} from the LARS DB.
+     * Executes a manual update of {@link me.zodac.folding.api.tc.Hardware} from the LARS DB.
      *
      * @throws FoldingRestException thrown if an error occurs sending the HTTP request
      */
     public static void manualLarsUpdate() throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
-            .GET()
+            .POST(HttpRequest.BodyPublishers.noBody())
             .uri(URI.create(FOLDING_URL + "/debug/lars"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
@@ -61,9 +61,7 @@ public final class LarsUtils {
      */
     public static void addGpusToLarsDb(final LarsGpu... larsGpus) throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
-            .POST(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(
-                Set.of(larsGpus)
-            )))
+            .POST(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(Set.of(larsGpus))))
             .uri(URI.create(TEST_SERVICE_URL + "/gpu_ppd/overall_ranks"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
             .build();

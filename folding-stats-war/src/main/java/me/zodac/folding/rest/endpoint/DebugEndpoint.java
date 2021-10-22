@@ -6,7 +6,7 @@ import static me.zodac.folding.rest.response.Responses.serverError;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.enterprise.context.RequestScoped;
-import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -40,12 +40,12 @@ public class DebugEndpoint {
     private LarsHardwareUpdater larsHardwareUpdater;
 
     /**
-     * {@link GET} request to print the contents of all caches to the system log.
+     * {@link POST} request to print the contents of all caches to the system log.
      *
      * @return {@link Response.Status#OK}
      * @see LarsHardwareUpdater
      */
-    @GET
+    @POST
     @RolesAllowed("admin")
     @Path("/lars")
     @Produces(MediaType.APPLICATION_JSON)
@@ -61,11 +61,11 @@ public class DebugEndpoint {
     }
 
     /**
-     * {@link GET} request to print the contents of all caches to the system log.
+     * {@link POST} request to print the contents of all caches to the system log.
      *
-     * @return an {@link me.zodac.folding.rest.response.Responses#ok()} response
+     * @return {@link Response.Status#OK}
      */
-    @GET
+    @POST
     @RolesAllowed("admin")
     @Path("/caches")
     @Produces(MediaType.APPLICATION_JSON)

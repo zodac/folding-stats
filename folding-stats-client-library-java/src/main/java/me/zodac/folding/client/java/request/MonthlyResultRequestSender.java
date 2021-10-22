@@ -128,7 +128,7 @@ public final class MonthlyResultRequestSender {
     }
 
     /**
-     * Sends a <b>GET</b> request to manually save the result of the <code>Team Competition</code> for the current month.
+     * Sends a <b>POST</b> request to manually save the result of the <code>Team Competition</code> for the current month.
      *
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
@@ -138,7 +138,7 @@ public final class MonthlyResultRequestSender {
     }
 
     /**
-     * Sends a <b>GET</b> request to manually save the result of the <code>Team Competition</code> for the current month.
+     * Sends a <b>POST</b> request to manually save the result of the <code>Team Competition</code> for the current month.
      *
      * @param userName the username
      * @param password the password
@@ -147,7 +147,7 @@ public final class MonthlyResultRequestSender {
      */
     public HttpResponse<Void> manualSave(final String userName, final String password) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
-            .GET()
+            .POST(HttpRequest.BodyPublishers.noBody())
             .uri(URI.create(monthlyResultUrl + "/manual/save"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 

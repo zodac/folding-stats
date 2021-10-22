@@ -372,13 +372,28 @@ final class Storage {
      * <p>
      * Deletes it with the {@link DbManager}, then removes it to the {@link UserCache}.
      *
+     * <p>
+     * Also removes the {@link User}'s values from the stats caches:
+     * <ul>
+     *     <li>{@link InitialStatsCache}</li>
+     *     <li>{@link OffsetTcStatsCache}</li>
+     *     <li>{@link TcStatsCache}</li>
+     *     <li>{@link TotalStatsCache}</li>
+     * </ul>
+     *
      * @param userId the ID of the {@link User} to delete
      * @see DbManager#deleteUser(int)
      */
-    @Cached(UserCache.class)
+    @Cached({UserCache.class, InitialStatsCache.class, OffsetTcStatsCache.class, TcStatsCache.class, TotalStatsCache.class})
     void deleteUser(final int userId) {
         DB_MANAGER.deleteUser(userId);
         userCache.remove(userId);
+
+        // Remove the user entry from all stats caches
+        offsetTcStatsCache.remove(userId);
+        totalStatsCache.remove(userId);
+        initialStatsCache.remove(userId);
+        tcStatsCache.remove(userId);
     }
 
     /**
