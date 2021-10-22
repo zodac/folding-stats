@@ -44,7 +44,7 @@ public class StubbedUnitsEndpoint {
     private final Map<String, Integer> unitsByUserAndPasskey = new HashMap<>();
 
     /**
-     * Retrieves the units for a Folding@Home user.
+     * {@link GET} request that retrieves the units for a Folding@Home user.
      *
      * @param foldingUserName the Folding@Home user's username
      * @param passkey         the Folding@Home user's passkey
@@ -60,7 +60,7 @@ public class StubbedUnitsEndpoint {
     }
 
     /**
-     * Sets the units for a Folding@Home user.
+     * {@link POST} request that sets the units for a Folding@Home user.
      *
      * <p>
      * Since in the test environment we do not want a user to actually have to complete units, we can manually set them here.
@@ -91,7 +91,7 @@ public class StubbedUnitsEndpoint {
     }
 
     /**
-     * Resets the units for all Folding@Home users.
+     * {@link DELETE} request that resets the units for all Folding@Home users.
      *
      * @return {@link Response.Status#OK}
      */

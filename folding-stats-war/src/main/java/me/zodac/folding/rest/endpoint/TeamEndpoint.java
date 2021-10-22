@@ -31,7 +31,10 @@ import org.apache.logging.log4j.Logger;
 
 
 /**
- * REST endpoints for {@link Team}s for <code>folding-stats</code>.
+ * REST endpoints for <code>Team Competition</code> {@link Team}s.
+ *
+ * @see me.zodac.folding.client.java.request.TeamRequestSender
+ * @see me.zodac.folding.client.java.response.TeamResponseParser
  */
 @Path("/teams/")
 @RequestScoped
@@ -42,58 +45,105 @@ public class TeamEndpoint extends AbstractCrudEndpoint<TeamRequest, Team> {
     @EJB
     private StatsScheduler statsScheduler;
 
+    /**
+     * {@link POST} request to create a {@link Team} based on the input request.
+     *
+     * @param teamRequest the {@link TeamRequest} to create a {@link Team}
+     * @return {@link Response.Status#CREATED} containing the created {@link Team}
+     */
+    @Override
     @POST
     @WriteRequired
     @RolesAllowed("admin")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createTeam(final TeamRequest teamRequest) {
+    public Response create(final TeamRequest teamRequest) {
         return super.create(teamRequest);
     }
 
+    /**
+     * {@link POST} request to create a {@link Collection} of {@link Team}s based on the input requests.
+     *
+     * <p>
+     * Will perform a best-effort attempt to create all {@link Team}s and will return a response with successful and unsuccessful results.
+     *
+     * @param teamRequests the {@link TeamRequest}s to create {@link Team}s
+     * @return {@link Response.Status#OK} containing the created/failed {@link Team}s
+     */
+    @Override
     @POST
     @WriteRequired
     @RolesAllowed("admin")
     @Path("/batch")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createBatchOfTeams(final Collection<TeamRequest> teamRequests) {
+    public Response createBatchOf(final Collection<TeamRequest> teamRequests) {
         return super.createBatchOf(teamRequests);
     }
 
+    /**
+     * {@link GET} request to retrieve all {@link Team}s.
+     *
+     * @param request the {@link Request}, to be used for {@link javax.ws.rs.core.CacheControl}
+     * @return {@link Response.Status#OK} containing the {@link Team}s
+     */
+    @Override
     @GET
     @ReadRequired
     @PermitAll
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllTeams(@Context final Request request) {
+    public Response getAll(@Context final Request request) {
         return super.getAll(request);
     }
 
+    /**
+     * {@link GET} request to retrieve a {@link Team}.
+     *
+     * @param teamId  the ID of the {@link Team} to retrieve
+     * @param request the {@link Request}, to be used for {@link javax.ws.rs.core.CacheControl}
+     * @return {@link Response.Status#OK} containing the {@link Team}
+     */
+    @Override
     @GET
     @ReadRequired
     @PermitAll
     @Path("/{teamId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getTeamById(@PathParam("teamId") final String teamId, @Context final Request request) {
+    public Response getById(@PathParam("teamId") final String teamId, @Context final Request request) {
         return super.getById(teamId, request);
     }
 
+    /**
+     * {@link PUT} request to update an existing {@link Team} based on the input request.
+     *
+     * @param teamId      the ID of the {@link Team} to be updated
+     * @param teamRequest the {@link TeamRequest} to update a {@link Team}
+     * @return {@link Response.Status#OK} containing the updated {@link Team}
+     */
+    @Override
     @PUT
     @WriteRequired
     @RolesAllowed("admin")
     @Path("/{teamId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateTeamById(@PathParam("teamId") final String teamId, final TeamRequest teamRequest) {
+    public Response updateById(@PathParam("teamId") final String teamId, final TeamRequest teamRequest) {
         return super.updateById(teamId, teamRequest);
     }
 
+    /**
+     * {@link DELETE} request to delete an existing {@link Team}.
+     *
+     * @param teamId the ID of the {@link Team} to be deleted
+     * @return {@link Response.Status#OK}
+     */
+    @Override
     @DELETE
     @WriteRequired
     @RolesAllowed("admin")
     @Path("/{teamId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteTeamById(@PathParam("teamId") final String teamId) {
+    public Response deleteById(@PathParam("teamId") final String teamId) {
         return super.deleteById(teamId);
     }
 

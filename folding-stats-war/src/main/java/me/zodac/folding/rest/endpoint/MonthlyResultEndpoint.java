@@ -29,6 +29,12 @@ import me.zodac.folding.ejb.tc.user.UserStatsStorer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * REST endpoints for <code>Team Competition</code> {@link MonthlyResult}s.
+ *
+ * @see me.zodac.folding.client.java.request.MonthlyResultRequestSender
+ * @see me.zodac.folding.client.java.response.MonthlyResultResponseParser
+ */
 @Path("/results/")
 @RequestScoped
 public class MonthlyResultEndpoint {
@@ -44,6 +50,13 @@ public class MonthlyResultEndpoint {
     @EJB
     private UserStatsStorer userStatsStorer;
 
+    /**
+     * {@link GET} request that retrieves a {@link MonthlyResult} for the given {@link Month}/{@link Year}.
+     *
+     * @param year  the {@link Year} of the {@link MonthlyResult}
+     * @param month the {@link Month} of the {@link MonthlyResult}
+     * @return {@link Response.Status#OK} with the {@link MonthlyResult}
+     */
     @GET
     @ReadRequired
     @PermitAll
@@ -77,6 +90,11 @@ public class MonthlyResultEndpoint {
         }
     }
 
+    /**
+     * {@link GET} request that performs a manual save of the current {@link MonthlyResult}.
+     *
+     * @return {@link Response.Status#OK}
+     */
     @GET
     @WriteRequired
     @RolesAllowed("admin")

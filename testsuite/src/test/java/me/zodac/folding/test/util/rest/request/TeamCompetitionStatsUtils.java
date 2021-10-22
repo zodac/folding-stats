@@ -8,7 +8,7 @@ import java.net.HttpURLConnection;
 import java.net.http.HttpResponse;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.client.java.request.TeamCompetitionStatsRequestSender;
-import me.zodac.folding.client.java.response.TeamCompetitionResponseParser;
+import me.zodac.folding.client.java.response.TeamCompetitionStatsResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.tc.CompetitionSummary;
 import me.zodac.folding.rest.api.tc.RetiredUserSummary;
@@ -36,7 +36,7 @@ public final class TeamCompetitionStatsUtils {
     public static CompetitionSummary getStats() throws FoldingRestException {
         final HttpResponse<String> response = TEAM_COMPETITION_REQUEST_SENDER.getStats();
         if (response.statusCode() == HttpURLConnection.HTTP_OK) {
-            return TeamCompetitionResponseParser.getStats(response);
+            return TeamCompetitionStatsResponseParser.getStats(response);
         }
 
         throw new FoldingRestException(
@@ -53,7 +53,7 @@ public final class TeamCompetitionStatsUtils {
     public static UserSummary getStatsForUser(final int userId) throws FoldingRestException {
         final HttpResponse<String> response = TEAM_COMPETITION_REQUEST_SENDER.getStatsForUser(userId);
         if (response.statusCode() == HttpURLConnection.HTTP_OK) {
-            return TeamCompetitionResponseParser.getStatsForUser(response);
+            return TeamCompetitionStatsResponseParser.getStatsForUser(response);
         }
 
         throw new FoldingRestException(String

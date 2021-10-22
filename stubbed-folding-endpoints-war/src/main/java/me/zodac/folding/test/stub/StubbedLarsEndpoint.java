@@ -62,7 +62,7 @@ public class StubbedLarsEndpoint {
         + "</tr>";
 
     /**
-     * Endpoint that allows tests to <b>POST</b> a {@link Collection} of {@link LarsGpu} to be added to the stubbed response.
+     * {@link POST} request that allows tests to provide a {@link Collection} of {@link LarsGpu} to be added to the stubbed response.
      *
      * @param larsGpus the {@link LarsGpu}s to add
      * @return {@link Response.Status#CREATED}
@@ -81,7 +81,7 @@ public class StubbedLarsEndpoint {
     }
 
     /**
-     * Removes all {@link LarsGpu}s from the stubbed endpoint.
+     * {@link DELETE} request to remove all {@link LarsGpu}s from the stubbed endpoint.
      *
      * @return {@link Response.Status#OK}
      */
@@ -95,7 +95,7 @@ public class StubbedLarsEndpoint {
     }
 
     /**
-     * Endpoint that returns the configured hardware in the same format as the LARS DB HTML output.
+     * {@link GET} request that returns the configured hardware in the same format as the LARS DB HTML output.
      *
      * <p>
      * Used by production code, not by tests directly, though tests should populate the hardware using {@link #addGpus(Collection)}.

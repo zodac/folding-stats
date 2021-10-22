@@ -31,7 +31,7 @@ public class ValidationResult<E extends ResponsePojo> {
     private final boolean successful;
     private final E output;
     private final Response failureResponse;
-    private final ValidationResponse validationResponse;
+    private final ValidationFailure validationFailure;
 
     /**
      * Checks if the {@link ValidationResult} failed and does not contain a validated object.
@@ -42,8 +42,13 @@ public class ValidationResult<E extends ResponsePojo> {
         return !successful;
     }
 
+    /**
+     * Retrieves the errors from the {@code validationFailure}.
+     *
+     * @return the {@link Collection} of error {@link String}s from the {code validationFailure}, or {@link Collections#emptyList()}
+     */
     public Collection<String> getErrors() {
-        return validationResponse == null ? Collections.emptyList() : validationResponse.getErrors();
+        return validationFailure == null ? Collections.emptyList() : validationFailure.getErrors();
     }
 
     /**
@@ -66,7 +71,7 @@ public class ValidationResult<E extends ResponsePojo> {
      * @return a {@link ValidationResult} with the invalid object and a {@link Collection} of errors
      */
     public static <E extends ResponsePojo> ValidationResult<E> failure(final Object invalidObject, final Collection<String> errors) {
-        final ValidationFailureResponse response = new ValidationFailureResponse(invalidObject, errors);
+        final ConstraintFailure response = new ConstraintFailure(invalidObject, errors);
         return new ValidationResult<>(false, null, badRequest(response), response);
     }
 
@@ -77,7 +82,7 @@ public class ValidationResult<E extends ResponsePojo> {
      * @return a {@link ValidationResult} with the null object
      */
     public static <E extends ResponsePojo> ValidationResult<E> nullObject() {
-        final ValidationFailureResponse response = new ValidationFailureResponse(null, List.of("Payload is null"));
+        final ConstraintFailure response = new ConstraintFailure(null, List.of("Payload is null"));
         return new ValidationResult<>(false, null, badRequest(response), response);
     }
 
@@ -93,7 +98,7 @@ public class ValidationResult<E extends ResponsePojo> {
     public static <E extends ResponsePojo> ValidationResult<E> conflictingWith(final RequestPojo invalidObject,
                                                                                final ResponsePojo conflictingObject,
                                                                                final Collection<String> conflictingAttributes) {
-        final ConflictResponse response = new ConflictResponse(
+        final ConflictFailure response = new ConflictFailure(
             invalidObject,
             List.of(conflictingObject),
             List.of(String.format("Payload conflicts with an existing object on: %s", conflictingAttributes))
@@ -110,25 +115,31 @@ public class ValidationResult<E extends ResponsePojo> {
      * @return a {@link ValidationResult} with the conflicting {@link Object}
      */
     public static <E extends ResponsePojo> ValidationResult<E> usedBy(final ResponsePojo invalidObject, final Collection<?> usedBy) {
-        final ConflictResponse response = new ConflictResponse(invalidObject, usedBy, List.of("Payload is used by an existing object"));
+        final ConflictFailure response = new ConflictFailure(invalidObject, usedBy, List.of("Payload is used by an existing object"));
         return new ValidationResult<>(false, null, conflict(response), response);
     }
 
+    /**
+     * Implementation of {@link ValidationFailure} used when the input payload fails a constraint check.
+     */
     @NoArgsConstructor
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     @Getter
     @Setter
-    public static class ValidationFailureResponse implements ValidationResponse {
+    public static class ConstraintFailure implements ValidationFailure {
 
         private Object invalidObject;
         private Collection<String> errors;
     }
 
+    /**
+     * Implementation of {@link ValidationFailure} used when the input payload conflicts with another object.
+     */
     @NoArgsConstructor
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     @Getter
     @Setter
-    public static class ConflictResponse implements ValidationResponse {
+    public static class ConflictFailure implements ValidationFailure {
 
         private Object invalidObject;
         private Collection<?> conflictingObjects;

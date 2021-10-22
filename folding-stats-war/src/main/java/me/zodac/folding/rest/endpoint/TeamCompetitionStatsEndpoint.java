@@ -49,6 +49,12 @@ import me.zodac.folding.rest.endpoint.util.IntegerParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * REST endpoint for <code>Team Competition</code> stats.
+ *
+ * @see me.zodac.folding.client.java.request.TeamCompetitionStatsRequestSender
+ * @see me.zodac.folding.client.java.response.TeamCompetitionStatsResponseParser
+ */
 @Path("/stats/")
 @RequestScoped
 public class TeamCompetitionStatsEndpoint {
@@ -76,6 +82,11 @@ public class TeamCompetitionStatsEndpoint {
     @EJB
     private UserStatsResetter userStatsResetter;
 
+    /**
+     * {@link GET} request to retrieve the <code>Team Competition</code> overall {@link CompetitionSummary}.
+     *
+     * @return {@link Response.Status#OK} containing the {@link CompetitionSummary}
+     */
     @GET
     @ReadRequired
     @PermitAll
@@ -92,6 +103,12 @@ public class TeamCompetitionStatsEndpoint {
         }
     }
 
+    /**
+     * {@link GET} request to retrieve the <code>Team Competition</code> {@link UserSummary} for the given {@link User}.
+     *
+     * @param userId the ID of the {@link User} whose {@link UserSummary} is to be retrieved
+     * @return {@link Response.Status#OK} containing the {@link UserSummary}
+     */
     @GET
     @ReadRequired
     @PermitAll
@@ -133,6 +150,13 @@ public class TeamCompetitionStatsEndpoint {
         }
     }
 
+    /**
+     * {@link PATCH} request to update an existing {@link UserSummary} with an {@link OffsetTcStats}.
+     *
+     * @param userId        the ID of the {@link UserSummary} to be updated
+     * @param offsetTcStats the {@link OffsetTcStats} to be applied
+     * @return {@link Response.Status#OK}
+     */
     @PATCH
     @WriteRequired
     @RolesAllowed("admin")
@@ -176,6 +200,11 @@ public class TeamCompetitionStatsEndpoint {
         }
     }
 
+    /**
+     * {@link GET} request to retrieve the <code>Team Competition</code> {@link TeamLeaderboardEntry}s.
+     *
+     * @return {@link Response.Status#OK} containing the {@link TeamLeaderboardEntry}s
+     */
     @GET
     @ReadRequired
     @PermitAll
@@ -193,6 +222,11 @@ public class TeamCompetitionStatsEndpoint {
         }
     }
 
+    /**
+     * {@link GET} request to retrieve the <code>Team Competition</code> {@link UserCategoryLeaderboardEntry}s by {@link Category}.
+     *
+     * @return {@link Response.Status#OK} containing the {@link UserCategoryLeaderboardEntry}s
+     */
     @GET
     @ReadRequired
     @PermitAll
@@ -211,6 +245,12 @@ public class TeamCompetitionStatsEndpoint {
         }
     }
 
+    /**
+     * {@link GET} request to manually update the <code>Team Competition</code> stats.
+     *
+     * @param async whether the execution should be performed asynchronously or synchronously
+     * @return {@link Response.Status#OK}
+     */
     @GET
     @WriteRequired
     @RolesAllowed("admin")
@@ -228,6 +268,11 @@ public class TeamCompetitionStatsEndpoint {
         }
     }
 
+    /**
+     * {@link GET} request to manually reset the <code>Team Competition</code> stats.
+     *
+     * @return {@link Response.Status#OK}
+     */
     @GET
     @WriteRequired
     @RolesAllowed("admin")

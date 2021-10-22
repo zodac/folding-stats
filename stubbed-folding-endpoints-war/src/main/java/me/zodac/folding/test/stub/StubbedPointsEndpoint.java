@@ -43,7 +43,7 @@ public class StubbedPointsEndpoint {
     private final Map<String, Long> pointsByUserAndPasskey = new HashMap<>();
 
     /**
-     * Retrieves the points for a Folding@Home user.
+     * {@link GET} request that retrieves the points for a Folding@Home user.
      *
      * @param foldingUserName the Folding@Home user's username
      * @param passkey         the Folding@Home user's passkey
@@ -60,7 +60,7 @@ public class StubbedPointsEndpoint {
     }
 
     /**
-     * Sets the points for a Folding@Home user.
+     * {@link POST} request that sets the points for a Folding@Home user.
      *
      * <p>
      * Since in the test environment we do not want a user to actually have to complete units and earn points, we can manually set them here.
@@ -92,7 +92,7 @@ public class StubbedPointsEndpoint {
     }
 
     /**
-     * Resets the points for all Folding@Home users.
+     * {@link DELETE} request that resets the points for all Folding@Home users.
      *
      * @return {@link Response.Status#OK}
      */

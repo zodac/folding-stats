@@ -18,7 +18,7 @@ import java.util.Map;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.client.java.response.TeamCompetitionResponseParser;
+import me.zodac.folding.client.java.response.TeamCompetitionStatsResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.tc.leaderboard.TeamLeaderboardEntry;
 import me.zodac.folding.rest.api.tc.leaderboard.UserCategoryLeaderboardEntry;
@@ -55,7 +55,7 @@ class TeamCompetitionLeaderboardTest {
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
-        final Collection<TeamLeaderboardEntry> result = TeamCompetitionResponseParser.getTeamLeaderboard(response);
+        final Collection<TeamLeaderboardEntry> result = TeamCompetitionStatsResponseParser.getTeamLeaderboard(response);
 
         assertThat(result)
             .as("Expected no teams: " + result)
@@ -84,7 +84,7 @@ class TeamCompetitionLeaderboardTest {
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
-        final List<TeamLeaderboardEntry> results = new ArrayList<>(TeamCompetitionResponseParser.getTeamLeaderboard(response));
+        final List<TeamLeaderboardEntry> results = new ArrayList<>(TeamCompetitionStatsResponseParser.getTeamLeaderboard(response));
 
         assertThat(results)
             .as("Incorrect number of team summaries returned: " + response.body())
@@ -117,7 +117,7 @@ class TeamCompetitionLeaderboardTest {
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
-        final Map<String, List<UserCategoryLeaderboardEntry>> result = TeamCompetitionResponseParser.getCategoryLeaderboard(response);
+        final Map<String, List<UserCategoryLeaderboardEntry>> result = TeamCompetitionStatsResponseParser.getCategoryLeaderboard(response);
 
         assertThat(result)
             .as("Expected no users: " + result)
@@ -148,7 +148,7 @@ class TeamCompetitionLeaderboardTest {
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
-        final Map<String, List<UserCategoryLeaderboardEntry>> results = TeamCompetitionResponseParser.getCategoryLeaderboard(response);
+        final Map<String, List<UserCategoryLeaderboardEntry>> results = TeamCompetitionStatsResponseParser.getCategoryLeaderboard(response);
 
         assertThat(results)
             .as("Incorrect number of categories returned: " + response.body())

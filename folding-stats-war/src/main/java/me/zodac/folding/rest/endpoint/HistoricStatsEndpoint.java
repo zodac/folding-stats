@@ -38,6 +38,12 @@ import me.zodac.folding.rest.endpoint.util.IntegerParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * REST endpoints for <code>Team Competition</code> {@link HistoricStats}.
+ *
+ * @see me.zodac.folding.client.java.request.HistoricStatsRequestSender
+ * @see me.zodac.folding.client.java.response.HistoricStatsResponseParser
+ */
 // TODO: [zodac] Verify that all places that return a HTTP response also log something (after removing AbstractCrudEndpoint)
 @Path("/historic/")
 @RequestScoped
@@ -54,6 +60,16 @@ public class HistoricStatsEndpoint {
     @EJB
     private BusinessLogic businessLogic;
 
+    /**
+     * {@link GET} request to retrieve a {@link User}'s hourly {@link HistoricStats} for a single {@code day}.
+     *
+     * @param userId  the ID of the {@link User} whose {@link HistoricStats} are to be retrieved
+     * @param year    the {@link Year} of the {@link HistoricStats}
+     * @param month   the {@link Month} of the {@link HistoricStats}
+     * @param day     the {@code day} of the {@link HistoricStats}
+     * @param request the {@link Request}, to be used for {@link javax.ws.rs.core.CacheControl}
+     * @return {@link Response.Status#OK} containing the {@link User}'s hourly {@link HistoricStats}
+     */
     @GET
     @ReadRequired
     @PermitAll
@@ -114,6 +130,15 @@ public class HistoricStatsEndpoint {
         }
     }
 
+    /**
+     * {@link GET} request to retrieve a {@link User}'s daily {@link HistoricStats} for a single {@link Month}.
+     *
+     * @param userId  the ID of the {@link User} whose {@link HistoricStats} are to be retrieved
+     * @param year    the {@link Year} of the {@link HistoricStats}
+     * @param month   the {@link Month} of the {@link HistoricStats}
+     * @param request the {@link Request}, to be used for {@link javax.ws.rs.core.CacheControl}
+     * @return {@link Response.Status#OK} containing the {@link User}'s daily {@link HistoricStats}
+     */
     @GET
     @ReadRequired
     @PermitAll
@@ -156,6 +181,14 @@ public class HistoricStatsEndpoint {
         }
     }
 
+    /**
+     * {@link GET} request to retrieve a {@link User}'s monthly {@link HistoricStats} for a single {@link Year}.
+     *
+     * @param userId  the ID of the {@link User} whose {@link HistoricStats} are to be retrieved
+     * @param year    the {@link Year} of the {@link HistoricStats}
+     * @param request the {@link Request}, to be used for {@link javax.ws.rs.core.CacheControl}
+     * @return {@link Response.Status#OK} containing the {@link User}'s monthly {@link HistoricStats}
+     */
     @GET
     @ReadRequired
     @PermitAll
@@ -192,6 +225,16 @@ public class HistoricStatsEndpoint {
         }
     }
 
+    /**
+     * {@link GET} request to retrieve a {@link Team}'s hourly {@link HistoricStats} for a single {@code day}.
+     *
+     * @param teamId  the ID of the {@link Team} whose {@link HistoricStats} are to be retrieved
+     * @param year    the {@link Year} of the {@link HistoricStats}
+     * @param month   the {@link Month} of the {@link HistoricStats}
+     * @param day     the {@code day} of the {@link HistoricStats}
+     * @param request the {@link Request}, to be used for {@link javax.ws.rs.core.CacheControl}
+     * @return {@link Response.Status#OK} containing the {@link Team}'s hourly {@link HistoricStats}
+     */
     @GET
     @ReadRequired
     @PermitAll
@@ -261,6 +304,15 @@ public class HistoricStatsEndpoint {
         }
     }
 
+    /**
+     * {@link GET} request to retrieve a {@link Team}'s daily {@link HistoricStats} for a single {@link Month}.
+     *
+     * @param teamId  the ID of the {@link Team} whose {@link HistoricStats} are to be retrieved
+     * @param year    the {@link Year} of the {@link HistoricStats}
+     * @param month   the {@link Month} of the {@link HistoricStats}
+     * @param request the {@link Request}, to be used for {@link javax.ws.rs.core.CacheControl}
+     * @return {@link Response.Status#OK} containing the {@link Team}'s daily {@link HistoricStats}
+     */
     @GET
     @ReadRequired
     @PermitAll
@@ -313,6 +365,14 @@ public class HistoricStatsEndpoint {
         }
     }
 
+    /**
+     * {@link GET} request to retrieve a {@link Team}'s monthly {@link HistoricStats} for a single {@link Year}.
+     *
+     * @param teamId  the ID of the {@link Team} whose {@link HistoricStats} are to be retrieved
+     * @param year    the {@link Year} of the {@link HistoricStats}
+     * @param request the {@link Request}, to be used for {@link javax.ws.rs.core.CacheControl}
+     * @return {@link Response.Status#OK} containing the {@link Team}'s monthly {@link HistoricStats}
+     */
     @GET
     @ReadRequired
     @PermitAll

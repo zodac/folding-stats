@@ -375,7 +375,7 @@
                         <excludePackageNames>
                             me.zodac.folding.db.postgres.gen:me.zodac.folding.db.postgres.gen.*
                         </excludePackageNames>
-                        <!-- We only want to validate the Javadoc is valid, Checkstyle will verify the content -->
+                        <!-- TODO: [zodac] Enable -->
                         <failOnWarnings>false</failOnWarnings>
                         <quiet>true</quiet>
                         <serialwarn>true</serialwarn>

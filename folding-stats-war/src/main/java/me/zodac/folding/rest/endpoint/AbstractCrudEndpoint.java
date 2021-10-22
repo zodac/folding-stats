@@ -28,7 +28,7 @@ import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.rest.endpoint.util.IdResult;
 import me.zodac.folding.rest.endpoint.util.IntegerParser;
 import me.zodac.folding.rest.response.BatchCreateResponse;
-import me.zodac.folding.rest.validator.ValidationResponse;
+import me.zodac.folding.rest.validator.ValidationFailure;
 import me.zodac.folding.rest.validator.ValidationResult;
 import org.apache.logging.log4j.Logger;
 
@@ -91,26 +91,26 @@ abstract class AbstractCrudEndpoint<I extends RequestPojo, O extends ResponsePoj
             uriContext::getAbsolutePath, () -> batchOfInputRequests);
 
         final Collection<O> validElements = new ArrayList<>(batchOfInputRequests.size() / 2);
-        final Collection<ValidationResponse> failedValidationResponses = new ArrayList<>(batchOfInputRequests.size() / 2);
+        final Collection<ValidationFailure> failedValidationRespons = new ArrayList<>(batchOfInputRequests.size() / 2);
 
         for (final I inputRequest : batchOfInputRequests) {
             final ValidationResult<O> validationResult = validateCreateAndConvert(inputRequest);
 
             if (validationResult.isFailure()) {
                 getLogger().error("Found validation error for {}: {}", inputRequest, validationResult);
-                failedValidationResponses.add(validationResult.getValidationResponse());
+                failedValidationRespons.add(validationResult.getValidationFailure());
             } else {
                 validElements.add(validationResult.getOutput());
             }
         }
 
         if (validElements.isEmpty()) {
-            getLogger().error("All {}s contain validation errors: {}", elementType(), failedValidationResponses);
-            return badRequest(failedValidationResponses);
+            getLogger().error("All {}s contain validation errors: {}", elementType(), failedValidationRespons);
+            return badRequest(failedValidationRespons);
         }
 
         final List<Object> successful = new ArrayList<>();
-        final List<Object> unsuccessful = new ArrayList<>(failedValidationResponses);
+        final List<Object> unsuccessful = new ArrayList<>(failedValidationRespons);
 
         for (final O element : validElements) {
             try {

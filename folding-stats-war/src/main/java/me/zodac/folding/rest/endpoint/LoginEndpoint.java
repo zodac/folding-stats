@@ -26,6 +26,8 @@ import org.apache.logging.log4j.Logger;
 
 /**
  * REST endpoints to log in as a system user.
+ *
+ * @see me.zodac.folding.client.java.request.LoginRequestSender
  */
 @Path("/login/")
 @RequestScoped
@@ -37,7 +39,7 @@ public class LoginEndpoint {
     private BusinessLogic businessLogic;
 
     /**
-     * <b>POST</b> request to log in as an admin system user.
+     * {@link POST} request to log in as an admin system user.
      *
      * <p>
      * The {@link Response} will be one of:

@@ -40,9 +40,9 @@ public class DebugEndpoint {
     private LarsHardwareUpdater larsHardwareUpdater;
 
     /**
-     * <b>GET</b> request to print the contents of all caches to the system log.
+     * {@link GET} request to print the contents of all caches to the system log.
      *
-     * @return an {@link me.zodac.folding.rest.response.Responses#ok()} response
+     * @return {@link Response.Status#OK}
      * @see LarsHardwareUpdater
      */
     @GET
@@ -61,7 +61,7 @@ public class DebugEndpoint {
     }
 
     /**
-     * <b>GET</b> request to print the contents of all caches to the system log.
+     * {@link GET} request to print the contents of all caches to the system log.
      *
      * @return an {@link me.zodac.folding.rest.response.Responses#ok()} response
      */

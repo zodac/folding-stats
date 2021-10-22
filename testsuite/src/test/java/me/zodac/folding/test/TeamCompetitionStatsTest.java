@@ -33,7 +33,7 @@ import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.client.java.response.TeamCompetitionResponseParser;
+import me.zodac.folding.client.java.response.TeamCompetitionStatsResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
@@ -79,7 +79,7 @@ class TeamCompetitionStatsTest {
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
-        final CompetitionSummary result = TeamCompetitionResponseParser.getStats(response);
+        final CompetitionSummary result = TeamCompetitionStatsResponseParser.getStats(response);
 
         assertThat(result.getTeams())
             .as("Expected no teams: " + result)

@@ -211,8 +211,6 @@ class TeamTest {
         TEAM_REQUEST_SENDER.create(teamToCreate, ADMIN_USER.userName(), ADMIN_USER.password());
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(teamWithSameName, ADMIN_USER.userName(), ADMIN_USER.password());
 
-        System.out.println(response.body());
-
         assertThat(response.statusCode())
             .as("Did not receive a 409_CONFLICT HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_CONFLICT);

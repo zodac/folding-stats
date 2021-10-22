@@ -16,9 +16,9 @@ import me.zodac.folding.rest.util.RestUtilConstants;
 /**
  * Utility class used to parse a {@link HttpResponse} returned from {@link TeamCompetitionStatsRequestSender}.
  */
-public final class TeamCompetitionResponseParser {
+public final class TeamCompetitionStatsResponseParser {
 
-    private TeamCompetitionResponseParser() {
+    private TeamCompetitionStatsResponseParser() {
 
     }
 

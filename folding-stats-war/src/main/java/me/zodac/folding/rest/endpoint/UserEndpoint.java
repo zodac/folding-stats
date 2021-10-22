@@ -28,7 +28,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * REST endpoints for {@link User}s for <code>folding-stats</code>.
+ * REST endpoints for <code>Team Competition</code> {@link User}s.
+ *
+ * @see me.zodac.folding.client.java.request.UserRequestSender
+ * @see me.zodac.folding.client.java.response.UserResponseParser
  */
 @Path("/users/")
 @RequestScoped
@@ -36,58 +39,105 @@ public class UserEndpoint extends AbstractCrudEndpoint<UserRequest, User> {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    /**
+     * {@link POST} request to create a {@link User} based on the input request.
+     *
+     * @param userRequest the {@link UserRequest} to create a {@link User}
+     * @return {@link Response.Status#CREATED} containing the created {@link User}
+     */
+    @Override
     @POST
     @WriteRequired
     @RolesAllowed("admin")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createUser(final UserRequest userRequest) {
+    public Response create(final UserRequest userRequest) {
         return super.create(userRequest);
     }
 
+    /**
+     * {@link POST} request to create a {@link Collection} of {@link User}s based on the input requests.
+     *
+     * <p>
+     * Will perform a best-effort attempt to create all {@link User}s and will return a response with successful and unsuccessful results.
+     *
+     * @param userRequests the {@link UserRequest}s to create {@link User}s
+     * @return {@link Response.Status#OK} containing the created/failed {@link User}s
+     */
+    @Override
     @POST
     @WriteRequired
     @RolesAllowed("admin")
     @Path("/batch")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createBatchOfUsers(final Collection<UserRequest> userRequests) {
+    public Response createBatchOf(final Collection<UserRequest> userRequests) {
         return super.createBatchOf(userRequests);
     }
 
+    /**
+     * {@link GET} request to retrieve all {@link User}s.
+     *
+     * @param request the {@link Request}, to be used for {@link javax.ws.rs.core.CacheControl}
+     * @return {@link Response.Status#OK} containing the {@link User}s
+     */
+    @Override
     @GET
     @ReadRequired
     @PermitAll
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllUsers(@Context final Request request) {
+    public Response getAll(@Context final Request request) {
         return super.getAll(request);
     }
 
+    /**
+     * {@link GET} request to retrieve a {@link User}.
+     *
+     * @param userId  the ID of the {@link User} to retrieve
+     * @param request the {@link Request}, to be used for {@link javax.ws.rs.core.CacheControl}
+     * @return {@link Response.Status#OK} containing the {@link User}
+     */
+    @Override
     @GET
     @ReadRequired
     @PermitAll
     @Path("/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getUserById(@PathParam("userId") final String userId, @Context final Request request) {
+    public Response getById(@PathParam("userId") final String userId, @Context final Request request) {
         return super.getById(userId, request);
     }
 
+    /**
+     * {@link PUT} request to update an existing {@link User} based on the input request.
+     *
+     * @param userId      the ID of the {@link User} to be updated
+     * @param userRequest the {@link UserRequest} to update a {@link User}
+     * @return {@link Response.Status#OK} containing the updated {@link User}
+     */
+    @Override
     @PUT
     @WriteRequired
     @RolesAllowed("admin")
     @Path("/{userId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateUserById(@PathParam("userId") final String userId, final UserRequest userRequest) {
+    public Response updateById(@PathParam("userId") final String userId, final UserRequest userRequest) {
         return super.updateById(userId, userRequest);
     }
 
+    /**
+     * {@link DELETE} request to delete an existing {@link User}.
+     *
+     * @param userId the ID of the {@link User} to be deleted
+     * @return {@link Response.Status#OK}
+     */
+    @Override
     @DELETE
     @WriteRequired
     @RolesAllowed("admin")
     @Path("/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteUserById(@PathParam("userId") final String userId) {
+    public Response deleteById(@PathParam("userId") final String userId) {
         return super.deleteById(userId);
     }
 
