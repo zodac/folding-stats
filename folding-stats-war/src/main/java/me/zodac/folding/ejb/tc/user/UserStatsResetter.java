@@ -2,12 +2,12 @@ package me.zodac.folding.ejb.tc.user;
 
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
-import me.zodac.folding.api.ejb.BusinessLogic;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.util.ProcessingType;
 import me.zodac.folding.cache.RetiredTcStatsCache;
 import me.zodac.folding.cache.TcStatsCache;
 import me.zodac.folding.cache.TotalStatsCache;
+import me.zodac.folding.ejb.api.BusinessLogic;
 import me.zodac.folding.ejb.tc.scheduled.StatsScheduler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
