@@ -18,12 +18,11 @@ RUN grep -rl '%ROOT_URL%' . | xargs sed -i "s|%ROOT_URL%|${ROOT_URL}|g" && \
     find ./frontend/site/res -iname *.js -o -iname *.css | grep -v "min" | xargs rm
 
 FROM node:lts-alpine3.14 AS node
-COPY ./docker/frontend/src/raml/ /docker/frontend/src/raml/
+# Install raml2html
+RUN npm i -g raml2html
 
-# 1 - Install raml2html
-# 2 - Run raml2html to create the RAML API output file
-RUN npm i -g raml2html && \
-    raml2html --input /docker/frontend/src/raml/api.raml --output /docker/frontend/api.html
+COPY ./docker/frontend/src/raml/ /docker/frontend/src/raml/
+RUN raml2html --input /docker/frontend/src/raml/api.raml --output /docker/frontend/api.html
 
 FROM httpd:2.4-alpine
 WORKDIR /usr/local/apache2/htdocs/
