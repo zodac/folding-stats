@@ -1,5 +1,7 @@
 package me.zodac.folding.ejb.tc.scheduled;
 
+import static java.lang.Boolean.parseBoolean;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.ejb.EJB;
@@ -22,30 +24,26 @@ import org.apache.logging.log4j.Logger;
  * {@link Startup} EJB which schedules the beginning of the <code>Team Competition</code> on the first day of the month. The day on which the month
  * starts can be configured using the environment variable:
  * <ul>
- *     <li>STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH</li>
+ *     <li>{@code STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH}</li>
  * </ul>
  *
  * <p>
- * It performs the following actions:
+ * It Resets the stats for all users.
+ *
+ * <p>
+ * The reset will occur on the day configured to start stats parsing at <b>00:15</b>. This time cannot be changed, but the reset can be disabled using
+ * the environment variable:
  * <ul>
- *     <li> Resets the stats for all users.
- *
- * <p>
- *          The reset will occur on the day configured to start stats parsing at <b>00:15</b>. This time cannot be changed, but the
- *          reset can be disabled using the environment variable:
- *          <ul>
- *              <li>ENABLE_STATS_MONTHLY_RESET</li>
- *          </ul>
- *      <b>NOTE:</b> The {@link StatsScheduler} <i>can</i> have its schedule changed, but should not be set to conflict with this reset time.
- *      </li>
+ *     <li>{@code ENABLE_STATS_MONTHLY_RESET}</li>
  * </ul>
+ * <b>NOTE:</b> The {@link StatsScheduler} <i>can</i> have its schedule changed, but should not be set to conflict with this reset time.
  */
 @Startup
 @Singleton
 public class StartOfMonthScheduler {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final boolean IS_MONTHLY_RESET_ENABLED = Boolean.parseBoolean(EnvironmentVariableUtils.get("ENABLE_STATS_MONTHLY_RESET", "false"));
+    private static final boolean IS_MONTHLY_RESET_ENABLED = parseBoolean(EnvironmentVariableUtils.get("ENABLE_STATS_MONTHLY_RESET", "false"));
     private static final String STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH =
         EnvironmentVariableUtils.get("STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH", "3");
 

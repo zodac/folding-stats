@@ -349,7 +349,8 @@ public interface BusinessLogic {
      *
      * <ul>
      *      <li>
-     *          Zeroes out each {@link User}'s {@link UserTcStats} by setting their initial {@link UserStats} to their current total {@link UserStats}
+     *          Zeroes each {@link User}'s {@link UserTcStats} by setting their initial {@link UserStats} to their current total {@link UserStats}.
+     * <p>
      *          <b>NOTE:</b> This does not retrieve the latest online {@link UserStats} for the {@link User}, it simply retrieves the latest total
      *          {@link UserStats} available on the system from {@link #getTotalStats(User)}.
      *      </li>

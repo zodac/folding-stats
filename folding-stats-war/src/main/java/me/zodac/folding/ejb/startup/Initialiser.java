@@ -68,7 +68,7 @@ public class Initialiser {
             LOGGER.debug("Found initial stats for user {}: {}", user, initialStatsForUser);
         }
 
-        LOGGER.debug("Initialised initial stats cache");
+        LOGGER.debug("Initialised stats caches");
     }
 
     private void initTcStats() {

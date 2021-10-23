@@ -17,9 +17,9 @@ import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.state.ParsingState;
 import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
+import me.zodac.folding.ejb.tc.lars.LarsHardwareUpdater;
 import me.zodac.folding.ejb.tc.user.UserStatsResetter;
 import me.zodac.folding.ejb.tc.user.UserStatsStorer;
-import me.zodac.folding.ejb.tc.lars.LarsHardwareUpdater;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -35,7 +35,7 @@ import org.apache.logging.log4j.Logger;
  *          The reset will occur on the day configured to start stats parsing at <b>00:15</b>. This time cannot be changed, but the
  *          reset can be disabled using the environment variable:
  *          <ul>
- *              <li>ENABLE_STATS_MONTHLY_RESET</li>
+ *              <li>{@code ENABLE_STATS_MONTHLY_RESET}</li>
  *          </ul>
  *      <b>NOTE:</b> The {@link StatsScheduler} <i>can</i> have its schedule changed, but should not be set to conflict with this reset time.
  *      </li>
@@ -44,7 +44,7 @@ import org.apache.logging.log4j.Logger;
  * <p>
  *          The monthly result time cannot be configured, but it can be disabled using the environment variable:
  *          <ul>
- *              <li>ENABLE_MONTHLY_RESULT_STORAGE</li>
+ *              <li>{@code ENABLE_MONTHLY_RESULT_STORAGE}</li>
  *          </ul>
  *      </li>
  *      <li>Updates the value of all {@link me.zodac.folding.api.tc.Hardware} from the LARS PPD database.</li>

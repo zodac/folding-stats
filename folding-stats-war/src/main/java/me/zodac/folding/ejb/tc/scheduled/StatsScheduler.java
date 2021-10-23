@@ -1,5 +1,7 @@
 package me.zodac.folding.ejb.tc.scheduled;
 
+import static java.lang.Boolean.parseBoolean;
+
 import java.util.Collection;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -31,11 +33,11 @@ import org.apache.logging.log4j.Logger;
  * <p>
  * However, these default dates/times can be changed by setting the environment variables:
  * <ul>
- *     <li>STATS_PARSING_SCHEDULE_HOUR</li>
- *     <li>STATS_PARSING_SCHEDULE_MINUTE</li>
- *     <li>STATS_PARSING_SCHEDULE_SECOND</li>
- *     <li>STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH</li>
- *     <li>STATS_PARSING_SCHEDULE_LAST_DAY_OF_MONTH</li>
+ *     <li>{@code STATS_PARSING_SCHEDULE_HOUR}</li>
+ *     <li>{@code STATS_PARSING_SCHEDULE_MINUTE}</li>
+ *     <li>{@code STATS_PARSING_SCHEDULE_SECOND}</li>
+ *     <li>{@code STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH}</li>
+ *     <li>{@code STATS_PARSING_SCHEDULE_LAST_DAY_OF_MONTH}</li>
  * </ul>
  *
  * <b>NOTE:</b> The {@link EndOfMonthScheduler} schedule cannot be modified, so you should be careful not to
@@ -47,7 +49,7 @@ public class StatsScheduler {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final boolean IS_STATS_SCHEDULED_PARSING_ENABLED =
-        Boolean.parseBoolean(EnvironmentVariableUtils.get("ENABLE_STATS_SCHEDULED_PARSING", "false"));
+        parseBoolean(EnvironmentVariableUtils.get("ENABLE_STATS_SCHEDULED_PARSING", "false"));
 
     // Default is to run every hour at 55 minutes past the hour
     private static final String STATS_PARSING_SCHEDULE_HOUR = EnvironmentVariableUtils.get("STATS_PARSING_SCHEDULE_HOUR", "*");

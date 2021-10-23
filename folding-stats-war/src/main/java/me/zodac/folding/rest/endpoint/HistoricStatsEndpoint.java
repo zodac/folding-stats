@@ -44,7 +44,6 @@ import org.apache.logging.log4j.Logger;
  * @see me.zodac.folding.client.java.request.HistoricStatsRequestSender
  * @see me.zodac.folding.client.java.response.HistoricStatsResponseParser
  */
-// TODO: [zodac] Verify that all places that return a HTTP response also log something (after removing AbstractCrudEndpoint)
 @Path("/historic/")
 @RequestScoped
 public class HistoricStatsEndpoint {
