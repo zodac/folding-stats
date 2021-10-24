@@ -7,7 +7,7 @@ services:
       context: .
       dockerfile: docker/frontend/Dockerfile
       args:
-        ROOT_URL: "http://internal.axihub.ca/folding"
+        ROOT_URL: "https://internal-secure.axihub.ca/folding"
     container_name: frontend
     hostname: frontend
     depends_on:
