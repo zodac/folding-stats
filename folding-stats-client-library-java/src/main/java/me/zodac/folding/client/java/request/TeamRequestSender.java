@@ -129,6 +129,53 @@ public final class TeamRequestSender {
     }
 
     /**
+     * Send a <b>GET</b> request to retrieve a single {@link me.zodac.folding.api.tc.Team} with the given {@code teamName}.
+     *
+     * @param teamName the {@code teamName} of the {@link me.zodac.folding.api.tc.Team} to be retrieved
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     * @see #get(String, String)
+     */
+    public HttpResponse<String> get(final String teamName) throws FoldingRestException {
+        return get(teamName, null);
+    }
+
+    /**
+     * Send a <b>GET</b> request to retrieve a single {@link me.zodac.folding.api.tc.Team} with the given {@code teamName}.
+     *
+     * <p>
+     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.api.tc.Team} based on the <code>ETag</code>, an empty
+     * {@link HttpResponse#body()} is returned.
+     *
+     * @param teamName  the {@code teamName} of the {@link me.zodac.folding.api.tc.Team} to be retrieved
+     * @param entityTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached {@link me.zodac.folding.api.tc.Team}
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     * @see #get(String)
+     */
+    public HttpResponse<String> get(final String teamName, final String entityTag) throws FoldingRestException {
+        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+            .GET()
+            .uri(URI.create(teamsUrl + "/fields?teamName=" + teamName))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
+
+        if (StringUtils.isNotBlank(entityTag)) {
+            requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), entityTag);
+        }
+
+        final HttpRequest request = requestBuilder.build();
+
+        try {
+            return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException("Error sending HTTP request to get team", e);
+        } catch (final IOException e) {
+            throw new FoldingRestException("Error sending HTTP request to get team", e);
+        }
+    }
+
+    /**
      * Send a <b>POST</b> request to create the given {@link TeamRequest} in the system.
      *
      * @param team the {@link TeamRequest} to create

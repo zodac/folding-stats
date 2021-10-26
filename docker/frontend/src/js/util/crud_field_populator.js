@@ -1,15 +1,31 @@
 function populateHardwareUpdate(){
-    show("loader");
-    element = document.getElementById("hardware_update_selector");
-    selectedElement = element.options[element.selectedIndex];
+    var inputElement = document.getElementById("hardware_update_selector_input");
+    var hardwareName = inputElement.value
 
-    document.getElementById("hardware_update_id").value = selectedElement.getAttribute("hardware_id");
-    document.getElementById("hardware_update_name").value = selectedElement.getAttribute("hardware_name");
-    document.getElementById("hardware_update_display_name").value = selectedElement.getAttribute("display_name");
-    document.getElementById("hardware_update_hardware_make").value = selectedElement.getAttribute("hardware_make");
-    document.getElementById("hardware_update_hardware_type").value = selectedElement.getAttribute("hardware_type");
-    document.getElementById("hardware_update_multiplier").value = selectedElement.getAttribute("multiplier");
-    document.getElementById("hardware_update_average_ppd").value = selectedElement.getAttribute("average_ppd");
+    if (hardwareName == '') {
+        hardwareFields = document.querySelectorAll(".hardware_update");
+        for (var i = 0, hardwareField; hardwareField = hardwareFields[i]; i++) {
+            hideElement(hardwareField);
+        }
+
+        return;
+    }
+
+    show("loader");
+
+    fetch(ROOT_URL+'/hardware/fields?hardwareName=' + hardwareName)
+    .then(response => {
+        return response.json();
+    })
+    .then(function(jsonResponse) {
+        document.getElementById("hardware_update_id").value = jsonResponse["id"];
+        document.getElementById("hardware_update_name").value = jsonResponse["hardwareName"];
+        document.getElementById("hardware_update_display_name").value = jsonResponse["displayName"];
+        document.getElementById("hardware_update_hardware_make").value = jsonResponse["hardwareMake"];
+        document.getElementById("hardware_update_hardware_type").value = jsonResponse["hardwareType"];
+        document.getElementById("hardware_update_multiplier").value = jsonResponse["multiplier"];
+        document.getElementById("hardware_update_average_ppd").value = jsonResponse["averagePpd"];
+    })
 
     hardwareFields = document.querySelectorAll(".hardware_update");
     for (var i = 0, hardwareField; hardwareField = hardwareFields[i]; i++) {
@@ -19,17 +35,33 @@ function populateHardwareUpdate(){
 }
 
 function populateHardwareDelete(){
-    show("loader");
-    element = document.getElementById("hardware_delete_selector");
-    selectedElement = element.options[element.selectedIndex];
+    var inputElement = document.getElementById("hardware_delete_selector_input");
+    var hardwareName = inputElement.value
 
-    document.getElementById("hardware_delete_id").value = selectedElement.getAttribute("hardware_id");
-    document.getElementById("hardware_delete_name").value = selectedElement.getAttribute("hardware_name");
-    document.getElementById("hardware_delete_display_name").value = selectedElement.getAttribute("display_name");
-    document.getElementById("hardware_delete_hardware_make").value = selectedElement.getAttribute("hardware_make");
-    document.getElementById("hardware_delete_hardware_type").value = selectedElement.getAttribute("hardware_type");
-    document.getElementById("hardware_delete_multiplier").value = selectedElement.getAttribute("multiplier");
-    document.getElementById("hardware_delete_average_ppd").value = selectedElement.getAttribute("average_ppd");
+    if (hardwareName == '') {
+        hardwareFields = document.querySelectorAll(".hardware_delete");
+        for (var i = 0, hardwareField; hardwareField = hardwareFields[i]; i++) {
+            hideElement(hardwareField);
+        }
+
+        return;
+    }
+
+    show("loader");
+
+    fetch(ROOT_URL+'/hardware/fields?hardwareName=' + hardwareName)
+    .then(response => {
+        return response.json();
+    })
+    .then(function(jsonResponse) {
+        document.getElementById("hardware_delete_id").value = jsonResponse["id"];
+        document.getElementById("hardware_delete_name").value = jsonResponse["hardwareName"];
+        document.getElementById("hardware_delete_display_name").value = jsonResponse["displayName"];
+        document.getElementById("hardware_delete_hardware_make").value = jsonResponse["hardwareMake"];
+        document.getElementById("hardware_delete_hardware_type").value = jsonResponse["hardwareType"];
+        document.getElementById("hardware_delete_multiplier").value = jsonResponse["multiplier"];
+        document.getElementById("hardware_delete_average_ppd").value = jsonResponse["averagePpd"];
+    })
 
     hardwareFields = document.querySelectorAll(".hardware_delete");
     for (var i = 0, hardwareField; hardwareField = hardwareFields[i]; i++) {
@@ -39,26 +71,36 @@ function populateHardwareDelete(){
 }
 
 function populateTeamUpdate(){
+    var inputElement = document.getElementById("team_update_selector_input");
+    var teamName = inputElement.value
+
+    if (teamName == '') {
+        teamFields = document.querySelectorAll(".team_update");
+        for (var i = 0, teamField; teamField = teamFields[i]; i++) {
+            hideElement(teamField);
+        }
+
+        return;
+    }
+
     show("loader");
-    element = document.getElementById("team_update_selector");
-    selectedElement = element.options[element.selectedIndex];
 
-    document.getElementById("team_update_id").value = selectedElement.getAttribute("team_id");
-    document.getElementById("team_update_name").value = selectedElement.getAttribute("team_name");
+    fetch(ROOT_URL+'/teams/fields?teamName=' + teamName)
+    .then(response => {
+        return response.json();
+    })
+    .then(function(jsonResponse) {
+        document.getElementById("team_update_id").value = jsonResponse["id"];
+        document.getElementById("team_update_name").value = jsonResponse["teamName"];
+        document.getElementById("team_update_forum_link").value = jsonResponse["forumLink"];
 
-    teamDescription = selectedElement.getAttribute("team_description");
-    if (teamDescription !== 'undefined') {
-        document.getElementById("team_update_description").value = teamDescription;
-    } else {
-        document.getElementById("team_update_description").value = '';
-    }
-
-    forumLink = selectedElement.getAttribute("team_forum_link");
-    if (forumLink !== 'undefined') {
-        document.getElementById("team_update_forum_link").value = forumLink;
-    } else {
-        document.getElementById("team_update_forum_link").value = '';
-    }
+        teamDescription = jsonResponse["teamDescription"];
+        if (teamDescription !== undefined) {
+            document.getElementById("team_update_description").value = teamDescription;
+        } else {
+            document.getElementById("team_update_description").value = '';
+        }
+    })
 
     teamFields = document.querySelectorAll(".team_update");
     for (var i = 0, teamField; teamField = teamFields[i]; i++) {
@@ -68,31 +110,41 @@ function populateTeamUpdate(){
 }
 
 function populateTeamDelete(){
+    var inputElement = document.getElementById("team_delete_selector_input");
+    var teamName = inputElement.value
+
+    if (teamName == '') {
+        teamFields = document.querySelectorAll(".team_delete");
+        for (var i = 0, teamField; teamField = teamFields[i]; i++) {
+            hideElement(teamField);
+        }
+
+        return;
+    }
+
     show("loader");
-    element = document.getElementById("team_delete_selector");
-    selectedElement = element.options[element.selectedIndex];
 
-    document.getElementById("team_delete_id").value = selectedElement.getAttribute("team_id");
-    document.getElementById("team_delete_name").value = selectedElement.getAttribute("team_name");
+    fetch(ROOT_URL+'/teams/fields?teamName=' + teamName)
+    .then(response => {
+        return response.json();
+    })
+    .then(function(jsonResponse) {
+        document.getElementById("team_delete_id").value = jsonResponse["id"];
+        document.getElementById("team_delete_name").value = jsonResponse["teamName"];
+        document.getElementById("team_delete_forum_link").value = jsonResponse["forumLink"];
 
-    teamDescription = selectedElement.getAttribute("team_description");
-    if (teamDescription !== 'undefined') {
-        document.getElementById("team_delete_description").value = teamDescription;
-    } else {
-        document.getElementById("team_delete_description").value = '';
-    }
-
-    forumLink = selectedElement.getAttribute("team_forum_link");
-    if (forumLink !== 'undefined') {
-        document.getElementById("team_delete_forum_link").value = forumLink;
-    } else {
-        document.getElementById("team_delete_forum_link").value = '';
-    }
+        teamDescription = jsonResponse["teamDescription"];
+        if (teamDescription !== undefined) {
+            document.getElementById("team_delete_description").value = teamDescription;
+        } else {
+            document.getElementById("team_delete_description").value = '';
+        }
+    })
 
     teamFields = document.querySelectorAll(".team_delete");
-        for (var i = 0, teamField; teamField = teamFields[i]; i++) {
-            showElement(teamField);
-        }
+    for (var i = 0, teamField; teamField = teamFields[i]; i++) {
+        showElement(teamField);
+    }
     hide("loader");
 }
 

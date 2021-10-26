@@ -5,7 +5,7 @@
     "hardwareMake": "invalid",
     "hardwareType": "invalid",
     "multiplier": -1.00,
-    "averagePpd": -1.00
+    "averagePpd": -1
   },
   "errors": [
     "Field 'hardwareName' must not be empty",
@@ -13,6 +13,6 @@
     "Field 'hardwareMake' must be one of: [AMD, INTEL, NVIDIA]",
     "Field 'hardwareType' must be one of: [CPU, GPU]",
     "Field 'multiplier' must be 1.00 or higher",
-    "Field 'averagePpd' must be 1.00 or higher"
+    "Field 'averagePpd' must be 1 or higher"
   ]
 }

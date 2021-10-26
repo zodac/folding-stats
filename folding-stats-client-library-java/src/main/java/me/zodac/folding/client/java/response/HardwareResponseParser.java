@@ -29,7 +29,8 @@ public final class HardwareResponseParser {
     }
 
     /**
-     * Returns the {@link Hardware} retrieved by {@link me.zodac.folding.client.java.request.HardwareRequestSender#get(int)}.
+     * Returns the {@link Hardware} retrieved by {@link me.zodac.folding.client.java.request.HardwareRequestSender#get(int)} or
+     * {@link me.zodac.folding.client.java.request.HardwareRequestSender#get(String)}.
      *
      * @param response the {@link HttpResponse} to parse
      * @return the retrieved {@link Hardware}

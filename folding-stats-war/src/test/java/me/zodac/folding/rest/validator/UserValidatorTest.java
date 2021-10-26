@@ -1,5 +1,7 @@
 package me.zodac.folding.rest.validator;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.Test;
 
 /**
@@ -8,7 +10,8 @@ import org.junit.jupiter.api.Test;
 class UserValidatorTest {
 
     @Test
-    public void whenValidatingCreate_givenValidUser_thenSuccessResponseIsReturned() {
-
+    void whenValidatingCreate_givenValidUser_thenSuccessResponseIsReturned() {
+        assertThat(true)
+            .isTrue();
     }
 }

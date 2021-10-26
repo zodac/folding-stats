@@ -29,7 +29,8 @@ public final class TeamResponseParser {
     }
 
     /**
-     * Returns the {@link Team} retrieved by {@link me.zodac.folding.client.java.request.TeamRequestSender#get(int)}.
+     * Returns the {@link Team} retrieved by {@link me.zodac.folding.client.java.request.TeamRequestSender#get(int)} or
+     * {@link me.zodac.folding.client.java.request.TeamRequestSender#get(String)}.
      *
      * @param response the {@link HttpResponse} to parse
      * @return the retrieved {@link Team}

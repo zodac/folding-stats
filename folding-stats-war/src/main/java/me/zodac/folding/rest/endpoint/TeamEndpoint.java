@@ -26,6 +26,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
@@ -45,6 +46,7 @@ import me.zodac.folding.rest.response.BatchCreateResponse;
 import me.zodac.folding.rest.validator.TeamValidator;
 import me.zodac.folding.rest.validator.ValidationFailure;
 import me.zodac.folding.rest.validator.ValidationResult;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -224,6 +226,46 @@ public class TeamEndpoint {
             return cachedOk(element, request, untilNextMonthUtc(ChronoUnit.SECONDS));
         } catch (final Exception e) {
             LOGGER.error("Unexpected error getting team with ID: {}", teamId, e);
+            return serverError();
+        }
+    }
+
+    /**
+     * {@link GET} request to retrieve a {@link Team}.
+     *
+     * @param teamName the {@code teamName} of the {@link Team} to retrieve
+     * @param request  the {@link Request}, to be used for {@link javax.ws.rs.core.CacheControl}
+     * @return {@link Response.Status#OK} containing the {@link Team}
+     */
+    @GET
+    @ReadRequired
+    @PermitAll
+    @Path("/fields")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getByHardwareName(@QueryParam("teamName") final String teamName, @Context final Request request) {
+        LOGGER.debug("GET request for team received at '{}'", uriContext::getAbsolutePath);
+
+        try {
+            if (StringUtils.isBlank(teamName)) {
+                final String errorMessage = String.format("Input 'teamName' must not be blank: '%s'", teamName);
+                LOGGER.error(errorMessage);
+                return badRequest(errorMessage);
+            }
+
+            final Optional<Team> optionalTeam = businessLogic.getAllTeams()
+                .stream()
+                .filter(team -> team.getTeamName().equalsIgnoreCase(teamName))
+                .findAny();
+
+            if (optionalTeam.isEmpty()) {
+                LOGGER.error("No hardware found with 'hardwareName' '{}'", teamName);
+                return notFound();
+            }
+
+            final Team element = optionalTeam.get();
+            return cachedOk(element, request, untilNextMonthUtc(ChronoUnit.SECONDS));
+        } catch (final Exception e) {
+            LOGGER.error("Unexpected error getting team with 'hardwareName': '{}'", teamName, e);
             return serverError();
         }
     }

@@ -26,6 +26,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
@@ -45,6 +46,7 @@ import me.zodac.folding.rest.response.BatchCreateResponse;
 import me.zodac.folding.rest.validator.HardwareValidator;
 import me.zodac.folding.rest.validator.ValidationFailure;
 import me.zodac.folding.rest.validator.ValidationResult;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -192,7 +194,7 @@ public class HardwareEndpoint {
     }
 
     /**
-     * {@link GET} request to retrieve a {@link Hardware}s.
+     * {@link GET} request to retrieve a {@link Hardware}.
      *
      * @param hardwareId the ID of the {@link Hardware} to retrieve
      * @param request    the {@link Request}, to be used for {@link javax.ws.rs.core.CacheControl}
@@ -223,6 +225,46 @@ public class HardwareEndpoint {
             return cachedOk(element, request, untilNextMonthUtc(ChronoUnit.SECONDS));
         } catch (final Exception e) {
             LOGGER.error("Unexpected error getting hardware with ID: {}", hardwareId, e);
+            return serverError();
+        }
+    }
+
+    /**
+     * {@link GET} request to retrieve a {@link Hardware}.
+     *
+     * @param hardwareName the {@code hardwareName} of the {@link Hardware} to retrieve
+     * @param request      the {@link Request}, to be used for {@link javax.ws.rs.core.CacheControl}
+     * @return {@link Response.Status#OK} containing the {@link Hardware}
+     */
+    @GET
+    @ReadRequired
+    @PermitAll
+    @Path("/fields")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getByHardwareName(@QueryParam("hardwareName") final String hardwareName, @Context final Request request) {
+        LOGGER.debug("GET request for hardware received at '{}'", uriContext::getAbsolutePath);
+
+        try {
+            if (StringUtils.isBlank(hardwareName)) {
+                final String errorMessage = String.format("Input 'hardwareName' must not be blank: '%s'", hardwareName);
+                LOGGER.error(errorMessage);
+                return badRequest(errorMessage);
+            }
+
+            final Optional<Hardware> optionalHardware = businessLogic.getAllHardware()
+                .stream()
+                .filter(hardware -> hardware.getHardwareName().equalsIgnoreCase(hardwareName))
+                .findAny();
+
+            if (optionalHardware.isEmpty()) {
+                LOGGER.error("No hardware found with 'hardwareName' '{}'", hardwareName);
+                return notFound();
+            }
+
+            final Hardware element = optionalHardware.get();
+            return cachedOk(element, request, untilNextMonthUtc(ChronoUnit.SECONDS));
+        } catch (final Exception e) {
+            LOGGER.error("Unexpected error getting hardware with 'hardwareName': '{}'", hardwareName, e);
             return serverError();
         }
     }

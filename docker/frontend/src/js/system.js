@@ -84,7 +84,36 @@ function manualUpdate() {
     });
 }
 
-function printCache() {
+function manualLars() {
+    show("loader");
+    fetch(ROOT_URL+'/debug/lars', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': sessionGet("Authorization")
+        }
+    })
+    .then(response => {
+        hide("loader");
+
+        if(response.status != 200){
+            failureToast("Manual LARS update failed with code: " + response.status);
+            response.json()
+            .then(response => {
+                console.error(JSON.stringify(response, null, 2));
+            });
+            return;
+        }
+        successToast("LARS data manually updated");
+    })
+    .catch((error) => {
+        hide("loader");
+        console.error('Unexpected error updating LARS: ', error);
+        return false;
+    });
+}
+
+function printCaches() {
     show("loader");
     fetch(ROOT_URL+'/debug/caches', {
         method: 'POST',
@@ -189,14 +218,6 @@ function loadHardware() {
                 hardwareList.removeChild(hardwareList.lastChild);
             }
 
-            // Add the default entry
-            defaultHardwareOption = document.createElement("option");
-            defaultHardwareOption.setAttribute("value", "");
-            defaultHardwareOption.setAttribute("disabled", "");
-            defaultHardwareOption.setAttribute("selected", "");
-            defaultHardwareOption.innerHTML = "Choose Hardware...";
-            hardwareList.append(defaultHardwareOption);
-
             // Add entries
             jsonResponse.forEach(function(hardwareItem, i) {
                 hardwareOption = document.createElement("option");
@@ -212,6 +233,22 @@ function loadHardware() {
 
                 hardwareOption.innerHTML = hardwareItem['hardwareName'] + " (" + hardwareItem['displayName'] + ")";
                 hardwareList.append(hardwareOption);
+            });
+        }
+
+        hardwareDataLists = document.querySelectorAll(".hardware_datalist");
+        for (var i = 0, hardwareDataList; hardwareDataList = hardwareDataLists[i]; i++) {
+            // Clear existing entries
+            while (hardwareDataList.firstChild) {
+                hardwareDataList.removeChild(hardwareDataList.lastChild);
+            }
+
+            // Add entries
+            jsonResponse.forEach(function(hardwareItem, i) {
+                hardwareOption = document.createElement("option");
+                hardwareOption.setAttribute("value", hardwareItem['hardwareName']);
+                hardwareOption.innerHTML = hardwareItem['displayName'];
+                hardwareDataList.append(hardwareOption);
             });
         }
     })
@@ -428,6 +465,21 @@ function loadTeams() {
 
                 teamOption.innerHTML = teamItem["teamName"];
                 teamList.append(teamOption);
+            });
+        }
+
+        teamDataLists = document.querySelectorAll(".team_datalist");
+        for (var i = 0, teamDataList; teamDataList = teamDataLists[i]; i++) {
+            // Clear existing entries
+            while (teamDataList.firstChild) {
+                teamDataList.removeChild(teamDataList.lastChild);
+            }
+
+            // Add entries
+            jsonResponse.forEach(function(teamItem, i) {
+                teamOption = document.createElement("option");
+                teamOption.setAttribute("value", teamItem['teamName']);
+                teamDataList.append(teamOption);
             });
         }
     })

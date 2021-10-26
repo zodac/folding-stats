@@ -67,6 +67,32 @@ traits:
         description: "An error occurred connecting to an external system to verify the hardware"
       503:
         description: "The system is not in a valid state to execute write requests"
+  /fields:
+    get:
+      is: [ "cached" ]
+      queryParameters:
+        hardwareName:
+          displayName: hardwareName
+          type: string
+          description: The unique name of the hardware
+          example: GM204 [GeForce GTX 970] 3494
+          required: false
+      description: "Retrieves the hardware with the given hardware name"
+      responses:
+        200:
+          description: "The hardware has been retrieved from the system"
+          body:
+            application/json:
+              example: !include responses/hardware/hardwareGet.json
+        400:
+          description: "The provided ID is an invalid integer, or out of range"
+          body:
+            application/json:
+              example: !include responses/hardware/hardwareGetBadRequest.json
+        404:
+          description: "No hardware exists with the given ID"
+        503:
+          description: "The system is not in a valid state to execute read requests"
   /{hardwareId}:
     uriParameters:
       hardwareId:
@@ -223,6 +249,32 @@ traits:
         description: "An error occurred connecting to an external system to verify the team"
       503:
         description: "The system is not in a valid state to execute write requests"
+  /fields:
+    get:
+      is: [ "cached" ]
+      queryParameters:
+        teamName:
+          displayName: teamName
+          type: string
+          description: The unique name of the Team
+          example: Fluffy Pink Ninjas
+          required: false
+      description: "Retrieves the team with the given team name"
+      responses:
+        200:
+          description: "The team has been retrieved from the system"
+          body:
+            application/json:
+              example: !include responses/team/teamGet.json
+        400:
+          description: "The provided ID is an invalid integer, or out of range"
+          body:
+            application/json:
+              example: !include responses/team/teamGetBadRequest.json
+        404:
+          description: "No team exists with the given ID"
+        503:
+          description: "The system is not in a valid state to execute read requests"
   /{teamId}:
     uriParameters:
       teamId:

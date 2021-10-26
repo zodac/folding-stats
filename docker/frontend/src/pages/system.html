@@ -142,7 +142,11 @@
         Manual Stats Update
     </button>
 
-    <button onclick="printCache()" class="btn btn-warning" id="print_cache_button">
+    <button onclick="manualLars()" class="btn btn-warning" id="manual_lars_button">
+        Manual LARS Update
+    </button>
+
+    <button onclick="printCaches()" class="btn btn-warning" id="print_cache_button">
         Print Caches
     </button>
 
@@ -208,7 +212,7 @@
                             </div>
                             <div class="col-auto">
                                 <label for="hardware_create_average_ppd" class="visually-hidden">Multiplier</label>
-                                <input id="hardware_create_average_ppd" class="form-control" type="number" step="0.01"
+                                <input id="hardware_create_average_ppd" class="form-control" type="number" step="1"
                                        placeholder="Average PPD" aria-label="Average PPD" required>
                             </div>
                         </form>
@@ -235,10 +239,17 @@
                                 <button type="submit" class="btn btn-primary mb-3">Update Hardware</button>
                             </div>
                             <div class="col-auto">
-                                <select id="hardware_update_selector" class="form-select hardware_list"
-                                        aria-label="hardware_update_list" onchange="populateHardwareUpdate();" required>
+                                <input class="form-control"
+                                       list="hardware_update_selector"
+                                       id="hardware_update_selector_input"
+                                       onchange="populateHardwareUpdate();"
+                                       placeholder="Type to search...">
+                                <datalist id="hardware_update_selector"
+                                          class="hardware_datalist"
+                                          aria-label="hardware_update_list"
+                                          required>
                                     <!-- Will be populated by system.js -->
-                                </select>
+                                </datalist>
                             </div>
                             <div class="col-auto" style="display:none;">
                                 <label for="hardware_update_id" class="visually-hidden">Hardware ID</label>
@@ -281,7 +292,7 @@
                             </div>
                             <div class="col-auto hardware_update" style="display:none;">
                                 <label for="hardware_update_average_ppd" class="visually-hidden">Multiplier</label>
-                                <input id="hardware_update_average_ppd" class="form-control" type="number" step="0.01"
+                                <input id="hardware_update_average_ppd" class="form-control" type="number" step="1"
                                        placeholder="Average PPD" aria-label="Average PPD" required>
                             </div>
                         </form>
@@ -307,10 +318,17 @@
                                 <button type="submit" class="btn btn-danger mb-3">Delete Hardware</button>
                             </div>
                             <div class="col-auto">
-                                <select id="hardware_delete_selector" class="form-select hardware_list"
-                                        aria-label="hardware_delete_list" onchange="populateHardwareDelete();" required>
+                                <input class="form-control"
+                                       list="hardware_delete_selector"
+                                       id="hardware_delete_selector_input"
+                                       onchange="populateHardwareDelete();"
+                                       placeholder="Type to search...">
+                                <datalist id="hardware_delete_selector"
+                                          class="hardware_datalist"
+                                          aria-label="hardware_delete_list"
+                                          required>
                                     <!-- Will be populated by system.js -->
-                                </select>
+                                </datalist>
                             </div>
                             <div class="col-auto" style="display:none;">
                                 <label for="hardware_delete_id" class="visually-hidden">Hardware ID</label>
@@ -351,7 +369,7 @@
                             </div>
                             <div class="col-auto hardware_delete" style="display:none;">
                                 <label for="hardware_delete_average_ppd" class="visually-hidden">Multiplier</label>
-                                <input id="hardware_delete_average_ppd" class="form-control" type="number" step="0.01"
+                                <input id="hardware_delete_average_ppd" class="form-control" type="number" step="1"
                                        placeholder="Average PPD" aria-label="Average PPD" disabled>
                             </div>
                         </form>
@@ -419,10 +437,17 @@
                                 <button type="submit" class="btn btn-primary mb-3">Update Team</button>
                             </div>
                             <div class="col-auto">
-                                <select id="team_update_selector" class="form-select team_list"
-                                        aria-label="team_update_list" onchange="populateTeamUpdate();" required>
+                                <input class="form-control"
+                                       list="team_update_selector"
+                                       id="team_update_selector_input"
+                                       onchange="populateTeamUpdate();"
+                                       placeholder="Type to search...">
+                                <datalist id="team_update_selector"
+                                          class="team_datalist"
+                                          aria-label="team_update_list"
+                                          required>
                                     <!-- Will be populated by system.js -->
-                                </select>
+                                </datalist>
                             </div>
                             <div class="col-auto" style="display:none;">
                                 <label for="team_update_id" class="visually-hidden">Team ID</label>
@@ -467,10 +492,17 @@
                                 <button type="submit" class="btn btn-danger mb-3">Delete Team</button>
                             </div>
                             <div class="col-auto">
-                                <select id="team_delete_selector" class="form-select team_list"
-                                        aria-label="team_delete_list" onchange="populateTeamDelete();" required>
+                                <input class="form-control"
+                                       list="team_delete_selector"
+                                       id="team_delete_selector_input"
+                                       onchange="populateTeamDelete();"
+                                       placeholder="Type to search...">
+                                <datalist id="team_delete_selector"
+                                          class="team_datalist"
+                                          aria-label="team_delete_list"
+                                          required>
                                     <!-- Will be populated by system.js -->
-                                </select>
+                                </datalist>
                             </div>
                             <div class="col-auto" style="display:none;">
                                 <label for="team_delete_id" class="visually-hidden">Team ID</label>

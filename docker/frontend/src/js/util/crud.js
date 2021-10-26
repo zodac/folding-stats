@@ -55,11 +55,7 @@ function createHardware() {
 }
 
 function updateHardware() {
-    var element = document.getElementById("hardware_update_selector");
-    element = document.getElementById("hardware_update_selector");
-    selectedElement = element.options[element.selectedIndex];
-    var hardwareId = selectedElement.getAttribute("hardware_id");
-
+    var hardwareId = document.getElementById("hardware_update_id").value.trim();
     var hardwareName = document.getElementById("hardware_update_name").value.trim();
     var displayName = document.getElementById("hardware_update_display_name").value.trim();
     var hardwareMake = document.getElementById("hardware_update_hardware_make").value.trim();
@@ -99,6 +95,7 @@ function updateHardware() {
             return;
         }
 
+        document.getElementById("hardware_update_selector_input").value = '';
         document.getElementById("hardware_update_id").value = '';
         document.getElementById("hardware_update_name").value = '';
         document.getElementById("hardware_update_display_name").value = '';
@@ -123,12 +120,8 @@ function updateHardware() {
 }
 
 function deleteHardware() {
-    var element = document.getElementById("hardware_delete_selector");
-    element = document.getElementById("hardware_delete_selector");
-    selectedElement = element.options[element.selectedIndex];
-
-    var hardwareId = selectedElement.getAttribute("hardware_id");
-    var hardwareDisplayName = selectedElement.getAttribute("hardware_name");
+    var hardwareId = document.getElementById("hardware_delete_id").value.trim();
+    var displayName = document.getElementById("hardware_delete_display_name").value.trim();
 
     show("loader");
     fetch(ROOT_URL+'/hardware/' + hardwareId, {
@@ -150,6 +143,7 @@ function deleteHardware() {
             return;
         }
 
+        document.getElementById("hardware_delete_selector_input").value = '';
         document.getElementById("hardware_delete_id").value = '';
         document.getElementById("hardware_delete_name").value = '';
         document.getElementById("hardware_delete_display_name").value = '';
@@ -163,7 +157,7 @@ function deleteHardware() {
             hideElement(hardwareField);
         }
 
-        successToast("Hardware '" + hardwareDisplayName + "' deleted");
+        successToast("Hardware '" + displayName + "' deleted");
         loadHardware();
     })
     .catch((error) => {
@@ -221,11 +215,7 @@ function createTeam() {
 }
 
 function updateTeam() {
-    var element = document.getElementById("team_update_selector");
-    element = document.getElementById("team_update_selector");
-    selectedElement = element.options[element.selectedIndex];
-    var teamId = selectedElement.getAttribute("team_id");
-
+    var teamId = document.getElementById("team_update_id").value.trim();
     var teamName = document.getElementById("team_update_name").value.trim();
     var teamDescription = document.getElementById("team_update_description").value.trim();
     var forumLink = document.getElementById("team_update_forum_link").value.trim();
@@ -259,6 +249,7 @@ function updateTeam() {
             return;
         }
 
+        document.getElementById("team_update_selector_input").value = '';
         document.getElementById("team_update_id").value = '';
         document.getElementById("team_update_name").value = '';
         document.getElementById("team_update_description").value = '';
@@ -280,12 +271,8 @@ function updateTeam() {
 }
 
 function deleteTeam() {
-    var element = document.getElementById("team_delete_selector");
-    element = document.getElementById("team_delete_selector");
-    selectedElement = element.options[element.selectedIndex];
-
-    var teamId = selectedElement.getAttribute("team_id");
-    var teamName = selectedElement.getAttribute("team_name");
+    var teamId = document.getElementById("team_delete_id").value.trim();
+    var teamName = document.getElementById("team_delete_name").value.trim();
 
     show("loader");
     fetch(ROOT_URL+'/teams/' + teamId, {
@@ -307,6 +294,7 @@ function deleteTeam() {
             return;
         }
 
+        document.getElementById("team_delete_selector_input").value = '';
         document.getElementById("team_delete_id").value = '';
         document.getElementById("team_delete_name").value = '';
         document.getElementById("team_delete_description").value = '';

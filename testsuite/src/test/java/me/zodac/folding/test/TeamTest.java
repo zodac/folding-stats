@@ -132,6 +132,21 @@ class TeamTest {
     }
 
     @Test
+    void whenGettingTeam_givenValidTeamName_thenTeamIsReturned_andHas200Status() throws FoldingRestException {
+        final String teamName = create(generateTeam()).getTeamName();
+
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.get(teamName);
+        assertThat(response.statusCode())
+            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_OK);
+
+        final Team team = TeamResponseParser.get(response);
+        assertThat(team.getTeamName())
+            .as("Did not receive the expected team: " + response.body())
+            .isEqualTo(teamName);
+    }
+
+    @Test
     void whenUpdatingTeam_givenValidTeamId_andValidPayload_thenUpdatedTeamIsReturned_andNoNewTeamIsCreated_andHas200Status()
         throws FoldingRestException {
         final Team createdTeam = create(generateTeam());
@@ -219,6 +234,19 @@ class TeamTest {
     @Test
     void whenGettingTeam_givenNonExistingTeamId_thenNoJsonResponseIsReturned_andHas404Status() throws FoldingRestException {
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.get(TestConstants.NON_EXISTING_ID);
+
+        assertThat(response.statusCode())
+            .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
+
+        assertThat(response.body())
+            .as("Did not receive an empty JSON response: " + response.body())
+            .isEmpty();
+    }
+
+    @Test
+    void whenGettingTeam_givenNonExistingTeamName_thenNoJsonResponseIsReturned_andHas404Status() throws FoldingRestException {
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.get("nonExistingName");
 
         assertThat(response.statusCode())
             .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())

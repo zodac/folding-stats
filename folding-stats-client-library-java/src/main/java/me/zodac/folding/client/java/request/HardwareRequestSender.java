@@ -128,6 +128,52 @@ public final class HardwareRequestSender {
     }
 
     /**
+     * Send a <b>GET</b> request to retrieve a single {@link Hardware} with the given {@code hardwareName}.
+     *
+     * @param hardwareName the {@code hardwareName} of the {@link Hardware} to be retrieved
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     * @see #get(String, String)
+     */
+    public HttpResponse<String> get(final String hardwareName) throws FoldingRestException {
+        return get(hardwareName, null);
+    }
+
+    /**
+     * Send a <b>GET</b> request to retrieve a single {@link Hardware} with the given {@code hardwareName}.
+     *
+     * <p>
+     * <b>NOTE:</b> If the server has a cached {@link Hardware} based on the <code>ETag</code>, an empty {@link HttpResponse#body()} is returned.
+     *
+     * @param hardwareName the {@code hardwareName} of the {@link Hardware} to be retrieved
+     * @param entityTag    the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached {@link Hardware}
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     * @see #get(String)
+     */
+    public HttpResponse<String> get(final String hardwareName, final String entityTag) throws FoldingRestException {
+        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+            .GET()
+            .uri(URI.create(hardwareUrl + "/fields?hardwareName=" + hardwareName))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
+
+        if (StringUtils.isNotBlank(entityTag)) {
+            requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), entityTag);
+        }
+
+        final HttpRequest request = requestBuilder.build();
+
+        try {
+            return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException("Error sending HTTP request to get hardware", e);
+        } catch (final IOException e) {
+            throw new FoldingRestException("Error sending HTTP request to get hardware", e);
+        }
+    }
+
+    /**
      * Send a <b>POST</b> request to create the given {@link HardwareRequest} in the system.
      *
      * @param hardware the {@link HardwareRequest} to create

@@ -103,8 +103,6 @@ networks:
   production:
 
 volumes:
-  # Volume to save maven .m2 for subsequent builds
-  m2:
   # Volume to save the PostgreSQL contents
   postgres_data:
   # Volume to save the Wildfly logs in case of a crash

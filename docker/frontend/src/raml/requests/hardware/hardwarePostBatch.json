@@ -5,7 +5,7 @@
     "hardwareMake": "NVIDIA",
     "hardwareType": "GPU",
     "multiplier": 21.33,
-    "averagePpd": 1.00
+    "averagePpd": 1
   },
   {
     "hardwareName": "Hardware2",
@@ -13,6 +13,6 @@
     "hardwareMake": "AMD",
     "hardwareType": "GPU",
     "multiplier": 3.62,
-    "averagePpd": 25.30
+    "averagePpd": 25
   }
 ]

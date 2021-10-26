@@ -7,7 +7,7 @@
       "hardwareMake": "NVIDIA",
       "hardwareType": "GPU",
       "multiplier": 21.33,
-      "averagePpd": 1.00
+      "averagePpd": 1
     }
   ],
   "unsuccessful": [
@@ -18,7 +18,7 @@
         "hardwareMake": "AMD",
         "hardwareType": "GPU",
         "multiplier": -3.62,
-        "averagePpd": 25.30
+        "averagePpd": 25
       },
       "errors": [
         "Field 'multiplier' must be 1.00 or higher"

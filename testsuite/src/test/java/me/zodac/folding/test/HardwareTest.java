@@ -129,6 +129,21 @@ class HardwareTest {
     }
 
     @Test
+    void whenGettingHardware_givenValidHardwareName_thenHardwareIsReturned_andHas200Status() throws FoldingRestException {
+        final String hardwareName = create(generateHardware()).getHardwareName();
+
+        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get(hardwareName);
+        assertThat(response.statusCode())
+            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_OK);
+
+        final Hardware hardware = HardwareResponseParser.get(response);
+        assertThat(hardware.getHardwareName())
+            .as("Did not receive the expected hardware: " + response.body())
+            .isEqualTo(hardwareName);
+    }
+
+    @Test
     void whenUpdatingHardware_givenValidHardwareId_andValidPayload_thenUpdatedHardwareIsReturned_andNoNewHardwareIsCreated_andHas200Status()
         throws FoldingRestException {
         final Hardware createdHardware = create(generateHardware());
@@ -220,6 +235,19 @@ class HardwareTest {
         assertThat(response.body())
             .as("Did not receive valid error message: " + response.body())
             .contains("out of range");
+    }
+
+    @Test
+    void whenGettingHardware_givenNonExistingHardwareName_thenNoJsonResponseIsReturned_andHas404Status() throws FoldingRestException {
+        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get("nonExistingName");
+
+        assertThat(response.statusCode())
+            .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
+
+        assertThat(response.body())
+            .as("Did not receive an empty JSON response: " + response.body())
+            .isEmpty();
     }
 
     @Test
