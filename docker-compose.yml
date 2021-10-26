@@ -12,6 +12,11 @@ services:
     hostname: frontend
     depends_on:
       - wildfly
+    healthcheck:
+      test: curl --fail http://localhost/ || exit 1
+      interval: 15s
+      timeout: 10s
+      retries: 30
     links:
       - wildfly
     networks:
@@ -53,6 +58,11 @@ services:
       JDBC_CONNECTION_USER: "${DB_USER}"
       JDBC_CONNECTION_PASSWORD: "${DB_PASSWORD}"
       JDBC_CONNECTION_DRIVER: "org.postgresql.Driver"
+    healthcheck:
+      test: curl -k --fail https://localhost:8443/folding || exit 1
+      interval: 15s
+      timeout: 10s
+      retries: 30
     links:
       - postgres
     networks:

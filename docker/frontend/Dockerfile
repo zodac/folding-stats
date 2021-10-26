@@ -27,6 +27,9 @@ RUN raml2html --input /docker/frontend/src/raml/api.raml --output /docker/fronte
 FROM httpd:2.4-alpine
 WORKDIR /usr/local/apache2/htdocs/
 
+# Used for healthcheck
+RUN apk add curl
+
 # Copy the RAML API and minified JS/CSS files
 COPY --from=node /docker/frontend/api.html ./api.html
 COPY --from=maven /docker/frontend/site/res ./res
