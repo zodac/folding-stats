@@ -36,9 +36,9 @@ COPY --from=node /docker/apache/api.html ./api.html
 COPY --from=maven /docker/apache/site/res ./res
 
 # Copy the static content (images, 3PP JS/CSS files)
-COPY ./docker/apache/img ./res/img
-COPY ./docker/apache/js/final/*.js ./res/js/
-COPY ./docker/apache/css/final/*.css ./res/css/
+COPY ./docker/apache/res/img ./res/img
+COPY ./docker/apache/res/js/*.js ./res/js/
+COPY ./docker/apache/res/css/*.css ./res/css/
 
 # Website structure
 COPY ./docker/apache/pages/robots.txt ./robots.txt
