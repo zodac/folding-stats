@@ -92,7 +92,7 @@
                 <executions>
                     <execution>
                         <id>default-install</id>
-                        <phase/>
+                        <phase>none</phase>
                     </execution>
                 </executions>
             </plugin>
@@ -102,7 +102,7 @@
                 <executions>
                     <execution>
                         <id>default-jar</id>
-                        <phase/>
+                        <phase>none</phase>
                     </execution>
                 </executions>
             </plugin>

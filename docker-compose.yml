@@ -14,9 +14,9 @@ services:
       - wildfly
     healthcheck:
       test: curl --fail http://localhost/ || exit 1
-      interval: 15s
+      interval: 120s
       timeout: 10s
-      retries: 30
+      retries: 10
     links:
       - wildfly
     networks:
@@ -37,9 +37,10 @@ services:
     environment:
       # Container configuration
       JAVA_OPTS: -Xms512m -Xmx2g -Djava.net.preferIPv4Stack=true
-      # Stats parsing configuration
+      # External URL configuration
       STATS_URL_ROOT: "https://api2.foldingathome.org"
       LARS_URL_ROOT: "https://folding.lar.systems/"
+      TC_HOMEPAGE_URL: "http://teamcomp.axihub.ca/"
       # NOTE: The monthly reset, result storage and LARS update will always occur at 23:57 on the last day of the month
       ENABLE_STATS_MONTHLY_RESET: "true"
       ENABLE_MONTHLY_RESULT_STORAGE: "true"

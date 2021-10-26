@@ -5,7 +5,8 @@ ARG ROOT_URL
 RUN mkdir --parents /docker/
 WORKDIR /docker/
 
-# Copy the JS and CSS files (along with the pom.xml) to run the minify plugin
+# Copy the JS and CSS files (along with the pom.xmls) to run the minify plugin
+COPY ./pom.xml /pom.xml
 COPY ./docker/pom.xml /docker/pom.xml
 COPY ./docker/apache/src/css /docker/apache/src/css
 COPY ./docker/apache/src/js /docker/apache/src/js

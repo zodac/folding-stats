@@ -21,6 +21,9 @@ import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * Validator class to validate a {@link User} or {@link UserRequest}.
+ */
 // TODO: [zodac] In severe need of a clean up. Write tests for the validators first though, because you're a moron
 // TODO: [zodac] Validate the linked hardware matches the user's category
 public final class UserValidator {
@@ -34,6 +37,19 @@ public final class UserValidator {
 
     }
 
+    /**
+     * Validates a {@link UserRequest} for a {@link User} to be created on the system.
+     *
+     * <p>
+     * Validation checks include:
+     * TODO:
+     *
+     * @param userRequest the {@link UserRequest} to validate
+     * @param allUsers    all existing {@link User}s in the system
+     * @param allHardware all existing {@link Hardware}s in the system
+     * @param allTeams    all existing {@link Team}s in the system
+     * @return the {@link ValidationResult}
+     */
     @SuppressWarnings("PMD.NPathComplexity") // Better than breaking into smaller functions
     public static ValidationResult<User> validateCreate(final UserRequest userRequest,
                                                         final Collection<User> allUsers,
@@ -126,6 +142,20 @@ public final class UserValidator {
         return ValidationResult.failure(userRequest, failureMessages);
     }
 
+    /**
+     * Validates a {@link UserRequest} for a {@link User} to be updated on the system.
+     *
+     * <p>
+     * Validation checks include:
+     * TODO:
+     *
+     * @param userRequest  the {@link UserRequest} to validate
+     * @param existingUser the already existing {@link User} in the system to be updated
+     * @param allUsers     all existing {@link User}s in the system
+     * @param allHardware  all existing {@link Hardware}s in the system
+     * @param allTeams     all existing {@link Team}s in the system
+     * @return the {@link ValidationResult}
+     */
     @SuppressWarnings("PMD.NPathComplexity") // Better than breaking into smaller functions
     public static ValidationResult<User> validateUpdate(final UserRequest userRequest,
                                                         final User existingUser,
@@ -276,7 +306,7 @@ public final class UserValidator {
             }
         }
 
-        // What the hell, man? Who approved this shit?
+        // What the hell, man? Who approved this?
         if (existingUser == null) { // Create
             if (usersOnTeam.size() >= Category.maximumPermittedAmountForAllCategories()) {
                 failureMessages.add(String.format("Team '%s' has %s users, maximum permitted is %s", team.get().getTeamName(), usersOnTeam.size(),

@@ -49,7 +49,7 @@
         <embedded-postgres.version>1.2.7</embedded-postgres.version>
         <!-- Version should be the same as the postgres docker image version, where possible -->
         <embedded-postgres-binaries-bom.version>13.4.0</embedded-postgres-binaries-bom.version>
-        <flyway-core>8.0.1</flyway-core>
+        <flyway-core>8.0.2</flyway-core>
         <junit.version>5.8.1</junit.version>
 
         <!-- Plugin Versions -->
@@ -62,6 +62,7 @@
         <maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
         <maven-war-plugin.version>3.3.2</maven-war-plugin.version>
+        <minify-maven-plugin.version>1.7.6</minify-maven-plugin.version>
         <versions-maven-plugin.version>2.8.1</versions-maven-plugin.version>
 
         <!-- Linter 3PP Versions -->
@@ -319,6 +320,11 @@
                     <version>${maven-war-plugin.version}</version>
                 </plugin>
                 <plugin>
+                    <groupId>com.samaxes.maven</groupId>
+                    <artifactId>minify-maven-plugin</artifactId>
+                    <version>${minify-maven-plugin.version}</version>
+                </plugin>
+                <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
                     <version>${versions-maven-plugin.version}</version>
@@ -375,8 +381,7 @@
                         <excludePackageNames>
                             me.zodac.folding.db.postgres.gen:me.zodac.folding.db.postgres.gen.*
                         </excludePackageNames>
-                        <!-- TODO: [zodac] Enable -->
-                        <failOnWarnings>false</failOnWarnings>
+                        <failOnWarnings>true</failOnWarnings>
                         <quiet>true</quiet>
                         <serialwarn>true</serialwarn>
                         <skip>${skip-linters}</skip>

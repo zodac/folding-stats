@@ -12,11 +12,6 @@ services:
     hostname: apache_dev
     depends_on:
       - wildfly_dev
-    healthcheck:
-      test: curl --fail http://localhost/ || exit 1
-      interval: 15s
-      timeout: 10s
-      retries: 30
     links:
       - wildfly_dev
     networks:
@@ -37,9 +32,10 @@ services:
     environment:
       # Container configuration
       JAVA_OPTS: -Xms512m -Xmx2g -Djava.net.preferIPv4Stack=true
-      # Stats parsing configuration
+      # External URL configuration
       STATS_URL_ROOT: "http://wildfly-dev:8080"
       LARS_URL_ROOT: "http://wildfly-dev:8080"
+      TC_HOMEPAGE_URL: "http://apache_dev/"
       # NOTE: The monthly reset, result storage and LARS update will always occur at 23:57 on the last day of the month
       ENABLE_STATS_MONTHLY_RESET: "false"
       ENABLE_MONTHLY_RESULT_STORAGE: "false"
@@ -55,11 +51,6 @@ services:
       JDBC_CONNECTION_USER: "folding_user"
       JDBC_CONNECTION_PASSWORD: "shroot"
       JDBC_CONNECTION_DRIVER: "org.postgresql.Driver"
-    healthcheck:
-      test: curl -k --fail https://localhost:8443/folding || exit 1
-      interval: 15s
-      timeout: 10s
-      retries: 30
     links:
       - postgres_dev
     networks:
@@ -91,11 +82,6 @@ services:
       PGDATABASE: "folding_db"
       PGUSER: "folding_user"
       PGPASSWORD: "shroot"
-    healthcheck:
-      test: pg_isready --host localhost || exit 1
-      interval: 15s
-      timeout: 10s
-      retries: 30
     networks:
       - development
     ports:
