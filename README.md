@@ -1,4 +1,4 @@
-# Still a work in progress!
+# README still a work in progress!
 
 # Folding Stats
 

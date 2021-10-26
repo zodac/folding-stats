@@ -1,10 +1,4 @@
-FROM maven:3.8.2-openjdk-17 AS maven
-
-# Configure maven
-COPY --from=maven /usr/share/maven /usr/share/maven
-ARG MAVEN_HOME=/usr/share/maven
-ARG MAVEN_CONFIG="${USER_HOME_DIR}/.m2"
-ARG PATH=${PATH}:${MAVEN_HOME}
+FROM maven:3.8.2-openjdk-17 AS builder
 
 # Build folding-stats
 RUN mkdir --parents /folding-stats/
@@ -40,10 +34,10 @@ RUN mkdir --parents /opt/jboss/wildfly/standalone/deployments/ && \
     mv /folding-stats/stubbed-folding-endpoints-war/target/stubbed-folding-endpoints-war*.war /opt/jboss/wildfly/standalone/deployments/stubbed-folding-endpoints-war.war && \
     rm -rf /folding-stats/ "${MAVEN_CONFIG}" "${MAVEN_HOME}"
 
-FROM jboss/wildfly:24.0.0.Final AS wildfly
+FROM jboss/wildfly:24.0.0.Final
 
 # Copy the WAR artifacts
-COPY --from=maven /opt/jboss/wildfly/standalone/deployments/ /opt/jboss/wildfly/standalone/deployments/
+COPY --from=builder /opt/jboss/wildfly/standalone/deployments/ /opt/jboss/wildfly/standalone/deployments/
 
 # Remove the stubbed endpoints if this is not a test deployment
 ARG DEPLOYMENT_TYPE

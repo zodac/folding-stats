@@ -19,7 +19,7 @@ RUN minify --verbose --match=\.*.css$ --type=css --output /docker/apache/site/re
     find /docker/apache/site/res/ -iname "*.css" | sed 's/....$//' | xargs -i mv {}.css {}.min.css && \
     find /docker/apache/site/res/ -iname "*.js" | sed 's/...$//' | xargs -i mv {}.js {}.min.js
 
-FROM node:lts-alpine3.14 AS node
+FROM node:lts-alpine3.14 AS raml
 # Install raml2html
 RUN npm i -g raml2html
 
@@ -33,7 +33,7 @@ WORKDIR /usr/local/apache2/htdocs/
 RUN apk add curl
 
 # Copy the RAML API and minified JS/CSS files
-COPY --from=node /docker/apache/api.html ./api.html
+COPY --from=raml /docker/apache/api.html ./api.html
 COPY --from=minifier /docker/apache/site/res ./res
 
 # Copy the static content (images, 3PP JS/CSS files)

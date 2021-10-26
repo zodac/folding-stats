@@ -86,7 +86,6 @@ services:
       - development
     ports:
       - "5433:5432"
-    restart: always
 
 networks:
   development:
