@@ -62,7 +62,6 @@
         <maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
         <maven-war-plugin.version>3.3.2</maven-war-plugin.version>
-        <minify-maven-plugin.version>1.7.6</minify-maven-plugin.version>
         <versions-maven-plugin.version>2.8.1</versions-maven-plugin.version>
 
         <!-- Linter 3PP Versions -->
@@ -318,11 +317,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
                     <version>${maven-war-plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>com.samaxes.maven</groupId>
-                    <artifactId>minify-maven-plugin</artifactId>
-                    <version>${minify-maven-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>

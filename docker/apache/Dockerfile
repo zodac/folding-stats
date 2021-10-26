@@ -1,22 +1,23 @@
-FROM maven:3.8.2-openjdk-17 AS maven
+FROM mysocialobservations/docker-tdewolff-minify AS minifier
 
 ARG ROOT_URL
 
-RUN mkdir --parents /docker/
+RUN mkdir /docker/
 WORKDIR /docker/
 
-# Copy the JS and CSS files (along with the pom.xmls) to run the minify plugin
-COPY ./pom.xml /pom.xml
-COPY ./docker/pom.xml /docker/pom.xml
+# Copy the JS and CSS files to run the minification
 COPY ./docker/apache/css /docker/apache/css
 COPY ./docker/apache/js /docker/apache/js
 
-# 1 - Replace '%ROOT_URL%' in the JS files with the actual URL for the deployment (changing sed delimiter for URL slashes)
-# 2 - Run the minification and merging of JS and CSS files
-# 3 - Remove any files that are not minified (do not include 'min' in their filename)
-RUN grep -rl '%ROOT_URL%' . | xargs sed -i "s|%ROOT_URL%|${ROOT_URL}|g" && \
-    mvn package -Dminify && \
-    find ./apache/site/res -iname *.js -o -iname *.css | grep -v "min" | xargs rm
+# Replace '%ROOT_URL%' in the JS files with the actual URL for the deployment (changing sed delimiter for URL slashes)
+RUN grep -rl '%ROOT_URL%' . | xargs sed -i "s|%ROOT_URL%|${ROOT_URL}|g"
+
+# Minify JS and CSS files, then rename to end with *.min.*
+RUN minify --verbose --match=\.*.css$ --type=css --output /docker/apache/site/res/css/ /docker/apache/css/ && \
+    minify --verbose --match=\.*.js$ --type=js --output /docker/apache/site/res/js/ /docker/apache/js/ && \
+    minify --verbose --match=\.*.js$ --type=js --output /docker/apache/site/res/js/ /docker/apache/js/util && \
+    find /docker/apache/site/res/ -iname "*.css" | sed 's/....$//' | xargs -i mv {}.css {}.min.css && \
+    find /docker/apache/site/res/ -iname "*.js" | sed 's/...$//' | xargs -i mv {}.js {}.min.js
 
 FROM node:lts-alpine3.14 AS node
 # Install raml2html
@@ -33,7 +34,7 @@ RUN apk add curl
 
 # Copy the RAML API and minified JS/CSS files
 COPY --from=node /docker/apache/api.html ./api.html
-COPY --from=maven /docker/apache/site/res ./res
+COPY --from=minifier /docker/apache/site/res ./res
 
 # Copy the static content (images, 3PP JS/CSS files)
 COPY ./docker/apache/res/img ./res/img
