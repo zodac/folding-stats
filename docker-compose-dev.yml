@@ -2,14 +2,14 @@ version: '2.3'
 
 services:
 
-  frontend_dev:
+  apache_dev:
     build:
       context: .
-      dockerfile: docker/frontend/Dockerfile
+      dockerfile: docker/apache/Dockerfile
       args:
         ROOT_URL: "http://127.0.0.1:8081/folding"
-    container_name: frontend_dev
-    hostname: frontend_dev
+    container_name: apache_dev
+    hostname: apache_dev
     depends_on:
       - wildfly_dev
     healthcheck:

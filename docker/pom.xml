@@ -29,8 +29,8 @@
                         <phase>package</phase>
                         <configuration>
                             <charset>UTF-8</charset>
-                            <webappSourceDir>${project.basedir}/frontend/src</webappSourceDir>
-                            <webappTargetDir>${project.basedir}/frontend/site/res</webappTargetDir>
+                            <webappSourceDir>${project.basedir}/apache/src</webappSourceDir>
+                            <webappTargetDir>${project.basedir}/apache/site/res</webappTargetDir>
 
                             <!-- CSS files -->
                             <cssSourceDir>css</cssSourceDir>
@@ -51,8 +51,8 @@
                         <phase>package</phase>
                         <configuration>
                             <charset>UTF-8</charset>
-                            <webappSourceDir>${project.basedir}/frontend/src</webappSourceDir>
-                            <webappTargetDir>${project.basedir}/frontend/site/res</webappTargetDir>
+                            <webappSourceDir>${project.basedir}/apache/src</webappSourceDir>
+                            <webappTargetDir>${project.basedir}/apache/site/res</webappTargetDir>
 
                             <jsSourceDir>js</jsSourceDir>
                             <jsSourceFiles>
@@ -83,8 +83,8 @@
                         <phase>package</phase>
                         <configuration>
                             <charset>UTF-8</charset>
-                            <webappSourceDir>${project.basedir}/frontend/src</webappSourceDir>
-                            <webappTargetDir>${project.basedir}/frontend/site/res</webappTargetDir>
+                            <webappSourceDir>${project.basedir}/apache/src</webappSourceDir>
+                            <webappTargetDir>${project.basedir}/apache/site/res</webappTargetDir>
 
                             <jsSourceDir>js</jsSourceDir>
                             <jsSourceFiles>
@@ -117,8 +117,8 @@
                         <phase>package</phase>
                         <configuration>
                             <charset>UTF-8</charset>
-                            <webappSourceDir>${project.basedir}/frontend/src</webappSourceDir>
-                            <webappTargetDir>${project.basedir}/frontend/site/res</webappTargetDir>
+                            <webappSourceDir>${project.basedir}/apache/src</webappSourceDir>
+                            <webappTargetDir>${project.basedir}/apache/site/res</webappTargetDir>
 
                             <jsSourceDir>js</jsSourceDir>
                             <jsSourceFiles>
@@ -148,8 +148,8 @@
                         <phase>package</phase>
                         <configuration>
                             <charset>UTF-8</charset>
-                            <webappSourceDir>${project.basedir}/frontend/src</webappSourceDir>
-                            <webappTargetDir>${project.basedir}/frontend/site/res</webappTargetDir>
+                            <webappSourceDir>${project.basedir}/apache/src</webappSourceDir>
+                            <webappTargetDir>${project.basedir}/apache/site/res</webappTargetDir>
 
                             <jsSourceDir>js</jsSourceDir>
                             <jsSourceFiles>
@@ -178,8 +178,8 @@
                         <phase>package</phase>
                         <configuration>
                             <charset>UTF-8</charset>
-                            <webappSourceDir>${project.basedir}/frontend/src</webappSourceDir>
-                            <webappTargetDir>${project.basedir}/frontend/site/res</webappTargetDir>
+                            <webappSourceDir>${project.basedir}/apache/src</webappSourceDir>
+                            <webappTargetDir>${project.basedir}/apache/site/res</webappTargetDir>
 
                             <jsSourceDir>js</jsSourceDir>
                             <jsSourceFiles>
@@ -207,8 +207,8 @@
                         <phase>package</phase>
                         <configuration>
                             <charset>UTF-8</charset>
-                            <webappSourceDir>${project.basedir}/frontend/src</webappSourceDir>
-                            <webappTargetDir>${project.basedir}/frontend/site/res</webappTargetDir>
+                            <webappSourceDir>${project.basedir}/apache/src</webappSourceDir>
+                            <webappTargetDir>${project.basedir}/apache/site/res</webappTargetDir>
 
                             <jsSourceDir>js</jsSourceDir>
                             <jsSourceFiles>
@@ -238,8 +238,8 @@
                         <phase>package</phase>
                         <configuration>
                             <charset>UTF-8</charset>
-                            <webappSourceDir>${project.basedir}/frontend/src</webappSourceDir>
-                            <webappTargetDir>${project.basedir}/frontend/site/res</webappTargetDir>
+                            <webappSourceDir>${project.basedir}/apache/src</webappSourceDir>
+                            <webappTargetDir>${project.basedir}/apache/site/res</webappTargetDir>
 
                             <jsSourceDir>js</jsSourceDir>
                             <jsSourceFiles>
@@ -268,8 +268,8 @@
                         <phase>package</phase>
                         <configuration>
                             <charset>UTF-8</charset>
-                            <webappSourceDir>${project.basedir}/frontend/src</webappSourceDir>
-                            <webappTargetDir>${project.basedir}/frontend/site/res</webappTargetDir>
+                            <webappSourceDir>${project.basedir}/apache/src</webappSourceDir>
+                            <webappTargetDir>${project.basedir}/apache/site/res</webappTargetDir>
 
                             <jsSourceDir>js</jsSourceDir>
                             <jsSourceFiles>
@@ -297,8 +297,8 @@
                         <phase>package</phase>
                         <configuration>
                             <charset>UTF-8</charset>
-                            <webappSourceDir>${project.basedir}/frontend/src</webappSourceDir>
-                            <webappTargetDir>${project.basedir}/frontend/site/res</webappTargetDir>
+                            <webappSourceDir>${project.basedir}/apache/src</webappSourceDir>
+                            <webappTargetDir>${project.basedir}/apache/site/res</webappTargetDir>
 
                             <jsSourceDir>js</jsSourceDir>
                             <jsSourceFiles>

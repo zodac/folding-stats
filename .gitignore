@@ -7,7 +7,7 @@ target/
 pom.xml.versionsBackup
 
 # Generated webpages
-docker/frontend/site/
+docker/apache/site/
 
 # Generated jOOQ schema files
 docker/postgres/jooq/me/

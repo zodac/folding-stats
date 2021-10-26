@@ -2,14 +2,14 @@ version: '2.3'
 
 services:
 
-  frontend:
+  apache:
     build:
       context: .
-      dockerfile: docker/frontend/Dockerfile
+      dockerfile: docker/apache/Dockerfile
       args:
         ROOT_URL: "https://internal-secure.axihub.ca/folding"
-    container_name: frontend
-    hostname: frontend
+    container_name: apache
+    hostname: apache
     depends_on:
       - wildfly
     healthcheck:
@@ -45,7 +45,7 @@ services:
       ENABLE_MONTHLY_RESULT_STORAGE: "true"
       ENABLE_LARS_HARDWARE_UPDATE: "true"
       # Scheduled stats parsing configuration
-      # NOTE: This time is hardcoded in the frontend, will also need to update 'timer.js'
+      # TODO: This time is hardcoded in the UI, will also need to update 'timer.js'
       ENABLE_STATS_SCHEDULED_PARSING: "true"
       STATS_PARSING_SCHEDULE_HOUR: "*"
       STATS_PARSING_SCHEDULE_MINUTE: "55"
