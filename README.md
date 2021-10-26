@@ -47,15 +47,14 @@ required for this are:
 
 ### JS/CSS Updates
 
-The JS scripts and CSS stylesheets are stored in `docker/apache/src`. They are then minified and merged by a maven
-plugin, which creates the final files for the site. These CSS and JS files are generated in the `apache` docker
-container.
+The JS scripts and CSS stylesheets are stored in `docker/apache/`. They are then minified and merged by a maven plugin,
+which creates the final files for the site. These CSS and JS files are generated in the `apache` docker container.
 
 ### REST RAML API
 
-The REST endpoints are documented through RAML, with the source RAML file found in  `docker/apache/src/raml/api.raml`.
-This is used to generate an HTML output which is saved to `docker/apache/site/api.html`, and can be accessed through the
-UI. The RAML HTML is generated in the `apache` docker container.
+The REST endpoints are documented through RAML, with the source RAML file found in  `docker/apache/raml/api.raml`. This
+is used to generate an HTML output which is saved to `docker/apache/site/api.html`, and can be accessed through the UI.
+The RAML HTML is generated in the `apache` docker container.
 
 ## Decisions
 

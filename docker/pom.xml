@@ -51,7 +51,7 @@
                         <phase>package</phase>
                         <configuration>
                             <charset>UTF-8</charset>
-                            <webappSourceDir>${project.basedir}/apache/src</webappSourceDir>
+                            <webappSourceDir>${project.basedir}/apache</webappSourceDir>
                             <webappTargetDir>${project.basedir}/apache/site/res</webappTargetDir>
 
                             <!-- CSS files -->
@@ -73,7 +73,7 @@
                         <phase>package</phase>
                         <configuration>
                             <charset>UTF-8</charset>
-                            <webappSourceDir>${project.basedir}/apache/src</webappSourceDir>
+                            <webappSourceDir>${project.basedir}/apache</webappSourceDir>
                             <webappTargetDir>${project.basedir}/apache/site/res</webappTargetDir>
 
                             <jsSourceDir>js</jsSourceDir>
@@ -105,7 +105,7 @@
                         <phase>package</phase>
                         <configuration>
                             <charset>UTF-8</charset>
-                            <webappSourceDir>${project.basedir}/apache/src</webappSourceDir>
+                            <webappSourceDir>${project.basedir}/apache</webappSourceDir>
                             <webappTargetDir>${project.basedir}/apache/site/res</webappTargetDir>
 
                             <jsSourceDir>js</jsSourceDir>
@@ -139,7 +139,7 @@
                         <phase>package</phase>
                         <configuration>
                             <charset>UTF-8</charset>
-                            <webappSourceDir>${project.basedir}/apache/src</webappSourceDir>
+                            <webappSourceDir>${project.basedir}/apache</webappSourceDir>
                             <webappTargetDir>${project.basedir}/apache/site/res</webappTargetDir>
 
                             <jsSourceDir>js</jsSourceDir>
@@ -170,7 +170,7 @@
                         <phase>package</phase>
                         <configuration>
                             <charset>UTF-8</charset>
-                            <webappSourceDir>${project.basedir}/apache/src</webappSourceDir>
+                            <webappSourceDir>${project.basedir}/apache</webappSourceDir>
                             <webappTargetDir>${project.basedir}/apache/site/res</webappTargetDir>
 
                             <jsSourceDir>js</jsSourceDir>
@@ -200,7 +200,7 @@
                         <phase>package</phase>
                         <configuration>
                             <charset>UTF-8</charset>
-                            <webappSourceDir>${project.basedir}/apache/src</webappSourceDir>
+                            <webappSourceDir>${project.basedir}/apache</webappSourceDir>
                             <webappTargetDir>${project.basedir}/apache/site/res</webappTargetDir>
 
                             <jsSourceDir>js</jsSourceDir>
@@ -229,7 +229,7 @@
                         <phase>package</phase>
                         <configuration>
                             <charset>UTF-8</charset>
-                            <webappSourceDir>${project.basedir}/apache/src</webappSourceDir>
+                            <webappSourceDir>${project.basedir}/apache</webappSourceDir>
                             <webappTargetDir>${project.basedir}/apache/site/res</webappTargetDir>
 
                             <jsSourceDir>js</jsSourceDir>
@@ -260,7 +260,7 @@
                         <phase>package</phase>
                         <configuration>
                             <charset>UTF-8</charset>
-                            <webappSourceDir>${project.basedir}/apache/src</webappSourceDir>
+                            <webappSourceDir>${project.basedir}/apache</webappSourceDir>
                             <webappTargetDir>${project.basedir}/apache/site/res</webappTargetDir>
 
                             <jsSourceDir>js</jsSourceDir>
@@ -290,7 +290,7 @@
                         <phase>package</phase>
                         <configuration>
                             <charset>UTF-8</charset>
-                            <webappSourceDir>${project.basedir}/apache/src</webappSourceDir>
+                            <webappSourceDir>${project.basedir}/apache</webappSourceDir>
                             <webappTargetDir>${project.basedir}/apache/site/res</webappTargetDir>
 
                             <jsSourceDir>js</jsSourceDir>
@@ -319,7 +319,7 @@
                         <phase>package</phase>
                         <configuration>
                             <charset>UTF-8</charset>
-                            <webappSourceDir>${project.basedir}/apache/src</webappSourceDir>
+                            <webappSourceDir>${project.basedir}/apache</webappSourceDir>
                             <webappTargetDir>${project.basedir}/apache/site/res</webappTargetDir>
 
                             <jsSourceDir>js</jsSourceDir>
