@@ -322,61 +322,77 @@ function createUser() {
     var category = document.getElementById("user_create_category").value.trim();
     var profileLink = document.getElementById("user_create_profile_link").value.trim();
     var liveStatsLink = document.getElementById("user_create_live_stats_link").value.trim();
-    var hardwareId = document.getElementById("user_create_hardware_selector").value.trim();
-    var teamId = document.getElementById("user_create_team_selector").value.trim();
+    var hardwareName = document.getElementById("user_create_hardware_selector_input").value.trim();
+    var teamName = document.getElementById("user_create_team_selector_input").value.trim();
     var isCaptain = document.getElementById("user_create_is_captain").checked;
 
-    var requestData = JSON.stringify(
-        {
-            "foldingUserName": foldingUserName,
-            "displayName": displayName,
-            "passkey": passkey,
-            "category": getCategoryBackend(category),
-            "profileLink": profileLink,
-            "liveStatsLink": liveStatsLink,
-            "hardwareId": hardwareId,
-            "teamId": teamId,
-            "userIsCaptain": isCaptain
-        }
-    );
-
-    show("loader");
-    fetch(ROOT_URL+'/users', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': sessionGet("Authorization")
-        },
-        body: requestData
-    })
+    fetch(ROOT_URL+'/hardware/fields?hardwareName=' + hardwareName)
     .then(response => {
-        hide("loader");
-
-        if(response.status != 201){
-            failureToast("User create failed with code: " + response.status);
-            response.json()
-            .then(response => {
-                console.error(JSON.stringify(response, null, 2));
-            });
-            return;
-        }
-
-        document.getElementById("user_create_folding_name").value = '';
-        document.getElementById("user_create_display_name").value = '';
-        document.getElementById("user_create_passkey").value = '';
-        document.getElementById("user_create_category").value = '';
-        document.getElementById("user_create_profile_link").value = '';
-        document.getElementById("user_create_live_stats_link").value = '';
-        document.getElementById("user_create_hardware_selector").value = '';
-        document.getElementById("user_create_team_selector").value = '';
-        document.getElementById("user_create_is_captain").checked = false;
-        successToast("User '" + displayName + "' created");
-        loadUsers();
+        return response.json();
     })
-    .catch((error) => {
-        hide("loader");
-        console.error('Unexpected error creating user: ', error);
-        return false;
+    .then(function(jsonResponse) {
+        var hardwareId = jsonResponse["id"];
+
+        fetch(ROOT_URL+'/teams/fields?teamName=' + teamName)
+        .then(response => {
+            return response.json();
+        })
+        .then(function(jsonResponse) {
+            var teamId = jsonResponse["id"];
+
+            var requestData = JSON.stringify(
+                {
+                    "foldingUserName": foldingUserName,
+                    "displayName": displayName,
+                    "passkey": passkey,
+                    "category": getCategoryBackend(category),
+                    "profileLink": profileLink,
+                    "liveStatsLink": liveStatsLink,
+                    "hardwareId": hardwareId,
+                    "teamId": teamId,
+                    "userIsCaptain": isCaptain
+                }
+            );
+
+            show("loader");
+            fetch(ROOT_URL+'/users', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': sessionGet("Authorization")
+                },
+                body: requestData
+            })
+            .then(response => {
+                hide("loader");
+
+                if(response.status != 201){
+                    failureToast("User create failed with code: " + response.status);
+                    response.json()
+                    .then(response => {
+                        console.error(JSON.stringify(response, null, 2));
+                    });
+                    return;
+                }
+
+                document.getElementById("user_create_folding_name").value = '';
+                document.getElementById("user_create_display_name").value = '';
+                document.getElementById("user_create_passkey").value = '';
+                document.getElementById("user_create_category").value = '';
+                document.getElementById("user_create_profile_link").value = '';
+                document.getElementById("user_create_live_stats_link").value = '';
+                document.getElementById("user_create_hardware_selector_input").value = '';
+                document.getElementById("user_create_team_selector_input").value = '';
+                document.getElementById("user_create_is_captain").checked = false;
+                successToast("User '" + displayName + "' created");
+                loadUsers();
+            })
+            .catch((error) => {
+                hide("loader");
+                console.error('Unexpected error creating user: ', error);
+                return false;
+            });
+        })
     });
 }
 
@@ -393,68 +409,84 @@ function updateUser() {
     var category = document.getElementById("user_update_category").value.trim();
     var profileLink = document.getElementById("user_update_profile_link").value.trim();
     var liveStatsLink = document.getElementById("user_update_live_stats_link").value.trim();
-    var hardwareId = document.getElementById("user_update_hardware_selector").value.trim();
-    var teamId = document.getElementById("user_update_team_selector").value.trim();
+    var hardwareName = document.getElementById("user_update_hardware_selector_input").value.trim();
+    var teamName = document.getElementById("user_update_team_selector_input").value.trim();
     var isCaptain = document.getElementById("user_update_is_captain").checked;
 
-    var requestData = JSON.stringify(
-        {
-            "foldingUserName": foldingUserName,
-            "displayName": displayName,
-            "passkey": passkey,
-            "category": getCategoryBackend(category),
-            "profileLink": profileLink,
-            "liveStatsLink": liveStatsLink,
-            "hardwareId": hardwareId,
-            "teamId": teamId,
-            "userIsCaptain": isCaptain,
-        }
-    );
-
-    show("loader");
-    fetch(ROOT_URL+'/users/' + userId, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': sessionGet("Authorization")
-        },
-        body: requestData
-    })
+    fetch(ROOT_URL+'/hardware/fields?hardwareName=' + hardwareName)
     .then(response => {
-        hide("loader");
-
-        if(response.status != 200){
-            failureToast("User update failed with code: " + response.status)
-            response.json()
-            .then(response => {
-                console.error(JSON.stringify(response, null, 2));
-            });
-            return;
-        }
-
-        document.getElementById("user_update_id").value = '';
-        document.getElementById("user_update_folding_name").value = '';
-        document.getElementById("user_update_display_name").value = '';
-        document.getElementById("user_update_passkey").value = '';
-        document.getElementById("user_update_category").value = '';
-        document.getElementById("user_update_profile_link").value = '';
-        document.getElementById("user_update_live_stats_link").value = '';
-        document.getElementById("user_update_hardware_selector").value = '';
-        document.getElementById("user_update_team_selector").value = '';
-        document.getElementById("user_update_is_captain").checked = false;
-
-        userFields = document.querySelectorAll(".user_delete");
-        for (var i = 0, userField; userField = userFields[i]; i++) {
-            hideElement(userField);
-        }
-
-        successToast("User '" + displayName + "' updated");
-        loadUsers();
+        return response.json();
     })
-    .catch((error) => {
-        hide("loader");
-        console.error('Unexpected error updating user: ', error);
-        return false;
+    .then(function(jsonResponse) {
+        var hardwareId = jsonResponse["id"];
+
+        fetch(ROOT_URL+'/teams/fields?teamName=' + teamName)
+        .then(response => {
+            return response.json();
+        })
+        .then(function(jsonResponse) {
+            var teamId = jsonResponse["id"];
+
+            var requestData = JSON.stringify(
+                {
+                    "foldingUserName": foldingUserName,
+                    "displayName": displayName,
+                    "passkey": passkey,
+                    "category": getCategoryBackend(category),
+                    "profileLink": profileLink,
+                    "liveStatsLink": liveStatsLink,
+                    "hardwareId": hardwareId,
+                    "teamId": teamId,
+                    "userIsCaptain": isCaptain
+                }
+            );
+
+            show("loader");
+            fetch(ROOT_URL+'/users/' + userId, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': sessionGet("Authorization")
+                },
+                body: requestData
+            })
+            .then(response => {
+                hide("loader");
+
+                if(response.status != 200){
+                    failureToast("User update failed with code: " + response.status)
+                    response.json()
+                    .then(response => {
+                        console.error(JSON.stringify(response, null, 2));
+                    });
+                    return;
+                }
+
+                document.getElementById("user_update_id").value = '';
+                document.getElementById("user_update_folding_name").value = '';
+                document.getElementById("user_update_display_name").value = '';
+                document.getElementById("user_update_passkey").value = '';
+                document.getElementById("user_update_category").value = '';
+                document.getElementById("user_update_profile_link").value = '';
+                document.getElementById("user_update_live_stats_link").value = '';
+                document.getElementById("user_update_hardware_selector_input").value = '';
+                document.getElementById("user_update_team_selector_input").value = '';
+                document.getElementById("user_update_is_captain").checked = false;
+
+                userFields = document.querySelectorAll(".user_update");
+                for (var i = 0, userField; userField = userFields[i]; i++) {
+                    hideElement(userField);
+                }
+
+                successToast("User '" + displayName + "' updated");
+                loadUsers();
+            })
+            .catch((error) => {
+                hide("loader");
+                console.error('Unexpected error updating user: ', error);
+                return false;
+            });
+        })
     });
 }
 
@@ -493,8 +525,8 @@ function deleteUser() {
         document.getElementById("user_delete_category").value = '';
         document.getElementById("user_delete_profile_link").value = '';
         document.getElementById("user_delete_live_stats_link").value = '';
-        document.getElementById("user_delete_hardware_selector").value = '';
-        document.getElementById("user_delete_team_selector").value = '';
+        document.getElementById("user_delete_hardware_selector_input").value = '';
+        document.getElementById("user_delete_team_selector_input").value = '';
         document.getElementById("user_delete_is_captain").checked = false;
 
         userFields = document.querySelectorAll(".user_delete");
@@ -561,8 +593,20 @@ function offsetUser() {
                 return;
             }
 
+            document.getElementById("user_offset_id").value = '';
+            document.getElementById("user_offset_folding_name").value = '';
+            document.getElementById("user_offset_display_name").value = '';
+            document.getElementById("user_offset_category").value = '';
+            document.getElementById("user_offset_hardware_selector_input").value = '';
+            document.getElementById("user_offset_team_selector_input").value = '';
             document.getElementById("user_offset_points").value = '';
             document.getElementById("user_offset_units").value = '';
+
+            userFields = document.querySelectorAll(".user_offset");
+            for (var i = 0, userField; userField = userFields[i]; i++) {
+                hideElement(userField);
+            }
+
             successToast("User '" + displayName + "' stats updated: " + offsetPoints + " points, " + offsetUnits + " units");
             loadUsers();
         })

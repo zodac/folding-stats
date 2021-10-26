@@ -158,8 +158,6 @@ function populateUserUpdate(){
     document.getElementById("user_update_display_name").value = selectedElement.getAttribute("user_display_name");
     document.getElementById("user_update_passkey").value = selectedElement.getAttribute("user_passkey");
     document.getElementById("user_update_category").value = selectedElement.getAttribute("user_category");
-    document.getElementById("user_update_hardware_selector").value = selectedElement.getAttribute("user_hardware_id");
-    document.getElementById("user_update_team_selector").value = selectedElement.getAttribute("user_team_id");
 
     if (selectedElement.getAttribute("user_is_captain") === "true") {
         document.getElementById("user_update_is_captain").checked = true;
@@ -181,11 +179,29 @@ function populateUserUpdate(){
         document.getElementById("user_update_live_stats_link").value = '';
     }
 
-    userFields = document.querySelectorAll(".user_update");
-    for (var i = 0, userField; userField = userFields[i]; i++) {
-        showElement(userField);
-    }
-    hide("loader");
+    var hardwareId = selectedElement.getAttribute("user_hardware_id");
+    fetch(ROOT_URL+'/hardware/' + hardwareId)
+    .then(response => {
+        return response.json();
+    })
+    .then(function(jsonResponse) {
+        document.getElementById("user_update_hardware_selector_input").value = jsonResponse["hardwareName"];
+
+        var teamId = selectedElement.getAttribute("user_team_id");
+        fetch(ROOT_URL+'/teams/' + teamId)
+        .then(response => {
+            return response.json();
+        })
+        .then(function(jsonResponse) {
+            document.getElementById("user_update_team_selector_input").value = jsonResponse["teamName"];
+
+            userFields = document.querySelectorAll(".user_update");
+            for (var i = 0, userField; userField = userFields[i]; i++) {
+                showElement(userField);
+            }
+            hide("loader");
+        })
+    });
 }
 
 function populateUserDelete(){
@@ -198,8 +214,6 @@ function populateUserDelete(){
     document.getElementById("user_delete_display_name").value = selectedElement.getAttribute("user_display_name");
     document.getElementById("user_delete_passkey").value = selectedElement.getAttribute("user_passkey");
     document.getElementById("user_delete_category").value = selectedElement.getAttribute("user_category");
-    document.getElementById("user_delete_hardware_selector").value = selectedElement.getAttribute("user_hardware_id");
-    document.getElementById("user_delete_team_selector").value = selectedElement.getAttribute("user_team_id");
 
     if (selectedElement.getAttribute("user_is_captain") === "true") {
         document.getElementById("user_delete_is_captain").checked = true;
@@ -221,11 +235,29 @@ function populateUserDelete(){
         document.getElementById("user_delete_live_stats_link").value = '';
     }
 
-    userFields = document.querySelectorAll(".user_delete");
-    for (var i = 0, userField; userField = userFields[i]; i++) {
-        showElement(userField);
-    }
-    hide("loader");
+    var hardwareId = selectedElement.getAttribute("user_hardware_id");
+    fetch(ROOT_URL+'/hardware/' + hardwareId)
+    .then(response => {
+        return response.json();
+    })
+    .then(function(jsonResponse) {
+        document.getElementById("user_delete_hardware_selector_input").value = jsonResponse["hardwareName"];
+
+        var teamId = selectedElement.getAttribute("user_team_id");
+        fetch(ROOT_URL+'/teams/' + teamId)
+        .then(response => {
+            return response.json();
+        })
+        .then(function(jsonResponse) {
+            document.getElementById("user_delete_team_selector_input").value = jsonResponse["teamName"];
+
+            userFields = document.querySelectorAll(".user_delete");
+            for (var i = 0, userField; userField = userFields[i]; i++) {
+                showElement(userField);
+            }
+            hide("loader");
+        })
+    });
 }
 
 function populateUserOffset(){
@@ -239,8 +271,6 @@ function populateUserOffset(){
     document.getElementById("user_offset_folding_name").value = selectedElement.getAttribute("user_folding_name");
     document.getElementById("user_offset_display_name").value = selectedElement.getAttribute("user_display_name");
     document.getElementById("user_offset_category").value = selectedElement.getAttribute("user_category");
-    document.getElementById("user_offset_hardware_selector").value = selectedElement.getAttribute("user_hardware_id");
-    document.getElementById("user_offset_team_selector").value = selectedElement.getAttribute("user_team_id");
 
     fetch(ROOT_URL+'/stats/users/' + userId)
     .then(response => {
@@ -249,11 +279,29 @@ function populateUserOffset(){
     .then(function(jsonResponse) {
         document.getElementById("user_offset_points").value = jsonResponse['multipliedPoints'];
         document.getElementById("user_offset_units").value = jsonResponse['units'];
-    });
 
-    userFields = document.querySelectorAll(".user_offset");
-    for (var i = 0, userField; userField = userFields[i]; i++) {
-        showElement(userField);
-    }
-    hide("loader");
+        var hardwareId = selectedElement.getAttribute("user_hardware_id");
+        fetch(ROOT_URL+'/hardware/' + hardwareId)
+        .then(response => {
+            return response.json();
+        })
+        .then(function(jsonResponse) {
+            document.getElementById("user_offset_hardware_selector_input").value = jsonResponse["hardwareName"];
+
+            var teamId = selectedElement.getAttribute("user_team_id");
+            fetch(ROOT_URL+'/teams/' + teamId)
+            .then(response => {
+                return response.json();
+            })
+            .then(function(jsonResponse) {
+                document.getElementById("user_offset_team_selector_input").value = jsonResponse["teamName"];
+
+                userFields = document.querySelectorAll(".user_offset");
+                for (var i = 0, userField; userField = userFields[i]; i++) {
+                    showElement(userField);
+                }
+                hide("loader");
+            })
+        });
+    });
 }

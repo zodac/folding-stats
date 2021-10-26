@@ -218,6 +218,14 @@ function loadHardware() {
                 hardwareList.removeChild(hardwareList.lastChild);
             }
 
+            // Add the default entry
+            defaultHardwareOption = document.createElement("option");
+            defaultHardwareOption.setAttribute("value", "");
+            defaultHardwareOption.setAttribute("disabled", "");
+            defaultHardwareOption.setAttribute("selected", "");
+            defaultHardwareOption.innerHTML = "Choose Hardware...";
+            hardwareList.append(defaultHardwareOption);
+
             // Add entries
             jsonResponse.forEach(function(hardwareItem, i) {
                 hardwareOption = document.createElement("option");

@@ -589,16 +589,28 @@
                                        placeholder="Live Stats Link" aria-label="Live Stats Link">
                             </div>
                             <div class="col-auto">
-                                <select id="user_create_hardware_selector" class="form-select hardware_list"
-                                        aria-label="user_create_hardware_selector" required>
+                                <input class="form-control"
+                                       list="user_create_hardware_selector"
+                                       id="user_create_hardware_selector_input"
+                                       placeholder="Type to search..."
+                                       required>
+                                <datalist id="user_create_hardware_selector"
+                                          class="hardware_datalist"
+                                          aria-label="user_create_hardware_selector">
                                     <!-- Will be populated by system.js -->
-                                </select>
+                                </datalist>
                             </div>
                             <div class="col-auto">
-                                <select id="user_create_team_selector" class="form-select team_list"
-                                        aria-label="user_create_team_selector" required>
+                                <input class="form-control"
+                                       list="user_create_team_selector"
+                                       id="user_create_team_selector_input"
+                                       placeholder="Type to search..."
+                                       required>
+                                <datalist id="user_create_team_selector"
+                                          class="team_datalist"
+                                          aria-label="user_create_team_selector">
                                     <!-- Will be populated by system.js -->
-                                </select>
+                                </datalist>
                             </div>
                             <div class="mb-3 form-check">
                                 <label for="user_create_is_captain" class="form-check-label">Team Captain</label>
@@ -673,16 +685,28 @@
                                        placeholder="Live Stats Link" aria-label="Live Stats Link">
                             </div>
                             <div class="col-auto user_update" style="display:none;">
-                                <select id="user_update_hardware_selector" class="form-select hardware_list"
-                                        aria-label="user_update_hardware_selector" required>
+                                <input class="form-control"
+                                       list="user_update_hardware_selector"
+                                       id="user_update_hardware_selector_input"
+                                       placeholder="Type to search..."
+                                       required>
+                                <datalist id="user_update_hardware_selector"
+                                          class="hardware_datalist"
+                                          aria-label="user_update_hardware_selector">
                                     <!-- Will be populated by system.js -->
-                                </select>
+                                </datalist>
                             </div>
                             <div class="col-auto user_update" style="display:none;">
-                                <select id="user_update_team_selector" class="form-select team_list"
-                                        aria-label="user_update_team_selector" required>
+                                <input class="form-control"
+                                       list="user_update_team_selector"
+                                       id="user_update_team_selector_input"
+                                       placeholder="Type to search..."
+                                       required>
+                                <datalist id="user_update_team_selector"
+                                          class="team_datalist"
+                                          aria-label="user_update_team_selector">
                                     <!-- Will be populated by system.js -->
-                                </select>
+                                </datalist>
                             </div>
                             <div class="mb-3 form-check user_update" style="display:none;">
                                 <label for="user_update_is_captain" class="form-check-label">Team Captain</label>
@@ -756,16 +780,28 @@
                                        placeholder="Live Stats Link" aria-label="Live Stats Link" disabled>
                             </div>
                             <div class="col-auto user_delete" style="display:none;">
-                                <select id="user_delete_hardware_selector" class="form-select hardware_list"
-                                        aria-label="user_delete_hardware_selector" disabled>
+                                <input class="form-control"
+                                       list="user_delete_hardware_selector"
+                                       id="user_delete_hardware_selector_input"
+                                       placeholder="Type to search..."
+                                       required>
+                                <datalist id="user_delete_hardware_selector"
+                                          class="hardware_datalist"
+                                          aria-label="user_delete_hardware_selector">
                                     <!-- Will be populated by system.js -->
-                                </select>
+                                </datalist>
                             </div>
                             <div class="col-auto user_delete" style="display:none;">
-                                <select id="user_delete_team_selector" class="form-select team_list"
-                                        aria-label="user_delete_team_selector" disabled>
+                                <input class="form-control"
+                                       list="user_delete_team_selector"
+                                       id="user_delete_team_selector_input"
+                                       placeholder="Type to search..."
+                                       required>
+                                <datalist id="user_delete_team_selector"
+                                          class="team_datalist"
+                                          aria-label="user_delete_team_selector">
                                     <!-- Will be populated by system.js -->
-                                </select>
+                                </datalist>
                             </div>
                             <div class="mb-3 form-check user_delete" style="display:none;">
                                 <label for="user_delete_is_captain" class="form-check-label">Team Captain</label>
@@ -824,16 +860,28 @@
                                 </select>
                             </div>
                             <div class="col-auto user_offset" style="display:none;">
-                                <select id="user_offset_hardware_selector" class="form-select hardware_list"
-                                        aria-label="user_offset_hardware_selector" disabled>
+                                <input class="form-control"
+                                       list="user_offset_hardware_selector"
+                                       id="user_offset_hardware_selector_input"
+                                       placeholder="Type to search..."
+                                       required>
+                                <datalist id="user_offset_hardware_selector"
+                                          class="hardware_datalist"
+                                          aria-label="user_offset_hardware_selector">
                                     <!-- Will be populated by system.js -->
-                                </select>
+                                </datalist>
                             </div>
                             <div class="col-auto user_offset" style="display:none;">
-                                <select id="user_offset_team_selector" class="form-select team_list"
-                                        aria-label="user_offset_team_selector" disabled>
+                                <input class="form-control"
+                                       list="user_offset_team_selector"
+                                       id="user_offset_team_selector_input"
+                                       placeholder="Type to search..."
+                                       required>
+                                <datalist id="user_offset_team_selector"
+                                          class="team_datalist"
+                                          aria-label="user_offset_team_selector">
                                     <!-- Will be populated by system.js -->
-                                </select>
+                                </datalist>
                             </div>
                             <div class="col-auto user_offset" style="display:none;">
                                 <label for="user_offset_points" class="visually-hidden">Points</label>
