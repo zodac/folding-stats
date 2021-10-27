@@ -49,19 +49,6 @@ public class UserTcStats extends UserStats {
     }
 
     /**
-     * Creates an instance of {@link UserTcStats}. Assumes the {@link UserTcStats} were retrieved at {@link DateTimeUtils#currentUtcTimestamp()}.
-     *
-     * @param userId           the ID of the {@link me.zodac.folding.api.tc.User}
-     * @param points           the points
-     * @param multipliedPoints the multiplied points
-     * @param units            the units
-     * @return the created {@link UserTcStats}
-     */
-    public static UserTcStats createNow(final int userId, final long points, final long multipliedPoints, final int units) {
-        return create(userId, DateTimeUtils.currentUtcTimestamp(), points, multipliedPoints, units);
-    }
-
-    /**
      * Creates an empty instance of {@link UserTcStats}, with no values. Can be used where no stats are necessary, but
      * an {@link java.util.Optional} is not clean enough.
      *

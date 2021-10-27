@@ -458,20 +458,17 @@
                     <version>${pitest-maven.version}</version>
                     <configuration>
                         <excludedClasses>
-                            <!-- Default classes to exclude -->
-                            <param>*Exception</param> <!-- Many false positives -->
-                            <!-- Skipping due to inconvenience/false positives/performance -->
                             <param>*Responses</param>
-                            <param>*PostgresDbManager</param>
                         </excludedClasses>
                         <excludedMethods>
-                            <!-- Default methods to exclude -->
-                            <param>toString</param> <!-- Unnecessary to unit test -->
-                            <param>hashCode</param> <!-- Unnecessary to unit test -->
-                            <param>canEqual</param>  <!-- Many false positives -->
-                            <param>equals</param> <!-- Many false positives -->
-                            <param>getInstance</param> <!-- Issues with unit tests on singleton instances -->
+                            <param>canEqual</param>
+                            <param>equals</param>
+                            <param>hashCode</param>
+                            <param>toString</param>
                         </excludedMethods>
+                        <excludedTestClasses>
+                            <param>*PostgresDbManagerTest</param>
+                        </excludedTestClasses>
                         <failWhenNoMutations>false</failWhenNoMutations>
                         <outputFormats>xml,html</outputFormats>
                         <skip>${skip-linters}</skip>

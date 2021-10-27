@@ -265,12 +265,12 @@ traits:
           description: "The team has been retrieved from the system"
           body:
             application/json:
-              example: !include responses/team/teamGet.json
+              example: !include responses/teams/teamGet.json
         400:
           description: "The provided ID is an invalid integer, or out of range"
           body:
             application/json:
-              example: !include responses/team/teamGetBadRequest.json
+              example: !include responses/teams/teamGetBadRequest.json
         404:
           description: "No team exists with the given ID"
         503:
