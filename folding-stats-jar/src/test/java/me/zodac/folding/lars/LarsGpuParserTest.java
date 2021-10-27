@@ -133,6 +133,23 @@ class LarsGpuParserTest {
     }
 
     @Test
+    void zeroRank() throws URISyntaxException, IOException {
+        final LarsGpu inputLarsGpu = LarsGpu.create("displayName", "manufacturer", "modelInfo", 1, 1_000_000L);
+        final Map<String, String> substitutionValues = Map.of(
+            "displayName", inputLarsGpu.getDisplayName(),
+            "manufacturer", inputLarsGpu.getManufacturer(),
+            "modelInfo", inputLarsGpu.getModelInfo(),
+            "rank", "0",
+            "averagePpd", String.valueOf(inputLarsGpu.getAveragePpd())
+        );
+
+        final Document inputHtml = readFromFile("validGpuTemplate.txt", substitutionValues);
+        assertThatThrownBy(() -> LarsGpuParser.parseSingleGpuEntry(inputHtml))
+            .isInstanceOf(LarsParseException.class)
+            .hasMessageContaining(String.format("Unable to use GPU '%s' as it has a rank of '0'", inputLarsGpu.getDisplayName()));
+    }
+
+    @Test
     void negativeRank() throws URISyntaxException, IOException {
         final LarsGpu inputLarsGpu = LarsGpu.create("displayName", "manufacturer", "modelInfo", 1, 1_000_000L);
         final Map<String, String> substitutionValues = Map.of(
@@ -176,6 +193,23 @@ class LarsGpuParserTest {
                 "Expected at least ",
                 "'td' elements"
             );
+    }
+
+    @Test
+    void zeroAveragePpd() throws URISyntaxException, IOException {
+        final LarsGpu inputLarsGpu = LarsGpu.create("displayName", "manufacturer", "modelInfo", 1, 1_000_000L);
+        final Map<String, String> substitutionValues = Map.of(
+            "displayName", inputLarsGpu.getDisplayName(),
+            "manufacturer", inputLarsGpu.getManufacturer(),
+            "modelInfo", inputLarsGpu.getModelInfo(),
+            "rank", String.valueOf(inputLarsGpu.getRank()),
+            "averagePpd", "0"
+        );
+
+        final Document inputHtml = readFromFile("validGpuTemplate.txt", substitutionValues);
+        assertThatThrownBy(() -> LarsGpuParser.parseSingleGpuEntry(inputHtml))
+            .isInstanceOf(LarsParseException.class)
+            .hasMessageContaining(String.format("Unable to use GPU '%s' as it has an averagePpd of '0'", inputLarsGpu.getDisplayName()));
     }
 
     @Test

@@ -52,6 +52,21 @@ public class HistoricStats {
     }
 
     /**
+     * Creates an instance of {@link HistoricStats}.
+     *
+     * <p>
+     * Uses the current {@link ZoneOffset#UTC} {@link LocalDateTime}.
+     *
+     * @param points           the points
+     * @param multipliedPoints the multiplied points
+     * @param units            the units
+     * @return the {@link HistoricStats} instance
+     */
+    public static HistoricStats createNow(final long points, final long multipliedPoints, final int units) {
+        return create(LocalDateTime.now(ZoneOffset.UTC), points, multipliedPoints, units);
+    }
+
+    /**
      * Creates an empty instance of {@link HistoricStats} with default values.
      *
      * @return {@link HistoricStats} with default values

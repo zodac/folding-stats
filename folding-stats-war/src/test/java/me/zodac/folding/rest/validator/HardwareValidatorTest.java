@@ -67,6 +67,33 @@ class HardwareValidatorTest {
     }
 
     @Test
+    void whenValidatingCreate_givenOtherHardwareAlreadyExists_thenSuccessResponseIsReturned() {
+        final Collection<Hardware> allHardware = List.of(Hardware.builder()
+            .hardwareName("anotherName")
+            .displayName("displayName")
+            .hardwareMake(HardwareMake.AMD)
+            .hardwareType(HardwareType.GPU)
+            .multiplier(1.00D)
+            .averagePpd(1L)
+            .build()
+        );
+
+        final HardwareRequest hardware = HardwareRequest.builder()
+            .hardwareName("existingName")
+            .displayName("displayName")
+            .hardwareMake(HardwareMake.AMD.toString())
+            .hardwareType(HardwareType.GPU.toString())
+            .multiplier(1.00D)
+            .averagePpd(1L)
+            .build();
+
+        final ValidationResult<Hardware> response = HardwareValidator.validateCreate(hardware, allHardware);
+
+        assertThat(response.isFailure())
+            .isFalse();
+    }
+
+    @Test
     void whenValidatingCreate_givenHardwareWithNameAlreadyExists_thenFailureResponseIsReturned() {
         final Collection<Hardware> allHardware = List.of(Hardware.builder()
             .hardwareName("existingName")
@@ -621,5 +648,38 @@ class HardwareValidatorTest {
 
         assertThat(response.isFailure())
             .isTrue();
+    }
+
+    @Test
+    void whenValidatingDelete_givenHardwareExistsButIsNotBeingUsedByUser_thenSuccessResponseIsReturned() {
+        final Hardware existingHardware = Hardware.builder()
+            .id(1)
+            .hardwareName("hardwareName")
+            .displayName("displayName")
+            .hardwareMake(HardwareMake.AMD)
+            .hardwareType(HardwareType.GPU)
+            .multiplier(1.00D)
+            .averagePpd(1L)
+            .build();
+
+        final Hardware userHardware = Hardware.builder()
+            .id(2)
+            .hardwareName("hardwareName2")
+            .displayName("displayName2")
+            .hardwareMake(HardwareMake.AMD)
+            .hardwareType(HardwareType.GPU)
+            .multiplier(1.00D)
+            .averagePpd(1L)
+            .build();
+
+        final Collection<User> allUsers = List.of(User.builder()
+            .hardware(userHardware)
+            .build()
+        );
+
+        final ValidationResult<Hardware> response = HardwareValidator.validateDelete(existingHardware, allUsers);
+
+        assertThat(response.isFailure())
+            .isFalse();
     }
 }

@@ -21,8 +21,15 @@ class HistoricStatsTest {
         final int month = Month.JANUARY.getValue();
         final int hour = 1;
         final int minute = 1;
-        
+
         final HistoricStats zero = HistoricStats.create(LocalDateTime.of(year, month, 25, hour, minute), 300L, 3_000L, 30);
+        assertThat(zero.getPoints())
+            .isEqualTo(300L);
+        assertThat(zero.getMultipliedPoints())
+            .isEqualTo(3_000L);
+        assertThat(zero.getUnits())
+            .isEqualTo(30);
+
         final HistoricStats first = HistoricStats.create(LocalDateTime.of(year, month, 1, hour, minute), 500L, 5_000L, 50);
         final HistoricStats second = HistoricStats.create(LocalDateTime.of(year, month, 1, hour, minute), 100L, 1_000L, 10);
         final HistoricStats third = HistoricStats.create(LocalDateTime.of(year, month, 2, hour, minute), 200L, 2_000L, 20);

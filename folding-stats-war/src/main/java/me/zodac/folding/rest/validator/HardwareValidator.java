@@ -72,7 +72,7 @@ public final class HardwareValidator {
         }
 
         final Hardware convertedHardware = Hardware.createWithoutId(hardwareRequest);
-        return ValidationResult.success(convertedHardware);
+        return ValidationResult.successful(convertedHardware);
     }
 
     /**
@@ -123,7 +123,7 @@ public final class HardwareValidator {
         }
 
         final Hardware convertedHardware = Hardware.createWithoutId(hardwareRequest);
-        return ValidationResult.success(convertedHardware);
+        return ValidationResult.successful(convertedHardware);
     }
 
     /**
@@ -140,7 +140,7 @@ public final class HardwareValidator {
             return ValidationResult.usedBy(hardware, usersWithMatchingHardware);
         }
 
-        return ValidationResult.success(hardware);
+        return ValidationResult.successful(hardware);
     }
 
     private static Optional<Hardware> getHardwareWithName(final String hardwareName, final Collection<Hardware> allHardware) {

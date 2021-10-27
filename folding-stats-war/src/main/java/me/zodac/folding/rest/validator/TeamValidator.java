@@ -64,7 +64,7 @@ public final class TeamValidator {
         }
 
         final Team convertedTeam = Team.createWithoutId(teamRequest);
-        return ValidationResult.success(convertedTeam);
+        return ValidationResult.successful(convertedTeam);
     }
 
     /**
@@ -106,7 +106,7 @@ public final class TeamValidator {
         }
 
         final Team convertedTeam = Team.createWithoutId(teamRequest);
-        return ValidationResult.success(convertedTeam);
+        return ValidationResult.successful(convertedTeam);
     }
 
     /**
@@ -123,7 +123,7 @@ public final class TeamValidator {
             return ValidationResult.usedBy(team, usersWithMatchingTeam);
         }
 
-        return ValidationResult.success(team);
+        return ValidationResult.successful(team);
     }
 
     private static Optional<Team> getTeamWithName(final String teamName, final Collection<Team> allTeams) {

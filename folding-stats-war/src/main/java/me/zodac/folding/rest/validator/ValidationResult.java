@@ -28,7 +28,7 @@ import me.zodac.folding.api.ResponsePojo;
 @ToString(doNotUseGetters = true)
 public class ValidationResult<E extends ResponsePojo> {
 
-    private final boolean successful;
+    private final boolean success;
     private final E output;
     private final Response failureResponse;
     private final ValidationFailure validationFailure;
@@ -39,7 +39,7 @@ public class ValidationResult<E extends ResponsePojo> {
      * @return <code>true</code> if the {@link ValidationResult} does not contain a valid object
      */
     public boolean isFailure() {
-        return !successful;
+        return !success;
     }
 
     /**
@@ -58,7 +58,7 @@ public class ValidationResult<E extends ResponsePojo> {
      * @param <E>    the output type of the validated object
      * @return a {@link ValidationResult} with no invalid object and an empty {@link Collection} of errors
      */
-    public static <E extends ResponsePojo> ValidationResult<E> success(final E output) {
+    public static <E extends ResponsePojo> ValidationResult<E> successful(final E output) {
         return new ValidationResult<>(true, output, null, null);
     }
 

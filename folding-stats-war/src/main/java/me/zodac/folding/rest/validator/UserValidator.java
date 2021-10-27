@@ -135,7 +135,7 @@ public final class UserValidator {
                 final User user =
                     User.createWithoutId(userRequest.getFoldingUserName(), userRequest.getDisplayName(), userRequest.getPasskey(), category,
                         userRequest.getProfileLink(), userRequest.getLiveStatsLink(), hardware.get(), team.get(), userRequest.isUserIsCaptain());
-                return ValidationResult.success(user);
+                return ValidationResult.successful(user);
             }
         }
 
@@ -231,7 +231,7 @@ public final class UserValidator {
                 final User user =
                     User.createWithoutId(userRequest.getFoldingUserName(), userRequest.getDisplayName(), userRequest.getPasskey(), category,
                         userRequest.getProfileLink(), userRequest.getLiveStatsLink(), hardware.get(), team.get(), userRequest.isUserIsCaptain());
-                return ValidationResult.success(user);
+                return ValidationResult.successful(user);
             }
         }
 

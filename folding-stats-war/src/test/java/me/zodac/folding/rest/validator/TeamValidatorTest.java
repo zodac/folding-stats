@@ -59,6 +59,27 @@ class TeamValidatorTest {
     }
 
     @Test
+    void whenValidatingCreate_givenOtherTeamAlreadyExists_thenSuccessResponseIsReturned() {
+        final Collection<Team> allTeams = List.of(Team.builder()
+            .teamName("anotherName")
+            .teamDescription("teamDescription")
+            .forumLink("http://www.google.com")
+            .build()
+        );
+
+        final TeamRequest team = TeamRequest.builder()
+            .teamName("existingName")
+            .teamDescription("teamDescription")
+            .forumLink("http://www.google.com")
+            .build();
+
+        final ValidationResult<Team> response = TeamValidator.validateCreate(team, allTeams);
+
+        assertThat(response.isFailure())
+            .isFalse();
+    }
+
+    @Test
     void whenValidatingCreate_givenTeamWithNameAlreadyExists_thenFailureResponseIsReturned() {
         final Collection<Team> allTeams = List.of(Team.builder()
             .teamName("existingName")
@@ -362,5 +383,32 @@ class TeamValidatorTest {
 
         assertThat(response.isFailure())
             .isTrue();
+    }
+
+    @Test
+    void whenValidatingDelete_givenTeamExistsButIsNotBeingUsedByUser_thenSuccessResponseIsReturned() {
+        final Team existingTeam = Team.builder()
+            .id(1)
+            .teamName("teamName")
+            .teamDescription("teamDescription")
+            .forumLink("http://www.google.com")
+            .build();
+
+        final Team userTeam = Team.builder()
+            .id(2)
+            .teamName("teamName2")
+            .teamDescription("teamDescription")
+            .forumLink("http://www.google.com")
+            .build();
+
+        final Collection<User> allUsers = List.of(User.builder()
+            .team(userTeam)
+            .build()
+        );
+
+        final ValidationResult<Team> response = TeamValidator.validateDelete(existingTeam, allUsers);
+
+        assertThat(response.isFailure())
+            .isFalse();
     }
 }
