@@ -21,8 +21,8 @@ function populateHardwareUpdate(){
         document.getElementById("hardware_update_id").value = jsonResponse["id"];
         document.getElementById("hardware_update_name").value = jsonResponse["hardwareName"];
         document.getElementById("hardware_update_display_name").value = jsonResponse["displayName"];
-        document.getElementById("hardware_update_hardware_make").value = jsonResponse["hardwareMake"];
-        document.getElementById("hardware_update_hardware_type").value = jsonResponse["hardwareType"];
+        document.getElementById("hardware_update_hardware_make_input").value = jsonResponse["hardwareMake"];
+        document.getElementById("hardware_update_hardware_type_input").value = jsonResponse["hardwareType"];
         document.getElementById("hardware_update_multiplier").value = jsonResponse["multiplier"];
         document.getElementById("hardware_update_average_ppd").value = jsonResponse["averagePpd"];
     })
@@ -57,8 +57,8 @@ function populateHardwareDelete(){
         document.getElementById("hardware_delete_id").value = jsonResponse["id"];
         document.getElementById("hardware_delete_name").value = jsonResponse["hardwareName"];
         document.getElementById("hardware_delete_display_name").value = jsonResponse["displayName"];
-        document.getElementById("hardware_delete_hardware_make").value = jsonResponse["hardwareMake"];
-        document.getElementById("hardware_delete_hardware_type").value = jsonResponse["hardwareType"];
+        document.getElementById("hardware_delete_hardware_make_input").value = jsonResponse["hardwareMake"];
+        document.getElementById("hardware_delete_hardware_type_input").value = jsonResponse["hardwareType"];
         document.getElementById("hardware_delete_multiplier").value = jsonResponse["multiplier"];
         document.getElementById("hardware_delete_average_ppd").value = jsonResponse["averagePpd"];
     })

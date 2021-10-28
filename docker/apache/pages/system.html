@@ -201,21 +201,29 @@
                                        aria-label="Display Name" required>
                             </div>
                             <div class="col-auto">
-                                <select id="hardware_create_hardware_make" class="form-select"
-                                        aria-label="hardware_create_hardware_make" required>
-                                    <option selected disabled value="">Make</option>
+                                <input class="form-control"
+                                       list="hardware_create_hardware_make"
+                                       id="hardware_create_hardware_make_input"
+                                       placeholder="Type to search..."
+                                       required>
+                                <datalist id="hardware_create_hardware_make"
+                                          aria-label="hardware_create_hardware_make">
                                     <option value="AMD">AMD</option>
                                     <option value="NVIDIA">nVidia</option>
                                     <option value="INTEL">Intel</option>
-                                </select>
+                                </datalist>
                             </div>
                             <div class="col-auto">
-                                <select id="hardware_create_hardware_type" class="form-select"
-                                        aria-label="hardware_create_hardware_type" required>
-                                    <option selected disabled value="">Type</option>
+                                <input class="form-control"
+                                       list="hardware_create_hardware_type"
+                                       id="hardware_create_hardware_type_input"
+                                       placeholder="Type to search..."
+                                       required>
+                                <datalist id="hardware_create_hardware_type"
+                                          aria-label="hardware_create_hardware_type">
                                     <option value="GPU">GPU</option>
                                     <option value="CPU">CPU</option>
-                                </select>
+                                </datalist>
                             </div>
                             <div class="col-auto">
                                 <label for="hardware_create_multiplier" class="visually-hidden">Multiplier</label>
@@ -281,21 +289,29 @@
                                        aria-label="Display Name" required>
                             </div>
                             <div class="col-auto hardware_update" style="display:none;">
-                                <select id="hardware_update_hardware_make" class="form-select"
-                                        aria-label="hardware_update_hardware_make" required>
-                                    <option selected disabled value="">Make</option>
+                                <input class="form-control"
+                                       list="hardware_update_hardware_make"
+                                       id="hardware_update_hardware_make_input"
+                                       placeholder="Type to search..."
+                                       required>
+                                <datalist id="hardware_update_hardware_make"
+                                          aria-label="hardware_update_hardware_make">
                                     <option value="AMD">AMD</option>
                                     <option value="NVIDIA">nVidia</option>
                                     <option value="INTEL">Intel</option>
-                                </select>
+                                </datalist>
                             </div>
                             <div class="col-auto hardware_update" style="display:none;">
-                                <select id="hardware_update_hardware_type" class="form-select"
-                                        aria-label="hardware_update_hardware_type" required>
-                                    <option selected disabled value="">Type</option>
+                                <input class="form-control"
+                                       list="hardware_update_hardware_type"
+                                       id="hardware_update_hardware_type_input"
+                                       placeholder="Type to search..."
+                                       required>
+                                <datalist id="hardware_update_hardware_type"
+                                          aria-label="hardware_update_hardware_type">
                                     <option value="GPU">GPU</option>
                                     <option value="CPU">CPU</option>
-                                </select>
+                                </datalist>
                             </div>
                             <div class="col-auto hardware_update" style="display:none;">
                                 <label for="hardware_update_multiplier" class="visually-hidden">Multiplier</label>
@@ -358,21 +374,29 @@
                                        placeholder="Display Name" aria-label="Display Name" disabled>
                             </div>
                             <div class="col-auto hardware_delete" style="display:none;">
-                                <select id="hardware_delete_hardware_make" class="form-select"
-                                        aria-label="hardware_delete_hardware_make" disabled>
-                                    <option selected disabled value="">Make</option>
+                                <input class="form-control"
+                                       list="hardware_delete_hardware_make"
+                                       id="hardware_delete_hardware_make_input"
+                                       placeholder="Type to search..."
+                                       disabled>
+                                <datalist id="hardware_delete_hardware_make"
+                                          aria-label="hardware_delete_hardware_make">
                                     <option value="AMD">AMD</option>
                                     <option value="NVIDIA">nVidia</option>
                                     <option value="INTEL">Intel</option>
-                                </select>
+                                </datalist>
                             </div>
                             <div class="col-auto hardware_delete" style="display:none;">
-                                <select id="hardware_delete_hardware_type" class="form-select"
-                                        aria-label="hardware_delete_hardware_type" disabled>
-                                    <option selected disabled value="">Type</option>
+                                <input class="form-control"
+                                       list="hardware_delete_hardware_type"
+                                       id="hardware_delete_hardware_type_input"
+                                       placeholder="Type to search..."
+                                       disabled>
+                                <datalist id="hardware_delete_hardware_type"
+                                          aria-label="hardware_delete_hardware_type">
                                     <option value="GPU">GPU</option>
                                     <option value="CPU">CPU</option>
-                                </select>
+                                </datalist>
                             </div>
                             <div class="col-auto hardware_delete" style="display:none;">
                                 <label for="hardware_delete_multiplier" class="visually-hidden">Multiplier</label>
