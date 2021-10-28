@@ -157,7 +157,7 @@ function populateUserUpdate(){
     document.getElementById("user_update_folding_name").value = selectedElement.getAttribute("user_folding_name");
     document.getElementById("user_update_display_name").value = selectedElement.getAttribute("user_display_name");
     document.getElementById("user_update_passkey").value = selectedElement.getAttribute("user_passkey");
-    document.getElementById("user_update_category").value = selectedElement.getAttribute("user_category");
+    document.getElementById("user_update_category_input").value = selectedElement.getAttribute("user_category");
 
     if (selectedElement.getAttribute("user_is_captain") === "true") {
         document.getElementById("user_update_is_captain").checked = true;
@@ -213,7 +213,7 @@ function populateUserDelete(){
     document.getElementById("user_delete_folding_name").value = selectedElement.getAttribute("user_folding_name");
     document.getElementById("user_delete_display_name").value = selectedElement.getAttribute("user_display_name");
     document.getElementById("user_delete_passkey").value = selectedElement.getAttribute("user_passkey");
-    document.getElementById("user_delete_category").value = selectedElement.getAttribute("user_category");
+    document.getElementById("user_delete_category_input").value = selectedElement.getAttribute("user_category");
 
     if (selectedElement.getAttribute("user_is_captain") === "true") {
         document.getElementById("user_delete_is_captain").checked = true;
@@ -270,7 +270,7 @@ function populateUserOffset(){
     document.getElementById("user_offset_id").value = userId;
     document.getElementById("user_offset_folding_name").value = selectedElement.getAttribute("user_folding_name");
     document.getElementById("user_offset_display_name").value = selectedElement.getAttribute("user_display_name");
-    document.getElementById("user_offset_category").value = selectedElement.getAttribute("user_category");
+    document.getElementById("user_offset_category_input").value = selectedElement.getAttribute("user_category");
 
     fetch(ROOT_URL+'/stats/users/' + userId)
     .then(response => {

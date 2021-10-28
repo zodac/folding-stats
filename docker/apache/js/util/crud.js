@@ -319,7 +319,7 @@ function createUser() {
     var foldingUserName = document.getElementById("user_create_folding_name").value.trim();
     var displayName = document.getElementById("user_create_display_name").value.trim();
     var passkey = document.getElementById("user_create_passkey").value.trim();
-    var category = document.getElementById("user_create_category").value.trim();
+    var category = document.getElementById("user_create_category_input").value.trim();
     var profileLink = document.getElementById("user_create_profile_link").value.trim();
     var liveStatsLink = document.getElementById("user_create_live_stats_link").value.trim();
     var hardwareName = document.getElementById("user_create_hardware_selector_input").value.trim();
@@ -378,7 +378,7 @@ function createUser() {
                 document.getElementById("user_create_folding_name").value = '';
                 document.getElementById("user_create_display_name").value = '';
                 document.getElementById("user_create_passkey").value = '';
-                document.getElementById("user_create_category").value = '';
+                document.getElementById("user_create_category_input").value = '';
                 document.getElementById("user_create_profile_link").value = '';
                 document.getElementById("user_create_live_stats_link").value = '';
                 document.getElementById("user_create_hardware_selector_input").value = '';
@@ -406,7 +406,7 @@ function updateUser() {
     var foldingUserName = document.getElementById("user_update_folding_name").value.trim();
     var displayName = document.getElementById("user_update_display_name").value.trim();
     var passkey = document.getElementById("user_update_passkey").value.trim();
-    var category = document.getElementById("user_update_category").value.trim();
+    var category = document.getElementById("user_update_category_input").value.trim();
     var profileLink = document.getElementById("user_update_profile_link").value.trim();
     var liveStatsLink = document.getElementById("user_update_live_stats_link").value.trim();
     var hardwareName = document.getElementById("user_update_hardware_selector_input").value.trim();
@@ -466,7 +466,7 @@ function updateUser() {
                 document.getElementById("user_update_folding_name").value = '';
                 document.getElementById("user_update_display_name").value = '';
                 document.getElementById("user_update_passkey").value = '';
-                document.getElementById("user_update_category").value = '';
+                document.getElementById("user_update_category_input").value = '';
                 document.getElementById("user_update_profile_link").value = '';
                 document.getElementById("user_update_live_stats_link").value = '';
                 document.getElementById("user_update_hardware_selector_input").value = '';
@@ -522,7 +522,7 @@ function deleteUser() {
         document.getElementById("user_delete_folding_name").value = '';
         document.getElementById("user_delete_display_name").value = '';
         document.getElementById("user_delete_passkey").value = '';
-        document.getElementById("user_delete_category").value = '';
+        document.getElementById("user_delete_category_input").value = '';
         document.getElementById("user_delete_profile_link").value = '';
         document.getElementById("user_delete_live_stats_link").value = '';
         document.getElementById("user_delete_hardware_selector_input").value = '';
@@ -596,7 +596,7 @@ function offsetUser() {
             document.getElementById("user_offset_id").value = '';
             document.getElementById("user_offset_folding_name").value = '';
             document.getElementById("user_offset_display_name").value = '';
-            document.getElementById("user_offset_category").value = '';
+            document.getElementById("user_offset_category_input").value = '';
             document.getElementById("user_offset_hardware_selector_input").value = '';
             document.getElementById("user_offset_team_selector_input").value = '';
             document.getElementById("user_offset_points").value = '';

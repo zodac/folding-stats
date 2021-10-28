@@ -154,6 +154,12 @@ For example, first check the available volumes:
 Then create a simple container, attaching the `folding-stats_wildfly_logs` volume (in read-only mode):
 
     docker container create --name dummy -v folding-stats_wildfly_logs:/root:ro folding-stats_wildfly
+
+We can then copy the logs from the `dummy` container to our host:
+
     docker cp dummy:/root/server.log ./server.log
     docker cp dummy:/root/audit.log ./audit.log
+
+And finally remove the `dummy` container:
+
     docker rm dummy

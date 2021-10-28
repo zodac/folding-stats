@@ -204,7 +204,7 @@
                                 <input class="form-control"
                                        list="hardware_create_hardware_make"
                                        id="hardware_create_hardware_make_input"
-                                       placeholder="Type to search..."
+                                       placeholder="Hardware Make"
                                        required>
                                 <datalist id="hardware_create_hardware_make"
                                           aria-label="hardware_create_hardware_make">
@@ -217,7 +217,7 @@
                                 <input class="form-control"
                                        list="hardware_create_hardware_type"
                                        id="hardware_create_hardware_type_input"
-                                       placeholder="Type to search..."
+                                       placeholder="Hardware Type"
                                        required>
                                 <datalist id="hardware_create_hardware_type"
                                           aria-label="hardware_create_hardware_type">
@@ -263,7 +263,7 @@
                                        list="hardware_update_selector"
                                        id="hardware_update_selector_input"
                                        onchange="populateHardwareUpdate();"
-                                       placeholder="Type to search...">
+                                       placeholder="Search for hardware...">
                                 <datalist id="hardware_update_selector"
                                           class="hardware_datalist"
                                           aria-label="hardware_update_list"
@@ -292,7 +292,7 @@
                                 <input class="form-control"
                                        list="hardware_update_hardware_make"
                                        id="hardware_update_hardware_make_input"
-                                       placeholder="Type to search..."
+                                       placeholder="Hardware Make"
                                        required>
                                 <datalist id="hardware_update_hardware_make"
                                           aria-label="hardware_update_hardware_make">
@@ -305,7 +305,7 @@
                                 <input class="form-control"
                                        list="hardware_update_hardware_type"
                                        id="hardware_update_hardware_type_input"
-                                       placeholder="Type to search..."
+                                       placeholder="Hardware Type"
                                        required>
                                 <datalist id="hardware_update_hardware_type"
                                           aria-label="hardware_update_hardware_type">
@@ -350,7 +350,7 @@
                                        list="hardware_delete_selector"
                                        id="hardware_delete_selector_input"
                                        onchange="populateHardwareDelete();"
-                                       placeholder="Type to search...">
+                                       placeholder="Search for hardware...">
                                 <datalist id="hardware_delete_selector"
                                           class="hardware_datalist"
                                           aria-label="hardware_delete_list"
@@ -377,7 +377,7 @@
                                 <input class="form-control"
                                        list="hardware_delete_hardware_make"
                                        id="hardware_delete_hardware_make_input"
-                                       placeholder="Type to search..."
+                                       placeholder="Hardware Make"
                                        disabled>
                                 <datalist id="hardware_delete_hardware_make"
                                           aria-label="hardware_delete_hardware_make">
@@ -390,7 +390,7 @@
                                 <input class="form-control"
                                        list="hardware_delete_hardware_type"
                                        id="hardware_delete_hardware_type_input"
-                                       placeholder="Type to search..."
+                                       placeholder="Hardware Type"
                                        disabled>
                                 <datalist id="hardware_delete_hardware_type"
                                           aria-label="hardware_delete_hardware_type">
@@ -477,7 +477,7 @@
                                        list="team_update_selector"
                                        id="team_update_selector_input"
                                        onchange="populateTeamUpdate();"
-                                       placeholder="Type to search...">
+                                       placeholder="Search for team...">
                                 <datalist id="team_update_selector"
                                           class="team_datalist"
                                           aria-label="team_update_list"
@@ -532,7 +532,7 @@
                                        list="team_delete_selector"
                                        id="team_delete_selector_input"
                                        onchange="populateTeamDelete();"
-                                       placeholder="Type to search...">
+                                       placeholder="Search for team...">
                                 <datalist id="team_delete_selector"
                                           class="team_datalist"
                                           aria-label="team_delete_list"
@@ -606,13 +606,17 @@
                                        minlength="32" placeholder="Passkey" aria-label="Passkey" required>
                             </div>
                             <div class="col-auto">
-                                <select id="user_create_category" class="form-select"
-                                        aria-label="user_create_category_list" required>
-                                    <option selected disabled value="">Category</option>
+                                <input class="form-control"
+                                       list="user_create_category"
+                                       id="user_create_category_input"
+                                       placeholder="Category"
+                                       required>
+                                <datalist id="user_create_category"
+                                          aria-label="user_create_category">
                                     <option value="AMD GPU">AMD GPU</option>
                                     <option value="nVidia GPU">nVidia GPU</option>
                                     <option value="Wildcard">Wildcard</option>
-                                </select>
+                                </datalist>
                             </div>
                             <div class="col">
                                 <label for="user_create_profile_link" class="visually-hidden">Profile Link</label>
@@ -628,7 +632,7 @@
                                 <input class="form-control"
                                        list="user_create_hardware_selector"
                                        id="user_create_hardware_selector_input"
-                                       placeholder="Type to search..."
+                                       placeholder="Search for hardware..."
                                        required>
                                 <datalist id="user_create_hardware_selector"
                                           class="hardware_datalist"
@@ -640,7 +644,7 @@
                                 <input class="form-control"
                                        list="user_create_team_selector"
                                        id="user_create_team_selector_input"
-                                       placeholder="Type to search..."
+                                       placeholder="Search for team..."
                                        required>
                                 <datalist id="user_create_team_selector"
                                           class="team_datalist"
@@ -702,13 +706,17 @@
                                        minlength="32" placeholder="Passkey" aria-label="Passkey" required>
                             </div>
                             <div class="col-auto user_update" style="display:none;">
-                                <select id="user_update_category" class="form-select"
-                                        aria-label="user_update_category_list" required>
-                                    <option selected disabled value="">Category</option>
+                                <input class="form-control"
+                                       list="user_update_category"
+                                       id="user_update_category_input"
+                                       placeholder="Category"
+                                       required>
+                                <datalist id="user_update_category"
+                                          aria-label="user_update_category">
                                     <option value="AMD GPU">AMD GPU</option>
                                     <option value="nVidia GPU">nVidia GPU</option>
                                     <option value="Wildcard">Wildcard</option>
-                                </select>
+                                </datalist>
                             </div>
                             <div class="col user_update" style="display:none;">
                                 <label for="user_update_profile_link" class="visually-hidden">Profile Link</label>
@@ -724,7 +732,7 @@
                                 <input class="form-control"
                                        list="user_update_hardware_selector"
                                        id="user_update_hardware_selector_input"
-                                       placeholder="Type to search..."
+                                       placeholder="Search for hardware..."
                                        required>
                                 <datalist id="user_update_hardware_selector"
                                           class="hardware_datalist"
@@ -736,7 +744,7 @@
                                 <input class="form-control"
                                        list="user_update_team_selector"
                                        id="user_update_team_selector_input"
-                                       placeholder="Type to search..."
+                                       placeholder="Search for team..."
                                        required>
                                 <datalist id="user_update_team_selector"
                                           class="team_datalist"
@@ -797,13 +805,17 @@
                                        minlength="32" placeholder="Passkey" aria-label="Passkey" required disabled>
                             </div>
                             <div class="col-auto user_delete" style="display:none;">
-                                <select id="user_delete_category" class="form-select"
-                                        aria-label="user_delete_category_list" required disabled>
-                                    <option selected disabled value="">Category</option>
+                                <input class="form-control"
+                                       list="user_delete_category"
+                                       id="user_delete_category_input"
+                                       placeholder="Category"
+                                       disabled>
+                                <datalist id="user_delete_category"
+                                          aria-label="user_delete_category">
                                     <option value="AMD GPU">AMD GPU</option>
                                     <option value="nVidia GPU">nVidia GPU</option>
                                     <option value="Wildcard">Wildcard</option>
-                                </select>
+                                </datalist>
                             </div>
                             <div class="col user_delete" style="display:none;">
                                 <label for="user_delete_profile_link" class="visually-hidden">Profile Link</label>
@@ -819,7 +831,7 @@
                                 <input class="form-control"
                                        list="user_delete_hardware_selector"
                                        id="user_delete_hardware_selector_input"
-                                       placeholder="Type to search..."
+                                       placeholder="Search for hardware..."
                                        required>
                                 <datalist id="user_delete_hardware_selector"
                                           class="hardware_datalist"
@@ -831,7 +843,7 @@
                                 <input class="form-control"
                                        list="user_delete_team_selector"
                                        id="user_delete_team_selector_input"
-                                       placeholder="Type to search..."
+                                       placeholder="Search for team..."
                                        required>
                                 <datalist id="user_delete_team_selector"
                                           class="team_datalist"
@@ -887,20 +899,24 @@
                                        placeholder="Display Name" aria-label="Display Name" required disabled>
                             </div>
                             <div class="col-auto user_offset" style="display:none;">
-                                <select id="user_offset_category" class="form-select"
-                                        aria-label="user_offset_category" required disabled>
-                                    <option selected disabled value="">Category</option>
+                                <input class="form-control"
+                                       list="user_offset_category"
+                                       id="user_offset_category_input"
+                                       placeholder="Category"
+                                       disabled>
+                                <datalist id="user_offset_category"
+                                          aria-label="user_offset_category">
                                     <option value="AMD GPU">AMD GPU</option>
                                     <option value="nVidia GPU">nVidia GPU</option>
                                     <option value="Wildcard">Wildcard</option>
-                                </select>
+                                </datalist>
                             </div>
                             <div class="col-auto user_offset" style="display:none;">
                                 <input class="form-control"
                                        list="user_offset_hardware_selector"
                                        id="user_offset_hardware_selector_input"
-                                       placeholder="Type to search..."
-                                       required>
+                                       placeholder="Search for hardware..."
+                                       disabled>
                                 <datalist id="user_offset_hardware_selector"
                                           class="hardware_datalist"
                                           aria-label="user_offset_hardware_selector">
@@ -911,8 +927,8 @@
                                 <input class="form-control"
                                        list="user_offset_team_selector"
                                        id="user_offset_team_selector_input"
-                                       placeholder="Type to search..."
-                                       required>
+                                       placeholder="Search for team..."
+                                       disabled>
                                 <datalist id="user_offset_team_selector"
                                           class="team_datalist"
                                           aria-label="user_offset_team_selector">
