@@ -59,6 +59,7 @@ import org.apache.logging.log4j.Logger;
 public class UserEndpoint {
 
     private static final Logger LOGGER = LogManager.getLogger();
+    private static final UserValidator USER_VALIDATOR = UserValidator.create();
 
     @Context
     private UriInfo uriContext;
@@ -328,12 +329,21 @@ public class UserEndpoint {
     }
 
     private ValidationResult<User> validateCreate(final UserRequest userRequest) {
-        return UserValidator.validateCreate(userRequest, businessLogic.getAllUsersWithPasskeys(), businessLogic.getAllHardware(),
-            businessLogic.getAllTeams());
+        return USER_VALIDATOR.validateCreate(
+            userRequest,
+            businessLogic.getAllUsersWithPasskeys(),
+            businessLogic.getAllHardware(),
+            businessLogic.getAllTeams()
+        );
     }
 
     private ValidationResult<User> validateUpdate(final UserRequest userRequest, final User existingUser) {
-        return UserValidator.validateUpdate(userRequest, existingUser, businessLogic.getAllUsersWithPasskeys(), businessLogic.getAllHardware(),
-            businessLogic.getAllTeams());
+        return USER_VALIDATOR.validateUpdate(
+            userRequest,
+            existingUser,
+            businessLogic.getAllUsersWithPasskeys(),
+            businessLogic.getAllHardware(),
+            businessLogic.getAllTeams()
+        );
     }
 }

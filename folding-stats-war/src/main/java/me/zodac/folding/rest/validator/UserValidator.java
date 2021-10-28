@@ -18,23 +18,44 @@ import me.zodac.folding.rest.api.tc.request.UserRequest;
 import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.UrlValidator;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * Validator class to validate a {@link User} or {@link UserRequest}.
  */
-// TODO: [zodac] In severe need of a clean up. Write tests for the validators first though, because you're a moron
+// TODO: [zodac] In severe need of a clean up
 // TODO: [zodac] Validate the linked hardware matches the user's category
+// TODO: [zodac] Update passkey check to a regex of 32 alpha-numeric characters
 public final class UserValidator {
 
-    private static final Logger LOGGER = LogManager.getLogger();
     private static final UrlValidator URL_VALIDATOR = new UrlValidator();
     private static final int EXPECTED_PASSKEY_LENGTH = 32;
-    private static final FoldingStatsRetriever HTTP_FOLDING_STATS_RETRIEVER = HttpFoldingStatsRetriever.create();
 
-    private UserValidator() {
+    private final FoldingStatsRetriever foldingStatsRetriever;
 
+    private UserValidator(final FoldingStatsRetriever foldingStatsRetriever) {
+        this.foldingStatsRetriever = foldingStatsRetriever;
+    }
+
+    /**
+     * Create an instance of {@link UserValidator}.
+     *
+     * @param foldingStatsRetriever the {@link FoldingStatsRetriever} to verify the user stats
+     * @return the created {@link UserValidator}
+     */
+    public static UserValidator createWithFoldingStatsRetriever(final FoldingStatsRetriever foldingStatsRetriever) {
+        return new UserValidator(foldingStatsRetriever);
+    }
+
+    /**
+     * Create an instance of {@link UserValidator}.
+     *
+     * <p>
+     * Uses an instance of {@link HttpFoldingStatsRetriever}.
+     *
+     * @return the created {@link UserValidator}
+     */
+    public static UserValidator create() {
+        return new UserValidator(HttpFoldingStatsRetriever.create());
     }
 
     /**
@@ -51,20 +72,15 @@ public final class UserValidator {
      * @return the {@link ValidationResult}
      */
     @SuppressWarnings("PMD.NPathComplexity") // Better than breaking into smaller functions
-    public static ValidationResult<User> validateCreate(final UserRequest userRequest,
-                                                        final Collection<User> allUsers,
-                                                        final Collection<Hardware> allHardware,
-                                                        final Collection<Team> allTeams) {
+    public ValidationResult<User> validateCreate(final UserRequest userRequest,
+                                                 final Collection<User> allUsers,
+                                                 final Collection<Hardware> allHardware,
+                                                 final Collection<Team> allTeams) {
         if (userRequest == null) {
             return ValidationResult.nullObject();
         }
 
         final List<String> failureMessages = new ArrayList<>();
-
-        final Category category = Category.get(userRequest.getCategory());
-        if (Category.INVALID == category) {
-            failureMessages.add(String.format("Field 'category' must be one of: %s", Category.getAllValues()));
-        }
 
         if (StringUtils.isBlank(userRequest.getFoldingUserName())) {
             failureMessages.add("Field 'foldingUserName' must not be empty");
@@ -72,6 +88,14 @@ public final class UserValidator {
 
         if (StringUtils.isBlank(userRequest.getPasskey())) {
             failureMessages.add("Field 'passkey' must not be empty");
+        } else {
+            if (userRequest.getPasskey().length() != EXPECTED_PASSKEY_LENGTH) {
+                failureMessages.add(String.format("Field 'passkey' must be %d characters in length", EXPECTED_PASSKEY_LENGTH));
+            }
+
+            if (userRequest.getPasskey().contains("*")) {
+                failureMessages.add("Field 'passkey' cannot contain '*' characters");
+            }
         }
 
         // If foldingUserName and passkey are valid, ensure they don't already exist
@@ -88,12 +112,9 @@ public final class UserValidator {
             failureMessages.add("Field 'displayName' must not be empty");
         }
 
-        if (userRequest.getPasskey().contains("*")) {
-            failureMessages.add("Field 'passkey' cannot contain '*' characters");
-        }
-
-        if (userRequest.getPasskey().length() != EXPECTED_PASSKEY_LENGTH) {
-            failureMessages.add("Field 'passkey' must be 32 characters in length");
+        final Category category = Category.get(userRequest.getCategory());
+        if (Category.INVALID == category) {
+            failureMessages.add(String.format("Field 'category' must be one of: %s", Category.getAllValues()));
         }
 
         if (StringUtils.isNotEmpty(userRequest.getProfileLink()) && !URL_VALIDATOR.isValid(userRequest.getProfileLink())) {
@@ -124,6 +145,7 @@ public final class UserValidator {
         }
 
         if (failureMessages.isEmpty()) {
+            // TODO: [zodac] Would have been retrieved earlier, find a way to reuse it
             final Optional<Hardware> hardware = getHardware(userRequest.getHardwareId(), allHardware);
             final Optional<Team> team = getTeam(userRequest.getTeamId(), allTeams);
 
@@ -157,11 +179,11 @@ public final class UserValidator {
      * @return the {@link ValidationResult}
      */
     @SuppressWarnings("PMD.NPathComplexity") // Better than breaking into smaller functions
-    public static ValidationResult<User> validateUpdate(final UserRequest userRequest,
-                                                        final User existingUser,
-                                                        final Collection<User> allUsers,
-                                                        final Collection<Hardware> allHardware,
-                                                        final Collection<Team> allTeams) {
+    public ValidationResult<User> validateUpdate(final UserRequest userRequest,
+                                                 final User existingUser,
+                                                 final Collection<User> allUsers,
+                                                 final Collection<Hardware> allHardware,
+                                                 final Collection<Team> allTeams) {
         if (userRequest == null) {
             return ValidationResult.nullObject();
         }
@@ -264,10 +286,10 @@ public final class UserValidator {
         return Collections.emptyList();
     }
 
-    private static List<String> validateUserUnits(final UserRequest userRequest) {
+    private List<String> validateUserUnits(final UserRequest userRequest) {
         try {
             final FoldingStatsDetails foldingStatsDetails = FoldingStatsDetails.create(userRequest.getFoldingUserName(), userRequest.getPasskey());
-            final Stats statsForUserAndPasskey = HTTP_FOLDING_STATS_RETRIEVER.getStats(foldingStatsDetails);
+            final Stats statsForUserAndPasskey = foldingStatsRetriever.getStats(foldingStatsDetails);
 
             if (statsForUserAndPasskey.getUnits() == 0) {
                 return List.of(String.format(
@@ -276,8 +298,7 @@ public final class UserValidator {
                 ));
             }
         } catch (final Exception e) { // TODO: [zodac] Handle ExternalConnectionException here, otherwise will return 400 response instead of 502
-            LOGGER.warn("Unable to get Folding stats for user {}", userRequest, e);
-            return List.of("Unable to check stats for user");
+            return List.of(String.format("Unable to check stats for user '%s': %s", userRequest.getDisplayName(), e.getMessage()));
         }
 
         return Collections.emptyList();
@@ -288,8 +309,8 @@ public final class UserValidator {
                                                                final User existingUser,
                                                                final Collection<User> allUsers,
                                                                final Collection<Team> allTeams) {
+        // TODO: [zodac] We should have this team already
         final Optional<Team> team = getTeam(userRequest.getTeamId(), allTeams);
-
         if (team.isEmpty()) {
             return List.of(String.format("Unable to retrieve team with ID '%s'", userRequest.getTeamId()));
         }
@@ -300,34 +321,34 @@ public final class UserValidator {
         if (userRequest.isUserIsCaptain()) {
             for (final User existingUserOnTeam : usersOnTeam) {
                 if (existingUserOnTeam.isUserIsCaptain()) {
-                    failureMessages.add(String.format("Team '%s' already has a captain (%s), cannot have multiple captains", team.get().getTeamName(),
-                        userRequest.getDisplayName()));
+                    failureMessages.add(String.format("Team '%s' already has a captain '%s', cannot have multiple captains", team.get().getTeamName(),
+                        existingUserOnTeam.getDisplayName()));
                 }
             }
         }
 
         // What the hell, man? Who approved this?
         if (existingUser == null) { // Create
-            if (usersOnTeam.size() >= Category.maximumPermittedAmountForAllCategories()) {
+            if (usersOnTeam.size() == Category.maximumPermittedAmountForAllCategories()) {
                 failureMessages.add(String.format("Team '%s' has %s users, maximum permitted is %s", team.get().getTeamName(), usersOnTeam.size(),
                     Category.maximumPermittedAmountForAllCategories()));
             }
 
             final int permittedNumberForCategory = category.permittedUsers();
-            final int numberOfUsersInTeamWithCategory = (int) usersOnTeam
+            final long numberOfUsersInTeamWithCategory = usersOnTeam
                 .stream()
                 .filter(user -> user.getCategory() == category)
                 .count();
 
-            if (numberOfUsersInTeamWithCategory >= permittedNumberForCategory) {
-                failureMessages.add(String.format("Found %s users of category '%s', only %s permitted", numberOfUsersInTeamWithCategory, category,
-                    permittedNumberForCategory));
+            if (numberOfUsersInTeamWithCategory == permittedNumberForCategory) {
+                failureMessages.add(String.format("Team '%s' already has %s users in category '%s', only %s permitted", team.get().getTeamName(),
+                    numberOfUsersInTeamWithCategory, category, permittedNumberForCategory));
             }
         } else {
             // isUpdate
             if (category != existingUser.getCategory()) {
                 final int permittedNumberForCategory = category.permittedUsers();
-                final int numberOfUsersInTeamWithCategory = (int) usersOnTeam
+                final long numberOfUsersInTeamWithCategory = usersOnTeam
                     .stream()
                     .filter(user -> user.getId() != existingUser.getId() && user.getCategory() == category)
                     .count();
