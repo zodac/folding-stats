@@ -260,27 +260,28 @@ public final class UserValidator {
         return ValidationResult.failure(userRequest, failureMessages);
     }
 
-    private static List<String> validateTeam(final UserRequest userRequest, final Collection<Team> allTeams) {
-        if (userRequest.getTeamId() <= Team.EMPTY_TEAM_ID || getTeam(userRequest.getTeamId(), allTeams).isEmpty()) {
-            final List<String> availableTeams = allTeams
-                .stream()
-                .map(team -> String.format("%s: %s", team.getId(), team.getTeamName()))
-                .collect(toList());
-
-            return List.of(String.format("Field 'teamId' must be one of: %s", availableTeams));
-        }
-
-        return Collections.emptyList();
-    }
-
+    // TODO: [zodac] New error message if no hardware or team exists on system?
     private static List<String> validateHardware(final UserRequest userRequest, final Collection<Hardware> allHardware) {
-        if (userRequest.getHardwareId() <= Hardware.EMPTY_HARDWARE_ID || getHardware(userRequest.getHardwareId(), allHardware).isEmpty()) {
+        if (getHardware(userRequest.getHardwareId(), allHardware).isEmpty()) {
             final List<String> availableHardware = allHardware
                 .stream()
                 .map(hardware -> String.format("%s: %s", hardware.getId(), hardware.getHardwareName()))
                 .collect(toList());
 
             return List.of(String.format("Field 'hardwareId' must be one of: %s", availableHardware));
+        }
+
+        return Collections.emptyList();
+    }
+
+    private static List<String> validateTeam(final UserRequest userRequest, final Collection<Team> allTeams) {
+        if (getTeam(userRequest.getTeamId(), allTeams).isEmpty()) {
+            final List<String> availableTeams = allTeams
+                .stream()
+                .map(team -> String.format("%s: %s", team.getId(), team.getTeamName()))
+                .collect(toList());
+
+            return List.of(String.format("Field 'teamId' must be one of: %s", availableTeams));
         }
 
         return Collections.emptyList();

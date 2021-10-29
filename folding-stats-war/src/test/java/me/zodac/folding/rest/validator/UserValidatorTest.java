@@ -70,7 +70,7 @@ class UserValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Payload is null");
+            .containsOnly("Payload is null");
     }
 
     @Test
@@ -101,7 +101,7 @@ class UserValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains(String.format("Field 'category' must be one of: %s", Category.getAllValues()));
+            .containsOnly(String.format("Field 'category' must be one of: %s", Category.getAllValues()));
     }
 
     @Test
@@ -132,7 +132,7 @@ class UserValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'foldingUserName' must not be empty");
+            .containsOnly("Field 'foldingUserName' must not be empty");
     }
 
     @Test
@@ -163,7 +163,7 @@ class UserValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'displayName' must not be empty");
+            .containsOnly("Field 'displayName' must not be empty");
     }
 
     @Test
@@ -194,7 +194,7 @@ class UserValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'passkey' must not be empty");
+            .containsOnly("Field 'passkey' must not be empty");
     }
 
     @Test
@@ -225,7 +225,7 @@ class UserValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'passkey' must be 32 characters in length");
+            .containsOnly("Field 'passkey' must be 32 characters in length");
     }
 
     @Test
@@ -256,7 +256,7 @@ class UserValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'passkey' cannot contain '*' characters");
+            .containsOnly("Field 'passkey' cannot contain '*' characters");
     }
 
     @Test
@@ -315,7 +315,7 @@ class UserValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'profileLink' is not a valid link: 'invalidUrl'");
+            .containsOnly("Field 'profileLink' is not a valid link: 'invalidUrl'");
     }
 
     @Test
@@ -374,7 +374,7 @@ class UserValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'liveStatsLink' is not a valid link: 'invalidUrl'");
+            .containsOnly("Field 'liveStatsLink' is not a valid link: 'invalidUrl'");
     }
 
     @Test
@@ -464,69 +464,7 @@ class UserValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Payload conflicts with an existing object on: [foldingUserName, passkey]");
-    }
-
-    @Test
-    void whenValidatingCreate_givenUserWithHardwareWithIdOfZero_thenFailureResponseIsReturned() {
-        final Hardware hardware = generateHardware();
-        final Team team = generateTeam();
-
-        final UserRequest user = UserRequest.builder()
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU.toString())
-            .profileLink("http://www.google.com")
-            .liveStatsLink("http://www.google.com")
-            .userIsCaptain(true)
-            .hardwareId(0)
-            .teamId(team.getId())
-            .build();
-
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateCreate(user,
-            Collections.emptyList(),
-            List.of(hardware),
-            List.of(team)
-        );
-
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
-            .contains(String.format("Field 'hardwareId' must be one of: [%s: %s]", hardware.getId(), hardware.getHardwareName()));
-    }
-
-    @Test
-    void whenValidatingCreate_givenUserWithHardwareWithNegativeId_thenFailureResponseIsReturned() {
-        final Hardware hardware = generateHardware();
-        final Team team = generateTeam();
-
-        final UserRequest user = UserRequest.builder()
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU.toString())
-            .profileLink("http://www.google.com")
-            .liveStatsLink("http://www.google.com")
-            .userIsCaptain(true)
-            .hardwareId(-1)
-            .teamId(team.getId())
-            .build();
-
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateCreate(user,
-            Collections.emptyList(),
-            List.of(hardware),
-            List.of(team)
-        );
-
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
-            .contains(String.format("Field 'hardwareId' must be one of: [%s: %s]", hardware.getId(), hardware.getHardwareName()));
+            .containsOnly("Payload conflicts with an existing object on: [foldingUserName, passkey]");
     }
 
     @Test
@@ -557,69 +495,7 @@ class UserValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains(String.format("Field 'hardwareId' must be one of: [%s: %s]", hardware.getId(), hardware.getHardwareName()));
-    }
-
-    @Test
-    void whenValidatingCreate_givenUserWithTeamWithIdOfZero_thenFailureResponseIsReturned() {
-        final Hardware hardware = generateHardware();
-        final Team team = generateTeam();
-
-        final UserRequest user = UserRequest.builder()
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU.toString())
-            .profileLink("http://www.google.com")
-            .liveStatsLink("http://www.google.com")
-            .userIsCaptain(true)
-            .hardwareId(hardware.getId())
-            .teamId(0)
-            .build();
-
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateCreate(user,
-            Collections.emptyList(),
-            List.of(hardware),
-            List.of(team)
-        );
-
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
-            .contains(String.format("Field 'teamId' must be one of: [%s: %s]", team.getId(), team.getTeamName()));
-    }
-
-    @Test
-    void whenValidatingCreate_givenUserWithTeamWithNegativeId_thenFailureResponseIsReturned() {
-        final Hardware hardware = generateHardware();
-        final Team team = generateTeam();
-
-        final UserRequest user = UserRequest.builder()
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU.toString())
-            .profileLink("http://www.google.com")
-            .liveStatsLink("http://www.google.com")
-            .userIsCaptain(true)
-            .hardwareId(hardware.getId())
-            .teamId(-1)
-            .build();
-
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateCreate(user,
-            Collections.emptyList(),
-            List.of(hardware),
-            List.of(team)
-        );
-
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
-            .contains(String.format("Field 'teamId' must be one of: [%s: %s]", team.getId(), team.getTeamName()));
+            .containsOnly(String.format("Field 'hardwareId' must be one of: [%s: %s]", hardware.getId(), hardware.getHardwareName()));
     }
 
     @Test
@@ -650,7 +526,7 @@ class UserValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains(String.format("Field 'teamId' must be one of: [%s: %s]", team.getId(), team.getTeamName()));
+            .containsOnly(String.format("Field 'teamId' must be one of: [%s: %s]", team.getId(), team.getTeamName()));
     }
 
     @Test
@@ -693,7 +569,7 @@ class UserValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains(String.format("Team '%s' already has a captain '%s', cannot have multiple captains",
+            .containsOnly(String.format("Team '%s' already has a captain '%s', cannot have multiple captains",
                 team.getTeamName(), currentCaptain.getDisplayName()));
     }
 
@@ -743,8 +619,55 @@ class UserValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains(String.format("Team '%s' has %s users, maximum permitted is %s", team.getTeamName(), usersOnTeam.size(),
+            .containsOnly(String.format("Team '%s' has %s users, maximum permitted is %s", team.getTeamName(), usersOnTeam.size(),
                 Category.maximumPermittedAmountForAllCategories()));
+    }
+
+    @Test
+    void whenValidatingCreate_givenTeamAlreadyHasUsersInAnotherCategory_thenSuccessResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
+
+        final List<User> usersOnTeamInCategory = new ArrayList<>(Category.NVIDIA_GPU.permittedUsers());
+
+        for (int i = 0; i < Category.NVIDIA_GPU.permittedUsers(); i++) {
+            usersOnTeamInCategory.add(
+                User.builder()
+                    .foldingUserName("user" + 0)
+                    .displayName("user" + 0)
+                    .passkey("DummyPasskey12345678901234567891")
+                    .category(Category.NVIDIA_GPU)
+                    .profileLink("http://www.google.com")
+                    .liveStatsLink("http://www.google.com")
+                    .userIsCaptain(false)
+                    .hardware(hardware)
+                    .team(team)
+                    .build()
+            );
+        }
+
+        final UserRequest user = UserRequest.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.AMD_GPU.toString())
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardwareId(hardware.getId())
+            .teamId(team.getId())
+            .build();
+
+        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final ValidationResult<User> response = userValidator.validateCreate(user,
+            usersOnTeamInCategory,
+            List.of(hardware),
+            List.of(team)
+        );
+
+        assertThat(response.isFailure())
+            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
+            .isFalse();
     }
 
     @Test
@@ -793,7 +716,7 @@ class UserValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains(String.format("Team '%s' already has %s users in category '%s', only %s permitted", team.getTeamName(),
+            .containsOnly(String.format("Team '%s' already has %s users in category '%s', only %s permitted", team.getTeamName(),
                 usersOnTeamInCategory.size(), Category.NVIDIA_GPU, Category.NVIDIA_GPU.permittedUsers()));
     }
 
@@ -825,7 +748,7 @@ class UserValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("User 'user' has 0 Work Units with passkey 'DummyPasskey12345678901234567890', "
+            .containsOnly("User 'user' has 0 Work Units with passkey 'DummyPasskey12345678901234567890', "
                 + "there must be at least one completed Work Unit before adding the user");
     }
 
@@ -857,7 +780,7 @@ class UserValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Unable to check stats for user 'user': Error connecting");
+            .containsOnly("Unable to check stats for user 'user': Error connecting");
     }
 
     private static Hardware generateHardware() {

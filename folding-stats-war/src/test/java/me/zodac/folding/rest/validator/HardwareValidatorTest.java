@@ -43,7 +43,7 @@ class HardwareValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Payload is null");
+            .containsOnly("Payload is null");
     }
 
     @Test
@@ -63,7 +63,7 @@ class HardwareValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'hardwareName' must not be empty");
+            .containsOnly("Field 'hardwareName' must not be empty");
     }
 
     @Test
@@ -120,7 +120,7 @@ class HardwareValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Payload conflicts with an existing object on: [hardwareName]");
+            .containsOnly("Payload conflicts with an existing object on: [hardwareName]");
     }
 
     @Test
@@ -140,7 +140,7 @@ class HardwareValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'displayName' must not be empty");
+            .containsOnly("Field 'displayName' must not be empty");
     }
 
     @Test
@@ -160,7 +160,7 @@ class HardwareValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'hardwareMake' must be one of: " + HardwareMake.getAllValues());
+            .containsOnly("Field 'hardwareMake' must be one of: " + HardwareMake.getAllValues());
     }
 
     @Test
@@ -180,7 +180,7 @@ class HardwareValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'hardwareType' must be one of: " + HardwareType.getAllValues());
+            .containsOnly("Field 'hardwareType' must be one of: " + HardwareType.getAllValues());
     }
 
     @Test
@@ -200,7 +200,7 @@ class HardwareValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'multiplier' must be 1.00 or higher");
+            .containsOnly("Field 'multiplier' must be 1.00 or higher");
     }
 
     @Test
@@ -220,7 +220,7 @@ class HardwareValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'averagePpd' must be 1 or higher");
+            .containsOnly("Field 'averagePpd' must be 1 or higher");
     }
 
     @Test
@@ -242,7 +242,7 @@ class HardwareValidatorTest {
         assertThat(response.getErrors())
             .as("Did not receive expected error messages")
             .hasSize(6)
-            .contains(
+            .containsOnly(
                 "Field 'hardwareName' must not be empty",
                 "Field 'displayName' must not be empty",
                 "Field 'hardwareMake' must be one of: " + HardwareMake.getAllValues(),
@@ -296,7 +296,7 @@ class HardwareValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Payload is null");
+            .containsOnly("Payload is null");
     }
 
     @Test
@@ -316,7 +316,7 @@ class HardwareValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Payload is null");
+            .containsOnly("Payload is null");
     }
 
     @Test
@@ -345,7 +345,7 @@ class HardwareValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'hardwareName' must not be empty");
+            .containsOnly("Field 'hardwareName' must not be empty");
     }
 
     @Test
@@ -386,7 +386,7 @@ class HardwareValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Payload conflicts with an existing object on: [hardwareName]");
+            .containsOnly("Payload conflicts with an existing object on: [hardwareName]");
     }
 
     @Test
@@ -453,7 +453,7 @@ class HardwareValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'displayName' must not be empty");
+            .containsOnly("Field 'displayName' must not be empty");
     }
 
     @Test
@@ -482,7 +482,7 @@ class HardwareValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'hardwareMake' must be one of: " + HardwareMake.getAllValues());
+            .containsOnly("Field 'hardwareMake' must be one of: " + HardwareMake.getAllValues());
     }
 
     @Test
@@ -511,7 +511,7 @@ class HardwareValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'hardwareType' must be one of: " + HardwareType.getAllValues());
+            .containsOnly("Field 'hardwareType' must be one of: " + HardwareType.getAllValues());
     }
 
     @Test
@@ -540,7 +540,7 @@ class HardwareValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'multiplier' must be 1.00 or higher");
+            .containsOnly("Field 'multiplier' must be 1.00 or higher");
     }
 
     @Test
@@ -569,7 +569,7 @@ class HardwareValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'averagePpd' must be 1 or higher");
+            .containsOnly("Field 'averagePpd' must be 1 or higher");
     }
 
     @Test
@@ -600,7 +600,7 @@ class HardwareValidatorTest {
         assertThat(response.getErrors())
             .as("Did not receive expected error messages")
             .hasSize(5)
-            .contains(
+            .containsOnly(
                 "Field 'displayName' must not be empty",
                 "Field 'hardwareMake' must be one of: " + HardwareMake.getAllValues(),
                 "Field 'hardwareType' must be one of: " + HardwareType.getAllValues(),

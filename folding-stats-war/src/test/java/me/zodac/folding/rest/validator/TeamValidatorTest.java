@@ -38,7 +38,7 @@ class TeamValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Payload is null");
+            .containsOnly("Payload is null");
     }
 
     @Test
@@ -55,7 +55,7 @@ class TeamValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'teamName' must not be empty");
+            .containsOnly("Field 'teamName' must not be empty");
     }
 
     @Test
@@ -100,7 +100,7 @@ class TeamValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Payload conflicts with an existing object on: [teamName]");
+            .containsOnly("Payload conflicts with an existing object on: [teamName]");
     }
 
     @Test
@@ -145,7 +145,7 @@ class TeamValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'forumLink' is not a valid link: 'invalidUrl'");
+            .containsOnly("Field 'forumLink' is not a valid link: 'invalidUrl'");
     }
 
     @Test
@@ -183,7 +183,7 @@ class TeamValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Payload is null");
+            .containsOnly("Payload is null");
     }
 
     @Test
@@ -200,7 +200,7 @@ class TeamValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Payload is null");
+            .containsOnly("Payload is null");
     }
 
     @Test
@@ -223,7 +223,7 @@ class TeamValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'teamName' must not be empty");
+            .containsOnly("Field 'teamName' must not be empty");
     }
 
     @Test
@@ -255,7 +255,7 @@ class TeamValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Payload conflicts with an existing object on: [teamName]");
+            .containsOnly("Payload conflicts with an existing object on: [teamName]");
     }
 
     @Test
@@ -347,7 +347,7 @@ class TeamValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .contains("Field 'forumLink' is not a valid link: 'invalidUrl'");
+            .containsOnly("Field 'forumLink' is not a valid link: 'invalidUrl'");
     }
 
     @Test
