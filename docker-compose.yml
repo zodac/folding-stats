@@ -2,29 +2,29 @@ version: '2.3'
 
 services:
 
-  apache:
+  frontend:
     build:
       context: .
       dockerfile: docker/apache/Dockerfile
       args:
         ROOT_URL: "https://internal-secure.axihub.ca/folding"
-    container_name: apache
-    hostname: apache
+    container_name: frontend
+    hostname: frontend
     depends_on:
-      - wildfly
+      - backend
     healthcheck:
       test: curl --fail http://localhost/ || exit 1
       interval: 120s
       timeout: 10s
       retries: 10
     links:
-      - wildfly
+      - backend
     networks:
       - production
     ports:
       - "85:80"
 
-  wildfly:
+  backend:
     build:
       context: .
       dockerfile: docker/wildfly/Dockerfile
@@ -32,8 +32,8 @@ services:
         ADMIN_USERNAME: "${BACKEND_USER}"
         ADMIN_PASSWORD: "${BACKEND_PASSWORD}"
         DEPLOYMENT_TYPE: "production"
-    container_name: wildfly
-    hostname: wildfly
+    container_name: backend
+    hostname: backend
     environment:
       # Container configuration
       JAVA_OPTS: -Xms512m -Xmx2g -Djava.net.preferIPv4Stack=true
@@ -55,7 +55,7 @@ services:
       STATS_PARSING_SCHEDULE_LAST_DAY_OF_MONTH: "31"
       # Database configuration
       DEPLOYED_DATABASE: "postgresql"
-      JDBC_CONNECTION_URL: "jdbc:postgresql://postgres:5432/folding_db"
+      JDBC_CONNECTION_URL: "jdbc:postgresql://database:5432/folding_db"
       JDBC_CONNECTION_USER: "${DB_USER}"
       JDBC_CONNECTION_PASSWORD: "${DB_PASSWORD}"
       JDBC_CONNECTION_DRIVER: "org.postgresql.Driver"
@@ -65,7 +65,7 @@ services:
       timeout: 10s
       retries: 30
     links:
-      - postgres
+      - database
     networks:
       - production
     ports:
@@ -73,9 +73,9 @@ services:
       - "8443:8443"
       - "9990:9990"
     volumes:
-      - wildfly_logs:/opt/jboss/wildfly/standalone/log
+      - backend_logs:/opt/jboss/wildfly/standalone/log
 
-  postgres:
+  database:
     build:
       context: .
       dockerfile: docker/postgres/Dockerfile
@@ -84,8 +84,8 @@ services:
         ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
         READ_ONLY_USERNAME: "${READ_ONLY_USER}"
         READ_ONLY_PASSWORD: "${READ_ONLY_PASSWORD}"
-    container_name: postgres
-    hostname: postgres
+    container_name: database
+    hostname: database
     environment:
       # First 4 variables used to configure DB
       POSTGRES_DB: "folding_db"
@@ -108,13 +108,13 @@ services:
       - "5432:5432"
     restart: always
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - database_content:/var/lib/postgresql/data
 
 networks:
   production:
 
 volumes:
-  # Volume to save the PostgreSQL contents
-  postgres_data:
-  # Volume to save the Wildfly logs in case of a crash
-  wildfly_logs:
+  # Volume to save the database contents
+  database_content:
+  # Volume to save the backend logs in case of a crash
+  backend_logs:

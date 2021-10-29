@@ -34,9 +34,9 @@ Since the system is containerised, it is possible to swap out the default Postgr
 required for this are:
 
 - Update docker-compose.yml:
-    - Remove the PostgreSQL DB `postgres` container
+    - Remove the PostgreSQL DB `database` container
     - Add the new DB container (if containerised)
-    - Update the `wildfly` container environment variables for "Database configuration"
+    - Update the `backend` container environment variables for "Database configuration"
 - Add support for the new DB container in code:
     - Implement the *DbManager.java* interface, with code stored in
       the `folding-stats-jar/src/main/java/me/zodac/folding/db/<DB_NAME>` package
@@ -48,13 +48,13 @@ required for this are:
 ### JS/CSS Updates
 
 The JS scripts and CSS stylesheets are stored in `docker/apache/`. They are then minified and merged by a maven plugin,
-which creates the final files for the site. These CSS and JS files are generated in the `apache` docker container.
+which creates the final files for the site. These CSS and JS files are generated in the `frontend` docker container.
 
 ### REST RAML API
 
 The REST endpoints are documented through RAML, with the source RAML file found in  `docker/apache/raml/api.raml`. This
 is used to generate an HTML output which is saved to `docker/apache/site/api.html`, and can be accessed through the UI.
-The RAML HTML is generated in the `apache` docker container.
+The RAML HTML is generated in the `frontend` docker container.
 
 ## Decisions
 
@@ -78,22 +78,22 @@ TBC
 
 ### Take Backup Of Database
 
-To take a backup of the database, the following commands can be run against the `postgres` container:
+To take a backup of the database, the following commands can be run against the `database` container:
 
-    docker exec postgres pg_dump -U folding_user -F t folding_db -f export.tar
-    docker cp postgres:/export.tar ~/export_$(date +%F).tar
+    docker exec database pg_dump -U folding_user -F t folding_db -f export.tar
+    docker cp database:/export.tar ~/export_$(date +%F).tar
 
-The first line will create a backup of the DB in the `postgres` container, and the second will copy it out to the host.
+The first line will create a backup of the DB in the `database` container, and the second will copy it out to the host.
 
 ### Restore Database From Backup
 
 Assuming a backup was previously created using the instructions in --> Take Backup Of Database <--, it can be restored
-using the following commands against the `postgres` container:
+using the following commands against the `database` container:
 
-    docker cp ~/export_<TIMESTAMP>.tar postgres:/export.tar
-    docker exec postgres pg_restore -d folding_db export.tar -c -U folding_user
+    docker cp ~/export_<TIMESTAMP>.tar database:/export.tar
+    docker exec database pg_restore -d folding_db export.tar -c -U folding_user
 
-The first line will copy the backup from the host to the `postgres` container, and the second will restore the DB using
+The first line will copy the backup from the host to the `database` container, and the second will restore the DB using
 the *export.tar* file.
 
 ### Enabling DEBUG Logs
@@ -102,8 +102,8 @@ This requires us to connect to the `wildfly` container, so we will need the cont
 
     $ docker container ls
     CONTAINER ID        IMAGE                    COMMAND                  CREATED             STATUS                   PORTS                                            NAMES
-    c669fe278e36        folding-stats_wildfly    "/opt/jboss/wildfly/…"   3 minutes ago       Up 3 minutes             0.0.0.0:8080->8080/tcp, 0.0.0.0:9990->9990/tcp   wildfly
-    334ace4ab4be        folding-stats_postgres   "docker-entrypoint.s…"   3 minutes ago       Up 3 minutes (healthy)   0.0.0.0:5432->5432/tcp                           postgres
+    c669fe278e36        folding-stats_backend    "/opt/jboss/wildfly/…"   3 minutes ago       Up 3 minutes             0.0.0.0:8080->8080/tcp, 0.0.0.0:9990->9990/tcp   wildfly
+    334ace4ab4be        folding-stats_database   "docker-entrypoint.s…"   3 minutes ago       Up 3 minutes (healthy)   0.0.0.0:5432->5432/tcp                           postgres
 
 Then connect to this container (if using Linux, ignore the `winpty` at the start of the command):
 
@@ -128,7 +128,7 @@ the log file only):
 ### Available Logs
 
 The system currently has two logs available. Both can be viewed either through the Wildfly Admin UI, connecting to the
-docker container and checking directory `/opt/jboss/wildfly/standalone/log`, or attaching to the `wildfly_logs` volume.
+docker container and checking directory `/opt/jboss/wildfly/standalone/log`, or attaching to the `backend_logs` volume.
 
 - server.log
     - This is the general application log, where most logging will be written to. It will also be printed to the
@@ -137,9 +137,9 @@ docker container and checking directory `/opt/jboss/wildfly/standalone/log`, or 
     - This is where all logging for *SecurityInterceptor.java* is written, detailing login attempts or access requests
       to WRITE operations. This is not printed to the console.
 
-### How To Extract Wildfly Logs On Container Crash
+### How To Extract Logs On Container Crash
 
-A volume `wildfly_logs` should exist. We cannot retrieve the file directly from the volume. Instead, we create a
+A volume `backend_logs` should exist. We cannot retrieve the file directly from the volume. Instead, we create a
 lightweight docker container, and attach the volume to this container. We can then copy the file from the container to
 the host system.
 
@@ -148,12 +148,12 @@ For example, first check the available volumes:
     $ docker volume ls
     DRIVER VOLUME NAME
     local 97f3b514d34ebc85ebd71c61d1701b7faf585c2c755c62f78bea798b5a150c35
-    local folding-stats_postgres_data
-    local folding-stats_wildfly_logs
+    local folding-stats_database_content
+    local folding-stats_backend_logs
 
-Then create a simple container, attaching the `folding-stats_wildfly_logs` volume (in read-only mode):
+Then create a simple container, attaching the `folding-stats_backend_logs` volume (in read-only mode):
 
-    docker container create --name dummy -v folding-stats_wildfly_logs:/root:ro folding-stats_wildfly
+    docker container create --name dummy -v folding-stats_backend_logs:/root:ro folding-stats_backend
 
 We can then copy the logs from the `dummy` container to our host:
 

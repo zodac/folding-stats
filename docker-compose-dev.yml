@@ -2,24 +2,24 @@ version: '2.3'
 
 services:
 
-  apache_dev:
+  frontend_dev:
     build:
       context: .
       dockerfile: docker/apache/Dockerfile
       args:
         ROOT_URL: "http://127.0.0.1:8081/folding"
-    container_name: apache_dev
-    hostname: apache_dev
+    container_name: frontend_dev
+    hostname: frontend_dev
     depends_on:
-      - wildfly_dev
+      - backend_dev
     links:
-      - wildfly_dev
+      - backend_dev
     networks:
       - development
     ports:
       - "86:80"
 
-  wildfly_dev:
+  backend_dev:
     build:
       context: .
       dockerfile: docker/wildfly/Dockerfile
@@ -27,15 +27,15 @@ services:
         ADMIN_USERNAME: "root"
         ADMIN_PASSWORD: "shroot"
         DEPLOYMENT_TYPE: "test"
-    container_name: wildfly_dev
-    hostname: wildfly-dev # Using a dash as Java's URI builder will fail with an underscore
+    container_name: backend_dev
+    hostname: backend-dev # Using a dash as Java's URI builder will fail with an underscore
     environment:
       # Container configuration
       JAVA_OPTS: -Xms512m -Xmx2g -Djava.net.preferIPv4Stack=true
       # External URL configuration
-      STATS_URL_ROOT: "http://wildfly-dev:8080"
-      LARS_URL_ROOT: "http://wildfly-dev:8080"
-      TC_HOMEPAGE_URL: "http://apache_dev/"
+      STATS_URL_ROOT: "http://backend-dev:8080"
+      LARS_URL_ROOT: "http://backend-dev:8080"
+      TC_HOMEPAGE_URL: "http://frontend_dev/"
       # NOTE: The monthly reset, result storage and LARS update will always occur at 23:57 on the last day of the month
       ENABLE_STATS_MONTHLY_RESET: "false"
       ENABLE_MONTHLY_RESULT_STORAGE: "false"
@@ -47,12 +47,12 @@ services:
       STATS_PARSING_SCHEDULE_SECOND: "0"
       # Database configuration
       DEPLOYED_DATABASE: "postgresql"
-      JDBC_CONNECTION_URL: "jdbc:postgresql://postgres_dev:5432/folding_db"
+      JDBC_CONNECTION_URL: "jdbc:postgresql://database_dev:5432/folding_db"
       JDBC_CONNECTION_USER: "folding_user"
       JDBC_CONNECTION_PASSWORD: "shroot"
       JDBC_CONNECTION_DRIVER: "org.postgresql.Driver"
     links:
-      - postgres_dev
+      - database_dev
     networks:
       - development
     ports:
@@ -60,7 +60,7 @@ services:
       - "8444:8443"
       - "9991:9990"
 
-  postgres_dev:
+  database_dev:
     build:
       context: .
       dockerfile: docker/postgres/Dockerfile
@@ -69,8 +69,8 @@ services:
         ADMIN_PASSWORD: "shroot"
         READ_ONLY_USERNAME: "root2"
         READ_ONLY_PASSWORD: "shroot2"
-    container_name: postgres_dev
-    hostname: postgres_dev
+    container_name: database_dev
+    hostname: database_dev
     environment:
       # First 4 variables used to configure DB
       POSTGRES_DB: "folding_db"
