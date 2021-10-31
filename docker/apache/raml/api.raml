@@ -641,7 +641,7 @@ traits:
         type: integer
         required: true
     get:
-      description: "Used to retrieve current the TC stats for the user"
+      description: "Used to retrieve current the ETF stats for the user"
       responses:
         200:
           description: "The user stats have been successfully retrieved"
@@ -659,7 +659,7 @@ traits:
           description: "The system is not in a valid state to execute read requests"
     patch:
       is: [ "adminOnly" ]
-      description: "Used to offset the TC stats for the user"
+      description: "Used to offset the ETF stats for the user"
       body:
         application/json:
           example: !include requests/stats/userOffsetPatch.json

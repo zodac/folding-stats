@@ -105,10 +105,6 @@ public class UserStateChangeHandler {
         return isMultiplierChange;
     }
 
-    // If a user is updated and their Folding username, hardware ID or passkey is changed, we need to update their initial offset again
-    // Also occurs if the hardware multiplier for a hardware used by a user is changed
-    // We set the new initial stats to the user's current total stats, then give an offset of their current TC stats (multiplied)
-
     /**
      * This should be called if any of the following are changed:
      * <ul>

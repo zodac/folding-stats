@@ -60,7 +60,7 @@ The RAML HTML is generated in the `frontend` docker container.
 
 ### Historic Stats
 
-We're using a couple of queries to read the user stats from the TC stats table, but not persisting hourly/daily/monthly
+We're using a couple of queries to read the user stats from the ETF stats table, but not persisting hourly/daily/monthly
 stats. This might be a bit slow if there is frequent access to the historic pages, so there is a potential for
 caching/persisting results. Could be persisted on a scheduled basis, or perhaps only persisted on the first call, then
 cache those results. Need to do more profiling on a live system, see how much it is being used. (A good idea to bring in
