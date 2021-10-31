@@ -90,6 +90,7 @@ class HardwareValidatorTest {
         final ValidationResult<Hardware> response = HardwareValidator.validateCreate(hardware, allHardware);
 
         assertThat(response.isFailure())
+            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
             .isFalse();
     }
 
@@ -424,6 +425,7 @@ class HardwareValidatorTest {
         final ValidationResult<Hardware> response = HardwareValidator.validateUpdate(hardware, existingHardware, allHardware);
 
         assertThat(response.isFailure())
+            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
             .isFalse();
     }
 
@@ -680,6 +682,7 @@ class HardwareValidatorTest {
         final ValidationResult<Hardware> response = HardwareValidator.validateDelete(existingHardware, allUsers);
 
         assertThat(response.isFailure())
+            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
             .isFalse();
     }
 }

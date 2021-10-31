@@ -76,6 +76,7 @@ class TeamValidatorTest {
         final ValidationResult<Team> response = TeamValidator.validateCreate(team, allTeams);
 
         assertThat(response.isFailure())
+            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
             .isFalse();
     }
 
@@ -114,6 +115,7 @@ class TeamValidatorTest {
         final ValidationResult<Team> response = TeamValidator.validateCreate(team, Collections.emptyList());
 
         assertThat(response.isFailure())
+            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
             .isFalse();
     }
 
@@ -128,6 +130,7 @@ class TeamValidatorTest {
         final ValidationResult<Team> response = TeamValidator.validateCreate(team, Collections.emptyList());
 
         assertThat(response.isFailure())
+            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
             .isFalse();
     }
 
@@ -284,6 +287,7 @@ class TeamValidatorTest {
         final ValidationResult<Team> response = TeamValidator.validateUpdate(team, existingTeam, allTeams);
 
         assertThat(response.isFailure())
+            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
             .isFalse();
     }
 
@@ -304,6 +308,7 @@ class TeamValidatorTest {
         final ValidationResult<Team> response = TeamValidator.validateUpdate(team, existingTeam, Collections.emptyList());
 
         assertThat(response.isFailure())
+            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
             .isFalse();
     }
 
@@ -324,6 +329,7 @@ class TeamValidatorTest {
         final ValidationResult<Team> response = TeamValidator.validateUpdate(team, existingTeam, Collections.emptyList());
 
         assertThat(response.isFailure())
+            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
             .isFalse();
     }
 
@@ -409,6 +415,7 @@ class TeamValidatorTest {
         final ValidationResult<Team> response = TeamValidator.validateDelete(existingTeam, allUsers);
 
         assertThat(response.isFailure())
+            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
             .isFalse();
     }
 }

@@ -284,6 +284,7 @@ class UserValidatorTest {
         );
 
         assertThat(response.isFailure())
+            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
             .isFalse();
     }
 
@@ -343,6 +344,7 @@ class UserValidatorTest {
         );
 
         assertThat(response.isFailure())
+            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
             .isFalse();
     }
 
@@ -772,6 +774,1169 @@ class UserValidatorTest {
         final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ExternalConnectionFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateCreate(user,
             Collections.emptyList(),
+            List.of(hardware),
+            List.of(team)
+        );
+
+        assertThat(response.isFailure())
+            .isTrue();
+
+        assertThat(response.getErrors())
+            .containsOnly("Unable to check stats for user 'user': Error connecting");
+    }
+
+    @Test
+    void whenValidatingUpdate_givenValidUser_thenSuccessResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
+
+        final UserRequest user = UserRequest.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardwareId(hardware.getId())
+            .teamId(team.getId())
+            .build();
+
+        final User existingUser = User.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU)
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardware(hardware)
+            .team(team)
+            .build();
+
+        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
+            List.of(existingUser),
+            List.of(hardware),
+            List.of(team)
+        );
+
+        assertThat(response.isFailure())
+            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
+            .isFalse();
+    }
+
+    @Test
+    void whenValidatingUpdate_givenNullUser_thenFailureResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
+
+        final User existingUser = User.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU)
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardware(hardware)
+            .team(team)
+            .build();
+
+        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final ValidationResult<User> response = userValidator.validateUpdate(null, existingUser,
+            List.of(existingUser),
+            Collections.emptyList(),
+            Collections.emptyList()
+        );
+
+        assertThat(response.isFailure())
+            .isTrue();
+
+        assertThat(response.getErrors())
+            .containsOnly("Payload is null");
+    }
+
+    @Test
+    void whenValidatingUpdate_givenNullExistingUser_thenFailureResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
+
+        final UserRequest user = UserRequest.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardwareId(hardware.getId())
+            .teamId(team.getId())
+            .build();
+
+        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final ValidationResult<User> response = userValidator.validateUpdate(user, null,
+            Collections.emptyList(),
+            Collections.emptyList(),
+            Collections.emptyList()
+        );
+
+        assertThat(response.isFailure())
+            .isTrue();
+
+        assertThat(response.getErrors())
+            .containsOnly("Payload is null");
+    }
+
+    @Test
+    void whenValidatingUpdate_givenUserWithInvalidCategory_thenFailureResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
+
+        final UserRequest user = UserRequest.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category("invalid")
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardwareId(hardware.getId())
+            .teamId(team.getId())
+            .build();
+
+        final User existingUser = User.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU)
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardware(hardware)
+            .team(team)
+            .build();
+
+        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
+            List.of(existingUser),
+            List.of(hardware),
+            List.of(team)
+        );
+
+        assertThat(response.isFailure())
+            .isTrue();
+
+        assertThat(response.getErrors())
+            .containsOnly(String.format("Field 'category' must be one of: %s", Category.getAllValues()));
+    }
+
+    @Test
+    void whenValidatingUpdate_givenUserWithNullFoldingUserName_thenFailureResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
+
+        final UserRequest user = UserRequest.builder()
+            .foldingUserName(null)
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardwareId(hardware.getId())
+            .teamId(team.getId())
+            .build();
+
+        final User existingUser = User.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU)
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardware(hardware)
+            .team(team)
+            .build();
+
+        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
+            List.of(existingUser),
+            List.of(hardware),
+            List.of(team)
+        );
+
+        assertThat(response.isFailure())
+            .isTrue();
+
+        assertThat(response.getErrors())
+            .containsOnly("Field 'foldingUserName' must not be empty");
+    }
+
+    @Test
+    void whenValidatingUpdate_givenUserWithNullDisplayName_thenFailureResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
+
+        final UserRequest user = UserRequest.builder()
+            .foldingUserName("user")
+            .displayName(null)
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardwareId(hardware.getId())
+            .teamId(team.getId())
+            .build();
+
+        final User existingUser = User.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU)
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardware(hardware)
+            .team(team)
+            .build();
+
+        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
+            List.of(existingUser),
+            List.of(hardware),
+            List.of(team)
+        );
+
+        assertThat(response.isFailure())
+            .isTrue();
+
+        assertThat(response.getErrors())
+            .containsOnly("Field 'displayName' must not be empty");
+    }
+
+    @Test
+    void whenValidatingUpdate_givenUserWithNullPasskey_thenFailureResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
+
+        final UserRequest user = UserRequest.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey(null)
+            .category(Category.NVIDIA_GPU.toString())
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardwareId(hardware.getId())
+            .teamId(team.getId())
+            .build();
+
+        final User existingUser = User.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU)
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardware(hardware)
+            .team(team)
+            .build();
+
+        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
+            List.of(existingUser),
+            List.of(hardware),
+            List.of(team)
+        );
+
+        assertThat(response.isFailure())
+            .isTrue();
+
+        assertThat(response.getErrors())
+            .containsOnly("Field 'passkey' must not be empty");
+    }
+
+    @Test
+    void whenValidatingUpdate_givenUserWithPasskeyOfInvalidLength_thenFailureResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
+
+        final UserRequest user = UserRequest.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("1234")
+            .category(Category.NVIDIA_GPU.toString())
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardwareId(hardware.getId())
+            .teamId(team.getId())
+            .build();
+
+        final User existingUser = User.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU)
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardware(hardware)
+            .team(team)
+            .build();
+
+        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
+            List.of(existingUser),
+            List.of(hardware),
+            List.of(team)
+        );
+
+        assertThat(response.isFailure())
+            .isTrue();
+
+        assertThat(response.getErrors())
+            .containsOnly("Field 'passkey' must be 32 characters in length");
+    }
+
+    @Test
+    void whenValidatingUpdate_givenUserWithPasskeyContainingInvalidCharacters_thenFailureResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
+
+        final UserRequest user = UserRequest.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey1234567890123456789*")
+            .category(Category.NVIDIA_GPU.toString())
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardwareId(hardware.getId())
+            .teamId(team.getId())
+            .build();
+
+        final User existingUser = User.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU)
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardware(hardware)
+            .team(team)
+            .build();
+
+        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
+            List.of(existingUser),
+            List.of(hardware),
+            List.of(team)
+        );
+
+        assertThat(response.isFailure())
+            .isTrue();
+
+        assertThat(response.getErrors())
+            .containsOnly("Field 'passkey' cannot contain '*' characters");
+    }
+
+    @Test
+    void whenValidatingUpdate_givenUserWithNullProfileLink_thenSuccessResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
+
+        final UserRequest user = UserRequest.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .profileLink(null)
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardwareId(hardware.getId())
+            .teamId(team.getId())
+            .build();
+
+        final User existingUser = User.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU)
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardware(hardware)
+            .team(team)
+            .build();
+
+        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
+            List.of(existingUser),
+            List.of(hardware),
+            List.of(team)
+        );
+
+        assertThat(response.isFailure())
+            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
+            .isFalse();
+    }
+
+    @Test
+    void whenValidatingUpdate_givenUserWithInvalidProfileLink_thenFailureResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
+
+        final UserRequest user = UserRequest.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .profileLink("invalidUrl")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardwareId(hardware.getId())
+            .teamId(team.getId())
+            .build();
+
+        final User existingUser = User.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU)
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardware(hardware)
+            .team(team)
+            .build();
+
+        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
+            List.of(existingUser),
+            List.of(hardware),
+            List.of(team)
+        );
+
+        assertThat(response.isFailure())
+            .isTrue();
+
+        assertThat(response.getErrors())
+            .containsOnly("Field 'profileLink' is not a valid link: 'invalidUrl'");
+    }
+
+    @Test
+    void whenValidatingUpdate_givenUserWithNullLiveStatsLink_thenSuccessResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
+
+        final UserRequest user = UserRequest.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .profileLink("http://www.google.com")
+            .liveStatsLink(null)
+            .userIsCaptain(true)
+            .hardwareId(hardware.getId())
+            .teamId(team.getId())
+            .build();
+
+        final User existingUser = User.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU)
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardware(hardware)
+            .team(team)
+            .build();
+
+        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
+            List.of(existingUser),
+            List.of(hardware),
+            List.of(team)
+        );
+
+        assertThat(response.isFailure())
+            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
+            .isFalse();
+    }
+
+    @Test
+    void whenValidatingUpdate_givenUserWithInvalidLiveStatsLink_thenFailureResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
+
+        final UserRequest user = UserRequest.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .profileLink("http://www.google.com")
+            .liveStatsLink("invalidUrl")
+            .userIsCaptain(true)
+            .hardwareId(hardware.getId())
+            .teamId(team.getId())
+            .build();
+
+        final User existingUser = User.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU)
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardware(hardware)
+            .team(team)
+            .build();
+
+        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
+            List.of(existingUser),
+            List.of(hardware),
+            List.of(team)
+        );
+
+        assertThat(response.isFailure())
+            .isTrue();
+
+        assertThat(response.getErrors())
+            .containsOnly("Field 'liveStatsLink' is not a valid link: 'invalidUrl'");
+    }
+
+    @Test
+    void whenValidatingUpdate_givenUserWithFoldingUserNameAndPasskeyAlreadyExists_thenFailureResponseIsReturned() {
+        final Hardware otherHardware = generateHardware();
+        final Team otherTeam = generateTeam();
+
+        final User otherUser = User.builder()
+            .id(1)
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU)
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardware(otherHardware)
+            .team(otherTeam)
+            .build();
+
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
+
+        final UserRequest user = UserRequest.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardwareId(hardware.getId())
+            .teamId(team.getId())
+            .build();
+
+        final User existingUser = User.builder()
+            .id(2)
+            .foldingUserName("differentUser")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU)
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardware(hardware)
+            .team(team)
+            .build();
+
+        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
+            List.of(existingUser, otherUser),
+            List.of(hardware, otherHardware),
+            List.of(team, otherTeam)
+        );
+
+        assertThat(response.isFailure())
+            .isTrue();
+
+        assertThat(response.getErrors())
+            .containsOnly("Payload conflicts with an existing object on: [foldingUserName, passkey]");
+    }
+
+    @Test
+    void whenValidatingUpdate_givenUserWithFoldingUserNameAndPasskeyExists_andExistingUserIsTheOneBeingUpdated_thenSuccessResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
+
+        final UserRequest user = UserRequest.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardwareId(hardware.getId())
+            .teamId(team.getId())
+            .build();
+
+        final User existingUser = User.builder()
+            .id(1)
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU)
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardware(hardware)
+            .team(team)
+            .build();
+
+        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
+            List.of(existingUser),
+            List.of(hardware),
+            List.of(team)
+        );
+
+        assertThat(response.isFailure())
+            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
+            .isFalse();
+    }
+
+    @Test
+    void whenValidatingUpdate_givenUserIsCaptain_andExistingUserWasAlsoCaptain_andTeamIsNotChanged_thenSuccessResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
+
+        final UserRequest user = UserRequest.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardwareId(hardware.getId())
+            .teamId(team.getId())
+            .build();
+
+        final User existingUser = User.builder()
+            .id(1)
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU)
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardware(hardware)
+            .team(team)
+            .build();
+
+        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
+            List.of(existingUser),
+            List.of(hardware),
+            List.of(team)
+        );
+
+        assertThat(response.isFailure())
+            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
+            .isFalse();
+    }
+
+    @Test
+    void whenValidatingUpdate_givenUserIsCaptain_andExistingUserWasAlsoCaptain_andTeamIsChanged_andTeamHasCaptain_thenFailureResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
+        final Team oldTeam = generateTeam();
+
+        final User currentCaptain = User.builder()
+            .id(2)
+            .foldingUserName("otherUser")
+            .displayName("otherUser")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.AMD_GPU)
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardware(hardware)
+            .team(team)
+            .build();
+
+        final UserRequest user = UserRequest.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardwareId(hardware.getId())
+            .teamId(team.getId())
+            .build();
+
+        final User existingUser = User.builder()
+            .id(1)
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU)
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardware(hardware)
+            .team(oldTeam)
+            .build();
+
+        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
+            List.of(existingUser, currentCaptain),
+            List.of(hardware),
+            List.of(team, oldTeam)
+        );
+
+        assertThat(response.isFailure())
+            .isTrue();
+
+        assertThat(response.getErrors())
+            .containsOnly(String.format("Team '%s' already has a captain '%s', cannot have multiple captains",
+                team.getTeamName(), currentCaptain.getDisplayName()));
+    }
+
+    @Test
+    void whenValidatingUpdate_givenUserIsCaptain_andAnotherUserIsCaptain_thenFailureResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
+
+        final User currentCaptain = User.builder()
+            .id(2)
+            .foldingUserName("otherUser")
+            .displayName("otherUser")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.AMD_GPU)
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardware(hardware)
+            .team(team)
+            .build();
+
+        final UserRequest user = UserRequest.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardwareId(hardware.getId())
+            .teamId(team.getId())
+            .build();
+
+        final User existingUser = User.builder()
+            .id(1)
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU)
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(false)
+            .hardware(hardware)
+            .team(team)
+            .build();
+
+        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
+            List.of(existingUser, currentCaptain),
+            List.of(hardware),
+            List.of(team)
+        );
+
+        assertThat(response.isFailure())
+            .isTrue();
+
+        assertThat(response.getErrors())
+            .containsOnly(String.format("Team '%s' already has a captain '%s', cannot have multiple captains",
+                team.getTeamName(), currentCaptain.getDisplayName()));
+    }
+
+    @Test
+    void whenValidatingUpdate_givenTeamIsUpdated_andTeamAlreadyHasMaximumTotalUsers_thenFailureResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
+        final Team oldTeam = generateTeam();
+
+        final List<User> usersOnTeam = new ArrayList<>(Category.maximumPermittedAmountForAllCategories());
+
+        for (int i = 0; i < Category.maximumPermittedAmountForAllCategories(); i++) {
+            usersOnTeam.add(
+                User.builder()
+                    .foldingUserName("user" + 0)
+                    .displayName("user" + 0)
+                    .passkey("DummyPasskey12345678901234567891")
+                    .category(Category.WILDCARD)
+                    .profileLink("http://www.google.com")
+                    .liveStatsLink("http://www.google.com")
+                    .userIsCaptain(false)
+                    .hardware(hardware)
+                    .team(team)
+                    .build()
+            );
+        }
+
+        final UserRequest user = UserRequest.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(false)
+            .hardwareId(hardware.getId())
+            .teamId(team.getId())
+            .build();
+
+        final User existingUser = User.builder()
+            .id(1)
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU)
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(false)
+            .hardware(hardware)
+            .team(oldTeam)
+            .build();
+
+        final List<User> allUsers = new ArrayList<>(usersOnTeam);
+        allUsers.add(existingUser);
+
+        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
+            allUsers,
+            List.of(hardware),
+            List.of(team, oldTeam)
+        );
+
+        assertThat(response.isFailure())
+            .isTrue();
+
+        assertThat(response.getErrors())
+            .containsOnly(String.format("Team '%s' has %s users, maximum permitted is %s", team.getTeamName(), usersOnTeam.size(),
+                Category.maximumPermittedAmountForAllCategories()));
+    }
+
+    @Test
+    void whenValidatingUpdate_givenTeamIsUpdated_andTeamAlreadyHasMaximumUsersInCategory_thenFailureResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
+        final Team oldTeam = generateTeam();
+
+        final List<User> usersOnTeamInCategory = new ArrayList<>(Category.NVIDIA_GPU.permittedUsers());
+
+        for (int i = 0; i < Category.NVIDIA_GPU.permittedUsers(); i++) {
+            usersOnTeamInCategory.add(
+                User.builder()
+                    .foldingUserName("user" + 0)
+                    .displayName("user" + 0)
+                    .passkey("DummyPasskey12345678901234567891")
+                    .category(Category.NVIDIA_GPU)
+                    .profileLink("http://www.google.com")
+                    .liveStatsLink("http://www.google.com")
+                    .userIsCaptain(false)
+                    .hardware(hardware)
+                    .team(team)
+                    .build()
+            );
+        }
+
+        final UserRequest user = UserRequest.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardwareId(hardware.getId())
+            .teamId(team.getId())
+            .build();
+
+        final User existingUser = User.builder()
+            .id(1)
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU)
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(false)
+            .hardware(hardware)
+            .team(oldTeam)
+            .build();
+
+        final List<User> allUsers = new ArrayList<>(usersOnTeamInCategory);
+        allUsers.add(existingUser);
+
+        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
+            allUsers,
+            List.of(hardware),
+            List.of(team)
+        );
+
+        assertThat(response.isFailure())
+            .isTrue();
+
+        assertThat(response.getErrors())
+            .containsOnly(String.format("Team '%s' already has %s users in category '%s', only %s permitted", team.getTeamName(),
+                usersOnTeamInCategory.size(), Category.NVIDIA_GPU, Category.NVIDIA_GPU.permittedUsers()));
+    }
+
+    @Test
+    void whenValidatingUpdate_givenCategoryIsUpdated_andTeamAlreadyHasMaximumUsersInCategory_thenFailureResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
+
+        final List<User> usersOnTeamInCategory = new ArrayList<>(Category.NVIDIA_GPU.permittedUsers());
+
+        for (int i = 0; i < Category.NVIDIA_GPU.permittedUsers(); i++) {
+            usersOnTeamInCategory.add(
+                User.builder()
+                    .foldingUserName("user" + 0)
+                    .displayName("user" + 0)
+                    .passkey("DummyPasskey12345678901234567891")
+                    .category(Category.NVIDIA_GPU)
+                    .profileLink("http://www.google.com")
+                    .liveStatsLink("http://www.google.com")
+                    .userIsCaptain(false)
+                    .hardware(hardware)
+                    .team(team)
+                    .build()
+            );
+        }
+
+        final UserRequest user = UserRequest.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardwareId(hardware.getId())
+            .teamId(team.getId())
+            .build();
+
+        final User existingUser = User.builder()
+            .id(1)
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.AMD_GPU)
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(false)
+            .hardware(hardware)
+            .team(team)
+            .build();
+
+        final List<User> allUsers = new ArrayList<>(usersOnTeamInCategory);
+        allUsers.add(existingUser);
+
+        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
+            allUsers,
+            List.of(hardware),
+            List.of(team)
+        );
+
+        assertThat(response.isFailure())
+            .isTrue();
+
+        assertThat(response.getErrors())
+            .containsOnly(String.format("Team '%s' already has %s users in category '%s', only %s permitted", team.getTeamName(),
+                usersOnTeamInCategory.size(), Category.NVIDIA_GPU, Category.NVIDIA_GPU.permittedUsers()));
+    }
+
+    @Test
+    void whenValidatingUpdate_givenUserWithHardwareWithNonExistingId_thenFailureResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
+
+        final UserRequest user = UserRequest.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardwareId(99)
+            .teamId(team.getId())
+            .build();
+
+        final User existingUser = User.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU)
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardware(hardware)
+            .team(team)
+            .build();
+
+        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
+            List.of(existingUser),
+            List.of(hardware),
+            List.of(team)
+        );
+
+        assertThat(response.isFailure())
+            .isTrue();
+
+        assertThat(response.getErrors())
+            .containsOnly(String.format("Field 'hardwareId' must be one of: [%s: %s]", hardware.getId(), hardware.getHardwareName()));
+    }
+
+    @Test
+    void whenValidatingUpdate_givenUserWithTeamWithNonExistingId_thenFailureResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
+
+        final UserRequest user = UserRequest.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardwareId(hardware.getId())
+            .teamId(99)
+            .build();
+
+        final User existingUser = User.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU)
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardware(hardware)
+            .team(team)
+            .build();
+
+        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
+            List.of(existingUser),
+            List.of(hardware),
+            List.of(team)
+        );
+
+        assertThat(response.isFailure())
+            .isTrue();
+
+        assertThat(response.getErrors())
+            .containsOnly(String.format("Field 'teamId' must be one of: [%s: %s]", team.getId(), team.getTeamName()));
+    }
+
+    @Test
+    void whenValidatingUpdate_givenUserHasNoWorkUnitsCompleted_thenFailureResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
+
+        final UserRequest user = UserRequest.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardwareId(hardware.getId())
+            .teamId(team.getId())
+            .build();
+
+        final User existingUser = User.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU)
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardware(hardware)
+            .team(team)
+            .build();
+
+        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new NoUnitsFoldingStatsRetriever());
+        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
+            List.of(existingUser),
+            List.of(hardware),
+            List.of(team)
+        );
+
+        assertThat(response.isFailure())
+            .isTrue();
+
+        assertThat(response.getErrors())
+            .containsOnly("User 'user' has 0 Work Units with passkey 'DummyPasskey12345678901234567890', "
+                + "there must be at least one completed Work Unit before adding the user");
+    }
+
+    @Test
+    void whenValidatingUpdate_givenUserWorkUnitsCannotBeAccessed_thenFailureResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
+
+        final UserRequest user = UserRequest.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardwareId(hardware.getId())
+            .teamId(team.getId())
+            .build();
+
+        final User existingUser = User.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU)
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardware(hardware)
+            .team(team)
+            .build();
+
+        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ExternalConnectionFoldingStatsRetriever());
+        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
+            List.of(existingUser),
             List.of(hardware),
             List.of(team)
         );
