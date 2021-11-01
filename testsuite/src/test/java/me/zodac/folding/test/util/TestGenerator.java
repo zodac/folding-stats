@@ -1,5 +1,6 @@
 package me.zodac.folding.test.util;
 
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.HardwareMake;
@@ -64,6 +65,27 @@ public final class TestGenerator {
             .displayName(hardwareName)
             .hardwareMake(HardwareMake.NVIDIA.toString())
             .hardwareType(HardwareType.GPU.toString())
+            .multiplier(1.00D)
+            .averagePpd(1L)
+            .build();
+    }
+
+    /**
+     * Generate a {@link HardwareRequest} with the {@link HardwareMake} and {@link HardwareType} derived from the provided {@link Category}.
+     *
+     * @param category the {@link Category} to define the {@link HardwareMake} and {@link HardwareType}
+     * @return the generated {@link HardwareRequest}
+     */
+    public static HardwareRequest generateHardwareFromCategory(final Category category) {
+        final String hardwareName = nextHardwareName();
+        final HardwareMake hardwareMake = new ArrayList<>(category.supportedHardwareMakes()).get(0);
+        final HardwareType hardwareType = new ArrayList<>(category.supportedHardwareTypes()).get(0);
+
+        return HardwareRequest.builder()
+            .hardwareName(hardwareName)
+            .displayName(hardwareName)
+            .hardwareMake(hardwareMake.toString())
+            .hardwareType(hardwareType.toString())
             .multiplier(1.00D)
             .averagePpd(1L)
             .build();
@@ -144,7 +166,7 @@ public final class TestGenerator {
      *                              or {@link TeamUtils#create(TeamRequest)}
      */
     public static UserRequest generateUserWithCategory(final Category category) throws FoldingRestException {
-        final int hardwareId = HardwareUtils.create(generateHardware()).getId();
+        final int hardwareId = HardwareUtils.create(generateHardwareFromCategory(category)).getId();
         final int teamId = TeamUtils.create(generateTeam()).getId();
         final String userName = nextUserName();
 
@@ -155,7 +177,6 @@ public final class TestGenerator {
             .category(category.toString())
             .hardwareId(hardwareId)
             .teamId(teamId)
-            .userIsCaptain(false)
             .build();
     }
 
@@ -232,7 +253,7 @@ public final class TestGenerator {
      *                              or {@link TeamUtils#create(TeamRequest)}
      */
     public static UserRequest generateUserWithTeamIdAndCategory(final int teamId, final Category category) throws FoldingRestException {
-        final int hardwareId = HardwareUtils.create(generateHardware()).getId();
+        final int hardwareId = HardwareUtils.create(generateHardwareFromCategory(category)).getId();
         final String userName = nextUserName();
 
         return UserRequest.builder()

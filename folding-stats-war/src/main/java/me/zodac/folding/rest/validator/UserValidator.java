@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.stats.FoldingStatsDetails;
@@ -24,13 +25,10 @@ import org.apache.commons.validator.routines.UrlValidator;
 /**
  * Validator class to validate a {@link User} or {@link UserRequest}.
  */
-// TODO: [zodac] Validate the linked hardware matches the user's category
-// TODO: [zodac] Update passkey check to a regex of 32 alpha-numeric characters
-// TODO: [zodac] When validating update, only check units if foldingUserName or passkey has changed
 public final class UserValidator {
 
     private static final UrlValidator URL_VALIDATOR = new UrlValidator();
-    private static final int EXPECTED_PASSKEY_LENGTH = 32;
+    private static final Pattern PASSKEY_PATTERN = Pattern.compile("[a-zA-Z0-9]{32}");
 
     private final FoldingStatsRetriever foldingStatsRetriever;
 
@@ -106,20 +104,29 @@ public final class UserValidator {
             return ValidationResult.conflictingWith(userRequest, matchingUser.get(), List.of("foldingUserName", "passkey"));
         }
 
-        final List<String> failureMessages = Stream.of(
-                foldingUserName(userRequest),
-                displayName(userRequest),
-                passkey(userRequest),
-                category(userRequest),
-                profileLink(userRequest),
-                liveStatsLink(userRequest),
+        // Hardware and team must be validated first, since they may be used by other validation checks
+        final List<String> hardwareAndTeamFailureMessages = Stream.of(
                 hardware(userRequest, allHardware),
                 team(userRequest, allTeams)
             )
             .filter(Objects::nonNull)
             .collect(toList());
 
-        // All subsequent checks will be heavier, so best to return early if any failures occur
+        if (!hardwareAndTeamFailureMessages.isEmpty()) {
+            return ValidationResult.failure(userRequest, hardwareAndTeamFailureMessages);
+        }
+
+        final List<String> failureMessages = Stream.of(
+                foldingUserName(userRequest),
+                displayName(userRequest),
+                passkey(userRequest),
+                category(userRequest),
+                profileLink(userRequest),
+                liveStatsLink(userRequest)
+            )
+            .filter(Objects::nonNull)
+            .collect(toList());
+
         if (!failureMessages.isEmpty()) {
             return ValidationResult.failure(userRequest, failureMessages);
         }
@@ -130,7 +137,7 @@ public final class UserValidator {
         final List<String> complexFailureMessages = Stream.of(
                 validateNewUserDoesNotExceedTeamLimits(usersOnTeam, category),
                 validateNewUserCanBeCaptain(userRequest, usersOnTeam),
-                validateUserUnits(userRequest)
+                validateNewUserWorkUnits(userRequest)
             )
             .filter(Objects::nonNull)
             .collect(toList());
@@ -189,15 +196,25 @@ public final class UserValidator {
             return ValidationResult.conflictingWith(userRequest, matchingUser.get(), List.of("foldingUserName", "passkey"));
         }
 
+        // Hardware and team must be validated first, since they may be used by other validation checks
+        final List<String> hardwareAndTeamFailureMessages = Stream.of(
+                hardware(userRequest, allHardware),
+                team(userRequest, allTeams)
+            )
+            .filter(Objects::nonNull)
+            .collect(toList());
+
+        if (!hardwareAndTeamFailureMessages.isEmpty()) {
+            return ValidationResult.failure(userRequest, hardwareAndTeamFailureMessages);
+        }
+
         final List<String> failureMessages = Stream.of(
                 foldingUserName(userRequest),
                 displayName(userRequest),
                 passkey(userRequest),
                 category(userRequest),
                 profileLink(userRequest),
-                liveStatsLink(userRequest),
-                hardware(userRequest, allHardware),
-                team(userRequest, allTeams)
+                liveStatsLink(userRequest)
             )
             .filter(Objects::nonNull)
             .collect(toList());
@@ -213,7 +230,7 @@ public final class UserValidator {
         final List<String> complexFailureMessages = Stream.of(
                 validateUpdatedUserDoesNotExceedTeamLimits(userRequest, existingUser, usersOnTeam, category),
                 validateUpdatedUserCanBeCaptain(userRequest, usersOnTeam, existingUser),
-                validateUserUnits(userRequest)
+                validateUpdateUserWorkUnits(userRequest, existingUser)
             )
             .filter(Objects::nonNull)
             .collect(toList());
@@ -225,7 +242,22 @@ public final class UserValidator {
         return ValidationResult.successful(User.createWithoutId(userRequest, hardwareForUser, teamForUser));
     }
 
-    private String validateUserUnits(final UserRequest userRequest) {
+    private String validateNewUserWorkUnits(final UserRequest userRequest) {
+        return validateUserWorkUnits(userRequest);
+    }
+
+    private String validateUpdateUserWorkUnits(final UserRequest userRequest, final User existingUser) {
+        final boolean isFoldingUserNameChange = !userRequest.getFoldingUserName().equalsIgnoreCase(existingUser.getFoldingUserName());
+        final boolean isPasskeyChange = !userRequest.getPasskey().equalsIgnoreCase(existingUser.getPasskey());
+
+        if (isFoldingUserNameChange || isPasskeyChange) {
+            return validateUserWorkUnits(userRequest);
+        }
+
+        return null;
+    }
+
+    private String validateUserWorkUnits(final UserRequest userRequest) {
         try {
             final FoldingStatsDetails foldingStatsDetails = FoldingStatsDetails.create(userRequest.getFoldingUserName(), userRequest.getPasskey());
             final Stats statsForUserAndPasskey = foldingStatsRetriever.getStats(foldingStatsDetails);
@@ -367,25 +399,28 @@ public final class UserValidator {
     }
 
     private static String passkey(final UserRequest userRequest) {
-        if (StringUtils.isBlank(userRequest.getPasskey())) {
-            return "Field 'passkey' must not be empty";
+        return StringUtils.isBlank(userRequest.getPasskey()) || !PASSKEY_PATTERN.matcher(userRequest.getPasskey()).find()
+            ? "Field 'passkey' must be 32 characters long and include only alphanumeric characters"
+            : null;
+    }
+
+    private String category(final UserRequest userRequest) {
+        final Category category = Category.get(userRequest.getCategory());
+        if (category == Category.INVALID) {
+            return String.format("Field 'category' must be one of: %s", Category.getAllValues());
         }
 
-        if (userRequest.getPasskey().length() != EXPECTED_PASSKEY_LENGTH) {
-            return String.format("Field 'passkey' must be %d characters in length", EXPECTED_PASSKEY_LENGTH);
+        if (!category.isHardwareMakeSupported(hardwareForUser.getHardwareMake())) {
+            return String.format("Category '%s' cannot be filled by hardware of make '%s', must be one of: %s", category,
+                hardwareForUser.getHardwareMake(), category.supportedHardwareMakes());
         }
 
-        if (userRequest.getPasskey().contains("*")) {
-            return "Field 'passkey' cannot contain '*' characters";
+        if (!category.isHardwareTypeSupported(hardwareForUser.getHardwareType())) {
+            return String.format("Category '%s' cannot be filled by hardware of type '%s', must be one of: %s", category,
+                hardwareForUser.getHardwareType(), category.supportedHardwareTypes());
         }
 
         return null;
-    }
-
-    private static String category(final UserRequest userRequest) {
-        return Category.get(userRequest.getCategory()) == Category.INVALID
-            ? String.format("Field 'category' must be one of: %s", Category.getAllValues())
-            : null;
     }
 
     private static String profileLink(final UserRequest userRequest) {

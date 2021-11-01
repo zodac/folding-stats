@@ -2,7 +2,7 @@ package me.zodac.folding.test;
 
 import static me.zodac.folding.test.util.SystemCleaner.cleanSystemForComplexTests;
 import static me.zodac.folding.test.util.TestAuthenticationData.ADMIN_USER;
-import static me.zodac.folding.test.util.TestGenerator.generateHardware;
+import static me.zodac.folding.test.util.TestGenerator.generateHardwareFromCategory;
 import static me.zodac.folding.test.util.TestGenerator.generateTeam;
 import static me.zodac.folding.test.util.TestGenerator.generateUserWithCategory;
 import static me.zodac.folding.test.util.TestGenerator.nextUserName;
@@ -71,7 +71,8 @@ class ResetTest {
 
     @Test
     void whenResetOccurs_andRetiredStatsExistForTeam_thenRetiredStatsAreRemovedOnReset() throws FoldingRestException {
-        final Hardware hardware = HardwareUtils.create(generateHardware());
+        final Hardware captainHardware = HardwareUtils.create(generateHardwareFromCategory(Category.NVIDIA_GPU));
+        final Hardware hardware = HardwareUtils.create(generateHardwareFromCategory(Category.AMD_GPU));
         final Team team = TeamUtils.create(generateTeam());
 
         final UserRequest captainUser = UserRequest.builder()
@@ -79,7 +80,7 @@ class ResetTest {
             .displayName("displayName")
             .passkey("DummyPasskey12345678901234567890")
             .category(Category.NVIDIA_GPU.toString())
-            .hardwareId(hardware.getId())
+            .hardwareId(captainHardware.getId())
             .teamId(team.getId())
             .userIsCaptain(true)
             .build();
@@ -92,7 +93,6 @@ class ResetTest {
             .category(Category.AMD_GPU.toString())
             .hardwareId(hardware.getId())
             .teamId(team.getId())
-            .userIsCaptain(false)
             .build();
 
         final int userToRetireId = create(userToRetire).getId();

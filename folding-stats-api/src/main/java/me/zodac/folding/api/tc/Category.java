@@ -118,6 +118,26 @@ public enum Category {
     }
 
     /**
+     * Checks if the provided {@link HardwareMake} is supported by the {@link Category}.
+     *
+     * @param hardwareMake the {@link HardwareMake} to check
+     * @return <b>true</b> if the {@link HardwareMake} is supported
+     */
+    public boolean isHardwareMakeSupported(final HardwareMake hardwareMake) {
+        return supportedHardwareMakes.contains(hardwareMake);
+    }
+
+    /**
+     * Checks if the provided {@link HardwareType} is supported by the {@link Category}.
+     *
+     * @param hardwareType the {@link HardwareType} to check
+     * @return <b>true</b> if the {@link HardwareType} is supported
+     */
+    public boolean isHardwareTypeSupported(final HardwareType hardwareType) {
+        return supportedHardwareTypes.contains(hardwareType);
+    }
+
+    /**
      * Returns the supported {@link HardwareMake}s in the {@link Category}.
      *
      * @return a {@link Set} of the supported {@link HardwareMake}s
