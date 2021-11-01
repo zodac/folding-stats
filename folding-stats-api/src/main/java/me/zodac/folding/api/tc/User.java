@@ -116,6 +116,34 @@ public class User implements ResponsePojo {
     }
 
     /**
+     * Creates a {@link User}.
+     *
+     * <p>
+     * We assume the provided {@link UserRequest}'s {@link Category} has already been validated.
+     *
+     * <p>
+     * Since we do not know the ID until the DB has persisted the {@link User}, the {@link #EMPTY_USER_ID} will be used instead.
+     *
+     * @param userRequest the input {@link UserRequest} from the REST endpoint
+     * @param hardware    the {@link Hardware} that this {@link User} is Folding on
+     * @param team        the {@link Team} that the {@link User} is Folding for
+     * @return the created {@link User}
+     */
+    public static User createWithoutId(final UserRequest userRequest, final Hardware hardware, final Team team) {
+        return createWithoutId(
+            userRequest.getFoldingUserName(),
+            userRequest.getDisplayName(),
+            userRequest.getPasskey(),
+            Category.get(userRequest.getCategory()),
+            userRequest.getProfileLink(),
+            userRequest.getLiveStatsLink(),
+            hardware,
+            team,
+            userRequest.isUserIsCaptain()
+        );
+    }
+
+    /**
      * Updates a {@link User} with the given ID.
      *
      * <p>

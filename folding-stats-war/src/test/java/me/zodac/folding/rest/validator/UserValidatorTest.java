@@ -501,6 +501,36 @@ class UserValidatorTest {
     }
 
     @Test
+    void whenValidatingCreate_givenNoHardwareExistsOnSystem_thenFailureResponseIsReturned() {
+        final Team team = generateTeam();
+
+        final UserRequest user = UserRequest.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardwareId(1)
+            .teamId(team.getId())
+            .build();
+
+        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final ValidationResult<User> response = userValidator.validateCreate(user,
+            Collections.emptyList(),
+            Collections.emptyList(),
+            List.of(team)
+        );
+
+        assertThat(response.isFailure())
+            .isTrue();
+
+        assertThat(response.getErrors())
+            .containsOnly("No hardware exist on the system");
+    }
+
+    @Test
     void whenValidatingCreate_givenUserWithTeamWithNonExistingId_thenFailureResponseIsReturned() {
         final Hardware hardware = generateHardware();
         final Team team = generateTeam();
@@ -529,6 +559,36 @@ class UserValidatorTest {
 
         assertThat(response.getErrors())
             .containsOnly(String.format("Field 'teamId' must be one of: [%s: %s]", team.getId(), team.getTeamName()));
+    }
+
+    @Test
+    void whenValidatingCreate_givenNoTeamsExistsOnSystem_thenFailureResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+
+        final UserRequest user = UserRequest.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardwareId(hardware.getId())
+            .teamId(1)
+            .build();
+
+        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final ValidationResult<User> response = userValidator.validateCreate(user,
+            Collections.emptyList(),
+            List.of(hardware),
+            Collections.emptyList()
+        );
+
+        assertThat(response.isFailure())
+            .isTrue();
+
+        assertThat(response.getErrors())
+            .containsOnly("No teams exist on the system");
     }
 
     @Test
@@ -576,6 +636,47 @@ class UserValidatorTest {
     }
 
     @Test
+    void whenValidatingCreate_givenUserIsNotCaptain_andTeamAlreadyContainsCaptain_thenSuccessResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
+
+        final User currentCaptain = User.builder()
+            .foldingUserName("user1")
+            .displayName("user1")
+            .passkey("DummyPasskey12345678901234567891")
+            .category(Category.WILDCARD)
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardware(hardware)
+            .team(team)
+            .build();
+
+        final UserRequest user = UserRequest.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(false)
+            .hardwareId(hardware.getId())
+            .teamId(team.getId())
+            .build();
+
+        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final ValidationResult<User> response = userValidator.validateCreate(user,
+            List.of(currentCaptain),
+            List.of(hardware),
+            List.of(team)
+        );
+
+        assertThat(response.isFailure())
+            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
+            .isFalse();
+    }
+
+    @Test
     void whenValidatingCreate_givenTeamAlreadyHasMaximumTotalUsers_thenFailureResponseIsReturned() {
         final Hardware hardware = generateHardware();
         final Team team = generateTeam();
@@ -591,7 +692,7 @@ class UserValidatorTest {
                     .category(Category.WILDCARD)
                     .profileLink("http://www.google.com")
                     .liveStatsLink("http://www.google.com")
-                    .userIsCaptain(true)
+                    .userIsCaptain(false)
                     .hardware(hardware)
                     .team(team)
                     .build()
@@ -782,7 +883,7 @@ class UserValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .containsOnly("Unable to check stats for user 'user': Error connecting");
+            .containsOnly("Unable to connect to 'http://www.google.com' to check stats for user 'user': Error connecting");
     }
 
     @Test
@@ -1576,6 +1677,61 @@ class UserValidatorTest {
     }
 
     @Test
+    void whenValidatingUpdate_givenUserIsNotCaptain_andTeamAlreadyContainsCaptain_thenSuccessResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
+
+        final User currentCaptain = User.builder()
+            .id(2)
+            .foldingUserName("user1")
+            .displayName("user1")
+            .passkey("DummyPasskey12345678901234567891")
+            .category(Category.WILDCARD)
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardware(hardware)
+            .team(team)
+            .build();
+
+        final UserRequest user = UserRequest.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(false)
+            .hardwareId(hardware.getId())
+            .teamId(team.getId())
+            .build();
+
+        final User existingUser = User.builder()
+            .id(1)
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU)
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(false)
+            .hardware(hardware)
+            .team(team)
+            .build();
+
+        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
+            List.of(currentCaptain, existingUser),
+            List.of(hardware),
+            List.of(team)
+        );
+
+        assertThat(response.isFailure())
+            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
+            .isFalse();
+    }
+
+    @Test
     void whenValidatingUpdate_givenTeamIsUpdated_andTeamAlreadyHasMaximumTotalUsers_thenFailureResponseIsReturned() {
         final Hardware hardware = generateHardware();
         final Team team = generateTeam();
@@ -1945,7 +2101,7 @@ class UserValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .containsOnly("Unable to check stats for user 'user': Error connecting");
+            .containsOnly("Unable to connect to 'http://www.google.com' to check stats for user 'user': Error connecting");
     }
 
     private static Hardware generateHardware() {

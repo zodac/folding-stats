@@ -97,6 +97,9 @@ public class Hardware implements ResponsePojo {
      * Creates a {@link Hardware}.
      *
      * <p>
+     * We assume the provided {@link HardwareRequest}'s {@link HardwareMake} and {@link HardwareType} have already been validated.
+     *
+     * <p>
      * Since we do not know the ID until the DB has persisted the {@link Hardware}, the {@link #EMPTY_HARDWARE_ID} will be used instead.
      *
      * @param hardwareRequest the input {@link HardwareRequest} from the REST endpoint

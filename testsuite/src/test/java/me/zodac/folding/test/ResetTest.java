@@ -92,6 +92,7 @@ class ResetTest {
             .category(Category.AMD_GPU.toString())
             .hardwareId(hardware.getId())
             .teamId(team.getId())
+            .userIsCaptain(false)
             .build();
 
         final int userToRetireId = create(userToRetire).getId();

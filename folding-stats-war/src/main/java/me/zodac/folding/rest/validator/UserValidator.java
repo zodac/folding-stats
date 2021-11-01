@@ -2,11 +2,13 @@ package me.zodac.folding.rest.validator;
 
 import static java.util.stream.Collectors.toList;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
+import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.stats.FoldingStatsDetails;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
 import me.zodac.folding.api.tc.Category;
@@ -22,7 +24,6 @@ import org.apache.commons.validator.routines.UrlValidator;
 /**
  * Validator class to validate a {@link User} or {@link UserRequest}.
  */
-// TODO: [zodac] In severe need of a clean up
 // TODO: [zodac] Validate the linked hardware matches the user's category
 // TODO: [zodac] Update passkey check to a regex of 32 alpha-numeric characters
 // TODO: [zodac] When validating update, only check units if foldingUserName or passkey has changed
@@ -32,6 +33,10 @@ public final class UserValidator {
     private static final int EXPECTED_PASSKEY_LENGTH = 32;
 
     private final FoldingStatsRetriever foldingStatsRetriever;
+
+    // These fields will be set during validation for ease of re-use
+    private Hardware hardwareForUser;
+    private Team teamForUser;
 
     private UserValidator(final FoldingStatsRetriever foldingStatsRetriever) {
         this.foldingStatsRetriever = foldingStatsRetriever;
@@ -64,7 +69,22 @@ public final class UserValidator {
      *
      * <p>
      * Validation checks include:
-     * TODO:
+     * <ul>
+     *     <li>Input {@code userRequest} must not be <b>null</b></li>
+     *     <li>Field 'foldingUserName' must not be empty</li>
+     *     <li>Field 'displayName' must not be empty</li>
+     *     <li>Field 'passkey' must not be empty, must be 32-characters long, and must only include alphanumeric characters</li>
+     *     <li>If fields 'foldingUserName' and 'passkey' are valid, they must not be used by another {@link User}</li>
+     *     <li>Field 'category' must be a valid {@link Category}</li>
+     *     <li>If field 'profileLink' is not empty, it must be a valid URL</li>
+     *     <li>If field 'liveStatsLink' is not empty, it must be a valid URL</li>
+     *     <li>Field 'hardwareId' must match an existing {@link Hardware}</li>
+     *     <li>Field 'teamId' must match an existing {@link Team}</li>
+     *     <li>The {@link User} must not cause its {@link Team} to exceed the {@link Category#maximumPermittedAmountForAllCategories()}</li>
+     *     <li>The {@link User} must not cause its {@link Category} to exceed the {@link Category#permittedUsers()}</li>
+     *     <li>The {@link User} may only be captain if no other {@link User} in the team is already captain</li>
+     *     <li>The 'foldingUserName' and 'passkey' combination has at least 1 Work Unit successfully completed</li>
+     * </ul>
      *
      * @param userRequest the {@link UserRequest} to validate
      * @param allUsers    all existing {@link User}s in the system
@@ -72,7 +92,6 @@ public final class UserValidator {
      * @param allTeams    all existing {@link Team}s in the system
      * @return the {@link ValidationResult}
      */
-    @SuppressWarnings("PMD.NPathComplexity") // Better than breaking into smaller functions
     public ValidationResult<User> validateCreate(final UserRequest userRequest,
                                                  final Collection<User> allUsers,
                                                  final Collection<Hardware> allHardware,
@@ -81,89 +100,46 @@ public final class UserValidator {
             return ValidationResult.nullObject();
         }
 
-        final List<String> failureMessages = new ArrayList<>();
-
-        if (StringUtils.isBlank(userRequest.getFoldingUserName())) {
-            failureMessages.add("Field 'foldingUserName' must not be empty");
+        // The foldingUserName and passkey must be unique
+        final Optional<User> matchingUser = getUserWithFoldingUserNameAndPasskey(userRequest, allUsers);
+        if (matchingUser.isPresent()) {
+            return ValidationResult.conflictingWith(userRequest, matchingUser.get(), List.of("foldingUserName", "passkey"));
         }
 
-        // TODO: [zodac] Regex for passkey
-        if (StringUtils.isBlank(userRequest.getPasskey())) {
-            failureMessages.add("Field 'passkey' must not be empty");
-        } else {
-            if (userRequest.getPasskey().length() != EXPECTED_PASSKEY_LENGTH) {
-                failureMessages.add(String.format("Field 'passkey' must be %d characters in length", EXPECTED_PASSKEY_LENGTH));
-            }
+        final List<String> failureMessages = Stream.of(
+                foldingUserName(userRequest),
+                displayName(userRequest),
+                passkey(userRequest),
+                category(userRequest),
+                profileLink(userRequest),
+                liveStatsLink(userRequest),
+                hardware(userRequest, allHardware),
+                team(userRequest, allTeams)
+            )
+            .filter(Objects::nonNull)
+            .collect(toList());
 
-            if (userRequest.getPasskey().contains("*")) {
-                failureMessages.add("Field 'passkey' cannot contain '*' characters");
-            }
+        // All subsequent checks will be heavier, so best to return early if any failures occur
+        if (!failureMessages.isEmpty()) {
+            return ValidationResult.failure(userRequest, failureMessages);
         }
 
-        // If foldingUserName and passkey are valid, ensure they don't already exist
-        if (failureMessages.isEmpty()) { // TODO: [zodac] No need for this check
-            final Optional<User> matchingUser = getUserWithFoldingUserNameAndPasskey(userRequest, allUsers);
-
-            if (matchingUser.isPresent()) {
-                return ValidationResult
-                    .conflictingWith(userRequest, matchingUser.get(), List.of("foldingUserName", "passkey"));
-            }
-        }
-
-        if (StringUtils.isBlank(userRequest.getDisplayName())) {
-            failureMessages.add("Field 'displayName' must not be empty");
-        }
-
+        final Collection<User> usersOnTeam = getUsersOnTeam(teamForUser.getId(), allUsers);
         final Category category = Category.get(userRequest.getCategory());
-        if (Category.INVALID == category) {
-            failureMessages.add(String.format("Field 'category' must be one of: %s", Category.getAllValues()));
+
+        final List<String> complexFailureMessages = Stream.of(
+                validateNewUserDoesNotExceedTeamLimits(usersOnTeam, category),
+                validateNewUserCanBeCaptain(userRequest, usersOnTeam),
+                validateUserUnits(userRequest)
+            )
+            .filter(Objects::nonNull)
+            .collect(toList());
+
+        if (!complexFailureMessages.isEmpty()) {
+            return ValidationResult.failure(userRequest, complexFailureMessages);
         }
 
-        if (StringUtils.isNotEmpty(userRequest.getProfileLink()) && !URL_VALIDATOR.isValid(userRequest.getProfileLink())) {
-            failureMessages.add(String.format("Field 'profileLink' is not a valid link: '%s'", userRequest.getProfileLink()));
-
-        }
-
-        if (StringUtils.isNotEmpty(userRequest.getLiveStatsLink()) && !URL_VALIDATOR.isValid(userRequest.getLiveStatsLink())) {
-            failureMessages.add(String.format("Field 'liveStatsLink' is not a valid link: '%s'", userRequest.getLiveStatsLink()));
-        }
-
-        final List<String> hardwareValidationFailureMessages = validateHardware(userRequest, allHardware);
-        failureMessages.addAll(hardwareValidationFailureMessages);
-
-        final List<String> teamValidationFailureMessages = validateTeam(userRequest, allTeams);
-        failureMessages.addAll(teamValidationFailureMessages);
-
-        // Since this is a heavy validation check, only do it if the rest of the user is valid
-        if (failureMessages.isEmpty()) {
-            final List<String> teamFailureMessages = validateIfUserCanBeAddedToTeam(userRequest, category, null, allUsers, allTeams);
-            failureMessages.addAll(teamFailureMessages);
-        }
-
-        // Since this is a heavy validation check, only do it if the rest of the user is valid
-        if (failureMessages.isEmpty()) {
-            final List<String> userUnitsFailureMessages = validateUserUnits(userRequest);
-            failureMessages.addAll(userUnitsFailureMessages);
-        }
-
-        if (failureMessages.isEmpty()) {
-            // TODO: [zodac] Would have been retrieved earlier, find a way to reuse it
-            final Optional<Hardware> hardware = getHardware(userRequest.getHardwareId(), allHardware);
-            final Optional<Team> team = getTeam(userRequest.getTeamId(), allTeams);
-
-            if (hardware.isEmpty()) {
-                failureMessages.add(String.format("Unable to retrieve hardware with ID '%s'", userRequest.getHardwareId()));
-            } else if (team.isEmpty()) {
-                failureMessages.add(String.format("Unable to retrieve team with ID '%s'", userRequest.getTeamId()));
-            } else {
-                final User user =
-                    User.createWithoutId(userRequest.getFoldingUserName(), userRequest.getDisplayName(), userRequest.getPasskey(), category,
-                        userRequest.getProfileLink(), userRequest.getLiveStatsLink(), hardware.get(), team.get(), userRequest.isUserIsCaptain());
-                return ValidationResult.successful(user);
-            }
-        }
-
-        return ValidationResult.failure(userRequest, failureMessages);
+        return ValidationResult.successful(User.createWithoutId(userRequest, hardwareForUser, teamForUser));
     }
 
     /**
@@ -171,7 +147,25 @@ public final class UserValidator {
      *
      * <p>
      * Validation checks include:
-     * TODO:
+     * <ul>
+     *     <li>Input {@code userRequest} and {@code existingUser} must not be <b>null</b></li>
+     *     <li>Field 'foldingUserName' must not be empty</li>
+     *     <li>Field 'displayName' must not be empty</li>
+     *     <li>Field 'passkey' must not be empty, must be 32-characters long, and must only include alphanumeric characters</li>
+     *     <li>If fields 'foldingUserName' and 'passkey' are valid, they must not be used by another {@link User}, unless it is the {@link User} being
+     *     updated</li>
+     *     <li>Field 'category' must be a valid {@link Category}</li>
+     *     <li>If field 'profileLink' is not empty, it must be a valid URL</li>
+     *     <li>If field 'liveStatsLink' is not empty, it must be a valid URL</li>
+     *     <li>Field 'hardwareId' must match an existing {@link Hardware}</li>
+     *     <li>Field 'teamId' must match an existing {@link Team}</li>
+     *     <li>If the {@link User} is updating its {@link Team}, it must not cause its {@link Team} to exceed the
+     *     {@link Category#maximumPermittedAmountForAllCategories()}</li>
+     *     <li>If the {@link User} is updating its {@link Category} must not cause its {@link Category} to exceed the
+     *     {@link Category#permittedUsers()}</li>
+     *     <li>The {@link User} may only be captain if no other {@link User} in the team is already captain</li>
+     *     <li>The 'foldingUserName' and 'passkey' combination has at least 1 Work Unit successfully completed</li>
+     * </ul>
      *
      * @param userRequest  the {@link UserRequest} to validate
      * @param existingUser the already existing {@link User} in the system to be updated
@@ -180,7 +174,6 @@ public final class UserValidator {
      * @param allTeams     all existing {@link Team}s in the system
      * @return the {@link ValidationResult}
      */
-    @SuppressWarnings({"PMD.NPathComplexity", "PMD.CognitiveComplexity", "PMD.CyclomaticComplexity"}) // Better than breaking into smaller functions
     public ValidationResult<User> validateUpdate(final UserRequest userRequest,
                                                  final User existingUser,
                                                  final Collection<User> allUsers,
@@ -190,227 +183,136 @@ public final class UserValidator {
             return ValidationResult.nullObject();
         }
 
-        final List<String> failureMessages = new ArrayList<>();
-
-        if (StringUtils.isBlank(userRequest.getFoldingUserName())) {
-            failureMessages.add("Field 'foldingUserName' must not be empty");
+        // The foldingUserName and passkey must be unique, unless replacing the same user
+        final Optional<User> matchingUser = getUserWithFoldingUserNameAndPasskey(userRequest, allUsers);
+        if (matchingUser.isPresent() && matchingUser.get().getId() != existingUser.getId()) {
+            return ValidationResult.conflictingWith(userRequest, matchingUser.get(), List.of("foldingUserName", "passkey"));
         }
 
-        if (StringUtils.isBlank(userRequest.getPasskey())) {
-            failureMessages.add("Field 'passkey' must not be empty");
-        } else {
-            if (userRequest.getPasskey().length() != EXPECTED_PASSKEY_LENGTH) {
-                failureMessages.add(String.format("Field 'passkey' must be %d characters in length", EXPECTED_PASSKEY_LENGTH));
-            }
+        final List<String> failureMessages = Stream.of(
+                foldingUserName(userRequest),
+                displayName(userRequest),
+                passkey(userRequest),
+                category(userRequest),
+                profileLink(userRequest),
+                liveStatsLink(userRequest),
+                hardware(userRequest, allHardware),
+                team(userRequest, allTeams)
+            )
+            .filter(Objects::nonNull)
+            .collect(toList());
 
-            if (userRequest.getPasskey().contains("*")) {
-                failureMessages.add("Field 'passkey' cannot contain '*' characters");
-            }
+        // All subsequent checks will be heavier, so best to return early if any failures occur
+        if (!failureMessages.isEmpty()) {
+            return ValidationResult.failure(userRequest, failureMessages);
         }
 
-        // The foldingUserName and passkey must be unique, unless we're replacing the same user
-        if (failureMessages.isEmpty()) { // TODO: [zodac] No need for this check
-            final Optional<User> matchingUser = getUserWithFoldingUserNameAndPasskey(userRequest, allUsers);
-
-            if (matchingUser.isPresent() && matchingUser.get().getId() != existingUser.getId()) {
-                return ValidationResult
-                    .conflictingWith(userRequest, matchingUser.get(), List.of("foldingUserName", "passkey"));
-            }
-        }
-
-        if (StringUtils.isBlank(userRequest.getDisplayName())) {
-            failureMessages.add("Field 'displayName' must not be empty");
-        }
-
+        final Collection<User> usersOnTeam = getUsersOnTeam(teamForUser.getId(), allUsers);
         final Category category = Category.get(userRequest.getCategory());
-        if (Category.INVALID == category) {
-            failureMessages.add(String.format("Field 'category' must be one of: %s", Category.getAllValues()));
+
+        final List<String> complexFailureMessages = Stream.of(
+                validateUpdatedUserDoesNotExceedTeamLimits(userRequest, existingUser, usersOnTeam, category),
+                validateUpdatedUserCanBeCaptain(userRequest, usersOnTeam, existingUser),
+                validateUserUnits(userRequest)
+            )
+            .filter(Objects::nonNull)
+            .collect(toList());
+
+        if (!complexFailureMessages.isEmpty()) {
+            return ValidationResult.failure(userRequest, complexFailureMessages);
         }
 
-        if (StringUtils.isNotEmpty(userRequest.getProfileLink()) && !URL_VALIDATOR.isValid(userRequest.getProfileLink())) {
-            failureMessages.add(String.format("Field 'profileLink' is not a valid link: '%s'", userRequest.getProfileLink()));
-        }
-
-        if (StringUtils.isNotEmpty(userRequest.getLiveStatsLink()) && !URL_VALIDATOR.isValid(userRequest.getLiveStatsLink())) {
-            failureMessages.add(String.format("Field 'liveStatsLink' is not a valid link: '%s'", userRequest.getLiveStatsLink()));
-        }
-
-        final List<String> hardwareValidationFailureMessages = validateHardware(userRequest, allHardware);
-        failureMessages.addAll(hardwareValidationFailureMessages);
-
-        final List<String> teamValidationFailureMessages = validateTeam(userRequest, allTeams);
-        failureMessages.addAll(teamValidationFailureMessages);
-
-        // Since this is a heavy validation check, only do it if the rest of the user is valid
-        if (failureMessages.isEmpty()) {
-            final List<String> teamFailureMessages = validateIfUserCanBeAddedToTeam(userRequest, category, existingUser, allUsers, allTeams);
-            failureMessages.addAll(teamFailureMessages);
-        }
-
-        // Since this is a heavy validation check, only do it if the rest of the user is valid
-        if (failureMessages.isEmpty()) {
-            final List<String> userUnitsFailureMessages = validateUserUnits(userRequest);
-            failureMessages.addAll(userUnitsFailureMessages);
-        }
-
-        if (failureMessages.isEmpty()) {
-            final Optional<Hardware> hardware = getHardware(userRequest.getHardwareId(), allHardware);
-            final Optional<Team> team = getTeam(userRequest.getTeamId(), allTeams);
-
-            if (hardware.isEmpty()) {
-                failureMessages.add(String.format("Unable to retrieve hardware with ID '%s'", userRequest.getHardwareId()));
-            } else if (team.isEmpty()) {
-                failureMessages.add(String.format("Unable to retrieve team with ID '%s'", userRequest.getTeamId()));
-            } else {
-                final User user =
-                    User.createWithoutId(userRequest.getFoldingUserName(), userRequest.getDisplayName(), userRequest.getPasskey(), category,
-                        userRequest.getProfileLink(), userRequest.getLiveStatsLink(), hardware.get(), team.get(), userRequest.isUserIsCaptain());
-                return ValidationResult.successful(user);
-            }
-        }
-
-        return ValidationResult.failure(userRequest, failureMessages);
+        return ValidationResult.successful(User.createWithoutId(userRequest, hardwareForUser, teamForUser));
     }
 
-    // TODO: [zodac] New error message if no hardware or team exists on system?
-    private static List<String> validateHardware(final UserRequest userRequest, final Collection<Hardware> allHardware) {
-        if (getHardware(userRequest.getHardwareId(), allHardware).isEmpty()) {
-            final List<String> availableHardware = allHardware
-                .stream()
-                .map(hardware -> String.format("%s: %s", hardware.getId(), hardware.getHardwareName()))
-                .collect(toList());
-
-            return List.of(String.format("Field 'hardwareId' must be one of: %s", availableHardware));
-        }
-
-        return Collections.emptyList();
-    }
-
-    private static List<String> validateTeam(final UserRequest userRequest, final Collection<Team> allTeams) {
-        if (getTeam(userRequest.getTeamId(), allTeams).isEmpty()) {
-            final List<String> availableTeams = allTeams
-                .stream()
-                .map(team -> String.format("%s: %s", team.getId(), team.getTeamName()))
-                .collect(toList());
-
-            return List.of(String.format("Field 'teamId' must be one of: %s", availableTeams));
-        }
-
-        return Collections.emptyList();
-    }
-
-    private List<String> validateUserUnits(final UserRequest userRequest) {
+    private String validateUserUnits(final UserRequest userRequest) {
         try {
             final FoldingStatsDetails foldingStatsDetails = FoldingStatsDetails.create(userRequest.getFoldingUserName(), userRequest.getPasskey());
             final Stats statsForUserAndPasskey = foldingStatsRetriever.getStats(foldingStatsDetails);
 
             if (statsForUserAndPasskey.getUnits() == 0) {
-                return List.of(String.format(
+                return String.format(
                     "User '%s' has 0 Work Units with passkey '%s', there must be at least one completed Work Unit before adding the user",
-                    userRequest.getFoldingUserName(), userRequest.getPasskey()
-                ));
+                    userRequest.getFoldingUserName(), userRequest.getPasskey());
             }
-        } catch (final Exception e) { // TODO: [zodac] Handle ExternalConnectionException here, otherwise will return 400 response instead of 502
-            return List.of(String.format("Unable to check stats for user '%s': %s", userRequest.getDisplayName(), e.getMessage()));
+        } catch (final ExternalConnectionException e) {
+            return String.format("Unable to connect to '%s' to check stats for user '%s': %s", e.getUrl(), userRequest.getDisplayName(),
+                e.getMessage());
+        } catch (final Exception e) {
+            return String.format("Unable to check stats for user '%s': %s", userRequest.getDisplayName(), e.getMessage());
         }
 
-        return Collections.emptyList();
+        return null;
     }
 
-    @SuppressWarnings({"PMD.NPathComplexity", "PMD.CognitiveComplexity"}) // Better than breaking into smaller functions
-    private static List<String> validateIfUserCanBeAddedToTeam(final UserRequest userRequest,
-                                                               final Category category,
-                                                               final User existingUser,
-                                                               final Collection<User> allUsers,
-                                                               final Collection<Team> allTeams) {
-        // TODO: [zodac] We should have this team already
-        final Optional<Team> team = getTeam(userRequest.getTeamId(), allTeams);
-        if (team.isEmpty()) {
-            return List.of(String.format("Unable to retrieve team with ID '%s'", userRequest.getTeamId()));
+    private String validateUpdatedUserDoesNotExceedTeamLimits(final UserRequest userRequest, final User existingUser,
+                                                              final Collection<User> usersOnTeam,
+                                                              final Category category) {
+        final boolean userIsChangingTeams = userRequest.getTeamId() != existingUser.getTeam().getId();
+        if (userIsChangingTeams) {
+            // If we are changing teams, we need to ensure there is enough space in the team and category
+            return validateNewUserDoesNotExceedTeamLimits(usersOnTeam, category);
         }
 
-        final List<String> failureMessages = new ArrayList<>(4);
-        final Collection<User> usersOnTeam = getUsersOnTeam(team.get().getId(), allUsers);
-
-        final boolean isCreate = existingUser == null;
-
-        // What the hell, man? Who approved this?
-        if (isCreate) {
-            if (userRequest.isUserIsCaptain()) {
-                for (final User existingUserOnTeam : usersOnTeam) {
-                    if (existingUserOnTeam.isUserIsCaptain()) {
-                        failureMessages.add(
-                            String.format("Team '%s' already has a captain '%s', cannot have multiple captains", team.get().getTeamName(),
-                                existingUserOnTeam.getDisplayName()));
-                        break; // There will only be a single captain per team
-                    }
-                }
-            }
-
-            if (usersOnTeam.size() == Category.maximumPermittedAmountForAllCategories()) {
-                failureMessages.add(String.format("Team '%s' has %s users, maximum permitted is %s", team.get().getTeamName(), usersOnTeam.size(),
-                    Category.maximumPermittedAmountForAllCategories()));
-            }
-
+        final boolean userIsChangingCategory = category != existingUser.getCategory();
+        if (userIsChangingCategory) {
+            // If we are staying on the team but changing category, we need to ensure there is space in the category
             final int permittedNumberForCategory = category.permittedUsers();
             final long numberOfUsersInTeamWithCategory = usersOnTeam
                 .stream()
-                .filter(user -> user.getCategory() == category)
+                .filter(user -> user.getId() != existingUser.getId() && user.getCategory() == category)
                 .count();
 
-            if (numberOfUsersInTeamWithCategory == permittedNumberForCategory) {
-                failureMessages.add(String.format("Team '%s' already has %s users in category '%s', only %s permitted", team.get().getTeamName(),
-                    numberOfUsersInTeamWithCategory, category, permittedNumberForCategory));
-            }
-        } else {
-            // isUpdate
-            final boolean updatingUserInTeam = userRequest.getTeamId() == existingUser.getTeam().getId();
-
-            // What if the user was a captain, but is on a new team now? This will allow it incorrectly?
-            for (final User existingUserOnTeam : usersOnTeam) {
-                if (existingUserOnTeam.isUserIsCaptain() && existingUser.getId() != existingUserOnTeam.getId()) {
-                    failureMessages.add(
-                        String.format("Team '%s' already has a captain '%s', cannot have multiple captains", team.get().getTeamName(),
-                            existingUserOnTeam.getDisplayName()));
-                    break; // There will only be a single captain per team
-                }
-            }
-
-            if (updatingUserInTeam) {
-                // Only check that we are not changing category
-                if (category != existingUser.getCategory()) {
-                    final int permittedNumberForCategory = category.permittedUsers();
-                    final long numberOfUsersInTeamWithCategory = usersOnTeam
-                        .stream()
-                        .filter(user -> user.getId() != existingUser.getId() && user.getCategory() == category)
-                        .count();
-
-                    if (numberOfUsersInTeamWithCategory >= permittedNumberForCategory) {
-                        failureMessages.add(String.format("Team '%s' already has %s users in category '%s', only %s permitted",
-                            team.get().getTeamName(), numberOfUsersInTeamWithCategory, category, permittedNumberForCategory));
-                    }
-                }
-            } else {
-                // Check we are not exceeding size limits (team and category) in new team
-                if (usersOnTeam.size() == Category.maximumPermittedAmountForAllCategories()) {
-                    failureMessages.add(String.format("Team '%s' has %s users, maximum permitted is %s", team.get().getTeamName(), usersOnTeam.size(),
-                        Category.maximumPermittedAmountForAllCategories()));
-                }
-
-                final int permittedNumberForCategory = category.permittedUsers();
-                final long numberOfUsersInTeamWithCategory = usersOnTeam
-                    .stream()
-                    .filter(user -> user.getCategory() == category)
-                    .count();
-
-                if (numberOfUsersInTeamWithCategory == permittedNumberForCategory) {
-                    failureMessages.add(String.format("Team '%s' already has %s users in category '%s', only %s permitted", team.get().getTeamName(),
-                        numberOfUsersInTeamWithCategory, category, permittedNumberForCategory));
-                }
+            if (numberOfUsersInTeamWithCategory >= permittedNumberForCategory) {
+                return String.format("Team '%s' already has %s users in category '%s', only %s permitted",
+                    teamForUser.getTeamName(), numberOfUsersInTeamWithCategory, category, permittedNumberForCategory);
             }
         }
 
-        return failureMessages;
+        return null;
+    }
+
+    private String validateNewUserCanBeCaptain(final UserRequest userRequest, final Collection<User> usersOnTeam) {
+        return validateUserCanBeCaptain(userRequest, usersOnTeam, null);
+    }
+
+    private String validateUpdatedUserCanBeCaptain(final UserRequest userRequest, final Collection<User> usersOnTeam, final User existingUser) {
+        return validateUserCanBeCaptain(userRequest, usersOnTeam, existingUser);
+    }
+
+    private String validateUserCanBeCaptain(final UserRequest userRequest, final Collection<User> usersOnTeam, final User existingUser) {
+        if (!userRequest.isUserIsCaptain()) {
+            return null;
+        }
+
+        for (final User userOnTeam : usersOnTeam) {
+            if (userOnTeam.isUserIsCaptain() && (existingUser == null || existingUser.getId() != userOnTeam.getId())) {
+                return String.format("Team '%s' already has a captain '%s', cannot have multiple captains", teamForUser.getTeamName(),
+                    userOnTeam.getDisplayName());
+            }
+        }
+
+        return null;
+    }
+
+    private String validateNewUserDoesNotExceedTeamLimits(final Collection<User> usersOnTeam, final Category category) {
+        if (usersOnTeam.size() == Category.maximumPermittedAmountForAllCategories()) {
+            return String.format("Team '%s' has %s users, maximum permitted is %s", teamForUser.getTeamName(), usersOnTeam.size(),
+                Category.maximumPermittedAmountForAllCategories());
+        }
+
+        final int permittedNumberForCategory = category.permittedUsers();
+        final long numberOfUsersInTeamWithCategory = usersOnTeam
+            .stream()
+            .filter(user -> user.getCategory() == category)
+            .count();
+
+        if (numberOfUsersInTeamWithCategory == permittedNumberForCategory) {
+            return String.format("Team '%s' already has %s users in category '%s', only %s permitted", teamForUser.getTeamName(),
+                numberOfUsersInTeamWithCategory, category, permittedNumberForCategory);
+        }
+
+        return null;
     }
 
     private static Optional<User> getUserWithFoldingUserNameAndPasskey(final UserRequest userRequest, final Collection<User> allUsers) {
@@ -450,5 +352,89 @@ public final class UserValidator {
             .stream()
             .filter(team -> team.getId() == teamId)
             .findAny();
+    }
+
+    private static String foldingUserName(final UserRequest userRequest) {
+        return StringUtils.isNotBlank(userRequest.getFoldingUserName())
+            ? null
+            : "Field 'foldingUserName' must not be empty";
+    }
+
+    private static String displayName(final UserRequest userRequest) {
+        return StringUtils.isNotBlank(userRequest.getDisplayName())
+            ? null
+            : "Field 'displayName' must not be empty";
+    }
+
+    private static String passkey(final UserRequest userRequest) {
+        if (StringUtils.isBlank(userRequest.getPasskey())) {
+            return "Field 'passkey' must not be empty";
+        }
+
+        if (userRequest.getPasskey().length() != EXPECTED_PASSKEY_LENGTH) {
+            return String.format("Field 'passkey' must be %d characters in length", EXPECTED_PASSKEY_LENGTH);
+        }
+
+        if (userRequest.getPasskey().contains("*")) {
+            return "Field 'passkey' cannot contain '*' characters";
+        }
+
+        return null;
+    }
+
+    private static String category(final UserRequest userRequest) {
+        return Category.get(userRequest.getCategory()) == Category.INVALID
+            ? String.format("Field 'category' must be one of: %s", Category.getAllValues())
+            : null;
+    }
+
+    private static String profileLink(final UserRequest userRequest) {
+        return (StringUtils.isBlank(userRequest.getProfileLink()) || URL_VALIDATOR.isValid(userRequest.getProfileLink()))
+            ? null
+            : String.format("Field 'profileLink' is not a valid link: '%s'", userRequest.getProfileLink());
+    }
+
+    private static String liveStatsLink(final UserRequest userRequest) {
+        return (StringUtils.isBlank(userRequest.getLiveStatsLink()) || URL_VALIDATOR.isValid(userRequest.getLiveStatsLink()))
+            ? null
+            : String.format("Field 'liveStatsLink' is not a valid link: '%s'", userRequest.getLiveStatsLink());
+    }
+
+    private String hardware(final UserRequest userRequest, final Collection<Hardware> allHardware) {
+        if (allHardware.isEmpty()) {
+            return "No hardware exist on the system";
+        }
+
+        final Optional<Hardware> optionalHardware = getHardware(userRequest.getHardwareId(), allHardware);
+        if (optionalHardware.isEmpty()) {
+            final List<String> availableHardware = allHardware
+                .stream()
+                .map(hardware -> String.format("%s: %s", hardware.getId(), hardware.getHardwareName()))
+                .collect(toList());
+
+            return String.format("Field 'hardwareId' must be one of: %s", availableHardware);
+        }
+
+        hardwareForUser = optionalHardware.get();
+        return null;
+    }
+
+    private String team(final UserRequest userRequest, final Collection<Team> allTeams) {
+        if (allTeams.isEmpty()) {
+            return "No teams exist on the system";
+        }
+
+        final Optional<Team> optionalTeam = getTeam(userRequest.getTeamId(), allTeams);
+        if (optionalTeam.isEmpty()) {
+            final List<String> availableTeams = allTeams
+                .stream()
+                .map(team -> String.format("%s: %s", team.getId(), team.getTeamName()))
+                .collect(toList());
+
+            return String.format("Field 'teamId' must be one of: %s", availableTeams);
+        }
+
+        teamForUser = optionalTeam.get();
+        return null;
     }
 }

@@ -36,9 +36,12 @@ public final class HardwareValidator {
      * <ul>
      *     <li>Input {@code hardwareRequest} must not be <b>null</b></li>
      *     <li>Field 'hardwareName' must not be empty</li>
-     *     <li>If field 'hardwareName' is not empty, it must not be used by another {@link Hardware}</li>
+     *     <li>If field 'hardwareName' is valid, it must not be used by another {@link Hardware}</li>
      *     <li>Field 'displayName' must not be empty</li>
+     *     <li>Field 'hardwareMake' must be a valid {@link HardwareMake}</li>
+     *     <li>Field 'hardwareType' must be a valid {@link HardwareType}</li>
      *     <li>Field 'multiplier' must be over <b>0.00</b></li>
+     *     <li>Field 'averagePpd' must be over <b>1</b></li>
      * </ul>
      *
      * @param hardwareRequest the {@link HardwareRequest} to validate
@@ -50,7 +53,7 @@ public final class HardwareValidator {
             return ValidationResult.nullObject();
         }
 
-        // Hardware name must be unique
+        // The hardwareName must be unique
         final Optional<Hardware> hardwareWithMatchingName = getHardwareWithName(hardwareRequest.getHardwareName(), allHardware);
         if (hardwareWithMatchingName.isPresent()) {
             return ValidationResult.conflictingWith(hardwareRequest, hardwareWithMatchingName.get(), List.of("hardwareName"));
@@ -83,10 +86,13 @@ public final class HardwareValidator {
      * <ul>
      *     <li>Input {@code hardwareRequest} and {@code existingHardware} must not be <b>null</b></li>
      *     <li>Field 'hardwareName' must not be empty</li>
-     *     <li>If field 'hardwareName' is not empty, it must not be used by another {@link Hardware}, unless it is the {@link Hardware} to be
+     *     <li>If field 'hardwareName' is valid, it must not be used by another {@link Hardware}, unless it is the {@link Hardware} to be
      *     updated</li>
      *     <li>Field 'displayName' must not be empty</li>
+     *     <li>Field 'hardwareMake' must be a valid {@link HardwareMake}</li>
+     *     <li>Field 'hardwareType' must be a valid {@link HardwareType}</li>
      *     <li>Field 'multiplier' must be over <b>0.00</b></li>
+     *     <li>Field 'averagePpd' must be over <b>1</b></li>
      * </ul>
      *
      * @param hardwareRequest  the {@link HardwareRequest} to validate
@@ -101,7 +107,7 @@ public final class HardwareValidator {
             return ValidationResult.nullObject();
         }
 
-        // Hardware name must be unique
+        // The hardwareName must be unique, unless replacing the same hardware
         final Optional<Hardware> hardwareWithMatchingName = getHardwareWithName(hardwareRequest.getHardwareName(), allHardware);
         if (hardwareWithMatchingName.isPresent() && hardwareWithMatchingName.get().getId() != existingHardware.getId()) {
             return ValidationResult.conflictingWith(hardwareRequest, hardwareWithMatchingName.get(), List.of("hardwareName"));

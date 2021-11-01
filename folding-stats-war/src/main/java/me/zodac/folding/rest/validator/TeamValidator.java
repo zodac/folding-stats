@@ -32,7 +32,7 @@ public final class TeamValidator {
      * Validation checks include:
      * <ul>
      *     <li>Field 'teamName' must not be empty</li>
-     *     <li>If field 'teamName' is not empty, it must not be used by any other {@link Team}</li>
+     *     <li>If field 'teamName' is valid, it must not be used by any other {@link Team}</li>
      *     <li>If field 'forumLink' is not empty, it must be a valid URL</li>
      * </ul>
      *
@@ -46,7 +46,7 @@ public final class TeamValidator {
             return ValidationResult.nullObject();
         }
 
-        // Team name must be unique
+        // The teamName must be unique
         final Optional<Team> teamWithMatchingName = getTeamWithName(teamRequest.getTeamName(), allTeams);
         if (teamWithMatchingName.isPresent()) {
             return ValidationResult.conflictingWith(teamRequest, teamWithMatchingName.get(), List.of("teamName"));
@@ -74,7 +74,7 @@ public final class TeamValidator {
      * Validation checks include:
      * <ul>
      *     <li>Field 'teamName' must not be empty</li>
-     *     <li>If field 'teamName' is not empty, it must not be used by another {@link Team}, unless it is the {@link Team} to be updated</li>
+     *     <li>If field 'teamName' is valid, it must not be used by another {@link Team}, unless it is the {@link Team} to be updated</li>
      *     <li>If field 'forumLink' is not empty, it must be a valid URL</li>
      * </ul>
      *
@@ -88,7 +88,7 @@ public final class TeamValidator {
             return ValidationResult.nullObject();
         }
 
-        // Team name must be unique
+        // The teamName must be unique, unless replacing the same team
         final Optional<Team> teamWithMatchingName = getTeamWithName(teamRequest.getTeamName(), allTeams);
         if (teamWithMatchingName.isPresent() && teamWithMatchingName.get().getId() != existingTeam.getId()) {
             return ValidationResult.conflictingWith(teamRequest, teamWithMatchingName.get(), List.of("teamName"));
@@ -149,11 +149,14 @@ public final class TeamValidator {
     }
 
     private static String teamName(final TeamRequest teamRequest) {
-        return StringUtils.isNotBlank(teamRequest.getTeamName()) ? null : "Field 'teamName' must not be empty";
+        return StringUtils.isNotBlank(teamRequest.getTeamName())
+            ? null
+            : "Field 'teamName' must not be empty";
     }
 
     private static String forumLink(final TeamRequest teamRequest) {
-        return (StringUtils.isBlank(teamRequest.getForumLink()) || URL_VALIDATOR.isValid(teamRequest.getForumLink())) ? null :
-            String.format("Field 'forumLink' is not a valid link: '%s'", teamRequest.getForumLink());
+        return (StringUtils.isBlank(teamRequest.getForumLink()) || URL_VALIDATOR.isValid(teamRequest.getForumLink()))
+            ? null
+            : String.format("Field 'forumLink' is not a valid link: '%s'", teamRequest.getForumLink());
     }
 }

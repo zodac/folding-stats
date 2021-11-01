@@ -155,6 +155,7 @@ public final class TestGenerator {
             .category(category.toString())
             .hardwareId(hardwareId)
             .teamId(teamId)
+            .userIsCaptain(false)
             .build();
     }
 
