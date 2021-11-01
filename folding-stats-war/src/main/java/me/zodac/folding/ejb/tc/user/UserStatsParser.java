@@ -110,13 +110,13 @@ public class UserStatsParser {
         final UserTcStats statsBeforeOffset = UserTcStats.create(user.getId(), totalStats.getTimestamp(), points, multipliedPoints, units);
         final UserTcStats hourlyUserTcStats = statsBeforeOffset.updateWithOffsets(offsetTcStats);
 
-        LOGGER.debug("{}: {} total points (unmultiplied) | {} total units", user::getDisplayName, () -> formatWithCommas(totalStats.getPoints()),
-            () -> formatWithCommas(totalStats.getUnits()));
-        LOGGER.debug("{}: {} TC multiplied points (pre-offset) | {} TC units (pre-offset)", user::getDisplayName,
+        LOGGER.debug("{} (ID: {}): {} total points (unmultiplied) | {} total units", user::getDisplayName, user::getId,
+            () -> formatWithCommas(totalStats.getPoints()), () -> formatWithCommas(totalStats.getUnits()));
+        LOGGER.debug("{} (ID: {}): {} TC multiplied points (pre-offset) | {} TC units (pre-offset)", user::getDisplayName, user::getId,
             () -> formatWithCommas(multipliedPoints), () -> formatWithCommas(units));
 
         final UserTcStats createdHourlyTcStats = businessLogic.createHourlyTcStats(hourlyUserTcStats);
-        LOGGER.info("{}: {} TC points | {} TC units", user.getDisplayName(), formatWithCommas(createdHourlyTcStats.getMultipliedPoints()),
-            formatWithCommas(createdHourlyTcStats.getUnits()));
+        LOGGER.info("{} (ID: {}): {} TC points | {} TC units", user.getDisplayName(), user.getId(),
+            formatWithCommas(createdHourlyTcStats.getMultipliedPoints()), formatWithCommas(createdHourlyTcStats.getUnits()));
     }
 }
