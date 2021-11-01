@@ -7,22 +7,17 @@ services:
       context: .
       dockerfile: docker/apache/Dockerfile
       args:
-        ROOT_URL: "https://internal-secure.axihub.ca/folding"
+        ROOT_URL: "https://internal.axihub.ca/folding"
     container_name: frontend
     hostname: frontend
     depends_on:
       - backend
-    healthcheck:
-      test: curl --fail http://localhost/ || exit 1
-      interval: 120s
-      timeout: 10s
-      retries: 10
     links:
       - backend
     networks:
       - production
     ports:
-      - "85:80"
+      - "443:443"
 
   backend:
     build:
@@ -69,7 +64,6 @@ services:
     networks:
       - production
     ports:
-      - "8080:8080"
       - "8443:8443"
       - "9990:9990"
     volumes:

@@ -27,10 +27,13 @@ COPY ./docker/apache/raml/ /docker/apache/raml/
 RUN raml2html --input /docker/apache/raml/api.raml --output /docker/apache/api.html
 
 FROM httpd:2.4-alpine
-WORKDIR /usr/local/apache2/htdocs/
 
-# Used for healthcheck
-RUN apk add curl
+# SSL configuration
+COPY ./docker/apache/conf/httpd.conf /usr/local/apache2/conf/httpd.conf
+COPY ./docker/apache/conf/certs/server.crt /usr/local/apache2/conf/server.crt
+COPY ./docker/apache/conf/certs/server.key /usr/local/apache2/conf/server.key
+
+WORKDIR /usr/local/apache2/htdocs/
 
 # Copy the RAML API and minified JS/CSS files
 COPY --from=raml /docker/apache/api.html ./api.html
