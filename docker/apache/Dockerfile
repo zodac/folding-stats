@@ -28,10 +28,10 @@ RUN raml2html --input /docker/apache/raml/api.raml --output /docker/apache/api.h
 
 FROM httpd:2.4-alpine
 
-# SSL configuration
+# Apache configuration (SSL certs are provided through a volume mount)
 COPY ./docker/apache/conf/httpd.conf /usr/local/apache2/conf/httpd.conf
-COPY ./docker/apache/conf/certs/server.crt /usr/local/apache2/conf/server.crt
-COPY ./docker/apache/conf/certs/server.key /usr/local/apache2/conf/server.key
+COPY ./docker/apache/conf/httpd-ssl.conf /usr/local/apache2/conf/original/extra/httpd-ssl.conf
+COPY ./docker/apache/conf/httpd-ssl.conf /usr/local/apache2/conf/extra/httpd-ssl.conf
 
 WORKDIR /usr/local/apache2/htdocs/
 

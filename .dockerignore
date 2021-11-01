@@ -1,5 +1,13 @@
 Dockerfile
 .dockerignore
+.env.template
+.env
+.gitignore
+CONTRIBUTING.md
+README.md
+LICENSE
+docker-compose-dev.yml
+docker-compose.yml
 
 # IntelliJ
 *.iml

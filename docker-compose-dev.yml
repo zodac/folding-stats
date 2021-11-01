@@ -18,6 +18,8 @@ services:
       - development
     ports:
       - "81:80"
+    volumes:
+      - "${SSL_CERT_DIRECTORY}:/usr/local/apache2/conf/certs"
 
   backend_dev:
     build:
