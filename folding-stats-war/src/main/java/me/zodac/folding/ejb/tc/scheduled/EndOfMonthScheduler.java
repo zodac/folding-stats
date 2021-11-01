@@ -109,17 +109,17 @@ public class EndOfMonthScheduler {
             return;
         }
 
+        if (IS_MONTHLY_RESULT_ENABLED) {
+            LOGGER.info("Storing TC stats for new month");
+            userStatsStorer.storeMonthlyResult();
+        }
+
         if (IS_MONTHLY_RESET_ENABLED) {
             LOGGER.warn("Resetting TC stats for end of month");
             ParsingStateManager.next(ParsingState.DISABLED);
             SystemStateManager.next(SystemState.RESETTING_STATS);
             userStatsResetter.resetTeamCompetitionStats();
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
-        }
-
-        if (IS_MONTHLY_RESULT_ENABLED) {
-            LOGGER.info("Storing TC stats for new month");
-            userStatsStorer.storeMonthlyResult();
         }
 
         if (IS_LARS_UPDATE_ENABLED) {
