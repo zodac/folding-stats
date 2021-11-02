@@ -8,7 +8,6 @@ services:
       dockerfile: docker/apache/Dockerfile
       args:
         ROOT_URL: "https://internal.axihub.ca/folding"
-        SSL_CERT_DIRECTORY: "${SSL_CERT_DIRECTORY}"
     container_name: frontend
     hostname: frontend
     depends_on:
