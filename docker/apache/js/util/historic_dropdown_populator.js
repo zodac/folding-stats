@@ -20,7 +20,7 @@ function populateUserDropdown(dropdownId) {
             userButton.setAttribute("class", "dropdown-item");
             userButton.setAttribute("type", "button");
 
-            var userDisplayNameWithoutQuotes = userItem["displayName"].replace("'", "\\'")
+            var userDisplayNameWithoutQuotes = escape(userItem["displayName"]);
             userButton.setAttribute("onclick", "getUserHistoricStats("+userItem["id"]+",'"+userDisplayNameWithoutQuotes+"',null,null,null,null)");
             userButton.innerHTML = userItem["displayName"];
 
@@ -47,7 +47,7 @@ function populateTeamDropdown(dropdownId) {
             teamButton.setAttribute("class", "dropdown-item");
             teamButton.setAttribute("type", "button");
 
-            var teamNameWithoutQuotes = teamItem["teamName"].replace("'", "\\'")
+            var teamNameWithoutQuotes = escape(teamItem["teamName"];
             teamButton.setAttribute("onclick", "getTeamHistoricStats("+teamItem["id"]+",'"+teamNameWithoutQuotes+"',null,null,null,null)");
             teamButton.innerHTML = teamItem["teamName"];
 

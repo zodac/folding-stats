@@ -8,12 +8,12 @@ function createHardware() {
 
     var requestData = JSON.stringify(
         {
-            "hardwareName": hardwareName,
-            "displayName": displayName,
-            "hardwareMake": getHardwareMakeBackend(hardwareMake),
-            "hardwareType": getHardwareTypeBackend(hardwareType),
-            "multiplier": multiplier,
-            "averagePpd": averagePpd,
+            "hardwareName": escape(hardwareName),
+            "displayName": escape(displayName),
+            "hardwareMake": getHardwareMakeBackend(escape(hardwareMake)),
+            "hardwareType": getHardwareTypeBackend(escape(hardwareType)),
+            "multiplier": escape(multiplier),
+            "averagePpd": escape(averagePpd),
         }
     );
 
@@ -65,12 +65,12 @@ function updateHardware() {
 
     var requestData = JSON.stringify(
         {
-            "hardwareName": hardwareName,
-            "displayName": displayName,
-            "hardwareMake": getHardwareMakeBackend(hardwareMake),
-            "hardwareType": getHardwareTypeBackend(hardwareType),
-            "multiplier": multiplier,
-            "averagePpd": averagePpd,
+            "hardwareName": escape(hardwareName),
+            "displayName": escape(displayName),
+            "hardwareMake": escape(getHardwareMakeBackend(hardwareMake)),
+            "hardwareType": escape(getHardwareTypeBackend(hardwareType)),
+            "multiplier": escape(multiplier),
+            "averagePpd": escape(averagePpd),
         }
     );
 
@@ -174,9 +174,9 @@ function createTeam() {
 
     var requestData = JSON.stringify(
         {
-            "teamName": teamName,
-            "teamDescription": teamDescription,
-            "forumLink": forumLink
+            "teamName": escape(teamName),
+            "teamDescription": escape(teamDescription),
+            "forumLink": escape(forumLink)
         }
     );
 
@@ -222,9 +222,9 @@ function updateTeam() {
 
     var requestData = JSON.stringify(
         {
-            "teamName": teamName,
-            "teamDescription": teamDescription,
-            "forumLink": forumLink
+            "teamName": escape(teamName),
+            "teamDescription": escape(teamDescription),
+            "forumLink": escape(forumLink)
         }
     );
 
@@ -342,15 +342,15 @@ function createUser() {
 
             var requestData = JSON.stringify(
                 {
-                    "foldingUserName": foldingUserName,
-                    "displayName": displayName,
-                    "passkey": passkey,
-                    "category": getCategoryBackend(category),
-                    "profileLink": profileLink,
-                    "liveStatsLink": liveStatsLink,
-                    "hardwareId": hardwareId,
-                    "teamId": teamId,
-                    "userIsCaptain": isCaptain
+                    "foldingUserName": escape(foldingUserName),
+                    "displayName": escape(displayName),
+                    "passkey": escape(passkey),
+                    "category": escape(getCategoryBackend(category)),
+                    "profileLink": escape(profileLink),
+                    "liveStatsLink": escape(liveStatsLink),
+                    "hardwareId": escape(hardwareId),
+                    "teamId": escape(teamId),
+                    "userIsCaptain": escape(isCaptain)
                 }
             );
 
@@ -429,15 +429,15 @@ function updateUser() {
 
             var requestData = JSON.stringify(
                 {
-                    "foldingUserName": foldingUserName,
-                    "displayName": displayName,
-                    "passkey": passkey,
-                    "category": getCategoryBackend(category),
-                    "profileLink": profileLink,
-                    "liveStatsLink": liveStatsLink,
-                    "hardwareId": hardwareId,
-                    "teamId": teamId,
-                    "userIsCaptain": isCaptain
+                    "foldingUserName": escape(foldingUserName),
+                    "displayName": escape(displayName),
+                    "passkey": escape(passkey),
+                    "category": escape(getCategoryBackend(category)),
+                    "profileLink": escape(profileLink),
+                    "liveStatsLink": escape(liveStatsLink),
+                    "hardwareId": escape(hardwareId),
+                    "teamId": escape(teamId),
+                    "userIsCaptain": escape(isCaptain)
                 }
             );
 
@@ -568,8 +568,8 @@ function offsetUser() {
 
         var requestData = JSON.stringify(
             {
-                "multipliedPointsOffset": offsetPoints,
-                "unitsOffset": offsetUnits
+                "multipliedPointsOffset": escape(offsetPoints),
+                "unitsOffset": escape(offsetUnits)
             }
         );
 

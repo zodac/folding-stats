@@ -17,11 +17,11 @@ function closeToast(id) {
 }
 
 function successToast(text){
-    document.getElementById("toast-success-text").innerHTML = text;
+    document.getElementById("toast-success-text").innerHTML = escape(text);
     showToast("toast-success", true);
 }
 
 function failureToast(text){
-    document.getElementById("toast-failure-text").innerHTML = text;
+    document.getElementById("toast-failure-text").innerHTML = escape(text);
     showToast("toast-failure", true);
 }
