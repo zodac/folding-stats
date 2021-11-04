@@ -93,8 +93,7 @@ public class CompetitionResultGenerator {
             .collect(toList());
 
         final String captainDisplayName = getCaptainDisplayName(team.getTeamName(), usersOnTeam);
-        return TeamSummary.createWithDefaultRank(team.getTeamName(), team.getTeamDescription(), team.getForumLink(), captainDisplayName,
-            activeUserSummaries, retiredUserSummaries);
+        return TeamSummary.createWithDefaultRank(team, captainDisplayName, activeUserSummaries, retiredUserSummaries);
     }
 
     private UserSummary getTcStatsForUser(final User user) {

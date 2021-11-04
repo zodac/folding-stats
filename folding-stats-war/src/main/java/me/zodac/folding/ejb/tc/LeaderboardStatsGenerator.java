@@ -85,7 +85,7 @@ public class LeaderboardStatsGenerator {
         final Map<String, String> teamNameForFoldingUserName = new HashMap<>(); // Convenient way to determine the team name of a user
 
         for (final TeamSummary teamSummary : competitionSummary.getTeams()) {
-            final String teamName = teamSummary.getTeamName();
+            final String teamName = teamSummary.getTeam().getTeamName();
 
             for (final UserSummary userSummary : teamSummary.getActiveUsers()) {
                 final Category category = Category.get(userSummary.getCategory());

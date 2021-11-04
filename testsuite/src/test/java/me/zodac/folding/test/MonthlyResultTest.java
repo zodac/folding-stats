@@ -97,7 +97,7 @@ class MonthlyResultTest {
             .hasSize(1);
 
         final TeamLeaderboardEntry teamLeaderboardEntry = monthlyResult.getTeamLeaderboard().get(0);
-        assertThat(teamLeaderboardEntry.getTeamName())
+        assertThat(teamLeaderboardEntry.getTeam().getTeamName())
             .as("Expected result team to have same name as input team")
             .isEqualTo(team.getTeamName());
         assertThat(teamLeaderboardEntry.getTeamMultipliedPoints())
@@ -163,21 +163,21 @@ class MonthlyResultTest {
         final TeamLeaderboardEntry secondTeamLeaderboardEntry = monthlyResult.getTeamLeaderboard().get(1);
         final TeamLeaderboardEntry thirdTeamLeaderboardEntry = monthlyResult.getTeamLeaderboard().get(2);
 
-        assertThat(firstTeamLeaderboardEntry.getTeamName())
+        assertThat(firstTeamLeaderboardEntry.getTeam().getTeamName())
             .as("Expected team in first to be the third created team")
             .isEqualTo(thirdTeam.getTeamName());
         assertThat(firstTeamLeaderboardEntry.getTeamMultipliedPoints())
             .as("Expected team in first to have the same points as fourth created user")
             .isEqualTo(30_000L);
 
-        assertThat(secondTeamLeaderboardEntry.getTeamName())
+        assertThat(secondTeamLeaderboardEntry.getTeam().getTeamName())
             .as("Expected team in second to be the second created team")
             .isEqualTo(secondTeam.getTeamName());
         assertThat(secondTeamLeaderboardEntry.getTeamMultipliedPoints())
             .as("Expected team in second to have the same points as second and third created users")
             .isEqualTo(20_000L);
 
-        assertThat(thirdTeamLeaderboardEntry.getTeamName())
+        assertThat(thirdTeamLeaderboardEntry.getTeam().getTeamName())
             .as("Expected team in third to be the first created team")
             .isEqualTo(firstTeam.getTeamName());
         assertThat(thirdTeamLeaderboardEntry.getTeamMultipliedPoints())
@@ -248,7 +248,7 @@ class MonthlyResultTest {
             .hasSize(1);
 
         final TeamLeaderboardEntry teamLeaderboardEntry = monthlyResult.getTeamLeaderboard().get(0);
-        assertThat(teamLeaderboardEntry.getTeamName())
+        assertThat(teamLeaderboardEntry.getTeam().getTeamName())
             .as("Expected result team to have same name as input team")
             .isEqualTo(team.getTeamName());
         assertThat(teamLeaderboardEntry.getTeamMultipliedPoints())

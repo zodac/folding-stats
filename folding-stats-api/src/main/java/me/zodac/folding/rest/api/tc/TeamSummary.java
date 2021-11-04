@@ -12,10 +12,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import me.zodac.folding.api.tc.Team;
 
 /**
- * Summary of the stats of a {@link me.zodac.folding.api.tc.Team}s and its {@link me.zodac.folding.api.tc.User}s in
+ * Summary of the stats of a {@link Team}s and its {@link me.zodac.folding.api.tc.User}s in
  * the <code>Team Competition</code>.
+ *
+ * <p>
+ * Available at the <code>folding/stats</code> REST endpoint.
  */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -27,9 +31,7 @@ public class TeamSummary {
 
     private static final int DEFAULT_TEAM_RANK = 0;
 
-    private String teamName;
-    private String teamDescription;
-    private String forumLink;
+    private Team team;
     private String captainName;
 
     private long teamPoints;
@@ -55,18 +57,13 @@ public class TeamSummary {
      * <b>NOTE:</b> The {@link RetiredUserSummary}s will always be ranked after the {@link UserSummary}s, to highlight
      * the active {@link me.zodac.folding.api.tc.User}s.
      *
-     * @param teamName        the name of the {@link me.zodac.folding.api.tc.Team}
-     * @param teamDescription the description of the {@link me.zodac.folding.api.tc.Team}
-     * @param forumLink       the URL to the forum thread for the {@link me.zodac.folding.api.tc.Team}
-     * @param captainName     the captain's display name for the {@link me.zodac.folding.api.tc.Team}, or null if no captain
-     * @param activeUsers     the active {@link me.zodac.folding.api.tc.User} {@link UserSummary}s
-     * @param retiredUsers    the retired {@link me.zodac.folding.api.tc.User} {@link RetiredUserSummary}
+     * @param team         the {@link Team}
+     * @param captainName  the captain's display name for the {@link Team}, or null if no captain
+     * @param activeUsers  the active {@link me.zodac.folding.api.tc.User} {@link UserSummary}s
+     * @param retiredUsers the retired {@link me.zodac.folding.api.tc.User} {@link RetiredUserSummary}
      * @return the created {@link TeamSummary}
      */
-    // TODO: [zodac] Use Team here for first 3 params?
-    public static TeamSummary createWithDefaultRank(final String teamName,
-                                                    final String teamDescription,
-                                                    final String forumLink,
+    public static TeamSummary createWithDefaultRank(final Team team,
                                                     final String captainName,
                                                     final Collection<UserSummary> activeUsers,
                                                     final Collection<RetiredUserSummary> retiredUsers) {
@@ -112,8 +109,16 @@ public class TeamSummary {
             .collect(toList());
 
         // Not ranked to begin with, will be updated by the calling class
-        return new TeamSummary(teamName, teamDescription, forumLink, captainName, teamPoints, teamMultipliedPoints, teamUnits, DEFAULT_TEAM_RANK,
-            rankedActiveUsers, rankedRetiredUsers);
+        return new TeamSummary(
+            team,
+            captainName,
+            teamPoints,
+            teamMultipliedPoints,
+            teamUnits,
+            DEFAULT_TEAM_RANK,
+            rankedActiveUsers,
+            rankedRetiredUsers
+        );
     }
 
     /**
@@ -124,7 +129,15 @@ public class TeamSummary {
      * @return the updated {@link TeamSummary}
      */
     public static TeamSummary updateWithRank(final TeamSummary teamSummary, final int rank) {
-        return new TeamSummary(teamSummary.teamName, teamSummary.teamDescription, teamSummary.forumLink, teamSummary.captainName,
-            teamSummary.teamPoints, teamSummary.teamMultipliedPoints, teamSummary.teamUnits, rank, teamSummary.activeUsers, teamSummary.retiredUsers);
+        return new TeamSummary(
+            teamSummary.team,
+            teamSummary.captainName,
+            teamSummary.teamPoints,
+            teamSummary.teamMultipliedPoints,
+            teamSummary.teamUnits,
+            rank,
+            teamSummary.activeUsers,
+            teamSummary.retiredUsers
+        );
     }
 }

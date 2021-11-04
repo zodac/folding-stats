@@ -7,10 +7,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.rest.api.tc.TeamSummary;
 
 /**
- * POJO for the {@link me.zodac.folding.api.tc.Team} leaderboard, summarising the stats for a {@link me.zodac.folding.api.tc.Team}.
+ * POJO for the {@link Team} leaderboard, summarising the stats for a {@link Team}.
+ *
+ * <p>
+ * Available at the <code>folding/stats/leaderboard</code> REST endpoint.
  */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -23,7 +27,7 @@ public class TeamLeaderboardEntry {
     private static final long DEFAULT_DIFF = 0L;
     private static final int DEFAULT_RANK = 1;
 
-    private String teamName;
+    private Team team;
     private long teamPoints;
     private long teamMultipliedPoints;
     private int teamUnits;
@@ -33,24 +37,31 @@ public class TeamLeaderboardEntry {
     private long diffToNext;
 
     /**
-     * Creates the {@link TeamLeaderboardEntry} for a {@link me.zodac.folding.api.tc.Team}.
+     * Creates the {@link TeamLeaderboardEntry} for a {@link Team}.
      *
-     * @param teamSummary  the {@link TeamSummary} for the {@link me.zodac.folding.api.tc.Team}
-     * @param rank         the rank of the {@link me.zodac.folding.api.tc.Team}
-     * @param diffToLeader the number of points between this {@link me.zodac.folding.api.tc.Team} and the one in first place
-     * @param diffToNext   the number of points between this {@link me.zodac.folding.api.tc.Team} and the one a single place above
+     * @param teamSummary  the {@link TeamSummary} for the {@link Team}
+     * @param rank         the rank of the {@link Team}
+     * @param diffToLeader the number of points between this {@link Team} and the one in first place
+     * @param diffToNext   the number of points between this {@link Team} and the one a single place above
      * @return the created {@link TeamLeaderboardEntry}
      */
     public static TeamLeaderboardEntry create(final TeamSummary teamSummary, final int rank, final long diffToLeader, final long diffToNext) {
-        return new TeamLeaderboardEntry(teamSummary.getTeamName(), teamSummary.getTeamPoints(), teamSummary.getTeamMultipliedPoints(),
-            teamSummary.getTeamUnits(), rank, diffToLeader, diffToNext);
+        return new TeamLeaderboardEntry(
+            teamSummary.getTeam(),
+            teamSummary.getTeamPoints(),
+            teamSummary.getTeamMultipliedPoints(),
+            teamSummary.getTeamUnits(),
+            rank,
+            diffToLeader,
+            diffToNext
+        );
     }
 
     /**
-     * Creates the {@link TeamLeaderboardEntry} for the {@link me.zodac.folding.api.tc.Team} in first place. The rank and diff
+     * Creates the {@link TeamLeaderboardEntry} for the {@link Team} in first place. The rank and diff
      * values are constant in this case.
      *
-     * @param teamSummary the {@link TeamSummary} for the {@link me.zodac.folding.api.tc.Team} in first
+     * @param teamSummary the {@link TeamSummary} for the {@link Team} in first
      * @return the created {@link TeamLeaderboardEntry}
      */
     public static TeamLeaderboardEntry createLeader(final TeamSummary teamSummary) {

@@ -121,14 +121,18 @@ function loadTeamLeaderboard() {
             leaderboardProperties.forEach(function(property){
                 leaderboardCell = document.createElement('td');
 
-                if(property === "teamMultipliedPoints") {
+                if (property === "teamMultipliedPoints") {
                     leaderboardCell.setAttribute("data-bs-toggle", "tooltip");
                     leaderboardCell.setAttribute("data-placement", "top");
                     leaderboardCell.setAttribute("title", "Unmultiplied: " + team["teamPoints"].toLocaleString());
                     new bootstrap.Tooltip(leaderboardCell);
+                    leaderboardCell.innerHTML = team["teamMultipliedPoints"].toLocaleString();
+                } else if (property === "teamName") {
+                    leaderboardCell.innerHTML = team["team"]["teamName"].toLocaleString();
+                } else {
+                    leaderboardCell.innerHTML = team[property].toLocaleString();
                 }
 
-                leaderboardCell.innerHTML = team[property].toLocaleString();
                 leaderboardTableBodyRow.append(leaderboardCell);
             });
             leaderboardTableBody.append(leaderboardTableBodyRow);
@@ -240,10 +244,10 @@ function loadTeamStats() {
             teamTitle.setAttribute("class", "navbar-brand");
             teamTitle.innerHTML = "Rank #" + team['rank'] + ": ";
 
-            if ("forumLink" in team) {
-                teamTitle.innerHTML += "<a href='" + team["forumLink"] + "' target='_blank'>" + team['teamName'] + "</a>";
+            if ("forumLink" in team["team"]) {
+                teamTitle.innerHTML += "<a href='" + team["team"]["forumLink"] + "' target='_blank'>" + team["team"]['teamName'] + "</a>";
             } else {
-                teamTitle.innerHTML += team['teamName'];
+                teamTitle.innerHTML += team["team"]['teamName'];
             }
             metadataDiv.append(teamTitle);
 

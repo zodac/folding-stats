@@ -406,10 +406,12 @@ class PostgresDbManagerTest {
             List.of(
                 TeamLeaderboardEntry.create(
                     TeamSummary.createWithDefaultRank(
-                        "Team1",
-                        "Test team 1",
-                        "",
-                        "",
+                        Team.builder()
+                            .id(1)
+                            .teamName("Team 1")
+                            .teamDescription("Test Team 1")
+                            .build(),
+                        "Captain1",
                         Collections.emptyList(),
                         Collections.emptyList()
                     ),
@@ -453,10 +455,12 @@ class PostgresDbManagerTest {
             List.of(
                 TeamLeaderboardEntry.create(
                     TeamSummary.createWithDefaultRank(
-                        "Team2",
-                        "Test team 2",
-                        "",
-                        "",
+                        Team.builder()
+                            .id(2)
+                            .teamName("Team 2")
+                            .teamDescription("Test Team 2")
+                            .build(),
+                        "Captain2",
                         Collections.emptyList(),
                         Collections.emptyList()
                     ),
