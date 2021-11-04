@@ -79,7 +79,10 @@
                     <systemProperties combine.children="append">
                         <property>
                             <name>testIpAddress</name>
-                            <value>192.168.99.100</value>
+                            <!-- Value for Windows 10 Docker for Windows -->
+                            <value>127.0.0.1</value>
+                            <!-- Value for Windows 7 Docker toolbox -->
+                            <!-- <value>192.168.99.100</value> -->
                         </property>
                     </systemProperties>
                 </configuration>

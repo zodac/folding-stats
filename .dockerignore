@@ -10,11 +10,7 @@ docker-compose-dev.yml
 docker-compose.yml
 
 # IntelliJ
-*.iml
 .idea/
-
-# Build
-target/
 
 # git
 .git/
