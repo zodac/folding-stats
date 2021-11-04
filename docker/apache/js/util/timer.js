@@ -1,5 +1,5 @@
 const NUMBER_OF_UPDATES_PROPERTY_NAME = "numberOfUpdates";
-const UPDATE_MINUTE = 55;
+const UPDATE_MINUTE = %UPDATE_MINUTE%;
 
 function startTimer() {
     calculateNumberOfUpdates();

@@ -47,7 +47,7 @@ function populateTeamDropdown(dropdownId) {
             teamButton.setAttribute("class", "dropdown-item");
             teamButton.setAttribute("type", "button");
 
-            var teamNameWithoutQuotes = escape(teamItem["teamName"];
+            var teamNameWithoutQuotes = escape(teamItem["teamName"]);
             teamButton.setAttribute("onclick", "getTeamHistoricStats("+teamItem["id"]+",'"+teamNameWithoutQuotes+"',null,null,null,null)");
             teamButton.innerHTML = teamItem["teamName"];
 

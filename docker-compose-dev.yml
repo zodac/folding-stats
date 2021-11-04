@@ -8,6 +8,7 @@ services:
       dockerfile: docker/apache/Dockerfile
       args:
         ROOT_URL: "http://127.0.0.1:8081/folding"
+        UPDATE_MINUTE: "55"
     container_name: frontend_dev
     hostname: frontend_dev
     depends_on:

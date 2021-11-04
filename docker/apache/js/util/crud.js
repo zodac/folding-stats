@@ -67,8 +67,8 @@ function updateHardware() {
         {
             "hardwareName": escape(hardwareName),
             "displayName": escape(displayName),
-            "hardwareMake": escape(getHardwareMakeBackend(hardwareMake)),
-            "hardwareType": escape(getHardwareTypeBackend(hardwareType)),
+            "hardwareMake": getHardwareMakeBackend(escape(hardwareMake)),
+            "hardwareType": getHardwareTypeBackend(escape(hardwareType)),
             "multiplier": escape(multiplier),
             "averagePpd": escape(averagePpd),
         }
@@ -345,7 +345,7 @@ function createUser() {
                     "foldingUserName": escape(foldingUserName),
                     "displayName": escape(displayName),
                     "passkey": escape(passkey),
-                    "category": escape(getCategoryBackend(category)),
+                    "category": getCategoryBackend(escape(category)),
                     "profileLink": escape(profileLink),
                     "liveStatsLink": escape(liveStatsLink),
                     "hardwareId": escape(hardwareId),
@@ -432,7 +432,7 @@ function updateUser() {
                     "foldingUserName": escape(foldingUserName),
                     "displayName": escape(displayName),
                     "passkey": escape(passkey),
-                    "category": escape(getCategoryBackend(category)),
+                    "category": getCategoryBackend(escape(category)),
                     "profileLink": escape(profileLink),
                     "liveStatsLink": escape(liveStatsLink),
                     "hardwareId": escape(hardwareId),
