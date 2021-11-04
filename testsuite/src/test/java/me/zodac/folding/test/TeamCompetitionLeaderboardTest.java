@@ -93,20 +93,20 @@ class TeamCompetitionLeaderboardTest {
         final TeamLeaderboardEntry firstResult = results.get(0);
         assertThat(firstResult)
             .as("Did not receive the expected result for rank 1: " + response.body())
-            .extracting("rank", "teamName", "teamMultipliedPoints", "diffToLeader", "diffToNext")
-            .containsExactly(1, secondTeam.getTeamName(), 15_000L, 0L, 0L);
+            .extracting("rank", "team", "teamMultipliedPoints", "diffToLeader", "diffToNext")
+            .containsExactly(1, secondTeam, 15_000L, 0L, 0L);
 
         final TeamLeaderboardEntry secondResult = results.get(1);
         assertThat(secondResult)
             .as("Did not receive the expected result for rank 2: " + response.body())
-            .extracting("rank", "teamName", "teamMultipliedPoints", "diffToLeader", "diffToNext")
-            .containsExactly(2, firstTeam.getTeamName(), 10_000L, 5_000L, 5_000L);
+            .extracting("rank", "team", "teamMultipliedPoints", "diffToLeader", "diffToNext")
+            .containsExactly(2, firstTeam, 10_000L, 5_000L, 5_000L);
 
         final TeamLeaderboardEntry thirdResult = results.get(2);
         assertThat(thirdResult)
             .as("Did not receive the expected result for rank 3: " + response.body())
-            .extracting("rank", "teamName", "teamMultipliedPoints", "diffToLeader", "diffToNext")
-            .containsExactly(3, thirdTeam.getTeamName(), 1_000L, 14_000L, 9_000L);
+            .extracting("rank", "team", "teamMultipliedPoints", "diffToLeader", "diffToNext")
+            .containsExactly(3, thirdTeam, 1_000L, 14_000L, 9_000L);
     }
 
     @Test
