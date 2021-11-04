@@ -13,7 +13,7 @@ COPY ./docker/apache/js /docker/apache/js
 # Replace '%ROOT_URL%' in the JS files with the actual URL for the deployment (changing sed delimiter for URL slashes)
 # Also replaces '%UPDATE_MINUTE%' for the site timer
 RUN grep -rl '%ROOT_URL%' . | xargs sed -i "s|%ROOT_URL%|${ROOT_URL}|g" && \
-    grep -rl '%UPDATE_MINUTE%' . | xargs sed -i "s|%UPDATE_MINUTE%|${UPDATE_MINUTE}|g" && \
+    grep -rl '%UPDATE_MINUTE%' . | xargs sed -i "s|%UPDATE_MINUTE%|${UPDATE_MINUTE}|g"
 
 # Minify JS and CSS files, then rename to end with *.min.*
 RUN minify --verbose --match=\.*.css$ --type=css --output /docker/apache/site/res/css/ /docker/apache/css/ && \
