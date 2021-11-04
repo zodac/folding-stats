@@ -37,7 +37,7 @@ services:
       # External URL configuration
       STATS_URL_ROOT: "https://api2.foldingathome.org"
       LARS_URL_ROOT: "https://folding.lar.systems/"
-      TC_HOMEPAGE_URL: "http://teamcomp.axihub.ca/"
+      TC_HOMEPAGE_URL: "https://etf.axihub.ca/"
       # NOTE: The monthly reset, result storage and LARS update will always occur at 23:57 on the last day of the month
       ENABLE_STATS_MONTHLY_RESET: "true"
       ENABLE_MONTHLY_RESULT_STORAGE: "true"

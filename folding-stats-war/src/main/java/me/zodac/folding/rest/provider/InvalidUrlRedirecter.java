@@ -13,7 +13,7 @@ import me.zodac.folding.api.util.EnvironmentVariableUtils;
 @Provider
 public class InvalidUrlRedirecter implements ExceptionMapper<NotFoundException> {
 
-    private static final String TC_HOMEPAGE_URL = EnvironmentVariableUtils.get("TC_HOMEPAGE_URL", "https://teamcomp.axihub.ca/");
+    private static final String TC_HOMEPAGE_URL = EnvironmentVariableUtils.get("TC_HOMEPAGE_URL", "https://etf.axihub.ca/");
 
     @Override
     public Response toResponse(final NotFoundException e) {
