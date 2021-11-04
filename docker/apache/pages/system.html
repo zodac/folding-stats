@@ -159,6 +159,10 @@
         Manual LARS Update
     </button>
 
+    <button onclick="manualResultSave()" class="btn btn-warning" id="manual_result_button">
+        Manual Result Save
+    </button>
+
     <button onclick="printCaches()" class="btn btn-warning" id="print_cache_button">
         Print Caches
     </button>
@@ -175,14 +179,12 @@
                 <h2 id="hardware_create_accordion_header" class="accordion-header bg-dark text-light">
                     <button class="accordion-button collapsed bg-dark text-light" type="button"
                             data-bs-toggle="collapse" data-bs-target="#hardware_create_accordion_item"
-                            aria-expanded="true"
-                            aria-controls="hardware_create_accordion">
+                            aria-expanded="true" aria-controls="hardware_create_accordion">
                         Create Hardware
                     </button>
                 </h2>
                 <div id="hardware_create_accordion_item" class="accordion-collapse collapse"
-                     aria-labelledby="hardware_create_accordion_header"
-                     data-bs-parent="#hardware_accordion">
+                     aria-labelledby="hardware_create_accordion_header" data-bs-parent="#hardware_accordion">
                     <div class="accordion-body">
                         <form id="hardware_create_form" class="row g-3" onsubmit="createHardware(); return false;"
                               action="">

@@ -113,6 +113,35 @@ function manualLars() {
     });
 }
 
+function manualResultSave() {
+    show("loader");
+    fetch(ROOT_URL+'/results/manual/save', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': sessionGet("Authorization")
+        }
+    })
+    .then(response => {
+        hide("loader");
+
+        if(response.status != 200){
+            failureToast("Manual result save failed with code: " + response.status);
+            response.json()
+            .then(response => {
+                console.error(JSON.stringify(response, null, 2));
+            });
+            return;
+        }
+        successToast("Result manually saved");
+    })
+    .catch((error) => {
+        hide("loader");
+        console.error('Unexpected error saving result: ', error);
+        return false;
+    });
+}
+
 function printCaches() {
     show("loader");
     fetch(ROOT_URL+'/debug/caches', {

@@ -536,18 +536,18 @@ traits:
   /result/{year}/{month}:
     uriParameters:
       year:
-        description: "The year of the monthly TC result to be retrieved"
+        description: "The year of the monthly ETF result to be retrieved"
         type: integer
         required: true
       month:
-        description: "The month of the monthly TC result to be retrieved"
+        description: "The month of the monthly ETF result to be retrieved"
         type: integer
         required: true
     get:
-      description: "Retrieves the TC result for the given month/year"
+      description: "Retrieves the ETF result for the given month/year"
       responses:
         200:
-          description: "TC result is retrieved successfully"
+          description: "ETF result is retrieved successfully"
           body:
             application/json:
               example: !include responses/result/get.json
@@ -560,10 +560,10 @@ traits:
   /manual/save:
     post:
       is: [ "adminOnly" ]
-      description: "Request a manual save of the current TC result"
+      description: "Request a manual save of the current ETF result"
       responses:
         200:
-          description: "TC result has been successfully saved"
+          description: "ETF result has been successfully saved"
         401:
           description: "System user cannot be successfully logged in with provided credentials"
         403:
