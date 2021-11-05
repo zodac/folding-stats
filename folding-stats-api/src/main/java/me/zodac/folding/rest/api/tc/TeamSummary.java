@@ -58,7 +58,7 @@ public class TeamSummary {
      * the active {@link me.zodac.folding.api.tc.User}s.
      *
      * @param team         the {@link Team}
-     * @param captainName  the captain's display name for the {@link Team}, or null if no captain
+     * @param captainName  the captain's display name for the {@link Team}, or <b>null</b> if no captain
      * @param activeUsers  the active {@link me.zodac.folding.api.tc.User} {@link UserSummary}s
      * @param retiredUsers the retired {@link me.zodac.folding.api.tc.User} {@link RetiredUserSummary}
      * @return the created {@link TeamSummary}

@@ -36,9 +36,9 @@ import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.util.ProcessingType;
 import me.zodac.folding.ejb.api.BusinessLogic;
-import me.zodac.folding.ejb.tc.CompetitionResultGenerator;
 import me.zodac.folding.ejb.tc.LeaderboardStatsGenerator;
 import me.zodac.folding.ejb.tc.scheduled.StatsScheduler;
+import me.zodac.folding.ejb.tc.summary.CompetitionSummaryRetriever;
 import me.zodac.folding.ejb.tc.user.UserStatsParser;
 import me.zodac.folding.ejb.tc.user.UserStatsResetter;
 import me.zodac.folding.rest.api.tc.CompetitionSummary;
@@ -69,7 +69,7 @@ public class TeamCompetitionStatsEndpoint {
     private BusinessLogic businessLogic;
 
     @EJB
-    private CompetitionResultGenerator competitionResultGenerator;
+    private CompetitionSummaryRetriever competitionSummaryRetriever;
 
     @EJB
     private LeaderboardStatsGenerator leaderboardStatsGenerator;
@@ -96,7 +96,7 @@ public class TeamCompetitionStatsEndpoint {
         LOGGER.debug("GET request received to show TC stats");
 
         try {
-            final CompetitionSummary competitionSummary = competitionResultGenerator.generate();
+            final CompetitionSummary competitionSummary = competitionSummaryRetriever.retrieve();
             return ok(competitionSummary);
         } catch (final Exception e) {
             LOGGER.error("Unexpected error retrieving full TC stats", e);
@@ -132,7 +132,7 @@ public class TeamCompetitionStatsEndpoint {
             }
             final User user = optionalUser.get();
 
-            final CompetitionSummary competitionSummary = competitionResultGenerator.generate();
+            final CompetitionSummary competitionSummary = competitionSummaryRetriever.retrieve();
             final Collection<UserSummary> userSummaries = competitionSummary.getTeams()
                 .stream()
                 .flatMap(teamResult -> teamResult.getActiveUsers().stream())

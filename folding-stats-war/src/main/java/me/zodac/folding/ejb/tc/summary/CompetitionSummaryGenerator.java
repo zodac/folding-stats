@@ -1,20 +1,16 @@
-package me.zodac.folding.ejb.tc;
+package me.zodac.folding.ejb.tc.summary;
 
 import static java.util.stream.Collectors.toList;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
-import javax.ejb.EJB;
 import javax.ejb.Singleton;
-import me.zodac.folding.SystemStateManager;
 import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.UserTcStats;
-import me.zodac.folding.cache.CompetitionSummaryCache;
 import me.zodac.folding.ejb.api.BusinessLogic;
 import me.zodac.folding.rest.api.tc.CompetitionSummary;
 import me.zodac.folding.rest.api.tc.RetiredUserSummary;
@@ -26,65 +22,49 @@ import org.apache.logging.log4j.Logger;
 /**
  * {@link Singleton} EJB used to generate a {@link CompetitionSummary} for the <code>Team Competition</code>.
  */
-@Singleton
-public class CompetitionResultGenerator {
+final class CompetitionSummaryGenerator {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @EJB
-    private BusinessLogic businessLogic;
+    private CompetitionSummaryGenerator() {
+        
+    }
 
     /**
      * Generates a {@link CompetitionSummary} based on the latest <code>Team Competition</code> {@link UserTcStats}.
      * Will retrieve a cached instance if one exists and the {@link SystemState} is not {@link SystemState#WRITE_EXECUTED}.
      *
+     * @param businessLogic the {@link BusinessLogic} to retrieve current system information
      * @return the latest {@link CompetitionSummary}
      */
-    public CompetitionSummary generate() {
-        // TODO: [zodac] This cache logic should not be here, should be in the Storage access layer (whatever that will be)
-        final CompetitionSummaryCache competitionSummaryCache = CompetitionSummaryCache.getInstance();
-        if (SystemStateManager.current() != SystemState.WRITE_EXECUTED && competitionSummaryCache.hasCachedResult()) {
-            LOGGER.debug("System is not in state {} and has a cached TC result, using cache", SystemState.WRITE_EXECUTED);
+    static CompetitionSummary generate(final BusinessLogic businessLogic) {
+        LOGGER.debug("Calculating latest TC result");
 
-            final Optional<CompetitionSummary> cachedCompetitionResult = competitionSummaryCache.get();
-            if (cachedCompetitionResult.isPresent()) {
-                return cachedCompetitionResult.get();
-            } else {
-                LOGGER.warn("Cache said it had TC result, but none was returned! Calculating new TC result");
-            }
-        }
-
-        LOGGER.debug("Calculating latest TC result, system state: {}, TC cache populated: {}", SystemStateManager::current,
-            competitionSummaryCache::hasCachedResult);
-
-        final List<TeamSummary> teamSummaries = getStatsForTeams();
+        final List<TeamSummary> teamSummaries = getStatsForTeams(businessLogic);
         LOGGER.debug("Found {} TC teams", teamSummaries::size);
 
         if (teamSummaries.isEmpty()) {
             LOGGER.warn("No TC teams to show");
         }
 
-        final CompetitionSummary competitionSummary = CompetitionSummary.create(teamSummaries);
-        competitionSummaryCache.add(competitionSummary);
-        SystemStateManager.next(SystemState.AVAILABLE);
-        return competitionSummary;
+        return CompetitionSummary.create(teamSummaries);
     }
 
-    private List<TeamSummary> getStatsForTeams() {
+    private static List<TeamSummary> getStatsForTeams(final BusinessLogic businessLogic) {
         return businessLogic.getAllTeams()
             .stream()
-            .map(this::getTcTeamResult)
+            .map(team -> getTcTeamResult(team, businessLogic))
             .collect(toList());
     }
 
-    private TeamSummary getTcTeamResult(final Team team) {
+    private static TeamSummary getTcTeamResult(final Team team, final BusinessLogic businessLogic) {
         LOGGER.debug("Converting team '{}' for TC stats", team::getTeamName);
 
         final Collection<User> usersOnTeam = businessLogic.getUsersOnTeam(team);
 
         final Collection<UserSummary> activeUserSummaries = usersOnTeam
             .stream()
-            .map(this::getTcStatsForUser)
+            .map(user -> getTcStatsForUser(user, businessLogic))
             .collect(toList());
 
         final Collection<RetiredUserSummary> retiredUserSummaries = businessLogic.getAllRetiredUsersForTeam(team)
@@ -96,7 +76,7 @@ public class CompetitionResultGenerator {
         return TeamSummary.createWithDefaultRank(team, captainDisplayName, activeUserSummaries, retiredUserSummaries);
     }
 
-    private UserSummary getTcStatsForUser(final User user) {
+    private static UserSummary getTcStatsForUser(final User user, final BusinessLogic businessLogic) {
         final Hardware hardware = user.getHardware();
         final Category category = user.getCategory();
 

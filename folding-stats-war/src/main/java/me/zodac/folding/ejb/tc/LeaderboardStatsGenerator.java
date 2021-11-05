@@ -13,6 +13,7 @@ import java.util.TreeMap;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import me.zodac.folding.api.tc.Category;
+import me.zodac.folding.ejb.tc.summary.CompetitionSummaryRetriever;
 import me.zodac.folding.rest.api.tc.CompetitionSummary;
 import me.zodac.folding.rest.api.tc.TeamSummary;
 import me.zodac.folding.rest.api.tc.UserSummary;
@@ -30,7 +31,7 @@ public class LeaderboardStatsGenerator {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @EJB
-    private CompetitionResultGenerator competitionResultGenerator;
+    private CompetitionSummaryRetriever competitionSummaryRetriever;
 
     /**
      * Generates the {@link me.zodac.folding.api.tc.Team} leaderboards.
@@ -38,7 +39,7 @@ public class LeaderboardStatsGenerator {
      * @return a {@link List} of {@link TeamLeaderboardEntry}s
      */
     public List<TeamLeaderboardEntry> generateTeamLeaderboards() {
-        final CompetitionSummary competitionSummary = competitionResultGenerator.generate();
+        final CompetitionSummary competitionSummary = competitionSummaryRetriever.retrieve();
         final List<TeamSummary> teamResults = competitionSummary.getTeams()
             .stream()
             .sorted(Comparator.comparingLong(TeamSummary::getTeamMultipliedPoints).reversed())
@@ -75,7 +76,7 @@ public class LeaderboardStatsGenerator {
      * @return a {@link Map} of {@link UserCategoryLeaderboardEntry}s keyed by the {@link Category}
      */
     public Map<Category, List<UserCategoryLeaderboardEntry>> generateUserCategoryLeaderboards() {
-        final CompetitionSummary competitionSummary = competitionResultGenerator.generate();
+        final CompetitionSummary competitionSummary = competitionSummaryRetriever.retrieve();
         if (competitionSummary.getTeams().isEmpty()) {
             LOGGER.warn("No TC teams to show");
             return Collections.emptyMap();
