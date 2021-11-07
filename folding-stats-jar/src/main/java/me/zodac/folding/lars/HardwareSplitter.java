@@ -1,8 +1,11 @@
 package me.zodac.folding.lars;
 
+import static java.util.stream.Collectors.toMap;
+
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeSet;
 import me.zodac.folding.api.tc.Hardware;
@@ -70,17 +73,18 @@ public final class HardwareSplitter {
      * @return a {@link Map} of the {@link Hardware} to be updated, where the key is the LARS {@link Hardware} and value is the DB {@link Hardware}
      */
     public static Map<Hardware, Hardware> toUpdate(final Collection<Hardware> fromLars, final Collection<Hardware> inDb) {
-        final Map<Hardware, Hardware> larsHardwareAlreadyInDb = new HashMap<>();
+        final Map<String, Hardware> fromLarsHardware = fromLars
+                .stream()
+                .collect(toMap(hardware -> hardware.getHardwareName().toLowerCase(Locale.UK), hardware -> hardware));
 
-        // TODO: [zodac] Make this less shit
-        for (final Hardware lars : fromLars) {
-            for (final Hardware db : inDb) {
-                if (db.getHardwareName().equalsIgnoreCase(lars.getHardwareName())) {
-                    larsHardwareAlreadyInDb.put(lars, db);
-                    break;
-                }
-            }
-        }
+        final Map<String, Hardware> inDbHardware = inDb
+                .stream()
+                .collect(toMap(hardware -> hardware.getHardwareName().toLowerCase(Locale.UK), hardware -> hardware));
+
+        fromLarsHardware.keySet().retainAll(inDbHardware.keySet());
+        final Map<Hardware, Hardware> larsHardwareAlreadyInDb = fromLarsHardware.entrySet()
+                .stream()
+                .collect(toMap(Map.Entry::getValue, e -> inDbHardware.get(e.getKey())));
 
         final Map<Hardware, Hardware> toUpdate = new HashMap<>();
         for (final Map.Entry<Hardware, Hardware> entry : larsHardwareAlreadyInDb.entrySet()) {
