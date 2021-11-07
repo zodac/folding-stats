@@ -193,6 +193,8 @@ function loadHardware() {
         hardwareTitle.innerHTML = "Hardware";
         hardwareDiv.append(hardwareTitle);
 
+        hardwareTableDiv = document.createElement('div');
+        hardwareTableDiv.setAttribute("class", "scrollable-table")
         hardwareTable = document.createElement('table');
         hardwareTable.setAttribute("id", "hardware");
         hardwareTable.setAttribute("class", "table table-dark table-striped table-hover");
@@ -235,7 +237,8 @@ function loadHardware() {
         });
         hardwareTable.append(hardwareTableBody);
 
-        hardwareDiv.append(hardwareTable);
+        hardwareTableDiv.append(hardwareTable);
+        hardwareDiv.append(hardwareTableDiv);
 
         // Update any list that needs all hardware
         jsonResponse.sort(sortJsonByKey("hardwareName"));
@@ -280,6 +283,8 @@ function loadUsers() {
         usersTitle.innerHTML = "Users";
         usersDiv.append(usersTitle);
 
+        usersTableDiv = document.createElement('div');
+        usersTableDiv.setAttribute("class", "scrollable-table")
         usersTable = document.createElement('table');
         usersTable.setAttribute("id", "users");
         usersTable.setAttribute("class", "table table-dark table-striped table-hover");
@@ -331,7 +336,8 @@ function loadUsers() {
         });
         usersTable.append(usersTableBody);
 
-        usersDiv.append(usersTable);
+        usersTableDiv.append(usersTable);
+        usersDiv.append(usersTableDiv);
 
         // Update any list that needs all users
         jsonResponse.sort(sortJsonByKey("displayName"));
@@ -376,6 +382,8 @@ function loadTeams() {
         teamsTitle.innerHTML = "Teams";
         teamsDiv.append(teamsTitle);
 
+        teamsTableDiv = document.createElement('div');
+        teamsTableDiv.setAttribute("class", "scrollable-table")
         teamsTable = document.createElement('table');
         teamsTable.setAttribute("id", "teams");
         teamsTable.setAttribute("class", "table table-dark table-striped table-hover");
@@ -420,7 +428,8 @@ function loadTeams() {
         });
         teamsTable.append(teamsTableBody);
 
-        teamsDiv.append(teamsTable);
+        teamsTableDiv.append(teamsTable);
+        teamsDiv.append(teamsTableDiv);
 
         // Update any list that needs all teams
         jsonResponse.sort(sortJsonByKey("teamName"));
