@@ -31,6 +31,8 @@ RUN minify --verbose --match=\.*.css$ --type=css --output /docker/apache/site/re
 
 FROM httpd:2.4-alpine
 
+RUN apk update && apk add brotli
+
 # Apache configuration (SSL certs are provided through a volume mount)
 COPY ./docker/apache/conf/httpd.conf /usr/local/apache2/conf/httpd.conf
 COPY ./docker/apache/conf/httpd-ssl.conf /usr/local/apache2/conf/original/extra/httpd-ssl.conf
