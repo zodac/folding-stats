@@ -40,7 +40,17 @@ th {
 }
 
 .scrollable-table {
+    margin: auto;
+    padding: 2px;
     height: 360px;
     overflow: scroll;
     overflow-x: hidden;
+}
+
+table {
+    table-layout: fixed;
+}
+
+table th, table td {
+    overflow: hidden;
 }
