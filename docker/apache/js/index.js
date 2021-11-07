@@ -245,7 +245,7 @@ function loadTeamStats() {
             teamTitle.innerHTML = "Rank #" + team['rank'] + ": ";
 
             if ("forumLink" in team["team"]) {
-                teamTitle.innerHTML += "<a href='" + team["team"]["forumLink"] + "' target='_blank'>" + team["team"]['teamName'] + "</a>";
+                teamTitle.innerHTML += "<a href='" + team["team"]["forumLink"] + "' target='_blank' rel='noreferrer'>" + team["team"]['teamName'] + "</a>";
             } else {
                 teamTitle.innerHTML += team["team"]['teamName'];
             }
@@ -316,12 +316,12 @@ function loadTeamStats() {
                         }
 
                         if ("profileLink" in activeUser) {
-                            teamTableUserCell.innerHTML = "<a href='" + activeUser["profileLink"] + "' target='_blank'>" + teamTableUserCell.innerHTML + "</a>"
+                            teamTableUserCell.innerHTML = "<a href='" + activeUser["profileLink"] + "' target='_blank' rel='noreferrer'>" + teamTableUserCell.innerHTML + "</a>"
                         }
 
                         if ("liveStatsLink" in activeUser) {
                             teamTableUserCell.innerHTML +=
-                                " <a href='" + activeUser["liveStatsLink"] + "' target='_blank'>" +
+                                " <a href='" + activeUser["liveStatsLink"] + "' target='_blank' rel='noreferrer'>" +
                                     "<img alt='stats' src='./res/img/live.png' width='16px' height='16px'>" +
                                 "</a>";
                         }

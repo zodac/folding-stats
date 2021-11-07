@@ -413,6 +413,7 @@ function loadTeams() {
                         link = document.createElement('a');
                         link.setAttribute("href", teamsItem[teamsProperty]);
                         link.setAttribute("target", "_blank");
+                        link.setAttribute("rel", "noreferrer")
                         link.innerHTML = teamsItem[teamsProperty];
 
                         teamsTableBodyCell.append(link);
