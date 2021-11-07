@@ -38,7 +38,6 @@ import me.zodac.folding.api.util.ProcessingType;
 import me.zodac.folding.ejb.api.BusinessLogic;
 import me.zodac.folding.ejb.tc.LeaderboardStatsGenerator;
 import me.zodac.folding.ejb.tc.scheduled.StatsScheduler;
-import me.zodac.folding.ejb.tc.summary.CompetitionSummaryRetriever;
 import me.zodac.folding.ejb.tc.user.UserStatsParser;
 import me.zodac.folding.ejb.tc.user.UserStatsResetter;
 import me.zodac.folding.rest.api.tc.CompetitionSummary;
@@ -69,9 +68,6 @@ public class TeamCompetitionStatsEndpoint {
     private BusinessLogic businessLogic;
 
     @EJB
-    private CompetitionSummaryRetriever competitionSummaryRetriever;
-
-    @EJB
     private LeaderboardStatsGenerator leaderboardStatsGenerator;
 
     @EJB
@@ -96,7 +92,7 @@ public class TeamCompetitionStatsEndpoint {
         LOGGER.debug("GET request received to show TC stats");
 
         try {
-            final CompetitionSummary competitionSummary = competitionSummaryRetriever.retrieve();
+            final CompetitionSummary competitionSummary = businessLogic.getCompetitionSummary();
             return ok(competitionSummary);
         } catch (final Exception e) {
             LOGGER.error("Unexpected error retrieving full TC stats", e);
@@ -132,11 +128,11 @@ public class TeamCompetitionStatsEndpoint {
             }
             final User user = optionalUser.get();
 
-            final CompetitionSummary competitionSummary = competitionSummaryRetriever.retrieve();
+            final CompetitionSummary competitionSummary = businessLogic.getCompetitionSummary();
             final Collection<UserSummary> userSummaries = competitionSummary.getTeams()
-                .stream()
-                .flatMap(teamResult -> teamResult.getActiveUsers().stream())
-                .collect(toList());
+                    .stream()
+                    .flatMap(teamResult -> teamResult.getActiveUsers().stream())
+                    .collect(toList());
 
             for (final UserSummary userSummary : userSummaries) {
                 if (userSummary.getId() == user.getId()) {
@@ -238,7 +234,7 @@ public class TeamCompetitionStatsEndpoint {
 
         try {
             final Map<Category, List<UserCategoryLeaderboardEntry>> categoryLeaderboard =
-                leaderboardStatsGenerator.generateUserCategoryLeaderboards();
+                    leaderboardStatsGenerator.generateUserCategoryLeaderboards();
             return ok(categoryLeaderboard);
         } catch (final Exception e) {
             LOGGER.error("Unexpected error retrieving TC stats", e);

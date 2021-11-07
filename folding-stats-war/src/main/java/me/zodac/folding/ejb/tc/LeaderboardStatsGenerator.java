@@ -13,7 +13,7 @@ import java.util.TreeMap;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import me.zodac.folding.api.tc.Category;
-import me.zodac.folding.ejb.tc.summary.CompetitionSummaryRetriever;
+import me.zodac.folding.ejb.api.BusinessLogic;
 import me.zodac.folding.rest.api.tc.CompetitionSummary;
 import me.zodac.folding.rest.api.tc.TeamSummary;
 import me.zodac.folding.rest.api.tc.UserSummary;
@@ -31,7 +31,7 @@ public class LeaderboardStatsGenerator {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @EJB
-    private CompetitionSummaryRetriever competitionSummaryRetriever;
+    private BusinessLogic businessLogic;
 
     /**
      * Generates the {@link me.zodac.folding.api.tc.Team} leaderboards.
@@ -39,11 +39,11 @@ public class LeaderboardStatsGenerator {
      * @return a {@link List} of {@link TeamLeaderboardEntry}s
      */
     public List<TeamLeaderboardEntry> generateTeamLeaderboards() {
-        final CompetitionSummary competitionSummary = competitionSummaryRetriever.retrieve();
+        final CompetitionSummary competitionSummary = businessLogic.getCompetitionSummary();
         final List<TeamSummary> teamResults = competitionSummary.getTeams()
-            .stream()
-            .sorted(Comparator.comparingLong(TeamSummary::getTeamMultipliedPoints).reversed())
-            .collect(toList());
+                .stream()
+                .sorted(Comparator.comparingLong(TeamSummary::getTeamMultipliedPoints).reversed())
+                .collect(toList());
 
         if (teamResults.isEmpty()) {
             LOGGER.warn("No TC teams to show");
@@ -76,7 +76,7 @@ public class LeaderboardStatsGenerator {
      * @return a {@link Map} of {@link UserCategoryLeaderboardEntry}s keyed by the {@link Category}
      */
     public Map<Category, List<UserCategoryLeaderboardEntry>> generateUserCategoryLeaderboards() {
-        final CompetitionSummary competitionSummary = competitionSummaryRetriever.retrieve();
+        final CompetitionSummary competitionSummary = businessLogic.getCompetitionSummary();
         if (competitionSummary.getTeams().isEmpty()) {
             LOGGER.warn("No TC teams to show");
             return Collections.emptyMap();
@@ -104,13 +104,13 @@ public class LeaderboardStatsGenerator {
         for (final var entry : userResultsByCategory.entrySet()) {
             final Category category = entry.getKey();
             final List<UserSummary> userSummaries = entry.getValue()
-                .stream()
-                .sorted(Comparator.comparingLong(UserSummary::getMultipliedPoints).reversed())
-                .collect(toList());
+                    .stream()
+                    .sorted(Comparator.comparingLong(UserSummary::getMultipliedPoints).reversed())
+                    .collect(toList());
 
             final UserSummary firstResult = userSummaries.get(0);
             final UserCategoryLeaderboardEntry categoryLeader =
-                UserCategoryLeaderboardEntry.createLeader(firstResult, teamNameForFoldingUserName.get(firstResult.getFoldingName()));
+                    UserCategoryLeaderboardEntry.createLeader(firstResult, teamNameForFoldingUserName.get(firstResult.getFoldingName()));
 
             final List<UserCategoryLeaderboardEntry> userSummariesInCategory = new ArrayList<>(userSummaries.size());
             userSummariesInCategory.add(categoryLeader);
@@ -125,7 +125,7 @@ public class LeaderboardStatsGenerator {
                 final String teamName = teamNameForFoldingUserName.get(userSummary.getFoldingName());
                 final int rank = i + 1;
                 final UserCategoryLeaderboardEntry userCategoryLeaderboardEntry =
-                    UserCategoryLeaderboardEntry.create(userSummary, teamName, rank, diffToLeader, diffToNext);
+                        UserCategoryLeaderboardEntry.create(userSummary, teamName, rank, diffToLeader, diffToNext);
                 userSummariesInCategory.add(userCategoryLeaderboardEntry);
             }
 

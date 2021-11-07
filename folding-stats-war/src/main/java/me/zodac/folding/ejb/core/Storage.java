@@ -15,6 +15,7 @@ import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
+import me.zodac.folding.cache.CompetitionSummaryCache;
 import me.zodac.folding.cache.HardwareCache;
 import me.zodac.folding.cache.InitialStatsCache;
 import me.zodac.folding.cache.OffsetTcStatsCache;
@@ -24,6 +25,7 @@ import me.zodac.folding.cache.TeamCache;
 import me.zodac.folding.cache.TotalStatsCache;
 import me.zodac.folding.cache.UserCache;
 import me.zodac.folding.db.DbManagerRetriever;
+import me.zodac.folding.rest.api.tc.CompetitionSummary;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -50,6 +52,7 @@ final class Storage {
     private final TeamCache teamCache = TeamCache.getInstance();
 
     // Stat caches
+    private final CompetitionSummaryCache competitionSummaryCache = CompetitionSummaryCache.getInstance();
     private final InitialStatsCache initialStatsCache = InitialStatsCache.getInstance();
     private final OffsetTcStatsCache offsetTcStatsCache = OffsetTcStatsCache.getInstance();
     private final RetiredTcStatsCache retiredStatsCache = RetiredTcStatsCache.getInstance();
@@ -150,10 +153,10 @@ final class Storage {
         hardwareCache.add(updatedHardware.getId(), updatedHardware);
 
         getAllUsers()
-            .stream()
-            .filter(user -> user.getHardware().getId() == updatedHardware.getId())
-            .map(user -> User.updateHardware(user, updatedHardware))
-            .forEach(updatedUser -> userCache.add(updatedUser.getId(), updatedUser));
+                .stream()
+                .filter(user -> user.getHardware().getId() == updatedHardware.getId())
+                .map(user -> User.updateHardware(user, updatedHardware))
+                .forEach(updatedUser -> userCache.add(updatedUser.getId(), updatedUser));
 
         return updatedHardware;
     }
@@ -259,10 +262,10 @@ final class Storage {
         teamCache.add(updatedTeam.getId(), updatedTeam);
 
         getAllUsers()
-            .stream()
-            .filter(user -> user.getTeam().getId() == updatedTeam.getId())
-            .map(user -> User.updateTeam(user, updatedTeam))
-            .forEach(updatedUser -> userCache.add(updatedUser.getId(), updatedUser));
+                .stream()
+                .filter(user -> user.getTeam().getId() == updatedTeam.getId())
+                .map(user -> User.updateTeam(user, updatedTeam))
+                .forEach(updatedUser -> userCache.add(updatedUser.getId(), updatedUser));
 
         return updatedTeam;
     }
@@ -733,6 +736,26 @@ final class Storage {
         final Optional<UserStats> fromDb = DB_MANAGER.getInitialStats(userId);
         fromDb.ifPresent(userStats -> initialStatsCache.add(userId, userStats));
         return fromDb;
+    }
+
+    /**
+     * Creates a {@link CompetitionSummary}.
+     *
+     * @param competitionSummary the {@link CompetitionSummary} to be created
+     * @return the created {@link CompetitionSummary}
+     */
+    CompetitionSummary createCompetitionSummary(final CompetitionSummary competitionSummary) {
+        competitionSummaryCache.add(competitionSummary);
+        return competitionSummary;
+    }
+
+    /**
+     * Creates the latest {@link CompetitionSummary}.
+     *
+     * @return an {@link Optional} of the latest {@link CompetitionSummary}
+     */
+    Optional<CompetitionSummary> getCompetitionSummary() {
+        return competitionSummaryCache.get();
     }
 
     /**
