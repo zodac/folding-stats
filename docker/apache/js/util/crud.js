@@ -397,12 +397,7 @@ function createUser() {
 }
 
 function updateUser() {
-    var element = document.getElementById("user_update_selector");
-    element = document.getElementById("user_update_selector");
-    selectedElement = element.options[element.selectedIndex];
-
-    var userId = selectedElement.getAttribute("user_id");
-
+    var userId = document.getElementById("user_update_id").value
     var foldingUserName = document.getElementById("user_update_folding_name").value.trim();
     var displayName = document.getElementById("user_update_display_name").value.trim();
     var passkey = document.getElementById("user_update_passkey").value.trim();
@@ -462,6 +457,7 @@ function updateUser() {
                     return;
                 }
 
+                document.getElementById("user_update_selector_input").value = '';
                 document.getElementById("user_update_id").value = '';
                 document.getElementById("user_update_folding_name").value = '';
                 document.getElementById("user_update_display_name").value = '';
@@ -491,12 +487,8 @@ function updateUser() {
 }
 
 function deleteUser() {
-    var element = document.getElementById("user_delete_selector");
-    element = document.getElementById("user_delete_selector");
-    selectedElement = element.options[element.selectedIndex];
-
-    var userId = selectedElement.getAttribute("user_id");
-    var userDisplayName = selectedElement.getAttribute("user_display_name");
+    var userId = document.getElementById("user_delete_id").value
+    var displayName = document.getElementById("user_delete_display_name").value
 
     show("loader");
     fetch(ROOT_URL+'/users/' + userId, {
@@ -518,6 +510,7 @@ function deleteUser() {
             return;
         }
 
+        document.getElementById("user_delete_selector_input").value = '';
         document.getElementById("user_delete_id").value = '';
         document.getElementById("user_delete_folding_name").value = '';
         document.getElementById("user_delete_display_name").value = '';
@@ -534,7 +527,7 @@ function deleteUser() {
             hideElement(userField);
         }
 
-        successToast("User '" + userDisplayName + "' deleted");
+        successToast("User '" + displayName + "' deleted");
         loadUsers();
     })
     .catch((error) => {
@@ -545,12 +538,8 @@ function deleteUser() {
 }
 
 function offsetUser() {
-    var element = document.getElementById("user_offset_selector");
-    element = document.getElementById("user_offset_selector");
-    selectedElement = element.options[element.selectedIndex];
-
-    var userId = selectedElement.getAttribute("user_id");
-    var displayName = selectedElement.getAttribute("user_display_name");
+    var userId = document.getElementById("user_offset_id").value
+    var displayName = document.getElementById("user_offset_display_name").value
 
     show("loader");
     fetch(ROOT_URL+'/stats/users/' + userId)
@@ -558,9 +547,9 @@ function offsetUser() {
         return response.json();
     })
     .then(function(jsonResponse) {
-        var startPoints = jsonResponse['multipliedPoints'];
-        var startUnits = jsonResponse['units'];
-        var endPoints = document.getElementById("user_offset_points").value;
+        var startPoints = jsonResponse['multipliedPoints']
+        var startUnits = jsonResponse['units']
+        var endPoints = document.getElementById("user_offset_points").value
         var endUnits = document.getElementById("user_offset_units").value
 
         var offsetPoints = (endPoints - startPoints);
@@ -593,6 +582,7 @@ function offsetUser() {
                 return;
             }
 
+            document.getElementById("user_offset_selector_input").value = '';
             document.getElementById("user_offset_id").value = '';
             document.getElementById("user_offset_folding_name").value = '';
             document.getElementById("user_offset_display_name").value = '';

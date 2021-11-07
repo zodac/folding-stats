@@ -62,6 +62,7 @@
         <exclude name="LoosePackageCoupling"/>
 
         <!-- Issues for a style guide -->
+        <exclude name="CouplingBetweenObjects"/>
         <exclude name="ExcessiveClassLength"/>
         <exclude name="ExcessiveImports"/>
         <exclude name="ExcessiveMethodLength"/>

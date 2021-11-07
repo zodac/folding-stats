@@ -47,17 +47,17 @@ final class Storage {
     private static final Storage INSTANCE = new Storage();
 
     // POJO caches
-    private final HardwareCache hardwareCache = HardwareCache.getInstance();
-    private final UserCache userCache = UserCache.getInstance();
-    private final TeamCache teamCache = TeamCache.getInstance();
+    private static final HardwareCache HARDWARE_CACHE = HardwareCache.getInstance();
+    private static final TeamCache TEAM_CACHE = TeamCache.getInstance();
+    private static final UserCache USER_CACHE = UserCache.getInstance();
 
-    // Stat caches
-    private final CompetitionSummaryCache competitionSummaryCache = CompetitionSummaryCache.getInstance();
-    private final InitialStatsCache initialStatsCache = InitialStatsCache.getInstance();
-    private final OffsetTcStatsCache offsetTcStatsCache = OffsetTcStatsCache.getInstance();
-    private final RetiredTcStatsCache retiredStatsCache = RetiredTcStatsCache.getInstance();
-    private final TcStatsCache tcStatsCache = TcStatsCache.getInstance();
-    private final TotalStatsCache totalStatsCache = TotalStatsCache.getInstance();
+    // Stats caches
+    private static final CompetitionSummaryCache COMPETITION_SUMMARY_CACHE = CompetitionSummaryCache.getInstance();
+    private static final InitialStatsCache INITIAL_STATS_CACHE = InitialStatsCache.getInstance();
+    private static final OffsetTcStatsCache OFFSET_TC_STATS_CACHE = OffsetTcStatsCache.getInstance();
+    private static final RetiredTcStatsCache RETIRED_TC_STATS_CACHE = RetiredTcStatsCache.getInstance();
+    private static final TcStatsCache TC_STATS_CACHE = TcStatsCache.getInstance();
+    private static final TotalStatsCache TOTAL_STATS_CACHE = TotalStatsCache.getInstance();
 
     private Storage() {
 
@@ -80,7 +80,7 @@ final class Storage {
     @Cached(HardwareCache.class)
     Hardware createHardware(final Hardware hardware) {
         final Hardware hardwareWithId = DB_MANAGER.createHardware(hardware);
-        hardwareCache.add(hardwareWithId.getId(), hardwareWithId);
+        HARDWARE_CACHE.add(hardwareWithId.getId(), hardwareWithId);
         return hardwareWithId;
     }
 
@@ -96,7 +96,7 @@ final class Storage {
      */
     @Cached(HardwareCache.class)
     Optional<Hardware> getHardware(final int hardwareId) {
-        final Optional<Hardware> fromCache = hardwareCache.get(hardwareId);
+        final Optional<Hardware> fromCache = HARDWARE_CACHE.get(hardwareId);
 
         if (fromCache.isPresent()) {
             return fromCache;
@@ -104,7 +104,7 @@ final class Storage {
 
         LOGGER.trace("Cache miss! Get hardware");
         final Optional<Hardware> fromDb = DB_MANAGER.getHardware(hardwareId);
-        fromDb.ifPresent(hardware -> hardwareCache.add(hardwareId, hardware));
+        fromDb.ifPresent(hardware -> HARDWARE_CACHE.add(hardwareId, hardware));
         return fromDb;
     }
 
@@ -119,7 +119,7 @@ final class Storage {
      */
     @Cached(HardwareCache.class)
     Collection<Hardware> getAllHardware() {
-        final Collection<Hardware> fromCache = hardwareCache.getAll();
+        final Collection<Hardware> fromCache = HARDWARE_CACHE.getAll();
 
         if (!fromCache.isEmpty()) {
             return fromCache;
@@ -129,7 +129,7 @@ final class Storage {
         final Collection<Hardware> fromDb = DB_MANAGER.getAllHardware();
 
         for (final Hardware hardware : fromDb) {
-            hardwareCache.add(hardware.getId(), hardware);
+            HARDWARE_CACHE.add(hardware.getId(), hardware);
         }
 
         return fromDb;
@@ -150,13 +150,13 @@ final class Storage {
     @Cached({HardwareCache.class, UserCache.class})
     public Hardware updateHardware(final Hardware hardwareToUpdate) {
         final Hardware updatedHardware = DB_MANAGER.updateHardware(hardwareToUpdate);
-        hardwareCache.add(updatedHardware.getId(), updatedHardware);
+        HARDWARE_CACHE.add(updatedHardware.getId(), updatedHardware);
 
         getAllUsers()
                 .stream()
                 .filter(user -> user.getHardware().getId() == updatedHardware.getId())
                 .map(user -> User.updateHardware(user, updatedHardware))
-                .forEach(updatedUser -> userCache.add(updatedUser.getId(), updatedUser));
+                .forEach(updatedUser -> USER_CACHE.add(updatedUser.getId(), updatedUser));
 
         return updatedHardware;
     }
@@ -173,7 +173,7 @@ final class Storage {
     @Cached(HardwareCache.class)
     void deleteHardware(final int hardwareId) {
         DB_MANAGER.deleteHardware(hardwareId);
-        hardwareCache.remove(hardwareId);
+        HARDWARE_CACHE.remove(hardwareId);
     }
 
     /**
@@ -189,7 +189,7 @@ final class Storage {
     @Cached(TeamCache.class)
     Team createTeam(final Team team) {
         final Team teamWithId = DB_MANAGER.createTeam(team);
-        teamCache.add(teamWithId.getId(), teamWithId);
+        TEAM_CACHE.add(teamWithId.getId(), teamWithId);
         return teamWithId;
     }
 
@@ -205,7 +205,7 @@ final class Storage {
      */
     @Cached(TeamCache.class)
     Optional<Team> getTeam(final int teamId) {
-        final Optional<Team> fromCache = teamCache.get(teamId);
+        final Optional<Team> fromCache = TEAM_CACHE.get(teamId);
 
         if (fromCache.isPresent()) {
             return fromCache;
@@ -213,7 +213,7 @@ final class Storage {
 
         LOGGER.trace("Cache miss! Get team");
         final Optional<Team> fromDb = DB_MANAGER.getTeam(teamId);
-        fromDb.ifPresent(team -> teamCache.add(teamId, team));
+        fromDb.ifPresent(team -> TEAM_CACHE.add(teamId, team));
         return fromDb;
     }
 
@@ -228,7 +228,7 @@ final class Storage {
      */
     @Cached(TeamCache.class)
     Collection<Team> getAllTeams() {
-        final Collection<Team> fromCache = teamCache.getAll();
+        final Collection<Team> fromCache = TEAM_CACHE.getAll();
 
         if (!fromCache.isEmpty()) {
             return fromCache;
@@ -238,7 +238,7 @@ final class Storage {
         final Collection<Team> fromDb = DB_MANAGER.getAllTeams();
 
         for (final Team team : fromDb) {
-            teamCache.add(team.getId(), team);
+            TEAM_CACHE.add(team.getId(), team);
         }
 
         return fromDb;
@@ -259,13 +259,13 @@ final class Storage {
     @Cached({TeamCache.class, UserCache.class})
     public Team updateTeam(final Team teamToUpdate) {
         final Team updatedTeam = DB_MANAGER.updateTeam(teamToUpdate);
-        teamCache.add(updatedTeam.getId(), updatedTeam);
+        TEAM_CACHE.add(updatedTeam.getId(), updatedTeam);
 
         getAllUsers()
                 .stream()
                 .filter(user -> user.getTeam().getId() == updatedTeam.getId())
                 .map(user -> User.updateTeam(user, updatedTeam))
-                .forEach(updatedUser -> userCache.add(updatedUser.getId(), updatedUser));
+                .forEach(updatedUser -> USER_CACHE.add(updatedUser.getId(), updatedUser));
 
         return updatedTeam;
     }
@@ -282,7 +282,7 @@ final class Storage {
     @Cached(TeamCache.class)
     void deleteTeam(final int teamId) {
         DB_MANAGER.deleteTeam(teamId);
-        teamCache.remove(teamId);
+        TEAM_CACHE.remove(teamId);
     }
 
     /**
@@ -298,7 +298,7 @@ final class Storage {
     @Cached(UserCache.class)
     User createUser(final User user) {
         final User userWithId = DB_MANAGER.createUser(user);
-        userCache.add(userWithId.getId(), userWithId);
+        USER_CACHE.add(userWithId.getId(), userWithId);
         return userWithId;
     }
 
@@ -314,7 +314,7 @@ final class Storage {
      */
     @Cached(UserCache.class)
     Optional<User> getUser(final int userId) {
-        final Optional<User> fromCache = userCache.get(userId);
+        final Optional<User> fromCache = USER_CACHE.get(userId);
 
         if (fromCache.isPresent()) {
             return fromCache;
@@ -322,7 +322,7 @@ final class Storage {
 
         LOGGER.trace("Cache miss! Get user");
         final Optional<User> fromDb = DB_MANAGER.getUser(userId);
-        fromDb.ifPresent(user -> userCache.add(userId, user));
+        fromDb.ifPresent(user -> USER_CACHE.add(userId, user));
         return fromDb;
     }
 
@@ -337,7 +337,7 @@ final class Storage {
      */
     @Cached(UserCache.class)
     Collection<User> getAllUsers() {
-        final Collection<User> fromCache = userCache.getAll();
+        final Collection<User> fromCache = USER_CACHE.getAll();
 
         if (!fromCache.isEmpty()) {
             return fromCache;
@@ -347,7 +347,7 @@ final class Storage {
         final Collection<User> fromDb = DB_MANAGER.getAllUsers();
 
         for (final User user : fromDb) {
-            userCache.add(user.getId(), user);
+            USER_CACHE.add(user.getId(), user);
         }
 
         return fromDb;
@@ -365,7 +365,7 @@ final class Storage {
     @Cached(UserCache.class)
     public User updateUser(final User userToUpdate) {
         final User updatedUser = DB_MANAGER.updateUser(userToUpdate);
-        userCache.add(updatedUser.getId(), updatedUser);
+        USER_CACHE.add(updatedUser.getId(), updatedUser);
         return updatedUser;
     }
 
@@ -390,13 +390,13 @@ final class Storage {
     @Cached({UserCache.class, InitialStatsCache.class, OffsetTcStatsCache.class, TcStatsCache.class, TotalStatsCache.class})
     void deleteUser(final int userId) {
         DB_MANAGER.deleteUser(userId);
-        userCache.remove(userId);
+        USER_CACHE.remove(userId);
 
         // Remove the user entry from all stats caches
-        offsetTcStatsCache.remove(userId);
-        totalStatsCache.remove(userId);
-        initialStatsCache.remove(userId);
-        tcStatsCache.remove(userId);
+        OFFSET_TC_STATS_CACHE.remove(userId);
+        TOTAL_STATS_CACHE.remove(userId);
+        INITIAL_STATS_CACHE.remove(userId);
+        TC_STATS_CACHE.remove(userId);
     }
 
     /**
@@ -440,7 +440,7 @@ final class Storage {
     @Cached(RetiredTcStatsCache.class)
     RetiredUserTcStats createRetiredUserStats(final RetiredUserTcStats retiredUserTcStats) {
         final RetiredUserTcStats createdRetiredUserTcStats = DB_MANAGER.createRetiredUserStats(retiredUserTcStats);
-        retiredStatsCache.add(createdRetiredUserTcStats.getRetiredUserId(), createdRetiredUserTcStats);
+        RETIRED_TC_STATS_CACHE.add(createdRetiredUserTcStats.getRetiredUserId(), createdRetiredUserTcStats);
         return createdRetiredUserTcStats;
     }
 
@@ -455,7 +455,7 @@ final class Storage {
      */
     @Cached(RetiredTcStatsCache.class)
     Collection<RetiredUserTcStats> getAllRetiredUsers() {
-        final Collection<RetiredUserTcStats> fromCache = retiredStatsCache.getAll();
+        final Collection<RetiredUserTcStats> fromCache = RETIRED_TC_STATS_CACHE.getAll();
 
         if (!fromCache.isEmpty()) {
             return fromCache;
@@ -465,7 +465,7 @@ final class Storage {
         final Collection<RetiredUserTcStats> fromDb = DB_MANAGER.getAllRetiredUserStats();
 
         for (final RetiredUserTcStats retiredUserTcStats : fromDb) {
-            retiredStatsCache.add(retiredUserTcStats.getRetiredUserId(), retiredUserTcStats);
+            RETIRED_TC_STATS_CACHE.add(retiredUserTcStats.getRetiredUserId(), retiredUserTcStats);
         }
 
         return fromDb;
@@ -480,7 +480,7 @@ final class Storage {
     @Cached(RetiredTcStatsCache.class)
     void deleteAllRetiredUserTcStats() {
         DB_MANAGER.deleteAllRetiredUserStats();
-        retiredStatsCache.removeAll();
+        RETIRED_TC_STATS_CACHE.removeAll();
     }
 
     /**
@@ -548,7 +548,7 @@ final class Storage {
     @Cached(TotalStatsCache.class)
     UserStats createTotalStats(final UserStats userStats) {
         final UserStats fromDb = DB_MANAGER.createTotalStats(userStats);
-        totalStatsCache.add(fromDb.getUserId(), fromDb);
+        TOTAL_STATS_CACHE.add(fromDb.getUserId(), fromDb);
         return fromDb;
     }
 
@@ -564,7 +564,7 @@ final class Storage {
      */
     @Cached(TotalStatsCache.class)
     Optional<UserStats> getTotalStats(final int userId) {
-        final Optional<UserStats> fromCache = totalStatsCache.get(userId);
+        final Optional<UserStats> fromCache = TOTAL_STATS_CACHE.get(userId);
 
         if (fromCache.isPresent()) {
             return fromCache;
@@ -572,7 +572,7 @@ final class Storage {
 
         LOGGER.trace("Cache miss! Total stats");
         final Optional<UserStats> fromDb = DB_MANAGER.getTotalStats(userId);
-        fromDb.ifPresent(userStats -> totalStatsCache.add(userId, userStats));
+        fromDb.ifPresent(userStats -> TOTAL_STATS_CACHE.add(userId, userStats));
         return fromDb;
     }
 
@@ -593,7 +593,7 @@ final class Storage {
     @Cached(OffsetTcStatsCache.class)
     OffsetTcStats createOrUpdateOffsetStats(final int userId, final OffsetTcStats offsetTcStats) {
         final OffsetTcStats fromDb = DB_MANAGER.createOrUpdateOffsetStats(userId, offsetTcStats);
-        offsetTcStatsCache.add(userId, fromDb);
+        OFFSET_TC_STATS_CACHE.add(userId, fromDb);
         return fromDb;
     }
 
@@ -609,7 +609,7 @@ final class Storage {
      */
     @Cached(OffsetTcStatsCache.class)
     Optional<OffsetTcStats> getOffsetStats(final int userId) {
-        final Optional<OffsetTcStats> fromCache = offsetTcStatsCache.get(userId);
+        final Optional<OffsetTcStats> fromCache = OFFSET_TC_STATS_CACHE.get(userId);
 
         if (fromCache.isPresent()) {
             return fromCache;
@@ -617,7 +617,7 @@ final class Storage {
 
         LOGGER.trace("Cache miss! Offset stats");
         final Optional<OffsetTcStats> fromDb = DB_MANAGER.getOffsetStats(userId);
-        fromDb.ifPresent(offsetTcStats -> offsetTcStatsCache.add(userId, offsetTcStats));
+        fromDb.ifPresent(offsetTcStats -> OFFSET_TC_STATS_CACHE.add(userId, offsetTcStats));
         return fromDb;
     }
 
@@ -632,7 +632,7 @@ final class Storage {
     @Cached(OffsetTcStatsCache.class)
     void deleteOffsetStats(final int userId) {
         DB_MANAGER.deleteOffsetStats(userId);
-        offsetTcStatsCache.remove(userId);
+        OFFSET_TC_STATS_CACHE.remove(userId);
     }
 
     /**
@@ -644,7 +644,7 @@ final class Storage {
     @Cached(OffsetTcStatsCache.class)
     void deleteAllOffsetTcStats() {
         DB_MANAGER.deleteAllOffsetStats();
-        offsetTcStatsCache.removeAll();
+        OFFSET_TC_STATS_CACHE.removeAll();
     }
 
     /**
@@ -659,7 +659,7 @@ final class Storage {
     @Cached(TcStatsCache.class)
     UserTcStats createHourlyTcStats(final UserTcStats userTcStats) {
         final UserTcStats fromDb = DB_MANAGER.createHourlyTcStats(userTcStats);
-        tcStatsCache.add(userTcStats.getUserId(), fromDb);
+        TC_STATS_CACHE.add(userTcStats.getUserId(), fromDb);
         return fromDb;
     }
 
@@ -674,7 +674,7 @@ final class Storage {
      */
     @Cached(TcStatsCache.class)
     Optional<UserTcStats> getHourlyTcStats(final int userId) {
-        final Optional<UserTcStats> fromCache = tcStatsCache.get(userId);
+        final Optional<UserTcStats> fromCache = TC_STATS_CACHE.get(userId);
 
         if (fromCache.isPresent()) {
             return fromCache;
@@ -682,7 +682,7 @@ final class Storage {
 
         LOGGER.trace("Cache miss! Hourly TC stats");
         final Optional<UserTcStats> fromDb = DB_MANAGER.getHourlyTcStats(userId);
-        fromDb.ifPresent(userTcStats -> tcStatsCache.add(userId, userTcStats));
+        fromDb.ifPresent(userTcStats -> TC_STATS_CACHE.add(userId, userTcStats));
         return fromDb;
     }
 
@@ -711,7 +711,7 @@ final class Storage {
     @Cached(InitialStatsCache.class)
     UserStats createInitialStats(final UserStats userStats) {
         final UserStats fromDb = DB_MANAGER.createInitialStats(userStats);
-        initialStatsCache.add(fromDb.getUserId(), fromDb);
+        INITIAL_STATS_CACHE.add(fromDb.getUserId(), fromDb);
         return fromDb;
     }
 
@@ -726,7 +726,7 @@ final class Storage {
      */
     @Cached(InitialStatsCache.class)
     Optional<UserStats> getInitialStats(final int userId) {
-        final Optional<UserStats> fromCache = initialStatsCache.get(userId);
+        final Optional<UserStats> fromCache = INITIAL_STATS_CACHE.get(userId);
 
         if (fromCache.isPresent()) {
             return fromCache;
@@ -734,7 +734,7 @@ final class Storage {
 
         LOGGER.trace("Cache miss! Initial stats");
         final Optional<UserStats> fromDb = DB_MANAGER.getInitialStats(userId);
-        fromDb.ifPresent(userStats -> initialStatsCache.add(userId, userStats));
+        fromDb.ifPresent(userStats -> INITIAL_STATS_CACHE.add(userId, userStats));
         return fromDb;
     }
 
@@ -745,7 +745,7 @@ final class Storage {
      * @return the created {@link CompetitionSummary}
      */
     CompetitionSummary createCompetitionSummary(final CompetitionSummary competitionSummary) {
-        competitionSummaryCache.add(competitionSummary);
+        COMPETITION_SUMMARY_CACHE.add(competitionSummary);
         return competitionSummary;
     }
 
@@ -755,7 +755,7 @@ final class Storage {
      * @return an {@link Optional} of the latest {@link CompetitionSummary}
      */
     Optional<CompetitionSummary> getCompetitionSummary() {
-        return competitionSummaryCache.get();
+        return COMPETITION_SUMMARY_CACHE.get();
     }
 
     /**
@@ -763,7 +763,7 @@ final class Storage {
      */
     @Cached(TotalStatsCache.class)
     void evictTcStatsCache() {
-        tcStatsCache.removeAll();
+        TC_STATS_CACHE.removeAll();
     }
 
     /**
@@ -771,6 +771,6 @@ final class Storage {
      */
     @Cached(InitialStatsCache.class)
     void evictInitialStatsCache() {
-        initialStatsCache.removeAll();
+        INITIAL_STATS_CACHE.removeAll();
     }
 }

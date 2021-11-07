@@ -36,8 +36,8 @@ services:
       # Container configuration
       JAVA_OPTS: -Xms512m -Xmx2g -Djava.net.preferIPv4Stack=true
       # External URL configuration
-      STATS_URL_ROOT: "http://backend-dev:8080"
       LARS_URL_ROOT: "http://backend-dev:8080"
+      STATS_URL_ROOT: "http://backend-dev:8080"
       TC_HOMEPAGE_URL: "http://frontend_dev/"
       # NOTE: The monthly reset, result storage and LARS update will always occur at 23:57 on the last day of the month
       ENABLE_STATS_MONTHLY_RESET: "false"

@@ -240,39 +240,6 @@ function loadHardware() {
         // Update any list that needs all hardware
         jsonResponse.sort(sortJsonByKey("hardwareName"));
 
-        hardwareLists = document.querySelectorAll(".hardware_list");
-        for (var i = 0, hardwareList; hardwareList = hardwareLists[i]; i++) {
-            // Clear existing entries
-            while (hardwareList.firstChild) {
-                hardwareList.removeChild(hardwareList.lastChild);
-            }
-
-            // Add the default entry
-            defaultHardwareOption = document.createElement("option");
-            defaultHardwareOption.setAttribute("value", "");
-            defaultHardwareOption.setAttribute("disabled", "");
-            defaultHardwareOption.setAttribute("selected", "");
-            defaultHardwareOption.innerHTML = "Choose Hardware...";
-            hardwareList.append(defaultHardwareOption);
-
-            // Add entries
-            jsonResponse.forEach(function(hardwareItem, i) {
-                hardwareOption = document.createElement("option");
-                hardwareOption.setAttribute("value", hardwareItem['id']);
-
-                hardwareOption.setAttribute("hardware_id", hardwareItem['id']);
-                hardwareOption.setAttribute("hardware_name", hardwareItem['hardwareName']);
-                hardwareOption.setAttribute("display_name", hardwareItem['displayName']);
-                hardwareOption.setAttribute("hardware_make", hardwareItem['hardwareMake']);
-                hardwareOption.setAttribute("hardware_type", hardwareItem['hardwareType']);
-                hardwareOption.setAttribute("multiplier", hardwareItem['multiplier']);
-                hardwareOption.setAttribute("average_ppd", hardwareItem['averagePpd']);
-
-                hardwareOption.innerHTML = hardwareItem['hardwareName'] + " (" + hardwareItem['displayName'] + ")";
-                hardwareList.append(hardwareOption);
-            });
-        }
-
         hardwareDataLists = document.querySelectorAll(".hardware_datalist");
         for (var i = 0, hardwareDataList; hardwareDataList = hardwareDataLists[i]; i++) {
             // Clear existing entries
@@ -369,39 +336,19 @@ function loadUsers() {
         // Update any list that needs all users
         jsonResponse.sort(sortJsonByKey("displayName"));
 
-        userLists = document.querySelectorAll(".user_list");
-        for (var i = 0, userList; userList = userLists[i]; i++) {
+        userDataLists = document.querySelectorAll(".user_datalist");
+        for (var i = 0, userDataList; userDataList = userDataLists[i]; i++) {
             // Clear existing entries
-            while (userList.firstChild) {
-                userList.removeChild(userList.lastChild);
+            while (userDataList.firstChild) {
+                userDataList.removeChild(userDataList.lastChild);
             }
-
-            // Add the default entry
-            defaultUserOption = document.createElement("option");
-            defaultUserOption.setAttribute("value", "");
-            defaultUserOption.setAttribute("disabled", "");
-            defaultUserOption.setAttribute("selected", "");
-            defaultUserOption.innerHTML = "Choose User...";
-            userList.append(defaultUserOption);
 
             // Add entries
             jsonResponse.forEach(function(userItem, i) {
                 userOption = document.createElement("option");
-                userOption.setAttribute("value", userItem['id']);
-
-                userOption.setAttribute("user_id", userItem['id']);
-                userOption.setAttribute("user_folding_name", userItem['foldingUserName']);
-                userOption.setAttribute("user_display_name", userItem['displayName']);
-                userOption.setAttribute("user_passkey", userItem['passkey']);
-                userOption.setAttribute("user_category", getCategoryFrontend(userItem['category']));
-                userOption.setAttribute("user_profile_link", userItem['profileLink']);
-                userOption.setAttribute("user_live_stats_link", userItem['liveStatsLink']);
-                userOption.setAttribute("user_hardware_id", userItem['hardware']['id']);
-                userOption.setAttribute("user_team_id", userItem['team']['id']);
-                userOption.setAttribute("user_is_captain", userItem['userIsCaptain']);
-
-                userOption.innerHTML = userItem["displayName"] + " ("+userItem['team']['teamName']+")";
-                userList.append(userOption);
+                userOption.setAttribute("value", userItem['id'] + ": " + userItem['displayName']);
+                userOption.innerHTML = userItem['foldingUserName'] + " (" + getCategoryFrontend(userItem['category']) + ", " + userItem['team']['teamName'] + ")"
+                userDataList.append(userOption);
             });
         }
     })
@@ -475,36 +422,8 @@ function loadTeams() {
 
         teamsDiv.append(teamsTable);
 
-        teamLists = document.querySelectorAll(".team_list");
-        for (var i = 0, teamList; teamList = teamLists[i]; i++) {
-            // Clear existing entries
-            while (teamList.firstChild) {
-                teamList.removeChild(teamList.lastChild);
-            }
-
-            // Add the default entry
-            defaultTeamOption = document.createElement("option");
-            defaultTeamOption.setAttribute("value", "");
-            defaultTeamOption.setAttribute("disabled", "");
-            defaultTeamOption.setAttribute("selected", "");
-            defaultTeamOption.innerHTML = "Choose Team...";
-            teamList.append(defaultTeamOption);
-
-            // Add entries
-            jsonResponse.forEach(function(teamItem, i) {
-                teamOption = document.createElement("option");
-                teamOption.setAttribute("value", teamItem['id']);
-
-                teamOption.setAttribute("team_id", teamItem['id']);
-                teamOption.setAttribute("team_name", teamItem['teamName']);
-                teamOption.setAttribute("team_description", teamItem['teamDescription']);
-                teamOption.setAttribute("team_forum_link", teamItem['forumLink']);
-
-                teamOption.innerHTML = teamItem["teamName"];
-                teamList.append(teamOption);
-            });
-        }
-
+        // Update any list that needs all teams
+        jsonResponse.sort(sortJsonByKey("teamName"));
         teamDataLists = document.querySelectorAll(".team_datalist");
         for (var i = 0, teamDataList; teamDataList = teamDataLists[i]; i++) {
             // Clear existing entries

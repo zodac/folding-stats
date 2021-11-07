@@ -21,7 +21,7 @@
     <script src="./res/js/html_escaper.min.js" type="text/javascript"></script>
     <script src="./res/js/json_sorter.min.js" type="text/javascript"></script>
     <script src="./res/js/storage.min.js" type="text/javascript"></script>
-    <script src="./res/js/table_sort.min.js" type="text/javascript"></script>
+    <script src="./res/js/table_sorter.min.js" type="text/javascript"></script>
     <script src="./res/js/timer.min.js" type="text/javascript"></script>
     <script src="./res/js/toast.min.js" type="text/javascript"></script>
 </head>
@@ -682,10 +682,17 @@
                                 <button type="submit" class="btn btn-primary mb-3">Update User</button>
                             </div>
                             <div class="col-auto">
-                                <select id="user_update_selector" class="form-select user_list"
-                                        aria-label="user_update_list" onchange="populateUserUpdate();" required>
+                                <input class="form-control"
+                                       list="user_update_selector"
+                                       id="user_update_selector_input"
+                                       onchange="populateUserUpdate();"
+                                       placeholder="Search for User...">
+                                <datalist id="user_update_selector"
+                                          class="user_datalist"
+                                          aria-label="user_update_list"
+                                          required>
                                     <!-- Will be populated by system.js -->
-                                </select>
+                                </datalist>
                             </div>
                             <div class="col-auto user_update" style="display:none;">
                                 <label for="user_update_id" class="visually-hidden">User ID</label>
@@ -782,10 +789,17 @@
                                 <button type="submit" class="btn btn-danger mb-3">Delete User</button>
                             </div>
                             <div class="col-auto">
-                                <select id="user_delete_selector" class="form-select user_list"
-                                        aria-label="user_delete_list" onchange="populateUserDelete();" required>
+                                <input class="form-control"
+                                       list="user_delete_selector"
+                                       id="user_delete_selector_input"
+                                       onchange="populateUserDelete();"
+                                       placeholder="Search for User...">
+                                <datalist id="user_delete_selector"
+                                          class="user_datalist"
+                                          aria-label="user_delete_list"
+                                          required>
                                     <!-- Will be populated by system.js -->
-                                </select>
+                                </datalist>
                             </div>
                             <div class="col-auto user_delete" style="display:none;">
                                 <label for="user_delete_id" class="visually-hidden">User ID</label>
@@ -881,10 +895,17 @@
                                 <button type="submit" class="btn btn-primary mb-3">Edit User Stats</button>
                             </div>
                             <div class="col-auto">
-                                <select id="user_offset_selector" class="form-select user_list"
-                                        aria-label="user_offset_list" onchange="populateUserOffset();" required>
+                                <input class="form-control"
+                                       list="user_offset_selector"
+                                       id="user_offset_selector_input"
+                                       onchange="populateUserOffset();"
+                                       placeholder="Search for User...">
+                                <datalist id="user_offset_selector"
+                                          class="user_datalist"
+                                          aria-label="user_offset_list"
+                                          required>
                                     <!-- Will be populated by system.js -->
-                                </select>
+                                </datalist>
                             </div>
                             <div class="col-auto user_offset" style="display:none;">
                                 <label for="user_offset_id" class="visually-hidden">User ID</label>

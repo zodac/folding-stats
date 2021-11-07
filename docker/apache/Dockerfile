@@ -1,3 +1,10 @@
+FROM node:lts-alpine3.14 AS raml
+# Install raml2html
+RUN npm i -g raml2html
+
+COPY ./docker/apache/raml/ /docker/apache/raml/
+RUN raml2html --input /docker/apache/raml/api.raml --output /docker/apache/api.html
+
 FROM mysocialobservations/docker-tdewolff-minify AS minifier
 
 ARG ROOT_URL
@@ -21,13 +28,6 @@ RUN minify --verbose --match=\.*.css$ --type=css --output /docker/apache/site/re
     minify --verbose --match=\.*.js$ --type=js --output /docker/apache/site/res/js/ /docker/apache/js/util && \
     find /docker/apache/site/res/ -iname "*.css" | sed 's/....$//' | xargs -i mv {}.css {}.min.css && \
     find /docker/apache/site/res/ -iname "*.js" | sed 's/...$//' | xargs -i mv {}.js {}.min.js
-
-FROM node:lts-alpine3.14 AS raml
-# Install raml2html
-RUN npm i -g raml2html
-
-COPY ./docker/apache/raml/ /docker/apache/raml/
-RUN raml2html --input /docker/apache/raml/api.raml --output /docker/apache/api.html
 
 FROM httpd:2.4-alpine
 

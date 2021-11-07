@@ -36,8 +36,8 @@ services:
       # Container configuration
       JAVA_OPTS: -Xms512m -Xmx2g -Djava.net.preferIPv4Stack=true
       # External URL configuration
-      STATS_URL_ROOT: "https://api2.foldingathome.org"
       LARS_URL_ROOT: "https://folding.lar.systems/"
+      STATS_URL_ROOT: "https://api2.foldingathome.org"
       TC_HOMEPAGE_URL: "https://etf.axihub.ca/"
       # NOTE: The monthly reset, result storage and LARS update will always occur at 23:57 on the last day of the month
       ENABLE_STATS_MONTHLY_RESET: "true"
