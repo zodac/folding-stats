@@ -441,7 +441,6 @@ function loadTeams() {
     })
 };
 
-
 document.addEventListener("DOMContentLoaded", function(event) {
     if(sessionContains("Authorization")) {
         hide("login_form");

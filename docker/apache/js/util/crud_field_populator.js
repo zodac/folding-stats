@@ -316,8 +316,8 @@ function populateUserOffset(){
             return response.json();
         })
         .then(function(jsonResponse) {
-            document.getElementById("user_offset_points").value = jsonResponse['multipliedPoints'];
-            document.getElementById("user_offset_units").value = jsonResponse['units'];
+            document.getElementById("user_offset_points").value = jsonResponse['multipliedPoints'].toLocaleString();
+            document.getElementById("user_offset_units").value = jsonResponse['units'].toLocaleString();
 
             fetch(ROOT_URL+'/hardware/' + hardwareId)
             .then(response => {

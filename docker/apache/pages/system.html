@@ -961,13 +961,15 @@
                             </div>
                             <div class="col-auto user_offset" style="display:none;">
                                 <label for="user_offset_points" class="visually-hidden">Points</label>
-                                <input id="user_offset_points" class="form-control" type="number" step="1"
-                                       placeholder="Points" aria-label="Points">
+                                <input id="user_offset_points" class="form-control" type="text"
+                                       pattern="(?<!\S)(?=.)(0|([1-9](\d*|\d{0,2}(,\d{3})*)))?(\.\d*[1-9])?(?!\S)"
+                                       title="Number (with or without commas)" placeholder="Points" aria-label="Points">
                             </div>
                             <div class="col-auto user_offset" style="display:none;">
                                 <label for="user_offset_units" class="visually-hidden">Units</label>
-                                <input id="user_offset_units" class="form-control" type="number" step="1"
-                                       placeholder="Units" aria-label="Units">
+                                <input id="user_offset_units" class="form-control" type="text"
+                                       pattern="(?<!\S)(?=.)(0|([1-9](\d*|\d{0,2}(,\d{3})*)))?(\.\d*[1-9])?(?!\S)"
+                                       title="Number (with or without commas)" placeholder="Units" aria-label="Units">
                             </div>
                         </form>
                     </div>

@@ -549,8 +549,8 @@ function offsetUser() {
     .then(function(jsonResponse) {
         var startPoints = jsonResponse['multipliedPoints']
         var startUnits = jsonResponse['units']
-        var endPoints = document.getElementById("user_offset_points").value
-        var endUnits = document.getElementById("user_offset_units").value
+        var endPoints = document.getElementById("user_offset_points").value.replaceAll(',', "")
+        var endUnits = document.getElementById("user_offset_units").value.replaceAll(',', "")
 
         var offsetPoints = (endPoints - startPoints);
         var offsetUnits = (endUnits - startUnits);
