@@ -42,6 +42,7 @@ class HistoricStatsTest {
 
         // Verify same dates are combined
         assertThat(result)
+            .as("Expected stats of the same date to be combined")
             .hasSize(3);
 
         // Verify values are combined in same date

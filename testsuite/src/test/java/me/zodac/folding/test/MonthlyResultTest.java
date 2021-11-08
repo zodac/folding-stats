@@ -117,10 +117,10 @@ class MonthlyResultTest {
             .hasSize(1);
 
         final UserCategoryLeaderboardEntry userCategoryLeaderboardEntry = monthlyResult.getUserCategoryLeaderboard().get(Category.NVIDIA_GPU).get(0);
-        assertThat(userCategoryLeaderboardEntry.getTeamName())
+        assertThat(userCategoryLeaderboardEntry.getUser().getTeam().getTeamName())
             .as("Expected result user to have same team name as input team")
             .isEqualTo(team.getTeamName());
-        assertThat(userCategoryLeaderboardEntry.getFoldingName())
+        assertThat(userCategoryLeaderboardEntry.getUser().getFoldingUserName())
             .as("Expected result user to have same name as input user")
             .isEqualTo(user.getFoldingUserName());
         assertThat(userCategoryLeaderboardEntry.getMultipliedPoints())
@@ -190,7 +190,7 @@ class MonthlyResultTest {
 
         assertThat(amdLeaderboard)
             .hasSize(1);
-        assertThat(amdLeaderboard.get(0).getFoldingName())
+        assertThat(amdLeaderboard.get(0).getUser().getFoldingUserName())
             .as("Expected user in first to be the third created user")
             .isEqualTo(thirdUser.getFoldingUserName());
         assertThat(amdLeaderboard.get(0).getMultipliedPoints())
@@ -199,7 +199,7 @@ class MonthlyResultTest {
 
         assertThat(wildcardLeaderboard)
             .hasSize(1);
-        assertThat(wildcardLeaderboard.get(0).getFoldingName())
+        assertThat(wildcardLeaderboard.get(0).getUser().getFoldingUserName())
             .as("Expected user in first to be the fourth created user")
             .isEqualTo(fourthUser.getFoldingUserName());
         assertThat(wildcardLeaderboard.get(0).getMultipliedPoints())
@@ -208,13 +208,13 @@ class MonthlyResultTest {
 
         assertThat(nvidiaLeaderboard)
             .hasSize(2);
-        assertThat(nvidiaLeaderboard.get(0).getFoldingName())
+        assertThat(nvidiaLeaderboard.get(0).getUser().getFoldingUserName())
             .as("Expected user in first to be the first created user")
             .isEqualTo(firstUser.getFoldingUserName());
         assertThat(nvidiaLeaderboard.get(0).getMultipliedPoints())
             .as("Expected user in first have the same points as first created user")
             .isEqualTo(10_000L);
-        assertThat(nvidiaLeaderboard.get(1).getFoldingName())
+        assertThat(nvidiaLeaderboard.get(1).getUser().getFoldingUserName())
             .as("Expected user in second to be the second created user")
             .isEqualTo(secondUser.getFoldingUserName());
         assertThat(nvidiaLeaderboard.get(1).getMultipliedPoints())
@@ -268,10 +268,10 @@ class MonthlyResultTest {
             .hasSize(1);
 
         final UserCategoryLeaderboardEntry userCategoryLeaderboardEntry = monthlyResult.getUserCategoryLeaderboard().get(Category.NVIDIA_GPU).get(0);
-        assertThat(userCategoryLeaderboardEntry.getTeamName())
+        assertThat(userCategoryLeaderboardEntry.getUser().getTeam().getTeamName())
             .as("Expected result user to have same team name as input team")
             .isEqualTo(team.getTeamName());
-        assertThat(userCategoryLeaderboardEntry.getFoldingName())
+        assertThat(userCategoryLeaderboardEntry.getUser().getFoldingUserName())
             .as("Expected result user to have same name as input user")
             .isEqualTo(user.getFoldingUserName());
         assertThat(userCategoryLeaderboardEntry.getMultipliedPoints())

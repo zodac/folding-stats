@@ -54,7 +54,7 @@ import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 
 /**
- * Implementation of {@link DbManager} for PostgreSQL databases.
+ * Implementation of {@link DbManager} for <b>PostgreSQL</b> databases.
  *
  * <p>
  * Uses <b>jOOQ</b> for code generation for the DB tables/schemas, rather than direct SQL queries. See existing methods for examples.

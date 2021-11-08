@@ -130,12 +130,12 @@ public class TeamCompetitionStatsEndpoint {
 
             final CompetitionSummary competitionSummary = businessLogic.getCompetitionSummary();
             final Collection<UserSummary> userSummaries = competitionSummary.getTeams()
-                    .stream()
-                    .flatMap(teamResult -> teamResult.getActiveUsers().stream())
-                    .collect(toList());
+                .stream()
+                .flatMap(teamResult -> teamResult.getActiveUsers().stream())
+                .collect(toList());
 
             for (final UserSummary userSummary : userSummaries) {
-                if (userSummary.getId() == user.getId()) {
+                if (userSummary.getUser().getId() == user.getId()) {
                     return ok(userSummary);
                 }
             }
@@ -234,7 +234,7 @@ public class TeamCompetitionStatsEndpoint {
 
         try {
             final Map<Category, List<UserCategoryLeaderboardEntry>> categoryLeaderboard =
-                    leaderboardStatsGenerator.generateUserCategoryLeaderboards();
+                leaderboardStatsGenerator.generateUserCategoryLeaderboards();
             return ok(categoryLeaderboard);
         } catch (final Exception e) {
             LOGGER.error("Unexpected error retrieving TC stats", e);

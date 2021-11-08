@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 public enum DatabaseType {
 
     /**
-     * The system is using a PostgreSQL database.
+     * The system is using a <b>PostgreSQL</b> database.
      */
     POSTGRESQL,
 

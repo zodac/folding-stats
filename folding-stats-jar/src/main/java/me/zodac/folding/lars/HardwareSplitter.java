@@ -74,17 +74,17 @@ public final class HardwareSplitter {
      */
     public static Map<Hardware, Hardware> toUpdate(final Collection<Hardware> fromLars, final Collection<Hardware> inDb) {
         final Map<String, Hardware> fromLarsHardware = fromLars
-                .stream()
-                .collect(toMap(hardware -> hardware.getHardwareName().toLowerCase(Locale.UK), hardware -> hardware));
+            .stream()
+            .collect(toMap(hardware -> hardware.getHardwareName().toLowerCase(Locale.UK), hardware -> hardware));
 
         final Map<String, Hardware> inDbHardware = inDb
-                .stream()
-                .collect(toMap(hardware -> hardware.getHardwareName().toLowerCase(Locale.UK), hardware -> hardware));
+            .stream()
+            .collect(toMap(hardware -> hardware.getHardwareName().toLowerCase(Locale.UK), hardware -> hardware));
 
         fromLarsHardware.keySet().retainAll(inDbHardware.keySet());
         final Map<Hardware, Hardware> larsHardwareAlreadyInDb = fromLarsHardware.entrySet()
-                .stream()
-                .collect(toMap(Map.Entry::getValue, e -> inDbHardware.get(e.getKey())));
+            .stream()
+            .collect(toMap(Map.Entry::getValue, e -> inDbHardware.get(e.getKey())));
 
         final Map<Hardware, Hardware> toUpdate = new HashMap<>();
         for (final Map.Entry<Hardware, Hardware> entry : larsHardwareAlreadyInDb.entrySet()) {

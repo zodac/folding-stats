@@ -1,5 +1,9 @@
 package me.zodac.folding.ejb.api;
 
+import java.time.Month;
+import java.time.Year;
+import java.util.Collection;
+import java.util.Optional;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
@@ -11,11 +15,6 @@ import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.rest.api.tc.CompetitionSummary;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
-
-import java.time.Month;
-import java.time.Year;
-import java.util.Collection;
-import java.util.Optional;
 
 /**
  * In order to decouple the REST layer from any business requirements, we move that logic into this interface, to be

@@ -15,7 +15,6 @@ import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
-import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
@@ -166,9 +165,9 @@ public class BusinessLogicEjb implements BusinessLogic {
     @Override
     public Collection<User> getAllUsersWithoutPasskeys() {
         return getAllUsersWithPasskeys()
-                .stream()
-                .map(User::hidePasskey)
-                .collect(toList());
+            .stream()
+            .map(User::hidePasskey)
+            .collect(toList());
     }
 
     @Override
@@ -197,7 +196,7 @@ public class BusinessLogicEjb implements BusinessLogic {
         final RetiredUserTcStats retiredUserTcStats = RetiredUserTcStats.createWithoutId(user.getTeam().getId(), user.getDisplayName(), userStats);
         final RetiredUserTcStats createdRetiredUserTcStats = STORAGE.createRetiredUserStats(retiredUserTcStats);
         LOGGER.info("User '{}' (ID: {}) retired with retired stats ID: {}", user.getDisplayName(), user.getId(),
-                createdRetiredUserTcStats.getRetiredUserId());
+            createdRetiredUserTcStats.getRetiredUserId());
     }
 
     @Override
@@ -207,9 +206,9 @@ public class BusinessLogicEjb implements BusinessLogic {
         }
 
         return getAllUsersWithPasskeys()
-                .stream()
-                .filter(user -> user.getHardware().getId() == hardware.getId())
-                .collect(toList());
+            .stream()
+            .filter(user -> user.getHardware().getId() == hardware.getId())
+            .collect(toList());
     }
 
     @Override
@@ -219,9 +218,9 @@ public class BusinessLogicEjb implements BusinessLogic {
         }
 
         return getAllUsersWithPasskeys()
-                .stream()
-                .filter(user -> user.getTeam().getId() == team.getId())
-                .collect(toList());
+            .stream()
+            .filter(user -> user.getTeam().getId() == team.getId())
+            .collect(toList());
     }
 
     @Override
@@ -237,9 +236,9 @@ public class BusinessLogicEjb implements BusinessLogic {
     @Override
     public Collection<RetiredUserTcStats> getAllRetiredUsersForTeam(final Team team) {
         return STORAGE.getAllRetiredUsers()
-                .stream()
-                .filter(retiredUserTcStats -> retiredUserTcStats.getTeamId() == team.getId())
-                .collect(toList());
+            .stream()
+            .filter(retiredUserTcStats -> retiredUserTcStats.getTeamId() == team.getId())
+            .collect(toList());
     }
 
     @Override
@@ -293,7 +292,7 @@ public class BusinessLogicEjb implements BusinessLogic {
     @Override
     public UserStats getTotalStats(final User user) {
         return STORAGE.getTotalStats(user.getId())
-                .orElse(UserStats.empty());
+            .orElse(UserStats.empty());
     }
 
     @Override
@@ -310,7 +309,7 @@ public class BusinessLogicEjb implements BusinessLogic {
     @Override
     public OffsetTcStats getOffsetStats(final User user) {
         return STORAGE.getOffsetStats(user.getId())
-                .orElse(OffsetTcStats.empty());
+            .orElse(OffsetTcStats.empty());
     }
 
     @Override
@@ -321,7 +320,7 @@ public class BusinessLogicEjb implements BusinessLogic {
     @Override
     public UserTcStats getHourlyTcStats(final User user) {
         return STORAGE.getHourlyTcStats(user.getId())
-                .orElse(UserTcStats.empty(user.getId()));
+            .orElse(UserTcStats.empty(user.getId()));
     }
 
     @Override
@@ -337,7 +336,7 @@ public class BusinessLogicEjb implements BusinessLogic {
     @Override
     public UserStats getInitialStats(final User user) {
         return STORAGE.getInitialStats(user.getId())
-                .orElse(UserStats.empty());
+            .orElse(UserStats.empty());
     }
 
     @Override
@@ -391,9 +390,9 @@ public class BusinessLogicEjb implements BusinessLogic {
 
     private List<TeamSummary> getStatsForTeams() {
         return getAllTeams()
-                .stream()
-                .map(this::getTcTeamResult)
-                .collect(toList());
+            .stream()
+            .map(this::getTcTeamResult)
+            .collect(toList());
     }
 
     private TeamSummary getTcTeamResult(final Team team) {
@@ -402,28 +401,24 @@ public class BusinessLogicEjb implements BusinessLogic {
         final Collection<User> usersOnTeam = getUsersOnTeam(team);
 
         final Collection<UserSummary> activeUserSummaries = usersOnTeam
-                .stream()
-                .map(this::getTcStatsForUser)
-                .collect(toList());
+            .stream()
+            .map(this::getTcStatsForUser)
+            .collect(toList());
 
         final Collection<RetiredUserSummary> retiredUserSummaries = getAllRetiredUsersForTeam(team)
-                .stream()
-                .map(RetiredUserSummary::createWithDefaultRank)
-                .collect(toList());
+            .stream()
+            .map(RetiredUserSummary::createWithDefaultRank)
+            .collect(toList());
 
         final String captainDisplayName = getCaptainDisplayName(team.getTeamName(), usersOnTeam);
         return TeamSummary.createWithDefaultRank(team, captainDisplayName, activeUserSummaries, retiredUserSummaries);
     }
 
     private UserSummary getTcStatsForUser(final User user) {
-        final Hardware hardware = user.getHardware();
-        final Category category = user.getCategory();
-
         final UserTcStats userTcStats = getHourlyTcStats(user);
         LOGGER.debug("Results for {}: {} points | {} multiplied points | {} units", user::getDisplayName, userTcStats::getPoints,
-                userTcStats::getMultipliedPoints, userTcStats::getUnits);
-        return UserSummary.createWithDefaultRank(user.getId(), user.getDisplayName(), user.getFoldingUserName(), hardware, category,
-                user.getProfileLink(), user.getLiveStatsLink(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits());
+            userTcStats::getMultipliedPoints, userTcStats::getUnits);
+        return UserSummary.createWithDefaultRank(user, userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits());
     }
 
     private static String getCaptainDisplayName(final String teamName, final Collection<User> usersOnTeam) {

@@ -9,7 +9,7 @@ import me.zodac.folding.api.exception.DatabaseConnectionException;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
 
 /**
- * {@link DbConnectionPool} for PostgreSQL DB {@link Connection}s.
+ * {@link DbConnectionPool} for <b>PostgreSQL</b> DB {@link Connection}s.
  */
 public final class PostgresDbConnectionPool implements DbConnectionPool {
 

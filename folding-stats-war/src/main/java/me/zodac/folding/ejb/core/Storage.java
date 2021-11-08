@@ -153,10 +153,10 @@ final class Storage {
         HARDWARE_CACHE.add(updatedHardware.getId(), updatedHardware);
 
         getAllUsers()
-                .stream()
-                .filter(user -> user.getHardware().getId() == updatedHardware.getId())
-                .map(user -> User.updateHardware(user, updatedHardware))
-                .forEach(updatedUser -> USER_CACHE.add(updatedUser.getId(), updatedUser));
+            .stream()
+            .filter(user -> user.getHardware().getId() == updatedHardware.getId())
+            .map(user -> User.updateHardware(user, updatedHardware))
+            .forEach(updatedUser -> USER_CACHE.add(updatedUser.getId(), updatedUser));
 
         return updatedHardware;
     }
@@ -262,10 +262,10 @@ final class Storage {
         TEAM_CACHE.add(updatedTeam.getId(), updatedTeam);
 
         getAllUsers()
-                .stream()
-                .filter(user -> user.getTeam().getId() == updatedTeam.getId())
-                .map(user -> User.updateTeam(user, updatedTeam))
-                .forEach(updatedUser -> USER_CACHE.add(updatedUser.getId(), updatedUser));
+            .stream()
+            .filter(user -> user.getTeam().getId() == updatedTeam.getId())
+            .map(user -> User.updateTeam(user, updatedTeam))
+            .forEach(updatedUser -> USER_CACHE.add(updatedUser.getId(), updatedUser));
 
         return updatedTeam;
     }

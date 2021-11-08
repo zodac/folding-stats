@@ -24,6 +24,8 @@ public class UserStatsStorer {
     @EJB
     private LeaderboardStatsGenerator leaderboardStatsGenerator;
 
+    // TODO: [zodac] Update this JSON output, and the RAML to go with it.
+
     /**
      * Stores the {@link MonthlyResult} for the current {@link java.time.ZoneOffset#UTC} date-time.
      *

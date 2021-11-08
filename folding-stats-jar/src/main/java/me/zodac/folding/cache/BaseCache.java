@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @param <V> the type of the element to be cached
  */
+// TODO: [zodac] Replace with Caffine caches
 public class BaseCache<V> {
 
     private final Map<Integer, V> elementsById;

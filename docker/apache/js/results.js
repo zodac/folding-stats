@@ -169,9 +169,15 @@ function loadCategoryLeaderboard(jsonResponse) {
                     categoryCell.setAttribute("data-placement", "top");
                     categoryCell.setAttribute("title", "Unmultiplied: " + user["points"].toLocaleString());
                     new bootstrap.Tooltip(categoryCell);
+                    categoryCell.innerHTML = user[property].toLocaleString();
+                } else if (property === "displayName") {
+                    categoryCell.innerHTML = user['user']["displayName"].toLocaleString();
+                } else if (property === "hardware") {
+                    categoryCell.innerHTML = user['user']['hardware']["displayName"].toLocaleString();
+                } else {
+                    categoryCell.innerHTML = user[property].toLocaleString();
                 }
 
-                categoryCell.innerHTML = user[property].toLocaleString();
                 categoryTableBodyRow.append(categoryCell);
             });
             categoryTableBody.append(categoryTableBodyRow);

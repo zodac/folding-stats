@@ -87,7 +87,7 @@ public final class TeamCompetitionStatsUtils {
      */
     public static UserSummary getActiveUserFromTeam(final TeamSummary teamSummary, final String userName) throws FoldingRestException {
         for (final UserSummary userSummary : teamSummary.getActiveUsers()) {
-            if (userSummary.getDisplayName().equalsIgnoreCase(userName)) {
+            if (userSummary.getUser().getDisplayName().equalsIgnoreCase(userName)) {
                 return userSummary;
             }
         }

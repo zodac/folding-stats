@@ -20,7 +20,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public final class HardwareValidator {
 
-    // Assuming the 'best' hardware will have a multiplier of <b>1.00</b>, and all others will be based on that
+    // The hardware with the highest PPD will have a multiplier of <b>1.00</b>, and all others will be based on that
     private static final double MINIMUM_MULTIPLIER_VALUE = 1.00D;
     private static final long MINIMUM_AVERAGE_PPD_VALUE = 1L;
 

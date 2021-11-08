@@ -421,25 +421,34 @@ class PostgresDbManagerTest {
             Map.of(Category.AMD_GPU, List.of(
                     UserCategoryLeaderboardEntry.create(
                         UserSummary.createWithDefaultRank(
-                            1,
-                            "User1",
-                            "User1",
-                            Hardware.createWithoutId(
-                                "Hardware1",
-                                "Hardware1",
-                                HardwareMake.AMD,
-                                HardwareType.GPU,
-                                1.00D,
-                                1L
-                            ),
-                            Category.AMD_GPU,
-                            "",
-                            "",
+                            User.builder()
+                                .id(1)
+                                .foldingUserName("User1")
+                                .displayName("User 1")
+                                .category(Category.AMD_GPU)
+                                .hardware(
+                                    Hardware.createWithoutId(
+                                        "Hardware1",
+                                        "Hardware 1",
+                                        HardwareMake.AMD,
+                                        HardwareType.GPU,
+                                        1.00D,
+                                        1L
+                                    )
+                                )
+                                .team(
+                                    Team.builder()
+                                        .id(1)
+                                        .teamName("Team 1")
+                                        .teamDescription("Test Team 1")
+                                        .build()
+                                )
+                                .build(),
                             0L,
                             0L,
                             0
                         ),
-                        "Team1", 1, 0L, 0L
+                        1, 0L, 0L
                     )
                 ),
                 Category.NVIDIA_GPU, Collections.emptyList(),
@@ -470,25 +479,35 @@ class PostgresDbManagerTest {
             Map.of(Category.NVIDIA_GPU, List.of(
                     UserCategoryLeaderboardEntry.create(
                         UserSummary.createWithDefaultRank(
-                            1,
-                            "User2",
-                            "User2",
-                            Hardware.createWithoutId(
-                                "Hardware2",
-                                "Hardware2",
-                                HardwareMake.NVIDIA,
-                                HardwareType.GPU,
-                                1.00D,
-                                1L
-                            ),
-                            Category.AMD_GPU,
-                            "",
-                            "",
+                            User.builder()
+                                .id(2)
+                                .foldingUserName("User2")
+                                .displayName("User 2")
+                                .category(Category.NVIDIA_GPU)
+                                .hardware(
+                                    Hardware.createWithoutId(
+                                        "Hardware2",
+                                        "Hardware 2",
+                                        HardwareMake.NVIDIA,
+                                        HardwareType.GPU,
+                                        1.00D,
+                                        1L
+                                    )
+                                )
+                                .team(
+                                    Team.builder()
+                                        .id(2)
+                                        .teamName("Team 2")
+                                        .teamDescription("Test Team 2")
+                                        .build()
+                                )
+                                .build(),
+
                             0L,
                             0L,
                             0
                         ),
-                        "Team2", 1, 0L, 0L
+                        1, 0L, 0L
                     )
                 ),
                 Category.AMD_GPU, Collections.emptyList(),

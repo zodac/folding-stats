@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -41,9 +40,9 @@ public class LeaderboardStatsGenerator {
     public List<TeamLeaderboardEntry> generateTeamLeaderboards() {
         final CompetitionSummary competitionSummary = businessLogic.getCompetitionSummary();
         final List<TeamSummary> teamResults = competitionSummary.getTeams()
-                .stream()
-                .sorted(Comparator.comparingLong(TeamSummary::getTeamMultipliedPoints).reversed())
-                .collect(toList());
+            .stream()
+            .sorted(Comparator.comparingLong(TeamSummary::getTeamMultipliedPoints).reversed())
+            .collect(toList());
 
         if (teamResults.isEmpty()) {
             LOGGER.warn("No TC teams to show");
@@ -83,19 +82,16 @@ public class LeaderboardStatsGenerator {
         }
 
         final Map<Category, List<UserSummary>> userResultsByCategory = new EnumMap<>(Category.class);
-        final Map<String, String> teamNameForFoldingUserName = new HashMap<>(); // Convenient way to determine the team name of a user
 
         for (final TeamSummary teamSummary : competitionSummary.getTeams()) {
-            final String teamName = teamSummary.getTeam().getTeamName();
-
+            // TODO: [zodac] Instead of adding active users to category, iterate through categories
             for (final UserSummary userSummary : teamSummary.getActiveUsers()) {
-                final Category category = Category.get(userSummary.getCategory());
+                final Category category = userSummary.getUser().getCategory();
 
                 final List<UserSummary> existingUsersInCategory = userResultsByCategory.getOrDefault(category, new ArrayList<>(0));
                 existingUsersInCategory.add(userSummary);
 
                 userResultsByCategory.put(category, existingUsersInCategory);
-                teamNameForFoldingUserName.put(userSummary.getFoldingName(), teamName);
             }
         }
 
@@ -104,13 +100,12 @@ public class LeaderboardStatsGenerator {
         for (final var entry : userResultsByCategory.entrySet()) {
             final Category category = entry.getKey();
             final List<UserSummary> userSummaries = entry.getValue()
-                    .stream()
-                    .sorted(Comparator.comparingLong(UserSummary::getMultipliedPoints).reversed())
-                    .collect(toList());
+                .stream()
+                .sorted(Comparator.comparingLong(UserSummary::getMultipliedPoints).reversed())
+                .collect(toList());
 
             final UserSummary firstResult = userSummaries.get(0);
-            final UserCategoryLeaderboardEntry categoryLeader =
-                    UserCategoryLeaderboardEntry.createLeader(firstResult, teamNameForFoldingUserName.get(firstResult.getFoldingName()));
+            final UserCategoryLeaderboardEntry categoryLeader = UserCategoryLeaderboardEntry.createLeader(firstResult);
 
             final List<UserCategoryLeaderboardEntry> userSummariesInCategory = new ArrayList<>(userSummaries.size());
             userSummariesInCategory.add(categoryLeader);
@@ -122,10 +117,9 @@ public class LeaderboardStatsGenerator {
                 final long diffToLeader = categoryLeader.getMultipliedPoints() - userSummary.getMultipliedPoints();
                 final long diffToNext = userAhead.getMultipliedPoints() - userSummary.getMultipliedPoints();
 
-                final String teamName = teamNameForFoldingUserName.get(userSummary.getFoldingName());
                 final int rank = i + 1;
-                final UserCategoryLeaderboardEntry userCategoryLeaderboardEntry =
-                        UserCategoryLeaderboardEntry.create(userSummary, teamName, rank, diffToLeader, diffToNext);
+                final UserCategoryLeaderboardEntry userCategoryLeaderboardEntry = UserCategoryLeaderboardEntry.create(userSummary, rank, diffToLeader,
+                    diffToNext);
                 userSummariesInCategory.add(userCategoryLeaderboardEntry);
             }
 

@@ -100,7 +100,7 @@ public class SecurityInterceptor implements ContainerRequestFilter {
         final String authorizationProperty = requestContext.getHeaderString(RestHeader.AUTHORIZATION.headerName());
         if (EncodingUtils.isNotBasicAuthentication(authorizationProperty)) {
             LOGGER.warn("Invalid {} value provided at '{}': '{}'", RestHeader.AUTHORIZATION.headerName(),
-                    requestContext.getUriInfo().getAbsolutePath(), authorizationProperty);
+                requestContext.getUriInfo().getAbsolutePath(), authorizationProperty);
             requestContext.abortWith(unauthorized());
             return;
         }
@@ -124,14 +124,14 @@ public class SecurityInterceptor implements ContainerRequestFilter {
         }
 
         final Set<String> userRoles = userAuthenticationResult.getUserRoles()
-                .stream()
-                .map(s -> s.toLowerCase(Locale.UK))
-                .collect(toSet());
+            .stream()
+            .map(s -> s.toLowerCase(Locale.UK))
+            .collect(toSet());
 
         final RolesAllowed rolesAnnotation = method.getAnnotation(RolesAllowed.class);
         final Set<String> permittedRoles = Arrays.stream(rolesAnnotation.value())
-                .map(s -> s.toLowerCase(Locale.UK))
-                .collect(toSet());
+            .map(s -> s.toLowerCase(Locale.UK))
+            .collect(toSet());
         LOGGER.info("Permitted roles: {}", permittedRoles);
 
         if (containsNoMatches(userRoles, permittedRoles)) {

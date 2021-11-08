@@ -173,27 +173,39 @@ class TeamCompetitionLeaderboardTest {
             .doesNotContainKey(Category.WILDCARD.toString());
 
         final UserCategoryLeaderboardEntry firstResult = firstCategoryUsers.get(0);
+        assertThat(firstResult.getUser().getDisplayName())
+            .as("Did not receive the expected user for rank 1, " + Category.AMD_GPU + ": " + response.body())
+            .isEqualTo(secondUser.getDisplayName());
         assertThat(firstResult)
             .as("Did not receive the expected result for rank 1, " + Category.AMD_GPU + ": " + response.body())
-            .extracting("rank", "displayName", "multipliedPoints", "diffToLeader", "diffToNext")
-            .containsExactly(1, secondUser.getDisplayName(), 15_000L, 0L, 0L);
+            .extracting("rank", "multipliedPoints", "diffToLeader", "diffToNext")
+            .containsExactly(1, 15_000L, 0L, 0L);
 
         final UserCategoryLeaderboardEntry secondResult = firstCategoryUsers.get(1);
+        assertThat(secondResult.getUser().getDisplayName())
+            .as("Did not receive the expected user for rank 2, " + Category.AMD_GPU + ": " + response.body())
+            .isEqualTo(firstUser.getDisplayName());
         assertThat(secondResult)
             .as("Did not receive the expected result for rank 2, " + Category.AMD_GPU + ": " + response.body())
-            .extracting("rank", "displayName", "multipliedPoints", "diffToLeader", "diffToNext")
-            .containsExactly(2, firstUser.getDisplayName(), 10_000L, 5_000L, 5_000L);
+            .extracting("rank", "multipliedPoints", "diffToLeader", "diffToNext")
+            .containsExactly(2, 10_000L, 5_000L, 5_000L);
 
         final UserCategoryLeaderboardEntry thirdResult = firstCategoryUsers.get(2);
+        assertThat(thirdResult.getUser().getDisplayName())
+            .as("Did not receive the expected user for rank 3, " + Category.AMD_GPU + ": " + response.body())
+            .isEqualTo(thirdUser.getDisplayName());
         assertThat(thirdResult)
             .as("Did not receive the expected result for rank 3, " + Category.AMD_GPU + ": " + response.body())
-            .extracting("rank", "displayName", "multipliedPoints", "diffToLeader", "diffToNext")
-            .containsExactly(3, thirdUser.getDisplayName(), 1_000L, 14_000L, 9_000L);
+            .extracting("rank", "multipliedPoints", "diffToLeader", "diffToNext")
+            .containsExactly(3, 1_000L, 14_000L, 9_000L);
 
         final UserCategoryLeaderboardEntry fourthResult = secondCategoryUsers.get(0);
+        assertThat(fourthResult.getUser().getDisplayName())
+            .as("Did not receive the expected user for rank 1, " + Category.NVIDIA_GPU + ": " + response.body())
+            .isEqualTo(fourthUser.getDisplayName());
         assertThat(fourthResult)
             .as("Did not receive the expected result for rank 1, category " + Category.NVIDIA_GPU + ":" + response.body())
-            .extracting("rank", "displayName", "multipliedPoints", "diffToLeader", "diffToNext")
-            .containsExactly(1, fourthUser.getDisplayName(), 1_000L, 0L, 0L);
+            .extracting("rank", "multipliedPoints", "diffToLeader", "diffToNext")
+            .containsExactly(1, 1_000L, 0L, 0L);
     }
 }

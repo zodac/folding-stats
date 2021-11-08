@@ -43,8 +43,14 @@ public class RetiredUserSummary {
      * @return the created {@link RetiredUserSummary}
      */
     public static RetiredUserSummary create(final RetiredUserTcStats retiredUserTcStats, final int rankInTeam) {
-        return new RetiredUserSummary(retiredUserTcStats.getUserId(), retiredUserTcStats.getDisplayName(), retiredUserTcStats.getPoints(),
-            retiredUserTcStats.getMultipliedPoints(), retiredUserTcStats.getUnits(), rankInTeam);
+        return new RetiredUserSummary(
+            retiredUserTcStats.getUserId(),
+            retiredUserTcStats.getDisplayName(),
+            retiredUserTcStats.getPoints(),
+            retiredUserTcStats.getMultipliedPoints(),
+            retiredUserTcStats.getUnits(),
+            rankInTeam
+        );
     }
 
     /**
@@ -70,7 +76,13 @@ public class RetiredUserSummary {
      * @return the updated {@link RetiredUserSummary}
      */
     public static RetiredUserSummary updateWithRankInTeam(final RetiredUserSummary retiredUserSummary, final int rankInTeam) {
-        return new RetiredUserSummary(retiredUserSummary.id, retiredUserSummary.displayName, retiredUserSummary.points,
-            retiredUserSummary.multipliedPoints, retiredUserSummary.units, rankInTeam);
+        return new RetiredUserSummary(
+            retiredUserSummary.id,
+            retiredUserSummary.displayName,
+            retiredUserSummary.points,
+            retiredUserSummary.multipliedPoints,
+            retiredUserSummary.units,
+            rankInTeam
+        );
     }
 }

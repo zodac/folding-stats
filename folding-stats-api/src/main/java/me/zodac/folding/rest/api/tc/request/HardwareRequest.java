@@ -11,7 +11,7 @@ import lombok.ToString;
 import me.zodac.folding.api.RequestPojo;
 
 /**
- * * REST request to create/update a {@link me.zodac.folding.api.tc.Hardware}.
+ * REST request to create/update a {@link me.zodac.folding.api.tc.Hardware}.
  */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)

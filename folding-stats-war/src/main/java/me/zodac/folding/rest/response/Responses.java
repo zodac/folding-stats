@@ -325,21 +325,6 @@ public final class Responses {
     }
 
     /**
-     * A <b>502_BAD_GATEWAY</b> {@link Response}.
-     *
-     * <p>
-     * Generally used for cases where it is explicitly an external service (such as the Folding@Home API) that is
-     * unavailable, rather than the more generic {@link #serviceUnavailable()} {@link Response}.
-     *
-     * @return the <b>502_BAD_GATEWAY</b> {@link Response}
-     */
-    public static Response badGateway() {
-        return Response
-            .status(Response.Status.BAD_GATEWAY)
-            .build();
-    }
-
-    /**
      * A <b>503_SERVICE_UNAVAILABLE</b> {@link Response}.
      *
      * <p>

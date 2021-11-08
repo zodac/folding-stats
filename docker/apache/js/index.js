@@ -1,3 +1,4 @@
+// TODO: [zodac] Consistently use double quotes for strings, single quotes for JSON properties
 const ROOT_URL="%ROOT_URL%";
 
 // The 'toggle' functions below simply change the colour of the buttons. There must be a smarter way to do this...
@@ -203,9 +204,15 @@ function loadCategoryLeaderboard() {
                         categoryCell.setAttribute("data-placement", "top");
                         categoryCell.setAttribute("title", "Unmultiplied: " + user["points"].toLocaleString());
                         new bootstrap.Tooltip(categoryCell);
+                        categoryCell.innerHTML = user[property].toLocaleString();
+                    } else if (property === "displayName") {
+                        categoryCell.innerHTML = user['user']["displayName"].toLocaleString();
+                    } else if (property === "hardware") {
+                        categoryCell.innerHTML = user['user']['hardware']["displayName"].toLocaleString();
+                    } else {
+                        categoryCell.innerHTML = user[property].toLocaleString();
                     }
 
-                    categoryCell.innerHTML = user[property].toLocaleString();
                     categoryTableBodyRow.append(categoryCell);
                 });
                 categoryTableBody.append(categoryTableBodyRow);
@@ -309,40 +316,43 @@ function loadTeamStats() {
                         teamTableUserCell.innerHTML = activeUser[userProperty].toLocaleString();
                         new bootstrap.Tooltip(teamTableUserCell);
                     } else if (userProperty === "displayName") {
-                        teamTableUserCell.innerHTML = activeUser[userProperty];
+                        teamTableUserCell.innerHTML = activeUser['user']['displayName'];
 
-                        if (activeUser[userProperty] === captainName){
+                        if (activeUser['user']['displayName'] === captainName){
                             teamTableUserCell.innerHTML += " (Captain)";
                         }
 
-                        if ("profileLink" in activeUser) {
-                            teamTableUserCell.innerHTML = "<a href='" + activeUser["profileLink"] + "' target='_blank' rel='noreferrer'>" + teamTableUserCell.innerHTML + "</a>"
+                        if ("profileLink" in activeUser['user']) {
+                            teamTableUserCell.innerHTML = "<a href='" + activeUser['user']['profileLink'] + "' target='_blank' rel='noreferrer'>" +
+                                teamTableUserCell.innerHTML + "</a>"
                         }
 
-                        if ("liveStatsLink" in activeUser) {
+                        if ("liveStatsLink" in activeUser['user']) {
                             teamTableUserCell.innerHTML +=
-                                " <a href='" + activeUser["liveStatsLink"] + "' target='_blank' rel='noreferrer'>" +
+                                " <a href='" + activeUser['user']['liveStatsLink'] + "' target='_blank' rel='noreferrer'>" +
                                     "<img alt='stats' src='./res/img/live.png' width='16px' height='16px'>" +
                                 "</a>";
                         }
 
-                        if(activeUser["displayName"] != activeUser["foldingName"]){
+                        if(activeUser['user']['displayName'] != activeUser['user']['foldingUserName']){
                             teamTableUserCell.setAttribute("data-bs-toggle", "tooltip");
                             teamTableUserCell.setAttribute("data-placement", "left");
-                            teamTableUserCell.setAttribute("title", "Folding Username: " + activeUser["foldingName"]);
+                            teamTableUserCell.setAttribute("title", "Folding Username: " + activeUser['user']['foldingUserName']);
                             new bootstrap.Tooltip(teamTableUserCell);
                         }
                     } else if (userProperty === "hardware") {
                         teamTableUserCell.setAttribute("data-bs-toggle", "tooltip");
                         teamTableUserCell.setAttribute("data-placement", "left");
-                        teamTableUserCell.setAttribute("title", "Multiplier: x" + activeUser["hardware"]["multiplier"].toLocaleString());
-                        teamTableUserCell.innerHTML = activeUser[userProperty]["displayName"].toLocaleString();
+                        teamTableUserCell.setAttribute("title", "Multiplier: x" + activeUser['user']['hardware']['multiplier'].toLocaleString());
+                        teamTableUserCell.innerHTML = activeUser['user']['hardware']['displayName'].toLocaleString();
                         new bootstrap.Tooltip(teamTableUserCell);
                     } else if (userProperty === "category") {
-                        teamTableUserCell.innerHTML = getCategoryFrontend(activeUser["category"]);
+                        teamTableUserCell.innerHTML = getCategoryFrontend(activeUser['user']["category"]);
                     } else {
                         if (userProperty in activeUser) {
                             teamTableUserCell.innerHTML = activeUser[userProperty].toLocaleString();
+                        } else if (userProperty in activeUser['user']) {
+                            teamTableUserCell.innerHTML = activeUser['user'][userProperty].toLocaleString();
                         }
                     }
 

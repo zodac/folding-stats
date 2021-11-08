@@ -19,6 +19,7 @@ class CollectionUtilsTest {
         final boolean result = CollectionUtils.containsNoMatches(first, second);
 
         assertThat(result)
+            .as("Expected there to be no matches")
             .isTrue();
     }
 
@@ -30,6 +31,7 @@ class CollectionUtilsTest {
         final boolean result = CollectionUtils.containsNoMatches(first, second);
 
         assertThat(result)
+            .as("Expected there to be a match")
             .isFalse();
     }
 
@@ -41,6 +43,7 @@ class CollectionUtilsTest {
         final boolean result = CollectionUtils.containsNoMatches(first, second);
 
         assertThat(result)
+            .as("Expected there to be a match")
             .isFalse();
     }
 
@@ -52,6 +55,7 @@ class CollectionUtilsTest {
         final boolean result = CollectionUtils.containsNoMatches(first, second);
 
         assertThat(result)
+            .as("Expected there to be a match")
             .isFalse();
     }
 }
