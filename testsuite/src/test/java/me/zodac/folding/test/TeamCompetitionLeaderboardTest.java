@@ -214,5 +214,9 @@ class TeamCompetitionLeaderboardTest {
             .as("Did not receive the expected result for rank 1, category " + Category.NVIDIA_GPU + ":" + response.body())
             .extracting("rank", "multipliedPoints", "diffToLeader", "diffToNext")
             .containsExactly(1, 1_000L, 0L, 0L);
+
+        assertThat(fourthResult.getUser().getPasskey())
+            .as("Expected user passkey to be masked: " + response.body())
+            .contains("*");
     }
 }

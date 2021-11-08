@@ -205,7 +205,7 @@ public class BusinessLogicEjb implements BusinessLogic {
             return Collections.emptyList();
         }
 
-        return getAllUsersWithPasskeys()
+        return getAllUsersWithoutPasskeys()
             .stream()
             .filter(user -> user.getHardware().getId() == hardware.getId())
             .collect(toList());
@@ -217,7 +217,7 @@ public class BusinessLogicEjb implements BusinessLogic {
             return Collections.emptyList();
         }
 
-        return getAllUsersWithPasskeys()
+        return getAllUsersWithoutPasskeys()
             .stream()
             .filter(user -> user.getTeam().getId() == team.getId())
             .collect(toList());

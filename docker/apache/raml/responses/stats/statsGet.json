@@ -1,222 +1,515 @@
 {
-  "totalPoints": 218411290,
-  "totalMultipliedPoints": 576050684,
-  "totalUnits": 111,
+  "totalPoints": 80459975,
+  "totalMultipliedPoints": 625993028,
+  "totalUnits": 416,
   "teams": [
     {
-      "teamName": "Team1",
-      "teamPoints": 206998256,
-      "teamMultipliedPoints": 500000000,
-      "teamUnits": 2,
+      "team": {
+        "id": 1,
+        "teamName": "Team 1",
+        "forumLink": "https://google.com"
+      },
+      "captainName": "User 1",
+      "teamPoints": 18696798,
+      "teamMultipliedPoints": 158584992,
+      "teamUnits": 68,
       "rank": 1,
       "activeUsers": [
         {
-          "id": 1,
-          "displayName": "User1",
-          "foldingName": "User1",
-          "hardware": {
+          "user": {
             "id": 1,
-            "hardwareName": "Tesla M40",
-            "displayName": "Tesla M40",
-            "multiplier": 6.99
+            "foldingUserName": "User1",
+            "displayName": "User 1",
+            "passkey": "4f5535e1************************",
+            "category": "WILDCARD",
+            "profileLink": "https://google.com",
+            "liveStatsLink": "https://google.com",
+            "hardware": {
+              "id": 1,
+              "hardwareName": "Hardware1",
+              "displayName": "Hardware 1",
+              "hardwareMake": "NVIDIA",
+              "hardwareType": "GPU",
+              "multiplier": 42.75,
+              "averagePpd": 154070
+            },
+            "team": {
+              "id": 1,
+              "teamName": "Team 1",
+              "forumLink": "https://google.com"
+            },
+            "userIsCaptain": true
           },
-          "category": "AMD GPU",
-          "points": 35765379,
-          "multipliedPoints": 250000000,
-          "units": 1,
+          "points": 1495839,
+          "multipliedPoints": 63947117,
+          "units": 11,
           "rankInTeam": 1
         },
         {
-          "id": 2,
-          "displayName": "User2",
-          "foldingName": "User2",
-          "hardware": {
+          "user": {
             "id": 2,
-            "hardwareName": "RTX 2080 Ti",
-            "displayName": "RTX 2080 Ti",
-            "multiplier": 1.46
+            "foldingUserName": "User2",
+            "displayName": "User 2",
+            "passkey": "8b98b0a2************************",
+            "category": "NVIDIA_GPU",
+            "profileLink": "https://google.com",
+            "liveStatsLink": "https://google.com",
+            "hardware": {
+              "id": 2,
+              "hardwareName": "Hardware2",
+              "displayName": "Hardware 2",
+              "hardwareMake": "NVIDIA",
+              "hardwareType": "GPU",
+              "multiplier": 3.63,
+              "averagePpd": 1816142
+            },
+            "team": {
+              "id": 1,
+              "teamName": "Team 1",
+              "forumLink": "https://google.com"
+            },
+            "userIsCaptain": false
           },
-          "category": "nVidia GPU",
-          "points": 171232877,
-          "multipliedPoints": 250000000,
-          "units": 1,
-          "rankInTeam": 1
+          "points": 14137363,
+          "multipliedPoints": 51318628,
+          "units": 41,
+          "rankInTeam": 2
+        },
+        {
+          "user": {
+            "id": 3,
+            "foldingUserName": "User3",
+            "displayName": "User 3",
+            "passkey": "13d79997************************",
+            "category": "AMD_GPU",
+            "profileLink": "https://google.com",
+            "liveStatsLink": "https://google.com",
+            "hardware": {
+              "id": 3,
+              "hardwareName": "Hardware3",
+              "displayName": "Hardware 3",
+              "hardwareMake": "AMD",
+              "hardwareType": "GPU",
+              "multiplier": 14.14,
+              "averagePpd": 465865
+            },
+            "team": {
+              "id": 1,
+              "teamName": "Team 1",
+              "forumLink": "https://google.com"
+            },
+            "userIsCaptain": false
+          },
+          "points": 3063596,
+          "multipliedPoints": 43319247,
+          "units": 16,
+          "rankInTeam": 3
         }
       ],
       "retiredUsers": []
     },
     {
-      "teamName": "Team2",
-      "captainName": "User4",
-      "teamPoints": 1184400,
-      "teamMultipliedPoints": 33651375,
-      "teamUnits": 36,
+      "team": {
+        "id": 2,
+        "teamName": "Team 2",
+        "forumLink": "https://google.com"
+      },
+      "captainName": "User 6",
+      "teamPoints": 10475450,
+      "teamMultipliedPoints": 122304697,
+      "teamUnits": 57,
       "rank": 2,
       "activeUsers": [
         {
-          "id": 3,
-          "displayName": "User3",
-          "foldingName": "User3",
-          "hardware": {
-            "id": 8,
-            "hardwareName": "HD 7850",
-            "displayName": "HD 7850",
-            "multiplier": 71.08
+          "user": {
+            "id": 4,
+            "foldingUserName": "User4",
+            "displayName": "User 4",
+            "passkey": "b1e51fa2************************",
+            "category": "WILDCARD",
+            "profileLink": "https://google.com",
+            "hardware": {
+              "id": 4,
+              "hardwareName": "Hardware4",
+              "displayName": "Hardware 4",
+              "hardwareMake": "AMD",
+              "hardwareType": "GPU",
+              "multiplier": 98.72,
+              "averagePpd": 66718
+            },
+            "team": {
+              "id": 2,
+              "teamName": "Team 2",
+              "forumLink": "https://google.com"
+            },
+            "userIsCaptain": false
           },
-          "category": "AMD GPU",
-          "points": 226055,
-          "multipliedPoints": 16067989,
-          "units": 2,
+          "points": 487199,
+          "multipliedPoints": 48096285,
+          "units": 4,
           "rankInTeam": 1
         },
         {
-          "id": 4,
-          "displayName": "User4",
-          "foldingName": "User4",
-          "hardware": {
-            "id": 7,
-            "hardwareName": "GTX 960",
-            "displayName": "GTX 960",
-            "multiplier": 20.82
+          "user": {
+            "id": 5,
+            "foldingUserName": "User5",
+            "displayName": "User 5",
+            "passkey": "4b1e4dac************************",
+            "category": "AMD_GPU",
+            "profileLink": "https://google.com",
+            "hardware": {
+              "id": 3,
+              "hardwareName": "Hardware3",
+              "displayName": "Hardware 3",
+              "hardwareMake": "AMD",
+              "hardwareType": "GPU",
+              "multiplier": 14.14,
+              "averagePpd": 465865
+            },
+            "team": {
+              "id": 2,
+              "teamName": "Team 2",
+              "forumLink": "https://google.com"
+            },
+            "userIsCaptain": false
           },
-          "category": "nVidia GPU",
-          "points": 424706,
-          "multipliedPoints": 8842379,
-          "units": 31,
+          "points": 2873022,
+          "multipliedPoints": 40624531,
+          "units": 15,
           "rankInTeam": 2
         },
         {
-          "id": 5,
-          "displayName": "User5",
-          "foldingName": "User5",
-          "hardware": {
-            "id": 1,
-            "hardwareName": "RX 580",
-            "displayName": "RX 580",
-            "multiplier": 16.38
+          "user": {
+            "id": 6,
+            "foldingUserName": "User6",
+            "displayName": "User 6",
+            "passkey": "82edd687************************",
+            "category": "NVIDIA_GPU",
+            "profileLink": "https://google.com",
+            "hardware": {
+              "id": 5,
+              "hardwareName": "Hardware5",
+              "displayName": "Hardware 5",
+              "hardwareMake": "NVIDIA",
+              "hardwareType": "GPU",
+              "multiplier": 4.72,
+              "averagePpd": 1395095
+            },
+            "team": {
+              "id": 2,
+              "teamName": "Team 2",
+              "forumLink": "https://google.com"
+            },
+            "userIsCaptain": true
           },
-          "category": "Wildcard",
-          "points": 533639,
-          "multipliedPoints": 8741007,
-          "units": 3,
+          "points": 7115229,
+          "multipliedPoints": 33583881,
+          "units": 38,
           "rankInTeam": 3
         }
       ],
       "retiredUsers": []
     },
     {
-      "teamName": "Team3",
-      "captainName": "User6",
-      "teamPoints": 7392878,
-      "teamMultipliedPoints": 28390541,
-      "teamUnits": 60,
+      "team": {
+        "id": 3,
+        "teamName": "Team 3",
+        "forumLink": "https://google.com"
+      },
+      "captainName": "User 7",
+      "teamPoints": 26326940,
+      "teamMultipliedPoints": 121282206,
+      "teamUnits": 187,
       "rank": 3,
       "activeUsers": [
         {
-          "id": 6,
-          "displayName": "User6",
-          "foldingName": "User6",
-          "hardware": {
-            "id": 3,
-            "hardwareName": "GTX 960",
-            "displayName": "GTX 960",
-            "multiplier": 21.33
+          "user": {
+            "id": 7,
+            "foldingUserName": "User7",
+            "displayName": "User 7",
+            "passkey": "366cb50f************************",
+            "category": "NVIDIA_GPU",
+            "hardware": {
+              "id": 6,
+              "hardwareName": "Hardware6",
+              "displayName": "Hardware 6",
+              "hardwareMake": "NVIDIA",
+              "hardwareType": "GPU",
+              "multiplier": 2.98,
+              "averagePpd": 2213983
+            },
+            "team": {
+              "id": 3,
+              "teamName": "Team 3",
+              "forumLink": "https://google.com"
+            },
+            "userIsCaptain": true
           },
-          "category": "Wildcard",
-          "points": 480103,
-          "multipliedPoints": 10240597,
-          "units": 34,
+          "points": 15935091,
+          "multipliedPoints": 47486571,
+          "units": 145,
           "rankInTeam": 1
         },
         {
-          "id": 7,
-          "displayName": "User7",
-          "foldingName": "User7",
-          "hardware": {
-            "id": 2,
-            "hardwareName": "RTX 2080 Ti",
-            "displayName": "RTX 2080 Ti",
-            "multiplier": 1.46
+          "user": {
+            "id": 8,
+            "foldingUserName": "User8",
+            "displayName": "User 8",
+            "passkey": "f2ac7962************************",
+            "category": "WILDCARD",
+            "profileLink": "https://google.com",
+            "hardware": {
+              "id": 7,
+              "hardwareName": "Hardware7",
+              "displayName": "Hardware 7",
+              "hardwareMake": "NVIDIA",
+              "hardwareType": "GPU",
+              "multiplier": 38.6,
+              "averagePpd": 170655
+            },
+            "team": {
+              "id": 3,
+              "teamName": "Team 3",
+              "forumLink": "https://google.com"
+            },
+            "userIsCaptain": false
           },
-          "category": "nVidia GPU",
-          "points": 6372742,
-          "multipliedPoints": 9304203,
-          "units": 22,
+          "points": 1859293,
+          "multipliedPoints": 45808851,
+          "units": 11,
           "rankInTeam": 2
         },
         {
-          "id": 8,
-          "displayName": "User8",
-          "foldingName": "User8",
-          "hardware": {
-            "id": 1,
-            "hardwareName": "RX 580",
-            "displayName": "RX 580",
-            "multiplier": 16.38
+          "user": {
+            "id": 9,
+            "foldingUserName": "User9",
+            "displayName": "User 9",
+            "passkey": "88a9cdf2************************",
+            "category": "AMD_GPU",
+            "hardware": {
+              "id": 8,
+              "hardwareName": "Hardware8",
+              "displayName": "Hardware 8",
+              "hardwareMake": "AMD",
+              "hardwareType": "GPU",
+              "multiplier": 3.28,
+              "averagePpd": 2008233
+            },
+            "team": {
+              "id": 3,
+              "teamName": "Team 3",
+              "forumLink": "https://google.com"
+            },
+            "userIsCaptain": false
           },
-          "category": "AMD GPU",
-          "points": 540033,
-          "multipliedPoints": 8845741,
-          "units": 4,
+          "points": 8532556,
+          "multipliedPoints": 27986784,
+          "units": 31,
           "rankInTeam": 3
         }
       ],
       "retiredUsers": []
     },
     {
-      "teamName": "Team4",
-      "captainName": "User10",
-      "teamPoints": 2835756,
-      "teamMultipliedPoints": 14008768,
-      "teamUnits": 13,
+      "team": {
+        "id": 4,
+        "teamName": "Team 4",
+        "forumLink": "https://google.com"
+      },
+      "captainName": "User 10",
+      "teamPoints": 21333939,
+      "teamMultipliedPoints": 112172040,
+      "teamUnits": 76,
       "rank": 4,
       "activeUsers": [
         {
-          "id": 9,
-          "displayName": "User9",
-          "foldingName": "User9",
-          "hardware": {
-            "id": 6,
-            "hardwareName": "RX 5700",
-            "displayName": "RX 5700",
-            "multiplier": 7.47
+          "user": {
+            "id": 10,
+            "foldingUserName": "User10",
+            "displayName": "User 10",
+            "passkey": "5fe45546************************",
+            "category": "NVIDIA_GPU",
+            "profileLink": "https://google.com",
+            "hardware": {
+              "id": 9,
+              "hardwareName": "Hardware9",
+              "displayName": "Hardware 9",
+              "hardwareMake": "NVIDIA",
+              "hardwareType": "GPU",
+              "multiplier": 2.83,
+              "averagePpd": 2326189
+            },
+            "team": {
+              "id": 4,
+              "teamName": "Team 4",
+              "forumLink": "https://google.com"
+            },
+            "userIsCaptain": true
           },
-          "category": "Wildcard",
-          "points": 972294,
-          "multipliedPoints": 7263036,
-          "units": 6,
+          "points": 16206717,
+          "multipliedPoints": 45865009,
+          "units": 45,
           "rankInTeam": 1
         },
         {
-          "id": 10,
-          "displayName": "User10",
-          "foldingName": "User10",
-          "hardware": {
-            "id": 4,
-            "hardwareName": "Radeon VII",
-            "displayName": "Radeon VII",
-            "multiplier": 3.62
+          "user": {
+            "id": 11,
+            "foldingUserName": "User11",
+            "displayName": "User 11",
+            "passkey": "5cb32aa3************************",
+            "category": "AMD_GPU",
+            "profileLink": "https://google.com",
+            "hardware": {
+              "id": 3,
+              "hardwareName": "Hardware3",
+              "displayName": "Hardware 3",
+              "hardwareMake": "AMD",
+              "hardwareType": "GPU",
+              "multiplier": 14.14,
+              "averagePpd": 465865
+            },
+            "team": {
+              "id": 4,
+              "teamName": "Team 4",
+              "forumLink": "https://google.com"
+            },
+            "userIsCaptain": false
           },
-          "category": "AMD GPU",
-          "points": 1863462,
-          "multipliedPoints": 6745732,
-          "units": 7,
+          "points": 2984700,
+          "multipliedPoints": 42203658,
+          "units": 17,
           "rankInTeam": 2
         },
         {
-          "id": 11,
-          "displayName": "User11",
-          "foldingName": "User11",
-          "hardware": {
-            "id": 5,
-            "hardwareName": "Tesla M40",
-            "displayName": "Tesla M40",
-            "multiplier": 6.99
+          "user": {
+            "id": 12,
+            "foldingUserName": "User12",
+            "displayName": "User 12",
+            "passkey": "52e74b68************************",
+            "category": "WILDCARD",
+            "profileLink": "https://google.com",
+            "hardware": {
+              "id": 10,
+              "hardwareName": "Hardware10",
+              "displayName": "Hardware 10",
+              "hardwareMake": "NVIDIA",
+              "hardwareType": "GPU",
+              "multiplier": 11.25,
+              "averagePpd": 585655
+            },
+            "team": {
+              "id": 4,
+              "teamName": "Team 4",
+              "forumLink": "https://google.com"
+            },
+            "userIsCaptain": false
           },
-          "category": "nVidia GPU",
-          "points": 0,
-          "multipliedPoints": 0,
-          "units": 0,
+          "points": 2142522,
+          "multipliedPoints": 24103373,
+          "units": 14,
+          "rankInTeam": 3
+        }
+      ],
+      "retiredUsers": []
+    },
+    {
+      "team": {
+        "id": 5,
+        "teamName": "Team 5",
+        "forumLink": "https://google.com"
+      },
+      "captainName": "User 13",
+      "teamPoints": 3626848,
+      "teamMultipliedPoints": 111649093,
+      "teamUnits": 28,
+      "rank": 5,
+      "activeUsers": [
+        {
+          "user": {
+            "id": 13,
+            "foldingUserName": "User13",
+            "displayName": "User 13",
+            "passkey": "c031f83e************************",
+            "category": "NVIDIA_GPU",
+            "profileLink": "https://google.com",
+            "liveStatsLink": "https://google.com",
+            "hardware": {
+              "id": 11,
+              "hardwareName": "Hardware11",
+              "displayName": "Hardware 11",
+              "hardwareMake": "NVIDIA",
+              "hardwareType": "GPU",
+              "multiplier": 48.23,
+              "averagePpd": 136571
+            },
+            "team": {
+              "id": 5,
+              "teamName": "Team 5",
+              "forumLink": "https://google.com"
+            },
+            "userIsCaptain": true
+          },
+          "points": 983412,
+          "multipliedPoints": 47429961,
+          "units": 11,
+          "rankInTeam": 1
+        },
+        {
+          "user": {
+            "id": 14,
+            "foldingUserName": "User14",
+            "displayName": "User 14",
+            "passkey": "45fc2116************************",
+            "category": "AMD_GPU",
+            "profileLink": "https://google.com",
+            "hardware": {
+              "id": 3,
+              "hardwareName": "Hardware3",
+              "displayName": "Hardware 3",
+              "hardwareMake": "AMD",
+              "hardwareType": "GPU",
+              "multiplier": 14.14,
+              "averagePpd": 465865
+            },
+            "team": {
+              "id": 5,
+              "teamName": "Team 5",
+              "forumLink": "https://google.com"
+            },
+            "userIsCaptain": false
+          },
+          "points": 2500551,
+          "multipliedPoints": 35357791,
+          "units": 14,
+          "rankInTeam": 2
+        },
+        {
+          "user": {
+            "id": 15,
+            "foldingUserName": "User15",
+            "displayName": "User 15",
+            "passkey": "0c710b59************************",
+            "category": "WILDCARD",
+            "profileLink": "https://google.com",
+            "hardware": {
+              "id": 12,
+              "hardwareName": "Hardware12",
+              "displayName": "Hardware 12",
+              "hardwareMake": "NVIDIA",
+              "hardwareType": "GPU",
+              "multiplier": 201.99,
+              "averagePpd": 32608
+            },
+            "team": {
+              "id": 5,
+              "teamName": "Team 5",
+              "forumLink": "https://google.com"
+            },
+            "userIsCaptain": false
+          },
+          "points": 142885,
+          "multipliedPoints": 28861341,
+          "units": 3,
           "rankInTeam": 3
         }
       ],

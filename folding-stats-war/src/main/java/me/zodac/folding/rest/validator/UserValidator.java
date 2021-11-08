@@ -25,6 +25,7 @@ import org.apache.commons.validator.routines.UrlValidator;
 /**
  * Validator class to validate a {@link User} or {@link UserRequest}.
  */
+// TODO: [zodac] foldingUserName cannot have a space? Must be alphanumeric only I think?
 public final class UserValidator {
 
     private static final UrlValidator URL_VALIDATOR = new UrlValidator();
