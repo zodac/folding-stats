@@ -52,7 +52,7 @@ public class UserSummary {
      * @param points           the points of the {@link me.zodac.folding.api.tc.User}
      * @param multipliedPoints the multiplied points of the {@link me.zodac.folding.api.tc.User}
      * @param units            the units of the {@link me.zodac.folding.api.tc.User}
-     * @param rankInTeam       the rank of the {@link me.zodac.folding.api.tc.User} in thit {@link me.zodac.folding.api.tc.Team}
+     * @param rankInTeam       the rank of the {@link me.zodac.folding.api.tc.User} in this {@link me.zodac.folding.api.tc.Team}
      * @return the created {@link UserSummary}
      */
     public static UserSummary create(final int id,
@@ -67,7 +67,7 @@ public class UserSummary {
                                      final int units,
                                      final int rankInTeam) {
         return new UserSummary(id, displayName, foldingName, hardware, category.toString(), profileLink, liveStatsLink, points, multipliedPoints,
-            units, rankInTeam);
+                units, rankInTeam);
     }
 
     /**
@@ -112,6 +112,6 @@ public class UserSummary {
      */
     public static UserSummary updateWithRankInTeam(final UserSummary userSummary, final int rankInTeam) {
         return create(userSummary.id, userSummary.displayName, userSummary.foldingName, userSummary.hardware, Category.get(userSummary.category),
-            userSummary.profileLink, userSummary.liveStatsLink, userSummary.points, userSummary.multipliedPoints, userSummary.units, rankInTeam);
+                userSummary.profileLink, userSummary.liveStatsLink, userSummary.points, userSummary.multipliedPoints, userSummary.units, rankInTeam);
     }
 }
