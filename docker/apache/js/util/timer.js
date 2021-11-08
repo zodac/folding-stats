@@ -34,6 +34,7 @@ function calculateNumberOfUpdates() {
 }
 
 // https://stackoverflow.com/questions/37179899/countdown-timer-every-hour-but-on-30-minute-marks
+// TODO: [zodac] Disable if stats not running, or within 'off' dates
 function updateTimer() {
     const zeroPad = (num, places) => String(num).padStart(places, '0')
     var time = new Date(),

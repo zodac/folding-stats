@@ -17,8 +17,8 @@ function sortTable(columnIndex, tableId) {
             shouldSwitch = false;
           
             // Get the two elements you want to compare, one from current row and one from the next
-            first = rows[i].getElementsByTagName("TD")[columnIndex];
-            second = rows[i + 1].getElementsByTagName("TD")[columnIndex];
+            first = rows[i].getElementsByTagName("td")[columnIndex];
+            second = rows[i + 1].getElementsByTagName("td")[columnIndex];
          
             // Check if the two rows should switch place, based on the direction, asc or desc
             if (dir == "asc") {

@@ -26,17 +26,17 @@ function adminLogin(){
 
     show("loader");
 
-    fetch(ROOT_URL+'/login/admin', {
-        method: 'POST',
+    fetch(ROOT_URL+"/login/admin", {
+        method: "POST",
         headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json"
         },
         body: requestData
     })
     .then(response => {
         hide("loader");
-        document.getElementById("login_username").value = '';
-        document.getElementById("login_password").value = '';
+        document.getElementById("login_username").value = "";
+        document.getElementById("login_password").value = "";
 
         if(response.status != 200){
             failureToast("Invalid admin credentials!");
@@ -50,18 +50,18 @@ function adminLogin(){
     })
     .catch((error) => {
         hide("loader");
-        console.error('Unexpected error logging in: ', error);
+        console.error("Unexpected error logging in: ", error);
         return false;
     });
 }
 
 function manualUpdate() {
     show("loader");
-    fetch(ROOT_URL+'/stats/manual/update', {
-        method: 'POST',
+    fetch(ROOT_URL+"/stats/manual/update", {
+        method: "POST",
         headers: {
-            'Content-Type': 'application/json',
-            'Authorization': sessionGet("Authorization")
+            "Content-Type": "application/json",
+            "Authorization": sessionGet("Authorization")
         }
     })
     .then(response => {
@@ -79,18 +79,18 @@ function manualUpdate() {
     })
     .catch((error) => {
         hide("loader");
-        console.error('Unexpected error updating stats: ', error);
+        console.error("Unexpected error updating stats: ", error);
         return false;
     });
 }
 
 function manualLars() {
     show("loader");
-    fetch(ROOT_URL+'/debug/lars', {
-        method: 'POST',
+    fetch(ROOT_URL+"/debug/lars", {
+        method: "POST",
         headers: {
-            'Content-Type': 'application/json',
-            'Authorization': sessionGet("Authorization")
+            "Content-Type": "application/json",
+            "Authorization": sessionGet("Authorization")
         }
     })
     .then(response => {
@@ -108,18 +108,18 @@ function manualLars() {
     })
     .catch((error) => {
         hide("loader");
-        console.error('Unexpected error updating LARS: ', error);
+        console.error("Unexpected error updating LARS: ", error);
         return false;
     });
 }
 
 function manualResultSave() {
     show("loader");
-    fetch(ROOT_URL+'/results/manual/save', {
-        method: 'POST',
+    fetch(ROOT_URL+"/results/manual/save", {
+        method: "POST",
         headers: {
-            'Content-Type': 'application/json',
-            'Authorization': sessionGet("Authorization")
+            "Content-Type": "application/json",
+            "Authorization": sessionGet("Authorization")
         }
     })
     .then(response => {
@@ -137,18 +137,18 @@ function manualResultSave() {
     })
     .catch((error) => {
         hide("loader");
-        console.error('Unexpected error saving result: ', error);
+        console.error("Unexpected error saving result: ", error);
         return false;
     });
 }
 
 function printCaches() {
     show("loader");
-    fetch(ROOT_URL+'/debug/caches', {
-        method: 'POST',
+    fetch(ROOT_URL+"/debug/caches", {
+        method: "POST",
         headers: {
-            'Content-Type': 'application/json',
-            'Authorization': sessionGet("Authorization")
+            "Content-Type": "application/json",
+            "Authorization": sessionGet("Authorization")
         }
     })
     .then(response => {
@@ -166,13 +166,13 @@ function printCaches() {
     })
     .catch((error) => {
         hide("loader");
-        console.error('Unexpected error printing caches: ', error);
+        console.error("Unexpected error printing caches: ", error);
         return false;
     });
 }
 
 function loadHardware() {
-    fetch(ROOT_URL+'/hardware')
+    fetch(ROOT_URL+"/hardware")
     .then(response => {
         return response.json();
     })
@@ -188,19 +188,19 @@ function loadHardware() {
             hardwareDiv.removeChild(hardwareDiv.lastChild);
         }
 
-        hardwareTitle = document.createElement('h2');
+        hardwareTitle = document.createElement("h2");
         hardwareTitle.setAttribute("class", "navbar-brand");
         hardwareTitle.innerHTML = "Hardware";
         hardwareDiv.append(hardwareTitle);
 
-        hardwareTableDiv = document.createElement('div');
+        hardwareTableDiv = document.createElement("div");
         hardwareTableDiv.setAttribute("class", "scrollable-table")
-        hardwareTable = document.createElement('table');
+        hardwareTable = document.createElement("table");
         hardwareTable.setAttribute("id", "hardware");
         hardwareTable.setAttribute("class", "table table-dark table-striped table-hover");
 
-        hardwareTableHead = document.createElement('thead');
-        hardwareTableHeaderRow = document.createElement('tr');
+        hardwareTableHead = document.createElement("thead");
+        hardwareTableHeaderRow = document.createElement("tr");
         hardwareHeaders.forEach(function (header, i) {
             hardwareTableHeader = document.createElement("th");
             hardwareTableHeader.setAttribute("onclick", "sortTable("+i+", 'hardware')");
@@ -213,20 +213,20 @@ function loadHardware() {
         hardwareTable.append(hardwareTableHead);
 
 
-        hardwareTableBody = document.createElement('tbody');
+        hardwareTableBody = document.createElement("tbody");
 
         jsonResponse.forEach(function(hardwareItem, i) {
             // Update hardware display table
-            hardwareTableBodyRow = document.createElement('tr');
+            hardwareTableBodyRow = document.createElement("tr");
             hardwareProperties.forEach(function (hardwareProperty, i) {
                 hardwareTableBodyCell = document.createElement("td");
 
                 if (hardwareProperty === "multiplier") {
-                    hardwareTableBodyCell.innerHTML = "x" + hardwareItem[hardwareProperty].toLocaleString();
+                    hardwareTableBodyCell.innerHTML = "x" + hardwareItem['multiplier'].toLocaleString();
                 } else if (hardwareProperty === "hardwareMake") {
-                    hardwareTableBodyCell.innerHTML = getHardwareMakeFrontend(hardwareItem[hardwareProperty]);
+                    hardwareTableBodyCell.innerHTML = getHardwareMakeFrontend(hardwareItem['hardwareMake']);
                 } else if (hardwareProperty === "hardwareType") {
-                    hardwareTableBodyCell.innerHTML = getHardwareTypeFrontend(hardwareItem[hardwareProperty]);
+                    hardwareTableBodyCell.innerHTML = getHardwareTypeFrontend(hardwareItem['hardwareType']);
                 } else {
                     hardwareTableBodyCell.innerHTML = hardwareItem[hardwareProperty].toLocaleString();
                 }
@@ -262,7 +262,7 @@ function loadHardware() {
 };
 
 function loadUsers() {
-    fetch(ROOT_URL+'/users')
+    fetch(ROOT_URL+"/users")
     .then(response => {
         return response.json();
     })
@@ -278,19 +278,19 @@ function loadUsers() {
             usersDiv.removeChild(usersDiv.lastChild);
         }
 
-        usersTitle = document.createElement('h2');
+        usersTitle = document.createElement("h2");
         usersTitle.setAttribute("class", "navbar-brand");
         usersTitle.innerHTML = "Users";
         usersDiv.append(usersTitle);
 
-        usersTableDiv = document.createElement('div');
+        usersTableDiv = document.createElement("div");
         usersTableDiv.setAttribute("class", "scrollable-table")
         usersTable = document.createElement('table');
         usersTable.setAttribute("id", "users");
         usersTable.setAttribute("class", "table table-dark table-striped table-hover");
 
-        usersTableHead = document.createElement('thead');
-        usersTableHeaderRow = document.createElement('tr');
+        usersTableHead = document.createElement("thead");
+        usersTableHeaderRow = document.createElement("tr");
         usersHeaders.forEach(function (header, i) {
             usersTableHeader = document.createElement("th");
             usersTableHeader.setAttribute("onclick", "sortTable("+i+", 'users')");
@@ -303,11 +303,11 @@ function loadUsers() {
         usersTable.append(usersTableHead);
 
 
-        usersTableBody = document.createElement('tbody');
+        usersTableBody = document.createElement("tbody");
 
         jsonResponse.forEach(function(usersItem, i) {
             // Update users display table
-            usersTableBodyRow = document.createElement('tr');
+            usersTableBodyRow = document.createElement("tr");
             usersProperties.forEach(function (usersProperty, i) {
                 usersTableBodyCell = document.createElement("td");
 
@@ -320,9 +320,9 @@ function loadUsers() {
                         usersTableBodyCell.append(link);
                     }
                 } else if (usersProperty === "hardware") {
-                    usersTableBodyCell.innerHTML = usersItem["hardware"]["hardwareName"].toLocaleString();
+                    usersTableBodyCell.innerHTML = usersItem['hardware']['hardwareName'].toLocaleString();
                 } else if (usersProperty === "team") {
-                    usersTableBodyCell.innerHTML = usersItem["team"]["teamName"].toLocaleString();
+                    usersTableBodyCell.innerHTML = usersItem['team']['teamName'].toLocaleString();
                 } else if (usersProperty === "category") {
                     usersTableBodyCell.innerHTML = getCategoryFrontend(usersItem[usersProperty]);
                 } else {
@@ -361,7 +361,7 @@ function loadUsers() {
 };
 
 function loadTeams() {
-    fetch(ROOT_URL+'/teams')
+    fetch(ROOT_URL+"/teams")
     .then(response => {
         return response.json();
     })
@@ -377,19 +377,19 @@ function loadTeams() {
             teamsDiv.removeChild(teamsDiv.lastChild);
         }
 
-        teamsTitle = document.createElement('h2');
+        teamsTitle = document.createElement("h2");
         teamsTitle.setAttribute("class", "navbar-brand");
         teamsTitle.innerHTML = "Teams";
         teamsDiv.append(teamsTitle);
 
-        teamsTableDiv = document.createElement('div');
+        teamsTableDiv = document.createElement("div");
         teamsTableDiv.setAttribute("class", "scrollable-table")
-        teamsTable = document.createElement('table');
+        teamsTable = document.createElement("table");
         teamsTable.setAttribute("id", "teams");
         teamsTable.setAttribute("class", "table table-dark table-striped table-hover");
 
-        teamsTableHead = document.createElement('thead');
-        teamsTableHeaderRow = document.createElement('tr');
+        teamsTableHead = document.createElement("thead");
+        teamsTableHeaderRow = document.createElement("tr");
         teamsHeaders.forEach(function (header, i) {
             teamsTableHeader = document.createElement("th");
             teamsTableHeader.setAttribute("onclick", "sortTable("+i+", 'teams')");
@@ -401,10 +401,10 @@ function loadTeams() {
         teamsTableHead.append(teamsTableHeaderRow);
         teamsTable.append(teamsTableHead);
 
-        teamsTableBody = document.createElement('tbody');
+        teamsTableBody = document.createElement("tbody");
 
         jsonResponse.forEach(function(teamsItem, i) {
-            teamsTableBodyRow = document.createElement('tr');
+            teamsTableBodyRow = document.createElement("tr");
             teamsProperties.forEach(function (teamsProperty, i) {
                 teamsTableBodyCell = document.createElement("td");
 

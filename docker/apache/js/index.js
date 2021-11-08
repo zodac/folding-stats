@@ -1,4 +1,3 @@
-// TODO: [zodac] Consistently use double quotes for strings, single quotes for JSON properties
 const ROOT_URL="%ROOT_URL%";
 
 // The 'toggle' functions below simply change the colour of the buttons. There must be a smarter way to do this...
@@ -38,17 +37,17 @@ function loadOverallStats() {
 
         overallDiv = document.getElementById("overall_div");
 
-        overallTitle = document.createElement('h2');
+        overallTitle = document.createElement("h2");
         overallTitle.setAttribute("class", "navbar-brand");
         overallTitle.innerHTML = "Overall Stats";
         overallDiv.append(overallTitle);
 
-        overallTable = document.createElement('table');
+        overallTable = document.createElement("table");
         overallTable.setAttribute("id", "overall");
         overallTable.setAttribute("class", "table table-dark table-striped table-hover");
 
-        overallTableHead = document.createElement('thead');
-        overallTableHeaderRow = document.createElement('tr');
+        overallTableHead = document.createElement("thead");
+        overallTableHeaderRow = document.createElement("tr");
         overallTableHeaders.forEach(function (header, i) {
             overallTableHeader = document.createElement("th");
             overallTableHeader.setAttribute("onclick", "sortTable("+i+", 'overall')");
@@ -60,8 +59,8 @@ function loadOverallStats() {
         overallTableHead.append(overallTableHeaderRow);
         overallTable.append(overallTableHead);
 
-        overallTableBody = document.createElement('tbody');
-        overallTableBodyRow = document.createElement('tr');
+        overallTableBody = document.createElement("tbody");
+        overallTableBodyRow = document.createElement("tr");
         overallTableProperties.forEach(function (property, i) {
             overallTableBodyCell = document.createElement("td");
 
@@ -83,7 +82,7 @@ function loadOverallStats() {
 };
 
 function loadTeamLeaderboard() {
-    fetch(ROOT_URL+'/stats/leaderboard')
+    fetch(ROOT_URL+"/stats/leaderboard")
     .then(response => {
         return response.json();
     })
@@ -93,16 +92,16 @@ function loadTeamLeaderboard() {
 
         leaderboardDiv = document.getElementById("leaderboard_div");
 
-        leaderboardTitle = document.createElement('h2');
+        leaderboardTitle = document.createElement("h2");
         leaderboardTitle.setAttribute("class", "navbar-brand");
         leaderboardTitle.innerHTML = "Team Leaderboard";
 
-        leaderboardTable = document.createElement('table');
+        leaderboardTable = document.createElement("table");
         leaderboardTable.setAttribute("id", "leaderboard");
         leaderboardTable.setAttribute("class", "table table-dark table-striped table-hover");
 
-        leaderboardTableHead = document.createElement('thead');
-        leaderboardTableHeaderRow = document.createElement('tr');
+        leaderboardTableHead = document.createElement("thead");
+        leaderboardTableHeaderRow = document.createElement("tr");
         leaderboardHeaders.forEach(function (header, i) {
             leaderboardTableHeader = document.createElement("th");
             leaderboardTableHeader.setAttribute("onclick", "sortTable("+i+", 'leaderboard')");
@@ -114,22 +113,23 @@ function loadTeamLeaderboard() {
         leaderboardTableHead.append(leaderboardTableHeaderRow);
         leaderboardTable.append(leaderboardTableHead);
 
-        leaderboardTableBody = document.createElement('tbody');
+        leaderboardTableBody = document.createElement("tbody");
 
         jsonResponse.forEach(function(team, i){
-            leaderboardTableBodyRow = document.createElement('tr');
+            leaderboardTableBodyRow = document.createElement("tr");
+
 
             leaderboardProperties.forEach(function(property){
-                leaderboardCell = document.createElement('td');
+                leaderboardCell = document.createElement("td");
 
                 if (property === "teamMultipliedPoints") {
                     leaderboardCell.setAttribute("data-bs-toggle", "tooltip");
                     leaderboardCell.setAttribute("data-placement", "top");
-                    leaderboardCell.setAttribute("title", "Unmultiplied: " + team["teamPoints"].toLocaleString());
+                    leaderboardCell.setAttribute("title", "Unmultiplied: " + team['teamPoints'].toLocaleString());
                     new bootstrap.Tooltip(leaderboardCell);
-                    leaderboardCell.innerHTML = team["teamMultipliedPoints"].toLocaleString();
+                    leaderboardCell.innerHTML = team['teamMultipliedPoints'].toLocaleString();
                 } else if (property === "teamName") {
-                    leaderboardCell.innerHTML = team["team"]["teamName"].toLocaleString();
+                    leaderboardCell.innerHTML = team['team']['teamName'].toLocaleString();
                 } else {
                     leaderboardCell.innerHTML = team[property].toLocaleString();
                 }
@@ -149,7 +149,7 @@ function loadTeamLeaderboard() {
 };
 
 function loadCategoryLeaderboard() {
-    fetch(ROOT_URL+'/stats/category')
+    fetch(ROOT_URL+"/stats/category")
     .then(response => {
         return response.json();
     })
@@ -159,26 +159,26 @@ function loadCategoryLeaderboard() {
         const categoryHeaders = ["Rank", "User", "Hardware", "Points", "Units", "Points to Leader", "Points to Next"];
         const categoryProperties = ["rank", "displayName", "hardware", "multipliedPoints", "units", "diffToLeader", "diffToNext"];
 
-        categoryLeaderboardTitle = document.createElement('h2');
+        categoryLeaderboardTitle = document.createElement("h2");
         categoryLeaderboardTitle.setAttribute("class", "navbar-brand");
         categoryLeaderboardTitle.innerHTML = "Category Leaderboard";
         categoryDiv.append(categoryLeaderboardTitle);
 
         Object.keys(jsonResponse).forEach(function(key) {
             var keyDisplay = getCategoryFrontend(key);
-            categoryTitle = document.createElement('h2');
+            categoryTitle = document.createElement("h2");
             categoryTitle.setAttribute("class", "navbar-brand");
             categoryTitle.innerHTML = keyDisplay;
             categoryDiv.append(categoryTitle);
 
-            tableId = "category_" + key.replace(/\s+/g,"_").toLowerCase();
+            tableId = "category_" + key.replace(/\s+/g, "_").toLowerCase();
 
-            categoryTable = document.createElement('table');
+            categoryTable = document.createElement("table");
             categoryTable.setAttribute("id", tableId);
             categoryTable.setAttribute("class", "table table-dark table-striped table-hover");
 
-            categoryTableHead = document.createElement('thead');
-            categoryTableHeaderRow = document.createElement('tr');
+            categoryTableHead = document.createElement("thead");
+            categoryTableHeaderRow = document.createElement("tr");
             categoryHeaders.forEach(function (header, i) {
                 categoryTableHeader = document.createElement("th");
                 categoryTableHeader.setAttribute("onclick", "sortTable("+i+", '"+tableId+"')");
@@ -190,25 +190,25 @@ function loadCategoryLeaderboard() {
             categoryTableHead.append(categoryTableHeaderRow);
             categoryTable.append(categoryTableHead);
 
-            categoryTableBody = document.createElement('tbody');
+            categoryTableBody = document.createElement("tbody");
 
             users = jsonResponse[key];
             users.forEach(function(user){
-                categoryTableBodyRow = document.createElement('tr');
+                categoryTableBodyRow = document.createElement("tr");
 
                 categoryProperties.forEach(function(property){
-                    categoryCell = document.createElement('td');
+                    categoryCell = document.createElement("td");
 
                     if(property === "multipliedPoints") {
                         categoryCell.setAttribute("data-bs-toggle", "tooltip");
                         categoryCell.setAttribute("data-placement", "top");
-                        categoryCell.setAttribute("title", "Unmultiplied: " + user["points"].toLocaleString());
+                        categoryCell.setAttribute("title", "Unmultiplied: " + user['points'].toLocaleString());
                         new bootstrap.Tooltip(categoryCell);
-                        categoryCell.innerHTML = user[property].toLocaleString();
+                        categoryCell.innerHTML = user['multipliedPoints'].toLocaleString();
                     } else if (property === "displayName") {
-                        categoryCell.innerHTML = user['user']["displayName"].toLocaleString();
+                        categoryCell.innerHTML = user['user']['displayName'].toLocaleString();
                     } else if (property === "hardware") {
-                        categoryCell.innerHTML = user['user']['hardware']["displayName"].toLocaleString();
+                        categoryCell.innerHTML = user['user']['hardware']['displayName'].toLocaleString();
                     } else {
                         categoryCell.innerHTML = user[property].toLocaleString();
                     }
@@ -220,7 +220,7 @@ function loadCategoryLeaderboard() {
             categoryTable.append(categoryTableBody);
 
             categoryDiv.append(categoryTable);
-            categoryDiv.append(document.createElement('br'));
+            categoryDiv.append(document.createElement("br"));
         });
     });
 };
@@ -233,7 +233,7 @@ function loadTeamStats() {
     .then(function(jsonResponse) {
         statsDiv = document.getElementById("stats_div");
 
-        statsTitle = document.createElement('h2');
+        statsTitle = document.createElement("h2");
         statsTitle.setAttribute("class", "navbar-brand");
         statsTitle.innerHTML = "Individual Team Stats";
         statsDiv.append(statsTitle);
@@ -248,28 +248,28 @@ function loadTeamStats() {
             var teamNumber = (i+1);
             var captainName = team['captainName'];
 
-            teamDiv = document.createElement('div');
+            teamDiv = document.createElement("div");
             teamDiv.setAttribute("id", "team_"+teamNumber+"_div");
 
-            metadataDiv = document.createElement('div');
+            metadataDiv = document.createElement("div");
             metadataDiv.setAttribute("id", "team_"+teamNumber+"_metadata")
 
-            teamTitle = document.createElement('h2');
+            teamTitle = document.createElement("h2");
             teamTitle.setAttribute("class", "navbar-brand");
             teamTitle.innerHTML = "Rank #" + team['rank'] + ": ";
 
-            if ("forumLink" in team["team"]) {
-                teamTitle.innerHTML += "<a href='" + team["team"]["forumLink"] + "' target='_blank' rel='noreferrer'>" + team["team"]['teamName'] + "</a>";
+            if ("forumLink" in team['team']) {
+                teamTitle.innerHTML += "<a href='" + team['team']['forumLink'] + "' target='_blank' rel='noreferrer'>" + team['team']['teamName'] + "</a>";
             } else {
-                teamTitle.innerHTML += team["team"]['teamName'];
+                teamTitle.innerHTML += team['team']['teamName'];
             }
             metadataDiv.append(teamTitle);
 
-            teamStats = document.createElement('h5');
+            teamStats = document.createElement("h5");
             teamStats.setAttribute("id", "team_"+teamNumber+"_stats");
             teamStats.setAttribute("data-bs-toggle", "tooltip");
             teamStats.setAttribute("data-placement", "top");
-            teamStats.setAttribute("title", "Unmultiplied: " + team["teamPoints"].toLocaleString());
+            teamStats.setAttribute("title", "Unmultiplied: " + team['teamPoints'].toLocaleString());
             teamStats.innerHTML = team['teamMultipliedPoints'].toLocaleString() + " points | " + team['teamUnits'].toLocaleString() + " units";
             new bootstrap.Tooltip(teamStats);
             metadataDiv.append(teamStats);
@@ -285,11 +285,11 @@ function loadTeamStats() {
             metadataDiv.append(teamButton);
             teamDiv.append(metadataDiv);
 
-            subDiv = document.createElement('div');
+            subDiv = document.createElement("div");
             subDiv.setAttribute("id", "team_"+teamNumber+"_subdiv");
             subDiv.setAttribute("class", "collapse");
 
-            teamTable = document.createElement('table');
+            teamTable = document.createElement("table");
             teamTable.setAttribute("id", "team_"+teamNumber);
             teamTable.setAttribute("class", "table table-dark table-striped table-hover");
 
@@ -319,8 +319,8 @@ function loadTeamStats() {
                     if(userProperty === "multipliedPoints"){
                         teamTableUserCell.setAttribute("data-bs-toggle", "tooltip");
                         teamTableUserCell.setAttribute("data-placement", "left");
-                        teamTableUserCell.setAttribute("title", "Unmultiplied: " + activeUser["points"].toLocaleString());
-                        teamTableUserCell.innerHTML = activeUser[userProperty].toLocaleString();
+                        teamTableUserCell.setAttribute("title", "Unmultiplied: " + activeUser['points'].toLocaleString());
+                        teamTableUserCell.innerHTML = activeUser['multipliedPoints'].toLocaleString();
                         new bootstrap.Tooltip(teamTableUserCell);
                     } else if (userProperty === "displayName") {
                         teamTableUserCell.innerHTML = activeUser['user']['displayName'];
@@ -354,7 +354,7 @@ function loadTeamStats() {
                         teamTableUserCell.innerHTML = activeUser['user']['hardware']['displayName'].toLocaleString();
                         new bootstrap.Tooltip(teamTableUserCell);
                     } else if (userProperty === "category") {
-                        teamTableUserCell.innerHTML = getCategoryFrontend(activeUser['user']["category"]);
+                        teamTableUserCell.innerHTML = getCategoryFrontend(activeUser['user']['category']);
                     } else {
                         if (userProperty in activeUser) {
                             teamTableUserCell.innerHTML = activeUser[userProperty].toLocaleString();
@@ -379,7 +379,7 @@ function loadTeamStats() {
                     if (userProperty === "multipliedPoints") {
                         teamTableUserCell.setAttribute("data-bs-toggle", "tooltip");
                         teamTableUserCell.setAttribute("data-placement", "left");
-                        teamTableUserCell.setAttribute("title", "Unmultiplied: " + retiredUser["points"].toLocaleString());
+                        teamTableUserCell.setAttribute("title", "Unmultiplied: " + retiredUser['points'].toLocaleString());
                         teamTableUserCell.innerHTML = retiredUser[userProperty].toLocaleString();
                         new bootstrap.Tooltip(teamTableUserCell);
                     } else if (userProperty === "category") {
@@ -400,7 +400,7 @@ function loadTeamStats() {
             teamDiv.append(subDiv);
 
             statsDiv.append(teamDiv);
-            statsDiv.append(document.createElement('br'));
+            statsDiv.append(document.createElement("br"));
         });
     })
 };

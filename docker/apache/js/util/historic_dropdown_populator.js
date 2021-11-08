@@ -8,7 +8,7 @@ function populateUserDropdown(dropdownId) {
         dropdown.removeChild(dropdown.lastChild);
     }
 
-    fetch(ROOT_URL+'/users')
+    fetch(ROOT_URL+"/users")
     .then(response => {
         return response.json();
     })
@@ -20,9 +20,9 @@ function populateUserDropdown(dropdownId) {
             userButton.setAttribute("class", "dropdown-item");
             userButton.setAttribute("type", "button");
 
-            var userDisplayNameWithoutQuotes = escape(userItem["displayName"]);
-            userButton.setAttribute("onclick", "getUserHistoricStats("+userItem["id"]+",'"+userDisplayNameWithoutQuotes+"',null,null,null,null)");
-            userButton.innerHTML = userItem["displayName"];
+            var userDisplayNameWithoutQuotes = escape(userItem['displayName']);
+            userButton.setAttribute("onclick", "getUserHistoricStats("+userItem['id']+",'"+userDisplayNameWithoutQuotes+"',null,null,null,null)");
+            userButton.innerHTML = userItem['displayName'];
 
             userDropdownDiv.append(userButton);
         });
@@ -35,7 +35,7 @@ function populateTeamDropdown(dropdownId) {
         dropdown.removeChild(dropdown.lastChild);
     }
 
-    fetch(ROOT_URL+'/teams')
+    fetch(ROOT_URL+"/teams")
     .then(response => {
         return response.json();
     })
@@ -47,9 +47,9 @@ function populateTeamDropdown(dropdownId) {
             teamButton.setAttribute("class", "dropdown-item");
             teamButton.setAttribute("type", "button");
 
-            var teamNameWithoutQuotes = escape(teamItem["teamName"]);
-            teamButton.setAttribute("onclick", "getTeamHistoricStats("+teamItem["id"]+",'"+teamNameWithoutQuotes+"',null,null,null,null)");
-            teamButton.innerHTML = teamItem["teamName"];
+            var teamNameWithoutQuotes = escape(teamItem['teamName']);
+            teamButton.setAttribute("onclick", "getTeamHistoricStats("+teamItem['id']+",'"+teamNameWithoutQuotes+"',null,null,null,null)");
+            teamButton.innerHTML = teamItem['teamName'];
 
             teamDropDownDiv.append(teamButton);
         });
@@ -95,7 +95,7 @@ function populateMonthDropdown(dropdownId, historicFunctionName) {
     monthDropdownDiv = document.getElementById(dropdownId);
 
     for (i = 0; i < NUMBER_OF_MONTHS; i++) {
-        var loopMonthName = new Date(YEAR_START, i, 1).toLocaleString('default', { month: 'long' });
+        var loopMonthName = new Date(YEAR_START, i, 1).toLocaleString("default", { month: "long" });
 
         monthButton = document.createElement("button");
         monthButton.setAttribute("class", "dropdown-item");

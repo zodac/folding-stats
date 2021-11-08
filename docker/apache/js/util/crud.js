@@ -18,11 +18,11 @@ function createHardware() {
     );
 
     show("loader");
-    fetch(ROOT_URL+'/hardware', {
-        method: 'POST',
+    fetch(ROOT_URL+"/hardware", {
+        method: "POST",
         headers: {
-            'Content-Type': 'application/json',
-            'Authorization': sessionGet("Authorization")
+            "Content-Type": "application/json",
+            "Authorization": sessionGet("Authorization")
         },
         body: requestData
     })
@@ -38,18 +38,18 @@ function createHardware() {
             return;
         }
 
-        document.getElementById("hardware_create_name").value = '';
-        document.getElementById("hardware_create_display_name").value = '';
-        document.getElementById("hardware_create_hardware_make_input").value = '';
-        document.getElementById("hardware_create_hardware_type_input").value = '';
-        document.getElementById("hardware_create_multiplier").value = '';
-        document.getElementById("hardware_create_average_ppd").value = '';
+        document.getElementById("hardware_create_name").value = "";
+        document.getElementById("hardware_create_display_name").value = "";
+        document.getElementById("hardware_create_hardware_make_input").value = "";
+        document.getElementById("hardware_create_hardware_type_input").value = "";
+        document.getElementById("hardware_create_multiplier").value = "";
+        document.getElementById("hardware_create_average_ppd").value = "";
         successToast("Hardware '" + displayName + "' created");
         loadHardware();
     })
     .catch((error) => {
         hide("loader");
-        console.error('Unexpected error creating hardware: ', error);
+        console.error("Unexpected error creating hardware: ", error);
         return false;
     });
 }
@@ -75,11 +75,11 @@ function updateHardware() {
     );
 
     show("loader");
-    fetch(ROOT_URL+'/hardware/' + hardwareId, {
-        method: 'PUT',
+    fetch(ROOT_URL+"/hardware/" + hardwareId, {
+        method: "PUT",
         headers: {
-            'Content-Type': 'application/json',
-            'Authorization': sessionGet("Authorization")
+            "Content-Type": "application/json",
+            "Authorization": sessionGet("Authorization")
         },
         body: requestData
     })
@@ -95,14 +95,14 @@ function updateHardware() {
             return;
         }
 
-        document.getElementById("hardware_update_selector_input").value = '';
-        document.getElementById("hardware_update_id").value = '';
-        document.getElementById("hardware_update_name").value = '';
-        document.getElementById("hardware_update_display_name").value = '';
-        document.getElementById("hardware_update_hardware_make_input").value = '';
-        document.getElementById("hardware_update_hardware_type_input").value = '';
-        document.getElementById("hardware_update_multiplier").value = '';
-        document.getElementById("hardware_update_average_ppd").value = '';
+        document.getElementById("hardware_update_selector_input").value = "";
+        document.getElementById("hardware_update_id").value = "";
+        document.getElementById("hardware_update_name").value = "";
+        document.getElementById("hardware_update_display_name").value = "";
+        document.getElementById("hardware_update_hardware_make_input").value = "";
+        document.getElementById("hardware_update_hardware_type_input").value = "";
+        document.getElementById("hardware_update_multiplier").value = "";
+        document.getElementById("hardware_update_average_ppd").value = "";
 
         hardwareFields = document.querySelectorAll(".hardware_update");
         for (var i = 0, hardwareField; hardwareField = hardwareFields[i]; i++) {
@@ -114,7 +114,7 @@ function updateHardware() {
     })
     .catch((error) => {
         hide("loader");
-        console.error('Unexpected error updating hardware: ', error);
+        console.error("Unexpected error updating hardware: ", error);
         return false;
     });
 }
@@ -124,11 +124,11 @@ function deleteHardware() {
     var displayName = document.getElementById("hardware_delete_display_name").value.trim();
 
     show("loader");
-    fetch(ROOT_URL+'/hardware/' + hardwareId, {
-        method: 'DELETE',
+    fetch(ROOT_URL+"/hardware/" + hardwareId, {
+        method: "DELETE",
         headers: {
-            'Content-Type': 'application/json',
-            'Authorization': sessionGet("Authorization")
+            "Content-Type": "application/json",
+            "Authorization": sessionGet("Authorization")
         }
     })
     .then(response => {
@@ -143,14 +143,14 @@ function deleteHardware() {
             return;
         }
 
-        document.getElementById("hardware_delete_selector_input").value = '';
-        document.getElementById("hardware_delete_id").value = '';
-        document.getElementById("hardware_delete_name").value = '';
-        document.getElementById("hardware_delete_display_name").value = '';
-        document.getElementById("hardware_delete_hardware_make_input").value = '';
-        document.getElementById("hardware_delete_hardware_type_input").value = '';
-        document.getElementById("hardware_delete_multiplier").value = '';
-        document.getElementById("hardware_delete_average_ppd").value = '';
+        document.getElementById("hardware_delete_selector_input").value = "";
+        document.getElementById("hardware_delete_id").value = "";
+        document.getElementById("hardware_delete_name").value = "";
+        document.getElementById("hardware_delete_display_name").value = "";
+        document.getElementById("hardware_delete_hardware_make_input").value = "";
+        document.getElementById("hardware_delete_hardware_type_input").value = "";
+        document.getElementById("hardware_delete_multiplier").value = "";
+        document.getElementById("hardware_delete_average_ppd").value = "";
 
         hardwareFields = document.querySelectorAll(".hardware_delete");
         for (var i = 0, hardwareField; hardwareField = hardwareFields[i]; i++) {
@@ -162,7 +162,7 @@ function deleteHardware() {
     })
     .catch((error) => {
         hide("loader");
-        console.error('Unexpected error deleting hardware: ', error);
+        console.error("Unexpected error deleting hardware: ", error);
         return false;
     });
 }
@@ -181,11 +181,11 @@ function createTeam() {
     );
 
     show("loader");
-    fetch(ROOT_URL+'/teams', {
-        method: 'POST',
+    fetch(ROOT_URL+"/teams", {
+        method: "POST",
         headers: {
-            'Content-Type': 'application/json',
-            'Authorization': sessionGet("Authorization")
+            "Content-Type": "application/json",
+            "Authorization": sessionGet("Authorization")
         },
         body: requestData
     })
@@ -201,15 +201,15 @@ function createTeam() {
             return;
         }
 
-        document.getElementById("team_create_name").value = '';
-        document.getElementById("team_create_description").value = '';
-        document.getElementById("team_create_forum_link").value = '';
+        document.getElementById("team_create_name").value = "";
+        document.getElementById("team_create_description").value = "";
+        document.getElementById("team_create_forum_link").value = "";
         successToast("Team '" + teamName + "' created");
         loadTeams();
     })
     .catch((error) => {
         hide("loader");
-        console.error('Unexpected error creating team: ', error);
+        console.error("Unexpected error creating team: ", error);
         return false;
     });
 }
@@ -229,11 +229,11 @@ function updateTeam() {
     );
 
     show("loader");
-    fetch(ROOT_URL+'/teams/' + teamId, {
-        method: 'PUT',
+    fetch(ROOT_URL+"/teams/" + teamId, {
+        method: "PUT",
         headers: {
-            'Content-Type': 'application/json',
-            'Authorization': sessionGet("Authorization")
+            "Content-Type": "application/json",
+            "Authorization": sessionGet("Authorization")
         },
         body: requestData
     })
@@ -249,11 +249,11 @@ function updateTeam() {
             return;
         }
 
-        document.getElementById("team_update_selector_input").value = '';
-        document.getElementById("team_update_id").value = '';
-        document.getElementById("team_update_name").value = '';
-        document.getElementById("team_update_description").value = '';
-        document.getElementById("team_update_forum_link").value = '';
+        document.getElementById("team_update_selector_input").value = "";
+        document.getElementById("team_update_id").value = "";
+        document.getElementById("team_update_name").value = "";
+        document.getElementById("team_update_description").value = "";
+        document.getElementById("team_update_forum_link").value = "";
 
         teamFields = document.querySelectorAll(".team_update");
         for (var i = 0, teamField; teamField = teamFields[i]; i++) {
@@ -265,7 +265,7 @@ function updateTeam() {
     })
     .catch((error) => {
         hide("loader");
-        console.error('Unexpected error updating team: ', error);
+        console.error("Unexpected error updating team: ", error);
         return false;
     });
 }
@@ -275,11 +275,11 @@ function deleteTeam() {
     var teamName = document.getElementById("team_delete_name").value.trim();
 
     show("loader");
-    fetch(ROOT_URL+'/teams/' + teamId, {
-        method: 'DELETE',
+    fetch(ROOT_URL+"/teams/" + teamId, {
+        method: "DELETE",
         headers: {
-            'Content-Type': 'application/json',
-            'Authorization': sessionGet("Authorization")
+            "Content-Type": "application/json",
+            "Authorization": sessionGet("Authorization")
         }
     })
     .then(response => {
@@ -294,11 +294,11 @@ function deleteTeam() {
             return;
         }
 
-        document.getElementById("team_delete_selector_input").value = '';
-        document.getElementById("team_delete_id").value = '';
-        document.getElementById("team_delete_name").value = '';
-        document.getElementById("team_delete_description").value = '';
-        document.getElementById("team_delete_forum_link").value = '';
+        document.getElementById("team_delete_selector_input").value = "";
+        document.getElementById("team_delete_id").value = "";
+        document.getElementById("team_delete_name").value = "";
+        document.getElementById("team_delete_description").value = "";
+        document.getElementById("team_delete_forum_link").value = "";
 
         teamFields = document.querySelectorAll(".team_delete");
         for (var i = 0, teamField; teamField = teamFields[i]; i++) {
@@ -310,7 +310,7 @@ function deleteTeam() {
     })
     .catch((error) => {
         hide("loader");
-        console.error('Unexpected error deleting team: ', error);
+        console.error("Unexpected error deleting team: ", error);
         return false;
     });
 }
@@ -326,19 +326,19 @@ function createUser() {
     var teamName = document.getElementById("user_create_team_selector_input").value.trim();
     var isCaptain = document.getElementById("user_create_is_captain").checked;
 
-    fetch(ROOT_URL+'/hardware/fields?hardwareName=' + hardwareName)
+    fetch(ROOT_URL+"/hardware/fields?hardwareName=" + hardwareName)
     .then(response => {
         return response.json();
     })
     .then(function(jsonResponse) {
-        var hardwareId = jsonResponse["id"];
+        var hardwareId = jsonResponse['id'];
 
-        fetch(ROOT_URL+'/teams/fields?teamName=' + teamName)
+        fetch(ROOT_URL+"/teams/fields?teamName=" + teamName)
         .then(response => {
             return response.json();
         })
         .then(function(jsonResponse) {
-            var teamId = jsonResponse["id"];
+            var teamId = jsonResponse['id'];
 
             var requestData = JSON.stringify(
                 {
@@ -355,11 +355,11 @@ function createUser() {
             );
 
             show("loader");
-            fetch(ROOT_URL+'/users', {
-                method: 'POST',
+            fetch(ROOT_URL+"/users", {
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': sessionGet("Authorization")
+                    "Content-Type": "application/json",
+                    "Authorization": sessionGet("Authorization")
                 },
                 body: requestData
             })
@@ -375,21 +375,21 @@ function createUser() {
                     return;
                 }
 
-                document.getElementById("user_create_folding_name").value = '';
-                document.getElementById("user_create_display_name").value = '';
-                document.getElementById("user_create_passkey").value = '';
-                document.getElementById("user_create_category_input").value = '';
-                document.getElementById("user_create_profile_link").value = '';
-                document.getElementById("user_create_live_stats_link").value = '';
-                document.getElementById("user_create_hardware_selector_input").value = '';
-                document.getElementById("user_create_team_selector_input").value = '';
+                document.getElementById("user_create_folding_name").value = "";
+                document.getElementById("user_create_display_name").value = "";
+                document.getElementById("user_create_passkey").value = "";
+                document.getElementById("user_create_category_input").value = "";
+                document.getElementById("user_create_profile_link").value = "";
+                document.getElementById("user_create_live_stats_link").value = "";
+                document.getElementById("user_create_hardware_selector_input").value = "";
+                document.getElementById("user_create_team_selector_input").value = "";
                 document.getElementById("user_create_is_captain").checked = false;
                 successToast("User '" + displayName + "' created");
                 loadUsers();
             })
             .catch((error) => {
                 hide("loader");
-                console.error('Unexpected error creating user: ', error);
+                console.error("Unexpected error creating user: ", error);
                 return false;
             });
         })
@@ -408,19 +408,19 @@ function updateUser() {
     var teamName = document.getElementById("user_update_team_selector_input").value.trim();
     var isCaptain = document.getElementById("user_update_is_captain").checked;
 
-    fetch(ROOT_URL+'/hardware/fields?hardwareName=' + hardwareName)
+    fetch(ROOT_URL+"/hardware/fields?hardwareName=" + hardwareName)
     .then(response => {
         return response.json();
     })
     .then(function(jsonResponse) {
-        var hardwareId = jsonResponse["id"];
+        var hardwareId = jsonResponse['id'];
 
-        fetch(ROOT_URL+'/teams/fields?teamName=' + teamName)
+        fetch(ROOT_URL+"/teams/fields?teamName=" + teamName)
         .then(response => {
             return response.json();
         })
         .then(function(jsonResponse) {
-            var teamId = jsonResponse["id"];
+            var teamId = jsonResponse['id'];
 
             var requestData = JSON.stringify(
                 {
@@ -437,11 +437,11 @@ function updateUser() {
             );
 
             show("loader");
-            fetch(ROOT_URL+'/users/' + userId, {
-                method: 'PUT',
+            fetch(ROOT_URL+"/users/" + userId, {
+                method: "PUT",
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': sessionGet("Authorization")
+                    "Content-Type": "application/json",
+                    "Authorization": sessionGet("Authorization")
                 },
                 body: requestData
             })
@@ -457,16 +457,16 @@ function updateUser() {
                     return;
                 }
 
-                document.getElementById("user_update_selector_input").value = '';
-                document.getElementById("user_update_id").value = '';
-                document.getElementById("user_update_folding_name").value = '';
-                document.getElementById("user_update_display_name").value = '';
-                document.getElementById("user_update_passkey").value = '';
-                document.getElementById("user_update_category_input").value = '';
-                document.getElementById("user_update_profile_link").value = '';
-                document.getElementById("user_update_live_stats_link").value = '';
-                document.getElementById("user_update_hardware_selector_input").value = '';
-                document.getElementById("user_update_team_selector_input").value = '';
+                document.getElementById("user_update_selector_input").value = "";
+                document.getElementById("user_update_id").value = "";
+                document.getElementById("user_update_folding_name").value = "";
+                document.getElementById("user_update_display_name").value = "";
+                document.getElementById("user_update_passkey").value = "";
+                document.getElementById("user_update_category_input").value = "";
+                document.getElementById("user_update_profile_link").value = "";
+                document.getElementById("user_update_live_stats_link").value = "";
+                document.getElementById("user_update_hardware_selector_input").value = "";
+                document.getElementById("user_update_team_selector_input").value = "";
                 document.getElementById("user_update_is_captain").checked = false;
 
                 userFields = document.querySelectorAll(".user_update");
@@ -479,7 +479,7 @@ function updateUser() {
             })
             .catch((error) => {
                 hide("loader");
-                console.error('Unexpected error updating user: ', error);
+                console.error("Unexpected error updating user: ", error);
                 return false;
             });
         })
@@ -491,11 +491,11 @@ function deleteUser() {
     var displayName = document.getElementById("user_delete_display_name").value
 
     show("loader");
-    fetch(ROOT_URL+'/users/' + userId, {
-        method: 'DELETE',
+    fetch(ROOT_URL+"/users/" + userId, {
+        method: "DELETE",
         headers: {
-            'Content-Type': 'application/json',
-            'Authorization': sessionGet("Authorization")
+            "Content-Type": "application/json",
+            "Authorization": sessionGet("Authorization")
         }
     })
     .then(response => {
@@ -510,16 +510,16 @@ function deleteUser() {
             return;
         }
 
-        document.getElementById("user_delete_selector_input").value = '';
-        document.getElementById("user_delete_id").value = '';
-        document.getElementById("user_delete_folding_name").value = '';
-        document.getElementById("user_delete_display_name").value = '';
-        document.getElementById("user_delete_passkey").value = '';
-        document.getElementById("user_delete_category_input").value = '';
-        document.getElementById("user_delete_profile_link").value = '';
-        document.getElementById("user_delete_live_stats_link").value = '';
-        document.getElementById("user_delete_hardware_selector_input").value = '';
-        document.getElementById("user_delete_team_selector_input").value = '';
+        document.getElementById("user_delete_selector_input").value = "";
+        document.getElementById("user_delete_id").value = "";
+        document.getElementById("user_delete_folding_name").value = "";
+        document.getElementById("user_delete_display_name").value = "";
+        document.getElementById("user_delete_passkey").value = "";
+        document.getElementById("user_delete_category_input").value = "";
+        document.getElementById("user_delete_profile_link").value = "";
+        document.getElementById("user_delete_live_stats_link").value = "";
+        document.getElementById("user_delete_hardware_selector_input").value = "";
+        document.getElementById("user_delete_team_selector_input").value = "";
         document.getElementById("user_delete_is_captain").checked = false;
 
         userFields = document.querySelectorAll(".user_delete");
@@ -532,7 +532,7 @@ function deleteUser() {
     })
     .catch((error) => {
         hide("loader");
-        console.error('Unexpected error deleting user: ', error);
+        console.error("Unexpected error deleting user: ", error);
         return false;
     });
 }
@@ -542,7 +542,7 @@ function offsetUser() {
     var displayName = document.getElementById("user_offset_display_name").value
 
     show("loader");
-    fetch(ROOT_URL+'/stats/users/' + userId)
+    fetch(ROOT_URL+"/stats/users/" + userId)
     .then(response => {
         return response.json();
     })
@@ -562,11 +562,11 @@ function offsetUser() {
             }
         );
 
-        fetch(ROOT_URL+'/stats/users/' + userId, {
-            method: 'PATCH',
+        fetch(ROOT_URL+"/stats/users/" + userId, {
+            method: "PATCH",
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': sessionGet("Authorization")
+                "Content-Type": "application/json",
+                "Authorization": sessionGet("Authorization")
             },
             body: requestData
         })
@@ -582,15 +582,15 @@ function offsetUser() {
                 return;
             }
 
-            document.getElementById("user_offset_selector_input").value = '';
-            document.getElementById("user_offset_id").value = '';
-            document.getElementById("user_offset_folding_name").value = '';
-            document.getElementById("user_offset_display_name").value = '';
-            document.getElementById("user_offset_category_input").value = '';
-            document.getElementById("user_offset_hardware_selector_input").value = '';
-            document.getElementById("user_offset_team_selector_input").value = '';
-            document.getElementById("user_offset_points").value = '';
-            document.getElementById("user_offset_units").value = '';
+            document.getElementById("user_offset_selector_input").value = "";
+            document.getElementById("user_offset_id").value = "";
+            document.getElementById("user_offset_folding_name").value = "";
+            document.getElementById("user_offset_display_name").value = "";
+            document.getElementById("user_offset_category_input").value = "";
+            document.getElementById("user_offset_hardware_selector_input").value = "";
+            document.getElementById("user_offset_team_selector_input").value = "";
+            document.getElementById("user_offset_points").value = "";
+            document.getElementById("user_offset_units").value = "";
 
             userFields = document.querySelectorAll(".user_offset");
             for (var i = 0, userField; userField = userFields[i]; i++) {
@@ -602,7 +602,7 @@ function offsetUser() {
         })
         .catch((error) => {
             hide("loader");
-            console.error('Unexpected error offsetting user stats: ', error);
+            console.error("Unexpected error offsetting user stats: ", error);
             return false;
         });
     });
