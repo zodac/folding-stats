@@ -37,7 +37,7 @@ class InvalidUrlTest {
             .orElse("no location header");
 
         assertThat(redirectLocation)
-            .as("Expected redirect to go to home page")
+            .as("Expected redirect to go to home page: " + response.body() + ", " + response.headers())
             .isEqualTo("http://frontend_dev/");
     }
 }

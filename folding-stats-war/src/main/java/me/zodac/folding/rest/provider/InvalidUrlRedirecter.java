@@ -10,7 +10,6 @@ import me.zodac.folding.api.util.EnvironmentVariableUtils;
 /**
  * {@link Provider} used to handle invalid URL requests. Redirects to the main <code>Team Competition</code> homepage.
  */
-// TODO: [zodac] Add integration test for this
 @Provider
 public class InvalidUrlRedirecter implements ExceptionMapper<NotFoundException> {
 

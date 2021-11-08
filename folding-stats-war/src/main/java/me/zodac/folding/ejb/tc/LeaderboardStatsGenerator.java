@@ -3,6 +3,7 @@ package me.zodac.folding.ejb.tc;
 import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumMap;
@@ -76,56 +77,68 @@ public class LeaderboardStatsGenerator {
      */
     public Map<Category, List<UserCategoryLeaderboardEntry>> generateUserCategoryLeaderboards() {
         final CompetitionSummary competitionSummary = businessLogic.getCompetitionSummary();
-        if (competitionSummary.getTeams().isEmpty()) {
-            LOGGER.warn("No TC teams to show");
-            return Collections.emptyMap();
-        }
-
-        final Map<Category, List<UserSummary>> userResultsByCategory = new EnumMap<>(Category.class);
-
-        for (final TeamSummary teamSummary : competitionSummary.getTeams()) {
-            // TODO: [zodac] Instead of adding active users to category, iterate through categories
-            for (final UserSummary userSummary : teamSummary.getActiveUsers()) {
-                final Category category = userSummary.getUser().getCategory();
-
-                final List<UserSummary> existingUsersInCategory = userResultsByCategory.getOrDefault(category, new ArrayList<>(0));
-                existingUsersInCategory.add(userSummary);
-
-                userResultsByCategory.put(category, existingUsersInCategory);
-            }
-        }
+        final Map<Category, List<UserSummary>> usersByCategory = getUsersSortedByCategory(competitionSummary);
 
         final Map<Category, List<UserCategoryLeaderboardEntry>> categoryLeaderboard = new TreeMap<>();
-
-        for (final var entry : userResultsByCategory.entrySet()) {
+        for (final var entry : usersByCategory.entrySet()) {
             final Category category = entry.getKey();
             final List<UserSummary> userSummaries = entry.getValue()
                 .stream()
                 .sorted(Comparator.comparingLong(UserSummary::getMultipliedPoints).reversed())
                 .collect(toList());
 
-            final UserSummary firstResult = userSummaries.get(0);
-            final UserCategoryLeaderboardEntry categoryLeader = UserCategoryLeaderboardEntry.createLeader(firstResult);
-
-            final List<UserCategoryLeaderboardEntry> userSummariesInCategory = new ArrayList<>(userSummaries.size());
-            userSummariesInCategory.add(categoryLeader);
-
-            for (int i = 1; i < userSummaries.size(); i++) {
-                final UserSummary userSummary = userSummaries.get(i);
-                final UserSummary userAhead = userSummaries.get(i - 1);
-
-                final long diffToLeader = categoryLeader.getMultipliedPoints() - userSummary.getMultipliedPoints();
-                final long diffToNext = userAhead.getMultipliedPoints() - userSummary.getMultipliedPoints();
-
-                final int rank = i + 1;
-                final UserCategoryLeaderboardEntry userCategoryLeaderboardEntry = UserCategoryLeaderboardEntry.create(userSummary, rank, diffToLeader,
-                    diffToNext);
-                userSummariesInCategory.add(userCategoryLeaderboardEntry);
-            }
-
+            final List<UserCategoryLeaderboardEntry> userSummariesInCategory = getUserLeaderboardForCategory(userSummaries);
             categoryLeaderboard.put(category, userSummariesInCategory);
         }
 
         return categoryLeaderboard;
+    }
+
+    private List<UserCategoryLeaderboardEntry> getUserLeaderboardForCategory(final List<UserSummary> userSummaries) {
+        // If we have no users for the category, no need to do anything
+        if (userSummaries.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        final UserSummary firstResult = userSummaries.get(0);
+        final UserCategoryLeaderboardEntry categoryLeader = UserCategoryLeaderboardEntry.createLeader(firstResult);
+
+        final List<UserCategoryLeaderboardEntry> userSummariesInCategory = new ArrayList<>(userSummaries.size());
+        userSummariesInCategory.add(categoryLeader);
+
+        for (int i = 1; i < userSummaries.size(); i++) {
+            final UserSummary userSummary = userSummaries.get(i);
+            final UserSummary userAhead = userSummaries.get(i - 1);
+
+            final long diffToLeader = categoryLeader.getMultipliedPoints() - userSummary.getMultipliedPoints();
+            final long diffToNext = userAhead.getMultipliedPoints() - userSummary.getMultipliedPoints();
+
+            final int rank = i + 1;
+            final UserCategoryLeaderboardEntry userCategoryLeaderboardEntry = UserCategoryLeaderboardEntry.create(userSummary, rank, diffToLeader,
+                diffToNext);
+            userSummariesInCategory.add(userCategoryLeaderboardEntry);
+        }
+        return userSummariesInCategory;
+    }
+
+    private static Map<Category, List<UserSummary>> getUsersSortedByCategory(final CompetitionSummary competitionSummary) {
+        final Map<Category, List<UserSummary>> usersByCategory = new EnumMap<>(Category.class);
+        final Collection<UserSummary> usersInAllTeams = competitionSummary
+            .getTeams()
+            .stream()
+            .map(TeamSummary::getActiveUsers)
+            .flatMap(Collection::stream)
+            .collect(toList());
+
+        // Iterate over each category so even if we don't have a user in that category, we will have an entry
+        for (final Category category : Category.getAllValues()) {
+            final List<UserSummary> usersInCategory = usersInAllTeams
+                .stream()
+                .filter(userSummary -> userSummary.getUser().getCategory() == category)
+                .collect(toList());
+
+            usersByCategory.put(category, usersInCategory);
+        }
+        return usersByCategory;
     }
 }

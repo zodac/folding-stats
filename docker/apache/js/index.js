@@ -231,6 +231,13 @@ function loadTeamStats() {
         return response.json();
     })
     .then(function(jsonResponse) {
+        statsDiv = document.getElementById("stats_div");
+
+        statsTitle = document.createElement('h2');
+        statsTitle.setAttribute("class", "navbar-brand");
+        statsTitle.innerHTML = "Individual Team Stats";
+        statsDiv.append(statsTitle);
+
         // Build team tables
         const teamTableHeaders = ["Rank", "User", "Category", "Hardware", "Points", "Units"];
         const activeUserProperties = ["rankInTeam", "displayName", "category", "hardware", "multipliedPoints", "units"];
@@ -392,7 +399,6 @@ function loadTeamStats() {
 
             teamDiv.append(subDiv);
 
-            statsDiv = document.getElementById("stats_div");
             statsDiv.append(teamDiv);
             statsDiv.append(document.createElement('br'));
         });

@@ -119,9 +119,15 @@ class TeamCompetitionLeaderboardTest {
 
         final Map<String, List<UserCategoryLeaderboardEntry>> result = TeamCompetitionStatsResponseParser.getCategoryLeaderboard(response);
 
-        assertThat(result)
-            .as("Expected no users: " + result)
-            .isEmpty();
+        assertThat(result.keySet())
+            .as("Expected category keys even if there are no teams: " + result)
+            .hasSize(Category.getAllValues().size());
+
+        for (final Category category : Category.getAllValues()) {
+            assertThat(result.get(category.toString()))
+                .as("Expected no values for category: " + category)
+                .isEmpty();
+        }
     }
 
     @Test
@@ -151,8 +157,8 @@ class TeamCompetitionLeaderboardTest {
         final Map<String, List<UserCategoryLeaderboardEntry>> results = TeamCompetitionStatsResponseParser.getCategoryLeaderboard(response);
 
         assertThat(results)
-            .as("Incorrect number of categories returned: " + response.body())
-            .hasSize(2);
+            .as("Expected one entry per category, found: " + results.keySet() + ", : " + response.body())
+            .hasSize(Category.getAllValues().size());
 
         assertThat(results.values().stream().flatMap(Collection::stream).collect(toList()))
             .as("Incorrect number of user summaries returned: " + response.body())
@@ -168,9 +174,10 @@ class TeamCompetitionLeaderboardTest {
             .as("Incorrect number of " + Category.NVIDIA_GPU + " user summaries returned: " + response.body())
             .hasSize(1);
 
-        assertThat(results)
+        final List<UserCategoryLeaderboardEntry> thirdCategoryUsers = results.get(Category.WILDCARD.toString());
+        assertThat(thirdCategoryUsers)
             .as("Incorrect number of " + Category.WILDCARD + " user summaries returned: " + response.body())
-            .doesNotContainKey(Category.WILDCARD.toString());
+            .isEmpty();
 
         final UserCategoryLeaderboardEntry firstResult = firstCategoryUsers.get(0);
         assertThat(firstResult.getUser().getDisplayName())
