@@ -12,10 +12,6 @@
     <artifactId>testsuite</artifactId>
     <name>[${project.parent.artifactId}] TestSuite module</name>
 
-    <properties>
-        <skip-license>false</skip-license>
-    </properties>
-
     <dependencies>
         <!-- Project Dependencies -->
         <dependency>
@@ -57,6 +53,10 @@
     <build>
         <plugins>
             <!-- Execute linters -->
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>

@@ -12,10 +12,6 @@
     <artifactId>folding-stats-api</artifactId>
     <name>[${project.parent.artifactId}] API module</name>
 
-    <properties>
-        <skip-license>false</skip-license>
-    </properties>
-
     <dependencies>
         <!-- 3PP Dependencies -->
         <!-- Required for custom LocalDateTime serializer/deserializer -->
@@ -51,6 +47,10 @@
             </plugin>
 
             <!-- Execute linters -->
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>

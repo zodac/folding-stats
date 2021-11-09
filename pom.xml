@@ -22,7 +22,6 @@
         <java-release>11</java-release>
 
         <!-- License Properties -->
-        <skip-license>true</skip-license>
         <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
         <license-file>${project.parent.basedir}/license-template.txt</license-file>
 
@@ -58,7 +57,6 @@
         <junit.version>5.8.1</junit.version>
 
         <!-- Plugin Versions -->
-        <license-maven-plugin.version>4.2.rc1</license-maven-plugin.version>
         <maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-dependency-plugin.version>3.2.0</maven-dependency-plugin.version>
@@ -70,17 +68,16 @@
         <maven-war-plugin.version>3.3.2</maven-war-plugin.version>
         <versions-maven-plugin.version>2.8.1</versions-maven-plugin.version>
 
-        <!-- License 3PP Version -->
-        <licenses.version>1</licenses.version>
-
         <!-- Linter 3PP Versions -->
         <checkstyle.version>9.1</checkstyle.version>
         <errorprone.version>2.9.0</errorprone.version>
+        <licenses.version>1</licenses.version>
         <spotbugs.version>4.4.2</spotbugs.version>
         <pitest-junit5-plugin.version>0.15</pitest-junit5-plugin.version>
         <pmd.version>6.40.0</pmd.version>
 
         <!-- Linter Plugin Versions -->
+        <license-maven-plugin.version>4.2.rc1</license-maven-plugin.version>
         <maven-checkstyle-plugin.version>3.1.2</maven-checkstyle-plugin.version>
         <maven-javadoc-plugin.version>3.3.1</maven-javadoc-plugin.version>
         <maven-pmd-plugin.version>3.15.0</maven-pmd-plugin.version>
@@ -241,38 +238,6 @@
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>com.mycila</groupId>
-                    <artifactId>license-maven-plugin</artifactId>
-                    <version>${license-maven-plugin.version}</version>
-                    <configuration>
-                        <header>${license-file}</header>
-                        <properties>
-                            <year>2021</year>
-                            <website>zodac.me</website>
-                        </properties>
-                        <includes>
-                            <include>src/main/java/**</include>
-                            <include>src/test/java/**</include>
-                        </includes>
-                        <skip>${skip-license}</skip>
-                    </configuration>
-                    <dependencies>
-                        <dependency>
-                            <groupId>com.mycila</groupId>
-                            <artifactId>licenses</artifactId>
-                            <version>${licenses.version}</version>
-                        </dependency>
-                    </dependencies>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>format</goal>
-                            </goals>
-                            <phase>process-sources</phase>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-clean-plugin</artifactId>
                     <version>${maven-clean-plugin.version}</version>
@@ -371,6 +336,44 @@
                 </plugin>
 
                 <!-- Linters -->
+
+                <!-- Manual execution: -->
+                <!-- mvn clean install license:check -Dskip-linters=false -->
+                <plugin>
+                    <groupId>com.mycila</groupId>
+                    <artifactId>license-maven-plugin</artifactId>
+                    <version>${license-maven-plugin.version}</version>
+                    <configuration>
+                        <header>${license-file}</header>
+                        <properties>
+                            <year>2021</year>
+                            <website>zodac.me</website>
+                        </properties>
+                        <includes>
+                            <include>src/main/java/**</include>
+                            <include>src/test/java/**</include>
+                        </includes>
+                        <excludes>
+                            <exclude>**/gen/**</exclude>
+                        </excludes>
+                        <skip>${skip-linters}</skip>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.mycila</groupId>
+                            <artifactId>licenses</artifactId>
+                            <version>${licenses.version}</version>
+                        </dependency>
+                    </dependencies>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                            <phase>process-sources</phase>
+                        </execution>
+                    </executions>
+                </plugin>
 
                 <!-- Manual execution: -->
                 <!-- mvn clean install checkstyle:checkstyle -Dskip-linters=false -->

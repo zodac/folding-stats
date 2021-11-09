@@ -13,10 +13,6 @@
     <packaging>war</packaging>
     <name>[${project.parent.artifactId}] WAR module</name>
 
-    <properties>
-        <skip-license>false</skip-license>
-    </properties>
-
     <dependencies>
         <!-- Project Dependencies -->
         <dependency>
@@ -119,6 +115,10 @@
             </plugin>
 
             <!-- Execute linters -->
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
