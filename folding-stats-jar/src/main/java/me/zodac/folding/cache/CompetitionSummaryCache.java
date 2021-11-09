@@ -1,57 +1,35 @@
 package me.zodac.folding.cache;
 
-import java.util.Optional;
 import me.zodac.folding.rest.api.tc.CompetitionSummary;
 
 /**
- * Cache for the {@link CompetitionSummary}. There should only be a single {@link CompetitionSummary}, so this will cache the latest, or none.
+ * Cache for the {@link CompetitionSummary}.
+ *
+ * <p>
+ * <b>key:</b> {@link #COMPETITION_SUMMARY_ID}
+ *
+ * <p>
+ * <b>value:</b> {@link CompetitionSummary}
  */
-public final class CompetitionSummaryCache {
+public final class CompetitionSummaryCache extends BaseCache<CompetitionSummary> {
+
+    /**
+     * While we extend {@link BaseCache}, we don't actually have multiple {@link CompetitionSummary}s, so we reuse the same ID.
+     */
+    public static final int COMPETITION_SUMMARY_ID = 1;
 
     private static final CompetitionSummaryCache INSTANCE = new CompetitionSummaryCache();
 
-    private CompetitionSummary competitionSummary;
-
     private CompetitionSummaryCache() {
-
+        super();
     }
 
     /**
-     * Returns a singleton instance of {@link RetiredTcStatsCache}.
+     * Returns a singleton instance of {@link CompetitionSummaryCache}.
      *
-     * @return the {@link RetiredTcStatsCache}
+     * @return the {@link CompetitionSummaryCache}
      */
     public static CompetitionSummaryCache getInstance() {
         return INSTANCE;
-    }
-
-    /**
-     * Checks whether any {@link CompetitionSummary} has been cached.
-     *
-     * @return <code>true</code> is there is a cached {@link CompetitionSummary}
-     */
-    public boolean hasCachedResult() {
-        return competitionSummary != null;
-    }
-
-    /**
-     * Adds a {@link CompetitionSummary} to the cache, replacing any existing one.
-     *
-     * @param competitionSummary the {@link CompetitionSummary} to cache
-     */
-    public void add(final CompetitionSummary competitionSummary) {
-        this.competitionSummary = competitionSummary;
-    }
-
-    /**
-     * Retrieves the cached {@link CompetitionSummary}.
-     *
-     * <p>
-     * Should check whether any {@link CompetitionSummary} is already cached by using {@link #hasCachedResult()}
-     *
-     * @return an {@link Optional} of the cached {@link CompetitionSummary}
-     */
-    public Optional<CompetitionSummary> get() {
-        return Optional.ofNullable(competitionSummary);
     }
 }

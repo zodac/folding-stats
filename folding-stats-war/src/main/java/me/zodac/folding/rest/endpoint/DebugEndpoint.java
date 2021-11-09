@@ -11,15 +11,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import me.zodac.folding.cache.CompetitionSummaryCache;
-import me.zodac.folding.cache.HardwareCache;
-import me.zodac.folding.cache.InitialStatsCache;
-import me.zodac.folding.cache.OffsetTcStatsCache;
-import me.zodac.folding.cache.RetiredTcStatsCache;
-import me.zodac.folding.cache.TcStatsCache;
-import me.zodac.folding.cache.TeamCache;
-import me.zodac.folding.cache.TotalStatsCache;
-import me.zodac.folding.cache.UserCache;
+import me.zodac.folding.ejb.api.BusinessLogic;
 import me.zodac.folding.ejb.tc.lars.LarsHardwareUpdater;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,6 +27,9 @@ import org.apache.logging.log4j.Logger;
 public class DebugEndpoint {
 
     private static final Logger LOGGER = LogManager.getLogger();
+
+    @EJB
+    private BusinessLogic businessLogic;
 
     @EJB
     private LarsHardwareUpdater larsHardwareUpdater;
@@ -64,6 +59,7 @@ public class DebugEndpoint {
      * {@link POST} request to print the contents of all caches to the system log.
      *
      * @return {@link Response.Status#OK}
+     * @see BusinessLogic#printCacheContents()
      */
     @POST
     @RolesAllowed("admin")
@@ -71,22 +67,7 @@ public class DebugEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     public Response printCaches() {
         LOGGER.info("Printing cache contents");
-
-        // POJOs
-        LOGGER.info("HardwareCache: {}", HardwareCache.getInstance().getCacheContents());
-        LOGGER.info("TeamCache: {}", TeamCache.getInstance().getCacheContents());
-        LOGGER.info("UserCache: {}", UserCache.getInstance().getCacheContents());
-
-        // Stats
-        LOGGER.info("InitialStatsCache: {}", InitialStatsCache.getInstance().getCacheContents());
-        LOGGER.info("OffsetStatsCache: {}", OffsetTcStatsCache.getInstance().getCacheContents());
-        LOGGER.info("RetiredTcStatsCache: {}", RetiredTcStatsCache.getInstance().getCacheContents());
-        LOGGER.info("TcStatsCache: {}", TcStatsCache.getInstance().getCacheContents());
-        LOGGER.info("TotalStatsCache: {}", TotalStatsCache.getInstance().getCacheContents());
-
-        // TC overall
-        LOGGER.info("CompetitionSummaryCache: {}", CompetitionSummaryCache.getInstance().get());
-
+        businessLogic.printCacheContents();
         return ok();
     }
 }

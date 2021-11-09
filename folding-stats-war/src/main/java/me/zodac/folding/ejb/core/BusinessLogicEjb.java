@@ -443,4 +443,9 @@ public class BusinessLogicEjb implements BusinessLogic {
         LOGGER.warn("No captain set for team '{}'", teamName);
         return null;
     }
+
+    @Override
+    public void printCacheContents() {
+        STORAGE.printCacheContents();
+    }
 }

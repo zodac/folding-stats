@@ -392,4 +392,9 @@ public interface BusinessLogic {
      * @return the latest {@link CompetitionSummary}
      */
     CompetitionSummary getCompetitionSummary();
+
+    /**
+     * Debug function which will print the contents of any caches being used to the system log.
+     */
+    void printCacheContents();
 }
