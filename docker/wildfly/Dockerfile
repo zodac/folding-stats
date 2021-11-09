@@ -36,6 +36,10 @@ RUN mkdir --parents /opt/jboss/wildfly/standalone/deployments/ && \
 
 FROM jboss/wildfly:24.0.0.Final
 
+USER root
+RUN yum -y update && yum -y upgrade
+USER jboss
+
 # Copy the WAR artifacts
 COPY --from=builder /opt/jboss/wildfly/standalone/deployments/ /opt/jboss/wildfly/standalone/deployments/
 
