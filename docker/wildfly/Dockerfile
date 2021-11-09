@@ -32,7 +32,7 @@ RUN cd /folding-stats/stubbed-folding-endpoints-war && mvn install --projects . 
 RUN mkdir --parents /opt/jboss/wildfly/standalone/deployments/ && \
     mv /folding-stats/folding-stats-war/target/folding-stats-war*.war /opt/jboss/wildfly/standalone/deployments/folding-stats-war.war && \
     mv /folding-stats/stubbed-folding-endpoints-war/target/stubbed-folding-endpoints-war*.war /opt/jboss/wildfly/standalone/deployments/stubbed-folding-endpoints-war.war && \
-    rm -rf /folding-stats/ "${MAVEN_CONFIG}" "${MAVEN_HOME}"
+    rm -rf /folding-stats/
 
 FROM jboss/wildfly:24.0.0.Final
 

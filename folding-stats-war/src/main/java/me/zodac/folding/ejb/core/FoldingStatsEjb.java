@@ -116,6 +116,17 @@ public class FoldingStatsEjb implements FoldingStatsCore {
         return updatedHardware;
     }
 
+    private Collection<User> getUsersWithHardware(final Hardware hardware) {
+        if (hardware.getId() == Hardware.EMPTY_HARDWARE_ID) {
+            return Collections.emptyList();
+        }
+
+        return getAllUsersWithPasskeys()
+            .stream()
+            .filter(user -> user.getHardware().getId() == hardware.getId())
+            .collect(toList());
+    }
+
     @Override
     public void deleteHardware(final Hardware hardware) {
         STORAGE.deleteHardware(hardware.getId());
@@ -224,18 +235,6 @@ public class FoldingStatsEjb implements FoldingStatsCore {
     }
 
     @Override
-    public Collection<User> getUsersWithHardware(final Hardware hardware) {
-        if (hardware.getId() == Hardware.EMPTY_HARDWARE_ID) {
-            return Collections.emptyList();
-        }
-
-        return getAllUsersWithPasskeys()
-            .stream()
-            .filter(user -> user.getHardware().getId() == hardware.getId())
-            .collect(toList());
-    }
-
-    @Override
     public Collection<User> getUsersOnTeam(final Team team) {
         if (team.getId() == Team.EMPTY_TEAM_ID) {
             return Collections.emptyList();
@@ -267,14 +266,6 @@ public class FoldingStatsEjb implements FoldingStatsCore {
     @Override
     public Optional<MonthlyResult> getMonthlyResult(final Month month, final Year year) {
         return STORAGE.getMonthlyResult(month, year);
-    }
-
-    @Override
-    public Collection<RetiredUserTcStats> getAllRetiredUsersForTeam(final Team team) {
-        return STORAGE.getAllRetiredUsers()
-            .stream()
-            .filter(retiredUserTcStats -> retiredUserTcStats.getTeamId() == team.getId())
-            .collect(toList());
     }
 
     @Override
@@ -323,12 +314,6 @@ public class FoldingStatsEjb implements FoldingStatsCore {
     @Override
     public UserStats createTotalStats(final UserStats userStats) {
         return STORAGE.createTotalStats(userStats);
-    }
-
-    @Override
-    public UserStats getTotalStats(final User user) {
-        return STORAGE.getTotalStats(user.getId())
-            .orElse(UserStats.empty());
     }
 
     @Override
@@ -394,6 +379,11 @@ public class FoldingStatsEjb implements FoldingStatsCore {
         STORAGE.evictInitialStatsCache();
     }
 
+    private static UserStats getTotalStats(final User user) {
+        return STORAGE.getTotalStats(user.getId())
+            .orElse(UserStats.empty());
+    }
+
     @Override
     public CompetitionSummary getCompetitionSummary() {
         if (SystemStateManager.current() != SystemState.WRITE_EXECUTED) {
@@ -448,6 +438,13 @@ public class FoldingStatsEjb implements FoldingStatsCore {
 
         final String captainDisplayName = getCaptainDisplayName(team.getTeamName(), usersOnTeam);
         return TeamSummary.createWithDefaultRank(team, captainDisplayName, activeUserSummaries, retiredUserSummaries);
+    }
+
+    private Collection<RetiredUserTcStats> getAllRetiredUsersForTeam(final Team team) {
+        return STORAGE.getAllRetiredUsers()
+            .stream()
+            .filter(retiredUserTcStats -> retiredUserTcStats.getTeamId() == team.getId())
+            .collect(toList());
     }
 
     private UserSummary getTcStatsForUser(final User user) {

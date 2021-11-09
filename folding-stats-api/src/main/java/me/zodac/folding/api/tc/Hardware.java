@@ -31,7 +31,6 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import me.zodac.folding.api.RequestPojo;
 import me.zodac.folding.api.ResponsePojo;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 
@@ -163,14 +162,17 @@ public class Hardware implements ResponsePojo {
         );
     }
 
-    @Override
-    public boolean isEqualRequest(final RequestPojo inputRequest) {
-        if (!(inputRequest instanceof HardwareRequest)) {
-            return false;
-        }
-
-        final HardwareRequest hardwareRequest = (HardwareRequest) inputRequest;
-
+    /**
+     * Checks if the input {@link HardwareRequest} is equal to the {@link Hardware}.
+     *
+     * <p>
+     * While the {@link HardwareRequest} will likely not be a complete match, there should be enough fields to verify
+     * if it is the same as an existing {@link Hardware}.
+     *
+     * @param hardwareRequest input {@link HardwareRequest}
+     * @return <code>true</code> if the input{@link HardwareRequest} is equal to the {@link Hardware}
+     */
+    public boolean isEqualRequest(final HardwareRequest hardwareRequest) {
         return Double.compare(multiplier, hardwareRequest.getMultiplier()) == 0
             && Objects.equals(hardwareName, hardwareRequest.getHardwareName())
             && Objects.equals(displayName, hardwareRequest.getDisplayName())

@@ -39,10 +39,10 @@ public enum CacheControl {
     /**
      * Constructs a {@link CacheControl} with the header value as a {@link String}.
      *
-     * @param cacheControl the {@link CacheControl} value as a {@link String}
+     * @param cacheControlValue the {@link CacheControl} value as a {@link String}
      */
-    CacheControl(final String cacheControl) {
-        cacheControlValue = cacheControl;
+    CacheControl(final String cacheControlValue) {
+        this.cacheControlValue = cacheControlValue;
     }
 
     /**

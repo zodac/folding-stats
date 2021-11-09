@@ -64,20 +64,10 @@ public class Stats {
     }
 
     /**
-     * Creates an empty instance of {@link Stats}, with no values. Can be used where no {@link Stats} are necessary, but
-     * an {@link java.util.Optional} is not clean enough.
-     *
-     * @return the empty {@link Stats}
-     */
-    public static Stats empty() {
-        return create(DEFAULT_POINTS, DEFAULT_UNITS);
-    }
-
-    /**
      * Checks if the {@link Stats} instance has both {@code points} set to <b>0L</b> and {@code unitsOffset} set to
      * <b>0</b>.
      *
-     * @return <code>true</code> if the {@link Stats} instance is {@link Stats#empty()}
+     * @return <code>true</code> if the {@link Stats} instance is empty
      */
     public boolean isEmpty() {
         return points == DEFAULT_POINTS && units == DEFAULT_UNITS;

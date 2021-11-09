@@ -113,13 +113,4 @@ public class BaseCache<V> {
     public void removeAll() {
         elementsById.clear();
     }
-
-    /**
-     * Checks if there is any content in the cache.
-     *
-     * @return <code>true</code> if the cache is empty
-     */
-    public boolean isEmpty() {
-        return elementsById.isEmpty();
-    }
 }

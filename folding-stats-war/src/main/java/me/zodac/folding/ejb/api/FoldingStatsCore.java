@@ -197,14 +197,6 @@ public interface FoldingStatsCore {
     void deleteUser(final User user);
 
     /**
-     * Retrieves all {@link User}s currently referencing the provided {@link Hardware}.
-     *
-     * @param hardware the {@link Hardware} to check for
-     * @return a {@link Collection} of {@link User}s using the {@link Hardware}
-     */
-    Collection<User> getUsersWithHardware(final Hardware hardware);
-
-    /**
      * Retrieves all {@link User}s currently referencing the provided {@link Team}.
      *
      * <p>
@@ -242,14 +234,6 @@ public interface FoldingStatsCore {
      * @return an {@link Optional} of the <code>Team Competition</code> {@link MonthlyResult}
      */
     Optional<MonthlyResult> getMonthlyResult(final Month month, final Year year);
-
-    /**
-     * Retrieves all {@link RetiredUserTcStats} for the provided {@link Team}.
-     *
-     * @param team the {@link Team} whose retired users are to be found
-     * @return a {@link Collection} of the retrieved {@link RetiredUserTcStats}
-     */
-    Collection<RetiredUserTcStats> getAllRetiredUsersForTeam(final Team team);
 
     /**
      * Authenticates a system user and retrieves its roles.
@@ -305,14 +289,6 @@ public interface FoldingStatsCore {
      * @return the created {@link UserStats}
      */
     UserStats createTotalStats(final UserStats userStats);
-
-    /**
-     * Retrieves the total {@link UserStats} for the provided {@link User}.
-     *
-     * @param user the {@link User} whose {@link UserStats} are to be retrieved
-     * @return the {@link UserStats} for the {@link User}, or {@link UserStats#empty()} if none can be found
-     */
-    UserStats getTotalStats(final User user);
 
     /**
      * Creates an {@link OffsetTcStats}, defining the offset points/units for the provided {@link User}.
@@ -394,7 +370,7 @@ public interface FoldingStatsCore {
      *          Zeroes each {@link User}'s {@link UserTcStats} by setting their initial {@link UserStats} to their current total {@link UserStats}.
      * <p>
      *          <b>NOTE:</b> This does not retrieve the latest online {@link UserStats} for the {@link User}, it simply retrieves the latest total
-     *          {@link UserStats} available on the system from {@link #getTotalStats(User)}.
+     *          {@link UserStats} available on the system.
      *      </li>
      *      <li>
      *          Deletes any {@link OffsetTcStats} for the {@link User}s.

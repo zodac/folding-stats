@@ -14,7 +14,7 @@ available online:
 ## Licences
 
 All source code should have a license header at the top of the file. This will be enforced by the `license-maven-plugin` linter. In order to
-automatically add a license to any file that is missing it, the follwing command can be used:
+automatically add a license to any file that is missing it, the following command can be used:
 
     mvn license:format
 

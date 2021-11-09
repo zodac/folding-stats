@@ -25,7 +25,6 @@
 package me.zodac.folding.rest.api.tc.historic;
 
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -73,15 +72,6 @@ public class HistoricStats {
      */
     public static HistoricStats create(final LocalDateTime dateTime, final long points, final long multipliedPoints, final int units) {
         return new HistoricStats(dateTime.truncatedTo(ChronoUnit.HOURS), points, multipliedPoints, units);
-    }
-
-    /**
-     * Creates an empty instance of {@link HistoricStats} with default values.
-     *
-     * @return {@link HistoricStats} with default values
-     */
-    public static HistoricStats empty() {
-        return create(LocalDateTime.now(ZoneOffset.UTC), DEFAULT_POINTS, DEFAULT_MULTIPLIED_POINTS, DEFAULT_UNITS);
     }
 
     /**

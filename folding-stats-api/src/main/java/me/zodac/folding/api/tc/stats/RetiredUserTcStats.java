@@ -114,13 +114,4 @@ public class RetiredUserTcStats extends UserTcStats {
             retiredUserTcStats
         );
     }
-
-    /**
-     * Creates an empty instance of {@link RetiredUserTcStats}, with no values.
-     *
-     * @return the empty {@link RetiredUserTcStats}
-     */
-    public static RetiredUserTcStats empty() {
-        return create(EMPTY_RETIRED_USER_ID, EMPTY_TEAM_ID, DEFAULT_DISPLAY_NAME, UserTcStats.empty());
-    }
 }

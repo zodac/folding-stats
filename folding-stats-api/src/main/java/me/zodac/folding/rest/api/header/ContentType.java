@@ -32,22 +32,17 @@ public enum ContentType {
     /**
      * The <code>application/json</code> value.
      */
-    JSON("application/json"),
-
-    /**
-     * The <code>text/plain</code> value.
-     */
-    TEXT("text/plain");
+    JSON("application/json");
 
     private final String contentTypeValue;
 
     /**
      * Constructs a {@link ContentType} with the header value as a {@link String}.
      *
-     * @param contentType the {@link ContentType} value as a {@link String}
+     * @param contentTypeValue the {@link ContentType} value as a {@link String}
      */
-    ContentType(final String contentType) {
-        contentTypeValue = contentType;
+    ContentType(final String contentTypeValue) {
+        this.contentTypeValue = contentTypeValue;
     }
 
     /**

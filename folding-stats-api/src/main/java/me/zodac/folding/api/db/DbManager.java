@@ -72,7 +72,7 @@ public interface DbManager {
     Optional<Hardware> getHardware(final int hardwareId);
 
     /**
-     * Updates an existing {@link Hardware} in the system, matching on {@link Hardware#getId()}.
+     * Updates an existing {@link Hardware} in the system, matching on ID.
      *
      * @param hardwareToUpdate the updated {@link Hardware} to be persisted in the DB
      * @return the updated {@link Hardware}
@@ -110,7 +110,7 @@ public interface DbManager {
     Optional<Team> getTeam(final int teamId);
 
     /**
-     * Updates an existing {@link Team} in the system, matching on {@link Team#getId()}.
+     * Updates an existing {@link Team} in the system, matching on ID.
      *
      * @param teamToUpdate the updated {@link Team} to be persisted in the DB
      * @return the updated {@link Team}
@@ -148,7 +148,7 @@ public interface DbManager {
     Optional<User> getUser(final int userId);
 
     /**
-     * Updates an existing {@link User} in the system, matching on {@link User#getId()}.
+     * Updates an existing {@link User} in the system, matching on ID.
      *
      * @param userToUpdate the updated {@link User} to be persisted in the DB
      * @return the updated {@link User}

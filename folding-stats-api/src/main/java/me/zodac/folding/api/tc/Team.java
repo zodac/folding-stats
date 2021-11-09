@@ -31,7 +31,6 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import me.zodac.folding.api.RequestPojo;
 import me.zodac.folding.api.ResponsePojo;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
 
@@ -125,13 +124,17 @@ public class Team implements ResponsePojo {
         return input == null || input.isBlank();
     }
 
-    @Override
-    public boolean isEqualRequest(final RequestPojo inputRequest) {
-        if (!(inputRequest instanceof TeamRequest)) {
-            return false;
-        }
-
-        final TeamRequest teamRequest = (TeamRequest) inputRequest;
+    /**
+     * Checks if the input {@link TeamRequest} is equal to the {@link Team}.
+     *
+     * <p>
+     * While the {@link TeamRequest} will likely not be a complete match, there should be enough fields to verify
+     * if it is the same as an existing {@link Team}.
+     *
+     * @param teamRequest input {@link TeamRequest}
+     * @return <code>true</code> if the input{@link TeamRequest} is equal to the {@link Team}
+     */
+    public boolean isEqualRequest(final TeamRequest teamRequest) {
         return Objects.equals(teamName, teamRequest.getTeamName())
             && Objects.equals(teamDescription, teamRequest.getTeamDescription())
             && Objects.equals(forumLink, teamRequest.getForumLink());

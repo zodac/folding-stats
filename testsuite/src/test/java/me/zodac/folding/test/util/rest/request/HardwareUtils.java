@@ -90,21 +90,4 @@ public final class HardwareUtils {
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.getAll();
         return getTotalCount(response);
     }
-
-    /**
-     * Retrieves a {@link Hardware} with the given ID.
-     *
-     * @param hardwareId the ID of the {@link Hardware} to retrieve
-     * @return the {@link Hardware}
-     * @throws FoldingRestException thrown if an error occurs retrieving the {@link Hardware}
-     */
-    public static Hardware get(final int hardwareId) throws FoldingRestException {
-        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get(hardwareId);
-        if (response.statusCode() == HttpURLConnection.HTTP_OK) {
-            return HardwareResponseParser.get(response);
-        }
-
-        throw new FoldingRestException(
-            String.format("Invalid response (%s) when getting hardware with ID %s: %s", response.statusCode(), hardwareId, response.body()));
-    }
 }

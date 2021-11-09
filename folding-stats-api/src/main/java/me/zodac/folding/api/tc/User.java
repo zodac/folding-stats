@@ -31,7 +31,6 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import me.zodac.folding.api.RequestPojo;
 import me.zodac.folding.api.ResponsePojo;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 
@@ -237,14 +236,17 @@ public class User implements ResponsePojo {
         return input == null || input.isBlank();
     }
 
-    @Override
-    public boolean isEqualRequest(final RequestPojo inputRequest) {
-        if (!(inputRequest instanceof UserRequest)) {
-            return false;
-        }
-
-        final UserRequest userRequest = (UserRequest) inputRequest;
-
+    /**
+     * Checks if the input {@link UserRequest} is equal to the {@link User}.
+     *
+     * <p>
+     * While the {@link UserRequest} will likely not be a complete match, there should be enough fields to verify
+     * if it is the same as an existing {@link User}.
+     *
+     * @param userRequest input {@link UserRequest}
+     * @return <code>true</code> if the input{@link UserRequest} is equal to the {@link User}
+     */
+    public boolean isEqualRequest(final UserRequest userRequest) {
         return hardware.getId() == userRequest.getHardwareId()
             && team.getId() == userRequest.getTeamId()
             && userIsCaptain == userRequest.isUserIsCaptain()

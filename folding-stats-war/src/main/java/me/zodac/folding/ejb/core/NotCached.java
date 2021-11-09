@@ -29,7 +29,8 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 
 /**
- * Marker annotation to define a function in {@link Storage} that persists and retrieves data from a database, but does <b>not</b> cache that data locally.
+ * Marker annotation to define a function in {@link Storage} that persists and retrieves data from a database, but does <b>not</b> cache that data
+ * locally.
  */
 @Documented
 @Target(ElementType.METHOD)
