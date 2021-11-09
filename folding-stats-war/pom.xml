@@ -13,6 +13,10 @@
     <packaging>war</packaging>
     <name>[${project.parent.artifactId}] WAR module</name>
 
+    <properties>
+        <skip-license>false</skip-license>
+    </properties>
+
     <dependencies>
         <!-- Project Dependencies -->
         <dependency>

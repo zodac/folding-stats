@@ -12,6 +12,10 @@
     <artifactId>testsuite</artifactId>
     <name>[${project.parent.artifactId}] TestSuite module</name>
 
+    <properties>
+        <skip-license>false</skip-license>
+    </properties>
+
     <dependencies>
         <!-- Project Dependencies -->
         <dependency>
