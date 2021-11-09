@@ -405,6 +405,7 @@ class TeamValidatorTest {
             .build();
 
         final Collection<User> allUsers = List.of(User.builder()
+            .passkey("DummyPasskey12345678901234567890")
             .team(existingTeam)
             .build()
         );
@@ -413,6 +414,13 @@ class TeamValidatorTest {
 
         assertThat(response.isFailure())
             .isTrue();
+
+        assertThat(response.getErrors())
+            .as("Response" + response.getFailureResponse().getEntity())
+            .containsOnly("Payload is used by an existing object");
+
+        assertThat((String) response.getFailureResponse().getEntity())
+            .doesNotContain("DummyPasskey12345678901234567890");
     }
 
     @Test

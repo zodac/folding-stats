@@ -192,6 +192,7 @@ public final class HardwareValidator {
         return allUsers
             .stream()
             .filter(user -> user.getHardware().getId() == hardwareId)
+            .map(User::hidePasskey)
             .collect(toList());
     }
 

@@ -169,6 +169,7 @@ public final class TeamValidator {
         return allUsers
             .stream()
             .filter(user -> user.getTeam().getId() == teamId)
+            .map(User::hidePasskey)
             .collect(toList());
     }
 
