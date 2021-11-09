@@ -189,7 +189,6 @@ function loadCategoryLeaderboard(jsonResponse) {
     });
 };
 
-// TODO: [zodac] Replace with inputs of date/time/datetime
 function populateMonthDropdown() {
     var dropdownId = "month_dropdown"
     var dropdown = document.getElementById(dropdownId);
