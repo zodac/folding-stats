@@ -25,10 +25,10 @@ import org.apache.commons.validator.routines.UrlValidator;
 /**
  * Validator class to validate a {@link User} or {@link UserRequest}.
  */
-// TODO: [zodac] foldingUserName cannot have a space? Must be alphanumeric only I think?
 public final class UserValidator {
 
     private static final UrlValidator URL_VALIDATOR = new UrlValidator();
+    private static final Pattern FOLDING_USER_NAME_PATTERN = Pattern.compile("^[a-zA-Z0-9._-]*$");
     private static final Pattern PASSKEY_PATTERN = Pattern.compile("[a-zA-Z0-9]{32}");
 
     private final FoldingStatsRetriever foldingStatsRetriever;
@@ -70,7 +70,7 @@ public final class UserValidator {
      * Validation checks include:
      * <ul>
      *     <li>Input {@code userRequest} must not be <b>null</b></li>
-     *     <li>Field 'foldingUserName' must not be empty</li>
+     *     <li>Field 'foldingUserName' must not be empty, must only include alphanumeric characters or underscore (_), period (.) or hyphen (-)</li>
      *     <li>Field 'displayName' must not be empty</li>
      *     <li>Field 'passkey' must not be empty, must be 32-characters long, and must only include alphanumeric characters</li>
      *     <li>If fields 'foldingUserName' and 'passkey' are valid, they must not be used by another {@link User}</li>
@@ -388,9 +388,9 @@ public final class UserValidator {
     }
 
     private static String foldingUserName(final UserRequest userRequest) {
-        return StringUtils.isNotBlank(userRequest.getFoldingUserName())
-            ? null
-            : "Field 'foldingUserName' must not be empty";
+        return StringUtils.isBlank(userRequest.getFoldingUserName()) || !FOLDING_USER_NAME_PATTERN.matcher(userRequest.getFoldingUserName()).find()
+            ? "Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen"
+            : null;
     }
 
     private static String displayName(final UserRequest userRequest) {

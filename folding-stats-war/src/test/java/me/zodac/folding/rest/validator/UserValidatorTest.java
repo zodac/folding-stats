@@ -34,7 +34,7 @@ class UserValidatorTest {
         final Team team = generateTeam();
 
         final UserRequest user = UserRequest.builder()
-            .foldingUserName("user")
+            .foldingUserName("-folding.Name_1")
             .displayName("user")
             .passkey("DummyPasskey12345678901234567890")
             .category(Category.NVIDIA_GPU.toString())
@@ -132,7 +132,38 @@ class UserValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .containsOnly("Field 'foldingUserName' must not be empty");
+            .containsOnly("Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen");
+    }
+
+    @Test
+    void whenValidatingCreate_givenUserWithInvalidFoldingUserName_thenFailureResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
+
+        final UserRequest user = UserRequest.builder()
+            .foldingUserName("folding*Name")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardwareId(hardware.getId())
+            .teamId(team.getId())
+            .build();
+
+        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final ValidationResult<User> response = userValidator.validateCreate(user,
+            Collections.emptyList(),
+            List.of(hardware),
+            List.of(team)
+        );
+
+        assertThat(response.isFailure())
+            .isTrue();
+
+        assertThat(response.getErrors())
+            .containsOnly("Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen");
     }
 
     @Test
@@ -1235,7 +1266,50 @@ class UserValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .containsOnly("Field 'foldingUserName' must not be empty");
+            .containsOnly("Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen");
+    }
+
+    @Test
+    void whenValidatingUpdate_givenUserWithInvalidFoldingUserName_thenFailureResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
+
+        final UserRequest user = UserRequest.builder()
+            .foldingUserName("folding name")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardwareId(hardware.getId())
+            .teamId(team.getId())
+            .build();
+
+        final User existingUser = User.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU)
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardware(hardware)
+            .team(team)
+            .build();
+
+        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
+            List.of(existingUser),
+            List.of(hardware),
+            List.of(team)
+        );
+
+        assertThat(response.isFailure())
+            .isTrue();
+
+        assertThat(response.getErrors())
+            .containsOnly("Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen");
     }
 
     @Test
