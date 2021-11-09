@@ -1,4 +1,4 @@
-const ROOT_URL="%ROOT_URL%";
+const REST_ENDPOINT_URL="%REST_ENDPOINT_URL%";
 
 const NUMBER_OF_MONTHS = 12;
 const NUMBER_OF_YEARS_TO_SHOW = 2;
@@ -31,7 +31,7 @@ function getPastResult(month, monthName, year) {
     show("loader");
     hide("past_result");
 
-    fetch(ROOT_URL+"/results/result/" + selectedYear + "/" + selectedMonth)
+    fetch(REST_ENDPOINT_URL+"/results/result/" + selectedYear + "/" + selectedMonth)
     .then(response => {
         return response.json();
     })

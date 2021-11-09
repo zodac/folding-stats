@@ -32,17 +32,17 @@ import javax.ws.rs.ext.Provider;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
 
 /**
- * {@link Provider} used to handle invalid URL requests. Redirects to the main <code>Team Competition</code> homepage.
+ * {@link Provider} used to handle invalid URL requests. Redirects to the URL defined in environment variable <b>REDIRECT_URL</b>.
  */
 @Provider
 public class InvalidUrlRedirecter implements ExceptionMapper<NotFoundException> {
 
-    private static final String TC_HOMEPAGE_URL = EnvironmentVariableUtils.get("TC_HOMEPAGE_URL", "https://etf.axihub.ca/");
+    private static final String REDIRECT_URL = EnvironmentVariableUtils.get("REDIRECT_URL", "https://etf.axihub.ca/");
 
     @Override
     public Response toResponse(final NotFoundException e) {
         return Response
-            .seeOther(URI.create(TC_HOMEPAGE_URL))
+            .seeOther(URI.create(REDIRECT_URL))
             .build();
     }
 }

@@ -8,7 +8,7 @@ function populateUserDropdown(dropdownId) {
         dropdown.removeChild(dropdown.lastChild);
     }
 
-    fetch(ROOT_URL+"/users")
+    fetch(REST_ENDPOINT_URL+"/users")
     .then(response => {
         return response.json();
     })
@@ -35,7 +35,7 @@ function populateTeamDropdown(dropdownId) {
         dropdown.removeChild(dropdown.lastChild);
     }
 
-    fetch(ROOT_URL+"/teams")
+    fetch(REST_ENDPOINT_URL+"/teams")
     .then(response => {
         return response.json();
     })

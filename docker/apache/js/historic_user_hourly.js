@@ -1,4 +1,4 @@
-const ROOT_URL="%ROOT_URL%";
+const REST_ENDPOINT_URL="%REST_ENDPOINT_URL%";
 
 var currentDate = new Date();
 var currentUtcDate = new Date(currentDate.getUTCFullYear(), currentDate.getUTCMonth(), currentDate.getUTCDate(), currentDate.getUTCHours(), currentDate.getUTCMinutes(), currentDate.getUTCSeconds());
@@ -54,7 +54,7 @@ function getUserHistoricStats(userId, userName, day, month, monthName, year) {
     show("loader");
     hide("historic_stats");
 
-    fetch(ROOT_URL+"/historic/users/" + selectedUserId + "/" + selectedYear + "/" + selectedMonth + "/" + selectedDay)
+    fetch(REST_ENDPOINT_URL+"/historic/users/" + selectedUserId + "/" + selectedYear + "/" + selectedMonth + "/" + selectedDay)
     .then(response => {
         return response.json();
     })

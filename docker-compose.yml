@@ -7,10 +7,10 @@ services:
       context: .
       dockerfile: docker/apache/Dockerfile
       args:
-        FIRST_DAY_OF_MONTH: "3"
-        ROOT_URL: "https://internal.axihub.ca/folding"
-        UPDATE_ENABLED: "true"
-        UPDATE_MINUTE: "55"
+        FIRST_DAY_OF_MONTH: "${FIRST_DAY_OF_MONTH}"
+        REST_ENDPOINT_URL: "${REST_ENDPOINT_URL}"
+        UPDATE_ENABLED: "${STATS_ENABLED}"
+        UPDATE_MINUTE: "${UPDATE_MINUTE}"
     container_name: frontend
     hostname: frontend
     depends_on:
@@ -20,7 +20,7 @@ services:
     networks:
       - production
     ports:
-      - "443:443"
+      - "${HTTPS_FRONTEND_PORT}:${HTTPS_FRONTEND_PORT}"
     volumes:
       - "${SSL_CERT_DIRECTORY}:/usr/local/apache2/conf/certs"
 
@@ -36,33 +36,33 @@ services:
     hostname: backend
     environment:
       # Container configuration
-      JAVA_OPTS: -Xms512m -Xmx2g -Djava.net.preferIPv4Stack=true
+      JAVA_OPTS: -Xms${JAVA_XMS} -Xmx${JAVA_XMX} -Djava.net.preferIPv4Stack=true
       # External URL configuration
-      LARS_URL_ROOT: "https://folding.lar.systems/"
-      STATS_URL_ROOT: "https://api2.foldingathome.org"
-      TC_HOMEPAGE_URL: "https://etf.axihub.ca/"
+      LARS_URL_ROOT: "${LARS_URL_ROOT}"
+      STATS_URL_ROOT: "${STATS_URL_ROOT}"
+      REDIRECT_URL: "${REDIRECT_URL}"
       # NOTE: The monthly reset, result storage and LARS update will always occur at 23:57 on the last day of the month
-      ENABLE_STATS_MONTHLY_RESET: "true"
-      ENABLE_MONTHLY_RESULT_STORAGE: "true"
-      ENABLE_LARS_HARDWARE_UPDATE: "true"
+      ENABLE_LARS_HARDWARE_UPDATE: "${ENABLE_LARS_HARDWARE_UPDATE}"
+      ENABLE_MONTHLY_RESULT_STORAGE: "${ENABLE_MONTHLY_RESULT_STORAGE}"
+      ENABLE_STATS_MONTHLY_RESET: "${ENABLE_STATS_MONTHLY_RESET}"
       # Scheduled stats parsing configuration
       # This value should match the value of 'UPDATE_ENABLED' in the 'frontend' container
-      ENABLE_STATS_SCHEDULED_PARSING: "true"
-      STATS_PARSING_SCHEDULE_HOUR: "*"
+      ENABLE_STATS_SCHEDULED_PARSING: "${STATS_ENABLED}"
+      STATS_PARSING_SCHEDULE_HOUR: "${UPDATE_HOUR}"
       # This value should match the value of 'UPDATE_MINUTE' in the 'frontend' container
-      STATS_PARSING_SCHEDULE_MINUTE: "55"
-      STATS_PARSING_SCHEDULE_SECOND: "0"
+      STATS_PARSING_SCHEDULE_MINUTE: "${UPDATE_MINUTE}"
+      STATS_PARSING_SCHEDULE_SECOND: "${UPDATE_SECOND}"
       # This value should match the value of 'FIRST_DAY_OF_MONTH' in the 'frontend' container
-      STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH: "3"
-      STATS_PARSING_SCHEDULE_LAST_DAY_OF_MONTH: "31"
+      STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH: "${FIRST_DAY_OF_MONTH}"
+      STATS_PARSING_SCHEDULE_LAST_DAY_OF_MONTH: "${LAST_DAY_OF_MONTH}"
       # Database configuration
       DEPLOYED_DATABASE: "postgresql"
-      JDBC_CONNECTION_URL: "jdbc:postgresql://database:5432/folding_db"
+      JDBC_CONNECTION_URL: "jdbc:postgresql://database:${POSTGRES_PORT}/${POSTGRES_DB_NAME}"
       JDBC_CONNECTION_USER: "${DB_USER}"
       JDBC_CONNECTION_PASSWORD: "${DB_PASSWORD}"
       JDBC_CONNECTION_DRIVER: "org.postgresql.Driver"
     healthcheck:
-      test: curl -k --fail https://localhost:8443/folding || exit 1
+      test: curl -k --fail https://localhost:${HTTPS_BACKEND_PORT}/folding || exit 1
       interval: 15s
       timeout: 10s
       retries: 30
@@ -71,8 +71,8 @@ services:
     networks:
       - production
     ports:
-      - "8443:8443"
-      - "9990:9990"
+      - "${HTTPS_BACKEND_PORT}:${HTTPS_BACKEND_PORT}"
+      - "${ADMIN_CONSOLE_PORT}:${ADMIN_CONSOLE_PORT}"
     volumes:
       - backend_logs:/opt/jboss/wildfly/standalone/log
 
@@ -89,13 +89,13 @@ services:
     hostname: database
     environment:
       # First 4 variables used to configure DB
-      POSTGRES_DB: "folding_db"
+      POSTGRES_DB: "${POSTGRES_DB_NAME}"
       POSTGRES_USER: "${DB_USER}"
       POSTGRES_PASSWORD: "${DB_PASSWORD}"
-      POSTGRES_PORT: "5432"
+      POSTGRES_PORT: "${POSTGRES_PORT}"
       PGDATA: "/var/lib/postgresql/data/pgdata"
       # Next 3 variables needed to avoid "FATAL role 'root' does not exist" error
-      PGDATABASE: "folding_db"
+      PGDATABASE: "${POSTGRES_DB_NAME}"
       PGUSER: "${DB_USER}"
       PGPASSWORD: "${DB_PASSWORD}"
     healthcheck:
@@ -106,7 +106,7 @@ services:
     networks:
       - production
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
     restart: always
     volumes:
       - database_content:/var/lib/postgresql/data

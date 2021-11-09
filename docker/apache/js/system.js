@@ -1,4 +1,4 @@
-const ROOT_URL="%ROOT_URL%";
+const REST_ENDPOINT_URL="%REST_ENDPOINT_URL%";
 
 // The 'toggle' functions below simply change the colour of the buttons. There must be a smarter way to do this...
 function toggleMainButtonStyle(id, classList){
@@ -26,7 +26,7 @@ function adminLogin(){
 
     show("loader");
 
-    fetch(ROOT_URL+"/login/admin", {
+    fetch(REST_ENDPOINT_URL+"/login/admin", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -57,7 +57,7 @@ function adminLogin(){
 
 function manualUpdate() {
     show("loader");
-    fetch(ROOT_URL+"/stats/manual/update", {
+    fetch(REST_ENDPOINT_URL+"/stats/manual/update", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -86,7 +86,7 @@ function manualUpdate() {
 
 function manualLars() {
     show("loader");
-    fetch(ROOT_URL+"/debug/lars", {
+    fetch(REST_ENDPOINT_URL+"/debug/lars", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -115,7 +115,7 @@ function manualLars() {
 
 function manualResultSave() {
     show("loader");
-    fetch(ROOT_URL+"/results/manual/save", {
+    fetch(REST_ENDPOINT_URL+"/results/manual/save", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -144,7 +144,7 @@ function manualResultSave() {
 
 function printCaches() {
     show("loader");
-    fetch(ROOT_URL+"/debug/caches", {
+    fetch(REST_ENDPOINT_URL+"/debug/caches", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -172,7 +172,7 @@ function printCaches() {
 }
 
 function loadHardware() {
-    fetch(ROOT_URL+"/hardware")
+    fetch(REST_ENDPOINT_URL+"/hardware")
     .then(response => {
         return response.json();
     })
@@ -262,7 +262,7 @@ function loadHardware() {
 };
 
 function loadUsers() {
-    fetch(ROOT_URL+"/users")
+    fetch(REST_ENDPOINT_URL+"/users")
     .then(response => {
         return response.json();
     })
@@ -361,7 +361,7 @@ function loadUsers() {
 };
 
 function loadTeams() {
-    fetch(ROOT_URL+"/teams")
+    fetch(REST_ENDPOINT_URL+"/teams")
     .then(response => {
         return response.json();
     })

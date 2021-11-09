@@ -8,7 +8,7 @@ RUN raml2html --input /docker/apache/raml/api.raml --output /docker/apache/api.h
 FROM mysocialobservations/docker-tdewolff-minify AS minifier
 
 ARG FIRST_DAY_OF_MONTH
-ARG ROOT_URL
+ARG REST_ENDPOINT_URL
 ARG UPDATE_ENABLED
 ARG UPDATE_MINUTE
 
@@ -21,7 +21,7 @@ COPY ./docker/apache/js /docker/apache/js
 
 # Replace environment arguments in JS files
 RUN grep -rl '%FIRST_DAY_OF_MONTH%' . | xargs sed -i "s|%FIRST_DAY_OF_MONTH%|${FIRST_DAY_OF_MONTH}|g" && \
-    grep -rl '%ROOT_URL%' . | xargs sed -i "s|%ROOT_URL%|${ROOT_URL}|g" && \
+    grep -rl '%REST_ENDPOINT_URL%' . | xargs sed -i "s|%REST_ENDPOINT_URL%|${REST_ENDPOINT_URL}|g" && \
     grep -rl '%UPDATE_ENABLED%' . | xargs sed -i "s|%UPDATE_ENABLED%|${UPDATE_ENABLED}|g" && \
     grep -rl '%UPDATE_MINUTE%' . | xargs sed -i "s|%UPDATE_MINUTE%|${UPDATE_MINUTE}|g"
 

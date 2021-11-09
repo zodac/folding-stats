@@ -1,4 +1,4 @@
-const ROOT_URL="%ROOT_URL%";
+const REST_ENDPOINT_URL="%REST_ENDPOINT_URL%";
 
 var selectedUserId = 0;
 var selectedUser = "";
@@ -28,7 +28,7 @@ function getUserHistoricStats(userId, userName, day, month, monthName, year) {
     show("loader");
     hide("historic_stats");
 
-    fetch(ROOT_URL+"/historic/users/" + selectedUserId + "/" + selectedYear)
+    fetch(REST_ENDPOINT_URL+"/historic/users/" + selectedUserId + "/" + selectedYear)
     .then(response => {
         return response.json();
     })

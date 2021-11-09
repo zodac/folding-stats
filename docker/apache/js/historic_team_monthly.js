@@ -1,4 +1,4 @@
-const ROOT_URL="%ROOT_URL%";
+const REST_ENDPOINT_URL="%REST_ENDPOINT_URL%";
 
 var selectedUserId = 0;
 var selectedUser = "";
@@ -10,7 +10,7 @@ function populateTeamDropdown() {
         dropdown.removeChild(dropdown.lastChild);
     }
 
-    fetch(ROOT_URL+"/teams")
+    fetch(REST_ENDPOINT_URL+"/teams")
     .then(response => {
         return response.json();
     })
@@ -61,7 +61,7 @@ function getTeamHistoricStats(teamId, teamName, day, month, monthName, year) {
     show("loader");
     hide("historic_stats");
 
-    fetch(ROOT_URL+"/historic/teams/" + selectedTeamId + "/" + selectedYear)
+    fetch(REST_ENDPOINT_URL+"/historic/teams/" + selectedTeamId + "/" + selectedYear)
     .then(response => {
         return response.json();
     })

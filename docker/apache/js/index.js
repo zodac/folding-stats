@@ -1,4 +1,4 @@
-const ROOT_URL="%ROOT_URL%";
+const REST_ENDPOINT_URL="%REST_ENDPOINT_URL%";
 
 // The 'toggle' functions below simply change the colour of the buttons. There must be a smarter way to do this...
 function toggleMainButtonStyle(id, classList){
@@ -26,7 +26,7 @@ function toggleTeam(teamNumber, classList) {
 }
 
 function loadOverallStats() {
-    fetch(ROOT_URL+'/stats')
+    fetch(REST_ENDPOINT_URL+'/stats')
         .then(response => {
             return response.json();
         })
@@ -82,7 +82,7 @@ function loadOverallStats() {
 };
 
 function loadTeamLeaderboard() {
-    fetch(ROOT_URL+"/stats/leaderboard")
+    fetch(REST_ENDPOINT_URL+"/stats/leaderboard")
     .then(response => {
         return response.json();
     })
@@ -149,7 +149,7 @@ function loadTeamLeaderboard() {
 };
 
 function loadCategoryLeaderboard() {
-    fetch(ROOT_URL+"/stats/category")
+    fetch(REST_ENDPOINT_URL+"/stats/category")
     .then(response => {
         return response.json();
     })
@@ -226,7 +226,7 @@ function loadCategoryLeaderboard() {
 };
 
 function loadTeamStats() {
-    fetch(ROOT_URL+'/stats')
+    fetch(REST_ENDPOINT_URL+'/stats')
     .then(response => {
         return response.json();
     })

@@ -13,7 +13,7 @@ function populateHardwareUpdate(){
 
     show("loader");
 
-    fetch(ROOT_URL+"/hardware/fields?hardwareName=" + hardwareName)
+    fetch(REST_ENDPOINT_URL+"/hardware/fields?hardwareName=" + hardwareName)
     .then(response => {
         return response.json();
     })
@@ -49,7 +49,7 @@ function populateHardwareDelete(){
 
     show("loader");
 
-    fetch(ROOT_URL+"/hardware/fields?hardwareName=" + hardwareName)
+    fetch(REST_ENDPOINT_URL+"/hardware/fields?hardwareName=" + hardwareName)
     .then(response => {
         return response.json();
     })
@@ -85,7 +85,7 @@ function populateTeamUpdate(){
 
     show("loader");
 
-    fetch(ROOT_URL+"/teams/fields?teamName=" + teamName)
+    fetch(REST_ENDPOINT_URL+"/teams/fields?teamName=" + teamName)
     .then(response => {
         return response.json();
     })
@@ -123,7 +123,7 @@ function populateTeamDelete(){
 
     show("loader");
 
-    fetch(ROOT_URL+"/teams/fields?teamName=" + teamName)
+    fetch(REST_ENDPOINT_URL+"/teams/fields?teamName=" + teamName)
     .then(response => {
         return response.json();
     })
@@ -162,7 +162,7 @@ function populateUserUpdate(){
     show("loader");
 
     var userId = input.split(":")[0];
-    fetch(ROOT_URL+"/users/" + userId)
+    fetch(REST_ENDPOINT_URL+"/users/" + userId)
     .then(response => {
         return response.json();
     })
@@ -189,14 +189,14 @@ function populateUserUpdate(){
         var hardwareId = jsonResponse['hardware']['id'];
         var teamId = jsonResponse['team']['id'];
 
-        fetch(ROOT_URL+"/hardware/" + hardwareId)
+        fetch(REST_ENDPOINT_URL+"/hardware/" + hardwareId)
         .then(response => {
             return response.json();
         })
         .then(function(jsonResponse) {
             document.getElementById("user_update_hardware_selector_input").value = jsonResponse['hardwareName'];
 
-            fetch(ROOT_URL+"/teams/" + teamId)
+            fetch(REST_ENDPOINT_URL+"/teams/" + teamId)
             .then(response => {
                 return response.json();
             })
@@ -229,7 +229,7 @@ function populateUserDelete(){
     show("loader");
 
     var userId = input.split(":")[0];
-    fetch(ROOT_URL+"/users/" + userId)
+    fetch(REST_ENDPOINT_URL+"/users/" + userId)
     .then(response => {
         return response.json();
     })
@@ -256,14 +256,14 @@ function populateUserDelete(){
         var hardwareId = jsonResponse['hardware']['id'];
         var teamId = jsonResponse['team']['id'];
 
-        fetch(ROOT_URL+"/hardware/" + hardwareId)
+        fetch(REST_ENDPOINT_URL+"/hardware/" + hardwareId)
         .then(response => {
             return response.json();
         })
         .then(function(jsonResponse) {
             document.getElementById("user_delete_hardware_selector_input").value = jsonResponse['hardwareName'];
 
-            fetch(ROOT_URL+"/teams/" + teamId)
+            fetch(REST_ENDPOINT_URL+"/teams/" + teamId)
             .then(response => {
                 return response.json();
             })
@@ -296,7 +296,7 @@ function populateUserOffset(){
     show("loader");
 
     var userId = input.split(":")[0];
-    fetch(ROOT_URL+"/users/" + userId)
+    fetch(REST_ENDPOINT_URL+"/users/" + userId)
     .then(response => {
         return response.json();
     })
@@ -309,7 +309,7 @@ function populateUserOffset(){
         var hardwareId = jsonResponse['hardware']['id'];
         var teamId = jsonResponse['team']['id'];
 
-        fetch(ROOT_URL+"/stats/users/" + userId)
+        fetch(REST_ENDPOINT_URL+"/stats/users/" + userId)
         .then(response => {
             return response.json();
         })
@@ -317,14 +317,14 @@ function populateUserOffset(){
             document.getElementById("user_offset_points").value = jsonResponse['multipliedPoints'].toLocaleString();
             document.getElementById("user_offset_units").value = jsonResponse['units'].toLocaleString();
 
-            fetch(ROOT_URL+"/hardware/" + hardwareId)
+            fetch(REST_ENDPOINT_URL+"/hardware/" + hardwareId)
             .then(response => {
                 return response.json();
             })
             .then(function(jsonResponse) {
                 document.getElementById("user_offset_hardware_selector_input").value = jsonResponse['hardwareName'];
 
-                fetch(ROOT_URL+"/teams/" + teamId)
+                fetch(REST_ENDPOINT_URL+"/teams/" + teamId)
                 .then(response => {
                     return response.json();
                 })
