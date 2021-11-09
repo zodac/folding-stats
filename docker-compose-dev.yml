@@ -7,7 +7,9 @@ services:
       context: .
       dockerfile: docker/apache/Dockerfile
       args:
+        FIRST_DAY_OF_MONTH: "3"
         ROOT_URL: "http://127.0.0.1:8081/folding"
+        UPDATE_ENABLED: "false"
         UPDATE_MINUTE: "55"
     container_name: frontend_dev
     hostname: frontend_dev

@@ -7,7 +7,9 @@ services:
       context: .
       dockerfile: docker/apache/Dockerfile
       args:
+        FIRST_DAY_OF_MONTH: "3"
         ROOT_URL: "https://internal.axihub.ca/folding"
+        UPDATE_ENABLED: "true"
         UPDATE_MINUTE: "55"
     container_name: frontend
     hostname: frontend
@@ -44,11 +46,13 @@ services:
       ENABLE_MONTHLY_RESULT_STORAGE: "true"
       ENABLE_LARS_HARDWARE_UPDATE: "true"
       # Scheduled stats parsing configuration
+      # This value should match the value of 'UPDATE_ENABLED' in the 'frontend' container
       ENABLE_STATS_SCHEDULED_PARSING: "true"
       STATS_PARSING_SCHEDULE_HOUR: "*"
       # This value should match the value of 'UPDATE_MINUTE' in the 'frontend' container
       STATS_PARSING_SCHEDULE_MINUTE: "55"
       STATS_PARSING_SCHEDULE_SECOND: "0"
+      # This value should match the value of 'FIRST_DAY_OF_MONTH' in the 'frontend' container
       STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH: "3"
       STATS_PARSING_SCHEDULE_LAST_DAY_OF_MONTH: "31"
       # Database configuration

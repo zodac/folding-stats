@@ -1,5 +1,8 @@
 const NUMBER_OF_UPDATES_PROPERTY_NAME = "numberOfUpdates";
+
+const FIRST_DAY_OF_MONTH = %FIRST_DAY_OF_MONTH%;
 const UPDATE_MINUTE = %UPDATE_MINUTE%;
+const UPDATE_ENABLED = %UPDATE_ENABLED%;
 
 function startTimer() {
     calculateNumberOfUpdates();
@@ -7,18 +10,19 @@ function startTimer() {
 }
 
 function calculateNumberOfUpdates() {
-    var now = new Date();
-    var startOfMonth = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, UPDATE_MINUTE, 0, 0);
+    now = new Date();
+
+    startOfMonth = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, UPDATE_MINUTE, 0, 0);
     seconds = Math.floor((now - (startOfMonth))/1000);
     minutes = seconds/60;
     hours = Math.floor(minutes/60);
 
     if (localContains(NUMBER_OF_UPDATES_PROPERTY_NAME)){
-        var previousNumber = localGet(NUMBER_OF_UPDATES_PROPERTY_NAME);
+        previousNumber = localGet(NUMBER_OF_UPDATES_PROPERTY_NAME);
 
         if(previousNumber < hours){
-            var diff = hours - previousNumber;
-            var updateCountToast = document.getElementById("toast-update-count-text");
+            diff = hours - previousNumber;
+            updateCountToast = document.getElementById("toast-update-count-text");
 
             if(diff == 1){
                 updateCountToast.innerHTML = diff.toLocaleString() + " update";
@@ -34,10 +38,15 @@ function calculateNumberOfUpdates() {
 }
 
 // https://stackoverflow.com/questions/37179899/countdown-timer-every-hour-but-on-30-minute-marks
-// TODO: [zodac] Disable if stats not running, or within 'off' dates
 function updateTimer() {
+    currentDayOfMonth = new Date().getDate();
+
+    if(!UPDATE_ENABLED || currentDayOfMonth < parseInt(FIRST_DAY_OF_MONTH)){
+        return;
+    }
+
     const zeroPad = (num, places) => String(num).padStart(places, '0')
-    var time = new Date(),
+    time = new Date()
     secsRemaining = 3600 - (time.getUTCMinutes()-UPDATE_MINUTE)%60 * 60 - time.getUTCSeconds();
     minutes = Math.floor(secsRemaining / 60) % 60;
     seconds = secsRemaining % 60;
