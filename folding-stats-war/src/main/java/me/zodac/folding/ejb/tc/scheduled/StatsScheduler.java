@@ -139,7 +139,7 @@ public class StatsScheduler {
 
     private void parseTcStatsForTeam(final Team team, final ProcessingType processingType) {
         LOGGER.debug("Getting TC stats for users in team {}", team::getTeamName);
-        final Collection<User> teamUsers = businessLogic.getUsersOnTeam(team);
+        final Collection<User> teamUsers = businessLogic.getUsersOnTeamWithPasskeys(team);
 
         if (teamUsers.isEmpty()) {
             LOGGER.warn("No users for team '{}'", team.getTeamName());

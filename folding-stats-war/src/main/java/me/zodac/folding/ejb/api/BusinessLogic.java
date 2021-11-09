@@ -180,10 +180,24 @@ public interface BusinessLogic {
     /**
      * Retrieves all {@link User}s currently referencing the provided {@link Team}.
      *
+     * <p>
+     * The {@link User} {@code passkey} will be masked with {@link User#hidePasskey(User)}.
+     *
      * @param team the {@link Team} to check for
      * @return a {@link Collection} of {@link User}s using the {@link Team}
      */
     Collection<User> getUsersOnTeam(final Team team);
+
+    /**
+     * Retrieves all {@link User}s currently referencing the provided {@link Team}.
+     *
+     * <p>
+     * The {@link User} {@code passkey} will be available in plaintext, so should only be used for internal processing.
+     *
+     * @param team the {@link Team} to check for
+     * @return a {@link Collection} of {@link User}s using the {@link Team}
+     */
+    Collection<User> getUsersOnTeamWithPasskeys(final Team team);
 
     /**
      * Creates a {@link MonthlyResult} for the <code>Team Competition</code>.

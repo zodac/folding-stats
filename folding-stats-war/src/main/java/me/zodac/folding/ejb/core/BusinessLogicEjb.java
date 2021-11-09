@@ -205,7 +205,7 @@ public class BusinessLogicEjb implements BusinessLogic {
             return Collections.emptyList();
         }
 
-        return getAllUsersWithoutPasskeys()
+        return getAllUsersWithPasskeys()
             .stream()
             .filter(user -> user.getHardware().getId() == hardware.getId())
             .collect(toList());
@@ -217,7 +217,19 @@ public class BusinessLogicEjb implements BusinessLogic {
             return Collections.emptyList();
         }
 
-        return getAllUsersWithoutPasskeys()
+        return getUsersOnTeamWithPasskeys(team)
+            .stream()
+            .map(User::hidePasskey)
+            .collect(toList());
+    }
+
+    @Override
+    public Collection<User> getUsersOnTeamWithPasskeys(final Team team) {
+        if (team.getId() == Team.EMPTY_TEAM_ID) {
+            return Collections.emptyList();
+        }
+
+        return getAllUsersWithPasskeys()
             .stream()
             .filter(user -> user.getTeam().getId() == team.getId())
             .collect(toList());

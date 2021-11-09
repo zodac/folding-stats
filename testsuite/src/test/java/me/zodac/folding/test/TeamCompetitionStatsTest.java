@@ -319,11 +319,11 @@ class TeamCompetitionStatsTest {
         final TeamSummary secondTeamSummaryAfterFirstUpdate = getTeamFromCompetition(resultAfterFirstUpdate, secondTeam.getTeamName());
 
         assertThat(firstTeamSummaryAfterFirstUpdate.getRank())
-            .as("Expected first team to be rank 1: " + firstTeamSummaryAfterFirstUpdate)
+            .as("Expected first team to be rank 1: " + resultAfterFirstUpdate)
             .isEqualTo(1);
 
         assertThat(secondTeamSummaryAfterFirstUpdate.getRank())
-            .as("Expected second team to be rank 2: " + secondTeamSummaryAfterFirstUpdate)
+            .as("Expected second team to be rank 2: " + resultAfterFirstUpdate)
             .isEqualTo(2);
 
         StubbedFoldingEndpointUtils.addPoints(secondUser, 20_000L);
