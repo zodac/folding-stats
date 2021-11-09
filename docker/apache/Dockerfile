@@ -34,7 +34,7 @@ RUN minify --verbose --match=\.*.css$ --type=css --output /docker/apache/site/re
 
 FROM httpd:2.4-alpine
 
-# Updating system packages
+# Updating system packages, and installing any required packages
 RUN apk update && apk upgrade && \
     apk add \
       brotli
