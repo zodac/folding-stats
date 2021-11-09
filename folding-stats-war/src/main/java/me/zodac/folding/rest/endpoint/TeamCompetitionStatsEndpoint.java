@@ -35,7 +35,7 @@ import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.util.ProcessingType;
-import me.zodac.folding.ejb.api.BusinessLogic;
+import me.zodac.folding.ejb.api.FoldingStatsCore;
 import me.zodac.folding.ejb.tc.LeaderboardStatsGenerator;
 import me.zodac.folding.ejb.tc.scheduled.StatsScheduler;
 import me.zodac.folding.ejb.tc.user.UserStatsParser;
@@ -65,7 +65,7 @@ public class TeamCompetitionStatsEndpoint {
     private UriInfo uriContext;
 
     @EJB
-    private BusinessLogic businessLogic;
+    private FoldingStatsCore foldingStatsCore;
 
     @EJB
     private LeaderboardStatsGenerator leaderboardStatsGenerator;
@@ -92,7 +92,7 @@ public class TeamCompetitionStatsEndpoint {
         LOGGER.debug("GET request received to show TC stats");
 
         try {
-            final CompetitionSummary competitionSummary = businessLogic.getCompetitionSummary();
+            final CompetitionSummary competitionSummary = foldingStatsCore.getCompetitionSummary();
             return ok(competitionSummary);
         } catch (final Exception e) {
             LOGGER.error("Unexpected error retrieving full TC stats", e);
@@ -121,14 +121,14 @@ public class TeamCompetitionStatsEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<User> optionalUser = businessLogic.getUserWithoutPasskey(parsedId);
+            final Optional<User> optionalUser = foldingStatsCore.getUserWithoutPasskey(parsedId);
             if (optionalUser.isEmpty()) {
                 LOGGER.error("No user found with ID: {}", parsedId);
                 return notFound();
             }
             final User user = optionalUser.get();
 
-            final CompetitionSummary competitionSummary = businessLogic.getCompetitionSummary();
+            final CompetitionSummary competitionSummary = foldingStatsCore.getCompetitionSummary();
             final Collection<UserSummary> userSummaries = competitionSummary.getTeams()
                 .stream()
                 .flatMap(teamResult -> teamResult.getActiveUsers().stream())
@@ -175,7 +175,7 @@ public class TeamCompetitionStatsEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<User> optionalUser = businessLogic.getUserWithPasskey(parsedId);
+            final Optional<User> optionalUser = foldingStatsCore.getUserWithPasskey(parsedId);
             if (optionalUser.isEmpty()) {
                 LOGGER.error("No user found with ID: {}", parsedId);
                 return notFound();
@@ -184,7 +184,7 @@ public class TeamCompetitionStatsEndpoint {
             final User user = optionalUser.get();
             final Hardware hardware = user.getHardware();
             final OffsetTcStats offsetTcStatsToPersist = OffsetTcStats.updateWithHardwareMultiplier(offsetTcStats, hardware.getMultiplier());
-            final OffsetTcStats createdOffsetStats = businessLogic.createOrUpdateOffsetStats(user, offsetTcStatsToPersist);
+            final OffsetTcStats createdOffsetStats = foldingStatsCore.createOrUpdateOffsetStats(user, offsetTcStatsToPersist);
 
             SystemStateManager.next(SystemState.UPDATING_STATS);
             userStatsParser.parseTcStatsForUserAndWait(user);

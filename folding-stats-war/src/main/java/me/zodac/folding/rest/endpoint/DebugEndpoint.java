@@ -11,7 +11,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import me.zodac.folding.ejb.api.BusinessLogic;
+import me.zodac.folding.ejb.api.FoldingStatsCore;
 import me.zodac.folding.ejb.tc.lars.LarsHardwareUpdater;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,7 +29,7 @@ public class DebugEndpoint {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @EJB
-    private BusinessLogic businessLogic;
+    private FoldingStatsCore foldingStatsCore;
 
     @EJB
     private LarsHardwareUpdater larsHardwareUpdater;
@@ -59,7 +59,7 @@ public class DebugEndpoint {
      * {@link POST} request to print the contents of all caches to the system log.
      *
      * @return {@link Response.Status#OK}
-     * @see BusinessLogic#printCacheContents()
+     * @see FoldingStatsCore#printCacheContents()
      */
     @POST
     @RolesAllowed("admin")
@@ -67,7 +67,7 @@ public class DebugEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     public Response printCaches() {
         LOGGER.info("Printing cache contents");
-        businessLogic.printCacheContents();
+        foldingStatsCore.printCacheContents();
         return ok();
     }
 }

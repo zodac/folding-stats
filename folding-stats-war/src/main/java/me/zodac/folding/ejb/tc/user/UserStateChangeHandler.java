@@ -13,7 +13,7 @@ import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
-import me.zodac.folding.ejb.api.BusinessLogic;
+import me.zodac.folding.ejb.api.FoldingStatsCore;
 import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,7 +29,7 @@ public class UserStateChangeHandler {
     private static final FoldingStatsRetriever FOLDING_STATS_RETRIEVER = HttpFoldingStatsRetriever.create();
 
     @EJB
-    private BusinessLogic businessLogic;
+    private FoldingStatsCore foldingStatsCore;
 
     /**
      * Checks if the updated {@link User} requires a state change for the <code>Team Competition</code>.
@@ -141,11 +141,11 @@ public class UserStateChangeHandler {
         try {
             final UserStats userTotalStats = FOLDING_STATS_RETRIEVER.getTotalStats(userWithStateChange);
             LOGGER.debug("Setting initial stats to: {}", userTotalStats);
-            businessLogic.createInitialStats(userTotalStats);
+            foldingStatsCore.createInitialStats(userTotalStats);
 
-            final UserTcStats currentUserTcStats = businessLogic.getHourlyTcStats(userWithStateChange);
+            final UserTcStats currentUserTcStats = foldingStatsCore.getHourlyTcStats(userWithStateChange);
             final OffsetTcStats offsetTcStats = OffsetTcStats.create(currentUserTcStats);
-            final OffsetTcStats createdOffsetStats = businessLogic.createOffsetStats(userWithStateChange, offsetTcStats);
+            final OffsetTcStats createdOffsetStats = foldingStatsCore.createOffsetStats(userWithStateChange, offsetTcStats);
             LOGGER.debug("Added offset stats of: {}", createdOffsetStats);
 
             LOGGER.info("Handled state change for user '{}' (ID: {})", userWithStateChange.getDisplayName(), userWithStateChange.getId());

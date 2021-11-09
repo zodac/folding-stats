@@ -12,7 +12,7 @@ import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.util.ProcessingType;
-import me.zodac.folding.ejb.api.BusinessLogic;
+import me.zodac.folding.ejb.api.FoldingStatsCore;
 import me.zodac.folding.ejb.tc.scheduled.StatsScheduler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,7 +29,7 @@ public class Initialiser {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @EJB
-    private BusinessLogic businessLogic;
+    private FoldingStatsCore foldingStatsCore;
 
     @EJB
     private StatsScheduler statsScheduler;
@@ -43,7 +43,7 @@ public class Initialiser {
      *     <li>Sets the {@link SystemState} to {@link SystemState#AVAILABLE} when complete</li>
      * </ol>
      *
-     * @see BusinessLogic#isAnyHourlyTcStatsExist()
+     * @see FoldingStatsCore#isAnyHourlyTcStatsExist()
      * @see StatsScheduler#manualTeamCompetitionStatsParsing(ProcessingType)
      */
     @PostConstruct
@@ -56,15 +56,15 @@ public class Initialiser {
     }
 
     private void initCaches() {
-        businessLogic.getAllHardware();
-        businessLogic.getAllTeams();
-        final Collection<User> users = businessLogic.getAllUsersWithoutPasskeys();
+        foldingStatsCore.getAllHardware();
+        foldingStatsCore.getAllTeams();
+        final Collection<User> users = foldingStatsCore.getAllUsersWithoutPasskeys();
 
         for (final User user : users) {
-            final OffsetTcStats offsetTcStatsForUser = businessLogic.getOffsetStats(user);
+            final OffsetTcStats offsetTcStatsForUser = foldingStatsCore.getOffsetStats(user);
             LOGGER.debug("Found offset stats for user {}: {}", user, offsetTcStatsForUser);
 
-            final UserStats initialStatsForUser = businessLogic.getInitialStats(user);
+            final UserStats initialStatsForUser = foldingStatsCore.getInitialStats(user);
             LOGGER.debug("Found initial stats for user {}: {}", user, initialStatsForUser);
         }
 
@@ -72,7 +72,7 @@ public class Initialiser {
     }
 
     private void initTcStats() {
-        if (!businessLogic.isAnyHourlyTcStatsExist()) {
+        if (!foldingStatsCore.isAnyHourlyTcStatsExist()) {
             LOGGER.warn("No TC stats data exists in the DB");
             statsScheduler.manualTeamCompetitionStatsParsing(ProcessingType.ASYNCHRONOUS);
         }

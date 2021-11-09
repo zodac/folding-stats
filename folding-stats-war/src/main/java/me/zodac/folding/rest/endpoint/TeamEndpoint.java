@@ -38,7 +38,7 @@ import me.zodac.folding.api.state.ReadRequired;
 import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.state.WriteRequired;
 import me.zodac.folding.api.tc.Team;
-import me.zodac.folding.ejb.api.BusinessLogic;
+import me.zodac.folding.ejb.api.FoldingStatsCore;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
 import me.zodac.folding.rest.endpoint.util.IdResult;
 import me.zodac.folding.rest.endpoint.util.IntegerParser;
@@ -67,7 +67,7 @@ public class TeamEndpoint {
     private UriInfo uriContext;
 
     @EJB
-    private BusinessLogic businessLogic;
+    private FoldingStatsCore foldingStatsCore;
 
     /**
      * {@link POST} request to create a {@link Team} based on the input request.
@@ -90,7 +90,7 @@ public class TeamEndpoint {
         final Team validatedTeam = validationResult.getOutput();
 
         try {
-            final Team elementWithId = businessLogic.createTeam(validatedTeam);
+            final Team elementWithId = foldingStatsCore.createTeam(validatedTeam);
 
             final UriBuilder elementLocationBuilder = uriContext
                 .getRequestUriBuilder()
@@ -147,7 +147,7 @@ public class TeamEndpoint {
 
         for (final Team validTeam : validTeams) {
             try {
-                final Team teamWithId = businessLogic.createTeam(validTeam);
+                final Team teamWithId = foldingStatsCore.createTeam(validTeam);
                 successful.add(teamWithId);
             } catch (final Exception e) {
                 LOGGER.error("Unexpected error creating team: {}", validTeam, e);
@@ -186,7 +186,7 @@ public class TeamEndpoint {
         LOGGER.debug("GET request received for all teams at '{}'", uriContext::getAbsolutePath);
 
         try {
-            final Collection<Team> elements = businessLogic.getAllTeams();
+            final Collection<Team> elements = foldingStatsCore.getAllTeams();
             return cachedOk(elements, request, untilNextMonthUtc(ChronoUnit.SECONDS));
         } catch (final Exception e) {
             LOGGER.error("Unexpected error getting all teams", e);
@@ -216,7 +216,7 @@ public class TeamEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<Team> optionalElement = businessLogic.getTeam(parsedId);
+            final Optional<Team> optionalElement = foldingStatsCore.getTeam(parsedId);
             if (optionalElement.isEmpty()) {
                 LOGGER.error("No team found with ID {}", teamId);
                 return notFound();
@@ -252,7 +252,7 @@ public class TeamEndpoint {
                 return badRequest(errorMessage);
             }
 
-            final Optional<Team> optionalTeam = businessLogic.getAllTeams()
+            final Optional<Team> optionalTeam = foldingStatsCore.getAllTeams()
                 .stream()
                 .filter(team -> team.getTeamName().equalsIgnoreCase(teamName))
                 .findAny();
@@ -298,7 +298,7 @@ public class TeamEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<Team> optionalElement = businessLogic.getTeam(parsedId);
+            final Optional<Team> optionalElement = foldingStatsCore.getTeam(parsedId);
             if (optionalElement.isEmpty()) {
                 LOGGER.error("No team found with ID {}", teamId);
                 return notFound();
@@ -318,7 +318,7 @@ public class TeamEndpoint {
 
             // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
             final Team teamWithId = Team.updateWithId(existingTeam.getId(), validatedHardware);
-            final Team updatedTeamWithId = businessLogic.updateTeam(teamWithId);
+            final Team updatedTeamWithId = foldingStatsCore.updateTeam(teamWithId);
 
             final UriBuilder elementLocationBuilder = uriContext
                 .getRequestUriBuilder()
@@ -353,7 +353,7 @@ public class TeamEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<Team> optionalElement = businessLogic.getTeam(parsedId);
+            final Optional<Team> optionalElement = foldingStatsCore.getTeam(parsedId);
             if (optionalElement.isEmpty()) {
                 LOGGER.error("No team found with ID {}", teamId);
                 return notFound();
@@ -366,7 +366,7 @@ public class TeamEndpoint {
             }
             final Team validatedTeam = validationResult.getOutput();
 
-            businessLogic.deleteTeam(validatedTeam);
+            foldingStatsCore.deleteTeam(validatedTeam);
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             LOGGER.info("Deleted team with ID {}", teamId);
             return ok();
@@ -377,14 +377,14 @@ public class TeamEndpoint {
     }
 
     private ValidationResult<Team> validateCreate(final TeamRequest teamRequest) {
-        return TeamValidator.validateCreate(teamRequest, businessLogic.getAllTeams());
+        return TeamValidator.validateCreate(teamRequest, foldingStatsCore.getAllTeams());
     }
 
     private ValidationResult<Team> validateUpdate(final TeamRequest teamRequest, final Team existingTeam) {
-        return TeamValidator.validateUpdate(teamRequest, existingTeam, businessLogic.getAllTeams());
+        return TeamValidator.validateUpdate(teamRequest, existingTeam, foldingStatsCore.getAllTeams());
     }
 
     private ValidationResult<Team> validateDelete(final Team team) {
-        return TeamValidator.validateDelete(team, businessLogic.getAllUsersWithoutPasskeys());
+        return TeamValidator.validateDelete(team, foldingStatsCore.getAllUsersWithoutPasskeys());
     }
 }

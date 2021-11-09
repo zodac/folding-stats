@@ -13,7 +13,7 @@ import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
-import me.zodac.folding.ejb.api.BusinessLogic;
+import me.zodac.folding.ejb.api.FoldingStatsCore;
 import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -30,7 +30,7 @@ public class UserStatsParser {
     private static final FoldingStatsRetriever FOLDING_STATS_RETRIEVER = HttpFoldingStatsRetriever.create();
 
     @EJB
-    private BusinessLogic businessLogic;
+    private FoldingStatsCore foldingStatsCore;
 
     /**
      * Parses the latest TC stats for the given {@link User}.
@@ -64,13 +64,13 @@ public class UserStatsParser {
             return;
         }
 
-        final Stats initialStats = businessLogic.getInitialStats(user);
+        final Stats initialStats = foldingStatsCore.getInitialStats(user);
         if (initialStats.isEmpty()) {
             LOGGER.warn("Retrieved empty initial stats for user: {}", user);
             return;
         }
 
-        final OffsetTcStats offsetTcStats = businessLogic.getOffsetStats(user);
+        final OffsetTcStats offsetTcStats = foldingStatsCore.getOffsetStats(user);
         if (offsetTcStats.isEmpty()) {
             LOGGER.trace("Retrieved empty stats offset for user: {}", () -> user);
         } else {
@@ -84,7 +84,7 @@ public class UserStatsParser {
             return;
         }
 
-        final UserStats createdTotalStats = businessLogic.createTotalStats(totalStats);
+        final UserStats createdTotalStats = foldingStatsCore.createTotalStats(totalStats);
         calculateAndPersistTcStats(user, initialStats, offsetTcStats, createdTotalStats);
     }
 
@@ -115,7 +115,7 @@ public class UserStatsParser {
         LOGGER.debug("{} (ID: {}): {} TC multiplied points (pre-offset) | {} TC units (pre-offset)", user::getDisplayName, user::getId,
             () -> formatWithCommas(multipliedPoints), () -> formatWithCommas(units));
 
-        final UserTcStats createdHourlyTcStats = businessLogic.createHourlyTcStats(hourlyUserTcStats);
+        final UserTcStats createdHourlyTcStats = foldingStatsCore.createHourlyTcStats(hourlyUserTcStats);
         LOGGER.info("{} (ID: {}): {} TC points | {} TC units", user.getDisplayName(), user.getId(),
             formatWithCommas(createdHourlyTcStats.getMultipliedPoints()), formatWithCommas(createdHourlyTcStats.getUnits()));
     }

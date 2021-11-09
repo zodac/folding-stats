@@ -38,7 +38,7 @@ import me.zodac.folding.api.state.ReadRequired;
 import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.state.WriteRequired;
 import me.zodac.folding.api.tc.Hardware;
-import me.zodac.folding.ejb.api.BusinessLogic;
+import me.zodac.folding.ejb.api.FoldingStatsCore;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 import me.zodac.folding.rest.endpoint.util.IdResult;
 import me.zodac.folding.rest.endpoint.util.IntegerParser;
@@ -66,7 +66,7 @@ public class HardwareEndpoint {
     private UriInfo uriContext;
 
     @EJB
-    private BusinessLogic businessLogic;
+    private FoldingStatsCore foldingStatsCore;
 
     /**
      * {@link POST} request to create a {@link Hardware} based on the input request.
@@ -89,7 +89,7 @@ public class HardwareEndpoint {
         final Hardware validatedHardware = validationResult.getOutput();
 
         try {
-            final Hardware elementWithId = businessLogic.createHardware(validatedHardware);
+            final Hardware elementWithId = foldingStatsCore.createHardware(validatedHardware);
 
             final UriBuilder elementLocationBuilder = uriContext
                 .getRequestUriBuilder()
@@ -146,7 +146,7 @@ public class HardwareEndpoint {
 
         for (final Hardware validHardware : validHardwares) {
             try {
-                final Hardware hardwareWithId = businessLogic.createHardware(validHardware);
+                final Hardware hardwareWithId = foldingStatsCore.createHardware(validHardware);
                 successful.add(hardwareWithId);
             } catch (final Exception e) {
                 LOGGER.error("Unexpected error creating hardware: {}", validHardware, e);
@@ -185,7 +185,7 @@ public class HardwareEndpoint {
         LOGGER.debug("GET request received for all hardwares at '{}'", uriContext::getAbsolutePath);
 
         try {
-            final Collection<Hardware> elements = businessLogic.getAllHardware();
+            final Collection<Hardware> elements = foldingStatsCore.getAllHardware();
             return cachedOk(elements, request, untilNextMonthUtc(ChronoUnit.SECONDS));
         } catch (final Exception e) {
             LOGGER.error("Unexpected error getting all hardwares", e);
@@ -215,7 +215,7 @@ public class HardwareEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<Hardware> optionalElement = businessLogic.getHardware(parsedId);
+            final Optional<Hardware> optionalElement = foldingStatsCore.getHardware(parsedId);
             if (optionalElement.isEmpty()) {
                 LOGGER.error("No hardware found with ID {}", hardwareId);
                 return notFound();
@@ -251,7 +251,7 @@ public class HardwareEndpoint {
                 return badRequest(errorMessage);
             }
 
-            final Optional<Hardware> optionalHardware = businessLogic.getAllHardware()
+            final Optional<Hardware> optionalHardware = foldingStatsCore.getAllHardware()
                 .stream()
                 .filter(hardware -> hardware.getHardwareName().equalsIgnoreCase(hardwareName))
                 .findAny();
@@ -297,7 +297,7 @@ public class HardwareEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<Hardware> optionalElement = businessLogic.getHardware(parsedId);
+            final Optional<Hardware> optionalElement = foldingStatsCore.getHardware(parsedId);
             if (optionalElement.isEmpty()) {
                 LOGGER.error("No hardware found with ID {}", hardwareId);
                 return notFound();
@@ -317,7 +317,7 @@ public class HardwareEndpoint {
 
             // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
             final Hardware hardwareWithId = Hardware.updateWithId(existingHardware.getId(), validatedHardware);
-            final Hardware updatedHardwareWithId = businessLogic.updateHardware(hardwareWithId, existingHardware);
+            final Hardware updatedHardwareWithId = foldingStatsCore.updateHardware(hardwareWithId, existingHardware);
 
             final UriBuilder elementLocationBuilder = uriContext
                 .getRequestUriBuilder()
@@ -352,7 +352,7 @@ public class HardwareEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<Hardware> optionalElement = businessLogic.getHardware(parsedId);
+            final Optional<Hardware> optionalElement = foldingStatsCore.getHardware(parsedId);
             if (optionalElement.isEmpty()) {
                 LOGGER.error("No hardware found with ID {}", hardwareId);
                 return notFound();
@@ -365,7 +365,7 @@ public class HardwareEndpoint {
             }
             final Hardware validatedHardware = validationResult.getOutput();
 
-            businessLogic.deleteHardware(validatedHardware);
+            foldingStatsCore.deleteHardware(validatedHardware);
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             LOGGER.info("Deleted hardware with ID {}", hardwareId);
             return ok();
@@ -376,14 +376,14 @@ public class HardwareEndpoint {
     }
 
     private ValidationResult<Hardware> validateCreate(final HardwareRequest hardwareRequest) {
-        return HardwareValidator.validateCreate(hardwareRequest, businessLogic.getAllHardware());
+        return HardwareValidator.validateCreate(hardwareRequest, foldingStatsCore.getAllHardware());
     }
 
     private ValidationResult<Hardware> validateUpdate(final HardwareRequest hardwareRequest, final Hardware existingHardware) {
-        return HardwareValidator.validateUpdate(hardwareRequest, existingHardware, businessLogic.getAllHardware());
+        return HardwareValidator.validateUpdate(hardwareRequest, existingHardware, foldingStatsCore.getAllHardware());
     }
 
     private ValidationResult<Hardware> validateDelete(final Hardware hardware) {
-        return HardwareValidator.validateDelete(hardware, businessLogic.getAllUsersWithoutPasskeys());
+        return HardwareValidator.validateDelete(hardware, foldingStatsCore.getAllUsersWithoutPasskeys());
     }
 }

@@ -37,7 +37,7 @@ import me.zodac.folding.api.state.ReadRequired;
 import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.state.WriteRequired;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.ejb.api.BusinessLogic;
+import me.zodac.folding.ejb.api.FoldingStatsCore;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 import me.zodac.folding.rest.endpoint.util.IdResult;
 import me.zodac.folding.rest.endpoint.util.IntegerParser;
@@ -64,7 +64,7 @@ public class UserEndpoint {
     private UriInfo uriContext;
 
     @EJB
-    private BusinessLogic businessLogic;
+    private FoldingStatsCore foldingStatsCore;
 
     /**
      * {@link POST} request to create a {@link User} based on the input request.
@@ -87,7 +87,7 @@ public class UserEndpoint {
         final User validatedUser = validationResult.getOutput();
 
         try {
-            final User elementWithId = businessLogic.createUser(validatedUser);
+            final User elementWithId = foldingStatsCore.createUser(validatedUser);
 
             final UriBuilder elementLocationBuilder = uriContext
                 .getRequestUriBuilder()
@@ -144,7 +144,7 @@ public class UserEndpoint {
 
         for (final User validUser : validUsers) {
             try {
-                final User userWithId = businessLogic.createUser(validUser);
+                final User userWithId = foldingStatsCore.createUser(validUser);
                 successful.add(userWithId);
             } catch (final Exception e) {
                 LOGGER.error("Unexpected error creating user: {}", validUser, e);
@@ -183,7 +183,7 @@ public class UserEndpoint {
         LOGGER.debug("GET request received for all users at '{}'", uriContext::getAbsolutePath);
 
         try {
-            final Collection<User> elements = businessLogic.getAllUsersWithoutPasskeys();
+            final Collection<User> elements = foldingStatsCore.getAllUsersWithoutPasskeys();
             return cachedOk(elements, request, untilNextMonthUtc(ChronoUnit.SECONDS));
         } catch (final Exception e) {
             LOGGER.error("Unexpected error getting all users", e);
@@ -213,7 +213,7 @@ public class UserEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<User> optionalElement = businessLogic.getUserWithoutPasskey(parsedId);
+            final Optional<User> optionalElement = foldingStatsCore.getUserWithoutPasskey(parsedId);
             if (optionalElement.isEmpty()) {
                 LOGGER.error("No user found with ID {}", userId);
                 return notFound();
@@ -255,7 +255,7 @@ public class UserEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<User> optionalElement = businessLogic.getUserWithoutPasskey(parsedId);
+            final Optional<User> optionalElement = foldingStatsCore.getUserWithoutPasskey(parsedId);
             if (optionalElement.isEmpty()) {
                 LOGGER.error("No user found with ID {}", userId);
                 return notFound();
@@ -275,7 +275,7 @@ public class UserEndpoint {
 
             // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
             final User userWithId = User.updateWithId(existingUser.getId(), validatedUser);
-            final User updatedUserWithId = businessLogic.updateUser(userWithId, existingUser);
+            final User updatedUserWithId = foldingStatsCore.updateUser(userWithId, existingUser);
 
             final UriBuilder elementLocationBuilder = uriContext
                 .getRequestUriBuilder()
@@ -310,14 +310,14 @@ public class UserEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<User> optionalElement = businessLogic.getUserWithoutPasskey(parsedId);
+            final Optional<User> optionalElement = foldingStatsCore.getUserWithoutPasskey(parsedId);
             if (optionalElement.isEmpty()) {
                 LOGGER.error("No user found with ID {}", userId);
                 return notFound();
             }
             final User user = optionalElement.get();
 
-            businessLogic.deleteUser(user);
+            foldingStatsCore.deleteUser(user);
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             LOGGER.info("Deleted user with ID {}", userId);
             return ok();
@@ -331,9 +331,9 @@ public class UserEndpoint {
         final UserValidator userValidator = UserValidator.create();
         return userValidator.validateCreate(
             userRequest,
-            businessLogic.getAllUsersWithPasskeys(),
-            businessLogic.getAllHardware(),
-            businessLogic.getAllTeams()
+            foldingStatsCore.getAllUsersWithPasskeys(),
+            foldingStatsCore.getAllHardware(),
+            foldingStatsCore.getAllTeams()
         );
     }
 
@@ -342,9 +342,9 @@ public class UserEndpoint {
         return userValidator.validateUpdate(
             userRequest,
             existingUser,
-            businessLogic.getAllUsersWithPasskeys(),
-            businessLogic.getAllHardware(),
-            businessLogic.getAllTeams()
+            foldingStatsCore.getAllUsersWithPasskeys(),
+            foldingStatsCore.getAllHardware(),
+            foldingStatsCore.getAllTeams()
         );
     }
 }

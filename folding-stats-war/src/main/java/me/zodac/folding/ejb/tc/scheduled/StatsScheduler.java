@@ -20,7 +20,7 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
 import me.zodac.folding.api.util.ProcessingType;
-import me.zodac.folding.ejb.api.BusinessLogic;
+import me.zodac.folding.ejb.api.FoldingStatsCore;
 import me.zodac.folding.ejb.tc.user.UserStatsParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -61,7 +61,7 @@ public class StatsScheduler {
         EnvironmentVariableUtils.get("STATS_PARSING_SCHEDULE_LAST_DAY_OF_MONTH", "31");
 
     @EJB
-    private BusinessLogic businessLogic;
+    private FoldingStatsCore foldingStatsCore;
 
     @EJB
     private UserStatsParser userStatsParser;
@@ -125,7 +125,7 @@ public class StatsScheduler {
         LOGGER.info("");
         LOGGER.info("Parsing TC Folding stats:");
 
-        final Collection<Team> tcTeams = businessLogic.getAllTeams();
+        final Collection<Team> tcTeams = foldingStatsCore.getAllTeams();
         if (tcTeams.isEmpty()) {
             LOGGER.warn("No TC teams configured in system!");
             return;
@@ -139,7 +139,7 @@ public class StatsScheduler {
 
     private void parseTcStatsForTeam(final Team team, final ProcessingType processingType) {
         LOGGER.debug("Getting TC stats for users in team {}", team::getTeamName);
-        final Collection<User> teamUsers = businessLogic.getUsersOnTeamWithPasskeys(team);
+        final Collection<User> teamUsers = foldingStatsCore.getUsersOnTeamWithPasskeys(team);
 
         if (teamUsers.isEmpty()) {
             LOGGER.warn("No users for team '{}'", team.getTeamName());

@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import me.zodac.folding.api.tc.result.MonthlyResult;
-import me.zodac.folding.ejb.api.BusinessLogic;
+import me.zodac.folding.ejb.api.FoldingStatsCore;
 import me.zodac.folding.ejb.tc.LeaderboardStatsGenerator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,11 +19,11 @@ public class UserStatsStorer {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @EJB
-    private BusinessLogic businessLogic;
+    private FoldingStatsCore foldingStatsCore;
 
     @EJB
     private LeaderboardStatsGenerator leaderboardStatsGenerator;
-    
+
     /**
      * Stores the {@link MonthlyResult} for the current {@link java.time.ZoneOffset#UTC} date-time.
      *
@@ -597,7 +597,7 @@ public class UserStatsStorer {
             leaderboardStatsGenerator.generateUserCategoryLeaderboards()
         );
 
-        final MonthlyResult createdMonthlyResult = businessLogic.createMonthlyResult(monthlyResult);
+        final MonthlyResult createdMonthlyResult = foldingStatsCore.createMonthlyResult(monthlyResult);
         LOGGER.info("Storing TC results for {}", createdMonthlyResult.getUtcTimestamp());
     }
 }

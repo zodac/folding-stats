@@ -24,7 +24,7 @@ import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.api.util.ProcessingType;
-import me.zodac.folding.ejb.api.BusinessLogic;
+import me.zodac.folding.ejb.api.FoldingStatsCore;
 import me.zodac.folding.ejb.tc.scheduled.StatsScheduler;
 import me.zodac.folding.ejb.tc.user.UserStateChangeHandler;
 import me.zodac.folding.ejb.tc.user.UserStatsParser;
@@ -38,7 +38,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * {@link Singleton} EJB implementation of {@link BusinessLogic}.
+ * {@link Singleton} EJB implementation of {@link FoldingStatsCore}.
  *
  * <p>
  * For the most part, this will serve as a wrapper to {@link Storage}, which knows how to perform CRUD operations on the backend storage and caches.
@@ -46,7 +46,7 @@ import org.apache.logging.log4j.Logger;
  * implement that logic here, and delegate any CRUD needs to {@link Storage}.
  */
 @Singleton
-public class BusinessLogicEjb implements BusinessLogic {
+public class FoldingStatsEjb implements FoldingStatsCore {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Storage STORAGE = Storage.getInstance();

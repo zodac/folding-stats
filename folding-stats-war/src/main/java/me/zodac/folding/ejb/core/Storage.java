@@ -33,14 +33,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * In order to decouple both the REST layer and the {@link BusinessLogicEjb} from the persistence solution we use this interface for CRUD operations.
+ * In order to decouple both the REST layer and the {@link FoldingStatsEjb} from the persistence solution we use this interface for CRUD operations.
  *
  * <p>
  * Since some persisted data can be cached, we don't want any other modules of the codebase to need to worry about DB vs cache access, and
  * instead encapsulate all of that logic here.
  *
  * <p>
- * <b>NOTE:</b> Should only be used by {@link BusinessLogicEjb}, other classes should not go use this class.
+ * <b>NOTE:</b> Should only be used by {@link FoldingStatsEjb}, other classes should not go use this class.
  */
 final class Storage {
 

@@ -17,10 +17,13 @@ import me.zodac.folding.rest.api.tc.CompetitionSummary;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 
 /**
+ * Interface defining the core business logic of the system.
+ *
+ * <p>
  * In order to decouple the REST layer from any business requirements, we move that logic into this interface, to be
  * implemented as an EJB. This should simplify the REST layer to simply validate incoming requests and forward to here.
  */
-public interface BusinessLogic {
+public interface FoldingStatsCore {
 
     /**
      * Creates a {@link Hardware}.

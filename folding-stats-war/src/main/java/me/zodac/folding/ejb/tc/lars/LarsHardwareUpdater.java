@@ -13,7 +13,7 @@ import me.zodac.folding.api.tc.HardwareMake;
 import me.zodac.folding.api.tc.HardwareType;
 import me.zodac.folding.api.tc.lars.LarsGpu;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
-import me.zodac.folding.ejb.api.BusinessLogic;
+import me.zodac.folding.ejb.api.FoldingStatsCore;
 import me.zodac.folding.lars.HardwareSplitter;
 import me.zodac.folding.lars.LarsGpuRetriever;
 import org.apache.logging.log4j.LogManager;
@@ -30,7 +30,7 @@ public class LarsHardwareUpdater {
     private static final String LARS_URL_ROOT = EnvironmentVariableUtils.get("LARS_URL_ROOT", "https://folding.lar.systems");
 
     @EJB
-    private BusinessLogic businessLogic;
+    private FoldingStatsCore foldingStatsCore;
 
     /**
      * Retrieves {@link me.zodac.folding.api.tc.HardwareType} data from LARS, creates {@link Hardware} instances, then updates to the DB.
@@ -79,10 +79,10 @@ public class LarsHardwareUpdater {
             .stream()
             .map(larsGpu -> toHardware(larsGpu, bestPpd))
             .collect(toList());
-        final Collection<Hardware> existing = businessLogic.getAllHardware();
+        final Collection<Hardware> existing = foldingStatsCore.getAllHardware();
 
         for (final Hardware hardware : HardwareSplitter.toDelete(lars, existing)) {
-            businessLogic.deleteHardware(hardware);
+            foldingStatsCore.deleteHardware(hardware);
             LOGGER.info("Deleted hardware '{}' (ID: {})", hardware.getHardwareName(), hardware.getId());
         }
 
@@ -92,7 +92,7 @@ public class LarsHardwareUpdater {
                 final Hardware existingHardware = entry.getValue();
                 final Hardware updatedHardwareWithId = Hardware.updateWithId(existingHardware.getId(), updatedHardware);
 
-                businessLogic.updateHardware(updatedHardwareWithId, existingHardware);
+                foldingStatsCore.updateHardware(updatedHardwareWithId, existingHardware);
                 LOGGER.info("LARS updated hardware\n'{}' (ID: {})\nMultiplier: {} -> {}\nAverage PPD: {} -> {}\n", updatedHardware.getHardwareName(),
                     existingHardware.getId(), existingHardware.getMultiplier(), updatedHardware.getMultiplier(),
                     formatWithCommas(existingHardware.getAveragePpd()), formatWithCommas(updatedHardware.getAveragePpd()));
@@ -102,7 +102,7 @@ public class LarsHardwareUpdater {
         }
 
         for (final Hardware hardware : HardwareSplitter.toCreate(lars, existing)) {
-            final Hardware createdHardware = businessLogic.createHardware(hardware);
+            final Hardware createdHardware = foldingStatsCore.createHardware(hardware);
             LOGGER.debug("Created hardware '{}' (ID: {})", createdHardware.getHardwareName(), createdHardware.getId());
         }
     }

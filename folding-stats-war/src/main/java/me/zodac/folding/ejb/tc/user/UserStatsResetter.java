@@ -7,7 +7,7 @@ import me.zodac.folding.api.util.ProcessingType;
 import me.zodac.folding.cache.RetiredTcStatsCache;
 import me.zodac.folding.cache.TcStatsCache;
 import me.zodac.folding.cache.TotalStatsCache;
-import me.zodac.folding.ejb.api.BusinessLogic;
+import me.zodac.folding.ejb.api.FoldingStatsCore;
 import me.zodac.folding.ejb.tc.scheduled.StatsScheduler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,7 +21,7 @@ public class UserStatsResetter {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @EJB
-    private BusinessLogic businessLogic;
+    private FoldingStatsCore foldingStatsCore;
 
     @EJB
     private StatsScheduler statsScheduler;
@@ -39,7 +39,7 @@ public class UserStatsResetter {
      * <li>Execute a new stats update to set all values to <b>0</b></li>
      * </ol>
      *
-     * @see BusinessLogic#resetAllTeamCompetitionUserStats()
+     * @see FoldingStatsCore#resetAllTeamCompetitionUserStats()
      * @see StatsScheduler#manualTeamCompetitionStatsParsing(ProcessingType)
      */
     public void resetTeamCompetitionStats() {
@@ -48,7 +48,7 @@ public class UserStatsResetter {
             statsScheduler.manualTeamCompetitionStatsParsing(ProcessingType.SYNCHRONOUS);
 
             LOGGER.info("Resetting Team Competition stats");
-            businessLogic.resetAllTeamCompetitionUserStats();
+            foldingStatsCore.resetAllTeamCompetitionUserStats();
 
             // Pull stats for new month
             statsScheduler.manualTeamCompetitionStatsParsing(ProcessingType.SYNCHRONOUS);

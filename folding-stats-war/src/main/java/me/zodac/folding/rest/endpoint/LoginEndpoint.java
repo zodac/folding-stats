@@ -19,7 +19,7 @@ import javax.ws.rs.core.Response;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.state.ReadRequired;
 import me.zodac.folding.api.util.EncodingUtils;
-import me.zodac.folding.ejb.api.BusinessLogic;
+import me.zodac.folding.ejb.api.FoldingStatsCore;
 import me.zodac.folding.rest.api.LoginCredentials;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,7 +36,7 @@ public class LoginEndpoint {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @EJB
-    private BusinessLogic businessLogic;
+    private FoldingStatsCore foldingStatsCore;
 
     /**
      * {@link POST} request to log in as an admin system user.
@@ -75,7 +75,7 @@ public class LoginEndpoint {
             final String password = decodedUserNameAndPassword.get(EncodingUtils.DECODED_PASSWORD_KEY);
             LOGGER.debug("Login request received for user: '{}'", userName);
 
-            final UserAuthenticationResult userAuthenticationResult = businessLogic.authenticateSystemUser(userName, password);
+            final UserAuthenticationResult userAuthenticationResult = foldingStatsCore.authenticateSystemUser(userName, password);
 
             if (!userAuthenticationResult.isUserExists() || !userAuthenticationResult.isPasswordMatch()) {
                 LOGGER.warn("Invalid user credentials supplied: {}", loginCredentials);

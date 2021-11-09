@@ -25,7 +25,7 @@ import javax.ws.rs.core.UriInfo;
 import me.zodac.folding.api.state.ReadRequired;
 import me.zodac.folding.api.state.WriteRequired;
 import me.zodac.folding.api.tc.result.MonthlyResult;
-import me.zodac.folding.ejb.api.BusinessLogic;
+import me.zodac.folding.ejb.api.FoldingStatsCore;
 import me.zodac.folding.ejb.tc.user.UserStatsStorer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -46,7 +46,7 @@ public class MonthlyResultEndpoint {
     private UriInfo uriContext;
 
     @EJB
-    private BusinessLogic businessLogic;
+    private FoldingStatsCore foldingStatsCore;
 
     @EJB
     private UserStatsStorer userStatsStorer;
@@ -68,7 +68,7 @@ public class MonthlyResultEndpoint {
         LOGGER.debug("GET request received to retrieve monthly TC result at '{}'", uriContext.getAbsolutePath());
 
         try {
-            final Optional<MonthlyResult> monthlyResult = businessLogic.getMonthlyResult(Month.of(Integer.parseInt(month)), Year.parse(year));
+            final Optional<MonthlyResult> monthlyResult = foldingStatsCore.getMonthlyResult(Month.of(Integer.parseInt(month)), Year.parse(year));
             return ok(monthlyResult.orElse(MonthlyResult.empty()));
         } catch (final DateTimeParseException e) {
             final String errorMessage = String.format("The year '%s' is not a valid format", year);

@@ -23,7 +23,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.util.EncodingUtils;
-import me.zodac.folding.ejb.api.BusinessLogic;
+import me.zodac.folding.ejb.api.FoldingStatsCore;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.response.Responses;
 import org.apache.logging.log4j.LogManager;
@@ -59,7 +59,7 @@ import org.apache.logging.log4j.Logger;
  *     </li>
  * </ul>
  *
- * @see BusinessLogic#authenticateSystemUser(String, String)
+ * @see FoldingStatsCore#authenticateSystemUser(String, String)
  */
 @Provider
 public class SecurityInterceptor implements ContainerRequestFilter {
@@ -70,7 +70,7 @@ public class SecurityInterceptor implements ContainerRequestFilter {
     private ResourceInfo resourceInfo;
 
     @EJB
-    private BusinessLogic businessLogic;
+    private FoldingStatsCore foldingStatsCore;
 
     @Override
     public void filter(final ContainerRequestContext requestContext) {
@@ -109,7 +109,7 @@ public class SecurityInterceptor implements ContainerRequestFilter {
         final String userName = decodedUserNameAndPassword.get(EncodingUtils.DECODED_USERNAME_KEY);
         final String password = decodedUserNameAndPassword.get(EncodingUtils.DECODED_PASSWORD_KEY);
 
-        final UserAuthenticationResult userAuthenticationResult = businessLogic.authenticateSystemUser(userName, password);
+        final UserAuthenticationResult userAuthenticationResult = foldingStatsCore.authenticateSystemUser(userName, password);
 
         if (!userAuthenticationResult.isUserExists()) {
             LOGGER.warn("User '{}' does not exist", userName);

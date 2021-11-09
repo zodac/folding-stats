@@ -31,7 +31,7 @@ import javax.ws.rs.core.UriInfo;
 import me.zodac.folding.api.state.ReadRequired;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.ejb.api.BusinessLogic;
+import me.zodac.folding.ejb.api.FoldingStatsCore;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import me.zodac.folding.rest.endpoint.util.IdResult;
 import me.zodac.folding.rest.endpoint.util.IntegerParser;
@@ -57,7 +57,7 @@ public class HistoricStatsEndpoint {
     private UriInfo uriContext;
 
     @EJB
-    private BusinessLogic businessLogic;
+    private FoldingStatsCore foldingStatsCore;
 
     /**
      * {@link GET} request to retrieve a {@link User}'s hourly {@link HistoricStats} for a single {@code day}.
@@ -99,13 +99,13 @@ public class HistoricStatsEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<User> user = businessLogic.getUserWithPasskey(parsedId);
+            final Optional<User> user = foldingStatsCore.getUserWithPasskey(parsedId);
             if (user.isEmpty()) {
                 LOGGER.error("No user found with ID: {}", parsedId);
                 return notFound();
             }
 
-            final Collection<HistoricStats> historicStats = businessLogic.getHistoricStats(user.get(), Year.parse(year), Month.of(monthAsInt),
+            final Collection<HistoricStats> historicStats = foldingStatsCore.getHistoricStats(user.get(), Year.parse(year), Month.of(monthAsInt),
                 dayAsInt);
             return cachedOk(historicStats, request, CACHE_EXPIRATION_TIME);
         } catch (final DateTimeParseException e) {
@@ -156,13 +156,13 @@ public class HistoricStatsEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<User> user = businessLogic.getUserWithPasskey(parsedId);
+            final Optional<User> user = foldingStatsCore.getUserWithPasskey(parsedId);
             if (user.isEmpty()) {
                 LOGGER.error("No user found with ID: {}", parsedId);
                 return notFound();
             }
 
-            final Collection<HistoricStats> historicStats = businessLogic.getHistoricStats(user.get(), Year.parse(year), Month.of(parseInt(month)));
+            final Collection<HistoricStats> historicStats = foldingStatsCore.getHistoricStats(user.get(), Year.parse(year), Month.of(parseInt(month)));
             return cachedOk(historicStats, request, CACHE_EXPIRATION_TIME);
         } catch (final DateTimeParseException e) {
             final String errorMessage = String.format("The year '%s' is not a valid format", year);
@@ -205,13 +205,13 @@ public class HistoricStatsEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<User> user = businessLogic.getUserWithPasskey(parsedId);
+            final Optional<User> user = foldingStatsCore.getUserWithPasskey(parsedId);
             if (user.isEmpty()) {
                 LOGGER.error("No user found with ID: {}", parsedId);
                 return notFound();
             }
 
-            final Collection<HistoricStats> historicStats = businessLogic.getHistoricStats(user.get(), Year.parse(year));
+            final Collection<HistoricStats> historicStats = foldingStatsCore.getHistoricStats(user.get(), Year.parse(year));
             return cachedOk(historicStats, request, CACHE_EXPIRATION_TIME);
         } catch (final DateTimeParseException e) {
             final String errorMessage = String.format("The year '%s' is not a valid format", year);
@@ -264,19 +264,19 @@ public class HistoricStatsEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<Team> teamOptional = businessLogic.getTeam(parsedId);
+            final Optional<Team> teamOptional = foldingStatsCore.getTeam(parsedId);
             if (teamOptional.isEmpty()) {
                 LOGGER.error("No team found with ID: {}", parsedId);
                 return notFound();
             }
             final Team team = teamOptional.get();
 
-            final Collection<User> teamUsers = businessLogic.getUsersOnTeam(team);
+            final Collection<User> teamUsers = foldingStatsCore.getUsersOnTeam(team);
             final List<HistoricStats> teamHourlyStats = new ArrayList<>(teamUsers.size());
 
             for (final User user : teamUsers) {
                 LOGGER.debug("Getting historic stats for user with ID: {}", user.getId());
-                final Collection<HistoricStats> dailyStats = businessLogic.getHistoricStats(user, Year.parse(year), Month.of(monthAsInt), dayAsInt);
+                final Collection<HistoricStats> dailyStats = foldingStatsCore.getHistoricStats(user, Year.parse(year), Month.of(monthAsInt), dayAsInt);
                 teamHourlyStats.addAll(dailyStats);
             }
 
@@ -330,19 +330,19 @@ public class HistoricStatsEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<Team> teamOptional = businessLogic.getTeam(parsedId);
+            final Optional<Team> teamOptional = foldingStatsCore.getTeam(parsedId);
             if (teamOptional.isEmpty()) {
                 LOGGER.error("No team found with ID: {}", parsedId);
                 return notFound();
             }
             final Team team = teamOptional.get();
 
-            final Collection<User> teamUsers = businessLogic.getUsersOnTeam(team);
+            final Collection<User> teamUsers = foldingStatsCore.getUsersOnTeam(team);
             final List<HistoricStats> teamDailyStats = new ArrayList<>(teamUsers.size());
 
             for (final User user : teamUsers) {
                 LOGGER.debug("Getting historic stats for user with ID: {}", user.getId());
-                final Collection<HistoricStats> dailyStats = businessLogic.getHistoricStats(user, Year.parse(year), Month.of(parseInt(month)));
+                final Collection<HistoricStats> dailyStats = foldingStatsCore.getHistoricStats(user, Year.parse(year), Month.of(parseInt(month)));
                 teamDailyStats.addAll(dailyStats);
             }
 
@@ -389,19 +389,19 @@ public class HistoricStatsEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<Team> teamOptional = businessLogic.getTeam(parsedId);
+            final Optional<Team> teamOptional = foldingStatsCore.getTeam(parsedId);
             if (teamOptional.isEmpty()) {
                 LOGGER.error("No team found with ID: {}", parsedId);
                 return notFound();
             }
             final Team team = teamOptional.get();
 
-            final Collection<User> teamUsers = businessLogic.getUsersOnTeam(team);
+            final Collection<User> teamUsers = foldingStatsCore.getUsersOnTeam(team);
             final List<HistoricStats> teamMonthlyStats = new ArrayList<>(teamUsers.size());
 
             for (final User user : teamUsers) {
                 LOGGER.debug("Getting historic stats for user with ID: {}", user.getId());
-                final Collection<HistoricStats> monthlyStats = businessLogic.getHistoricStats(user, Year.parse(year));
+                final Collection<HistoricStats> monthlyStats = foldingStatsCore.getHistoricStats(user, Year.parse(year));
                 teamMonthlyStats.addAll(monthlyStats);
             }
 
