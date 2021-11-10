@@ -279,7 +279,7 @@ public class UserEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<User> optionalElement = foldingStatsCore.getUserWithoutPasskey(parsedId);
+            final Optional<User> optionalElement = foldingStatsCore.getUserWithPasskey(parsedId);
             if (optionalElement.isEmpty()) {
                 LOGGER.error("No user found with ID {}", userId);
                 return notFound();
@@ -288,7 +288,8 @@ public class UserEndpoint {
 
             if (existingUser.isEqualRequest(userRequest)) {
                 LOGGER.debug("No change necessary");
-                return ok(existingUser);
+                final User userWithHiddenPasskey = User.hidePasskey(existingUser);
+                return ok(userWithHiddenPasskey);
             }
 
             final ValidationResult<User> validationResult = validateUpdate(userRequest, existingUser);

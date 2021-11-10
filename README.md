@@ -202,6 +202,8 @@ Restrictions:
 - _Live Stats Link_ is optional, but if it is populated, it must be a valid URL
 - _Is Captain_ cannot be selected if the user's team already has a captain
 - We expect at least 1 Work Unit to have been successfully completed by the _Folding User Name_ and _Passkey_, to confirm it is being used
+- User cannot be added to a category that already has a maximum number of users
+- User cannot be added to a team that already has the maximum number of users
 
 Note, there is no way to ensure a participant is actually only using their passkey on a single piece of hardware, so there is some level of trust
 involved. However, since we can view a user's stats on a per-hour basis, any suspicious passkey usage should be possible to find.
@@ -210,16 +212,18 @@ involved. However, since we can view a user's stats on a per-hour basis, any sus
 
 The following user categories are available in the system:
 
-| Category    | Description                                                                    | Number of users in this category allowed per team | 
-| ----------- | ------------------------------------------------------------------------------ | ------------------------------------------------  |
-| AMD GPU     | Any hardware with _Hardware Make_ of **AMD** and _Hardware Type_ of **GPU**    | 1                                                 |
-| nVidia GPU  | Any hardware with _Hardware Make_ of **nVidia** and _Hardware Type_ of **GPU** | 1                                                 |
-| Wildcard    | Any hardware                                                                   | 1                                                 |
+| Category    | Description                                                                    | Default number of users per category | 
+| ----------- | ------------------------------------------------------------------------------ | ------------------------------------ |
+| AMD GPU     | Any hardware with _Hardware Make_ of **AMD** and _Hardware Type_ of **GPU**    | 1                                    |
+| nVidia GPU  | Any hardware with _Hardware Make_ of **nVidia** and _Hardware Type_ of **GPU** | 1                                    |
+| Wildcard    | Any hardware                                                                   | 1                                    |
 
 Based on these limitations, the current maximum number of users for any team is **3**.
 
-These values are not currently configurable through docker variables, and instead requires updating the *Category.java* class within the source code.
-Please read the [Contributing](#Contributing) section for more information on how to do this.
+The number of users per category is configurable though [docker variables](#configuration).
+
+However, adding new categories (like CPU-based categories, or more specific GPU categories) requires updating the *Category.java* class within the
+source code. Please read the [Contributing](#Contributing) section for more information on how to do this.
 
 ## Adjustments During The Competition
 

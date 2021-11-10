@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.stream.Stream;
+import me.zodac.folding.api.util.EnvironmentVariableUtils;
 
 /**
  * Lists the possible {@link Team} categories for a {@link User} taking part in the <code>Team Competition</code>.
@@ -43,22 +44,24 @@ public enum Category {
     /**
      * {@link User} is using an {@link HardwareMake#AMD} {@link HardwareType#GPU} as their {@link Hardware}.
      */
-    AMD_GPU(1, HardwareMake.AMD, HardwareType.GPU),
+    AMD_GPU(getCategoryCount("USERS_IN_AMD_GPU"), HardwareMake.AMD, HardwareType.GPU),
 
     /**
      * {@link User} is using an {@link HardwareMake#NVIDIA} {@link HardwareType#GPU} as their {@link Hardware}.
      */
-    NVIDIA_GPU(1, HardwareMake.NVIDIA, HardwareType.GPU),
+    NVIDIA_GPU(getCategoryCount("USERS_IN_NVIDIA_GPU"), HardwareMake.NVIDIA, HardwareType.GPU),
 
     /**
      * {@link User} is permitted to use any {@link HardwareMake} and {@link HardwareType} as their {@link Hardware}.
      */
-    WILDCARD(1, HardwareMake.getAllValues(), HardwareType.getAllValues()),
+    WILDCARD(getCategoryCount("USERS_IN_WILDCARD"), HardwareMake.getAllValues(), HardwareType.getAllValues()),
 
     /**
      * Not a valid {@link Category}.
      */
     INVALID(0, Collections.emptySet(), Collections.emptySet());
+
+    private static final int DEFAULT_USERS_PER_CATEGORY = 1;
 
     private static final Collection<Category> ALL_VALUES = Stream.of(values())
         .filter(value -> value != INVALID)
@@ -177,5 +180,17 @@ public enum Category {
      */
     public Set<HardwareType> supportedHardwareTypes() {
         return supportedHardwareTypes;
+    }
+
+    private static int getCategoryCount(final String categoryVariable) {
+        return convertToIntOrDefault(EnvironmentVariableUtils.get(categoryVariable));
+    }
+
+    private static int convertToIntOrDefault(final String input) {
+        try {
+            return Integer.parseInt(input);
+        } catch (final NumberFormatException e) {
+            return DEFAULT_USERS_PER_CATEGORY;
+        }
     }
 }

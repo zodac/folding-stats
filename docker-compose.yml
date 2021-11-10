@@ -58,6 +58,10 @@ services:
       # This value should match the value of 'FIRST_DAY_OF_MONTH' in the 'frontend' container
       STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH: "${FIRST_DAY_OF_MONTH}"
       STATS_PARSING_SCHEDULE_LAST_DAY_OF_MONTH: "${LAST_DAY_OF_MONTH}"
+      # Category configuration
+      USERS_IN_AMD_GPU: "${USERS_IN_AMD_GPU}"
+      USERS_IN_NVIDIA_GPU: "${USERS_IN_NVIDIA_GPU}"
+      USERS_IN_WILDCARD: "${USERS_IN_WILDCARD}"
       # Database configuration
       DEPLOYED_DATABASE: "postgresql"
       JDBC_CONNECTION_URL: "jdbc:postgresql://database:${POSTGRES_PORT}/${POSTGRES_DB_NAME}"
