@@ -98,7 +98,8 @@ public final class UserValidator {
      *     <li>Field 'displayName' must not be empty</li>
      *     <li>Field 'passkey' must not be empty, must be 32-characters long, and must only include alphanumeric characters</li>
      *     <li>If fields 'foldingUserName' and 'passkey' are valid, they must not be used by another {@link User}</li>
-     *     <li>Field 'category' must be a valid {@link Category}</li>
+     *     <li>Field 'category' must be a valid {@link Category}, and must match the {@link me.zodac.folding.api.tc.HardwareMake} and
+     *     {@link me.zodac.folding.api.tc.HardwareType} of the user's {@link Hardware}</li>
      *     <li>If field 'profileLink' is not empty, it must be a valid URL</li>
      *     <li>If field 'liveStatsLink' is not empty, it must be a valid URL</li>
      *     <li>Field 'hardwareId' must match an existing {@link Hardware}</li>
@@ -186,7 +187,8 @@ public final class UserValidator {
      *     <li>Field 'passkey' must not be empty, must be 32-characters long, and must only include alphanumeric characters</li>
      *     <li>If fields 'foldingUserName' and 'passkey' are valid, they must not be used by another {@link User}, unless it is the {@link User} being
      *     updated</li>
-     *     <li>Field 'category' must be a valid {@link Category}</li>
+     *     <li>Field 'category' must be a valid {@link Category}, and must match the {@link me.zodac.folding.api.tc.HardwareMake} and
+     *     {@link me.zodac.folding.api.tc.HardwareType} of the user's {@link Hardware}</li>
      *     <li>If field 'profileLink' is not empty, it must be a valid URL</li>
      *     <li>If field 'liveStatsLink' is not empty, it must be a valid URL</li>
      *     <li>Field 'hardwareId' must match an existing {@link Hardware}</li>

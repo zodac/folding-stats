@@ -1,132 +1,242 @@
-# README still a work in progress!
+- [Folding@Home Team Competition](#foldinghome-team-competition)
+    - [Overview](#overview)
+    - [How Are Points Calculated](#how-are-points-calculated)
+- [Getting Started](#getting-started)
+    - [System Requirements](#system-requirements)
+    - [Configuration](#configuration)
+    - [Starting The System](#starting-the-system)
+    - [Adding Folding@Home Users To The System](#adding-foldinghome-users-to-the-system)
+        - [Adding Hardware](#adding-hardware)
+            - [Hardware Definition](#hardware-definition)
+            - [LARS Hardware Update](#lars-hardware-update)
+        - [Adding Teams](#adding-teams)
+            - [Team Definition](#team-definition)
+        - [Adding Users](#adding-users)
+            - [User Definition](#user-definition)
+            - [User Categories](#user-categories)
+- [Troubleshooting](#troubleshooting)
+    - [Errors Performing Admin Functions](#errors-performing-admin-functions)
+    - [Logging](#logging)
+        - [Available Logs](#available-logs)
+        - [Enable DEBUG Or TRACE Logs](#enabling-debug-or-trace-logs)
+        - [Extracting Logs On Container Crash](#extracting-logs-on-container-crash)
+    - [Backup And Restore The Database](#backup-and-restore-of-database)
+- [Contributing](#contributing)
+- [Contact Us](#contact-us)
+- [License](#license)
 
-# Folding Stats
+# Folding@Home Team Competition
 
-## Development
+The *Folding@Home Team Competition* is a competition where members of a [Folding@Home](https://foldingathome.org/) team can group together into
+sub-teams to compete, while still continuing to contribute to their parent team in the
+overall [Folding@Home donor statistics](https://stats.foldingathome.org/).
 
-### Dependency Management
+A live example of this competition can be seen running for the [ExtremeHW Folding@Home team](https://etf.axihub.ca/).
 
-All dependencies can be updated using the `versions-maven-plugin`. By using the following command, all version will be updated to the latest version
-available online:
+## Overview
 
-    mvn versions:update-properties
+The idea is that sub-teams will be created with 'categories' of hardware, which will be filled by Folding@Home users. In order to uniquely identify a
+piece of hardware for a user (while still allowing them to contribute under the same Folding@Home user name and team), we require each piece of
+hardware to have its own [Folding@Home passkey](https://apps.foldingathome.org/getpasskey). Since it is possible to get points for a user+passkey
+combination, this allows us to get the points for a single CPU or GPU.
 
-## Licences
+## How Are Points Calculated
 
-All source code should have a license header at the top of the file. This will be enforced by the `license-maven-plugin` linter. In order to
-automatically add a license to any file that is missing it, the following command can be used:
+In order to try and normalise scores across different hardware, each hardware is assigned a multiplier, based on its average PPD. The best performing
+GPU or CPU is used as the base and given a multiplier of **1.00**. All other hardware has their multiplier calculated using the formula, rounded to
+two decimal places:
 
-    mvn license:format
+    Average PPD of best GPU / Average PPD of current GPU
 
-### jOOQ Database Access
+Note that we will not compare CPUs to GPUs, but we *will* compare all makes of GPUs to other makes; nVidia and AMD GPUs, for example.
 
-We use **jOOQ** for generating PostgreSQL queries (as seen in *PostgresDbManager.java*). We use **jOOQ** code generation to generate files to make SQL
-query building simpler and able to conform to schemas. This requires a few steps when the DB changes:
+The average PPDs for hardware is retrieved from the [LARS PPD Database](https://folding.lar.systems/).
 
-- Start the test containers (--> "Executing tests" <-- )
-- Update the `docker/postgres/jooq/jooq-config.xml` file with the DB connection properties if not using the default
-- Run the `generate.bat` batch file, which will generate the schemas (starting in a directory named `me`)
-- Traverse the `me` directory until you get to `gen` (full path is `me/zodac/folding/db/postgres/gen`)
-- Move the `gen` directory and all contents into `folding-stats/folding-stats-jar/src/main/java/me/zodac/folding/db/postgres`
-    - Overwrite any existing files (or delete beforehand)
+---
 
-Once this is done, it will be possible to reference the DB tables/fields/schema from *PostgresDbManager.java* to assist with SQL query generation.
+# Getting Started
 
-### Adding Support for Another Database
+If you're interested in running this for your own Folding@Home team, the instructions below should help you get set up.
 
-Since the system is containerised, it is possible to swap out the default PostgreSQL DB for an alternative. The steps required for this are:
+## System Requirements
 
-- Update docker-compose.yml:
-    - Remove the PostgreSQL DB `database` container
-    - Add the new DB container (if containerised)
-    - Update the `backend` container environment variables for "Database configuration"
-- Add support for the new DB container in code:
-    - Implement the *DbManager.java* interface, with code stored in the `folding-stats-jar/src/main/java/me/zodac/folding/db/<DB_NAME>` package
-    - Update *DatabaseType.java* with an Enum for the new DB name
-    - Update *DbManagerRetriever.java* with a new SWITCH condition for the DB name
-    - Optionally, use the instructions in --> jooQ Database Access <-- to run jOOQ code generation for easier SQL query building
+You'll need to have the following installed on your system:
 
-### JS/CSS Updates
+- [git](https://git-scm.com/)
+- [docker](https://www.docker.com/get-started)
+- [docker-compose](https://docs.docker.com/compose/install/)
 
-The JS scripts and CSS stylesheets are stored in `docker/apache/`. They are then minified and merged by a maven plugin, which creates the final files
-for the site. These CSS and JS files are generated in the `frontend` docker container.
+## Configuration
 
-### REST RAML API
+You can start by pulling down the repository, then configuring the environment variables for your system. Copy the existing `.env.template` file and
+rename it to `.env`. Then open it up and read the instructions, filling in the variables. By default:
 
-The REST endpoints are documented through RAML, with the source RAML file found in  `docker/apache/raml/api.raml`. This is used to generate an HTML
-output which is saved to `docker/apache/site/api.html`, and can be accessed through the UI. The RAML HTML is generated in the `frontend` docker
-container.
+- The competition runs from the 3rd of the month until the end of the month
+- The stats will be collected for all users and teams once an hour (at xx:55)
+- At the end of the month:
+    - The month's results are saved
+    - All user's stats are reset to 0
+    - The hardware multipliers and average PPD are recalculated from LARS
+- Both the backend and frontend will run using HTTPS
 
-## Decisions
+The defaults should be sufficient for most users, but any variable in the first `Mandatory` section must be updated. These will be credentials, the
+location of any SSL certificates needed, and the URLs to your own frontend.
 
-### Historic Stats
+## Starting The System
 
-We're using a couple of queries to read the user stats from the ETF stats table, but not persisting hourly/daily/monthly stats. This might be a bit
-slow if there is frequent access to the historic pages, so there is a potential for caching/persisting results. Could be persisted on a scheduled
-basis, or perhaps only persisted on the first call, then cache those results. Need to do more profiling on a live system, see how much it is being
-used. (A good idea to bring in an ELK stack to instrument the system when we go live.)
+There are three components to the system:
 
-## Executing Tests
+- The `frontend`, hosting the UI
+- The `backend`, for stats calculation and hardware/team/user management
+- The `database`, for persistent storage
 
-TBC
+These are all run as individual docker containers, and are configured by the `docker-compose.yml` file in the root of the repository. To start, you
+can run the commands:
 
-## Executing linting
+    cd ~/<GIT_HOME>/folding-stats
+    docker-compose up --build --detach
 
-TBC
+This will build and run the docker containers in the background, and you can then access the UI at:
 
-## Troubleshooting
+    https://127.0.0.1
 
-### Take Backup Of Database
+## Adding Folding@Home Users To The System
 
-To take a backup of the database, the following commands can be run against the `database` container:
+Now that the system is running, we can begin adding users. However, we need to set up hardware and teams for each user to use.
 
-    docker exec database pg_dump -U folding_user -F t folding_db -f export.tar
-    docker cp database:/export.tar ~/export_$(date +%F).tar
+This is done by opening the UI and clicking on the `System` -> `Admin` [tab](https://127.0.0.1/system) on the nav bar. Log in with the admin
+credentials defined [above](#configuration). The sections below describe how to populate the system with users and teams.
 
-The first line will create a backup of the DB in the `database` container, and the second will copy it out to the host.
+### Adding Hardware
 
-### Restore Database From Backup
+Click on the **List of Hardware** button. It should show an empty list, since we have no hardware yet. We don't need to manually add these, however.
+Instead, we can click on the `Manual LARS Update` button. This will retrieve all available GPUs from the LARS database, and add them to the system. If
+you refresh the page (it may need a **CTRL+F5** refresh), you should now be able to see the hardware in the **List of Hardware**
+section.
 
-Assuming a backup was previously created using the instructions in --> Take Backup Of Database <--, it can be restored using the following commands
-against the `database` container:
+#### Hardware Definition
 
-    docker cp ~/export_<TIMESTAMP>.tar database:/export.tar
-    docker exec database pg_restore -d folding_db export.tar -c -U folding_user
+A **hardware** has the following fields:
 
-The first line will copy the backup from the host to the `database` container, and the second will restore the DB using the *export.tar* file.
+| Field Name      | Description                                                                                                    |
+| --------------- | -------------------------------------------------------------------------------------------------------------- |
+| _ID_            | System-generated ID for the hardware                                                                           |
+| _Hardware Name_ | Unique hardware name as retrieved from the LARS DB                                                             |
+| _Display Name_  | User-friendly name to be shown on the UI                                                                       |
+| _Hardware Make_ | Manufacturer of the hardware (AMD, nVidia, etc)                                                                |
+| _Hardware Type_ | The type of hardware (CPU, GPU, etc)                                                                           |
+| _Multiplier_    | The multiplier for the hardware, comparing its average PPD to the best GPU or CPU, rounded to 2 decimal places |
+| _Average PPD_   | The average PPD for the hardware, based on the value retrieved from the LARS DB                                |
 
-### Enabling DEBUG Logs
+Restrictions:
 
-This requires us to connect to the `wildfly` container, so we will need the container ID:
+- _Hardware Name_ must be unique and cannot be empty
+- _Display Name_ cannot be empty
+- _Multiplier_ must be 1.00 or greater
+- _Average PPD_ must be 1 or greater
 
-    $ docker container ls
-    CONTAINER ID        IMAGE                    COMMAND                  CREATED             STATUS                   PORTS                                            NAMES
-    c669fe278e36        folding-stats_backend    "/opt/jboss/wildfly/…"   3 minutes ago       Up 3 minutes             0.0.0.0:8080->8080/tcp, 0.0.0.0:9990->9990/tcp   wildfly
-    334ace4ab4be        folding-stats_database   "docker-entrypoint.s…"   3 minutes ago       Up 3 minutes (healthy)   0.0.0.0:5432->5432/tcp                           postgres
+#### LARS Hardware Update
 
-Then connect to this container (if using Linux, ignore the `winpty` at the start of the command):
+We currently only support GPUs as hardware in the system, so we only retrieve the GPU data from LARS. CPU support may be introduced in future, but if
+a CPU is needed, it can be manually added using the UI.
 
-    $ winpty docker exec -it c669fe278e36 bash
-    [root@wildfly jboss]#
+### Adding Teams
 
-This gives us access to the Wildfly container. Now we connect to the console:
+Click on the **List of Team** button. It should also show an empty list. We can manually create a team (or many) by clicking on `Teams`
+-> `Create Team`. You can now populate the fields and create a team.
 
-    [root@wildfly jboss]# ./wildfly/bin/jboss-cli.sh --connect
-    [standalone@localhost:9990 /]
+Note that you do not *technically* add a user to a team. Instead, when you create a user, it is assigned to a team. As a result, the team admin screen
+will not reference any users.
 
-Finally, we update both the logger for our code, and the CONSOLE logger (otherwise the debug logs will be available in the log file only):
+Please take a look at [User Categories](#user-categories) for an explanation on how we limit the size of a team.
 
-    [standalone@localhost:9990 /] /subsystem=logging/logger=me.zodac.folding:write-attribute(name=level, value=DEBUG)
-    {"outcome" => "success"}
-    [standalone@localhost:9990 /] /subsystem=logging/console-handler=CONSOLE:write-attribute(name=level, value=DEBUG)
-    {"outcome" => "success"}
+#### Team Definition
+
+A **team** has the following fields:
+
+| Field Name         | Description                      |
+| ------------------ | -------------------------------- |
+| _ID_               | System-generated ID for the team |
+| _Team Name_        | Unique team name                 |
+| _Team Description_ | Description of the team          |
+| _Forum Link_       | Link to the team's forum page    |
+
+Restrictions:
+
+- _Team Name_ must be unique and cannot be empty
+- _Forum Link_ is optional, but if it is populated, it must be a valid URL
+
+### Adding Users
+
+#### User Definition
+
+A **user** has the following fields:
+
+| Field Name          | Description                                                                                                          |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| _ID_                | System-generated ID for the user                                                                                     |
+| _Folding User Name_ | Folding@Home user name                                                                                               |
+| _Display Name_      | Name to be displayed on the UI for the user (for example, if a user's forum name differs from Folding@Home user name |
+| _Passkey_           | User's passkey **for this specific hardware**                                                                        |
+| _Category_          | Category the user is competing under (see [User Categories](#user-categories) for more info)                         |
+| _Profile Link_      | Link to the user's forum profile                                                                                     |
+| _Live Stats Link_   | Link to the user's live stats link, if exposed through HFM, for example                                              |
+| _Hardware_          | The hardware this user is competing under                                                                            |
+| _Team_              | The team this user is competing under                                                                                |
+| _Is Captain_        | Whether this user is the captain of the team                                                                         |
+
+Restrictions:
+
+- _Folding User Name_ can only include alphanumeric characters, or underscore (_), hyphen (-) or period (.)
+- _Display Name_ cannot be empty
+- _Passkey_ must be 32 characters long, and can only include alphanumeric characters
+- The combination of _Folding User Name_ and _Passkey_ must be unique
+- _Category_ must be valid according to [User Categories](#user-categories), and match the _Hardware Make_ and _Hardware Type_ of the user's hardware
+- _Profile Link_ is optional, but if it is populated, it must be a valid URL
+- _Live Stats Link_ is optional, but if it is populated, it must be a valid URL
+- _Is Captain_ cannot be selected if the user's team already has a captain
+
+Note, there is no way to ensure a participant is actually only using their passkey on a single piece of hardware, so there is some level of trust
+involved. However, since we can view a user's stats on a per-hour basis, any suspicious passkey usage should be possible to find.
+
+#### User Categories
+
+The following user categories are available in the system:
+
+| Category    | Description                                                                    | Number of users in this category allowed per team | 
+| ----------- | ------------------------------------------------------------------------------ | ------------------------------------------------  |
+| AMD GPU     | Any hardware with _Hardware Make_ of **AMD** and _Hardware Type_ of **GPU**    | 1                                                 |
+| nVidia GPU  | Any hardware with _Hardware Make_ of **nVidia** and _Hardware Type_ of **GPU** | 1                                                 |
+| Wildcard    | Any hardware                                                                   | 1                                                 |
+
+Based on these limitations, the maximum number of users for any team is 3.
+
+These values are not currently configurable through docker variables, and instead requires updating the *Category.java* class within the source code.
+
+---
+
+# Troubleshooting
+
+## Errors Performing Admin Functions
+
+When performing any admin functions, you may get a failure pop-up stating an operation failed. You can get more information by viewing the console in
+your browser. In Google Chrome, this can be done by pressing **F12** and selecting the `console` tab. You may need to re-run the command to see the
+error after opening the console.
+
+If this does not provide enough information, you can see the [Logging](#logging) section below on how to log into the `backend` container and view the
+system log there.
 
 ## Logging
 
 ### Available Logs
 
-The system currently has two logs available. Both can be viewed either through the Wildfly Admin UI, connecting to the docker container and checking
-directory `/opt/jboss/wildfly/standalone/log`, or attaching to the `backend_logs` volume.
+The system currently has multiple logs available. They can be viewed by:
+
+- Connecting to the docker container and checking directory `/opt/jboss/wildfly/standalone/log`
+- Attaching to the `backend_logs` volume (as described in [Extracting Logs On Container Crash](#extracting-logs-on-container-crash))
+- Logging in through the Wildfly Admin UI
+
+The description of the available log files:
 
 - server.log
     - This is the general application log, where most logging will be written to. It will also be printed to the console.
@@ -134,10 +244,47 @@ directory `/opt/jboss/wildfly/standalone/log`, or attaching to the `backend_logs
     - This is where all logging for *SecurityInterceptor.java* is written, detailing login attempts or access requests to WRITE operations. This is
       not printed to the console.
 
-### How To Extract Logs On Container Crash
+The logs are rotated each day, so you will see the following on the file system (with the non-timestamped log files referring to the current day's
+logs):
 
-A volume `backend_logs` should exist. We cannot retrieve the file directly from the volume. Instead, we create a lightweight docker container, and
-attach the volume to this container. We can then copy the file from the container to the host system.
+    [root@backend log]# ls -1
+    audit.log
+    audit.log.2021-11-08
+    server.log
+    server.log.2021-11-08
+
+### Enabling DEBUG Or TRACE Logs
+
+This requires us to connect to the `backend` container, so we will need the container ID:
+
+    $ docker container ls
+    CONTAINER ID        IMAGE                    COMMAND                  CREATED             STATUS                   PORTS                                            NAMES
+    c669fe278e36        folding-stats_backend    "/opt/jboss/wildfly/…"   3 minutes ago       Up 3 minutes             0.0.0.0:8080->8080/tcp, 0.0.0.0:9990->9990/tcp   backend
+    334ace4ab4be        folding-stats_database   "docker-entrypoint.s…"   3 minutes ago       Up 3 minutes (healthy)   0.0.0.0:5432->5432/tcp                           database
+
+Then connect to this container:
+
+    $ docker exec -it c669fe278e36 bash
+    [root@backend log]#
+
+This gives us access to the backend container, which runs on the [Wildfly AS](https://www.wildfly.org/). Now we connect to the console:
+
+    [root@backend jboss]# /opt/jboss/wildfly/bin/jboss-cli.sh --connect
+    [standalone@localhost:9990 /]
+
+Finally, we update both the logger for our code and the CONSOLE logger, otherwise the updated logs will be available in the log file only. Use
+either `DEBUG` or `TRACE` as the *value* below:
+
+    [standalone@localhost:9990 /] /subsystem=logging/logger=me.zodac.folding:write-attribute(name=level, value=DEBUG)
+    {"outcome" => "success"}
+    [standalone@localhost:9990 /] /subsystem=logging/console-handler=CONSOLE:write-attribute(name=level, value=DEBUG)
+    {"outcome" => "success"}
+
+### Extracting Logs On Container Crash
+
+In the event of a container crash, the logs should be retained as we mount the `log` directory in a docker volume mount named `backend_logs`. However,
+we cannot retrieve the file directly from the volume. Instead, we create a lightweight docker container, and attach the volume to this container. We
+can then copy the file from the container to the host system.
 
 For example, first check the available volumes:
 
@@ -151,7 +298,7 @@ Then create a simple container, attaching the `folding-stats_backend_logs` volum
 
     docker container create --name dummy -v folding-stats_backend_logs:/root:ro folding-stats_backend
 
-We can then copy the logs from the `dummy` container to our host:
+We can then copy the logs from the `dummy` container to our local machine:
 
     docker cp dummy:/root/server.log ./server.log
     docker cp dummy:/root/audit.log ./audit.log
@@ -159,3 +306,43 @@ We can then copy the logs from the `dummy` container to our host:
 And finally remove the `dummy` container:
 
     docker rm dummy
+
+---
+
+## Backup And Restore Of Database
+
+In case of a migration to a new host, or a major issue where the docker volumes may be lost, we can create a backup of the database, then restore it
+onto the new/remade environment. Please note that the instructions below are for the default `database` container, which runs on **PostgreSQL**.
+
+To take a backup of the database, the following commands can be run against the `database` container:
+
+    docker exec database pg_dump -U folding_user -F t folding_db -f export.tar
+    docker cp database:/export.tar ~/export_$(date +%F).tar
+
+The first line will create a backup of the DB in the `database` container, and the second will copy it out to the host.
+
+Assuming a backup was previously created, it can be restored using the following commands against the `database` container:
+
+    docker cp ~/export_<TIMESTAMP>.tar database:/export.tar
+    docker exec database pg_restore -d folding_db export.tar -c -U folding_user
+
+The first line will copy the backup from the host to the `database` container, and the second will restore the DB using the *export.tar* file.
+
+---
+
+# Contributing
+
+Would you like to contribute? [CONTRIBUTING.md](CONTRIBUTING.md) has details on how!
+
+---
+
+# Contact Us
+
+We are currently running the competition over at [ExtremeHW](https://forums.extremehw.net/forum/125-extreme-team-folding/), so you can find us over
+there.
+
+---
+
+# License
+
+The *Folding@Home Team Competition* source code is released under the [MIT License](http://www.opensource.org/licenses/MIT).
