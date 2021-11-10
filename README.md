@@ -14,6 +14,10 @@
         - [Adding Users](#adding-users)
             - [User Definition](#user-definition)
             - [User Categories](#user-categories)
+    - [Adjustments During The Competition](#adjustments-during-the-competition)
+        - [Offsetting User Stats](#offsetting-user-stats)
+        - [Deleting Users](#deleting-users)
+        - [Moving A User To Another Team](#moving-a-user-to-another-team)
 - [Troubleshooting](#troubleshooting)
     - [Errors Performing Admin Functions](#errors-performing-admin-functions)
     - [Logging](#logging)
@@ -28,7 +32,7 @@
 # Folding@Home Team Competition
 
 The *Folding@Home Team Competition* is a competition where members of a [Folding@Home](https://foldingathome.org/) team can group together into
-sub-teams to compete, while still continuing to contribute to their parent team in the
+sub-teams to compete against each other, while still continuing to contribute to their parent team in the
 overall [Folding@Home donor statistics](https://stats.foldingathome.org/).
 
 A live example of this competition can be seen running for the [ExtremeHW Folding@Home team](https://etf.axihub.ca/).
@@ -37,8 +41,8 @@ A live example of this competition can be seen running for the [ExtremeHW Foldin
 
 The idea is that sub-teams will be created with 'categories' of hardware, which will be filled by Folding@Home users. In order to uniquely identify a
 piece of hardware for a user (while still allowing them to contribute under the same Folding@Home user name and team), we require each piece of
-hardware to have its own [Folding@Home passkey](https://apps.foldingathome.org/getpasskey). Since it is possible to get points for a user+passkey
-combination, this allows us to get the points for a single CPU or GPU.
+hardware to have its own [Folding@Home passkey](https://apps.foldingathome.org/getpasskey). Since it is possible to retrieve the points for a
+user+passkey combination, this allows us to get the points for a single CPU or GPU.
 
 ## How Are Points Calculated
 
@@ -68,16 +72,16 @@ You'll need to have the following installed on your system:
 
 ## Configuration
 
-You can start by pulling down the repository, then configuring the environment variables for your system. Copy the existing `.env.template` file and
-rename it to `.env`. Then open it up and read the instructions, filling in the variables. By default:
+You can start by using `git clone` to copy the repository, then configuring the environment variables for your system. Copy the
+existing `.env.template` file and rename it to `.env`. Then open it up and read the instructions, filling in the variables. By default:
 
 - The competition runs from the 3rd of the month until the end of the month
+- Both the backend and frontend will run using HTTPS
 - The stats will be collected for all users and teams once an hour (at xx:55)
 - At the end of the month:
     - The month's results are saved
-    - All user's stats are reset to 0
+    - All user's stats are reset to **0**
     - The hardware multipliers and average PPD are recalculated from LARS
-- Both the backend and frontend will run using HTTPS
 
 The defaults should be sufficient for most users, but any variable in the first `Mandatory` section must be updated. These will be credentials, the
 location of any SSL certificates needed, and the URLs to your own frontend.
@@ -96,9 +100,7 @@ can run the commands:
     cd ~/<GIT_HOME>/folding-stats
     docker-compose up --build --detach
 
-This will build and run the docker containers in the background, and you can then access the UI at:
-
-    https://127.0.0.1
+This will build and run the docker containers in the background, and you can then access the UI at [https://127.0.0.1](https://127.0.0.1).
 
 ## Adding Folding@Home Users To The System
 
@@ -132,8 +134,8 @@ Restrictions:
 
 - _Hardware Name_ must be unique and cannot be empty
 - _Display Name_ cannot be empty
-- _Multiplier_ must be 1.00 or greater
-- _Average PPD_ must be 1 or greater
+- _Multiplier_ must be **1.00** or greater
+- _Average PPD_ must be **1** or greater
 
 #### LARS Hardware Update
 
@@ -142,7 +144,7 @@ a CPU is needed, it can be manually added using the UI.
 
 ### Adding Teams
 
-Click on the **List of Team** button. It should also show an empty list. We can manually create a team (or many) by clicking on `Teams`
+Click on the **List of Teams** button. It should also show an empty list. We can manually create a team (or many) by clicking on `Teams`
 -> `Create Team`. You can now populate the fields and create a team.
 
 Note that you do not *technically* add a user to a team. Instead, when you create a user, it is assigned to a team. As a result, the team admin screen
@@ -167,6 +169,10 @@ Restrictions:
 - _Forum Link_ is optional, but if it is populated, it must be a valid URL
 
 ### Adding Users
+
+As above, if you click on the **List of Users** button you will only see an empty list. But since we now have hardware and teams in the system, we can
+begin adding users. Similar to the teams, simply click on `Users` -> `Create User` and populate the values. The team and hardware fields are
+searchable, so no need to scroll through all available options.
 
 #### User Definition
 
@@ -195,6 +201,7 @@ Restrictions:
 - _Profile Link_ is optional, but if it is populated, it must be a valid URL
 - _Live Stats Link_ is optional, but if it is populated, it must be a valid URL
 - _Is Captain_ cannot be selected if the user's team already has a captain
+- We expect at least 1 Work Unit to have been successfully completed by the _Folding User Name_ and _Passkey_, to confirm it is being used
 
 Note, there is no way to ensure a participant is actually only using their passkey on a single piece of hardware, so there is some level of trust
 involved. However, since we can view a user's stats on a per-hour basis, any suspicious passkey usage should be possible to find.
@@ -209,9 +216,29 @@ The following user categories are available in the system:
 | nVidia GPU  | Any hardware with _Hardware Make_ of **nVidia** and _Hardware Type_ of **GPU** | 1                                                 |
 | Wildcard    | Any hardware                                                                   | 1                                                 |
 
-Based on these limitations, the maximum number of users for any team is 3.
+Based on these limitations, the current maximum number of users for any team is **3**.
 
 These values are not currently configurable through docker variables, and instead requires updating the *Category.java* class within the source code.
+Please read the [Contributing](#Contributing) section for more information on how to do this.
+
+## Adjustments During The Competition
+
+### Offsetting User Stats
+
+Sometimes a user's stats may need to be adjusted. Perhaps they were using the wrong hardware, or had their passkey on multiple GPUs by mistake. If for
+any reason a user's points needs to be changed, simply click on `Users` -> `Edit User Points/Units` and enter the new wanted stats for the user.
+
+### Deleting Users
+
+When a user is deleted, we don't want the points they earned to be lost for their team. So whenever a user is deleted, their final stats until that
+moment in the month are saved and retained for the team as "Retired User" stats. This retired user will remain until the end of the month (when the
+stats are reset), at which point it will be removed from the team.
+
+### Moving A User To Another Team
+
+When a user is updated and has their team changed (meaning they have been moved), it is similar to if they have been [deleted](#deleting-users) from
+their first team, and then added as a new user to their new team. So their old team will get a "Retired User" with the moved user's current stats, and
+the new team will get the user with 0 stats.
 
 ---
 
@@ -219,9 +246,9 @@ These values are not currently configurable through docker variables, and instea
 
 ## Errors Performing Admin Functions
 
-When performing any admin functions, you may get a failure pop-up stating an operation failed. You can get more information by viewing the console in
-your browser. In Google Chrome, this can be done by pressing **F12** and selecting the `console` tab. You may need to re-run the command to see the
-error after opening the console.
+When performing any [admin functions](#adding-foldinghome-users-to-the-system), you may get a failure pop-up stating an operation failed. You can get
+more information by viewing the console in your browser. In Google Chrome, this can be done by pressing **F12** and selecting the `Console` tab. You
+may need to re-run the command to see the error after opening the console.
 
 If this does not provide enough information, you can see the [Logging](#logging) section below on how to log into the `backend` container and view the
 system log there.
@@ -230,19 +257,19 @@ system log there.
 
 ### Available Logs
 
-The system currently has multiple logs available. They can be viewed by:
-
-- Connecting to the docker container and checking directory `/opt/jboss/wildfly/standalone/log`
-- Attaching to the `backend_logs` volume (as described in [Extracting Logs On Container Crash](#extracting-logs-on-container-crash))
-- Logging in through the Wildfly Admin UI
-
-The description of the available log files:
+The system currently has multiple logs available:
 
 - server.log
     - This is the general application log, where most logging will be written to. It will also be printed to the console.
 - audit.log
     - This is where all logging for *SecurityInterceptor.java* is written, detailing login attempts or access requests to WRITE operations. This is
       not printed to the console.
+
+These can be accessed and viewed by:
+
+- Connecting to the docker container and checking directory `/opt/jboss/wildfly/standalone/log`
+- Attaching to the `backend_logs` volume (as described in [Extracting Logs On Container Crash](#extracting-logs-on-container-crash))
+- Logging in through the Wildfly Admin UI
 
 The logs are rotated each day, so you will see the following on the file system (with the non-timestamped log files referring to the current day's
 logs):
@@ -332,17 +359,17 @@ The first line will copy the backup from the host to the `database` container, a
 
 # Contributing
 
-Would you like to contribute? [CONTRIBUTING.md](CONTRIBUTING.md) has details on how!
+Would you like to contribute? [Check here](CONTRIBUTING.md) for details on how.
 
 ---
 
 # Contact Us
 
-We are currently running the competition over at [ExtremeHW](https://forums.extremehw.net/forum/125-extreme-team-folding/), so you can find us over
-there.
+We are currently running the competition over at [ExtremeHW](https://forums.extremehw.net/forum/125-extreme-team-folding/), so you can get in touch
+with us over there.
 
 ---
 
 # License
 
-The *Folding@Home Team Competition* source code is released under the [MIT License](http://www.opensource.org/licenses/MIT).
+The source code is released under the [MIT License](http://www.opensource.org/licenses/MIT).

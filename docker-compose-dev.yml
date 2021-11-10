@@ -8,7 +8,7 @@ services:
       dockerfile: docker/apache/Dockerfile
       args:
         FIRST_DAY_OF_MONTH: "3"
-        FORUM_LINK: "https://forums.extremehw.net/forum/125-extreme-team-folding/"
+        FORUM_LINK: "https://forums.extremehw.net/forum/125-extreme-team-folding"
         REST_ENDPOINT_URL: "http://127.0.0.1:8081/folding"
         ROOT_URL: "http://frontend_dev/"
         TITLE: "Extreme Team Folding"
@@ -43,7 +43,7 @@ services:
       # External URL configuration
       LARS_URL_ROOT: "http://backend-dev:8080"
       STATS_URL_ROOT: "http://backend-dev:8080"
-      REDIRECT_URL: "http://frontend_dev/"
+      REDIRECT_URL: "http://frontend_dev"
       # NOTE: The monthly reset, result storage and LARS update will always occur at 23:57 on the last day of the month
       ENABLE_LARS_HARDWARE_UPDATE: "false"
       ENABLE_MONTHLY_RESULT_STORAGE: "false"
