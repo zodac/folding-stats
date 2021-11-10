@@ -52,6 +52,7 @@ import me.zodac.folding.ejb.api.FoldingStatsCore;
 import me.zodac.folding.ejb.tc.scheduled.StatsScheduler;
 import me.zodac.folding.ejb.tc.user.UserStateChangeHandler;
 import me.zodac.folding.ejb.tc.user.UserStatsParser;
+import me.zodac.folding.ejb.tc.user.UserTeamChangeHandler;
 import me.zodac.folding.rest.api.tc.CompetitionSummary;
 import me.zodac.folding.rest.api.tc.RetiredUserSummary;
 import me.zodac.folding.rest.api.tc.TeamSummary;
@@ -85,6 +86,9 @@ public class FoldingStatsEjb implements FoldingStatsCore {
     @EJB
     private UserStatsParser userStatsParser;
 
+    @EJB
+    private UserTeamChangeHandler userTeamChangeHandler;
+
     @Override
     public Hardware createHardware(final Hardware hardware) {
         return STORAGE.createHardware(hardware);
@@ -107,9 +111,9 @@ public class FoldingStatsEjb implements FoldingStatsCore {
         if (userStateChangeHandler.isHardwareStateChange(updatedHardware, existingHardware)) {
             final Collection<User> usersUsingThisHardware = getUsersWithHardware(updatedHardware);
 
-            for (final User user : usersUsingThisHardware) {
-                LOGGER.debug("User '{}' (ID: {}) had state change to hardware", user.getDisplayName(), user.getId());
-                userStateChangeHandler.handleStateChange(user);
+            for (final User userUsingHardware : usersUsingThisHardware) {
+                LOGGER.debug("User '{}' (ID: {}) had state change to hardware", userUsingHardware.getDisplayName(), userUsingHardware.getId());
+                userStateChangeHandler.handleStateChange(userUsingHardware);
             }
         }
 
@@ -207,6 +211,11 @@ public class FoldingStatsEjb implements FoldingStatsCore {
 
     @Override
     public User updateUser(final User userToUpdate, final User existingUser) {
+        // Perform any stats handling before updating the user
+        if (userTeamChangeHandler.isUserTeamChange(userToUpdate, existingUser)) {
+            userTeamChangeHandler.handleTeamChange(userToUpdate, existingUser.getTeam());
+        }
+
         final User updatedUser = STORAGE.updateUser(userToUpdate);
 
         if (userStateChangeHandler.isUserStateChange(updatedUser, existingUser)) {
@@ -317,6 +326,12 @@ public class FoldingStatsEjb implements FoldingStatsCore {
     }
 
     @Override
+    public UserStats getTotalStats(final User user) {
+        return STORAGE.getTotalStats(user.getId())
+            .orElse(UserStats.empty());
+    }
+
+    @Override
     public OffsetTcStats createOffsetStats(final User user, final OffsetTcStats offsetTcStats) {
         STORAGE.deleteOffsetStats(user.getId());
         return STORAGE.createOrUpdateOffsetStats(user.getId(), offsetTcStats);
@@ -361,6 +376,11 @@ public class FoldingStatsEjb implements FoldingStatsCore {
     }
 
     @Override
+    public RetiredUserTcStats createRetiredUserStats(final RetiredUserTcStats retiredUserTcStats) {
+        return STORAGE.createRetiredUserStats(retiredUserTcStats);
+    }
+
+    @Override
     public void resetAllTeamCompetitionUserStats() {
         for (final User user : getAllUsersWithoutPasskeys()) {
             LOGGER.info("Resetting TC stats for {}", user.getDisplayName());
@@ -377,11 +397,6 @@ public class FoldingStatsEjb implements FoldingStatsCore {
         LOGGER.info("Evicting TC and initial stats caches");
         STORAGE.evictTcStatsCache();
         STORAGE.evictInitialStatsCache();
-    }
-
-    private static UserStats getTotalStats(final User user) {
-        return STORAGE.getTotalStats(user.getId())
-            .orElse(UserStats.empty());
     }
 
     @Override

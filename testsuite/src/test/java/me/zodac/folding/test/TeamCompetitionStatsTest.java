@@ -1065,4 +1065,85 @@ class TeamCompetitionStatsTest {
             .as("Expected initial points + first offset points + second points for user: " + userAfterFourthUpdate)
             .isEqualTo(firstPoints + firstOffsetPoints + secondPoints + secondOffsetPoints);
     }
+
+    @Test
+    void whenUserIsUpdated_givenUserChangesTeam_andUserHasStatsOnOldTeam_thenRetiredUserWithStatsAddedToOldTeam_andUserHasNoStatsForNewTeam()
+        throws FoldingRestException {
+        final Team firstTeam = TeamUtils.create(generateTeam());
+        final User firstUser = UserUtils.create(generateUserWithTeamIdAndCategory(firstTeam.getId(), Category.AMD_GPU));
+        final User secondUser = UserUtils.create(generateUserWithTeamIdAndCategory(firstTeam.getId(), Category.NVIDIA_GPU));
+
+        final Team secondTeam = TeamUtils.create(generateTeam());
+        final User thirdUser = UserUtils.create(generateUserWithTeamIdAndCategory(secondTeam.getId(), Category.NVIDIA_GPU));
+
+        StubbedFoldingEndpointUtils.addPoints(firstUser, 10_000L);
+        StubbedFoldingEndpointUtils.addPoints(secondUser, 5_000L);
+        StubbedFoldingEndpointUtils.addPoints(thirdUser, 1_000L);
+        manuallyUpdateStats();
+
+        final CompetitionSummary resultAfterFirstUpdate = TeamCompetitionStatsUtils.getStats();
+        final TeamSummary firstTeamSummaryAfterFirstUpdate = getTeamFromCompetition(resultAfterFirstUpdate, firstTeam.getTeamName());
+        final TeamSummary secondTeamSummaryAfterFirstUpdate = getTeamFromCompetition(resultAfterFirstUpdate, secondTeam.getTeamName());
+
+        assertThat(firstTeamSummaryAfterFirstUpdate.getTeamMultipliedPoints())
+            .as("Expected first team to have points of first and second user")
+            .isEqualTo(15_000L);
+        assertThat(firstTeamSummaryAfterFirstUpdate.getRetiredUsers())
+            .as("Expected first team to have no retired users")
+            .isEmpty();
+
+        assertThat(secondTeamSummaryAfterFirstUpdate.getTeamMultipliedPoints())
+            .as("Expected second team to have points of third user")
+            .isEqualTo(1_000L);
+        assertThat(secondTeamSummaryAfterFirstUpdate.getActiveUsers())
+            .as("Expected second team to have one active user")
+            .hasSize(1);
+
+        final UserRequest updatedFirstUserRequest = UserRequest.builder()
+            .foldingUserName(firstUser.getFoldingUserName())
+            .displayName(firstUser.getDisplayName())
+            .passkey(firstUser.getPasskey())
+            .category(firstUser.getCategory().toString())
+            .hardwareId(firstUser.getHardware().getId())
+            .teamId(secondTeam.getId())
+            .build();
+
+        final User updatedFirstUser = UserUtils.update(firstUser.getId(), updatedFirstUserRequest);
+
+        final CompetitionSummary resultAfterSecondUpdate = TeamCompetitionStatsUtils.getStats();
+        final TeamSummary firstTeamSummaryAfterSecondUpdate = getTeamFromCompetition(resultAfterSecondUpdate, firstTeam.getTeamName());
+        final TeamSummary secondTeamSummaryAfterSecondUpdate = getTeamFromCompetition(resultAfterSecondUpdate, secondTeam.getTeamName());
+
+        assertThat(firstTeamSummaryAfterSecondUpdate.getTeamMultipliedPoints())
+            .as("Expected first team to have no change to points")
+            .isEqualTo(15_000L);
+        assertThat(firstTeamSummaryAfterSecondUpdate.getRetiredUsers())
+            .as("Expected first team to have one retired user")
+            .hasSize(1);
+
+        assertThat(secondTeamSummaryAfterSecondUpdate.getTeamMultipliedPoints())
+            .as("Expected second team to have no change to points")
+            .isEqualTo(1_000L);
+        assertThat(secondTeamSummaryAfterSecondUpdate.getActiveUsers())
+            .as("Expected second team to have two active users")
+            .hasSize(2);
+
+        StubbedFoldingEndpointUtils.addPoints(updatedFirstUser, 10_000L);
+        manuallyUpdateStats();
+
+        final CompetitionSummary resultAfterThirdUpdate = TeamCompetitionStatsUtils.getStats();
+        final TeamSummary firstTeamSummaryAfterThirdUpdate = getTeamFromCompetition(resultAfterThirdUpdate, firstTeam.getTeamName());
+        final TeamSummary secondTeamSummaryAfterThirdUpdate = getTeamFromCompetition(resultAfterThirdUpdate, secondTeam.getTeamName());
+
+        assertThat(firstTeamSummaryAfterThirdUpdate.getTeamMultipliedPoints())
+            .as("Expected first team to have no change to points")
+            .isEqualTo(15_000L);
+        assertThat(firstTeamSummaryAfterThirdUpdate.getRetiredUsers())
+            .as("Expected first team to have one retired user")
+            .hasSize(1);
+
+        assertThat(secondTeamSummaryAfterThirdUpdate.getTeamMultipliedPoints())
+            .as("Expected second team to have new points from the moved user")
+            .isEqualTo(11_000L);
+    }
 }

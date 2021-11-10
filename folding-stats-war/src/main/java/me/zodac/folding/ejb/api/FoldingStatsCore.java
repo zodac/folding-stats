@@ -291,6 +291,14 @@ public interface FoldingStatsCore {
     UserStats createTotalStats(final UserStats userStats);
 
     /**
+     * Retrieves the total {@link UserStats} for the provided {@link User}.
+     *
+     * @param user the {@link User} whose {@link UserStats} are to be retrieved
+     * @return the {@link UserStats} for the {@link User}, or {@link UserStats#empty()} if none can be found
+     */
+    UserStats getTotalStats(final User user);
+
+    /**
      * Creates an {@link OffsetTcStats}, defining the offset points/units for the provided {@link User}.
      *
      * <p>
@@ -361,6 +369,14 @@ public interface FoldingStatsCore {
      * @return the {@link UserStats} for the {@link User}, or {@link UserStats#empty()} if none can be found
      */
     UserStats getInitialStats(final User user);
+
+    /**
+     * Creates a {@link RetiredUserTcStats} for a {@link User} that has been removed from a {@link Team}.
+     *
+     * @param retiredUserTcStats the {@link RetiredUserTcStats} of the removed {@link User}
+     * @return the created {@link RetiredUserTcStats}
+     */
+    RetiredUserTcStats createRetiredUserStats(final RetiredUserTcStats retiredUserTcStats);
 
     /**
      * Resets all {@link User}s for the <code>Team Competition</code>. Performs the following actions:

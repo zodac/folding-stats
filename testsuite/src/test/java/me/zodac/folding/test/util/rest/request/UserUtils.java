@@ -70,6 +70,28 @@ public final class UserUtils {
     }
 
     /**
+     * Updates a {@link User} based on the given {@link UserRequest}.
+     *
+     * <p>
+     * Will also call {@link StubbedFoldingEndpointUtils#enableUser(UserRequest)}, so if you wish to test an invalid number of
+     * units, you must set that explicitly.
+     *
+     * @param userId the ID of the {@link User} to update
+     * @param user   the {@link User} to update
+     * @return the updated{@link User}
+     * @throws FoldingRestException thrown if an error occurs updating the {@link User}
+     */
+    public static User update(final int userId, final UserRequest user) throws FoldingRestException {
+        StubbedFoldingEndpointUtils.enableUser(user);
+        final HttpResponse<String> response = USER_REQUEST_SENDER.update(userId, user, ADMIN_USER.userName(), ADMIN_USER.password());
+        if (response.statusCode() == HttpURLConnection.HTTP_OK) {
+            return UserResponseParser.create(response);
+        }
+
+        throw new FoldingRestException(String.format("Invalid response (%s) when updating user: %s", response.statusCode(), response.body()));
+    }
+
+    /**
      * Retrieves all {@link User}s.
      *
      * @return the {@link User}s

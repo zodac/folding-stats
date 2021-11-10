@@ -1,5 +1,13 @@
+# Folding@Home Team Competition
+
+The *Folding@Home Team Competition* is a competition where members of a [Folding@Home](https://foldingathome.org/) team can group together into
+sub-teams to compete against each other, while still continuing to contribute to their parent team in the
+overall [Folding@Home donor statistics](https://stats.foldingathome.org/).
+
+A live example of this competition can be seen running for the [ExtremeHW Folding@Home team](https://etf.axihub.ca/).
+
 - [Folding@Home Team Competition](#foldinghome-team-competition)
-    - [Overview](#overview)
+- [Overview](#overview)
     - [How Are Points Calculated](#how-are-points-calculated)
 - [Getting Started](#getting-started)
     - [System Requirements](#system-requirements)
@@ -29,15 +37,7 @@
 - [Contact Us](#contact-us)
 - [License](#license)
 
-# Folding@Home Team Competition
-
-The *Folding@Home Team Competition* is a competition where members of a [Folding@Home](https://foldingathome.org/) team can group together into
-sub-teams to compete against each other, while still continuing to contribute to their parent team in the
-overall [Folding@Home donor statistics](https://stats.foldingathome.org/).
-
-A live example of this competition can be seen running for the [ExtremeHW Folding@Home team](https://etf.axihub.ca/).
-
-## Overview
+# Overview
 
 The idea is that sub-teams will be created with 'categories' of hardware, which will be filled by Folding@Home users. In order to uniquely identify a
 piece of hardware for a user (while still allowing them to contribute under the same Folding@Home user name and team), we require each piece of

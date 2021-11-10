@@ -79,12 +79,6 @@ public class UserStateChangeHandler {
             return true;
         }
 
-        if (existingUser.getTeam().getId() != updatedUser.getTeam().getId()) {
-            LOGGER.debug("User '{}' (ID: {}) had state change to team, {} -> {}", existingUser.getDisplayName(),
-                existingUser.getId(), existingUser.getTeam(), updatedUser.getTeam());
-            return true;
-        }
-
         if (!existingUser.getFoldingUserName().equalsIgnoreCase(updatedUser.getFoldingUserName())) {
             LOGGER.debug("User '{}' (ID: {}) had state change to Folding username, {} -> {}",
                 existingUser.getDisplayName(), existingUser.getId(), existingUser.getFoldingUserName(), updatedUser.getFoldingUserName());
@@ -130,14 +124,7 @@ public class UserStateChangeHandler {
     }
 
     /**
-     * This should be called if any of the following are changed:
-     * <ul>
-     *     <li>{@link User}'s Folding@Home username</li>
-     *     <li>{@link User}'s Folding@Home passkey</li>
-     *     <li>{@link User}'s {@link Hardware}</li>
-     *     <li>{@link User}'s {@link Team}</li>
-     *     <li>The {@code multiplier} of a {@link Hardware} being used by the {@link User}</li>
-     * </ul>
+     * This should be called if either {@link #isUserStateChange(User, User)} or {@link #isHardwareStateChange(Hardware, Hardware)} is <b>true</b>.
      *
      * <p>
      * We want to restart their <code>Team Competition</code> calculation with their new information, so we do the following:
