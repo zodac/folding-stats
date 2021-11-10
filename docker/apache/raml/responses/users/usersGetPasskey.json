@@ -1,0 +1,23 @@
+{
+  "id": 1,
+  "foldingUserName": "User1",
+  "displayName": "User1",
+  "passkey": "13d7999713d7999713d7999713d79997",
+  "category": "AMD_GPU",
+  "profileLink": "https://forums.extremehw.net/",
+  "liveStatsLink": "https://etf.axihub.ca/",
+  "hardware": {
+    "id": 1,
+    "hardwareName": "Hardware1",
+    "displayName": "Hardware1",
+    "hardwareMake": "NVIDIA",
+    "hardwareType": "GPU",
+    "multiplier": 21.33,
+    "averagePpd": 1
+  },
+  "team": {
+    "id": 1,
+    "teamName": "Team1"
+  },
+  "userIsCaptain": true
+}

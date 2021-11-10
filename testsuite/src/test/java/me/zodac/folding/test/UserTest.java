@@ -188,6 +188,26 @@ class UserTest {
     }
 
     @Test
+    void whenGettingUserWithPasskey_givenValidUserId_thenUserIsReturned_andPasskeyIsNotMasked_andHas200Status() throws FoldingRestException {
+        final int userId = create(generateUser()).getId();
+
+        final HttpResponse<String> response = USER_REQUEST_SENDER.getWithPasskey(userId, ADMIN_USER.userName(), ADMIN_USER.password());
+        assertThat(response.statusCode())
+            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_OK);
+
+        final User user = UserResponseParser.get(response);
+        assertThat(user.getId())
+            .as("Did not receive the expected user: " + response.body())
+            .isEqualTo(userId);
+
+        assertThat(user.getPasskey())
+            .as("Expected the the passkey to be shown completely")
+            .containsPattern(Pattern.compile("[a-zA-Z]"))
+            .doesNotContain("*");
+    }
+
+    @Test
     void whenUpdatingUser_givenValidUserId_andValidPayload_thenUpdatedUserIsReturned_andNoNewUserIsCreated_andHas200Status()
         throws FoldingRestException {
         final User createdUser = create(generateUser());
@@ -460,9 +480,21 @@ class UserTest {
         final User actual = UserResponseParser.update(updateResponse);
 
         assertThat(actual)
-            .extracting("id", "foldingUserName", "displayName", "passkey", "category", "profileLink", "liveStatsLink", "userIsCaptain")
-            .containsExactly(createdUser.getId(), createdUser.getFoldingUserName(), createdUser.getDisplayName(), createdUser.getPasskey(),
-                createdUser.getCategory(), createdUser.getProfileLink(), createdUser.getLiveStatsLink(), createdUser.isUserIsCaptain());
+            .extracting("id", "foldingUserName", "displayName", "category", "profileLink", "liveStatsLink", "userIsCaptain")
+            .containsExactly(createdUser.getId(), createdUser.getFoldingUserName(), createdUser.getDisplayName(), createdUser.getCategory(),
+                createdUser.getProfileLink(), createdUser.getLiveStatsLink(), createdUser.isUserIsCaptain());
+
+        final int lengthOfUnmaskedPasskey = 8;
+        final String firstPartOfPasskey = actual.getPasskey().substring(0, lengthOfUnmaskedPasskey);
+        final String secondPartOfPasskey = actual.getPasskey().substring(lengthOfUnmaskedPasskey);
+
+        assertThat(firstPartOfPasskey)
+            .as("Expected the first 8 characters of the passkey to be shown")
+            .doesNotContain("*");
+
+        assertThat(secondPartOfPasskey)
+            .as("Expected the remaining 24 characters of the passkey to be masked")
+            .doesNotContainPattern(Pattern.compile("[a-zA-Z]"));
     }
 
     @Test

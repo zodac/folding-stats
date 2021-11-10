@@ -162,7 +162,12 @@ function populateUserUpdate(){
     show("loader");
 
     var userId = input.split(":")[0];
-    fetch(REST_ENDPOINT_URL+"/users/" + userId)
+    fetch(REST_ENDPOINT_URL+"/users/" + userId + "/passkey", {
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": sessionGet("Authorization")
+        },
+    })
     .then(response => {
         return response.json();
     })
@@ -229,7 +234,12 @@ function populateUserDelete(){
     show("loader");
 
     var userId = input.split(":")[0];
-    fetch(REST_ENDPOINT_URL+"/users/" + userId)
+    fetch(REST_ENDPOINT_URL+"/users/" + userId + "/passkey", {
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": sessionGet("Authorization")
+            },
+        })
     .then(response => {
         return response.json();
     })

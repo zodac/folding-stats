@@ -146,9 +146,65 @@ public final class UserRequestSender {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new FoldingRestException("Error sending HTTP request to get user", e);
+            throw new FoldingRestException("Error sending HTTP request to get user with passkey", e);
         } catch (final IOException e) {
-            throw new FoldingRestException("Error sending HTTP request to get user", e);
+            throw new FoldingRestException("Error sending HTTP request to get user with passkey", e);
+        }
+    }
+
+    /**
+     * Send a <b>GET</b> request to retrieve a single {@link me.zodac.folding.api.tc.User} with passkey with the given {@code userId}.
+     *
+     * @param userId   the ID of the {@link me.zodac.folding.api.tc.User} to be retrieved
+     * @param userName the username
+     * @param password the password
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     * @see #getWithPasskey(int, String, String, String)
+     */
+    public HttpResponse<String> getWithPasskey(final int userId, final String userName, final String password) throws FoldingRestException {
+        return getWithPasskey(userId, null, userName, password);
+    }
+
+    /**
+     * Send a <b>GET</b> request to retrieve a single {@link me.zodac.folding.api.tc.User} with passkey with the given {@code userId}.
+     *
+     * <p>
+     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.api.tc.User} based on the <code>ETag</code>, an empty
+     * {@link HttpResponse#body()} is returned.
+     *
+     * @param userId    the ID of the {@link me.zodac.folding.api.tc.User} to be retrieved
+     * @param entityTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached {@link me.zodac.folding.api.tc.User}
+     * @param userName  the username
+     * @param password  the password
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     * @see #getWithPasskey(int, String, String)
+     */
+    public HttpResponse<String> getWithPasskey(final int userId, final String entityTag, final String userName, final String password)
+        throws FoldingRestException {
+        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+            .GET()
+            .uri(URI.create(usersUrl + '/' + userId + "/passkey"))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
+
+        if (StringUtils.isNotBlank(entityTag)) {
+            requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), entityTag);
+        }
+
+        if (StringUtils.isNoneBlank(userName, password)) {
+            requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
+        }
+
+        final HttpRequest request = requestBuilder.build();
+
+        try {
+            return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException("Error sending HTTP request to get user with passkey", e);
+        } catch (final IOException e) {
+            throw new FoldingRestException("Error sending HTTP request to get user with passkey", e);
         }
     }
 

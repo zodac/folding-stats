@@ -352,6 +352,42 @@ public class UserEndpoint {
         }
     }
 
+    /**
+     * {@link GET} request to retrieve a {@link User}, with the passkey exposed.
+     *
+     * @param userId  the ID of the {@link User} to retrieve
+     * @param request the {@link Request}, to be used for {@link javax.ws.rs.core.CacheControl}
+     * @return {@link Response.Status#OK} containing the {@link User}
+     */
+    @GET
+    @ReadRequired
+    @RolesAllowed("admin")
+    @Path("/{userId}/passkey")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getByIdWithPasskey(@PathParam("userId") final String userId, @Context final Request request) {
+        LOGGER.debug("GET request for user with passkey received at '{}'", uriContext::getAbsolutePath);
+
+        try {
+            final IdResult idResult = IntegerParser.parsePositive(userId);
+            if (idResult.isFailure()) {
+                return idResult.getFailureResponse();
+            }
+            final int parsedId = idResult.getId();
+
+            final Optional<User> optionalElement = foldingStatsCore.getUserWithPasskey(parsedId);
+            if (optionalElement.isEmpty()) {
+                LOGGER.error("No user with passkey found with ID {}", userId);
+                return notFound();
+            }
+
+            final User element = optionalElement.get();
+            return cachedOk(element, request, untilNextMonthUtc(ChronoUnit.SECONDS));
+        } catch (final Exception e) {
+            LOGGER.error("Unexpected error getting user with passkey ID: {}", userId, e);
+            return serverError();
+        }
+    }
+
     private ValidationResult<User> validateCreate(final UserRequest userRequest) {
         final UserValidator userValidator = UserValidator.create();
         return userValidator.validateCreate(
