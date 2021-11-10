@@ -159,6 +159,9 @@ public final class HardwareValidator {
     /**
      * Validates a {@link Hardware} to be deleted from the system.
      *
+     * <p>
+     * If the {@link Hardware} is in use by a {@link User}, it cannot be deleted.
+     *
      * @param hardware the {@link Hardware} to validate
      * @param allUsers all existing {@link User}s in the system
      * @return the {@link ValidationResult}

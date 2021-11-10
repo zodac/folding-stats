@@ -1,0 +1,26 @@
+{
+  "invalidObject": {
+    "id": 1,
+    "foldingUserName": "User1",
+    "displayName": "User 1",
+    "passkey": "c031f83e************************",
+    "category": "NVIDIA_GPU",
+    "hardware": {
+      "id": 1,
+      "hardwareName": "Hardware1",
+      "displayName": "Hardware 1",
+      "hardwareMake": "NVIDIA",
+      "hardwareType": "GPU",
+      "multiplier": 48.23,
+      "averagePpd": 136571
+    },
+    "team": {
+      "id": 1,
+      "teamName": "Team 1"
+    },
+    "userIsCaptain": true
+  },
+  "errors": [
+    "Cannot delete user 'User 1' since they are team captain"
+  ]
+}

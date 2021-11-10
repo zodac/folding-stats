@@ -182,6 +182,29 @@ public final class TestGenerator {
     }
 
     /**
+     * Generates a {@link UserRequest} where the {@link me.zodac.folding.api.tc.User} is captain of their {@link me.zodac.folding.api.tc.Team}.
+     *
+     * @return the generated {@link UserRequest}
+     * @throws FoldingRestException thrown if an error occurs executing {@link HardwareUtils#create(HardwareRequest)}
+     *                              or {@link TeamUtils#create(TeamRequest)}
+     */
+    public static UserRequest generateCaptainUser() throws FoldingRestException {
+        final int hardwareId = HardwareUtils.create(generateHardware()).getId();
+        final int teamId = TeamUtils.create(generateTeam()).getId();
+        final String userName = nextUserName();
+
+        return UserRequest.builder()
+            .foldingUserName(userName)
+            .displayName(userName)
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .hardwareId(hardwareId)
+            .teamId(teamId)
+            .userIsCaptain(true)
+            .build();
+    }
+
+    /**
      * Generates a {@link UserRequest} with a specified {@link Category}.
      *
      * @param category the {@link Category} of the {@link UserRequest}

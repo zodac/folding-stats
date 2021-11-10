@@ -269,6 +269,24 @@ public final class UserValidator {
         return ValidationResult.successful(User.createWithoutId(userRequest, hardwareForUser, teamForUser));
     }
 
+    /**
+     * Validates whether a {@link User} can be deleted from the system.
+     *
+     * <p>
+     * If the {@link User} is their {@link Team} captain, they cannot be deleted.
+     *
+     * @param user the {@link User} to delete
+     * @return the {@link ValidationResult}
+     */
+    public ValidationResult<User> validateDelete(final User user) {
+        if (user.isUserIsCaptain()) {
+            return ValidationResult.failure(user,
+                List.of(String.format("Cannot delete user '%s' since they are team captain", user.getDisplayName())));
+        }
+
+        return ValidationResult.successful(user);
+    }
+
     private String validateNewUserWorkUnits(final UserRequest userRequest) {
         return validateUserWorkUnits(userRequest);
     }

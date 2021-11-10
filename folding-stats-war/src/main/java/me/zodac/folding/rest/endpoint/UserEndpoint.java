@@ -342,7 +342,13 @@ public class UserEndpoint {
             }
             final User user = optionalElement.get();
 
-            foldingStatsCore.deleteUser(user);
+            final ValidationResult<User> validationResult = validateDelete(user);
+            if (validationResult.isFailure()) {
+                return validationResult.getFailureResponse();
+            }
+            final User validatedUser = validationResult.getOutput();
+
+            foldingStatsCore.deleteUser(validatedUser);
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             LOGGER.info("Deleted user with ID {}", userId);
             return ok();
@@ -407,5 +413,10 @@ public class UserEndpoint {
             foldingStatsCore.getAllHardware(),
             foldingStatsCore.getAllTeams()
         );
+    }
+
+    private ValidationResult<User> validateDelete(final User existingUser) {
+        final UserValidator userValidator = UserValidator.create();
+        return userValidator.validateDelete(existingUser);
     }
 }

@@ -2678,7 +2678,7 @@ class UserValidatorTest {
         final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser),
-            Collections.emptyList(),
+            List.of(hardware),
             List.of(team)
         );
 
@@ -2687,13 +2687,65 @@ class UserValidatorTest {
 
         assertThat(response.getErrors())
             .containsOnly(
-                "No hardware exist on the system",
-                "No hardware exist on the system",
-                "No hardware exist on the system",
-                "No hardware exist on the system",
-                "No hardware exist on the system",
-                "No hardware exist on the system"
+                "Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen",
+                "Field 'displayName' must not be empty",
+                "Field 'passkey' must be 32 characters long and include only alphanumeric characters",
+                "Field 'category' must be one of: [AMD_GPU, NVIDIA_GPU, WILDCARD]",
+                "Field 'profileLink' is not a valid link: 'invalid'",
+                "Field 'liveStatsLink' is not a valid link: 'invalid'"
             );
+    }
+
+    @Test
+    void whenValidatingDelete_andUserIsNotCaptain_thenSuccessResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
+
+        final User userToDelete = User.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU)
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(false)
+            .hardware(hardware)
+            .team(team)
+            .build();
+
+        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final ValidationResult<User> response = userValidator.validateDelete(userToDelete);
+
+        assertThat(response.isFailure())
+            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
+            .isFalse();
+    }
+
+    @Test
+    void whenValidatingDelete_andUserIsCaptain_thenFailureResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
+
+        final User userToDelete = User.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU)
+            .profileLink("http://www.google.com")
+            .liveStatsLink("http://www.google.com")
+            .userIsCaptain(true)
+            .hardware(hardware)
+            .team(team)
+            .build();
+
+        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final ValidationResult<User> response = userValidator.validateDelete(userToDelete);
+
+        assertThat(response.isFailure())
+            .isTrue();
+
+        assertThat(response.getErrors())
+            .containsOnly(String.format("Cannot delete user '%s' since they are team captain", userToDelete.getDisplayName()));
     }
 
     private static Hardware generateHardware() {

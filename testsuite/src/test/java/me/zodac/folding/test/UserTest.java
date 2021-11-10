@@ -33,6 +33,7 @@ import static me.zodac.folding.test.util.TestAuthenticationData.INVALID_PASSWORD
 import static me.zodac.folding.test.util.TestAuthenticationData.INVALID_USERNAME;
 import static me.zodac.folding.test.util.TestAuthenticationData.READ_ONLY_USER;
 import static me.zodac.folding.test.util.TestConstants.FOLDING_URL;
+import static me.zodac.folding.test.util.TestGenerator.generateCaptainUser;
 import static me.zodac.folding.test.util.TestGenerator.generateHardware;
 import static me.zodac.folding.test.util.TestGenerator.generateTeam;
 import static me.zodac.folding.test.util.TestGenerator.generateUser;
@@ -416,6 +417,16 @@ class UserTest {
         assertThat(response.body())
             .as("Did not receive valid error message: " + response.body())
             .contains("not a valid format");
+    }
+
+    @Test
+    void whenDeletingUser_givenUserIsTeamCaptain_thenResponseHas400Status() throws FoldingRestException {
+        final User captainUser = create(generateCaptainUser());
+        final HttpResponse<Void> response = USER_REQUEST_SENDER.delete(captainUser.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
+
+        assertThat(response.statusCode())
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
     @Test

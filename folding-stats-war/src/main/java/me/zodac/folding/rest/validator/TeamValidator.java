@@ -136,6 +136,9 @@ public final class TeamValidator {
     /**
      * Validates a {@link Team} to be deleted from the system.
      *
+     * <p>
+     * If the {@link Team} is in use by a {@link User}, it cannot be deleted.
+     *
      * @param team     the {@link Team} to validate
      * @param allUsers all {@link User}s on the system
      * @return the {@link ValidationResult}

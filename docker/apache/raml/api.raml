@@ -443,6 +443,11 @@ traits:
       responses:
         200:
           description: "The user has been deleted from the system"
+        400:
+          description: "The user is their team captain and cannot be deleted"
+          body:
+            application/json:
+              example: !include responses/users/usersDeleteBadRequest.json
         401:
           description: "System user cannot be successfully logged in with provided credentials"
         403:
