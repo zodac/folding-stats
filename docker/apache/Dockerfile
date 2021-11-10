@@ -2,8 +2,18 @@ FROM node:lts-alpine3.14 AS raml
 # Install raml2html
 RUN npm i -g raml2html
 
+ARG REST_ENDPOINT_URL
+ARG TITLE
+
+RUN mkdir /docker/
+WORKDIR /docker/
+
 COPY ./docker/apache/raml/ /docker/apache/raml/
-RUN raml2html --input /docker/apache/raml/api.raml --output /docker/apache/api.html
+
+# Replace environment arguments in RAML files, then build RAML output HTML
+RUN grep -rl '%REST_ENDPOINT_URL%' . | xargs sed -i "s|%REST_ENDPOINT_URL%|${REST_ENDPOINT_URL}|g" && \
+    grep -rl '%TITLE%' . | xargs sed -i "s|%TITLE%|${TITLE}|g" && \
+    raml2html --input /docker/apache/raml/api.raml --output /docker/apache/api.html
 
 FROM mysocialobservations/docker-tdewolff-minify AS minifier
 
@@ -69,3 +79,12 @@ COPY ./docker/apache/pages/historic/historic_team_monthly.html ./historic_team_m
 COPY ./docker/apache/pages/historic/historic_user_daily.html ./historic_user_daily
 COPY ./docker/apache/pages/historic/historic_user_hourly.html ./historic_user_hourly
 COPY ./docker/apache/pages/historic/historic_user_monthly.html ./historic_user_monthly
+
+ARG FORUM_LINK
+ARG ROOT_URL
+ARG TITLE
+
+# Replace environment arguments in HTML files
+RUN grep -rl '%FORUM_LINK%' . | xargs sed -i "s|%FORUM_LINK%|${FORUM_LINK}|g" && \
+    grep -rl '%ROOT_URL%' . | xargs sed -i "s|%ROOT_URL%|${ROOT_URL}|g" && \
+    grep -rl '%TITLE%' . | xargs sed -i "s|%TITLE%|${TITLE}|g"

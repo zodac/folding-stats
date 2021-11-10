@@ -666,6 +666,7 @@ class HardwareValidatorTest {
             .build();
 
         final Collection<User> allUsers = List.of(User.builder()
+            .passkey("DummyPasskey12345678901234567890")
             .hardware(existingHardware)
             .build()
         );
@@ -674,6 +675,12 @@ class HardwareValidatorTest {
 
         assertThat(response.isFailure())
             .isTrue();
+
+        assertThat(response.getErrors())
+            .containsOnly("Payload is used by an existing object");
+
+        assertThat((String) response.getFailureResponse().getEntity())
+            .doesNotContain("DummyPasskey12345678901234567890");
     }
 
     @Test

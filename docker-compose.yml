@@ -8,7 +8,10 @@ services:
       dockerfile: docker/apache/Dockerfile
       args:
         FIRST_DAY_OF_MONTH: "${FIRST_DAY_OF_MONTH}"
+        FORUM_LINK: "${FORUM_LINK}"
         REST_ENDPOINT_URL: "${REST_ENDPOINT_URL}"
+        ROOT_URL: "${ROOT_URL}"
+        TITLE: "${TITLE}"
         UPDATE_ENABLED: "${STATS_ENABLED}"
         UPDATE_MINUTE: "${UPDATE_MINUTE}"
     container_name: frontend
@@ -40,7 +43,7 @@ services:
       # External URL configuration
       LARS_URL_ROOT: "${LARS_URL_ROOT}"
       STATS_URL_ROOT: "${STATS_URL_ROOT}"
-      REDIRECT_URL: "${REDIRECT_URL}"
+      REDIRECT_URL: "${ROOT_URL}"
       # NOTE: The monthly reset, result storage and LARS update will always occur at 23:57 on the last day of the month
       ENABLE_LARS_HARDWARE_UPDATE: "${ENABLE_LARS_HARDWARE_UPDATE}"
       ENABLE_MONTHLY_RESULT_STORAGE: "${ENABLE_MONTHLY_RESULT_STORAGE}"
