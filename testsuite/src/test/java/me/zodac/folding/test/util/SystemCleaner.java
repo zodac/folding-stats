@@ -33,6 +33,7 @@ import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
+import me.zodac.folding.rest.api.tc.request.UserRequest;
 import me.zodac.folding.test.util.db.DatabaseUtils;
 import me.zodac.folding.test.util.rest.request.HardwareUtils;
 import me.zodac.folding.test.util.rest.request.StubbedFoldingEndpointUtils;
@@ -75,7 +76,27 @@ public final class SystemCleaner {
         DatabaseUtils.truncateTableAndResetId("retired_user_stats");
 
         for (final User user : UserUtils.getAll()) {
-            USER_REQUEST_SENDER.delete(user.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
+            if (!user.isUserIsCaptain()) {
+                USER_REQUEST_SENDER.delete(user.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
+                continue;
+            }
+
+            // Captains must be unset as captains before they can be deleted
+            final User userWithPasskey = UserUtils.getWithPasskey(user.getId());
+            final UserRequest userNoLongerCaptain = UserRequest.builder()
+                .foldingUserName(userWithPasskey.getFoldingUserName())
+                .displayName(userWithPasskey.getDisplayName())
+                .passkey(userWithPasskey.getPasskey())
+                .category(userWithPasskey.getCategory().toString())
+                .profileLink(userWithPasskey.getProfileLink())
+                .liveStatsLink(userWithPasskey.getLiveStatsLink())
+                .hardwareId(userWithPasskey.getHardware().getId())
+                .teamId(userWithPasskey.getTeam().getId())
+                .userIsCaptain(false)
+                .build();
+
+            USER_REQUEST_SENDER.update(userWithPasskey.getId(), userNoLongerCaptain, ADMIN_USER.userName(), ADMIN_USER.password());
+            USER_REQUEST_SENDER.delete(userWithPasskey.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
         }
 
         for (final Team team : TeamUtils.getAll()) {

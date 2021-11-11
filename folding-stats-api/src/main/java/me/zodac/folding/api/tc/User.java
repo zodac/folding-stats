@@ -213,6 +213,17 @@ public class User implements ResponsePojo {
     }
 
     /**
+     * Sets the {@link User} to no longer be captain of their {@link Team}.
+     *
+     * @param user the {@link User} to update
+     * @return the updated {@link User}
+     */
+    public static User removeCaptaincyFromUser(final User user) {
+        return create(user.id, user.foldingUserName, user.displayName, user.passkey, user.category, user.profileLink, user.liveStatsLink,
+            user.hardware, user.team, false);
+    }
+
+    /**
      * Hides the {@code passkey} for the given {@link User}.
      *
      * <p>

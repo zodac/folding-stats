@@ -134,4 +134,21 @@ public final class UserUtils {
         throw new FoldingRestException(
             String.format("Invalid response (%s) when getting user with ID %s: %s", response.statusCode(), userId, response.body()));
     }
+
+    /**
+     * Retrieves a {@link User} with passkey with the given ID.
+     *
+     * @param userId the ID of the {@link User} to retrieve
+     * @return the {@link User}
+     * @throws FoldingRestException thrown if an error occurs retrieving the {@link User}
+     */
+    public static User getWithPasskey(final int userId) throws FoldingRestException {
+        final HttpResponse<String> response = USER_REQUEST_SENDER.getWithPasskey(userId, ADMIN_USER.userName(), ADMIN_USER.password());
+        if (response.statusCode() == HttpURLConnection.HTTP_OK) {
+            return UserResponseParser.get(response);
+        }
+
+        throw new FoldingRestException(
+            String.format("Invalid response (%s) when getting user with ID %s: %s", response.statusCode(), userId, response.body()));
+    }
 }
