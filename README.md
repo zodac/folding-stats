@@ -26,6 +26,9 @@ A live example of this competition can be seen running for the [ExtremeHW Foldin
         - [Deleting Users](#deleting-users)
         - [Moving A User To Another Team](#moving-a-user-to-another-team)
 - [Troubleshooting](#troubleshooting)
+    - [Containers](#containers)
+        - [Checking Container Status](#checking-container-status)
+        - [Restarting Containers](#restarting-containers)
     - [Errors Performing Admin Functions](#errors-performing-admin-functions)
     - [Logging](#logging)
         - [Available Logs](#available-logs)
@@ -99,7 +102,10 @@ can run the commands:
     cd ~/<GIT_HOME>/folding-stats
     docker-compose up --build --detach
 
-This will build and run the docker containers in the background, and you can then access the UI at [https://127.0.0.1](https://127.0.0.1).
+This will build and run the docker containers in the background. It will take a minute or so for the backend to come online. You
+can [check the status of the containers](#checking-container-status) to see if they are online.
+
+Once all containers have a `STATUS` that is **healthy**, you can then access the UI at [https://127.0.0.1](https://127.0.0.1).
 
 ## Adding Folding@Home Users To The System
 
@@ -248,6 +254,54 @@ the new team will get the user with 0 stats.
 ---
 
 # Troubleshooting
+
+## Containers
+
+### Checking Container Status
+
+To check the status of any containers, the following command can be used:
+
+    docker ps -a
+
+This will show any docker containers (running and stopped) on the system and their status. When the system first comes online, you you should see the
+following:
+
+    CONTAINER ID   IMAGE                    COMMAND                  CREATED                  STATUS                            PORTS                                                      NAMES
+    6d314cbbb902   folding-stats_frontend   "httpd-foreground"       Less than a second ago   Up Less than a second             80/tcp, 0.0.0.0:443->443/tcp                               frontend
+    a7b722f8a178   folding-stats_backend    "/opt/jboss/wildfly/…"   2 seconds ago            Up 1 second (health: starting)    0.0.0.0:8443->8443/tcp, 8080/tcp, 0.0.0.0:9990->9990/tcp   backend
+    312f5f61ec87   folding-stats_database   "docker-entrypoint.s…"   3 seconds ago            Up 3 seconds (health: starting)   0.0.0.0:5432->5432/tcp                                     database
+
+(Note that your `CONTAINER ID` value will be different.)
+
+Pay attention to the `STATUS` value. When the system first comes online, the `backend` and `database` containers will take a minute or two to start
+up, as seen by the value **health: starting**. Once they are successfully online, the `STATUS` will change to:
+
+    CONTAINER ID   IMAGE                    COMMAND                  CREATED         STATUS                   PORTS                                                      NAMES
+    6d314cbbb902   folding-stats_frontend   "httpd-foreground"       2 minutes ago   Up 2 minutes             80/tcp, 0.0.0.0:443->443/tcp                               frontend
+    a7b722f8a178   folding-stats_backend    "/opt/jboss/wildfly/…"   2 minutes ago   Up 2 minutes (healthy)   0.0.0.0:8443->8443/tcp, 8080/tcp, 0.0.0.0:9990->9990/tcp   backend
+    312f5f61ec87   folding-stats_database   "docker-entrypoint.s…"   2 minutes ago   Up 2 minutes (healthy)   0.0.0.0:5432->5432/tcp                                     database
+
+However, if one or more of the containers has stopped, you may see a container marked as **Exited**:
+
+    CONTAINER ID   IMAGE                        COMMAND                  CREATED         STATUS                      PORTS                          NAMES
+    6d314cbbb902   folding-stats_frontend       "httpd-foreground"       5 minutes ago   Up 5 minutes                80/tcp, 0.0.0.0:443->443/tcp   frontend
+    a7b722f8a178   folding-stats_backend        "/opt/jboss/wildfly/…"   5 minutes ago   Exited (0) 10 seconds ago                                  backend
+    312f5f61ec87   folding-stats_database       "docker-entrypoint.s…"   5 minutes ago   Up 5 minutes (healthy)      0.0.0.0:5432->5432/tcp         database
+
+### Restarting Containers
+
+While tt is possible to restart a single container if one has gone down, it is simpler to just restart the entire docker-compose set up. Since we save
+the database content in a docker volume, any stats will be retained through a restart.
+
+To stop any remaining containers, execute the following command (in the `folding-stats` root directory):
+
+    docker-compose down
+
+And to bring the containers back online, execute the command:
+
+    docker-compose up --build --detach
+
+---
 
 ## Errors Performing Admin Functions
 
