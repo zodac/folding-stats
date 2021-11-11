@@ -200,13 +200,15 @@ Restrictions:
 - _Category_ must be valid according to [User Categories](#user-categories), and match the _Hardware Make_ and _Hardware Type_ of the user's hardware
 - _Profile Link_ is optional, but if it is populated, it must be a valid URL
 - _Live Stats Link_ is optional, but if it is populated, it must be a valid URL
-- _Is Captain_ cannot be selected if the user's team already has a captain
 - We expect at least 1 Work Unit to have been successfully completed by the _Folding User Name_ and _Passkey_, to confirm it is being used
 - User cannot be added to a category that already has a maximum number of users
 - User cannot be added to a team that already has the maximum number of users
 
-Note, there is no way to ensure a participant is actually only using their passkey on a single piece of hardware, so there is some level of trust
-involved. However, since we can view a user's stats on a per-hour basis, any suspicious passkey usage should be possible to find.
+Notes:
+
+- If _Is Captain_ is selected but the user's team already has a captain, the old captain will be replaced as captain. There can only be one!
+- There is no way to ensure a participant is actually only using their passkey on a single piece of hardware, so there is some level of trust
+  involved. However, since we can view a user's stats on a per-hour basis, any suspicious passkey usage should be possible to find.
 
 #### User Categories
 

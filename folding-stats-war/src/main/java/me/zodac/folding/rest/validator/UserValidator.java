@@ -162,7 +162,6 @@ public final class UserValidator {
 
         final List<String> complexFailureMessages = Stream.of(
                 validateNewUserDoesNotExceedTeamLimits(usersOnTeam, category),
-                validateNewUserCanBeCaptain(userRequest, usersOnTeam),
                 validateNewUserWorkUnits(userRequest)
             )
             .filter(Objects::nonNull)
@@ -256,7 +255,7 @@ public final class UserValidator {
 
         final List<String> complexFailureMessages = Stream.of(
                 validateUpdatedUserDoesNotExceedTeamLimits(userRequest, existingUser, usersOnTeam, category),
-                validateUpdatedUserCanBeCaptain(userRequest, usersOnTeam, existingUser),
+                validateUserCanBeCaptain(userRequest, usersOnTeam, existingUser),
                 validateUpdateUserWorkUnits(userRequest, existingUser)
             )
             .filter(Objects::nonNull)
@@ -347,14 +346,6 @@ public final class UserValidator {
         }
 
         return null;
-    }
-
-    private String validateNewUserCanBeCaptain(final UserRequest userRequest, final Collection<User> usersOnTeam) {
-        return validateUserCanBeCaptain(userRequest, usersOnTeam, null);
-    }
-
-    private String validateUpdatedUserCanBeCaptain(final UserRequest userRequest, final Collection<User> usersOnTeam, final User existingUser) {
-        return validateUserCanBeCaptain(userRequest, usersOnTeam, existingUser);
     }
 
     private String validateUserCanBeCaptain(final UserRequest userRequest, final Collection<User> usersOnTeam, final User existingUser) {

@@ -743,7 +743,7 @@ class UserValidatorTest {
     }
 
     @Test
-    void whenValidatingCreate_givenUserIsCaptain_andTeamAlreadyContainsCaptain_thenFailureResponseIsReturned() {
+    void whenValidatingCreate_givenUserIsCaptain_andTeamAlreadyContainsCaptain_thenSuccessResponseIsReturned() {
         final Hardware hardware = generateHardware();
         final Team team = generateTeam();
 
@@ -779,11 +779,8 @@ class UserValidatorTest {
         );
 
         assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
-            .containsOnly(String.format("Team '%s' already has a captain '%s', cannot have multiple captains",
-                team.getTeamName(), currentCaptain.getDisplayName()));
+            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
+            .isFalse();
     }
 
     @Test

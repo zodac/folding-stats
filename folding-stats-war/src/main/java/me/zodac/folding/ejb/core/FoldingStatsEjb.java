@@ -50,6 +50,7 @@ import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.api.util.ProcessingType;
 import me.zodac.folding.ejb.api.FoldingStatsCore;
 import me.zodac.folding.ejb.tc.scheduled.StatsScheduler;
+import me.zodac.folding.ejb.tc.user.UserCaptainHandler;
 import me.zodac.folding.ejb.tc.user.UserStateChangeHandler;
 import me.zodac.folding.ejb.tc.user.UserStatsParser;
 import me.zodac.folding.ejb.tc.user.UserTeamChangeHandler;
@@ -79,6 +80,9 @@ public class FoldingStatsEjb implements FoldingStatsCore {
 
     @EJB
     private StatsScheduler statsScheduler;
+
+    @EJB
+    private UserCaptainHandler userCaptainHandler;
 
     @EJB
     private UserStateChangeHandler userStateChangeHandler;
@@ -165,6 +169,10 @@ public class FoldingStatsEjb implements FoldingStatsCore {
 
     @Override
     public User createUser(final User user) {
+        if (userCaptainHandler.isUserCaptainAndCaptainExistsOnTeam(user)) {
+            userCaptainHandler.removeCaptaincyFromExistingTeamCaptain(user.getTeam());
+        }
+
         final User createdUser = STORAGE.createUser(user);
 
         try {

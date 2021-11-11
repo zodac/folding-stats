@@ -35,6 +35,7 @@ import static me.zodac.folding.test.util.TestAuthenticationData.READ_ONLY_USER;
 import static me.zodac.folding.test.util.TestConstants.FOLDING_URL;
 import static me.zodac.folding.test.util.TestGenerator.generateCaptainUser;
 import static me.zodac.folding.test.util.TestGenerator.generateHardware;
+import static me.zodac.folding.test.util.TestGenerator.generateHardwareFromCategory;
 import static me.zodac.folding.test.util.TestGenerator.generateTeam;
 import static me.zodac.folding.test.util.TestGenerator.generateUser;
 import static me.zodac.folding.test.util.TestGenerator.generateUserWithHardwareId;
@@ -288,7 +289,7 @@ class UserTest {
     }
 
     @Test
-    void whenCreatingUser_givenUserHasNoUnitsCompleted_thenUserIsNotCreated_andHas400Stats() throws FoldingRestException {
+    void whenCreatingUser_givenUserHasNoUnitsCompleted_thenUserIsNotCreated_andHas400Status() throws FoldingRestException {
         final UserRequest user = generateUser();
         StubbedFoldingEndpointUtils.disableUser(user);
 
@@ -863,6 +864,37 @@ class UserTest {
         assertThat(userWithId.getTeam())
             .as("Expected user to contain updated team")
             .isEqualTo(updatedTeam);
+    }
+
+    @Test
+    void whenCreatingUser_givenUserIsCaptain_andCaptainAlreadyExistsInTeam_thenUserBecomesCaptain_andOldUserIsRemovedAsCaptain_andHas201Status()
+        throws FoldingRestException {
+        final User existingCaptain = create(generateCaptainUser());
+
+        final User retrievedExistingCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(existingCaptain.getId()));
+        assertThat(retrievedExistingCaptain.isUserIsCaptain())
+            .isTrue();
+
+        final Hardware newHardware = HardwareUtils.create(generateHardwareFromCategory(Category.AMD_GPU));
+        final UserRequest userRequest = UserRequest.builder()
+            .foldingUserName("newUser")
+            .displayName("newUser")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.AMD_GPU.toString())
+            .hardwareId(newHardware.getId())
+            .teamId(existingCaptain.getId())
+            .userIsCaptain(true)
+            .build();
+
+        final User newCaptain = create(userRequest);
+
+        final User retrievedOldCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(existingCaptain.getId()));
+        assertThat(retrievedOldCaptain.isUserIsCaptain())
+            .isFalse();
+
+        final User retrievedNewCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(newCaptain.getId()));
+        assertThat(retrievedNewCaptain.isUserIsCaptain())
+            .isTrue();
     }
 
     private static User findUserById(final Collection<User> users, final int id) {
