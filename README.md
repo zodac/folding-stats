@@ -229,8 +229,9 @@ Based on these limitations, the current maximum number of users for any team is 
 
 The number of users per category is configurable though [docker variables](#configuration).
 
-However, adding new categories (like CPU-based categories, or more specific GPU categories) requires updating the *Category.java* class within the
-source code. Please read the [Contributing](#Contributing) section for more information on how to do this.
+However, adding new categories (like CPU-based categories, or more specific GPU categories) requires updating
+the [Category.java](./folding-stats-api/src/main/java/me/zodac/folding/api/tc/Category.java) class within the source code. Please read
+the [Contributing](#contributing) section for more information on how to do this.
 
 ## Adjustments During The Competition
 
@@ -290,7 +291,7 @@ However, if one or more of the containers has stopped, you may see a container m
 
 ### Restarting Containers
 
-While tt is possible to restart a single container if one has gone down, it is simpler to just restart the entire docker-compose set up. Since we save
+While it is possible to restart a single container if one has gone down, it is simpler to just restart the entire docker-compose set up. Since we save
 the database content in a docker volume, any stats will be retained through a restart.
 
 To stop any remaining containers, execute the following command (in the `folding-stats` root directory):
@@ -321,8 +322,9 @@ The system currently has multiple logs available:
 - server.log
     - This is the general application log, where most logging will be written to. It will also be printed to the console.
 - audit.log
-    - This is where all logging for *SecurityInterceptor.java* is written, detailing login attempts or access requests to WRITE operations. This is
-      not printed to the console.
+    - This is where all logging
+      for [SecurityInterceptor.java](./folding-stats-war/src/main/java/me/zodac/folding/rest/provider/interceptor/security/SecurityInterceptor.java)
+      is written, detailing login attempts or access requests to WRITE operations. This is not printed to the console.
 
 These can be accessed and viewed by:
 
@@ -418,7 +420,7 @@ The first line will copy the backup from the host to the `database` container, a
 
 # Contributing
 
-Would you like to contribute? [Check here](CONTRIBUTING.md) for details on how.
+Would you like to contribute? [Check here](./CONTRIBUTING.md) for details on how.
 
 ---
 
