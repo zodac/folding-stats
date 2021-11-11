@@ -6,7 +6,6 @@ overall [Folding@Home donor statistics](https://stats.foldingathome.org/).
 
 A live example of this competition can be seen running for the [ExtremeHW Folding@Home team](https://etf.axihub.ca/).
 
-- [Folding@Home Team Competition](#foldinghome-team-competition)
 - [Overview](#overview)
     - [How Are Points Calculated](#how-are-points-calculated)
 - [Getting Started](#getting-started)
@@ -206,7 +205,7 @@ Restrictions:
 
 Notes:
 
-- If _Is Captain_ is selected but the user's team already has a captain, the old captain will be replaced as captain. There can only be one!
+- If _Is Captain_ is selected but the user's team already has a captain, the old captain will be replaced as captain. "**There can be only one!**"
 - There is no way to ensure a participant is actually only using their passkey on a single piece of hardware, so there is some level of trust
   involved. However, since we can view a user's stats on a per-hour basis, any suspicious passkey usage should be possible to find.
 
