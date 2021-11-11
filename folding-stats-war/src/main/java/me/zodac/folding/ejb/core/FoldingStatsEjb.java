@@ -219,6 +219,15 @@ public class FoldingStatsEjb implements FoldingStatsCore {
 
     @Override
     public User updateUser(final User userToUpdate, final User existingUser) {
+        if (userCaptainHandler.isUserCaptainAndCaptainExistsOnTeam(userToUpdate)) {
+            final boolean isCaptainChange = userToUpdate.isUserIsCaptain() != existingUser.isUserIsCaptain();
+            final boolean isTeamChange = userToUpdate.getTeam().getId() != existingUser.getTeam().getId();
+
+            if (isCaptainChange || isTeamChange) {
+                userCaptainHandler.removeCaptaincyFromExistingTeamCaptain(userToUpdate.getTeam());
+            }
+        }
+
         // Perform any stats handling before updating the user
         if (userTeamChangeHandler.isUserTeamChange(userToUpdate, existingUser)) {
             userTeamChangeHandler.handleTeamChange(userToUpdate, existingUser.getTeam());

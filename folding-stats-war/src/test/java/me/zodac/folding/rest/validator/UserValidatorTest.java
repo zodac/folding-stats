@@ -1869,15 +1869,12 @@ class UserValidatorTest {
         );
 
         assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
-            .containsOnly(String.format("Team '%s' already has a captain '%s', cannot have multiple captains",
-                team.getTeamName(), currentCaptain.getDisplayName()));
+            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
+            .isFalse();
     }
 
     @Test
-    void whenValidatingUpdate_givenUserIsCaptain_andAnotherUserIsCaptain_thenFailureResponseIsReturned() {
+    void whenValidatingUpdate_givenUserIsCaptain_andAnotherUserIsCaptain_thenSuccessResponseIsReturned() {
         final Hardware hardware = generateHardware();
         final Team team = generateTeam();
 
@@ -1927,11 +1924,8 @@ class UserValidatorTest {
         );
 
         assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
-            .containsOnly(String.format("Team '%s' already has a captain '%s', cannot have multiple captains",
-                team.getTeamName(), currentCaptain.getDisplayName()));
+            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
+            .isFalse();
     }
 
     @Test

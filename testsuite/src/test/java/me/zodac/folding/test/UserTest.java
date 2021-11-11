@@ -45,6 +45,7 @@ import static me.zodac.folding.test.util.rest.request.HardwareUtils.HARDWARE_REQ
 import static me.zodac.folding.test.util.rest.request.TeamUtils.TEAM_REQUEST_SENDER;
 import static me.zodac.folding.test.util.rest.request.UserUtils.USER_REQUEST_SENDER;
 import static me.zodac.folding.test.util.rest.request.UserUtils.create;
+import static me.zodac.folding.test.util.rest.request.UserUtils.update;
 import static me.zodac.folding.test.util.rest.response.HttpResponseHeaderUtils.getEntityTag;
 import static me.zodac.folding.test.util.rest.response.HttpResponseHeaderUtils.getTotalCount;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -72,6 +73,7 @@ import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 import me.zodac.folding.test.util.TestConstants;
+import me.zodac.folding.test.util.TestGenerator;
 import me.zodac.folding.test.util.rest.request.HardwareUtils;
 import me.zodac.folding.test.util.rest.request.StubbedFoldingEndpointUtils;
 import me.zodac.folding.test.util.rest.request.TeamUtils;
@@ -867,22 +869,23 @@ class UserTest {
     }
 
     @Test
-    void whenCreatingUser_givenUserIsCaptain_andCaptainAlreadyExistsInTeam_thenUserBecomesCaptain_andOldUserIsRemovedAsCaptain_andHas201Status()
+    void whenCreatingUser_givenUserIsCaptain_andCaptainAlreadyExistsInTeam_thenUserBecomesCaptain_andOldUserIsRemovedAsCaptain()
         throws FoldingRestException {
         final User existingCaptain = create(generateCaptainUser());
 
         final User retrievedExistingCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(existingCaptain.getId()));
         assertThat(retrievedExistingCaptain.isUserIsCaptain())
+            .as("Expected existing user to be captain")
             .isTrue();
 
         final Hardware newHardware = HardwareUtils.create(generateHardwareFromCategory(Category.AMD_GPU));
         final UserRequest userRequest = UserRequest.builder()
-            .foldingUserName("newUser")
+            .foldingUserName(TestGenerator.nextUserName())
             .displayName("newUser")
             .passkey("DummyPasskey12345678901234567890")
             .category(Category.AMD_GPU.toString())
             .hardwareId(newHardware.getId())
-            .teamId(existingCaptain.getId())
+            .teamId(existingCaptain.getTeam().getId())
             .userIsCaptain(true)
             .build();
 
@@ -890,11 +893,93 @@ class UserTest {
 
         final User retrievedOldCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(existingCaptain.getId()));
         assertThat(retrievedOldCaptain.isUserIsCaptain())
+            .as("Expected original user to no longer be captain")
             .isFalse();
 
         final User retrievedNewCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(newCaptain.getId()));
         assertThat(retrievedNewCaptain.isUserIsCaptain())
+            .as("Expected new user to be captain")
             .isTrue();
+    }
+
+    @Test
+    void whenUpdatingUser_givenUserIsCaptain_andCaptainAlreadyExistsInTeam_thenUserReplacesOldUserAsCaptain()
+        throws FoldingRestException {
+        final Hardware newHardware = HardwareUtils.create(generateHardwareFromCategory(Category.AMD_GPU));
+
+        final User existingCaptain = create(generateCaptainUser());
+        final User nonCaptain = create(UserRequest.builder()
+            .foldingUserName(TestGenerator.nextUserName())
+            .displayName("newUser")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.AMD_GPU.toString())
+            .hardwareId(newHardware.getId())
+            .teamId(existingCaptain.getTeam().getId())
+            .build());
+
+        final User retrievedExistingCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(existingCaptain.getId()));
+        assertThat(retrievedExistingCaptain.isUserIsCaptain())
+            .as("Expected existing captain to be captain")
+            .isTrue();
+        final User retrievedExistingNonCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(nonCaptain.getId()));
+        assertThat(retrievedExistingNonCaptain.isUserIsCaptain())
+            .as("Expected other user to not be captain")
+            .isFalse();
+
+        final User newCaptain = update(nonCaptain.getId(), UserRequest.builder()
+            .foldingUserName(TestGenerator.nextUserName())
+            .displayName("newUser")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.AMD_GPU.toString())
+            .hardwareId(newHardware.getId())
+            .teamId(existingCaptain.getTeam().getId())
+            .userIsCaptain(true)
+            .build());
+
+        final User retrievedOldCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(existingCaptain.getId()));
+        assertThat(retrievedOldCaptain.isUserIsCaptain())
+            .as("Expected original captain to no longer be captain")
+            .isFalse();
+        final User retrievedNewCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(newCaptain.getId()));
+        assertThat(retrievedNewCaptain.isUserIsCaptain())
+            .as("Expected other user to be new captain")
+            .isTrue();
+    }
+
+    @Test
+    void whenUpdatingUser_givenUserIsCaptain_andUserIsChangingTeams_andCaptainAlreadyExistsInTeam_thenUserReplacesOldUserAsCaptain()
+        throws FoldingRestException {
+
+        final User firstTeamCaptain = create(generateCaptainUser());
+        final User secondTeamCaptain = create(generateCaptainUser());
+
+        final User retrievedFirstTeamCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(firstTeamCaptain.getId()));
+        assertThat(retrievedFirstTeamCaptain.isUserIsCaptain())
+            .as("Expected user of first team to be captain")
+            .isTrue();
+        final User retrievedSecondTeamCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(secondTeamCaptain.getId()));
+        assertThat(retrievedSecondTeamCaptain.isUserIsCaptain())
+            .as("Expected user of second team to be captain")
+            .isTrue();
+
+        final User firstUserMovingToSecondTeam = update(firstTeamCaptain.getId(), UserRequest.builder()
+            .foldingUserName(firstTeamCaptain.getFoldingUserName())
+            .displayName(firstTeamCaptain.getDisplayName())
+            .passkey(firstTeamCaptain.getPasskey())
+            .category(Category.WILDCARD.toString())
+            .hardwareId(firstTeamCaptain.getHardware().getId())
+            .teamId(secondTeamCaptain.getTeam().getId())
+            .userIsCaptain(firstTeamCaptain.isUserIsCaptain())
+            .build());
+
+        final User retrievedSecondTeamNewCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(firstUserMovingToSecondTeam.getId()));
+        assertThat(retrievedSecondTeamNewCaptain.isUserIsCaptain())
+            .as("Expected moved user to be captain of new team")
+            .isTrue();
+        final User retrievedSecondTeamOldCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(secondTeamCaptain.getId()));
+        assertThat(retrievedSecondTeamOldCaptain.isUserIsCaptain())
+            .as("Expected old captain of team to no longer be captain")
+            .isFalse();
     }
 
     private static User findUserById(final Collection<User> users, final int id) {

@@ -106,7 +106,6 @@ public final class UserValidator {
      *     <li>Field 'teamId' must match an existing {@link Team}</li>
      *     <li>The {@link User} must not cause its {@link Team} to exceed the {@link Category#maximumPermittedAmountForAllCategories()}</li>
      *     <li>The {@link User} must not cause its {@link Category} to exceed the {@link Category#permittedUsers()}</li>
-     *     <li>The {@link User} may only be captain if no other {@link User} in the team is already captain</li>
      *     <li>The 'foldingUserName' and 'passkey' combination has at least 1 Work Unit successfully completed</li>
      * </ul>
      *
@@ -196,7 +195,6 @@ public final class UserValidator {
      *     {@link Category#maximumPermittedAmountForAllCategories()}</li>
      *     <li>If the {@link User} is updating its {@link Category} must not cause its {@link Category} to exceed the
      *     {@link Category#permittedUsers()}</li>
-     *     <li>The {@link User} may only be captain if no other {@link User} in the team is already captain</li>
      *     <li>The 'foldingUserName' and 'passkey' combination has at least 1 Work Unit successfully completed</li>
      * </ul>
      *
@@ -255,7 +253,6 @@ public final class UserValidator {
 
         final List<String> complexFailureMessages = Stream.of(
                 validateUpdatedUserDoesNotExceedTeamLimits(userRequest, existingUser, usersOnTeam, category),
-                validateUserCanBeCaptain(userRequest, usersOnTeam, existingUser),
                 validateUpdateUserWorkUnits(userRequest, existingUser)
             )
             .filter(Objects::nonNull)
@@ -342,21 +339,6 @@ public final class UserValidator {
             if (numberOfUsersInTeamWithCategory >= permittedNumberForCategory) {
                 return String.format("Team '%s' already has %s users in category '%s', only %s permitted",
                     teamForUser.getTeamName(), numberOfUsersInTeamWithCategory, category, permittedNumberForCategory);
-            }
-        }
-
-        return null;
-    }
-
-    private String validateUserCanBeCaptain(final UserRequest userRequest, final Collection<User> usersOnTeam, final User existingUser) {
-        if (!userRequest.isUserIsCaptain()) {
-            return null;
-        }
-
-        for (final User userOnTeam : usersOnTeam) {
-            if (userOnTeam.isUserIsCaptain() && (existingUser == null || existingUser.getId() != userOnTeam.getId())) {
-                return String.format("Team '%s' already has a captain '%s', cannot have multiple captains", teamForUser.getTeamName(),
-                    userOnTeam.getDisplayName());
             }
         }
 
