@@ -29,7 +29,7 @@ import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
-import me.zodac.folding.SystemStateManager;
+import me.zodac.folding.state.SystemStateManager;
 import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;

@@ -758,7 +758,7 @@ class UserTest {
             .passkey(createdUser.getPasskey())
             .category(createdUser.getCategory().toString())
             .profileLink(createdUser.getProfileLink())
-            .liveStatsLink("")
+            .liveStatsLink(null)
             .hardwareId(createdUser.getHardware().getId())
             .teamId(createdUser.getTeam().getId())
             .userIsCaptain(createdUser.isUserIsCaptain())

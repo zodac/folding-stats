@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Optional;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
-import me.zodac.folding.SystemStateManager;
+import me.zodac.folding.state.SystemStateManager;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.state.SystemState;

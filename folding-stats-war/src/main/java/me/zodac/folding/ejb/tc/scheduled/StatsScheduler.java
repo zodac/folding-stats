@@ -36,8 +36,8 @@ import javax.ejb.Startup;
 import javax.ejb.Timeout;
 import javax.ejb.Timer;
 import javax.ejb.TimerService;
-import me.zodac.folding.ParsingStateManager;
-import me.zodac.folding.SystemStateManager;
+import me.zodac.folding.state.ParsingStateManager;
+import me.zodac.folding.state.SystemStateManager;
 import me.zodac.folding.api.state.ParsingState;
 import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.tc.Team;
@@ -73,16 +73,16 @@ public class StatsScheduler {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final boolean IS_STATS_SCHEDULED_PARSING_ENABLED =
-        parseBoolean(EnvironmentVariableUtils.get("ENABLE_STATS_SCHEDULED_PARSING", "false"));
+        parseBoolean(EnvironmentVariableUtils.getOrDefault("ENABLE_STATS_SCHEDULED_PARSING", "false"));
 
     // Default is to run every hour at 55 minutes past the hour
-    private static final String STATS_PARSING_SCHEDULE_HOUR = EnvironmentVariableUtils.get("STATS_PARSING_SCHEDULE_HOUR", "*");
-    private static final String STATS_PARSING_SCHEDULE_MINUTE = EnvironmentVariableUtils.get("STATS_PARSING_SCHEDULE_MINUTE", "55");
-    private static final String STATS_PARSING_SCHEDULE_SECOND = EnvironmentVariableUtils.get("STATS_PARSING_SCHEDULE_SECOND", "0");
+    private static final String STATS_PARSING_SCHEDULE_HOUR = EnvironmentVariableUtils.getOrDefault("STATS_PARSING_SCHEDULE_HOUR", "*");
+    private static final String STATS_PARSING_SCHEDULE_MINUTE = EnvironmentVariableUtils.getOrDefault("STATS_PARSING_SCHEDULE_MINUTE", "55");
+    private static final String STATS_PARSING_SCHEDULE_SECOND = EnvironmentVariableUtils.getOrDefault("STATS_PARSING_SCHEDULE_SECOND", "0");
     private static final String STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH =
-        EnvironmentVariableUtils.get("STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH", "3");
+        EnvironmentVariableUtils.getOrDefault("STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH", "3");
     private static final String STATS_PARSING_SCHEDULE_LAST_DAY_OF_MONTH =
-        EnvironmentVariableUtils.get("STATS_PARSING_SCHEDULE_LAST_DAY_OF_MONTH", "31");
+        EnvironmentVariableUtils.getOrDefault("STATS_PARSING_SCHEDULE_LAST_DAY_OF_MONTH", "31");
 
     @EJB
     private FoldingStatsCore foldingStatsCore;

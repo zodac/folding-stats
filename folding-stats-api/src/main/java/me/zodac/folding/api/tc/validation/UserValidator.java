@@ -22,9 +22,11 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.rest.validator;
+package me.zodac.folding.api.tc.validation;
 
 import static java.util.stream.Collectors.toList;
+import static me.zodac.folding.api.tc.validation.ValidationUtils.isBlankOrValidUrl;
+import static me.zodac.folding.api.tc.validation.ValidationUtils.isBlankString;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -42,16 +44,12 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
-import me.zodac.folding.stats.HttpFoldingStatsRetriever;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.validator.routines.UrlValidator;
 
 /**
  * Validator class to validate a {@link User} or {@link UserRequest}.
  */
 public final class UserValidator {
 
-    private static final UrlValidator URL_VALIDATOR = new UrlValidator();
     private static final Pattern FOLDING_USER_NAME_PATTERN = Pattern.compile("^[a-zA-Z0-9._-]*$");
     private static final Pattern PASSKEY_PATTERN = Pattern.compile("[a-zA-Z0-9]{32}");
 
@@ -71,20 +69,8 @@ public final class UserValidator {
      * @param foldingStatsRetriever the {@link FoldingStatsRetriever} to verify the user stats
      * @return the created {@link UserValidator}
      */
-    public static UserValidator createWithFoldingStatsRetriever(final FoldingStatsRetriever foldingStatsRetriever) {
+    public static UserValidator create(final FoldingStatsRetriever foldingStatsRetriever) {
         return new UserValidator(foldingStatsRetriever);
-    }
-
-    /**
-     * Create an instance of {@link UserValidator}.
-     *
-     * <p>
-     * Uses an instance of {@link HttpFoldingStatsRetriever}.
-     *
-     * @return the created {@link UserValidator}
-     */
-    public static UserValidator create() {
-        return new UserValidator(HttpFoldingStatsRetriever.create());
     }
 
     /**
@@ -369,7 +355,7 @@ public final class UserValidator {
         final String foldingUserName = userRequest.getFoldingUserName();
         final String passkey = userRequest.getPasskey();
 
-        if (StringUtils.isAnyBlank(foldingUserName, passkey)) {
+        if (isBlankString(foldingUserName) || isBlankString(passkey)) {
             return Optional.empty();
         }
 
@@ -405,19 +391,19 @@ public final class UserValidator {
     }
 
     private static String foldingUserName(final UserRequest userRequest) {
-        return StringUtils.isBlank(userRequest.getFoldingUserName()) || !FOLDING_USER_NAME_PATTERN.matcher(userRequest.getFoldingUserName()).find()
+        return isBlankString(userRequest.getFoldingUserName()) || !FOLDING_USER_NAME_PATTERN.matcher(userRequest.getFoldingUserName()).find()
             ? "Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen"
             : null;
     }
 
     private static String displayName(final UserRequest userRequest) {
-        return StringUtils.isNotBlank(userRequest.getDisplayName())
-            ? null
-            : "Field 'displayName' must not be empty";
+        return isBlankString(userRequest.getDisplayName())
+            ? "Field 'displayName' must not be empty"
+            : null;
     }
 
     private static String passkey(final UserRequest userRequest) {
-        return StringUtils.isBlank(userRequest.getPasskey()) || !PASSKEY_PATTERN.matcher(userRequest.getPasskey()).find()
+        return isBlankString(userRequest.getPasskey()) || !PASSKEY_PATTERN.matcher(userRequest.getPasskey()).find()
             ? "Field 'passkey' must be 32 characters long and include only alphanumeric characters"
             : null;
     }
@@ -442,13 +428,13 @@ public final class UserValidator {
     }
 
     private static String profileLink(final UserRequest userRequest) {
-        return (StringUtils.isBlank(userRequest.getProfileLink()) || URL_VALIDATOR.isValid(userRequest.getProfileLink()))
+        return isBlankOrValidUrl(userRequest.getProfileLink())
             ? null
             : String.format("Field 'profileLink' is not a valid link: '%s'", userRequest.getProfileLink());
     }
 
     private static String liveStatsLink(final UserRequest userRequest) {
-        return (StringUtils.isBlank(userRequest.getLiveStatsLink()) || URL_VALIDATOR.isValid(userRequest.getLiveStatsLink()))
+        return isBlankOrValidUrl(userRequest.getLiveStatsLink())
             ? null
             : String.format("Field 'liveStatsLink' is not a valid link: '%s'", userRequest.getLiveStatsLink());
     }

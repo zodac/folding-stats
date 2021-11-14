@@ -26,7 +26,7 @@ package me.zodac.folding.ejb.tc.user;
 
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
-import me.zodac.folding.ParsingStateManager;
+import me.zodac.folding.state.ParsingStateManager;
 import me.zodac.folding.api.state.ParsingState;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;

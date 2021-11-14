@@ -74,9 +74,9 @@ public final class EncodingUtils {
      * Checks if the authorization payload contains the {@value BASIC_AUTHENTICATION_SCHEME} authentication scheme.
      *
      * @param authorizationPayload the value to check
-     * @return <code>true</code> if the value is a basic authentication payload
+     * @return <code>true</code> if the value is <b>not</b> a basic authentication payload
      */
-    public static boolean isNotBasicAuthentication(final String authorizationPayload) {
+    public static boolean isInvalidBasicAuthentication(final String authorizationPayload) {
         return authorizationPayload == null || !authorizationPayload.contains(BASIC_AUTHENTICATION_SCHEME);
     }
 
@@ -92,6 +92,10 @@ public final class EncodingUtils {
             throw new IllegalArgumentException("Cannot decode null");
         }
 
+        if (!authorizationPayload.startsWith(BASIC_AUTHENTICATION_SCHEME)) {
+            throw new IllegalArgumentException(String.format("Cannot decode input that does not start with: '%s'", BASIC_AUTHENTICATION_SCHEME));
+        }
+
         final String encodedUserNameAndPassword = authorizationPayload.split(BASIC_AUTHENTICATION_SCHEME)[1];
         return decodeAuthentication(encodedUserNameAndPassword);
     }
@@ -104,7 +108,16 @@ public final class EncodingUtils {
      * @throws IllegalArgumentException thrown if the input is not a valid {@link Base64} {@link String}
      */
     public static Map<String, String> decodeAuthentication(final String encodedUserNameAndPassword) {
+        if (encodedUserNameAndPassword == null) {
+            throw new IllegalArgumentException("Cannot decode null");
+        }
+
         final String decodedUserNameAndPassword = new String(Base64.getDecoder().decode(encodedUserNameAndPassword), StandardCharsets.ISO_8859_1);
+
+        if (!decodedUserNameAndPassword.contains(DECODED_USERNAME_PASSWORD_DELIMITER)) {
+            throw new IllegalArgumentException(String.format("Decoded input does not contain: '%s'", DECODED_USERNAME_PASSWORD_DELIMITER));
+        }
+
         final String[] userNameAndPasswordTokens = decodedUserNameAndPassword.split(DECODED_USERNAME_PASSWORD_DELIMITER, 2);
 
         return Map.of(

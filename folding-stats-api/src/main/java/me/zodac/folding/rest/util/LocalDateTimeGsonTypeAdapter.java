@@ -60,6 +60,10 @@ import java.time.LocalDateTime;
  *
  * <p>
  * For the {@link JsonSerializer}, we do the reverse and build up the same JSON output.
+ *
+ * <p>
+ * <b>NOTE:</b> I'm not a huge fan of this existing in the API module, since it forces a dependency on {@code Gson}.
+ * However, it made less sense to implement this in the two places that need it (client library and REST endpoints), so this was the compromise.
  */
 public final class LocalDateTimeGsonTypeAdapter implements JsonDeserializer<LocalDateTime>, JsonSerializer<LocalDateTime> {
 

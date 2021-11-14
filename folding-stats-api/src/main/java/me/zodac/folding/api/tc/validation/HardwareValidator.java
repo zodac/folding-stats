@@ -22,9 +22,10 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.rest.validator;
+package me.zodac.folding.api.tc.validation;
 
 import static java.util.stream.Collectors.toList;
+import static me.zodac.folding.api.tc.validation.ValidationUtils.isBlankString;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -37,7 +38,6 @@ import me.zodac.folding.api.tc.HardwareMake;
 import me.zodac.folding.api.tc.HardwareType;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Validator class to validate a {@link Hardware} or {@link HardwareRequest}.
@@ -177,7 +177,7 @@ public final class HardwareValidator {
     }
 
     private static Optional<Hardware> getHardwareWithName(final String hardwareName, final Collection<Hardware> allHardware) {
-        if (StringUtils.isBlank(hardwareName)) {
+        if (isBlankString(hardwareName)) {
             return Optional.empty();
         }
 
@@ -200,15 +200,15 @@ public final class HardwareValidator {
     }
 
     private static String hardwareName(final HardwareRequest hardwareRequest) {
-        return StringUtils.isNotBlank(hardwareRequest.getHardwareName())
-            ? null
-            : "Field 'hardwareName' must not be empty";
+        return isBlankString(hardwareRequest.getHardwareName())
+            ? "Field 'hardwareName' must not be empty"
+            : null;
     }
 
     private static String displayName(final HardwareRequest hardwareRequest) {
-        return StringUtils.isNotBlank(hardwareRequest.getDisplayName())
-            ? null
-            : "Field 'displayName' must not be empty";
+        return isBlankString(hardwareRequest.getDisplayName())
+            ? "Field 'displayName' must not be empty"
+            : null;
     }
 
     private static String hardwareMake(final HardwareRequest hardwareRequest) {

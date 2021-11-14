@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.rest.validator;
+package me.zodac.folding.api.tc.validation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -69,7 +69,7 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateCreate(user,
             Collections.emptyList(),
             List.of(hardware),
@@ -83,7 +83,7 @@ class UserValidatorTest {
 
     @Test
     void whenValidatingCreate_givenNullUser_thenFailureResponseIsReturned() {
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateCreate(null,
             Collections.emptyList(),
             Collections.emptyList(),
@@ -106,7 +106,7 @@ class UserValidatorTest {
             .foldingUserName("user")
             .displayName("user")
             .passkey("DummyPasskey12345678901234567890")
-            .category("invalid")
+            .category(Category.INVALID.toString())
             .profileLink("http://www.google.com")
             .liveStatsLink("http://www.google.com")
             .userIsCaptain(true)
@@ -114,7 +114,7 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateCreate(user,
             Collections.emptyList(),
             List.of(hardware),
@@ -125,7 +125,7 @@ class UserValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .containsOnly(String.format("Field 'category' must be one of: %s", Category.getAllValues()));
+            .containsOnly("Field 'category' must be one of: [AMD_GPU, NVIDIA_GPU, WILDCARD]");
     }
 
     @Test
@@ -145,7 +145,7 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateCreate(user,
             Collections.emptyList(),
             List.of(hardware),
@@ -176,7 +176,7 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateCreate(user,
             Collections.emptyList(),
             List.of(hardware),
@@ -207,7 +207,7 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateCreate(user,
             Collections.emptyList(),
             List.of(hardware),
@@ -238,38 +238,7 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateCreate(user,
-            Collections.emptyList(),
-            List.of(hardware),
-            List.of(team)
-        );
-
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
-            .containsOnly("Field 'passkey' must be 32 characters long and include only alphanumeric characters");
-    }
-
-    @Test
-    void whenValidatingCreate_givenUserWithPasskeyOfInvalidLength_thenFailureResponseIsReturned() {
-        final Hardware hardware = generateHardware();
-        final Team team = generateTeam();
-
-        final UserRequest user = UserRequest.builder()
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("1234")
-            .category(Category.NVIDIA_GPU.toString())
-            .profileLink("http://www.google.com")
-            .liveStatsLink("http://www.google.com")
-            .userIsCaptain(true)
-            .hardwareId(hardware.getId())
-            .teamId(team.getId())
-            .build();
-
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateCreate(user,
             Collections.emptyList(),
             List.of(hardware),
@@ -300,7 +269,7 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateCreate(user,
             Collections.emptyList(),
             List.of(hardware),
@@ -331,7 +300,7 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateCreate(user,
             Collections.emptyList(),
             List.of(hardware),
@@ -360,7 +329,7 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateCreate(user,
             Collections.emptyList(),
             List.of(hardware),
@@ -391,7 +360,7 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateCreate(user,
             Collections.emptyList(),
             List.of(hardware),
@@ -420,7 +389,7 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateCreate(user,
             Collections.emptyList(),
             List.of(hardware),
@@ -466,7 +435,7 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateCreate(user,
             List.of(otherUser),
             List.of(hardware, otherHardware),
@@ -510,7 +479,7 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateCreate(user,
             List.of(otherUser),
             List.of(hardware, otherHardware),
@@ -549,7 +518,7 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateCreate(user,
             Collections.emptyList(),
             List.of(hardware),
@@ -589,7 +558,7 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateCreate(user,
             Collections.emptyList(),
             List.of(hardware),
@@ -629,7 +598,7 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateCreate(user,
             Collections.emptyList(),
             List.of(hardware),
@@ -659,7 +628,7 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateCreate(user,
             Collections.emptyList(),
             Collections.emptyList(),
@@ -698,7 +667,7 @@ class UserValidatorTest {
             .teamId(1)
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateCreate(user,
             Collections.emptyList(),
             List.of(hardware),
@@ -728,7 +697,7 @@ class UserValidatorTest {
             .teamId(1)
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateCreate(user,
             Collections.emptyList(),
             List.of(hardware),
@@ -771,7 +740,7 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateCreate(user,
             List.of(currentCaptain),
             List.of(hardware),
@@ -812,7 +781,7 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateCreate(user,
             List.of(currentCaptain),
             List.of(hardware),
@@ -859,7 +828,7 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateCreate(user,
             usersOnTeam,
             List.of(hardware),
@@ -909,7 +878,7 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateCreate(user,
             usersOnTeamInCategory,
             List.of(hardware),
@@ -956,7 +925,7 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateCreate(user,
             usersOnTeamInCategory,
             List.of(hardware),
@@ -988,7 +957,7 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new NoUnitsFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new NoUnitsFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateCreate(user,
             Collections.emptyList(),
             List.of(hardware),
@@ -1020,7 +989,7 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ExternalConnectionFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ExternalConnectionFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateCreate(user,
             Collections.emptyList(),
             List.of(hardware),
@@ -1049,7 +1018,7 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateCreate(user,
             Collections.emptyList(),
             Collections.emptyList(),
@@ -1080,7 +1049,7 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateCreate(user,
             Collections.emptyList(),
             Collections.emptyList(),
@@ -1130,7 +1099,7 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser),
             List.of(hardware),
@@ -1159,7 +1128,7 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateUpdate(null, existingUser,
             List.of(existingUser),
             Collections.emptyList(),
@@ -1190,7 +1159,7 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateUpdate(user, null,
             Collections.emptyList(),
             Collections.emptyList(),
@@ -1233,7 +1202,7 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser),
             List.of(hardware),
@@ -1244,7 +1213,7 @@ class UserValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .containsOnly(String.format("Field 'category' must be one of: %s", Category.getAllValues()));
+            .containsOnly("Field 'category' must be one of: [AMD_GPU, NVIDIA_GPU, WILDCARD]");
     }
 
     @Test
@@ -1276,7 +1245,7 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser),
             List.of(hardware),
@@ -1319,7 +1288,7 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser),
             List.of(hardware),
@@ -1362,7 +1331,7 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser),
             List.of(hardware),
@@ -1405,7 +1374,7 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser),
             List.of(hardware),
@@ -1448,7 +1417,7 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser),
             List.of(hardware),
@@ -1491,7 +1460,7 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser),
             List.of(hardware),
@@ -1534,7 +1503,7 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser),
             List.of(hardware),
@@ -1575,7 +1544,7 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser),
             List.of(hardware),
@@ -1618,7 +1587,7 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser),
             List.of(hardware),
@@ -1659,7 +1628,7 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser),
             List.of(hardware),
@@ -1719,7 +1688,7 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser, otherUser),
             List.of(hardware, otherHardware),
@@ -1763,7 +1732,7 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser),
             List.of(hardware),
@@ -1805,7 +1774,7 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser),
             List.of(hardware),
@@ -1861,7 +1830,7 @@ class UserValidatorTest {
             .team(oldTeam)
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser, currentCaptain),
             List.of(hardware),
@@ -1916,7 +1885,7 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser, currentCaptain),
             List.of(hardware),
@@ -1971,7 +1940,7 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
             List.of(currentCaptain, existingUser),
             List.of(hardware),
@@ -2035,7 +2004,7 @@ class UserValidatorTest {
         final List<User> allUsers = new ArrayList<>(usersOnTeam);
         allUsers.add(existingUser);
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
             allUsers,
             List.of(hardware),
@@ -2102,7 +2071,7 @@ class UserValidatorTest {
         final List<User> allUsers = new ArrayList<>(usersOnTeamInCategory);
         allUsers.add(existingUser);
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
             allUsers,
             List.of(hardware),
@@ -2168,7 +2137,7 @@ class UserValidatorTest {
         final List<User> allUsers = new ArrayList<>(usersOnTeamInCategory);
         allUsers.add(existingUser);
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
             allUsers,
             List.of(hardware),
@@ -2221,7 +2190,7 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser),
             List.of(hardware),
@@ -2274,7 +2243,7 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser),
             List.of(hardware),
@@ -2326,7 +2295,7 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser),
             List.of(hardware),
@@ -2367,7 +2336,7 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser),
             Collections.emptyList(),
@@ -2415,7 +2384,7 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser),
             List.of(hardware),
@@ -2456,7 +2425,7 @@ class UserValidatorTest {
             .hardware(hardware)
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser),
             List.of(hardware),
@@ -2499,7 +2468,7 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new NoUnitsFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new NoUnitsFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser),
             List.of(hardware),
@@ -2540,7 +2509,7 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new NoUnitsFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new NoUnitsFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser),
             List.of(hardware),
@@ -2584,7 +2553,7 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ExternalConnectionFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ExternalConnectionFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser),
             List.of(hardware),
@@ -2624,7 +2593,7 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser),
             Collections.emptyList(),
@@ -2666,7 +2635,7 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser),
             List.of(hardware),
@@ -2704,7 +2673,7 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateDelete(userToDelete);
 
         assertThat(response.isFailure())
@@ -2729,7 +2698,7 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.createWithFoldingStatsRetriever(new ValidFoldingStatsRetriever());
+        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<User> response = userValidator.validateDelete(userToDelete);
 
         assertThat(response.isFailure())

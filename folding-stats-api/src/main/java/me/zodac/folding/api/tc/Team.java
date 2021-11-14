@@ -72,8 +72,8 @@ public class Team implements ResponsePojo {
      * @return the created {@link Team}
      */
     public static Team create(final int teamId, final String teamName, final String teamDescription, final String forumLink) {
-        final String teamDescriptionOrNull = isEmpty(teamDescription) ? null : teamDescription;
-        final String forumLinkOrNull = isEmpty(forumLink) ? null : forumLink;
+        final String teamDescriptionOrNull = isBlank(teamDescription) ? null : teamDescription;
+        final String forumLinkOrNull = isBlank(forumLink) ? null : forumLink;
         return new Team(teamId, teamName, teamDescriptionOrNull, forumLinkOrNull);
     }
 
@@ -120,7 +120,7 @@ public class Team implements ResponsePojo {
         return create(teamId, team.teamName, team.teamDescription, team.forumLink);
     }
 
-    private static boolean isEmpty(final String input) {
+    private static boolean isBlank(final String input) {
         return input == null || input.isBlank();
     }
 

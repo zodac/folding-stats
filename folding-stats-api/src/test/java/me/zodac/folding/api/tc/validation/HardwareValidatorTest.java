@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.rest.validator;
+package me.zodac.folding.api.tc.validation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -185,7 +185,7 @@ class HardwareValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .containsOnly("Field 'hardwareMake' must be one of: " + HardwareMake.getAllValues());
+            .containsOnly("Field 'hardwareMake' must be one of: [AMD, INTEL, NVIDIA]");
     }
 
     @Test
@@ -205,7 +205,7 @@ class HardwareValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .containsOnly("Field 'hardwareType' must be one of: " + HardwareType.getAllValues());
+            .containsOnly("Field 'hardwareType' must be one of: [CPU, GPU]");
     }
 
     @Test
@@ -270,8 +270,8 @@ class HardwareValidatorTest {
             .containsOnly(
                 "Field 'hardwareName' must not be empty",
                 "Field 'displayName' must not be empty",
-                "Field 'hardwareMake' must be one of: " + HardwareMake.getAllValues(),
-                "Field 'hardwareType' must be one of: " + HardwareType.getAllValues(),
+                "Field 'hardwareMake' must be one of: [AMD, INTEL, NVIDIA]",
+                "Field 'hardwareType' must be one of: [CPU, GPU]",
                 "Field 'multiplier' must be 1.00 or higher",
                 "Field 'averagePpd' must be 1 or higher"
             );
@@ -508,7 +508,7 @@ class HardwareValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .containsOnly("Field 'hardwareMake' must be one of: " + HardwareMake.getAllValues());
+            .containsOnly("Field 'hardwareMake' must be one of: [AMD, INTEL, NVIDIA]");
     }
 
     @Test
@@ -537,7 +537,7 @@ class HardwareValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .containsOnly("Field 'hardwareType' must be one of: " + HardwareType.getAllValues());
+            .containsOnly("Field 'hardwareType' must be one of: [CPU, GPU]");
     }
 
     @Test
@@ -628,8 +628,8 @@ class HardwareValidatorTest {
             .hasSize(5)
             .containsOnly(
                 "Field 'displayName' must not be empty",
-                "Field 'hardwareMake' must be one of: " + HardwareMake.getAllValues(),
-                "Field 'hardwareType' must be one of: " + HardwareType.getAllValues(),
+                "Field 'hardwareMake' must be one of: [AMD, INTEL, NVIDIA]",
+                "Field 'hardwareType' must be one of: [CPU, GPU]",
                 "Field 'multiplier' must be 1.00 or higher",
                 "Field 'averagePpd' must be 1 or higher"
             );
@@ -679,7 +679,7 @@ class HardwareValidatorTest {
         assertThat(response.getErrors())
             .containsOnly("Payload is used by an existing object");
 
-        assertThat((String) response.getFailureResponse().getEntity())
+        assertThat(response.getValidationFailure().toString())
             .doesNotContain("DummyPasskey12345678901234567890");
     }
 

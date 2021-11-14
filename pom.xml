@@ -36,7 +36,6 @@
         <!-- 3PP Versions -->
         <commons-lang3.version>3.12.0</commons-lang3.version>
         <commons-text.version>1.9</commons-text.version>
-        <commons-validator.version>1.7</commons-validator.version>
         <gson.version>2.8.9</gson.version>
         <hikariCP.version>5.0.0</hikariCP.version>
         <javaee-web-api.version>8.0.1</javaee-web-api.version>
@@ -53,7 +52,7 @@
         <embedded-postgres.version>1.3.1</embedded-postgres.version>
         <!-- Version should be the same as the postgres docker image version, where possible -->
         <embedded-postgres-binaries-bom.version>13.4.0</embedded-postgres-binaries-bom.version>
-        <flyway-core>8.0.3</flyway-core>
+        <flyway-core>8.0.4</flyway-core>
         <junit.version>5.8.1</junit.version>
 
         <!-- Plugin Versions -->
@@ -81,7 +80,7 @@
         <maven-checkstyle-plugin.version>3.1.2</maven-checkstyle-plugin.version>
         <maven-javadoc-plugin.version>3.3.1</maven-javadoc-plugin.version>
         <maven-pmd-plugin.version>3.15.0</maven-pmd-plugin.version>
-        <pitest-maven.version>1.7.2</pitest-maven.version>
+        <pitest-maven.version>1.7.3</pitest-maven.version>
         <sonar-maven-plugin.version>3.9.0.2155</sonar-maven-plugin.version>
         <spotbugs-maven-plugin.version>4.4.2.2</spotbugs-maven-plugin.version>
 
@@ -92,6 +91,7 @@
         <spotbugs-exclude-file>${project.parent.basedir}/ci/spotbugs-exclude-filter-file.xml</spotbugs-exclude-file>
         <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
         <pmd-ruleset>${project.parent.basedir}/ci/pmd-ruleset.xml</pmd-ruleset>
+        <pitest-test-strength-threshold>100</pitest-test-strength-threshold>
 
         <!-- SonarQube server properties -->
         <!-- Using own local SonarQube, can't guarantee availability or credentials -->
@@ -130,11 +130,6 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-text</artifactId>
                 <version>${commons-text.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-validator</groupId>
-                <artifactId>commons-validator</artifactId>
-                <version>${commons-validator.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.code.gson</groupId>
@@ -514,7 +509,7 @@
                         <failWhenNoMutations>false</failWhenNoMutations>
                         <outputFormats>xml,html</outputFormats>
                         <skip>${skip-linters}</skip>
-                        <testStrengthThreshold>100</testStrengthThreshold>
+                        <testStrengthThreshold>${pitest-test-strength-threshold}</testStrengthThreshold>
                     </configuration>
                     <dependencies>
                         <dependency>

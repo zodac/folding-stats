@@ -35,7 +35,7 @@ public class PointsUrlBuilder {
     // We do not care about the team number, as we want the points for user/passkey on all teams
     // However, the API call requires a team number to be specified, so we'll stick to OCN. :)
     private static final int TEAM_NUMBER = 37_726;
-    private static final String STATS_URL_ROOT = EnvironmentVariableUtils.get("STATS_URL_ROOT", "https://api2.foldingathome.org");
+    private static final String STATS_URL_ROOT = EnvironmentVariableUtils.getOrDefault("STATS_URL_ROOT", "https://api2.foldingathome.org");
     private static final String POINTS_URL_ROOT_FORMAT = STATS_URL_ROOT + "/user/%s/stats";
 
     private String user;

@@ -56,7 +56,7 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-import me.zodac.folding.SystemStateManager;
+import me.zodac.folding.state.SystemStateManager;
 import me.zodac.folding.api.state.ReadRequired;
 import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.state.WriteRequired;
@@ -65,10 +65,12 @@ import me.zodac.folding.ejb.api.FoldingStatsCore;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 import me.zodac.folding.rest.endpoint.util.IdResult;
 import me.zodac.folding.rest.endpoint.util.IntegerParser;
+import me.zodac.folding.rest.endpoint.util.ValidationFailureResponseMapper;
 import me.zodac.folding.rest.response.BatchCreateResponse;
-import me.zodac.folding.rest.validator.UserValidator;
-import me.zodac.folding.rest.validator.ValidationFailure;
-import me.zodac.folding.rest.validator.ValidationResult;
+import me.zodac.folding.api.tc.validation.UserValidator;
+import me.zodac.folding.api.tc.validation.ValidationFailure;
+import me.zodac.folding.api.tc.validation.ValidationResult;
+import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -106,7 +108,7 @@ public class UserEndpoint {
 
         final ValidationResult<User> validationResult = validateCreate(userRequest);
         if (validationResult.isFailure()) {
-            return validationResult.getFailureResponse();
+            return ValidationFailureResponseMapper.map(validationResult);
         }
         final User validatedUser = validationResult.getOutput();
 
@@ -294,7 +296,7 @@ public class UserEndpoint {
 
             final ValidationResult<User> validationResult = validateUpdate(userRequest, existingUser);
             if (validationResult.isFailure()) {
-                return validationResult.getFailureResponse();
+                return ValidationFailureResponseMapper.map(validationResult);
             }
             final User validatedUser = validationResult.getOutput();
 
@@ -344,7 +346,7 @@ public class UserEndpoint {
 
             final ValidationResult<User> validationResult = validateDelete(user);
             if (validationResult.isFailure()) {
-                return validationResult.getFailureResponse();
+                return ValidationFailureResponseMapper.map(validationResult);
             }
             final User validatedUser = validationResult.getOutput();
 
@@ -395,7 +397,7 @@ public class UserEndpoint {
     }
 
     private ValidationResult<User> validateCreate(final UserRequest userRequest) {
-        final UserValidator userValidator = UserValidator.create();
+        final UserValidator userValidator = UserValidator.create(HttpFoldingStatsRetriever.create());
         return userValidator.validateCreate(
             userRequest,
             foldingStatsCore.getAllUsersWithPasskeys(),
@@ -405,7 +407,7 @@ public class UserEndpoint {
     }
 
     private ValidationResult<User> validateUpdate(final UserRequest userRequest, final User existingUser) {
-        final UserValidator userValidator = UserValidator.create();
+        final UserValidator userValidator = UserValidator.create(HttpFoldingStatsRetriever.create());
         return userValidator.validateUpdate(
             userRequest,
             existingUser,
@@ -416,7 +418,7 @@ public class UserEndpoint {
     }
 
     private ValidationResult<User> validateDelete(final User existingUser) {
-        final UserValidator userValidator = UserValidator.create();
+        final UserValidator userValidator = UserValidator.create(HttpFoldingStatsRetriever.create());
         return userValidator.validateDelete(existingUser);
     }
 }

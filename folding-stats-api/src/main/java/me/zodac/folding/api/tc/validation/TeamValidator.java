@@ -22,9 +22,11 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.rest.validator;
+package me.zodac.folding.api.tc.validation;
 
 import static java.util.stream.Collectors.toList;
+import static me.zodac.folding.api.tc.validation.ValidationUtils.isBlankOrValidUrl;
+import static me.zodac.folding.api.tc.validation.ValidationUtils.isBlankString;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -35,15 +37,11 @@ import java.util.stream.Stream;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.validator.routines.UrlValidator;
 
 /**
  * Validator class to validate a {@link Team} or {@link TeamRequest}.
  */
 public final class TeamValidator {
-
-    private static final UrlValidator URL_VALIDATOR = new UrlValidator();
 
     private TeamValidator() {
 
@@ -63,7 +61,6 @@ public final class TeamValidator {
      * @param teamRequest the {@link TeamRequest} to validate
      * @param allTeams    all {@link Team}s on the system
      * @return the {@link ValidationResult}
-     * @see UrlValidator#isValid(String)
      */
     public static ValidationResult<Team> validateCreate(final TeamRequest teamRequest, final Collection<Team> allTeams) {
         if (teamRequest == null) {
@@ -154,7 +151,7 @@ public final class TeamValidator {
     }
 
     private static Optional<Team> getTeamWithName(final String teamName, final Collection<Team> allTeams) {
-        if (StringUtils.isBlank(teamName)) {
+        if (isBlankString(teamName)) {
             return Optional.empty();
         }
 
@@ -177,13 +174,13 @@ public final class TeamValidator {
     }
 
     private static String teamName(final TeamRequest teamRequest) {
-        return StringUtils.isNotBlank(teamRequest.getTeamName())
-            ? null
-            : "Field 'teamName' must not be empty";
+        return isBlankString(teamRequest.getTeamName())
+            ? "Field 'teamName' must not be empty"
+            : null;
     }
 
     private static String forumLink(final TeamRequest teamRequest) {
-        return (StringUtils.isBlank(teamRequest.getForumLink()) || URL_VALIDATOR.isValid(teamRequest.getForumLink()))
+        return isBlankOrValidUrl(teamRequest.getForumLink())
             ? null
             : String.format("Field 'forumLink' is not a valid link: '%s'", teamRequest.getForumLink());
     }

@@ -32,7 +32,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class UnitsUrlBuilder {
 
-    private static final String STATS_URL_ROOT = EnvironmentVariableUtils.get("STATS_URL_ROOT", "https://api2.foldingathome.org");
+    private static final String STATS_URL_ROOT = EnvironmentVariableUtils.getOrDefault("STATS_URL_ROOT", "https://api2.foldingathome.org");
     private static final String UNITS_URL_ROOT = STATS_URL_ROOT + "/bonus";
 
     private String user;

@@ -35,8 +35,8 @@ import javax.ejb.Startup;
 import javax.ejb.Timeout;
 import javax.ejb.Timer;
 import javax.ejb.TimerService;
-import me.zodac.folding.ParsingStateManager;
-import me.zodac.folding.SystemStateManager;
+import me.zodac.folding.state.ParsingStateManager;
+import me.zodac.folding.state.SystemStateManager;
 import me.zodac.folding.api.state.ParsingState;
 import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
@@ -67,9 +67,9 @@ import org.apache.logging.log4j.Logger;
 public class StartOfMonthScheduler {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final boolean IS_MONTHLY_RESET_ENABLED = parseBoolean(EnvironmentVariableUtils.get("ENABLE_STATS_MONTHLY_RESET", "false"));
+    private static final boolean IS_MONTHLY_RESET_ENABLED = parseBoolean(EnvironmentVariableUtils.getOrDefault("ENABLE_STATS_MONTHLY_RESET", "false"));
     private static final String STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH =
-        EnvironmentVariableUtils.get("STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH", "3");
+        EnvironmentVariableUtils.getOrDefault("STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH", "3");
 
     @EJB
     private UserStatsResetter userStatsResetter;

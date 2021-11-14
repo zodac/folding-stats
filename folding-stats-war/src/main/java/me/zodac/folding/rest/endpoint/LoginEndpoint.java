@@ -87,7 +87,7 @@ public class LoginEndpoint {
     public Response loginAsAdmin(final LoginCredentials loginCredentials) {
         LOGGER.debug("Login request received");
 
-        if (loginCredentials == null || EncodingUtils.isNotBasicAuthentication(loginCredentials.getEncodedUserNameAndPassword())) {
+        if (loginCredentials == null || EncodingUtils.isInvalidBasicAuthentication(loginCredentials.getEncodedUserNameAndPassword())) {
             LOGGER.error("Invalid payload: {}", loginCredentials);
             return badRequest(loginCredentials);
         }

@@ -27,6 +27,7 @@ package me.zodac.folding.api.util;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 
@@ -34,6 +35,18 @@ import org.junit.jupiter.api.Test;
  * Unit tests for {@link CollectionUtils}.
  */
 class CollectionUtilsTest {
+
+    @Test
+    void whenContainsNoMatches_givenTwoEmptyCollections_thenTheReturnedValueIsTrue() {
+        final Collection<String> first = Collections.emptyList();
+        final Collection<String> second = Collections.emptyList();
+
+        final boolean result = CollectionUtils.containsNoMatches(first, second);
+
+        assertThat(result)
+            .as("Expected there to be no matches")
+            .isTrue();
+    }
 
     @Test
     void whenContainsNoMatches_givenTwoCollectionsWithNoMatches_thenTheReturnedValueIsTrue() {
@@ -81,5 +94,71 @@ class CollectionUtilsTest {
         assertThat(result)
             .as("Expected there to be a match")
             .isFalse();
+    }
+
+    @Test
+    void whenExistsInFirstOnly_givenTwoCollections_andBothAreEmpty_thenEmptySetIsReturned() {
+        final Collection<String> first = Collections.emptyList();
+        final Collection<String> second = Collections.emptyList();
+
+        final Set<String> result = CollectionUtils.existsInFirstOnly(first, second);
+
+        assertThat(result)
+            .isEmpty();
+    }
+
+    @Test
+    void whenExistsInFirstOnly_givenTwoCollections_andBothContainSameElements_thenEmptySetIsReturned() {
+        final Collection<String> first = Set.of("one", "two");
+        final Collection<String> second = Set.of("one", "two");
+
+        final Set<String> result = CollectionUtils.existsInFirstOnly(first, second);
+
+        assertThat(result)
+            .isEmpty();
+    }
+
+    @Test
+    void whenExistsInFirstOnly_givenTwoCollections_andFirstHasElements_andSecondIsEmpty_thenFirstElementsAreReturned() {
+        final Collection<String> first = Set.of("one", "two");
+        final Collection<String> second = Collections.emptyList();
+
+        final Set<String> result = CollectionUtils.existsInFirstOnly(first, second);
+
+        assertThat(result)
+            .isEqualTo(first);
+    }
+
+    @Test
+    void whenExistsInFirstOnly_givenTwoCollections_andFirstIsEmpty_andSecondHasElements_thenEmptySetIsReturned() {
+        final Collection<String> first = Collections.emptyList();
+        final Collection<String> second = Set.of("one", "two");
+
+        final Set<String> result = CollectionUtils.existsInFirstOnly(first, second);
+
+        assertThat(result)
+            .isEmpty();
+    }
+
+    @Test
+    void whenExistsInFirstOnly_givenTwoCollections_andBothCollectionsHaveDifferentElements_thenFirstElementsAreReturned() {
+        final Collection<String> first = Set.of("one", "two");
+        final Collection<String> second = Set.of("three", "four");
+
+        final Set<String> result = CollectionUtils.existsInFirstOnly(first, second);
+
+        assertThat(result)
+            .isEqualTo(first);
+    }
+
+    @Test
+    void whenExistsInFirstOnly_givenTwoCollections_andSecondCollectionIsSubSetOfFirst_thenOnlyFirstElementsAreReturned() {
+        final Collection<String> first = Set.of("one", "two", "three");
+        final Collection<String> second = Set.of("two", "three");
+
+        final Set<String> result = CollectionUtils.existsInFirstOnly(first, second);
+
+        assertThat(result)
+            .containsOnly("one");
     }
 }

@@ -35,10 +35,6 @@ import javax.ws.rs.core.UriBuilder;
 
 /**
  * Utility class to simplify returning a {@link Response} in the REST layer.
- *
- * <p>
- * For most use-cases we return a {@link Response}, but for more complex use-cases, we can return a {@link Response.ResponseBuilder}
- * to allow the REST function to decide to add additional logic (like a {@link javax.ws.rs.core.CacheControl} or similar).
  */
 public final class Responses {
 
@@ -289,27 +285,6 @@ public final class Responses {
     public static Response notFound() {
         return Response
             .status(Response.Status.NOT_FOUND)
-            .build();
-    }
-
-    /**
-     * A <b>409_CONFLICT</b> {@link Response}.
-     *
-     * <p>
-     * Generally used for cases where the REST request is trying to do one of the following:
-     * <ul>
-     *     <li>Create a resource that already exists</li>
-     *     <li>Update a resource with a value that conflicts with another resource</li>
-     *     <li>Delete a resource that is being used by another resource</li>
-     * </ul>
-     *
-     * @param errorMessage an error message defining what part of the input payload caused the error
-     * @return the <b>409_CONFLICT</b> {@link Response}
-     */
-    public static Response conflict(final String errorMessage) {
-        return Response
-            .status(Response.Status.CONFLICT)
-            .entity(GSON.toJson(ErrorResponse.create(errorMessage), ErrorResponse.class))
             .build();
     }
 

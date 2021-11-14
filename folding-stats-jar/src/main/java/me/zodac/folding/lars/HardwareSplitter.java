@@ -31,8 +31,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 import me.zodac.folding.api.tc.Hardware;
+import me.zodac.folding.api.util.CollectionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -55,18 +57,13 @@ public final class HardwareSplitter {
      *
      * @param fromLars the {@link Hardware} retrieved from LARS
      * @param inDb     the {@link Hardware} already existing in the DB
-     * @return a {@link Collection} of the {@link Hardware} to be created
+     * @return a {@link Collection} of the {@link Hardware} to be created, sorted according to {@link HardwareNameComparator}
      */
     public static Collection<Hardware> toCreate(final Collection<Hardware> fromLars, final Collection<Hardware> inDb) {
-        final TreeSet<Hardware> lars = new TreeSet<>(HardwareNameComparator.create());
-        lars.addAll(fromLars);
-
-        final TreeSet<Hardware> db = new TreeSet<>(HardwareNameComparator.create());
-        db.addAll(inDb);
-
-        lars.removeAll(db);
-        LOGGER.info("{} from LARS, {} in DB, {} to create", fromLars.size(), inDb.size(), lars.size());
-        return lars;
+        final Set<Hardware> toCreate = new TreeSet<>(HardwareNameComparator.create());
+        toCreate.addAll(CollectionUtils.existsInFirstOnly(fromLars, inDb));
+        LOGGER.info("{} from LARS, {} in DB, {} to create", fromLars.size(), inDb.size(), toCreate.size());
+        return toCreate;
     }
 
     /**
@@ -74,18 +71,13 @@ public final class HardwareSplitter {
      *
      * @param fromLars the {@link Hardware} retrieved from LARS
      * @param inDb     the {@link Hardware} already existing in the DB
-     * @return a {@link Collection} of the {@link Hardware} to be deleted
+     * @return a {@link Collection} of the {@link Hardware} to be deleted, sorted according to {@link HardwareNameComparator}
      */
     public static Collection<Hardware> toDelete(final Collection<Hardware> fromLars, final Collection<Hardware> inDb) {
-        final TreeSet<Hardware> lars = new TreeSet<>(HardwareNameComparator.create());
-        lars.addAll(fromLars);
-
-        final TreeSet<Hardware> db = new TreeSet<>(HardwareNameComparator.create());
-        db.addAll(inDb);
-
-        db.removeAll(lars);
-        LOGGER.info("{} from LARS, {} in DB, {} to delete", fromLars.size(), inDb.size(), db.size());
-        return db;
+        final Set<Hardware> toDelete = new TreeSet<>(HardwareNameComparator.create());
+        toDelete.addAll(CollectionUtils.existsInFirstOnly(inDb, fromLars));
+        LOGGER.info("{} from LARS, {} in DB, {} to delete", fromLars.size(), inDb.size(), toDelete.size());
+        return toDelete;
     }
 
     /**

@@ -22,15 +22,11 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.rest.validator;
-
-import static me.zodac.folding.rest.response.Responses.badRequest;
-import static me.zodac.folding.rest.response.Responses.conflict;
+package me.zodac.folding.api.tc.validation;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import javax.ws.rs.core.Response;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -54,7 +50,7 @@ public class ValidationResult<E extends ResponsePojo> {
 
     private final boolean success;
     private final E output;
-    private final Response failureResponse;
+    private final ValidationFailureType validationFailureType;
     private final ValidationFailure validationFailure;
 
     /**
@@ -83,7 +79,7 @@ public class ValidationResult<E extends ResponsePojo> {
      * @return a {@link ValidationResult} with no invalid object and an empty {@link Collection} of errors
      */
     public static <E extends ResponsePojo> ValidationResult<E> successful(final E output) {
-        return new ValidationResult<>(true, output, null, null);
+        return new ValidationResult<>(true, output, ValidationFailureType.NONE, null);
     }
 
     /**
@@ -96,7 +92,7 @@ public class ValidationResult<E extends ResponsePojo> {
      */
     public static <E extends ResponsePojo> ValidationResult<E> failure(final Object invalidObject, final Collection<String> errors) {
         final ConstraintFailure response = new ConstraintFailure(invalidObject, errors);
-        return new ValidationResult<>(false, null, badRequest(response), response);
+        return new ValidationResult<>(false, null, ValidationFailureType.BAD_REQUEST, response);
     }
 
     /**
@@ -107,7 +103,7 @@ public class ValidationResult<E extends ResponsePojo> {
      */
     public static <E extends ResponsePojo> ValidationResult<E> nullObject() {
         final ConstraintFailure response = new ConstraintFailure(null, List.of("Payload is null"));
-        return new ValidationResult<>(false, null, badRequest(response), response);
+        return new ValidationResult<>(false, null, ValidationFailureType.BAD_REQUEST, response);
     }
 
     /**
@@ -127,7 +123,7 @@ public class ValidationResult<E extends ResponsePojo> {
             List.of(conflictingObject),
             List.of(String.format("Payload conflicts with an existing object on: %s", conflictingAttributes))
         );
-        return new ValidationResult<>(false, null, conflict(response), response);
+        return new ValidationResult<>(false, null, ValidationFailureType.CONFLICT, response);
     }
 
     /**
@@ -140,7 +136,7 @@ public class ValidationResult<E extends ResponsePojo> {
      */
     public static <E extends ResponsePojo> ValidationResult<E> usedBy(final ResponsePojo invalidObject, final Collection<?> usedBy) {
         final ConflictFailure response = new ConflictFailure(invalidObject, usedBy, List.of("Payload is used by an existing object"));
-        return new ValidationResult<>(false, null, conflict(response), response);
+        return new ValidationResult<>(false, null, ValidationFailureType.CONFLICT, response);
     }
 
     /**

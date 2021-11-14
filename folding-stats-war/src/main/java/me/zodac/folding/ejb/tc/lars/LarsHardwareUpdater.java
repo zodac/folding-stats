@@ -51,7 +51,7 @@ import org.apache.logging.log4j.Logger;
 public class LarsHardwareUpdater {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final String LARS_URL_ROOT = EnvironmentVariableUtils.get("LARS_URL_ROOT", "https://folding.lar.systems");
+    private static final String LARS_URL_ROOT = EnvironmentVariableUtils.getOrDefault("LARS_URL_ROOT", "https://folding.lar.systems");
 
     @EJB
     private FoldingStatsCore foldingStatsCore;

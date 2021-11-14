@@ -22,27 +22,26 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.rest.provider;
-
-import java.net.URI;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
-import me.zodac.folding.api.util.EnvironmentVariableUtils;
+package me.zodac.folding.api.tc.validation;
 
 /**
- * {@link Provider} used to handle invalid URL requests. Redirects to the URL defined in environment variable <b>REDIRECT_URL</b>.
+ * ENUM defining the types of {@link ValidationResult} that can be returned.
  */
-@Provider
-public class InvalidUrlRedirecter implements ExceptionMapper<NotFoundException> {
+public enum ValidationFailureType {
 
-    private static final String REDIRECT_URL = EnvironmentVariableUtils.getOrDefault("REDIRECT_URL", "https://etf.axihub.ca/");
+    /**
+     * Validation failed due to a bad request; the content was invalid in some way.
+     */
+    BAD_REQUEST,
 
-    @Override
-    public Response toResponse(final NotFoundException e) {
-        return Response
-            .seeOther(URI.create(REDIRECT_URL))
-            .build();
-    }
+    /**
+     * Validation failed due to a conflict with another object. Either another object already exists, or something is using the current object so it
+     * cannot be deleted.
+     */
+    CONFLICT,
+
+    /**
+     * No validation failure occurred.
+     */
+    NONE
 }

@@ -22,46 +22,46 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding;
+package me.zodac.folding.state;
 
-import me.zodac.folding.api.state.ParsingState;
+import me.zodac.folding.api.state.SystemState;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Utility class to manage the {@link ParsingState}.
+ * Utility class to manage the {@link SystemState}.
  */
-public final class ParsingStateManager {
+public final class SystemStateManager {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static ParsingState currentState = ParsingState.DISABLED;
+    private static SystemState currentState = SystemState.STARTING;
 
-    private ParsingStateManager() {
+    private SystemStateManager() {
 
     }
 
     /**
-     * Get the current {@link ParsingState}. On system startup, the {@link ParsingState} is {@link ParsingState#DISABLED}.
+     * Get the current {@link SystemState}. On system startup, the {@link SystemState} is {@link SystemState#STARTING}.
      *
-     * @return the current {@link ParsingState}
+     * @return the current {@link SystemState}
      */
-    public static ParsingState current() {
+    public static SystemState current() {
         return currentState;
     }
 
     /**
-     * Change to the next {@link ParsingState}.
+     * Change to the next {@link SystemState}.
      *
-     * @param nextState the {@link ParsingState} to transition to
+     * @param nextState the {@link SystemState} to transition to
      */
-    public static void next(final ParsingState nextState) {
+    public static void next(final SystemState nextState) {
         if (nextState == currentState) {
-            LOGGER.trace("Parsing state is already {}, no transition needed", nextState);
+            LOGGER.trace("System state is already {}, no transition needed", nextState);
             return;
         }
 
-        LOGGER.debug("Transitioning parsing state from {} to {}", currentState, nextState);
+        LOGGER.debug("Transitioning system state from {} to {}", currentState, nextState);
         currentState = nextState;
     }
 }

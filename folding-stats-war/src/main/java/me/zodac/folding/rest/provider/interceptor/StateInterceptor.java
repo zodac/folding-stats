@@ -32,7 +32,7 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.Provider;
-import me.zodac.folding.SystemStateManager;
+import me.zodac.folding.state.SystemStateManager;
 import me.zodac.folding.api.state.OperationType;
 import me.zodac.folding.api.state.ReadRequired;
 import me.zodac.folding.api.state.WriteRequired;
@@ -49,7 +49,7 @@ import org.apache.logging.log4j.Logger;
  * {@link me.zodac.folding.api.state.SystemState} does not allow {@link OperationType#WRITE} operations, we return a
  * <b>503_SERVICE_UNAVAILABLE</b> {@link javax.ws.rs.core.Response}.
  *
- * @see me.zodac.folding.SystemStateManager
+ * @see SystemStateManager
  */
 @Provider
 public class StateInterceptor implements ContainerRequestFilter {

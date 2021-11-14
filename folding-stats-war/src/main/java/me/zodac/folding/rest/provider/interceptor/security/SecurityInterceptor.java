@@ -122,7 +122,7 @@ public class SecurityInterceptor implements ContainerRequestFilter {
         }
 
         final String authorizationProperty = requestContext.getHeaderString(RestHeader.AUTHORIZATION.headerName());
-        if (EncodingUtils.isNotBasicAuthentication(authorizationProperty)) {
+        if (EncodingUtils.isInvalidBasicAuthentication(authorizationProperty)) {
             LOGGER.warn("Invalid {} value provided at '{}': '{}'", RestHeader.AUTHORIZATION.headerName(),
                 requestContext.getUriInfo().getAbsolutePath(), authorizationProperty);
             requestContext.abortWith(unauthorized());

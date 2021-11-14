@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.rest.validator;
+package me.zodac.folding.api.tc.validation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -416,10 +416,10 @@ class TeamValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .as("Response" + response.getFailureResponse().getEntity())
+            .as("Response" + response.getValidationFailure().toString())
             .containsOnly("Payload is used by an existing object");
 
-        assertThat((String) response.getFailureResponse().getEntity())
+        assertThat(response.getValidationFailure().toString())
             .doesNotContain("DummyPasskey12345678901234567890");
     }
 

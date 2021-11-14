@@ -57,7 +57,7 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-import me.zodac.folding.SystemStateManager;
+import me.zodac.folding.state.SystemStateManager;
 import me.zodac.folding.api.state.ReadRequired;
 import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.state.WriteRequired;
@@ -66,10 +66,11 @@ import me.zodac.folding.ejb.api.FoldingStatsCore;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
 import me.zodac.folding.rest.endpoint.util.IdResult;
 import me.zodac.folding.rest.endpoint.util.IntegerParser;
+import me.zodac.folding.rest.endpoint.util.ValidationFailureResponseMapper;
 import me.zodac.folding.rest.response.BatchCreateResponse;
-import me.zodac.folding.rest.validator.TeamValidator;
-import me.zodac.folding.rest.validator.ValidationFailure;
-import me.zodac.folding.rest.validator.ValidationResult;
+import me.zodac.folding.api.tc.validation.TeamValidator;
+import me.zodac.folding.api.tc.validation.ValidationFailure;
+import me.zodac.folding.api.tc.validation.ValidationResult;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -109,7 +110,7 @@ public class TeamEndpoint {
 
         final ValidationResult<Team> validationResult = validateCreate(teamRequest);
         if (validationResult.isFailure()) {
-            return validationResult.getFailureResponse();
+            return ValidationFailureResponseMapper.map(validationResult);
         }
         final Team validatedTeam = validationResult.getOutput();
 
@@ -336,7 +337,7 @@ public class TeamEndpoint {
 
             final ValidationResult<Team> validationResult = validateUpdate(teamRequest, existingTeam);
             if (validationResult.isFailure()) {
-                return validationResult.getFailureResponse();
+                return ValidationFailureResponseMapper.map(validationResult);
             }
             final Team validatedHardware = validationResult.getOutput();
 
@@ -386,7 +387,7 @@ public class TeamEndpoint {
 
             final ValidationResult<Team> validationResult = validateDelete(team);
             if (validationResult.isFailure()) {
-                return validationResult.getFailureResponse();
+                return ValidationFailureResponseMapper.map(validationResult);
             }
             final Team validatedTeam = validationResult.getOutput();
 

@@ -36,8 +36,8 @@ import javax.ejb.Startup;
 import javax.ejb.Timeout;
 import javax.ejb.Timer;
 import javax.ejb.TimerService;
-import me.zodac.folding.ParsingStateManager;
-import me.zodac.folding.SystemStateManager;
+import me.zodac.folding.state.ParsingStateManager;
+import me.zodac.folding.state.SystemStateManager;
 import me.zodac.folding.api.state.ParsingState;
 import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
@@ -79,9 +79,9 @@ import org.apache.logging.log4j.Logger;
 public class EndOfMonthScheduler {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final boolean IS_MONTHLY_RESET_ENABLED = parseBoolean(EnvironmentVariableUtils.get("ENABLE_STATS_MONTHLY_RESET", "false"));
-    private static final boolean IS_MONTHLY_RESULT_ENABLED = parseBoolean(EnvironmentVariableUtils.get("ENABLE_MONTHLY_RESULT_STORAGE", "false"));
-    private static final boolean IS_LARS_UPDATE_ENABLED = parseBoolean(EnvironmentVariableUtils.get("ENABLE_LARS_HARDWARE_UPDATE", "false"));
+    private static final boolean IS_MONTHLY_RESET_ENABLED = parseBoolean(EnvironmentVariableUtils.getOrDefault("ENABLE_STATS_MONTHLY_RESET", "false"));
+    private static final boolean IS_MONTHLY_RESULT_ENABLED = parseBoolean(EnvironmentVariableUtils.getOrDefault("ENABLE_MONTHLY_RESULT_STORAGE", "false"));
+    private static final boolean IS_LARS_UPDATE_ENABLED = parseBoolean(EnvironmentVariableUtils.getOrDefault("ENABLE_LARS_HARDWARE_UPDATE", "false"));
 
     @EJB
     private LarsHardwareUpdater larsHardwareUpdater;
