@@ -577,7 +577,7 @@
                 <module>folding-stats-api</module>
                 <module>folding-stats-client-library-java</module>
                 <module>folding-stats-jar</module>
-                <module>folding-stats-war</module>
+                <module>folding-stats-rest</module>
                 <module>stubbed-folding-endpoints-war</module>
                 <module>testsuite</module>
             </modules>
@@ -606,7 +606,7 @@
                 <module>folding-stats-api</module>
                 <module>folding-stats-client-library-java</module>
                 <module>folding-stats-jar</module>
-                <module>folding-stats-war</module>
+                <module>folding-stats-rest</module>
                 <module>stubbed-folding-endpoints-war</module>
                 <module>testsuite</module>
             </modules>
@@ -630,7 +630,7 @@
                 <module>folding-stats-api</module>
                 <module>folding-stats-client-library-java</module>
                 <module>folding-stats-jar</module>
-                <module>folding-stats-war</module>
+                <module>folding-stats-rest</module>
                 <module>stubbed-folding-endpoints-war</module>
                 <module>testsuite</module>
             </modules>
@@ -652,7 +652,7 @@
                 <module>folding-stats-api</module>
                 <module>folding-stats-client-library-java</module>
                 <module>folding-stats-jar</module>
-                <module>folding-stats-war</module>
+                <module>folding-stats-rest</module>
                 <module>stubbed-folding-endpoints-war</module>
                 <module>testsuite</module>
             </modules>
@@ -673,7 +673,7 @@
                 <module>folding-stats-api</module>
                 <module>folding-stats-client-library-java</module>
                 <module>folding-stats-jar</module>
-                <module>folding-stats-war</module>
+                <module>folding-stats-rest</module>
                 <module>stubbed-folding-endpoints-war</module>
                 <module>testsuite</module>
             </modules>
@@ -695,7 +695,7 @@
                 <module>folding-stats-api</module>
                 <module>folding-stats-client-library-java</module>
                 <module>folding-stats-jar</module>
-                <module>folding-stats-war</module>
+                <module>folding-stats-rest</module>
                 <module>stubbed-folding-endpoints-war</module>
                 <module>testsuite</module>
             </modules>

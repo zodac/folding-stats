@@ -30,16 +30,14 @@ services:
   backend_dev:
     build:
       context: .
-      dockerfile: docker/wildfly/Dockerfile
+      dockerfile: docker/java/Dockerfile
       args:
-        ADMIN_USERNAME: "root"
-        ADMIN_PASSWORD: "shroot"
         DEPLOYMENT_TYPE: "test"
+        JAVA_VERSION: 17
+        MAVEN_VERSION: 3.8.3
     container_name: backend_dev
     hostname: backend-dev # Using a dash as Java's URI builder will fail with an underscore
     environment:
-      # Container configuration
-      JAVA_OPTS: -Xms512m -Xmx2g -Djava.net.preferIPv4Stack=true
       # External URL configuration
       LARS_URL_ROOT: "http://backend-dev:8080"
       STATS_URL_ROOT: "http://backend-dev:8080"
