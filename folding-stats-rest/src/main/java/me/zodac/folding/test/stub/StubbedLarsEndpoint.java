@@ -123,7 +123,7 @@ public class StubbedLarsEndpoint {
             return "<html><table id=\"primary-database\"></table></html>";
         }
 
-        final StringBuilder htmlPage = new StringBuilder(67) // String literals have at least 67 characters
+        final StringBuilder htmlPage = new StringBuilder(68) // The defined String literals have at least 68 characters
             .append("<html><table id=\"primary-datatable\"><tbody>");
 
         final Collection<String> trElementsForHardwares = createTrElementsForHardwares();

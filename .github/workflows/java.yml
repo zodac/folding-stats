@@ -22,5 +22,5 @@ jobs:
             ${{ runner.os }}-maven-
       - name: Run lints with Maven
         run: mvn clean install -Dlint
-      - name: Run unit tests with Maven
-        run: mvn clean install -Dunit-tests
+      - name: Run tests with Maven
+        run: mvn clean install -Dtests

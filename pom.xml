@@ -30,8 +30,7 @@
         <skip-sonar>true</skip-sonar>
 
         <!-- Test Properties -->
-        <skip-integration-tests>true</skip-integration-tests>
-        <skip-unit-tests>true</skip-unit-tests>
+        <skip-tests>true</skip-tests>
 
         <!-- 3PP Versions -->
         <commons-text.version>1.9</commons-text.version>
@@ -44,6 +43,7 @@
         <log4j.version>2.14.1</log4j.version>
         <lombok.version>1.18.22</lombok.version>
         <postgresql-driver.version>42.3.1</postgresql-driver.version>
+        <spring.version>2.5.6</spring.version>
 
         <!-- Test 3PP Versions -->
         <assertj-core.version>3.21.0</assertj-core.version>
@@ -51,7 +51,7 @@
         <!-- Version should be the same as the postgres docker image version, where possible -->
         <embedded-postgres-binaries-bom.version>13.4.0</embedded-postgres-binaries-bom.version>
         <flyway-core>8.0.4</flyway-core>
-        <junit.version>5.8.1</junit.version>
+        <junit-jupiter.version>5.8.1</junit-jupiter.version>
 
         <!-- Plugin Versions -->
         <maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
@@ -116,6 +116,23 @@
                 <groupId>me.zodac</groupId>
                 <artifactId>folding-stats-jar</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+
+            <!-- Spring Dependencies -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-web</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-actuator</artifactId>
+                <version>${spring.version}</version>
             </dependency>
 
             <!-- 3PP Dependencies -->
@@ -199,9 +216,22 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit-jupiter.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-engine</artifactId>
-                <version>${junit.version}</version>
+                <version>${junit-jupiter.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-test</artifactId>
+                <version>${spring.version}</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
@@ -288,7 +318,7 @@
                     <version>${maven-surefire-plugin.version}</version>
                     <configuration>
                         <failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
-                        <skipTests>${skip-unit-tests}</skipTests>
+                        <skipTests>${skip-tests}</skipTests>
                         <includes>
                             <include>**/*Test.java</include>
                         </includes>
@@ -452,7 +482,7 @@
                             <ruleset>${pmd-ruleset}</ruleset>
                         </rulesets>
                         <skip>${skip-linters}</skip>
-                        <sourceEncoding>utf-8</sourceEncoding>
+                        <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
                         <targetJdk>${java-release}</targetJdk>
                     </configuration>
                     <executions>
@@ -485,7 +515,7 @@
                             <param>*PostgresDbManagerTest</param>
                         </excludedTestClasses>
                         <failWhenNoMutations>false</failWhenNoMutations>
-                        <outputFormats>xml,html</outputFormats>
+                        <outputFormats>html</outputFormats>
                         <skip>${skip-linters}</skip>
                         <testStrengthThreshold>${pitest-test-strength-threshold}</testStrengthThreshold>
                     </configuration>
@@ -599,7 +629,7 @@
             <id>activate_all</id>
             <activation>
                 <property>
-                    <name>ts</name> <!-- Name means 'testsuite', but it's just what I'm used to running from work -->
+                    <name>all</name>
                 </property>
             </activation>
             <modules>
@@ -607,14 +637,11 @@
                 <module>folding-stats-client-library-java</module>
                 <module>folding-stats-jar</module>
                 <module>folding-stats-rest</module>
-                <module>stubbed-folding-endpoints-war</module>
-                <module>testsuite</module>
             </modules>
             <properties>
-                <skip-integration-tests>false</skip-integration-tests>
                 <skip-linters>false</skip-linters>
                 <skip-sonar>false</skip-sonar>
-                <skip-unit-tests>false</skip-unit-tests>
+                <skip-tests>false</skip-tests>
             </properties>
         </profile>
 
@@ -631,8 +658,6 @@
                 <module>folding-stats-client-library-java</module>
                 <module>folding-stats-jar</module>
                 <module>folding-stats-rest</module>
-                <module>stubbed-folding-endpoints-war</module>
-                <module>testsuite</module>
             </modules>
             <properties>
                 <skip-linters>false</skip-linters>
@@ -653,8 +678,6 @@
                 <module>folding-stats-client-library-java</module>
                 <module>folding-stats-jar</module>
                 <module>folding-stats-rest</module>
-                <module>stubbed-folding-endpoints-war</module>
-                <module>testsuite</module>
             </modules>
             <properties>
                 <skip-sonar>false</skip-sonar>
@@ -674,48 +697,9 @@
                 <module>folding-stats-client-library-java</module>
                 <module>folding-stats-jar</module>
                 <module>folding-stats-rest</module>
-                <module>stubbed-folding-endpoints-war</module>
-                <module>testsuite</module>
             </modules>
             <properties>
-                <skip-integration-tests>false</skip-integration-tests>
-                <skip-unit-tests>false</skip-unit-tests>
-            </properties>
-        </profile>
-
-        <!-- Profile used to execute each module's unit testsuite (if any) -->
-        <profile>
-            <id>activate_unit_tests</id>
-            <activation>
-                <property>
-                    <name>unit-tests</name>
-                </property>
-            </activation>
-            <modules>
-                <module>folding-stats-api</module>
-                <module>folding-stats-client-library-java</module>
-                <module>folding-stats-jar</module>
-                <module>folding-stats-rest</module>
-                <module>stubbed-folding-endpoints-war</module>
-                <module>testsuite</module>
-            </modules>
-            <properties>
-                <skip-integration-tests>true</skip-integration-tests>
-                <skip-unit-tests>false</skip-unit-tests>
-            </properties>
-        </profile>
-
-        <!-- Profile used to execute each module's integration testsuite (if any) -->
-        <profile>
-            <id>activate_integration_tests</id>
-            <activation>
-                <property>
-                    <name>integration-tests</name>
-                </property>
-            </activation>
-            <properties>
-                <skip-integration-tests>false</skip-integration-tests>
-                <skip-unit-tests>true</skip-unit-tests>
+                <skip-tests>false</skip-tests>
             </properties>
         </profile>
     </profiles>
