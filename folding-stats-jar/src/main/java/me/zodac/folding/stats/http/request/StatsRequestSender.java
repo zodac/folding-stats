@@ -35,11 +35,11 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import me.zodac.folding.api.exception.ExternalConnectionException;
+import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.rest.api.header.CacheControl;
 import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.stats.http.response.StatsResponseParser;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

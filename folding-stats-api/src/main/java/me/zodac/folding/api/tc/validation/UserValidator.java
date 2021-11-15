@@ -25,8 +25,8 @@
 package me.zodac.folding.api.tc.validation;
 
 import static java.util.stream.Collectors.toList;
-import static me.zodac.folding.api.tc.validation.ValidationUtils.isBlankOrValidUrl;
-import static me.zodac.folding.api.tc.validation.ValidationUtils.isBlankString;
+import static me.zodac.folding.api.util.StringUtils.isBlank;
+import static me.zodac.folding.api.util.StringUtils.isBlankOrValidUrl;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -355,7 +355,7 @@ public final class UserValidator {
         final String foldingUserName = userRequest.getFoldingUserName();
         final String passkey = userRequest.getPasskey();
 
-        if (isBlankString(foldingUserName) || isBlankString(passkey)) {
+        if (isBlank(foldingUserName) || isBlank(passkey)) {
             return Optional.empty();
         }
 
@@ -391,19 +391,19 @@ public final class UserValidator {
     }
 
     private static String foldingUserName(final UserRequest userRequest) {
-        return isBlankString(userRequest.getFoldingUserName()) || !FOLDING_USER_NAME_PATTERN.matcher(userRequest.getFoldingUserName()).find()
+        return isBlank(userRequest.getFoldingUserName()) || !FOLDING_USER_NAME_PATTERN.matcher(userRequest.getFoldingUserName()).find()
             ? "Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen"
             : null;
     }
 
     private static String displayName(final UserRequest userRequest) {
-        return isBlankString(userRequest.getDisplayName())
+        return isBlank(userRequest.getDisplayName())
             ? "Field 'displayName' must not be empty"
             : null;
     }
 
     private static String passkey(final UserRequest userRequest) {
-        return isBlankString(userRequest.getPasskey()) || !PASSKEY_PATTERN.matcher(userRequest.getPasskey()).find()
+        return isBlank(userRequest.getPasskey()) || !PASSKEY_PATTERN.matcher(userRequest.getPasskey()).find()
             ? "Field 'passkey' must be 32 characters long and include only alphanumeric characters"
             : null;
     }

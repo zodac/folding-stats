@@ -25,8 +25,8 @@
 package me.zodac.folding.api.tc.validation;
 
 import static java.util.stream.Collectors.toList;
-import static me.zodac.folding.api.tc.validation.ValidationUtils.isBlankOrValidUrl;
-import static me.zodac.folding.api.tc.validation.ValidationUtils.isBlankString;
+import static me.zodac.folding.api.util.StringUtils.isBlank;
+import static me.zodac.folding.api.util.StringUtils.isBlankOrValidUrl;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -151,7 +151,7 @@ public final class TeamValidator {
     }
 
     private static Optional<Team> getTeamWithName(final String teamName, final Collection<Team> allTeams) {
-        if (isBlankString(teamName)) {
+        if (isBlank(teamName)) {
             return Optional.empty();
         }
 
@@ -174,7 +174,7 @@ public final class TeamValidator {
     }
 
     private static String teamName(final TeamRequest teamRequest) {
-        return isBlankString(teamRequest.getTeamName())
+        return isBlank(teamRequest.getTeamName())
             ? "Field 'teamName' must not be empty"
             : null;
     }

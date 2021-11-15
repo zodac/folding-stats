@@ -33,12 +33,12 @@ import java.net.http.HttpResponse;
 import java.util.Collection;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 import me.zodac.folding.rest.util.RestUtilConstants;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Convenience class to send HTTP requests to the {@link me.zodac.folding.api.tc.User} REST endpoint.
@@ -192,7 +192,7 @@ public final class UserRequestSender {
             requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), entityTag);
         }
 
-        if (StringUtils.isNoneBlank(userName, password)) {
+        if (StringUtils.isNeitherBlank(userName, password)) {
             requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
         }
 
@@ -234,7 +234,7 @@ public final class UserRequestSender {
             .uri(URI.create(usersUrl))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
-        if (StringUtils.isNoneBlank(userName, password)) {
+        if (StringUtils.isNeitherBlank(userName, password)) {
             requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
         }
 
@@ -277,7 +277,7 @@ public final class UserRequestSender {
             .uri(URI.create(usersUrl + "/batch"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
-        if (StringUtils.isNoneBlank(userName, password)) {
+        if (StringUtils.isNeitherBlank(userName, password)) {
             requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
         }
 
@@ -322,7 +322,7 @@ public final class UserRequestSender {
             .uri(URI.create(usersUrl + '/' + userId))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
-        if (StringUtils.isNoneBlank(userName, password)) {
+        if (StringUtils.isNeitherBlank(userName, password)) {
             requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
         }
 
@@ -364,7 +364,7 @@ public final class UserRequestSender {
             .uri(URI.create(usersUrl + '/' + userId))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
-        if (StringUtils.isNoneBlank(userName, password)) {
+        if (StringUtils.isNeitherBlank(userName, password)) {
             requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
         }
 

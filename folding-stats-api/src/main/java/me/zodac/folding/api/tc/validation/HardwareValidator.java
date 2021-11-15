@@ -25,7 +25,7 @@
 package me.zodac.folding.api.tc.validation;
 
 import static java.util.stream.Collectors.toList;
-import static me.zodac.folding.api.tc.validation.ValidationUtils.isBlankString;
+import static me.zodac.folding.api.util.StringUtils.isBlank;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -177,7 +177,7 @@ public final class HardwareValidator {
     }
 
     private static Optional<Hardware> getHardwareWithName(final String hardwareName, final Collection<Hardware> allHardware) {
-        if (isBlankString(hardwareName)) {
+        if (isBlank(hardwareName)) {
             return Optional.empty();
         }
 
@@ -200,13 +200,13 @@ public final class HardwareValidator {
     }
 
     private static String hardwareName(final HardwareRequest hardwareRequest) {
-        return isBlankString(hardwareRequest.getHardwareName())
+        return isBlank(hardwareRequest.getHardwareName())
             ? "Field 'hardwareName' must not be empty"
             : null;
     }
 
     private static String displayName(final HardwareRequest hardwareRequest) {
-        return isBlankString(hardwareRequest.getDisplayName())
+        return isBlank(hardwareRequest.getDisplayName())
             ? "Field 'displayName' must not be empty"
             : null;
     }

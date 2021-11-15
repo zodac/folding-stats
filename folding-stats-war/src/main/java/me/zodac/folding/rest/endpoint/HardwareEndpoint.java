@@ -57,6 +57,7 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.state.SystemStateManager;
 import me.zodac.folding.api.state.ReadRequired;
 import me.zodac.folding.api.state.SystemState;
@@ -71,7 +72,6 @@ import me.zodac.folding.rest.response.BatchCreateResponse;
 import me.zodac.folding.api.tc.validation.HardwareValidator;
 import me.zodac.folding.api.tc.validation.ValidationFailure;
 import me.zodac.folding.api.tc.validation.ValidationResult;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

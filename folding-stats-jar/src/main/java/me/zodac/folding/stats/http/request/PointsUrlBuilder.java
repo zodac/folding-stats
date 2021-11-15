@@ -25,7 +25,7 @@
 package me.zodac.folding.stats.http.request;
 
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
-import org.apache.commons.lang3.StringUtils;
+import me.zodac.folding.api.util.StringUtils;
 
 /**
  * Utility class used to build the URL to request Folding points for a user from the Stanford Folding@Home API.

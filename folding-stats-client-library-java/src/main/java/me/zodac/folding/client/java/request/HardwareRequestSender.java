@@ -34,12 +34,12 @@ import java.util.Collection;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import me.zodac.folding.api.tc.Hardware;
+import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 import me.zodac.folding.rest.util.RestUtilConstants;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Convenience class to send HTTP requests to the {@link Hardware} REST endpoint.
@@ -224,7 +224,7 @@ public final class HardwareRequestSender {
             .uri(URI.create(hardwareUrl))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
-        if (StringUtils.isNoneBlank(userName, password)) {
+        if (StringUtils.isNeitherBlank(userName, password)) {
             requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
         }
 
@@ -267,7 +267,7 @@ public final class HardwareRequestSender {
             .uri(URI.create(hardwareUrl + "/batch"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
-        if (StringUtils.isNoneBlank(userName, password)) {
+        if (StringUtils.isNeitherBlank(userName, password)) {
             requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
         }
 
@@ -312,7 +312,7 @@ public final class HardwareRequestSender {
             .uri(URI.create(hardwareUrl + '/' + hardwareId))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
-        if (StringUtils.isNoneBlank(userName, password)) {
+        if (StringUtils.isNeitherBlank(userName, password)) {
             requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
         }
 
@@ -354,7 +354,7 @@ public final class HardwareRequestSender {
             .uri(URI.create(hardwareUrl + '/' + hardwareId))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
-        if (StringUtils.isNoneBlank(userName, password)) {
+        if (StringUtils.isNeitherBlank(userName, password)) {
             requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
         }
 

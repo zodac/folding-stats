@@ -33,12 +33,12 @@ import java.net.http.HttpResponse;
 import java.util.Collection;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
 import me.zodac.folding.rest.util.RestUtilConstants;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Convenience class to send HTTP requests to the {@link me.zodac.folding.api.tc.Team} REST endpoint.
@@ -225,7 +225,7 @@ public final class TeamRequestSender {
             .uri(URI.create(teamsUrl))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
-        if (StringUtils.isNoneBlank(userName, password)) {
+        if (StringUtils.isNeitherBlank(userName, password)) {
             requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
         }
 
@@ -268,7 +268,7 @@ public final class TeamRequestSender {
             .uri(URI.create(teamsUrl + "/batch"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
-        if (StringUtils.isNoneBlank(userName, password)) {
+        if (StringUtils.isNeitherBlank(userName, password)) {
             requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
         }
 
@@ -313,7 +313,7 @@ public final class TeamRequestSender {
             .uri(URI.create(teamsUrl + '/' + teamId))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
-        if (StringUtils.isNoneBlank(userName, password)) {
+        if (StringUtils.isNeitherBlank(userName, password)) {
             requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
         }
 
@@ -355,7 +355,7 @@ public final class TeamRequestSender {
             .uri(URI.create(teamsUrl + '/' + teamId))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
 
-        if (StringUtils.isNoneBlank(userName, password)) {
+        if (StringUtils.isNeitherBlank(userName, password)) {
             requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
         }
 

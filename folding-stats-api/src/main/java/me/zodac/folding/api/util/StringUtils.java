@@ -22,31 +22,35 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.api.tc.validation;
+package me.zodac.folding.api.util;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Locale;
 import java.util.Set;
 
 /**
- * Convenience methods to assist with the validation logic.
+ * Convenience methods to assist with {@link String}s.
  */
-final class ValidationUtils {
+public final class StringUtils {
 
     private static final Set<String> VALID_URL_SCHEMES = Set.of("http", "https");
 
-    private ValidationUtils() {
+    private StringUtils() {
 
     }
 
     /**
      * Checks if the provided {@link String} is <code>null</code>, and if it is not, that it is a valid URL.
      *
+     * <p>
+     * <b>NOTE:</b> Only supports <b>HTTP</b> or <b>HTTPS</b> URLs.
+     *
      * @param input the {@link String} to check
      * @return <code>true</code> if the {@link String} is either empty, or a valid URL
      */
-    static boolean isBlankOrValidUrl(final String input) {
-        if (isBlankString(input)) {
+    public static boolean isBlankOrValidUrl(final String input) {
+        if (isBlank(input)) {
             return true;
         }
 
@@ -59,8 +63,29 @@ final class ValidationUtils {
      * @param input the {@link String} to check
      * @return <code>true</code> if the {@link String} is either <code>null</code> or {@link String#isBlank()}
      */
-    static boolean isBlankString(final String input) {
+    public static boolean isBlank(final String input) {
         return input == null || input.isBlank();
+    }
+
+    /**
+     * Checks if the provided {@link String} is not <code>null</code>, and is not {@link String#isBlank()}.
+     *
+     * @param input the {@link String} to check
+     * @return <code>true</code> if the {@link String} is neither <code>null</code> nor {@link String#isBlank()}
+     */
+    public static boolean isNotBlank(final String input) {
+        return !isBlank(input);
+    }
+
+    /**
+     * Checks if the two provided {@link String}s are not <code>null</code>, and are not {@link String#isBlank()}.
+     *
+     * @param first  the first {@link String} to check
+     * @param second the second {@link String} to check
+     * @return <code>true</code> if the {@link String}s are neither <code>null</code> nor {@link String#isBlank()}
+     */
+    public static boolean isNeitherBlank(final String first, final String second) {
+        return isNotBlank(first) && isNotBlank(second);
     }
 
     private static boolean isValidUrl(final String input) {
@@ -72,6 +97,6 @@ final class ValidationUtils {
         }
 
         final String scheme = uri.getScheme();
-        return scheme != null && VALID_URL_SCHEMES.contains(scheme);
+        return scheme != null && VALID_URL_SCHEMES.contains(scheme.toLowerCase(Locale.UK));
     }
 }

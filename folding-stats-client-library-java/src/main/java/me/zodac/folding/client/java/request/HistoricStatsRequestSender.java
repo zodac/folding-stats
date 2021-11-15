@@ -32,11 +32,11 @@ import java.time.Month;
 import java.time.Year;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.util.RestUtilConstants;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Convenience class to send HTTP requests to the {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} REST endpoint.
