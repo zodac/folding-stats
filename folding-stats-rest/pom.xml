@@ -17,7 +17,17 @@
     </properties>
 
     <dependencies>
+        <!-- Project Dependencies -->
+        <dependency>
+            <groupId>me.zodac</groupId>
+            <artifactId>folding-stats-api</artifactId>
+        </dependency>
+
         <!-- 3PP Dependencies -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
