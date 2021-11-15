@@ -22,10 +22,11 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding;
+package me.zodac.folding.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import me.zodac.folding.HelloController;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -42,9 +43,23 @@ class StubIntegrationTest {
     private TestRestTemplate template;
 
     @Test
-    void whenTestingWelcomeMessage_thenCorrectWelcomeMessageIsReturned() {
+    void lars() {
         final ResponseEntity<String> response = template.getForEntity("/gpu_ppd/overall_ranks/", String.class);
         assertThat(response.getBody())
             .isEqualTo("<html><table id=\"primary-database\"></table></html>");
+    }
+
+    @Test
+    void points() {
+        final ResponseEntity<String> response = template.getForEntity("/user/foldingUserName/stats?passkey=passkey", String.class);
+        assertThat(response.getBody())
+            .isEqualTo("{\"earned\":0}");
+    }
+
+    @Test
+    void units() {
+        final ResponseEntity<String> response = template.getForEntity("/bonus?user=user&passkey=passkey", String.class);
+        assertThat(response.getBody())
+            .isEqualTo("[]");
     }
 }

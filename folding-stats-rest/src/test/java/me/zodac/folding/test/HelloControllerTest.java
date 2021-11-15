@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding;
+package me.zodac.folding.test;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -37,7 +37,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 /**
- * Simple {@link Autowired} test for {@link HelloController}.
+ * Simple {@link Autowired} test for {@link me.zodac.folding.HelloController}.
  */
 @SpringBootTest
 @AutoConfigureMockMvc

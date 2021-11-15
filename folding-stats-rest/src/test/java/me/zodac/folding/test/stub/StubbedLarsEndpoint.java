@@ -26,24 +26,23 @@ package me.zodac.folding.test.stub;
 
 import static java.util.stream.Collectors.toList;
 
-import java.net.URI;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import javax.enterprise.context.ApplicationScoped;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import me.zodac.folding.api.tc.lars.LarsGpu;
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Stubbed endpoint for the LARS PPD DB. Used to retrieve metadata about a piece of hardware, rather than going to the real API.
@@ -53,13 +52,12 @@ import org.apache.logging.log4j.Logger;
  * structure (at least the parts that the production code expected), then populate our configured hardware in a similar way to the LARS DB itself.
  *
  * <p>
- * We expose additional endpoints to allow the tests to provide {@link LarsGpu}s to the system. The endpoint is {@link ApplicationScoped} so we can
- * store updates across multiple HTTP requests and tests.
+ * We expose additional endpoints to allow the tests to provide {@link LarsGpu}s to the system.
  *
  * @see <a href="https://folding.lar.systems/">LARS PPD DB</a>
  */
-@Path("/gpu_ppd/overall_ranks")
-@ApplicationScoped
+@RestController
+@RequestMapping("/gpu_ppd/overall_ranks")
 public class StubbedLarsEndpoint {
 
     private static final Logger LOGGER = LogManager.getLogger();
@@ -86,54 +84,38 @@ public class StubbedLarsEndpoint {
         + "</tr>";
 
     /**
-     * {@link POST} request that allows tests to provide a {@link Collection} of {@link LarsGpu} to be added to the stubbed response.
+     * <b>POST</b> request that allows tests to provide a single {@link LarsGpu} to be added to the stubbed response.
      *
-     * @param larsGpus the {@link LarsGpu}s to add
-     * @return {@link Response.Status#CREATED}
+     * @param larsGpu the {@link LarsGpu} to add
      */
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response addGpus(final Collection<LarsGpu> larsGpus) {
-        for (final LarsGpu larsGpu : larsGpus) {
-            LARS_GPUS_BY_MODEL_INFO.put(larsGpu.getModelInfo(), larsGpu);
-        }
-
-        return Response
-            .created(URI.create(""))
-            .build();
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public void addGpu(@RequestBody final LarsGpu larsGpu) {
+        LOGGER.info("Received LarsGpu: {}", larsGpu);
+        LARS_GPUS_BY_MODEL_INFO.put(larsGpu.getModelInfo(), larsGpu);
     }
 
     /**
-     * {@link DELETE} request to remove all {@link LarsGpu}s from the stubbed endpoint.
-     *
-     * @return {@link Response.Status#OK}
+     * <b>DELETE</b> request to remove all {@link LarsGpu}s from the stubbed endpoint.
      */
-    @DELETE
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteGpus() {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping
+    public void deleteGpus() {
         LARS_GPUS_BY_MODEL_INFO.clear();
-        return Response
-            .ok()
-            .build();
     }
 
     /**
-     * {@link GET} request that returns the configured hardware in the same format as the LARS DB HTML output.
+     * <b>GET</b> request that returns the configured hardware in the same format as the LARS DB HTML output.
      *
      * <p>
-     * Used by production code, not by tests directly, though tests should populate the hardware using {@link #addGpus(Collection)}.
+     * Used by production code, not by tests directly, though tests should populate the hardware using {@link #addGpu(LarsGpu)}.
      *
-     * @return {@link Response.Status#OK} with the HTML output
-     * @see StubbedLarsEndpoint#addGpus(Collection)
+     * @return the HTML output
+     * @see StubbedLarsEndpoint#addGpu(LarsGpu)
      */
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public Response getGpus() {
-        return Response
-            .ok()
-            .entity(createGpuPage())
-            .build();
+    @GetMapping(produces = MediaType.TEXT_PLAIN_VALUE)
+    public String getGpus() {
+        return createGpuPage();
     }
 
     private static String createGpuPage() {
@@ -165,7 +147,6 @@ public class StubbedLarsEndpoint {
 
     private static String createTrElementForHardware(final LarsGpu larsGpu) {
         try {
-
             final Map<String, String> substitutionValues = Map.of(
                 "displayName", larsGpu.getDisplayName(),
                 "manufacturer", larsGpu.getManufacturer(),
@@ -177,7 +158,7 @@ public class StubbedLarsEndpoint {
             final StringSubstitutor substitutor = new StringSubstitutor(substitutionValues);
             return substitutor.replace(LARS_GPU_TEMPLATE);
         } catch (final Exception e) {
-            LOGGER.warn("Unexpected error creating element for LARS GPU: {}", larsGpu, e);
+            LOGGER.warn("Unexpected error building element for LARS GPU: {}", larsGpu, e);
             return null;
         }
     }

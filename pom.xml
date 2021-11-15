@@ -118,23 +118,6 @@
                 <version>${project.version}</version>
             </dependency>
 
-            <!-- Spring Dependencies -->
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-web</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-actuator</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-
             <!-- 3PP Dependencies -->
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -181,6 +164,23 @@
                 <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
                 <version>${postgresql-driver.version}</version>
+            </dependency>
+
+            <!-- Spring Dependencies -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-web</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-actuator</artifactId>
+                <version>${spring.version}</version>
             </dependency>
 
             <!-- Test Dependencies -->
@@ -608,8 +608,6 @@
                 <module>folding-stats-client-library-java</module>
                 <module>folding-stats-jar</module>
                 <module>folding-stats-rest</module>
-                <module>stubbed-folding-endpoints-war</module>
-                <module>testsuite</module>
             </modules>
         </profile>
 

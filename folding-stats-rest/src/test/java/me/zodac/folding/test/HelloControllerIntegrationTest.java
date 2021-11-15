@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding;
+package me.zodac.folding.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,7 +33,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.ResponseEntity;
 
 /**
- * {@link SpringBootTest.WebEnvironment} integration test for {@link HelloController}.
+ * {@link SpringBootTest.WebEnvironment} integration test for {@link me.zodac.folding.HelloController}.
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class HelloControllerIntegrationTest {
