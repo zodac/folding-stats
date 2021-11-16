@@ -66,9 +66,7 @@ services:
     networks:
       - development
     ports:
-      # For test env, we expose the HTTP endpoint, not HTTPS
       - "8081:8080"
-      - "9991:9990"
 
   database_dev:
     build:

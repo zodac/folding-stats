@@ -24,39 +24,21 @@
 
 package me.zodac.folding;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
 
 /**
- * Base {@link Application}.
+ * Base {@link FoldingStatsApplication}.
  */
 @SpringBootApplication
-public class Application {
-
-    private static final Logger LOGGER = LogManager.getLogger();
+public class FoldingStatsApplication {
 
     /**
      * Main method.
      *
-     * @param args arguments for the {@link Application}.
+     * @param args arguments for the {@link FoldingStatsApplication}.
      */
     public static void main(final String[] args) {
-        SpringApplication.run(Application.class, args);
-    }
-
-    /**
-     * Simple {@link Bean} function to run a command.
-     *
-     * @param ctx the {@link ApplicationContext}
-     * @return the {@link CommandLineRunner} to be executed
-     */
-    @Bean
-    public CommandLineRunner commandLineRunner(final ApplicationContext ctx) {
-        return args -> LOGGER.info("System online");
+        SpringApplication.run(FoldingStatsApplication.class, args);
     }
 }

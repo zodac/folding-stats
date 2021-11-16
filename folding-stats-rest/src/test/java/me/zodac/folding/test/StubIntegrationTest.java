@@ -26,7 +26,6 @@ package me.zodac.folding.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import me.zodac.folding.HelloController;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,7 +33,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.ResponseEntity;
 
 /**
- * {@link SpringBootTest.WebEnvironment} integration test for {@link HelloController}.
+ * {@link SpringBootTest.WebEnvironment} integration test for stubbed endpoints, until the testsuite is migrated.
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class StubIntegrationTest {

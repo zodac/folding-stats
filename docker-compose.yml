@@ -31,16 +31,14 @@ services:
   backend:
     build:
       context: .
-      dockerfile: docker/wildfly/Dockerfile
+      dockerfile: docker/java/Dockerfile
       args:
-        ADMIN_USERNAME: "${BACKEND_USER}"
-        ADMIN_PASSWORD: "${BACKEND_PASSWORD}"
         DEPLOYMENT_TYPE: "production"
+        JAVA_VERSION: 17
+        MAVEN_VERSION: 3.8.3
     container_name: backend
     hostname: backend
     environment:
-      # Container configuration
-      JAVA_OPTS: -Xms${JAVA_XMS} -Xmx${JAVA_XMX} -Djava.net.preferIPv4Stack=true
       # External URL configuration
       LARS_URL_ROOT: "${LARS_URL_ROOT}"
       STATS_URL_ROOT: "${STATS_URL_ROOT}"
@@ -69,21 +67,13 @@ services:
       JDBC_CONNECTION_USER: "${DB_USER}"
       JDBC_CONNECTION_PASSWORD: "${DB_PASSWORD}"
       JDBC_CONNECTION_DRIVER: "org.postgresql.Driver"
-    healthcheck:
-      test: curl -k --fail https://localhost:${HTTPS_BACKEND_PORT}/folding || exit 1
-      interval: 15s
-      timeout: 10s
-      retries: 30
     links:
       - database
     networks:
       - production
     ports:
       - "${HTTPS_BACKEND_PORT}:${HTTPS_BACKEND_PORT}"
-      - "${ADMIN_CONSOLE_PORT}:${ADMIN_CONSOLE_PORT}"
     restart: unless-stopped
-    volumes:
-      - backend_logs:/opt/jboss/wildfly/standalone/log
 
   database:
     build:
