@@ -31,7 +31,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * Base {@link FoldingStatsApplication}.
  */
 @SpringBootApplication
-public class FoldingStatsApplication {
+public class FoldingStatsApplication { // NOPMD - SpringBootApplication must be non-final and have a public constructor
 
     /**
      * Main method.
