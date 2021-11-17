@@ -2,31 +2,31 @@ version: '2.3'
 
 services:
 
-  frontend:
-    build:
-      context: .
-      dockerfile: docker/apache/Dockerfile
-      args:
-        FIRST_DAY_OF_MONTH: "${FIRST_DAY_OF_MONTH}"
-        FORUM_LINK: "${FORUM_LINK}"
-        REST_ENDPOINT_URL: "${REST_ENDPOINT_URL}"
-        ROOT_URL: "${ROOT_URL}"
-        TITLE: "${TITLE}"
-        UPDATE_ENABLED: "${STATS_ENABLED}"
-        UPDATE_MINUTE: "${UPDATE_MINUTE}"
-    container_name: frontend
-    hostname: frontend
-    depends_on:
-      - backend
-    links:
-      - backend
-    networks:
-      - production
-    ports:
-      - "${HTTPS_FRONTEND_PORT}:${HTTPS_FRONTEND_PORT}"
-    restart: unless-stopped
-    volumes:
-      - "${SSL_CERT_DIRECTORY}:/usr/local/apache2/conf/certs"
+  #  frontend:
+  #    build:
+  #      context: .
+  #      dockerfile: docker/apache/Dockerfile
+  #      args:
+  #        FIRST_DAY_OF_MONTH: "${FIRST_DAY_OF_MONTH}"
+  #        FORUM_LINK: "${FORUM_LINK}"
+  #        REST_ENDPOINT_URL: "${REST_ENDPOINT_URL}"
+  #        ROOT_URL: "${ROOT_URL}"
+  #        TITLE: "${TITLE}"
+  #        UPDATE_ENABLED: "${STATS_ENABLED}"
+  #        UPDATE_MINUTE: "${UPDATE_MINUTE}"
+  #    container_name: frontend
+  #    hostname: frontend
+  #    depends_on:
+  #      - backend
+  #    links:
+  #      - backend
+  #    networks:
+  #      - production
+  #    ports:
+  #      - "${HTTPS_FRONTEND_PORT}:${HTTPS_FRONTEND_PORT}"
+  #    restart: unless-stopped
+  #    volumes:
+  #      - "${SSL_CERT_DIRECTORY}:/usr/local/apache2/conf/certs"
 
   backend:
     build:

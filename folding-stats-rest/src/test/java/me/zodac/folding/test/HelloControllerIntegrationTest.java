@@ -26,6 +26,7 @@ package me.zodac.folding.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import me.zodac.folding.rest.endpoint.HelloController;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,7 +34,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.ResponseEntity;
 
 /**
- * {@link SpringBootTest.WebEnvironment} integration test for {@link me.zodac.folding.HelloController}.
+ * {@link SpringBootTest.WebEnvironment} integration test for {@link HelloController}.
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class HelloControllerIntegrationTest {

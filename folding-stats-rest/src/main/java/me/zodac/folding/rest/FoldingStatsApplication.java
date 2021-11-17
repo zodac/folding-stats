@@ -22,24 +22,23 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding;
+package me.zodac.folding.rest;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * Base {@link RestController}.
+ * Base {@link FoldingStatsApplication}.
  */
-@RestController
-public class HelloController {
+@SpringBootApplication
+public class FoldingStatsApplication { // NOPMD - SpringBootApplication must be non-final and have a public constructor
 
     /**
-     * Welcome message endpoint.
+     * Main method.
      *
-     * @return the welcome {@link String}
+     * @param args arguments for the {@link FoldingStatsApplication}.
      */
-    @GetMapping("/")
-    public String welcome() {
-        return "Greetings from Spring Boot!";
+    public static void main(final String[] args) {
+        SpringApplication.run(FoldingStatsApplication.class, args);
     }
 }

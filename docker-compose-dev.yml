@@ -2,30 +2,30 @@ version: '2.3'
 
 services:
 
-  frontend_dev:
-    build:
-      context: .
-      dockerfile: docker/apache/Dockerfile
-      args:
-        FIRST_DAY_OF_MONTH: "3"
-        FORUM_LINK: "https://forums.extremehw.net/forum/125-extreme-team-folding"
-        REST_ENDPOINT_URL: "http://127.0.0.1:8081/folding"
-        ROOT_URL: "http://frontend_dev/"
-        TITLE: "Extreme Team Folding"
-        UPDATE_ENABLED: "false"
-        UPDATE_MINUTE: "55"
-    container_name: frontend_dev
-    hostname: frontend_dev
-    depends_on:
-      - backend_dev
-    links:
-      - backend_dev
-    networks:
-      - development
-    ports:
-      - "81:80"
-    volumes:
-      - "${SSL_CERT_DIRECTORY}:/usr/local/apache2/conf/certs"
+  #  frontend_dev:
+  #    build:
+  #      context: .
+  #      dockerfile: docker/apache/Dockerfile
+  #      args:
+  #        FIRST_DAY_OF_MONTH: "3"
+  #        FORUM_LINK: "https://forums.extremehw.net/forum/125-extreme-team-folding"
+  #        REST_ENDPOINT_URL: "http://127.0.0.1:8081/folding"
+  #        ROOT_URL: "http://frontend_dev/"
+  #        TITLE: "Extreme Team Folding"
+  #        UPDATE_ENABLED: "false"
+  #        UPDATE_MINUTE: "55"
+  #    container_name: frontend_dev
+  #    hostname: frontend_dev
+  #    depends_on:
+  #      - backend_dev
+  #    links:
+  #      - backend_dev
+  #    networks:
+  #      - development
+  #    ports:
+  #      - "81:80"
+  #    volumes:
+  #      - "${SSL_CERT_DIRECTORY}:/usr/local/apache2/conf/certs"
 
   backend_dev:
     build:
