@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.test;
+package me.zodac.folding.rest.stub;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

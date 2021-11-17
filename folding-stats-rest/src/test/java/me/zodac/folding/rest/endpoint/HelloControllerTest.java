@@ -22,13 +22,12 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.test;
+package me.zodac.folding.rest.endpoint;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import me.zodac.folding.rest.endpoint.HelloController;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

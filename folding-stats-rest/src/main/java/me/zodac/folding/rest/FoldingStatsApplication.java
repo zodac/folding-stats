@@ -29,6 +29,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * Base {@link FoldingStatsApplication}.
+ *
+ * <p>
+ * Any {@link org.springframework.web.bind.annotation.RestController} that is in this package or any subpackage will automatically be picked up.
  */
 @SpringBootApplication
 public class FoldingStatsApplication { // NOPMD - SpringBootApplication must be non-final and have a public constructor
