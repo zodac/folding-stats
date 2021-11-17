@@ -43,6 +43,7 @@
         <log4j.version>2.14.1</log4j.version>
         <lombok.version>1.18.22</lombok.version>
         <postgresql-driver.version>42.3.1</postgresql-driver.version>
+        <slf4j.version>2.0.0-alpha5</slf4j.version>
         <spring.version>2.5.6</spring.version>
 
         <!-- Test 3PP Versions -->
@@ -164,6 +165,12 @@
                 <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
                 <version>${postgresql-driver.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-simple</artifactId>
+                <version>${slf4j.version}</version>
+                <scope>runtime</scope>
             </dependency>
 
             <!-- Spring Dependencies -->

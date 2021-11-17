@@ -2,3 +2,10 @@ server:
   port: 8080
   servlet:
     context-path: /folding
+
+#spring:
+#  datasource:
+#    url: jdbc:postgresql://database_dev:5432/folding_db
+#    username: folding_user
+#    password: shroot
+#    driver-class-name: org.postgresql.Driver

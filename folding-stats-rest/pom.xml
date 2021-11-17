@@ -18,6 +18,10 @@
             <groupId>me.zodac</groupId>
             <artifactId>folding-stats-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>me.zodac</groupId>
+            <artifactId>folding-stats-jar</artifactId>
+        </dependency>
 
         <!-- 3PP Dependencies -->
         <dependency>
@@ -32,6 +36,11 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <scope>runtime</scope>
         </dependency>
 
         <!-- Spring Dependencies -->

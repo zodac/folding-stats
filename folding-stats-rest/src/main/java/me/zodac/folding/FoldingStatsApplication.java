@@ -26,6 +26,7 @@ package me.zodac.folding;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration;
 
 /**
  * Base {@link FoldingStatsApplication}.
@@ -34,8 +35,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * This should be placed in the highest package possible, as the Spring application will scan all sub-packages for
  * {@link org.springframework.web.bind.annotation.RestController}s, {@link org.springframework.stereotype.Service}s,
  * {@link org.springframework.stereotype.Component}s, etc.
+ *
+ * <p>
+ * The {@code jooq} transitive dependency {@link R2dbcAutoConfiguration} must also be disabled.
  */
-@SpringBootApplication
+@SpringBootApplication(exclude = {R2dbcAutoConfiguration.class})
 public class FoldingStatsApplication { // NOPMD - SpringBootApplication must be non-final and have a public constructor
 
     /**
