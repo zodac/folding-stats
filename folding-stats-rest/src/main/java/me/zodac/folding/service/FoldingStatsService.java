@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.core.service;
+package me.zodac.folding.service;
 
 import me.zodac.folding.api.UserAuthenticationResult;
 import org.springframework.stereotype.Service;

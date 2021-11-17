@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.rest.endpoint;
+package me.zodac.folding.test.stub;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,18 +33,32 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.ResponseEntity;
 
 /**
- * {@link SpringBootTest.WebEnvironment} integration test for {@link HelloController}.
+ * {@link SpringBootTest.WebEnvironment} integration test for stubbed endpoints, until the testsuite is migrated.
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class HelloControllerIntegrationTest {
+class StubIntegrationTest {
 
     @Autowired
     private TestRestTemplate template;
 
     @Test
-    void whenTestingWelcomeMessage_thenCorrectWelcomeMessageIsReturned() {
-        final ResponseEntity<String> response = template.getForEntity("/", String.class);
+    void lars() {
+        final ResponseEntity<String> response = template.getForEntity("/gpu_ppd/overall_ranks/", String.class);
         assertThat(response.getBody())
-            .isEqualTo("Greetings from Spring Boot!");
+            .isEqualTo("<html><table id=\"primary-database\"></table></html>");
+    }
+
+    @Test
+    void points() {
+        final ResponseEntity<String> response = template.getForEntity("/user/foldingUserName/stats?passkey=passkey", String.class);
+        assertThat(response.getBody())
+            .isEqualTo("{\"earned\":0}");
+    }
+
+    @Test
+    void units() {
+        final ResponseEntity<String> response = template.getForEntity("/bonus?user=user&passkey=passkey", String.class);
+        assertThat(response.getBody())
+            .isEqualTo("[]");
     }
 }

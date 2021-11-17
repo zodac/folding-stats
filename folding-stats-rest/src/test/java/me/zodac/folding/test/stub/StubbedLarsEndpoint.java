@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.rest.stub;
+package me.zodac.folding.test.stub;
 
 import static java.util.stream.Collectors.toList;
 

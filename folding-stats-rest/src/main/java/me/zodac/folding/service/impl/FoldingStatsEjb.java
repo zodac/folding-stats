@@ -22,11 +22,11 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.core.service.impl;
+package me.zodac.folding.service.impl;
 
 import java.util.Set;
 import me.zodac.folding.api.UserAuthenticationResult;
-import me.zodac.folding.core.service.FoldingStatsService;
+import me.zodac.folding.service.FoldingStatsService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;

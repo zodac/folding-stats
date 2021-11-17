@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.rest.stub;
+package me.zodac.folding.test.stub;
 
 import java.util.HashMap;
 import java.util.Map;
