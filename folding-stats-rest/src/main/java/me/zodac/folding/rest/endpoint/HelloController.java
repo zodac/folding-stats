@@ -24,6 +24,11 @@
 
 package me.zodac.folding.rest.endpoint;
 
+import javax.annotation.PostConstruct;
+import me.zodac.folding.core.service.FoldingStatsService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -32,6 +37,17 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class HelloController {
+
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    @Autowired
+    private FoldingStatsService foldingStatsService;
+
+    @PostConstruct
+    public void init() {
+        LOGGER.info("Started with: {}", foldingStatsService);
+        LOGGER.info("Login details: {}", foldingStatsService.authenticateSystemUser("userName", "password"));
+    }
 
     /**
      * Welcome message endpoint.

@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.rest;
+package me.zodac.folding;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -31,13 +31,15 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * Base {@link FoldingStatsApplication}.
  *
  * <p>
- * Any {@link org.springframework.web.bind.annotation.RestController} that is in this package or any subpackage will automatically be picked up.
+ * This should be placed in the highest package possible, as the Spring application will scan all sub-packages for
+ * {@link org.springframework.web.bind.annotation.RestController}s, {@link org.springframework.stereotype.Service}s,
+ * {@link org.springframework.stereotype.Component}s, etc.
  */
 @SpringBootApplication
 public class FoldingStatsApplication { // NOPMD - SpringBootApplication must be non-final and have a public constructor
 
     /**
-     * Main method.
+     * Main entry point to our Spring application.
      *
      * @param args arguments for the {@link FoldingStatsApplication}.
      */
