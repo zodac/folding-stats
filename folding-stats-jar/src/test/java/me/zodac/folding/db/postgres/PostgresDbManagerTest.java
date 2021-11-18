@@ -66,7 +66,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class PostgresDbManagerTest {
 
-    private static final PostgresDbManager POSTGRES_DB_MANAGER = PostgresDbManager.create(TestDbConnectionPool.create());
+    private static final PostgresDbManager POSTGRES_DB_MANAGER = PostgresDbManager.create(EmbeddedPostgresDataSource.create());
 
     @Test
     @Order(1)

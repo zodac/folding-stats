@@ -28,7 +28,7 @@ import java.util.EnumMap;
 import java.util.Map;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
-import me.zodac.folding.db.postgres.PostgresDbConnectionPool;
+import me.zodac.folding.db.postgres.PostgresDataSource;
 import me.zodac.folding.db.postgres.PostgresDbManager;
 
 /**
@@ -57,7 +57,7 @@ public final class DbManagerRetriever {
 
         switch (databaseType) {
             case POSTGRESQL: {
-                DB_MANAGER_BY_DATABASE.putIfAbsent(DatabaseType.POSTGRESQL, PostgresDbManager.create(PostgresDbConnectionPool.create()));
+                DB_MANAGER_BY_DATABASE.putIfAbsent(DatabaseType.POSTGRESQL, PostgresDbManager.create(PostgresDataSource.create()));
                 return DB_MANAGER_BY_DATABASE.get(DatabaseType.POSTGRESQL);
             }
             case INVALID:

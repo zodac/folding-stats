@@ -39,21 +39,19 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import javax.sql.DataSource;
-import me.zodac.folding.api.db.DbConnectionPool;
-import me.zodac.folding.api.exception.DatabaseConnectionException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Implementation of {@link DbConnectionPool} to use an {@link EmbeddedPostgres} DB for tests.
+ * {@link EmbeddedPostgres} DB to be used for tests.
  */
-public final class TestDbConnectionPool implements DbConnectionPool {
+public final class EmbeddedPostgresDataSource {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final transient DataSource dataSource;
+    private final DataSource dataSource;
 
-    private TestDbConnectionPool() {
+    private EmbeddedPostgresDataSource() {
         try {
             LOGGER.info("Configuring test DB...");
             dataSource = EmbeddedPostgres.builder()
@@ -66,21 +64,12 @@ public final class TestDbConnectionPool implements DbConnectionPool {
     }
 
     /**
-     * Creates an instance of {@link TestDbConnectionPool}.
+     * Creates an instance of {@link EmbeddedPostgresDataSource}.
      *
-     * @return the created {@link TestDbConnectionPool}
+     * @return the created {@link EmbeddedPostgresDataSource}
      */
-    public static TestDbConnectionPool create() {
-        return new TestDbConnectionPool();
-    }
-
-    @Override
-    public Connection getConnection() {
-        try {
-            return dataSource.getConnection();
-        } catch (final SQLException e) {
-            throw new DatabaseConnectionException("Error opening connection", e);
-        }
+    public static DataSource create() {
+        return new EmbeddedPostgresDataSource().dataSource;
     }
 
     private void createDatabaseTables() throws IOException, URISyntaxException, SQLException {

@@ -57,8 +57,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import javax.sql.DataSource;
 import me.zodac.folding.api.UserAuthenticationResult;
-import me.zodac.folding.api.db.DbConnectionPool;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.exception.DatabaseConnectionException;
 import me.zodac.folding.api.tc.Hardware;
@@ -88,20 +88,20 @@ public final class PostgresDbManager implements DbManager {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final int SINGLE_RESULT = 1;
 
-    private final DbConnectionPool dbConnectionPool;
+    private final DataSource dataSource;
 
-    private PostgresDbManager(final DbConnectionPool dbConnectionPool) {
-        this.dbConnectionPool = dbConnectionPool;
+    private PostgresDbManager(final DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     /**
      * Creates an instance of {@link PostgresDbManager}.
      *
-     * @param dbConnectionPool the {@link DbConnectionPool} for this instance
+     * @param dataSource the {@link DataSource} for this instance
      * @return the created {@link PostgresDbManager}
      */
-    public static PostgresDbManager create(final DbConnectionPool dbConnectionPool) {
-        return new PostgresDbManager(dbConnectionPool);
+    public static PostgresDbManager create(final DataSource dataSource) {
+        return new PostgresDbManager(dataSource);
     }
 
     @Override
@@ -499,7 +499,7 @@ public final class PostgresDbManager implements DbManager {
             + "GROUP BY EXTRACT(HOUR FROM utc_timestamp) "
             + "ORDER BY EXTRACT(HOUR FROM utc_timestamp) ASC";
 
-        try (final Connection connection = dbConnectionPool.getConnection();
+        try (final Connection connection = dataSource.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
 
             preparedStatement.setTimestamp(1, DateTimeUtils.getTimestampOf(year, month, day, 0, 0, 0));
@@ -680,7 +680,7 @@ public final class PostgresDbManager implements DbManager {
             + "GROUP BY utc_timestamp::DATE "
             + "ORDER BY utc_timestamp::DATE ASC;";
 
-        try (final Connection connection = dbConnectionPool.getConnection();
+        try (final Connection connection = dataSource.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
 
             preparedStatement.setInt(1, month.getValue());
@@ -1123,7 +1123,7 @@ public final class PostgresDbManager implements DbManager {
     }
 
     private <T> T executeQuery(final Function<DSLContext, T> sqlQuery) {
-        try (final Connection connection = dbConnectionPool.getConnection()) {
+        try (final Connection connection = dataSource.getConnection()) {
             final DSLContext queryContext = DSL.using(connection, SQLDialect.POSTGRES);
             return sqlQuery.apply(queryContext);
         } catch (final SQLException e) {
