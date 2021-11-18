@@ -8,6 +8,10 @@ RUN mkdir --parents /folding-stats-spring-boot
 
 WORKDIR /folding-stats-spring-boot
 
+ARG NEXUS_URL
+COPY ./docker/java/scripts/configure_custom_nexus.sh /tmp/configure_custom_nexus.sh
+RUN /tmp/configure_custom_nexus.sh "${NEXUS_URL}"
+
 # Copy source code
 # Adding and building each module incrementally so we can retain some docker caches when building for tests
 COPY ./pom.xml ./pom.xml

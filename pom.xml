@@ -709,14 +709,22 @@
         </profile>
     </profiles>
 
+    <repositories>
+        <repository>
+            <id>maven-public</id>
+            <url>https://nexus.zodac.me/repository/maven-group/</url>
+        </repository>
+    </repositories>
+
+
     <distributionManagement>
         <snapshotRepository>
             <id>nexus-snapshots</id>
-            <url>http://nexus.zodac.me/repository/maven-snapshots/</url>
+            <url>https://nexus.zodac.me/repository/maven-snapshots/</url>
         </snapshotRepository>
         <repository>
             <id>nexus-releases</id>
-            <url>http://nexus.zodac.me/repository/maven-releases/</url>
+            <url>https://nexus.zodac.me/repository/maven-releases/</url>
         </repository>
     </distributionManagement>
 </project>

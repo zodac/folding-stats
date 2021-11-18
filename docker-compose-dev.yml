@@ -35,6 +35,7 @@ services:
         DEPLOYMENT_TYPE: "test"
         JAVA_VERSION: 17
         MAVEN_VERSION: 3.8.3
+        NEXUS_URL: "${NEXUS_URL}"
     container_name: backend_dev
     hostname: backend-dev # Using a dash as Java's URI builder will fail with an underscore
     environment:
