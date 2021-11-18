@@ -716,7 +716,6 @@
         </repository>
     </repositories>
 
-
     <distributionManagement>
         <snapshotRepository>
             <id>nexus-snapshots</id>

@@ -26,19 +26,15 @@ package me.zodac.folding.db.postgres;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
-import me.zodac.folding.api.db.DbConnectionPool;
-import me.zodac.folding.api.exception.DatabaseConnectionException;
+import javax.sql.DataSource;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
 
 /**
- * {@link DbConnectionPool} for <b>PostgreSQL</b> DB {@link Connection}s.
+ * <b>PostgreSQL</b> implementation of {@link HikariDataSource}.
  */
-public final class PostgresDbConnectionPool implements DbConnectionPool {
+public final class PostgresDataSource extends HikariDataSource {
 
     private static final HikariConfig DATA_SOURCE_CONFIG = new HikariConfig();
-    private static final HikariDataSource DATA_SOURCE_POOL;
 
     static {
         DATA_SOURCE_CONFIG.setJdbcUrl(EnvironmentVariableUtils.get("JDBC_CONNECTION_URL"));
@@ -49,29 +45,18 @@ public final class PostgresDbConnectionPool implements DbConnectionPool {
         DATA_SOURCE_CONFIG.addDataSourceProperty("cachePrepStmts", "true");
         DATA_SOURCE_CONFIG.addDataSourceProperty("prepStmtCacheSize", "250");
         DATA_SOURCE_CONFIG.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-
-        DATA_SOURCE_POOL = new HikariDataSource(DATA_SOURCE_CONFIG);
     }
 
-    private PostgresDbConnectionPool() {
-
+    private PostgresDataSource() {
+        super(DATA_SOURCE_CONFIG);
     }
 
     /**
-     * Creates an instance of {@link PostgresDbConnectionPool}.
+     * Creates an instance of {@link PostgresDataSource}.
      *
-     * @return the created {@link PostgresDbConnectionPool}
+     * @return the created {@link PostgresDataSource}
      */
-    public static PostgresDbConnectionPool create() {
-        return new PostgresDbConnectionPool();
-    }
-
-    @Override
-    public Connection getConnection() {
-        try {
-            return DATA_SOURCE_POOL.getConnection();
-        } catch (final SQLException e) {
-            throw new DatabaseConnectionException("Error opening connection", e);
-        }
+    public static DataSource create() {
+        return new PostgresDataSource();
     }
 }
