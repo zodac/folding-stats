@@ -3,6 +3,10 @@ FROM maven:3.8.3-openjdk-17 AS builder
 # Build folding-stats
 RUN mkdir --parents /folding-stats/
 
+ARG NEXUS_URL
+COPY ./docker/wildfly/scripts/configure_custom_nexus.sh /tmp/configure_custom_nexus.sh
+RUN /tmp/configure_custom_nexus.sh "${NEXUS_URL}"
+
 # Copy source code
 # Adding and building each module incrementally so we can retain some docker caches when building for tests
 COPY ./pom.xml /folding-stats/pom.xml
