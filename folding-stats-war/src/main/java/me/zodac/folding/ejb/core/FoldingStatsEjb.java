@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Optional;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
-import me.zodac.folding.state.SystemStateManager;
+import javax.ejb.Stateless;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.state.SystemState;
@@ -59,6 +59,7 @@ import me.zodac.folding.rest.api.tc.RetiredUserSummary;
 import me.zodac.folding.rest.api.tc.TeamSummary;
 import me.zodac.folding.rest.api.tc.UserSummary;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
+import me.zodac.folding.state.SystemStateManager;
 import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -71,15 +72,17 @@ import org.apache.logging.log4j.Logger;
  * But since some logic is needed for special cases (like retrieving the latest Folding@Home stats for a {@link User} when it is created), we
  * implement that logic here, and delegate any CRUD needs to {@link Storage}.
  */
-@Singleton
+@Stateless
 public class FoldingStatsEjb implements FoldingStatsCore {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final Storage STORAGE = Storage.getInstance();
     private static final FoldingStatsRetriever FOLDING_STATS_RETRIEVER = HttpFoldingStatsRetriever.create();
-
+    
     @EJB
     private StatsScheduler statsScheduler;
+
+    @EJB
+    private Storage storage;
 
     @EJB
     private UserCaptainHandler userCaptainHandler;
@@ -95,22 +98,22 @@ public class FoldingStatsEjb implements FoldingStatsCore {
 
     @Override
     public Hardware createHardware(final Hardware hardware) {
-        return STORAGE.createHardware(hardware);
+        return storage.createHardware(hardware);
     }
 
     @Override
     public Optional<Hardware> getHardware(final int hardwareId) {
-        return STORAGE.getHardware(hardwareId);
+        return storage.getHardware(hardwareId);
     }
 
     @Override
     public Collection<Hardware> getAllHardware() {
-        return STORAGE.getAllHardware();
+        return storage.getAllHardware();
     }
 
     @Override
     public Hardware updateHardware(final Hardware hardwareToUpdate, final Hardware existingHardware) {
-        final Hardware updatedHardware = STORAGE.updateHardware(hardwareToUpdate);
+        final Hardware updatedHardware = storage.updateHardware(hardwareToUpdate);
 
         if (userStateChangeHandler.isHardwareStateChange(updatedHardware, existingHardware)) {
             final Collection<User> usersUsingThisHardware = getUsersWithHardware(updatedHardware);
@@ -137,34 +140,34 @@ public class FoldingStatsEjb implements FoldingStatsCore {
 
     @Override
     public void deleteHardware(final Hardware hardware) {
-        STORAGE.deleteHardware(hardware.getId());
+        storage.deleteHardware(hardware.getId());
     }
 
     @Override
     public Team createTeam(final Team team) {
-        final Team createdTeam = STORAGE.createTeam(team);
+        final Team createdTeam = storage.createTeam(team);
         statsScheduler.manualTeamCompetitionStatsParsing(ProcessingType.SYNCHRONOUS);
         return createdTeam;
     }
 
     @Override
     public Optional<Team> getTeam(final int teamId) {
-        return STORAGE.getTeam(teamId);
+        return storage.getTeam(teamId);
     }
 
     @Override
     public Collection<Team> getAllTeams() {
-        return STORAGE.getAllTeams();
+        return storage.getAllTeams();
     }
 
     @Override
     public Team updateTeam(final Team teamToUpdate) {
-        return STORAGE.updateTeam(teamToUpdate);
+        return storage.updateTeam(teamToUpdate);
     }
 
     @Override
     public void deleteTeam(final Team team) {
-        STORAGE.deleteTeam(team.getId());
+        storage.deleteTeam(team.getId());
     }
 
     @Override
@@ -173,7 +176,7 @@ public class FoldingStatsEjb implements FoldingStatsCore {
             userCaptainHandler.removeCaptaincyFromExistingTeamCaptain(user.getTeam());
         }
 
-        final User createdUser = STORAGE.createUser(user);
+        final User createdUser = storage.createUser(user);
 
         try {
             // When adding a new user, we configure the initial stats DB/cache
@@ -190,7 +193,7 @@ public class FoldingStatsEjb implements FoldingStatsCore {
 
     @Override
     public Optional<User> getUserWithPasskey(final int userId) {
-        return STORAGE.getUser(userId);
+        return storage.getUser(userId);
     }
 
     @Override
@@ -206,7 +209,7 @@ public class FoldingStatsEjb implements FoldingStatsCore {
 
     @Override
     public Collection<User> getAllUsersWithPasskeys() {
-        return STORAGE.getAllUsers();
+        return storage.getAllUsers();
     }
 
     @Override
@@ -233,7 +236,7 @@ public class FoldingStatsEjb implements FoldingStatsCore {
             userTeamChangeHandler.handleTeamChange(userToUpdate, existingUser.getTeam());
         }
 
-        final User updatedUser = STORAGE.updateUser(userToUpdate);
+        final User updatedUser = storage.updateUser(userToUpdate);
 
         if (userStateChangeHandler.isUserStateChange(updatedUser, existingUser)) {
             userStateChangeHandler.handleStateChange(updatedUser);
@@ -247,7 +250,7 @@ public class FoldingStatsEjb implements FoldingStatsCore {
     public void deleteUser(final User user) {
         // Retrieve the user's stats before deleting the user, so we can use the values for the retried user stats
         final UserTcStats userStats = getHourlyTcStats(user);
-        STORAGE.deleteUser(user.getId());
+        storage.deleteUser(user.getId());
 
         if (userStats.isEmptyStats()) {
             LOGGER.warn("User '{}' (ID: {}) has no stats, not saving any retired stats", user.getDisplayName(), user.getId());
@@ -255,7 +258,7 @@ public class FoldingStatsEjb implements FoldingStatsCore {
         }
 
         final RetiredUserTcStats retiredUserTcStats = RetiredUserTcStats.createWithoutId(user.getTeam().getId(), user.getDisplayName(), userStats);
-        final RetiredUserTcStats createdRetiredUserTcStats = STORAGE.createRetiredUserStats(retiredUserTcStats);
+        final RetiredUserTcStats createdRetiredUserTcStats = storage.createRetiredUserStats(retiredUserTcStats);
         LOGGER.info("User '{}' (ID: {}) retired with retired stats ID: {}", user.getDisplayName(), user.getId(),
             createdRetiredUserTcStats.getRetiredUserId());
     }
@@ -286,17 +289,17 @@ public class FoldingStatsEjb implements FoldingStatsCore {
 
     @Override
     public MonthlyResult createMonthlyResult(final MonthlyResult monthlyResult) {
-        return STORAGE.createMonthlyResult(monthlyResult);
+        return storage.createMonthlyResult(monthlyResult);
     }
 
     @Override
     public Optional<MonthlyResult> getMonthlyResult(final Month month, final Year year) {
-        return STORAGE.getMonthlyResult(month, year);
+        return storage.getMonthlyResult(month, year);
     }
 
     @Override
     public UserAuthenticationResult authenticateSystemUser(final String userName, final String password) {
-        final UserAuthenticationResult userAuthenticationResult = STORAGE.authenticateSystemUser(userName, password);
+        final UserAuthenticationResult userAuthenticationResult = storage.authenticateSystemUser(userName, password);
 
         if (userAuthenticationResult.isUserExists() && userAuthenticationResult.isPasswordMatch()) {
             LOGGER.debug("System user '{}' successfully logged in", userName);
@@ -309,7 +312,7 @@ public class FoldingStatsEjb implements FoldingStatsCore {
 
     @Override
     public Collection<HistoricStats> getHistoricStats(final User user, final Year year, final Month month, final int day) {
-        final Collection<HistoricStats> historicStats = STORAGE.getHistoricStats(user.getId(), year, month, day);
+        final Collection<HistoricStats> historicStats = storage.getHistoricStats(user.getId(), year, month, day);
         if (historicStats.isEmpty()) {
             LOGGER.warn("No stats retrieved for user with ID {} on {}/{}/{}, returning empty", user.getId(), year.getValue(), month.getValue(), day);
         }
@@ -319,7 +322,7 @@ public class FoldingStatsEjb implements FoldingStatsCore {
 
     @Override
     public Collection<HistoricStats> getHistoricStats(final User user, final Year year, final Month month) {
-        final Collection<HistoricStats> historicStats = STORAGE.getHistoricStats(user.getId(), year, month, 0);
+        final Collection<HistoricStats> historicStats = storage.getHistoricStats(user.getId(), year, month, 0);
         if (historicStats.isEmpty()) {
             LOGGER.warn("No stats retrieved for user with ID {} on {}/{}, returning empty", user.getId(), year.getValue(), month.getValue());
         }
@@ -329,7 +332,7 @@ public class FoldingStatsEjb implements FoldingStatsCore {
 
     @Override
     public Collection<HistoricStats> getHistoricStats(final User user, final Year year) {
-        final Collection<HistoricStats> historicStats = STORAGE.getHistoricStats(user.getId(), year, null, 0);
+        final Collection<HistoricStats> historicStats = storage.getHistoricStats(user.getId(), year, null, 0);
         if (historicStats.isEmpty()) {
             LOGGER.warn("No stats retrieved for user with ID {} on {}, returning empty", user.getId(), year.getValue());
         }
@@ -339,62 +342,62 @@ public class FoldingStatsEjb implements FoldingStatsCore {
 
     @Override
     public UserStats createTotalStats(final UserStats userStats) {
-        return STORAGE.createTotalStats(userStats);
+        return storage.createTotalStats(userStats);
     }
 
     @Override
     public UserStats getTotalStats(final User user) {
-        return STORAGE.getTotalStats(user.getId())
+        return storage.getTotalStats(user.getId())
             .orElse(UserStats.empty());
     }
 
     @Override
     public OffsetTcStats createOffsetStats(final User user, final OffsetTcStats offsetTcStats) {
-        STORAGE.deleteOffsetStats(user.getId());
-        return STORAGE.createOrUpdateOffsetStats(user.getId(), offsetTcStats);
+        storage.deleteOffsetStats(user.getId());
+        return storage.createOrUpdateOffsetStats(user.getId(), offsetTcStats);
     }
 
     @Override
     public OffsetTcStats createOrUpdateOffsetStats(final User user, final OffsetTcStats offsetTcStats) {
-        return STORAGE.createOrUpdateOffsetStats(user.getId(), offsetTcStats);
+        return storage.createOrUpdateOffsetStats(user.getId(), offsetTcStats);
     }
 
     @Override
     public OffsetTcStats getOffsetStats(final User user) {
-        return STORAGE.getOffsetStats(user.getId())
+        return storage.getOffsetStats(user.getId())
             .orElse(OffsetTcStats.empty());
     }
 
     @Override
     public UserTcStats createHourlyTcStats(final UserTcStats userTcStats) {
-        return STORAGE.createHourlyTcStats(userTcStats);
+        return storage.createHourlyTcStats(userTcStats);
     }
 
     @Override
     public UserTcStats getHourlyTcStats(final User user) {
-        return STORAGE.getHourlyTcStats(user.getId())
+        return storage.getHourlyTcStats(user.getId())
             .orElse(UserTcStats.empty(user.getId()));
     }
 
     @Override
     public boolean isAnyHourlyTcStatsExist() {
-        return STORAGE.getFirstHourlyTcStats().isPresent();
+        return storage.getFirstHourlyTcStats().isPresent();
     }
 
     @Override
     public UserStats createInitialStats(final UserStats userStats) {
-        return STORAGE.createInitialStats(userStats);
+        return storage.createInitialStats(userStats);
     }
 
     @Override
     public UserStats getInitialStats(final User user) {
-        return STORAGE.getInitialStats(user.getId())
+        return storage.getInitialStats(user.getId())
             .orElse(UserStats.empty());
     }
 
     @Override
     public RetiredUserTcStats createRetiredUserStats(final RetiredUserTcStats retiredUserTcStats) {
-        return STORAGE.createRetiredUserStats(retiredUserTcStats);
+        return storage.createRetiredUserStats(retiredUserTcStats);
     }
 
     @Override
@@ -406,14 +409,14 @@ public class FoldingStatsEjb implements FoldingStatsCore {
         }
 
         LOGGER.info("Deleting retired user TC stats");
-        STORAGE.deleteAllRetiredUserTcStats();
+        storage.deleteAllRetiredUserTcStats();
 
         LOGGER.info("Deleting offset TC stats");
-        STORAGE.deleteAllOffsetTcStats();
+        storage.deleteAllOffsetTcStats();
 
         LOGGER.info("Evicting TC and initial stats caches");
-        STORAGE.evictTcStatsCache();
-        STORAGE.evictInitialStatsCache();
+        storage.evictTcStatsCache();
+        storage.evictInitialStatsCache();
     }
 
     @Override
@@ -421,7 +424,7 @@ public class FoldingStatsEjb implements FoldingStatsCore {
         if (SystemStateManager.current() != SystemState.WRITE_EXECUTED) {
             LOGGER.debug("System is not in state {}, retrieving competition summary", SystemState.WRITE_EXECUTED);
 
-            final Optional<CompetitionSummary> cachedCompetitionResult = STORAGE.getCompetitionSummary();
+            final Optional<CompetitionSummary> cachedCompetitionResult = storage.getCompetitionSummary();
             if (cachedCompetitionResult.isPresent()) {
                 return cachedCompetitionResult.get();
             }
@@ -429,7 +432,7 @@ public class FoldingStatsEjb implements FoldingStatsCore {
 
         LOGGER.debug("Calculating latest TC result, system state: {}", SystemStateManager.current());
         final CompetitionSummary competitionSummary = createCompetitionSummary();
-        final CompetitionSummary createdCompetitionSummary = STORAGE.createCompetitionSummary(competitionSummary);
+        final CompetitionSummary createdCompetitionSummary = storage.createCompetitionSummary(competitionSummary);
         SystemStateManager.next(SystemState.AVAILABLE);
 
         return createdCompetitionSummary;
@@ -473,7 +476,7 @@ public class FoldingStatsEjb implements FoldingStatsCore {
     }
 
     private Collection<RetiredUserTcStats> getAllRetiredUsersForTeam(final Team team) {
-        return STORAGE.getAllRetiredUsers()
+        return storage.getAllRetiredUsers()
             .stream()
             .filter(retiredUserTcStats -> retiredUserTcStats.getTeamId() == team.getId())
             .collect(toList());
@@ -499,6 +502,6 @@ public class FoldingStatsEjb implements FoldingStatsCore {
 
     @Override
     public void printCacheContents() {
-        STORAGE.printCacheContents();
+        storage.printCacheContents();
     }
 }
