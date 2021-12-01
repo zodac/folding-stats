@@ -24,6 +24,7 @@
 
 package me.zodac.folding.lars;
 
+import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toMap;
 
 import java.math.BigDecimal;
@@ -33,6 +34,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.util.CollectionUtils;
 import org.apache.logging.log4j.LogManager;
@@ -60,8 +62,17 @@ public final class HardwareSplitter {
      * @return a {@link Collection} of the {@link Hardware} to be created, sorted according to {@link HardwareNameComparator}
      */
     public static Collection<Hardware> toCreate(final Collection<Hardware> fromLars, final Collection<Hardware> inDb) {
-        final Set<Hardware> toCreate = new TreeSet<>(HardwareNameComparator.create());
-        toCreate.addAll(CollectionUtils.existsInFirstOnly(fromLars, inDb));
+        // Hardware name is unique, we can use it as an identifier
+        final Collection<String> fromLarsHardwareNames = getHardwareNames(fromLars);
+        final Collection<String> inDbHardwareNames = getHardwareNames(inDb);
+
+        final Set<String> hardwareNamesOnlyInLars = CollectionUtils.existsInFirstOnly(fromLarsHardwareNames, inDbHardwareNames);
+
+        final Set<Hardware> toCreate = fromLars
+            .stream()
+            .filter(hardwareFromLars -> hardwareNamesOnlyInLars.contains(hardwareFromLars.getHardwareName()))
+            .collect(toCollection(() -> new TreeSet<>(HardwareNameComparator.create())));
+
         LOGGER.info("{} from LARS, {} in DB, {} to create", fromLars.size(), inDb.size(), toCreate.size());
         return toCreate;
     }
@@ -74,10 +85,25 @@ public final class HardwareSplitter {
      * @return a {@link Collection} of the {@link Hardware} to be deleted, sorted according to {@link HardwareNameComparator}
      */
     public static Collection<Hardware> toDelete(final Collection<Hardware> fromLars, final Collection<Hardware> inDb) {
-        final Set<Hardware> toDelete = new TreeSet<>(HardwareNameComparator.create());
-        toDelete.addAll(CollectionUtils.existsInFirstOnly(inDb, fromLars));
+        // Hardware name is unique, we can use it as an identifier
+        final Collection<String> fromLarsHardwareNames = getHardwareNames(fromLars);
+        final Collection<String> inDbHardwareNames = getHardwareNames(inDb);
+
+        final Set<String> hardwareNamesNoLongerInLars = CollectionUtils.existsInFirstOnly(inDbHardwareNames, fromLarsHardwareNames);
+
+        final Set<Hardware> toDelete = inDb
+            .stream()
+            .filter(hardwareInDb -> hardwareNamesNoLongerInLars.contains(hardwareInDb.getHardwareName()))
+            .collect(toCollection(() -> new TreeSet<>(HardwareNameComparator.create())));
         LOGGER.info("{} from LARS, {} in DB, {} to delete", fromLars.size(), inDb.size(), toDelete.size());
         return toDelete;
+    }
+
+    private static Collection<String> getHardwareNames(final Collection<Hardware> hardwares) {
+        return hardwares
+            .stream()
+            .map(Hardware::getHardwareName)
+            .collect(Collectors.toList());
     }
 
     /**

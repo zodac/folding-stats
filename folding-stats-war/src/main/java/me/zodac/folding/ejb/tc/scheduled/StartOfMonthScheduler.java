@@ -67,7 +67,8 @@ import org.apache.logging.log4j.Logger;
 public class StartOfMonthScheduler {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final boolean IS_MONTHLY_RESET_ENABLED = parseBoolean(EnvironmentVariableUtils.getOrDefault("ENABLE_STATS_MONTHLY_RESET", "false"));
+    private static final boolean IS_MONTHLY_RESET_ENABLED =
+        parseBoolean(EnvironmentVariableUtils.getOrDefault("ENABLE_STATS_MONTHLY_RESET", "false"));
     private static final String STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH =
         EnvironmentVariableUtils.getOrDefault("STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH", "3");
 
@@ -106,12 +107,16 @@ public class StartOfMonthScheduler {
      */
     @Timeout
     public void startOfTeamCompetition(final Timer timer) {
-        LOGGER.trace("Timer fired at: {}", timer);
-        LOGGER.warn("Starting TC stats for new month");
+        try {
+            LOGGER.trace("Timer fired at: {}", timer);
+            LOGGER.warn("Starting TC stats for new month");
 
-        SystemStateManager.next(SystemState.RESETTING_STATS);
-        ParsingStateManager.next(ParsingState.DISABLED);
-        userStatsResetter.resetTeamCompetitionStats();
-        SystemStateManager.next(SystemState.WRITE_EXECUTED);
+            SystemStateManager.next(SystemState.RESETTING_STATS);
+            ParsingStateManager.next(ParsingState.DISABLED);
+            userStatsResetter.resetTeamCompetitionStats();
+            SystemStateManager.next(SystemState.WRITE_EXECUTED);
+        } catch (final Exception e) {
+            LOGGER.error("Error with start of team schedule", e);
+        }
     }
 }
