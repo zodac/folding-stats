@@ -96,8 +96,9 @@ public class LarsHardwareUpdater {
             return;
         }
 
-        final long bestPpd = larsGpus.get(0).getAveragePpd();
-        LOGGER.info("Best PPD is '{}', will compare to this", formatWithCommas(bestPpd));
+        final LarsGpu bestGpu = larsGpus.get(0);
+        final long bestPpd = bestGpu.getAveragePpd();
+        LOGGER.info("Best PPD is '{}' for '{}', will compare to this", formatWithCommas(bestPpd), bestGpu.getModelInfo());
 
         final Collection<Hardware> lars = larsGpus
             .stream()
@@ -117,9 +118,17 @@ public class LarsHardwareUpdater {
                 final Hardware updatedHardwareWithId = Hardware.updateWithId(existingHardware.getId(), updatedHardware);
 
                 foldingStatsCore.updateHardware(updatedHardwareWithId, existingHardware);
-                LOGGER.info("LARS updated hardware\n'{}' (ID: {})\nMultiplier: {} -> {}\nAverage PPD: {} -> {}\n", updatedHardware.getHardwareName(),
-                    existingHardware.getId(), existingHardware.getMultiplier(), updatedHardware.getMultiplier(),
-                    formatWithCommas(existingHardware.getAveragePpd()), formatWithCommas(updatedHardware.getAveragePpd()));
+                LOGGER.info("LARS updated hardware\n" +
+                        "ID: {}\n" +
+                        "{}\n" +
+                        "Multiplier: {} -> {}\n" +
+                        "Average PPD: {} -> {}\n",
+                    existingHardware.getId(),
+                    updatedHardware.getHardwareName(),
+                    existingHardware.getMultiplier(),
+                    updatedHardware.getMultiplier(),
+                    formatWithCommas(existingHardware.getAveragePpd()),
+                    formatWithCommas(updatedHardware.getAveragePpd()));
             } catch (final Exception e) {
                 LOGGER.warn("Unexpected error connecting to Folding@Home stats to verify new hardware", e);
             }
@@ -127,7 +136,7 @@ public class LarsHardwareUpdater {
 
         for (final Hardware hardware : HardwareSplitter.toCreate(lars, existing)) {
             final Hardware createdHardware = foldingStatsCore.createHardware(hardware);
-            LOGGER.debug("Created hardware '{}' (ID: {})", createdHardware.getHardwareName(), createdHardware.getId());
+            LOGGER.info("Created hardware '{}' (ID: {})", createdHardware.getHardwareName(), createdHardware.getId());
         }
     }
 
