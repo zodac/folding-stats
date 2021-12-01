@@ -24,7 +24,7 @@
 
 package me.zodac.folding.ejb.tc.lars;
 
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static me.zodac.folding.api.util.NumberUtils.formatWithCommas;
 
 import java.util.Collection;
@@ -102,7 +102,7 @@ public class LarsHardwareUpdater {
         final Collection<Hardware> lars = larsGpus
             .stream()
             .map(larsGpu -> toHardware(larsGpu, bestPpd))
-            .collect(toList());
+            .collect(toSet());
         final Collection<Hardware> existing = foldingStatsCore.getAllHardware();
 
         for (final Hardware hardware : HardwareSplitter.toDelete(lars, existing)) {

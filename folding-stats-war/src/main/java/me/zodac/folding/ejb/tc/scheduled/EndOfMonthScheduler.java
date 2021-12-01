@@ -79,8 +79,10 @@ import org.apache.logging.log4j.Logger;
 public class EndOfMonthScheduler {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final boolean IS_MONTHLY_RESET_ENABLED = parseBoolean(EnvironmentVariableUtils.getOrDefault("ENABLE_STATS_MONTHLY_RESET", "false"));
-    private static final boolean IS_MONTHLY_RESULT_ENABLED = parseBoolean(EnvironmentVariableUtils.getOrDefault("ENABLE_MONTHLY_RESULT_STORAGE", "false"));
+    private static final boolean IS_MONTHLY_RESET_ENABLED =
+        parseBoolean(EnvironmentVariableUtils.getOrDefault("ENABLE_STATS_MONTHLY_RESET", "false"));
+    private static final boolean IS_MONTHLY_RESULT_ENABLED =
+        parseBoolean(EnvironmentVariableUtils.getOrDefault("ENABLE_MONTHLY_RESULT_STORAGE", "false"));
     private static final boolean IS_LARS_UPDATE_ENABLED = parseBoolean(EnvironmentVariableUtils.getOrDefault("ENABLE_LARS_HARDWARE_UPDATE", "false"));
 
     @EJB
@@ -123,32 +125,36 @@ public class EndOfMonthScheduler {
      */
     @Timeout
     public void endOfTeamCompetition(final Timer timer) {
-        LOGGER.trace("Timer fired at: {}", timer);
+        try {
+            LOGGER.trace("Timer fired at: {}", timer);
 
-        // Because we cannot set up a cron schedule with last day, we use the range '28-31'.
-        // We then check if the current day in the month is the last day of the month.
-        // If not, we skip the reset.
-        if (!isLastDayInMonth()) {
-            LOGGER.warn("End of month reset triggered, but not actually end of the month, skipping");
-            return;
-        }
+            // Because we cannot set up a cron schedule with last day, we use the range '28-31'.
+            // We then check if the current day in the month is the last day of the month.
+            // If not, we skip the reset.
+            if (!isLastDayInMonth()) {
+                LOGGER.warn("End of month reset triggered, but not actually end of the month, skipping");
+                return;
+            }
 
-        if (IS_MONTHLY_RESULT_ENABLED) {
-            LOGGER.info("Storing TC stats for new month");
-            userStatsStorer.storeMonthlyResult();
-        }
+            if (IS_MONTHLY_RESULT_ENABLED) {
+                LOGGER.info("Storing TC stats for new month");
+                userStatsStorer.storeMonthlyResult();
+            }
 
-        if (IS_MONTHLY_RESET_ENABLED) {
-            LOGGER.warn("Resetting TC stats for end of month");
-            ParsingStateManager.next(ParsingState.DISABLED);
-            SystemStateManager.next(SystemState.RESETTING_STATS);
-            userStatsResetter.resetTeamCompetitionStats();
-            SystemStateManager.next(SystemState.WRITE_EXECUTED);
-        }
+            if (IS_MONTHLY_RESET_ENABLED) {
+                LOGGER.warn("Resetting TC stats for end of month");
+                ParsingStateManager.next(ParsingState.DISABLED);
+                SystemStateManager.next(SystemState.RESETTING_STATS);
+                userStatsResetter.resetTeamCompetitionStats();
+                SystemStateManager.next(SystemState.WRITE_EXECUTED);
+            }
 
-        if (IS_LARS_UPDATE_ENABLED) {
-            LOGGER.info("Updating hardware from LARS DB");
-            larsHardwareUpdater.retrieveHardwareAndPersist();
+            if (IS_LARS_UPDATE_ENABLED) {
+                LOGGER.info("Updating hardware from LARS DB");
+                larsHardwareUpdater.retrieveHardwareAndPersist();
+            }
+        } catch (final Exception e) {
+            LOGGER.error("Error with end of team schedule", e);
         }
     }
 

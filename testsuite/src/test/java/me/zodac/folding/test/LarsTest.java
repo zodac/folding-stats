@@ -247,11 +247,11 @@ class LarsTest {
             .extracting("hardwareName", "multiplier")
             .containsExactly("Hardware #1", 1.0D);
         assertThat(allHardwareAfterFirstUpdate.get(1))
-            .as("Expected second hardware to have correct multiplier after first update")
+            .as("Expected second hardware to have correct multiplier after first update: " + allHardwareAfterFirstUpdate)
             .extracting("hardwareName", "multiplier")
             .containsExactly("Hardware #2", 2.0D);
         assertThat(allHardwareAfterFirstUpdate.get(2))
-            .as("Expected third hardware to have correct multiplier after first update")
+            .as("Expected third hardware to have correct multiplier after first update: " + allHardwareAfterFirstUpdate)
             .extracting("hardwareName", "multiplier")
             .containsExactly("Hardware #3", 10.0D);
 

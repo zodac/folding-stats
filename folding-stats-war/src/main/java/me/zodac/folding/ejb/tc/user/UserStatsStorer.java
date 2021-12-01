@@ -621,6 +621,11 @@ public class UserStatsStorer {
             leaderboardStatsGenerator.generateUserCategoryLeaderboards()
         );
 
+        if (monthlyResult.hasNoStats()) {
+            LOGGER.error("Not storing result, result has no stats: {}", monthlyResult);
+            return;
+        }
+
         final MonthlyResult createdMonthlyResult = foldingStatsCore.createMonthlyResult(monthlyResult);
         LOGGER.info("Storing TC results for {}", createdMonthlyResult.getUtcTimestamp());
     }

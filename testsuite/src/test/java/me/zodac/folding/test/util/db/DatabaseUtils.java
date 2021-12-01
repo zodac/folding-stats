@@ -53,9 +53,27 @@ public final class DatabaseUtils {
     }
 
     /**
+     * Deletes all entries in the given {@code tableNames}.
+     *
+     * @param tableNames the tables to truncate
+     */
+    public static void truncateTable(final String... tableNames) {
+        for (final String tableName : tableNames) {
+            final String truncateQuery = String.format("TRUNCATE TABLE %s;", tableName);
+
+            try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
+                 final PreparedStatement preparedStatement = connection.prepareStatement(truncateQuery)) {
+                preparedStatement.execute();
+            } catch (final SQLException e) {
+                throw new AssertionError(String.format("Error truncating table: '%s'", tableName), e);
+            }
+        }
+    }
+
+    /**
      * Deletes all entries in the given {@code tableNames} and resets the serial count for the identity to <b>0</b>.
      *
-     * @param tableNames the tables to clean/truncate
+     * @param tableNames the tables to truncate and reset
      */
     public static void truncateTableAndResetId(final String... tableNames) {
         for (final String tableName : tableNames) {
@@ -65,7 +83,7 @@ public final class DatabaseUtils {
                  final PreparedStatement preparedStatement = connection.prepareStatement(truncateQuery)) {
                 preparedStatement.execute();
             } catch (final SQLException e) {
-                throw new AssertionError(String.format("Error cleaning table: '%s'", tableName), e);
+                throw new AssertionError(String.format("Error truncating or resetting table: '%s'", tableName), e);
             }
         }
     }
