@@ -126,7 +126,7 @@ section.
 A **hardware** has the following fields:
 
 | Field Name      | Description                                                                                                    |
-| --------------- | -------------------------------------------------------------------------------------------------------------- |
+|-----------------|----------------------------------------------------------------------------------------------------------------|
 | _ID_            | System-generated ID for the hardware                                                                           |
 | _Hardware Name_ | Unique hardware name as retrieved from the LARS DB                                                             |
 | _Display Name_  | User-friendly name to be shown on the UI                                                                       |
@@ -162,7 +162,7 @@ Please take a look at [User Categories](#user-categories) for an explanation on 
 A **team** has the following fields:
 
 | Field Name         | Description                      |
-| ------------------ | -------------------------------- |
+|--------------------|----------------------------------|
 | _ID_               | System-generated ID for the team |
 | _Team Name_        | Unique team name                 |
 | _Team Description_ | Description of the team          |
@@ -184,7 +184,7 @@ searchable, so no need to scroll through all available options.
 A **user** has the following fields:
 
 | Field Name          | Description                                                                                                          |
-| ------------------- | -------------------------------------------------------------------------------------------------------------------- |
+|---------------------|----------------------------------------------------------------------------------------------------------------------|
 | _ID_                | System-generated ID for the user                                                                                     |
 | _Folding User Name_ | Folding@Home user name                                                                                               |
 | _Display Name_      | Name to be displayed on the UI for the user (for example, if a user's forum name differs from Folding@Home user name |
@@ -220,7 +220,7 @@ Notes:
 The following user categories are available in the system:
 
 | Category    | Description                                                                    | Default number of users per category | 
-| ----------- | ------------------------------------------------------------------------------ | ------------------------------------ |
+|-------------|--------------------------------------------------------------------------------|--------------------------------------|
 | AMD GPU     | Any hardware with _Hardware Make_ of **AMD** and _Hardware Type_ of **GPU**    | 1                                    |
 | nVidia GPU  | Any hardware with _Hardware Make_ of **nVidia** and _Hardware Type_ of **GPU** | 1                                    |
 | Wildcard    | Any hardware                                                                   | 1                                    |
