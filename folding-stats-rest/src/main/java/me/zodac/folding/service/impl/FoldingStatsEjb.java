@@ -24,11 +24,11 @@
 
 package me.zodac.folding.service.impl;
 
-import java.util.Set;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.service.FoldingStatsService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 ///**
@@ -44,6 +44,9 @@ import org.springframework.stereotype.Component;
 public class FoldingStatsEjb implements FoldingStatsService {
 
     private static final Logger LOGGER = LogManager.getLogger();
+
+    @Autowired
+    private Storage storage;
 //    private static final Storage STORAGE = Storage.getInstance();
 //    private static final FoldingStatsRetriever FOLDING_STATS_RETRIEVER = HttpFoldingStatsRetriever.create();
 
@@ -265,8 +268,8 @@ public class FoldingStatsEjb implements FoldingStatsService {
 
     @Override
     public UserAuthenticationResult authenticateSystemUser(final String userName, final String password) {
-//        final UserAuthenticationResult userAuthenticationResult = STORAGE.authenticateSystemUser(userName, password);
-        final UserAuthenticationResult userAuthenticationResult = UserAuthenticationResult.success(Set.of("admin"));
+        final UserAuthenticationResult userAuthenticationResult = storage.authenticateSystemUser(userName, password);
+//        final UserAuthenticationResult userAuthenticationResult = UserAuthenticationResult.success(Set.of("admin"));
 
         if (userAuthenticationResult.isUserExists() && userAuthenticationResult.isPasswordMatch()) {
             LOGGER.debug("System user '{}' successfully logged in", userName);
