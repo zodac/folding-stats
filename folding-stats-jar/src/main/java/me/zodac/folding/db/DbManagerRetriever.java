@@ -57,7 +57,11 @@ public final class DbManagerRetriever {
 
         switch (databaseType) {
             case POSTGRESQL: {
-                DB_MANAGER_BY_DATABASE.putIfAbsent(DatabaseType.POSTGRESQL, PostgresDbManager.create(PostgresDataSource.create()));
+                if (!DB_MANAGER_BY_DATABASE.containsKey(DatabaseType.POSTGRESQL)) {
+                    final DbManager dbManager = PostgresDbManager.create(PostgresDataSource.create());
+                    DB_MANAGER_BY_DATABASE.put(DatabaseType.POSTGRESQL, dbManager);
+                }
+
                 return DB_MANAGER_BY_DATABASE.get(DatabaseType.POSTGRESQL);
             }
             case INVALID:

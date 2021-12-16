@@ -22,12 +22,11 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.service.impl;
+package me.zodac.folding.service;
 
 import me.zodac.folding.api.UserAuthenticationResult;
-import me.zodac.folding.db.DbManagerRetriever;
-import me.zodac.folding.service.StorageService;
-import org.springframework.stereotype.Component;
+import me.zodac.folding.api.db.DbManager;
+import org.springframework.stereotype.Service;
 
 ///**
 // * In order to decouple both the REST layer and the {@link FoldingStatsEjb} from the persistence solution we use this interface for CRUD operations.
@@ -40,8 +39,8 @@ import org.springframework.stereotype.Component;
 // * <b>NOTE:</b> Should only be used by {@link FoldingStatsEjb}, other classes should not go use this class.
 // */
 //@Stateless
-@Component
-public class Storage implements StorageService {
+@Service
+public interface StorageService {
 
     //    private static final Logger LOGGER = LogManager.getLogger();
 //    private static final DbManager DB_MANAGER = DbManagerRetriever.get();
@@ -478,11 +477,14 @@ public class Storage implements StorageService {
 //        retiredTcStatsCache.removeAll();
 //    }
 
-    @Override
-    @NotCached
-    public UserAuthenticationResult authenticateSystemUser(final String userName, final String password) {
-        return DbManagerRetriever.get().authenticateSystemUser(userName, password);
-    }
+    /**
+     * Authenticates a system user with {@link DbManager}.
+     *
+     * @param userName the system user username
+     * @param password the system user password
+     * @return the {@link UserAuthenticationResult}
+     */
+    UserAuthenticationResult authenticateSystemUser(final String userName, final String password);
 //
 //    /**
 //     * Retrieves the {@link HistoricStats} for a given {@link User} ID for a specific {@code day}, {@link Month} or {@link Year}.
