@@ -117,6 +117,7 @@ public final class SystemCleaner {
      * Cleans the stats DB tables, resets the stubbed Folding endpoints for units and points, then executes the {@link #cleanSystemForSimpleTests()}.
      * The order of the DB cleanup is:
      * <ol>
+     *     <li>monthly_results</li>
      *     <li>user_initial_stats</li>
      *     <li>user_offset_tc_stats</li>
      *     <li>user_tc_stats_hourly</li>
@@ -129,7 +130,10 @@ public final class SystemCleaner {
     public static void cleanSystemForComplexTests() throws FoldingRestException {
         StubbedFoldingEndpointUtils.deletePoints();
         StubbedFoldingEndpointUtils.deleteUnits();
+
+        DatabaseUtils.truncateTable("monthly_results");
         DatabaseUtils.truncateTableAndResetId("user_initial_stats", "user_offset_tc_stats", "user_tc_stats_hourly", "user_total_stats");
+
         TeamCompetitionStatsUtils.manuallyResetStats();
         cleanSystemForSimpleTests();
     }

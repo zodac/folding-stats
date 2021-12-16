@@ -49,11 +49,19 @@ class HardwareSplitterTest {
                 .build(),
             Hardware.builder()
                 .hardwareName("Test3")
+                .build(),
+            Hardware.builder()
+                .hardwareName("Test4")
+                .averagePpd(1)
                 .build()
         );
         final Collection<Hardware> existing = Set.of(
             Hardware.builder()
                 .hardwareName("Test1")
+                .build(),
+            Hardware.builder()
+                .hardwareName("Test4")
+                .averagePpd(2)
                 .build()
         );
 
@@ -73,6 +81,7 @@ class HardwareSplitterTest {
         final Collection<Hardware> lars = Set.of(
             Hardware.builder()
                 .hardwareName("Test2")
+                .averagePpd(1)
                 .build(),
             Hardware.builder()
                 .hardwareName("Test3")
@@ -81,6 +90,10 @@ class HardwareSplitterTest {
         final Collection<Hardware> existing = Set.of(
             Hardware.builder()
                 .hardwareName("Test1")
+                .build(),
+            Hardware.builder()
+                .hardwareName("Test2")
+                .averagePpd(2)
                 .build()
         );
 

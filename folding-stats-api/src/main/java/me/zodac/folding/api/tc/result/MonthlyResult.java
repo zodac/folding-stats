@@ -123,4 +123,24 @@ public class MonthlyResult {
 
         return create(monthlyResult.teamLeaderboard, categories, monthlyResult.utcTimestamp);
     }
+
+    /**
+     * Method to check if the {@link MonthlyResult} has no stats.
+     *
+     * <p>
+     * This can occur if a month's stats have been reset before attempting to create the {@link MonthlyResult}
+     *
+     * @return <code>true</code> if no {@link TeamLeaderboardEntry} has any points or units.
+     */
+    public boolean hasNoStats() {
+        long totalTeamPoints = 0L;
+        int totalTeamUnits = 0;
+
+        for (final TeamLeaderboardEntry teamLeaderboardEntry : teamLeaderboard) {
+            totalTeamPoints += teamLeaderboardEntry.getTeamPoints();
+            totalTeamUnits += teamLeaderboardEntry.getTeamUnits();
+        }
+
+        return totalTeamPoints == 0L && totalTeamUnits == 0;
+    }
 }
