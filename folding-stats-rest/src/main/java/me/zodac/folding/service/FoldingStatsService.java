@@ -24,7 +24,10 @@
 
 package me.zodac.folding.service;
 
+import java.util.Collection;
+import java.util.Optional;
 import me.zodac.folding.api.UserAuthenticationResult;
+import me.zodac.folding.api.tc.Hardware;
 import org.springframework.stereotype.Service;
 
 /**
@@ -37,30 +40,30 @@ import org.springframework.stereotype.Service;
 @Service
 public interface FoldingStatsService {
 
-//    /**
-//     * Creates a {@link Hardware}.
-//     *
-//     * @param hardware the {@link Hardware} to create
-//     * @return the created {@link Hardware}, with ID
-//     */
-//    Hardware createHardware(final Hardware hardware);
-//
-//    /**
-//     * Retrieves a {@link Hardware}.
-//     *
-//     * @param hardwareId the ID of the {@link Hardware} to retrieve
-//     * @return an {@link Optional} of the retrieved {@link Hardware}
-//     */
-//    Optional<Hardware> getHardware(final int hardwareId);
-//
-//    /**
-//     * Retrieves all {@link Hardware}.
-//     *
-//     * @return a {@link Collection} of the retrieved {@link Hardware}
-//     */
-//    Collection<Hardware> getAllHardware();
-//
-//    /**
+    /**
+     * Creates a {@link Hardware}.
+     *
+     * @param hardware the {@link Hardware} to create
+     * @return the created {@link Hardware}, with ID
+     */
+    Hardware createHardware(final Hardware hardware);
+
+    /**
+     * Retrieves a {@link Hardware}.
+     *
+     * @param hardwareId the ID of the {@link Hardware} to retrieve
+     * @return an {@link Optional} of the retrieved {@link Hardware}
+     */
+    Optional<Hardware> getHardware(final int hardwareId);
+
+    /**
+     * Retrieves all {@link Hardware}.
+     *
+     * @return a {@link Collection} of the retrieved {@link Hardware}
+     */
+    Collection<Hardware> getAllHardware();
+
+    //    /**
 //     * Updates an existing {@link Hardware}.
 //     *
 //     * <p>
@@ -71,15 +74,15 @@ public interface FoldingStatsService {
 //     * @return the updated {@link Hardware}
 //     * @see me.zodac.folding.core.tc.user.UserStateChangeHandler#isHardwareStateChange(Hardware, Hardware)
 //     */
-//    Hardware updateHardware(final Hardware hardwareToUpdate, final Hardware existingHardware);
-//
-//    /**
-//     * Deletes a {@link Hardware}.
-//     *
-//     * @param hardware the {@link Hardware} to delete
-//     */
-//    void deleteHardware(final Hardware hardware);
-//
+    Hardware updateHardware(final Hardware hardwareToUpdate, final Hardware existingHardware);
+
+    /**
+     * Deletes a {@link Hardware}.
+     *
+     * @param hardware the {@link Hardware} to delete
+     */
+    void deleteHardware(final Hardware hardware);
+
 //    /**
 //     * Creates a {@link Team}.
 //     *

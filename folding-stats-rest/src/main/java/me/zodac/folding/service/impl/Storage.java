@@ -24,9 +24,16 @@
 
 package me.zodac.folding.service.impl;
 
+import java.util.Collection;
+import java.util.Optional;
 import me.zodac.folding.api.UserAuthenticationResult;
+import me.zodac.folding.api.tc.Hardware;
+import me.zodac.folding.cache.HardwareCache;
+import me.zodac.folding.cache.UserCache;
 import me.zodac.folding.db.DbManagerRetriever;
 import me.zodac.folding.service.StorageService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 ///**
@@ -43,11 +50,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class Storage implements StorageService {
 
-    //    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 //    private static final DbManager DB_MANAGER = DbManagerRetriever.get();
 
     // POJO caches
-//    private final HardwareCache hardwareCache = HardwareCache.getInstance();
+    private final HardwareCache hardwareCache = HardwareCache.getInstance();
 //    private final TeamCache teamCache = TeamCache.getInstance();
 //    private final UserCache userCache = UserCache.getInstance();
 
@@ -59,7 +66,7 @@ public class Storage implements StorageService {
 //    private final TcStatsCache tcStatsCache = TcStatsCache.getInstance();
 //    private final TotalStatsCache totalStatsCache = TotalStatsCache.getInstance();
 
-//    /**
+    //    /**
 //     * Creates a {@link Hardware}.
 //     *
 //     * <p>
@@ -69,14 +76,15 @@ public class Storage implements StorageService {
 //     * @return the created {@link Hardware}, with ID
 //     * @see DbManager#createHardware(Hardware)
 //     */
-//    @Cached(HardwareCache.class)
-//    public Hardware createHardware(final Hardware hardware) {
-//        final Hardware hardwareWithId = DB_MANAGER.createHardware(hardware);
-//        hardwareCache.add(hardwareWithId.getId(), hardwareWithId);
-//        return hardwareWithId;
-//    }
-//
-//    /**
+    @Override
+    @Cached(HardwareCache.class)
+    public Hardware createHardware(final Hardware hardware) {
+        final Hardware hardwareWithId = DbManagerRetriever.get().createHardware(hardware);
+        hardwareCache.add(hardwareWithId.getId(), hardwareWithId);
+        return hardwareWithId;
+    }
+
+    //    /**
 //     * Retrieves a {@link Hardware}.
 //     *
 //     * <p>
@@ -86,20 +94,22 @@ public class Storage implements StorageService {
 //     * @return an {@link Optional} of the retrieved {@link Hardware}
 //     * @see DbManager#getHardware(int)
 //     */
-//    @Cached(HardwareCache.class)
-//    public Optional<Hardware> getHardware(final int hardwareId) {
-//        final Optional<Hardware> fromCache = hardwareCache.get(hardwareId);
-//
-//        if (fromCache.isPresent()) {
-//            return fromCache;
-//        }
-//
-//        LOGGER.trace("Cache miss! Get hardware");
-//        final Optional<Hardware> fromDb = DB_MANAGER.getHardware(hardwareId);
-//        fromDb.ifPresent(hardware -> hardwareCache.add(hardwareId, hardware));
-//        return fromDb;
-//    }
-//
+    @Override
+    @Cached(HardwareCache.class)
+    public Optional<Hardware> getHardware(final int hardwareId) {
+        final Optional<Hardware> fromCache = hardwareCache.get(hardwareId);
+
+        if (fromCache.isPresent()) {
+            return fromCache;
+        }
+
+        LOGGER.trace("Cache miss! Get hardware");
+        final Optional<Hardware> fromDb = DbManagerRetriever.get().getHardware(hardwareId);
+        fromDb.ifPresent(hardware -> hardwareCache.add(hardwareId, hardware));
+        return fromDb;
+    }
+
+    //
 //    /**
 //     * Retrieves all {@link Hardware}.
 //     *
@@ -109,25 +119,26 @@ public class Storage implements StorageService {
 //     * @return a {@link Collection} of the retrieved {@link Hardware}
 //     * @see DbManager#getAllHardware()
 //     */
-//    @Cached(HardwareCache.class)
-//    public Collection<Hardware> getAllHardware() {
-//        final Collection<Hardware> fromCache = hardwareCache.getAll();
-//
-//        if (!fromCache.isEmpty()) {
-//            return fromCache;
-//        }
-//
-//        LOGGER.trace("Cache miss! Get all hardware");
-//        final Collection<Hardware> fromDb = DB_MANAGER.getAllHardware();
-//
-//        for (final Hardware hardware : fromDb) {
-//            hardwareCache.add(hardware.getId(), hardware);
-//        }
-//
-//        return fromDb;
-//    }
-//
-//    /**
+    @Override
+    @Cached(HardwareCache.class)
+    public Collection<Hardware> getAllHardware() {
+        final Collection<Hardware> fromCache = hardwareCache.getAll();
+
+        if (!fromCache.isEmpty()) {
+            return fromCache;
+        }
+
+        LOGGER.trace("Cache miss! Get all hardware");
+        final Collection<Hardware> fromDb = DbManagerRetriever.get().getAllHardware();
+
+        for (final Hardware hardware : fromDb) {
+            hardwareCache.add(hardware.getId(), hardware);
+        }
+
+        return fromDb;
+    }
+
+    //    /**
 //     * Updates a {@link Hardware}. Expects the {@link Hardware} to have a valid ID.
 //     *
 //     * <p>
@@ -140,21 +151,22 @@ public class Storage implements StorageService {
 //     * @return the updated {@link Hardware}
 //     * @see DbManager#updateHardware(Hardware)
 //     */
-//    @Cached({HardwareCache.class, UserCache.class})
-//    public Hardware updateHardware(final Hardware hardwareToUpdate) {
-//        final Hardware updatedHardware = DB_MANAGER.updateHardware(hardwareToUpdate);
-//        hardwareCache.add(updatedHardware.getId(), updatedHardware);
-//
+    @Override
+    @Cached({HardwareCache.class, UserCache.class})
+    public Hardware updateHardware(final Hardware hardwareToUpdate) {
+        final Hardware updatedHardware = DbManagerRetriever.get().updateHardware(hardwareToUpdate);
+        hardwareCache.add(updatedHardware.getId(), updatedHardware);
+
 //        getAllUsers()
 //            .stream()
 //            .filter(user -> user.getHardware().getId() == updatedHardware.getId())
 //            .map(user -> User.updateHardware(user, updatedHardware))
 //            .forEach(updatedUser -> userCache.add(updatedUser.getId(), updatedUser));
-//
-//        return updatedHardware;
-//    }
-//
-//    /**
+
+        return updatedHardware;
+    }
+
+    //    /**
 //     * Deletes a {@link Hardware}.
 //     *
 //     * <p>
@@ -163,11 +175,12 @@ public class Storage implements StorageService {
 //     * @param hardwareId the ID of the {@link Hardware} to delete
 //     * @see DbManager#deleteHardware(int)
 //     */
-//    @Cached(HardwareCache.class)
-//    public void deleteHardware(final int hardwareId) {
-//        DB_MANAGER.deleteHardware(hardwareId);
-//        hardwareCache.remove(hardwareId);
-//    }
+    @Override
+    @Cached(HardwareCache.class)
+    public void deleteHardware(final int hardwareId) {
+        DbManagerRetriever.get().deleteHardware(hardwareId);
+        hardwareCache.remove(hardwareId);
+    }
 //
 //    /**
 //     * Creates a {@link Team}.

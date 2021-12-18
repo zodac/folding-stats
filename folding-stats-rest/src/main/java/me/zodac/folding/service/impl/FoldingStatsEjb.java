@@ -24,8 +24,12 @@
 
 package me.zodac.folding.service.impl;
 
+import java.util.Collection;
+import java.util.Optional;
 import me.zodac.folding.api.UserAuthenticationResult;
+import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.service.FoldingStatsService;
+import me.zodac.folding.service.StorageService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +50,7 @@ public class FoldingStatsEjb implements FoldingStatsService {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Autowired
-    private Storage storage;
+    private StorageService storageService;
 //    private static final Storage STORAGE = Storage.getInstance();
 //    private static final FoldingStatsRetriever FOLDING_STATS_RETRIEVER = HttpFoldingStatsRetriever.create();
 
@@ -65,25 +69,26 @@ public class FoldingStatsEjb implements FoldingStatsService {
 //    @EJB
 //    private UserTeamChangeHandler userTeamChangeHandler;
 
-//    @Override
-//    public Hardware createHardware(final Hardware hardware) {
-//        return STORAGE.createHardware(hardware);
-//    }
-//
-//    @Override
-//    public Optional<Hardware> getHardware(final int hardwareId) {
-//        return STORAGE.getHardware(hardwareId);
-//    }
-//
-//    @Override
-//    public Collection<Hardware> getAllHardware() {
-//        return STORAGE.getAllHardware();
-//    }
-//
-//    @Override
-//    public Hardware updateHardware(final Hardware hardwareToUpdate, final Hardware existingHardware) {
-//        final Hardware updatedHardware = STORAGE.updateHardware(hardwareToUpdate);
-//
+    @Override
+    public Hardware createHardware(final Hardware hardware) {
+        return storageService.createHardware(hardware);
+    }
+
+
+    @Override
+    public Optional<Hardware> getHardware(final int hardwareId) {
+        return storageService.getHardware(hardwareId);
+    }
+
+    @Override
+    public Collection<Hardware> getAllHardware() {
+        return storageService.getAllHardware();
+    }
+
+    @Override
+    public Hardware updateHardware(final Hardware hardwareToUpdate, final Hardware existingHardware) {
+        final Hardware updatedHardware = storageService.updateHardware(hardwareToUpdate);
+
 //        if (userStateChangeHandler.isHardwareStateChange(updatedHardware, existingHardware)) {
 //            final Collection<User> usersUsingThisHardware = getUsersWithHardware(updatedHardware);
 //
@@ -92,10 +97,10 @@ public class FoldingStatsEjb implements FoldingStatsService {
 //                userStateChangeHandler.handleStateChange(userUsingHardware);
 //            }
 //        }
-//
-//        return updatedHardware;
-//    }
-//
+
+        return updatedHardware;
+    }
+
 //    private Collection<User> getUsersWithHardware(final Hardware hardware) {
 //        if (hardware.getId() == Hardware.EMPTY_HARDWARE_ID) {
 //            return Collections.emptyList();
@@ -106,11 +111,11 @@ public class FoldingStatsEjb implements FoldingStatsService {
 //            .filter(user -> user.getHardware().getId() == hardware.getId())
 //            .collect(toList());
 //    }
-//
-//    @Override
-//    public void deleteHardware(final Hardware hardware) {
-//        STORAGE.deleteHardware(hardware.getId());
-//    }
+
+    @Override
+    public void deleteHardware(final Hardware hardware) {
+        storageService.deleteHardware(hardware.getId());
+    }
 //
 //    @Override
 //    public Team createTeam(final Team team) {
@@ -268,7 +273,7 @@ public class FoldingStatsEjb implements FoldingStatsService {
 
     @Override
     public UserAuthenticationResult authenticateSystemUser(final String userName, final String password) {
-        final UserAuthenticationResult userAuthenticationResult = storage.authenticateSystemUser(userName, password);
+        final UserAuthenticationResult userAuthenticationResult = storageService.authenticateSystemUser(userName, password);
 //        final UserAuthenticationResult userAuthenticationResult = UserAuthenticationResult.success(Set.of("admin"));
 
         if (userAuthenticationResult.isUserExists() && userAuthenticationResult.isPasswordMatch()) {

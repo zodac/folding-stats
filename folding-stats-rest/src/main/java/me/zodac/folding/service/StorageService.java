@@ -24,8 +24,11 @@
 
 package me.zodac.folding.service;
 
+import java.util.Collection;
+import java.util.Optional;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.db.DbManager;
+import me.zodac.folding.api.tc.Hardware;
 import org.springframework.stereotype.Service;
 
 ///**
@@ -58,7 +61,7 @@ public interface StorageService {
 //    private final TcStatsCache tcStatsCache = TcStatsCache.getInstance();
 //    private final TotalStatsCache totalStatsCache = TotalStatsCache.getInstance();
 
-//    /**
+    //    /**
 //     * Creates a {@link Hardware}.
 //     *
 //     * <p>
@@ -69,8 +72,9 @@ public interface StorageService {
 //     * @see DbManager#createHardware(Hardware)
 //     */
 //    @Cached(HardwareCache.class)
-//    public Hardware createHardware(final Hardware hardware) {
-//        final Hardware hardwareWithId = DB_MANAGER.createHardware(hardware);
+    Hardware createHardware(final Hardware hardware);
+
+    //        final Hardware hardwareWithId = DB_MANAGER.createHardware(hardware);
 //        hardwareCache.add(hardwareWithId.getId(), hardwareWithId);
 //        return hardwareWithId;
 //    }
@@ -86,8 +90,9 @@ public interface StorageService {
 //     * @see DbManager#getHardware(int)
 //     */
 //    @Cached(HardwareCache.class)
-//    public Optional<Hardware> getHardware(final int hardwareId) {
-//        final Optional<Hardware> fromCache = hardwareCache.get(hardwareId);
+    Optional<Hardware> getHardware(final int hardwareId);
+
+    //        final Optional<Hardware> fromCache = hardwareCache.get(hardwareId);
 //
 //        if (fromCache.isPresent()) {
 //            return fromCache;
@@ -109,8 +114,9 @@ public interface StorageService {
 //     * @see DbManager#getAllHardware()
 //     */
 //    @Cached(HardwareCache.class)
-//    public Collection<Hardware> getAllHardware() {
-//        final Collection<Hardware> fromCache = hardwareCache.getAll();
+    Collection<Hardware> getAllHardware();
+
+    //        final Collection<Hardware> fromCache = hardwareCache.getAll();
 //
 //        if (!fromCache.isEmpty()) {
 //            return fromCache;
@@ -140,8 +146,9 @@ public interface StorageService {
 //     * @see DbManager#updateHardware(Hardware)
 //     */
 //    @Cached({HardwareCache.class, UserCache.class})
-//    public Hardware updateHardware(final Hardware hardwareToUpdate) {
-//        final Hardware updatedHardware = DB_MANAGER.updateHardware(hardwareToUpdate);
+    Hardware updateHardware(final Hardware hardwareToUpdate);
+
+    //        final Hardware updatedHardware = DB_MANAGER.updateHardware(hardwareToUpdate);
 //        hardwareCache.add(updatedHardware.getId(), updatedHardware);
 //
 //        getAllUsers()
@@ -163,7 +170,7 @@ public interface StorageService {
 //     * @see DbManager#deleteHardware(int)
 //     */
 //    @Cached(HardwareCache.class)
-//    public void deleteHardware(final int hardwareId) {
+    void deleteHardware(final int hardwareId);
 //        DB_MANAGER.deleteHardware(hardwareId);
 //        hardwareCache.remove(hardwareId);
 //    }

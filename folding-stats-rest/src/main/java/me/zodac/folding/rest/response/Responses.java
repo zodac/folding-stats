@@ -24,12 +24,18 @@
 
 package me.zodac.folding.rest.response;
 
+import java.util.Collection;
+import java.util.concurrent.TimeUnit;
+import org.springframework.http.CacheControl;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 /**
  * Utility class to simplify returning a {@link ResponseEntity} in the REST layer.
  */
+// TODO: [zodac] Some of these can be replaced by ResponseEntity functions
 public final class Responses {
 
     private Responses() {
@@ -46,164 +52,135 @@ public final class Responses {
      * @return the <b>200_OK</b> {@link ResponseEntity}
      */
     public static <E> ResponseEntity<E> ok() {
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .build();
     }
 
-//    /**
-//     * A <b>200_OK</b> {@link Response}.
-//     *
-//     * <p>
-//     * Generally used for cases where an HTTP request is sent to retrieve a {@link Collection} of {@link me.zodac.folding.api.ResponsePojo} resources.
-//     *
-//     * @param entities the {@link Collection} of entities being retrieved
-//     * @return the <b>200_OK</b> {@link Response}
-//     * @see #okBuilder(Collection)
-//     */
-//    public static Response ok(final Collection<?> entities) {
-//        return okBuilder(entities)
-//            .build();
-//    }
-//
-//    /**
-//     * A <b>200_OK</b> {@link Response}.
-//     *
-//     * <p>
-//     * Generally used for cases where an HTTP request is sent to retrieve a single {@link me.zodac.folding.api.ResponsePojo} resource, or also
-//     * if a batch of resources is being created (since there are partial failure scenarios, we cannot return a <b>201_CREATED</b>).
-//     *
-//     * @param entity the {@link Object} being retrieved
-//     * @return the <b>200_OK</b> {@link Response}
-//     * @see #okBuilder(Object)
-//     */
-//    public static Response ok(final Object entity) {
-//        return okBuilder(entity)
-//            .build();
-//    }
-//
-//    /**
-//     * A <b>200_OK</b> {@link Response}.
-//     *
-//     * <p>
-//     * Generally used for cases where an HTTP request is sent to update a single {@link me.zodac.folding.api.ResponsePojo} resource.
-//     *
-//     * @param entity                the updated resource
-//     * @param entityLocationBuilder the {@link UriBuilder} defining the {@link java.net.URI} of the updated resource, to
-//     *                              be populated in the <b>location</b> header in the {@link Response}
-//     * @return the <b>200_OK</b> {@link Response}
-//     */
-//    public static Response ok(final Object entity, final UriBuilder entityLocationBuilder) {
-//        return Response
-//            .ok(entityLocationBuilder.build())
-//            .entity(GSON.toJson(entity))
-//            .build();
-//    }
-//
-//    /**
-//     * A cached <b>200_OK</b> {@link Response}.
-//     *
-//     * <p>
-//     * Similar to {@link #ok(Object)}, but we check for an entity tag by hashing the entity and performing
-//     * {@link Request#evaluatePreconditions(EntityTag)} on the value. If the new entity tag matches the old one, we simply sent a
-//     * <b>304_NOT_MODIFIED</b> {@link Response}. Otherwise, we send the <b>200_OK</b> {@link Response} with the new content.
-//     *
-//     * @param entity                  the {@link Object} being retrieved
-//     * @param request                 the {@link Request} to validate the entity tag against
-//     * @param expirationTimeInSeconds the cache expiration time for the {@link Response}
-//     * @return the <b>200_OK</b> or <b>304_NOT_MODIFIED</b> {@link Response}
-//     */
-//    public static Response cachedOk(final Object entity, final Request request, final int expirationTimeInSeconds) {
-//        final CacheControl cacheControl = new CacheControl();
-//        cacheControl.setMaxAge(expirationTimeInSeconds);
-//
-//        final EntityTag entityTag = new EntityTag(String.valueOf(entity.hashCode()));
-//        Response.ResponseBuilder builder = request.evaluatePreconditions(entityTag);
-//
-//        if (builder == null) {
-//            builder = okBuilder(entity);
-//            builder.tag(entityTag);
-//        }
-//
-//        builder.cacheControl(cacheControl);
-//        return builder.build();
-//    }
-//
-//    /**
-//     * A cached <b>200_OK</b> {@link Response}.
-//     *
-//     * <p>
-//     * Similar to {@link #ok(Collection)}, but we check for an entity tag by hashing the entities and performing
-//     * {@link Request#evaluatePreconditions(EntityTag)} on the value. If the new entity tag matches the old one, we simply sent a
-//     * <b>304_NOT_MODIFIED</b> {@link Response}. Otherwise, we send the <b>200_OK</b> {@link Response} with the new content.
-//     *
-//     * @param entities                the {@link Collection} of entities being retrieved
-//     * @param request                 the {@link Request} to validate the entity tag against
-//     * @param expirationTimeInSeconds the cache expiration time for the {@link Response}
-//     * @return the <b>200_OK</b> or <b>304_NOT_MODIFIED</b> {@link Response}
-//     */
-//    public static Response cachedOk(final Collection<?> entities, final Request request, final int expirationTimeInSeconds) {
-//        final CacheControl cacheControl = new CacheControl();
-//        cacheControl.setMaxAge(expirationTimeInSeconds);
-//
-//        final EntityTag entityTag = new EntityTag(String.valueOf(entities.stream().mapToInt(Object::hashCode).sum()));
-//        Response.ResponseBuilder builder = request.evaluatePreconditions(entityTag);
-//
-//        if (builder == null) {
-//            builder = okBuilder(entities);
-//            builder.tag(entityTag);
-//        }
-//
-//        builder.cacheControl(cacheControl);
-//        return builder.build();
-//    }
-//
-//    private static Response.ResponseBuilder okBuilder(final Collection<?> entities) {
-//        return Response
-//            .ok()
-//            .header("X-Total-Count", entities.size())
-//            .entity(GSON.toJson(entities));
-//    }
-//
-//    private static Response.ResponseBuilder okBuilder(final Object entity) {
-//        return Response
-//            .ok()
-//            .entity(GSON.toJson(entity));
-//    }
-//
-//    /**
-//     * A <b>201_CREATED</b> {@link Response}.
-//     *
-//     * <p>
-//     * Used for cases where a <b>POST</b> request with a supplied payload has created a resource.
-//     *
-//     * @param entity                the created resource
-//     * @param entityLocationBuilder the {@link UriBuilder} defining the {@link java.net.URI} of the created resource, to
-//     *                              be populated in the <b>location</b> header in the {@link Response}
-//     * @return the <b>201_CREATED</b> {@link Response}
-//     */
-//    public static Response created(final Object entity, final UriBuilder entityLocationBuilder) {
-//        return Response
-//            .created(entityLocationBuilder.build())
-//            .entity(GSON.toJson(entity))
-//            .build();
-//    }
-//
-//    /**
-//     * A <b>400_BAD_REQUEST</b> {@link Response}.
-//     *
-//     * <p>
-//     * Generally used for cases where the REST request has some invalid data. This can be malformed data, or an
-//     * invalid payload, or any other similar error.
-//     *
-//     * @param errorMessage an error message defining what part of the input payload caused the error
-//     * @return the <b>400_BAD_REQUEST</b> {@link Response}
-//     */
-//    public static Response badRequest(final String errorMessage) {
-//        return Response
-//            .status(Response.Status.BAD_REQUEST)
-//            .entity(GSON.toJson(ErrorResponse.create(errorMessage), ErrorResponse.class))
-//            .build();
-//    }
-//
+    /**
+     * A <b>200_OK</b> {@link ResponseEntity}.
+     *
+     * <p>
+     * Generally used for cases where an HTTP request is sent to request something from the system, but no response is
+     * required, such as a delete request, for example.
+     *
+     * @param entity the entity being retrieved
+     * @return the <b>200_OK</b> {@link ResponseEntity}
+     */
+    public static <E> ResponseEntity<E> ok(final E entity) {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(entity);
+    }
+
+    /**
+     * A <b>200_OK</b> {@link ResponseEntity}.
+     *
+     * <p>
+     * Generally used for cases where an HTTP request is sent to request something from the system, but no response is
+     * required, such as a delete request, for example.
+     *
+     * @param entity               the entity being retrieved
+     * @param cachePeriodInSeconds the cache period for the entity in seconds
+     * @return the <b>200_OK</b> {@link ResponseEntity}
+     */
+    public static <E> ResponseEntity<E> cachedOk(final E entity, final long cachePeriodInSeconds) {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .cacheControl(CacheControl.maxAge(cachePeriodInSeconds, TimeUnit.SECONDS))
+            .body(entity);
+    }
+
+    /**
+     * A <b>200_OK</b> {@link ResponseEntity}.
+     *
+     * <p>
+     * Generally used for cases where an HTTP request is sent to retrieve a {@link Collection} of {@link me.zodac.folding.api.ResponsePojo} resources.
+     *
+     * @param entities the {@link Collection} of entities being retrieved
+     * @return the <b>200_OK</b> {@link ResponseEntity}
+     */
+    public static <E> ResponseEntity<Collection<E>> ok(final Collection<E> entities) {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .header("X-Total-Count", String.valueOf(entities.size()))
+            .body(entities);
+    }
+
+    /**
+     * A <b>200_OK</b> {@link ResponseEntity}.
+     *
+     * <p>
+     * Generally used for cases where an HTTP request is sent to retrieve a {@link Collection} of {@link me.zodac.folding.api.ResponsePojo} resources.
+     *
+     * @param entities             the {@link Collection} of entities being retrieved
+     * @param cachePeriodInSeconds the cache period for the entity in seconds
+     * @return the <b>200_OK</b> {@link ResponseEntity}
+     */
+    public static <E> ResponseEntity<Collection<E>> cachedOk(final Collection<E> entities, final long cachePeriodInSeconds) {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .header("X-Total-Count", String.valueOf(entities.size()))
+            .cacheControl(CacheControl.maxAge(cachePeriodInSeconds, TimeUnit.SECONDS))
+            .body(entities);
+    }
+
+    /**
+     * A <b>200_OK</b> {@link ResponseEntity}.
+     *
+     * <p>
+     * Generally used for cases where an HTTP request is sent to update a single {@link me.zodac.folding.api.ResponsePojo} resource.
+     *
+     * @param entity   the updated resource
+     * @param entityId the ID of the updated resource
+     * @return the <b>200_OK</b> {@link ResponseEntity}
+     */
+    public static <E> ResponseEntity<E> ok(final E entity, final int entityId) {
+        return responseWithLocation(entity, entityId, HttpStatus.OK);
+    }
+
+    /**
+     * A <b>201_CREATED</b> {@link ResponseEntity}.
+     *
+     * <p>
+     * Used for cases where a <b>POST</b> request with a supplied payload has created a resource.
+     *
+     * @param entity   the created resource
+     * @param entityId the ID of the created resource
+     * @return the <b>201_CREATED</b> {@link ResponseEntity}
+     */
+    public static <E> ResponseEntity<E> created(final E entity, final int entityId) {
+        return responseWithLocation(entity, entityId, HttpStatus.CREATED);
+    }
+
+    private static <E> ResponseEntity<E> responseWithLocation(final E entity, final int entityId, final HttpStatus httpStatus) {
+        final String location = ServletUriComponentsBuilder
+            .fromCurrentRequest()
+            .path("/{id}")
+            .buildAndExpand(entityId)
+            .toUriString();
+
+        return ResponseEntity
+            .status(httpStatus)
+            .header(HttpHeaders.LOCATION, location)
+            .body(entity);
+    }
+
+    /**
+     * A <b>400_BAD_REQUEST</b> {@link ResponseEntity}.
+     *
+     * <p>
+     * Generally used for cases where the REST request has some invalid data. This can be malformed data, or an
+     * invalid payload, or any other similar error.
+     *
+     * @param errorMessage an error message defining what part of the input payload caused the error
+     * @return the <b>400_BAD_REQUEST</b> {@link ResponseEntity}
+     */
+    public static ResponseEntity<ErrorResponse> badRequest(final String errorMessage) {
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(ErrorResponse.create(errorMessage));
+    }
 
     /**
      * A <b>400_BAD_REQUEST</b> {@link ResponseEntity}.
@@ -216,24 +193,24 @@ public final class Responses {
      * @return the <b>400_BAD_REQUEST</b> {@link ResponseEntity}
      */
     public static <E> ResponseEntity<E> badRequest(final E entity) {
-        return new ResponseEntity<>(entity, HttpStatus.BAD_REQUEST);
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(entity);
     }
-//
-//    /**
-//     * A <b>400_BAD_REQUEST</b> {@link Response}.
-//     *
-//     * <p>
-//     * Used for cases where the REST request has an empty or null payload.
-//     *
-//     * @return the <b>400_BAD_REQUEST</b> {@link Response}
-//     */
-//    public static Response nullRequest() {
-//        return Response
-//            .status(Response.Status.BAD_REQUEST)
-//            .entity(GSON.toJson(ErrorResponse.create("Payload is null"), ErrorResponse.class))
-//            .build();
-//    }
-//
+
+    /**
+     * A <b>400_BAD_REQUEST</b> {@link ResponseEntity}.
+     *
+     * <p>
+     * Used for cases where the REST request has an empty or null payload.
+     *
+     * @return the <b>400_BAD_REQUEST</b> {@link ResponseEntity}
+     */
+    public static ResponseEntity<ErrorResponse> nullRequest() {
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(ErrorResponse.create("Payload is null"));
+    }
 
     /**
      * A <b>401_UNAUTHORIZED</b> {@link ResponseEntity}.
@@ -245,7 +222,10 @@ public final class Responses {
      * @return the <b>401_UNAUTHORIZED</b> {@link ResponseEntity}
      */
     public static <E> ResponseEntity<E> unauthorized() {
-        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        return ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED)
+            .build();
+
     }
 
     /**
@@ -258,44 +238,44 @@ public final class Responses {
      * @return the <b>403_FORBIDDEN</b> {@link ResponseEntity}
      */
     public static <E> ResponseEntity<E> forbidden() {
-        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        return ResponseEntity
+            .status(HttpStatus.FORBIDDEN)
+            .build();
     }
-//
-//    /**
-//     * A <b>404_NOT_FOUND</b> {@link Response}.
-//     *
-//     * <p>
-//     * Generally used for cases when an ID is supplied in a REST request, but no resource exists matching that ID..
-//     *
-//     * @return the <b>404_NOT_FOUND</b> {@link Response}
-//     */
-//    public static Response notFound() {
-//        return Response
-//            .status(Response.Status.NOT_FOUND)
-//            .build();
-//    }
-//
-//    /**
-//     * A <b>409_CONFLICT</b> {@link Response}.
-//     *
-//     * <p>
-//     * Generally used for cases where the REST request is trying to do one of the following:
-//     * <ul>
-//     *     <li>Create a resource that already exists</li>
-//     *     <li>Update a resource with a value that conflicts with another resource</li>
-//     *     <li>Delete a resource that is being used by another resource</li>
-//     * </ul>
-//     *
-//     * @param entity the entity in the payload that caused the error
-//     * @return the <b>409_CONFLICT</b> {@link Response}
-//     */
-//    public static Response conflict(final Object entity) {
-//        return Response
-//            .status(Response.Status.CONFLICT)
-//            .entity(GSON.toJson(entity))
-//            .build();
-//    }
-//
+
+    /**
+     * A <b>404_NOT_FOUND</b> {@link ResponseEntity}.
+     *
+     * <p>
+     * Generally used for cases when an ID is supplied in a REST request, but no resource exists matching that ID..
+     *
+     * @return the <b>404_NOT_FOUND</b> {@link ResponseEntity}
+     */
+    public static <E> ResponseEntity<E> notFound() {
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .build();
+    }
+
+    /**
+     * A <b>409_CONFLICT</b> {@link ResponseEntity}.
+     *
+     * <p>
+     * Generally used for cases where the REST request is trying to do one of the following:
+     * <ul>
+     *     <li>Create a resource that already exists</li>
+     *     <li>Update a resource with a value that conflicts with another resource</li>
+     *     <li>Delete a resource that is being used by another resource</li>
+     * </ul>
+     *
+     * @param entity the entity in the payload that caused the error
+     * @return the <b>409_CONFLICT</b> {@link ResponseEntity}
+     */
+    public static <E> ResponseEntity<E> conflict(final E entity) {
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(entity);
+    }
 
     /**
      * A <b>500_INTERNAL_SERVER_ERROR</b> {@link ResponseEntity}.
@@ -306,21 +286,23 @@ public final class Responses {
      * @return the <b>500_INTERNAL_SERVER_ERROR</b> {@link ResponseEntity}
      */
     public static <E> ResponseEntity<E> serverError() {
-        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        return ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .build();
     }
 
-//    /**
-//     * A <b>503_SERVICE_UNAVAILABLE</b> {@link Response}.
-//     *
-//     * <p>
-//     * Generally used for cases where either this service is unavailable due to the {@link me.zodac.folding.api.state.SystemState},
-//     * or if an external service (such as the Folding@Home API) is unavailable.
-//     *
-//     * @return the <b>503_SERVICE_UNAVAILABLE</b> {@link Response}
-//     */
-//    public static Response serviceUnavailable() {
-//        return Response
-//            .status(Response.Status.SERVICE_UNAVAILABLE)
-//            .build();
-//    }
+    /**
+     * A <b>503_SERVICE_UNAVAILABLE</b> {@link ResponseEntity}.
+     *
+     * <p>
+     * Generally used for cases where either this service is unavailable due to the {@link me.zodac.folding.api.state.SystemState},
+     * or if an external service (such as the Folding@Home API) is unavailable.
+     *
+     * @return the <b>503_SERVICE_UNAVAILABLE</b> {@link ResponseEntity}
+     */
+    public static <E> ResponseEntity<E> serviceUnavailable() {
+        return ResponseEntity
+            .status(HttpStatus.SERVICE_UNAVAILABLE)
+            .build();
+    }
 }

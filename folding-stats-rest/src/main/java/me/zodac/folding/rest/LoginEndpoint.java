@@ -61,7 +61,7 @@ public class LoginEndpoint {
     private FoldingStatsService foldingStatsService;
 
     /**
-     * <b>POST</b> request to log in as an admin system user.
+     * {@link PostMapping} request to log in as an admin system user.
      *
      * <p>
      * The {@link ResponseEntity} will be one of:
