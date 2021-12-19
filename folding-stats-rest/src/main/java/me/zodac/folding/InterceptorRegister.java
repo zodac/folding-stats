@@ -26,6 +26,7 @@ package me.zodac.folding;
 
 import me.zodac.folding.rest.api.FoldingStatsService;
 import me.zodac.folding.rest.provider.interceptor.SecurityInterceptor;
+import me.zodac.folding.rest.provider.interceptor.StateInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -49,11 +50,9 @@ public class InterceptorRegister implements WebMvcConfigurer {
             .addPathPatterns("/**")
             .excludePathPatterns("/error");
 
-        // TODO: [zodac] Initialisation not implemented so state is never updated for system startup
-        //  Uncomment this when that is finished
-//        registry
-//            .addInterceptor(StateInterceptor.create())
-//            .addPathPatterns("/**")
-//            .excludePathPatterns("/error");
+        registry
+            .addInterceptor(StateInterceptor.create())
+            .addPathPatterns("/**")
+            .excludePathPatterns("/error");
     }
 }

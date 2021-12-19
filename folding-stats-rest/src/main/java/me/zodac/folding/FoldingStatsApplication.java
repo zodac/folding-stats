@@ -24,9 +24,21 @@
 
 package me.zodac.folding;
 
+import java.util.Collection;
+import me.zodac.folding.api.state.SystemState;
+import me.zodac.folding.api.tc.User;
+import me.zodac.folding.rest.api.FoldingStatsService;
+import me.zodac.folding.state.SystemStateManager;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * Base {@link FoldingStatsApplication}.
@@ -39,8 +51,14 @@ import org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration;
  * <p>
  * The {@code jooq} transitive dependency {@link R2dbcAutoConfiguration} must also be disabled.
  */
+@EnableScheduling
 @SpringBootApplication(exclude = {R2dbcAutoConfiguration.class})
-public class FoldingStatsApplication { // NOPMD - SpringBootApplication must be non-final and have a public constructor
+public class FoldingStatsApplication {
+
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    @Autowired
+    private FoldingStatsService foldingStatsService;
 
     /**
      * Main entry point to our Spring application.
@@ -49,5 +67,39 @@ public class FoldingStatsApplication { // NOPMD - SpringBootApplication must be 
      */
     public static void main(final String[] args) {
         SpringApplication.run(FoldingStatsApplication.class, args);
+    }
+
+    @Bean
+    public CommandLineRunner initialisation(final ApplicationContext ctx) {
+        return args -> {
+            initCaches();
+            initTcStats();
+
+            SystemStateManager.next(SystemState.AVAILABLE);
+            LOGGER.info("System ready for requests");
+        };
+    }
+
+    private void initCaches() {
+        foldingStatsService.getAllHardware();
+        foldingStatsService.getAllTeams();
+        final Collection<User> users = foldingStatsService.getAllUsersWithoutPasskeys();
+
+        for (final User user : users) {
+//            final OffsetTcStats offsetTcStatsForUser = foldingStatsService.getOffsetStats(user);
+//            LOGGER.debug("Found offset stats for user {}: {}", user, offsetTcStatsForUser);
+//
+//            final UserStats initialStatsForUser = foldingStatsService.getInitialStats(user);
+//            LOGGER.debug("Found initial stats for user {}: {}", user, initialStatsForUser);
+        }
+
+        LOGGER.debug("Initialised stats caches");
+    }
+
+    private void initTcStats() {
+//        if (!foldingStatsService.isAnyHourlyTcStatsExist()) {
+//            LOGGER.warn("No TC stats data exists in the DB");
+//            statsScheduler.manualTeamCompetitionStatsParsing(ProcessingType.ASYNCHRONOUS);
+//        }
     }
 }

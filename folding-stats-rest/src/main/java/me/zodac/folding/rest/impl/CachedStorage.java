@@ -24,21 +24,33 @@
 
 package me.zodac.folding.rest.impl;
 
+import java.time.Month;
+import java.time.Year;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.result.MonthlyResult;
+import me.zodac.folding.api.tc.stats.OffsetTcStats;
+import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
+import me.zodac.folding.api.tc.stats.UserStats;
+import me.zodac.folding.api.tc.stats.UserTcStats;
+import me.zodac.folding.cache.CompetitionSummaryCache;
 import me.zodac.folding.cache.HardwareCache;
 import me.zodac.folding.cache.InitialStatsCache;
 import me.zodac.folding.cache.OffsetTcStatsCache;
+import me.zodac.folding.cache.RetiredTcStatsCache;
 import me.zodac.folding.cache.TcStatsCache;
 import me.zodac.folding.cache.TeamCache;
 import me.zodac.folding.cache.TotalStatsCache;
 import me.zodac.folding.cache.UserCache;
 import me.zodac.folding.db.DbManagerRetriever;
 import me.zodac.folding.rest.api.StorageService;
+import me.zodac.folding.rest.api.tc.CompetitionSummary;
+import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
@@ -66,10 +78,10 @@ public class CachedStorage implements StorageService {
     private final UserCache userCache = UserCache.getInstance();
 
     // Stats caches
-//    private final CompetitionSummaryCache competitionSummaryCache = CompetitionSummaryCache.getInstance();
+    private final CompetitionSummaryCache competitionSummaryCache = CompetitionSummaryCache.getInstance();
     private final InitialStatsCache initialStatsCache = InitialStatsCache.getInstance();
     private final OffsetTcStatsCache offsetTcStatsCache = OffsetTcStatsCache.getInstance();
-    //    private final RetiredTcStatsCache retiredTcStatsCache = RetiredTcStatsCache.getInstance();
+    private final RetiredTcStatsCache retiredTcStatsCache = RetiredTcStatsCache.getInstance();
     private final TcStatsCache tcStatsCache = TcStatsCache.getInstance();
     private final TotalStatsCache totalStatsCache = TotalStatsCache.getInstance();
 
@@ -428,8 +440,8 @@ public class CachedStorage implements StorageService {
         initialStatsCache.remove(userId);
         tcStatsCache.remove(userId);
     }
-//
-//    /**
+
+    //    /**
 //     * Creates a {@link MonthlyResult} for the <code>Team Competition</code>.
 //     *
 //     * <p>
@@ -438,12 +450,13 @@ public class CachedStorage implements StorageService {
 //     * @param monthlyResult a {@link MonthlyResult} for the <code>Team Competition</code>
 //     * @return the <code>Team Competition</code> {@link MonthlyResult}
 //     */
-//    @NotCached
-//    public MonthlyResult createMonthlyResult(final MonthlyResult monthlyResult) {
-//        return DB_MANAGER.createMonthlyResult(monthlyResult);
-//    }
-//
-//    /**
+    @Override
+    @NotCached
+    public MonthlyResult createMonthlyResult(final MonthlyResult monthlyResult) {
+        return DbManagerRetriever.get().createMonthlyResult(monthlyResult);
+    }
+
+    //    /**
 //     * Retrieves the {@link MonthlyResult} of the <code>Team Competition</code> for the given {@link Month} and {@link Year}.
 //     *
 //     * <p>
@@ -453,12 +466,13 @@ public class CachedStorage implements StorageService {
 //     * @param year  the {@link Year} of the {@link MonthlyResult} to be retrieved
 //     * @return an {@link Optional} of the <code>Team Competition</code> {@link MonthlyResult}
 //     */
-//    @NotCached
-//    public Optional<MonthlyResult> getMonthlyResult(final Month month, final Year year) {
-//        return DB_MANAGER.getMonthlyResult(month, year);
-//    }
-//
-//    /**
+    @Override
+    @NotCached
+    public Optional<MonthlyResult> getMonthlyResult(final Month month, final Year year) {
+        return DbManagerRetriever.get().getMonthlyResult(month, year);
+    }
+
+    //    /**
 //     * Creates a {@link RetiredUserTcStats} for a {@link User} that has been deleted from a {@link Team}.
 //     *
 //     * <p>
@@ -467,14 +481,15 @@ public class CachedStorage implements StorageService {
 //     * @param retiredUserTcStats the {@link RetiredUserTcStats} for the deleted {@link User}
 //     * @return the {@link RetiredUserTcStats}
 //     */
-//    @Cached(RetiredTcStatsCache.class)
-//    public RetiredUserTcStats createRetiredUserStats(final RetiredUserTcStats retiredUserTcStats) {
-//        final RetiredUserTcStats createdRetiredUserTcStats = DB_MANAGER.createRetiredUserStats(retiredUserTcStats);
-//        retiredTcStatsCache.add(createdRetiredUserTcStats.getRetiredUserId(), createdRetiredUserTcStats);
-//        return createdRetiredUserTcStats;
-//    }
-//
-//    /**
+    @Override
+    @Cached(RetiredTcStatsCache.class)
+    public RetiredUserTcStats createRetiredUserStats(final RetiredUserTcStats retiredUserTcStats) {
+        final RetiredUserTcStats createdRetiredUserTcStats = DbManagerRetriever.get().createRetiredUserStats(retiredUserTcStats);
+        retiredTcStatsCache.add(createdRetiredUserTcStats.getRetiredUserId(), createdRetiredUserTcStats);
+        return createdRetiredUserTcStats;
+    }
+
+    //    /**
 //     * Retrieves all {@link RetiredUserTcStats}.
 //     *
 //     * <p>
@@ -483,43 +498,45 @@ public class CachedStorage implements StorageService {
 //     * @return a {@link Collection} of the retrieved {@link RetiredUserTcStats}
 //     * @see DbManager#getAllRetiredUserStats()
 //     */
-//    @Cached(RetiredTcStatsCache.class)
-//    public Collection<RetiredUserTcStats> getAllRetiredUsers() {
-//        final Collection<RetiredUserTcStats> fromCache = retiredTcStatsCache.getAll();
-//
-//        if (!fromCache.isEmpty()) {
-//            return fromCache;
-//        }
-//
-//        LOGGER.trace("Cache miss! Get all retired users");
-//        final Collection<RetiredUserTcStats> fromDb = DB_MANAGER.getAllRetiredUserStats();
-//
-//        for (final RetiredUserTcStats retiredUserTcStats : fromDb) {
-//            retiredTcStatsCache.add(retiredUserTcStats.getRetiredUserId(), retiredUserTcStats);
-//        }
-//
-//        return fromDb;
-//    }
-//
-//    /**
-//     * Deletes all {@link RetiredUserTcStats} for all {@link Team}s.
-//     *
-//     * <p>
-//     * Also evicts the {@link RetiredTcStatsCache}.
-//     */
-//    @Cached(RetiredTcStatsCache.class)
-//    public void deleteAllRetiredUserTcStats() {
-//        DB_MANAGER.deleteAllRetiredUserStats();
-//        retiredTcStatsCache.removeAll();
-//    }
+    @Override
+    @Cached(RetiredTcStatsCache.class)
+    public Collection<RetiredUserTcStats> getAllRetiredUsers() {
+        final Collection<RetiredUserTcStats> fromCache = retiredTcStatsCache.getAll();
+
+        if (!fromCache.isEmpty()) {
+            return fromCache;
+        }
+
+        LOGGER.trace("Cache miss! Get all retired users");
+        final Collection<RetiredUserTcStats> fromDb = DbManagerRetriever.get().getAllRetiredUserStats();
+
+        for (final RetiredUserTcStats retiredUserTcStats : fromDb) {
+            retiredTcStatsCache.add(retiredUserTcStats.getRetiredUserId(), retiredUserTcStats);
+        }
+
+        return fromDb;
+    }
+
+    /**
+     * Deletes all {@link RetiredUserTcStats} for all {@link Team}s.
+     *
+     * <p>
+     * Also evicts the {@link RetiredTcStatsCache}.
+     */
+    @Override
+    @Cached(RetiredTcStatsCache.class)
+    public void deleteAllRetiredUserTcStats() {
+        DbManagerRetriever.get().deleteAllRetiredUserStats();
+        retiredTcStatsCache.removeAll();
+    }
 
     @Override
     @NotCached
     public UserAuthenticationResult authenticateSystemUser(final String userName, final String password) {
         return DbManagerRetriever.get().authenticateSystemUser(userName, password);
     }
-//
-//    /**
+
+    //    /**
 //     * Retrieves the {@link HistoricStats} for a given {@link User} ID for a specific {@code day}, {@link Month} or {@link Year}.
 //     *
 //     * <p>
@@ -543,24 +560,25 @@ public class CachedStorage implements StorageService {
 //     * @see DbManager#getHistoricStatsDaily(int, Year, Month)
 //     * @see DbManager#getHistoricStatsMonthly(int, Year)
 //     */
-//    @NotCached
-//    public Collection<HistoricStats> getHistoricStats(final int userId, final Year year, final Month month, final int day) {
-//        if (year == null) {
-//            return Collections.emptyList();
-//        }
-//
-//        if (month == null) {
-//            return DB_MANAGER.getHistoricStatsMonthly(userId, year);
-//        }
-//
-//        if (day == 0) {
-//            return DB_MANAGER.getHistoricStatsDaily(userId, year, month);
-//        }
-//
-//        return DB_MANAGER.getHistoricStatsHourly(userId, year, month, day);
-//    }
-//
-//    /**
+    @Override
+    @NotCached
+    public Collection<HistoricStats> getHistoricStats(final int userId, final Year year, final Month month, final int day) {
+        if (year == null) {
+            return Collections.emptyList();
+        }
+
+        if (month == null) {
+            return DbManagerRetriever.get().getHistoricStatsMonthly(userId, year);
+        }
+
+        if (day == 0) {
+            return DbManagerRetriever.get().getHistoricStatsDaily(userId, year, month);
+        }
+
+        return DbManagerRetriever.get().getHistoricStatsHourly(userId, year, month, day);
+    }
+
+    //    /**
 //     * Creates a {@link UserStats} for the total overall stats for a {@link User}.
 //     *
 //     * <p>
@@ -569,14 +587,15 @@ public class CachedStorage implements StorageService {
 //     * @param userStats the {@link UserStats} to be created
 //     * @return the created {@link UserStats}
 //     */
-//    @Cached(TotalStatsCache.class)
-//    public UserStats createTotalStats(final UserStats userStats) {
-//        final UserStats fromDb = DB_MANAGER.createTotalStats(userStats);
-//        totalStatsCache.add(fromDb.getUserId(), fromDb);
-//        return fromDb;
-//    }
-//
-//    /**
+    @Override
+    @Cached(TotalStatsCache.class)
+    public UserStats createTotalStats(final UserStats userStats) {
+        final UserStats fromDb = DbManagerRetriever.get().createTotalStats(userStats);
+        totalStatsCache.add(fromDb.getUserId(), fromDb);
+        return fromDb;
+    }
+
+    //    /**
 //     * Retrieves the {@link UserStats} for a {@link User} with the provided ID.
 //     *
 //     * <p>
@@ -586,21 +605,22 @@ public class CachedStorage implements StorageService {
 //     * @return an {@link Optional} of the retrieved {@link UserStats}
 //     * @see DbManager#getTotalStats(int)
 //     */
-//    @Cached(TotalStatsCache.class)
-//    public Optional<UserStats> getTotalStats(final int userId) {
-//        final Optional<UserStats> fromCache = totalStatsCache.get(userId);
-//
-//        if (fromCache.isPresent()) {
-//            return fromCache;
-//        }
-//
-//        LOGGER.trace("Cache miss! Total stats");
-//        final Optional<UserStats> fromDb = DB_MANAGER.getTotalStats(userId);
-//        fromDb.ifPresent(userStats -> totalStatsCache.add(userId, userStats));
-//        return fromDb;
-//    }
-//
-//    /**
+    @Override
+    @Cached(TotalStatsCache.class)
+    public Optional<UserStats> getTotalStats(final int userId) {
+        final Optional<UserStats> fromCache = totalStatsCache.get(userId);
+
+        if (fromCache.isPresent()) {
+            return fromCache;
+        }
+
+        LOGGER.trace("Cache miss! Total stats");
+        final Optional<UserStats> fromDb = DbManagerRetriever.get().getTotalStats(userId);
+        fromDb.ifPresent(userStats -> totalStatsCache.add(userId, userStats));
+        return fromDb;
+    }
+
+    //    /**
 //     * Creates an {@link OffsetTcStats}, defining the offset points/units for the provided {@link User}.
 //     *
 //     * <p>
@@ -614,14 +634,15 @@ public class CachedStorage implements StorageService {
 //     * @param offsetTcStats the {@link OffsetTcStats} to be created
 //     * @return the created/updated {@link OffsetTcStats}, or {@link OffsetTcStats#empty()}
 //     */
-//    @Cached(OffsetTcStatsCache.class)
-//    public OffsetTcStats createOrUpdateOffsetStats(final int userId, final OffsetTcStats offsetTcStats) {
-//        final OffsetTcStats fromDb = DB_MANAGER.createOrUpdateOffsetStats(userId, offsetTcStats);
-//        offsetTcStatsCache.add(userId, fromDb);
-//        return fromDb;
-//    }
-//
-//    /**
+    @Override
+    @Cached(OffsetTcStatsCache.class)
+    public OffsetTcStats createOrUpdateOffsetStats(final int userId, final OffsetTcStats offsetTcStats) {
+        final OffsetTcStats fromDb = DbManagerRetriever.get().createOrUpdateOffsetStats(userId, offsetTcStats);
+        offsetTcStatsCache.add(userId, fromDb);
+        return fromDb;
+    }
+
+    //    /**
 //     * Retrieves the {@link OffsetTcStats} for a {@link User} with the provided ID.
 //     *
 //     * <p>
@@ -631,47 +652,50 @@ public class CachedStorage implements StorageService {
 //     * @return an {@link Optional} of the retrieved {@link OffsetTcStats}
 //     * @see DbManager#getOffsetStats(int)
 //     */
-//    @Cached(OffsetTcStatsCache.class)
-//    public Optional<OffsetTcStats> getOffsetStats(final int userId) {
-//        final Optional<OffsetTcStats> fromCache = offsetTcStatsCache.get(userId);
-//
-//        if (fromCache.isPresent()) {
-//            return fromCache;
-//        }
-//
-//        LOGGER.trace("Cache miss! Offset stats");
-//        final Optional<OffsetTcStats> fromDb = DB_MANAGER.getOffsetStats(userId);
-//        fromDb.ifPresent(offsetTcStats -> offsetTcStatsCache.add(userId, offsetTcStats));
-//        return fromDb;
-//    }
-//
-//    /**
-//     * Deletes the {@link OffsetTcStats} for a {@link User} with the provided ID.
-//     *
-//     * <p>
-//     * Also evicts the {@link User} ID from the {@link OffsetTcStatsCache}.
-//     *
-//     * @param userId the ID of the {@link User} to whose {@link OffsetTcStats} are to be deleted
-//     */
-//    @Cached(OffsetTcStatsCache.class)
-//    public void deleteOffsetStats(final int userId) {
-//        DB_MANAGER.deleteOffsetStats(userId);
-//        offsetTcStatsCache.remove(userId);
-//    }
-//
-//    /**
-//     * Deletes the {@link OffsetTcStats} for all {@link User}s in the system.
-//     *
-//     * <p>
-//     * Also evicts the {@link OffsetTcStatsCache}.
-//     */
-//    @Cached(OffsetTcStatsCache.class)
-//    public void deleteAllOffsetTcStats() {
-//        DB_MANAGER.deleteAllOffsetStats();
-//        offsetTcStatsCache.removeAll();
-//    }
-//
-//    /**
+    @Override
+    @Cached(OffsetTcStatsCache.class)
+    public Optional<OffsetTcStats> getOffsetStats(final int userId) {
+        final Optional<OffsetTcStats> fromCache = offsetTcStatsCache.get(userId);
+
+        if (fromCache.isPresent()) {
+            return fromCache;
+        }
+
+        LOGGER.trace("Cache miss! Offset stats");
+        final Optional<OffsetTcStats> fromDb = DbManagerRetriever.get().getOffsetStats(userId);
+        fromDb.ifPresent(offsetTcStats -> offsetTcStatsCache.add(userId, offsetTcStats));
+        return fromDb;
+    }
+
+    /**
+     * Deletes the {@link OffsetTcStats} for a {@link User} with the provided ID.
+     *
+     * <p>
+     * Also evicts the {@link User} ID from the {@link OffsetTcStatsCache}.
+     *
+     * @param userId the ID of the {@link User} to whose {@link OffsetTcStats} are to be deleted
+     */
+    @Override
+    @Cached(OffsetTcStatsCache.class)
+    public void deleteOffsetStats(final int userId) {
+        DbManagerRetriever.get().deleteOffsetStats(userId);
+        offsetTcStatsCache.remove(userId);
+    }
+
+    /**
+     * Deletes the {@link OffsetTcStats} for all {@link User}s in the system.
+     *
+     * <p>
+     * Also evicts the {@link OffsetTcStatsCache}.
+     */
+    @Override
+    @Cached(OffsetTcStatsCache.class)
+    public void deleteAllOffsetTcStats() {
+        DbManagerRetriever.get().deleteAllOffsetStats();
+        offsetTcStatsCache.removeAll();
+    }
+
+    //    /**
 //     * Creates a {@link UserTcStats} for a {@link User}'s <code>Team Competition</code> stats for a specific hour.
 //     *
 //     * <p>
@@ -680,14 +704,15 @@ public class CachedStorage implements StorageService {
 //     * @param userTcStats the {@link UserTcStats} to be created
 //     * @return the created {@link UserTcStats}
 //     */
-//    @Cached(TcStatsCache.class)
-//    public UserTcStats createHourlyTcStats(final UserTcStats userTcStats) {
-//        final UserTcStats fromDb = DB_MANAGER.createHourlyTcStats(userTcStats);
-//        tcStatsCache.add(userTcStats.getUserId(), fromDb);
-//        return fromDb;
-//    }
-//
-//    /**
+    @Override
+    @Cached(TcStatsCache.class)
+    public UserTcStats createHourlyTcStats(final UserTcStats userTcStats) {
+        final UserTcStats fromDb = DbManagerRetriever.get().createHourlyTcStats(userTcStats);
+        tcStatsCache.add(userTcStats.getUserId(), fromDb);
+        return fromDb;
+    }
+
+    //    /**
 //     * Retrieves the latest {@link UserTcStats} for the provided {@link User}.
 //     *
 //     * <p>
@@ -696,21 +721,22 @@ public class CachedStorage implements StorageService {
 //     * @param userId the ID of the {@link User} whose {@link UserTcStats} are to be retrieved
 //     * @return an {@link Optional} of the retrieved {@link UserTcStats}
 //     */
-//    @Cached(TcStatsCache.class)
-//    public Optional<UserTcStats> getHourlyTcStats(final int userId) {
-//        final Optional<UserTcStats> fromCache = tcStatsCache.get(userId);
-//
-//        if (fromCache.isPresent()) {
-//            return fromCache;
-//        }
-//
-//        LOGGER.trace("Cache miss! Hourly TC stats");
-//        final Optional<UserTcStats> fromDb = DB_MANAGER.getHourlyTcStats(userId);
-//        fromDb.ifPresent(userTcStats -> tcStatsCache.add(userId, userTcStats));
-//        return fromDb;
-//    }
-//
-//    /**
+    @Override
+    @Cached(TcStatsCache.class)
+    public Optional<UserTcStats> getHourlyTcStats(final int userId) {
+        final Optional<UserTcStats> fromCache = tcStatsCache.get(userId);
+
+        if (fromCache.isPresent()) {
+            return fromCache;
+        }
+
+        LOGGER.trace("Cache miss! Hourly TC stats");
+        final Optional<UserTcStats> fromDb = DbManagerRetriever.get().getHourlyTcStats(userId);
+        fromDb.ifPresent(userTcStats -> tcStatsCache.add(userId, userTcStats));
+        return fromDb;
+    }
+
+    //    /**
 //     * Retrieves the first {@link UserTcStats} for any users in the system.
 //     *
 //     * <p>
@@ -718,12 +744,13 @@ public class CachedStorage implements StorageService {
 //     *
 //     * @return an {@link Optional} of the first {@link UserTcStats}
 //     */
-//    @NotCached
-//    public Optional<UserTcStats> getFirstHourlyTcStats() {
-//        return DB_MANAGER.getFirstHourlyTcStats();
-//    }
-//
-//    /**
+    @Override
+    @NotCached
+    public Optional<UserTcStats> getFirstHourlyTcStats() {
+        return DbManagerRetriever.get().getFirstHourlyTcStats();
+    }
+
+    //    /**
 //     * Creates a {@link UserStats} for the initial overall stats for the provided {@link User} at the start of the monitoring period.
 //     *
 //     * <p>
@@ -732,14 +759,15 @@ public class CachedStorage implements StorageService {
 //     * @param userStats the {@link UserStats} to be created
 //     * @return the created {@link UserStats}
 //     */
-//    @Cached(InitialStatsCache.class)
-//    public UserStats createInitialStats(final UserStats userStats) {
-//        final UserStats fromDb = DB_MANAGER.createInitialStats(userStats);
-//        initialStatsCache.add(fromDb.getUserId(), fromDb);
-//        return fromDb;
-//    }
-//
-//    /**
+    @Override
+    @Cached(InitialStatsCache.class)
+    public UserStats createInitialStats(final UserStats userStats) {
+        final UserStats fromDb = DbManagerRetriever.get().createInitialStats(userStats);
+        initialStatsCache.add(fromDb.getUserId(), fromDb);
+        return fromDb;
+    }
+
+    //    /**
 //     * Retrieves the initial {@link UserStats} for the provided {@link User} ID.
 //     *
 //     * <p>
@@ -748,86 +776,92 @@ public class CachedStorage implements StorageService {
 //     * @param userId the ID of the {@link User} whose {@link UserStats} are to be retrieved
 //     * @return an {@link Optional} of the retrieved {@link UserStats}
 //     */
-//    @Cached(InitialStatsCache.class)
-//    public Optional<UserStats> getInitialStats(final int userId) {
-//        final Optional<UserStats> fromCache = initialStatsCache.get(userId);
-//
-//        if (fromCache.isPresent()) {
-//            return fromCache;
-//        }
-//
-//        LOGGER.trace("Cache miss! Initial stats");
-//        final Optional<UserStats> fromDb = DB_MANAGER.getInitialStats(userId);
-//        fromDb.ifPresent(userStats -> initialStatsCache.add(userId, userStats));
-//        return fromDb;
-//    }
-//
-//    /**
-//     * Creates a {@link CompetitionSummary}.
-//     *
-//     * @param competitionSummary the {@link CompetitionSummary} to be created
-//     * @return the created {@link CompetitionSummary}
-//     */
-//    @Cached(CompetitionSummaryCache.class)
-//    public CompetitionSummary createCompetitionSummary(final CompetitionSummary competitionSummary) {
-//        this.competitionSummaryCache.add(COMPETITION_SUMMARY_ID, competitionSummary);
-//        return competitionSummary;
-//    }
-//
-//    /**
-//     * Creates the latest {@link CompetitionSummary}.
-//     *
-//     * @return an {@link Optional} of the latest {@link CompetitionSummary}
-//     */
-//    @Cached(CompetitionSummaryCache.class)
-//    public Optional<CompetitionSummary> getCompetitionSummary() {
-//        return competitionSummaryCache.get(COMPETITION_SUMMARY_ID);
-//    }
-//
-//    /**
-//     * Evicts all {@link User}s from the {@link TotalStatsCache}.
-//     */
-//    @Cached(TotalStatsCache.class)
-//    public void evictTcStatsCache() {
-//        tcStatsCache.removeAll();
-//    }
-//
-//    /**
-//     * Evicts all {@link User}s from the {@link InitialStatsCache}.
-//     */
-//    @Cached(InitialStatsCache.class)
-//    public void evictInitialStatsCache() {
-//        initialStatsCache.removeAll();
-//    }
-//
-//    /**
-//     * Prints the contents of caches to the system log.
-//     */
-//    @Cached({
-//        CompetitionSummaryCache.class,
-//        HardwareCache.class,
-//        InitialStatsCache.class,
-//        OffsetTcStatsCache.class,
-//        RetiredTcStatsCache.class,
-//        TcStatsCache.class,
-//        TeamCache.class,
-//        TotalStatsCache.class,
-//        UserCache.class
-//    })
-//    public void printCacheContents() {
-//        // POJOs
-//        LOGGER.info("HardwareCache: {}", hardwareCache.getCacheContents());
-//        LOGGER.info("TeamCache: {}", teamCache.getCacheContents());
-//        LOGGER.info("UserCache: {}", userCache.getCacheContents());
-//
-//        // Stats
-//        LOGGER.info("InitialStatsCache: {}", initialStatsCache.getCacheContents());
-//        LOGGER.info("OffsetStatsCache: {}", offsetTcStatsCache.getCacheContents());
-//        LOGGER.info("RetiredTcStatsCache: {}", retiredTcStatsCache.getCacheContents());
-//        LOGGER.info("TcStatsCache: {}", tcStatsCache.getCacheContents());
-//        LOGGER.info("TotalStatsCache: {}", totalStatsCache.getCacheContents());
-//
-//        // TC overall
-//        LOGGER.info("CompetitionSummaryCache: {}", competitionSummaryCache.getCacheContents());
-//    }
+    @Override
+    @Cached(InitialStatsCache.class)
+    public Optional<UserStats> getInitialStats(final int userId) {
+        final Optional<UserStats> fromCache = initialStatsCache.get(userId);
+
+        if (fromCache.isPresent()) {
+            return fromCache;
+        }
+
+        LOGGER.trace("Cache miss! Initial stats");
+        final Optional<UserStats> fromDb = DbManagerRetriever.get().getInitialStats(userId);
+        fromDb.ifPresent(userStats -> initialStatsCache.add(userId, userStats));
+        return fromDb;
+    }
+
+    /**
+     * Creates a {@link CompetitionSummary}.
+     *
+     * @param competitionSummary the {@link CompetitionSummary} to be created
+     * @return the created {@link CompetitionSummary}
+     */
+    @Override
+    @Cached(CompetitionSummaryCache.class)
+    public CompetitionSummary createCompetitionSummary(final CompetitionSummary competitionSummary) {
+        this.competitionSummaryCache.add(CompetitionSummaryCache.COMPETITION_SUMMARY_ID, competitionSummary);
+        return competitionSummary;
+    }
+
+    /**
+     * Creates the latest {@link CompetitionSummary}.
+     *
+     * @return an {@link Optional} of the latest {@link CompetitionSummary}
+     */
+    @Override
+    @Cached(CompetitionSummaryCache.class)
+    public Optional<CompetitionSummary> getCompetitionSummary() {
+        return competitionSummaryCache.get(CompetitionSummaryCache.COMPETITION_SUMMARY_ID);
+    }
+
+    /**
+     * Evicts all {@link User}s from the {@link TotalStatsCache}.
+     */
+    @Override
+    @Cached(TotalStatsCache.class)
+    public void evictTcStatsCache() {
+        tcStatsCache.removeAll();
+    }
+
+    /**
+     * Evicts all {@link User}s from the {@link InitialStatsCache}.
+     */
+    @Override
+    @Cached(InitialStatsCache.class)
+    public void evictInitialStatsCache() {
+        initialStatsCache.removeAll();
+    }
+
+    /**
+     * Prints the contents of caches to the system log.
+     */
+    @Override
+    @Cached({
+        CompetitionSummaryCache.class,
+        HardwareCache.class,
+        InitialStatsCache.class,
+        OffsetTcStatsCache.class,
+        RetiredTcStatsCache.class,
+        TcStatsCache.class,
+        TeamCache.class,
+        TotalStatsCache.class,
+        UserCache.class
+    })
+    public void printCacheContents() {
+        // POJOs
+        LOGGER.info("HardwareCache: {}", hardwareCache.getCacheContents());
+        LOGGER.info("TeamCache: {}", teamCache.getCacheContents());
+        LOGGER.info("UserCache: {}", userCache.getCacheContents());
+
+        // Stats
+        LOGGER.info("InitialStatsCache: {}", initialStatsCache.getCacheContents());
+        LOGGER.info("OffsetStatsCache: {}", offsetTcStatsCache.getCacheContents());
+        LOGGER.info("RetiredTcStatsCache: {}", retiredTcStatsCache.getCacheContents());
+        LOGGER.info("TcStatsCache: {}", tcStatsCache.getCacheContents());
+        LOGGER.info("TotalStatsCache: {}", totalStatsCache.getCacheContents());
+
+        // TC overall
+        LOGGER.info("CompetitionSummaryCache: {}", competitionSummaryCache.getCacheContents());
+    }
 }

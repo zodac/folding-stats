@@ -24,6 +24,8 @@
 
 package me.zodac.folding.rest.api;
 
+import java.time.Month;
+import java.time.Year;
 import java.util.Collection;
 import java.util.Optional;
 import me.zodac.folding.api.UserAuthenticationResult;
@@ -31,6 +33,13 @@ import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.result.MonthlyResult;
+import me.zodac.folding.api.tc.stats.OffsetTcStats;
+import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
+import me.zodac.folding.api.tc.stats.UserStats;
+import me.zodac.folding.api.tc.stats.UserTcStats;
+import me.zodac.folding.rest.api.tc.CompetitionSummary;
+import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import org.springframework.stereotype.Service;
 
 ///**
@@ -385,7 +394,8 @@ public interface StorageService {
 //     */
 //    @Cached({UserCache.class, InitialStatsCache.class, OffsetTcStatsCache.class, TcStatsCache.class, TotalStatsCache.class})
     void deleteUser(final int userId);
-//        DB_MANAGER.deleteUser(userId);
+
+    //        DB_MANAGER.deleteUser(userId);
 //        userCache.remove(userId);
 //
 //        // Remove the user entry from all stats caches
@@ -405,8 +415,9 @@ public interface StorageService {
 //     * @return the <code>Team Competition</code> {@link MonthlyResult}
 //     */
 //    @NotCached
-//    public MonthlyResult createMonthlyResult(final MonthlyResult monthlyResult) {
-//        return DB_MANAGER.createMonthlyResult(monthlyResult);
+    MonthlyResult createMonthlyResult(final MonthlyResult monthlyResult);
+
+    //        return DB_MANAGER.createMonthlyResult(monthlyResult);
 //    }
 //
 //    /**
@@ -420,8 +431,9 @@ public interface StorageService {
 //     * @return an {@link Optional} of the <code>Team Competition</code> {@link MonthlyResult}
 //     */
 //    @NotCached
-//    public Optional<MonthlyResult> getMonthlyResult(final Month month, final Year year) {
-//        return DB_MANAGER.getMonthlyResult(month, year);
+    Optional<MonthlyResult> getMonthlyResult(final Month month, final Year year);
+
+    //        return DB_MANAGER.getMonthlyResult(month, year);
 //    }
 //
 //    /**
@@ -434,8 +446,9 @@ public interface StorageService {
 //     * @return the {@link RetiredUserTcStats}
 //     */
 //    @Cached(RetiredTcStatsCache.class)
-//    public RetiredUserTcStats createRetiredUserStats(final RetiredUserTcStats retiredUserTcStats) {
-//        final RetiredUserTcStats createdRetiredUserTcStats = DB_MANAGER.createRetiredUserStats(retiredUserTcStats);
+    RetiredUserTcStats createRetiredUserStats(final RetiredUserTcStats retiredUserTcStats);
+
+    //        final RetiredUserTcStats createdRetiredUserTcStats = DB_MANAGER.createRetiredUserStats(retiredUserTcStats);
 //        retiredTcStatsCache.add(createdRetiredUserTcStats.getRetiredUserId(), createdRetiredUserTcStats);
 //        return createdRetiredUserTcStats;
 //    }
@@ -450,8 +463,9 @@ public interface StorageService {
 //     * @see DbManager#getAllRetiredUserStats()
 //     */
 //    @Cached(RetiredTcStatsCache.class)
-//    public Collection<RetiredUserTcStats> getAllRetiredUsers() {
-//        final Collection<RetiredUserTcStats> fromCache = retiredTcStatsCache.getAll();
+    Collection<RetiredUserTcStats> getAllRetiredUsers();
+
+    //        final Collection<RetiredUserTcStats> fromCache = retiredTcStatsCache.getAll();
 //
 //        if (!fromCache.isEmpty()) {
 //            return fromCache;
@@ -474,7 +488,7 @@ public interface StorageService {
 //     * Also evicts the {@link RetiredTcStatsCache}.
 //     */
 //    @Cached(RetiredTcStatsCache.class)
-//    public void deleteAllRetiredUserTcStats() {
+    void deleteAllRetiredUserTcStats();
 //        DB_MANAGER.deleteAllRetiredUserStats();
 //        retiredTcStatsCache.removeAll();
 //    }
@@ -487,7 +501,8 @@ public interface StorageService {
      * @return the {@link UserAuthenticationResult}
      */
     UserAuthenticationResult authenticateSystemUser(final String userName, final String password);
-//
+
+    //
 //    /**
 //     * Retrieves the {@link HistoricStats} for a given {@link User} ID for a specific {@code day}, {@link Month} or {@link Year}.
 //     *
@@ -513,8 +528,9 @@ public interface StorageService {
 //     * @see DbManager#getHistoricStatsMonthly(int, Year)
 //     */
 //    @NotCached
-//    public Collection<HistoricStats> getHistoricStats(final int userId, final Year year, final Month month, final int day) {
-//        if (year == null) {
+    Collection<HistoricStats> getHistoricStats(final int userId, final Year year, final Month month, final int day);
+
+    //        if (year == null) {
 //            return Collections.emptyList();
 //        }
 //
@@ -539,8 +555,9 @@ public interface StorageService {
 //     * @return the created {@link UserStats}
 //     */
 //    @Cached(TotalStatsCache.class)
-//    public UserStats createTotalStats(final UserStats userStats) {
-//        final UserStats fromDb = DB_MANAGER.createTotalStats(userStats);
+    UserStats createTotalStats(final UserStats userStats);
+
+    //        final UserStats fromDb = DB_MANAGER.createTotalStats(userStats);
 //        totalStatsCache.add(fromDb.getUserId(), fromDb);
 //        return fromDb;
 //    }
@@ -556,8 +573,9 @@ public interface StorageService {
 //     * @see DbManager#getTotalStats(int)
 //     */
 //    @Cached(TotalStatsCache.class)
-//    public Optional<UserStats> getTotalStats(final int userId) {
-//        final Optional<UserStats> fromCache = totalStatsCache.get(userId);
+    Optional<UserStats> getTotalStats(final int userId);
+
+    //        final Optional<UserStats> fromCache = totalStatsCache.get(userId);
 //
 //        if (fromCache.isPresent()) {
 //            return fromCache;
@@ -584,8 +602,9 @@ public interface StorageService {
 //     * @return the created/updated {@link OffsetTcStats}, or {@link OffsetTcStats#empty()}
 //     */
 //    @Cached(OffsetTcStatsCache.class)
-//    public OffsetTcStats createOrUpdateOffsetStats(final int userId, final OffsetTcStats offsetTcStats) {
-//        final OffsetTcStats fromDb = DB_MANAGER.createOrUpdateOffsetStats(userId, offsetTcStats);
+    OffsetTcStats createOrUpdateOffsetStats(final int userId, final OffsetTcStats offsetTcStats);
+
+    //        final OffsetTcStats fromDb = DB_MANAGER.createOrUpdateOffsetStats(userId, offsetTcStats);
 //        offsetTcStatsCache.add(userId, fromDb);
 //        return fromDb;
 //    }
@@ -601,8 +620,9 @@ public interface StorageService {
 //     * @see DbManager#getOffsetStats(int)
 //     */
 //    @Cached(OffsetTcStatsCache.class)
-//    public Optional<OffsetTcStats> getOffsetStats(final int userId) {
-//        final Optional<OffsetTcStats> fromCache = offsetTcStatsCache.get(userId);
+    Optional<OffsetTcStats> getOffsetStats(final int userId);
+
+    //        final Optional<OffsetTcStats> fromCache = offsetTcStatsCache.get(userId);
 //
 //        if (fromCache.isPresent()) {
 //            return fromCache;
@@ -623,8 +643,9 @@ public interface StorageService {
 //     * @param userId the ID of the {@link User} to whose {@link OffsetTcStats} are to be deleted
 //     */
 //    @Cached(OffsetTcStatsCache.class)
-//    public void deleteOffsetStats(final int userId) {
-//        DB_MANAGER.deleteOffsetStats(userId);
+    void deleteOffsetStats(final int userId);
+
+    //        DB_MANAGER.deleteOffsetStats(userId);
 //        offsetTcStatsCache.remove(userId);
 //    }
 //
@@ -635,8 +656,9 @@ public interface StorageService {
 //     * Also evicts the {@link OffsetTcStatsCache}.
 //     */
 //    @Cached(OffsetTcStatsCache.class)
-//    public void deleteAllOffsetTcStats() {
-//        DB_MANAGER.deleteAllOffsetStats();
+    void deleteAllOffsetTcStats();
+
+    //        DB_MANAGER.deleteAllOffsetStats();
 //        offsetTcStatsCache.removeAll();
 //    }
 //
@@ -650,8 +672,9 @@ public interface StorageService {
 //     * @return the created {@link UserTcStats}
 //     */
 //    @Cached(TcStatsCache.class)
-//    public UserTcStats createHourlyTcStats(final UserTcStats userTcStats) {
-//        final UserTcStats fromDb = DB_MANAGER.createHourlyTcStats(userTcStats);
+    UserTcStats createHourlyTcStats(final UserTcStats userTcStats);
+
+    //        final UserTcStats fromDb = DB_MANAGER.createHourlyTcStats(userTcStats);
 //        tcStatsCache.add(userTcStats.getUserId(), fromDb);
 //        return fromDb;
 //    }
@@ -666,8 +689,9 @@ public interface StorageService {
 //     * @return an {@link Optional} of the retrieved {@link UserTcStats}
 //     */
 //    @Cached(TcStatsCache.class)
-//    public Optional<UserTcStats> getHourlyTcStats(final int userId) {
-//        final Optional<UserTcStats> fromCache = tcStatsCache.get(userId);
+    Optional<UserTcStats> getHourlyTcStats(final int userId);
+
+    //        final Optional<UserTcStats> fromCache = tcStatsCache.get(userId);
 //
 //        if (fromCache.isPresent()) {
 //            return fromCache;
@@ -688,8 +712,9 @@ public interface StorageService {
 //     * @return an {@link Optional} of the first {@link UserTcStats}
 //     */
 //    @NotCached
-//    public Optional<UserTcStats> getFirstHourlyTcStats() {
-//        return DB_MANAGER.getFirstHourlyTcStats();
+    Optional<UserTcStats> getFirstHourlyTcStats();
+
+    //        return DB_MANAGER.getFirstHourlyTcStats();
 //    }
 //
 //    /**
@@ -702,8 +727,9 @@ public interface StorageService {
 //     * @return the created {@link UserStats}
 //     */
 //    @Cached(InitialStatsCache.class)
-//    public UserStats createInitialStats(final UserStats userStats) {
-//        final UserStats fromDb = DB_MANAGER.createInitialStats(userStats);
+    UserStats createInitialStats(final UserStats userStats);
+
+    //        final UserStats fromDb = DB_MANAGER.createInitialStats(userStats);
 //        initialStatsCache.add(fromDb.getUserId(), fromDb);
 //        return fromDb;
 //    }
@@ -718,8 +744,9 @@ public interface StorageService {
 //     * @return an {@link Optional} of the retrieved {@link UserStats}
 //     */
 //    @Cached(InitialStatsCache.class)
-//    public Optional<UserStats> getInitialStats(final int userId) {
-//        final Optional<UserStats> fromCache = initialStatsCache.get(userId);
+    Optional<UserStats> getInitialStats(final int userId);
+
+    //        final Optional<UserStats> fromCache = initialStatsCache.get(userId);
 //
 //        if (fromCache.isPresent()) {
 //            return fromCache;
@@ -738,8 +765,9 @@ public interface StorageService {
 //     * @return the created {@link CompetitionSummary}
 //     */
 //    @Cached(CompetitionSummaryCache.class)
-//    public CompetitionSummary createCompetitionSummary(final CompetitionSummary competitionSummary) {
-//        this.competitionSummaryCache.add(COMPETITION_SUMMARY_ID, competitionSummary);
+    CompetitionSummary createCompetitionSummary(final CompetitionSummary competitionSummary);
+
+    //        this.competitionSummaryCache.add(COMPETITION_SUMMARY_ID, competitionSummary);
 //        return competitionSummary;
 //    }
 //
@@ -749,24 +777,27 @@ public interface StorageService {
 //     * @return an {@link Optional} of the latest {@link CompetitionSummary}
 //     */
 //    @Cached(CompetitionSummaryCache.class)
-//    public Optional<CompetitionSummary> getCompetitionSummary() {
-//        return competitionSummaryCache.get(COMPETITION_SUMMARY_ID);
+    Optional<CompetitionSummary> getCompetitionSummary();
+
+    //        return competitionSummaryCache.get(COMPETITION_SUMMARY_ID);
 //    }
 //
 //    /**
 //     * Evicts all {@link User}s from the {@link TotalStatsCache}.
 //     */
 //    @Cached(TotalStatsCache.class)
-//    public void evictTcStatsCache() {
-//        tcStatsCache.removeAll();
+    void evictTcStatsCache();
+
+    //        tcStatsCache.removeAll();
 //    }
 //
 //    /**
 //     * Evicts all {@link User}s from the {@link InitialStatsCache}.
 //     */
 //    @Cached(InitialStatsCache.class)
-//    public void evictInitialStatsCache() {
-//        initialStatsCache.removeAll();
+    void evictInitialStatsCache();
+
+    //        initialStatsCache.removeAll();
 //    }
 //
 //    /**
@@ -783,7 +814,7 @@ public interface StorageService {
 //        TotalStatsCache.class,
 //        UserCache.class
 //    })
-//    public void printCacheContents() {
+    void printCacheContents();
 //        // POJOs
 //        LOGGER.info("HardwareCache: {}", hardwareCache.getCacheContents());
 //        LOGGER.info("TeamCache: {}", teamCache.getCacheContents());

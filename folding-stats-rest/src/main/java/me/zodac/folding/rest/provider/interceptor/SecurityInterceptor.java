@@ -125,7 +125,7 @@ public class SecurityInterceptor implements HandlerInterceptor {
 
     private void validateRequest(final HttpServletRequest request, final HandlerMethod handlerMethod) {
         final Method method = handlerMethod.getMethod();
-        LOGGER.info("Access requested to: #{}()", method.getName());
+        LOGGER.debug("Access requested to: #{}()", method.getName());
 
         if (method.isAnnotationPresent(DenyAll.class)) {
             LOGGER.warn("All access to '#{}()' at '{}' is denied", method.getName(), request.getRequestURI());
@@ -133,7 +133,7 @@ public class SecurityInterceptor implements HandlerInterceptor {
         }
 
         if (method.isAnnotationPresent(PermitAll.class) || !method.isAnnotationPresent(RolesAllowed.class)) {
-            LOGGER.info("All access to '#{}()' at '{}' is permitted", method.getName(), request.getRequestURI());
+            LOGGER.debug("All access to '#{}()' at '{}' is permitted", method.getName(), request.getRequestURI());
             return;
         }
 
@@ -169,13 +169,13 @@ public class SecurityInterceptor implements HandlerInterceptor {
         final Set<String> permittedRoles = Arrays.stream(rolesAnnotation.value())
             .map(s -> s.toLowerCase(Locale.UK))
             .collect(toSet());
-        LOGGER.info("Permitted roles: {}", permittedRoles);
+        LOGGER.debug("Permitted roles: {}", permittedRoles);
 
         if (containsNoMatches(userRoles, permittedRoles)) {
             LOGGER.warn("User '{}' has roles {}, must be one of: {}", userName, userRoles, permittedRoles);
             throw new ForbiddenException();
         }
 
-        LOGGER.info("Request permitted");
+        LOGGER.debug("Request permitted");
     }
 }
