@@ -50,7 +50,7 @@ public final class DateTimeUtils {
      * @param chronoUnit the {@link ChronoUnit} of the response
      * @return the number of {@link ChronoUnit}s until <code>00:00:000</code> {@link ZoneOffset#UTC} of the 1st of next {@link Month}
      */
-    public static long untilNextMonthUtc(final ChronoUnit chronoUnit) {
+    public static int untilNextMonthUtc(final ChronoUnit chronoUnit) {
         final int currentMonth = currentUtcMonth().getValue();
         final int nextMonth = currentMonth == 12 ? 1 : (currentMonth + 1);
         final int currentYear = currentUtcYear().getValue();
@@ -58,7 +58,7 @@ public final class DateTimeUtils {
 
         final String nextMonthAsDate = String.format("%s-%02d-01T00:00:00Z", nextMonthYear, nextMonth);
 
-        return chronoUnit.between(
+        return (int) chronoUnit.between(
             Instant.now().atZone(ZoneOffset.UTC),
             Instant.parse(nextMonthAsDate).atZone(ZoneOffset.UTC)
         );
