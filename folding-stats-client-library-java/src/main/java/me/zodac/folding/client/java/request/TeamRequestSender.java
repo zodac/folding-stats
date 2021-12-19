@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.Collection;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import me.zodac.folding.api.util.StringUtils;
@@ -238,49 +237,6 @@ public final class TeamRequestSender {
             throw new FoldingRestException("Error sending HTTP request to create team", e);
         } catch (final IOException e) {
             throw new FoldingRestException("Error sending HTTP request to create team", e);
-        }
-    }
-
-    /**
-     * Send a <b>POST</b> request to create the given {@link me.zodac.folding.api.tc.Team}s in the system.
-     *
-     * @param batchOfTeams the {@link Collection} of {@link me.zodac.folding.api.tc.Team}s to create
-     * @return the {@link HttpResponse} from the {@link HttpRequest}
-     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
-     */
-    public HttpResponse<String> createBatchOf(final Collection<TeamRequest> batchOfTeams) throws FoldingRestException {
-        return createBatchOf(batchOfTeams, null, null);
-    }
-
-    /**
-     * Send a <b>POST</b> request to create the given {@link me.zodac.folding.api.tc.Team}s in the system.
-     *
-     * @param batchOfTeams the {@link Collection} of {@link me.zodac.folding.api.tc.Team}s to create
-     * @param userName     the username
-     * @param password     the password
-     * @return the {@link HttpResponse} from the {@link HttpRequest}
-     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
-     */
-    public HttpResponse<String> createBatchOf(final Collection<TeamRequest> batchOfTeams, final String userName, final String password)
-        throws FoldingRestException {
-        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
-            .POST(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(batchOfTeams)))
-            .uri(URI.create(teamsUrl + "/batch"))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
-
-        if (StringUtils.isNeitherBlank(userName, password)) {
-            requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
-        }
-
-        final HttpRequest request = requestBuilder.build();
-
-        try {
-            return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new FoldingRestException("Error sending HTTP request to create batch of teams", e);
-        } catch (final IOException e) {
-            throw new FoldingRestException("Error sending HTTP request to create batch of teams", e);
         }
     }
 

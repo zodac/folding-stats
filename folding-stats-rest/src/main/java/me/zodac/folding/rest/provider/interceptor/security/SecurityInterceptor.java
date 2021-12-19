@@ -108,10 +108,10 @@ public class SecurityInterceptor implements HandlerInterceptor {
 
         try {
             if (handler instanceof HandlerMethod) {
-                LOGGER.info("Validating...");
                 validateRequest(request, (HandlerMethod) handler);
             } else {
-                LOGGER.warn("Not validating, handler is: {}", handler.getClass());
+                LOGGER.warn("Unable to validate, handler is type: {}", handler.getClass());
+                throw new UnauthorizedException();
             }
         } catch (final ForbiddenException | UnauthorizedException e) {
             throw e;

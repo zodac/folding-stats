@@ -28,7 +28,9 @@ import java.util.Collection;
 import java.util.Optional;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.tc.Hardware;
+import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.cache.HardwareCache;
+import me.zodac.folding.cache.TeamCache;
 import me.zodac.folding.cache.UserCache;
 import me.zodac.folding.db.DbManagerRetriever;
 import me.zodac.folding.service.StorageService;
@@ -55,7 +57,7 @@ public class Storage implements StorageService {
 
     // POJO caches
     private final HardwareCache hardwareCache = HardwareCache.getInstance();
-//    private final TeamCache teamCache = TeamCache.getInstance();
+    private final TeamCache teamCache = TeamCache.getInstance();
 //    private final UserCache userCache = UserCache.getInstance();
 
     // Stats caches
@@ -182,7 +184,8 @@ public class Storage implements StorageService {
         hardwareCache.remove(hardwareId);
     }
 //
-//    /**
+
+    //    /**
 //     * Creates a {@link Team}.
 //     *
 //     * <p>
@@ -192,14 +195,15 @@ public class Storage implements StorageService {
 //     * @return the created {@link Team}, with ID
 //     * @see DbManager#createTeam(Team)
 //     */
-//    @Cached(TeamCache.class)
-//    public Team createTeam(final Team team) {
-//        final Team teamWithId = DB_MANAGER.createTeam(team);
-//        teamCache.add(teamWithId.getId(), teamWithId);
-//        return teamWithId;
-//    }
-//
-//    /**
+    @Override
+    @Cached(TeamCache.class)
+    public Team createTeam(final Team team) {
+        final Team teamWithId = DbManagerRetriever.get().createTeam(team);
+        teamCache.add(teamWithId.getId(), teamWithId);
+        return teamWithId;
+    }
+
+    //    /**
 //     * Retrieves a {@link Team}.
 //     *
 //     * <p>
@@ -209,21 +213,22 @@ public class Storage implements StorageService {
 //     * @return an {@link Optional} of the retrieved {@link Team}
 //     * @see DbManager#getTeam(int)
 //     */
-//    @Cached(TeamCache.class)
-//    public Optional<Team> getTeam(final int teamId) {
-//        final Optional<Team> fromCache = teamCache.get(teamId);
-//
-//        if (fromCache.isPresent()) {
-//            return fromCache;
-//        }
-//
-//        LOGGER.trace("Cache miss! Get team");
-//        final Optional<Team> fromDb = DB_MANAGER.getTeam(teamId);
-//        fromDb.ifPresent(team -> teamCache.add(teamId, team));
-//        return fromDb;
-//    }
-//
-//    /**
+    @Override
+    @Cached(TeamCache.class)
+    public Optional<Team> getTeam(final int teamId) {
+        final Optional<Team> fromCache = teamCache.get(teamId);
+
+        if (fromCache.isPresent()) {
+            return fromCache;
+        }
+
+        LOGGER.trace("Cache miss! Get team");
+        final Optional<Team> fromDb = DbManagerRetriever.get().getTeam(teamId);
+        fromDb.ifPresent(team -> teamCache.add(teamId, team));
+        return fromDb;
+    }
+
+    //    /**
 //     * Retrieves all {@link Team}s.
 //     *
 //     * <p>
@@ -232,25 +237,26 @@ public class Storage implements StorageService {
 //     * @return a {@link Collection} of the retrieved {@link Team}s
 //     * @see DbManager#getAllTeams()
 //     */
-//    @Cached(TeamCache.class)
-//    public Collection<Team> getAllTeams() {
-//        final Collection<Team> fromCache = teamCache.getAll();
-//
-//        if (!fromCache.isEmpty()) {
-//            return fromCache;
-//        }
-//
-//        LOGGER.trace("Cache miss! Get all teams");
-//        final Collection<Team> fromDb = DB_MANAGER.getAllTeams();
-//
-//        for (final Team team : fromDb) {
-//            teamCache.add(team.getId(), team);
-//        }
-//
-//        return fromDb;
-//    }
-//
-//    /**
+    @Override
+    @Cached(TeamCache.class)
+    public Collection<Team> getAllTeams() {
+        final Collection<Team> fromCache = teamCache.getAll();
+
+        if (!fromCache.isEmpty()) {
+            return fromCache;
+        }
+
+        LOGGER.trace("Cache miss! Get all teams");
+        final Collection<Team> fromDb = DbManagerRetriever.get().getAllTeams();
+
+        for (final Team team : fromDb) {
+            teamCache.add(team.getId(), team);
+        }
+
+        return fromDb;
+    }
+
+    //    /**
 //     * Updates a {@link Team}. Expects the {@link Team} to have a valid ID.
 //     *
 //     * <p>
@@ -263,21 +269,22 @@ public class Storage implements StorageService {
 //     * @return the updated {@link Team}
 //     * @see DbManager#updateTeam(Team)
 //     */
-//    @Cached({TeamCache.class, UserCache.class})
-//    public Team updateTeam(final Team teamToUpdate) {
-//        final Team updatedTeam = DB_MANAGER.updateTeam(teamToUpdate);
-//        teamCache.add(updatedTeam.getId(), updatedTeam);
-//
+    @Override
+    @Cached({TeamCache.class, UserCache.class})
+    public Team updateTeam(final Team teamToUpdate) {
+        final Team updatedTeam = DbManagerRetriever.get().updateTeam(teamToUpdate);
+        teamCache.add(updatedTeam.getId(), updatedTeam);
+
 //        getAllUsers()
 //            .stream()
 //            .filter(user -> user.getTeam().getId() == updatedTeam.getId())
 //            .map(user -> User.updateTeam(user, updatedTeam))
 //            .forEach(updatedUser -> userCache.add(updatedUser.getId(), updatedUser));
-//
-//        return updatedTeam;
-//    }
-//
-//    /**
+
+        return updatedTeam;
+    }
+
+    //    /**
 //     * Deletes a {@link Team}.
 //     *
 //     * <p>
@@ -286,11 +293,12 @@ public class Storage implements StorageService {
 //     * @param teamId the ID of the {@link Team} to delete
 //     * @see DbManager#deleteTeam(int)
 //     */
-//    @Cached(TeamCache.class)
-//    public void deleteTeam(final int teamId) {
-//        DB_MANAGER.deleteTeam(teamId);
-//        teamCache.remove(teamId);
-//    }
+    @Override
+    @Cached(TeamCache.class)
+    public void deleteTeam(final int teamId) {
+        DbManagerRetriever.get().deleteTeam(teamId);
+        teamCache.remove(teamId);
+    }
 //
 //    /**
 //     * Creates a {@link User}.

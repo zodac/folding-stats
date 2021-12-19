@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.Optional;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.tc.Hardware;
+import me.zodac.folding.api.tc.Team;
 import org.springframework.stereotype.Service;
 
 /**
@@ -83,43 +84,43 @@ public interface FoldingStatsService {
      */
     void deleteHardware(final Hardware hardware);
 
-//    /**
-//     * Creates a {@link Team}.
-//     *
-//     * @param team the {@link Team} to create
-//     * @return the created {@link Team}, with ID
-//     */
-//    Team createTeam(final Team team);
-//
-//    /**
-//     * Retrieves a {@link Team}.
-//     *
-//     * @param teamId the ID of the {@link Team} to retrieve
-//     * @return an {@link Optional} of the retrieved {@link Team}
-//     */
-//    Optional<Team> getTeam(final int teamId);
-//
-//    /**
-//     * Retrieves all {@link Team}.
-//     *
-//     * @return a {@link Collection} of the retrieved {@link Team}s
-//     */
-//    Collection<Team> getAllTeams();
-//
-//    /**
-//     * Updates an existing {@link Team}.
-//     *
-//     * @param teamToUpdate the {@link Team} with updated values
-//     * @return the updated {@link Team}
-//     */
-//    Team updateTeam(final Team teamToUpdate);
-//
-//    /**
-//     * Deletes a {@link Team}.
-//     *
-//     * @param team the {@link Team} to delete
-//     */
-//    void deleteTeam(final Team team);
+    /**
+     * Creates a {@link Team}.
+     *
+     * @param team the {@link Team} to create
+     * @return the created {@link Team}, with ID
+     */
+    Team createTeam(final Team team);
+
+    /**
+     * Retrieves a {@link Team}.
+     *
+     * @param teamId the ID of the {@link Team} to retrieve
+     * @return an {@link Optional} of the retrieved {@link Team}
+     */
+    Optional<Team> getTeam(final int teamId);
+
+    /**
+     * Retrieves all {@link Team}.
+     *
+     * @return a {@link Collection} of the retrieved {@link Team}s
+     */
+    Collection<Team> getAllTeams();
+
+    /**
+     * Updates an existing {@link Team}.
+     *
+     * @param teamToUpdate the {@link Team} with updated values
+     * @return the updated {@link Team}
+     */
+    Team updateTeam(final Team teamToUpdate);
+
+    /**
+     * Deletes a {@link Team}.
+     *
+     * @param team the {@link Team} to delete
+     */
+    void deleteTeam(final Team team);
 //
 //    /**
 //     * Creates a {@link User}.

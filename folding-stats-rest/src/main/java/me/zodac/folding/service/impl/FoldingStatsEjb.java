@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.Optional;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.tc.Hardware;
+import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.service.FoldingStatsService;
 import me.zodac.folding.service.StorageService;
 import org.apache.logging.log4j.LogManager;
@@ -116,33 +117,33 @@ public class FoldingStatsEjb implements FoldingStatsService {
     public void deleteHardware(final Hardware hardware) {
         storageService.deleteHardware(hardware.getId());
     }
-//
-//    @Override
-//    public Team createTeam(final Team team) {
-//        final Team createdTeam = STORAGE.createTeam(team);
+
+    @Override
+    public Team createTeam(final Team team) {
+        final Team createdTeam = storageService.createTeam(team);
 //        statsScheduler.manualTeamCompetitionStatsParsing(ProcessingType.SYNCHRONOUS);
-//        return createdTeam;
-//    }
-//
-//    @Override
-//    public Optional<Team> getTeam(final int teamId) {
-//        return STORAGE.getTeam(teamId);
-//    }
-//
-//    @Override
-//    public Collection<Team> getAllTeams() {
-//        return STORAGE.getAllTeams();
-//    }
-//
-//    @Override
-//    public Team updateTeam(final Team teamToUpdate) {
-//        return STORAGE.updateTeam(teamToUpdate);
-//    }
-//
-//    @Override
-//    public void deleteTeam(final Team team) {
-//        STORAGE.deleteTeam(team.getId());
-//    }
+        return createdTeam;
+    }
+
+    @Override
+    public Optional<Team> getTeam(final int teamId) {
+        return storageService.getTeam(teamId);
+    }
+
+    @Override
+    public Collection<Team> getAllTeams() {
+        return storageService.getAllTeams();
+    }
+
+    @Override
+    public Team updateTeam(final Team teamToUpdate) {
+        return storageService.updateTeam(teamToUpdate);
+    }
+
+    @Override
+    public void deleteTeam(final Team team) {
+        storageService.deleteTeam(team.getId());
+    }
 //
 //    @Override
 //    public User createUser(final User user) {

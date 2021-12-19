@@ -29,6 +29,7 @@ import java.util.Optional;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.tc.Hardware;
+import me.zodac.folding.api.tc.Team;
 import org.springframework.stereotype.Service;
 
 ///**
@@ -171,7 +172,8 @@ public interface StorageService {
 //     */
 //    @Cached(HardwareCache.class)
     void deleteHardware(final int hardwareId);
-//        DB_MANAGER.deleteHardware(hardwareId);
+
+    //        DB_MANAGER.deleteHardware(hardwareId);
 //        hardwareCache.remove(hardwareId);
 //    }
 //
@@ -186,8 +188,9 @@ public interface StorageService {
 //     * @see DbManager#createTeam(Team)
 //     */
 //    @Cached(TeamCache.class)
-//    public Team createTeam(final Team team) {
-//        final Team teamWithId = DB_MANAGER.createTeam(team);
+    Team createTeam(final Team team);
+
+    //        final Team teamWithId = DB_MANAGER.createTeam(team);
 //        teamCache.add(teamWithId.getId(), teamWithId);
 //        return teamWithId;
 //    }
@@ -203,8 +206,9 @@ public interface StorageService {
 //     * @see DbManager#getTeam(int)
 //     */
 //    @Cached(TeamCache.class)
-//    public Optional<Team> getTeam(final int teamId) {
-//        final Optional<Team> fromCache = teamCache.get(teamId);
+    Optional<Team> getTeam(final int teamId);
+
+    //        final Optional<Team> fromCache = teamCache.get(teamId);
 //
 //        if (fromCache.isPresent()) {
 //            return fromCache;
@@ -226,8 +230,9 @@ public interface StorageService {
 //     * @see DbManager#getAllTeams()
 //     */
 //    @Cached(TeamCache.class)
-//    public Collection<Team> getAllTeams() {
-//        final Collection<Team> fromCache = teamCache.getAll();
+    Collection<Team> getAllTeams();
+
+    //        final Collection<Team> fromCache = teamCache.getAll();
 //
 //        if (!fromCache.isEmpty()) {
 //            return fromCache;
@@ -257,8 +262,9 @@ public interface StorageService {
 //     * @see DbManager#updateTeam(Team)
 //     */
 //    @Cached({TeamCache.class, UserCache.class})
-//    public Team updateTeam(final Team teamToUpdate) {
-//        final Team updatedTeam = DB_MANAGER.updateTeam(teamToUpdate);
+    Team updateTeam(final Team teamToUpdate);
+
+    //        final Team updatedTeam = DB_MANAGER.updateTeam(teamToUpdate);
 //        teamCache.add(updatedTeam.getId(), updatedTeam);
 //
 //        getAllUsers()
@@ -280,7 +286,7 @@ public interface StorageService {
 //     * @see DbManager#deleteTeam(int)
 //     */
 //    @Cached(TeamCache.class)
-//    public void deleteTeam(final int teamId) {
+    void deleteTeam(final int teamId);
 //        DB_MANAGER.deleteTeam(teamId);
 //        teamCache.remove(teamId);
 //    }

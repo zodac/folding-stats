@@ -324,34 +324,6 @@ traits:
           description: "An error occurred connecting to an external system to verify the team"
         503:
           description: "The system is not in a valid state to execute write requests"
-  /batch:
-    post:
-      is: [ "adminOnly" ]
-      description: "Creates a batch of team with the given properties"
-      body:
-        application/json-all-success:
-          example: !include requests/teams/teamsPostBatch.json
-        application/json-partial-success:
-          example: !include requests/teams/teamsPostBatch.json
-      responses:
-        200:
-          description: "At least one team in the payload is created"
-          body:
-            application/json:
-              example: !include responses/teams/teamsPostBatch.json
-        400:
-          description: "All given payloads are invalid"
-          body:
-            application/json:
-              example: !include responses/teams/teamsPostBatchBadRequest.json
-        401:
-          description: "System user cannot be successfully logged in with provided credentials"
-        403:
-          description: "System user does not have the correct role to perform this request"
-        502:
-          description: "An error occurred connecting to an external system to verify the team"
-        503:
-          description: "The system is not in a valid state to execute write requests"
 
 /users:
   get:

@@ -84,6 +84,7 @@ public class HardwareEndpoint {
      * {@link PostMapping} request to create a {@link Hardware} based on the input request.
      *
      * @param hardwareRequest the {@link HardwareRequest} to create a {@link Hardware}
+     * @param request         the {@link HttpServletRequest}
      * @return {@link Responses#created(Object, int)} containing the created {@link Hardware}
      */
     @WriteRequired
@@ -101,8 +102,8 @@ public class HardwareEndpoint {
         try {
             final Hardware elementWithId = foldingStatsService.createHardware(validatedHardware);
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
-            LOGGER.info("Created hardware with ID {}", elementWithId.getId());
 
+            LOGGER.info("Created hardware with ID {}", elementWithId.getId());
             return created(elementWithId, elementWithId.getId());
         } catch (final Exception e) {
             LOGGER.error("Unexpected error creating hardware: {}", hardwareRequest, e);
@@ -208,6 +209,7 @@ public class HardwareEndpoint {
      *
      * @param hardwareId      the ID of the {@link Hardware} to be updated
      * @param hardwareRequest the {@link HardwareRequest} to update a {@link Hardware}
+     * @param request         the {@link HttpServletRequest}
      * @return {@link Responses#ok(Object, int)} containing the updated {@link Hardware}
      */
     @WriteRequired

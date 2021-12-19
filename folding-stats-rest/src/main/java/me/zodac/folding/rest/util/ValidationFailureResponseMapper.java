@@ -28,28 +28,29 @@ import me.zodac.folding.api.tc.validation.ValidationResult;
 import me.zodac.folding.rest.response.Responses;
 import org.springframework.http.ResponseEntity;
 
-///**
-// * Utility class used to convert a {@link ValidationResult} into a {@link Response} for REST endpoints.
-// */
+/**
+ * Utility class used to convert a {@link ValidationResult} into a {@link ResponseEntity} for REST endpoints.
+ */
 public final class ValidationFailureResponseMapper {
 
     private ValidationFailureResponseMapper() {
 
     }
 
-    //    /**
-//     * Map the input {@link ValidationResult} to a REST {@link Response}. Extracts the {@link ValidationFailureType} and
-//     * decides on the best {@link Response}.
-//     * <p>
-//     * Currently supports:
-//     * <ul>
-//     *     <li>{@link ValidationFailureType#BAD_REQUEST}</li>
-//     *     <li>{@link ValidationFailureType#CONFLICT}</li>
-//     * </ul>
-//     *
-//     * @param validationResult the input {@link ValidationResult} to map
-//     * @return the mapped {@link Response}
-//     */
+    /**
+     * Map the input {@link ValidationResult} to a REST {@link ResponseEntity}. Extracts the
+     * {@link me.zodac.folding.api.tc.validation.ValidationFailureType} and decides on the best {@link ResponseEntity}.
+     *
+     * <p>
+     * Currently supports:
+     * <ul>
+     *     <li>{@link me.zodac.folding.api.tc.validation.ValidationFailureType#BAD_REQUEST}</li>
+     *     <li>{@link me.zodac.folding.api.tc.validation.ValidationFailureType#CONFLICT}</li>
+     * </ul>
+     *
+     * @param validationResult the input {@link ValidationResult} to map
+     * @return the mapped {@link ResponseEntity}
+     */
     public static ResponseEntity<?> map(final ValidationResult<?> validationResult) {
         switch (validationResult.getValidationFailureType()) {
             case BAD_REQUEST:
