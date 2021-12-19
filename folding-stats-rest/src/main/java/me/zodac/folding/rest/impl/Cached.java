@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.service.impl;
+package me.zodac.folding.rest.impl;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -30,7 +30,7 @@ import java.lang.annotation.Target;
 import me.zodac.folding.cache.BaseCache;
 
 /**
- * Marker annotation to define a function in {@link Storage} that persists and retrieves data from a database, but also caches that data locally.
+ * Marker annotation to define a function in {@link CachedStorage} that persists and retrieves data from a database, but also caches that data locally.
  */
 @Documented
 @Target(ElementType.METHOD)

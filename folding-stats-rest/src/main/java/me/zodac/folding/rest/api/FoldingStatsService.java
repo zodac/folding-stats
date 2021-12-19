@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.service;
+package me.zodac.folding.rest.api;
 
 import java.util.Collection;
 import java.util.Optional;

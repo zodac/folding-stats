@@ -20,20 +20,20 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
+ *
  */
 
-package me.zodac.folding.service.impl;
+package me.zodac.folding.rest.provider.interceptor;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Target;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
- * Marker annotation to define a function in {@link Storage} that persists and retrieves data from a database, but does <b>not</b> cache that data
- * locally.
+ * Marker {@link Exception} thrown then an {@link HttpStatus#SERVICE_UNAVAILABLE} request has been made. Will automatically tell the
+ * {@link org.springframework.boot.autoconfigure.SpringBootApplication} to return a <b>503_SERVICE_UNAVAILABLE</b> response, without requiring
+ * explicit handling in any {@link org.springframework.web.bind.annotation.RestController}.
  */
-@Documented
-@Target(ElementType.METHOD)
-@interface NotCached {
+@ResponseStatus(value = HttpStatus.SERVICE_UNAVAILABLE)
+public class ServiceUnavailableException extends RuntimeException {
 
 }

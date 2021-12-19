@@ -290,19 +290,4 @@ public final class Responses {
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
             .build();
     }
-
-    /**
-     * A <b>503_SERVICE_UNAVAILABLE</b> {@link ResponseEntity}.
-     *
-     * <p>
-     * Generally used for cases where either this service is unavailable due to the {@link me.zodac.folding.api.state.SystemState},
-     * or if an external service (such as the Folding@Home API) is unavailable.
-     *
-     * @return the <b>503_SERVICE_UNAVAILABLE</b> {@link ResponseEntity}
-     */
-    public static <E> ResponseEntity<E> serviceUnavailable() {
-        return ResponseEntity
-            .status(HttpStatus.SERVICE_UNAVAILABLE)
-            .build();
-    }
 }

@@ -827,13 +827,13 @@ class UserTest {
 //            .as("Expected old captain of team to no longer be captain")
 //            .isFalse();
 //    }
-
-    private static User findUserById(final Collection<User> users, final int id) {
-        for (final User user : users) {
-            if (user.getId() == id) {
-                return user;
-            }
-        }
-        return null;
-    }
+//
+//    private static User findUserById(final Collection<User> users, final int id) {
+//        for (final User user : users) {
+//            if (user.getId() == id) {
+//                return user;
+//            }
+//        }
+//        return null;
+//    }
 }

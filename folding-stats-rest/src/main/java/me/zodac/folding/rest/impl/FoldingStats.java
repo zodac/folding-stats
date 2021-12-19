@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.service.impl;
+package me.zodac.folding.rest.impl;
 
 import static java.util.stream.Collectors.toList;
 
@@ -33,8 +33,8 @@ import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.service.FoldingStatsService;
-import me.zodac.folding.service.StorageService;
+import me.zodac.folding.rest.api.FoldingStatsService;
+import me.zodac.folding.rest.api.StorageService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +50,7 @@ import org.springframework.stereotype.Component;
 // */
 //@Singleton
 @Component
-public class FoldingStatsEjb implements FoldingStatsService {
+public class FoldingStats implements FoldingStatsService {
 
     private static final Logger LOGGER = LogManager.getLogger();
 

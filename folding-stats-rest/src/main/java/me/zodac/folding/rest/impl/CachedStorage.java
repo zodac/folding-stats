@@ -22,16 +22,26 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.service;
+package me.zodac.folding.rest.impl;
 
 import java.util.Collection;
 import java.util.Optional;
 import me.zodac.folding.api.UserAuthenticationResult;
-import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import org.springframework.stereotype.Service;
+import me.zodac.folding.cache.HardwareCache;
+import me.zodac.folding.cache.InitialStatsCache;
+import me.zodac.folding.cache.OffsetTcStatsCache;
+import me.zodac.folding.cache.TcStatsCache;
+import me.zodac.folding.cache.TeamCache;
+import me.zodac.folding.cache.TotalStatsCache;
+import me.zodac.folding.cache.UserCache;
+import me.zodac.folding.db.DbManagerRetriever;
+import me.zodac.folding.rest.api.StorageService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Component;
 
 ///**
 // * In order to decouple both the REST layer and the {@link FoldingStatsEjb} from the persistence solution we use this interface for CRUD operations.
@@ -43,8 +53,25 @@ import org.springframework.stereotype.Service;
 // * <p>
 // * <b>NOTE:</b> Should only be used by {@link FoldingStatsEjb}, other classes should not go use this class.
 // */
-@Service
-public interface StorageService {
+//@Stateless
+@Component
+public class CachedStorage implements StorageService {
+
+    private static final Logger LOGGER = LogManager.getLogger();
+//    private static final DbManager DB_MANAGER = DbManagerRetriever.get();
+
+    // POJO caches
+    private final HardwareCache hardwareCache = HardwareCache.getInstance();
+    private final TeamCache teamCache = TeamCache.getInstance();
+    private final UserCache userCache = UserCache.getInstance();
+
+    // Stats caches
+//    private final CompetitionSummaryCache competitionSummaryCache = CompetitionSummaryCache.getInstance();
+    private final InitialStatsCache initialStatsCache = InitialStatsCache.getInstance();
+    private final OffsetTcStatsCache offsetTcStatsCache = OffsetTcStatsCache.getInstance();
+    //    private final RetiredTcStatsCache retiredTcStatsCache = RetiredTcStatsCache.getInstance();
+    private final TcStatsCache tcStatsCache = TcStatsCache.getInstance();
+    private final TotalStatsCache totalStatsCache = TotalStatsCache.getInstance();
 
     //    /**
 //     * Creates a {@link Hardware}.
@@ -56,15 +83,15 @@ public interface StorageService {
 //     * @return the created {@link Hardware}, with ID
 //     * @see DbManager#createHardware(Hardware)
 //     */
-//    @Cached(HardwareCache.class)
-    Hardware createHardware(final Hardware hardware);
+    @Override
+    @Cached(HardwareCache.class)
+    public Hardware createHardware(final Hardware hardware) {
+        final Hardware hardwareWithId = DbManagerRetriever.get().createHardware(hardware);
+        hardwareCache.add(hardwareWithId.getId(), hardwareWithId);
+        return hardwareWithId;
+    }
 
-    //        final Hardware hardwareWithId = DB_MANAGER.createHardware(hardware);
-//        hardwareCache.add(hardwareWithId.getId(), hardwareWithId);
-//        return hardwareWithId;
-//    }
-//
-//    /**
+    //    /**
 //     * Retrieves a {@link Hardware}.
 //     *
 //     * <p>
@@ -74,21 +101,22 @@ public interface StorageService {
 //     * @return an {@link Optional} of the retrieved {@link Hardware}
 //     * @see DbManager#getHardware(int)
 //     */
-//    @Cached(HardwareCache.class)
-    Optional<Hardware> getHardware(final int hardwareId);
+    @Override
+    @Cached(HardwareCache.class)
+    public Optional<Hardware> getHardware(final int hardwareId) {
+        final Optional<Hardware> fromCache = hardwareCache.get(hardwareId);
 
-    //        final Optional<Hardware> fromCache = hardwareCache.get(hardwareId);
-//
-//        if (fromCache.isPresent()) {
-//            return fromCache;
-//        }
-//
-//        LOGGER.trace("Cache miss! Get hardware");
-//        final Optional<Hardware> fromDb = DB_MANAGER.getHardware(hardwareId);
-//        fromDb.ifPresent(hardware -> hardwareCache.add(hardwareId, hardware));
-//        return fromDb;
-//    }
-//
+        if (fromCache.isPresent()) {
+            return fromCache;
+        }
+
+        LOGGER.trace("Cache miss! Get hardware");
+        final Optional<Hardware> fromDb = DbManagerRetriever.get().getHardware(hardwareId);
+        fromDb.ifPresent(hardware -> hardwareCache.add(hardwareId, hardware));
+        return fromDb;
+    }
+
+    //
 //    /**
 //     * Retrieves all {@link Hardware}.
 //     *
@@ -98,26 +126,26 @@ public interface StorageService {
 //     * @return a {@link Collection} of the retrieved {@link Hardware}
 //     * @see DbManager#getAllHardware()
 //     */
-//    @Cached(HardwareCache.class)
-    Collection<Hardware> getAllHardware();
+    @Override
+    @Cached(HardwareCache.class)
+    public Collection<Hardware> getAllHardware() {
+        final Collection<Hardware> fromCache = hardwareCache.getAll();
 
-    //        final Collection<Hardware> fromCache = hardwareCache.getAll();
-//
-//        if (!fromCache.isEmpty()) {
-//            return fromCache;
-//        }
-//
-//        LOGGER.trace("Cache miss! Get all hardware");
-//        final Collection<Hardware> fromDb = DB_MANAGER.getAllHardware();
-//
-//        for (final Hardware hardware : fromDb) {
-//            hardwareCache.add(hardware.getId(), hardware);
-//        }
-//
-//        return fromDb;
-//    }
-//
-//    /**
+        if (!fromCache.isEmpty()) {
+            return fromCache;
+        }
+
+        LOGGER.trace("Cache miss! Get all hardware");
+        final Collection<Hardware> fromDb = DbManagerRetriever.get().getAllHardware();
+
+        for (final Hardware hardware : fromDb) {
+            hardwareCache.add(hardware.getId(), hardware);
+        }
+
+        return fromDb;
+    }
+
+    //    /**
 //     * Updates a {@link Hardware}. Expects the {@link Hardware} to have a valid ID.
 //     *
 //     * <p>
@@ -130,22 +158,22 @@ public interface StorageService {
 //     * @return the updated {@link Hardware}
 //     * @see DbManager#updateHardware(Hardware)
 //     */
-//    @Cached({HardwareCache.class, UserCache.class})
-    Hardware updateHardware(final Hardware hardwareToUpdate);
+    @Override
+    @Cached({HardwareCache.class, UserCache.class})
+    public Hardware updateHardware(final Hardware hardwareToUpdate) {
+        final Hardware updatedHardware = DbManagerRetriever.get().updateHardware(hardwareToUpdate);
+        hardwareCache.add(updatedHardware.getId(), updatedHardware);
 
-    //        final Hardware updatedHardware = DB_MANAGER.updateHardware(hardwareToUpdate);
-//        hardwareCache.add(updatedHardware.getId(), updatedHardware);
-//
 //        getAllUsers()
 //            .stream()
 //            .filter(user -> user.getHardware().getId() == updatedHardware.getId())
 //            .map(user -> User.updateHardware(user, updatedHardware))
 //            .forEach(updatedUser -> userCache.add(updatedUser.getId(), updatedUser));
-//
-//        return updatedHardware;
-//    }
-//
-//    /**
+
+        return updatedHardware;
+    }
+
+    //    /**
 //     * Deletes a {@link Hardware}.
 //     *
 //     * <p>
@@ -154,14 +182,15 @@ public interface StorageService {
 //     * @param hardwareId the ID of the {@link Hardware} to delete
 //     * @see DbManager#deleteHardware(int)
 //     */
-//    @Cached(HardwareCache.class)
-    void deleteHardware(final int hardwareId);
-
-    //        DB_MANAGER.deleteHardware(hardwareId);
-//        hardwareCache.remove(hardwareId);
-//    }
+    @Override
+    @Cached(HardwareCache.class)
+    public void deleteHardware(final int hardwareId) {
+        DbManagerRetriever.get().deleteHardware(hardwareId);
+        hardwareCache.remove(hardwareId);
+    }
 //
-//    /**
+
+    //    /**
 //     * Creates a {@link Team}.
 //     *
 //     * <p>
@@ -171,15 +200,15 @@ public interface StorageService {
 //     * @return the created {@link Team}, with ID
 //     * @see DbManager#createTeam(Team)
 //     */
-//    @Cached(TeamCache.class)
-    Team createTeam(final Team team);
+    @Override
+    @Cached(TeamCache.class)
+    public Team createTeam(final Team team) {
+        final Team teamWithId = DbManagerRetriever.get().createTeam(team);
+        teamCache.add(teamWithId.getId(), teamWithId);
+        return teamWithId;
+    }
 
-    //        final Team teamWithId = DB_MANAGER.createTeam(team);
-//        teamCache.add(teamWithId.getId(), teamWithId);
-//        return teamWithId;
-//    }
-//
-//    /**
+    //    /**
 //     * Retrieves a {@link Team}.
 //     *
 //     * <p>
@@ -189,22 +218,22 @@ public interface StorageService {
 //     * @return an {@link Optional} of the retrieved {@link Team}
 //     * @see DbManager#getTeam(int)
 //     */
-//    @Cached(TeamCache.class)
-    Optional<Team> getTeam(final int teamId);
+    @Override
+    @Cached(TeamCache.class)
+    public Optional<Team> getTeam(final int teamId) {
+        final Optional<Team> fromCache = teamCache.get(teamId);
 
-    //        final Optional<Team> fromCache = teamCache.get(teamId);
-//
-//        if (fromCache.isPresent()) {
-//            return fromCache;
-//        }
-//
-//        LOGGER.trace("Cache miss! Get team");
-//        final Optional<Team> fromDb = DB_MANAGER.getTeam(teamId);
-//        fromDb.ifPresent(team -> teamCache.add(teamId, team));
-//        return fromDb;
-//    }
-//
-//    /**
+        if (fromCache.isPresent()) {
+            return fromCache;
+        }
+
+        LOGGER.trace("Cache miss! Get team");
+        final Optional<Team> fromDb = DbManagerRetriever.get().getTeam(teamId);
+        fromDb.ifPresent(team -> teamCache.add(teamId, team));
+        return fromDb;
+    }
+
+    //    /**
 //     * Retrieves all {@link Team}s.
 //     *
 //     * <p>
@@ -213,26 +242,26 @@ public interface StorageService {
 //     * @return a {@link Collection} of the retrieved {@link Team}s
 //     * @see DbManager#getAllTeams()
 //     */
-//    @Cached(TeamCache.class)
-    Collection<Team> getAllTeams();
+    @Override
+    @Cached(TeamCache.class)
+    public Collection<Team> getAllTeams() {
+        final Collection<Team> fromCache = teamCache.getAll();
 
-    //        final Collection<Team> fromCache = teamCache.getAll();
-//
-//        if (!fromCache.isEmpty()) {
-//            return fromCache;
-//        }
-//
-//        LOGGER.trace("Cache miss! Get all teams");
-//        final Collection<Team> fromDb = DB_MANAGER.getAllTeams();
-//
-//        for (final Team team : fromDb) {
-//            teamCache.add(team.getId(), team);
-//        }
-//
-//        return fromDb;
-//    }
-//
-//    /**
+        if (!fromCache.isEmpty()) {
+            return fromCache;
+        }
+
+        LOGGER.trace("Cache miss! Get all teams");
+        final Collection<Team> fromDb = DbManagerRetriever.get().getAllTeams();
+
+        for (final Team team : fromDb) {
+            teamCache.add(team.getId(), team);
+        }
+
+        return fromDb;
+    }
+
+    //    /**
 //     * Updates a {@link Team}. Expects the {@link Team} to have a valid ID.
 //     *
 //     * <p>
@@ -245,22 +274,22 @@ public interface StorageService {
 //     * @return the updated {@link Team}
 //     * @see DbManager#updateTeam(Team)
 //     */
-//    @Cached({TeamCache.class, UserCache.class})
-    Team updateTeam(final Team teamToUpdate);
+    @Override
+    @Cached({TeamCache.class, UserCache.class})
+    public Team updateTeam(final Team teamToUpdate) {
+        final Team updatedTeam = DbManagerRetriever.get().updateTeam(teamToUpdate);
+        teamCache.add(updatedTeam.getId(), updatedTeam);
 
-    //        final Team updatedTeam = DB_MANAGER.updateTeam(teamToUpdate);
-//        teamCache.add(updatedTeam.getId(), updatedTeam);
-//
 //        getAllUsers()
 //            .stream()
 //            .filter(user -> user.getTeam().getId() == updatedTeam.getId())
 //            .map(user -> User.updateTeam(user, updatedTeam))
 //            .forEach(updatedUser -> userCache.add(updatedUser.getId(), updatedUser));
-//
-//        return updatedTeam;
-//    }
-//
-//    /**
+
+        return updatedTeam;
+    }
+
+    //    /**
 //     * Deletes a {@link Team}.
 //     *
 //     * <p>
@@ -269,13 +298,14 @@ public interface StorageService {
 //     * @param teamId the ID of the {@link Team} to delete
 //     * @see DbManager#deleteTeam(int)
 //     */
-//    @Cached(TeamCache.class)
-    void deleteTeam(final int teamId);
+    @Override
+    @Cached(TeamCache.class)
+    public void deleteTeam(final int teamId) {
+        DbManagerRetriever.get().deleteTeam(teamId);
+        teamCache.remove(teamId);
+    }
 
-    //        DB_MANAGER.deleteTeam(teamId);
-//        teamCache.remove(teamId);
-//    }
-//
+    //
 //    /**
 //     * Creates a {@link User}.
 //     *
@@ -286,14 +316,15 @@ public interface StorageService {
 //     * @return the created {@link User}, with ID
 //     * @see DbManager#createUser(User)
 //     */
-//    @Cached(UserCache.class)
-    User createUser(final User user);
+    @Override
+    @Cached(UserCache.class)
+    public User createUser(final User user) {
+        final User userWithId = DbManagerRetriever.get().createUser(user);
+        userCache.add(userWithId.getId(), userWithId);
+        return userWithId;
+    }
 
-    //        final User userWithId = DB_MANAGER.createUser(user);
-//        userCache.add(userWithId.getId(), userWithId);
-//        return userWithId;
-//    }
-//
+    //
 //    /**
 //     * Retrieves a {@link User}.
 //     *
@@ -304,21 +335,22 @@ public interface StorageService {
 //     * @return an {@link Optional} of the retrieved {@link User}
 //     * @see DbManager#getUser(int)
 //     */
-//    @Cached(UserCache.class)
-    Optional<User> getUser(final int userId);
+    @Override
+    @Cached(UserCache.class)
+    public Optional<User> getUser(final int userId) {
+        final Optional<User> fromCache = userCache.get(userId);
 
-    //        final Optional<User> fromCache = userCache.get(userId);
-//
-//        if (fromCache.isPresent()) {
-//            return fromCache;
-//        }
-//
-//        LOGGER.trace("Cache miss! Get user");
-//        final Optional<User> fromDb = DB_MANAGER.getUser(userId);
-//        fromDb.ifPresent(user -> userCache.add(userId, user));
-//        return fromDb;
-//    }
-//
+        if (fromCache.isPresent()) {
+            return fromCache;
+        }
+
+        LOGGER.trace("Cache miss! Get user");
+        final Optional<User> fromDb = DbManagerRetriever.get().getUser(userId);
+        fromDb.ifPresent(user -> userCache.add(userId, user));
+        return fromDb;
+    }
+
+    //
 //    /**
 //     * Retrieves all {@link User}s.
 //     *
@@ -328,25 +360,26 @@ public interface StorageService {
 //     * @return a {@link Collection} of the retrieved {@link User}s
 //     * @see DbManager#getAllUsers()
 //     */
-//    @Cached(UserCache.class)
-    Collection<User> getAllUsers();
+    @Override
+    @Cached(UserCache.class)
+    public Collection<User> getAllUsers() {
+        final Collection<User> fromCache = userCache.getAll();
 
-    //        final Collection<User> fromCache = userCache.getAll();
-//
-//        if (!fromCache.isEmpty()) {
-//            return fromCache;
-//        }
-//
-//        LOGGER.trace("Cache miss! Get all users");
-//        final Collection<User> fromDb = DB_MANAGER.getAllUsers();
-//
-//        for (final User user : fromDb) {
-//            userCache.add(user.getId(), user);
-//        }
-//
-//        return fromDb;
-//    }
-//
+        if (!fromCache.isEmpty()) {
+            return fromCache;
+        }
+
+        LOGGER.trace("Cache miss! Get all users");
+        final Collection<User> fromDb = DbManagerRetriever.get().getAllUsers();
+
+        for (final User user : fromDb) {
+            userCache.add(user.getId(), user);
+        }
+
+        return fromDb;
+    }
+
+    //
 //    /**
 //     * Updates a {@link User}. Expects the {@link User} to have a valid ID.
 //     *
@@ -357,15 +390,15 @@ public interface StorageService {
 //     * @return the updated {@link User}
 //     * @see DbManager#updateUser(User)
 //     */
-//    @Cached(UserCache.class)
-    User updateUser(final User userToUpdate);
+    @Override
+    @Cached(UserCache.class)
+    public User updateUser(final User userToUpdate) {
+        final User updatedUser = DbManagerRetriever.get().updateUser(userToUpdate);
+        userCache.add(updatedUser.getId(), updatedUser);
+        return updatedUser;
+    }
 
-    //        final User updatedUser = DB_MANAGER.updateUser(userToUpdate);
-//        userCache.add(updatedUser.getId(), updatedUser);
-//        return updatedUser;
-//    }
-//
-//    /**
+    //    /**
 //     * Deletes a {@link User}.
 //     *
 //     * <p>
@@ -383,17 +416,18 @@ public interface StorageService {
 //     * @param userId the ID of the {@link User} to delete
 //     * @see DbManager#deleteUser(int)
 //     */
-//    @Cached({UserCache.class, InitialStatsCache.class, OffsetTcStatsCache.class, TcStatsCache.class, TotalStatsCache.class})
-    void deleteUser(final int userId);
-//        DB_MANAGER.deleteUser(userId);
-//        userCache.remove(userId);
-//
-//        // Remove the user entry from all stats caches
-//        offsetTcStatsCache.remove(userId);
-//        totalStatsCache.remove(userId);
-//        initialStatsCache.remove(userId);
-//        tcStatsCache.remove(userId);
-//    }
+    @Override
+    @Cached({UserCache.class, InitialStatsCache.class, OffsetTcStatsCache.class, TcStatsCache.class, TotalStatsCache.class})
+    public void deleteUser(final int userId) {
+        DbManagerRetriever.get().deleteUser(userId);
+        userCache.remove(userId);
+
+        // Remove the user entry from all stats caches
+        offsetTcStatsCache.remove(userId);
+        totalStatsCache.remove(userId);
+        initialStatsCache.remove(userId);
+        tcStatsCache.remove(userId);
+    }
 //
 //    /**
 //     * Creates a {@link MonthlyResult} for the <code>Team Competition</code>.
@@ -479,14 +513,11 @@ public interface StorageService {
 //        retiredTcStatsCache.removeAll();
 //    }
 
-    /**
-     * Authenticates a system user with {@link DbManager}.
-     *
-     * @param userName the system user username
-     * @param password the system user password
-     * @return the {@link UserAuthenticationResult}
-     */
-    UserAuthenticationResult authenticateSystemUser(final String userName, final String password);
+    @Override
+    @NotCached
+    public UserAuthenticationResult authenticateSystemUser(final String userName, final String password) {
+        return DbManagerRetriever.get().authenticateSystemUser(userName, password);
+    }
 //
 //    /**
 //     * Retrieves the {@link HistoricStats} for a given {@link User} ID for a specific {@code day}, {@link Month} or {@link Year}.

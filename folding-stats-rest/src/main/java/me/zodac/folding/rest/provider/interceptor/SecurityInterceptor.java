@@ -20,9 +20,10 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
+ *
  */
 
-package me.zodac.folding.rest.provider.interceptor.security;
+package me.zodac.folding.rest.provider.interceptor;
 
 import static java.util.stream.Collectors.toSet;
 import static me.zodac.folding.api.util.CollectionUtils.containsNoMatches;
@@ -39,8 +40,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.util.EncodingUtils;
+import me.zodac.folding.rest.api.FoldingStatsService;
 import me.zodac.folding.rest.api.header.RestHeader;
-import me.zodac.folding.service.FoldingStatsService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.web.method.HandlerMethod;
@@ -101,10 +102,9 @@ public class SecurityInterceptor implements HandlerInterceptor {
         return new SecurityInterceptor(foldingStatsService);
     }
 
-
     @Override
     public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler) {
-        LOGGER.info("Validating REST request at '{}'", request::getRequestURI);
+        LOGGER.debug("Validating REST request at '{}'", request::getRequestURI);
 
         try {
             if (handler instanceof HandlerMethod) {
