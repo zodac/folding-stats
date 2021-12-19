@@ -30,7 +30,7 @@ package me.zodac.folding.test.util;
 public class TestConstants {
 
     // URL
-    public static final String TEST_IP_ADDRESS = System.getProperty("testIpAddress");
+    public static final String TEST_IP_ADDRESS = System.getProperty("testIpAddress", "127.0.0.1");
     public static final String TEST_SERVICE_URL = "http://" + TEST_IP_ADDRESS + ":8081";
     public static final String FOLDING_URL = TEST_SERVICE_URL + "/folding";
 

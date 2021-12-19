@@ -133,7 +133,7 @@ public class TeamEndpoint {
     }
 
     /**
-     * {@link GetMapping} request to retrieve a {@link Team}.
+     * {@link GetMapping} request to retrieve a {@link Team} by {@code teamId}.
      *
      * @param teamId  the ID of the {@link Team} to retrieve
      * @param request the {@link HttpServletRequest}
@@ -167,7 +167,7 @@ public class TeamEndpoint {
     }
 
     /**
-     * {@link GetMapping} request to retrieve a {@link Team}.
+     * {@link GetMapping} request to retrieve a {@link Team} by {@code teamName}.
      *
      * @param teamName the {@code teamName} of the {@link Team} to retrieve
      * @param request  the {@link HttpServletRequest}
@@ -316,7 +316,6 @@ public class TeamEndpoint {
     }
 
     private ValidationResult<Team> validateDelete(final Team team) {
-        return ValidationResult.successful(team);
-//        return TeamValidator.validateDelete(team, foldingStatsCore.getAllUsersWithoutPasskeys());
+        return TeamValidator.validateDelete(team, foldingStatsService.getAllUsersWithoutPasskeys());
     }
 }

@@ -22,11 +22,13 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.test.stub;
+package me.zodac.folding.rest.stub;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import javax.websocket.server.PathParam;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -44,78 +46,76 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-
 /**
- * Stubbed endpoint for the Folding@Home user 'stats' API. Used to retrieve the total points count for a user/passkey across all teams for tests,
- * rather than going to the real API.
+ * Stubbed endpoint for the Folding@Home 'bonus' API. Used to retrieve the WU count for a user/passkey for tests, rather than going to the real API.
  *
  * <p>
- * We expose additional endpoints to allow the tests to set the points for a given user.
+ * We expose additional endpoints to allow the tests to set the WUs for a given user.
  *
- * @see <a href="https://api2.foldingathome.org/#GET-/user/:name/stats">Real user stats API</a>
+ * @see <a href="https://api2.foldingathome.org/#GET-/bonus">Real bonus API</a>
  */
 @RestController
-@RequestMapping("/user")
-public class StubbedPointsEndpoint {
+@RequestMapping("/bonus")
+public class StubbedUnitsEndpoint {
 
-    private static final long NO_POINTS = 0L;
+    private static final int NO_UNITS = 0;
 
-    private final Map<String, Long> pointsByUserAndPasskey = new HashMap<>();
+    private final Map<String, Integer> unitsByUserAndPasskey = new HashMap<>();
 
     /**
-     * <b>GET</b> request that retrieves the points for a Folding@Home user.
+     * <b>GET</b> request that retrieves the units for a Folding@Home user.
      *
      * @param foldingUserName the Folding@Home user's username
      * @param passkey         the Folding@Home user's passkey
-     * @return the Folding@Home user's {@link PointsResponse}
+     * @return the Folding@Home user's {@link UnitsResponse}
      */
-    @GetMapping(value = "/{foldingUserName}/stats", produces = MediaType.APPLICATION_JSON_VALUE)
-    public PointsResponse getUserPoints(@PathParam("foldingUserName") final String foldingUserName, @RequestParam("passkey") final String passkey) {
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public Collection<UnitsResponse> getUserUnits(@RequestParam("user") final String foldingUserName, @RequestParam("passkey") final String passkey) {
         return createResponse(foldingUserName, passkey);
     }
 
     /**
-     * <b>POST</b>> request that sets the points for a Folding@Home user.
+     * <b>POST</b> request that sets the units for a Folding@Home user.
      *
      * <p>
-     * Since in the test environment we do not want a user to actually have to complete units and earn points, we can manually set them here.
+     * Since in the test environment we do not want a user to actually have to complete units, we can manually set them here.
      *
      * @param foldingUserName the Folding@Home user's username
      * @param passkey         the Folding@Home user's passkey
-     * @param points          the points to set
+     * @param units           the units to set
      */
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PostMapping(value = "/{foldingUserName}/stats", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public void updateUserPoints(@PathParam("foldingUserName") final String foldingUserName,
-                                 @RequestParam("passkey") final String passkey,
-                                 @RequestParam("points") final long points) {
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public void updateUserUnits(@RequestParam("user") final String foldingUserName,
+                                @RequestParam("passkey") final String passkey,
+                                @RequestParam("units") final int units) {
+        System.out.println("Adding units: " + foldingUserName + ", " + passkey + ", " + units);
         final String key = foldingUserName + passkey;
 
-        if (points == NO_POINTS) {
-            // Remove all points from the user
-            pointsByUserAndPasskey.put(key, points);
+        if (units == NO_UNITS) {
+            // Remove all units from the user
+            unitsByUserAndPasskey.put(key, units);
         } else {
-            pointsByUserAndPasskey.put(key, pointsByUserAndPasskey.getOrDefault(key, NO_POINTS) + points);
+            unitsByUserAndPasskey.put(key, unitsByUserAndPasskey.getOrDefault(key, NO_UNITS) + units);
         }
     }
 
     /**
-     * <b>DELETE</b> request that resets the points for all Folding@Home users.
+     * <b>DELETE</b>> request that resets the units for all Folding@Home users.
      */
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping
-    public void deleteUserPoints() {
-        pointsByUserAndPasskey.clear();
+    public void deleteUserUnits() {
+        unitsByUserAndPasskey.clear();
     }
 
-    private PointsResponse createResponse(final String foldingUserName, final String passkey) {
+    private Collection<UnitsResponse> createResponse(final String foldingUserName, final String passkey) {
         final String key = foldingUserName + passkey;
-
-        if (pointsByUserAndPasskey.containsKey(key)) {
-            return PointsResponse.create(pointsByUserAndPasskey.get(key));
+        if (unitsByUserAndPasskey.containsKey(key)) {
+            return List.of(UnitsResponse.create(unitsByUserAndPasskey.get(key)));
         }
 
-        return PointsResponse.empty();
+        return Collections.emptyList();
     }
 
     @NoArgsConstructor
@@ -124,16 +124,12 @@ public class StubbedPointsEndpoint {
     @Setter
     @EqualsAndHashCode
     @ToString(doNotUseGetters = true)
-    private static class PointsResponse {
+    private static class UnitsResponse {
 
-        private long earned;
+        private int finished;
 
-        public static PointsResponse create(final long earned) {
-            return new PointsResponse(earned);
-        }
-
-        public static PointsResponse empty() {
-            return create(NO_POINTS);
+        public static UnitsResponse create(final int finished) {
+            return new UnitsResponse(finished);
         }
     }
 }

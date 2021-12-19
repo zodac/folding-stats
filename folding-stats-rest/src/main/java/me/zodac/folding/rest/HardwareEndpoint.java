@@ -267,6 +267,7 @@ public class HardwareEndpoint {
      * {@link DeleteMapping} request to delete an existing {@link Hardware}.
      *
      * @param hardwareId the ID of the {@link Hardware} to be deleted
+     * @param request    the {@link HttpServletRequest}
      * @return {@link Responses#ok()}
      */
     @WriteRequired
@@ -314,7 +315,6 @@ public class HardwareEndpoint {
     }
 
     private ValidationResult<Hardware> validateDelete(final Hardware hardware) {
-        return ValidationResult.successful(hardware);
-//        return HardwareValidator.validateDelete(hardware, foldingStatsService.getAllUsersWithoutPasskeys());
+        return HardwareValidator.validateDelete(hardware, foldingStatsService.getAllUsersWithoutPasskeys());
     }
 }

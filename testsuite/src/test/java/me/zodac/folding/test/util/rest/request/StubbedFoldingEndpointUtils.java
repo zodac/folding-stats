@@ -25,7 +25,7 @@
 package me.zodac.folding.test.util.rest.request;
 
 import static me.zodac.folding.rest.util.RestUtilConstants.HTTP_CLIENT;
-import static me.zodac.folding.test.util.TestConstants.TEST_SERVICE_URL;
+import static me.zodac.folding.test.util.TestConstants.FOLDING_URL;
 
 import java.io.IOException;
 import java.net.URI;
@@ -40,9 +40,9 @@ import me.zodac.folding.rest.api.tc.request.UserRequest;
  */
 public final class StubbedFoldingEndpointUtils {
 
-    private static final String POINTS_URL_ROOT = TEST_SERVICE_URL + "/user";
+    private static final String POINTS_URL_ROOT = FOLDING_URL + "/user";
     private static final String POINTS_URL_FORMAT = POINTS_URL_ROOT + "/%s/stats?passkey=%s&points=%s";
-    private static final String UNIT_URL_ROOT = TEST_SERVICE_URL + "/bonus";
+    private static final String UNIT_URL_ROOT = FOLDING_URL + "/bonus";
     private static final String UNIT_URL_FORMAT = UNIT_URL_ROOT + "?user=%s&passkey=%s&units=%s";
 
     private StubbedFoldingEndpointUtils() {

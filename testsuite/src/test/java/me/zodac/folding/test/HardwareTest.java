@@ -51,8 +51,11 @@ import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
+import me.zodac.folding.rest.api.tc.request.UserRequest;
 import me.zodac.folding.test.util.TestConstants;
+import me.zodac.folding.test.util.TestGenerator;
 import me.zodac.folding.test.util.rest.request.HardwareUtils;
+import me.zodac.folding.test.util.rest.request.UserUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
@@ -385,18 +388,18 @@ class HardwareTest {
             .as("Did not receive the original hardware in response")
             .isTrue();
     }
-// TODO: [zodac] Re-enable
-//    @Test
-//    void whenDeletingHardware_givenTheHardwareIsLinkedToUser_thenResponseHas409Status() throws FoldingRestException {
-//        final int hardwareId = create(generateHardware()).getId();
-//        final UserRequest user = TestGenerator.generateUserWithHardwareId(hardwareId);
-//        UserUtils.create(user);
-//
-//        final HttpResponse<Void> deleteHardwareResponse = HARDWARE_REQUEST_SENDER.delete(hardwareId, ADMIN_USER.userName(), ADMIN_USER.password());
-//        assertThat(deleteHardwareResponse.statusCode())
-//            .as("Expected to fail due to a 409_CONFLICT: " + deleteHardwareResponse)
-//            .isEqualTo(HttpURLConnection.HTTP_CONFLICT);
-//    }
+
+    @Test
+    void whenDeletingHardware_givenTheHardwareIsLinkedToUser_thenResponseHas409Status() throws FoldingRestException {
+        final int hardwareId = create(generateHardware()).getId();
+        final UserRequest user = TestGenerator.generateUserWithHardwareId(hardwareId);
+        UserUtils.create(user);
+
+        final HttpResponse<Void> deleteHardwareResponse = HARDWARE_REQUEST_SENDER.delete(hardwareId, ADMIN_USER.userName(), ADMIN_USER.password());
+        assertThat(deleteHardwareResponse.statusCode())
+            .as("Expected to fail due to a 409_CONFLICT: " + deleteHardwareResponse)
+            .isEqualTo(HttpURLConnection.HTTP_CONFLICT);
+    }
 
     @Test
     void whenCreatingHardware_givenNoAuthentication_thenRequestFails_andResponseHas401Status() throws FoldingRestException {

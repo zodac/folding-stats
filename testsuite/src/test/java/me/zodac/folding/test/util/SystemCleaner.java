@@ -29,21 +29,16 @@ import static me.zodac.folding.test.util.rest.request.HardwareUtils.HARDWARE_REQ
 import static me.zodac.folding.test.util.rest.request.TeamUtils.TEAM_REQUEST_SENDER;
 import static me.zodac.folding.test.util.rest.request.UserUtils.USER_REQUEST_SENDER;
 
-import java.net.HttpURLConnection;
-import java.net.http.HttpResponse;
-import java.util.Collection;
-import java.util.Collections;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.client.java.response.TeamResponseParser;
-import me.zodac.folding.client.java.response.UserResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 import me.zodac.folding.test.util.db.DatabaseUtils;
 import me.zodac.folding.test.util.rest.request.HardwareUtils;
 import me.zodac.folding.test.util.rest.request.StubbedFoldingEndpointUtils;
 import me.zodac.folding.test.util.rest.request.TeamCompetitionStatsUtils;
+import me.zodac.folding.test.util.rest.request.TeamUtils;
 import me.zodac.folding.test.util.rest.request.UserUtils;
 
 /**
@@ -80,8 +75,7 @@ public final class SystemCleaner {
     public static void cleanSystemForSimpleTests() throws FoldingRestException {
         DatabaseUtils.truncateTableAndResetId("retired_user_stats");
 
-//        for (final User user : UserUtils.getAll()) {
-        for (final User user : getAllUsers()) {
+        for (final User user : UserUtils.getAll()) {
             if (!user.isUserIsCaptain()) {
                 USER_REQUEST_SENDER.delete(user.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
                 continue;
@@ -105,8 +99,7 @@ public final class SystemCleaner {
             USER_REQUEST_SENDER.delete(userWithPasskey.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
         }
 
-//        for (final Team team : TeamUtils.getAll()) {
-        for (final Team team : getAllTeams()) {
+        for (final Team team : TeamUtils.getAll()) {
             TEAM_REQUEST_SENDER.delete(team.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
         }
 
@@ -143,24 +136,5 @@ public final class SystemCleaner {
 
         TeamCompetitionStatsUtils.manuallyResetStats();
         cleanSystemForSimpleTests();
-    }
-
-    // TODO: [zodac] Remove these
-    private static Collection<User> getAllUsers() throws FoldingRestException {
-        final HttpResponse<String> response = USER_REQUEST_SENDER.getAll();
-        if (response.statusCode() == HttpURLConnection.HTTP_OK) {
-            return UserResponseParser.getAll(response);
-        }
-
-        return Collections.emptyList();
-    }
-
-    private static Collection<Team> getAllTeams() throws FoldingRestException {
-        final HttpResponse<String> response = TEAM_REQUEST_SENDER.getAll();
-        if (response.statusCode() == HttpURLConnection.HTTP_OK) {
-            return TeamResponseParser.getAll(response);
-        }
-
-        return Collections.emptyList();
     }
 }

@@ -30,6 +30,7 @@ import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
+import me.zodac.folding.api.tc.User;
 import org.springframework.stereotype.Service;
 
 ///**
@@ -42,25 +43,8 @@ import org.springframework.stereotype.Service;
 // * <p>
 // * <b>NOTE:</b> Should only be used by {@link FoldingStatsEjb}, other classes should not go use this class.
 // */
-//@Stateless
 @Service
 public interface StorageService {
-
-    //    private static final Logger LOGGER = LogManager.getLogger();
-//    private static final DbManager DB_MANAGER = DbManagerRetriever.get();
-
-    // POJO caches
-//    private final HardwareCache hardwareCache = HardwareCache.getInstance();
-//    private final TeamCache teamCache = TeamCache.getInstance();
-//    private final UserCache userCache = UserCache.getInstance();
-
-    // Stats caches
-//    private final CompetitionSummaryCache competitionSummaryCache = CompetitionSummaryCache.getInstance();
-//    private final InitialStatsCache initialStatsCache = InitialStatsCache.getInstance();
-//    private final OffsetTcStatsCache offsetTcStatsCache = OffsetTcStatsCache.getInstance();
-//    private final RetiredTcStatsCache retiredTcStatsCache = RetiredTcStatsCache.getInstance();
-//    private final TcStatsCache tcStatsCache = TcStatsCache.getInstance();
-//    private final TotalStatsCache totalStatsCache = TotalStatsCache.getInstance();
 
     //    /**
 //     * Creates a {@link Hardware}.
@@ -287,7 +271,8 @@ public interface StorageService {
 //     */
 //    @Cached(TeamCache.class)
     void deleteTeam(final int teamId);
-//        DB_MANAGER.deleteTeam(teamId);
+
+    //        DB_MANAGER.deleteTeam(teamId);
 //        teamCache.remove(teamId);
 //    }
 //
@@ -302,8 +287,9 @@ public interface StorageService {
 //     * @see DbManager#createUser(User)
 //     */
 //    @Cached(UserCache.class)
-//    public User createUser(final User user) {
-//        final User userWithId = DB_MANAGER.createUser(user);
+    User createUser(final User user);
+
+    //        final User userWithId = DB_MANAGER.createUser(user);
 //        userCache.add(userWithId.getId(), userWithId);
 //        return userWithId;
 //    }
@@ -319,8 +305,9 @@ public interface StorageService {
 //     * @see DbManager#getUser(int)
 //     */
 //    @Cached(UserCache.class)
-//    public Optional<User> getUser(final int userId) {
-//        final Optional<User> fromCache = userCache.get(userId);
+    Optional<User> getUser(final int userId);
+
+    //        final Optional<User> fromCache = userCache.get(userId);
 //
 //        if (fromCache.isPresent()) {
 //            return fromCache;
@@ -342,8 +329,9 @@ public interface StorageService {
 //     * @see DbManager#getAllUsers()
 //     */
 //    @Cached(UserCache.class)
-//    public Collection<User> getAllUsers() {
-//        final Collection<User> fromCache = userCache.getAll();
+    Collection<User> getAllUsers();
+
+    //        final Collection<User> fromCache = userCache.getAll();
 //
 //        if (!fromCache.isEmpty()) {
 //            return fromCache;
@@ -370,8 +358,9 @@ public interface StorageService {
 //     * @see DbManager#updateUser(User)
 //     */
 //    @Cached(UserCache.class)
-//    public User updateUser(final User userToUpdate) {
-//        final User updatedUser = DB_MANAGER.updateUser(userToUpdate);
+    User updateUser(final User userToUpdate);
+
+    //        final User updatedUser = DB_MANAGER.updateUser(userToUpdate);
 //        userCache.add(updatedUser.getId(), updatedUser);
 //        return updatedUser;
 //    }
@@ -395,7 +384,7 @@ public interface StorageService {
 //     * @see DbManager#deleteUser(int)
 //     */
 //    @Cached({UserCache.class, InitialStatsCache.class, OffsetTcStatsCache.class, TcStatsCache.class, TotalStatsCache.class})
-//    public void deleteUser(final int userId) {
+    void deleteUser(final int userId);
 //        DB_MANAGER.deleteUser(userId);
 //        userCache.remove(userId);
 //

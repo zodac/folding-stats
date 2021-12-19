@@ -53,7 +53,9 @@ import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
 import me.zodac.folding.test.util.TestConstants;
+import me.zodac.folding.test.util.TestGenerator;
 import me.zodac.folding.test.util.rest.request.TeamUtils;
+import me.zodac.folding.test.util.rest.request.UserUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
@@ -398,17 +400,16 @@ class TeamTest {
             .containsExactly(createdTeam.getId(), createdTeam.getTeamName(), createdTeam.getTeamDescription(), createdTeam.getForumLink());
     }
 
-    // TODO: [zodac] Re-enable
-//    @Test
-//    void whenDeletingTeam_givenTheTeamIsLinkedToUser_thenResponseHas409Status() throws FoldingRestException {
-//        final int teamId = create(generateTeam()).getId();
-//        UserUtils.create(TestGenerator.generateUserWithTeamId(teamId));
-//
-//        final HttpResponse<Void> deleteTeamResponse = TEAM_REQUEST_SENDER.delete(teamId, ADMIN_USER.userName(), ADMIN_USER.password());
-//        assertThat(deleteTeamResponse.statusCode())
-//            .as("Expected to fail due to a 409_CONFLICT: " + deleteTeamResponse)
-//            .isEqualTo(HttpURLConnection.HTTP_CONFLICT);
-//    }
+    @Test
+    void whenDeletingTeam_givenTheTeamIsLinkedToUser_thenResponseHas409Status() throws FoldingRestException {
+        final int teamId = create(generateTeam()).getId();
+        UserUtils.create(TestGenerator.generateUserWithTeamId(teamId));
+
+        final HttpResponse<Void> deleteTeamResponse = TEAM_REQUEST_SENDER.delete(teamId, ADMIN_USER.userName(), ADMIN_USER.password());
+        assertThat(deleteTeamResponse.statusCode())
+            .as("Expected to fail due to a 409_CONFLICT: " + deleteTeamResponse)
+            .isEqualTo(HttpURLConnection.HTTP_CONFLICT);
+    }
 
     @Test
     void whenCreatingTeam_givenNoAuthentication_thenRequestFails_andResponseHas401Status() throws FoldingRestException {

@@ -29,6 +29,10 @@ import java.util.Optional;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
+import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
+import me.zodac.folding.api.tc.stats.UserStats;
+import me.zodac.folding.api.tc.stats.UserTcStats;
 import org.springframework.stereotype.Service;
 
 /**
@@ -121,95 +125,95 @@ public interface FoldingStatsService {
      * @param team the {@link Team} to delete
      */
     void deleteTeam(final Team team);
-//
-//    /**
-//     * Creates a {@link User}.
-//     *
-//     * <p>
-//     * Creates initial {@link UserStats} on creation. Also triggers a new <code>Team Competition</code> stats parse.
-//     *
-//     * @param user the {@link User} to create
-//     * @return the created {@link User}, with ID
-//     * @see me.zodac.folding.core.tc.user.UserStatsParser#parseTcStatsForUser(User)
-//     */
-//    User createUser(final User user);
-//
-//    /**
-//     * Retrieves a {@link User}, with the passkey unmodified.
-//     *
-//     * @param userId the ID of the {@link User} to retrieve
-//     * @return an {@link Optional} of the retrieved {@link User}
-//     */
-//    Optional<User> getUserWithPasskey(final int userId);
-//
-//    /**
-//     * Retrieves a {@link User}, with the passkey masked.
-//     *
-//     * @param userId the ID of the {@link User} to retrieve
-//     * @return an {@link Optional} of the retrieved {@link User}
-//     */
-//    Optional<User> getUserWithoutPasskey(final int userId);
-//
-//    /**
-//     * Retrieves all {@link User}, with the passkey unmodified.
-//     *
-//     * @return a {@link Collection} of the retrieved {@link User}s
-//     */
-//    Collection<User> getAllUsersWithPasskeys();
-//
-//    /**
-//     * Retrieves all {@link User}, with the passkey masked.
-//     *
-//     * @return a {@link Collection} of the retrieved {@link User}s
-//     */
-//    Collection<User> getAllUsersWithoutPasskeys();
-//
-//    /**
-//     * Updates an existing {@link User}.
-//     *
-//     * <p>
-//     * Also handles state change to this {@link User} if necessary.
-//     *
-//     * @param userToUpdate the {@link User} with updated values
-//     * @param existingUser the existing {@link User}
-//     * @return the updated {@link User}
-//     * @see me.zodac.folding.core.tc.user.UserStateChangeHandler#isUserStateChange(User, User)
-//     */
-//    User updateUser(final User userToUpdate, final User existingUser);
-//
-//    /**
-//     * Deletes a {@link User}.
-//     *
-//     * <p>
-//     * If the {@link User} has any <code>Team Competition</code> {@link UserTcStats}, those are retained for their {@link Team} as
-//     * {@link RetiredUserTcStats}.
-//     *
-//     * @param user the {@link User} to delete
-//     */
-//    void deleteUser(final User user);
-//
-//    /**
-//     * Retrieves all {@link User}s currently referencing the provided {@link Team}.
-//     *
-//     * <p>
-//     * The {@link User} {@code passkey} will be masked with {@link User#hidePasskey(User)}.
-//     *
-//     * @param team the {@link Team} to check for
-//     * @return a {@link Collection} of {@link User}s using the {@link Team}
-//     */
-//    Collection<User> getUsersOnTeam(final Team team);
-//
-//    /**
-//     * Retrieves all {@link User}s currently referencing the provided {@link Team}.
-//     *
-//     * <p>
-//     * The {@link User} {@code passkey} will be available in plaintext, so should only be used for internal processing.
-//     *
-//     * @param team the {@link Team} to check for
-//     * @return a {@link Collection} of {@link User}s using the {@link Team}
-//     */
-//    Collection<User> getUsersOnTeamWithPasskeys(final Team team);
-//
+
+    /**
+     * Creates a {@link User}.
+     *
+     * <p>
+     * Creates initial {@link UserStats} on creation. Also triggers a new <code>Team Competition</code> stats parse.
+     *
+     * @param user the {@link User} to create
+     * @return the created {@link User}, with ID
+     * //     * @see me.zodac.folding.core.tc.user.UserStatsParser#parseTcStatsForUser(User)
+     */
+    User createUser(final User user);
+
+    /**
+     * Retrieves a {@link User}, with the passkey unmodified.
+     *
+     * @param userId the ID of the {@link User} to retrieve
+     * @return an {@link Optional} of the retrieved {@link User}
+     */
+    Optional<User> getUserWithPasskey(final int userId);
+
+    /**
+     * Retrieves a {@link User}, with the passkey masked.
+     *
+     * @param userId the ID of the {@link User} to retrieve
+     * @return an {@link Optional} of the retrieved {@link User}
+     */
+    Optional<User> getUserWithoutPasskey(final int userId);
+
+    /**
+     * Retrieves all {@link User}, with the passkey unmodified.
+     *
+     * @return a {@link Collection} of the retrieved {@link User}s
+     */
+    Collection<User> getAllUsersWithPasskeys();
+
+    /**
+     * Retrieves all {@link User}, with the passkey masked.
+     *
+     * @return a {@link Collection} of the retrieved {@link User}s
+     */
+    Collection<User> getAllUsersWithoutPasskeys();
+
+    /**
+     * Updates an existing {@link User}.
+     *
+     * <p>
+     * Also handles state change to this {@link User} if necessary.
+     *
+     * @param userToUpdate the {@link User} with updated values
+     * @param existingUser the existing {@link User}
+     * @return the updated {@link User}
+     * //     * @see me.zodac.folding.core.tc.user.UserStateChangeHandler#isUserStateChange(User, User)
+     */
+    User updateUser(final User userToUpdate, final User existingUser);
+
+    /**
+     * Deletes a {@link User}.
+     *
+     * <p>
+     * If the {@link User} has any <code>Team Competition</code> {@link UserTcStats}, those are retained for their {@link Team} as
+     * {@link RetiredUserTcStats}.
+     *
+     * @param user the {@link User} to delete
+     */
+    void deleteUser(final User user);
+
+    /**
+     * Retrieves all {@link User}s currently referencing the provided {@link Team}.
+     *
+     * <p>
+     * The {@link User} {@code passkey} will be masked with {@link User#hidePasskey(User)}.
+     *
+     * @param team the {@link Team} to check for
+     * @return a {@link Collection} of {@link User}s using the {@link Team}
+     */
+    Collection<User> getUsersOnTeam(final Team team);
+
+    /**
+     * Retrieves all {@link User}s currently referencing the provided {@link Team}.
+     *
+     * <p>
+     * The {@link User} {@code passkey} will be available in plaintext, so should only be used for internal processing.
+     *
+     * @param team the {@link Team} to check for
+     * @return a {@link Collection} of {@link User}s using the {@link Team}
+     */
+    Collection<User> getUsersOnTeamWithPasskeys(final Team team);
+
 //    /**
 //     * Creates a {@link MonthlyResult} for the <code>Team Competition</code>.
 //     *
