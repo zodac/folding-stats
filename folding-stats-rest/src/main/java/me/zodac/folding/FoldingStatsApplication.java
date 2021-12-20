@@ -25,6 +25,7 @@
 package me.zodac.folding;
 
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
@@ -41,7 +42,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * Base {@link FoldingStatsApplication}.
@@ -54,7 +54,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * <p>
  * The {@code jooq} transitive dependency {@link R2dbcAutoConfiguration} must also be disabled.
  */
-@EnableScheduling
+//@EnableScheduling
 @SpringBootApplication(exclude = {R2dbcAutoConfiguration.class})
 public class FoldingStatsApplication {
 
@@ -78,6 +78,7 @@ public class FoldingStatsApplication {
     @Bean
     public CommandLineRunner initialisation(final ApplicationContext ctx) {
         return args -> {
+            Thread.sleep(TimeUnit.SECONDS.toMillis(10)); // TODO: [zodac] DB might not be online by now, what do?
             initCaches();
             initTcStats();
 

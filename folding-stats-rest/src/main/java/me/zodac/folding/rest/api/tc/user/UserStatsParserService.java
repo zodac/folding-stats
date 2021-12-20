@@ -25,6 +25,7 @@
 
 package me.zodac.folding.rest.api.tc.user;
 
+import java.util.Collection;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.Stats;
 import org.springframework.stereotype.Service;
@@ -36,19 +37,19 @@ import org.springframework.stereotype.Service;
 public interface UserStatsParserService {
 
     /**
-     * Parses the latest TC stats for the given {@link User}.
+     * Parses the latest TC stats for the given {@link User}s.
      *
      * <p>
      * Method blocks until the stats have been parsed, calculated and persisted.
      *
-     * @param user the {@link User} whose TC stats are to be parsed
+     * @param users the {@link User}s whose TC stats are to be parsed
      */
-    void parseTcStatsForUserAndWait(final User user);
+    void parseTcStatsForUserAndWait(final Collection<User> users);
 
     /**
-     * Parses the latest TC stats for the given {@link User}.
+     * Parses the latest TC stats for the given {@link User}s.
      *
-     * @param user the {@link User} whose TC stats are to be parsed
+     * @param users the {@link User}s whose TC stats are to be parsed
      */
-    void parseTcStatsForUser(final User user);
+    void parseTcStatsForUser(final Collection<User> users);
 }

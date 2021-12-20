@@ -71,12 +71,6 @@ public class FoldingServiceImpl implements FoldingService {
     @Autowired
     private FoldingStatsService foldingStatsService;
 
-//    @Autowired
-//    private StatsSchedulerService statsScheduler;
-
-//    @Autowired
-//    private UserCaptainHandlerService userCaptainHandler;
-
     @Autowired
     private UserStateChangeHandlerService userStateChangeHandler;
 
@@ -137,7 +131,10 @@ public class FoldingServiceImpl implements FoldingService {
     @Override
     public Team createTeam(final Team team) {
         final Team createdTeam = storageService.createTeam(team);
-//        statsScheduler.manualTeamCompetitionStatsParsing(ProcessingType.SYNCHRONOUS);
+
+        // Manual update to add the new (empty) team to the stats
+        final Collection<User> users = getAllUsersWithPasskeys();
+        userStatsParser.parseTcStatsForUserAndWait(users);
         return createdTeam;
     }
 
@@ -174,7 +171,7 @@ public class FoldingServiceImpl implements FoldingService {
             final UserStats currentUserStats = FOLDING_STATS_RETRIEVER.getTotalStats(createdUser);
             final UserStats initialStats = foldingStatsService.createInitialStats(currentUserStats);
             LOGGER.info("User '{}' (ID: {}) created with initial stats: {}", createdUser.getDisplayName(), createdUser.getId(), initialStats);
-            userStatsParser.parseTcStatsForUser(createdUser);
+            userStatsParser.parseTcStatsForUser(Collections.singletonList(createdUser));
         } catch (final ExternalConnectionException e) {
             LOGGER.error("Error retrieving initial stats for user '{}' (ID: {})", createdUser.getDisplayName(), createdUser.getId(), e);
         }

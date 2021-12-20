@@ -27,6 +27,7 @@ package me.zodac.folding.rest.impl.tc.user;
 
 import static me.zodac.folding.api.util.NumberUtils.formatWithCommas;
 
+import java.util.Collection;
 import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
 import me.zodac.folding.api.tc.User;
@@ -56,31 +57,41 @@ public class UserStatsParser implements UserStatsParserService {
     @Autowired
     private FoldingStatsService foldingStatsCore;
 
-    /**
-     * Parses the latest TC stats for the given {@link User}.
-     *
-     * <p>
-     * Method blocks until the stats have been parsed, calculated and persisted.
-     *
-     * @param user the {@link User} whose TC stats are to be parsed
-     */
+    //    /**
+//     * Parses the latest TC stats for the given {@link User}.
+//     *
+//     * <p>
+//     * Method blocks until the stats have been parsed, calculated and persisted.
+//     *
+//     * @param user the {@link User} whose TC stats are to be parsed
+//     */
     @Override
-    public void parseTcStatsForUserAndWait(final User user) {
-        parseTcStatsForUser(user);
+    public void parseTcStatsForUserAndWait(final Collection<User> users) {
+        updateTcStatsForUsers(users);
     }
 
-    /**
-     * Parses the latest TC stats for the given {@link User}.
-     *
-     * <p>
-     * Method runs {@link Async}, so returns immediately and processes the {@link User} stats in a separate/background thread.
-     *
-     * @param user the {@link User} whose TC stats are to be parsed
-     */
+    //    /**
+//     * Parses the latest TC stats for the given {@link User}.
+//     *
+//     * <p>
+//     * Method runs {@link Async}, so returns immediately and processes the {@link User} stats in a separate/background thread.
+//     *
+//     * @param user the {@link User} whose TC stats are to be parsed
+//     */
     @Override
     @Async
-    public void parseTcStatsForUser(final User user) {
-        updateTcStatsForUser(user);
+    public void parseTcStatsForUser(final Collection<User> users) {
+        updateTcStatsForUsers(users);
+    }
+
+    private void updateTcStatsForUsers(final Collection<User> users) {
+        for (final User user : users) {
+            try {
+                updateTcStatsForUser(user);
+            } catch (final Exception e) {
+                LOGGER.error("Error updating TC stats for user '{}' (ID: {})", user.getDisplayName(), user.getId(), e);
+            }
+        }
     }
 
     private void updateTcStatsForUser(final User user) {
