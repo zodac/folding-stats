@@ -26,31 +26,18 @@ package me.zodac.folding.rest.impl;
 
 import static java.util.stream.Collectors.toList;
 
-import java.time.Month;
-import java.time.Year;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import me.zodac.folding.api.UserAuthenticationResult;
-import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.tc.result.MonthlyResult;
-import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
-import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
-import me.zodac.folding.rest.api.FoldingStatsService;
+import me.zodac.folding.rest.api.FoldingService;
 import me.zodac.folding.rest.api.StorageService;
-import me.zodac.folding.rest.api.tc.CompetitionSummary;
-import me.zodac.folding.rest.api.tc.RetiredUserSummary;
-import me.zodac.folding.rest.api.tc.TeamSummary;
-import me.zodac.folding.rest.api.tc.UserSummary;
-import me.zodac.folding.rest.api.tc.historic.HistoricStats;
-import me.zodac.folding.state.SystemStateManager;
 import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -67,7 +54,7 @@ import org.springframework.stereotype.Component;
 // */
 //@Singleton
 @Component
-public class FoldingStats implements FoldingStatsService {
+public class FoldingServiceImpl implements FoldingService {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final FoldingStatsRetriever FOLDING_STATS_RETRIEVER = HttpFoldingStatsRetriever.create();
@@ -244,15 +231,15 @@ public class FoldingStats implements FoldingStatsService {
     @Override
     public void deleteUser(final User user) {
         // Retrieve the user's stats before deleting the user, so we can use the values for the retried user stats
-        final UserTcStats userStats = getHourlyTcStats(user);
+        final Optional<UserTcStats> userStats = storageService.getHourlyTcStats(user.getId());
         storageService.deleteUser(user.getId());
 
-        if (userStats.isEmptyStats()) {
+        if (userStats.isEmpty()) {
             LOGGER.warn("User '{}' (ID: {}) has no stats, not saving any retired stats", user.getDisplayName(), user.getId());
             return;
         }
 
-        final RetiredUserTcStats retiredUserTcStats = RetiredUserTcStats.createWithoutId(user.getTeam().getId(), user.getDisplayName(), userStats);
+        final RetiredUserTcStats retiredUserTcStats = RetiredUserTcStats.createWithoutId(user, userStats.get());
         final RetiredUserTcStats createdRetiredUserTcStats = storageService.createRetiredUserStats(retiredUserTcStats);
         LOGGER.info("User '{}' (ID: {}) retired with retired stats ID: {}", user.getDisplayName(), user.getId(),
             createdRetiredUserTcStats.getRetiredUserId());
@@ -283,16 +270,6 @@ public class FoldingStats implements FoldingStatsService {
     }
 
     @Override
-    public MonthlyResult createMonthlyResult(final MonthlyResult monthlyResult) {
-        return storageService.createMonthlyResult(monthlyResult);
-    }
-
-    @Override
-    public Optional<MonthlyResult> getMonthlyResult(final Month month, final Year year) {
-        return storageService.getMonthlyResult(month, year);
-    }
-
-    @Override
     public UserAuthenticationResult authenticateSystemUser(final String userName, final String password) {
         final UserAuthenticationResult userAuthenticationResult = storageService.authenticateSystemUser(userName, password);
 
@@ -303,196 +280,6 @@ public class FoldingStats implements FoldingStatsService {
         }
 
         return userAuthenticationResult;
-    }
-
-    @Override
-    public Collection<HistoricStats> getHistoricStats(final User user, final Year year, final Month month, final int day) {
-        final Collection<HistoricStats> historicStats = storageService.getHistoricStats(user.getId(), year, month, day);
-        if (historicStats.isEmpty()) {
-            LOGGER.warn("No stats retrieved for user with ID {} on {}/{}/{}, returning empty", user.getId(), year.getValue(), month.getValue(), day);
-        }
-
-        return historicStats;
-    }
-
-    @Override
-    public Collection<HistoricStats> getHistoricStats(final User user, final Year year, final Month month) {
-        final Collection<HistoricStats> historicStats = storageService.getHistoricStats(user.getId(), year, month, 0);
-        if (historicStats.isEmpty()) {
-            LOGGER.warn("No stats retrieved for user with ID {} on {}/{}, returning empty", user.getId(), year.getValue(), month.getValue());
-        }
-
-        return historicStats;
-    }
-
-    @Override
-    public Collection<HistoricStats> getHistoricStats(final User user, final Year year) {
-        final Collection<HistoricStats> historicStats = storageService.getHistoricStats(user.getId(), year, null, 0);
-        if (historicStats.isEmpty()) {
-            LOGGER.warn("No stats retrieved for user with ID {} on {}, returning empty", user.getId(), year.getValue());
-        }
-
-        return historicStats;
-    }
-
-    @Override
-    public UserStats createTotalStats(final UserStats userStats) {
-        return storageService.createTotalStats(userStats);
-    }
-
-    @Override
-    public UserStats getTotalStats(final User user) {
-        return storageService.getTotalStats(user.getId())
-            .orElse(UserStats.empty());
-    }
-
-    @Override
-    public OffsetTcStats createOffsetStats(final User user, final OffsetTcStats offsetTcStats) {
-        storageService.deleteOffsetStats(user.getId());
-        return storageService.createOrUpdateOffsetStats(user.getId(), offsetTcStats);
-    }
-
-    @Override
-    public OffsetTcStats createOrUpdateOffsetStats(final User user, final OffsetTcStats offsetTcStats) {
-        return storageService.createOrUpdateOffsetStats(user.getId(), offsetTcStats);
-    }
-
-    @Override
-    public OffsetTcStats getOffsetStats(final User user) {
-        return storageService.getOffsetStats(user.getId())
-            .orElse(OffsetTcStats.empty());
-    }
-
-    @Override
-    public UserTcStats createHourlyTcStats(final UserTcStats userTcStats) {
-        return storageService.createHourlyTcStats(userTcStats);
-    }
-
-    @Override
-    public UserTcStats getHourlyTcStats(final User user) {
-        return storageService.getHourlyTcStats(user.getId())
-            .orElse(UserTcStats.empty(user.getId()));
-    }
-
-    @Override
-    public boolean isAnyHourlyTcStatsExist() {
-        return storageService.getFirstHourlyTcStats().isPresent();
-    }
-
-    @Override
-    public UserStats createInitialStats(final UserStats userStats) {
-        return storageService.createInitialStats(userStats);
-    }
-
-    @Override
-    public UserStats getInitialStats(final User user) {
-        return storageService.getInitialStats(user.getId())
-            .orElse(UserStats.empty());
-    }
-
-    @Override
-    public RetiredUserTcStats createRetiredUserStats(final RetiredUserTcStats retiredUserTcStats) {
-        return storageService.createRetiredUserStats(retiredUserTcStats);
-    }
-
-    @Override
-    public void resetAllTeamCompetitionUserStats() {
-        for (final User user : getAllUsersWithoutPasskeys()) {
-            LOGGER.info("Resetting TC stats for {}", user.getDisplayName());
-            final UserStats totalStats = getTotalStats(user);
-            createInitialStats(totalStats);
-        }
-
-        LOGGER.info("Deleting retired user TC stats");
-        storageService.deleteAllRetiredUserTcStats();
-
-        LOGGER.info("Deleting offset TC stats");
-        storageService.deleteAllOffsetTcStats();
-
-        LOGGER.info("Evicting TC and initial stats caches");
-        storageService.evictTcStatsCache();
-        storageService.evictInitialStatsCache();
-    }
-
-    @Override
-    public CompetitionSummary getCompetitionSummary() {
-        if (SystemStateManager.current() != SystemState.WRITE_EXECUTED) {
-            LOGGER.debug("System is not in state {}, retrieving competition summary", SystemState.WRITE_EXECUTED);
-
-            final Optional<CompetitionSummary> cachedCompetitionResult = storageService.getCompetitionSummary();
-            if (cachedCompetitionResult.isPresent()) {
-                return cachedCompetitionResult.get();
-            }
-        }
-
-        LOGGER.debug("Calculating latest TC result, system state: {}", SystemStateManager.current());
-        final CompetitionSummary competitionSummary = createCompetitionSummary();
-        final CompetitionSummary createdCompetitionSummary = storageService.createCompetitionSummary(competitionSummary);
-        SystemStateManager.next(SystemState.AVAILABLE);
-
-        return createdCompetitionSummary;
-    }
-
-    private CompetitionSummary createCompetitionSummary() {
-        final List<TeamSummary> teamSummaries = getStatsForTeams();
-        LOGGER.debug("Found {} TC teams", teamSummaries::size);
-
-        if (teamSummaries.isEmpty()) {
-            LOGGER.warn("No TC teams to show");
-        }
-
-        return CompetitionSummary.create(teamSummaries);
-    }
-
-    private List<TeamSummary> getStatsForTeams() {
-        return getAllTeams()
-            .stream()
-            .map(this::getTcTeamResult)
-            .collect(toList());
-    }
-
-    private TeamSummary getTcTeamResult(final Team team) {
-        LOGGER.debug("Converting team '{}' for TC stats", team::getTeamName);
-
-        final Collection<User> usersOnTeam = getUsersOnTeam(team);
-
-        final Collection<UserSummary> activeUserSummaries = usersOnTeam
-            .stream()
-            .map(this::getTcStatsForUser)
-            .collect(toList());
-
-        final Collection<RetiredUserSummary> retiredUserSummaries = getAllRetiredUsersForTeam(team)
-            .stream()
-            .map(RetiredUserSummary::createWithDefaultRank)
-            .collect(toList());
-
-        final String captainDisplayName = getCaptainDisplayName(team.getTeamName(), usersOnTeam);
-        return TeamSummary.createWithDefaultRank(team, captainDisplayName, activeUserSummaries, retiredUserSummaries);
-    }
-
-    private Collection<RetiredUserTcStats> getAllRetiredUsersForTeam(final Team team) {
-        return storageService.getAllRetiredUsers()
-            .stream()
-            .filter(retiredUserTcStats -> retiredUserTcStats.getTeamId() == team.getId())
-            .collect(toList());
-    }
-
-    private UserSummary getTcStatsForUser(final User user) {
-        final UserTcStats userTcStats = getHourlyTcStats(user);
-        LOGGER.debug("Results for {}: {} points | {} multiplied points | {} units", user::getDisplayName, userTcStats::getPoints,
-            userTcStats::getMultipliedPoints, userTcStats::getUnits);
-        return UserSummary.createWithDefaultRank(user, userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits());
-    }
-
-    private static String getCaptainDisplayName(final String teamName, final Collection<User> usersOnTeam) {
-        for (final User user : usersOnTeam) {
-            if (user.isUserIsCaptain()) {
-                return user.getDisplayName();
-            }
-        }
-
-        LOGGER.warn("No captain set for team '{}'", teamName);
-        return null;
     }
 
     @Override

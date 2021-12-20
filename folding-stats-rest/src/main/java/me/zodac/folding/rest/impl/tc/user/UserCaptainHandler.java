@@ -28,7 +28,7 @@ package me.zodac.folding.rest.impl.tc.user;
 import java.util.Optional;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.rest.api.FoldingStatsService;
+import me.zodac.folding.rest.api.FoldingService;
 import me.zodac.folding.rest.api.tc.user.UserCaptainHandlerService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -48,7 +48,7 @@ public class UserCaptainHandler implements UserCaptainHandlerService {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Autowired
-    private FoldingStatsService foldingStatsCore;
+    private FoldingService foldingService;
 
     @Override
     public boolean isUserCaptainAndCaptainExistsOnTeam(final User user) {
@@ -79,11 +79,11 @@ public class UserCaptainHandler implements UserCaptainHandlerService {
         final User existingCaptain = existingCaptainOptional.get();
         final User userWithCaptaincyRemoved = User.removeCaptaincyFromUser(existingCaptain);
 
-        foldingStatsCore.updateUser(userWithCaptaincyRemoved, existingCaptain);
+        foldingService.updateUser(userWithCaptaincyRemoved, existingCaptain);
     }
 
     private Optional<User> getCaptainOfTeam(final Team team) {
-        return foldingStatsCore.getUsersOnTeam(team)
+        return foldingService.getUsersOnTeam(team)
             .stream()
             .filter(User::isUserIsCaptain)
             .findAny();

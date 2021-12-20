@@ -46,7 +46,7 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.validation.TeamValidator;
 import me.zodac.folding.api.tc.validation.ValidationResult;
 import me.zodac.folding.api.util.StringUtils;
-import me.zodac.folding.rest.api.FoldingStatsService;
+import me.zodac.folding.rest.api.FoldingService;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
 import me.zodac.folding.rest.response.Responses;
 import me.zodac.folding.rest.util.IdResult;
@@ -78,7 +78,7 @@ public class TeamEndpoint {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Autowired
-    private FoldingStatsService foldingStatsService;
+    private FoldingService foldingService;
 
     /**
      * {@link PostMapping} request to create a {@link Team} based on the input request.
@@ -100,7 +100,7 @@ public class TeamEndpoint {
         final Team validatedTeam = validationResult.getOutput();
 
         try {
-            final Team elementWithId = foldingStatsService.createTeam(validatedTeam);
+            final Team elementWithId = foldingService.createTeam(validatedTeam);
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
             LOGGER.info("Created team with ID {}", elementWithId.getId());
@@ -124,7 +124,7 @@ public class TeamEndpoint {
         LOGGER.debug("GET request received for all teams at '{}'", request::getRequestURI);
 
         try {
-            final Collection<Team> elements = foldingStatsService.getAllTeams();
+            final Collection<Team> elements = foldingService.getAllTeams();
             return cachedOk(elements, untilNextMonthUtc(ChronoUnit.SECONDS));
         } catch (final Exception e) {
             LOGGER.error("Unexpected error getting all teams", e);
@@ -152,7 +152,7 @@ public class TeamEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<Team> optionalElement = foldingStatsService.getTeam(parsedId);
+            final Optional<Team> optionalElement = foldingService.getTeam(parsedId);
             if (optionalElement.isEmpty()) {
                 LOGGER.error("No team found with ID {}", teamId);
                 return notFound();
@@ -186,7 +186,7 @@ public class TeamEndpoint {
                 return badRequest(errorMessage);
             }
 
-            final Optional<Team> optionalTeam = foldingStatsService.getAllTeams()
+            final Optional<Team> optionalTeam = foldingService.getAllTeams()
                 .stream()
                 .filter(team -> team.getTeamName().equalsIgnoreCase(teamName))
                 .findAny();
@@ -232,7 +232,7 @@ public class TeamEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<Team> optionalElement = foldingStatsService.getTeam(parsedId);
+            final Optional<Team> optionalElement = foldingService.getTeam(parsedId);
             if (optionalElement.isEmpty()) {
                 LOGGER.error("No team found with ID {}", teamId);
                 return notFound();
@@ -252,7 +252,7 @@ public class TeamEndpoint {
 
             // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
             final Team teamWithId = Team.updateWithId(existingTeam.getId(), validatedHardware);
-            final Team updatedTeamWithId = foldingStatsService.updateTeam(teamWithId);
+            final Team updatedTeamWithId = foldingService.updateTeam(teamWithId);
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
             LOGGER.info("Updated team with ID {}", updatedTeamWithId.getId());
@@ -283,7 +283,7 @@ public class TeamEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<Team> optionalElement = foldingStatsService.getTeam(parsedId);
+            final Optional<Team> optionalElement = foldingService.getTeam(parsedId);
             if (optionalElement.isEmpty()) {
                 LOGGER.error("No team found with ID {}", teamId);
                 return notFound();
@@ -296,7 +296,7 @@ public class TeamEndpoint {
             }
             final Team validatedTeam = validationResult.getOutput();
 
-            foldingStatsService.deleteTeam(validatedTeam);
+            foldingService.deleteTeam(validatedTeam);
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
             LOGGER.info("Deleted team with ID {}", teamId);
@@ -308,14 +308,14 @@ public class TeamEndpoint {
     }
 
     private ValidationResult<Team> validateCreate(final TeamRequest teamRequest) {
-        return TeamValidator.validateCreate(teamRequest, foldingStatsService.getAllTeams());
+        return TeamValidator.validateCreate(teamRequest, foldingService.getAllTeams());
     }
 
     private ValidationResult<Team> validateUpdate(final TeamRequest teamRequest, final Team existingTeam) {
-        return TeamValidator.validateUpdate(teamRequest, existingTeam, foldingStatsService.getAllTeams());
+        return TeamValidator.validateUpdate(teamRequest, existingTeam, foldingService.getAllTeams());
     }
 
     private ValidationResult<Team> validateDelete(final Team team) {
-        return TeamValidator.validateDelete(team, foldingStatsService.getAllUsersWithoutPasskeys());
+        return TeamValidator.validateDelete(team, foldingService.getAllUsersWithoutPasskeys());
     }
 }

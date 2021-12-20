@@ -25,10 +25,12 @@
 
 package me.zodac.folding.rest.impl.tc.user;
 
+import java.util.Collection;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.cache.RetiredTcStatsCache;
 import me.zodac.folding.cache.TcStatsCache;
 import me.zodac.folding.cache.TotalStatsCache;
+import me.zodac.folding.rest.api.FoldingService;
 import me.zodac.folding.rest.api.FoldingStatsService;
 import me.zodac.folding.rest.api.tc.user.UserStatsResetterService;
 import org.apache.logging.log4j.LogManager;
@@ -45,7 +47,10 @@ public class UserStatsResetter implements UserStatsResetterService {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Autowired
-    private FoldingStatsService foldingStatsCore;
+    private FoldingService foldingService;
+
+    @Autowired
+    private FoldingStatsService foldingStatsRepository;
 
 //    @Autowired
 //    private StatsSchedulerService statsScheduler;
@@ -73,7 +78,8 @@ public class UserStatsResetter implements UserStatsResetterService {
 //            statsScheduler.manualTeamCompetitionStatsParsing(ProcessingType.SYNCHRONOUS);
 
             LOGGER.info("Resetting Team Competition stats");
-            foldingStatsCore.resetAllTeamCompetitionUserStats();
+            final Collection<User> users = foldingService.getAllUsersWithoutPasskeys();
+            foldingStatsRepository.resetAllTeamCompetitionUserStats(users);
 
             // Pull stats for new month
 //            statsScheduler.manualTeamCompetitionStatsParsing(ProcessingType.SYNCHRONOUS);

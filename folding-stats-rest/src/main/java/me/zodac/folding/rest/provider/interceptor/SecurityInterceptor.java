@@ -40,6 +40,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.util.EncodingUtils;
+import me.zodac.folding.rest.api.FoldingService;
 import me.zodac.folding.rest.api.FoldingStatsService;
 import me.zodac.folding.rest.api.header.RestHeader;
 import org.apache.logging.log4j.LogManager;
@@ -74,17 +75,17 @@ import org.springframework.web.servlet.HandlerInterceptor;
  *     </li>
  * </ul>
  *
- * @see FoldingStatsService#authenticateSystemUser(String, String)
+ * @see FoldingService#authenticateSystemUser(String, String)
  */
 // TODO: [zodac] Sort out the logging
 public class SecurityInterceptor implements HandlerInterceptor {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final FoldingStatsService foldingStatsService;
+    private final FoldingService foldingService;
 
-    private SecurityInterceptor(final FoldingStatsService foldingStatsService) {
-        this.foldingStatsService = foldingStatsService;
+    private SecurityInterceptor(final FoldingService foldingService) {
+        this.foldingService = foldingService;
     }
 
     /**
@@ -95,11 +96,11 @@ public class SecurityInterceptor implements HandlerInterceptor {
      * {@link org.springframework.beans.factory.annotation.Autowired} {@link FoldingStatsService}. Instead, the
      * {@link me.zodac.folding.InterceptorRegister} will pass in its own injected {@link FoldingStatsService}.
      *
-     * @param foldingStatsService the {@link FoldingStatsService}
+     * @param foldingService the {@link FoldingService}
      * @return the created {@link SecurityInterceptor}
      */
-    public static SecurityInterceptor create(final FoldingStatsService foldingStatsService) {
-        return new SecurityInterceptor(foldingStatsService);
+    public static SecurityInterceptor create(final FoldingService foldingService) {
+        return new SecurityInterceptor(foldingService);
     }
 
     @Override
@@ -148,7 +149,7 @@ public class SecurityInterceptor implements HandlerInterceptor {
         final String userName = decodedUserNameAndPassword.get(EncodingUtils.DECODED_USERNAME_KEY);
         final String password = decodedUserNameAndPassword.get(EncodingUtils.DECODED_PASSWORD_KEY);
 
-        final UserAuthenticationResult userAuthenticationResult = foldingStatsService.authenticateSystemUser(userName, password);
+        final UserAuthenticationResult userAuthenticationResult = foldingService.authenticateSystemUser(userName, password);
 
         if (!userAuthenticationResult.isUserExists()) {
             LOGGER.warn("User '{}' does not exist", userName);

@@ -96,6 +96,20 @@ public class RetiredUserTcStats extends UserTcStats {
     }
 
     /**
+     * Creates an instance of {@link RetiredUserTcStats} for a {@link User} within a {@link Team}.
+     *
+     * <p>
+     * Since we do not know the ID until the DB has persisted the {@link RetiredUserTcStats}, the {@link #EMPTY_RETIRED_USER_ID} will be used instead.
+     *
+     * @param user           the {@link User} being retired
+     * @param retiredTcStats the {@link UserTcStats}
+     * @return the created {@link RetiredUserTcStats}
+     */
+    public static RetiredUserTcStats createWithoutId(final User user, final UserTcStats retiredTcStats) {
+        return create(EMPTY_RETIRED_USER_ID, user.getTeam().getId(), user.getDisplayName(), retiredTcStats);
+    }
+
+    /**
      * Updates a {@link RetiredUserTcStats} with the given ID.
      *
      * <p>

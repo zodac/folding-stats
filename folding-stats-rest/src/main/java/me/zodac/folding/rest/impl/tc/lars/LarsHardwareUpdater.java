@@ -38,7 +38,7 @@ import me.zodac.folding.api.tc.lars.LarsGpu;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
 import me.zodac.folding.lars.HardwareSplitter;
 import me.zodac.folding.lars.LarsGpuRetriever;
-import me.zodac.folding.rest.api.FoldingStatsService;
+import me.zodac.folding.rest.api.FoldingService;
 import me.zodac.folding.rest.api.tc.lars.LarsHardwareUpdaterService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -56,7 +56,7 @@ public class LarsHardwareUpdater implements LarsHardwareUpdaterService {
     private static final String LARS_URL_ROOT = EnvironmentVariableUtils.getOrDefault("LARS_URL_ROOT", "https://folding.lar.systems");
 
     @Autowired
-    private FoldingStatsService foldingStatsService;
+    private FoldingService foldingService;
 
     @Override
     public void retrieveHardwareAndPersist() {
@@ -78,10 +78,10 @@ public class LarsHardwareUpdater implements LarsHardwareUpdaterService {
             .stream()
             .map(larsGpu -> toHardware(larsGpu, bestPpd))
             .collect(toSet());
-        final Collection<Hardware> existing = foldingStatsService.getAllHardware();
+        final Collection<Hardware> existing = foldingService.getAllHardware();
 
         for (final Hardware hardware : HardwareSplitter.toDelete(lars, existing)) {
-            foldingStatsService.deleteHardware(hardware);
+            foldingService.deleteHardware(hardware);
             LOGGER.info("Deleted hardware '{}' (ID: {})", hardware.getHardwareName(), hardware.getId());
         }
 
@@ -91,7 +91,7 @@ public class LarsHardwareUpdater implements LarsHardwareUpdaterService {
                 final Hardware existingHardware = entry.getValue();
                 final Hardware updatedHardwareWithId = Hardware.updateWithId(existingHardware.getId(), updatedHardware);
 
-                foldingStatsService.updateHardware(updatedHardwareWithId, existingHardware);
+                foldingService.updateHardware(updatedHardwareWithId, existingHardware);
                 LOGGER.info("LARS updated hardware\n" +
                         "ID: {}\n" +
                         "{}\n" +
@@ -109,7 +109,7 @@ public class LarsHardwareUpdater implements LarsHardwareUpdaterService {
         }
 
         for (final Hardware hardware : HardwareSplitter.toCreate(lars, existing)) {
-            final Hardware createdHardware = foldingStatsService.createHardware(hardware);
+            final Hardware createdHardware = foldingService.createHardware(hardware);
             LOGGER.info("Created hardware '{}' (ID: {})", createdHardware.getHardwareName(), createdHardware.getId());
         }
     }

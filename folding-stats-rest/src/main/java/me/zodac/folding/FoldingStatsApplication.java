@@ -27,6 +27,9 @@ package me.zodac.folding;
 import java.util.Collection;
 import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.stats.OffsetTcStats;
+import me.zodac.folding.api.tc.stats.UserStats;
+import me.zodac.folding.rest.api.FoldingService;
 import me.zodac.folding.rest.api.FoldingStatsService;
 import me.zodac.folding.state.SystemStateManager;
 import org.apache.logging.log4j.LogManager;
@@ -58,6 +61,9 @@ public class FoldingStatsApplication {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Autowired
+    private FoldingService foldingService;
+
+    @Autowired
     private FoldingStatsService foldingStatsService;
 
     /**
@@ -81,16 +87,16 @@ public class FoldingStatsApplication {
     }
 
     private void initCaches() {
-        foldingStatsService.getAllHardware();
-        foldingStatsService.getAllTeams();
-        final Collection<User> users = foldingStatsService.getAllUsersWithoutPasskeys();
+        foldingService.getAllHardware();
+        foldingService.getAllTeams();
+        final Collection<User> users = foldingService.getAllUsersWithoutPasskeys();
 
         for (final User user : users) {
-//            final OffsetTcStats offsetTcStatsForUser = foldingStatsService.getOffsetStats(user);
-//            LOGGER.debug("Found offset stats for user {}: {}", user, offsetTcStatsForUser);
-//
-//            final UserStats initialStatsForUser = foldingStatsService.getInitialStats(user);
-//            LOGGER.debug("Found initial stats for user {}: {}", user, initialStatsForUser);
+            final OffsetTcStats offsetTcStatsForUser = foldingStatsService.getOffsetStats(user);
+            LOGGER.debug("Found offset stats for user {}: {}", user, offsetTcStatsForUser);
+
+            final UserStats initialStatsForUser = foldingStatsService.getInitialStats(user);
+            LOGGER.debug("Found initial stats for user {}: {}", user, initialStatsForUser);
         }
 
         LOGGER.debug("Initialised stats caches");
