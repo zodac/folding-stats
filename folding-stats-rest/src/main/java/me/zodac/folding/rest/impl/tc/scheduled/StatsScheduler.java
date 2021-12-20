@@ -51,13 +51,14 @@ public class StatsScheduler {
     @Autowired
     private UserStatsParserService userStatsParser;
 
-    @Scheduled(cron = "0 55 * * * *")
-    public void test() {
+    @Scheduled(cron = "0 55 * * * *", zone = "UTC")
+    public void scheduledTeamCompetitionStatsParsing() {
         if (!IS_STATS_SCHEDULED_PARSING_ENABLED) {
             LOGGER.error("Scheduled TC stats parsing not enabled");
             return;
         }
 
+        LOGGER.trace("Method #scheduledTeamCompetitionStatsParsing() fired");
         final Collection<User> users = foldingService.getAllUsersWithPasskeys();
 
         if (users.isEmpty()) {
