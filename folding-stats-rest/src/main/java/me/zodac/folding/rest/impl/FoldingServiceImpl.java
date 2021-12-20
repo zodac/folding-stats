@@ -30,14 +30,20 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 import me.zodac.folding.api.UserAuthenticationResult;
+import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
+import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.rest.api.FoldingService;
+import me.zodac.folding.rest.api.FoldingStatsService;
 import me.zodac.folding.rest.api.StorageService;
+import me.zodac.folding.rest.api.tc.user.UserStateChangeHandlerService;
+import me.zodac.folding.rest.api.tc.user.UserStatsParserService;
+import me.zodac.folding.rest.api.tc.user.UserTeamChangeHandlerService;
 import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -62,20 +68,23 @@ public class FoldingServiceImpl implements FoldingService {
     @Autowired
     private StorageService storageService;
 
+    @Autowired
+    private FoldingStatsService foldingStatsService;
+
 //    @Autowired
 //    private StatsSchedulerService statsScheduler;
-//
+
 //    @Autowired
 //    private UserCaptainHandlerService userCaptainHandler;
-//
-//    @Autowired
-//    private UserStateChangeHandlerService userStateChangeHandler;
-//
-//    @Autowired
-//    private UserStatsParserService userStatsParser;
-//
-//    @Autowired
-//    private UserTeamChangeHandlerService userTeamChangeHandler;
+
+    @Autowired
+    private UserStateChangeHandlerService userStateChangeHandler;
+
+    @Autowired
+    private UserStatsParserService userStatsParser;
+
+    @Autowired
+    private UserTeamChangeHandlerService userTeamChangeHandler;
 
     @Override
     public Hardware createHardware(final Hardware hardware) {
@@ -97,14 +106,14 @@ public class FoldingServiceImpl implements FoldingService {
     public Hardware updateHardware(final Hardware hardwareToUpdate, final Hardware existingHardware) {
         final Hardware updatedHardware = storageService.updateHardware(hardwareToUpdate);
 
-//        if (userStateChangeHandler.isHardwareStateChange(updatedHardware, existingHardware)) {
-//            final Collection<User> usersUsingThisHardware = getUsersWithHardware(updatedHardware);
-//
-//            for (final User userUsingHardware : usersUsingThisHardware) {
-//                LOGGER.debug("User '{}' (ID: {}) had state change to hardware", userUsingHardware.getDisplayName(), userUsingHardware.getId());
-//                userStateChangeHandler.handleStateChange(userUsingHardware);
-//            }
-//        }
+        if (userStateChangeHandler.isHardwareStateChange(updatedHardware, existingHardware)) {
+            final Collection<User> usersUsingThisHardware = getUsersWithHardware(updatedHardware);
+
+            for (final User userUsingHardware : usersUsingThisHardware) {
+                LOGGER.debug("User '{}' (ID: {}) had state change to hardware", userUsingHardware.getDisplayName(), userUsingHardware.getId());
+                userStateChangeHandler.handleStateChange(userUsingHardware);
+            }
+        }
 
         return updatedHardware;
     }
@@ -154,21 +163,21 @@ public class FoldingServiceImpl implements FoldingService {
 
     @Override
     public User createUser(final User user) {
-//        if (userCaptainHandler.isUserCaptainAndCaptainExistsOnTeam(user)) {
-//            userCaptainHandler.removeCaptaincyFromExistingTeamCaptain(user.getTeam());
-//        }
+        if (isUserCaptainAndCaptainExistsOnTeam(user)) {
+            removeCaptaincyFromExistingTeamCaptain(user.getTeam());
+        }
 
         final User createdUser = storageService.createUser(user);
 
-//        try {
-//            // When adding a new user, we configure the initial stats DB/cache
-//            final UserStats currentUserStats = FOLDING_STATS_RETRIEVER.getTotalStats(createdUser);
-//            final UserStats initialStats = createInitialStats(currentUserStats);
-//            LOGGER.info("User '{}' (ID: {}) created with initial stats: {}", createdUser.getDisplayName(), createdUser.getId(), initialStats);
-//            userStatsParser.parseTcStatsForUser(createdUser);
-//        } catch (final ExternalConnectionException e) {
-//            LOGGER.error("Error retrieving initial stats for user '{}' (ID: {})", createdUser.getDisplayName(), createdUser.getId(), e);
-//        }
+        try {
+            // When adding a new user, we configure the initial stats DB/cache
+            final UserStats currentUserStats = FOLDING_STATS_RETRIEVER.getTotalStats(createdUser);
+            final UserStats initialStats = foldingStatsService.createInitialStats(currentUserStats);
+            LOGGER.info("User '{}' (ID: {}) created with initial stats: {}", createdUser.getDisplayName(), createdUser.getId(), initialStats);
+            userStatsParser.parseTcStatsForUser(createdUser);
+        } catch (final ExternalConnectionException e) {
+            LOGGER.error("Error retrieving initial stats for user '{}' (ID: {})", createdUser.getDisplayName(), createdUser.getId(), e);
+        }
 
         return createdUser;
     }
@@ -204,28 +213,65 @@ public class FoldingServiceImpl implements FoldingService {
 
     @Override
     public User updateUser(final User userToUpdate, final User existingUser) {
-//        if (userCaptainHandler.isUserCaptainAndCaptainExistsOnTeam(userToUpdate)) {
-//            final boolean isCaptainChange = userToUpdate.isUserIsCaptain() != existingUser.isUserIsCaptain();
-//            final boolean isTeamChange = userToUpdate.getTeam().getId() != existingUser.getTeam().getId();
-//
-//            if (isCaptainChange || isTeamChange) {
-//                userCaptainHandler.removeCaptaincyFromExistingTeamCaptain(userToUpdate.getTeam());
-//            }
-//        }
+        if (isUserCaptainAndCaptainExistsOnTeam(userToUpdate)) {
+            final boolean isCaptainChange = userToUpdate.isUserIsCaptain() != existingUser.isUserIsCaptain();
+            final boolean isTeamChange = userToUpdate.getTeam().getId() != existingUser.getTeam().getId();
+
+            if (isCaptainChange || isTeamChange) {
+                removeCaptaincyFromExistingTeamCaptain(userToUpdate.getTeam());
+            }
+        }
 
         // Perform any stats handling before updating the user
-//        if (userTeamChangeHandler.isUserTeamChange(userToUpdate, existingUser)) {
-//            userTeamChangeHandler.handleTeamChange(userToUpdate, existingUser.getTeam());
-//        }
+        if (userTeamChangeHandler.isUserTeamChange(userToUpdate, existingUser)) {
+            userTeamChangeHandler.handleTeamChange(userToUpdate, existingUser.getTeam());
+        }
 
         final User updatedUser = storageService.updateUser(userToUpdate);
 
-//        if (userStateChangeHandler.isUserStateChange(updatedUser, existingUser)) {
-//            userStateChangeHandler.handleStateChange(updatedUser);
-//            LOGGER.trace("User updated with required state change");
-//        }
+        if (userStateChangeHandler.isUserStateChange(updatedUser, existingUser)) {
+            userStateChangeHandler.handleStateChange(updatedUser);
+            LOGGER.trace("User updated with required state change");
+        }
 
         return updatedUser;
+    }
+
+    private boolean isUserCaptainAndCaptainExistsOnTeam(final User user) {
+        if (!user.isUserIsCaptain()) {
+            return false;
+        }
+
+        final Team team = user.getTeam();
+        final Optional<User> existingCaptainOptional = getCaptainOfTeam(team);
+        if (existingCaptainOptional.isEmpty()) {
+            return false;
+        }
+
+        final User existingCaptain = existingCaptainOptional.get();
+        LOGGER.info("Captain '{} (ID: {})' already exists for team '{}', will be replaced by '{}' (ID: {})",
+            existingCaptain.getDisplayName(), existingCaptain.getId(), team.getTeamName(), user.getDisplayName(), user.getId()
+        );
+        return true;
+    }
+
+    private void removeCaptaincyFromExistingTeamCaptain(final Team team) {
+        final Optional<User> existingCaptainOptional = getCaptainOfTeam(team);
+        if (existingCaptainOptional.isEmpty()) {
+            return;
+        }
+
+        final User existingCaptain = existingCaptainOptional.get();
+        final User userWithCaptaincyRemoved = User.removeCaptaincyFromUser(existingCaptain);
+
+        updateUser(userWithCaptaincyRemoved, existingCaptain);
+    }
+
+    private Optional<User> getCaptainOfTeam(final Team team) {
+        return getUsersOnTeam(team)
+            .stream()
+            .filter(User::isUserIsCaptain)
+            .findAny();
     }
 
     @Override
