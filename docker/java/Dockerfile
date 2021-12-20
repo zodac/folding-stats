@@ -1,7 +1,8 @@
 ARG JAVA_VERSION
 ARG MAVEN_VERSION
+ARG DEBIAN_VERSION
 
-FROM maven:${MAVEN_VERSION}-openjdk-${JAVA_VERSION} AS builder
+FROM maven:${MAVEN_VERSION}-openjdk-${JAVA_VERSION} AS maven_builder
 
 # Build folding-stats
 RUN mkdir --parents /folding-stats-spring-boot
@@ -37,8 +38,25 @@ RUN cd ./folding-stats-rest && mvn package
 RUN mv ./folding-stats-rest/target/folding-stats-rest*.jar /folding-stats.jar
 
 ARG JAVA_VERSION
-FROM openjdk:${JAVA_VERSION}-jdk-alpine
+FROM openjdk:${JAVA_VERSION}-jdk-slim AS jdk_builder
 
-COPY --from=builder /folding-stats.jar /folding-stats.jar
+RUN apt-get update && apt-get install -y binutils
 
-ENTRYPOINT ["java","-jar","/folding-stats.jar"]
+RUN jlink --compress=2 \
+    --no-header-files \
+    --no-man-pages \
+    --strip-debug \
+    --add-modules java.base,java.compiler,java.datatransfer,java.desktop,java.instrument,java.logging,java.management,java.management.rmi,java.naming,java.net.http,java.prefs,java.rmi,java.scripting,java.se,java.security.jgss,java.security.sasl,java.smartcardio,java.sql,java.sql.rowset,java.transaction.xa,java.xml,java.xml.crypto,jdk.accessibility,jdk.attach,jdk.charsets,jdk.compiler,jdk.crypto.cryptoki,jdk.crypto.ec,jdk.dynalink,jdk.editpad,jdk.hotspot.agent,jdk.httpserver,jdk.incubator.foreign,jdk.incubator.vector,jdk.internal.ed,jdk.internal.jvmstat,jdk.internal.le,jdk.internal.opt,jdk.internal.vm.ci,jdk.jartool,jdk.javadoc,jdk.jcmd,jdk.jconsole,jdk.jdeps,jdk.jdi,jdk.jdwp.agent,jdk.jfr,jdk.jlink,jdk.jpackage,jdk.jshell,jdk.jsobject,jdk.jstatd,jdk.localedata,jdk.management,jdk.management.agent,jdk.management.jfr,jdk.naming.dns,jdk.naming.rmi,jdk.net,jdk.nio.mapmode,jdk.sctp,jdk.security.auth,jdk.security.jgss,jdk.unsupported,jdk.unsupported.desktop,jdk.xml.dom,jdk.zipfs \
+    --output /opt/jdk
+
+RUN strip -p --strip-unneeded /opt/jdk/lib/server/libjvm.so
+
+FROM debian:${DEBIAN_VERSION}-slim AS spring_base
+
+COPY --from=jdk_builder /opt/jdk /opt/jdk
+COPY --from=maven_builder /folding-stats.jar /folding-stats.jar
+
+ENV JAVA_HOME "/opt/jdk"
+ENV PATH "${PATH}:${JAVA_HOME}/bin"
+
+ENTRYPOINT ["java", "-jar", "/folding-stats.jar"]

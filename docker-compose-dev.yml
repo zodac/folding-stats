@@ -33,8 +33,9 @@ services:
       dockerfile: docker/java/Dockerfile
       args:
         DEPLOYMENT_TYPE: "test"
+        DEBIAN_VERSION: 11
         JAVA_VERSION: 17
-        MAVEN_VERSION: 3.8.3
+        MAVEN_VERSION: 3.8.4
         NEXUS_URL: "${NEXUS_URL}"
     container_name: backend_dev
     hostname: backend-dev # Using a dash as Java's URI builder will fail with an underscore

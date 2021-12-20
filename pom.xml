@@ -30,6 +30,7 @@
         <skip-sonar>true</skip-sonar>
 
         <!-- Test Properties -->
+        <skip-integration-tests>true</skip-integration-tests>
         <skip-tests>true</skip-tests>
 
         <!-- 3PP Versions -->
@@ -615,6 +616,7 @@
                 <module>folding-stats-client-library-java</module>
                 <module>folding-stats-jar</module>
                 <module>folding-stats-rest</module>
+                <module>testsuite</module>
             </modules>
         </profile>
 
@@ -642,6 +644,7 @@
                 <module>folding-stats-client-library-java</module>
                 <module>folding-stats-jar</module>
                 <module>folding-stats-rest</module>
+                <module>testsuite</module>
             </modules>
             <properties>
                 <skip-linters>false</skip-linters>
@@ -663,6 +666,7 @@
                 <module>folding-stats-client-library-java</module>
                 <module>folding-stats-jar</module>
                 <module>folding-stats-rest</module>
+                <module>testsuite</module>
             </modules>
             <properties>
                 <skip-linters>false</skip-linters>
@@ -683,6 +687,7 @@
                 <module>folding-stats-client-library-java</module>
                 <module>folding-stats-jar</module>
                 <module>folding-stats-rest</module>
+                <module>testsuite</module>
             </modules>
             <properties>
                 <skip-sonar>false</skip-sonar>
@@ -702,8 +707,10 @@
                 <module>folding-stats-client-library-java</module>
                 <module>folding-stats-jar</module>
                 <module>folding-stats-rest</module>
+                <module>testsuite</module>
             </modules>
             <properties>
+                <skip-integration-tests>false</skip-integration-tests>
                 <skip-tests>false</skip-tests>
             </properties>
         </profile>
