@@ -112,6 +112,8 @@ public class LarsHardwareUpdater implements LarsHardwareUpdaterService {
             final Hardware createdHardware = foldingService.createHardware(hardware);
             LOGGER.info("Created hardware '{}' (ID: {})", createdHardware.getHardwareName(), createdHardware.getId());
         }
+
+        LOGGER.info("LARS update complete");
     }
 
     private static Hardware toHardware(final LarsGpu larsGpu, final long bestPpd) {

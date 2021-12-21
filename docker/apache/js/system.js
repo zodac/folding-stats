@@ -104,6 +104,8 @@ function manualLars() {
             });
             return;
         }
+
+        loadHardware();
         successToast("LARS data manually updated");
     })
     .catch((error) => {

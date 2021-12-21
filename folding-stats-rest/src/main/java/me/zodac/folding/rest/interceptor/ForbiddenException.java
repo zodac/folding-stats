@@ -23,7 +23,7 @@
  *
  */
 
-package me.zodac.folding.rest.provider.interceptor;
+package me.zodac.folding.rest.interceptor;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

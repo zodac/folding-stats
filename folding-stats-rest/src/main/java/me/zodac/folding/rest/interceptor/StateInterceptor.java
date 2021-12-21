@@ -23,7 +23,7 @@
  *
  */
 
-package me.zodac.folding.rest.provider.interceptor;
+package me.zodac.folding.rest.interceptor;
 
 import java.lang.reflect.Method;
 import javax.servlet.http.HttpServletRequest;
@@ -33,6 +33,8 @@ import me.zodac.folding.api.state.WriteRequired;
 import me.zodac.folding.state.SystemStateManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.web.HttpRequestHandler;
+import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -68,6 +70,8 @@ public class StateInterceptor implements HandlerInterceptor {
         try {
             if (handler instanceof HandlerMethod) {
                 validateSystemState((HandlerMethod) handler);
+            } else if (handler instanceof CorsConfigurationSource && handler instanceof HttpRequestHandler) {
+                LOGGER.info("Preflight: {}", handler.getClass());
             } else {
                 LOGGER.warn("Unable to validate, handler is type: {}", handler.getClass());
                 throw new ServiceUnavailableException();

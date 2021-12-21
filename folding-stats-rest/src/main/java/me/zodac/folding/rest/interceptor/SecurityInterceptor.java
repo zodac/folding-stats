@@ -23,7 +23,7 @@
  *
  */
 
-package me.zodac.folding.rest.provider.interceptor;
+package me.zodac.folding.rest.interceptor;
 
 import static java.util.stream.Collectors.toSet;
 import static me.zodac.folding.api.util.CollectionUtils.containsNoMatches;
@@ -45,8 +45,11 @@ import me.zodac.folding.rest.api.FoldingStatsService;
 import me.zodac.folding.rest.api.header.RestHeader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.web.HttpRequestHandler;
+import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.handler.AbstractHandlerMapping;
 
 /**
  * {@link HandlerInterceptor} that intercepts all requests and verifies that the request is authorized and authenticated. Each request
@@ -110,6 +113,10 @@ public class SecurityInterceptor implements HandlerInterceptor {
         try {
             if (handler instanceof HandlerMethod) {
                 validateRequest(request, (HandlerMethod) handler);
+            } else if (handler instanceof CorsConfigurationSource && handler instanceof HttpRequestHandler) {
+                LOGGER.info("Preflight: {}", handler.getClass());
+            } else if (handler instanceof AbstractHandlerMapping) {
+                LOGGER.info("Second test: {}", handler.getClass());
             } else {
                 LOGGER.warn("Unable to validate, handler is type: {}", handler.getClass());
                 throw new UnauthorizedException();
