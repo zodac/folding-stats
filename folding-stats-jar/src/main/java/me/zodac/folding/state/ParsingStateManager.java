@@ -41,6 +41,8 @@ public final class ParsingStateManager {
 
     }
 
+    // TODO: [zodac] Replace with env check?
+
     /**
      * Get the current {@link ParsingState}. On system startup, the {@link ParsingState} is {@link ParsingState#DISABLED}.
      *

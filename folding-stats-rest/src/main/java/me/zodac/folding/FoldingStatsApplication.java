@@ -78,9 +78,8 @@ public class FoldingStatsApplication {
     @Bean
     public CommandLineRunner initialisation(final ApplicationContext ctx) {
         return args -> {
-            Thread.sleep(TimeUnit.SECONDS.toMillis(10)); // TODO: [zodac] DB might not be online by now, what do?
+            Thread.sleep(TimeUnit.SECONDS.toMillis(5)); // TODO: [zodac] DB might not be online by now, what do?
             initCaches();
-            initTcStats();
 
             SystemStateManager.next(SystemState.AVAILABLE);
             LOGGER.info("System ready for requests");
@@ -101,12 +100,5 @@ public class FoldingStatsApplication {
         }
 
         LOGGER.debug("Initialised stats caches");
-    }
-
-    private void initTcStats() {
-//        if (!foldingStatsService.isAnyHourlyTcStatsExist()) {
-//            LOGGER.warn("No TC stats data exists in the DB");
-//            statsScheduler.manualTeamCompetitionStatsParsing(ProcessingType.ASYNCHRONOUS);
-//        }
     }
 }

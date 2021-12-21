@@ -36,14 +36,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -63,19 +62,22 @@ public class StubbedUnitsEndpoint {
     private final Map<String, Integer> unitsByUserAndPasskey = new HashMap<>();
 
     /**
-     * <b>GET</b> request that retrieves the units for a Folding@Home user.
+     * {@link GetMapping} request that retrieves the units for a Folding@Home user.
      *
      * @param foldingUserName the Folding@Home user's username
      * @param passkey         the Folding@Home user's passkey
-     * @return the Folding@Home user's {@link UnitsResponse}
+     * @return the Folding@Home user's {@link UnitsResponse}s
      */
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public Collection<UnitsResponse> getUserUnits(@RequestParam("user") final String foldingUserName, @RequestParam("passkey") final String passkey) {
-        return createResponse(foldingUserName, passkey);
+    public ResponseEntity<Collection<UnitsResponse>> getUserUnits(@RequestParam("user") final String foldingUserName,
+                                                                  @RequestParam("passkey") final String passkey) {
+        return ResponseEntity
+            .ok()
+            .body(createResponse(foldingUserName, passkey));
     }
 
     /**
-     * <b>POST</b> request that sets the units for a Folding@Home user.
+     * {@link PostMapping} request that sets the units for a Folding@Home user.
      *
      * <p>
      * Since in the test environment we do not want a user to actually have to complete units, we can manually set them here.
@@ -84,12 +86,10 @@ public class StubbedUnitsEndpoint {
      * @param passkey         the Folding@Home user's passkey
      * @param units           the units to set
      */
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public void updateUserUnits(@RequestParam("user") final String foldingUserName,
-                                @RequestParam("passkey") final String passkey,
-                                @RequestParam("units") final int units) {
-        System.out.println("Adding units: " + foldingUserName + ", " + passkey + ", " + units);
+    public ResponseEntity<Void> updateUserUnits(@RequestParam("user") final String foldingUserName,
+                                                @RequestParam("passkey") final String passkey,
+                                                @RequestParam("units") final int units) {
         final String key = foldingUserName + passkey;
 
         if (units == NO_UNITS) {
@@ -98,15 +98,21 @@ public class StubbedUnitsEndpoint {
         } else {
             unitsByUserAndPasskey.put(key, unitsByUserAndPasskey.getOrDefault(key, NO_UNITS) + units);
         }
+
+        return ResponseEntity
+            .ok()
+            .build();
     }
 
     /**
-     * <b>DELETE</b>> request that resets the units for all Folding@Home users.
+     * {@link DeleteMapping} request that resets the units for all Folding@Home users.
      */
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping
-    public void deleteUserUnits() {
+    public ResponseEntity<Void> deleteUserUnits() {
         unitsByUserAndPasskey.clear();
+        return ResponseEntity
+            .ok()
+            .build();
     }
 
     private Collection<UnitsResponse> createResponse(final String foldingUserName, final String passkey) {

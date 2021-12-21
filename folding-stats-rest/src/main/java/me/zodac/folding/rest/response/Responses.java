@@ -24,6 +24,8 @@
 
 package me.zodac.folding.rest.response;
 
+import static me.zodac.folding.rest.util.RestUtilConstants.GSON;
+
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 import org.springframework.http.CacheControl;
@@ -53,7 +55,7 @@ public final class Responses {
      */
     public static <E> ResponseEntity<E> ok() {
         return ResponseEntity
-            .status(HttpStatus.OK)
+            .ok()
             .build();
     }
 
@@ -67,10 +69,10 @@ public final class Responses {
      * @param entity the entity being retrieved
      * @return the <b>200_OK</b> {@link ResponseEntity}
      */
-    public static <E> ResponseEntity<E> ok(final E entity) {
+    public static <E> ResponseEntity<String> ok(final E entity) {
         return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(entity);
+            .ok()
+            .body(GSON.toJson(entity));
     }
 
     /**
@@ -84,11 +86,11 @@ public final class Responses {
      * @param cachePeriodInSeconds the cache period for the entity in seconds
      * @return the <b>200_OK</b> {@link ResponseEntity}
      */
-    public static <E> ResponseEntity<E> cachedOk(final E entity, final long cachePeriodInSeconds) {
+    public static <E> ResponseEntity<String> cachedOk(final E entity, final long cachePeriodInSeconds) {
         return ResponseEntity
-            .status(HttpStatus.OK)
+            .ok()
             .cacheControl(CacheControl.maxAge(cachePeriodInSeconds, TimeUnit.SECONDS))
-            .body(entity);
+            .body(GSON.toJson(entity));
     }
 
     /**
@@ -100,11 +102,11 @@ public final class Responses {
      * @param entities the {@link Collection} of entities being retrieved
      * @return the <b>200_OK</b> {@link ResponseEntity}
      */
-    public static <E> ResponseEntity<Collection<E>> ok(final Collection<E> entities) {
+    public static <E> ResponseEntity<String> ok(final Collection<E> entities) {
         return ResponseEntity
-            .status(HttpStatus.OK)
+            .ok()
             .header("X-Total-Count", String.valueOf(entities.size()))
-            .body(entities);
+            .body(GSON.toJson(entities));
     }
 
     /**
@@ -117,12 +119,12 @@ public final class Responses {
      * @param cachePeriodInSeconds the cache period for the entity in seconds
      * @return the <b>200_OK</b> {@link ResponseEntity}
      */
-    public static <E> ResponseEntity<Collection<E>> cachedOk(final Collection<E> entities, final long cachePeriodInSeconds) {
+    public static <E> ResponseEntity<String> cachedOk(final Collection<E> entities, final long cachePeriodInSeconds) {
         return ResponseEntity
-            .status(HttpStatus.OK)
+            .ok()
             .header("X-Total-Count", String.valueOf(entities.size()))
             .cacheControl(CacheControl.maxAge(cachePeriodInSeconds, TimeUnit.SECONDS))
-            .body(entities);
+            .body(GSON.toJson(entities));
     }
 
     /**
@@ -135,7 +137,7 @@ public final class Responses {
      * @param entityId the ID of the updated resource
      * @return the <b>200_OK</b> {@link ResponseEntity}
      */
-    public static <E> ResponseEntity<E> ok(final E entity, final int entityId) {
+    public static <E> ResponseEntity<String> ok(final E entity, final int entityId) {
         return responseWithLocation(entity, entityId, HttpStatus.OK);
     }
 
@@ -149,11 +151,11 @@ public final class Responses {
      * @param entityId the ID of the created resource
      * @return the <b>201_CREATED</b> {@link ResponseEntity}
      */
-    public static <E> ResponseEntity<E> created(final E entity, final int entityId) {
+    public static <E> ResponseEntity<String> created(final E entity, final int entityId) {
         return responseWithLocation(entity, entityId, HttpStatus.CREATED);
     }
 
-    private static <E> ResponseEntity<E> responseWithLocation(final E entity, final int entityId, final HttpStatus httpStatus) {
+    private static <E> ResponseEntity<String> responseWithLocation(final E entity, final int entityId, final HttpStatus httpStatus) {
         final String location = ServletUriComponentsBuilder
             .fromCurrentRequest()
             .path("/{id}")
@@ -163,7 +165,7 @@ public final class Responses {
         return ResponseEntity
             .status(httpStatus)
             .header(HttpHeaders.LOCATION, location)
-            .body(entity);
+            .body(GSON.toJson(entity));
     }
 
     /**
@@ -176,10 +178,10 @@ public final class Responses {
      * @param errorMessage an error message defining what part of the input payload caused the error
      * @return the <b>400_BAD_REQUEST</b> {@link ResponseEntity}
      */
-    public static ResponseEntity<ErrorResponse> badRequest(final String errorMessage) {
+    public static ResponseEntity<String> badRequest(final String errorMessage) {
         return ResponseEntity
-            .status(HttpStatus.BAD_REQUEST)
-            .body(ErrorResponse.create(errorMessage));
+            .badRequest()
+            .body(GSON.toJson(ErrorResponse.create(errorMessage)));
     }
 
     /**
@@ -192,10 +194,10 @@ public final class Responses {
      * @param entity the entity in the payload that caused the error
      * @return the <b>400_BAD_REQUEST</b> {@link ResponseEntity}
      */
-    public static <E> ResponseEntity<E> badRequest(final E entity) {
+    public static <E> ResponseEntity<String> badRequest(final E entity) {
         return ResponseEntity
-            .status(HttpStatus.BAD_REQUEST)
-            .body(entity);
+            .badRequest()
+            .body(GSON.toJson(entity));
     }
 
     /**
@@ -206,10 +208,10 @@ public final class Responses {
      *
      * @return the <b>400_BAD_REQUEST</b> {@link ResponseEntity}
      */
-    public static ResponseEntity<ErrorResponse> nullRequest() {
+    public static ResponseEntity<String> nullRequest() {
         return ResponseEntity
-            .status(HttpStatus.BAD_REQUEST)
-            .body(ErrorResponse.create("Payload is null"));
+            .badRequest()
+            .body(GSON.toJson(ErrorResponse.create("Payload is null")));
     }
 
     /**
@@ -253,7 +255,7 @@ public final class Responses {
      */
     public static <E> ResponseEntity<E> notFound() {
         return ResponseEntity
-            .status(HttpStatus.NOT_FOUND)
+            .notFound()
             .build();
     }
 
@@ -271,10 +273,10 @@ public final class Responses {
      * @param entity the entity in the payload that caused the error
      * @return the <b>409_CONFLICT</b> {@link ResponseEntity}
      */
-    public static <E> ResponseEntity<E> conflict(final E entity) {
+    public static <E> ResponseEntity<String> conflict(final E entity) {
         return ResponseEntity
             .status(HttpStatus.CONFLICT)
-            .body(entity);
+            .body(GSON.toJson(entity));
     }
 
     /**
@@ -287,7 +289,7 @@ public final class Responses {
      */
     public static <E> ResponseEntity<E> serverError() {
         return ResponseEntity
-            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .internalServerError()
             .build();
     }
 }

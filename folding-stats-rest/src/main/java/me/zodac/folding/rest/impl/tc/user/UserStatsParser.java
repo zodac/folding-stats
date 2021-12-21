@@ -29,6 +29,8 @@ import static me.zodac.folding.api.util.NumberUtils.formatWithCommas;
 
 import java.util.Collection;
 import me.zodac.folding.api.exception.ExternalConnectionException;
+import me.zodac.folding.api.state.ParsingState;
+import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
@@ -38,6 +40,8 @@ import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.rest.api.FoldingStatsService;
 import me.zodac.folding.rest.api.tc.user.UserStatsParserService;
+import me.zodac.folding.state.ParsingStateManager;
+import me.zodac.folding.state.SystemStateManager;
 import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -85,6 +89,9 @@ public class UserStatsParser implements UserStatsParserService {
     }
 
     private void updateTcStatsForUsers(final Collection<User> users) {
+        ParsingStateManager.next(ParsingState.ENABLED_TEAM_COMPETITION);
+        SystemStateManager.next(SystemState.UPDATING_STATS);
+
         for (final User user : users) {
             try {
                 updateTcStatsForUser(user);
@@ -92,6 +99,8 @@ public class UserStatsParser implements UserStatsParserService {
                 LOGGER.error("Error updating TC stats for user '{}' (ID: {})", user.getDisplayName(), user.getId(), e);
             }
         }
+
+        SystemStateManager.next(SystemState.WRITE_EXECUTED);
     }
 
     private void updateTcStatsForUser(final User user) {
@@ -147,9 +156,9 @@ public class UserStatsParser implements UserStatsParserService {
         final UserTcStats statsBeforeOffset = UserTcStats.create(user.getId(), totalStats.getTimestamp(), points, multipliedPoints, units);
         final UserTcStats hourlyUserTcStats = statsBeforeOffset.updateWithOffsets(offsetTcStats);
 
-        LOGGER.debug("{} (ID: {}): {} total points (unmultiplied) | {} total units", user::getDisplayName, user::getId,
+        LOGGER.info("{} (ID: {}): {} total points (unmultiplied) | {} total units", user::getDisplayName, user::getId,
             () -> formatWithCommas(totalStats.getPoints()), () -> formatWithCommas(totalStats.getUnits()));
-        LOGGER.debug("{} (ID: {}): {} TC multiplied points (pre-offset) | {} TC units (pre-offset)", user::getDisplayName, user::getId,
+        LOGGER.info("{} (ID: {}): {} TC multiplied points (pre-offset) | {} TC units (pre-offset)", user::getDisplayName, user::getId,
             () -> formatWithCommas(multipliedPoints), () -> formatWithCommas(units));
 
         final UserTcStats createdHourlyTcStats = foldingStatsCore.createHourlyTcStats(hourlyUserTcStats);

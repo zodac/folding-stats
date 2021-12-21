@@ -57,7 +57,7 @@ class InvalidUrlTest {
             .isEqualTo(HttpURLConnection.HTTP_SEE_OTHER);
 
         final String redirectLocation = response.headers()
-            .firstValue("location")
+            .firstValue("Location")
             .orElse("no location header");
 
         assertThat(redirectLocation)

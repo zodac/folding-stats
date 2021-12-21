@@ -27,7 +27,6 @@ package me.zodac.folding.test;
 import static me.zodac.folding.rest.util.RestUtilConstants.HTTP_CLIENT;
 import static me.zodac.folding.test.util.SystemCleaner.cleanSystemForComplexTests;
 import static me.zodac.folding.test.util.TestConstants.FOLDING_URL;
-import static me.zodac.folding.test.util.rest.response.HttpResponseHeaderUtils.getEntityTag;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
@@ -160,31 +159,31 @@ class HistoricUserStatsTest {
             .isEqualTo(6);
     }
 
-    @Test
-    void whenGettingHourlyStats_givenRequestUsesPreviousEntityTag_andStatsHaveNotChanged_thenResponseHas304Status_andNoBody()
-        throws FoldingRestException {
-        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
-        DatabaseUtils.insertStats("user_tc_stats_hourly",
-            TestStats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10)
-        );
-
-        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getHourlyUserStats(userId, Year.parse("2020"), Month.of(4), 12);
-        assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
-            .isEqualTo(HttpURLConnection.HTTP_OK);
-
-        final String eTag = getEntityTag(response);
-
-        final HttpResponse<String> cachedResponse =
-            HISTORIC_STATS_REQUEST_SENDER.getHourlyUserStats(userId, Year.parse("2020"), Month.of(4), 12, eTag);
-        assertThat(cachedResponse.statusCode())
-            .as("Expected second request to have a 304_NOT_MODIFIED HTTP response")
-            .isEqualTo(HttpURLConnection.HTTP_NOT_MODIFIED);
-
-        assertThat(HistoricStatsResponseParser.getHourlyUserStats(cachedResponse))
-            .as("Expected cached response to have the same content as the non-cached response")
-            .isNull();
-    }
+//    @Test
+//    void whenGettingHourlyStats_givenRequestUsesPreviousEntityTag_andStatsHaveNotChanged_thenResponseHas304Status_andNoBody()
+//        throws FoldingRestException {
+//        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
+//        DatabaseUtils.insertStats("user_tc_stats_hourly",
+//            TestStats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10)
+//        );
+//
+//        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getHourlyUserStats(userId, Year.parse("2020"), Month.of(4), 12);
+//        assertThat(response.statusCode())
+//            .as("Did not receive a 200_OK HTTP response: " + response.body())
+//            .isEqualTo(HttpURLConnection.HTTP_OK);
+//
+//        final String eTag = getEntityTag(response);
+//
+//        final HttpResponse<String> cachedResponse =
+//            HISTORIC_STATS_REQUEST_SENDER.getHourlyUserStats(userId, Year.parse("2020"), Month.of(4), 12, eTag);
+//        assertThat(cachedResponse.statusCode())
+//            .as("Expected second request to have a 304_NOT_MODIFIED HTTP response")
+//            .isEqualTo(HttpURLConnection.HTTP_NOT_MODIFIED);
+//
+//        assertThat(HistoricStatsResponseParser.getHourlyUserStats(cachedResponse))
+//            .as("Expected cached response to have the same content as the non-cached response")
+//            .isNull();
+//    }
 
     @Test
     void whenGettingHourlyStats_givenNonExistingUserId_thenResponseHas404Status() throws FoldingRestException {
@@ -324,30 +323,30 @@ class HistoricUserStatsTest {
             .isEqualTo(10);
     }
 
-    @Test
-    void whenGettingDailyStats_givenRequestUsesPreviousEntityTag_andStatsHaveNotChanged_thenResponseHas304Status_andNoBody()
-        throws FoldingRestException {
-        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
-        DatabaseUtils.insertStats("user_tc_stats_hourly",
-            TestStats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10)
-        );
-
-        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getDailyUserStats(userId, Year.parse("2020"), Month.of(4));
-        assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
-            .isEqualTo(HttpURLConnection.HTTP_OK);
-
-        final String eTag = getEntityTag(response);
-
-        final HttpResponse<String> cachedResponse = HISTORIC_STATS_REQUEST_SENDER.getDailyUserStats(userId, Year.parse("2020"), Month.of(4), eTag);
-        assertThat(cachedResponse.statusCode())
-            .as("Expected second request to have a 304_NOT_MODIFIED HTTP response")
-            .isEqualTo(HttpURLConnection.HTTP_NOT_MODIFIED);
-
-        assertThat(HistoricStatsResponseParser.getDailyUserStats(cachedResponse))
-            .as("Expected cached response to have the same content as the non-cached response")
-            .isNull();
-    }
+//    @Test
+//    void whenGettingDailyStats_givenRequestUsesPreviousEntityTag_andStatsHaveNotChanged_thenResponseHas304Status_andNoBody()
+//        throws FoldingRestException {
+//        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
+//        DatabaseUtils.insertStats("user_tc_stats_hourly",
+//            TestStats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10)
+//        );
+//
+//        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getDailyUserStats(userId, Year.parse("2020"), Month.of(4));
+//        assertThat(response.statusCode())
+//            .as("Did not receive a 200_OK HTTP response: " + response.body())
+//            .isEqualTo(HttpURLConnection.HTTP_OK);
+//
+//        final String eTag = getEntityTag(response);
+//
+//        final HttpResponse<String> cachedResponse = HISTORIC_STATS_REQUEST_SENDER.getDailyUserStats(userId, Year.parse("2020"), Month.of(4), eTag);
+//        assertThat(cachedResponse.statusCode())
+//            .as("Expected second request to have a 304_NOT_MODIFIED HTTP response")
+//            .isEqualTo(HttpURLConnection.HTTP_NOT_MODIFIED);
+//
+//        assertThat(HistoricStatsResponseParser.getDailyUserStats(cachedResponse))
+//            .as("Expected cached response to have the same content as the non-cached response")
+//            .isNull();
+//    }
 
     @Test
     void whenGettingDailyStats_givenNonExistingUserId_thenResponseHas404Status() throws FoldingRestException {
@@ -497,30 +496,30 @@ class HistoricUserStatsTest {
             .isEqualTo(11);
     }
 
-    @Test
-    void whenGettingMonthlyStats_givenRequestUsesPreviousEntityTag_andStatsHaveNotChanged_thenResponseHas304Status_andNoBody()
-        throws FoldingRestException {
-        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
-        DatabaseUtils.insertStats("user_tc_stats_hourly",
-            TestStats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10)
-        );
-
-        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getMonthlyUserStats(userId, Year.parse("2020"));
-        assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
-            .isEqualTo(HttpURLConnection.HTTP_OK);
-
-        final String eTag = getEntityTag(response);
-
-        final HttpResponse<String> cachedResponse = HISTORIC_STATS_REQUEST_SENDER.getMonthlyUserStats(userId, Year.parse("2020"), eTag);
-        assertThat(cachedResponse.statusCode())
-            .as("Expected second request to have a 304_NOT_MODIFIED HTTP response")
-            .isEqualTo(HttpURLConnection.HTTP_NOT_MODIFIED);
-
-        assertThat(HistoricStatsResponseParser.getMonthlyUserStats(cachedResponse))
-            .as("Expected cached response to have the same content as the non-cached response")
-            .isNull();
-    }
+//    @Test
+//    void whenGettingMonthlyStats_givenRequestUsesPreviousEntityTag_andStatsHaveNotChanged_thenResponseHas304Status_andNoBody()
+//        throws FoldingRestException {
+//        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
+//        DatabaseUtils.insertStats("user_tc_stats_hourly",
+//            TestStats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10)
+//        );
+//
+//        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getMonthlyUserStats(userId, Year.parse("2020"));
+//        assertThat(response.statusCode())
+//            .as("Did not receive a 200_OK HTTP response: " + response.body())
+//            .isEqualTo(HttpURLConnection.HTTP_OK);
+//
+//        final String eTag = getEntityTag(response);
+//
+//        final HttpResponse<String> cachedResponse = HISTORIC_STATS_REQUEST_SENDER.getMonthlyUserStats(userId, Year.parse("2020"), eTag);
+//        assertThat(cachedResponse.statusCode())
+//            .as("Expected second request to have a 304_NOT_MODIFIED HTTP response")
+//            .isEqualTo(HttpURLConnection.HTTP_NOT_MODIFIED);
+//
+//        assertThat(HistoricStatsResponseParser.getMonthlyUserStats(cachedResponse))
+//            .as("Expected cached response to have the same content as the non-cached response")
+//            .isNull();
+//    }
 
     @Test
     void whenGettingMonthlyStats_givenNonExistingUserId_thenResponseHas404Status() throws FoldingRestException {

@@ -162,13 +162,6 @@ public interface FoldingStatsService {
     UserTcStats getHourlyTcStats(final User user);
 
     /**
-     * Checks if any {@link UserTcStats} for the <code>Team Competition</code> exist in the system.
-     *
-     * @return <code>true</code> if any {@link UserTcStats} have been created
-     */
-    boolean isAnyHourlyTcStatsExist();
-
-    /**
      * Creates a {@link UserStats} for the initial overall stats for the provided {@link User} at the start of the monitoring period.
      *
      * @param userStats the {@link UserStats} to be created
@@ -224,6 +217,5 @@ public interface FoldingStatsService {
      *
      * @return the latest {@link CompetitionSummary}
      */
-    // TODO: [zodac] Map users to teams and send once?
-    CompetitionSummary getCompetitionSummary(final Collection<Team> teams, final Collection<User> users);
+    CompetitionSummary getCompetitionSummary();
 }

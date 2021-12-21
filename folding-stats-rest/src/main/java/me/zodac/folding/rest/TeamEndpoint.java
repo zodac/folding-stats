@@ -48,7 +48,6 @@ import me.zodac.folding.api.tc.validation.ValidationResult;
 import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.rest.api.FoldingService;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
-import me.zodac.folding.rest.response.Responses;
 import me.zodac.folding.rest.util.IdResult;
 import me.zodac.folding.rest.util.IntegerParser;
 import me.zodac.folding.rest.util.ValidationFailureResponseMapper;
@@ -85,7 +84,7 @@ public class TeamEndpoint {
      *
      * @param teamRequest the {@link TeamRequest} to create a {@link Team}
      * @param request     the {@link HttpServletRequest}
-     * @return {@link Responses#created(Object, int)} containing the created {@link Team}
+     * @return {@link me.zodac.folding.rest.response.Responses#created(Object, int)} containing the created {@link Team}
      */
     @WriteRequired
     @RolesAllowed("admin")
@@ -115,7 +114,7 @@ public class TeamEndpoint {
      * {@link GetMapping} request to retrieve all {@link Team}s.
      *
      * @param request the {@link HttpServletRequest}
-     * @return {@link Responses#cachedOk(Collection, long)} containing the {@link Team}s
+     * @return {@link me.zodac.folding.rest.response.Responses#cachedOk(Collection, long)} containing the {@link Team}s
      */
     @ReadRequired
     @PermitAll
@@ -137,7 +136,7 @@ public class TeamEndpoint {
      *
      * @param teamId  the ID of the {@link Team} to retrieve
      * @param request the {@link HttpServletRequest}
-     * @return {@link Responses#cachedOk(Object, long)} containing the {@link Team}
+     * @return {@link me.zodac.folding.rest.response.Responses#cachedOk(Object, long)} containing the {@link Team}
      */
     @ReadRequired
     @PermitAll
@@ -171,7 +170,7 @@ public class TeamEndpoint {
      *
      * @param teamName the {@code teamName} of the {@link Team} to retrieve
      * @param request  the {@link HttpServletRequest}
-     * @return {@link Responses#cachedOk(Object, long)} containing the {@link Team}
+     * @return {@link me.zodac.folding.rest.response.Responses#cachedOk(Object, long)} containing the {@link Team}
      */
     @ReadRequired
     @PermitAll
@@ -210,7 +209,7 @@ public class TeamEndpoint {
      * @param teamId      the ID of the {@link Team} to be updated
      * @param teamRequest the {@link TeamRequest} to update a {@link Team}
      * @param request     the {@link HttpServletRequest}
-     * @return {@link Responses#ok(Object, int)} containing the updated {@link Team}
+     * @return {@link me.zodac.folding.rest.response.Responses#ok(Object, int)} containing the updated {@link Team}
      */
     @WriteRequired
     @RolesAllowed("admin")
@@ -268,7 +267,7 @@ public class TeamEndpoint {
      *
      * @param teamId  the ID of the {@link Team} to be deleted
      * @param request the {@link HttpServletRequest}
-     * @return {@link Responses#ok()}
+     * @return {@link me.zodac.folding.rest.response.Responses#ok()}
      */
     @WriteRequired
     @RolesAllowed("admin")

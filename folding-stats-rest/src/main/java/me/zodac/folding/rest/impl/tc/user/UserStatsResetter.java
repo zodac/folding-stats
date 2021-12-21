@@ -32,6 +32,7 @@ import me.zodac.folding.cache.TcStatsCache;
 import me.zodac.folding.cache.TotalStatsCache;
 import me.zodac.folding.rest.api.FoldingService;
 import me.zodac.folding.rest.api.FoldingStatsService;
+import me.zodac.folding.rest.api.tc.user.UserStatsParserService;
 import me.zodac.folding.rest.api.tc.user.UserStatsResetterService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -52,8 +53,8 @@ public class UserStatsResetter implements UserStatsResetterService {
     @Autowired
     private FoldingStatsService foldingStatsRepository;
 
-//    @Autowired
-//    private StatsSchedulerService statsScheduler;
+    @Autowired
+    private UserStatsParserService userStatsParser;
 
     /**
      * Resets the <code>Team Competition</code> stats for all {@link User}s.
@@ -67,22 +68,23 @@ public class UserStatsResetter implements UserStatsResetterService {
      * <li>Invalidate all stats caches ({@link TcStatsCache}/{@link TotalStatsCache}/{@link RetiredTcStatsCache})</li>
      * <li>Execute a new stats update to set all values to <b>0</b></li>
      * </ol>
-     * <p>
-     * //     * @see FoldingStatsCore#resetAllTeamCompetitionUserStats()
-     * //     * @see StatsScheduler#manualTeamCompetitionStatsParsing(ProcessingType)
+     *
+     * @see FoldingStatsService#resetAllTeamCompetitionUserStats(Collection)
+     * @see UserStatsParserService#parseTcStatsForUserAndWait(Collection)
      */
     @Override
     public void resetTeamCompetitionStats() {
         try {
+            final Collection<User> users = foldingService.getAllUsersWithPasskeys();
+
             // Pull stats one more time to get the latest values
-//            statsScheduler.manualTeamCompetitionStatsParsing(ProcessingType.SYNCHRONOUS);
+            userStatsParser.parseTcStatsForUserAndWait(users);
 
             LOGGER.info("Resetting Team Competition stats");
-            final Collection<User> users = foldingService.getAllUsersWithoutPasskeys();
             foldingStatsRepository.resetAllTeamCompetitionUserStats(users);
 
             // Pull stats for new month
-//            statsScheduler.manualTeamCompetitionStatsParsing(ProcessingType.SYNCHRONOUS);
+            userStatsParser.parseTcStatsForUserAndWait(users);
         } catch (final Exception e) {
             LOGGER.warn("Unexpected error manually resetting TC stats", e);
         }

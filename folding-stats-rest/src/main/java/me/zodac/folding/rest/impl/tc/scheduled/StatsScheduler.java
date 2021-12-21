@@ -28,10 +28,12 @@ package me.zodac.folding.rest.impl.tc.scheduled;
 import static java.lang.Boolean.parseBoolean;
 
 import java.util.Collection;
+import me.zodac.folding.api.state.ParsingState;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
 import me.zodac.folding.rest.api.FoldingService;
 import me.zodac.folding.rest.api.tc.user.UserStatsParserService;
+import me.zodac.folding.state.ParsingStateManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +68,7 @@ public class StatsScheduler {
             return;
         }
 
+        ParsingStateManager.next(ParsingState.ENABLED_TEAM_COMPETITION);
         userStatsParser.parseTcStatsForUser(users);
     }
 }

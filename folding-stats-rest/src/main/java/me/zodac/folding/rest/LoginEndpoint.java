@@ -37,7 +37,6 @@ import me.zodac.folding.api.state.ReadRequired;
 import me.zodac.folding.api.util.EncodingUtils;
 import me.zodac.folding.rest.api.FoldingService;
 import me.zodac.folding.rest.api.LoginCredentials;
-import me.zodac.folding.rest.response.Responses;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,11 +65,11 @@ public class LoginEndpoint {
      * <p>
      * The {@link ResponseEntity} will be one of:
      * <ul>
-     *     <li>{@link Responses#ok()}</li>
-     *     <li>{@link Responses#badRequest(Object)}</li>
-     *     <li>{@link Responses#unauthorized()}</li>
-     *     <li>{@link Responses#forbidden()}</li>
-     *     <li>{@link Responses#serverError()}</li>
+     *     <li>{@link me.zodac.folding.rest.response.Responses#ok()}</li>
+     *     <li>{@link me.zodac.folding.rest.response.Responses#badRequest(Object)}</li>
+     *     <li>{@link me.zodac.folding.rest.response.Responses#unauthorized()}</li>
+     *     <li>{@link me.zodac.folding.rest.response.Responses#forbidden()}</li>
+     *     <li>{@link me.zodac.folding.rest.response.Responses#serverError()}</li>
      * </ul>
      *
      * @param loginCredentials the {@link LoginCredentials}
@@ -79,7 +78,7 @@ public class LoginEndpoint {
     @ReadRequired
     @PermitAll
     @PostMapping(path = "/admin", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<? extends LoginCredentials> loginAsAdmin(@RequestBody final LoginCredentials loginCredentials) {
+    public ResponseEntity<?> loginAsAdmin(@RequestBody final LoginCredentials loginCredentials) {
         LOGGER.debug("Login request received");
 
         if (loginCredentials == null || EncodingUtils.isInvalidBasicAuthentication(loginCredentials.getEncodedUserNameAndPassword())) {

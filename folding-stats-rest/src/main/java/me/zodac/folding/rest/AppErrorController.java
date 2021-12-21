@@ -20,47 +20,32 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
+ *
  */
 
-package me.zodac.folding.rest.response;
+package me.zodac.folding.rest;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import me.zodac.folding.api.util.EnvironmentVariableUtils;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Simple POJO used for REST responses where an error message is required.
- *
- * <p>
- * When using {@link com.google.gson.Gson}, the response will be in the form:
- * <pre>
- *     {
- *         "error": "My error message here"
- *     }
- * </pre>
+ * Basic Controller which is called for unhandled errors
  */
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
-@Setter
-@EqualsAndHashCode
-@ToString(doNotUseGetters = true)
-// TODO: [zodac] Needed?
-public class ErrorResponse {
+@RestController
+@RequestMapping("/error")
+public class AppErrorController {
 
-    private String error;
+    private static final String REDIRECT_URL = EnvironmentVariableUtils.getOrDefault("REDIRECT_URL", "https://etf.axihub.ca/");
 
-    /**
-     * Creates an {@link ErrorResponse}.
-     *
-     * @param error the error message
-     * @return the created {@link ErrorResponse}
-     */
-    public static ErrorResponse create(final String error) {
-        return new ErrorResponse(error);
+    @GetMapping
+    public ResponseEntity<?> method() {
+        return ResponseEntity
+            .status(HttpStatus.SEE_OTHER)
+            .header("Location", REDIRECT_URL)
+            .build();
     }
 }

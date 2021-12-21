@@ -46,7 +46,6 @@ import me.zodac.folding.api.tc.validation.UserValidator;
 import me.zodac.folding.api.tc.validation.ValidationResult;
 import me.zodac.folding.rest.api.FoldingService;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
-import me.zodac.folding.rest.response.Responses;
 import me.zodac.folding.rest.util.IdResult;
 import me.zodac.folding.rest.util.IntegerParser;
 import me.zodac.folding.rest.util.ValidationFailureResponseMapper;
@@ -83,7 +82,7 @@ public class UserEndpoint {
      *
      * @param userRequest the {@link UserRequest} to create a {@link User}
      * @param request     the {@link HttpServletRequest}
-     * @return {@link Responses#created(Object, int)} containing the created {@link User}
+     * @return {@link me.zodac.folding.rest.response.Responses#created(Object, int)} containing the created {@link User}
      */
     @WriteRequired
     @RolesAllowed("admin")
@@ -113,7 +112,7 @@ public class UserEndpoint {
      * {@link GetMapping} request to retrieve all {@link User}s.
      *
      * @param request the {@link HttpServletRequest}
-     * @return {@link Responses#cachedOk(Collection, long)} containing the {@link User}s
+     * @return {@link me.zodac.folding.rest.response.Responses#cachedOk(Collection, long)} containing the {@link User}s
      */
     @ReadRequired
     @PermitAll
@@ -135,7 +134,7 @@ public class UserEndpoint {
      *
      * @param userId  the ID of the {@link User} to retrieve
      * @param request the {@link HttpServletRequest}
-     * @return {@link Responses#cachedOk(Object, long)} containing the {@link User}
+     * @return {@link me.zodac.folding.rest.response.Responses#cachedOk(Object, long)} containing the {@link User}
      */
     @ReadRequired
     @PermitAll
@@ -169,7 +168,7 @@ public class UserEndpoint {
      *
      * @param userId  the ID of the {@link User} to retrieve
      * @param request the {@link HttpServletRequest}
-     * @return {@link Responses#cachedOk(Object, long)} containing the {@link User}
+     * @return {@link me.zodac.folding.rest.response.Responses#cachedOk(Object, long)} containing the {@link User}
      */
     @ReadRequired
     @RolesAllowed("admin")
@@ -205,7 +204,7 @@ public class UserEndpoint {
      * @param userId      the ID of the {@link User} to be updated
      * @param userRequest the {@link UserRequest} to update a {@link User}
      * @param request     the {@link HttpServletRequest}
-     * @return {@link Responses#ok(Object, int)} containing the updated {@link User}
+     * @return {@link me.zodac.folding.rest.response.Responses#ok(Object, int)} containing the updated {@link User}
      */
     @WriteRequired
     @RolesAllowed("admin")
@@ -264,7 +263,7 @@ public class UserEndpoint {
      *
      * @param userId  the ID of the {@link User} to be deleted
      * @param request the {@link HttpServletRequest}
-     * @return {@link Responses#ok()}
+     * @return {@link me.zodac.folding.rest.response.Responses#ok()}
      */
     @WriteRequired
     @RolesAllowed("admin")

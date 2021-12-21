@@ -176,11 +176,11 @@ public class CachedStorage implements StorageService {
         final Hardware updatedHardware = DbManagerRetriever.get().updateHardware(hardwareToUpdate);
         hardwareCache.add(updatedHardware.getId(), updatedHardware);
 
-//        getAllUsers()
-//            .stream()
-//            .filter(user -> user.getHardware().getId() == updatedHardware.getId())
-//            .map(user -> User.updateHardware(user, updatedHardware))
-//            .forEach(updatedUser -> userCache.add(updatedUser.getId(), updatedUser));
+        getAllUsers()
+            .stream()
+            .filter(user -> user.getHardware().getId() == updatedHardware.getId())
+            .map(user -> User.updateHardware(user, updatedHardware))
+            .forEach(updatedUser -> userCache.add(updatedUser.getId(), updatedUser));
 
         return updatedHardware;
     }
@@ -292,11 +292,11 @@ public class CachedStorage implements StorageService {
         final Team updatedTeam = DbManagerRetriever.get().updateTeam(teamToUpdate);
         teamCache.add(updatedTeam.getId(), updatedTeam);
 
-//        getAllUsers()
-//            .stream()
-//            .filter(user -> user.getTeam().getId() == updatedTeam.getId())
-//            .map(user -> User.updateTeam(user, updatedTeam))
-//            .forEach(updatedUser -> userCache.add(updatedUser.getId(), updatedUser));
+        getAllUsers()
+            .stream()
+            .filter(user -> user.getTeam().getId() == updatedTeam.getId())
+            .map(user -> User.updateTeam(user, updatedTeam))
+            .forEach(updatedUser -> userCache.add(updatedUser.getId(), updatedUser));
 
         return updatedTeam;
     }

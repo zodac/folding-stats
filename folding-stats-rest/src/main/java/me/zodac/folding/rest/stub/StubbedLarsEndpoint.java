@@ -36,6 +36,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -84,28 +85,34 @@ public class StubbedLarsEndpoint {
         + "</tr>";
 
     /**
-     * <b>POST</b> request that allows tests to provide a single {@link LarsGpu} to be added to the stubbed response.
+     * {@link PostMapping} request that allows tests to provide a single {@link LarsGpu} to be added to the stubbed response.
      *
      * @param larsGpu the {@link LarsGpu} to add
      */
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void addGpu(@RequestBody final LarsGpu larsGpu) {
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<LarsGpu> addGpu(@RequestBody final LarsGpu larsGpu) {
         LOGGER.info("Received LarsGpu: {}", larsGpu);
         LARS_GPUS_BY_MODEL_INFO.put(larsGpu.getModelInfo(), larsGpu);
+
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(larsGpu);
     }
 
     /**
-     * <b>DELETE</b> request to remove all {@link LarsGpu}s from the stubbed endpoint.
+     * {@link DeleteMapping} request to remove all {@link LarsGpu}s from the stubbed endpoint.
      */
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping
-    public void deleteGpus() {
+    public ResponseEntity<Void> deleteGpus() {
         LARS_GPUS_BY_MODEL_INFO.clear();
+        return ResponseEntity
+            .ok()
+            .build();
     }
 
     /**
-     * <b>GET</b> request that returns the configured hardware in the same format as the LARS DB HTML output.
+     * {@link GetMapping} request that returns the configured hardware in the same format as the LARS DB HTML output.
      *
      * <p>
      * Used by production code, not by tests directly, though tests should populate the hardware using {@link #addGpu(LarsGpu)}.
@@ -114,8 +121,10 @@ public class StubbedLarsEndpoint {
      * @see StubbedLarsEndpoint#addGpu(LarsGpu)
      */
     @GetMapping(produces = MediaType.TEXT_PLAIN_VALUE)
-    public String getGpus() {
-        return createGpuPage();
+    public ResponseEntity<String> getGpus() {
+        return ResponseEntity
+            .ok()
+            .body(createGpuPage());
     }
 
     private static String createGpuPage() {

@@ -98,7 +98,7 @@ public class UserStateChangeHandler implements UserStateChangeHandlerService {
     @Override
     public void handleStateChange(final User userWithStateChange) {
         if (ParsingStateManager.current() == ParsingState.DISABLED) {
-            LOGGER.debug("Received a state change for user '{}' (ID: {}), but system is not currently parsing stats",
+            LOGGER.info("Received a state change for user '{}' (ID: {}), but system is not currently parsing stats",
                 userWithStateChange.getDisplayName(), userWithStateChange.getId());
             return;
         }

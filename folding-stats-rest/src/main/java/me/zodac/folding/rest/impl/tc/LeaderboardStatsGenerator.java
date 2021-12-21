@@ -29,16 +29,12 @@ import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import me.zodac.folding.api.tc.Category;
-import me.zodac.folding.api.tc.Team;
-import me.zodac.folding.api.tc.User;
-import me.zodac.folding.rest.api.FoldingService;
 import me.zodac.folding.rest.api.FoldingStatsService;
 import me.zodac.folding.rest.api.tc.CompetitionSummary;
 import me.zodac.folding.rest.api.tc.LeaderboardStatsGeneratorService;
@@ -60,9 +56,6 @@ public class LeaderboardStatsGenerator implements LeaderboardStatsGeneratorServi
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Autowired
-    private FoldingService foldingService;
-
-    @Autowired
     private FoldingStatsService foldingStatsService;
 
     /**
@@ -72,7 +65,7 @@ public class LeaderboardStatsGenerator implements LeaderboardStatsGeneratorServi
      */
     @Override
     public List<TeamLeaderboardEntry> generateTeamLeaderboards() {
-        final CompetitionSummary competitionSummary = getCompetitionSummary();
+        final CompetitionSummary competitionSummary = foldingStatsService.getCompetitionSummary();
         final List<TeamSummary> teamResults = competitionSummary.getTeams()
             .stream()
             .sorted(Comparator.comparingLong(TeamSummary::getTeamMultipliedPoints).reversed())
@@ -80,7 +73,7 @@ public class LeaderboardStatsGenerator implements LeaderboardStatsGeneratorServi
 
         if (teamResults.isEmpty()) {
             LOGGER.warn("No TC teams to show");
-            return Collections.emptyList();
+            return new ArrayList<>(); // TODO: [zodac] Custom GSON serializer/deserializer for Collections.emptyList()
         }
 
         final TeamLeaderboardEntry leader = TeamLeaderboardEntry.createLeader(teamResults.get(0));
@@ -110,7 +103,7 @@ public class LeaderboardStatsGenerator implements LeaderboardStatsGeneratorServi
      */
     @Override
     public Map<Category, List<UserCategoryLeaderboardEntry>> generateUserCategoryLeaderboards() {
-        final CompetitionSummary competitionSummary = getCompetitionSummary();
+        final CompetitionSummary competitionSummary = foldingStatsService.getCompetitionSummary();
         final Map<Category, List<UserSummary>> usersByCategory = getUsersSortedByCategory(competitionSummary);
 
         final Map<Category, List<UserCategoryLeaderboardEntry>> categoryLeaderboard = new TreeMap<>();
@@ -128,16 +121,10 @@ public class LeaderboardStatsGenerator implements LeaderboardStatsGeneratorServi
         return categoryLeaderboard;
     }
 
-    private CompetitionSummary getCompetitionSummary() {
-        final Collection<Team> teams = foldingService.getAllTeams();
-        final Collection<User> users = foldingService.getAllUsersWithPasskeys(); // TODO: [zodac] Don't think I need passkeys here
-        return foldingStatsService.getCompetitionSummary(teams, users);
-    }
-
     private List<UserCategoryLeaderboardEntry> getUserLeaderboardForCategory(final List<UserSummary> userSummaries) {
         // If we have no users for the category, no need to do anything
         if (userSummaries.isEmpty()) {
-            return Collections.emptyList();
+            return new ArrayList<>(); // TODO: [zodac] Custom GSON serializer/deserializer for Collections.emptyList()
         }
 
         final UserSummary firstResult = userSummaries.get(0);

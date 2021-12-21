@@ -149,11 +149,6 @@ public class FoldingStatsRepository implements FoldingStatsService {
     }
 
     @Override
-    public boolean isAnyHourlyTcStatsExist() {
-        return storageService.getFirstHourlyTcStats().isPresent();
-    }
-
-    @Override
     public UserStats createInitialStats(final UserStats userStats) {
         return storageService.createInitialStats(userStats);
     }
@@ -189,7 +184,7 @@ public class FoldingStatsRepository implements FoldingStatsService {
     }
 
     @Override
-    public CompetitionSummary getCompetitionSummary(final Collection<Team> teams, final Collection<User> users) {
+    public CompetitionSummary getCompetitionSummary() {
         if (SystemStateManager.current() != SystemState.WRITE_EXECUTED) {
             LOGGER.debug("System is not in state {}, retrieving competition summary", SystemState.WRITE_EXECUTED);
 
@@ -200,15 +195,15 @@ public class FoldingStatsRepository implements FoldingStatsService {
         }
 
         LOGGER.debug("Calculating latest TC result, system state: {}", SystemStateManager.current());
-        final CompetitionSummary competitionSummary = createCompetitionSummary(teams, users);
+        final CompetitionSummary competitionSummary = constructCompetitionSummary();
         final CompetitionSummary createdCompetitionSummary = storageService.createCompetitionSummary(competitionSummary);
         SystemStateManager.next(SystemState.AVAILABLE);
 
         return createdCompetitionSummary;
     }
 
-    private CompetitionSummary createCompetitionSummary(final Collection<Team> teams, final Collection<User> users) {
-        final List<TeamSummary> teamSummaries = getStatsForTeams(teams, users);
+    private CompetitionSummary constructCompetitionSummary() {
+        final List<TeamSummary> teamSummaries = getStatsForTeams();
         LOGGER.debug("Found {} TC teams", teamSummaries::size);
 
         if (teamSummaries.isEmpty()) {
@@ -218,20 +213,22 @@ public class FoldingStatsRepository implements FoldingStatsService {
         return CompetitionSummary.create(teamSummaries);
     }
 
-    private List<TeamSummary> getStatsForTeams(final Collection<Team> teams, final Collection<User> users) {
-        return teams
+    private List<TeamSummary> getStatsForTeams() {
+        return storageService.getAllTeams()
             .stream()
-            .map(team -> getTcTeamResult(team, users))
+            .map(this::getTcTeamResult)
             .collect(toList());
     }
 
-    private TeamSummary getTcTeamResult(final Team team, final Collection<User> users) {
+    private TeamSummary getTcTeamResult(final Team team) {
         LOGGER.debug("Converting team '{}' for TC stats", team::getTeamName);
 
-        final Collection<User> usersOnTeam = getUsersFromTeam(team, users);
+        final Collection<User> usersOnTeam = getUsersFromTeam(team);
+        LOGGER.debug("Found {} users for team '{}': {}", usersOnTeam.size(), team.getTeamName(), usersOnTeam);
 
         final Collection<UserSummary> activeUserSummaries = usersOnTeam
             .stream()
+            .map(User::hidePasskey) // Since we are retrieving users from StorageService, the passkeys will need to be explicitly hidden
             .map(this::getTcStatsForUser)
             .collect(toList());
 
@@ -244,8 +241,8 @@ public class FoldingStatsRepository implements FoldingStatsService {
         return TeamSummary.createWithDefaultRank(team, captainDisplayName, activeUserSummaries, retiredUserSummaries);
     }
 
-    private Collection<User> getUsersFromTeam(final Team team, final Collection<User> users) {
-        return users
+    private Collection<User> getUsersFromTeam(final Team team) {
+        return storageService.getAllUsers()
             .stream()
             .filter(user -> user.getTeam().getId() == team.getId())
             .collect(toList());

@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.Optional;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.exception.ExternalConnectionException;
+import me.zodac.folding.api.state.ParsingState;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
@@ -43,7 +44,7 @@ import me.zodac.folding.rest.api.FoldingStatsService;
 import me.zodac.folding.rest.api.StorageService;
 import me.zodac.folding.rest.api.tc.user.UserStateChangeHandlerService;
 import me.zodac.folding.rest.api.tc.user.UserStatsParserService;
-import me.zodac.folding.rest.api.tc.user.UserTeamChangeHandlerService;
+import me.zodac.folding.state.ParsingStateManager;
 import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -77,14 +78,10 @@ public class FoldingServiceImpl implements FoldingService {
     @Autowired
     private UserStatsParserService userStatsParser;
 
-    @Autowired
-    private UserTeamChangeHandlerService userTeamChangeHandler;
-
     @Override
     public Hardware createHardware(final Hardware hardware) {
         return storageService.createHardware(hardware);
     }
-
 
     @Override
     public Optional<Hardware> getHardware(final int hardwareId) {
@@ -220,8 +217,8 @@ public class FoldingServiceImpl implements FoldingService {
         }
 
         // Perform any stats handling before updating the user
-        if (userTeamChangeHandler.isUserTeamChange(userToUpdate, existingUser)) {
-            userTeamChangeHandler.handleTeamChange(userToUpdate, existingUser.getTeam());
+        if (isUserTeamChange(userToUpdate, existingUser)) {
+            handleTeamChange(userToUpdate, existingUser.getTeam());
         }
 
         final User updatedUser = storageService.updateUser(userToUpdate);
@@ -232,6 +229,45 @@ public class FoldingServiceImpl implements FoldingService {
         }
 
         return updatedUser;
+    }
+
+    private boolean isUserTeamChange(final User updatedUser, final User existingUser) {
+        if (updatedUser.getTeam().getId() != existingUser.getTeam().getId()) {
+            LOGGER.info("User '{}' (ID: {}) moved from team '{}' -> '{}'", existingUser.getDisplayName(), existingUser.getId(),
+                updatedUser.getTeam().getTeamName(), existingUser.getTeam().getTeamName());
+            return true;
+        }
+
+        return false;
+    }
+
+    private void handleTeamChange(final User userWithTeamChange, final Team oldTeam) {
+        if (ParsingStateManager.current() == ParsingState.DISABLED) {
+            LOGGER.info("Received a team change for user '{}' (ID: {}), but system is not currently parsing stats",
+                userWithTeamChange.getDisplayName(), userWithTeamChange.getId());
+            return;
+        }
+
+        // Add user's current stats as retired stats for old team
+        final UserTcStats userStats = foldingStatsService.getHourlyTcStats(userWithTeamChange);
+
+        if (!userStats.isEmptyStats()) {
+            final RetiredUserTcStats retiredUserTcStats =
+                RetiredUserTcStats.createWithoutId(oldTeam.getId(), userWithTeamChange.getDisplayName(), userStats);
+            final RetiredUserTcStats createdRetiredUserTcStats = foldingStatsService.createRetiredUserStats(retiredUserTcStats);
+            LOGGER.info("User '{}' (ID: {}) retired with retired stats ID: {}", userWithTeamChange.getDisplayName(), userWithTeamChange.getId(),
+                createdRetiredUserTcStats.getRetiredUserId());
+        }
+
+        // Reset user stats
+        final UserStats userTotalStats = foldingStatsService.getTotalStats(userWithTeamChange);
+        foldingStatsService.createInitialStats(userTotalStats);
+
+        // Pull stats to update teams
+        final Collection<User> users = getAllUsersWithPasskeys();
+        userStatsParser.parseTcStatsForUserAndWait(users);
+
+        LOGGER.info("Handled team change for user '{}' (ID: {})", userWithTeamChange.getDisplayName(), userWithTeamChange.getId());
     }
 
     private boolean isUserCaptainAndCaptainExistsOnTeam(final User user) {
@@ -274,15 +310,16 @@ public class FoldingServiceImpl implements FoldingService {
     @Override
     public void deleteUser(final User user) {
         // Retrieve the user's stats before deleting the user, so we can use the values for the retried user stats
-        final Optional<UserTcStats> userStats = storageService.getHourlyTcStats(user.getId());
+        final UserTcStats userStats = storageService.getHourlyTcStats(user.getId())
+            .orElse(UserTcStats.empty());
         storageService.deleteUser(user.getId());
 
-        if (userStats.isEmpty()) {
+        if (userStats.isEmptyStats()) {
             LOGGER.warn("User '{}' (ID: {}) has no stats, not saving any retired stats", user.getDisplayName(), user.getId());
             return;
         }
 
-        final RetiredUserTcStats retiredUserTcStats = RetiredUserTcStats.createWithoutId(user, userStats.get());
+        final RetiredUserTcStats retiredUserTcStats = RetiredUserTcStats.createWithoutId(user, userStats);
         final RetiredUserTcStats createdRetiredUserTcStats = storageService.createRetiredUserStats(retiredUserTcStats);
         LOGGER.info("User '{}' (ID: {}) retired with retired stats ID: {}", user.getDisplayName(), user.getId(),
             createdRetiredUserTcStats.getRetiredUserId());

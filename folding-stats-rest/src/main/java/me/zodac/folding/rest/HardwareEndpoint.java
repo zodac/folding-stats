@@ -48,7 +48,6 @@ import me.zodac.folding.api.tc.validation.ValidationResult;
 import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.rest.api.FoldingService;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
-import me.zodac.folding.rest.response.Responses;
 import me.zodac.folding.rest.util.IdResult;
 import me.zodac.folding.rest.util.IntegerParser;
 import me.zodac.folding.rest.util.ValidationFailureResponseMapper;
@@ -85,7 +84,7 @@ public class HardwareEndpoint {
      *
      * @param hardwareRequest the {@link HardwareRequest} to create a {@link Hardware}
      * @param request         the {@link HttpServletRequest}
-     * @return {@link Responses#created(Object, int)} containing the created {@link Hardware}
+     * @return {@link me.zodac.folding.rest.response.Responses#created(Object, int)} containing the created {@link Hardware}
      */
     @WriteRequired
     @RolesAllowed("admin")
@@ -115,7 +114,7 @@ public class HardwareEndpoint {
      * {@link GetMapping} request to retrieve all {@link Hardware}s.
      *
      * @param request the {@link HttpServletRequest}
-     * @return {@link Responses#cachedOk(Collection, long)} containing the {@link Hardware}s
+     * @return {@link me.zodac.folding.rest.response.Responses#cachedOk(Collection, long)} containing the {@link Hardware}s
      */
     @ReadRequired
     @PermitAll
@@ -137,7 +136,7 @@ public class HardwareEndpoint {
      *
      * @param hardwareId the ID of the {@link Hardware} to retrieve
      * @param request    the {@link HttpServletRequest}
-     * @return {@link Responses#cachedOk(Object, long)} containing the {@link Hardware}
+     * @return {@link me.zodac.folding.rest.response.Responses#cachedOk(Object, long)} containing the {@link Hardware}
      */
     @ReadRequired
     @PermitAll
@@ -171,7 +170,7 @@ public class HardwareEndpoint {
      *
      * @param hardwareName the {@code hardwareName} of the {@link Hardware} to retrieve
      * @param request      the {@link HttpServletRequest}
-     * @return {@link Responses#cachedOk(Object, long)} containing the {@link Hardware}
+     * @return {@link me.zodac.folding.rest.response.Responses#cachedOk(Object, long)} containing the {@link Hardware}
      */
     @ReadRequired
     @PermitAll
@@ -210,7 +209,7 @@ public class HardwareEndpoint {
      * @param hardwareId      the ID of the {@link Hardware} to be updated
      * @param hardwareRequest the {@link HardwareRequest} to update a {@link Hardware}
      * @param request         the {@link HttpServletRequest}
-     * @return {@link Responses#ok(Object, int)} containing the updated {@link Hardware}
+     * @return {@link me.zodac.folding.rest.response.Responses#ok(Object, int)} containing the updated {@link Hardware}
      */
     @WriteRequired
     @RolesAllowed("admin")
@@ -268,7 +267,7 @@ public class HardwareEndpoint {
      *
      * @param hardwareId the ID of the {@link Hardware} to be deleted
      * @param request    the {@link HttpServletRequest}
-     * @return {@link Responses#ok()}
+     * @return {@link me.zodac.folding.rest.response.Responses#ok()}
      */
     @WriteRequired
     @RolesAllowed("admin")

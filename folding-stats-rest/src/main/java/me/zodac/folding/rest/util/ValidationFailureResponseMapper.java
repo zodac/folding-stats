@@ -51,7 +51,7 @@ public final class ValidationFailureResponseMapper {
      * @param validationResult the input {@link ValidationResult} to map
      * @return the mapped {@link ResponseEntity}
      */
-    public static ResponseEntity<?> map(final ValidationResult<?> validationResult) {
+    public static ResponseEntity<String> map(final ValidationResult<?> validationResult) {
         switch (validationResult.getValidationFailureType()) {
             case BAD_REQUEST:
                 return Responses.badRequest(validationResult.getValidationFailure());

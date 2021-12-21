@@ -26,7 +26,6 @@ package me.zodac.folding.rest.stub;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.websocket.server.PathParam;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -34,16 +33,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
 
 /**
  * Stubbed endpoint for the Folding@Home user 'stats' API. Used to retrieve the total points count for a user/passkey across all teams for tests,
@@ -63,19 +61,22 @@ public class StubbedPointsEndpoint {
     private final Map<String, Long> pointsByUserAndPasskey = new HashMap<>();
 
     /**
-     * <b>GET</b> request that retrieves the points for a Folding@Home user.
+     * {@link GetMapping} request that retrieves the points for a Folding@Home user.
      *
      * @param foldingUserName the Folding@Home user's username
      * @param passkey         the Folding@Home user's passkey
      * @return the Folding@Home user's {@link PointsResponse}
      */
     @GetMapping(value = "/{foldingUserName}/stats", produces = MediaType.APPLICATION_JSON_VALUE)
-    public PointsResponse getUserPoints(@PathParam("foldingUserName") final String foldingUserName, @RequestParam("passkey") final String passkey) {
-        return createResponse(foldingUserName, passkey);
+    public ResponseEntity<PointsResponse> getUserPoints(@PathVariable("foldingUserName") final String foldingUserName,
+                                                        @RequestParam("passkey") final String passkey) {
+        return ResponseEntity
+            .ok()
+            .body(createResponse(foldingUserName, passkey));
     }
 
     /**
-     * <b>POST</b>> request that sets the points for a Folding@Home user.
+     * {@link PostMapping} request that sets the points for a Folding@Home user.
      *
      * <p>
      * Since in the test environment we do not want a user to actually have to complete units and earn points, we can manually set them here.
@@ -84,11 +85,10 @@ public class StubbedPointsEndpoint {
      * @param passkey         the Folding@Home user's passkey
      * @param points          the points to set
      */
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @PostMapping(value = "/{foldingUserName}/stats", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public void updateUserPoints(@PathParam("foldingUserName") final String foldingUserName,
-                                 @RequestParam("passkey") final String passkey,
-                                 @RequestParam("points") final long points) {
+    public ResponseEntity<Void> updateUserPoints(@PathVariable("foldingUserName") final String foldingUserName,
+                                                 @RequestParam("passkey") final String passkey,
+                                                 @RequestParam("points") final long points) {
         final String key = foldingUserName + passkey;
 
         if (points == NO_POINTS) {
@@ -97,15 +97,21 @@ public class StubbedPointsEndpoint {
         } else {
             pointsByUserAndPasskey.put(key, pointsByUserAndPasskey.getOrDefault(key, NO_POINTS) + points);
         }
+
+        return ResponseEntity
+            .ok()
+            .build();
     }
 
     /**
-     * <b>DELETE</b> request that resets the points for all Folding@Home users.
+     * {@link DeleteMapping} request that resets the points for all Folding@Home users.
      */
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping
-    public void deleteUserPoints() {
+    public ResponseEntity<Void> deleteUserPoints() {
         pointsByUserAndPasskey.clear();
+        return ResponseEntity
+            .ok()
+            .build();
     }
 
     private PointsResponse createResponse(final String foldingUserName, final String passkey) {
