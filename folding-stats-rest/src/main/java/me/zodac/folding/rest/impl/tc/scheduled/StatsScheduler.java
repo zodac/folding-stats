@@ -60,7 +60,7 @@ public class StatsScheduler {
             return;
         }
 
-        LOGGER.trace("Method #scheduledTeamCompetitionStatsParsing() fired");
+        LOGGER.info("Parsing Folding stats");
         final Collection<User> users = foldingService.getAllUsersWithPasskeys();
 
         if (users.isEmpty()) {

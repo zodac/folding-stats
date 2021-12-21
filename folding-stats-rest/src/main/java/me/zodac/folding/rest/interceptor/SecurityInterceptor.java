@@ -49,7 +49,6 @@ import org.springframework.web.HttpRequestHandler;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.handler.AbstractHandlerMapping;
 
 /**
  * {@link HandlerInterceptor} that intercepts all requests and verifies that the request is authorized and authenticated. Each request
@@ -113,10 +112,8 @@ public class SecurityInterceptor implements HandlerInterceptor {
         try {
             if (handler instanceof HandlerMethod) {
                 validateRequest(request, (HandlerMethod) handler);
-            } else if (handler instanceof CorsConfigurationSource && handler instanceof HttpRequestHandler) {
-                LOGGER.info("Preflight: {}", handler.getClass());
-            } else if (handler instanceof AbstractHandlerMapping) {
-                LOGGER.info("Second test: {}", handler.getClass());
+            } else if (isPreflightRequest(handler)) {
+                LOGGER.debug("Preflight: {}", handler.getClass());
             } else {
                 LOGGER.warn("Unable to validate, handler is type: {}", handler.getClass());
                 throw new UnauthorizedException();
@@ -129,6 +126,11 @@ public class SecurityInterceptor implements HandlerInterceptor {
         }
 
         return true;
+    }
+
+    // 'PreFlightHandler' is a private class in 'AbstractHandlerMapping' so we need to check for the classes it extends/implements
+    private static boolean isPreflightRequest(final Object handler) {
+        return handler instanceof CorsConfigurationSource && handler instanceof HttpRequestHandler;
     }
 
     private void validateRequest(final HttpServletRequest request, final HandlerMethod handlerMethod) {

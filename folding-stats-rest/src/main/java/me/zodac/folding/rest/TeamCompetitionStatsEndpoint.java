@@ -263,7 +263,7 @@ public class TeamCompetitionStatsEndpoint {
     @WriteRequired
     @RolesAllowed("admin")
     @PostMapping(path = "/manual/update")
-    public ResponseEntity<?> updateStats(@RequestParam("async") final boolean async) {
+    public ResponseEntity<?> updateStats(@RequestParam(value = "async", required = false) final boolean async) {
         LOGGER.info("GET request received to manually update TC stats");
 
         try {

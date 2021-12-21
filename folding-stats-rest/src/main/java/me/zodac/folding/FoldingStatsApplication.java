@@ -42,6 +42,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * Base {@link FoldingStatsApplication}.
@@ -54,7 +55,7 @@ import org.springframework.context.annotation.Bean;
  * <p>
  * The {@code jooq} transitive dependency {@link R2dbcAutoConfiguration} must also be disabled.
  */
-//@EnableScheduling
+@EnableScheduling
 @SpringBootApplication(exclude = {R2dbcAutoConfiguration.class})
 public class FoldingStatsApplication {
 

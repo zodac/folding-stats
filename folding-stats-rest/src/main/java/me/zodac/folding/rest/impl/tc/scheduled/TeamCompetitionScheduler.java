@@ -64,7 +64,7 @@ public class TeamCompetitionScheduler {
     @Autowired
     private UserStatsStorerService userStatsStorer;
 
-    @Scheduled(cron = "0 15 0 3 * *") // TC starts on the 3rd of the month
+    @Scheduled(cron = "0 15 0 3 * *", zone = "UTC") // TC starts on the 3rd of the month
     public void startOfTeamCompetition() {
         try {
             LOGGER.trace("Method #startOfTeamCompetition() fired");
@@ -79,7 +79,7 @@ public class TeamCompetitionScheduler {
         }
     }
 
-    @Scheduled(cron = "0 57 23 28-31 * *")
+    @Scheduled(cron = "0 57 23 28-31 * *", zone = "UTC")
     public void endOfTeamCompetition() {
         try {
             // Because we cannot set up a cron schedule with last day for each month, we use the range '28-31'.

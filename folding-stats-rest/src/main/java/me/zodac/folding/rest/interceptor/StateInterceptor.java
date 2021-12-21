@@ -70,8 +70,8 @@ public class StateInterceptor implements HandlerInterceptor {
         try {
             if (handler instanceof HandlerMethod) {
                 validateSystemState((HandlerMethod) handler);
-            } else if (handler instanceof CorsConfigurationSource && handler instanceof HttpRequestHandler) {
-                LOGGER.info("Preflight: {}", handler.getClass());
+            } else if (isPreflightRequest(handler)) {
+                LOGGER.debug("Preflight request: {}", handler.getClass());
             } else {
                 LOGGER.warn("Unable to validate, handler is type: {}", handler.getClass());
                 throw new ServiceUnavailableException();
@@ -84,6 +84,11 @@ public class StateInterceptor implements HandlerInterceptor {
         }
 
         return true;
+    }
+
+    // 'PreFlightHandler' is a private class in 'AbstractHandlerMapping' so we need to check for the classes it extends/implements
+    private static boolean isPreflightRequest(final Object handler) {
+        return handler instanceof CorsConfigurationSource && handler instanceof HttpRequestHandler;
     }
 
     private void validateSystemState(final HandlerMethod handlerMethod) {
