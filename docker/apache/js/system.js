@@ -105,6 +105,7 @@ function manualLars() {
             return;
         }
         successToast("LARS data manually updated");
+        loadHardware()
     })
     .catch((error) => {
         hide("loader");
