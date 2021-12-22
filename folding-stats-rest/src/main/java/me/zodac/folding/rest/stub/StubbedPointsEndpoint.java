@@ -33,6 +33,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -53,6 +54,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * @see <a href="https://api2.foldingathome.org/#GET-/user/:name/stats">Real user stats API</a>
  */
+@ConditionalOnProperty("stubbed.endpoints.enabled")
 @RestController
 @RequestMapping("/user")
 public class StubbedPointsEndpoint {

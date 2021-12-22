@@ -37,7 +37,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 /**
  * Utility class to simplify returning a {@link ResponseEntity} in the REST layer.
  */
-// TODO: [zodac] Some of these can be replaced by ResponseEntity functions
 public final class Responses {
 
     private Responses() {
@@ -48,8 +47,8 @@ public final class Responses {
      * A <b>200_OK</b> {@link ResponseEntity}.
      *
      * <p>
-     * Generally used for cases where an HTTP request is sent to request something from the system, but no response is
-     * required, such as a delete request, for example.
+     * Generally used for cases where an HTTP request is sent to request something from the system, but no body is required, such as a delete request,
+     * for example.
      *
      * @param <E> the response body type
      * @return the <b>200_OK</b> {@link ResponseEntity}
@@ -64,8 +63,7 @@ public final class Responses {
      * A <b>200_OK</b> {@link ResponseEntity}.
      *
      * <p>
-     * Generally used for cases where an HTTP request is sent to request something from the system, but no response is
-     * required, such as a delete request, for example.
+     * Generally used for cases where an HTTP request is sent to request something from the system.
      *
      * @param entity the entity being retrieved
      * @param <E>    the response body type

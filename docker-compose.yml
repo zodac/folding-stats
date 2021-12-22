@@ -33,7 +33,6 @@ services:
       context: .
       dockerfile: docker/java/Dockerfile
       args:
-        DEPLOYMENT_TYPE: "production"
         DEBIAN_VERSION: 11
         JAVA_VERSION: 17
         MAVEN_VERSION: 3.8.4
@@ -45,6 +44,8 @@ services:
       LARS_URL_ROOT: "${LARS_URL_ROOT}"
       STATS_URL_ROOT: "${STATS_URL_ROOT}"
       REDIRECT_URL: "${ROOT_URL}"
+      # Spring configuration
+      DEPLOYMENT_TYPE: "production"
       # NOTE: The monthly reset, result storage and LARS update will always occur at 23:57 on the last day of the month
       ENABLE_LARS_HARDWARE_UPDATE: "${ENABLE_LARS_HARDWARE_UPDATE}"
       ENABLE_MONTHLY_RESULT_STORAGE: "${ENABLE_MONTHLY_RESULT_STORAGE}"

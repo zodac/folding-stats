@@ -36,6 +36,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -54,6 +55,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * @see <a href="https://api2.foldingathome.org/#GET-/bonus">Real bonus API</a>
  */
+@ConditionalOnProperty("stubbed.endpoints.enabled")
 @RestController
 @RequestMapping("/bonus")
 public class StubbedUnitsEndpoint {

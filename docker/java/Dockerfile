@@ -55,8 +55,9 @@ FROM debian:${DEBIAN_VERSION}-slim AS spring_base
 
 COPY --from=jdk_builder /opt/jdk /opt/jdk
 COPY --from=maven_builder /folding-stats.jar /folding-stats.jar
+COPY ./docker/java/scripts/startup.sh /startup.sh
 
 ENV JAVA_HOME "/opt/jdk"
 ENV PATH "${PATH}:${JAVA_HOME}/bin"
 
-ENTRYPOINT ["java", "-jar", "/folding-stats.jar"]
+ENTRYPOINT [ "./startup.sh" ]
