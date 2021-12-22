@@ -33,6 +33,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -84,6 +85,7 @@ public class StubbedPointsEndpoint {
      * @param foldingUserName the Folding@Home user's username
      * @param passkey         the Folding@Home user's passkey
      * @param points          the points to set
+     * @return {@link HttpStatus#CREATED} {@link ResponseEntity}
      */
     @PostMapping(value = "/{foldingUserName}/stats", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> updateUserPoints(@PathVariable("foldingUserName") final String foldingUserName,
@@ -99,12 +101,14 @@ public class StubbedPointsEndpoint {
         }
 
         return ResponseEntity
-            .ok()
+            .status(HttpStatus.CREATED)
             .build();
     }
 
     /**
      * {@link DeleteMapping} request that resets the points for all Folding@Home users.
+     *
+     * @return {@link HttpStatus#OK} {@link ResponseEntity}
      */
     @DeleteMapping
     public ResponseEntity<Void> deleteUserPoints() {

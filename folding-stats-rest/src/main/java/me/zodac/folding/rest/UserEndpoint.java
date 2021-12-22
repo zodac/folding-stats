@@ -44,7 +44,7 @@ import me.zodac.folding.api.state.WriteRequired;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.validation.UserValidator;
 import me.zodac.folding.api.tc.validation.ValidationResult;
-import me.zodac.folding.rest.api.FoldingService;
+import me.zodac.folding.bean.FoldingRepository;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 import me.zodac.folding.rest.util.IdResult;
 import me.zodac.folding.rest.util.IntegerParser;
@@ -75,7 +75,7 @@ public class UserEndpoint {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Autowired
-    private FoldingService foldingService;
+    private FoldingRepository foldingRepository;
 
     /**
      * {@link PostMapping} request to create a {@link User} based on the input request.
@@ -97,7 +97,7 @@ public class UserEndpoint {
         final User validatedUser = validationResult.getOutput();
 
         try {
-            final User elementWithId = foldingService.createUser(validatedUser);
+            final User elementWithId = foldingRepository.createUser(validatedUser);
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
             LOGGER.info("Created user with ID {}", elementWithId.getId());
@@ -121,7 +121,7 @@ public class UserEndpoint {
         LOGGER.debug("GET request received for all users at '{}'", request::getRequestURI);
 
         try {
-            final Collection<User> elements = foldingService.getAllUsersWithoutPasskeys();
+            final Collection<User> elements = foldingRepository.getAllUsersWithoutPasskeys();
             return cachedOk(elements, untilNextMonthUtc(ChronoUnit.SECONDS));
         } catch (final Exception e) {
             LOGGER.error("Unexpected error getting all users", e);
@@ -149,7 +149,7 @@ public class UserEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<User> optionalElement = foldingService.getUserWithoutPasskey(parsedId);
+            final Optional<User> optionalElement = foldingRepository.getUserWithoutPasskey(parsedId);
             if (optionalElement.isEmpty()) {
                 LOGGER.error("No user found with ID {}", userId);
                 return notFound();
@@ -183,7 +183,7 @@ public class UserEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<User> optionalElement = foldingService.getUserWithPasskey(parsedId);
+            final Optional<User> optionalElement = foldingRepository.getUserWithPasskey(parsedId);
             if (optionalElement.isEmpty()) {
                 LOGGER.error("No user with passkey found with ID {}", userId);
                 return notFound();
@@ -226,7 +226,7 @@ public class UserEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<User> optionalElement = foldingService.getUserWithPasskey(parsedId);
+            final Optional<User> optionalElement = foldingRepository.getUserWithPasskey(parsedId);
             if (optionalElement.isEmpty()) {
                 LOGGER.error("No user found with ID {}", userId);
                 return notFound();
@@ -247,7 +247,7 @@ public class UserEndpoint {
 
             // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
             final User userWithId = User.updateWithId(existingUser.getId(), validatedUser);
-            final User updatedUserWithId = foldingService.updateUser(userWithId, existingUser);
+            final User updatedUserWithId = foldingRepository.updateUser(userWithId, existingUser);
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
             LOGGER.info("Updated user with ID {}", updatedUserWithId.getId());
@@ -278,7 +278,7 @@ public class UserEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<User> optionalElement = foldingService.getUserWithoutPasskey(parsedId);
+            final Optional<User> optionalElement = foldingRepository.getUserWithoutPasskey(parsedId);
             if (optionalElement.isEmpty()) {
                 LOGGER.error("No user found with ID {}", userId);
                 return notFound();
@@ -291,7 +291,7 @@ public class UserEndpoint {
             }
             final User validatedUser = validationResult.getOutput();
 
-            foldingService.deleteUser(validatedUser);
+            foldingRepository.deleteUser(validatedUser);
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             LOGGER.info("Deleted user with ID {}", userId);
             return ok();
@@ -305,9 +305,9 @@ public class UserEndpoint {
         final UserValidator userValidator = UserValidator.create(HttpFoldingStatsRetriever.create());
         return userValidator.validateCreate(
             userRequest,
-            foldingService.getAllUsersWithPasskeys(),
-            foldingService.getAllHardware(),
-            foldingService.getAllTeams()
+            foldingRepository.getAllUsersWithPasskeys(),
+            foldingRepository.getAllHardware(),
+            foldingRepository.getAllTeams()
         );
     }
 
@@ -316,9 +316,9 @@ public class UserEndpoint {
         return userValidator.validateUpdate(
             userRequest,
             existingUser,
-            foldingService.getAllUsersWithPasskeys(),
-            foldingService.getAllHardware(),
-            foldingService.getAllTeams()
+            foldingRepository.getAllUsersWithPasskeys(),
+            foldingRepository.getAllHardware(),
+            foldingRepository.getAllTeams()
         );
     }
 

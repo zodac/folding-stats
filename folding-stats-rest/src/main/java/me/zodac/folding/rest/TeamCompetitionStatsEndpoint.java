@@ -20,7 +20,6 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 
 package me.zodac.folding.rest;
@@ -47,15 +46,15 @@ import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.util.ProcessingType;
-import me.zodac.folding.rest.api.FoldingService;
-import me.zodac.folding.rest.api.FoldingStatsService;
+import me.zodac.folding.bean.FoldingRepository;
+import me.zodac.folding.bean.StatsRepository;
+import me.zodac.folding.bean.tc.LeaderboardStatsGenerator;
+import me.zodac.folding.bean.tc.user.UserStatsParser;
+import me.zodac.folding.bean.tc.user.UserStatsResetter;
 import me.zodac.folding.rest.api.tc.CompetitionSummary;
-import me.zodac.folding.rest.api.tc.LeaderboardStatsGeneratorService;
 import me.zodac.folding.rest.api.tc.UserSummary;
 import me.zodac.folding.rest.api.tc.leaderboard.TeamLeaderboardEntry;
 import me.zodac.folding.rest.api.tc.leaderboard.UserCategoryLeaderboardEntry;
-import me.zodac.folding.rest.api.tc.user.UserStatsParserService;
-import me.zodac.folding.rest.api.tc.user.UserStatsResetterService;
 import me.zodac.folding.rest.util.IdResult;
 import me.zodac.folding.rest.util.IntegerParser;
 import me.zodac.folding.state.SystemStateManager;
@@ -83,19 +82,19 @@ public class TeamCompetitionStatsEndpoint {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Autowired
-    private FoldingService foldingService;
+    private FoldingRepository foldingRepository;
 
     @Autowired
-    private FoldingStatsService foldingStatsService;
+    private LeaderboardStatsGenerator leaderboardStatsGenerator;
 
     @Autowired
-    private LeaderboardStatsGeneratorService leaderboardStatsGenerator;
+    private StatsRepository statsRepository;
 
     @Autowired
-    private UserStatsParserService userStatsParser;
+    private UserStatsParser userStatsParser;
 
     @Autowired
-    private UserStatsResetterService userStatsResetter;
+    private UserStatsResetter userStatsResetter;
 
     /**
      * {@link GetMapping} request to retrieve the <code>Team Competition</code> overall {@link CompetitionSummary}.
@@ -109,7 +108,7 @@ public class TeamCompetitionStatsEndpoint {
         LOGGER.debug("GET request received to show TC stats");
 
         try {
-            final CompetitionSummary competitionSummary = foldingStatsService.getCompetitionSummary();
+            final CompetitionSummary competitionSummary = statsRepository.getCompetitionSummary();
             return ok(competitionSummary);
         } catch (final Exception e) {
             LOGGER.error("Unexpected error retrieving full TC stats", e);
@@ -137,14 +136,14 @@ public class TeamCompetitionStatsEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<User> optionalUser = foldingService.getUserWithoutPasskey(parsedId);
+            final Optional<User> optionalUser = foldingRepository.getUserWithoutPasskey(parsedId);
             if (optionalUser.isEmpty()) {
                 LOGGER.error("No user found with ID: {}", parsedId);
                 return notFound();
             }
             final User user = optionalUser.get();
 
-            final CompetitionSummary competitionSummary = foldingStatsService.getCompetitionSummary();
+            final CompetitionSummary competitionSummary = statsRepository.getCompetitionSummary();
             final Collection<UserSummary> userSummaries = competitionSummary.getTeams()
                 .stream()
                 .flatMap(teamResult -> teamResult.getActiveUsers().stream())
@@ -191,7 +190,7 @@ public class TeamCompetitionStatsEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<User> optionalUser = foldingService.getUserWithPasskey(parsedId);
+            final Optional<User> optionalUser = foldingRepository.getUserWithPasskey(parsedId);
             if (optionalUser.isEmpty()) {
                 LOGGER.error("No user found with ID: {}", parsedId);
                 return notFound();
@@ -200,10 +199,10 @@ public class TeamCompetitionStatsEndpoint {
             final User user = optionalUser.get();
             final Hardware hardware = user.getHardware();
             final OffsetTcStats offsetTcStatsToPersist = OffsetTcStats.updateWithHardwareMultiplier(offsetTcStats, hardware.getMultiplier());
-            final OffsetTcStats createdOffsetStats = foldingStatsService.createOrUpdateOffsetStats(user, offsetTcStatsToPersist);
+            final OffsetTcStats createdOffsetStats = statsRepository.createOrUpdateOffsetStats(user, offsetTcStatsToPersist);
 
             SystemStateManager.next(SystemState.UPDATING_STATS);
-            userStatsParser.parseTcStatsForUserAndWait(Collections.singletonList(user));
+            userStatsParser.parseTcStatsForUsersAndWait(Collections.singletonList(user));
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             LOGGER.info("Updated user with ID {} with points offset: {}", userId, createdOffsetStats);
             return ok();
@@ -267,12 +266,12 @@ public class TeamCompetitionStatsEndpoint {
         LOGGER.info("GET request received to manually update TC stats");
 
         try {
-            final Collection<User> users = foldingService.getAllUsersWithPasskeys();
+            final Collection<User> users = foldingRepository.getAllUsersWithPasskeys();
             final ProcessingType processingType = async ? ProcessingType.ASYNCHRONOUS : ProcessingType.SYNCHRONOUS;
             if (processingType == ProcessingType.SYNCHRONOUS) {
-                userStatsParser.parseTcStatsForUserAndWait(users);
+                userStatsParser.parseTcStatsForUsersAndWait(users);
             } else {
-                userStatsParser.parseTcStatsForUser(users);
+                userStatsParser.parseTcStatsForUsers(users);
             }
             return ok();
         } catch (final Exception e) {

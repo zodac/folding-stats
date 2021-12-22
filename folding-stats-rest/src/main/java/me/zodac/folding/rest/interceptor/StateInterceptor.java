@@ -20,7 +20,6 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 
 package me.zodac.folding.rest.interceptor;
@@ -30,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import me.zodac.folding.api.state.ReadRequired;
 import me.zodac.folding.api.state.WriteRequired;
+import me.zodac.folding.rest.exception.ServiceUnavailableException;
 import me.zodac.folding.state.SystemStateManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -50,7 +50,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
  *
  * @see SystemStateManager
  */
-public class StateInterceptor implements HandlerInterceptor {
+public final class StateInterceptor implements HandlerInterceptor {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -71,16 +71,17 @@ public class StateInterceptor implements HandlerInterceptor {
             if (handler instanceof HandlerMethod) {
                 validateSystemState((HandlerMethod) handler);
             } else if (isPreflightRequest(handler)) {
-                LOGGER.debug("Preflight request: {}", handler.getClass());
+                LOGGER.debug("Preflight request, no need to validate: {}", handler.getClass());
             } else {
                 LOGGER.warn("Unable to validate, handler is type: {}", handler.getClass());
                 throw new ServiceUnavailableException();
             }
         } catch (final ServiceUnavailableException e) {
+            LOGGER.debug("Handling exception: {}", e.getClass().getSimpleName());
             throw e;
         } catch (final Exception e) {
             LOGGER.warn("Unexpected error validating REST request at '{}'", request.getRequestURI(), e);
-            throw new ServiceUnavailableException();
+            throw new ServiceUnavailableException(e);
         }
 
         return true;

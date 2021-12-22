@@ -20,10 +20,9 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 
-package me.zodac.folding.rest.impl.tc;
+package me.zodac.folding.bean.tc;
 
 import static java.util.stream.Collectors.toList;
 
@@ -35,9 +34,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import me.zodac.folding.api.tc.Category;
-import me.zodac.folding.rest.api.FoldingStatsService;
+import me.zodac.folding.bean.StatsRepository;
 import me.zodac.folding.rest.api.tc.CompetitionSummary;
-import me.zodac.folding.rest.api.tc.LeaderboardStatsGeneratorService;
 import me.zodac.folding.rest.api.tc.TeamSummary;
 import me.zodac.folding.rest.api.tc.UserSummary;
 import me.zodac.folding.rest.api.tc.leaderboard.TeamLeaderboardEntry;
@@ -51,21 +49,20 @@ import org.springframework.stereotype.Component;
  * Generates the leaderboard stats for {@link me.zodac.folding.api.tc.Team}s and {@link me.zodac.folding.api.tc.User} {@link Category}s.
  */
 @Component
-public class LeaderboardStatsGenerator implements LeaderboardStatsGeneratorService {
+public class LeaderboardStatsGenerator {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Autowired
-    private FoldingStatsService foldingStatsService;
+    private StatsRepository statsRepository;
 
     /**
      * Generates the {@link me.zodac.folding.api.tc.Team} leaderboards.
      *
      * @return a {@link List} of {@link TeamLeaderboardEntry}s
      */
-    @Override
     public List<TeamLeaderboardEntry> generateTeamLeaderboards() {
-        final CompetitionSummary competitionSummary = foldingStatsService.getCompetitionSummary();
+        final CompetitionSummary competitionSummary = statsRepository.getCompetitionSummary();
         final List<TeamSummary> teamResults = competitionSummary.getTeams()
             .stream()
             .sorted(Comparator.comparingLong(TeamSummary::getTeamMultipliedPoints).reversed())
@@ -101,9 +98,8 @@ public class LeaderboardStatsGenerator implements LeaderboardStatsGeneratorServi
      *
      * @return a {@link Map} of {@link UserCategoryLeaderboardEntry}s keyed by the {@link Category}
      */
-    @Override
     public Map<Category, List<UserCategoryLeaderboardEntry>> generateUserCategoryLeaderboards() {
-        final CompetitionSummary competitionSummary = foldingStatsService.getCompetitionSummary();
+        final CompetitionSummary competitionSummary = statsRepository.getCompetitionSummary();
         final Map<Category, List<UserSummary>> usersByCategory = getUsersSortedByCategory(competitionSummary);
 
         final Map<Category, List<UserCategoryLeaderboardEntry>> categoryLeaderboard = new TreeMap<>();

@@ -468,6 +468,49 @@ class UserTest {
             .doesNotContainPattern(Pattern.compile("[a-zA-Z]"));
     }
 
+//    @Test
+//    void whenGettingUserById_givenRequestUsesPreviousEntityTag_andUserHasNotChanged_thenResponseHas304Status_andNoBody() throws FoldingRestException {
+//        final int userId = create(generateUser()).getId();
+//
+//        final HttpResponse<String> response = USER_REQUEST_SENDER.get(userId);
+//        assertThat(response.statusCode())
+//            .as("Expected first request to have a 200_OK HTTP response")
+//            .isEqualTo(HttpURLConnection.HTTP_OK);
+//
+//        final String eTag = getEntityTag(response);
+//
+//        final HttpResponse<String> cachedResponse = USER_REQUEST_SENDER.get(userId, eTag);
+//        assertThat(cachedResponse.statusCode())
+//            .as("Expected second request to have a 304_NOT_MODIFIED HTTP response")
+//            .isEqualTo(HttpURLConnection.HTTP_NOT_MODIFIED);
+//
+//        assertThat(UserResponseParser.get(cachedResponse))
+//            .as("Expected cached response to have the same content as the non-cached response")
+//            .isNull();
+//    }
+//
+//    @Test
+//    void whenGettingAllUsers_givenRequestUsesPreviousEntityTag_andUsersHaveNotChanged_thenResponseHas304Status_andNoBody()
+//        throws FoldingRestException {
+//        create(generateUser());
+//
+//        final HttpResponse<String> response = USER_REQUEST_SENDER.getAll();
+//        assertThat(response.statusCode())
+//            .as("Expected first GET request to have a 200_OK HTTP response")
+//            .isEqualTo(HttpURLConnection.HTTP_OK);
+//
+//        final String eTag = getEntityTag(response);
+//
+//        final HttpResponse<String> cachedResponse = USER_REQUEST_SENDER.getAll(eTag);
+//        assertThat(cachedResponse.statusCode())
+//            .as("Expected second request to have a 304_NOT_MODIFIED HTTP response")
+//            .isEqualTo(HttpURLConnection.HTTP_NOT_MODIFIED);
+//
+//        assertThat(UserResponseParser.getAll(cachedResponse))
+//            .as("Expected cached response to have the same content as the non-cached response")
+//            .isNull();
+//    }
+
     @Test
     void whenCreatingUser_givenNoAuthentication_thenRequestFails_andResponseHas401Status() throws FoldingRestException {
         final UserRequest userToCreate = generateUser();

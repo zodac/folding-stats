@@ -51,6 +51,7 @@ public final class Responses {
      * Generally used for cases where an HTTP request is sent to request something from the system, but no response is
      * required, such as a delete request, for example.
      *
+     * @param <E> the response body type
      * @return the <b>200_OK</b> {@link ResponseEntity}
      */
     public static <E> ResponseEntity<E> ok() {
@@ -67,6 +68,7 @@ public final class Responses {
      * required, such as a delete request, for example.
      *
      * @param entity the entity being retrieved
+     * @param <E>    the response body type
      * @return the <b>200_OK</b> {@link ResponseEntity}
      */
     public static <E> ResponseEntity<String> ok(final E entity) {
@@ -79,11 +81,44 @@ public final class Responses {
      * A <b>200_OK</b> {@link ResponseEntity}.
      *
      * <p>
+     * Generally used for cases where an HTTP request is sent to retrieve a {@link Collection} of {@link me.zodac.folding.api.ResponsePojo} resources.
+     *
+     * @param entities the {@link Collection} of entities being retrieved
+     * @param <E>      the response body type
+     * @return the <b>200_OK</b> {@link ResponseEntity}
+     */
+    public static <E> ResponseEntity<String> ok(final Collection<E> entities) {
+        return ResponseEntity
+            .ok()
+            .header("X-Total-Count", String.valueOf(entities.size()))
+            .body(GSON.toJson(entities));
+    }
+
+    /**
+     * A <b>200_OK</b> {@link ResponseEntity}.
+     *
+     * <p>
+     * Generally used for cases where an HTTP request is sent to update a single {@link me.zodac.folding.api.ResponsePojo} resource.
+     *
+     * @param entity   the updated resource
+     * @param entityId the ID of the updated resource
+     * @param <E>      the response body type
+     * @return the <b>200_OK</b> {@link ResponseEntity}
+     */
+    public static <E> ResponseEntity<String> ok(final E entity, final int entityId) {
+        return responseWithLocation(entity, entityId, HttpStatus.OK);
+    }
+
+    /**
+     * A <b>200_OK</b> {@link ResponseEntity}.
+     *
+     * <p>
      * Generally used for cases where an HTTP request is sent to request something from the system, but no response is
      * required, such as a delete request, for example.
      *
      * @param entity               the entity being retrieved
      * @param cachePeriodInSeconds the cache period for the entity in seconds
+     * @param <E>                  the response body type
      * @return the <b>200_OK</b> {@link ResponseEntity}
      */
     public static <E> ResponseEntity<String> cachedOk(final E entity, final long cachePeriodInSeconds) {
@@ -99,24 +134,9 @@ public final class Responses {
      * <p>
      * Generally used for cases where an HTTP request is sent to retrieve a {@link Collection} of {@link me.zodac.folding.api.ResponsePojo} resources.
      *
-     * @param entities the {@link Collection} of entities being retrieved
-     * @return the <b>200_OK</b> {@link ResponseEntity}
-     */
-    public static <E> ResponseEntity<String> ok(final Collection<E> entities) {
-        return ResponseEntity
-            .ok()
-            .header("X-Total-Count", String.valueOf(entities.size()))
-            .body(GSON.toJson(entities));
-    }
-
-    /**
-     * A <b>200_OK</b> {@link ResponseEntity}.
-     *
-     * <p>
-     * Generally used for cases where an HTTP request is sent to retrieve a {@link Collection} of {@link me.zodac.folding.api.ResponsePojo} resources.
-     *
      * @param entities             the {@link Collection} of entities being retrieved
      * @param cachePeriodInSeconds the cache period for the entity in seconds
+     * @param <E>                  the response body type
      * @return the <b>200_OK</b> {@link ResponseEntity}
      */
     public static <E> ResponseEntity<String> cachedOk(final Collection<E> entities, final long cachePeriodInSeconds) {
@@ -128,20 +148,6 @@ public final class Responses {
     }
 
     /**
-     * A <b>200_OK</b> {@link ResponseEntity}.
-     *
-     * <p>
-     * Generally used for cases where an HTTP request is sent to update a single {@link me.zodac.folding.api.ResponsePojo} resource.
-     *
-     * @param entity   the updated resource
-     * @param entityId the ID of the updated resource
-     * @return the <b>200_OK</b> {@link ResponseEntity}
-     */
-    public static <E> ResponseEntity<String> ok(final E entity, final int entityId) {
-        return responseWithLocation(entity, entityId, HttpStatus.OK);
-    }
-
-    /**
      * A <b>201_CREATED</b> {@link ResponseEntity}.
      *
      * <p>
@@ -149,6 +155,7 @@ public final class Responses {
      *
      * @param entity   the created resource
      * @param entityId the ID of the created resource
+     * @param <E>      the response body type
      * @return the <b>201_CREATED</b> {@link ResponseEntity}
      */
     public static <E> ResponseEntity<String> created(final E entity, final int entityId) {
@@ -192,6 +199,7 @@ public final class Responses {
      * invalid payload, or any other similar error.
      *
      * @param entity the entity in the payload that caused the error
+     * @param <E>    the response body type
      * @return the <b>400_BAD_REQUEST</b> {@link ResponseEntity}
      */
     public static <E> ResponseEntity<String> badRequest(final E entity) {
@@ -221,6 +229,7 @@ public final class Responses {
      * Generally used for cases where the user has not been successfully authenticated, and cannot be authorized to
      * execute the REST endpoint.
      *
+     * @param <E> the response body type
      * @return the <b>401_UNAUTHORIZED</b> {@link ResponseEntity}
      */
     public static <E> ResponseEntity<E> unauthorized() {
@@ -237,6 +246,7 @@ public final class Responses {
      * Generally used for cases where a user has successfully authenticated, but does not have the required
      * authorization to execute the REST endpoint.
      *
+     * @param <E> the response body type
      * @return the <b>403_FORBIDDEN</b> {@link ResponseEntity}
      */
     public static <E> ResponseEntity<E> forbidden() {
@@ -251,6 +261,7 @@ public final class Responses {
      * <p>
      * Generally used for cases when an ID is supplied in a REST request, but no resource exists matching that ID..
      *
+     * @param <E> the response body type
      * @return the <b>404_NOT_FOUND</b> {@link ResponseEntity}
      */
     public static <E> ResponseEntity<E> notFound() {
@@ -271,6 +282,7 @@ public final class Responses {
      * </ul>
      *
      * @param entity the entity in the payload that caused the error
+     * @param <E>    the response body type
      * @return the <b>409_CONFLICT</b> {@link ResponseEntity}
      */
     public static <E> ResponseEntity<String> conflict(final E entity) {
@@ -285,6 +297,7 @@ public final class Responses {
      * <p>
      * Generally used for cases where an unexpected error has occurred.
      *
+     * @param <E> the response body type
      * @return the <b>500_INTERNAL_SERVER_ERROR</b> {@link ResponseEntity}
      */
     public static <E> ResponseEntity<E> serverError() {

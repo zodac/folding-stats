@@ -22,24 +22,34 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.rest.impl;
+package me.zodac.folding.rest.exception;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Target;
-import me.zodac.folding.cache.BaseCache;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
- * Marker annotation to define a function in {@link CachedStorage} that persists and retrieves data from a database, but also caches that data locally.
+ * Marker {@link Exception} thrown then a request fails due to {@link HttpStatus#SERVICE_UNAVAILABLE}. Will automatically tell the
+ * {@link org.springframework.boot.autoconfigure.SpringBootApplication} to return a <b>503_SERVICE_UNAVAILABLE</b> response, without requiring
+ * explicit handling in any {@link org.springframework.web.bind.annotation.RestController}.
  */
-@Documented
-@Target(ElementType.METHOD)
-@interface Cached {
+@ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+public class ServiceUnavailableException extends RuntimeException {
+
+    private static final long serialVersionUID = 911085106440593770L;
 
     /**
-     * The implementations of {@link BaseCache} used to perform the caching.
-     *
-     * @return the {@link BaseCache} implementations
+     * Basic constructor.
      */
-    Class<? extends BaseCache<?>>[] value();
+    public ServiceUnavailableException() {
+        super();
+    }
+
+    /**
+     * Constructor taking in a cause {@link Throwable}.
+     *
+     * @param throwable the cause {@link Throwable}
+     */
+    public ServiceUnavailableException(final Throwable throwable) {
+        super(throwable);
+    }
 }

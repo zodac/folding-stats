@@ -35,7 +35,7 @@ import javax.annotation.security.PermitAll;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.state.ReadRequired;
 import me.zodac.folding.api.util.EncodingUtils;
-import me.zodac.folding.rest.api.FoldingService;
+import me.zodac.folding.bean.FoldingRepository;
 import me.zodac.folding.rest.api.LoginCredentials;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -57,7 +57,7 @@ public class LoginEndpoint {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Autowired
-    private FoldingService foldingService;
+    private FoldingRepository foldingRepository;
 
     /**
      * {@link PostMapping} request to log in as an admin system user.
@@ -93,7 +93,7 @@ public class LoginEndpoint {
             final String password = decodedUserNameAndPassword.get(EncodingUtils.DECODED_PASSWORD_KEY);
             LOGGER.debug("Login request received for user: '{}'", userName);
 
-            final UserAuthenticationResult userAuthenticationResult = foldingService.authenticateSystemUser(userName, password);
+            final UserAuthenticationResult userAuthenticationResult = foldingRepository.authenticateSystemUser(userName, password);
 
             if (!userAuthenticationResult.isUserExists() || !userAuthenticationResult.isPasswordMatch()) {
                 LOGGER.warn("Invalid user credentials supplied: {}", loginCredentials);

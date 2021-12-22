@@ -20,27 +20,41 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 
-package me.zodac.folding.rest.api.tc.user;
+package me.zodac.folding.bean.tc.user;
 
 import java.time.LocalDateTime;
 import me.zodac.folding.api.tc.result.MonthlyResult;
-import org.springframework.stereotype.Service;
+import me.zodac.folding.bean.StatsRepository;
+import me.zodac.folding.bean.tc.LeaderboardStatsGenerator;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Stores the stats results for the <code>Team Competition</code>. Takes the current stats and stores them with the current
  * {@link java.time.ZoneOffset#UTC} {@link LocalDateTime}.
  */
-@Service
-public interface UserStatsStorerService {
+@Component
+public class UserStatsStorer {
+
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    @Autowired
+    private StatsRepository statsRepository;
+
+    @Autowired
+    private LeaderboardStatsGenerator leaderboardStatsGenerator;
 
     /**
      * Stores the {@link MonthlyResult} for the current {@link java.time.ZoneOffset#UTC} date-time.
      *
-     * <p>
-     * The JSON output will be in the form:
+     * <p> The {@link MonthlyResult} will be generated using {@link LeaderboardStatsGenerator#generateTeamLeaderboards()} and
+     * {@link LeaderboardStatsGenerator#generateUserCategoryLeaderboards()}.
+     *
+     * <p> The JSON output will be in the form:
      * <pre>
      * {
      *   "teamLeaderboard": [
@@ -601,5 +615,18 @@ public interface UserStatsStorerService {
      * }
      * </pre>
      */
-    void storeMonthlyResult();
+    public void storeMonthlyResult() {
+        final MonthlyResult monthlyResult = MonthlyResult.create(
+            leaderboardStatsGenerator.generateTeamLeaderboards(),
+            leaderboardStatsGenerator.generateUserCategoryLeaderboards()
+        );
+
+        if (monthlyResult.hasNoStats()) {
+            LOGGER.error("Not storing result, result has no stats: {}", monthlyResult);
+            return;
+        }
+
+        final MonthlyResult createdMonthlyResult = statsRepository.createMonthlyResult(monthlyResult);
+        LOGGER.info("Storing TC results for {}", createdMonthlyResult.getUtcTimestamp());
+    }
 }

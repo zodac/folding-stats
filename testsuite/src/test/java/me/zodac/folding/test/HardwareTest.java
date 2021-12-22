@@ -401,6 +401,50 @@ class HardwareTest {
             .isEqualTo(HttpURLConnection.HTTP_CONFLICT);
     }
 
+//    @Test
+//    void whenGettingHardwareById_givenRequestUsesPreviousEntityTag_andHardwareHasNotChanged_thenResponseHas304Status_andNoBody()
+//        throws FoldingRestException {
+//        final int hardwareId = create(generateHardware()).getId();
+//
+//        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get(hardwareId);
+//        assertThat(response.statusCode())
+//            .as("Expected first request to have a 200_OK HTTP response")
+//            .isEqualTo(HttpURLConnection.HTTP_OK);
+//
+//        final String eTag = getEntityTag(response);
+//
+//        final HttpResponse<String> cachedResponse = HARDWARE_REQUEST_SENDER.get(hardwareId, eTag);
+//        assertThat(cachedResponse.statusCode())
+//            .as("Expected second request to have a 304_NOT_MODIFIED HTTP response")
+//            .isEqualTo(HttpURLConnection.HTTP_NOT_MODIFIED);
+//
+//        assertThat(HardwareResponseParser.get(cachedResponse))
+//            .as("Expected cached response to have the same content as the non-cached response")
+//            .isNull();
+//    }
+//
+//    @Test
+//    void whenGettingAllHardware_givenRequestUsesPreviousEntityTag_andHardwareHasNotChanged_thenResponseHas304Status_andNoBody()
+//        throws FoldingRestException {
+//        create(generateHardware());
+//
+//        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.getAll();
+//        assertThat(response.statusCode())
+//            .as("Expected first GET request to have a 200_OK HTTP response")
+//            .isEqualTo(HttpURLConnection.HTTP_OK);
+//
+//        final String eTag = getEntityTag(response);
+//
+//        final HttpResponse<String> cachedResponse = HARDWARE_REQUEST_SENDER.getAll(eTag);
+//        assertThat(cachedResponse.statusCode())
+//            .as("Expected second request to have a 304_NOT_MODIFIED HTTP response")
+//            .isEqualTo(HttpURLConnection.HTTP_NOT_MODIFIED);
+//
+//        assertThat(HardwareResponseParser.getAll(cachedResponse))
+//            .as("Expected cached response to have the same content as the non-cached response")
+//            .isNull();
+//    }
+
     @Test
     void whenCreatingHardware_givenNoAuthentication_thenRequestFails_andResponseHas401Status() throws FoldingRestException {
         final HardwareRequest hardwareToCreate = generateHardware();

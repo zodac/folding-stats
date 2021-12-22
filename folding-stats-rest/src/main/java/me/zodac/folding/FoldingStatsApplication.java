@@ -30,8 +30,8 @@ import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
-import me.zodac.folding.rest.api.FoldingService;
-import me.zodac.folding.rest.api.FoldingStatsService;
+import me.zodac.folding.bean.FoldingRepository;
+import me.zodac.folding.bean.StatsRepository;
 import me.zodac.folding.state.SystemStateManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -62,10 +62,10 @@ public class FoldingStatsApplication {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Autowired
-    private FoldingService foldingService;
+    private FoldingRepository foldingRepository;
 
     @Autowired
-    private FoldingStatsService foldingStatsService;
+    private StatsRepository statsRepository;
 
     /**
      * Main entry point to our Spring application.
@@ -76,10 +76,21 @@ public class FoldingStatsApplication {
         SpringApplication.run(FoldingStatsApplication.class, args);
     }
 
+    /**
+     * On system startup, we execute the following actions to initialise the system for requests:
+     * <ol>
+     *     <li>Initialise the {@link me.zodac.folding.api.tc.Hardware}, {@link User}, {@link me.zodac.folding.api.tc.Team},
+     *     {@link OffsetTcStats} and initial {@link me.zodac.folding.api.tc.stats.UserStats} caches</li>
+     *     <li>Sets the {@link SystemState} to {@link SystemState#AVAILABLE} when complete</li>
+     * </ol>
+     *
+     * @param ctx the {@link ApplicationContext}
+     * @return the {@link CommandLineRunner} with the execution to be run by {@link FoldingStatsApplication}
+     */
     @Bean
     public CommandLineRunner initialisation(final ApplicationContext ctx) {
         return args -> {
-            Thread.sleep(TimeUnit.SECONDS.toMillis(5)); // TODO: [zodac] DB might not be online by now, what do?
+            Thread.sleep(TimeUnit.SECONDS.toMillis(10)); // TODO: [zodac] DB might not be online by now, what do?
             initCaches();
 
             SystemStateManager.next(SystemState.AVAILABLE);
@@ -88,15 +99,15 @@ public class FoldingStatsApplication {
     }
 
     private void initCaches() {
-        foldingService.getAllHardware();
-        foldingService.getAllTeams();
-        final Collection<User> users = foldingService.getAllUsersWithoutPasskeys();
+        foldingRepository.getAllHardware();
+        foldingRepository.getAllTeams();
+        final Collection<User> users = foldingRepository.getAllUsersWithoutPasskeys();
 
         for (final User user : users) {
-            final OffsetTcStats offsetTcStatsForUser = foldingStatsService.getOffsetStats(user);
+            final OffsetTcStats offsetTcStatsForUser = statsRepository.getOffsetStats(user);
             LOGGER.debug("Found offset stats for user {}: {}", user, offsetTcStatsForUser);
 
-            final UserStats initialStatsForUser = foldingStatsService.getInitialStats(user);
+            final UserStats initialStatsForUser = statsRepository.getInitialStats(user);
             LOGGER.debug("Found initial stats for user {}: {}", user, initialStatsForUser);
         }
 

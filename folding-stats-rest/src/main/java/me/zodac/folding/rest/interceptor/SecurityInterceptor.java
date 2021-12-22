@@ -20,7 +20,6 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 
 package me.zodac.folding.rest.interceptor;
@@ -40,9 +39,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.util.EncodingUtils;
-import me.zodac.folding.rest.api.FoldingService;
-import me.zodac.folding.rest.api.FoldingStatsService;
+import me.zodac.folding.bean.FoldingRepository;
+import me.zodac.folding.bean.StatsRepository;
 import me.zodac.folding.rest.api.header.RestHeader;
+import me.zodac.folding.rest.exception.ForbiddenException;
+import me.zodac.folding.rest.exception.UnauthorizedException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.web.HttpRequestHandler;
@@ -77,17 +78,17 @@ import org.springframework.web.servlet.HandlerInterceptor;
  *     </li>
  * </ul>
  *
- * @see FoldingService#authenticateSystemUser(String, String)
+ * @see FoldingRepository#authenticateSystemUser(String, String)
  */
 // TODO: [zodac] Sort out the logging
-public class SecurityInterceptor implements HandlerInterceptor {
+public final class SecurityInterceptor implements HandlerInterceptor {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final FoldingService foldingService;
+    private final FoldingRepository foldingRepository;
 
-    private SecurityInterceptor(final FoldingService foldingService) {
-        this.foldingService = foldingService;
+    private SecurityInterceptor(final FoldingRepository foldingRepository) {
+        this.foldingRepository = foldingRepository;
     }
 
     /**
@@ -95,14 +96,14 @@ public class SecurityInterceptor implements HandlerInterceptor {
      *
      * <p>
      * Since we must instantiate a new object to register in {@link me.zodac.folding.InterceptorRegister}, we cannot use an
-     * {@link org.springframework.beans.factory.annotation.Autowired} {@link FoldingStatsService}. Instead, the
-     * {@link me.zodac.folding.InterceptorRegister} will pass in its own injected {@link FoldingStatsService}.
+     * {@link org.springframework.beans.factory.annotation.Autowired} {@link StatsRepository}. Instead, the
+     * {@link me.zodac.folding.InterceptorRegister} will pass in its own injected {@link StatsRepository}.
      *
-     * @param foldingService the {@link FoldingService}
+     * @param foldingRepository the {@link FoldingRepository}
      * @return the created {@link SecurityInterceptor}
      */
-    public static SecurityInterceptor create(final FoldingService foldingService) {
-        return new SecurityInterceptor(foldingService);
+    public static SecurityInterceptor create(final FoldingRepository foldingRepository) {
+        return new SecurityInterceptor(foldingRepository);
     }
 
     @Override
@@ -113,16 +114,17 @@ public class SecurityInterceptor implements HandlerInterceptor {
             if (handler instanceof HandlerMethod) {
                 validateRequest(request, (HandlerMethod) handler);
             } else if (isPreflightRequest(handler)) {
-                LOGGER.debug("Preflight: {}", handler.getClass());
+                LOGGER.debug("Preflight request, no need to validate: {}", handler.getClass());
             } else {
                 LOGGER.warn("Unable to validate, handler is type: {}", handler.getClass());
                 throw new UnauthorizedException();
             }
         } catch (final ForbiddenException | UnauthorizedException e) {
+            LOGGER.debug("Handling exception: {}", e.getClass().getSimpleName());
             throw e;
         } catch (final Exception e) {
             LOGGER.warn("Unexpected error validating REST request at '{}'", request.getRequestURI(), e);
-            throw new UnauthorizedException();
+            throw new UnauthorizedException(e);
         }
 
         return true;
@@ -158,7 +160,7 @@ public class SecurityInterceptor implements HandlerInterceptor {
         final String userName = decodedUserNameAndPassword.get(EncodingUtils.DECODED_USERNAME_KEY);
         final String password = decodedUserNameAndPassword.get(EncodingUtils.DECODED_PASSWORD_KEY);
 
-        final UserAuthenticationResult userAuthenticationResult = foldingService.authenticateSystemUser(userName, password);
+        final UserAuthenticationResult userAuthenticationResult = foldingRepository.authenticateSystemUser(userName, password);
 
         if (!userAuthenticationResult.isUserExists()) {
             LOGGER.warn("User '{}' does not exist", userName);

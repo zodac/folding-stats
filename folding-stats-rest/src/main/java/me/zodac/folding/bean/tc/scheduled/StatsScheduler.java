@@ -20,10 +20,9 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 
-package me.zodac.folding.rest.impl.tc.scheduled;
+package me.zodac.folding.bean.tc.scheduled;
 
 import static java.lang.Boolean.parseBoolean;
 
@@ -31,8 +30,8 @@ import java.util.Collection;
 import me.zodac.folding.api.state.ParsingState;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
-import me.zodac.folding.rest.api.FoldingService;
-import me.zodac.folding.rest.api.tc.user.UserStatsParserService;
+import me.zodac.folding.bean.FoldingRepository;
+import me.zodac.folding.bean.tc.user.UserStatsParser;
 import me.zodac.folding.state.ParsingStateManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,6 +39,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+/**
+ * {@link Scheduled} {@link Component} which schedules the <code>Team Competition</code> stats retrieval for the system. The
+ * system will update stats using {@link UserStatsParser} every hour at <b>55</b> minutes past the hour.
+ * It will also only run from the 3rd of the month until the end of the month.
+ */
 @Component
 public class StatsScheduler {
 
@@ -48,27 +52,29 @@ public class StatsScheduler {
         parseBoolean(EnvironmentVariableUtils.getOrDefault("ENABLE_STATS_SCHEDULED_PARSING", "false"));
 
     @Autowired
-    private FoldingService foldingService;
+    private FoldingRepository foldingRepository;
 
     @Autowired
-    private UserStatsParserService userStatsParser;
+    private UserStatsParser userStatsParser;
 
-    @Scheduled(cron = "0 55 * * * *", zone = "UTC")
+    /**
+     * Scheduled execution to parse <code>Team Competition</code> stats.
+     */
+    @Scheduled(cron = "0 55 * 3-31 * *", zone = "UTC")
     public void scheduledTeamCompetitionStatsParsing() {
         if (!IS_STATS_SCHEDULED_PARSING_ENABLED) {
             LOGGER.error("Scheduled TC stats parsing not enabled");
             return;
         }
 
-        LOGGER.info("Parsing Folding stats");
-        final Collection<User> users = foldingService.getAllUsersWithPasskeys();
+        final Collection<User> users = foldingRepository.getAllUsersWithPasskeys();
 
         if (users.isEmpty()) {
-            LOGGER.warn("No TC users configured in system!");
+            LOGGER.warn("No TC users, not parsing stats");
             return;
         }
 
         ParsingStateManager.next(ParsingState.ENABLED_TEAM_COMPETITION);
-        userStatsParser.parseTcStatsForUser(users);
+        userStatsParser.parseTcStatsForUsers(users);
     }
 }

@@ -46,7 +46,7 @@ import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.validation.HardwareValidator;
 import me.zodac.folding.api.tc.validation.ValidationResult;
 import me.zodac.folding.api.util.StringUtils;
-import me.zodac.folding.rest.api.FoldingService;
+import me.zodac.folding.bean.FoldingRepository;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 import me.zodac.folding.rest.util.IdResult;
 import me.zodac.folding.rest.util.IntegerParser;
@@ -77,7 +77,7 @@ public class HardwareEndpoint {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Autowired
-    private FoldingService foldingService;
+    private FoldingRepository foldingRepository;
 
     /**
      * {@link PostMapping} request to create a {@link Hardware} based on the input request.
@@ -99,7 +99,7 @@ public class HardwareEndpoint {
         final Hardware validatedHardware = validationResult.getOutput();
 
         try {
-            final Hardware elementWithId = foldingService.createHardware(validatedHardware);
+            final Hardware elementWithId = foldingRepository.createHardware(validatedHardware);
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
             LOGGER.info("Created hardware with ID {}", elementWithId.getId());
@@ -123,7 +123,7 @@ public class HardwareEndpoint {
         LOGGER.debug("GET request received for all hardwares at '{}'", request::getRequestURI);
 
         try {
-            final Collection<Hardware> elements = foldingService.getAllHardware();
+            final Collection<Hardware> elements = foldingRepository.getAllHardware();
             return cachedOk(elements, untilNextMonthUtc(ChronoUnit.SECONDS));
         } catch (final Exception e) {
             LOGGER.error("Unexpected error getting all hardwares", e);
@@ -151,7 +151,7 @@ public class HardwareEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<Hardware> optionalElement = foldingService.getHardware(parsedId);
+            final Optional<Hardware> optionalElement = foldingRepository.getHardware(parsedId);
             if (optionalElement.isEmpty()) {
                 LOGGER.error("No hardware found with ID {}", hardwareId);
                 return notFound();
@@ -185,7 +185,7 @@ public class HardwareEndpoint {
                 return badRequest(errorMessage);
             }
 
-            final Optional<Hardware> optionalHardware = foldingService.getAllHardware()
+            final Optional<Hardware> optionalHardware = foldingRepository.getAllHardware()
                 .stream()
                 .filter(hardware -> hardware.getHardwareName().equalsIgnoreCase(hardwareName))
                 .findAny();
@@ -231,7 +231,7 @@ public class HardwareEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<Hardware> optionalElement = foldingService.getHardware(parsedId);
+            final Optional<Hardware> optionalElement = foldingRepository.getHardware(parsedId);
             if (optionalElement.isEmpty()) {
                 LOGGER.error("No hardware found with ID {}", hardwareId);
                 return notFound();
@@ -251,7 +251,7 @@ public class HardwareEndpoint {
 
             // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
             final Hardware hardwareWithId = Hardware.updateWithId(existingHardware.getId(), validatedHardware);
-            final Hardware updatedHardwareWithId = foldingService.updateHardware(hardwareWithId, existingHardware);
+            final Hardware updatedHardwareWithId = foldingRepository.updateHardware(hardwareWithId, existingHardware);
 
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             LOGGER.info("Updated hardware with ID {}", updatedHardwareWithId.getId());
@@ -282,7 +282,7 @@ public class HardwareEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<Hardware> optionalElement = foldingService.getHardware(parsedId);
+            final Optional<Hardware> optionalElement = foldingRepository.getHardware(parsedId);
             if (optionalElement.isEmpty()) {
                 LOGGER.error("No hardware found with ID {}", hardwareId);
                 return notFound();
@@ -295,7 +295,7 @@ public class HardwareEndpoint {
             }
             final Hardware validatedHardware = validationResult.getOutput();
 
-            foldingService.deleteHardware(validatedHardware);
+            foldingRepository.deleteHardware(validatedHardware);
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
             LOGGER.info("Deleted hardware with ID {}", hardwareId);
             return ok();
@@ -306,14 +306,14 @@ public class HardwareEndpoint {
     }
 
     private ValidationResult<Hardware> validateCreate(final HardwareRequest hardwareRequest) {
-        return HardwareValidator.validateCreate(hardwareRequest, foldingService.getAllHardware());
+        return HardwareValidator.validateCreate(hardwareRequest, foldingRepository.getAllHardware());
     }
 
     private ValidationResult<Hardware> validateUpdate(final HardwareRequest hardwareRequest, final Hardware existingHardware) {
-        return HardwareValidator.validateUpdate(hardwareRequest, existingHardware, foldingService.getAllHardware());
+        return HardwareValidator.validateUpdate(hardwareRequest, existingHardware, foldingRepository.getAllHardware());
     }
 
     private ValidationResult<Hardware> validateDelete(final Hardware hardware) {
-        return HardwareValidator.validateDelete(hardware, foldingService.getAllUsersWithoutPasskeys());
+        return HardwareValidator.validateDelete(hardware, foldingRepository.getAllUsersWithoutPasskeys());
     }
 }

@@ -88,6 +88,7 @@ public class StubbedLarsEndpoint {
      * {@link PostMapping} request that allows tests to provide a single {@link LarsGpu} to be added to the stubbed response.
      *
      * @param larsGpu the {@link LarsGpu} to add
+     * @return {@link HttpStatus#CREATED} {@link ResponseEntity}
      */
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<LarsGpu> addGpu(@RequestBody final LarsGpu larsGpu) {
@@ -101,6 +102,8 @@ public class StubbedLarsEndpoint {
 
     /**
      * {@link DeleteMapping} request to remove all {@link LarsGpu}s from the stubbed endpoint.
+     *
+     * @return {@link HttpStatus#OK} {@link ResponseEntity}
      */
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping

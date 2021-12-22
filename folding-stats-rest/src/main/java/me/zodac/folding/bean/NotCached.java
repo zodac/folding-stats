@@ -20,20 +20,20 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 
-package me.zodac.folding.rest.interceptor;
+package me.zodac.folding.bean;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Target;
 
 /**
- * Marker {@link Exception} thrown then an {@link HttpStatus#UNAUTHORIZED} request has been made. Will automatically tell the
- * {@link org.springframework.boot.autoconfigure.SpringBootApplication} to return a <b>401_UNAUTHORIZED</b> response, without requiring explicit
- * handling in any {@link org.springframework.web.bind.annotation.RestController}.
+ * Marker annotation to define a function in {@link Storage} that persists and retrieves data from a database, but does <b>not</b> cache that data
+ * locally.
  */
-@ResponseStatus(value = HttpStatus.UNAUTHORIZED)
-public class UnauthorizedException extends RuntimeException {
+@Documented
+@Target(ElementType.METHOD)
+@interface NotCached {
 
 }

@@ -465,26 +465,6 @@ public final class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public Optional<UserTcStats> getFirstHourlyTcStats() {
-        LOGGER.debug("Checking if any TC stats exist in the DB");
-
-        return executeQuery(queryContext -> {
-            final var query = queryContext
-                .select()
-                .from(USER_TC_STATS_HOURLY)
-                .limit(SINGLE_RESULT);
-            LOGGER.debug("Executing SQL: '{}'", query);
-
-            return query
-                .fetch()
-                .into(USER_TC_STATS_HOURLY)
-                .stream()
-                .map(RecordConverter::toUserTcStats)
-                .findAny();
-        });
-    }
-
-    @Override
     public Collection<HistoricStats> getHistoricStatsHourly(final int userId, final Year year, final Month month, final int day) {
         LOGGER.debug("Getting historic hourly user TC stats for {}/{}/{} for user {}", () -> year, () -> DateTimeUtils.formatMonth(month), () -> day,
             () -> userId);

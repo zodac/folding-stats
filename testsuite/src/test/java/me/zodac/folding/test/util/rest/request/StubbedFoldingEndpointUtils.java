@@ -26,8 +26,10 @@ package me.zodac.folding.test.util.rest.request;
 
 import static me.zodac.folding.rest.util.RestUtilConstants.HTTP_CLIENT;
 import static me.zodac.folding.test.util.TestConstants.FOLDING_URL;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -90,14 +92,17 @@ public final class StubbedFoldingEndpointUtils {
     }
 
     private static void addPoints(final String foldingUserName, final String passkey, final long points) throws FoldingRestException {
-        final HttpRequest unitsRequest = HttpRequest.newBuilder()
+        final HttpRequest pointsRequest = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.noBody())
             .uri(URI.create(String.format(POINTS_URL_FORMAT, foldingUserName, passkey, points)))
             .header("Content-Type", "application/json")
             .build();
 
         try {
-            HTTP_CLIENT.send(unitsRequest, HttpResponse.BodyHandlers.discarding());
+            final HttpResponse<Void> response = HTTP_CLIENT.send(pointsRequest, HttpResponse.BodyHandlers.discarding());
+            assertThat(response.statusCode())
+                .as("Expected a 201_CREATED")
+                .isEqualTo(HttpURLConnection.HTTP_CREATED);
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new FoldingRestException(String.format("Error setting points count of user %s/%s to %s", foldingUserName, passkey, points), e);
@@ -112,14 +117,17 @@ public final class StubbedFoldingEndpointUtils {
      * @throws FoldingRestException thrown if an error occurs sending the HTTP request
      */
     public static void deletePoints() throws FoldingRestException {
-        final HttpRequest unitsRequest = HttpRequest.newBuilder()
+        final HttpRequest pointsRequest = HttpRequest.newBuilder()
             .DELETE()
             .uri(URI.create(POINTS_URL_ROOT))
             .header("Content-Type", "application/json")
             .build();
 
         try {
-            HTTP_CLIENT.send(unitsRequest, HttpResponse.BodyHandlers.discarding());
+            final HttpResponse<Void> response = HTTP_CLIENT.send(pointsRequest, HttpResponse.BodyHandlers.discarding());
+            assertThat(response.statusCode())
+                .as("Expected a 201_OK")
+                .isEqualTo(HttpURLConnection.HTTP_OK);
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new FoldingRestException("Error resetting points count of users", e);
@@ -156,7 +164,10 @@ public final class StubbedFoldingEndpointUtils {
             .build();
 
         try {
-            HTTP_CLIENT.send(unitsRequest, HttpResponse.BodyHandlers.discarding());
+            final HttpResponse<Void> response = HTTP_CLIENT.send(unitsRequest, HttpResponse.BodyHandlers.discarding());
+            assertThat(response.statusCode())
+                .as("Expected a 201_CREATED")
+                .isEqualTo(HttpURLConnection.HTTP_CREATED);
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new FoldingRestException(String.format("Error setting unit count of user %s/%s to %s", foldingUserName, passkey, units), e);
@@ -178,7 +189,10 @@ public final class StubbedFoldingEndpointUtils {
             .build();
 
         try {
-            HTTP_CLIENT.send(unitsRequest, HttpResponse.BodyHandlers.discarding());
+            final HttpResponse<Void> response = HTTP_CLIENT.send(unitsRequest, HttpResponse.BodyHandlers.discarding());
+            assertThat(response.statusCode())
+                .as("Expected a 201_OK")
+                .isEqualTo(HttpURLConnection.HTTP_OK);
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new FoldingRestException("Error resetting points count of users", e);

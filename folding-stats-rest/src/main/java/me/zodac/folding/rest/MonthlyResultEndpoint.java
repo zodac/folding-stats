@@ -20,7 +20,6 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 
 package me.zodac.folding.rest;
@@ -40,8 +39,8 @@ import javax.servlet.http.HttpServletRequest;
 import me.zodac.folding.api.state.ReadRequired;
 import me.zodac.folding.api.state.WriteRequired;
 import me.zodac.folding.api.tc.result.MonthlyResult;
-import me.zodac.folding.rest.api.FoldingStatsService;
-import me.zodac.folding.rest.api.tc.user.UserStatsStorerService;
+import me.zodac.folding.bean.StatsRepository;
+import me.zodac.folding.bean.tc.user.UserStatsStorer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,10 +62,10 @@ public class MonthlyResultEndpoint {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Autowired
-    private FoldingStatsService foldingStatsService;
+    private StatsRepository statsRepository;
 
     @Autowired
-    private UserStatsStorerService userStatsStorer;
+    private UserStatsStorer userStatsStorer;
 
     /**
      * {@link GetMapping} request that retrieves a {@link MonthlyResult} for the given {@link Month}/{@link Year}.
@@ -85,7 +84,7 @@ public class MonthlyResultEndpoint {
         LOGGER.debug("GET request received to retrieve monthly TC result at '{}'", request::getRequestURI);
 
         try {
-            final Optional<MonthlyResult> monthlyResult = foldingStatsService.getMonthlyResult(Month.of(Integer.parseInt(month)), Year.parse(year));
+            final Optional<MonthlyResult> monthlyResult = statsRepository.getMonthlyResult(Month.of(Integer.parseInt(month)), Year.parse(year));
             return ok(monthlyResult.orElse(MonthlyResult.empty()));
         } catch (final DateTimeParseException e) {
             final String errorMessage = String.format("The year '%s' is not a valid format", year);

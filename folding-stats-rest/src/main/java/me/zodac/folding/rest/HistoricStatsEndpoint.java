@@ -20,7 +20,6 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 
 package me.zodac.folding.rest;
@@ -46,8 +45,8 @@ import javax.servlet.http.HttpServletRequest;
 import me.zodac.folding.api.state.ReadRequired;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.rest.api.FoldingService;
-import me.zodac.folding.rest.api.FoldingStatsService;
+import me.zodac.folding.bean.FoldingRepository;
+import me.zodac.folding.bean.StatsRepository;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import me.zodac.folding.rest.util.IdResult;
 import me.zodac.folding.rest.util.IntegerParser;
@@ -74,10 +73,10 @@ public class HistoricStatsEndpoint {
     private static final int CACHE_EXPIRATION_TIME = (int) TimeUnit.HOURS.toSeconds(1);
 
     @Autowired
-    private FoldingService foldingService;
+    private FoldingRepository foldingRepository;
 
     @Autowired
-    private FoldingStatsService foldingStatsService;
+    private StatsRepository statsRepository;
 
     /**
      * {@link GetMapping} request to retrieve a {@link User}'s hourly {@link HistoricStats} for a single {@code day}.
@@ -117,13 +116,13 @@ public class HistoricStatsEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<User> user = foldingService.getUserWithPasskey(parsedId);
+            final Optional<User> user = foldingRepository.getUserWithPasskey(parsedId);
             if (user.isEmpty()) {
                 LOGGER.error("No user found with ID: {}", parsedId);
                 return notFound();
             }
 
-            final Collection<HistoricStats> historicStats = foldingStatsService.getHistoricStats(user.get(), Year.parse(year), Month.of(monthAsInt),
+            final Collection<HistoricStats> historicStats = statsRepository.getHistoricStats(user.get(), Year.parse(year), Month.of(monthAsInt),
                 dayAsInt);
             return cachedOk(historicStats, CACHE_EXPIRATION_TIME);
         } catch (final DateTimeParseException e) {
@@ -172,14 +171,14 @@ public class HistoricStatsEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<User> user = foldingService.getUserWithPasskey(parsedId);
+            final Optional<User> user = foldingRepository.getUserWithPasskey(parsedId);
             if (user.isEmpty()) {
                 LOGGER.error("No user found with ID: {}", parsedId);
                 return notFound();
             }
 
             final Collection<HistoricStats> historicStats =
-                foldingStatsService.getHistoricStats(user.get(), Year.parse(year), Month.of(parseInt(month)));
+                statsRepository.getHistoricStats(user.get(), Year.parse(year), Month.of(parseInt(month)));
             return cachedOk(historicStats, CACHE_EXPIRATION_TIME);
         } catch (final DateTimeParseException e) {
             final String errorMessage = String.format("The year '%s' is not a valid format", year);
@@ -220,13 +219,13 @@ public class HistoricStatsEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<User> user = foldingService.getUserWithPasskey(parsedId);
+            final Optional<User> user = foldingRepository.getUserWithPasskey(parsedId);
             if (user.isEmpty()) {
                 LOGGER.error("No user found with ID: {}", parsedId);
                 return notFound();
             }
 
-            final Collection<HistoricStats> historicStats = foldingStatsService.getHistoricStats(user.get(), Year.parse(year));
+            final Collection<HistoricStats> historicStats = statsRepository.getHistoricStats(user.get(), Year.parse(year));
             return cachedOk(historicStats, CACHE_EXPIRATION_TIME);
         } catch (final DateTimeParseException e) {
             final String errorMessage = String.format("The year '%s' is not a valid format", year);
@@ -277,20 +276,20 @@ public class HistoricStatsEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<Team> teamOptional = foldingService.getTeam(parsedId);
+            final Optional<Team> teamOptional = foldingRepository.getTeam(parsedId);
             if (teamOptional.isEmpty()) {
                 LOGGER.error("No team found with ID: {}", parsedId);
                 return notFound();
             }
             final Team team = teamOptional.get();
 
-            final Collection<User> teamUsers = foldingService.getUsersOnTeam(team);
+            final Collection<User> teamUsers = foldingRepository.getUsersOnTeam(team);
             final List<HistoricStats> teamHourlyStats = new ArrayList<>(teamUsers.size());
 
             for (final User user : teamUsers) {
                 LOGGER.debug("Getting historic stats for user with ID: {}", user.getId());
                 final Collection<HistoricStats> dailyStats =
-                    foldingStatsService.getHistoricStats(user, Year.parse(year), Month.of(monthAsInt), dayAsInt);
+                    statsRepository.getHistoricStats(user, Year.parse(year), Month.of(monthAsInt), dayAsInt);
                 teamHourlyStats.addAll(dailyStats);
             }
 
@@ -342,19 +341,19 @@ public class HistoricStatsEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<Team> teamOptional = foldingService.getTeam(parsedId);
+            final Optional<Team> teamOptional = foldingRepository.getTeam(parsedId);
             if (teamOptional.isEmpty()) {
                 LOGGER.error("No team found with ID: {}", parsedId);
                 return notFound();
             }
             final Team team = teamOptional.get();
 
-            final Collection<User> teamUsers = foldingService.getUsersOnTeam(team);
+            final Collection<User> teamUsers = foldingRepository.getUsersOnTeam(team);
             final List<HistoricStats> teamDailyStats = new ArrayList<>(teamUsers.size());
 
             for (final User user : teamUsers) {
                 LOGGER.debug("Getting historic stats for user with ID: {}", user.getId());
-                final Collection<HistoricStats> dailyStats = foldingStatsService.getHistoricStats(user, Year.parse(year), Month.of(parseInt(month)));
+                final Collection<HistoricStats> dailyStats = statsRepository.getHistoricStats(user, Year.parse(year), Month.of(parseInt(month)));
                 teamDailyStats.addAll(dailyStats);
             }
 
@@ -399,19 +398,19 @@ public class HistoricStatsEndpoint {
             }
             final int parsedId = idResult.getId();
 
-            final Optional<Team> teamOptional = foldingService.getTeam(parsedId);
+            final Optional<Team> teamOptional = foldingRepository.getTeam(parsedId);
             if (teamOptional.isEmpty()) {
                 LOGGER.error("No team found with ID: {}", parsedId);
                 return notFound();
             }
             final Team team = teamOptional.get();
 
-            final Collection<User> teamUsers = foldingService.getUsersOnTeam(team);
+            final Collection<User> teamUsers = foldingRepository.getUsersOnTeam(team);
             final List<HistoricStats> teamMonthlyStats = new ArrayList<>(teamUsers.size());
 
             for (final User user : teamUsers) {
                 LOGGER.debug("Getting historic stats for user with ID: {}", user.getId());
-                final Collection<HistoricStats> monthlyStats = foldingStatsService.getHistoricStats(user, Year.parse(year));
+                final Collection<HistoricStats> monthlyStats = statsRepository.getHistoricStats(user, Year.parse(year));
                 teamMonthlyStats.addAll(monthlyStats);
             }
 

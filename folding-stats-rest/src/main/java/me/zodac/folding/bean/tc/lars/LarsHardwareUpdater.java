@@ -20,10 +20,9 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 
-package me.zodac.folding.rest.impl.tc.lars;
+package me.zodac.folding.bean.tc.lars;
 
 import static java.util.stream.Collectors.toSet;
 import static me.zodac.folding.api.util.NumberUtils.formatWithCommas;
@@ -36,10 +35,9 @@ import me.zodac.folding.api.tc.HardwareMake;
 import me.zodac.folding.api.tc.HardwareType;
 import me.zodac.folding.api.tc.lars.LarsGpu;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
+import me.zodac.folding.bean.FoldingRepository;
 import me.zodac.folding.lars.HardwareSplitter;
 import me.zodac.folding.lars.LarsGpuRetriever;
-import me.zodac.folding.rest.api.FoldingService;
-import me.zodac.folding.rest.api.tc.lars.LarsHardwareUpdaterService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,15 +48,43 @@ import org.springframework.stereotype.Component;
  * the database with the new values.
  */
 @Component
-public class LarsHardwareUpdater implements LarsHardwareUpdaterService {
+public class LarsHardwareUpdater {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final String LARS_URL_ROOT = EnvironmentVariableUtils.getOrDefault("LARS_URL_ROOT", "https://folding.lar.systems");
 
     @Autowired
-    private FoldingService foldingService;
+    private FoldingRepository foldingRepository;
 
-    @Override
+    /**
+     * Retrieves {@link me.zodac.folding.api.tc.HardwareType} data from LARS, creates {@link Hardware} instances, then updates to the DB.
+     *
+     * <p>
+     * Depending on the state of the retrieved {@link Hardware}, one of the following will occur:
+     * <ul>
+     *     <li>
+     *         If the {@link Hardware} is retrieved from LARS and does not exist in the DB, it will be <b>created</b>.
+     *     </li>
+     *     <li>
+     *         If the {@link Hardware} is exists in the DB but is not retrieved from LARS, it will be <b>deleted</b>.
+     *     </li>
+     *     <li>
+     *         If the {@link Hardware} is retrieved from LARS and does exist in the DB and either the {@code multiplier} or {@code averagePpd} is
+     *         different, it will be <b>updated</b>.
+     *     </li>
+     *     <li>
+     *         If the {@link Hardware} is retrieved from LARS and does exist in the DB and neither the {@code multiplier} nor {@code averagePpd} is
+     *         different, it will be <b>ignored</b>.
+     *     </li>
+     * </ul>
+     *
+     * <p>
+     * Since each {@link Hardware} requires a {@code multiplier}, we will manually calculate it based off the highest-ranked
+     * {@link LarsGpu} that is retrieved. The formula for the {@code multiplier} is:
+     * <pre>
+     *     (PPD of best {@link LarsGpu}) / (PPD of current {@link LarsGpu})
+     * </pre>
+     */
     public void retrieveHardwareAndPersist() {
         final String gpuDbUrl = LARS_URL_ROOT + "/gpu_ppd/overall_ranks";
         final List<LarsGpu> larsGpus = LarsGpuRetriever.retrieveGpus(gpuDbUrl);
@@ -78,10 +104,10 @@ public class LarsHardwareUpdater implements LarsHardwareUpdaterService {
             .stream()
             .map(larsGpu -> toHardware(larsGpu, bestPpd))
             .collect(toSet());
-        final Collection<Hardware> existing = foldingService.getAllHardware();
+        final Collection<Hardware> existing = foldingRepository.getAllHardware();
 
         for (final Hardware hardware : HardwareSplitter.toDelete(lars, existing)) {
-            foldingService.deleteHardware(hardware);
+            foldingRepository.deleteHardware(hardware);
             LOGGER.info("Deleted hardware '{}' (ID: {})", hardware.getHardwareName(), hardware.getId());
         }
 
@@ -91,12 +117,14 @@ public class LarsHardwareUpdater implements LarsHardwareUpdaterService {
                 final Hardware existingHardware = entry.getValue();
                 final Hardware updatedHardwareWithId = Hardware.updateWithId(existingHardware.getId(), updatedHardware);
 
-                foldingService.updateHardware(updatedHardwareWithId, existingHardware);
-                LOGGER.info("LARS updated hardware\n" +
-                        "ID: {}\n" +
-                        "{}\n" +
-                        "Multiplier: {} -> {}\n" +
-                        "Average PPD: {} -> {}\n",
+                foldingRepository.updateHardware(updatedHardwareWithId, existingHardware);
+
+                // TODO: [zodac] Make multiline string
+                LOGGER.info("LARS updated hardware\n"
+                        + "ID: {}\n"
+                        + "{}\n"
+                        + "Multiplier: {} -> {}\n"
+                        + "Average PPD: {} -> {}\n",
                     existingHardware.getId(),
                     updatedHardware.getHardwareName(),
                     existingHardware.getMultiplier(),
@@ -109,7 +137,7 @@ public class LarsHardwareUpdater implements LarsHardwareUpdaterService {
         }
 
         for (final Hardware hardware : HardwareSplitter.toCreate(lars, existing)) {
-            final Hardware createdHardware = foldingService.createHardware(hardware);
+            final Hardware createdHardware = foldingRepository.createHardware(hardware);
             LOGGER.info("Created hardware '{}' (ID: {})", createdHardware.getHardwareName(), createdHardware.getId());
         }
 

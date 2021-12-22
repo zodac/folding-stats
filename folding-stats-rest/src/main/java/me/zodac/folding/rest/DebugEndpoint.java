@@ -20,7 +20,6 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 
 package me.zodac.folding.rest;
@@ -29,8 +28,8 @@ import static me.zodac.folding.rest.response.Responses.ok;
 import static me.zodac.folding.rest.response.Responses.serverError;
 
 import javax.annotation.security.RolesAllowed;
-import me.zodac.folding.rest.api.FoldingService;
-import me.zodac.folding.rest.api.tc.lars.LarsHardwareUpdaterService;
+import me.zodac.folding.bean.FoldingRepository;
+import me.zodac.folding.bean.tc.lars.LarsHardwareUpdater;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,16 +52,16 @@ public class DebugEndpoint {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Autowired
-    private FoldingService foldingService;
+    private FoldingRepository foldingRepository;
 
     @Autowired
-    private LarsHardwareUpdaterService larsHardwareUpdater;
+    private LarsHardwareUpdater larsHardwareUpdater;
 
     /**
      * {@link PostMapping} request to print the contents of all caches to the system log.
      *
      * @return {@link me.zodac.folding.rest.response.Responses#ok()}
-     * @see LarsHardwareUpdaterService
+     * @see LarsHardwareUpdater
      */
     @RolesAllowed("admin")
     @PostMapping(path = "/lars", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -81,13 +80,13 @@ public class DebugEndpoint {
      * {@link PostMapping} request to print the contents of all caches to the system log.
      *
      * @return {@link me.zodac.folding.rest.response.Responses#ok()}
-     * @see FoldingService#printCacheContents()
+     * @see FoldingRepository#printCacheContents()
      */
     @RolesAllowed("admin")
     @PostMapping(path = "/caches", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> printCaches() {
         LOGGER.info("Printing cache contents");
-        foldingService.printCacheContents();
+        foldingRepository.printCacheContents();
         return ok();
     }
 }

@@ -20,20 +20,17 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 
-package me.zodac.folding.rest.impl.tc.user;
+package me.zodac.folding.bean.tc.user;
 
 import java.util.Collection;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.bean.FoldingRepository;
+import me.zodac.folding.bean.StatsRepository;
 import me.zodac.folding.cache.RetiredTcStatsCache;
 import me.zodac.folding.cache.TcStatsCache;
 import me.zodac.folding.cache.TotalStatsCache;
-import me.zodac.folding.rest.api.FoldingService;
-import me.zodac.folding.rest.api.FoldingStatsService;
-import me.zodac.folding.rest.api.tc.user.UserStatsParserService;
-import me.zodac.folding.rest.api.tc.user.UserStatsResetterService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,18 +40,18 @@ import org.springframework.stereotype.Component;
  * Resets the stats for the <code>Team Competition</code>.
  */
 @Component
-public class UserStatsResetter implements UserStatsResetterService {
+public class UserStatsResetter {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Autowired
-    private FoldingService foldingService;
+    private FoldingRepository foldingRepository;
 
     @Autowired
-    private FoldingStatsService foldingStatsRepository;
+    private StatsRepository statsRepository;
 
     @Autowired
-    private UserStatsParserService userStatsParser;
+    private UserStatsParser userStatsParser;
 
     /**
      * Resets the <code>Team Competition</code> stats for all {@link User}s.
@@ -69,22 +66,21 @@ public class UserStatsResetter implements UserStatsResetterService {
      * <li>Execute a new stats update to set all values to <b>0</b></li>
      * </ol>
      *
-     * @see FoldingStatsService#resetAllTeamCompetitionUserStats(Collection)
-     * @see UserStatsParserService#parseTcStatsForUserAndWait(Collection)
+     * @see StatsRepository#resetAllTeamCompetitionUserStats()
+     * @see UserStatsParser#parseTcStatsForUsersAndWait(Collection)
      */
-    @Override
     public void resetTeamCompetitionStats() {
         try {
-            final Collection<User> users = foldingService.getAllUsersWithPasskeys();
+            final Collection<User> users = foldingRepository.getAllUsersWithPasskeys();
 
             // Pull stats one more time to get the latest values
-            userStatsParser.parseTcStatsForUserAndWait(users);
+            userStatsParser.parseTcStatsForUsersAndWait(users);
 
             LOGGER.info("Resetting Team Competition stats");
-            foldingStatsRepository.resetAllTeamCompetitionUserStats(users);
+            statsRepository.resetAllTeamCompetitionUserStats();
 
             // Pull stats for new month
-            userStatsParser.parseTcStatsForUserAndWait(users);
+            userStatsParser.parseTcStatsForUsersAndWait(users);
         } catch (final Exception e) {
             LOGGER.warn("Unexpected error manually resetting TC stats", e);
         }

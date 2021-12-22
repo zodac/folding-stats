@@ -77,6 +77,13 @@ public final class HardwareSplitter {
         return toCreate;
     }
 
+    /**
+     * If any of the {@link Hardware} in the DB is not also listed in the LARS data, it will be returned to be deleted.
+     *
+     * @param fromLars the {@link Hardware} retrieved from LARS
+     * @param inDb     the {@link Hardware} already existing in the DB
+     * @return a {@link Collection} of the {@link Hardware} to be deleted, sorted according to {@link HardwareNameComparator}
+     */
     public static Collection<Hardware> toDelete(final Collection<Hardware> fromLars, final Collection<Hardware> inDb) {
         // Hardware name is unique, we can use it as an identifier
         final Collection<String> fromLarsHardwareNames = getHardwareNames(fromLars);

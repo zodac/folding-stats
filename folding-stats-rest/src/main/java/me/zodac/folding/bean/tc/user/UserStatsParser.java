@@ -20,10 +20,9 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 
-package me.zodac.folding.rest.impl.tc.user;
+package me.zodac.folding.bean.tc.user;
 
 import static me.zodac.folding.api.util.NumberUtils.formatWithCommas;
 
@@ -38,8 +37,7 @@ import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.api.util.StringUtils;
-import me.zodac.folding.rest.api.FoldingStatsService;
-import me.zodac.folding.rest.api.tc.user.UserStatsParserService;
+import me.zodac.folding.bean.StatsRepository;
 import me.zodac.folding.state.ParsingStateManager;
 import me.zodac.folding.state.SystemStateManager;
 import me.zodac.folding.stats.HttpFoldingStatsRetriever;
@@ -53,38 +51,33 @@ import org.springframework.stereotype.Component;
  * Class that parses {@link Stats} for <code>Team Competition</code> {@link User}s.
  */
 @Component
-public class UserStatsParser implements UserStatsParserService {
+public class UserStatsParser {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final FoldingStatsRetriever FOLDING_STATS_RETRIEVER = HttpFoldingStatsRetriever.create();
 
     @Autowired
-    private FoldingStatsService foldingStatsCore;
+    private StatsRepository statsRepository;
 
-    //    /**
-//     * Parses the latest TC stats for the given {@link User}.
-//     *
-//     * <p>
-//     * Method blocks until the stats have been parsed, calculated and persisted.
-//     *
-//     * @param user the {@link User} whose TC stats are to be parsed
-//     */
-    @Override
-    public void parseTcStatsForUserAndWait(final Collection<User> users) {
+    /**
+     * Parses the latest TC stats for the given {@link User}s.
+     *
+     * <p>
+     * Method blocks until the stats have been parsed, calculated and persisted.
+     *
+     * @param users the {@link User}s whose TC stats are to be parsed
+     */
+    public void parseTcStatsForUsersAndWait(final Collection<User> users) {
         updateTcStatsForUsers(users);
     }
 
-    //    /**
-//     * Parses the latest TC stats for the given {@link User}.
-//     *
-//     * <p>
-//     * Method runs {@link Async}, so returns immediately and processes the {@link User} stats in a separate/background thread.
-//     *
-//     * @param user the {@link User} whose TC stats are to be parsed
-//     */
-    @Override
+    /**
+     * Parses the latest TC stats for the given {@link User}s.
+     *
+     * @param users the {@link User}s whose TC stats are to be parsed
+     */
     @Async
-    public void parseTcStatsForUser(final Collection<User> users) {
+    public void parseTcStatsForUsers(final Collection<User> users) {
         updateTcStatsForUsers(users);
     }
 
@@ -92,6 +85,7 @@ public class UserStatsParser implements UserStatsParserService {
         ParsingStateManager.next(ParsingState.ENABLED_TEAM_COMPETITION);
         SystemStateManager.next(SystemState.UPDATING_STATS);
 
+        LOGGER.info("Parsing Folding stats:");
         for (final User user : users) {
             try {
                 updateTcStatsForUser(user);
@@ -99,6 +93,7 @@ public class UserStatsParser implements UserStatsParserService {
                 LOGGER.error("Error updating TC stats for user '{}' (ID: {})", user.getDisplayName(), user.getId(), e);
             }
         }
+        LOGGER.info("Finished parsing Folding stats");
 
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
     }
@@ -110,13 +105,13 @@ public class UserStatsParser implements UserStatsParserService {
             return;
         }
 
-        final Stats initialStats = foldingStatsCore.getInitialStats(user);
+        final Stats initialStats = statsRepository.getInitialStats(user);
         if (initialStats.isEmpty()) {
             LOGGER.warn("Retrieved empty initial stats for user: {}", user);
             return;
         }
 
-        final OffsetTcStats offsetTcStats = foldingStatsCore.getOffsetStats(user);
+        final OffsetTcStats offsetTcStats = statsRepository.getOffsetStats(user);
         if (offsetTcStats.isEmpty()) {
             LOGGER.trace("Retrieved empty stats offset for user: {}", () -> user);
         } else {
@@ -130,7 +125,7 @@ public class UserStatsParser implements UserStatsParserService {
             return;
         }
 
-        final UserStats createdTotalStats = foldingStatsCore.createTotalStats(totalStats);
+        final UserStats createdTotalStats = statsRepository.createTotalStats(totalStats);
         calculateAndPersistTcStats(user, initialStats, offsetTcStats, createdTotalStats);
     }
 
@@ -161,7 +156,7 @@ public class UserStatsParser implements UserStatsParserService {
         LOGGER.debug("{} (ID: {}): {} TC multiplied points (pre-offset) | {} TC units (pre-offset)", user::getDisplayName, user::getId,
             () -> formatWithCommas(multipliedPoints), () -> formatWithCommas(units));
 
-        final UserTcStats createdHourlyTcStats = foldingStatsCore.createHourlyTcStats(hourlyUserTcStats);
+        final UserTcStats createdHourlyTcStats = statsRepository.createHourlyTcStats(hourlyUserTcStats);
         LOGGER.info("{} (ID: {}): {} TC points | {} TC units", user.getDisplayName(), user.getId(),
             formatWithCommas(createdHourlyTcStats.getMultipliedPoints()), formatWithCommas(createdHourlyTcStats.getUnits()));
     }

@@ -179,13 +179,6 @@ public interface DbManager {
     Optional<UserTcStats> getHourlyTcStats(final int userId);
 
     /**
-     * Retrieves the first {@link UserTcStats} for any users in the system.
-     *
-     * @return an {@link Optional} of the first {@link UserTcStats}
-     */
-    Optional<UserTcStats> getFirstHourlyTcStats();
-
-    /**
      * Retrieves the {@link HistoricStats} for a given {@link User} ID for a specific {@code day}/{@link Month}/{@link Year}.
      *
      * @param userId the ID of the {@link User} whose {@link HistoricStats} are to be retrieved

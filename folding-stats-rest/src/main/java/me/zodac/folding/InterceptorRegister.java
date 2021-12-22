@@ -24,7 +24,7 @@
 
 package me.zodac.folding;
 
-import me.zodac.folding.rest.api.FoldingService;
+import me.zodac.folding.bean.FoldingRepository;
 import me.zodac.folding.rest.interceptor.SecurityInterceptor;
 import me.zodac.folding.rest.interceptor.StateInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,12 +41,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class InterceptorRegister implements WebMvcConfigurer {
 
     @Autowired
-    private FoldingService foldingService;
+    private FoldingRepository foldingRepository;
 
     @Override
     public void addInterceptors(final InterceptorRegistry registry) {
         registry
-            .addInterceptor(SecurityInterceptor.create(foldingService))
+            .addInterceptor(SecurityInterceptor.create(foldingRepository))
             .addPathPatterns("/**")
             .excludePathPatterns("/error", "/login/admin");
 
@@ -54,10 +54,5 @@ public class InterceptorRegister implements WebMvcConfigurer {
             .addInterceptor(StateInterceptor.create())
             .addPathPatterns("/**")
             .excludePathPatterns("/error", "/login/admin");
-
-//        registry
-//            .addInterceptor(CorsInterceptor.create())
-//            .addPathPatterns("/**")
-//            .excludePathPatterns("/error");
     }
 }

@@ -20,35 +20,36 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 
-package me.zodac.folding.rest.api.tc.user;
+package me.zodac.folding.rest.exception;
 
-import me.zodac.folding.api.tc.User;
-import me.zodac.folding.cache.RetiredTcStatsCache;
-import me.zodac.folding.cache.TcStatsCache;
-import me.zodac.folding.cache.TotalStatsCache;
-import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
- * Resets the stats for the <code>Team Competition</code>.
+ * Marker {@link Exception} thrown when an {@link HttpStatus#UNAUTHORIZED} request has been made. Will automatically tell the
+ * {@link org.springframework.boot.autoconfigure.SpringBootApplication} to return a <b>401_UNAUTHORIZED</b> response, without requiring explicit
+ * handling in any {@link org.springframework.web.bind.annotation.RestController}.
  */
-@Service
-public interface UserStatsResetterService {
+@ResponseStatus(HttpStatus.UNAUTHORIZED)
+public class UnauthorizedException extends RuntimeException {
+
+    private static final long serialVersionUID = 5640864796327254860L;
 
     /**
-     * Resets the <code>Team Competition</code> stats for all {@link User}s.
-     *
-     * <p>
-     * Actions performed:
-     * <ol>
-     * <li>Retrieves the current stats for all {@link User}s and updates their initial stats to these current values</li>
-     * <li>Remove offset stats for all users</li>
-     * <li>Delete all retired user stats</li>
-     * <li>Invalidate all stats caches ({@link TcStatsCache}/{@link TotalStatsCache}/{@link RetiredTcStatsCache})</li>
-     * <li>Execute a new stats update to set all values to <b>0</b></li>
-     * </ol>
+     * Basic constructor.
      */
-    void resetTeamCompetitionStats();
+    public UnauthorizedException() {
+        super();
+    }
+
+    /**
+     * Constructor taking in a cause {@link Throwable}.
+     *
+     * @param throwable the cause {@link Throwable}
+     */
+    public UnauthorizedException(final Throwable throwable) {
+        super(throwable);
+    }
 }

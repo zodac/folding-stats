@@ -20,10 +20,9 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 
-package me.zodac.folding.rest.impl.tc.scheduled;
+package me.zodac.folding.bean.tc.scheduled;
 
 import static java.lang.Boolean.parseBoolean;
 
@@ -34,9 +33,9 @@ import java.util.TimeZone;
 import me.zodac.folding.api.state.ParsingState;
 import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
-import me.zodac.folding.rest.api.tc.lars.LarsHardwareUpdaterService;
-import me.zodac.folding.rest.api.tc.user.UserStatsResetterService;
-import me.zodac.folding.rest.api.tc.user.UserStatsStorerService;
+import me.zodac.folding.bean.tc.lars.LarsHardwareUpdater;
+import me.zodac.folding.bean.tc.user.UserStatsResetter;
+import me.zodac.folding.bean.tc.user.UserStatsStorer;
 import me.zodac.folding.state.ParsingStateManager;
 import me.zodac.folding.state.SystemStateManager;
 import org.apache.logging.log4j.LogManager;
@@ -45,6 +44,33 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+/**
+ * {@link Scheduled} {@link Component} which schedules the beginning and end of the <code>Team Competition</code>.
+ *
+ * <p>
+ * The first day of the <code>Team Competition</code> is set to the <b>3rd</b> of the month, and on this day it will reset the stats for all users.
+ * The reset will occur at <b>00:15</b>. This time cannot be changed, but the reset can be disabled using the environment variable:
+ * <ul>
+ *     <li>{@code ENABLE_STATS_MONTHLY_RESET}</li>
+ * </ul>
+ *
+ * <p>
+ * The last day of the <code>Team Competition</code> is the final day of the month, and on this day the following actions are performed:
+ * <ul>
+ *     <li>Resets the stats for all users. The reset will occur  at <b>00:15</b>. This time cannot be changed, but the reset can be disabled using
+ *     the environment variable:
+ *         <ul>
+ *             <li>{@code ENABLE_STATS_MONTHLY_RESET}</li>
+ *         </ul>
+ *     </li>
+ *     <li>Persists the result of that month. The monthly result time cannot be configured, but it can be disabled using the environment variable:
+ *         <ul>
+ *             <li>{@code ENABLE_MONTHLY_RESULT_STORAGE}</li>
+ *         </ul>
+ *     </li>
+ *     <li>Updates the value of all {@link me.zodac.folding.api.tc.Hardware} from the LARS PPD database.</li>
+ * </ul>
+ */
 @Component
 public class TeamCompetitionScheduler {
 
@@ -56,14 +82,19 @@ public class TeamCompetitionScheduler {
     private static final boolean IS_LARS_UPDATE_ENABLED = parseBoolean(EnvironmentVariableUtils.getOrDefault("ENABLE_LARS_HARDWARE_UPDATE", "false"));
 
     @Autowired
-    private LarsHardwareUpdaterService larsHardwareUpdater;
+    private LarsHardwareUpdater larsHardwareUpdater;
 
     @Autowired
-    private UserStatsResetterService userStatsResetter;
+    private UserStatsResetter userStatsResetter;
 
     @Autowired
-    private UserStatsStorerService userStatsStorer;
+    private UserStatsStorer userStatsStorer;
 
+    /**
+     * Scheduled execution to prepare the <code>Team Competition</code> for the new month.
+     *
+     * @see UserStatsResetter#resetTeamCompetitionStats()
+     */
     @Scheduled(cron = "0 15 0 3 * *", zone = "UTC") // TC starts on the 3rd of the month
     public void startOfTeamCompetition() {
         try {
@@ -79,6 +110,13 @@ public class TeamCompetitionScheduler {
         }
     }
 
+    /**
+     * Scheduled execution to finalise the <code>Team Competition</code> at the end of a month.
+     *
+     * @see UserStatsStorer#storeMonthlyResult()
+     * @see UserStatsResetter#resetTeamCompetitionStats()
+     * @see LarsHardwareUpdater#retrieveHardwareAndPersist()
+     */
     @Scheduled(cron = "0 57 23 28-31 * *", zone = "UTC")
     public void endOfTeamCompetition() {
         try {

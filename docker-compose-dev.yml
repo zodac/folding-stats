@@ -12,7 +12,7 @@ services:
         REST_ENDPOINT_URL: "http://127.0.0.1:8081/folding"
         ROOT_URL: "http://127.0.0.1:81/"
         TITLE: "Extreme Team Folding"
-        UPDATE_ENABLED: "true"
+        UPDATE_ENABLED: "false"
         UPDATE_MINUTE: "55"
     container_name: frontend_dev
     hostname: frontend_dev
@@ -41,15 +41,15 @@ services:
     hostname: backend-dev # Using a dash as Java's URI builder will fail with an underscore
     environment:
       # External URL configuration
-      LARS_URL_ROOT: "http://backend-dev:8080"
-      STATS_URL_ROOT: "http://backend-dev:8080"
+      LARS_URL_ROOT: "http://backend-dev:8080/folding"
+      STATS_URL_ROOT: "http://backend-dev:8080/folding"
       REDIRECT_URL: "http://127.0.0.1:81/"
       # NOTE: The monthly reset, result storage and LARS update will always occur at 23:57 on the last day of the month
-      ENABLE_LARS_HARDWARE_UPDATE: "true"
-      ENABLE_MONTHLY_RESULT_STORAGE: "true"
-      ENABLE_STATS_MONTHLY_RESET: "true"
+      ENABLE_LARS_HARDWARE_UPDATE: "false"
+      ENABLE_MONTHLY_RESULT_STORAGE: "false"
+      ENABLE_STATS_MONTHLY_RESET: "false"
       # Scheduled stats parsing configuration
-      ENABLE_STATS_SCHEDULED_PARSING: "true"
+      ENABLE_STATS_SCHEDULED_PARSING: "false"
       STATS_PARSING_SCHEDULE_HOUR: "*"
       STATS_PARSING_SCHEDULE_MINUTE: "55"
       STATS_PARSING_SCHEDULE_SECOND: "0"

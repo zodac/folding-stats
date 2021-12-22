@@ -20,32 +20,20 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 
-package me.zodac.folding.rest;
+package me.zodac.folding.rest.exception;
 
-import me.zodac.folding.api.util.EnvironmentVariableUtils;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
- * Basic Controller which is called for unhandled errors
+ * Marker {@link Exception} thrown when an {@link HttpStatus#FORBIDDEN} request has been made. Will automatically tell the
+ * {@link org.springframework.boot.autoconfigure.SpringBootApplication} to return a <b>403_FORBIDDEN</b> response, without requiring explicit handling
+ * in any {@link org.springframework.web.bind.annotation.RestController}.
  */
-@RestController
-@RequestMapping("/error")
-public class AppErrorController {
+@ResponseStatus(HttpStatus.FORBIDDEN)
+public class ForbiddenException extends RuntimeException {
 
-    private static final String REDIRECT_URL = EnvironmentVariableUtils.getOrDefault("REDIRECT_URL", "https://etf.axihub.ca/");
-
-    @GetMapping
-    public ResponseEntity<?> method() {
-        return ResponseEntity
-            .status(HttpStatus.SEE_OTHER)
-            .header("Location", REDIRECT_URL)
-            .build();
-    }
+    private static final long serialVersionUID = -7931149448794408010L;
 }
