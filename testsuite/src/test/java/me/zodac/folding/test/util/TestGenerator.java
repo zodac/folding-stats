@@ -145,21 +145,6 @@ public final class TestGenerator {
     }
 
     /**
-     * Generates an invalid {@link TeamRequest}.
-     *
-     * <p>
-     * Uses an invalid URL as the forum link, so validation will fail.
-     *
-     * @return the generated {@link TeamRequest}
-     */
-    public static TeamRequest generateInvalidTeam() {
-        return TeamRequest.builder()
-            .teamName(nextTeamName())
-            .forumLink("invalidLink")
-            .build();
-    }
-
-    /**
      * Generates a {@link UserRequest}.
      *
      * @return the generated {@link UserRequest}
@@ -201,29 +186,6 @@ public final class TestGenerator {
             .hardwareId(hardwareId)
             .teamId(teamId)
             .userIsCaptain(true)
-            .build();
-    }
-
-    /**
-     * Generates a {@link UserRequest} with a specified {@link Category}.
-     *
-     * @param category the {@link Category} of the {@link UserRequest}
-     * @return the generated {@link UserRequest}
-     * @throws FoldingRestException thrown if an error occurs executing {@link HardwareUtils#create(HardwareRequest)}
-     *                              or {@link TeamUtils#create(TeamRequest)}
-     */
-    public static UserRequest generateUserWithCategory(final Category category) throws FoldingRestException {
-        final int hardwareId = HardwareUtils.create(generateHardwareFromCategory(category)).getId();
-        final int teamId = TeamUtils.create(generateTeam()).getId();
-        final String userName = nextUserName();
-
-        return UserRequest.builder()
-            .foldingUserName(userName)
-            .displayName(userName)
-            .passkey("DummyPasskey12345678901234567890")
-            .category(category.toString())
-            .hardwareId(hardwareId)
-            .teamId(teamId)
             .build();
     }
 

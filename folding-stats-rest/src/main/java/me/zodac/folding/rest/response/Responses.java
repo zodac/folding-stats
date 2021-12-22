@@ -125,6 +125,7 @@ public final class Responses {
         return ResponseEntity
             .ok()
             .cacheControl(CacheControl.maxAge(cachePeriodInSeconds, TimeUnit.SECONDS))
+            .eTag(String.valueOf(entity.hashCode()))
             .body(GSON.toJson(entity));
     }
 
@@ -144,6 +145,7 @@ public final class Responses {
             .ok()
             .header("X-Total-Count", String.valueOf(entities.size()))
             .cacheControl(CacheControl.maxAge(cachePeriodInSeconds, TimeUnit.SECONDS))
+            .eTag(String.valueOf(entities.stream().mapToInt(Object::hashCode).sum()))
             .body(GSON.toJson(entities));
     }
 

@@ -37,6 +37,7 @@ import static me.zodac.folding.test.util.TestGenerator.generateTeam;
 import static me.zodac.folding.test.util.TestGenerator.nextTeamName;
 import static me.zodac.folding.test.util.rest.request.TeamUtils.TEAM_REQUEST_SENDER;
 import static me.zodac.folding.test.util.rest.request.TeamUtils.create;
+import static me.zodac.folding.test.util.rest.response.HttpResponseHeaderUtils.getEntityTag;
 import static me.zodac.folding.test.util.rest.response.HttpResponseHeaderUtils.getTotalCount;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -411,48 +412,48 @@ class TeamTest {
             .isEqualTo(HttpURLConnection.HTTP_CONFLICT);
     }
 
-//    @Test
-//    void whenGettingTeamById_givenRequestUsesPreviousEntityTag_andTeamHasNotChanged_thenResponseHas304Status_andNoBody() throws FoldingRestException {
-//        final int teamId = create(generateTeam()).getId();
-//
-//        final HttpResponse<String> response = TEAM_REQUEST_SENDER.get(teamId);
-//        assertThat(response.statusCode())
-//            .as("Expected first request to have a 200_OK HTTP response")
-//            .isEqualTo(HttpURLConnection.HTTP_OK);
-//
-//        final String eTag = getEntityTag(response);
-//
-//        final HttpResponse<String> cachedResponse = TEAM_REQUEST_SENDER.get(teamId, eTag);
-//        assertThat(cachedResponse.statusCode())
-//            .as("Expected second request to have a 304_NOT_MODIFIED HTTP response")
-//            .isEqualTo(HttpURLConnection.HTTP_NOT_MODIFIED);
-//
-//        assertThat(TeamResponseParser.get(cachedResponse))
-//            .as("Expected cached response to have the same content as the non-cached response")
-//            .isNull();
-//    }
-//
-//    @Test
-//    void whenGettingAllTeams_givenRequestUsesPreviousEntityTag_andTeamsHaveNotChanged_thenResponseHas304Status_andNoBody()
-//        throws FoldingRestException {
-//        create(generateTeam());
-//
-//        final HttpResponse<String> response = TEAM_REQUEST_SENDER.getAll();
-//        assertThat(response.statusCode())
-//            .as("Expected first GET request to have a 200_OK HTTP response")
-//            .isEqualTo(HttpURLConnection.HTTP_OK);
-//
-//        final String eTag = getEntityTag(response);
-//
-//        final HttpResponse<String> cachedResponse = TEAM_REQUEST_SENDER.getAll(eTag);
-//        assertThat(cachedResponse.statusCode())
-//            .as("Expected second request to have a 304_NOT_MODIFIED HTTP response")
-//            .isEqualTo(HttpURLConnection.HTTP_NOT_MODIFIED);
-//
-//        assertThat(TeamResponseParser.getAll(cachedResponse))
-//            .as("Expected cached response to have the same content as the non-cached response")
-//            .isNull();
-//    }
+    @Test
+    void whenGettingTeamById_givenRequestUsesPreviousEntityTag_andTeamHasNotChanged_thenResponseHas304Status_andNoBody() throws FoldingRestException {
+        final int teamId = create(generateTeam()).getId();
+
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.get(teamId);
+        assertThat(response.statusCode())
+            .as("Expected first request to have a 200_OK HTTP response")
+            .isEqualTo(HttpURLConnection.HTTP_OK);
+
+        final String eTag = getEntityTag(response);
+
+        final HttpResponse<String> cachedResponse = TEAM_REQUEST_SENDER.get(teamId, eTag);
+        assertThat(cachedResponse.statusCode())
+            .as("Expected second request to have a 304_NOT_MODIFIED HTTP response")
+            .isEqualTo(HttpURLConnection.HTTP_NOT_MODIFIED);
+
+        assertThat(TeamResponseParser.get(cachedResponse))
+            .as("Expected cached response to have the same content as the non-cached response")
+            .isNull();
+    }
+
+    @Test
+    void whenGettingAllTeams_givenRequestUsesPreviousEntityTag_andTeamsHaveNotChanged_thenResponseHas304Status_andNoBody()
+        throws FoldingRestException {
+        create(generateTeam());
+
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.getAll();
+        assertThat(response.statusCode())
+            .as("Expected first GET request to have a 200_OK HTTP response")
+            .isEqualTo(HttpURLConnection.HTTP_OK);
+
+        final String eTag = getEntityTag(response);
+
+        final HttpResponse<String> cachedResponse = TEAM_REQUEST_SENDER.getAll(eTag);
+        assertThat(cachedResponse.statusCode())
+            .as("Expected second request to have a 304_NOT_MODIFIED HTTP response")
+            .isEqualTo(HttpURLConnection.HTTP_NOT_MODIFIED);
+
+        assertThat(TeamResponseParser.getAll(cachedResponse))
+            .as("Expected cached response to have the same content as the non-cached response")
+            .isNull();
+    }
 
     @Test
     void whenCreatingTeam_givenNoAuthentication_thenRequestFails_andResponseHas401Status() throws FoldingRestException {
