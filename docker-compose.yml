@@ -2,31 +2,29 @@ version: '2.3'
 
 services:
 
-  #  frontend:
-  #    build:
-  #      context: .
-  #      dockerfile: docker/apache/Dockerfile
-  #      args:
-  #        FIRST_DAY_OF_MONTH: "${FIRST_DAY_OF_MONTH}"
-  #        FORUM_LINK: "${FORUM_LINK}"
-  #        REST_ENDPOINT_URL: "${REST_ENDPOINT_URL}"
-  #        ROOT_URL: "${ROOT_URL}"
-  #        TITLE: "${TITLE}"
-  #        UPDATE_ENABLED: "${STATS_ENABLED}"
-  #        UPDATE_MINUTE: "${UPDATE_MINUTE}"
-  #    container_name: frontend
-  #    hostname: frontend
-  #    depends_on:
-  #      - backend
-  #    links:
-  #      - backend
-  #    networks:
-  #      - production
-  #    ports:
-  #      - "${HTTPS_FRONTEND_PORT}:${HTTPS_FRONTEND_PORT}"
-  #    restart: unless-stopped
-  #    volumes:
-  #      - "${SSL_CERT_DIRECTORY}:/usr/local/apache2/conf/certs"
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/apache/Dockerfile
+      args:
+        FORUM_LINK: "${FORUM_LINK}"
+        REST_ENDPOINT_URL: "${REST_ENDPOINT_URL}"
+        ROOT_URL: "${ROOT_URL}"
+        TITLE: "${TITLE}"
+        UPDATE_ENABLED: "${STATS_ENABLED}"
+    container_name: frontend
+    hostname: frontend
+    depends_on:
+      - backend
+    links:
+      - backend
+    networks:
+      - production
+    ports:
+      - "${HTTPS_FRONTEND_PORT}:${HTTPS_FRONTEND_PORT}"
+    restart: unless-stopped
+    volumes:
+      - "${SSL_CERT_DIRECTORY}:/usr/local/apache2/conf/certs"
 
   backend:
     build:
@@ -53,13 +51,6 @@ services:
       # Scheduled stats parsing configuration
       # This value should match the value of 'UPDATE_ENABLED' in the 'frontend' container
       ENABLE_STATS_SCHEDULED_PARSING: "${STATS_ENABLED}"
-      STATS_PARSING_SCHEDULE_HOUR: "${UPDATE_HOUR}"
-      # This value should match the value of 'UPDATE_MINUTE' in the 'frontend' container
-      STATS_PARSING_SCHEDULE_MINUTE: "${UPDATE_MINUTE}"
-      STATS_PARSING_SCHEDULE_SECOND: "${UPDATE_SECOND}"
-      # This value should match the value of 'FIRST_DAY_OF_MONTH' in the 'frontend' container
-      STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH: "${FIRST_DAY_OF_MONTH}"
-      STATS_PARSING_SCHEDULE_LAST_DAY_OF_MONTH: "${LAST_DAY_OF_MONTH}"
       # Category configuration
       USERS_IN_AMD_GPU: "${USERS_IN_AMD_GPU}"
       USERS_IN_NVIDIA_GPU: "${USERS_IN_NVIDIA_GPU}"

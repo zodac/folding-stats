@@ -1,8 +1,8 @@
 const NUMBER_OF_UPDATES_PROPERTY_NAME = "numberOfUpdates"
 
-const FIRST_DAY_OF_MONTH = %FIRST_DAY_OF_MONTH%
-const UPDATE_MINUTE = %UPDATE_MINUTE%
 const UPDATE_ENABLED = %UPDATE_ENABLED%
+const FIRST_DAY_OF_MONTH = 3
+const UPDATE_MINUTE = 55
 
 function startTimer() {
     calculateNumberOfUpdates()

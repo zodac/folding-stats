@@ -7,13 +7,11 @@ services:
       context: .
       dockerfile: docker/apache/Dockerfile
       args:
-        FIRST_DAY_OF_MONTH: "3"
         FORUM_LINK: "https://forums.extremehw.net/forum/125-extreme-team-folding"
         REST_ENDPOINT_URL: "http://127.0.0.1:8081/folding"
         ROOT_URL: "http://127.0.0.1:81/"
         TITLE: "Extreme Team Folding"
         UPDATE_ENABLED: "false"
-        UPDATE_MINUTE: "55"
     container_name: frontend_dev
     hostname: frontend_dev
     depends_on:
@@ -51,9 +49,6 @@ services:
       ENABLE_STATS_MONTHLY_RESET: "false"
       # Scheduled stats parsing configuration
       ENABLE_STATS_SCHEDULED_PARSING: "false"
-      STATS_PARSING_SCHEDULE_HOUR: "*"
-      STATS_PARSING_SCHEDULE_MINUTE: "55"
-      STATS_PARSING_SCHEDULE_SECOND: "0"
       # Category configuration
       USERS_IN_AMD_GPU: "1"
       USERS_IN_NVIDIA_GPU: "1"
