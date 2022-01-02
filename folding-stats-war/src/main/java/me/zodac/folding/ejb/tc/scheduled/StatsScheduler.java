@@ -36,8 +36,6 @@ import javax.ejb.Startup;
 import javax.ejb.Timeout;
 import javax.ejb.Timer;
 import javax.ejb.TimerService;
-import me.zodac.folding.state.ParsingStateManager;
-import me.zodac.folding.state.SystemStateManager;
 import me.zodac.folding.api.state.ParsingState;
 import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.tc.Team;
@@ -46,6 +44,8 @@ import me.zodac.folding.api.util.EnvironmentVariableUtils;
 import me.zodac.folding.api.util.ProcessingType;
 import me.zodac.folding.ejb.api.FoldingStatsCore;
 import me.zodac.folding.ejb.tc.user.UserStatsParser;
+import me.zodac.folding.state.ParsingStateManager;
+import me.zodac.folding.state.SystemStateManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -139,7 +139,6 @@ public class StatsScheduler {
      */
     public void manualTeamCompetitionStatsParsing(final ProcessingType processingType) {
         LOGGER.debug("Manual stats parsing execution");
-        ParsingStateManager.next(ParsingState.ENABLED_TEAM_COMPETITION);
         SystemStateManager.next(SystemState.UPDATING_STATS);
         parseTeamCompetitionStats(processingType);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
