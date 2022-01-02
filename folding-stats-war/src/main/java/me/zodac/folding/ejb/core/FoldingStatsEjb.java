@@ -37,6 +37,7 @@ import javax.ejb.Singleton;
 import javax.ejb.Stateless;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.exception.ExternalConnectionException;
+import me.zodac.folding.api.state.ParsingState;
 import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
 import me.zodac.folding.api.tc.Hardware;
@@ -59,6 +60,7 @@ import me.zodac.folding.rest.api.tc.RetiredUserSummary;
 import me.zodac.folding.rest.api.tc.TeamSummary;
 import me.zodac.folding.rest.api.tc.UserSummary;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
+import me.zodac.folding.state.ParsingStateManager;
 import me.zodac.folding.state.SystemStateManager;
 import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.apache.logging.log4j.LogManager;
@@ -77,7 +79,7 @@ public class FoldingStatsEjb implements FoldingStatsCore {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final FoldingStatsRetriever FOLDING_STATS_RETRIEVER = HttpFoldingStatsRetriever.create();
-    
+
     @EJB
     private StatsScheduler statsScheduler;
 
@@ -146,7 +148,9 @@ public class FoldingStatsEjb implements FoldingStatsCore {
     @Override
     public Team createTeam(final Team team) {
         final Team createdTeam = storage.createTeam(team);
-        statsScheduler.manualTeamCompetitionStatsParsing(ProcessingType.SYNCHRONOUS);
+        if (ParsingStateManager.current() != ParsingState.DISABLED) {
+            statsScheduler.manualTeamCompetitionStatsParsing(ProcessingType.SYNCHRONOUS);
+        }
         return createdTeam;
     }
 
