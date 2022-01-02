@@ -7,8 +7,12 @@ const YEAR_START = new Date().getUTCFullYear();
 var currentDate = new Date();
 var currentUtcDate = new Date(currentDate.getUTCFullYear(), currentDate.getUTCMonth(), currentDate.getUTCDate(), currentDate.getUTCHours(), currentDate.getUTCMinutes(), currentDate.getUTCSeconds());
 
-var selectedMonth = currentUtcDate.getMonth(); // Load previous month by default
-var selectedYear = currentUtcDate.getFullYear();
+// Load previous month by default
+// December is month 0, so force it to month 12
+var selectedMonth = currentUtcDate.getMonth() == 0 ? 12 : currentUtcDate.getMonth()
+
+// If month is December, choose previous year
+var selectedYear = selectedMonth == 12 ? currentUtcDate.getFullYear() - 1: currentUtcDate.getFullYear();
 var selectedMonthName = new Date(selectedYear, (selectedMonth-1), 1).toLocaleString("default", { month: "long" });
 
 function getPastResult(month, monthName, year) {
