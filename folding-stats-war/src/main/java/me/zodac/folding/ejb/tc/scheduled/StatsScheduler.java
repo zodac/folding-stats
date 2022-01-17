@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2021 zodac.me
+ * Copyright (c) 2021-2022 zodac.me
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -139,6 +139,7 @@ public class StatsScheduler {
      */
     public void manualTeamCompetitionStatsParsing(final ProcessingType processingType) {
         LOGGER.debug("Manual stats parsing execution");
+        ParsingStateManager.next(ParsingState.ENABLED_TEAM_COMPETITION);
         SystemStateManager.next(SystemState.UPDATING_STATS);
         parseTeamCompetitionStats(processingType);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
