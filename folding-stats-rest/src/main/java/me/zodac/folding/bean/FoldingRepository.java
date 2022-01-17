@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2021 zodac.me
+ * Copyright (c) 2021-2022 zodac.me
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -154,15 +154,22 @@ public class FoldingRepository {
     /**
      * Creates a {@link Team}.
      *
+     * <p>
+     * If the system is not in {@link ParsingState#DISABLED}, we will also update stats for all {@link User}s.
+     *
      * @param team the {@link Team} to create
      * @return the created {@link Team}, with ID
+     * @see ParsingStateManager
+     * @see UserStatsParser#parseTcStatsForUsersAndWait(Collection)
      */
     public Team createTeam(final Team team) {
         final Team createdTeam = storage.createTeam(team);
 
         // Manual update to add the new (empty) team to the stats
         final Collection<User> users = getAllUsersWithPasskeys();
-        userStatsParser.parseTcStatsForUsersAndWait(users);
+        if (ParsingStateManager.current() != ParsingState.DISABLED) {
+            userStatsParser.parseTcStatsForUsersAndWait(users);
+        }
         return createdTeam;
     }
 
