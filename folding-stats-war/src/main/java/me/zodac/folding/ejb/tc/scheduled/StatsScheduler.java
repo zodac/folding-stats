@@ -139,6 +139,7 @@ public class StatsScheduler {
      */
     public void manualTeamCompetitionStatsParsing(final ProcessingType processingType) {
         LOGGER.debug("Manual stats parsing execution");
+        ParsingStateManager.next(ParsingState.ENABLED_TEAM_COMPETITION);
         SystemStateManager.next(SystemState.UPDATING_STATS);
         parseTeamCompetitionStats(processingType);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
