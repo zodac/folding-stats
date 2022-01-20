@@ -32,7 +32,7 @@ A live example of this competition can be seen running for the [ExtremeHW Foldin
     - [Errors Performing Admin Functions](#errors-performing-admin-functions)
     - [Logging](#logging)
         - [Available Logs](#available-logs)
-        - [Enable DEBUG Or TRACE Logs](#changing-log-levels)
+        - [Changing Log Levels](#changing-log-levels)
         - [Extracting Logs On Container Crash](#extracting-logs-on-container-crash)
     - [Backup And Restore The Database](#backup-and-restore-of-database)
 - [Contributing](#contributing)
@@ -360,8 +360,8 @@ requires us to connect to the `backend` container:
     $ docker exec -it backend bash
     [root@backend-dev:/var/backend/logs# 
 
-We can now edit the _logback.xml_ configuration for our logging. We can change the log level printed to the server.log
-and console by updating this line:
+We can now edit the _/var/backend/logs/logback.xml_ configuration for our logging. We can change the log level printed
+to the server.log and console by updating this line:
 
     <root level="INFO">
 
