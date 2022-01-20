@@ -32,7 +32,7 @@ A live example of this competition can be seen running for the [ExtremeHW Foldin
     - [Errors Performing Admin Functions](#errors-performing-admin-functions)
     - [Logging](#logging)
         - [Available Logs](#available-logs)
-        - [Enable DEBUG Or TRACE Logs](#enabling-debug-or-trace-logs)
+        - [Enable DEBUG Or TRACE Logs](#changing-log-levels)
         - [Extracting Logs On Container Crash](#extracting-logs-on-container-crash)
     - [Backup And Restore The Database](#backup-and-restore-of-database)
 - [Contributing](#contributing)
@@ -346,51 +346,38 @@ The system currently has multiple logs available:
 
 These can be accessed and viewed by:
 
-- Connecting to the docker container and checking directory `/opt/jboss/wildfly/standalone/log`
-- Attaching to the `backend_logs` volume (as described
-  in [Extracting Logs On Container Crash](#extracting-logs-on-container-crash))
-- Logging in through the Wildfly Admin UI
+- Connecting to the `backend` docker container and checking directory `/var/backend/logs`
+- Attaching to the `backend_logs` volume, as described
+  in [Extracting Logs On Container Crash](#extracting-logs-on-container-crash)
 
-The logs are rotated each day, so you will see the following on the file system (with the non-timestamped log files
-referring to the current day's logs):
+The logs are rotated each day, where each previous day's logs will be zipped and saved in the same directory.
 
-    [root@backend log]# ls -1
-    audit.log
-    audit.log.2021-11-08
-    server.log
-    server.log.2021-11-08
+### Changing Log Levels
 
-### Enabling DEBUG Or TRACE Logs
+For additional information to debug issues, we can change the log level from **INFO** to **DEBUG** or **TRACE**. This
+requires us to connect to the `backend` container:
 
-This requires us to connect to the `backend` container, so we will need the container ID:
+    $ docker exec -it backend bash
+    [root@backend-dev:/var/backend/logs# 
 
-    $ docker container ls
-    CONTAINER ID        IMAGE                    COMMAND                  CREATED             STATUS                   PORTS                                            NAMES
-    c669fe278e36        folding-stats_backend    "/opt/jboss/wildfly/…"   3 minutes ago       Up 3 minutes             0.0.0.0:8080->8080/tcp, 0.0.0.0:9990->9990/tcp   backend
-    334ace4ab4be        folding-stats_database   "docker-entrypoint.s…"   3 minutes ago       Up 3 minutes (healthy)   0.0.0.0:5432->5432/tcp                           database
+We can now edit the _logback.xml_ configuration for our logging. We can change the log level printed to the server.log
+and console by updating this line:
 
-Then connect to this container:
+    <root level="INFO">
 
-    $ docker exec -it c669fe278e36 bash
-    [root@backend log]#
+to:
 
-This gives us access to the backend container, which runs on the [Wildfly AS](https://www.wildfly.org/). Now we connect
-to the console:
+    <root level="DEBUG">
 
-    [root@backend jboss]# /opt/jboss/wildfly/bin/jboss-cli.sh --connect
-    [standalone@localhost:9990 /]
+After 60 seconds, re-run the failing use-case and the log level will be changed. Remember to reset the log level back to
+**INFO** when finished to avoid the logs getting too large.
 
-Finally, we update both the logger for our code and the CONSOLE logger, otherwise the updated logs will be available in
-the log file only. Use either `DEBUG` or `TRACE` as the *value* below:
-
-    [standalone@localhost:9990 /] /subsystem=logging/logger=me.zodac.folding:write-attribute(name=level, value=DEBUG)
-    {"outcome" => "success"}
-    [standalone@localhost:9990 /] /subsystem=logging/console-handler=CONSOLE:write-attribute(name=level, value=DEBUG)
-    {"outcome" => "success"}
+Also note, that for those more familiar with logback, additional loggers may be defined here, or specific packages can
+have their log levels changed.
 
 ### Extracting Logs On Container Crash
 
-In the event of a container crash, the logs should be retained as we mount the `log` directory in a docker volume mount
+In the event of a container crash, the logs should be retained as we mount the `logs` directory in a docker volume mount
 named `backend_logs`. However, we cannot retrieve the file directly from the volume. Instead, we create a lightweight
 docker container, and attach the volume to this container. We can then copy the file from the container to the host
 system.

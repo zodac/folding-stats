@@ -80,10 +80,9 @@ import org.springframework.web.servlet.HandlerInterceptor;
  *
  * @see FoldingRepository#authenticateSystemUser(String, String)
  */
-// TODO: [zodac] Sort out the logging
 public final class SecurityInterceptor implements HandlerInterceptor {
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger AUDIT_LOGGER = LogManager.getLogger("audit");
 
     private final FoldingRepository foldingRepository;
 
@@ -108,22 +107,22 @@ public final class SecurityInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler) {
-        LOGGER.debug("Validating REST request at '{}'", request::getRequestURI);
+        AUDIT_LOGGER.debug("Validating REST request at '{}'", request::getRequestURI);
 
         try {
             if (handler instanceof HandlerMethod) {
                 validateRequest(request, (HandlerMethod) handler);
             } else if (isPreflightRequest(handler)) {
-                LOGGER.debug("Preflight request, no need to validate: {}", handler.getClass());
+                AUDIT_LOGGER.debug("Preflight request, no need to validate: {}", handler.getClass());
             } else {
-                LOGGER.warn("Unable to validate, handler is type: {}", handler.getClass());
+                AUDIT_LOGGER.warn("Unable to validate, handler is type: {}", handler.getClass());
                 throw new UnauthorizedException();
             }
         } catch (final ForbiddenException | UnauthorizedException e) {
-            LOGGER.debug("Handling exception: {}", e.getClass().getSimpleName());
+            AUDIT_LOGGER.debug("Handling exception: {}", e.getClass().getSimpleName());
             throw e;
         } catch (final Exception e) {
-            LOGGER.warn("Unexpected error validating REST request at '{}'", request.getRequestURI(), e);
+            AUDIT_LOGGER.warn("Unexpected error validating REST request at '{}'", request.getRequestURI(), e);
             throw new UnauthorizedException(e);
         }
 
@@ -137,21 +136,21 @@ public final class SecurityInterceptor implements HandlerInterceptor {
 
     private void validateRequest(final HttpServletRequest request, final HandlerMethod handlerMethod) {
         final Method method = handlerMethod.getMethod();
-        LOGGER.debug("Access requested to: #{}()", method.getName());
+        AUDIT_LOGGER.debug("Access requested to: #{}()", method.getName());
 
         if (method.isAnnotationPresent(DenyAll.class)) {
-            LOGGER.warn("All access to '#{}()' at '{}' is denied", method.getName(), request.getRequestURI());
+            AUDIT_LOGGER.warn("All access to '#{}()' at '{}' is denied", method.getName(), request.getRequestURI());
             throw new ForbiddenException();
         }
 
         if (method.isAnnotationPresent(PermitAll.class) || !method.isAnnotationPresent(RolesAllowed.class)) {
-            LOGGER.debug("All access to '#{}()' at '{}' is permitted", method.getName(), request.getRequestURI());
+            AUDIT_LOGGER.debug("All access to '#{}()' at '{}' is permitted", method.getName(), request.getRequestURI());
             return;
         }
 
         final String authorizationProperty = request.getHeader(RestHeader.AUTHORIZATION.headerName());
         if (EncodingUtils.isInvalidBasicAuthentication(authorizationProperty)) {
-            LOGGER.warn("Invalid {} value provided at '{}': '{}'", RestHeader.AUTHORIZATION.headerName(),
+            AUDIT_LOGGER.warn("Invalid {} value provided at '{}': '{}'", RestHeader.AUTHORIZATION.headerName(),
                 request.getRequestURI(), authorizationProperty);
             throw new UnauthorizedException();
         }
@@ -163,12 +162,12 @@ public final class SecurityInterceptor implements HandlerInterceptor {
         final UserAuthenticationResult userAuthenticationResult = foldingRepository.authenticateSystemUser(userName, password);
 
         if (!userAuthenticationResult.isUserExists()) {
-            LOGGER.warn("User '{}' does not exist", userName);
+            AUDIT_LOGGER.warn("User '{}' does not exist", userName);
             throw new UnauthorizedException();
         }
 
         if (!userAuthenticationResult.isPasswordMatch()) {
-            LOGGER.warn("Invalid password supplied for user '{}'", userName);
+            AUDIT_LOGGER.warn("Invalid password supplied for user '{}'", userName);
             throw new UnauthorizedException();
         }
 
@@ -181,13 +180,13 @@ public final class SecurityInterceptor implements HandlerInterceptor {
         final Set<String> permittedRoles = Arrays.stream(rolesAnnotation.value())
             .map(s -> s.toLowerCase(Locale.UK))
             .collect(toSet());
-        LOGGER.debug("Permitted roles: {}", permittedRoles);
+        AUDIT_LOGGER.debug("Permitted roles: {}", permittedRoles);
 
         if (containsNoMatches(userRoles, permittedRoles)) {
-            LOGGER.warn("User '{}' has roles {}, must be one of: {}", userName, userRoles, permittedRoles);
+            AUDIT_LOGGER.warn("User '{}' has roles {}, must be one of: {}", userName, userRoles, permittedRoles);
             throw new ForbiddenException();
         }
 
-        LOGGER.debug("Request permitted");
+        AUDIT_LOGGER.debug("Request permitted");
     }
 }

@@ -41,6 +41,7 @@
         <jooq.version>3.16.2</jooq.version>
         <jsoup.version>1.14.3</jsoup.version>
         <log4j.version>2.17.1</log4j.version>
+        <logback.version>1.2.9</logback.version>
         <lombok.version>1.18.22</lombok.version>
         <postgresql-driver.version>42.3.1</postgresql-driver.version>
         <slf4j.version>2.0.0-alpha6</slf4j.version>
@@ -148,6 +149,11 @@
                 <version>${log4j.version}</version>
             </dependency>
             <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
@@ -157,12 +163,6 @@
                 <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
                 <version>${postgresql-driver.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-simple</artifactId>
-                <version>${slf4j.version}</version>
-                <scope>runtime</scope>
             </dependency>
 
             <!-- Spring Dependencies -->
@@ -612,6 +612,7 @@
                 <module>testsuite</module>
             </modules>
             <properties>
+                <skip-integration-tests>false</skip-integration-tests>
                 <skip-linters>false</skip-linters>
                 <skip-tests>false</skip-tests>
             </properties>

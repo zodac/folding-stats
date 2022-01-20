@@ -53,7 +53,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * {@link org.springframework.stereotype.Component}s, etc.
  *
  * <p>
- * The {@code jooq} transitive dependency {@link R2dbcAutoConfiguration} must also be disabled.
+ * The {@code jooq} transitive dependency {@link R2dbcAutoConfiguration} must also be excluded.
  */
 @EnableScheduling
 @SpringBootApplication(exclude = {R2dbcAutoConfiguration.class})

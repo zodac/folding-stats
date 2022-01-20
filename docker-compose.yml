@@ -68,6 +68,8 @@ services:
     ports:
       - "${HTTPS_BACKEND_PORT}:${HTTPS_BACKEND_PORT}"
     restart: unless-stopped
+    volumes:
+      - backend_logs:/var/backend/logs
 
   database:
     build:
