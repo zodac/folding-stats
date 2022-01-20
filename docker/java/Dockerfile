@@ -40,7 +40,7 @@ RUN mv ./folding-stats-rest/target/folding-stats-rest*.jar /folding-stats.jar
 ARG JAVA_VERSION
 FROM openjdk:${JAVA_VERSION}-jdk-slim AS jdk_builder
 
-RUN apt-get update && apt-get install -y binutils vim
+RUN apt-get update && apt-get install -y binutils
 
 RUN jlink --compress=2 \
     --no-header-files \
@@ -131,18 +131,19 @@ ENV PATH "${PATH}:${JAVA_HOME}/bin"
 # Set default directory to the log directory
 WORKDIR /var/backend/logs/
 
-# Install vi/vim to allow user to connect to container and edit logback.xml
-RUN apt-get update && apt-get install -y \
-    vim && \
+# Install nano to allow user to connect to container and edit logback.xml
+RUN apt-get update && \
+    apt-get install -y \
+      nano \
+    && \
     apt-get autoremove && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Create non-root user
 RUN groupadd -g 999 backend_user && \
-    useradd -r -u 999 -g backend_user backend_user && \
-    chown -R backend_user /var/backend/logs/ && \
-    chmod 0777 /startup.sh
+    useradd --create-home --system --uid 999 --gid backend_user backend_user && \
+    chown -R backend_user /var/backend/logs/ /startup.sh
 USER backend_user
 
 ENTRYPOINT [ "/startup.sh" ]

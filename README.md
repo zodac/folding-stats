@@ -358,10 +358,14 @@ For additional information to debug issues, we can change the log level from **I
 requires us to connect to the `backend` container:
 
     $ docker exec -it backend bash
-    [root@backend-dev:/var/backend/logs# 
+    [root@backend:/var/backend/logs#
 
-We can now edit the _/var/backend/logs/logback.xml_ configuration for our logging. We can change the log level printed
-to the server.log and console by updating this line:
+We can now edit the _/var/backend/logs/logback.xml_ configuration for our logging. You can use the available `nano`
+command:
+
+    [root@backend:/var/backend/logs# nano logback.xml
+
+We can change the log level printed to the server.log and console by updating this line:
 
     <root level="INFO">
 
@@ -369,8 +373,8 @@ to:
 
     <root level="DEBUG">
 
-After 60 seconds, re-run the failing use-case and the log level will be changed. Remember to reset the log level back to
-**INFO** when finished to avoid the logs getting too large.
+Save and exit the `nano` editor. After 60 seconds, re-run the failing use-case and the log level will be changed.
+Remember to reset the log level back to **INFO** when finished to avoid the logs getting too large.
 
 Also note, that for those more familiar with logback, additional loggers may be defined here, or specific packages can
 have their log levels changed.
