@@ -1,9 +1,17 @@
 #!/usr/bin/env bash
 
+instance_type="test"
 if [[ "${DEPLOYMENT_TYPE}" == "production" ]]; then
-  echo "Starting production instance"
-  java -jar -Dspring.profiles.active=production /folding-stats.jar
+  instance_type="production"
 else
-  echo "Starting test instance"
-  java -jar -Dspring.profiles.active=test /folding-stats.jar
+  instance_type="test"
 fi
+
+echo "Starting ${instance_type} instance"
+
+# 'add-opens' is needed to allow Gson to serialise 'Collections.emptyList()'
+java \
+  --add-opens java.base/java.util=ALL-UNNAMED \
+  -jar \
+  -Dspring.profiles.active="${instance_type}" \
+  /folding-stats.jar
