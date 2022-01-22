@@ -29,11 +29,9 @@ import java.util.Collections;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import me.zodac.folding.api.RequestPojo;
 import me.zodac.folding.api.ResponsePojo;
 
@@ -42,16 +40,9 @@ import me.zodac.folding.api.ResponsePojo;
  *
  * @param <E> the type of the validated object, if it is valid
  */
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
-@EqualsAndHashCode
-@ToString(doNotUseGetters = true)
-public class ValidationResult<E extends ResponsePojo> {
-
-    private final boolean success;
-    private final E output;
-    private final ValidationFailureType validationFailureType;
-    private final ValidationFailure validationFailure;
+public record ValidationResult<E extends ResponsePojo>(boolean success, E output,
+                                                       ValidationFailureType validationFailureType,
+                                                       ValidationFailure validationFailure) {
 
     /**
      * Checks if the {@link ValidationResult} failed and does not contain a validated object.

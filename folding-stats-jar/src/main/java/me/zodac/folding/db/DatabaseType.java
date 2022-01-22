@@ -24,8 +24,6 @@
 
 package me.zodac.folding.db;
 
-import static java.util.stream.Collectors.toUnmodifiableList;
-
 import java.util.Collection;
 import java.util.stream.Stream;
 
@@ -46,7 +44,7 @@ public enum DatabaseType {
 
     private static final Collection<DatabaseType> ALL_VALUES = Stream.of(values())
         .filter(value -> value != INVALID)
-        .collect(toUnmodifiableList());
+        .toList();
 
     /**
      * Retrieve a {@link DatabaseType} based on the input {@link String}. The search is case-insensitive.

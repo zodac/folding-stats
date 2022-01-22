@@ -24,11 +24,14 @@
 
 package me.zodac.folding.api.exception;
 
+import java.io.Serial;
+
 /**
  * {@link Exception} for when errors occur when parsing LARS DB content.
  */
 public class LarsParseException extends Exception {
 
+    @Serial
     private static final long serialVersionUID = -4059920979584050749L;
 
     /**

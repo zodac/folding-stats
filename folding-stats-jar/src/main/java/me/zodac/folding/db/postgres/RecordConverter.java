@@ -248,7 +248,7 @@ final class RecordConverter {
      * a supplied password matches the hashed value in the DB.
      *
      * @param systemUsersRecord the {@link Record} to convert
-     * @return {@link UserAuthenticationResult#getUserRoles()} for a valid password, else {@link UserAuthenticationResult#invalidPassword()}
+     * @return {@link UserAuthenticationResult#userRoles()} for a valid password, else {@link UserAuthenticationResult#invalidPassword()}
      */
     static UserAuthenticationResult toSystemUserAuthentication(final Record systemUsersRecord) {
         final boolean isPasswordMatch = getPasswordMatchValue(systemUsersRecord);

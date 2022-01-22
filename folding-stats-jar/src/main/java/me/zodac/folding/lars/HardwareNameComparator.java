@@ -24,6 +24,7 @@
 
 package me.zodac.folding.lars;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Comparator;
 import me.zodac.folding.api.tc.Hardware;
@@ -33,6 +34,7 @@ import me.zodac.folding.api.tc.Hardware;
  */
 final class HardwareNameComparator implements Comparator<Hardware>, Serializable {
 
+    @Serial
     private static final long serialVersionUID = -7988652908218460899L;
 
     private HardwareNameComparator() {

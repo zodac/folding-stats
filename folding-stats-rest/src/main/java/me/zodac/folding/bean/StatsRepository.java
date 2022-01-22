@@ -24,8 +24,6 @@
 
 package me.zodac.folding.bean;
 
-import static java.util.stream.Collectors.toList;
-
 import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
@@ -339,7 +337,7 @@ public class StatsRepository {
         return storage.getAllTeams()
             .stream()
             .map(this::getTcTeamResult)
-            .collect(toList());
+            .toList();
     }
 
     private TeamSummary getTcTeamResult(final Team team) {
@@ -352,12 +350,12 @@ public class StatsRepository {
             .stream()
             .map(User::hidePasskey) // Since we are retrieving users from StorageService, the passkeys will need to be explicitly hidden
             .map(this::getTcStatsForUser)
-            .collect(toList());
+            .toList();
 
         final Collection<RetiredUserSummary> retiredUserSummaries = getAllRetiredUsersForTeam(team)
             .stream()
             .map(RetiredUserSummary::createWithDefaultRank)
-            .collect(toList());
+            .toList();
 
         final String captainDisplayName = getCaptainDisplayName(team.getTeamName(), usersOnTeam);
         return TeamSummary.createWithDefaultRank(team, captainDisplayName, activeUserSummaries, retiredUserSummaries);
@@ -367,14 +365,14 @@ public class StatsRepository {
         return storage.getAllUsers()
             .stream()
             .filter(user -> user.getTeam().getId() == team.getId())
-            .collect(toList());
+            .toList();
     }
 
     private Collection<RetiredUserTcStats> getAllRetiredUsersForTeam(final Team team) {
         return storage.getAllRetiredUsers()
             .stream()
             .filter(retiredUserTcStats -> retiredUserTcStats.getTeamId() == team.getId())
-            .collect(toList());
+            .toList();
     }
 
     private UserSummary getTcStatsForUser(final User user) {

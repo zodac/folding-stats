@@ -679,7 +679,7 @@ class HardwareValidatorTest {
         assertThat(response.getErrors())
             .containsOnly("Payload is used by an existing object");
 
-        assertThat(response.getValidationFailure().toString())
+        assertThat(response.validationFailure().toString())
             .doesNotContain("DummyPasskey12345678901234567890");
     }
 

@@ -95,7 +95,7 @@ public class LoginEndpoint {
 
             final UserAuthenticationResult userAuthenticationResult = foldingRepository.authenticateSystemUser(userName, password);
 
-            if (!userAuthenticationResult.isUserExists() || !userAuthenticationResult.isPasswordMatch()) {
+            if (!userAuthenticationResult.userExists() || !userAuthenticationResult.passwordMatch()) {
                 LOGGER.warn("Invalid user credentials supplied: {}", loginCredentials);
                 return unauthorized();
             }

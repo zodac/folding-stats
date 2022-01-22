@@ -33,7 +33,8 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Simple POJO used for REST responses where an error message is required.
+ * Simple POJO used for REST responses where an error message is required. Allows us to have a JSON payload with a name value, instead of the response
+ * body simply being a {@link String}.
  *
  * <p>
  * When using {@link com.google.gson.Gson}, the response will be in the form:
@@ -49,7 +50,6 @@ import lombok.ToString;
 @Setter
 @EqualsAndHashCode
 @ToString(doNotUseGetters = true)
-// TODO: [zodac] Needed?
 public class ErrorResponse {
 
     private String error;

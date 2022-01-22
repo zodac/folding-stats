@@ -24,7 +24,6 @@
 
 package me.zodac.folding.db.postgres;
 
-import static java.util.stream.Collectors.toList;
 import static me.zodac.folding.db.postgres.RecordConverter.MONTHLY_RESULT_GSON;
 import static me.zodac.folding.db.postgres.gen.Routines.crypt;
 import static me.zodac.folding.db.postgres.gen.tables.Hardware.HARDWARE;
@@ -150,7 +149,7 @@ public final class PostgresDbManager implements DbManager {
                 .into(HARDWARE)
                 .stream()
                 .map(RecordConverter::toHardware)
-                .collect(toList());
+                .toList();
         });
     }
 
@@ -237,7 +236,7 @@ public final class PostgresDbManager implements DbManager {
                 .into(TEAMS)
                 .stream()
                 .map(RecordConverter::toTeam)
-                .collect(toList());
+                .toList();
         });
     }
 
@@ -345,7 +344,7 @@ public final class PostgresDbManager implements DbManager {
                 .fetch()
                 .stream()
                 .map(RecordConverter::toUser)
-                .collect(toList());
+                .toList();
         });
     }
 
@@ -733,7 +732,7 @@ public final class PostgresDbManager implements DbManager {
                 .into(USER_TC_STATS_HOURLY)
                 .stream()
                 .map(RecordConverter::toHistoricStats)
-                .collect(toList());
+                .toList();
         });
     }
 
@@ -1004,7 +1003,7 @@ public final class PostgresDbManager implements DbManager {
                 .into(RETIRED_USER_STATS)
                 .stream()
                 .map(RecordConverter::toRetiredUserStats)
-                .collect(toList());
+                .toList();
         });
     }
 

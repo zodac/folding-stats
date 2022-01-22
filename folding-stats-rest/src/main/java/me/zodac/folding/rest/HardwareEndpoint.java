@@ -96,7 +96,7 @@ public class HardwareEndpoint {
         if (validationResult.isFailure()) {
             return ValidationFailureResponseMapper.map(validationResult);
         }
-        final Hardware validatedHardware = validationResult.getOutput();
+        final Hardware validatedHardware = validationResult.output();
 
         try {
             final Hardware elementWithId = foldingRepository.createHardware(validatedHardware);
@@ -147,9 +147,9 @@ public class HardwareEndpoint {
         try {
             final IdResult idResult = IntegerParser.parsePositive(hardwareId);
             if (idResult.isFailure()) {
-                return idResult.getFailureResponse();
+                return idResult.failureResponse();
             }
-            final int parsedId = idResult.getId();
+            final int parsedId = idResult.id();
 
             final Optional<Hardware> optionalElement = foldingRepository.getHardware(parsedId);
             if (optionalElement.isEmpty()) {
@@ -227,9 +227,9 @@ public class HardwareEndpoint {
         try {
             final IdResult idResult = IntegerParser.parsePositive(hardwareId);
             if (idResult.isFailure()) {
-                return idResult.getFailureResponse();
+                return idResult.failureResponse();
             }
-            final int parsedId = idResult.getId();
+            final int parsedId = idResult.id();
 
             final Optional<Hardware> optionalElement = foldingRepository.getHardware(parsedId);
             if (optionalElement.isEmpty()) {
@@ -247,7 +247,7 @@ public class HardwareEndpoint {
             if (validationResult.isFailure()) {
                 return ValidationFailureResponseMapper.map(validationResult);
             }
-            final Hardware validatedHardware = validationResult.getOutput();
+            final Hardware validatedHardware = validationResult.output();
 
             // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
             final Hardware hardwareWithId = Hardware.updateWithId(existingHardware.getId(), validatedHardware);
@@ -278,9 +278,9 @@ public class HardwareEndpoint {
         try {
             final IdResult idResult = IntegerParser.parsePositive(hardwareId);
             if (idResult.isFailure()) {
-                return idResult.getFailureResponse();
+                return idResult.failureResponse();
             }
-            final int parsedId = idResult.getId();
+            final int parsedId = idResult.id();
 
             final Optional<Hardware> optionalElement = foldingRepository.getHardware(parsedId);
             if (optionalElement.isEmpty()) {
@@ -293,7 +293,7 @@ public class HardwareEndpoint {
             if (validationResult.isFailure()) {
                 return ValidationFailureResponseMapper.map(validationResult);
             }
-            final Hardware validatedHardware = validationResult.getOutput();
+            final Hardware validatedHardware = validationResult.output();
 
             foldingRepository.deleteHardware(validatedHardware);
             SystemStateManager.next(SystemState.WRITE_EXECUTED);

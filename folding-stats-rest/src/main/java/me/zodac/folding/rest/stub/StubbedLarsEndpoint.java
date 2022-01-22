@@ -24,8 +24,6 @@
 
 package me.zodac.folding.rest.stub;
 
-import static java.util.stream.Collectors.toList;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -159,7 +157,7 @@ public class StubbedLarsEndpoint {
             .stream()
             .map(StubbedLarsEndpoint::createTrElementForHardware)
             .filter(Objects::nonNull)
-            .collect(toList());
+            .toList();
     }
 
     private static String createTrElementForHardware(final LarsGpu larsGpu) {

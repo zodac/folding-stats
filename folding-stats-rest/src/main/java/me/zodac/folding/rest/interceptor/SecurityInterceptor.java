@@ -161,17 +161,17 @@ public final class SecurityInterceptor implements HandlerInterceptor {
 
         final UserAuthenticationResult userAuthenticationResult = foldingRepository.authenticateSystemUser(userName, password);
 
-        if (!userAuthenticationResult.isUserExists()) {
+        if (!userAuthenticationResult.userExists()) {
             AUDIT_LOGGER.warn("User '{}' does not exist", userName);
             throw new UnauthorizedException();
         }
 
-        if (!userAuthenticationResult.isPasswordMatch()) {
+        if (!userAuthenticationResult.passwordMatch()) {
             AUDIT_LOGGER.warn("Invalid password supplied for user '{}'", userName);
             throw new UnauthorizedException();
         }
 
-        final Set<String> userRoles = userAuthenticationResult.getUserRoles()
+        final Set<String> userRoles = userAuthenticationResult.userRoles()
             .stream()
             .map(s -> s.toLowerCase(Locale.UK))
             .collect(toSet());

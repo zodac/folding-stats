@@ -28,8 +28,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.util.EncodingUtils;
 import me.zodac.folding.rest.api.LoginCredentials;
@@ -41,10 +39,7 @@ import me.zodac.folding.rest.util.RestUtilConstants;
 /**
  * Convenience class to send HTTP requests to the {@link Hardware} REST endpoint.
  */
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-public final class LoginRequestSender {
-
-    private final String loginUrl;
+public record LoginRequestSender(String loginUrl) {
 
     /**
      * Create an instance of {@link LoginRequestSender}.

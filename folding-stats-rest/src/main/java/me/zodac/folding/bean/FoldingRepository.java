@@ -24,8 +24,6 @@
 
 package me.zodac.folding.bean;
 
-import static java.util.stream.Collectors.toList;
-
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Collections;
@@ -139,7 +137,7 @@ public class FoldingRepository {
         return getAllUsersWithPasskeys()
             .stream()
             .filter(user -> user.getHardware().getId() == hardware.getId())
-            .collect(toList());
+            .toList();
     }
 
     /**
@@ -287,7 +285,7 @@ public class FoldingRepository {
         return getAllUsersWithPasskeys()
             .stream()
             .map(User::hidePasskey)
-            .collect(toList());
+            .toList();
     }
 
     /**
@@ -501,31 +499,11 @@ public class FoldingRepository {
             return Collections.emptyList();
         }
 
-        return getUsersOnTeamWithPasskeys(team)
-            .stream()
-            .map(User::hidePasskey)
-            .collect(toList());
-    }
-
-    /**
-     * Retrieves all {@link User}s currently referencing the provided {@link Team}.
-     *
-     * <p>
-     * The {@link User} {@code passkey} will be available in plaintext, so should only be used for internal processing.
-     *
-     * @param team the {@link Team} to check for
-     * @return a {@link Collection} of {@link User}s using the {@link Team}
-     */
-    // TODO: [zodac] Need to be public?
-    public Collection<User> getUsersOnTeamWithPasskeys(final Team team) {
-        if (team.getId() == Team.EMPTY_TEAM_ID) {
-            return Collections.emptyList();
-        }
-
         return getAllUsersWithPasskeys()
             .stream()
             .filter(user -> user.getTeam().getId() == team.getId())
-            .collect(toList());
+            .map(User::hidePasskey)
+            .toList();
     }
 
     /**
@@ -546,7 +524,7 @@ public class FoldingRepository {
     public UserAuthenticationResult authenticateSystemUser(final String userName, final String password) {
         final UserAuthenticationResult userAuthenticationResult = storage.authenticateSystemUser(userName, password);
 
-        if (userAuthenticationResult.isUserExists() && userAuthenticationResult.isPasswordMatch()) {
+        if (userAuthenticationResult.userExists() && userAuthenticationResult.passwordMatch()) {
             LOGGER.debug("System user '{}' successfully logged in", userName);
         } else {
             LOGGER.debug("Error authenticating system user '{}': {}", userName, userAuthenticationResult);

@@ -416,10 +416,10 @@ class TeamValidatorTest {
             .isTrue();
 
         assertThat(response.getErrors())
-            .as("Response" + response.getValidationFailure().toString())
+            .as("Response" + response.validationFailure().toString())
             .containsOnly("Payload is used by an existing object");
 
-        assertThat(response.getValidationFailure().toString())
+        assertThat(response.validationFailure().toString())
             .doesNotContain("DummyPasskey12345678901234567890");
     }
 

@@ -555,35 +555,35 @@ class PostgresDbManagerTest {
     @Test
     void systemUserTest() {
         final UserAuthenticationResult invalidUserName = POSTGRES_DB_MANAGER.authenticateSystemUser("invalidUserName", "ADMIN_PASSWORD");
-        assertThat(invalidUserName.isUserExists())
+        assertThat(invalidUserName.userExists())
             .isFalse();
-        assertThat(invalidUserName.isPasswordMatch())
+        assertThat(invalidUserName.passwordMatch())
             .isFalse();
-        assertThat(invalidUserName.getUserRoles())
+        assertThat(invalidUserName.userRoles())
             .isEmpty();
 
         final UserAuthenticationResult invalidPassword = POSTGRES_DB_MANAGER.authenticateSystemUser("ADMIN_USERNAME", "invalidPassword");
-        assertThat(invalidPassword.isUserExists())
+        assertThat(invalidPassword.userExists())
             .isTrue();
-        assertThat(invalidPassword.isPasswordMatch())
+        assertThat(invalidPassword.passwordMatch())
             .isFalse();
-        assertThat(invalidPassword.getUserRoles())
+        assertThat(invalidPassword.userRoles())
             .isEmpty();
 
         final UserAuthenticationResult admin = POSTGRES_DB_MANAGER.authenticateSystemUser("ADMIN_USERNAME", "ADMIN_PASSWORD");
-        assertThat(admin.isUserExists())
+        assertThat(admin.userExists())
             .isTrue();
-        assertThat(admin.isPasswordMatch())
+        assertThat(admin.passwordMatch())
             .isTrue();
-        assertThat(admin.getUserRoles())
+        assertThat(admin.userRoles())
             .contains("admin");
 
         final UserAuthenticationResult readOnly = POSTGRES_DB_MANAGER.authenticateSystemUser("READ_ONLY_USERNAME", "READ_ONLY_PASSWORD");
-        assertThat(readOnly.isUserExists())
+        assertThat(readOnly.userExists())
             .isTrue();
-        assertThat(readOnly.isPasswordMatch())
+        assertThat(readOnly.passwordMatch())
             .isTrue();
-        assertThat(readOnly.getUserRoles())
+        assertThat(readOnly.userRoles())
             .contains("read-only");
     }
 

@@ -24,8 +24,6 @@
 
 package me.zodac.folding.bean.tc;
 
-import static java.util.stream.Collectors.toList;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -66,7 +64,7 @@ public class LeaderboardStatsGenerator {
         final List<TeamSummary> teamResults = competitionSummary.getTeams()
             .stream()
             .sorted(Comparator.comparingLong(TeamSummary::getTeamMultipliedPoints).reversed())
-            .collect(toList());
+            .toList();
 
         if (teamResults.isEmpty()) {
             LOGGER.warn("No TC teams to show");
@@ -108,7 +106,7 @@ public class LeaderboardStatsGenerator {
             final List<UserSummary> userSummaries = entry.getValue()
                 .stream()
                 .sorted(Comparator.comparingLong(UserSummary::getMultipliedPoints).reversed())
-                .collect(toList());
+                .toList();
 
             final List<UserCategoryLeaderboardEntry> userSummariesInCategory = getUserLeaderboardForCategory(userSummaries);
             categoryLeaderboard.put(category, userSummariesInCategory);
@@ -151,14 +149,14 @@ public class LeaderboardStatsGenerator {
             .stream()
             .map(TeamSummary::getActiveUsers)
             .flatMap(Collection::stream)
-            .collect(toList());
+            .toList();
 
         // Iterate over each category so even if we don't have a user in that category, we will have an entry
         for (final Category category : Category.getAllValues()) {
             final List<UserSummary> usersInCategory = usersInAllTeams
                 .stream()
                 .filter(userSummary -> userSummary.getUser().getCategory() == category)
-                .collect(toList());
+                .toList();
 
             usersByCategory.put(category, usersInCategory);
         }

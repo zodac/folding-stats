@@ -24,24 +24,12 @@
 
 package me.zodac.folding.api.stats;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
 import me.zodac.folding.api.tc.User;
 
 /**
  * Simple POJO encapsulating the username and passkey for a Folding@Home user.
  */
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
-@EqualsAndHashCode
-@ToString(doNotUseGetters = true)
-public class FoldingStatsDetails {
-
-    private final String foldingUserName;
-    private final String passkey;
+public record FoldingStatsDetails(String foldingUserName, String passkey) {
 
     /**
      * Creates a {@link FoldingStatsDetails}.

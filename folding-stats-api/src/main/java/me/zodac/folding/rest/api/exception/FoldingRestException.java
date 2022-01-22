@@ -24,11 +24,14 @@
 
 package me.zodac.folding.rest.api.exception;
 
+import java.io.Serial;
+
 /**
  * Application {@link Exception} used when an error occurs sending a REST request.
  */
 public class FoldingRestException extends Exception {
 
+    @Serial
     private static final long serialVersionUID = -3883148353675655633L;
 
     /**

@@ -24,8 +24,6 @@
 
 package me.zodac.folding.rest.api.tc;
 
-import static java.util.stream.Collectors.toList;
-
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -130,7 +128,7 @@ public class TeamSummary {
             .stream()
             .map(rankedRetiredUser -> RetiredUserSummary
                 .updateWithRankInTeam(rankedRetiredUser, rankedRetiredUser.getRankInTeam() + activeUsers.size()))
-            .collect(toList());
+            .toList();
 
         // Not ranked to begin with, will be updated by the calling class
         return new TeamSummary(

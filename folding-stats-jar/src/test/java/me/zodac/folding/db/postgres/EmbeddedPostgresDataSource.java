@@ -24,8 +24,6 @@
 
 package me.zodac.folding.db.postgres;
 
-import static java.util.stream.Collectors.toList;
-
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -83,7 +81,7 @@ public final class EmbeddedPostgresDataSource {
                     .readString(initScript)
                     .split("((\\n\\r)|(\\r\\n)){2}|(\\r){2}|(\\n){2}")) // Split on blank line(s)
                 .map(String::trim)
-                .collect(toList());
+                .toList();
 
             try (final Connection connection = dataSource.getConnection();
                  final Statement statement = connection.createStatement()) {

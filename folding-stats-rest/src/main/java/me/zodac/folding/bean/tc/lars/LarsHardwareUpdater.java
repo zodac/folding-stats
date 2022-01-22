@@ -119,14 +119,15 @@ public class LarsHardwareUpdater {
 
                 foldingRepository.updateHardware(updatedHardwareWithId, existingHardware);
 
-                // TODO: [zodac] Make multiline string
-                LOGGER.info("LARS updated hardware\n"
-                        + "ID: {}\n"
-                        + "{}\n"
-                        + "Multiplier: {} -> {}\n"
-                        + "Average PPD: {} -> {}\n",
-                    existingHardware.getId(),
+                LOGGER.info("""
+                        LARS updated hardware:
+                        {}
+                        ID: {}
+                        Multiplier: {} -> {}
+                        Average PPD: {} -> {}
+                        """,
                     updatedHardware.getHardwareName(),
+                    existingHardware.getId(),
                     existingHardware.getMultiplier(),
                     updatedHardware.getMultiplier(),
                     formatWithCommas(existingHardware.getAveragePpd()),

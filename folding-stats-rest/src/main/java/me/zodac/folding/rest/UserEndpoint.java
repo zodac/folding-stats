@@ -94,7 +94,7 @@ public class UserEndpoint {
         if (validationResult.isFailure()) {
             return ValidationFailureResponseMapper.map(validationResult);
         }
-        final User validatedUser = validationResult.getOutput();
+        final User validatedUser = validationResult.output();
 
         try {
             final User elementWithId = foldingRepository.createUser(validatedUser);
@@ -145,9 +145,9 @@ public class UserEndpoint {
         try {
             final IdResult idResult = IntegerParser.parsePositive(userId);
             if (idResult.isFailure()) {
-                return idResult.getFailureResponse();
+                return idResult.failureResponse();
             }
-            final int parsedId = idResult.getId();
+            final int parsedId = idResult.id();
 
             final Optional<User> optionalElement = foldingRepository.getUserWithoutPasskey(parsedId);
             if (optionalElement.isEmpty()) {
@@ -179,9 +179,9 @@ public class UserEndpoint {
         try {
             final IdResult idResult = IntegerParser.parsePositive(userId);
             if (idResult.isFailure()) {
-                return idResult.getFailureResponse();
+                return idResult.failureResponse();
             }
-            final int parsedId = idResult.getId();
+            final int parsedId = idResult.id();
 
             final Optional<User> optionalElement = foldingRepository.getUserWithPasskey(parsedId);
             if (optionalElement.isEmpty()) {
@@ -222,9 +222,9 @@ public class UserEndpoint {
         try {
             final IdResult idResult = IntegerParser.parsePositive(userId);
             if (idResult.isFailure()) {
-                return idResult.getFailureResponse();
+                return idResult.failureResponse();
             }
-            final int parsedId = idResult.getId();
+            final int parsedId = idResult.id();
 
             final Optional<User> optionalElement = foldingRepository.getUserWithPasskey(parsedId);
             if (optionalElement.isEmpty()) {
@@ -243,7 +243,7 @@ public class UserEndpoint {
             if (validationResult.isFailure()) {
                 return ValidationFailureResponseMapper.map(validationResult);
             }
-            final User validatedUser = validationResult.getOutput();
+            final User validatedUser = validationResult.output();
 
             // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
             final User userWithId = User.updateWithId(existingUser.getId(), validatedUser);
@@ -274,9 +274,9 @@ public class UserEndpoint {
         try {
             final IdResult idResult = IntegerParser.parsePositive(userId);
             if (idResult.isFailure()) {
-                return idResult.getFailureResponse();
+                return idResult.failureResponse();
             }
-            final int parsedId = idResult.getId();
+            final int parsedId = idResult.id();
 
             final Optional<User> optionalElement = foldingRepository.getUserWithoutPasskey(parsedId);
             if (optionalElement.isEmpty()) {
@@ -289,7 +289,7 @@ public class UserEndpoint {
             if (validationResult.isFailure()) {
                 return ValidationFailureResponseMapper.map(validationResult);
             }
-            final User validatedUser = validationResult.getOutput();
+            final User validatedUser = validationResult.output();
 
             foldingRepository.deleteUser(validatedUser);
             SystemStateManager.next(SystemState.WRITE_EXECUTED);

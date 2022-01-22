@@ -112,9 +112,9 @@ public class HistoricStatsEndpoint {
 
             final IdResult idResult = IntegerParser.parsePositive(userId);
             if (idResult.isFailure()) {
-                return idResult.getFailureResponse();
+                return idResult.failureResponse();
             }
-            final int parsedId = idResult.getId();
+            final int parsedId = idResult.id();
 
             final Optional<User> user = foldingRepository.getUserWithPasskey(parsedId);
             if (user.isEmpty()) {
@@ -167,9 +167,9 @@ public class HistoricStatsEndpoint {
         try {
             final IdResult idResult = IntegerParser.parsePositive(userId);
             if (idResult.isFailure()) {
-                return idResult.getFailureResponse();
+                return idResult.failureResponse();
             }
-            final int parsedId = idResult.getId();
+            final int parsedId = idResult.id();
 
             final Optional<User> user = foldingRepository.getUserWithPasskey(parsedId);
             if (user.isEmpty()) {
@@ -215,9 +215,9 @@ public class HistoricStatsEndpoint {
         try {
             final IdResult idResult = IntegerParser.parsePositive(userId);
             if (idResult.isFailure()) {
-                return idResult.getFailureResponse();
+                return idResult.failureResponse();
             }
-            final int parsedId = idResult.getId();
+            final int parsedId = idResult.id();
 
             final Optional<User> user = foldingRepository.getUserWithPasskey(parsedId);
             if (user.isEmpty()) {
@@ -272,9 +272,9 @@ public class HistoricStatsEndpoint {
 
             final IdResult idResult = IntegerParser.parsePositive(teamId);
             if (idResult.isFailure()) {
-                return idResult.getFailureResponse();
+                return idResult.failureResponse();
             }
-            final int parsedId = idResult.getId();
+            final int parsedId = idResult.id();
 
             final Optional<Team> teamOptional = foldingRepository.getTeam(parsedId);
             if (teamOptional.isEmpty()) {
@@ -337,9 +337,9 @@ public class HistoricStatsEndpoint {
         try {
             final IdResult idResult = IntegerParser.parsePositive(teamId);
             if (idResult.isFailure()) {
-                return idResult.getFailureResponse();
+                return idResult.failureResponse();
             }
-            final int parsedId = idResult.getId();
+            final int parsedId = idResult.id();
 
             final Optional<Team> teamOptional = foldingRepository.getTeam(parsedId);
             if (teamOptional.isEmpty()) {
@@ -394,9 +394,9 @@ public class HistoricStatsEndpoint {
         try {
             final IdResult idResult = IntegerParser.parsePositive(teamId);
             if (idResult.isFailure()) {
-                return idResult.getFailureResponse();
+                return idResult.failureResponse();
             }
-            final int parsedId = idResult.getId();
+            final int parsedId = idResult.id();
 
             final Optional<Team> teamOptional = foldingRepository.getTeam(parsedId);
             if (teamOptional.isEmpty()) {

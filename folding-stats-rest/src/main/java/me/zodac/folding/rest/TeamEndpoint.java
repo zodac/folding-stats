@@ -96,7 +96,7 @@ public class TeamEndpoint {
         if (validationResult.isFailure()) {
             return ValidationFailureResponseMapper.map(validationResult);
         }
-        final Team validatedTeam = validationResult.getOutput();
+        final Team validatedTeam = validationResult.output();
 
         try {
             final Team elementWithId = foldingRepository.createTeam(validatedTeam);
@@ -147,9 +147,9 @@ public class TeamEndpoint {
         try {
             final IdResult idResult = IntegerParser.parsePositive(teamId);
             if (idResult.isFailure()) {
-                return idResult.getFailureResponse();
+                return idResult.failureResponse();
             }
-            final int parsedId = idResult.getId();
+            final int parsedId = idResult.id();
 
             final Optional<Team> optionalElement = foldingRepository.getTeam(parsedId);
             if (optionalElement.isEmpty()) {
@@ -227,9 +227,9 @@ public class TeamEndpoint {
         try {
             final IdResult idResult = IntegerParser.parsePositive(teamId);
             if (idResult.isFailure()) {
-                return idResult.getFailureResponse();
+                return idResult.failureResponse();
             }
-            final int parsedId = idResult.getId();
+            final int parsedId = idResult.id();
 
             final Optional<Team> optionalElement = foldingRepository.getTeam(parsedId);
             if (optionalElement.isEmpty()) {
@@ -247,7 +247,7 @@ public class TeamEndpoint {
             if (validationResult.isFailure()) {
                 return ValidationFailureResponseMapper.map(validationResult);
             }
-            final Team validatedHardware = validationResult.getOutput();
+            final Team validatedHardware = validationResult.output();
 
             // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
             final Team teamWithId = Team.updateWithId(existingTeam.getId(), validatedHardware);
@@ -278,9 +278,9 @@ public class TeamEndpoint {
         try {
             final IdResult idResult = IntegerParser.parsePositive(teamId);
             if (idResult.isFailure()) {
-                return idResult.getFailureResponse();
+                return idResult.failureResponse();
             }
-            final int parsedId = idResult.getId();
+            final int parsedId = idResult.id();
 
             final Optional<Team> optionalElement = foldingRepository.getTeam(parsedId);
             if (optionalElement.isEmpty()) {
@@ -293,7 +293,7 @@ public class TeamEndpoint {
             if (validationResult.isFailure()) {
                 return ValidationFailureResponseMapper.map(validationResult);
             }
-            final Team validatedTeam = validationResult.getOutput();
+            final Team validatedTeam = validationResult.output();
 
             foldingRepository.deleteTeam(validatedTeam);
             SystemStateManager.next(SystemState.WRITE_EXECUTED);

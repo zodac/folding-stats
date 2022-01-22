@@ -55,19 +55,16 @@ public final class DbManagerRetriever {
         final String deployedDatabase = EnvironmentVariableUtils.get(DATABASE_VARIABLE_NAME);
         final DatabaseType databaseType = DatabaseType.get(deployedDatabase);
 
-        switch (databaseType) {
-            case POSTGRESQL: {
-                if (!DB_MANAGER_BY_DATABASE.containsKey(DatabaseType.POSTGRESQL)) {
-                    final DbManager dbManager = PostgresDbManager.create(PostgresDataSource.create());
-                    DB_MANAGER_BY_DATABASE.put(DatabaseType.POSTGRESQL, dbManager);
-                }
-
-                return DB_MANAGER_BY_DATABASE.get(DatabaseType.POSTGRESQL);
+        if (databaseType == DatabaseType.POSTGRESQL) {
+            if (!DB_MANAGER_BY_DATABASE.containsKey(DatabaseType.POSTGRESQL)) {
+                final DbManager dbManager = PostgresDbManager.create(PostgresDataSource.create());
+                DB_MANAGER_BY_DATABASE.put(DatabaseType.POSTGRESQL, dbManager);
             }
-            case INVALID:
-            default:
-                throw new IllegalStateException(String.format("Unable to find database of type using variable '%s': %s",
-                    DATABASE_VARIABLE_NAME, deployedDatabase));
+
+            return DB_MANAGER_BY_DATABASE.get(DatabaseType.POSTGRESQL);
         }
+
+        throw new IllegalStateException(String.format("Unable to find database of type using variable '%s': %s",
+            DATABASE_VARIABLE_NAME, deployedDatabase));
     }
 }

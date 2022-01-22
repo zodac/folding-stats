@@ -24,7 +24,6 @@
 
 package me.zodac.folding.api.tc.validation;
 
-import static java.util.stream.Collectors.toList;
 import static me.zodac.folding.api.util.StringUtils.isBlank;
 
 import java.util.Collection;
@@ -92,7 +91,7 @@ public final class HardwareValidator {
                 averagePpd(hardwareRequest)
             )
             .filter(Objects::nonNull)
-            .collect(toList());
+            .toList();
 
         if (!failureMessages.isEmpty()) {
             return ValidationResult.failure(hardwareRequest, failureMessages);
@@ -146,7 +145,7 @@ public final class HardwareValidator {
                 averagePpd(hardwareRequest)
             )
             .filter(Objects::nonNull)
-            .collect(toList());
+            .toList();
 
         if (!failureMessages.isEmpty()) {
             return ValidationResult.failure(hardwareRequest, failureMessages);
@@ -196,7 +195,7 @@ public final class HardwareValidator {
             .stream()
             .filter(user -> user.getHardware().getId() == hardwareId)
             .map(User::hidePasskey)
-            .collect(toList());
+            .toList();
     }
 
     private static String hardwareName(final HardwareRequest hardwareRequest) {

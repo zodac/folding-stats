@@ -24,7 +24,6 @@
 
 package me.zodac.folding.rest;
 
-import static java.util.stream.Collectors.toList;
 import static me.zodac.folding.rest.response.Responses.notFound;
 import static me.zodac.folding.rest.response.Responses.nullRequest;
 import static me.zodac.folding.rest.response.Responses.ok;
@@ -132,9 +131,9 @@ public class TeamCompetitionStatsEndpoint {
         try {
             final IdResult idResult = IntegerParser.parsePositive(userId);
             if (idResult.isFailure()) {
-                return idResult.getFailureResponse();
+                return idResult.failureResponse();
             }
-            final int parsedId = idResult.getId();
+            final int parsedId = idResult.id();
 
             final Optional<User> optionalUser = foldingRepository.getUserWithoutPasskey(parsedId);
             if (optionalUser.isEmpty()) {
@@ -147,7 +146,7 @@ public class TeamCompetitionStatsEndpoint {
             final Collection<UserSummary> userSummaries = competitionSummary.getTeams()
                 .stream()
                 .flatMap(teamResult -> teamResult.getActiveUsers().stream())
-                .collect(toList());
+                .toList();
 
             for (final UserSummary userSummary : userSummaries) {
                 if (userSummary.getUser().getId() == user.getId()) {
@@ -186,9 +185,9 @@ public class TeamCompetitionStatsEndpoint {
         try {
             final IdResult idResult = IntegerParser.parsePositive(userId);
             if (idResult.isFailure()) {
-                return idResult.getFailureResponse();
+                return idResult.failureResponse();
             }
-            final int parsedId = idResult.getId();
+            final int parsedId = idResult.id();
 
             final Optional<User> optionalUser = foldingRepository.getUserWithPasskey(parsedId);
             if (optionalUser.isEmpty()) {

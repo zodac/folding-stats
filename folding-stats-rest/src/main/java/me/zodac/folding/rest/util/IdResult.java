@@ -24,27 +24,14 @@
 
 package me.zodac.folding.rest.util;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
 import org.springframework.http.ResponseEntity;
 
 /**
  * POJO defining the result of {@link IntegerParser#parsePositive(String)}.
  */
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
-@EqualsAndHashCode
-@ToString(doNotUseGetters = true)
-public class IdResult {
+public record IdResult(boolean successful, int id, ResponseEntity<?> failureResponse) {
 
     private static final int INVALID_ID = -1;
-
-    private final boolean successful;
-    private final int id;
-    private final ResponseEntity<?> failureResponse;
 
     /**
      * Creates an {@link IdResult} for a successfully parsed {@link Integer} ID.
