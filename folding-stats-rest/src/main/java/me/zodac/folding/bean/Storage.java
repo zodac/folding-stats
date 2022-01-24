@@ -24,13 +24,17 @@
 
 package me.zodac.folding.bean;
 
+import java.io.IOException;
 import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.db.DbManager;
+import me.zodac.folding.api.exception.DatabaseConnectionException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
@@ -66,7 +70,6 @@ import org.springframework.stereotype.Component;
 public class Storage {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final DbManager DB_MANAGER = DbManagerRetriever.get();
 
     // POJO caches
     private final HardwareCache hardwareCache = HardwareCache.getInstance();
@@ -94,10 +97,13 @@ public class Storage {
      */
     @Cached(HardwareCache.class)
     public Hardware createHardware(final Hardware hardware) {
-        final Hardware hardwareWithId = DB_MANAGER.createHardware(hardware);
-        hardwareCache.add(hardwareWithId.getId(), hardwareWithId);
-        return hardwareWithId;
+        return dbManagerFunction(dbManager -> {
+            final Hardware hardwareWithId = dbManager.createHardware(hardware);
+            hardwareCache.add(hardwareWithId.getId(), hardwareWithId);
+            return hardwareWithId;
+        });
     }
+
 
     /**
      * Retrieves a {@link Hardware}.
@@ -118,11 +124,12 @@ public class Storage {
         }
 
         LOGGER.trace("Cache miss! Get hardware");
-        final Optional<Hardware> fromDb = DB_MANAGER.getHardware(hardwareId);
-        fromDb.ifPresent(hardware -> hardwareCache.add(hardwareId, hardware));
-        return fromDb;
+        return dbManagerFunction(dbManager -> {
+            final Optional<Hardware> fromDb = dbManager.getHardware(hardwareId);
+            fromDb.ifPresent(hardware -> hardwareCache.add(hardwareId, hardware));
+            return fromDb;
+        });
     }
-
 
     /**
      * Retrieves all {@link Hardware}.
@@ -142,13 +149,15 @@ public class Storage {
         }
 
         LOGGER.trace("Cache miss! Get all hardware");
-        final Collection<Hardware> fromDb = DB_MANAGER.getAllHardware();
+        return dbManagerFunction(dbManager -> {
+            final Collection<Hardware> fromDb = dbManager.getAllHardware();
 
-        for (final Hardware hardware : fromDb) {
-            hardwareCache.add(hardware.getId(), hardware);
-        }
+            for (final Hardware hardware : fromDb) {
+                hardwareCache.add(hardware.getId(), hardware);
+            }
 
-        return fromDb;
+            return fromDb;
+        });
     }
 
     /**
@@ -166,16 +175,18 @@ public class Storage {
      */
     @Cached({HardwareCache.class, UserCache.class})
     public Hardware updateHardware(final Hardware hardwareToUpdate) {
-        final Hardware updatedHardware = DB_MANAGER.updateHardware(hardwareToUpdate);
-        hardwareCache.add(updatedHardware.getId(), updatedHardware);
+        return dbManagerFunction(dbManager -> {
+            final Hardware updatedHardware = dbManager.updateHardware(hardwareToUpdate);
+            hardwareCache.add(updatedHardware.getId(), updatedHardware);
 
-        getAllUsers()
-            .stream()
-            .filter(user -> user.getHardware().getId() == updatedHardware.getId())
-            .map(user -> User.updateHardware(user, updatedHardware))
-            .forEach(updatedUser -> userCache.add(updatedUser.getId(), updatedUser));
+            getAllUsers()
+                .stream()
+                .filter(user -> user.getHardware().getId() == updatedHardware.getId())
+                .map(user -> User.updateHardware(user, updatedHardware))
+                .forEach(updatedUser -> userCache.add(updatedUser.getId(), updatedUser));
 
-        return updatedHardware;
+            return updatedHardware;
+        });
     }
 
     /**
@@ -189,8 +200,10 @@ public class Storage {
      */
     @Cached(HardwareCache.class)
     public void deleteHardware(final int hardwareId) {
-        DB_MANAGER.deleteHardware(hardwareId);
-        hardwareCache.remove(hardwareId);
+        dbManagerConsumer(dbManager -> {
+            dbManager.deleteHardware(hardwareId);
+            hardwareCache.remove(hardwareId);
+        });
     }
 
     /**
@@ -205,9 +218,11 @@ public class Storage {
      */
     @Cached(TeamCache.class)
     public Team createTeam(final Team team) {
-        final Team teamWithId = DB_MANAGER.createTeam(team);
-        teamCache.add(teamWithId.getId(), teamWithId);
-        return teamWithId;
+        return dbManagerFunction(dbManager -> {
+            final Team teamWithId = dbManager.createTeam(team);
+            teamCache.add(teamWithId.getId(), teamWithId);
+            return teamWithId;
+        });
     }
 
     /**
@@ -229,9 +244,11 @@ public class Storage {
         }
 
         LOGGER.trace("Cache miss! Get team");
-        final Optional<Team> fromDb = DB_MANAGER.getTeam(teamId);
-        fromDb.ifPresent(team -> teamCache.add(teamId, team));
-        return fromDb;
+        return dbManagerFunction(dbManager -> {
+            final Optional<Team> fromDb = dbManager.getTeam(teamId);
+            fromDb.ifPresent(team -> teamCache.add(teamId, team));
+            return fromDb;
+        });
     }
 
     /**
@@ -252,13 +269,15 @@ public class Storage {
         }
 
         LOGGER.trace("Cache miss! Get all teams");
-        final Collection<Team> fromDb = DB_MANAGER.getAllTeams();
+        return dbManagerFunction(dbManager -> {
+            final Collection<Team> fromDb = dbManager.getAllTeams();
 
-        for (final Team team : fromDb) {
-            teamCache.add(team.getId(), team);
-        }
+            for (final Team team : fromDb) {
+                teamCache.add(team.getId(), team);
+            }
 
-        return fromDb;
+            return fromDb;
+        });
     }
 
     /**
@@ -276,16 +295,18 @@ public class Storage {
      */
     @Cached({TeamCache.class, UserCache.class})
     public Team updateTeam(final Team teamToUpdate) {
-        final Team updatedTeam = DB_MANAGER.updateTeam(teamToUpdate);
-        teamCache.add(updatedTeam.getId(), updatedTeam);
+        return dbManagerFunction(dbManager -> {
+            final Team updatedTeam = dbManager.updateTeam(teamToUpdate);
+            teamCache.add(updatedTeam.getId(), updatedTeam);
 
-        getAllUsers()
-            .stream()
-            .filter(user -> user.getTeam().getId() == updatedTeam.getId())
-            .map(user -> User.updateTeam(user, updatedTeam))
-            .forEach(updatedUser -> userCache.add(updatedUser.getId(), updatedUser));
+            getAllUsers()
+                .stream()
+                .filter(user -> user.getTeam().getId() == updatedTeam.getId())
+                .map(user -> User.updateTeam(user, updatedTeam))
+                .forEach(updatedUser -> userCache.add(updatedUser.getId(), updatedUser));
 
-        return updatedTeam;
+            return updatedTeam;
+        });
     }
 
     /**
@@ -299,8 +320,10 @@ public class Storage {
      */
     @Cached(TeamCache.class)
     public void deleteTeam(final int teamId) {
-        DB_MANAGER.deleteTeam(teamId);
-        teamCache.remove(teamId);
+        dbManagerConsumer(dbManager -> {
+            dbManager.deleteTeam(teamId);
+            teamCache.remove(teamId);
+        });
     }
 
     /**
@@ -315,10 +338,13 @@ public class Storage {
      */
     @Cached(UserCache.class)
     public User createUser(final User user) {
-        final User userWithId = DB_MANAGER.createUser(user);
-        userCache.add(userWithId.getId(), userWithId);
-        return userWithId;
+        return dbManagerFunction(dbManager -> {
+            final User userWithId = dbManager.createUser(user);
+            userCache.add(userWithId.getId(), userWithId);
+            return userWithId;
+        });
     }
+
 
     /**
      * Retrieves a {@link User}.
@@ -339,9 +365,11 @@ public class Storage {
         }
 
         LOGGER.trace("Cache miss! Get user");
-        final Optional<User> fromDb = DB_MANAGER.getUser(userId);
-        fromDb.ifPresent(user -> userCache.add(userId, user));
-        return fromDb;
+        return dbManagerFunction(dbManager -> {
+            final Optional<User> fromDb = dbManager.getUser(userId);
+            fromDb.ifPresent(user -> userCache.add(userId, user));
+            return fromDb;
+        });
     }
 
     /**
@@ -362,14 +390,17 @@ public class Storage {
         }
 
         LOGGER.trace("Cache miss! Get all users");
-        final Collection<User> fromDb = DB_MANAGER.getAllUsers();
+        return dbManagerFunction(dbManager -> {
+            final Collection<User> fromDb = dbManager.getAllUsers();
 
-        for (final User user : fromDb) {
-            userCache.add(user.getId(), user);
-        }
+            for (final User user : fromDb) {
+                userCache.add(user.getId(), user);
+            }
 
-        return fromDb;
+            return fromDb;
+        });
     }
+
 
     /**
      * Updates a {@link User}. Expects the {@link User} to have a valid ID.
@@ -383,9 +414,11 @@ public class Storage {
      */
     @Cached(UserCache.class)
     public User updateUser(final User userToUpdate) {
-        final User updatedUser = DB_MANAGER.updateUser(userToUpdate);
-        userCache.add(updatedUser.getId(), updatedUser);
-        return updatedUser;
+        return dbManagerFunction(dbManager -> {
+            final User updatedUser = dbManager.updateUser(userToUpdate);
+            userCache.add(updatedUser.getId(), updatedUser);
+            return updatedUser;
+        });
     }
 
     /**
@@ -408,14 +441,16 @@ public class Storage {
      */
     @Cached({UserCache.class, InitialStatsCache.class, OffsetTcStatsCache.class, TcStatsCache.class, TotalStatsCache.class})
     public void deleteUser(final int userId) {
-        DB_MANAGER.deleteUser(userId);
-        userCache.remove(userId);
+        dbManagerConsumer(dbManager -> {
+            dbManager.deleteUser(userId);
+            userCache.remove(userId);
 
-        // Remove the user entry from all stats caches
-        offsetTcStatsCache.remove(userId);
-        totalStatsCache.remove(userId);
-        initialStatsCache.remove(userId);
-        tcStatsCache.remove(userId);
+            // Remove the user entry from all stats caches
+            offsetTcStatsCache.remove(userId);
+            totalStatsCache.remove(userId);
+            initialStatsCache.remove(userId);
+            tcStatsCache.remove(userId);
+        });
     }
 
     /**
@@ -429,7 +464,7 @@ public class Storage {
      */
     @NotCached
     public MonthlyResult createMonthlyResult(final MonthlyResult monthlyResult) {
-        return DB_MANAGER.createMonthlyResult(monthlyResult);
+        return dbManagerFunction(dbManager -> dbManager.createMonthlyResult(monthlyResult));
     }
 
     /**
@@ -444,7 +479,7 @@ public class Storage {
      */
     @NotCached
     public Optional<MonthlyResult> getMonthlyResult(final Month month, final Year year) {
-        return DB_MANAGER.getMonthlyResult(month, year);
+        return dbManagerFunction(dbManager -> dbManager.getMonthlyResult(month, year));
     }
 
     /**
@@ -458,9 +493,11 @@ public class Storage {
      */
     @Cached(RetiredTcStatsCache.class)
     public RetiredUserTcStats createRetiredUserStats(final RetiredUserTcStats retiredUserTcStats) {
-        final RetiredUserTcStats createdRetiredUserTcStats = DB_MANAGER.createRetiredUserStats(retiredUserTcStats);
-        retiredTcStatsCache.add(createdRetiredUserTcStats.getRetiredUserId(), createdRetiredUserTcStats);
-        return createdRetiredUserTcStats;
+        return dbManagerFunction(dbManager -> {
+            final RetiredUserTcStats createdRetiredUserTcStats = dbManager.createRetiredUserStats(retiredUserTcStats);
+            retiredTcStatsCache.add(createdRetiredUserTcStats.getRetiredUserId(), createdRetiredUserTcStats);
+            return createdRetiredUserTcStats;
+        });
     }
 
     /**
@@ -481,13 +518,15 @@ public class Storage {
         }
 
         LOGGER.trace("Cache miss! Get all retired users");
-        final Collection<RetiredUserTcStats> fromDb = DB_MANAGER.getAllRetiredUserStats();
+        return dbManagerFunction(dbManager -> {
+            final Collection<RetiredUserTcStats> fromDb = dbManager.getAllRetiredUserStats();
 
-        for (final RetiredUserTcStats retiredUserTcStats : fromDb) {
-            retiredTcStatsCache.add(retiredUserTcStats.getRetiredUserId(), retiredUserTcStats);
-        }
+            for (final RetiredUserTcStats retiredUserTcStats : fromDb) {
+                retiredTcStatsCache.add(retiredUserTcStats.getRetiredUserId(), retiredUserTcStats);
+            }
 
-        return fromDb;
+            return fromDb;
+        });
     }
 
     /**
@@ -498,8 +537,10 @@ public class Storage {
      */
     @Cached(RetiredTcStatsCache.class)
     public void deleteAllRetiredUserTcStats() {
-        DB_MANAGER.deleteAllRetiredUserStats();
-        retiredTcStatsCache.removeAll();
+        dbManagerConsumer(dbManager -> {
+            dbManager.deleteAllRetiredUserStats();
+            retiredTcStatsCache.removeAll();
+        });
     }
 
     /**
@@ -511,7 +552,7 @@ public class Storage {
      */
     @NotCached
     public UserAuthenticationResult authenticateSystemUser(final String userName, final String password) {
-        return DB_MANAGER.authenticateSystemUser(userName, password);
+        return dbManagerFunction(dbManager -> dbManager.authenticateSystemUser(userName, password));
     }
 
     /**
@@ -544,15 +585,17 @@ public class Storage {
             return Collections.emptyList();
         }
 
-        if (month == null) {
-            return DB_MANAGER.getHistoricStatsMonthly(userId, year);
-        }
+        return dbManagerFunction(dbManager -> {
+            if (month == null) {
+                return dbManager.getHistoricStatsMonthly(userId, year);
+            }
 
-        if (day == 0) {
-            return DB_MANAGER.getHistoricStatsDaily(userId, year, month);
-        }
+            if (day == 0) {
+                return dbManager.getHistoricStatsDaily(userId, year, month);
+            }
 
-        return DB_MANAGER.getHistoricStatsHourly(userId, year, month, day);
+            return dbManager.getHistoricStatsHourly(userId, year, month, day);
+        });
     }
 
     /**
@@ -566,9 +609,11 @@ public class Storage {
      */
     @Cached(TotalStatsCache.class)
     public UserStats createTotalStats(final UserStats userStats) {
-        final UserStats fromDb = DB_MANAGER.createTotalStats(userStats);
-        totalStatsCache.add(fromDb.getUserId(), fromDb);
-        return fromDb;
+        return dbManagerFunction(dbManager -> {
+            final UserStats fromDb = dbManager.createTotalStats(userStats);
+            totalStatsCache.add(fromDb.getUserId(), fromDb);
+            return fromDb;
+        });
     }
 
     /**
@@ -590,9 +635,11 @@ public class Storage {
         }
 
         LOGGER.trace("Cache miss! Total stats");
-        final Optional<UserStats> fromDb = DB_MANAGER.getTotalStats(userId);
-        fromDb.ifPresent(userStats -> totalStatsCache.add(userId, userStats));
-        return fromDb;
+        return dbManagerFunction(dbManager -> {
+            final Optional<UserStats> fromDb = dbManager.getTotalStats(userId);
+            fromDb.ifPresent(userStats -> totalStatsCache.add(userId, userStats));
+            return fromDb;
+        });
     }
 
     /**
@@ -611,9 +658,11 @@ public class Storage {
      */
     @Cached(OffsetTcStatsCache.class)
     public OffsetTcStats createOrUpdateOffsetStats(final int userId, final OffsetTcStats offsetTcStats) {
-        final OffsetTcStats fromDb = DB_MANAGER.createOrUpdateOffsetStats(userId, offsetTcStats);
-        offsetTcStatsCache.add(userId, fromDb);
-        return fromDb;
+        return dbManagerFunction(dbManager -> {
+            final OffsetTcStats fromDb = dbManager.createOrUpdateOffsetStats(userId, offsetTcStats);
+            offsetTcStatsCache.add(userId, fromDb);
+            return fromDb;
+        });
     }
 
     /**
@@ -635,9 +684,11 @@ public class Storage {
         }
 
         LOGGER.trace("Cache miss! Offset stats");
-        final Optional<OffsetTcStats> fromDb = DB_MANAGER.getOffsetStats(userId);
-        fromDb.ifPresent(offsetTcStats -> offsetTcStatsCache.add(userId, offsetTcStats));
-        return fromDb;
+        return dbManagerFunction(dbManager -> {
+            final Optional<OffsetTcStats> fromDb = dbManager.getOffsetStats(userId);
+            fromDb.ifPresent(offsetTcStats -> offsetTcStatsCache.add(userId, offsetTcStats));
+            return fromDb;
+        });
     }
 
     /**
@@ -650,8 +701,10 @@ public class Storage {
      */
     @Cached(OffsetTcStatsCache.class)
     public void deleteOffsetStats(final int userId) {
-        DB_MANAGER.deleteOffsetStats(userId);
-        offsetTcStatsCache.remove(userId);
+        dbManagerConsumer(dbManager -> {
+            dbManager.deleteOffsetStats(userId);
+            offsetTcStatsCache.remove(userId);
+        });
     }
 
     /**
@@ -662,8 +715,10 @@ public class Storage {
      */
     @Cached(OffsetTcStatsCache.class)
     public void deleteAllOffsetTcStats() {
-        DB_MANAGER.deleteAllOffsetStats();
-        offsetTcStatsCache.removeAll();
+        dbManagerConsumer(dbManager -> {
+            dbManager.deleteAllOffsetStats();
+            offsetTcStatsCache.removeAll();
+        });
     }
 
     /**
@@ -677,9 +732,11 @@ public class Storage {
      */
     @Cached(TcStatsCache.class)
     public UserTcStats createHourlyTcStats(final UserTcStats userTcStats) {
-        final UserTcStats fromDb = DB_MANAGER.createHourlyTcStats(userTcStats);
-        tcStatsCache.add(userTcStats.getUserId(), fromDb);
-        return fromDb;
+        return dbManagerFunction(dbManager -> {
+            final UserTcStats fromDb = dbManager.createHourlyTcStats(userTcStats);
+            tcStatsCache.add(userTcStats.getUserId(), fromDb);
+            return fromDb;
+        });
     }
 
     /**
@@ -700,9 +757,11 @@ public class Storage {
         }
 
         LOGGER.trace("Cache miss! Hourly TC stats");
-        final Optional<UserTcStats> fromDb = DB_MANAGER.getHourlyTcStats(userId);
-        fromDb.ifPresent(userTcStats -> tcStatsCache.add(userId, userTcStats));
-        return fromDb;
+        return dbManagerFunction(dbManager -> {
+            final Optional<UserTcStats> fromDb = dbManager.getHourlyTcStats(userId);
+            fromDb.ifPresent(userTcStats -> tcStatsCache.add(userId, userTcStats));
+            return fromDb;
+        });
     }
 
     /**
@@ -716,9 +775,11 @@ public class Storage {
      */
     @Cached(InitialStatsCache.class)
     public UserStats createInitialStats(final UserStats userStats) {
-        final UserStats fromDb = DB_MANAGER.createInitialStats(userStats);
-        initialStatsCache.add(fromDb.getUserId(), fromDb);
-        return fromDb;
+        return dbManagerFunction(dbManager -> {
+            final UserStats fromDb = dbManager.createInitialStats(userStats);
+            initialStatsCache.add(fromDb.getUserId(), fromDb);
+            return fromDb;
+        });
     }
 
     /**
@@ -739,9 +800,11 @@ public class Storage {
         }
 
         LOGGER.trace("Cache miss! Initial stats");
-        final Optional<UserStats> fromDb = DB_MANAGER.getInitialStats(userId);
-        fromDb.ifPresent(userStats -> initialStatsCache.add(userId, userStats));
-        return fromDb;
+        return dbManagerFunction(dbManager -> {
+            final Optional<UserStats> fromDb = dbManager.getInitialStats(userId);
+            fromDb.ifPresent(userStats -> initialStatsCache.add(userId, userStats));
+            return fromDb;
+        });
     }
 
     /**
@@ -811,5 +874,21 @@ public class Storage {
 
         // TC overall
         LOGGER.info("CompetitionSummaryCache: {}", competitionSummaryCache.getCacheContents());
+    }
+
+    private <T> T dbManagerFunction(final Function<DbManager, T> function) {
+        try (final DbManager dbManager = DbManagerRetriever.get()) {
+            return function.apply(dbManager);
+        } catch (final IOException e) {
+            throw new DatabaseConnectionException("Error closing connection", e);
+        }
+    }
+
+    private void dbManagerConsumer(final Consumer<DbManager> consumer) {
+        try (final DbManager dbManager = DbManagerRetriever.get()) {
+            consumer.accept(dbManager);
+        } catch (final IOException e) {
+            throw new DatabaseConnectionException("Error closing connection", e);
+        }
     }
 }

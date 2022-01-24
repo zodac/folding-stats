@@ -24,11 +24,10 @@
 
 package me.zodac.folding.db;
 
+import io.github.resilience4j.core.IntervalFunction;
 import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryConfig;
 import java.time.Duration;
-import java.util.EnumMap;
-import java.util.Map;
 import java.util.function.Supplier;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
@@ -41,7 +40,6 @@ import me.zodac.folding.db.postgres.PostgresDbManager;
 public final class DbManagerRetriever {
 
     private static final String DATABASE_VARIABLE_NAME = "DEPLOYED_DATABASE";
-    private static final Map<DatabaseType, DbManager> DB_MANAGER_BY_DATABASE = new EnumMap<>(DatabaseType.class);
 
     private DbManagerRetriever() {
 
@@ -60,15 +58,9 @@ public final class DbManagerRetriever {
         final DatabaseType databaseType = DatabaseType.get(deployedDatabase);
 
         if (databaseType == DatabaseType.POSTGRESQL) {
-            if (!DB_MANAGER_BY_DATABASE.containsKey(DatabaseType.POSTGRESQL)) {
-                final Supplier<PostgresDataSource> supplier = Retry.decorateSupplier(getRetry(), PostgresDataSource::create);
-                final PostgresDataSource postgresDataSource = supplier.get();
-
-                final DbManager dbManager = PostgresDbManager.create(postgresDataSource);
-                DB_MANAGER_BY_DATABASE.put(DatabaseType.POSTGRESQL, dbManager);
-            }
-
-            return DB_MANAGER_BY_DATABASE.get(DatabaseType.POSTGRESQL);
+            final Supplier<PostgresDataSource> supplier = Retry.decorateSupplier(getRetry(), PostgresDataSource::create);
+            final PostgresDataSource postgresDataSource = supplier.get(); // NOPMD: CloseResource - Closed later manually
+            return PostgresDbManager.create(postgresDataSource);
         }
 
         throw new IllegalStateException(String.format("Unable to find database of type using variable '%s': %s",
@@ -77,8 +69,8 @@ public final class DbManagerRetriever {
 
     private static Retry getRetry() {
         final RetryConfig retryConfig = RetryConfig.custom()
-            .maxAttempts(6)
-            .waitDuration(Duration.ofSeconds(10L))
+            .maxAttempts(10)
+            .intervalFunction(IntervalFunction.ofExponentialBackoff(Duration.ofSeconds(10)))
             .build();
         return Retry.of("DatabaseConnection", retryConfig);
     }

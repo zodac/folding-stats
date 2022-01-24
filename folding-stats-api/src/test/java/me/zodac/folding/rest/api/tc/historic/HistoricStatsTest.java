@@ -81,7 +81,7 @@ class HistoricStatsTest {
             final HistoricStats historicStats = results.next();
 
             // Verify combined dates are sorted
-            switch (count) { // NOPMD - SwitchStmtsShouldHaveDefault false positive
+            switch (count) { // NOPMD: SwitchStmtsShouldHaveDefault - false positive
                 case 1 -> assertThat(historicStats)
                     .isEqualTo(expectedFirst);
                 case 2 -> assertThat(historicStats)

@@ -52,7 +52,7 @@ public final class ValidationFailureResponseMapper {
      * @return the mapped {@link ResponseEntity}
      */
     public static ResponseEntity<String> map(final ValidationResult<?> validationResult) {
-        return switch (validationResult.validationFailureType()) { // NOPMD - SwitchStmtsShouldHaveDefault false positive
+        return switch (validationResult.validationFailureType()) { // NOPMD: SwitchStmtsShouldHaveDefault - false positive
             case BAD_REQUEST -> Responses.badRequest(validationResult.validationFailure());
             case CONFLICT -> Responses.conflict(validationResult.validationFailure());
             default -> throw new IllegalStateException(String.format("Cannot map a REST response for validation result: %s", validationResult));

@@ -1109,4 +1109,11 @@ public final class PostgresDbManager implements DbManager {
             throw new DatabaseConnectionException("Error closing connection", e);
         }
     }
+
+    @Override
+    public void close() {
+        if (dataSource instanceof PostgresDataSource postgresDataSource) {
+            postgresDataSource.close();
+        }
+    }
 }
