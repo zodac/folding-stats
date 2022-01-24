@@ -3,8 +3,6 @@
 instance_type="test"
 if [[ "${DEPLOYMENT_TYPE}" == "production" ]]; then
   instance_type="production"
-else
-  instance_type="test"
 fi
 
 echo "Starting ${instance_type} instance"

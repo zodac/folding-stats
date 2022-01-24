@@ -5,7 +5,7 @@ services:
   frontend_dev:
     build:
       context: .
-      dockerfile: docker/apache/Dockerfile
+      dockerfile: docker/frontend/Dockerfile
       args:
         FORUM_LINK: "https://forums.extremehw.net/forum/125-extreme-team-folding"
         REST_ENDPOINT_URL: "http://127.0.0.1:8081/folding"
@@ -28,7 +28,7 @@ services:
   backend_dev:
     build:
       context: .
-      dockerfile: docker/java/Dockerfile
+      dockerfile: docker/backend/Dockerfile
       args:
         DEBIAN_VERSION: 11
         JAVA_VERSION: 17
@@ -69,7 +69,7 @@ services:
   database_dev:
     build:
       context: .
-      dockerfile: docker/postgres/Dockerfile
+      dockerfile: docker/database/Dockerfile
       args:
         ADMIN_USERNAME: "root"
         ADMIN_PASSWORD: "shroot"

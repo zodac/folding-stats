@@ -53,8 +53,8 @@ COPY ./docker/apache/conf/httpd-ssl.conf /usr/local/apache2/conf/extra/httpd-ssl
 WORKDIR /usr/local/apache2/htdocs/
 
 # Copy the RAML API and minified JS/CSS files
-COPY --from=raml /docker/apache/api.html ./api.html
-COPY --from=minifier /docker/apache/site/res ./res
+COPY --from=raml /docker/frontend/api.html ./api.html
+COPY --from=minifier /docker/frontend/site/res ./res
 
 # Copy the static content (images, 3PP JS/CSS files)
 COPY ./docker/apache/res/img ./res/img
