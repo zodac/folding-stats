@@ -25,7 +25,6 @@
 package me.zodac.folding;
 
 import java.util.Collection;
-import java.util.concurrent.TimeUnit;
 import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
@@ -90,7 +89,6 @@ public class FoldingStatsApplication {
     @Bean
     public CommandLineRunner initialisation(final ApplicationContext ctx) {
         return args -> {
-            Thread.sleep(TimeUnit.SECONDS.toMillis(10)); // TODO: [zodac] DB might not be online by now, what do?
             initCaches();
 
             SystemStateManager.next(SystemState.AVAILABLE);

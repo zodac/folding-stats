@@ -26,7 +26,6 @@ package me.zodac.folding.db.postgres;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import javax.sql.DataSource;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
 
 /**
@@ -52,7 +51,7 @@ public final class PostgresDataSource extends HikariDataSource {
      *
      * @return the created {@link PostgresDataSource}
      */
-    public static DataSource create() {
+    public static PostgresDataSource create() {
         final HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(EnvironmentVariableUtils.get("JDBC_CONNECTION_URL"));
         hikariConfig.setUsername(EnvironmentVariableUtils.get("JDBC_CONNECTION_USER"));

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true" scanPeriod="60 seconds">
     <property name="BASE_CONSOLE_LOG_PATTERN"
-              value="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%-45logger{45}] %msg%n"/>
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%-50logger{50}] %msg%n"/>
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <withJansi>true</withJansi>
@@ -31,7 +31,7 @@
         <file>/var/backend/logs/audit.log</file>
         <immediateFlush>true</immediateFlush>
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%-5logger] %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%-5logger{5}] %msg%n</pattern>
             <charset>utf8</charset>
         </encoder>
         <rollingPolicy
@@ -54,11 +54,18 @@
     </logger>
 
     <!-- Suppress logging for unwanted packages -->
+    <!-- Not interested in the jOOQ startup messages -->
     <logger name="org.jooq" level="WARN">
         <appender-ref ref="SERVER_LOG"/>
         <appender-ref ref="CONSOLE"/>
     </logger>
+    <!-- Not interested in Hikari DB logs when starting DB connection -->
     <logger name="com.zaxxer.hikari" level="WARN">
+        <appender-ref ref="SERVER_LOG"/>
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+    <!-- On system startup, we see errors due to the DB not being online, don't need to see those exceptions -->
+    <logger name="com.zaxxer.hikari.pool" level="OFF">
         <appender-ref ref="SERVER_LOG"/>
         <appender-ref ref="CONSOLE"/>
     </logger>
