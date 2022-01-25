@@ -23,8 +23,8 @@ services:
     ports:
       - "${HTTPS_FRONTEND_PORT}:${HTTPS_FRONTEND_PORT}"
     restart: unless-stopped
-    volumes:
-      - "${SSL_CERT_DIRECTORY}:/usr/local/apache2/conf/certs"
+    volumes_from:
+      - backend
 
   backend:
     build:
@@ -33,6 +33,7 @@ services:
       args:
         DEBIAN_VERSION: 11
         JAVA_VERSION: 17
+        KEYSTORE_PASSWORD: "${KEYSTORE_PASSWORD}"
         MAVEN_VERSION: 3.8.4
         NEXUS_URL: "${NEXUS_URL}"
     container_name: backend
@@ -69,7 +70,8 @@ services:
       - "${HTTPS_BACKEND_PORT}:${HTTPS_BACKEND_PORT}"
     restart: unless-stopped
     volumes:
-      - backend_logs:/var/backend/logs
+      - backend_certs:/usr/local/certs/
+      - backend_logs:/var/backend/logs/
 
   database:
     build:
@@ -114,3 +116,5 @@ volumes:
   database_content:
   # Volume to save the backend logs in case of a crash
   backend_logs:
+  # Volume to save the generated SSL certs for the backend
+  backend_certs:

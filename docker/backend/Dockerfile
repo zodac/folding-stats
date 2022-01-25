@@ -2,6 +2,28 @@ ARG JAVA_VERSION
 ARG MAVEN_VERSION
 ARG DEBIAN_VERSION
 
+FROM openjdk:${JAVA_VERSION}-jdk-slim AS cert_builder
+
+RUN mkdir --parents /usr/local/certs
+WORKDIR /usr/local/certs/
+
+# Generate PCKS12 keystore with self-signed certificate, and public crt and private key
+ARG KEYSTORE_PASSWORD
+RUN apt-get update && apt-get install -y openssl && \
+    keytool \
+        -genkey \
+        -alias folding-stats \
+        -dname "cn=localhost,ou=me,o=zodac,l=Auckland,C=NZ" \
+        -keyalg RSA \
+        -keysize 4096 \
+        -storetype PKCS12 \
+        -keystore folding-stats.p12 \
+        -validity 3650 \
+        -storepass "${KEYSTORE_PASSWORD}" && \
+    openssl pkcs12 -in folding-stats.p12 -out folding-stats.pem -nodes -passin pass:"${KEYSTORE_PASSWORD}" && \
+    cat folding-stats.pem | sed -n '/^-----BEGIN CERTIFICATE-----/,/^-----END CERTIFICATE-----/{p;/^-----END CERTIFICATE-----/q}' > folding-stats.crt && \
+    cat folding-stats.pem | sed -n '/^-----BEGIN PRIVATE KEY-----/,/^-----END PRIVATE KEY-----/{p;/^-----END PRIVATE KEY-----/q}' > folding-stats.key
+
 FROM maven:${MAVEN_VERSION}-openjdk-${JAVA_VERSION} AS maven_builder
 
 # Build folding-stats
@@ -10,7 +32,7 @@ RUN mkdir --parents /folding-stats-spring-boot
 WORKDIR /folding-stats-spring-boot
 
 ARG NEXUS_URL
-COPY ./docker/java/scripts/configure_custom_nexus.sh /tmp/configure_custom_nexus.sh
+COPY ./docker/backend/scripts/configure_custom_nexus.sh /tmp/configure_custom_nexus.sh
 RUN /tmp/configure_custom_nexus.sh "${NEXUS_URL}"
 
 # Copy source code
@@ -122,14 +144,18 @@ FROM debian:${DEBIAN_VERSION}-slim AS spring_base
 
 COPY --from=jdk_builder /opt/jdk /opt/jdk
 COPY --from=maven_builder /folding-stats.jar /folding-stats.jar
-COPY ./docker/java/scripts/startup.sh /startup.sh
-COPY ./docker/java/config/logback.xml /var/backend/logs/logback.xml
+COPY ./docker/backend/scripts/startup.sh /startup.sh
+COPY ./docker/backend/config/logback.xml /var/backend/logs/logback.xml
 
 ENV JAVA_HOME "/opt/jdk"
 ENV PATH "${PATH}:${JAVA_HOME}/bin"
 
-# Set default directory to the log directory
-WORKDIR /var/backend/logs/
+# Copy SSL certs
+COPY --from=cert_builder /usr/local/certs/folding-stats.p12 /usr/local/certs/folding-stats.p12
+COPY --from=cert_builder /usr/local/certs/folding-stats.crt /usr/local/certs/folding-stats.crt
+COPY --from=cert_builder /usr/local/certs/folding-stats.key /usr/local/certs/folding-stats.key
+
+RUN ls /usr/local/certs/
 
 # Install nano to allow user to connect to container and edit logback.xml
 RUN apt-get update && \
@@ -144,6 +170,9 @@ RUN apt-get update && \
 RUN groupadd -g 999 backend_user && \
     useradd --create-home --system --uid 999 --gid backend_user backend_user && \
     chown -R backend_user /var/backend/logs/ /startup.sh
-USER backend_user
+#USER backend_user
+
+# Set default directory to the log directory
+WORKDIR /var/backend/logs/
 
 ENTRYPOINT [ "/startup.sh" ]
