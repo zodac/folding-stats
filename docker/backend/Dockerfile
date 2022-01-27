@@ -7,13 +7,13 @@ FROM openjdk:${JAVA_VERSION}-jdk-slim AS cert_builder
 RUN mkdir --parents /usr/local/certs
 WORKDIR /usr/local/certs/
 
-# Generate PCKS12 keystore with self-signed certificate, and public crt and private key
+# Generate PCKS12 keystore with self-signed certificate, and extract public crt and private key
 ARG KEYSTORE_PASSWORD
 RUN apt-get update && apt-get install -y openssl && \
     keytool \
         -genkey \
         -alias folding-stats \
-        -dname "cn=localhost,ou=me,o=zodac,l=Auckland,C=NZ" \
+        -dname "cn=folding.zodac.me,ou=stats,o=zodac.me,l=Auckland,s=Auckland,C=NZ" \
         -keyalg RSA \
         -keysize 4096 \
         -storetype PKCS12 \
@@ -145,7 +145,7 @@ FROM debian:${DEBIAN_VERSION}-slim AS spring_base
 COPY --from=jdk_builder /opt/jdk /opt/jdk
 COPY --from=maven_builder /folding-stats.jar /folding-stats.jar
 COPY ./docker/backend/scripts/startup.sh /startup.sh
-COPY ./docker/backend/config/logback.xml /var/backend/logs/logback.xml
+COPY ./docker/backend/config/logback.xml /var/backend/logback.xml
 
 ENV JAVA_HOME "/opt/jdk"
 ENV PATH "${PATH}:${JAVA_HOME}/bin"
@@ -154,8 +154,6 @@ ENV PATH "${PATH}:${JAVA_HOME}/bin"
 COPY --from=cert_builder /usr/local/certs/folding-stats.p12 /usr/local/certs/folding-stats.p12
 COPY --from=cert_builder /usr/local/certs/folding-stats.crt /usr/local/certs/folding-stats.crt
 COPY --from=cert_builder /usr/local/certs/folding-stats.key /usr/local/certs/folding-stats.key
-
-RUN ls /usr/local/certs/
 
 # Install nano to allow user to connect to container and edit logback.xml
 RUN apt-get update && \
@@ -166,11 +164,10 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Create non-root user
+# Create non-root user, add to root group
 RUN groupadd -g 999 backend_user && \
-    useradd --create-home --system --uid 999 --gid backend_user backend_user && \
-    chown -R backend_user /var/backend/logs/ /startup.sh
-#USER backend_user
+    useradd --create-home --system --uid 999 --gid root backend_user
+USER backend_user
 
 # Set default directory to the log directory
 WORKDIR /var/backend/logs/
