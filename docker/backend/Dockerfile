@@ -167,7 +167,7 @@ RUN apt-get update && \
 # Create non-root user, add to root group
 RUN groupadd -g 999 backend_user && \
     useradd --create-home --system --uid 999 --gid root backend_user
-USER backend_user
+#USER backend_user
 
 # Set default directory to the log directory
 WORKDIR /var/backend/logs/

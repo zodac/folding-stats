@@ -62,6 +62,7 @@ services:
       JDBC_CONNECTION_USER: "${DB_USER}"
       JDBC_CONNECTION_PASSWORD: "${DB_PASSWORD}"
       JDBC_CONNECTION_DRIVER: "org.postgresql.Driver"
+      server.ssl.key-store-password: "${KEYSTORE_PASSWORD}"
     links:
       - database
     networks:
