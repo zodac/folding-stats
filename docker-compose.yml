@@ -108,6 +108,21 @@ services:
     volumes:
       - database_content:/var/lib/postgresql/data
 
+  prometheus:
+    build:
+      context: .
+      dockerfile: docker/metrics/prometheus/Dockerfile
+    container_name: prometheus
+    hostname: prometheus
+    depends_on:
+      - backend
+    networks:
+      - production
+    ports:
+      - "9090:9090"
+    volumes:
+      - prometheus_data:/prometheus
+
 networks:
   production:
 
@@ -118,3 +133,5 @@ volumes:
   backend_logs:
   # Volume to save the generated SSL certs for the backend
   backend_certs:
+  # Volume to save prometheus metrics
+  prometheus_data:
