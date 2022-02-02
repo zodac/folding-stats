@@ -24,7 +24,6 @@
 
 package me.zodac.folding.rest;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static me.zodac.folding.api.util.DateTimeUtils.untilNextMonthUtc;
 import static me.zodac.folding.rest.response.Responses.badRequest;
 import static me.zodac.folding.rest.response.Responses.cachedOk;
@@ -34,7 +33,6 @@ import static me.zodac.folding.rest.response.Responses.nullRequest;
 import static me.zodac.folding.rest.response.Responses.ok;
 import static me.zodac.folding.rest.response.Responses.serverError;
 
-import java.net.URLDecoder;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.Optional;
@@ -186,9 +184,6 @@ public class HardwareEndpoint {
                 LOGGER.error(errorMessage);
                 return badRequest(errorMessage);
             }
-
-            LOGGER.info("Current name: {}", hardwareName);
-            LOGGER.info("Decoded name: {}", URLDecoder.decode(hardwareName, UTF_8));
 
             final Optional<Hardware> optionalHardware = foldingRepository.getAllHardware()
                 .stream()

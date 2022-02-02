@@ -87,7 +87,7 @@ function populateTeamUpdate(){
 
     show("loader");
 
-    var url = REST_ENDPOINT_URL+"/teams/fields?teamName=" + teamName
+    var url = encodeURI(REST_ENDPOINT_URL+"/teams/fields?teamName=" + teamName)
     fetch(url)
     .then(response => {
         return response.json();
@@ -126,7 +126,7 @@ function populateTeamDelete(){
 
     show("loader");
 
-    var url = REST_ENDPOINT_URL+"/teams/fields?teamName=" + teamName
+    var url = encodeURI(REST_ENDPOINT_URL+"/teams/fields?teamName=" + teamName)
     fetch(url)
     .then(response => {
         return response.json();
@@ -166,7 +166,7 @@ function populateUserUpdate(){
     show("loader");
 
     var userId = input.split(":")[0];
-    var url = REST_ENDPOINT_URL+"/users/" + userId + "/passkey"
+    var url = encodeURI(REST_ENDPOINT_URL+"/users/" + userId + "/passkey")
     fetch(url, {
         headers: {
             "Content-Type": "application/json",
@@ -199,14 +199,16 @@ function populateUserUpdate(){
         var hardwareId = jsonResponse['hardware']['id'];
         var teamId = jsonResponse['team']['id'];
 
-        fetch(REST_ENDPOINT_URL+"/hardware/" + hardwareId)
+        var hardwareUrl = encodeURI(REST_ENDPOINT_URL+"/hardware/" + hardwareId)
+        fetch(hardwareUrl)
         .then(response => {
             return response.json();
         })
         .then(function(jsonResponse) {
             document.getElementById("user_update_hardware_selector_input").value = jsonResponse['hardwareName'];
 
-            fetch(REST_ENDPOINT_URL+"/teams/" + teamId)
+            var teamUrl = encodeURI(REST_ENDPOINT_URL+"/teams/" + teamId)
+            fetch(teamUrl)
             .then(response => {
                 return response.json();
             })
@@ -239,7 +241,7 @@ function populateUserDelete(){
     show("loader");
 
     var userId = input.split(":")[0];
-    var url = REST_ENDPOINT_URL+"/users/" + userId + "/passkey"
+    var url = encodeURI(REST_ENDPOINT_URL+"/users/" + userId + "/passkey")
     fetch(url, {
             headers: {
                 "Content-Type": "application/json",
@@ -272,7 +274,7 @@ function populateUserDelete(){
         var hardwareId = jsonResponse['hardware']['id'];
         var teamId = jsonResponse['team']['id'];
 
-        var hardwareUrl = REST_ENDPOINT_URL+"/hardware/" + hardwareId
+        var hardwareUrl = encodeURI(REST_ENDPOINT_URL+"/hardware/" + hardwareId)
         fetch(hardwareUrl)
         .then(response => {
             return response.json();
@@ -280,7 +282,7 @@ function populateUserDelete(){
         .then(function(jsonResponse) {
             document.getElementById("user_delete_hardware_selector_input").value = jsonResponse['hardwareName'];
 
-            var teamUrl = REST_ENDPOINT_URL+"/teams/" + teamId
+            var teamUrl = encodeURI(REST_ENDPOINT_URL+"/teams/" + teamId)
             fetch(teamUrl)
             .then(response => {
                 return response.json();
@@ -314,7 +316,8 @@ function populateUserOffset(){
     show("loader");
 
     var userId = input.split(":")[0];
-    fetch(REST_ENDPOINT_URL+"/users/" + userId)
+    var url = encodeURI(REST_ENDPOINT_URL+"/users/" + userId)
+    fetch(url)
     .then(response => {
         return response.json();
     })
@@ -327,7 +330,7 @@ function populateUserOffset(){
         var hardwareId = jsonResponse['hardware']['id'];
         var teamId = jsonResponse['team']['id'];
 
-        var statsUrl = REST_ENDPOINT_URL+"/stats/users/" + userId
+        var statsUrl = encodeURI(REST_ENDPOINT_URL+"/stats/users/" + userId)
         fetch(statsUrl)
         .then(response => {
             return response.json();
@@ -336,7 +339,7 @@ function populateUserOffset(){
             document.getElementById("user_offset_points").value = jsonResponse['multipliedPoints'].toLocaleString();
             document.getElementById("user_offset_units").value = jsonResponse['units'].toLocaleString();
 
-            var hardwareUrl = REST_ENDPOINT_URL+"/hardware/" + hardwareId
+            var hardwareUrl = encodeURI(REST_ENDPOINT_URL+"/hardware/" + hardwareId)
             fetch(hardwareUrl)
             .then(response => {
                 return response.json();
@@ -344,7 +347,7 @@ function populateUserOffset(){
             .then(function(jsonResponse) {
                 document.getElementById("user_offset_hardware_selector_input").value = jsonResponse['hardwareName'];
 
-                var teamUrl = REST_ENDPOINT_URL+"/teams/" + teamId
+                var teamUrl = encodeURI(REST_ENDPOINT_URL+"/teams/" + teamId)
                 fetch(teamUrl)
                 .then(response => {
                     return response.json();

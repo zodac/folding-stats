@@ -326,14 +326,16 @@ function createUser() {
     var teamName = document.getElementById("user_create_team_selector_input").value.trim();
     var isCaptain = document.getElementById("user_create_is_captain").checked;
 
-    fetch(REST_ENDPOINT_URL+"/hardware/fields?hardwareName=" + hardwareName)
+    var hardwareUrl = encodeURI(REST_ENDPOINT_URL+"/hardware/fields?hardwareName=" + hardwareName)
+    fetch(hardwareUrl)
     .then(response => {
         return response.json();
     })
     .then(function(jsonResponse) {
         var hardwareId = jsonResponse['id'];
 
-        fetch(REST_ENDPOINT_URL+"/teams/fields?teamName=" + teamName)
+        var teamUrl = encodeURI(REST_ENDPOINT_URL+"/teams/fields?teamName=" + teamName)
+        fetch(teamUrl)
         .then(response => {
             return response.json();
         })
@@ -355,7 +357,8 @@ function createUser() {
             );
 
             show("loader");
-            fetch(REST_ENDPOINT_URL+"/users", {
+            var url = encodeURI(REST_ENDPOINT_URL+"/users")
+            fetch(url, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -408,14 +411,16 @@ function updateUser() {
     var teamName = document.getElementById("user_update_team_selector_input").value.trim();
     var isCaptain = document.getElementById("user_update_is_captain").checked;
 
-    fetch(REST_ENDPOINT_URL+"/hardware/fields?hardwareName=" + hardwareName)
+    var hardwareUrl = encodeURI(REST_ENDPOINT_URL+"/hardware/fields?hardwareName=" + hardwareName)
+    fetch(hardwareUrl)
     .then(response => {
         return response.json();
     })
     .then(function(jsonResponse) {
         var hardwareId = jsonResponse['id'];
 
-        fetch(REST_ENDPOINT_URL+"/teams/fields?teamName=" + teamName)
+        var teamUrl = encodeURI(REST_ENDPOINT_URL+"/teams/fields?teamName=" + teamName)
+        fetch(teamUrl)
         .then(response => {
             return response.json();
         })
@@ -437,7 +442,8 @@ function updateUser() {
             );
 
             show("loader");
-            fetch(REST_ENDPOINT_URL+"/users/" + userId, {
+            var url = encodeURI(REST_ENDPOINT_URL+"/users/" + userId)
+            fetch(url, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -491,7 +497,8 @@ function deleteUser() {
     var displayName = document.getElementById("user_delete_display_name").value
 
     show("loader");
-    fetch(REST_ENDPOINT_URL+"/users/" + userId, {
+    var url = encodeURI(REST_ENDPOINT_URL+"/users/" + userId)
+    fetch(url, {
         method: "DELETE",
         headers: {
             "Content-Type": "application/json",
@@ -542,7 +549,8 @@ function offsetUser() {
     var displayName = document.getElementById("user_offset_display_name").value
 
     show("loader");
-    fetch(REST_ENDPOINT_URL+"/stats/users/" + userId)
+    var url = encodeURI(REST_ENDPOINT_URL+"/stats/users/" + userId)
+    fetch(url)
     .then(response => {
         return response.json();
     })
@@ -562,7 +570,8 @@ function offsetUser() {
             }
         );
 
-        fetch(REST_ENDPOINT_URL+"/stats/users/" + userId, {
+        var statsUrl = encodeURI(REST_ENDPOINT_URL+"/stats/users/" + userId)
+        fetch(statsUrl, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
