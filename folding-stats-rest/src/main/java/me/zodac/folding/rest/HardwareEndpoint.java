@@ -24,6 +24,7 @@
 
 package me.zodac.folding.rest;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static me.zodac.folding.api.util.DateTimeUtils.untilNextMonthUtc;
 import static me.zodac.folding.rest.response.Responses.badRequest;
 import static me.zodac.folding.rest.response.Responses.cachedOk;
@@ -33,6 +34,7 @@ import static me.zodac.folding.rest.response.Responses.nullRequest;
 import static me.zodac.folding.rest.response.Responses.ok;
 import static me.zodac.folding.rest.response.Responses.serverError;
 
+import java.net.URLDecoder;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.Optional;
@@ -176,7 +178,7 @@ public class HardwareEndpoint {
     @PermitAll
     @GetMapping(path = "/fields", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getByHardwareName(@RequestParam("hardwareName") final String hardwareName, final HttpServletRequest request) {
-        LOGGER.debug("GET request for hardware received at '{}'", request::getRequestURI);
+        LOGGER.info("GET request for hardware received at '{}'", request::getRequestURI);
 
         try {
             if (StringUtils.isBlank(hardwareName)) {
@@ -184,6 +186,9 @@ public class HardwareEndpoint {
                 LOGGER.error(errorMessage);
                 return badRequest(errorMessage);
             }
+
+            LOGGER.info("Current name: {}", hardwareName);
+            LOGGER.info("Decoded name: {}", URLDecoder.decode(hardwareName, UTF_8));
 
             final Optional<Hardware> optionalHardware = foldingRepository.getAllHardware()
                 .stream()
