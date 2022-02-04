@@ -281,10 +281,10 @@ To check the status of any containers, the following command can be used:
 This will show any docker containers (running and stopped) on the system and their status. When the system first comes
 online, you you should see the following:
 
-    CONTAINER ID   IMAGE                    COMMAND                  CREATED                  STATUS                            PORTS                                                      NAMES
-    6d314cbbb902   folding-stats_frontend   "httpd-foreground"       Less than a second ago   Up Less than a second             80/tcp, 0.0.0.0:443->443/tcp                               frontend
-    a7b722f8a178   folding-stats_backend    "/startup.sh"            2 seconds ago            Up 1 second (health: starting)    0.0.0.0:8443->8443/tcp, 8080/tcp, 0.0.0.0:9990->9990/tcp   backend
-    312f5f61ec87   folding-stats_database   "docker-entrypoint.s…"   3 seconds ago            Up 3 seconds (health: starting)   0.0.0.0:5432->5432/tcp                                     database
+    CONTAINER ID   IMAGE                    COMMAND                  CREATED                  STATUS                            PORTS                           NAMES
+    6d314cbbb902   folding-stats_frontend   "httpd-foreground"       Less than a second ago   Up Less than a second             80/tcp, 0.0.0.0:443->443/tcp    frontend
+    a7b722f8a178   folding-stats_backend    "/startup.sh"            2 seconds ago            Up 1 second (health: starting)    0.0.0.0:8443->8443/tcp          backend
+    312f5f61ec87   folding-stats_database   "docker-entrypoint.s…"   3 seconds ago            Up 3 seconds (health: starting)   0.0.0.0:5432->5432/tcp          database
 
 (Note that your `CONTAINER ID` value will be different.)
 
@@ -292,10 +292,10 @@ Pay attention to the `STATUS` value. When the system first comes online, the `ba
 take a minute or two to start up, as seen by the value **health: starting**. Once they are successfully online,
 the `STATUS` will change to:
 
-    CONTAINER ID   IMAGE                    COMMAND                  CREATED         STATUS                   PORTS                                                      NAMES
-    6d314cbbb902   folding-stats_frontend   "httpd-foreground"       2 minutes ago   Up 2 minutes             80/tcp, 0.0.0.0:443->443/tcp                               frontend
-    a7b722f8a178   folding-stats_backend    "/startup.sh"            2 minutes ago   Up 2 minutes (healthy)   0.0.0.0:8443->8443/tcp, 8080/tcp, 0.0.0.0:9990->9990/tcp   backend
-    312f5f61ec87   folding-stats_database   "docker-entrypoint.s…"   2 minutes ago   Up 2 minutes (healthy)   0.0.0.0:5432->5432/tcp                                     database
+    CONTAINER ID   IMAGE                    COMMAND                  CREATED         STATUS                   PORTS                         NAMES
+    6d314cbbb902   folding-stats_frontend   "httpd-foreground"       2 minutes ago   Up 2 minutes             80/tcp, 0.0.0.0:443->443/tcp  frontend
+    a7b722f8a178   folding-stats_backend    "/startup.sh"            2 minutes ago   Up 2 minutes (healthy)   0.0.0.0:8443->8443/tcp        backend
+    312f5f61ec87   folding-stats_database   "docker-entrypoint.s…"   2 minutes ago   Up 2 minutes (healthy)   0.0.0.0:5432->5432/tcp        database
 
 However, if one or more of the containers has stopped, you may see a container marked as **Exited**:
 
