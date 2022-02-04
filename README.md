@@ -1,3 +1,8 @@
+# The `jee` branch is now deprecated.
+# Please use the `spring-boot` branch instead.
+
+---
+
 # Folding@Home Team Competition
 
 The *Folding@Home Team Competition* is a competition where members of a [Folding@Home](https://foldingathome.org/) team can group together into
