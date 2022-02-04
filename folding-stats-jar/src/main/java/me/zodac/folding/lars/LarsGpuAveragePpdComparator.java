@@ -24,6 +24,7 @@
 
 package me.zodac.folding.lars;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Comparator;
 import me.zodac.folding.api.tc.lars.LarsGpu;
@@ -33,6 +34,7 @@ import me.zodac.folding.api.tc.lars.LarsGpu;
  */
 final class LarsGpuAveragePpdComparator implements Comparator<LarsGpu>, Serializable {
 
+    @Serial
     private static final long serialVersionUID = -7988652908218460899L;
 
     private LarsGpuAveragePpdComparator() {

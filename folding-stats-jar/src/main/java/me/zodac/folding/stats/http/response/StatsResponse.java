@@ -25,20 +25,12 @@
 package me.zodac.folding.stats.http.response;
 
 import java.net.http.HttpResponse;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 /**
  * Simple wrapper for a {@link String} to hold the status code and body for the {@link HttpResponse} for a
  * points or units REST request.
  */
-@Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class StatsResponse {
-
-    private final int statusCode;
-    private final String responseBody;
+public record StatsResponse(int statusCode, String responseBody) {
 
     /**
      * Creates a {@link StatsResponse} based on the provided {@link HttpResponse}.

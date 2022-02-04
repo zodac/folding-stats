@@ -5,15 +5,16 @@ services:
   frontend:
     build:
       context: .
-      dockerfile: docker/apache/Dockerfile
+      dockerfile: docker/frontend/Dockerfile
       args:
-        FIRST_DAY_OF_MONTH: "${FIRST_DAY_OF_MONTH}"
+        # Docker image versions
+        NODE_VERSION: 17
+        # Build arguments
         FORUM_LINK: "${FORUM_LINK}"
         REST_ENDPOINT_URL: "${REST_ENDPOINT_URL}"
         ROOT_URL: "${ROOT_URL}"
         TITLE: "${TITLE}"
         UPDATE_ENABLED: "${STATS_ENABLED}"
-        UPDATE_MINUTE: "${UPDATE_MINUTE}"
     container_name: frontend
     hostname: frontend
     depends_on:
@@ -25,27 +26,30 @@ services:
     ports:
       - "${HTTPS_FRONTEND_PORT}:${HTTPS_FRONTEND_PORT}"
     restart: unless-stopped
-    volumes:
-      - "${SSL_CERT_DIRECTORY}:/usr/local/apache2/conf/certs"
+    volumes_from:
+      - backend
 
   backend:
     build:
       context: .
-      dockerfile: docker/wildfly/Dockerfile
+      dockerfile: docker/backend/Dockerfile
       args:
-        ADMIN_USERNAME: "${BACKEND_USER}"
-        ADMIN_PASSWORD: "${BACKEND_PASSWORD}"
-        DEPLOYMENT_TYPE: "production"
+        # Docker image versions
+        DEBIAN_VERSION: 11.2
+        JAVA_VERSION: 17
+        MAVEN_VERSION: 3.8.4
+        # Build arguments
+        KEYSTORE_PASSWORD: "${KEYSTORE_PASSWORD}"
         NEXUS_URL: "${NEXUS_URL}"
     container_name: backend
     hostname: backend
     environment:
-      # Container configuration
-      JAVA_OPTS: -Xms${JAVA_XMS} -Xmx${JAVA_XMX} -Djava.net.preferIPv4Stack=true
       # External URL configuration
       LARS_URL_ROOT: "${LARS_URL_ROOT}"
       STATS_URL_ROOT: "${STATS_URL_ROOT}"
       REDIRECT_URL: "${ROOT_URL}"
+      # Spring configuration
+      DEPLOYMENT_TYPE: "production"
       # NOTE: The monthly reset, result storage and LARS update will always occur at 23:57 on the last day of the month
       ENABLE_LARS_HARDWARE_UPDATE: "${ENABLE_LARS_HARDWARE_UPDATE}"
       ENABLE_MONTHLY_RESULT_STORAGE: "${ENABLE_MONTHLY_RESULT_STORAGE}"
@@ -53,13 +57,6 @@ services:
       # Scheduled stats parsing configuration
       # This value should match the value of 'UPDATE_ENABLED' in the 'frontend' container
       ENABLE_STATS_SCHEDULED_PARSING: "${STATS_ENABLED}"
-      STATS_PARSING_SCHEDULE_HOUR: "${UPDATE_HOUR}"
-      # This value should match the value of 'UPDATE_MINUTE' in the 'frontend' container
-      STATS_PARSING_SCHEDULE_MINUTE: "${UPDATE_MINUTE}"
-      STATS_PARSING_SCHEDULE_SECOND: "${UPDATE_SECOND}"
-      # This value should match the value of 'FIRST_DAY_OF_MONTH' in the 'frontend' container
-      STATS_PARSING_SCHEDULE_FIRST_DAY_OF_MONTH: "${FIRST_DAY_OF_MONTH}"
-      STATS_PARSING_SCHEDULE_LAST_DAY_OF_MONTH: "${LAST_DAY_OF_MONTH}"
       # Category configuration
       USERS_IN_AMD_GPU: "${USERS_IN_AMD_GPU}"
       USERS_IN_NVIDIA_GPU: "${USERS_IN_NVIDIA_GPU}"
@@ -70,27 +67,26 @@ services:
       JDBC_CONNECTION_USER: "${DB_USER}"
       JDBC_CONNECTION_PASSWORD: "${DB_PASSWORD}"
       JDBC_CONNECTION_DRIVER: "org.postgresql.Driver"
-    healthcheck:
-      test: curl -k --fail https://localhost:${HTTPS_BACKEND_PORT}/folding || exit 1
-      interval: 15s
-      timeout: 10s
-      retries: 30
+      server.ssl.key-store-password: "${KEYSTORE_PASSWORD}"
     links:
       - database
     networks:
       - production
     ports:
       - "${HTTPS_BACKEND_PORT}:${HTTPS_BACKEND_PORT}"
-      - "${ADMIN_CONSOLE_PORT}:${ADMIN_CONSOLE_PORT}"
     restart: unless-stopped
     volumes:
-      - backend_logs:/opt/jboss/wildfly/standalone/log
+      - backend_certs:/usr/local/certs/
+      - backend_logs:/var/backend/logs/
 
   database:
     build:
       context: .
-      dockerfile: docker/postgres/Dockerfile
+      dockerfile: docker/database/Dockerfile
       args:
+        # Docker image versions
+        POSTGRES_VERSION: 14.1
+        # Build arguments
         ADMIN_USERNAME: "${ADMIN_USER}"
         ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
         READ_ONLY_USERNAME: "${READ_ONLY_USER}"
@@ -121,6 +117,21 @@ services:
     volumes:
       - database_content:/var/lib/postgresql/data
 
+  prometheus:
+    build:
+      context: .
+      dockerfile: docker/metrics/prometheus/Dockerfile
+    container_name: prometheus
+    hostname: prometheus
+    depends_on:
+      - backend
+    networks:
+      - production
+    ports:
+      - "9090:9090"
+    volumes:
+      - prometheus_data:/prometheus
+
 networks:
   production:
 
@@ -129,3 +140,7 @@ volumes:
   database_content:
   # Volume to save the backend logs in case of a crash
   backend_logs:
+  # Volume to save the generated SSL certs for the backend
+  backend_certs:
+  # Volume to save prometheus metrics
+  prometheus_data:

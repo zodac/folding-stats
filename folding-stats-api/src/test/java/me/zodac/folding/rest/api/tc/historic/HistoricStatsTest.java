@@ -81,21 +81,14 @@ class HistoricStatsTest {
             final HistoricStats historicStats = results.next();
 
             // Verify combined dates are sorted
-            switch (count) {
-                case 1:
-                    assertThat(historicStats)
-                        .isEqualTo(expectedFirst);
-                    break;
-                case 2:
-                    assertThat(historicStats)
-                        .isEqualTo(expectedThird);
-                    break;
-                case 3:
-                    assertThat(historicStats)
-                        .isEqualTo(expectedZero);
-                    break;
-                default:
-                    throw new AssertionError("Unexpected entry in results: " + count);
+            switch (count) { // NOPMD: SwitchStmtsShouldHaveDefault - false positive
+                case 1 -> assertThat(historicStats)
+                    .isEqualTo(expectedFirst);
+                case 2 -> assertThat(historicStats)
+                    .isEqualTo(expectedThird);
+                case 3 -> assertThat(historicStats)
+                    .isEqualTo(expectedZero);
+                default -> throw new AssertionError("Unexpected entry in results: " + count);
             }
 
             count++;

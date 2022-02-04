@@ -24,8 +24,6 @@
 
 package me.zodac.folding.api.tc;
 
-import static java.util.stream.Collectors.toUnmodifiableList;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -65,7 +63,7 @@ public enum Category {
 
     private static final Collection<Category> ALL_VALUES = Stream.of(values())
         .filter(value -> value != INVALID)
-        .collect(toUnmodifiableList());
+        .toList();
 
     private final int permittedUsers;
     private final EnumSet<HardwareMake> supportedHardwareMakes;

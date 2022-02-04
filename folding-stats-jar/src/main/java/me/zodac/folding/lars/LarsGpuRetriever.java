@@ -24,8 +24,6 @@
 
 package me.zodac.folding.lars;
 
-import static java.util.stream.Collectors.toList;
-
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
@@ -90,7 +88,7 @@ public final class LarsGpuRetriever {
                 .map(LarsGpuRetriever::safeParse)
                 .filter(Objects::nonNull)
                 .sorted(LarsGpuAveragePpdComparator.create())
-                .collect(toList());
+                .toList();
         } catch (final IOException e) {
             LOGGER.debug("Unable to connect to LARS GPU DB at '{}'", gpuDatabaseUrl, e);
             LOGGER.warn("Unable to connect to LARS GPU DB at '{}': {}", gpuDatabaseUrl, e.getMessage());

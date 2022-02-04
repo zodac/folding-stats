@@ -6,7 +6,7 @@
     <parent>
         <groupId>me.zodac</groupId>
         <artifactId>folding-stats</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>2.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>folding-stats-client-library-java</artifactId>
@@ -21,9 +21,8 @@
 
         <!-- 3PP Dependencies -->
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <scope>provided</scope>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
         </dependency>
     </dependencies>
 

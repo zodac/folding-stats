@@ -26,26 +26,13 @@ package me.zodac.folding.api;
 
 import java.util.Collections;
 import java.util.Set;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
 
 /**
  * POJO defining the authentication response for a system user/password, and the roles for that user if successful.
  */
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
-@EqualsAndHashCode
-@ToString(doNotUseGetters = true)
-public class UserAuthenticationResult {
+public record UserAuthenticationResult(boolean userExists, boolean passwordMatch, Set<String> userRoles) {
 
     private static final String ADMIN_ROLE = "admin";
-
-    private final boolean userExists;
-    private final boolean passwordMatch;
-    private final Set<String> userRoles;
 
     /**
      * User does not exist {@link UserAuthenticationResult}.

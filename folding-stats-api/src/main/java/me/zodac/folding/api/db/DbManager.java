@@ -24,6 +24,7 @@
 
 package me.zodac.folding.api.db;
 
+import java.io.Closeable;
 import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
@@ -46,7 +47,7 @@ import me.zodac.folding.rest.api.tc.historic.HistoricStats;
  * <p>
  * Any method can throw a {@link DatabaseConnectionException} if an error occurs connecting to the underlying DB.
  */
-public interface DbManager {
+public interface DbManager extends Closeable {
 
     /**
      * Creates a {@link Hardware} instance in the DB.
@@ -177,13 +178,6 @@ public interface DbManager {
      * @return an {@link Optional} of the retrieved {@link UserTcStats}
      */
     Optional<UserTcStats> getHourlyTcStats(final int userId);
-
-    /**
-     * Retrieves the first {@link UserTcStats} for any users in the system.
-     *
-     * @return an {@link Optional} of the first {@link UserTcStats}
-     */
-    Optional<UserTcStats> getFirstHourlyTcStats();
 
     /**
      * Retrieves the {@link HistoricStats} for a given {@link User} ID for a specific {@code day}/{@link Month}/{@link Year}.

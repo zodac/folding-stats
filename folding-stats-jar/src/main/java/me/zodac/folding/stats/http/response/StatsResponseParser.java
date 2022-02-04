@@ -24,7 +24,6 @@
 
 package me.zodac.folding.stats.http.response;
 
-import static java.util.stream.Collectors.toList;
 import static me.zodac.folding.rest.util.RestUtilConstants.GSON;
 
 import com.google.gson.JsonSyntaxException;
@@ -65,13 +64,13 @@ public final class StatsResponseParser {
 
     private static PointsApiInstance parsePointsResponse(final StatsResponse response) {
         try {
-            return GSON.fromJson(response.getResponseBody(), PointsApiInstance.class);
+            return GSON.fromJson(response.responseBody(), PointsApiInstance.class);
         } catch (final JsonSyntaxException e) {
-            LOGGER.warn("Error parsing the points JSON response from the API: '{}'", response.getResponseBody(), e);
+            LOGGER.warn("Error parsing the points JSON response from the API: '{}'", response.responseBody(), e);
             throw e;
         } catch (final Exception e) {
-            LOGGER.warn("Unexpected error parsing points JSON response from the API with status code {}: '{}'", response.getStatusCode(),
-                response.getResponseBody(), e);
+            LOGGER.warn("Unexpected error parsing points JSON response from the API with status code {}: '{}'", response.statusCode(),
+                response.responseBody(), e);
             throw e;
         }
     }
@@ -88,7 +87,7 @@ public final class StatsResponseParser {
         final List<UnitsApiInstance> unitsApiInstances = parseUnitsResponse(response);
 
         if (unitsApiInstances.isEmpty()) {
-            LOGGER.warn("No valid units found for user/passkey: '{}/{}'", foldingStatsDetails.getFoldingUserName(), foldingStatsDetails.getPasskey());
+            LOGGER.warn("No valid units found for user/passkey: '{}/{}'", foldingStatsDetails.foldingUserName(), foldingStatsDetails.passkey());
             return 0;
         }
 
@@ -98,11 +97,11 @@ public final class StatsResponseParser {
         final UnitsApiInstance firstEntry = unitsApiInstances
             .stream()
             .sorted(Collections.reverseOrder())
-            .collect(toList())
+            .toList()
             .get(0);
 
         if (unitsApiInstances.size() > EXPECTED_NUMBER_OF_UNIT_RESPONSES) {
-            LOGGER.warn("Too many unit responses returned for user, using {} from response: {}", firstEntry, response.getResponseBody());
+            LOGGER.warn("Too many unit responses returned for user, using {} from response: {}", firstEntry, response.responseBody());
         }
 
         return firstEntry.getFinished();
@@ -112,13 +111,13 @@ public final class StatsResponseParser {
         try {
             final Type collectionType = new TypeToken<Collection<UnitsApiInstance>>() {
             }.getType();
-            return GSON.fromJson(response.getResponseBody(), collectionType);
+            return GSON.fromJson(response.responseBody(), collectionType);
         } catch (final JsonSyntaxException e) {
-            LOGGER.warn("Error parsing the units JSON response from the API: '{}'", response.getResponseBody(), e);
+            LOGGER.warn("Error parsing the units JSON response from the API: '{}'", response.responseBody(), e);
             throw e;
         } catch (final Exception e) {
-            LOGGER.warn("Unexpected error parsing units JSON response from the API with status code {}: '{}'", response.getStatusCode(),
-                response.getResponseBody(), e);
+            LOGGER.warn("Unexpected error parsing units JSON response from the API with status code {}: '{}'", response.statusCode(),
+                response.responseBody(), e);
             throw e;
         }
     }

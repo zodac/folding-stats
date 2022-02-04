@@ -69,7 +69,7 @@ public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
     @Override
     public Stats getStats(final FoldingStatsDetails foldingStatsDetails) throws ExternalConnectionException {
         LOGGER.debug(""); // Line-break to differentiate different users
-        LOGGER.debug("Getting stats for username/passkey '{}/{}'", foldingStatsDetails::getFoldingUserName, foldingStatsDetails::getPasskey);
+        LOGGER.debug("Getting stats for username/passkey '{}/{}'", foldingStatsDetails::foldingUserName, foldingStatsDetails::passkey);
         final long userPoints = getPoints(foldingStatsDetails);
         final int userUnits = getUnits(foldingStatsDetails);
         return Stats.create(userPoints, userUnits);
@@ -84,8 +84,8 @@ public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
 
     private static long getPoints(final FoldingStatsDetails foldingStatsDetails) throws ExternalConnectionException {
         final StatsRequestUrl pointsRequestUrl = new PointsUrlBuilder()
-            .forUser(foldingStatsDetails.getFoldingUserName())
-            .withPasskey(foldingStatsDetails.getPasskey())
+            .forUser(foldingStatsDetails.foldingUserName())
+            .withPasskey(foldingStatsDetails.passkey())
             .build();
 
         LOGGER.debug("Sending points request to: {}", pointsRequestUrl);
@@ -98,8 +98,8 @@ public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
 
     private static int getUnits(final FoldingStatsDetails foldingStatsDetails) throws ExternalConnectionException {
         final StatsRequestUrl unitsRequestUrl = new UnitsUrlBuilder()
-            .forUser(foldingStatsDetails.getFoldingUserName())
-            .withPasskey(foldingStatsDetails.getPasskey())
+            .forUser(foldingStatsDetails.foldingUserName())
+            .withPasskey(foldingStatsDetails.passkey())
             .build();
 
         LOGGER.debug("Sending units request to: {}", unitsRequestUrl);

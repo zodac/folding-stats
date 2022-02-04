@@ -32,8 +32,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Month;
 import java.time.Year;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import me.zodac.folding.api.util.DateTimeUtils;
 import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
@@ -44,10 +42,7 @@ import me.zodac.folding.rest.util.RestUtilConstants;
 /**
  * Convenience class to send HTTP requests to the {@link me.zodac.folding.api.tc.result.MonthlyResult} REST endpoint.
  */
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-public final class MonthlyResultRequestSender {
-
-    private final String monthlyResultUrl;
+public record MonthlyResultRequestSender(String monthlyResultUrl) {
 
     /**
      * Create an instance of {@link MonthlyResultRequestSender}.

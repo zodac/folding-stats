@@ -55,9 +55,7 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.regex.Pattern;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
@@ -137,31 +135,6 @@ class UserTest {
             .containsExactly(userToCreate.getFoldingUserName(), userToCreate.getDisplayName(), userToCreate.getPasskey(),
                 Category.get(userToCreate.getCategory()), userToCreate.getProfileLink(), userToCreate.getLiveStatsLink(),
                 userToCreate.isUserIsCaptain());
-    }
-
-    @Test
-    void whenCreatingBatchOfUsers_givenPayloadIsValid_thenTheUsersAreCreated_andResponseHas200Status() throws FoldingRestException {
-        final int initialSize = UserUtils.getNumberOfUsers();
-
-        final List<UserRequest> batchOfUsers = List.of(
-            generateUser(),
-            generateUser(),
-            generateUser()
-        );
-
-        for (final UserRequest user : batchOfUsers) {
-            StubbedFoldingEndpointUtils.enableUser(user);
-        }
-
-        final HttpResponse<String> response = USER_REQUEST_SENDER.createBatchOf(batchOfUsers, ADMIN_USER.userName(), ADMIN_USER.password());
-        assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
-            .isEqualTo(HttpURLConnection.HTTP_OK);
-
-        final int newSize = UserUtils.getNumberOfUsers();
-        assertThat(newSize)
-            .as("Get all response did not return the initial users + new users")
-            .isEqualTo(initialSize + batchOfUsers.size());
     }
 
     @Test
@@ -512,56 +485,6 @@ class UserTest {
     }
 
     @Test
-    void whenCreatingBatchOfUsers_givenPayloadIsPartiallyValid_thenOnlyValidUsersAreCreated_andResponseHas200Status() throws FoldingRestException {
-        final int initialUsersSize = UserUtils.getNumberOfUsers();
-
-        final List<UserRequest> batchOfValidUsers = List.of(
-            generateUser(),
-            generateUser()
-        );
-        final List<UserRequest> batchOfInvalidUsers = List.of(
-            generateUserWithHardwareId(0),
-            generateUserWithHardwareId(0)
-        );
-        final List<UserRequest> batchOfUsers = new ArrayList<>(batchOfValidUsers.size() + batchOfInvalidUsers.size());
-        batchOfUsers.addAll(batchOfValidUsers);
-        batchOfUsers.addAll(batchOfInvalidUsers);
-
-        for (final UserRequest validUser : batchOfValidUsers) {
-            StubbedFoldingEndpointUtils.enableUser(validUser);
-        }
-
-        final HttpResponse<String> response = USER_REQUEST_SENDER.createBatchOf(batchOfUsers, ADMIN_USER.userName(), ADMIN_USER.password());
-        assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
-            .isEqualTo(HttpURLConnection.HTTP_OK);
-
-        final int newUsersSize = UserUtils.getNumberOfUsers();
-        assertThat(newUsersSize)
-            .as("Get all response did not return the initial users + new valid users")
-            .isEqualTo(initialUsersSize + batchOfValidUsers.size());
-    }
-
-    @Test
-    void whenCreatingBatchOfUsers_givenPayloadIsInvalid_thenResponseHas400Status() throws FoldingRestException {
-        final int initialUsersSize = UserUtils.getNumberOfUsers();
-        final List<UserRequest> batchOfInvalidUsers = List.of(
-            generateUserWithHardwareId(0),
-            generateUserWithHardwareId(0)
-        );
-
-        final HttpResponse<String> response = USER_REQUEST_SENDER.createBatchOf(batchOfInvalidUsers, ADMIN_USER.userName(), ADMIN_USER.password());
-        assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
-            .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
-
-        final int newUsersSize = UserUtils.getNumberOfUsers();
-        assertThat(newUsersSize)
-            .as("Get all response did not return only the initial users")
-            .isEqualTo(initialUsersSize);
-    }
-
-    @Test
     void whenGettingUserById_givenRequestUsesPreviousEntityTag_andUserHasNotChanged_thenResponseHas304Status_andNoBody() throws FoldingRestException {
         final int userId = create(generateUser()).getId();
 
@@ -610,24 +533,6 @@ class UserTest {
         StubbedFoldingEndpointUtils.enableUser(userToCreate);
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.create(userToCreate);
-        assertThat(response.statusCode())
-            .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
-            .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
-    }
-
-    @Test
-    void whenCreatingBatchOfUsers_givenNoAuthentication_thenRequestFails_andResponseHas401Status() throws FoldingRestException {
-        final List<UserRequest> batchOfUsers = List.of(
-            generateUser(),
-            generateUser(),
-            generateUser()
-        );
-
-        for (final UserRequest user : batchOfUsers) {
-            StubbedFoldingEndpointUtils.enableUser(user);
-        }
-
-        final HttpResponse<String> response = USER_REQUEST_SENDER.createBatchOf(batchOfUsers);
         assertThat(response.statusCode())
             .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);

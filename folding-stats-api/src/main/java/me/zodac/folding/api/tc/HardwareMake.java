@@ -24,8 +24,6 @@
 
 package me.zodac.folding.api.tc;
 
-import static java.util.stream.Collectors.toUnmodifiableList;
-
 import java.util.Collection;
 import java.util.stream.Stream;
 
@@ -56,7 +54,7 @@ public enum HardwareMake {
 
     private static final Collection<HardwareMake> ALL_VALUES = Stream.of(values())
         .filter(value -> value != INVALID)
-        .collect(toUnmodifiableList());
+        .toList();
 
     /**
      * Retrieve all available {@link HardwareMake}s (excluding {@link HardwareMake#INVALID}).

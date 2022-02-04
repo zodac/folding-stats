@@ -24,8 +24,11 @@
 
 package me.zodac.folding.db;
 
-import java.util.EnumMap;
-import java.util.Map;
+import io.github.resilience4j.core.IntervalFunction;
+import io.github.resilience4j.retry.Retry;
+import io.github.resilience4j.retry.RetryConfig;
+import java.time.Duration;
+import java.util.function.Supplier;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
 import me.zodac.folding.db.postgres.PostgresDataSource;
@@ -37,7 +40,6 @@ import me.zodac.folding.db.postgres.PostgresDbManager;
 public final class DbManagerRetriever {
 
     private static final String DATABASE_VARIABLE_NAME = "DEPLOYED_DATABASE";
-    private static final Map<DatabaseType, DbManager> DB_MANAGER_BY_DATABASE = new EnumMap<>(DatabaseType.class);
 
     private DbManagerRetriever() {
 
@@ -55,15 +57,21 @@ public final class DbManagerRetriever {
         final String deployedDatabase = EnvironmentVariableUtils.get(DATABASE_VARIABLE_NAME);
         final DatabaseType databaseType = DatabaseType.get(deployedDatabase);
 
-        switch (databaseType) {
-            case POSTGRESQL: {
-                DB_MANAGER_BY_DATABASE.putIfAbsent(DatabaseType.POSTGRESQL, PostgresDbManager.create(PostgresDataSource.create()));
-                return DB_MANAGER_BY_DATABASE.get(DatabaseType.POSTGRESQL);
-            }
-            case INVALID:
-            default:
-                throw new IllegalStateException(String.format("Unable to find database of type using variable '%s': %s",
-                    DATABASE_VARIABLE_NAME, deployedDatabase));
+        if (databaseType == DatabaseType.POSTGRESQL) {
+            final Supplier<PostgresDataSource> supplier = Retry.decorateSupplier(getRetry(), PostgresDataSource::create);
+            final PostgresDataSource postgresDataSource = supplier.get(); // NOPMD: CloseResource - Closed later manually
+            return PostgresDbManager.create(postgresDataSource);
         }
+
+        throw new IllegalStateException(String.format("Unable to find database of type using variable '%s': %s",
+            DATABASE_VARIABLE_NAME, deployedDatabase));
+    }
+
+    private static Retry getRetry() {
+        final RetryConfig retryConfig = RetryConfig.custom()
+            .maxAttempts(10)
+            .intervalFunction(IntervalFunction.ofExponentialBackoff(Duration.ofSeconds(10)))
+            .build();
+        return Retry.of("DatabaseConnection", retryConfig);
     }
 }

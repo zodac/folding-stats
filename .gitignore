@@ -6,11 +6,8 @@
 target/
 pom.xml.versionsBackup
 
-# Generated webpages
-docker/apache/site/
-
 # Generated jOOQ schema files
-docker/postgres/jooq/me/
+docker/database/jooq/me/
 !docker/postgres/jooq/*.jar
 
 # Environment files

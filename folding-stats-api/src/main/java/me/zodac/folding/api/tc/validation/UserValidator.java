@@ -24,7 +24,6 @@
 
 package me.zodac.folding.api.tc.validation;
 
-import static java.util.stream.Collectors.toList;
 import static me.zodac.folding.api.util.StringUtils.isBlank;
 import static me.zodac.folding.api.util.StringUtils.isBlankOrValidUrl;
 
@@ -121,7 +120,7 @@ public final class UserValidator {
                 team(userRequest, allTeams)
             )
             .filter(Objects::nonNull)
-            .collect(toList());
+            .toList();
 
         if (!hardwareAndTeamFailureMessages.isEmpty()) {
             return ValidationResult.failure(userRequest, hardwareAndTeamFailureMessages);
@@ -136,7 +135,7 @@ public final class UserValidator {
                 liveStatsLink(userRequest)
             )
             .filter(Objects::nonNull)
-            .collect(toList());
+            .toList();
 
         if (!failureMessages.isEmpty()) {
             return ValidationResult.failure(userRequest, failureMessages);
@@ -150,7 +149,7 @@ public final class UserValidator {
                 validateNewUserWorkUnits(userRequest)
             )
             .filter(Objects::nonNull)
-            .collect(toList());
+            .toList();
 
         if (!complexFailureMessages.isEmpty()) {
             return ValidationResult.failure(userRequest, complexFailureMessages);
@@ -212,7 +211,7 @@ public final class UserValidator {
                 team(userRequest, allTeams)
             )
             .filter(Objects::nonNull)
-            .collect(toList());
+            .toList();
 
         if (!hardwareAndTeamFailureMessages.isEmpty()) {
             return ValidationResult.failure(userRequest, hardwareAndTeamFailureMessages);
@@ -227,7 +226,7 @@ public final class UserValidator {
                 liveStatsLink(userRequest)
             )
             .filter(Objects::nonNull)
-            .collect(toList());
+            .toList();
 
         // All subsequent checks will be heavier, so best to return early if any failures occur
         if (!failureMessages.isEmpty()) {
@@ -242,7 +241,7 @@ public final class UserValidator {
                 validateUpdateUserWorkUnits(userRequest, existingUser)
             )
             .filter(Objects::nonNull)
-            .collect(toList());
+            .toList();
 
         if (!complexFailureMessages.isEmpty()) {
             return ValidationResult.failure(userRequest, complexFailureMessages);
@@ -373,7 +372,7 @@ public final class UserValidator {
         return allUsers
             .stream()
             .filter(user -> user.getTeam().getId() == teamId)
-            .collect(toList());
+            .toList();
     }
 
     private static Optional<Hardware> getHardware(final int hardwareId, final Collection<Hardware> allHardware) {
@@ -449,7 +448,7 @@ public final class UserValidator {
             final List<String> availableHardware = allHardware
                 .stream()
                 .map(hardware -> String.format("%s: %s", hardware.getId(), hardware.getHardwareName()))
-                .collect(toList());
+                .toList();
 
             return String.format("Field 'hardwareId' must be one of: %s", availableHardware);
         }
@@ -468,7 +467,7 @@ public final class UserValidator {
             final List<String> availableTeams = allTeams
                 .stream()
                 .map(team -> String.format("%s: %s", team.getId(), team.getTeamName()))
-                .collect(toList());
+                .toList();
 
             return String.format("Field 'teamId' must be one of: %s", availableTeams);
         }

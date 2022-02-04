@@ -30,8 +30,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Month;
 import java.time.Year;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
@@ -41,10 +39,7 @@ import me.zodac.folding.rest.util.RestUtilConstants;
 /**
  * Convenience class to send HTTP requests to the {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} REST endpoint.
  */
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-public final class HistoricStatsRequestSender {
-
-    private final String historicStatsUrl;
+public record HistoricStatsRequestSender(String historicStatsUrl) {
 
     /**
      * Create an instance of {@link HistoricStatsRequestSender}.

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds">
+    <property name="BASE_CONSOLE_LOG_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%-50logger{50}] %msg%n"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <withJansi>true</withJansi>
+        <encoder>
+            <pattern>%highlight(${BASE_CONSOLE_LOG_PATTERN})</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="SERVER_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <append>true</append>
+        <file>/var/backend/logs/server.log</file>
+        <immediateFlush>true</immediateFlush>
+        <encoder>
+            <pattern>${BASE_CONSOLE_LOG_PATTERN}</pattern>
+            <charset>utf8</charset>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>/var/backend/logs/server.log.%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+            <maxFileSize>100MB</maxFileSize>
+            <maxHistory>31</maxHistory>
+            <totalSizeCap>1000MB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="AUDIT_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <append>true</append>
+        <file>/var/backend/logs/audit.log</file>
+        <immediateFlush>true</immediateFlush>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%-5logger{5}] %msg%n</pattern>
+            <charset>utf8</charset>
+        </encoder>
+        <rollingPolicy
+                class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>/var/backend/logs/audit.log.%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+            <maxFileSize>100MB</maxFileSize>
+            <maxHistory>31</maxHistory>
+            <totalSizeCap>1000MB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="SERVER_LOG"/>
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+    <!-- The 'additivity=false' option ensures analytics data only goes to the analytics log -->
+    <logger name="audit" level="DEBUG" additivity="false">
+        <appender-ref ref="AUDIT_LOG"/>
+    </logger>
+
+    <!-- Suppress logging for unwanted packages -->
+    <!-- Not interested in the jOOQ startup messages -->
+    <logger name="org.jooq" level="WARN">
+        <appender-ref ref="SERVER_LOG"/>
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+    <!-- Not interested in Hikari DB logs when starting DB connection -->
+    <logger name="com.zaxxer.hikari" level="WARN">
+        <appender-ref ref="SERVER_LOG"/>
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+    <!-- On system startup, we see errors due to the DB not being online, don't need to see those exceptions -->
+    <logger name="com.zaxxer.hikari.pool" level="OFF">
+        <appender-ref ref="SERVER_LOG"/>
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+</configuration>

@@ -24,7 +24,6 @@
 
 package me.zodac.folding.db.postgres;
 
-import static java.util.stream.Collectors.toList;
 import static me.zodac.folding.db.postgres.RecordConverter.MONTHLY_RESULT_GSON;
 import static me.zodac.folding.db.postgres.gen.Routines.crypt;
 import static me.zodac.folding.db.postgres.gen.tables.Hardware.HARDWARE;
@@ -150,7 +149,7 @@ public final class PostgresDbManager implements DbManager {
                 .into(HARDWARE)
                 .stream()
                 .map(RecordConverter::toHardware)
-                .collect(toList());
+                .toList();
         });
     }
 
@@ -237,7 +236,7 @@ public final class PostgresDbManager implements DbManager {
                 .into(TEAMS)
                 .stream()
                 .map(RecordConverter::toTeam)
-                .collect(toList());
+                .toList();
         });
     }
 
@@ -345,7 +344,7 @@ public final class PostgresDbManager implements DbManager {
                 .fetch()
                 .stream()
                 .map(RecordConverter::toUser)
-                .collect(toList());
+                .toList();
         });
     }
 
@@ -452,26 +451,6 @@ public final class PostgresDbManager implements DbManager {
                 .from(USER_TC_STATS_HOURLY)
                 .where(USER_TC_STATS_HOURLY.USER_ID.equal(userId))
                 .orderBy(USER_TC_STATS_HOURLY.UTC_TIMESTAMP.desc())
-                .limit(SINGLE_RESULT);
-            LOGGER.debug("Executing SQL: '{}'", query);
-
-            return query
-                .fetch()
-                .into(USER_TC_STATS_HOURLY)
-                .stream()
-                .map(RecordConverter::toUserTcStats)
-                .findAny();
-        });
-    }
-
-    @Override
-    public Optional<UserTcStats> getFirstHourlyTcStats() {
-        LOGGER.debug("Checking if any TC stats exist in the DB");
-
-        return executeQuery(queryContext -> {
-            final var query = queryContext
-                .select()
-                .from(USER_TC_STATS_HOURLY)
                 .limit(SINGLE_RESULT);
             LOGGER.debug("Executing SQL: '{}'", query);
 
@@ -753,7 +732,7 @@ public final class PostgresDbManager implements DbManager {
                 .into(USER_TC_STATS_HOURLY)
                 .stream()
                 .map(RecordConverter::toHistoricStats)
-                .collect(toList());
+                .toList();
         });
     }
 
@@ -1024,7 +1003,7 @@ public final class PostgresDbManager implements DbManager {
                 .into(RETIRED_USER_STATS)
                 .stream()
                 .map(RecordConverter::toRetiredUserStats)
-                .collect(toList());
+                .toList();
         });
     }
 
@@ -1128,6 +1107,13 @@ public final class PostgresDbManager implements DbManager {
             return sqlQuery.apply(queryContext);
         } catch (final SQLException e) {
             throw new DatabaseConnectionException("Error closing connection", e);
+        }
+    }
+
+    @Override
+    public void close() {
+        if (dataSource instanceof PostgresDataSource postgresDataSource) {
+            postgresDataSource.close();
         }
     }
 }

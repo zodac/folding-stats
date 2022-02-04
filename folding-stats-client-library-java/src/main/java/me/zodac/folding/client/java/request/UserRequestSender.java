@@ -30,9 +30,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.Collection;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
@@ -43,10 +40,7 @@ import me.zodac.folding.rest.util.RestUtilConstants;
 /**
  * Convenience class to send HTTP requests to the {@link me.zodac.folding.api.tc.User} REST endpoint.
  */
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-public final class UserRequestSender {
-
-    private final String usersUrl;
+public record UserRequestSender(String usersUrl) {
 
     /**
      * Create an instance of {@link UserRequestSender}.
@@ -247,49 +241,6 @@ public final class UserRequestSender {
             throw new FoldingRestException("Error sending HTTP request to create user", e);
         } catch (final IOException e) {
             throw new FoldingRestException("Error sending HTTP request to create user", e);
-        }
-    }
-
-    /**
-     * Send a <b>POST</b> request to create the given {@link UserRequest}s in the system.
-     *
-     * @param batchOfUsers the {@link Collection} of {@link UserRequest}s to create
-     * @return the {@link HttpResponse} from the {@link HttpRequest}
-     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
-     */
-    public HttpResponse<String> createBatchOf(final Collection<UserRequest> batchOfUsers) throws FoldingRestException {
-        return createBatchOf(batchOfUsers, null, null);
-    }
-
-    /**
-     * Send a <b>POST</b> request to create the given {@link UserRequest}s in the system.
-     *
-     * @param batchOfUsers the {@link Collection} of {@link UserRequest}s to create
-     * @param userName     the username
-     * @param password     the password
-     * @return the {@link HttpResponse} from the {@link HttpRequest}
-     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
-     */
-    public HttpResponse<String> createBatchOf(final Collection<UserRequest> batchOfUsers, final String userName, final String password)
-        throws FoldingRestException {
-        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
-            .POST(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(batchOfUsers)))
-            .uri(URI.create(usersUrl + "/batch"))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
-
-        if (StringUtils.isNeitherBlank(userName, password)) {
-            requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
-        }
-
-        final HttpRequest request = requestBuilder.build();
-
-        try {
-            return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new FoldingRestException("Error sending HTTP request to create batch of users", e);
-        } catch (final IOException e) {
-            throw new FoldingRestException("Error sending HTTP request to create batch of users", e);
         }
     }
 

@@ -18,6 +18,8 @@
         <exclude name="JUnitTestContainsTooManyAsserts"/>
         <!-- False positives with AssertJ using #as() to include an error message -->
         <exclude name="JUnitAssertionsShouldIncludeMessage"/>
+        <!-- Mostly used for tests -->
+        <exclude name="AvoidUsingHardCodedIP"/>
     </rule>
 
     <rule ref="category/java/codestyle.xml">

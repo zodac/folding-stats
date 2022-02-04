@@ -28,7 +28,7 @@ import static me.zodac.folding.test.util.SystemCleaner.cleanSystemForComplexTest
 import static me.zodac.folding.test.util.TestAuthenticationData.ADMIN_USER;
 import static me.zodac.folding.test.util.TestGenerator.generateHardwareFromCategory;
 import static me.zodac.folding.test.util.TestGenerator.generateTeam;
-import static me.zodac.folding.test.util.TestGenerator.generateUserWithCategory;
+import static me.zodac.folding.test.util.TestGenerator.generateUserWithTeamIdAndCategory;
 import static me.zodac.folding.test.util.TestGenerator.nextUserName;
 import static me.zodac.folding.test.util.rest.request.TeamCompetitionStatsUtils.TEAM_COMPETITION_REQUEST_SENDER;
 import static me.zodac.folding.test.util.rest.request.TeamCompetitionStatsUtils.getActiveUserFromTeam;
@@ -170,19 +170,16 @@ class ResetTest {
     void whenResetOccurs_thenStatsAreResetForCompetitionAndTeamsAndUsers() throws FoldingRestException {
         final Team firstTeam = TeamUtils.create(generateTeam());
 
-        final UserRequest firstUser = generateUserWithCategory(Category.NVIDIA_GPU);
+        final UserRequest firstUser = generateUserWithTeamIdAndCategory(firstTeam.getId(), Category.NVIDIA_GPU);
         firstUser.setUserIsCaptain(true);
-        firstUser.setTeamId(firstTeam.getId());
         create(firstUser);
 
-        final UserRequest secondUser = generateUserWithCategory(Category.AMD_GPU);
-        secondUser.setTeamId(firstTeam.getId());
+        final UserRequest secondUser = generateUserWithTeamIdAndCategory(firstTeam.getId(), Category.AMD_GPU);
         create(secondUser);
 
         final Team secondTeam = TeamUtils.create(generateTeam());
-        final UserRequest thirdUser = generateUserWithCategory(Category.AMD_GPU);
+        final UserRequest thirdUser = generateUserWithTeamIdAndCategory(secondTeam.getId(), Category.AMD_GPU);
         thirdUser.setUserIsCaptain(true);
-        thirdUser.setTeamId(secondTeam.getId());
         create(thirdUser);
 
         final long firstUserPoints = 10_000L;

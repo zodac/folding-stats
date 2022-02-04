@@ -24,6 +24,8 @@
 
 package me.zodac.folding.api.exception;
 
+import java.io.Serial;
+
 /**
  * {@link RuntimeException} used when an error occurs opening or closing a database connection.
  *
@@ -38,6 +40,7 @@ package me.zodac.folding.api.exception;
  */
 public class DatabaseConnectionException extends RuntimeException {
 
+    @Serial
     private static final long serialVersionUID = 2662806281406745266L;
 
     /**

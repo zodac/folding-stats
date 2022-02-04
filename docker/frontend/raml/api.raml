@@ -1,0 +1,778 @@
+#%RAML 1.0
+title: "%TITLE%"
+baseUri: "%REST_ENDPOINT_URL%"
+
+traits:
+  adminOnly:
+    headers:
+      Authorization:
+        displayName: Authorization
+        description: "Basic authentication encoded as a Base64 string, with the credentials in the form 'username:password'"
+        type: string
+        required: true
+  cached:
+    headers:
+      If-None-Match:
+        description: "An EntityTag used to retrieve a cache version of the response"
+        type: string
+        required: false
+
+/hardware:
+  get:
+    is: [ "cached" ]
+    description: "Retrieves all hardware"
+    responses:
+      200:
+        description: "All hardware has been retrieved"
+        body:
+          application/json:
+            example: !include responses/hardware/hardwareGetAll.json
+        headers:
+          eTag:
+            description: "An EntityTag which can be used to retrieve a cached version of the response in future requests"
+            type: string
+      503:
+        description: "The system is not in a valid state to execute read requests"
+  post:
+    is: [ "adminOnly" ]
+    description: "Creates a new hardware with the given properties"
+    body:
+      application/json:
+        example: !include requests/hardware/hardwarePost.json
+    responses:
+      201:
+        description: "The hardware has been created"
+        body:
+          application/json:
+            example: !include responses/hardware/hardwarePost.json
+        headers:
+          location:
+            description: "The URL to the created hardware"
+            type: string
+      400:
+        description: "The given payload is invalid"
+        body:
+          application/json:
+            example: !include responses/hardware/hardwarePostBadRequest.json
+      401:
+        description: "System user cannot be successfully logged in with provided credentials"
+      403:
+        description: "System user does not have the correct role to perform this request"
+      409:
+        description: "A hardware with the same 'hardwareName' already exists"
+        body:
+          application/json:
+            example: !include responses/hardware/hardwarePostConflict.json
+      502:
+        description: "An error occurred connecting to an external system to verify the hardware"
+      503:
+        description: "The system is not in a valid state to execute write requests"
+  /fields:
+    get:
+      is: [ "cached" ]
+      queryParameters:
+        hardwareName:
+          displayName: hardwareName
+          type: string
+          description: The unique name of the hardware
+          example: GM204 [GeForce GTX 970] 3494
+          required: false
+      description: "Retrieves the hardware with the given hardware name"
+      responses:
+        200:
+          description: "The hardware has been retrieved from the system"
+          body:
+            application/json:
+              example: !include responses/hardware/hardwareGet.json
+        400:
+          description: "The provided ID is an invalid integer, or out of range"
+          body:
+            application/json:
+              example: !include responses/hardware/hardwareGetBadRequest.json
+        404:
+          description: "No hardware exists with the given ID"
+        503:
+          description: "The system is not in a valid state to execute read requests"
+  /{hardwareId}:
+    uriParameters:
+      hardwareId:
+        description: "The ID of the hardware"
+        type: integer
+        required: true
+    delete:
+      is: [ "adminOnly" ]
+      description: "Deletes the hardware with the given ID"
+      responses:
+        200:
+          description: "The hardware has been deleted from the system"
+        401:
+          description: "System user cannot be successfully logged in with provided credentials"
+        403:
+          description: "System user does not have the correct role to perform this request"
+        404:
+          description: "No hardware exists with the given ID"
+        409:
+          description: "The hardware is being referenced by a user and cannot be deleted"
+          body:
+            application/json:
+              example: !include responses/hardware/hardwareDeleteConflict.json
+        503:
+          description: "The system is not in a valid state to execute write requests"
+    get:
+      is: [ "cached" ]
+      description: "Retrieves the hardware with the given ID"
+      responses:
+        200:
+          description: "The hardware has been retrieved from the system"
+          body:
+            application/json:
+              example: !include responses/hardware/hardwareGet.json
+        400:
+          description: "The provided ID is an invalid integer, or out of range"
+          body:
+            application/json:
+              example: !include responses/hardware/hardwareGetBadRequest.json
+        404:
+          description: "No hardware exists with the given ID"
+        503:
+          description: "The system is not in a valid state to execute read requests"
+    put:
+      is: [ "adminOnly" ]
+      description: "Updates an existing hardware with the given properties"
+      body:
+        application/json:
+          example: !include requests/hardware/hardwarePut.json
+      responses:
+        200:
+          description: "The hardware has been updated"
+          body:
+            application/json:
+              example: !include responses/hardware/hardwarePut.json
+          headers:
+            location:
+              description: "The URL to the updated hardware (unless there was no change to the hardware)"
+              type: string
+              required: false
+        400:
+          description: "The given payload is invalid"
+          body:
+            application/json:
+              example: !include responses/hardware/hardwarePutBadRequest.json
+        401:
+          description: "System user cannot be successfully logged in with provided credentials"
+        403:
+          description: "System user does not have the correct role to perform this request"
+        404:
+          description: "No hardware exists with the given ID"
+        409:
+          description: "A hardware with the same 'hardwareName' already exists"
+        502:
+          description: "An error occurred connecting to an external system to verify the hardware"
+        503:
+          description: "The system is not in a valid state to execute write requests"
+
+/teams:
+  get:
+    is: [ "cached" ]
+    description: "Retrieves all teams"
+    responses:
+      200:
+        description: "All teams have been retrieved"
+        body:
+          application/json:
+            example: !include responses/teams/teamsGetAll.json
+        headers:
+          eTag:
+            description: "An EntityTag which can be used to retrieve a cached version of the response in future requests"
+            type: string
+      503:
+        description: "The system is not in a valid state to execute read requests"
+  post:
+    is: [ "adminOnly" ]
+    description: "Creates a new team with the given properties"
+    body:
+      application/json:
+        example: !include requests/teams/teamsPost.json
+    responses:
+      201:
+        description: "The team has been created"
+        body:
+          application/json:
+            example: !include responses/teams/teamsPost.json
+        headers:
+          location:
+            description: "The URL to the created team"
+            type: string
+      400:
+        description: "The given payload is invalid"
+        body:
+          application/json:
+            example: !include responses/teams/teamsPostBadRequest.json
+      401:
+        description: "System user cannot be successfully logged in with provided credentials"
+      403:
+        description: "System user does not have the correct role to perform this request"
+      409:
+        description: "A team with the same 'teamName' already exists"
+        body:
+          application/json:
+            example: !include responses/teams/teamsPostConflict.json
+      502:
+        description: "An error occurred connecting to an external system to verify the team"
+      503:
+        description: "The system is not in a valid state to execute write requests"
+  /fields:
+    get:
+      is: [ "cached" ]
+      queryParameters:
+        teamName:
+          displayName: teamName
+          type: string
+          description: The unique name of the Team
+          example: Fluffy Pink Ninjas
+          required: false
+      description: "Retrieves the team with the given team name"
+      responses:
+        200:
+          description: "The team has been retrieved from the system"
+          body:
+            application/json:
+              example: !include responses/teams/teamGet.json
+        400:
+          description: "The provided ID is an invalid integer, or out of range"
+          body:
+            application/json:
+              example: !include responses/teams/teamGetBadRequest.json
+        404:
+          description: "No team exists with the given ID"
+        503:
+          description: "The system is not in a valid state to execute read requests"
+  /{teamId}:
+    uriParameters:
+      teamId:
+        description: "The ID of the team"
+        type: integer
+        required: true
+    delete:
+      is: [ "adminOnly" ]
+      description: "Deletes the team with the given ID"
+      responses:
+        200:
+          description: "The team has been deleted from the system"
+        401:
+          description: "System user cannot be successfully logged in with provided credentials"
+        403:
+          description: "System user does not have the correct role to perform this request"
+        404:
+          description: "No team exists with the given ID"
+        409:
+          description: "The team is being referenced by a user and cannot be deleted"
+          body:
+            application/json:
+              example: !include responses/teams/teamsDeleteConflict.json
+        503:
+          description: "The system is not in a valid state to execute write requests"
+    get:
+      is: [ "cached" ]
+      description: "Retrieves the team with the given ID"
+      responses:
+        200:
+          description: "The team has been retrieved from the system"
+          body:
+            application/json:
+              example: !include responses/teams/teamsGet.json
+        400:
+          description: "The provided ID is an invalid integer, or out of range"
+          body:
+            application/json:
+              example: !include responses/teams/teamsGetBadRequest.json
+        404:
+          description: "No team exists with the given ID"
+        503:
+          description: "The system is not in a valid state to execute read requests"
+    put:
+      is: [ "adminOnly" ]
+      description: "Updates an existing team with the given properties"
+      body:
+        application/json:
+          example: !include requests/teams/teamsPut.json
+      responses:
+        200:
+          description: "The hardware has been updated"
+          body:
+            application/json:
+              example: !include responses/teams/teamsPut.json
+          headers:
+            location:
+              description: "The URL to the updated team (unless there was no change to the team)"
+              type: string
+              required: false
+        400:
+          description: "The given payload is invalid"
+          body:
+            application/json:
+              example: !include responses/teams/teamsPutBadRequest.json
+        401:
+          description: "System user cannot be successfully logged in with provided credentials"
+        403:
+          description: "System user does not have the correct role to perform this request"
+        404:
+          description: "No team exists with the given ID"
+        409:
+          description: "A team with the same 'teamName' already exists"
+        502:
+          description: "An error occurred connecting to an external system to verify the team"
+        503:
+          description: "The system is not in a valid state to execute write requests"
+
+/users:
+  get:
+    is: [ "cached" ]
+    description: "Retrieves all users with passkeys hidden"
+    responses:
+      200:
+        description: "All users have been retrieved"
+        body:
+          application/json:
+            example: !include responses/users/usersGetAll.json
+        headers:
+          eTag:
+            description: "An EntityTag which can be used to retrieve a cached version of the response in future requests"
+            type: string
+      503:
+        description: "The system is not in a valid state to execute read requests"
+  post:
+    is: [ "adminOnly" ]
+    description: "Creates a new user with the given properties"
+    body:
+      application/json:
+        example: !include requests/users/usersPost.json
+    responses:
+      201:
+        description: "The user has been created"
+        body:
+          application/json:
+            example: !include responses/users/usersPost.json
+        headers:
+          location:
+            description: "The URL to the created user"
+            type: string
+      400:
+        description: "The given payload is invalid"
+        body:
+          application/json:
+            example: !include responses/users/usersPostBadRequest.json
+      401:
+        description: "System user cannot be successfully logged in with provided credentials"
+      403:
+        description: "System user does not have the correct role to perform this request"
+      409:
+        description: "A user with the same 'foldingUserName' and 'passkey' already exists"
+        body:
+          application/json:
+            example: !include responses/users/usersPostConflict.json
+      502:
+        description: "An error occurred connecting to an external system to verify the user"
+      503:
+        description: "The system is not in a valid state to execute write requests"
+  /{userId}:
+    uriParameters:
+      userId:
+        description: "The ID of the user instance"
+        type: integer
+        required: true
+    delete:
+      is: [ "adminOnly" ]
+      description: "Deletes the user with the given ID"
+      responses:
+        200:
+          description: "The user has been deleted from the system"
+        400:
+          description: "The user is their team captain and cannot be deleted"
+          body:
+            application/json:
+              example: !include responses/users/usersDeleteBadRequest.json
+        401:
+          description: "System user cannot be successfully logged in with provided credentials"
+        403:
+          description: "System user does not have the correct role to perform this request"
+        404:
+          description: "No user exists with the given ID"
+        503:
+          description: "The system is not in a valid state to execute write requests"
+    get:
+      is: [ "cached" ]
+      description: "Retrieves the user with the given ID with passkey hidden"
+      responses:
+        200:
+          description: "The user has been retrieved from the system"
+          body:
+            application/json:
+              example: !include responses/users/usersGet.json
+        400:
+          description: "The provided ID is an invalid integer, or out of range"
+          body:
+            application/json:
+              example: !include responses/users/usersGetBadRequest.json
+        404:
+          description: "No user exists with the given ID"
+        503:
+          description: "The system is not in a valid state to execute read requests"
+    put:
+      is: [ "adminOnly" ]
+      description: "Updates an existing user with the given properties"
+      body:
+        application/json:
+          example: !include requests/users/usersPut.json
+      responses:
+        200:
+          description: "The user has been updated"
+          body:
+            application/json:
+              example: !include responses/users/usersPut.json
+          headers:
+            location:
+              description: "The URL to the updated user (unless there was no change to the user)"
+              type: string
+              required: false
+        400:
+          description: "The given payload is invalid"
+          body:
+            application/json:
+              example: !include responses/users/usersPutBadRequest.json
+        401:
+          description: "System user cannot be successfully logged in with provided credentials"
+        403:
+          description: "System user does not have the correct role to perform this request"
+        404:
+          description: "No user exists with the given ID"
+        409:
+          description: "A user with the same 'foldingUserName' and 'passkey' already exists"
+        502:
+          description: "An error occurred connecting to an external system to verify the hardware"
+        503:
+          description: "The system is not in a valid state to execute write requests"
+    /passkey:
+      get:
+        is: [ "cached" ]
+        description: "Retrieves the user with the given ID with passkey exposed"
+        responses:
+          200:
+            description: "The user has been retrieved from the system"
+            body:
+              application/json:
+                example: !include responses/users/usersGetPasskey.json
+          400:
+            description: "The provided ID is an invalid integer, or out of range"
+            body:
+              application/json:
+                example: !include responses/users/usersGetBadRequest.json
+          404:
+            description: "No user exists with the given ID"
+          503:
+            description: "The system is not in a valid state to execute read requests"
+
+/results:
+  /result/{year}/{month}:
+    uriParameters:
+      year:
+        description: "The year of the monthly ETF result to be retrieved"
+        type: integer
+        required: true
+      month:
+        description: "The month of the monthly ETF result to be retrieved"
+        type: integer
+        required: true
+    get:
+      description: "Retrieves the ETF result for the given month/year"
+      responses:
+        200:
+          description: "ETF result is retrieved successfully"
+          body:
+            application/json:
+              example: !include responses/result/get.json
+        400:
+          description: "The year or month"
+          body:
+            application/json:
+              example: !include responses/result/getBadRequest.json
+
+  /manual/save:
+    post:
+      is: [ "adminOnly" ]
+      description: "Request a manual save of the current ETF result"
+      responses:
+        200:
+          description: "ETF result has been successfully saved"
+        401:
+          description: "System user cannot be successfully logged in with provided credentials"
+        403:
+          description: "System user does not have the correct role to perform this request"
+        503:
+          description: "The system is not in a valid state to execute read requests"
+
+/stats:
+  get:
+    description:
+    responses:
+      200:
+        description: "Retrieve the overall stats for teams/users"
+        body:
+          application/json:
+            example: !include responses/stats/statsGet.json
+      503:
+        description: "The system is not in a valid state to execute read requests"
+  /category:
+    get:
+      description:
+      responses:
+        200:
+          description: "Retrieve the category leaderboards for all users"
+          body:
+            application/json:
+              example: !include responses/stats/statsGetCategory.json
+        503:
+          description: "The system is not in a valid state to execute read requests"
+  /leaderboard:
+    get:
+      description: "Retrieve the team leaderboard for all teams"
+      responses:
+        200:
+          description:
+          body:
+            application/json:
+              example: !include responses/stats/statsGetLeaderboard.json
+        503:
+          description: "The system is not in a valid state to execute read requests"
+  /manual:
+    /reset:
+      post:
+        is: [ "adminOnly" ]
+        description: "Resets all user/team stats"
+        responses:
+          401:
+            description: "System user cannot be successfully logged in with provided credentials"
+          403:
+            description: "System user does not have the correct role to perform this request"
+          503:
+            description: "The system is not in a valid state to execute write requests"
+    /update:
+      post:
+        is: [ "adminOnly" ]
+        description: "Requests an update of all user/team stats"
+        queryParameters:
+          async:
+            displayName: Async
+            type: boolean
+            description: "Whether the stats should be retrieved asynchronously, or the request should only return a response when complete"
+            example: true
+            required: false
+        responses:
+          401:
+            description: "System user cannot be successfully logged in with provided credentials"
+          403:
+            description: "System user does not have the correct role to perform this request"
+          503:
+            description: "The system is not in a valid state to execute write requests"
+  /users/{userId}:
+    uriParameters:
+      userId:
+        description: "The ID of the user whose stats are to be retrieved/updated"
+        type: integer
+        required: true
+    get:
+      description: "Used to retrieve current the ETF stats for the user"
+      responses:
+        200:
+          description: "The user stats have been successfully retrieved"
+          body:
+            application/json:
+              example: !include responses/stats/userOffsetGet.json
+        400:
+          description: "The user ID is invalid"
+          body:
+            application/json:
+              example: !include responses/stats/userOffsetGetBadRequest.json
+        404:
+          description: "No user exists with the given ID"
+        503:
+          description: "The system is not in a valid state to execute read requests"
+    patch:
+      is: [ "adminOnly" ]
+      description: "Used to offset the ETF stats for the user"
+      body:
+        application/json:
+          example: !include requests/stats/userOffsetPatch.json
+      responses:
+        200:
+          description: "The user stats have been updated successfully"
+        400:
+          description: "The payload is invalid, or an invalid user ID was provided"
+          body:
+            application/json:
+              example: !include responses/stats/userOffsetPatchBadRequest.json
+        401:
+          description: "System user cannot be successfully logged in with provided credentials"
+        403:
+          description: "System user does not have the correct role to perform this request"
+        404:
+          description: "No user exists with the given ID"
+        503:
+          description: "The system is not in a valid state to execute write requests"
+
+/historic:
+  /users/{userId}/{year}:
+    uriParameters:
+      userId:
+        description: "The ID of the user whose stats are to be retrieved"
+        type: integer
+        required: true
+      year:
+        description: "The year of the monthly/daily/hourly stats to be retrieved"
+        type: integer
+        required: true
+    get:
+      description: "Retrieves the monthly stats for a user for the given year"
+      responses:
+        200:
+          description: "Historic stats are retrieved successfully"
+          body:
+            application/json:
+              example: !include responses/historic/historicUserGetMonthly.json
+        400:
+          description: "The year or user ID is not valid"
+          body:
+            application/json:
+              example: !include responses/historic/historicUserGetMonthlyBadRequest.json
+        404:
+          description: "No user exists with the given ID"
+    /{month}:
+      get:
+        description: "Retrieves the daily stats for a user for the given year and month"
+        responses:
+          200:
+            description: "Historic stats are retrieved successfully"
+            body:
+              application/json:
+                example: !include responses/historic/historicUserGetDaily.json
+          400:
+            description: "The year, month or user ID is not valid"
+            body:
+              application/json:
+                example: !include responses/historic/historicUserGetDailyBadRequest.json
+          404:
+            description: "No user exists with the given ID"
+      /{day}:
+        get:
+          description: "Retrieves the hourly stats for a user for the given year, month and day"
+          responses:
+            200:
+              description: "Historic stats are retrieved successfully"
+              body:
+                application/json:
+                  example: !include responses/historic/historicUserGetHourly.json
+            400:
+              description: "The year, month, day or user ID is not valid"
+              body:
+                application/json:
+                  example: !include responses/historic/historicUserGetHourlyBadRequest.json
+            404:
+              description: "No user exists with the given ID"
+  /teams/{teamId}/{year}:
+    uriParameters:
+      teamId:
+        description: "The ID of the team whose stats are to be retrieved"
+        type: integer
+        required: true
+      year:
+        description: "The year of the monthly/daily/hourly stats to be retrieved"
+        type: integer
+        required: true
+    get:
+      description: "Retrieves the monthly stats for a team for the given year"
+      responses:
+        200:
+          description: "Historic stats are retrieved successfully"
+          body:
+            application/json:
+              example: !include responses/historic/historicTeamGetMonthly.json
+        400:
+          description: "The year or team ID is not valid"
+          body:
+            application/json:
+              example: !include responses/historic/historicTeamGetMonthlyBadRequest.json
+        404:
+          description: "No team exists with the given ID"
+    /{month}:
+      get:
+        description: "Retrieves the daily stats for a team for the given year and month"
+        responses:
+          200:
+            description: "Historic stats are retrieved successfully"
+            body:
+              application/json:
+                example: !include responses/historic/historicTeamGetDaily.json
+          400:
+            description: "The year, month or team ID is not valid"
+            body:
+              application/json:
+                example: !include responses/historic/historicTeamGetDailyBadRequest.json
+          404:
+            description: "No team exists with the given ID"
+      /{day}:
+        get:
+          description: "Retrieves the hourly stats for a team for the given year, month and day"
+          responses:
+            200:
+              description: "Historic stats are retrieved successfully"
+              body:
+                application/json:
+                  example: !include responses/historic/historicTeamGetHourly.json
+            400:
+              description: "The year, month, day or team ID is not valid"
+              body:
+                application/json:
+                  example: !include responses/historic/historicTeamGetHourlyBadRequest.json
+            404:
+              description: "No team exists with the given ID"
+
+/login/admin:
+  post:
+    description: "Accepts user credentials and verifies whether they have admin access to the system"
+    body:
+      application/json:
+        example: !include requests/login/loginPost.json
+    responses:
+      200:
+        description: "Credentials are valid and for an admin user"
+      400:
+        description:
+        body:
+          application/json:
+            example: !include responses/login/loginPostBadRequest.json
+      401:
+        description: "System user cannot be successfully logged in with provided credentials"
+      403:
+        description: "System user is a valid user, but not an admin"
+      503:
+        description: "The system is not in a valid state to execute write requests"
+
+/debug:
+  /caches:
+    is: [ "adminOnly" ]
+    post:
+      description: "Debugging endpoint to print contents of caches to system log"
+    responses:
+      200:
+        description: "Cache contents have been printed to system log"
+  /lars:
+    is: [ "adminOnly" ]
+    post:
+      description: "Debugging endpoint to manually start the LARS hardware update"
+    responses:
+      200:
+        description: "LARS update successfully run and results printed to system log"
+      401:
+        description: "System user cannot be successfully logged in with provided credentials"
+      403:
+        description: "System user does not have the correct role to perform this request"

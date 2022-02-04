@@ -27,7 +27,6 @@ package me.zodac.folding.test.util.rest.request;
 import static me.zodac.folding.api.util.EncodingUtils.encodeBasicAuthentication;
 import static me.zodac.folding.test.util.TestAuthenticationData.ADMIN_USER;
 import static me.zodac.folding.test.util.TestConstants.FOLDING_URL;
-import static me.zodac.folding.test.util.TestConstants.TEST_SERVICE_URL;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
@@ -35,7 +34,6 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.Set;
 import me.zodac.folding.api.tc.lars.LarsGpu;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
@@ -84,9 +82,15 @@ public final class LarsUtils {
      * @throws FoldingRestException thrown if an error occurs adding the {@link LarsGpu}s
      */
     public static void addGpusToLarsDb(final LarsGpu... larsGpus) throws FoldingRestException {
+        for (final LarsGpu larsGpu : larsGpus) {
+            addGpuToLarsDb(larsGpu);
+        }
+    }
+
+    private static void addGpuToLarsDb(final LarsGpu larsGpu) throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
-            .POST(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(Set.of(larsGpus))))
-            .uri(URI.create(TEST_SERVICE_URL + "/gpu_ppd/overall_ranks"))
+            .POST(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(larsGpu)))
+            .uri(URI.create(FOLDING_URL + "/gpu_ppd/overall_ranks"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
             .build();
 
@@ -113,7 +117,7 @@ public final class LarsUtils {
     public static void deleteAllGpusFromLarsDb() throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
             .DELETE()
-            .uri(URI.create(TEST_SERVICE_URL + "/gpu_ppd/overall_ranks/"))
+            .uri(URI.create(FOLDING_URL + "/gpu_ppd/overall_ranks/"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
             .build();

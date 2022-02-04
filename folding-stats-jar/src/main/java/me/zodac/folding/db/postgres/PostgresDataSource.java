@@ -26,7 +26,6 @@ package me.zodac.folding.db.postgres;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import javax.sql.DataSource;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
 
 /**
@@ -34,29 +33,34 @@ import me.zodac.folding.api.util.EnvironmentVariableUtils;
  */
 public final class PostgresDataSource extends HikariDataSource {
 
-    private static final HikariConfig DATA_SOURCE_CONFIG = new HikariConfig();
-
-    static {
-        DATA_SOURCE_CONFIG.setJdbcUrl(EnvironmentVariableUtils.get("JDBC_CONNECTION_URL"));
-        DATA_SOURCE_CONFIG.setUsername(EnvironmentVariableUtils.get("JDBC_CONNECTION_USER"));
-        DATA_SOURCE_CONFIG.setPassword(EnvironmentVariableUtils.get("JDBC_CONNECTION_PASSWORD"));
-        DATA_SOURCE_CONFIG.setDriverClassName(EnvironmentVariableUtils.get("JDBC_CONNECTION_DRIVER"));
-
-        DATA_SOURCE_CONFIG.addDataSourceProperty("cachePrepStmts", "true");
-        DATA_SOURCE_CONFIG.addDataSourceProperty("prepStmtCacheSize", "250");
-        DATA_SOURCE_CONFIG.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-    }
-
-    private PostgresDataSource() {
-        super(DATA_SOURCE_CONFIG);
+    private PostgresDataSource(final HikariConfig hikariConfig) {
+        super(hikariConfig);
     }
 
     /**
      * Creates an instance of {@link PostgresDataSource}.
      *
+     * <p>
+     * Uses the following environment variables:
+     * <ul>
+     *     <li>JDBC_CONNECTION_URL</li>
+     *     <li>JDBC_CONNECTION_USER</li>
+     *     <li>JDBC_CONNECTION_PASSWORD</li>
+     *     <li>JDBC_CONNECTION_DRIVER</li>
+     * </ul>
+     *
      * @return the created {@link PostgresDataSource}
      */
-    public static DataSource create() {
-        return new PostgresDataSource();
+    public static PostgresDataSource create() {
+        final HikariConfig hikariConfig = new HikariConfig();
+        hikariConfig.setJdbcUrl(EnvironmentVariableUtils.get("JDBC_CONNECTION_URL"));
+        hikariConfig.setUsername(EnvironmentVariableUtils.get("JDBC_CONNECTION_USER"));
+        hikariConfig.setPassword(EnvironmentVariableUtils.get("JDBC_CONNECTION_PASSWORD"));
+        hikariConfig.setDriverClassName(EnvironmentVariableUtils.get("JDBC_CONNECTION_DRIVER"));
+        hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
+        hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
+        hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+
+        return new PostgresDataSource(hikariConfig);
     }
 }

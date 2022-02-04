@@ -33,7 +33,6 @@ import static me.zodac.folding.test.util.TestAuthenticationData.INVALID_PASSWORD
 import static me.zodac.folding.test.util.TestAuthenticationData.INVALID_USERNAME;
 import static me.zodac.folding.test.util.TestAuthenticationData.READ_ONLY_USER;
 import static me.zodac.folding.test.util.TestConstants.FOLDING_URL;
-import static me.zodac.folding.test.util.TestGenerator.generateInvalidTeam;
 import static me.zodac.folding.test.util.TestGenerator.generateTeam;
 import static me.zodac.folding.test.util.TestGenerator.nextTeamName;
 import static me.zodac.folding.test.util.rest.request.TeamUtils.TEAM_REQUEST_SENDER;
@@ -47,9 +46,7 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.client.java.response.TeamResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
@@ -116,28 +113,6 @@ class TeamTest {
             .as("Did not receive created object as JSON response: " + response.body())
             .extracting("teamName", "teamDescription", "forumLink")
             .containsExactly(teamToCreate.getTeamName(), teamToCreate.getTeamDescription(), teamToCreate.getForumLink());
-
-    }
-
-    @Test
-    void whenCreatingBatchOfTeams_givenPayloadIsValid_thenTheTeamsAreCreated_andResponseHas200Status() throws FoldingRestException {
-        final int initialSize = TeamUtils.getNumberOfTeams();
-
-        final List<TeamRequest> batchOfTeams = List.of(
-            generateTeam(),
-            generateTeam(),
-            generateTeam()
-        );
-
-        final HttpResponse<String> response = TEAM_REQUEST_SENDER.createBatchOf(batchOfTeams, ADMIN_USER.userName(), ADMIN_USER.password());
-        assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
-            .isEqualTo(HttpURLConnection.HTTP_OK);
-
-        final int newSize = TeamUtils.getNumberOfTeams();
-        assertThat(newSize)
-            .as("Get all response did not return the initial teams + new teams")
-            .isEqualTo(initialSize + batchOfTeams.size());
     }
 
     @Test
@@ -427,53 +402,6 @@ class TeamTest {
     }
 
     @Test
-    void whenCreatingBatchOfTeams_givenPayloadIsPartiallyValid_thenOnlyValidTeamsAreCreated_andResponseHas200Status() throws FoldingRestException {
-        final int initialTeamsSize = TeamUtils.getNumberOfTeams();
-
-        final List<TeamRequest> batchOfValidTeams = List.of(
-            generateTeam(),
-            generateTeam()
-        );
-        final List<TeamRequest> batchOfInvalidTeams = List.of(
-            generateInvalidTeam(),
-            generateInvalidTeam()
-        );
-        final List<TeamRequest> batchOfTeams = new ArrayList<>(batchOfValidTeams.size() + batchOfInvalidTeams.size());
-        batchOfTeams.addAll(batchOfValidTeams);
-        batchOfTeams.addAll(batchOfInvalidTeams);
-
-        final HttpResponse<String> response = TEAM_REQUEST_SENDER.createBatchOf(batchOfTeams, ADMIN_USER.userName(), ADMIN_USER.password());
-        assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
-            .isEqualTo(HttpURLConnection.HTTP_OK);
-
-        final int newTeamsSize = TeamUtils.getNumberOfTeams();
-        assertThat(newTeamsSize)
-            .as("Get all response did not return the initial teams + new valid teams")
-            .isEqualTo(initialTeamsSize + batchOfValidTeams.size());
-    }
-
-    @Test
-    void whenCreatingBatchOfTeams_givenPayloadIsInvalid_thenResponseHas400Status() throws FoldingRestException {
-        final int initialTeamsSize = TeamUtils.getNumberOfTeams();
-
-        final List<TeamRequest> batchOfInvalidTeams = List.of(
-            generateInvalidTeam(),
-            generateInvalidTeam()
-        );
-
-        final HttpResponse<String> response = TEAM_REQUEST_SENDER.createBatchOf(batchOfInvalidTeams, ADMIN_USER.userName(), ADMIN_USER.password());
-        assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
-            .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
-
-        final int newHardwareSize = TeamUtils.getNumberOfTeams();
-        assertThat(newHardwareSize)
-            .as("Get all response did not return only the initial teams")
-            .isEqualTo(initialTeamsSize);
-    }
-
-    @Test
     void whenDeletingTeam_givenTheTeamIsLinkedToUser_thenResponseHas409Status() throws FoldingRestException {
         final int teamId = create(generateTeam()).getId();
         UserUtils.create(TestGenerator.generateUserWithTeamId(teamId));
@@ -532,20 +460,6 @@ class TeamTest {
         final TeamRequest teamToCreate = generateTeam();
 
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(teamToCreate);
-        assertThat(response.statusCode())
-            .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
-            .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
-    }
-
-    @Test
-    void whenCreatingBatchOfTeams_givenNoAuthentication_thenRequestFails_andResponseHas401Status() throws FoldingRestException {
-        final List<TeamRequest> batchOfTeams = List.of(
-            generateTeam(),
-            generateTeam(),
-            generateTeam()
-        );
-
-        final HttpResponse<String> response = TEAM_REQUEST_SENDER.createBatchOf(batchOfTeams);
         assertThat(response.statusCode())
             .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);

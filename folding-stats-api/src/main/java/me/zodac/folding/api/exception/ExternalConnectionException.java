@@ -24,11 +24,14 @@
 
 package me.zodac.folding.api.exception;
 
+import java.io.Serial;
+
 /**
  * {@link Exception} for errors when connecting to an external service, or when an unexpected response is returned.
  */
 public class ExternalConnectionException extends Exception {
 
+    @Serial
     private static final long serialVersionUID = 2084075114898438910L;
 
     /**

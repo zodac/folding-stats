@@ -90,7 +90,7 @@ public final class StatsRequestSender {
      * @throws ExternalConnectionException thrown if an error occurs connecting to the external URL
      */
     public static HttpResponse<String> sendFoldingRequest(final StatsRequestUrl statsRequestUrl) throws ExternalConnectionException {
-        final String requestUrl = statsRequestUrl.getUrl();
+        final String requestUrl = statsRequestUrl.url();
 
         try {
             final HttpResponse<String> response = sendRequest(requestUrl);
