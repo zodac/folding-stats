@@ -7,6 +7,9 @@ services:
       context: .
       dockerfile: docker/frontend/Dockerfile
       args:
+        # Docker image versions
+        NODE_VERSION: 17
+        # Build arguments
         FORUM_LINK: "${FORUM_LINK}"
         REST_ENDPOINT_URL: "${REST_ENDPOINT_URL}"
         ROOT_URL: "${ROOT_URL}"
@@ -31,10 +34,12 @@ services:
       context: .
       dockerfile: docker/backend/Dockerfile
       args:
-        DEBIAN_VERSION: 11
+        # Docker image versions
+        DEBIAN_VERSION: 11.2
         JAVA_VERSION: 17
-        KEYSTORE_PASSWORD: "${KEYSTORE_PASSWORD}"
         MAVEN_VERSION: 3.8.4
+        # Build arguments
+        KEYSTORE_PASSWORD: "${KEYSTORE_PASSWORD}"
         NEXUS_URL: "${NEXUS_URL}"
     container_name: backend
     hostname: backend
@@ -79,6 +84,9 @@ services:
       context: .
       dockerfile: docker/database/Dockerfile
       args:
+        # Docker image versions
+        POSTGRES_VERSION: 14.1
+        # Build arguments
         ADMIN_USERNAME: "${ADMIN_USER}"
         ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
         READ_ONLY_USERNAME: "${READ_ONLY_USER}"

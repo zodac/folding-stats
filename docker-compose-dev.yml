@@ -7,6 +7,9 @@ services:
       context: .
       dockerfile: docker/frontend/Dockerfile
       args:
+        # Docker image versions
+        NODE_VERSION: 17
+        # Build arguments
         FORUM_LINK: "https://forums.extremehw.net/forum/125-extreme-team-folding"
         REST_ENDPOINT_URL: "http://127.0.0.1:8081/folding"
         ROOT_URL: "http://127.0.0.1:81/"
@@ -30,10 +33,12 @@ services:
       context: .
       dockerfile: docker/backend/Dockerfile
       args:
-        DEBIAN_VERSION: 11
+        # Docker image versions
+        DEBIAN_VERSION: 11.2
         JAVA_VERSION: 17
-        KEYSTORE_PASSWORD: "shroot"
         MAVEN_VERSION: 3.8.4
+        # Build arguments
+        KEYSTORE_PASSWORD: "shroot"
         NEXUS_URL: "${NEXUS_URL}"
     container_name: backend_dev
     hostname: backend-dev # Using a dash as Java's URI builder will fail with an underscore
@@ -74,6 +79,9 @@ services:
       context: .
       dockerfile: docker/database/Dockerfile
       args:
+        # Docker image versions
+        POSTGRES_VERSION: 14.1
+        # Build arguments
         ADMIN_USERNAME: "root"
         ADMIN_PASSWORD: "shroot"
         READ_ONLY_USERNAME: "root2"

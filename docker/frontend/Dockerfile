@@ -1,4 +1,5 @@
-FROM node:lts-alpine3.14 AS raml
+ARG NODE_VERSION
+FROM node:${NODE_VERSION}-alpine AS raml
 # Install raml2html
 RUN npm i -g raml2html
 

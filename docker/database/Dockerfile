@@ -1,5 +1,5 @@
-# If this version is updated, also update 'embedded-postgres-binaries-bom.version' in the pom.xml, where possible
-FROM postgres:14.0-alpine
+ARG POSTGRES_VERSION
+FROM postgres:${POSTGRES_VERSION}-alpine
 
 ARG ADMIN_USERNAME
 ARG ADMIN_PASSWORD
