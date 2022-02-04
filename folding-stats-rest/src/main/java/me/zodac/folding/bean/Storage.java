@@ -84,7 +84,6 @@ public class Storage {
     private final TcStatsCache tcStatsCache = TcStatsCache.getInstance();
     private final TotalStatsCache totalStatsCache = TotalStatsCache.getInstance();
 
-
     /**
      * Creates a {@link Hardware}.
      *
