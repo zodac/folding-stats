@@ -27,7 +27,7 @@ services:
       - "${HTTPS_FRONTEND_PORT}:${HTTPS_FRONTEND_PORT}"
     restart: unless-stopped
     volumes_from:
-      - backend
+      - backend:ro
 
   backend:
     build:
@@ -48,7 +48,7 @@ services:
       LARS_URL_ROOT: "${LARS_URL_ROOT}"
       STATS_URL_ROOT: "${STATS_URL_ROOT}"
       REDIRECT_URL: "${ROOT_URL}"
-      # Spring configuration
+      # Building configuration
       DEPLOYMENT_TYPE: "production"
       # NOTE: The monthly reset, result storage and LARS update will always occur at 23:57 on the last day of the month
       ENABLE_LARS_HARDWARE_UPDATE: "${ENABLE_LARS_HARDWARE_UPDATE}"
@@ -67,6 +67,7 @@ services:
       JDBC_CONNECTION_USER: "${DB_USER}"
       JDBC_CONNECTION_PASSWORD: "${DB_PASSWORD}"
       JDBC_CONNECTION_DRIVER: "org.postgresql.Driver"
+      # Spring configuration
       server.ssl.key-store-password: "${KEYSTORE_PASSWORD}"
     links:
       - database
@@ -76,7 +77,7 @@ services:
       - "${HTTPS_BACKEND_PORT}:${HTTPS_BACKEND_PORT}"
     restart: unless-stopped
     volumes:
-      - backend_certs:/usr/local/certs/
+      - backend_certs:/usr/local/certs/stats/
       - backend_logs:/var/backend/logs/
 
   database:
@@ -121,6 +122,14 @@ services:
     build:
       context: .
       dockerfile: docker/metrics/prometheus/Dockerfile
+      args:
+        # Docker image versions
+        JAVA_VERSION: 17
+        PROMETHEUS_VERSION: v2.33.1
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --web.config.file=/etc/prometheus/web-config.yml
+      - --log.level=debug
     container_name: prometheus
     hostname: prometheus
     depends_on:
@@ -129,8 +138,12 @@ services:
       - production
     ports:
       - "9090:9090"
+    restart: unless-stopped
     volumes:
-      - prometheus_data:/prometheus
+      - prometheus_data:/prometheus/
+      - prometheus_certs:/usr/local/certs/metrics/
+    volumes_from:
+      - backend:ro
 
 networks:
   production:
@@ -142,5 +155,7 @@ volumes:
   backend_logs:
   # Volume to save the generated SSL certs for the backend
   backend_certs:
-  # Volume to save prometheus metrics
+  # Volume to save Prometheus metrics
   prometheus_data:
+  # Volume to save the generated SSL certs for Prometheus
+  prometheus_certs:

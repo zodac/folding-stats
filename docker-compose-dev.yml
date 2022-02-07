@@ -71,8 +71,6 @@ services:
       - development
     ports:
       - "8081:8081"
-    volumes:
-      - /usr/local/certs/
 
   database_dev:
     build:

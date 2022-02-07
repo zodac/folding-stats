@@ -4,8 +4,8 @@ ARG DEBIAN_VERSION
 
 FROM openjdk:${JAVA_VERSION}-jdk-slim AS cert_builder
 
-RUN mkdir --parents /usr/local/certs
-WORKDIR /usr/local/certs/
+RUN mkdir --parents /usr/local/certs/stats/
+WORKDIR /usr/local/certs/stats/
 
 # Generate PCKS12 keystore with self-signed certificate, and extract public crt and private key
 ARG KEYSTORE_PASSWORD
@@ -38,7 +38,7 @@ RUN /tmp/configure_custom_nexus.sh "${NEXUS_URL}"
 # Copy source code
 # Adding and building each module incrementally so we can retain some docker caches when building for tests
 COPY ./pom.xml ./pom.xml
-RUN mvn install -Pdocker
+RUN mvn install -P docker
 
 COPY ./folding-stats-api/pom.xml ./folding-stats-api/pom.xml
 COPY ./folding-stats-api/src/main ./folding-stats-api/src/main
@@ -54,10 +54,10 @@ RUN cd ./folding-stats-jar && mvn install --projects . && cd ..
 
 COPY ./folding-stats-rest/pom.xml ./folding-stats-rest/pom.xml
 COPY ./folding-stats-rest/src/main ./folding-stats-rest/src/main
-RUN cd ./folding-stats-rest && mvn install --projects . && cd ..
 
-RUN cd ./folding-stats-rest && mvn package
-RUN mv ./folding-stats-rest/target/folding-stats-rest*.jar /folding-stats.jar
+RUN cd ./folding-stats-rest && \
+    mvn package && \
+    mv ./target/folding-stats-rest*.jar /folding-stats.jar
 
 ARG JAVA_VERSION
 FROM openjdk:${JAVA_VERSION}-jdk-slim AS jdk_builder
@@ -151,9 +151,9 @@ ENV JAVA_HOME "/opt/jdk"
 ENV PATH "${PATH}:${JAVA_HOME}/bin"
 
 # Copy SSL certs
-COPY --from=cert_builder /usr/local/certs/folding-stats.p12 /usr/local/certs/folding-stats.p12
-COPY --from=cert_builder /usr/local/certs/folding-stats.crt /usr/local/certs/folding-stats.crt
-COPY --from=cert_builder /usr/local/certs/folding-stats.key /usr/local/certs/folding-stats.key
+COPY --from=cert_builder /usr/local/certs/stats/folding-stats.p12 /usr/local/certs/stats/folding-stats.p12
+COPY --from=cert_builder /usr/local/certs/stats/folding-stats.crt /usr/local/certs/stats/folding-stats.crt
+COPY --from=cert_builder /usr/local/certs/stats/folding-stats.key /usr/local/certs/stats/folding-stats.key
 
 # Install nano to allow user to connect to container and edit logback.xml
 RUN apt-get update && \
