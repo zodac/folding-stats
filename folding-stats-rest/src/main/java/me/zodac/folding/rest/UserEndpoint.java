@@ -27,14 +27,10 @@ package me.zodac.folding.rest;
 import static me.zodac.folding.api.util.DateTimeUtils.untilNextMonthUtc;
 import static me.zodac.folding.rest.response.Responses.cachedOk;
 import static me.zodac.folding.rest.response.Responses.created;
-import static me.zodac.folding.rest.response.Responses.notFound;
-import static me.zodac.folding.rest.response.Responses.nullRequest;
 import static me.zodac.folding.rest.response.Responses.ok;
-import static me.zodac.folding.rest.response.Responses.serverError;
 
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
-import java.util.Optional;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
@@ -46,7 +42,6 @@ import me.zodac.folding.api.tc.validation.UserValidator;
 import me.zodac.folding.api.tc.validation.ValidationResult;
 import me.zodac.folding.bean.FoldingRepository;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
-import me.zodac.folding.rest.util.IdResult;
 import me.zodac.folding.rest.util.IntegerParser;
 import me.zodac.folding.rest.util.ValidationFailureResponseMapper;
 import me.zodac.folding.state.SystemStateManager;
@@ -96,16 +91,11 @@ public class UserEndpoint {
         }
         final User validatedUser = validationResult.output();
 
-        try {
-            final User elementWithId = foldingRepository.createUser(validatedUser);
-            SystemStateManager.next(SystemState.WRITE_EXECUTED);
+        final User elementWithId = foldingRepository.createUser(validatedUser);
+        SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
-            LOGGER.info("Created user with ID {}", elementWithId.getId());
-            return created(elementWithId, elementWithId.getId());
-        } catch (final Exception e) {
-            LOGGER.error("Unexpected error creating user: {}", userRequest, e);
-            return serverError();
-        }
+        LOGGER.info("Created user with ID {}", elementWithId.getId());
+        return created(elementWithId, elementWithId.getId());
     }
 
     /**
@@ -119,14 +109,8 @@ public class UserEndpoint {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getAll(final HttpServletRequest request) {
         LOGGER.debug("GET request received for all users at '{}'", request::getRequestURI);
-
-        try {
-            final Collection<User> elements = foldingRepository.getAllUsersWithoutPasskeys();
-            return cachedOk(elements, untilNextMonthUtc(ChronoUnit.SECONDS));
-        } catch (final Exception e) {
-            LOGGER.error("Unexpected error getting all users", e);
-            return serverError();
-        }
+        final Collection<User> elements = foldingRepository.getAllUsersWithoutPasskeys();
+        return cachedOk(elements, untilNextMonthUtc(ChronoUnit.SECONDS));
     }
 
     /**
@@ -142,25 +126,9 @@ public class UserEndpoint {
     public ResponseEntity<?> getById(@PathVariable("userId") final String userId, final HttpServletRequest request) {
         LOGGER.debug("GET request for user received at '{}'", request::getRequestURI);
 
-        try {
-            final IdResult idResult = IntegerParser.parsePositive(userId);
-            if (idResult.isFailure()) {
-                return idResult.failureResponse();
-            }
-            final int parsedId = idResult.id();
-
-            final Optional<User> optionalElement = foldingRepository.getUserWithoutPasskey(parsedId);
-            if (optionalElement.isEmpty()) {
-                LOGGER.error("No user found with ID {}", userId);
-                return notFound();
-            }
-
-            final User element = optionalElement.get();
-            return cachedOk(element, untilNextMonthUtc(ChronoUnit.SECONDS));
-        } catch (final Exception e) {
-            LOGGER.error("Unexpected error getting user with ID: {}", userId, e);
-            return serverError();
-        }
+        final int parsedId = IntegerParser.parsePositive(userId);
+        final User element = foldingRepository.getUserWithoutPasskey(parsedId);
+        return cachedOk(element, untilNextMonthUtc(ChronoUnit.SECONDS));
     }
 
     /**
@@ -176,25 +144,9 @@ public class UserEndpoint {
     public ResponseEntity<?> getByIdWithPasskey(@PathVariable("userId") final String userId, final HttpServletRequest request) {
         LOGGER.debug("GET request for user with passkey received at '{}'", request::getRequestURI);
 
-        try {
-            final IdResult idResult = IntegerParser.parsePositive(userId);
-            if (idResult.isFailure()) {
-                return idResult.failureResponse();
-            }
-            final int parsedId = idResult.id();
-
-            final Optional<User> optionalElement = foldingRepository.getUserWithPasskey(parsedId);
-            if (optionalElement.isEmpty()) {
-                LOGGER.error("No user with passkey found with ID {}", userId);
-                return notFound();
-            }
-
-            final User element = optionalElement.get();
-            return cachedOk(element, untilNextMonthUtc(ChronoUnit.SECONDS));
-        } catch (final Exception e) {
-            LOGGER.error("Unexpected error getting user with passkey ID: {}", userId, e);
-            return serverError();
-        }
+        final int parsedId = IntegerParser.parsePositive(userId);
+        final User element = foldingRepository.getUserWithPasskey(parsedId);
+        return cachedOk(element, untilNextMonthUtc(ChronoUnit.SECONDS));
     }
 
 
@@ -214,48 +166,28 @@ public class UserEndpoint {
                                         final HttpServletRequest request) {
         LOGGER.debug("PUT request for user received at '{}'", request::getRequestURI);
 
-        if (userRequest == null) {
-            LOGGER.error("No payload provided");
-            return nullRequest();
+        final int parsedId = IntegerParser.parsePositive(userId);
+        final User existingUser = foldingRepository.getUserWithPasskey(parsedId);
+
+        if (existingUser.isEqualRequest(userRequest)) {
+            LOGGER.debug("No change necessary");
+            final User userWithHiddenPasskey = User.hidePasskey(existingUser);
+            return ok(userWithHiddenPasskey);
         }
 
-        try {
-            final IdResult idResult = IntegerParser.parsePositive(userId);
-            if (idResult.isFailure()) {
-                return idResult.failureResponse();
-            }
-            final int parsedId = idResult.id();
-
-            final Optional<User> optionalElement = foldingRepository.getUserWithPasskey(parsedId);
-            if (optionalElement.isEmpty()) {
-                LOGGER.error("No user found with ID {}", userId);
-                return notFound();
-            }
-            final User existingUser = optionalElement.get();
-
-            if (existingUser.isEqualRequest(userRequest)) {
-                LOGGER.debug("No change necessary");
-                final User userWithHiddenPasskey = User.hidePasskey(existingUser);
-                return ok(userWithHiddenPasskey);
-            }
-
-            final ValidationResult<User> validationResult = validateUpdate(userRequest, existingUser);
-            if (validationResult.isFailure()) {
-                return ValidationFailureResponseMapper.map(validationResult);
-            }
-            final User validatedUser = validationResult.output();
-
-            // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
-            final User userWithId = User.updateWithId(existingUser.getId(), validatedUser);
-            final User updatedUserWithId = foldingRepository.updateUser(userWithId, existingUser);
-            SystemStateManager.next(SystemState.WRITE_EXECUTED);
-
-            LOGGER.info("Updated user with ID {}", updatedUserWithId.getId());
-            return ok(updatedUserWithId, updatedUserWithId.getId());
-        } catch (final Exception e) {
-            LOGGER.error("Unexpected error updating user with ID: {}", userId, e);
-            return serverError();
+        final ValidationResult<User> validationResult = validateUpdate(userRequest, existingUser);
+        if (validationResult.isFailure()) {
+            return ValidationFailureResponseMapper.map(validationResult);
         }
+        final User validatedUser = validationResult.output();
+
+        // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
+        final User userWithId = User.updateWithId(existingUser.getId(), validatedUser);
+        final User updatedUserWithId = foldingRepository.updateUser(userWithId, existingUser);
+        SystemStateManager.next(SystemState.WRITE_EXECUTED);
+
+        LOGGER.info("Updated user with ID {}", updatedUserWithId.getId());
+        return ok(updatedUserWithId, updatedUserWithId.getId());
     }
 
     /**
@@ -271,34 +203,19 @@ public class UserEndpoint {
     public ResponseEntity<?> deleteById(@PathVariable("userId") final String userId, final HttpServletRequest request) {
         LOGGER.debug("DELETE request for user received at '{}'", request::getRequestURI);
 
-        try {
-            final IdResult idResult = IntegerParser.parsePositive(userId);
-            if (idResult.isFailure()) {
-                return idResult.failureResponse();
-            }
-            final int parsedId = idResult.id();
+        final int parsedId = IntegerParser.parsePositive(userId);
+        final User user = foldingRepository.getUserWithoutPasskey(parsedId);
 
-            final Optional<User> optionalElement = foldingRepository.getUserWithoutPasskey(parsedId);
-            if (optionalElement.isEmpty()) {
-                LOGGER.error("No user found with ID {}", userId);
-                return notFound();
-            }
-            final User user = optionalElement.get();
-
-            final ValidationResult<User> validationResult = validateDelete(user);
-            if (validationResult.isFailure()) {
-                return ValidationFailureResponseMapper.map(validationResult);
-            }
-            final User validatedUser = validationResult.output();
-
-            foldingRepository.deleteUser(validatedUser);
-            SystemStateManager.next(SystemState.WRITE_EXECUTED);
-            LOGGER.info("Deleted user with ID {}", userId);
-            return ok();
-        } catch (final Exception e) {
-            LOGGER.error("Unexpected error deleting user with ID: {}", userId, e);
-            return serverError();
+        final ValidationResult<User> validationResult = validateDelete(user);
+        if (validationResult.isFailure()) {
+            return ValidationFailureResponseMapper.map(validationResult);
         }
+        final User validatedUser = validationResult.output();
+
+        foldingRepository.deleteUser(validatedUser);
+        SystemStateManager.next(SystemState.WRITE_EXECUTED);
+        LOGGER.info("Deleted user with ID {}", userId);
+        return ok();
     }
 
     private ValidationResult<User> validateCreate(final UserRequest userRequest) {

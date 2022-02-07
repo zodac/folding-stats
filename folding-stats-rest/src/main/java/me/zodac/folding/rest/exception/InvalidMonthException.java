@@ -25,29 +25,38 @@
 package me.zodac.folding.rest.exception;
 
 import java.io.Serial;
-import org.springframework.http.HttpStatus;
+import java.time.Month;
 
 /**
- * {@link Exception} thrown when an {@link HttpStatus#UNAUTHORIZED} request has been made.
+ * {@link Exception} to be thrown when a provided {@link String} month is not a valid {@link Month}.
  */
-public class UnauthorizedException extends RuntimeException {
+public class InvalidMonthException extends RuntimeException {
 
     @Serial
-    private static final long serialVersionUID = 5640864796327254860L;
+    private static final long serialVersionUID = 210062796728375018L;
+
+    /**
+     * The invalid month.
+     */
+    private final String month;
 
     /**
      * Basic constructor.
+     *
+     * @param month     the invalid month
+     * @param throwable the cause {@link Throwable}
      */
-    public UnauthorizedException() {
-        super("Unauthorized access");
+    public InvalidMonthException(final String month, final Throwable throwable) {
+        super(throwable);
+        this.month = month;
     }
 
     /**
-     * Constructor taking in a cause {@link Throwable}.
+     * The invalid month.
      *
-     * @param throwable the cause {@link Throwable}
+     * @return the invalid month
      */
-    public UnauthorizedException(final Throwable throwable) {
-        super("Unauthorized access: " + throwable.getMessage(), throwable);
+    public String getMonth() {
+        return month;
     }
 }

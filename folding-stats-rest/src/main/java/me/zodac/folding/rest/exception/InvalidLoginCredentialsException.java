@@ -25,29 +25,48 @@
 package me.zodac.folding.rest.exception;
 
 import java.io.Serial;
-import org.springframework.http.HttpStatus;
+import me.zodac.folding.rest.api.LoginCredentials;
 
 /**
- * {@link Exception} thrown when an {@link HttpStatus#UNAUTHORIZED} request has been made.
+ * {@link Exception} to be thrown when a provided {@link LoginCredentials} is not valid.
  */
-public class UnauthorizedException extends RuntimeException {
+public class InvalidLoginCredentialsException extends RuntimeException {
 
     @Serial
-    private static final long serialVersionUID = 5640864796327254860L;
+    private static final long serialVersionUID = 5115765817637450011L;
+
+    /**
+     * The invalid {@link LoginCredentials}.
+     */
+    private final LoginCredentials loginCredentials;
 
     /**
      * Basic constructor.
+     *
+     * @param loginCredentials the invalid {@link LoginCredentials}
      */
-    public UnauthorizedException() {
-        super("Unauthorized access");
+    public InvalidLoginCredentialsException(final LoginCredentials loginCredentials) {
+        super();
+        this.loginCredentials = loginCredentials;
     }
 
     /**
-     * Constructor taking in a cause {@link Throwable}.
+     * Basic constructor.
      *
-     * @param throwable the cause {@link Throwable}
+     * @param loginCredentials the invalid {@link LoginCredentials}
+     * @param throwable        the cause {@link Throwable}
      */
-    public UnauthorizedException(final Throwable throwable) {
-        super("Unauthorized access: " + throwable.getMessage(), throwable);
+    public InvalidLoginCredentialsException(final LoginCredentials loginCredentials, final Throwable throwable) {
+        super(throwable);
+        this.loginCredentials = loginCredentials;
+    }
+
+    /**
+     * The invalid {@link LoginCredentials}.
+     *
+     * @return the invalid {@link LoginCredentials}
+     */
+    public LoginCredentials getLoginCredentials() {
+        return loginCredentials;
     }
 }

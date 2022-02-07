@@ -24,17 +24,13 @@
 
 package me.zodac.folding.rest.util;
 
-import static me.zodac.folding.rest.response.Responses.badRequest;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import me.zodac.folding.rest.exception.InvalidIdException;
+import me.zodac.folding.rest.exception.OutOfRangeIdException;
 
 /**
  * Utility class used to parse {@link Integer}s for the REST endpoints.
  */
 public final class IntegerParser {
-
-    private static final Logger LOGGER = LogManager.getLogger();
 
     private IntegerParser() {
 
@@ -43,26 +39,21 @@ public final class IntegerParser {
     /**
      * Attempts to parse the input {@link String} into a valid non-negative {@link Integer} ID.
      *
-     * <p>
-     * Logs any error and returns either the valid {@link Integer} ID, or an error {@link org.springframework.http.ResponseEntity}.
-     *
-     * @param integer the {@link String} to parse into an {@link Integer}
-     * @return the {@link IdResult}
+     * @param possibleId the {@link String} ID to parse into an {@link Integer} ID
+     * @return the ID as an {@link Integer}
+     * @throws OutOfRangeIdException thrown if the input {@code possibleId} is a valid {@link Integer}, but is less than <b>0</b>
+     * @throws InvalidIdException    thrown if the input {@code possibleId} is not a valid {@link Integer}
      */
-    public static IdResult parsePositive(final String integer) {
+    public static int parsePositive(final String possibleId) {
         try {
-            final int parsedId = Integer.parseInt(integer);
+            final int parsedId = Integer.parseInt(possibleId);
             if (parsedId < 0) {
-                final String errorMessage = String.format("The ID '%s' is out of range", parsedId);
-                LOGGER.error(errorMessage);
-                return IdResult.failure(badRequest(errorMessage));
+                throw new OutOfRangeIdException(parsedId);
             }
 
-            return IdResult.success(parsedId);
+            return parsedId;
         } catch (final NumberFormatException e) {
-            final String errorMessage = String.format("The ID '%s' is not a valid format", integer);
-            LOGGER.error(errorMessage);
-            return IdResult.failure(badRequest(errorMessage));
+            throw new InvalidIdException(possibleId, e);
         }
     }
 }

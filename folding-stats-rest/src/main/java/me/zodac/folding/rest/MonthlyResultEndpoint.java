@@ -24,14 +24,10 @@
 
 package me.zodac.folding.rest;
 
-import static me.zodac.folding.rest.response.Responses.badRequest;
 import static me.zodac.folding.rest.response.Responses.ok;
-import static me.zodac.folding.rest.response.Responses.serverError;
 
-import java.time.DateTimeException;
 import java.time.Month;
 import java.time.Year;
-import java.time.format.DateTimeParseException;
 import java.util.Optional;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -41,6 +37,7 @@ import me.zodac.folding.api.state.WriteRequired;
 import me.zodac.folding.api.tc.result.MonthlyResult;
 import me.zodac.folding.bean.StatsRepository;
 import me.zodac.folding.bean.tc.user.UserStatsStorer;
+import me.zodac.folding.rest.util.DateDetails;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,28 +80,9 @@ public class MonthlyResultEndpoint {
                                               final HttpServletRequest request) {
         LOGGER.debug("GET request received to retrieve monthly TC result at '{}'", request::getRequestURI);
 
-        try {
-            final Optional<MonthlyResult> monthlyResult = statsRepository.getMonthlyResult(Month.of(Integer.parseInt(month)), Year.parse(year));
-            return ok(monthlyResult.orElse(MonthlyResult.empty()));
-        } catch (final DateTimeParseException e) {
-            final String errorMessage = String.format("The year '%s' is not a valid format", year);
-            LOGGER.debug(errorMessage, e);
-            LOGGER.error(errorMessage);
-            return badRequest(errorMessage);
-        } catch (final DateTimeException e) {
-            final String errorMessage = String.format("The month '%s' is not a valid format", month);
-            LOGGER.debug(errorMessage, e);
-            LOGGER.error(errorMessage);
-            return badRequest(errorMessage);
-        } catch (final NumberFormatException e) {
-            final String errorMessage = String.format("The year '%s' or month '%s' is not a valid format", year, month);
-            LOGGER.debug(errorMessage, e);
-            LOGGER.error(errorMessage);
-            return badRequest(errorMessage);
-        } catch (final Exception e) {
-            LOGGER.error("Unexpected error retrieving TC result", e);
-            return serverError();
-        }
+        final DateDetails date = DateDetails.of(year, month);
+        final Optional<MonthlyResult> monthlyResult = statsRepository.getMonthlyResult(date.month(), date.year());
+        return ok(monthlyResult.orElse(MonthlyResult.empty()));
     }
 
     /**
@@ -117,13 +95,7 @@ public class MonthlyResultEndpoint {
     @PostMapping(path = "/manual/save")
     public ResponseEntity<?> saveMonthlyResult() {
         LOGGER.info("GET request received to manually store monthly TC result");
-
-        try {
-            userStatsStorer.storeMonthlyResult();
-            return ok();
-        } catch (final Exception e) {
-            LOGGER.error("Unexpected error manually storing TC result", e);
-            return serverError();
-        }
+        userStatsStorer.storeMonthlyResult();
+        return ok();
     }
 }

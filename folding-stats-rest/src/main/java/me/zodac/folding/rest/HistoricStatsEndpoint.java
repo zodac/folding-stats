@@ -24,21 +24,13 @@
 
 package me.zodac.folding.rest;
 
-import static java.lang.Integer.parseInt;
-import static me.zodac.folding.rest.response.Responses.badRequest;
 import static me.zodac.folding.rest.response.Responses.cachedOk;
-import static me.zodac.folding.rest.response.Responses.notFound;
-import static me.zodac.folding.rest.response.Responses.serverError;
 
-import java.time.DateTimeException;
 import java.time.Month;
 import java.time.Year;
-import java.time.YearMonth;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.security.PermitAll;
 import javax.servlet.http.HttpServletRequest;
@@ -48,7 +40,7 @@ import me.zodac.folding.api.tc.User;
 import me.zodac.folding.bean.FoldingRepository;
 import me.zodac.folding.bean.StatsRepository;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
-import me.zodac.folding.rest.util.IdResult;
+import me.zodac.folding.rest.util.DateDetails;
 import me.zodac.folding.rest.util.IntegerParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -98,52 +90,11 @@ public class HistoricStatsEndpoint {
                                                         final HttpServletRequest request) {
         LOGGER.debug("GET request received to show hourly TC user stats at '{}'", request::getRequestURI);
 
-        try {
-            final int dayAsInt = parseInt(day);
-            final int monthAsInt = parseInt(month);
-            final int yearAsInt = Year.parse(year).getValue();
-
-            final YearMonth date = YearMonth.of(yearAsInt, monthAsInt);
-            if (!date.isValidDay(dayAsInt)) {
-                final String errorMessage = String.format("The day '%s' is not a valid day for %s/%s", day, year, month);
-                LOGGER.error(errorMessage);
-                return badRequest(errorMessage);
-            }
-
-            final IdResult idResult = IntegerParser.parsePositive(userId);
-            if (idResult.isFailure()) {
-                return idResult.failureResponse();
-            }
-            final int parsedId = idResult.id();
-
-            final Optional<User> user = foldingRepository.getUserWithPasskey(parsedId);
-            if (user.isEmpty()) {
-                LOGGER.error("No user found with ID: {}", parsedId);
-                return notFound();
-            }
-
-            final Collection<HistoricStats> historicStats = statsRepository.getHistoricStats(user.get(), Year.parse(year), Month.of(monthAsInt),
-                dayAsInt);
-            return cachedOk(historicStats, CACHE_EXPIRATION_TIME);
-        } catch (final DateTimeParseException e) {
-            final String errorMessage = String.format("The year '%s' is not a valid format", year);
-            LOGGER.debug(errorMessage, e);
-            LOGGER.error(errorMessage);
-            return badRequest(errorMessage);
-        } catch (final DateTimeException e) {
-            final String errorMessage = String.format("The month '%s' is not a valid format", month);
-            LOGGER.debug(errorMessage, e);
-            LOGGER.error(errorMessage);
-            return badRequest(errorMessage);
-        } catch (final NumberFormatException e) {
-            final String errorMessage = String.format("The month '%s' or day '%s' is not a valid format", month, day);
-            LOGGER.debug(errorMessage, e);
-            LOGGER.error(errorMessage);
-            return badRequest(errorMessage);
-        } catch (final Exception e) {
-            LOGGER.error("Unexpected error getting user with ID: {}", userId, e);
-            return serverError();
-        }
+        final DateDetails date = DateDetails.of(year, month, day);
+        final int parsedId = IntegerParser.parsePositive(userId);
+        final User user = foldingRepository.getUserWithPasskey(parsedId);
+        final Collection<HistoricStats> historicStats = statsRepository.getHistoricStats(user, date.year(), date.month(), date.day());
+        return cachedOk(historicStats, CACHE_EXPIRATION_TIME);
     }
 
     /**
@@ -164,36 +115,11 @@ public class HistoricStatsEndpoint {
                                                        final HttpServletRequest request) {
         LOGGER.debug("GET request received to show daily TC user stats at '{}'", request::getRequestURI);
 
-        try {
-            final IdResult idResult = IntegerParser.parsePositive(userId);
-            if (idResult.isFailure()) {
-                return idResult.failureResponse();
-            }
-            final int parsedId = idResult.id();
-
-            final Optional<User> user = foldingRepository.getUserWithPasskey(parsedId);
-            if (user.isEmpty()) {
-                LOGGER.error("No user found with ID: {}", parsedId);
-                return notFound();
-            }
-
-            final Collection<HistoricStats> historicStats =
-                statsRepository.getHistoricStats(user.get(), Year.parse(year), Month.of(parseInt(month)));
-            return cachedOk(historicStats, CACHE_EXPIRATION_TIME);
-        } catch (final DateTimeParseException e) {
-            final String errorMessage = String.format("The year '%s' is not a valid format", year);
-            LOGGER.debug(errorMessage, e);
-            LOGGER.error(errorMessage);
-            return badRequest(errorMessage);
-        } catch (final DateTimeException | NumberFormatException e) {
-            final String errorMessage = String.format("The month '%s' is not a valid format", month);
-            LOGGER.debug(errorMessage, e);
-            LOGGER.error(errorMessage);
-            return badRequest(errorMessage);
-        } catch (final Exception e) {
-            LOGGER.error("Unexpected error getting user with ID: {}", userId, e);
-            return serverError();
-        }
+        final DateDetails date = DateDetails.of(year, month);
+        final int parsedId = IntegerParser.parsePositive(userId);
+        final User user = foldingRepository.getUserWithPasskey(parsedId);
+        final Collection<HistoricStats> historicStats = statsRepository.getHistoricStats(user, date.year(), date.month());
+        return cachedOk(historicStats, CACHE_EXPIRATION_TIME);
     }
 
     /**
@@ -212,30 +138,11 @@ public class HistoricStatsEndpoint {
                                                          final HttpServletRequest request) {
         LOGGER.debug("GET request received to show monthly TC user stats at '{}'", request::getRequestURI);
 
-        try {
-            final IdResult idResult = IntegerParser.parsePositive(userId);
-            if (idResult.isFailure()) {
-                return idResult.failureResponse();
-            }
-            final int parsedId = idResult.id();
-
-            final Optional<User> user = foldingRepository.getUserWithPasskey(parsedId);
-            if (user.isEmpty()) {
-                LOGGER.error("No user found with ID: {}", parsedId);
-                return notFound();
-            }
-
-            final Collection<HistoricStats> historicStats = statsRepository.getHistoricStats(user.get(), Year.parse(year));
-            return cachedOk(historicStats, CACHE_EXPIRATION_TIME);
-        } catch (final DateTimeParseException e) {
-            final String errorMessage = String.format("The year '%s' is not a valid format", year);
-            LOGGER.debug(errorMessage, e);
-            LOGGER.error(errorMessage);
-            return badRequest(errorMessage);
-        } catch (final Exception e) {
-            LOGGER.error("Unexpected error getting user with ID: {}", userId, e);
-            return serverError();
-        }
+        final DateDetails date = DateDetails.of(year);
+        final int parsedId = IntegerParser.parsePositive(userId);
+        final User user = foldingRepository.getUserWithPasskey(parsedId);
+        final Collection<HistoricStats> historicStats = statsRepository.getHistoricStats(user, date.year());
+        return cachedOk(historicStats, CACHE_EXPIRATION_TIME);
     }
 
     /**
@@ -258,62 +165,21 @@ public class HistoricStatsEndpoint {
                                                         final HttpServletRequest request) {
         LOGGER.debug("GET request received to show hourly TC user stats at '{}'", request::getRequestURI);
 
-        try {
-            final int dayAsInt = parseInt(day);
-            final int monthAsInt = parseInt(month);
-            final int yearAsInt = Year.parse(year).getValue();
+        final DateDetails date = DateDetails.of(year, month, day);
+        final int parsedId = IntegerParser.parsePositive(teamId);
+        final Team team = foldingRepository.getTeam(parsedId);
 
-            final YearMonth date = YearMonth.of(yearAsInt, monthAsInt);
-            if (!date.isValidDay(dayAsInt)) {
-                final String errorMessage = String.format("The day '%s' is not a valid day for %s/%s", day, year, month);
-                LOGGER.error(errorMessage);
-                return badRequest(errorMessage);
-            }
+        final Collection<User> teamUsers = foldingRepository.getUsersOnTeam(team);
+        final List<HistoricStats> teamHourlyStats = new ArrayList<>(teamUsers.size());
 
-            final IdResult idResult = IntegerParser.parsePositive(teamId);
-            if (idResult.isFailure()) {
-                return idResult.failureResponse();
-            }
-            final int parsedId = idResult.id();
-
-            final Optional<Team> teamOptional = foldingRepository.getTeam(parsedId);
-            if (teamOptional.isEmpty()) {
-                LOGGER.error("No team found with ID: {}", parsedId);
-                return notFound();
-            }
-            final Team team = teamOptional.get();
-
-            final Collection<User> teamUsers = foldingRepository.getUsersOnTeam(team);
-            final List<HistoricStats> teamHourlyStats = new ArrayList<>(teamUsers.size());
-
-            for (final User user : teamUsers) {
-                LOGGER.debug("Getting historic stats for user with ID: {}", user.getId());
-                final Collection<HistoricStats> dailyStats =
-                    statsRepository.getHistoricStats(user, Year.parse(year), Month.of(monthAsInt), dayAsInt);
-                teamHourlyStats.addAll(dailyStats);
-            }
-
-            final Collection<HistoricStats> combinedHistoricStats = HistoricStats.combine(teamHourlyStats);
-            return cachedOk(combinedHistoricStats, CACHE_EXPIRATION_TIME);
-        } catch (final DateTimeParseException e) {
-            final String errorMessage = String.format("The year '%s' is not a valid format", year);
-            LOGGER.debug(errorMessage, e);
-            LOGGER.error(errorMessage);
-            return badRequest(errorMessage);
-        } catch (final DateTimeException e) {
-            final String errorMessage = String.format("The month '%s' is not a valid format", month);
-            LOGGER.debug(errorMessage, e);
-            LOGGER.error(errorMessage);
-            return badRequest(errorMessage);
-        } catch (final NumberFormatException e) {
-            final String errorMessage = String.format("The month '%s' or day '%s' is not a valid format", month, day);
-            LOGGER.debug(errorMessage, e);
-            LOGGER.error(errorMessage);
-            return badRequest(errorMessage);
-        } catch (final Exception e) {
-            LOGGER.error("Unexpected error getting team with ID: {}", teamId, e);
-            return serverError();
+        for (final User user : teamUsers) {
+            LOGGER.debug("Getting historic stats for user with ID: {}", user.getId());
+            final Collection<HistoricStats> dailyStats = statsRepository.getHistoricStats(user, date.year(), date.month(), date.day());
+            teamHourlyStats.addAll(dailyStats);
         }
+
+        final Collection<HistoricStats> combinedHistoricStats = HistoricStats.combine(teamHourlyStats);
+        return cachedOk(combinedHistoricStats, CACHE_EXPIRATION_TIME);
     }
 
     /**
@@ -334,45 +200,21 @@ public class HistoricStatsEndpoint {
                                                        final HttpServletRequest request) {
         LOGGER.debug("GET request received to show daily TC user stats at '{}'", request::getRequestURI);
 
-        try {
-            final IdResult idResult = IntegerParser.parsePositive(teamId);
-            if (idResult.isFailure()) {
-                return idResult.failureResponse();
-            }
-            final int parsedId = idResult.id();
+        final DateDetails date = DateDetails.of(year, month);
+        final int parsedId = IntegerParser.parsePositive(teamId);
+        final Team team = foldingRepository.getTeam(parsedId);
 
-            final Optional<Team> teamOptional = foldingRepository.getTeam(parsedId);
-            if (teamOptional.isEmpty()) {
-                LOGGER.error("No team found with ID: {}", parsedId);
-                return notFound();
-            }
-            final Team team = teamOptional.get();
+        final Collection<User> teamUsers = foldingRepository.getUsersOnTeam(team);
+        final List<HistoricStats> teamDailyStats = new ArrayList<>(teamUsers.size());
 
-            final Collection<User> teamUsers = foldingRepository.getUsersOnTeam(team);
-            final List<HistoricStats> teamDailyStats = new ArrayList<>(teamUsers.size());
-
-            for (final User user : teamUsers) {
-                LOGGER.debug("Getting historic stats for user with ID: {}", user.getId());
-                final Collection<HistoricStats> dailyStats = statsRepository.getHistoricStats(user, Year.parse(year), Month.of(parseInt(month)));
-                teamDailyStats.addAll(dailyStats);
-            }
-
-            final Collection<HistoricStats> combinedHistoricStats = HistoricStats.combine(teamDailyStats);
-            return cachedOk(combinedHistoricStats, CACHE_EXPIRATION_TIME);
-        } catch (final DateTimeParseException e) {
-            final String errorMessage = String.format("The year '%s' is not a valid format", year);
-            LOGGER.debug(errorMessage, e);
-            LOGGER.error(errorMessage);
-            return badRequest(errorMessage);
-        } catch (final DateTimeException | NumberFormatException e) {
-            final String errorMessage = String.format("The month '%s' is not a valid format", month);
-            LOGGER.debug(errorMessage, e);
-            LOGGER.error(errorMessage);
-            return badRequest(errorMessage);
-        } catch (final Exception e) {
-            LOGGER.error("Unexpected error getting team with ID: {}", teamId, e);
-            return serverError();
+        for (final User user : teamUsers) {
+            LOGGER.debug("Getting historic stats for user with ID: {}", user.getId());
+            final Collection<HistoricStats> dailyStats = statsRepository.getHistoricStats(user, date.year(), date.month());
+            teamDailyStats.addAll(dailyStats);
         }
+
+        final Collection<HistoricStats> combinedHistoricStats = HistoricStats.combine(teamDailyStats);
+        return cachedOk(combinedHistoricStats, CACHE_EXPIRATION_TIME);
     }
 
     /**
@@ -390,40 +232,21 @@ public class HistoricStatsEndpoint {
                                                          @PathVariable("year") final String year,
                                                          final HttpServletRequest request) {
         LOGGER.info("GET request received to show monthly TC team stats at '{}'", request::getRequestURI);
+        
+        final DateDetails date = DateDetails.of(year);
+        final int parsedId = IntegerParser.parsePositive(teamId);
+        final Team team = foldingRepository.getTeam(parsedId);
 
-        try {
-            final IdResult idResult = IntegerParser.parsePositive(teamId);
-            if (idResult.isFailure()) {
-                return idResult.failureResponse();
-            }
-            final int parsedId = idResult.id();
+        final Collection<User> teamUsers = foldingRepository.getUsersOnTeam(team);
+        final List<HistoricStats> teamMonthlyStats = new ArrayList<>(teamUsers.size());
 
-            final Optional<Team> teamOptional = foldingRepository.getTeam(parsedId);
-            if (teamOptional.isEmpty()) {
-                LOGGER.error("No team found with ID: {}", parsedId);
-                return notFound();
-            }
-            final Team team = teamOptional.get();
-
-            final Collection<User> teamUsers = foldingRepository.getUsersOnTeam(team);
-            final List<HistoricStats> teamMonthlyStats = new ArrayList<>(teamUsers.size());
-
-            for (final User user : teamUsers) {
-                LOGGER.debug("Getting historic stats for user with ID: {}", user.getId());
-                final Collection<HistoricStats> monthlyStats = statsRepository.getHistoricStats(user, Year.parse(year));
-                teamMonthlyStats.addAll(monthlyStats);
-            }
-
-            final Collection<HistoricStats> combinedHistoricStats = HistoricStats.combine(teamMonthlyStats);
-            return cachedOk(combinedHistoricStats, CACHE_EXPIRATION_TIME);
-        } catch (final DateTimeParseException e) {
-            final String errorMessage = String.format("The year '%s' is not a valid format", year);
-            LOGGER.debug(errorMessage, e);
-            LOGGER.error(errorMessage);
-            return badRequest(errorMessage);
-        } catch (final Exception e) {
-            LOGGER.error("Unexpected error getting team with ID: {}", teamId, e);
-            return serverError();
+        for (final User user : teamUsers) {
+            LOGGER.debug("Getting historic stats for user with ID: {}", user.getId());
+            final Collection<HistoricStats> monthlyStats = statsRepository.getHistoricStats(user, date.year());
+            teamMonthlyStats.addAll(monthlyStats);
         }
+
+        final Collection<HistoricStats> combinedHistoricStats = HistoricStats.combine(teamMonthlyStats);
+        return cachedOk(combinedHistoricStats, CACHE_EXPIRATION_TIME);
     }
 }

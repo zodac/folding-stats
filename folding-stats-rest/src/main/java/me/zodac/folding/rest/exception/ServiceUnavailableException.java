@@ -29,9 +29,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
- * Marker {@link Exception} thrown then a request fails due to {@link HttpStatus#SERVICE_UNAVAILABLE}. Will automatically tell the
- * {@link org.springframework.boot.autoconfigure.SpringBootApplication} to return a <b>503_SERVICE_UNAVAILABLE</b> response, without requiring
- * explicit handling in any {@link org.springframework.web.bind.annotation.RestController}.
+ * {@link Exception} thrown then a request fails due to {@link HttpStatus#SERVICE_UNAVAILABLE}.
  */
 @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
 public class ServiceUnavailableException extends RuntimeException {
@@ -43,7 +41,7 @@ public class ServiceUnavailableException extends RuntimeException {
      * Basic constructor.
      */
     public ServiceUnavailableException() {
-        super();
+        super("Service unavailable");
     }
 
     /**
@@ -52,6 +50,6 @@ public class ServiceUnavailableException extends RuntimeException {
      * @param throwable the cause {@link Throwable}
      */
     public ServiceUnavailableException(final Throwable throwable) {
-        super(throwable);
+        super("Service unavailable: " + throwable.getMessage(), throwable);
     }
 }

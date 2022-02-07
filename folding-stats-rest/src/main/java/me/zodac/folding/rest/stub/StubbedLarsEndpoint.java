@@ -135,11 +135,19 @@ public class StubbedLarsEndpoint {
 
     private static String createGpuPage() {
         if (LARS_GPUS_BY_MODEL_INFO.isEmpty()) {
-            return "<html><table id=\"primary-database\"></table></html>";
+            return """
+                <html>
+                    <table id="primary-datatable"/>
+                </html>
+                """;
         }
 
-        final StringBuilder htmlPage = new StringBuilder(68) // The defined String literals have at least 68 characters
-            .append("<html><table id=\"primary-datatable\"><tbody>");
+        final StringBuilder htmlPage = new StringBuilder(234) // The defined String literal below has this many characters
+            .append("""
+                <html>
+                    <table id="primary-datatable">
+                        <tbody>
+                """);
 
         final Collection<String> trElementsForHardwares = createTrElementsForHardwares();
         for (final String trElementForHardware : trElementsForHardwares) {
@@ -147,7 +155,11 @@ public class StubbedLarsEndpoint {
         }
 
         return htmlPage
-            .append("</tbody></table></html>")
+            .append("""
+                        </tbody>
+                    </table>
+                </html>
+                """)
             .toString();
     }
 

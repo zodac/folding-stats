@@ -25,29 +25,22 @@
 package me.zodac.folding.rest.exception;
 
 import java.io.Serial;
-import org.springframework.http.HttpStatus;
 
 /**
- * {@link Exception} thrown when an {@link HttpStatus#UNAUTHORIZED} request has been made.
+ * {@link Exception} thrown when a requested object cannot be found.
  */
-public class UnauthorizedException extends RuntimeException {
+public class NotFoundException extends RuntimeException {
 
     @Serial
-    private static final long serialVersionUID = 5640864796327254860L;
+    private static final long serialVersionUID = -7931149448794408011L;
 
     /**
      * Basic constructor.
-     */
-    public UnauthorizedException() {
-        super("Unauthorized access");
-    }
-
-    /**
-     * Constructor taking in a cause {@link Throwable}.
      *
-     * @param throwable the cause {@link Throwable}
+     * @param type the type of object that cannot be found
+     * @param id   the ID of the object that cannot be found
      */
-    public UnauthorizedException(final Throwable throwable) {
-        super("Unauthorized access: " + throwable.getMessage(), throwable);
+    public NotFoundException(final String type, final int id) {
+        super(String.format("No %s found with ID '%s'", type, id));
     }
 }

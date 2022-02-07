@@ -339,7 +339,7 @@ The system currently has multiple logs available:
 - server.log
     - This is the general application log, where most logging will be written to. It will also be printed to the
       console.
-- audit.log
+- security.log
     - This is where all logging
       for [SecurityInterceptor.java](./folding-stats-rest/src/main/java/me/zodac/folding/rest/interceptor/SecurityInterceptor.java)
       is written, detailing login attempts or access requests to WRITE operations. This is not printed to the console.

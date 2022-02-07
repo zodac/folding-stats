@@ -40,6 +40,7 @@ import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.bean.tc.user.UserStatsParser;
+import me.zodac.folding.rest.exception.NotFoundException;
 import me.zodac.folding.state.ParsingStateManager;
 import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.apache.logging.log4j.LogManager;
@@ -89,10 +90,12 @@ public class FoldingRepository {
      * Retrieves a {@link Hardware}.
      *
      * @param hardwareId the ID of the {@link Hardware} to retrieve
-     * @return an {@link Optional} of the retrieved {@link Hardware}
+     * @return the retrieved {@link Hardware}
+     * @throws NotFoundException thrown if the {@link Hardware} cannot be found
      */
-    public Optional<Hardware> getHardware(final int hardwareId) {
-        return storage.getHardware(hardwareId);
+    public Hardware getHardware(final int hardwareId) {
+        return storage.getHardware(hardwareId)
+            .orElseThrow(() -> new NotFoundException("hardware", hardwareId));
     }
 
     /**
@@ -175,10 +178,12 @@ public class FoldingRepository {
      * Retrieves a {@link Team}.
      *
      * @param teamId the ID of the {@link Team} to retrieve
-     * @return an {@link Optional} of the retrieved {@link Team}
+     * @return the retrieved {@link Team}
+     * @throws NotFoundException thrown if the {@link Team} cannot be found
      */
-    public Optional<Team> getTeam(final int teamId) {
-        return storage.getTeam(teamId);
+    public Team getTeam(final int teamId) {
+        return storage.getTeam(teamId)
+            .orElseThrow(() -> new NotFoundException("team", teamId));
     }
 
     /**
@@ -243,27 +248,25 @@ public class FoldingRepository {
      * Retrieves a {@link User}, with the passkey unmodified.
      *
      * @param userId the ID of the {@link User} to retrieve
-     * @return an {@link Optional} of the retrieved {@link User}
+     * @return the retrieved {@link User}
+     * @throws NotFoundException thrown if the {@link User} cannot be found
      */
-    public Optional<User> getUserWithPasskey(final int userId) {
-        return storage.getUser(userId);
+    public User getUserWithPasskey(final int userId) {
+        return storage.getUser(userId)
+            .orElseThrow(() -> new NotFoundException("user", userId));
     }
 
     /**
      * Retrieves a {@link User}, with the passkey masked.
      *
      * @param userId the ID of the {@link User} to retrieve
-     * @return an {@link Optional} of the retrieved {@link User}
+     * @return the retrieved {@link User} with no passkey exposed
+     * @throws NotFoundException thrown if the {@link User} cannot be found
      * @see User#hidePasskey(User)
      */
-    public Optional<User> getUserWithoutPasskey(final int userId) {
-        final Optional<User> user = getUserWithPasskey(userId);
-
-        if (user.isEmpty()) {
-            return user;
-        }
-
-        return Optional.of(User.hidePasskey(user.get()));
+    public User getUserWithoutPasskey(final int userId) {
+        final User userWithPasskey = getUserWithPasskey(userId);
+        return User.hidePasskey(userWithPasskey);
     }
 
     /**

@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
@@ -39,7 +38,9 @@ import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 import me.zodac.folding.rest.util.RestUtilConstants;
 
 /**
- * Convenience class to send HTTP requests to the {@link Hardware} REST endpoint.
+ * Convenience class to send HTTP requests to the {@link me.zodac.folding.api.tc.Hardware} REST endpoint.
+ *
+ * @param hardwareUrl the URL to the {@link me.zodac.folding.api.tc.Hardware} REST endpoint
  */
 public record HardwareRequestSender(String hardwareUrl) {
 
@@ -56,7 +57,7 @@ public record HardwareRequestSender(String hardwareUrl) {
     }
 
     /**
-     * Send a <b>GET</b> request to retrieve all {@link Hardware}s in the system.
+     * Send a <b>GET</b> request to retrieve all {@link me.zodac.folding.api.tc.Hardware}s in the system.
      *
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
@@ -67,12 +68,13 @@ public record HardwareRequestSender(String hardwareUrl) {
     }
 
     /**
-     * Send a <b>GET</b> request to retrieve all {@link Hardware}s in the system.
+     * Send a <b>GET</b> request to retrieve all {@link me.zodac.folding.api.tc.Hardware}s in the system.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached {@link Hardware} based on the <code>ETag</code>, an empty {@link HttpResponse#body()} is returned.
+     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.api.tc.Hardware} based on the <code>ETag</code>, an empty
+     * {@link HttpResponse#body()} is returned.
      *
-     * @param entityTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve cached {@link Hardware}
+     * @param entityTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve cached {@link me.zodac.folding.api.tc.Hardware}
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      * @see #getAll()
@@ -100,9 +102,9 @@ public record HardwareRequestSender(String hardwareUrl) {
     }
 
     /**
-     * Send a <b>GET</b> request to retrieve a single {@link Hardware} with the given {@code hardwareId}.
+     * Send a <b>GET</b> request to retrieve a single {@link me.zodac.folding.api.tc.Hardware} with the given {@code hardwareId}.
      *
-     * @param hardwareId the ID of the {@link Hardware} to be retrieved
+     * @param hardwareId the ID of the {@link me.zodac.folding.api.tc.Hardware} to be retrieved
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      * @see #get(int, String)
@@ -112,13 +114,14 @@ public record HardwareRequestSender(String hardwareUrl) {
     }
 
     /**
-     * Send a <b>GET</b> request to retrieve a single {@link Hardware} with the given {@code hardwareId}.
+     * Send a <b>GET</b> request to retrieve a single {@link me.zodac.folding.api.tc.Hardware} with the given {@code hardwareId}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached {@link Hardware} based on the <code>ETag</code>, an empty {@link HttpResponse#body()} is returned.
+     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.api.tc.Hardware} based on the <code>ETag</code>, an empty
+     * {@link HttpResponse#body()} is returned.
      *
-     * @param hardwareId the ID of the {@link Hardware} to be retrieved
-     * @param entityTag  the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached {@link Hardware}
+     * @param hardwareId the ID of the {@link me.zodac.folding.api.tc.Hardware} to be retrieved
+     * @param entityTag  the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached {@link me.zodac.folding.api.tc.Hardware}
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      * @see #get(int)
@@ -146,9 +149,9 @@ public record HardwareRequestSender(String hardwareUrl) {
     }
 
     /**
-     * Send a <b>GET</b> request to retrieve a single {@link Hardware} with the given {@code hardwareName}.
+     * Send a <b>GET</b> request to retrieve a single {@link me.zodac.folding.api.tc.Hardware} with the given {@code hardwareName}.
      *
-     * @param hardwareName the {@code hardwareName} of the {@link Hardware} to be retrieved
+     * @param hardwareName the {@code hardwareName} of the {@link me.zodac.folding.api.tc.Hardware} to be retrieved
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      * @see #get(String, String)
@@ -158,13 +161,14 @@ public record HardwareRequestSender(String hardwareUrl) {
     }
 
     /**
-     * Send a <b>GET</b> request to retrieve a single {@link Hardware} with the given {@code hardwareName}.
+     * Send a <b>GET</b> request to retrieve a single {@link me.zodac.folding.api.tc.Hardware} with the given {@code hardwareName}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached {@link Hardware} based on the <code>ETag</code>, an empty {@link HttpResponse#body()} is returned.
+     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.api.tc.Hardware} based on the <code>ETag</code>, an empty
+     * {@link HttpResponse#body()} is returned.
      *
-     * @param hardwareName the {@code hardwareName} of the {@link Hardware} to be retrieved
-     * @param entityTag    the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached {@link Hardware}
+     * @param hardwareName the {@code hardwareName} of the {@link me.zodac.folding.api.tc.Hardware} to be retrieved
+     * @param entityTag    the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached {@link me.zodac.folding.api.tc.Hardware}
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      * @see #get(String)
@@ -237,7 +241,7 @@ public record HardwareRequestSender(String hardwareUrl) {
     /**
      * Send a <b>PUT</b> request to update the given {@link HardwareRequest} in the system.
      *
-     * @param hardwareId the ID of the {@link Hardware} to update
+     * @param hardwareId the ID of the {@link me.zodac.folding.api.tc.Hardware} to update
      * @param hardware   the {@link HardwareRequest} to update
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
@@ -249,7 +253,7 @@ public record HardwareRequestSender(String hardwareUrl) {
     /**
      * Send a <b>PUT</b> request to update the given {@link HardwareRequest} in the system.
      *
-     * @param hardwareId the ID of the {@link Hardware} to update
+     * @param hardwareId the ID of the {@link me.zodac.folding.api.tc.Hardware} to update
      * @param hardware   the {@link HardwareRequest} to update
      * @param userName   the username
      * @param password   the password
@@ -280,9 +284,9 @@ public record HardwareRequestSender(String hardwareUrl) {
     }
 
     /**
-     * Send a <b>DELETE</b> request to remove a {@link Hardware} with the given {@code hardwareId}.
+     * Send a <b>DELETE</b> request to remove a {@link me.zodac.folding.api.tc.Hardware} with the given {@code hardwareId}.
      *
-     * @param hardwareId the ID of the {@link Hardware} to remove
+     * @param hardwareId the ID of the {@link me.zodac.folding.api.tc.Hardware} to remove
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
@@ -291,9 +295,9 @@ public record HardwareRequestSender(String hardwareUrl) {
     }
 
     /**
-     * Send a <b>DELETE</b> request to remove a {@link Hardware} with the given {@code hardwareId}.
+     * Send a <b>DELETE</b> request to remove a {@link me.zodac.folding.api.tc.Hardware} with the given {@code hardwareId}.
      *
-     * @param hardwareId the ID of the {@link Hardware} to remove
+     * @param hardwareId the ID of the {@link me.zodac.folding.api.tc.Hardware} to remove
      * @param userName   the username
      * @param password   the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}

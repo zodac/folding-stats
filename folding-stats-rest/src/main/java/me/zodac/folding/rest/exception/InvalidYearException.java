@@ -25,29 +25,38 @@
 package me.zodac.folding.rest.exception;
 
 import java.io.Serial;
-import org.springframework.http.HttpStatus;
+import java.time.Year;
 
 /**
- * {@link Exception} thrown when an {@link HttpStatus#UNAUTHORIZED} request has been made.
+ * {@link Exception} to be thrown when a provided {@link String} year is not a valid {@link Year}.
  */
-public class UnauthorizedException extends RuntimeException {
+public class InvalidYearException extends RuntimeException {
 
     @Serial
-    private static final long serialVersionUID = 5640864796327254860L;
+    private static final long serialVersionUID = -5445226246538685833L;
+
+    /**
+     * The invalid year.
+     */
+    private final String year;
 
     /**
      * Basic constructor.
+     *
+     * @param year      the invalid year
+     * @param throwable the cause {@link Throwable}
      */
-    public UnauthorizedException() {
-        super("Unauthorized access");
+    public InvalidYearException(final String year, final Throwable throwable) {
+        super(throwable);
+        this.year = year;
     }
 
     /**
-     * Constructor taking in a cause {@link Throwable}.
+     * The invalid year.
      *
-     * @param throwable the cause {@link Throwable}
+     * @return the invalid year
      */
-    public UnauthorizedException(final Throwable throwable) {
-        super("Unauthorized access: " + throwable.getMessage(), throwable);
+    public String getYear() {
+        return year;
     }
 }

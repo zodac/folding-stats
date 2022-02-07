@@ -25,29 +25,36 @@
 package me.zodac.folding.rest.exception;
 
 import java.io.Serial;
-import org.springframework.http.HttpStatus;
 
 /**
- * {@link Exception} thrown when an {@link HttpStatus#UNAUTHORIZED} request has been made.
+ * {@link Exception} to be thrown when a provided ID is a valid {@link Integer}, but not in a valid range.
  */
-public class UnauthorizedException extends RuntimeException {
+public class OutOfRangeIdException extends RuntimeException {
 
     @Serial
-    private static final long serialVersionUID = 5640864796327254860L;
+    private static final long serialVersionUID = -1956391236596546606L;
+
+    /**
+     * The out of range ID.
+     */
+    private final int id;
 
     /**
      * Basic constructor.
+     *
+     * @param id the out of range ID
      */
-    public UnauthorizedException() {
-        super("Unauthorized access");
+    public OutOfRangeIdException(final int id) {
+        super();
+        this.id = id;
     }
 
     /**
-     * Constructor taking in a cause {@link Throwable}.
+     * The out of range ID.
      *
-     * @param throwable the cause {@link Throwable}
+     * @return the out of range ID
      */
-    public UnauthorizedException(final Throwable throwable) {
-        super("Unauthorized access: " + throwable.getMessage(), throwable);
+    public int getId() {
+        return id;
     }
 }

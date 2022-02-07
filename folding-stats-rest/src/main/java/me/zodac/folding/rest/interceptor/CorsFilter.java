@@ -36,7 +36,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * Intercepts all REST requests and sets the <code>Access-Control-*</code> headers.
  */
 @Component
-public class AccessControlFilter extends OncePerRequestFilter {
+public class CorsFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response,

@@ -38,6 +38,8 @@ import me.zodac.folding.rest.util.RestUtilConstants;
 
 /**
  * Convenience class to send HTTP requests to the {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} REST endpoint.
+ *
+ * @param historicStatsUrl the URL to the {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} REST endpoint
  */
 public record HistoricStatsRequestSender(String historicStatsUrl) {
 

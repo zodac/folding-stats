@@ -39,6 +39,8 @@ import me.zodac.folding.rest.util.RestUtilConstants;
 
 /**
  * Convenience class to send HTTP requests to the {@link me.zodac.folding.api.tc.User} REST endpoint.
+ *
+ * @param usersUrl the URL to the {@link me.zodac.folding.api.tc.User} REST endpoint
  */
 public record UserRequestSender(String usersUrl) {
 

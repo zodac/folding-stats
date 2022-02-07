@@ -41,6 +41,8 @@ import me.zodac.folding.rest.util.RestUtilConstants;
 
 /**
  * Convenience class to send HTTP requests to the {@link me.zodac.folding.api.tc.result.MonthlyResult} REST endpoint.
+ *
+ * @param monthlyResultUrl the URL to the {@link me.zodac.folding.api.tc.result.MonthlyResult} REST endpoint
  */
 public record MonthlyResultRequestSender(String monthlyResultUrl) {
 

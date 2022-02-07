@@ -22,44 +22,40 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.rest.util;
+package me.zodac.folding.rest.exception;
 
-import org.springframework.http.ResponseEntity;
+import java.io.Serial;
 
 /**
- * POJO defining the result of {@link IntegerParser#parsePositive(String)}.
+ * {@link Exception} to be thrown when a provided {@link String} ID is not a valid {@link Integer}.
  */
-public record IdResult(boolean successful, int id, ResponseEntity<?> failureResponse) {
+public class InvalidIdException extends RuntimeException {
 
-    private static final int INVALID_ID = -1;
+    @Serial
+    private static final long serialVersionUID = -4712566298212173158L;
 
     /**
-     * Creates an {@link IdResult} for a successfully parsed {@link Integer} ID.
-     *
-     * @param id the parsed {@link Integer} ID
-     * @return the {@link IdResult}
+     * The invalid ID.
      */
-    public static IdResult success(final int id) {
-        return new IdResult(true, id, null);
+    private final String id;
+
+    /**
+     * Basic constructor.
+     *
+     * @param id        the invalid ID
+     * @param throwable the cause {@link Throwable}
+     */
+    public InvalidIdException(final String id, final Throwable throwable) {
+        super(throwable);
+        this.id = id;
     }
 
     /**
-     * Creates an {@link IdResult} for an invalid parsing due the input value not being a valid
-     * {@link Integer}.
+     * The invalid ID.
      *
-     * @param response the failure {@link ResponseEntity}
-     * @return the {@link IdResult}
+     * @return the invalid ID
      */
-    public static IdResult failure(final ResponseEntity<?> response) {
-        return new IdResult(false, INVALID_ID, response);
-    }
-
-    /**
-     * Checks if the {@link IdResult} failed and does not contain a valid {@link Integer} ID.
-     *
-     * @return <code>true</code> if the {@link IdResult} does not contain an ID
-     */
-    public boolean isFailure() {
-        return !successful;
+    public String getId() {
+        return id;
     }
 }

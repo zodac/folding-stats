@@ -39,6 +39,8 @@ import me.zodac.folding.rest.util.RestUtilConstants;
 
 /**
  * Convenience class to send HTTP requests to the {@link me.zodac.folding.api.tc.Team} REST endpoint.
+ *
+ * @param teamsUrl the URL to the {@link me.zodac.folding.api.tc.Team} REST endpoint
  */
 public record TeamRequestSender(String teamsUrl) {
 

@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.util.EncodingUtils;
 import me.zodac.folding.rest.api.LoginCredentials;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
@@ -37,7 +36,9 @@ import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.util.RestUtilConstants;
 
 /**
- * Convenience class to send HTTP requests to the {@link Hardware} REST endpoint.
+ * Convenience class to send HTTP requests to the {@link LoginCredentials} REST endpoint.
+ *
+ * @param loginUrl the URL to the {@link LoginCredentials} REST endpoint
  */
 public record LoginRequestSender(String loginUrl) {
 

@@ -24,11 +24,7 @@
 
 package me.zodac.folding.rest;
 
-import static me.zodac.folding.rest.response.Responses.badRequest;
-import static me.zodac.folding.rest.response.Responses.forbidden;
 import static me.zodac.folding.rest.response.Responses.ok;
-import static me.zodac.folding.rest.response.Responses.serverError;
-import static me.zodac.folding.rest.response.Responses.unauthorized;
 
 import java.util.Map;
 import javax.annotation.security.PermitAll;
@@ -37,6 +33,9 @@ import me.zodac.folding.api.state.ReadRequired;
 import me.zodac.folding.api.util.EncodingUtils;
 import me.zodac.folding.bean.FoldingRepository;
 import me.zodac.folding.rest.api.LoginCredentials;
+import me.zodac.folding.rest.exception.ForbiddenException;
+import me.zodac.folding.rest.exception.InvalidLoginCredentialsException;
+import me.zodac.folding.rest.exception.UnauthorizedException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,18 +61,11 @@ public class LoginEndpoint {
     /**
      * {@link PostMapping} request to log in as an admin system user.
      *
-     * <p>
-     * The {@link ResponseEntity} will be one of:
-     * <ul>
-     *     <li>{@link me.zodac.folding.rest.response.Responses#ok()}</li>
-     *     <li>{@link me.zodac.folding.rest.response.Responses#badRequest(Object)}</li>
-     *     <li>{@link me.zodac.folding.rest.response.Responses#unauthorized()}</li>
-     *     <li>{@link me.zodac.folding.rest.response.Responses#forbidden()}</li>
-     *     <li>{@link me.zodac.folding.rest.response.Responses#serverError()}</li>
-     * </ul>
-     *
      * @param loginCredentials the {@link LoginCredentials}
-     * @return one of the above {@link ResponseEntity}s
+     * @return {@link me.zodac.folding.rest.response.Responses#ok(Object)}
+     * @throws InvalidLoginCredentialsException thrown if the input {@link LoginCredentials} are in an incorrect format
+     * @throws UnauthorizedException            thrown if the user does not exist, or the password is incorrect
+     * @throws ForbiddenException               thown if the user and password is accepted, but it does not have the correct role
      */
     @ReadRequired
     @PermitAll
@@ -81,9 +73,9 @@ public class LoginEndpoint {
     public ResponseEntity<?> loginAsAdmin(@RequestBody final LoginCredentials loginCredentials) {
         LOGGER.debug("Login request received");
 
-        if (loginCredentials == null || EncodingUtils.isInvalidBasicAuthentication(loginCredentials.getEncodedUserNameAndPassword())) {
+        if (EncodingUtils.isInvalidBasicAuthentication(loginCredentials.getEncodedUserNameAndPassword())) {
             LOGGER.error("Invalid payload: {}", loginCredentials);
-            return badRequest(loginCredentials);
+            throw new InvalidLoginCredentialsException(loginCredentials);
         }
 
         try {
@@ -97,22 +89,19 @@ public class LoginEndpoint {
 
             if (!userAuthenticationResult.userExists() || !userAuthenticationResult.passwordMatch()) {
                 LOGGER.warn("Invalid user credentials supplied: {}", loginCredentials);
-                return unauthorized();
+                throw new UnauthorizedException();
             }
 
             if (!userAuthenticationResult.isAdmin()) {
                 LOGGER.warn("User '{}' is not an admin", userName);
-                return forbidden();
+                throw new ForbiddenException();
             }
 
             LOGGER.info("Admin user '{}' logged in", userName);
             return ok();
         } catch (final IllegalArgumentException e) {
             LOGGER.error("Encoded username and password was not a valid Base64 string", e);
-            return badRequest(loginCredentials);
-        } catch (final Exception e) {
-            LOGGER.error("Unexpected error validating user credentials", e);
-            return serverError();
+            throw new InvalidLoginCredentialsException(loginCredentials, e);
         }
     }
 }

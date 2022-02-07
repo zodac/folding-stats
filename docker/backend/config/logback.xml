@@ -26,9 +26,9 @@
         </rollingPolicy>
     </appender>
 
-    <appender name="AUDIT_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <appender name="SECURITY_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <append>true</append>
-        <file>/var/backend/logs/audit.log</file>
+        <file>/var/backend/logs/security.log</file>
         <immediateFlush>true</immediateFlush>
         <encoder>
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%-5logger{5}] %msg%n</pattern>
@@ -50,7 +50,7 @@
 
     <!-- The 'additivity=false' option ensures analytics data only goes to the analytics log -->
     <logger name="audit" level="DEBUG" additivity="false">
-        <appender-ref ref="AUDIT_LOG"/>
+        <appender-ref ref="SECURITY_LOG"/>
     </logger>
 
     <!-- Suppress logging for unwanted packages -->

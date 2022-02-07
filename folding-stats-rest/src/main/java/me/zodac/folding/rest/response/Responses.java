@@ -209,53 +209,6 @@ public final class Responses {
     }
 
     /**
-     * A <b>400_BAD_REQUEST</b> {@link ResponseEntity}.
-     *
-     * <p>
-     * Used for cases where the REST request has an empty or null payload.
-     *
-     * @return the <b>400_BAD_REQUEST</b> {@link ResponseEntity}
-     */
-    public static ResponseEntity<String> nullRequest() {
-        return ResponseEntity
-            .badRequest()
-            .body(GSON.toJson(ErrorResponse.create("Payload is null")));
-    }
-
-    /**
-     * A <b>401_UNAUTHORIZED</b> {@link ResponseEntity}.
-     *
-     * <p>
-     * Generally used for cases where the user has not been successfully authenticated, and cannot be authorized to
-     * execute the REST endpoint.
-     *
-     * @param <E> the response body type
-     * @return the <b>401_UNAUTHORIZED</b> {@link ResponseEntity}
-     */
-    public static <E> ResponseEntity<E> unauthorized() {
-        return ResponseEntity
-            .status(HttpStatus.UNAUTHORIZED)
-            .build();
-
-    }
-
-    /**
-     * A <b>403_FORBIDDEN</b> {@link ResponseEntity}.
-     *
-     * <p>
-     * Generally used for cases where a user has successfully authenticated, but does not have the required
-     * authorization to execute the REST endpoint.
-     *
-     * @param <E> the response body type
-     * @return the <b>403_FORBIDDEN</b> {@link ResponseEntity}
-     */
-    public static <E> ResponseEntity<E> forbidden() {
-        return ResponseEntity
-            .status(HttpStatus.FORBIDDEN)
-            .build();
-    }
-
-    /**
      * A <b>404_NOT_FOUND</b> {@link ResponseEntity}.
      *
      * <p>

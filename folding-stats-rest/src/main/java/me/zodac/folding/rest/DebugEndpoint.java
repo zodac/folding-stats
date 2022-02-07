@@ -25,7 +25,6 @@
 package me.zodac.folding.rest;
 
 import static me.zodac.folding.rest.response.Responses.ok;
-import static me.zodac.folding.rest.response.Responses.serverError;
 
 import javax.annotation.security.RolesAllowed;
 import me.zodac.folding.bean.FoldingRepository;
@@ -67,13 +66,8 @@ public class DebugEndpoint {
     @PostMapping(path = "/lars", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> startLarsUpdate() {
         LOGGER.info("GET request received to manually update hardware from LARS DB");
-        try {
-            larsHardwareUpdater.retrieveHardwareAndPersist();
-            return ok();
-        } catch (final Exception e) {
-            LOGGER.error("Unexpected error updating hardware from LARS", e);
-            return serverError();
-        }
+        larsHardwareUpdater.retrieveHardwareAndPersist();
+        return ok();
     }
 
     /**

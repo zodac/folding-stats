@@ -25,29 +25,68 @@
 package me.zodac.folding.rest.exception;
 
 import java.io.Serial;
-import org.springframework.http.HttpStatus;
 
 /**
- * {@link Exception} thrown when an {@link HttpStatus#UNAUTHORIZED} request has been made.
+ * {@link Exception} to be thrown when a provided {@link String} day is not valid for the month/year.
  */
-public class UnauthorizedException extends RuntimeException {
+public class OutOfRangeDayException extends RuntimeException {
 
     @Serial
-    private static final long serialVersionUID = 5640864796327254860L;
+    private static final long serialVersionUID = 2315415240865681293L;
+
+    /**
+     * The year for the day.
+     */
+    private final int year;
+
+    /**
+     * The month for the day.
+     */
+    private final int month;
+
+    /**
+     * The out of range day.
+     */
+    private final int day;
 
     /**
      * Basic constructor.
+     *
+     * @param year  the year for the day
+     * @param month the month for the day
+     * @param day   the invalid day for the given year/month
      */
-    public UnauthorizedException() {
-        super("Unauthorized access");
+    public OutOfRangeDayException(final int year, final int month, final int day) {
+        super();
+        this.year = year;
+        this.month = month;
+        this.day = day;
     }
 
     /**
-     * Constructor taking in a cause {@link Throwable}.
+     * The year of the out of range day.
      *
-     * @param throwable the cause {@link Throwable}
+     * @return the year
      */
-    public UnauthorizedException(final Throwable throwable) {
-        super("Unauthorized access: " + throwable.getMessage(), throwable);
+    public int getYear() {
+        return year;
+    }
+
+    /**
+     * The month of the out of range day.
+     *
+     * @return the month
+     */
+    public int getMonth() {
+        return month;
+    }
+
+    /**
+     * The invalid day.
+     *
+     * @return the invalid day
+     */
+    public int getDay() {
+        return day;
     }
 }
