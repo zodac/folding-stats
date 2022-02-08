@@ -574,6 +574,17 @@ traits:
             description: "System user does not have the correct role to perform this request"
           503:
             description: "The system is not in a valid state to execute write requests"
+  /overall:
+    get:
+      description:
+      responses:
+        200:
+          description: "Returns the overall stats (total stats of all teams) for the competition"
+          body:
+            application/json:
+              example: !include responses/stats/statsGetOverall.json
+        503:
+          description: "The system is not in a valid state to execute read requests"
   /users/{userId}:
     uriParameters:
       userId:

@@ -108,7 +108,7 @@ public class TeamSummary {
         final List<UserSummary> rankedActiveUsers = activeUsers
             .stream()
             .sorted(Comparator.comparingLong(UserSummary::getMultipliedPoints).reversed())
-            .collect(new IntegerRankingCollector<>(
+            .collect(IntegerRankingCollector.create(
                 Comparator.comparingLong(UserSummary::getMultipliedPoints),
                 UserSummary::getRankInTeam,
                 UserSummary::updateWithRankInTeam)
@@ -117,7 +117,7 @@ public class TeamSummary {
         final List<RetiredUserSummary> rankedRetiredUsers = retiredUsers
             .stream()
             .sorted(Comparator.comparingLong(RetiredUserSummary::getMultipliedPoints).reversed())
-            .collect(new IntegerRankingCollector<>(
+            .collect(IntegerRankingCollector.create(
                 Comparator.comparingLong(RetiredUserSummary::getMultipliedPoints),
                 RetiredUserSummary::getRankInTeam,
                 RetiredUserSummary::updateWithRankInTeam)

@@ -47,6 +47,7 @@ import me.zodac.folding.bean.StatsRepository;
 import me.zodac.folding.bean.tc.LeaderboardStatsGenerator;
 import me.zodac.folding.bean.tc.user.UserStatsParser;
 import me.zodac.folding.bean.tc.user.UserStatsResetter;
+import me.zodac.folding.rest.api.tc.AllTeamsSummary;
 import me.zodac.folding.rest.api.tc.CompetitionSummary;
 import me.zodac.folding.rest.api.tc.UserSummary;
 import me.zodac.folding.rest.api.tc.leaderboard.TeamLeaderboardEntry;
@@ -92,17 +93,31 @@ public class TeamCompetitionStatsEndpoint {
     private UserStatsResetter userStatsResetter;
 
     /**
-     * {@link GetMapping} request to retrieve the <code>Team Competition</code> overall {@link CompetitionSummary}.
+     * {@link GetMapping} request to retrieve the <code>Team Competition</code> simple {@link CompetitionSummary}.
      *
      * @return {@link me.zodac.folding.rest.response.Responses#ok()} containing the {@link CompetitionSummary}
+     */
+    @ReadRequired
+    @PermitAll
+    @GetMapping(path = "/overall", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getCompetitionStats() {
+        LOGGER.debug("GET request received to show TC overall stats");
+        final AllTeamsSummary allTeamsSummary = statsRepository.getAllTeamsSummary();
+        return ok(allTeamsSummary.getCompetitionSummary());
+    }
+
+    /**
+     * {@link GetMapping} request to retrieve the <code>Team Competition</code> overall {@link AllTeamsSummary}.
+     *
+     * @return {@link me.zodac.folding.rest.response.Responses#ok()} containing the {@link AllTeamsSummary}
      */
     @ReadRequired
     @PermitAll
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getTeamCompetitionStats() {
         LOGGER.debug("GET request received to show TC stats");
-        final CompetitionSummary competitionSummary = statsRepository.getCompetitionSummary();
-        return ok(competitionSummary);
+        final AllTeamsSummary allTeamsSummary = statsRepository.getAllTeamsSummary();
+        return ok(allTeamsSummary);
     }
 
     /**
@@ -121,8 +136,8 @@ public class TeamCompetitionStatsEndpoint {
         final int parsedId = IntegerParser.parsePositive(userId);
         final User user = foldingRepository.getUserWithoutPasskey(parsedId);
 
-        final CompetitionSummary competitionSummary = statsRepository.getCompetitionSummary();
-        final Collection<UserSummary> userSummaries = competitionSummary.getTeams()
+        final AllTeamsSummary allTeamsSummary = statsRepository.getAllTeamsSummary();
+        final Collection<UserSummary> userSummaries = allTeamsSummary.getTeams()
             .stream()
             .flatMap(teamResult -> teamResult.getActiveUsers().stream())
             .toList();

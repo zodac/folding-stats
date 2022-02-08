@@ -44,12 +44,10 @@ import java.util.stream.Collector;
  * @param <T> the type of the {@link Object}
  * @see <a href="https://stackoverflow.com/a/41608187/2000246">How to rank collection of objects</a>
  */
-final class IntegerRankingCollector<T> implements Collector<T, List<T>, List<T>> {
+record IntegerRankingCollector<T>(Comparator<? super T> comparator, Function<T, Integer> ranker,
+                                  BiFunction<T, Integer, T> creator) implements Collector<T, List<T>, List<T>> {
 
     private static final Set<Characteristics> COLLECTOR_CHARACTERISTICS = Collections.unmodifiableSet(EnumSet.of(Characteristics.IDENTITY_FINISH));
-    private final Comparator<? super T> comparator;
-    private final BiFunction<T, Integer, T> creator;
-    private final Function<T, Integer> ranker;
 
     /**
      * Constructs an {@link IntegerRankingCollector}.
@@ -58,10 +56,10 @@ final class IntegerRankingCollector<T> implements Collector<T, List<T>, List<T>>
      * @param ranker     the existing rank of the object being ranked
      * @param creator    the {@link BiFunction} defining the output rank of the object
      */
-    IntegerRankingCollector(final Comparator<? super T> comparator, final Function<T, Integer> ranker, final BiFunction<T, Integer, T> creator) {
-        this.comparator = comparator;
-        this.ranker = ranker;
-        this.creator = creator;
+    static <T> IntegerRankingCollector<T> create(final Comparator<? super T> comparator,
+                                                 final Function<T, Integer> ranker,
+                                                 final BiFunction<T, Integer, T> creator) {
+        return new IntegerRankingCollector<>(comparator, ranker, creator);
     }
 
     @Override

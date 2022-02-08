@@ -34,7 +34,7 @@ import me.zodac.folding.api.tc.User;
 import me.zodac.folding.client.java.request.TeamCompetitionStatsRequestSender;
 import me.zodac.folding.client.java.response.TeamCompetitionStatsResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
-import me.zodac.folding.rest.api.tc.CompetitionSummary;
+import me.zodac.folding.rest.api.tc.AllTeamsSummary;
 import me.zodac.folding.rest.api.tc.RetiredUserSummary;
 import me.zodac.folding.rest.api.tc.TeamSummary;
 import me.zodac.folding.rest.api.tc.UserSummary;
@@ -54,10 +54,10 @@ public final class TeamCompetitionStatsUtils {
     /**
      * Get the overall TC results.
      *
-     * @return the TC {@link CompetitionSummary}
+     * @return the TC {@link AllTeamsSummary}
      * @throws FoldingRestException thrown if an error occurs sending the HTTP request
      */
-    public static CompetitionSummary getStats() throws FoldingRestException {
+    public static AllTeamsSummary getStats() throws FoldingRestException {
         final HttpResponse<String> response = TEAM_COMPETITION_REQUEST_SENDER.getStats();
         if (response.statusCode() == HttpURLConnection.HTTP_OK) {
             return TeamCompetitionStatsResponseParser.getStats(response);
@@ -85,20 +85,20 @@ public final class TeamCompetitionStatsUtils {
     }
 
     /**
-     * Retrieves the {@link TeamSummary} with the given {@code teamName} from the {@link CompetitionSummary}.
+     * Retrieves the {@link TeamSummary} with the given {@code teamName} from the {@link AllTeamsSummary}.
      *
-     * @param competitionSummary the {@link CompetitionSummary} to check
-     * @param teamName           the name of the {@link TeamSummary} to find
+     * @param allTeamsSummary the {@link AllTeamsSummary} to check
+     * @param teamName        the name of the {@link TeamSummary} to find
      * @return the {@link TeamSummary}
      * @throws FoldingRestException thrown if an error occurs sending the HTTP request
      */
-    public static TeamSummary getTeamFromCompetition(final CompetitionSummary competitionSummary, final String teamName) throws FoldingRestException {
-        for (final TeamSummary teamSummary : competitionSummary.getTeams()) {
+    public static TeamSummary getTeamFromCompetition(final AllTeamsSummary allTeamsSummary, final String teamName) throws FoldingRestException {
+        for (final TeamSummary teamSummary : allTeamsSummary.getTeams()) {
             if (teamSummary.getTeam().getTeamName().equalsIgnoreCase(teamName)) {
                 return teamSummary;
             }
         }
-        throw new FoldingRestException(String.format("Unable to find team '%s' in competition teams: %s", teamName, competitionSummary.getTeams()));
+        throw new FoldingRestException(String.format("Unable to find team '%s' in competition teams: %s", teamName, allTeamsSummary.getTeams()));
     }
 
     /**

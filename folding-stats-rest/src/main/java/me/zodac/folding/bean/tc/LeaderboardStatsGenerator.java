@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.bean.StatsRepository;
-import me.zodac.folding.rest.api.tc.CompetitionSummary;
+import me.zodac.folding.rest.api.tc.AllTeamsSummary;
 import me.zodac.folding.rest.api.tc.TeamSummary;
 import me.zodac.folding.rest.api.tc.UserSummary;
 import me.zodac.folding.rest.api.tc.leaderboard.TeamLeaderboardEntry;
@@ -61,8 +61,8 @@ public class LeaderboardStatsGenerator {
      * @return a {@link List} of {@link TeamLeaderboardEntry}s
      */
     public List<TeamLeaderboardEntry> generateTeamLeaderboards() {
-        final CompetitionSummary competitionSummary = statsRepository.getCompetitionSummary();
-        final List<TeamSummary> teamResults = competitionSummary.getTeams()
+        final AllTeamsSummary allTeamsSummary = statsRepository.getAllTeamsSummary();
+        final List<TeamSummary> teamResults = allTeamsSummary.getTeams()
             .stream()
             .sorted(Comparator.comparingLong(TeamSummary::getTeamMultipliedPoints).reversed())
             .toList();
@@ -98,8 +98,8 @@ public class LeaderboardStatsGenerator {
      * @return a {@link Map} of {@link UserCategoryLeaderboardEntry}s keyed by the {@link Category}
      */
     public Map<Category, List<UserCategoryLeaderboardEntry>> generateUserCategoryLeaderboards() {
-        final CompetitionSummary competitionSummary = statsRepository.getCompetitionSummary();
-        final Map<Category, List<UserSummary>> usersByCategory = getUsersSortedByCategory(competitionSummary);
+        final AllTeamsSummary allTeamsSummary = statsRepository.getAllTeamsSummary();
+        final Map<Category, List<UserSummary>> usersByCategory = getUsersSortedByCategory(allTeamsSummary);
 
         final Map<Category, List<UserCategoryLeaderboardEntry>> categoryLeaderboard = new TreeMap<>();
         for (final var entry : usersByCategory.entrySet()) {
@@ -143,9 +143,9 @@ public class LeaderboardStatsGenerator {
         return userSummariesInCategory;
     }
 
-    private static Map<Category, List<UserSummary>> getUsersSortedByCategory(final CompetitionSummary competitionSummary) {
+    private static Map<Category, List<UserSummary>> getUsersSortedByCategory(final AllTeamsSummary allTeamsSummary) {
         final Map<Category, List<UserSummary>> usersByCategory = new EnumMap<>(Category.class);
-        final Collection<UserSummary> usersInAllTeams = competitionSummary
+        final Collection<UserSummary> usersInAllTeams = allTeamsSummary
             .getTeams()
             .stream()
             .map(TeamSummary::getActiveUsers)

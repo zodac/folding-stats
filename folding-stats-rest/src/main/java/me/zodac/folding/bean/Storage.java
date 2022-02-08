@@ -43,7 +43,7 @@ import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
-import me.zodac.folding.cache.CompetitionSummaryCache;
+import me.zodac.folding.cache.AllTeamsSummaryCache;
 import me.zodac.folding.cache.HardwareCache;
 import me.zodac.folding.cache.InitialStatsCache;
 import me.zodac.folding.cache.OffsetTcStatsCache;
@@ -53,7 +53,7 @@ import me.zodac.folding.cache.TeamCache;
 import me.zodac.folding.cache.TotalStatsCache;
 import me.zodac.folding.cache.UserCache;
 import me.zodac.folding.db.DbManagerRetriever;
-import me.zodac.folding.rest.api.tc.CompetitionSummary;
+import me.zodac.folding.rest.api.tc.AllTeamsSummary;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -77,7 +77,7 @@ public class Storage {
     private final UserCache userCache = UserCache.getInstance();
 
     // Stats caches
-    private final CompetitionSummaryCache competitionSummaryCache = CompetitionSummaryCache.getInstance();
+    private final AllTeamsSummaryCache allTeamsSummaryCache = AllTeamsSummaryCache.getInstance();
     private final InitialStatsCache initialStatsCache = InitialStatsCache.getInstance();
     private final OffsetTcStatsCache offsetTcStatsCache = OffsetTcStatsCache.getInstance();
     private final RetiredTcStatsCache retiredTcStatsCache = RetiredTcStatsCache.getInstance();
@@ -807,25 +807,25 @@ public class Storage {
     }
 
     /**
-     * Creates a {@link CompetitionSummary}.
+     * Creates a {@link AllTeamsSummary}.
      *
-     * @param competitionSummary the {@link CompetitionSummary} to be created
-     * @return the created {@link CompetitionSummary}
+     * @param allTeamsSummary the {@link AllTeamsSummary} to be created
+     * @return the created {@link AllTeamsSummary}
      */
-    @Cached(CompetitionSummaryCache.class)
-    public CompetitionSummary createCompetitionSummary(final CompetitionSummary competitionSummary) {
-        this.competitionSummaryCache.add(CompetitionSummaryCache.COMPETITION_SUMMARY_ID, competitionSummary);
-        return competitionSummary;
+    @Cached(AllTeamsSummaryCache.class)
+    public AllTeamsSummary createAllTeamsSummary(final AllTeamsSummary allTeamsSummary) {
+        this.allTeamsSummaryCache.add(AllTeamsSummaryCache.ALL_TEAMS_SUMMARY_ID, allTeamsSummary);
+        return allTeamsSummary;
     }
 
     /**
-     * Creates the latest {@link CompetitionSummary}.
+     * Creates the latest {@link AllTeamsSummary}.
      *
-     * @return an {@link Optional} of the latest {@link CompetitionSummary}
+     * @return an {@link Optional} of the latest {@link AllTeamsSummary}
      */
-    @Cached(CompetitionSummaryCache.class)
-    public Optional<CompetitionSummary> getCompetitionSummary() {
-        return competitionSummaryCache.get(CompetitionSummaryCache.COMPETITION_SUMMARY_ID);
+    @Cached(AllTeamsSummaryCache.class)
+    public Optional<AllTeamsSummary> getAllTeamsSummary() {
+        return allTeamsSummaryCache.get(AllTeamsSummaryCache.ALL_TEAMS_SUMMARY_ID);
     }
 
     /**
@@ -848,7 +848,7 @@ public class Storage {
      * Prints the contents of caches to the system log.
      */
     @Cached({
-        CompetitionSummaryCache.class,
+        AllTeamsSummaryCache.class,
         HardwareCache.class,
         InitialStatsCache.class,
         OffsetTcStatsCache.class,
@@ -872,7 +872,7 @@ public class Storage {
         LOGGER.info("TotalStatsCache: {}", totalStatsCache.getCacheContents());
 
         // TC overall
-        LOGGER.info("CompetitionSummaryCache: {}", competitionSummaryCache.getCacheContents());
+        LOGGER.info("AllTeamsSummaryCache: {}", allTeamsSummaryCache.getCacheContents());
     }
 
     private <T> T dbManagerFunction(final Function<DbManager, T> function) {

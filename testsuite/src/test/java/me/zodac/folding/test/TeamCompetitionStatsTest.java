@@ -61,6 +61,7 @@ import me.zodac.folding.client.java.response.TeamCompetitionStatsResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
+import me.zodac.folding.rest.api.tc.AllTeamsSummary;
 import me.zodac.folding.rest.api.tc.CompetitionSummary;
 import me.zodac.folding.rest.api.tc.RetiredUserSummary;
 import me.zodac.folding.rest.api.tc.TeamSummary;
@@ -103,11 +104,34 @@ class TeamCompetitionStatsTest {
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
-        final CompetitionSummary result = TeamCompetitionStatsResponseParser.getStats(response);
+        final AllTeamsSummary result = TeamCompetitionStatsResponseParser.getStats(response);
 
         assertThat(result.getTeams())
             .as("Expected no teams: " + result)
             .isEmpty();
+
+        assertThat(result.getCompetitionSummary().getTotalPoints())
+            .as("Expected no points: " + result)
+            .isZero();
+
+        assertThat(result.getCompetitionSummary().getTotalMultipliedPoints())
+            .as("Expected no multiplied points: " + result)
+            .isZero();
+
+        assertThat(result.getCompetitionSummary().getTotalUnits())
+            .as("Expected no units: " + result)
+            .isZero();
+    }
+
+    @Test
+    void whenNoTeamsExistInTheSystem_thenResponseIsReturnedWithNoOverallStats() throws FoldingRestException {
+        final HttpResponse<String> response = TEAM_COMPETITION_REQUEST_SENDER.getOverallStats();
+
+        assertThat(response.statusCode())
+            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_OK);
+
+        final CompetitionSummary result = TeamCompetitionStatsResponseParser.getOverallStats(response);
 
         assertThat(result.getTotalPoints())
             .as("Expected no points: " + result)
@@ -128,17 +152,17 @@ class TeamCompetitionStatsTest {
         final Team team = TeamUtils.create(generateTeam());
         final User user = UserUtils.create(generateUserWithTeamId(team.getId()));
 
-        final CompetitionSummary resultBeforeStats = TeamCompetitionStatsUtils.getStats();
+        final AllTeamsSummary resultBeforeStats = TeamCompetitionStatsUtils.getStats();
 
-        assertThat(resultBeforeStats.getTotalPoints())
+        assertThat(resultBeforeStats.getCompetitionSummary().getTotalPoints())
             .as("Expected no points: " + resultBeforeStats)
             .isZero();
 
-        assertThat(resultBeforeStats.getTotalMultipliedPoints())
+        assertThat(resultBeforeStats.getCompetitionSummary().getTotalMultipliedPoints())
             .as("Expected no multiplied points: " + resultBeforeStats)
             .isZero();
 
-        assertThat(resultBeforeStats.getTotalUnits())
+        assertThat(resultBeforeStats.getCompetitionSummary().getTotalUnits())
             .as("Expected no units: " + resultBeforeStats)
             .isZero();
 
@@ -193,17 +217,17 @@ class TeamCompetitionStatsTest {
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
-        final CompetitionSummary resultAfterStats = TeamCompetitionStatsUtils.getStats();
+        final AllTeamsSummary resultAfterStats = TeamCompetitionStatsUtils.getStats();
 
-        assertThat(resultAfterStats.getTotalPoints())
+        assertThat(resultAfterStats.getCompetitionSummary().getTotalPoints())
             .as("Expected updated points: " + resultAfterStats)
             .isEqualTo(newPoints);
 
-        assertThat(resultAfterStats.getTotalMultipliedPoints())
+        assertThat(resultAfterStats.getCompetitionSummary().getTotalMultipliedPoints())
             .as("Expected updated multiplied points: " + resultAfterStats)
             .isEqualTo(newPoints);
 
-        assertThat(resultAfterStats.getTotalUnits())
+        assertThat(resultAfterStats.getCompetitionSummary().getTotalUnits())
             .as("Expected updated units: " + resultAfterStats)
             .isEqualTo(newUnits);
 
@@ -255,7 +279,7 @@ class TeamCompetitionStatsTest {
         final User firstUser = UserUtils.create(generateUserWithTeamIdAndCategory(team.getId(), Category.AMD_GPU));
         final User secondUser = UserUtils.create(generateUserWithTeamIdAndCategory(team.getId(), Category.NVIDIA_GPU));
 
-        final CompetitionSummary result = TeamCompetitionStatsUtils.getStats();
+        final AllTeamsSummary result = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamSummary = getTeamFromCompetition(result, team.getTeamName());
         final Collection<UserSummary> activeUserSummaries = teamSummary.getActiveUsers();
 
@@ -278,7 +302,7 @@ class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.addUnits(firstUser, 10);
         manuallyUpdateStats();
 
-        final CompetitionSummary resultAfterFirstUpdate = TeamCompetitionStatsUtils.getStats();
+        final AllTeamsSummary resultAfterFirstUpdate = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamSummaryAfterFirstUpdate = getTeamFromCompetition(resultAfterFirstUpdate, team.getTeamName());
         final UserSummary firstUserSummaryAfterFirstUpdate = getActiveUserFromTeam(teamSummaryAfterFirstUpdate, firstUser.getDisplayName());
         final UserSummary secondUserSummaryAfterFirstUpdate = getActiveUserFromTeam(teamSummaryAfterFirstUpdate, secondUser.getDisplayName());
@@ -295,7 +319,7 @@ class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.addUnits(secondUser, 20);
         manuallyUpdateStats();
 
-        final CompetitionSummary resultAfterSecondUpdate = TeamCompetitionStatsUtils.getStats();
+        final AllTeamsSummary resultAfterSecondUpdate = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamSummaryAfterSecondUpdate = getTeamFromCompetition(resultAfterSecondUpdate, team.getTeamName());
         final UserSummary firstUserSummaryAfterSecondUpdate = getActiveUserFromTeam(teamSummaryAfterSecondUpdate, firstUser.getDisplayName());
         final UserSummary secondUserSummaryAfterSecondUpdate = getActiveUserFromTeam(teamSummaryAfterSecondUpdate, secondUser.getDisplayName());
@@ -318,7 +342,7 @@ class TeamCompetitionStatsTest {
         final Team secondTeam = TeamUtils.create(generateTeam());
         final User secondUser = UserUtils.create(generateUserWithTeamId(secondTeam.getId()));
 
-        final CompetitionSummary result = TeamCompetitionStatsUtils.getStats();
+        final AllTeamsSummary result = TeamCompetitionStatsUtils.getStats();
         assertThat(result.getTeams())
             .as("Expected exactly 2 teams: " + result)
             .hasSize(2);
@@ -338,7 +362,7 @@ class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.addUnits(firstUser, 10);
         manuallyUpdateStats();
 
-        final CompetitionSummary resultAfterFirstUpdate = TeamCompetitionStatsUtils.getStats();
+        final AllTeamsSummary resultAfterFirstUpdate = TeamCompetitionStatsUtils.getStats();
         final TeamSummary firstTeamSummaryAfterFirstUpdate = getTeamFromCompetition(resultAfterFirstUpdate, firstTeam.getTeamName());
         final TeamSummary secondTeamSummaryAfterFirstUpdate = getTeamFromCompetition(resultAfterFirstUpdate, secondTeam.getTeamName());
 
@@ -354,7 +378,7 @@ class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.addUnits(secondUser, 20);
         manuallyUpdateStats();
 
-        final CompetitionSummary resultAfterSecondUpdate = TeamCompetitionStatsUtils.getStats();
+        final AllTeamsSummary resultAfterSecondUpdate = TeamCompetitionStatsUtils.getStats();
         final TeamSummary firstTeamSummaryAfterSecondUpdate = getTeamFromCompetition(resultAfterSecondUpdate, firstTeam.getTeamName());
         final TeamSummary secondTeamSummaryAfterSecondUpdate = getTeamFromCompetition(resultAfterSecondUpdate, secondTeam.getTeamName());
 
@@ -365,6 +389,19 @@ class TeamCompetitionStatsTest {
         assertThat(secondTeamSummaryAfterSecondUpdate.getRank())
             .as("Expected second team to be rank 1: " + secondTeamSummaryAfterSecondUpdate)
             .isEqualTo(1);
+
+        final HttpResponse<String> overallResultAfterSecondUpdate = TEAM_COMPETITION_REQUEST_SENDER.getOverallStats();
+        final CompetitionSummary overallResult = TeamCompetitionStatsResponseParser.getOverallStats(overallResultAfterSecondUpdate);
+
+        assertThat(overallResult)
+            .as("Expected overall stats to be same as competition stats")
+            .isEqualTo(resultAfterSecondUpdate.getCompetitionSummary());
+
+        assertThat(overallResult.getTotalMultipliedPoints())
+            .isEqualTo(30_000L);
+
+        assertThat(overallResult.getTotalUnits())
+            .isEqualTo(30);
     }
 
     @Test
@@ -384,7 +421,7 @@ class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.addUnits(createdUser, newUnits);
         manuallyUpdateStats();
 
-        final CompetitionSummary result = TeamCompetitionStatsUtils.getStats();
+        final AllTeamsSummary result = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamSummary = getTeamFromCompetition(result, team.getTeamName());
         final UserSummary userSummary = getActiveUserFromTeam(teamSummary, user.getDisplayName());
 
@@ -415,7 +452,7 @@ class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.addPoints(createdUser, firstPoints);
         manuallyUpdateStats();
 
-        final CompetitionSummary result = TeamCompetitionStatsUtils.getStats();
+        final AllTeamsSummary result = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamSummary = getTeamFromCompetition(result, team.getTeamName());
         final UserSummary userSummary = getActiveUserFromTeam(teamSummary, user.getDisplayName());
 
@@ -443,7 +480,7 @@ class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.addPoints(createdUser, secondPoints);
         manuallyUpdateStats();
 
-        final CompetitionSummary resultAfterUpdate = TeamCompetitionStatsUtils.getStats();
+        final AllTeamsSummary resultAfterUpdate = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamSummaryAfterUpdate = getTeamFromCompetition(resultAfterUpdate, team.getTeamName());
         final UserSummary userSummaryAfterUpdate = getActiveUserFromTeam(teamSummaryAfterUpdate, user.getDisplayName());
 
@@ -470,7 +507,7 @@ class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.addPoints(createdUser, firstPoints);
         manuallyUpdateStats();
 
-        final CompetitionSummary result = TeamCompetitionStatsUtils.getStats();
+        final AllTeamsSummary result = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamSummary = getTeamFromCompetition(result, team.getTeamName());
         final UserSummary userSummary = getActiveUserFromTeam(teamSummary, user.getDisplayName());
 
@@ -493,7 +530,7 @@ class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.addPoints(createdUser, secondPoints);
         manuallyUpdateStats();
 
-        final CompetitionSummary resultAfterUpdate = TeamCompetitionStatsUtils.getStats();
+        final AllTeamsSummary resultAfterUpdate = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamSummaryAfterUpdate = getTeamFromCompetition(resultAfterUpdate, team.getTeamName());
         final UserSummary userSummaryAfterUpdate = getActiveUserFromTeam(teamSummaryAfterUpdate, user.getDisplayName());
 
@@ -520,7 +557,7 @@ class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.addPoints(createdUserToRetire, firstPoints);
         manuallyUpdateStats();
 
-        final CompetitionSummary result = TeamCompetitionStatsUtils.getStats();
+        final AllTeamsSummary result = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamSummary = getTeamFromCompetition(result, team.getTeamName());
 
         assertThat(teamSummary.getActiveUsers())
@@ -541,7 +578,7 @@ class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.addPoints(createdUserToRetire, secondPoints);
         manuallyUpdateStats();
 
-        final CompetitionSummary resultAfterRetirement = TeamCompetitionStatsUtils.getStats();
+        final AllTeamsSummary resultAfterRetirement = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamSummaryAfterRetirement = getTeamFromCompetition(resultAfterRetirement, team.getTeamName());
 
         assertThat(teamSummaryAfterRetirement.getTeamMultipliedPoints())
@@ -574,7 +611,7 @@ class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.addPoints(createdUserToRetire, thirdPoints);
         manuallyUpdateStats();
 
-        final CompetitionSummary resultAfterUnretirement = TeamCompetitionStatsUtils.getStats();
+        final AllTeamsSummary resultAfterUnretirement = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamSummaryAfterUnretirement = getTeamFromCompetition(resultAfterUnretirement, team.getTeamName());
 
         assertThat(teamSummaryAfterUnretirement.getTeamMultipliedPoints())
@@ -624,7 +661,7 @@ class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.addPoints(createdUserToRetire, firstPoints);
         manuallyUpdateStats();
 
-        final CompetitionSummary result = TeamCompetitionStatsUtils.getStats();
+        final AllTeamsSummary result = TeamCompetitionStatsUtils.getStats();
         final TeamSummary originalTeamSummary = getTeamFromCompetition(result, originalTeam.getTeamName());
         final TeamSummary newTeamSummary = getTeamFromCompetition(result, newTeam.getTeamName());
 
@@ -660,7 +697,7 @@ class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.addPoints(createdUserToRetire, thirdPoints);
         manuallyUpdateStats();
 
-        final CompetitionSummary resultAfterUnretirement = TeamCompetitionStatsUtils.getStats();
+        final AllTeamsSummary resultAfterUnretirement = TeamCompetitionStatsUtils.getStats();
         final TeamSummary originalTeamSummaryAfterUnretirement = getTeamFromCompetition(resultAfterUnretirement, originalTeam.getTeamName());
         final TeamSummary newTeamSummaryAfterUnretirement = getTeamFromCompetition(resultAfterUnretirement, newTeam.getTeamName());
 
@@ -715,7 +752,7 @@ class TeamCompetitionStatsTest {
         TEAM_COMPETITION_REQUEST_SENDER.offset(userId, pointsOffset, pointsOffset, 0, ADMIN_USER.userName(), ADMIN_USER.password());
         manuallyUpdateStats();
 
-        final CompetitionSummary result = TeamCompetitionStatsUtils.getStats();
+        final AllTeamsSummary result = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamSummary = getTeamFromCompetition(result, team.getTeamName());
         final UserSummary userSummary = getActiveUserFromTeam(teamSummary, user.getDisplayName());
 
@@ -741,7 +778,7 @@ class TeamCompetitionStatsTest {
         offsetUserPoints(user, firstPointsOffset);
         manuallyUpdateStats();
 
-        final CompetitionSummary resultAfterFirstOffset = TeamCompetitionStatsUtils.getStats();
+        final AllTeamsSummary resultAfterFirstOffset = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamSummaryAfterFirstOffset = getTeamFromCompetition(resultAfterFirstOffset, team.getTeamName());
         final UserSummary userSummaryAfterFirstOffset = getActiveUserFromTeam(teamSummaryAfterFirstOffset, user.getDisplayName());
 
@@ -757,7 +794,7 @@ class TeamCompetitionStatsTest {
         offsetUserPoints(user, secondPointsOffset);
         manuallyUpdateStats();
 
-        final CompetitionSummary resultAfterSecondOffset = TeamCompetitionStatsUtils.getStats();
+        final AllTeamsSummary resultAfterSecondOffset = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamSummaryAfterSecondOffset = getTeamFromCompetition(resultAfterSecondOffset, team.getTeamName());
         final UserSummary userSummaryAfterSecondOffset = getActiveUserFromTeam(teamSummaryAfterSecondOffset, user.getDisplayName());
 
@@ -788,7 +825,7 @@ class TeamCompetitionStatsTest {
         TEAM_COMPETITION_REQUEST_SENDER.offset(userId, pointsOffset, pointsOffset, unitsOffset, ADMIN_USER.userName(), ADMIN_USER.password());
         manuallyUpdateStats();
 
-        final CompetitionSummary result = TeamCompetitionStatsUtils.getStats();
+        final AllTeamsSummary result = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamSummary = getTeamFromCompetition(result, team.getTeamName());
         final UserSummary userSummary = getActiveUserFromTeam(teamSummary, user.getDisplayName());
 
@@ -1005,7 +1042,7 @@ class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.addPoints(user, firstPoints);
         manuallyUpdateStats();
 
-        final CompetitionSummary resultAfterFirstUpdate = TeamCompetitionStatsUtils.getStats();
+        final AllTeamsSummary resultAfterFirstUpdate = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamAfterFirstUpdate = getTeamFromCompetition(resultAfterFirstUpdate, team.getTeamName());
         final UserSummary userAfterFirstUpdate = getActiveUserFromTeam(teamAfterFirstUpdate, user.getDisplayName());
 
@@ -1017,7 +1054,7 @@ class TeamCompetitionStatsTest {
         offsetUserPoints(user, firstOffsetPoints);
         manuallyUpdateStats();
 
-        final CompetitionSummary resultAfterSecondUpdate = TeamCompetitionStatsUtils.getStats();
+        final AllTeamsSummary resultAfterSecondUpdate = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamAfterSecondUpdate = getTeamFromCompetition(resultAfterSecondUpdate, team.getTeamName());
         final UserSummary userAfterSecondUpdate = getActiveUserFromTeam(teamAfterSecondUpdate, user.getDisplayName());
 
@@ -1045,7 +1082,7 @@ class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.addPoints(user, secondPoints);
         manuallyUpdateStats();
 
-        final CompetitionSummary resultAfterThirdUpdate = TeamCompetitionStatsUtils.getStats();
+        final AllTeamsSummary resultAfterThirdUpdate = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamAfterThirdUpdate = getTeamFromCompetition(resultAfterThirdUpdate, team.getTeamName());
         final UserSummary userAfterThirdUpdate = getActiveUserFromTeam(teamAfterThirdUpdate, user.getDisplayName());
 
@@ -1057,7 +1094,7 @@ class TeamCompetitionStatsTest {
         offsetUserPoints(user, secondOffsetPoints);
         manuallyUpdateStats();
 
-        final CompetitionSummary resultAfterFourthUpdate = TeamCompetitionStatsUtils.getStats();
+        final AllTeamsSummary resultAfterFourthUpdate = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamAfterFourthUpdate = getTeamFromCompetition(resultAfterFourthUpdate, team.getTeamName());
         final UserSummary userAfterFourthUpdate = getActiveUserFromTeam(teamAfterFourthUpdate, user.getDisplayName());
 
@@ -1081,7 +1118,7 @@ class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.addPoints(thirdUser, 1_000L);
         manuallyUpdateStats();
 
-        final CompetitionSummary resultAfterFirstUpdate = TeamCompetitionStatsUtils.getStats();
+        final AllTeamsSummary resultAfterFirstUpdate = TeamCompetitionStatsUtils.getStats();
         final TeamSummary firstTeamSummaryAfterFirstUpdate = getTeamFromCompetition(resultAfterFirstUpdate, firstTeam.getTeamName());
         final TeamSummary secondTeamSummaryAfterFirstUpdate = getTeamFromCompetition(resultAfterFirstUpdate, secondTeam.getTeamName());
 
@@ -1110,7 +1147,7 @@ class TeamCompetitionStatsTest {
 
         final User updatedFirstUser = UserUtils.update(firstUser.getId(), updatedFirstUserRequest);
 
-        final CompetitionSummary resultAfterSecondUpdate = TeamCompetitionStatsUtils.getStats();
+        final AllTeamsSummary resultAfterSecondUpdate = TeamCompetitionStatsUtils.getStats();
         final TeamSummary firstTeamSummaryAfterSecondUpdate = getTeamFromCompetition(resultAfterSecondUpdate, firstTeam.getTeamName());
         final TeamSummary secondTeamSummaryAfterSecondUpdate = getTeamFromCompetition(resultAfterSecondUpdate, secondTeam.getTeamName());
 
@@ -1131,7 +1168,7 @@ class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.addPoints(updatedFirstUser, 10_000L);
         manuallyUpdateStats();
 
-        final CompetitionSummary resultAfterThirdUpdate = TeamCompetitionStatsUtils.getStats();
+        final AllTeamsSummary resultAfterThirdUpdate = TeamCompetitionStatsUtils.getStats();
         final TeamSummary firstTeamSummaryAfterThirdUpdate = getTeamFromCompetition(resultAfterThirdUpdate, firstTeam.getTeamName());
         final TeamSummary secondTeamSummaryAfterThirdUpdate = getTeamFromCompetition(resultAfterThirdUpdate, secondTeam.getTeamName());
 

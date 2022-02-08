@@ -37,7 +37,7 @@ import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
-import me.zodac.folding.rest.api.tc.CompetitionSummary;
+import me.zodac.folding.rest.api.tc.AllTeamsSummary;
 import me.zodac.folding.rest.api.tc.RetiredUserSummary;
 import me.zodac.folding.rest.api.tc.TeamSummary;
 import me.zodac.folding.rest.api.tc.UserSummary;
@@ -51,7 +51,7 @@ import org.springframework.stereotype.Component;
 /**
  * {@link Component} used for CRUD operations for <code>folding-stats</code> stats classes:
  * <ul>
- *     <li>{@link CompetitionSummary}</li>
+ *     <li>{@link AllTeamsSummary}</li>
  *     <li>{@link HistoricStats}</li>
  *     <li>{@link MonthlyResult}</li>
  *     <li>{@link OffsetTcStats}</li>
@@ -296,33 +296,33 @@ public class StatsRepository {
     }
 
     /**
-     * Retrieves the current {@link CompetitionSummary}.
+     * Retrieves the current {@link AllTeamsSummary}.
      *
      * <p>
      * If the {@link  me.zodac.folding.api.state.SystemState} is in {@link  me.zodac.folding.api.state.SystemState#WRITE_EXECUTED}, a new
-     * {@link CompetitionSummary} will be created.
+     * {@link AllTeamsSummary} will be created.
      *
-     * @return the latest {@link CompetitionSummary}
+     * @return the latest {@link AllTeamsSummary}
      */
-    public CompetitionSummary getCompetitionSummary() {
+    public AllTeamsSummary getAllTeamsSummary() {
         if (SystemStateManager.current() != SystemState.WRITE_EXECUTED) {
-            LOGGER.debug("System is not in state {}, retrieving competition summary", SystemState.WRITE_EXECUTED);
+            LOGGER.debug("System is not in state {}, retrieving all teams summary", SystemState.WRITE_EXECUTED);
 
-            final Optional<CompetitionSummary> cachedCompetitionResult = storage.getCompetitionSummary();
+            final Optional<AllTeamsSummary> cachedCompetitionResult = storage.getAllTeamsSummary();
             if (cachedCompetitionResult.isPresent()) {
                 return cachedCompetitionResult.get();
             }
         }
 
         LOGGER.debug("Calculating latest TC result, system state: {}", SystemStateManager.current());
-        final CompetitionSummary competitionSummary = constructCompetitionSummary();
-        final CompetitionSummary createdCompetitionSummary = storage.createCompetitionSummary(competitionSummary);
+        final AllTeamsSummary allTeamsSummary = constructAllTeamsSummary();
+        final AllTeamsSummary createdAllTeamsSummary = storage.createAllTeamsSummary(allTeamsSummary);
         SystemStateManager.next(SystemState.AVAILABLE);
 
-        return createdCompetitionSummary;
+        return createdAllTeamsSummary;
     }
 
-    private CompetitionSummary constructCompetitionSummary() {
+    private AllTeamsSummary constructAllTeamsSummary() {
         final List<TeamSummary> teamSummaries = getStatsForTeams();
         LOGGER.debug("Found {} TC teams", teamSummaries::size);
 
@@ -330,7 +330,7 @@ public class StatsRepository {
             LOGGER.warn("No TC teams to show");
         }
 
-        return CompetitionSummary.create(teamSummaries);
+        return AllTeamsSummary.create(teamSummaries);
     }
 
     private List<TeamSummary> getStatsForTeams() {

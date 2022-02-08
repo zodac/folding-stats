@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import me.zodac.folding.client.java.request.TeamCompetitionStatsRequestSender;
+import me.zodac.folding.rest.api.tc.AllTeamsSummary;
 import me.zodac.folding.rest.api.tc.CompetitionSummary;
 import me.zodac.folding.rest.api.tc.UserSummary;
 import me.zodac.folding.rest.api.tc.leaderboard.TeamLeaderboardEntry;
@@ -47,12 +48,22 @@ public final class TeamCompetitionStatsResponseParser {
     }
 
     /**
-     * Returns the {@link CompetitionSummary} retrieved by {@link TeamCompetitionStatsRequestSender#getStats()}.
+     * Returns the {@link AllTeamsSummary} retrieved by {@link TeamCompetitionStatsRequestSender#getStats()}.
+     *
+     * @param response the {@link HttpResponse} to parse
+     * @return the retrieved {@link AllTeamsSummary}
+     */
+    public static AllTeamsSummary getStats(final HttpResponse<String> response) {
+        return RestUtilConstants.GSON.fromJson(response.body(), AllTeamsSummary.class);
+    }
+
+    /**
+     * Returns the {@link CompetitionSummary} retrieved by {@link TeamCompetitionStatsRequestSender#getOverallStats()}.
      *
      * @param response the {@link HttpResponse} to parse
      * @return the retrieved {@link CompetitionSummary}
      */
-    public static CompetitionSummary getStats(final HttpResponse<String> response) {
+    public static CompetitionSummary getOverallStats(final HttpResponse<String> response) {
         return RestUtilConstants.GSON.fromJson(response.body(), CompetitionSummary.class);
     }
 

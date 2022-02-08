@@ -26,7 +26,7 @@ function toggleTeam(teamNumber, classList) {
 }
 
 function loadOverallStats() {
-    fetch(REST_ENDPOINT_URL+'/stats')
+    fetch(REST_ENDPOINT_URL+'/stats/overall')
         .then(response => {
             return response.json();
         })

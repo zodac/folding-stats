@@ -1,7 +1,9 @@
 {
-  "totalPoints": 80459975,
-  "totalMultipliedPoints": 625993028,
-  "totalUnits": 416,
+  "competitionSummary": {
+    "totalPoints": 80459975,
+    "totalMultipliedPoints": 625993028,
+    "totalUnits": 416
+  },
   "teams": [
     {
       "team": {

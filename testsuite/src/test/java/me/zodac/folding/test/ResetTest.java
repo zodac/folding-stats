@@ -45,7 +45,7 @@ import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
-import me.zodac.folding.rest.api.tc.CompetitionSummary;
+import me.zodac.folding.rest.api.tc.AllTeamsSummary;
 import me.zodac.folding.rest.api.tc.TeamSummary;
 import me.zodac.folding.rest.api.tc.UserSummary;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
@@ -61,7 +61,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 /**
- * Tests for the monthly reset of the <code>Team Competition</code> {@link CompetitionSummary}.
+ * Tests for the monthly reset of the <code>Team Competition</code> {@link AllTeamsSummary}.
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ResetTest {
@@ -123,7 +123,7 @@ class ResetTest {
 
         manuallyUpdateStats();
 
-        final CompetitionSummary result = TeamCompetitionStatsUtils.getStats();
+        final AllTeamsSummary result = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamSummary = getTeamFromCompetition(result, team.getTeamName());
 
         assertThat(teamSummary.getActiveUsers())
@@ -141,7 +141,7 @@ class ResetTest {
         USER_REQUEST_SENDER.delete(userToRetireId, ADMIN_USER.userName(), ADMIN_USER.password());
         manuallyUpdateStats();
 
-        final CompetitionSummary resultAfterRetirement = TeamCompetitionStatsUtils.getStats();
+        final AllTeamsSummary resultAfterRetirement = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamSummaryAfterRetirement = getTeamFromCompetition(resultAfterRetirement, team.getTeamName());
 
         assertThat(teamSummaryAfterRetirement.getActiveUsers())
@@ -154,7 +154,7 @@ class ResetTest {
 
         manuallyResetStats();
 
-        final CompetitionSummary resultAfterReset = TeamCompetitionStatsUtils.getStats();
+        final AllTeamsSummary resultAfterReset = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamSummaryAfterReset = getTeamFromCompetition(resultAfterReset, team.getTeamName());
 
         assertThat(teamSummaryAfterReset.getActiveUsers())
@@ -190,8 +190,8 @@ class ResetTest {
         StubbedFoldingEndpointUtils.addPoints(thirdUser, thirdUserPoints);
         manuallyUpdateStats();
 
-        final CompetitionSummary result = TeamCompetitionStatsUtils.getStats();
-        assertThat(result.getTotalPoints())
+        final AllTeamsSummary result = TeamCompetitionStatsUtils.getStats();
+        assertThat(result.getCompetitionSummary().getTotalPoints())
             .as("Expected points from all three users: " + result)
             .isEqualTo(firstUserPoints + secondUserPoints + thirdUserPoints);
 
@@ -224,8 +224,8 @@ class ResetTest {
 
         manuallyResetStats();
 
-        final CompetitionSummary resultAfterReset = TeamCompetitionStatsUtils.getStats();
-        assertThat(resultAfterReset.getTotalPoints())
+        final AllTeamsSummary resultAfterReset = TeamCompetitionStatsUtils.getStats();
+        assertThat(resultAfterReset.getCompetitionSummary().getTotalPoints())
             .as("Expected no points overall: " + result)
             .isZero();
 

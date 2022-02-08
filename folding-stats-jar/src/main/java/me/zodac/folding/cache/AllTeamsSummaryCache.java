@@ -24,36 +24,36 @@
 
 package me.zodac.folding.cache;
 
-import me.zodac.folding.rest.api.tc.CompetitionSummary;
+import me.zodac.folding.rest.api.tc.AllTeamsSummary;
 
 /**
- * Cache for the {@link CompetitionSummary}.
+ * Cache for the {@link AllTeamsSummary}.
  *
  * <p>
- * <b>key:</b> {@link #COMPETITION_SUMMARY_ID}
+ * <b>key:</b> {@link #ALL_TEAMS_SUMMARY_ID}
  *
  * <p>
- * <b>value:</b> {@link CompetitionSummary}
+ * <b>value:</b> {@link AllTeamsSummary}
  */
-public final class CompetitionSummaryCache extends BaseCache<CompetitionSummary> {
+public final class AllTeamsSummaryCache extends BaseCache<AllTeamsSummary> {
 
     /**
-     * While we extend {@link BaseCache}, we don't actually have multiple {@link CompetitionSummary}s, so we reuse the same ID.
+     * While we extend {@link BaseCache}, we don't actually have multiple {@link AllTeamsSummary}s, so we reuse the same ID.
      */
-    public static final int COMPETITION_SUMMARY_ID = 1;
+    public static final int ALL_TEAMS_SUMMARY_ID = 1;
 
-    private static final CompetitionSummaryCache INSTANCE = new CompetitionSummaryCache();
+    private static final AllTeamsSummaryCache INSTANCE = new AllTeamsSummaryCache();
 
-    private CompetitionSummaryCache() {
+    private AllTeamsSummaryCache() {
         super();
     }
 
     /**
-     * Returns a singleton instance of {@link CompetitionSummaryCache}.
+     * Returns a singleton instance of {@link AllTeamsSummaryCache}.
      *
-     * @return the {@link CompetitionSummaryCache}
+     * @return the {@link AllTeamsSummaryCache}
      */
-    public static CompetitionSummaryCache getInstance() {
+    public static AllTeamsSummaryCache getInstance() {
         return INSTANCE;
     }
 }
