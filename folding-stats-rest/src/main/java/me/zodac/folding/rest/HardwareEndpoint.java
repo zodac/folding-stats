@@ -31,6 +31,8 @@ import static me.zodac.folding.rest.response.Responses.created;
 import static me.zodac.folding.rest.response.Responses.notFound;
 import static me.zodac.folding.rest.response.Responses.ok;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.Optional;
@@ -76,6 +78,23 @@ public class HardwareEndpoint {
     @Autowired
     private FoldingRepository foldingRepository;
 
+    // Prometheus counters
+    private final Counter hardwareCreates;
+    private final Counter hardwareUpdates;
+    private final Counter hardwareDeletes;
+
+    public HardwareEndpoint(final MeterRegistry registry) {
+        hardwareCreates = Counter.builder("hardware_create_counter")
+            .description("Number of Hardware creations through the REST endpoint")
+            .register(registry);
+        hardwareUpdates = Counter.builder("hardware_update_counter")
+            .description("Number of Hardware updates through the REST endpoint")
+            .register(registry);
+        hardwareDeletes = Counter.builder("hardware_delete_counter")
+            .description("Number of Hardware deletions through the REST endpoint")
+            .register(registry);
+    }
+
     /**
      * {@link PostMapping} request to create a {@link Hardware} based on the input request.
      *
@@ -99,6 +118,7 @@ public class HardwareEndpoint {
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
         LOGGER.info("Created hardware with ID {}", elementWithId.getId());
+        hardwareCreates.increment();
         return created(elementWithId, elementWithId.getId());
     }
 
@@ -204,6 +224,7 @@ public class HardwareEndpoint {
 
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
         LOGGER.info("Updated hardware with ID {}", updatedHardwareWithId.getId());
+        hardwareUpdates.increment();
         return ok(updatedHardwareWithId, updatedHardwareWithId.getId());
     }
 
@@ -232,6 +253,7 @@ public class HardwareEndpoint {
         foldingRepository.deleteHardware(validatedHardware);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
         LOGGER.info("Deleted hardware with ID {}", hardwareId);
+        hardwareDeletes.increment();
         return ok();
     }
 

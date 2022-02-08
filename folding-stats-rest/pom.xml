@@ -63,12 +63,9 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-
-        <!-- Test Dependencies -->
         <dependency>
-            <groupId>me.zodac</groupId>
-            <artifactId>folding-stats-client-library-java</artifactId>
-            <scope>test</scope>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
     </dependencies>
 

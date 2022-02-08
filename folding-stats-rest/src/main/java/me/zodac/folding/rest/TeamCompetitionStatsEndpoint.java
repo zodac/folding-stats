@@ -27,6 +27,8 @@ package me.zodac.folding.rest;
 import static me.zodac.folding.rest.response.Responses.notFound;
 import static me.zodac.folding.rest.response.Responses.ok;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -92,6 +94,20 @@ public class TeamCompetitionStatsEndpoint {
     @Autowired
     private UserStatsResetter userStatsResetter;
 
+    // Prometheus counters
+    private final Counter visitCounter;
+    private final Counter userStatsOffsets;
+
+    public TeamCompetitionStatsEndpoint(final MeterRegistry registry) {
+        visitCounter = Counter.builder("visit_counter")
+            .description("Number of visits to the site")
+            .register(registry);
+
+        userStatsOffsets = Counter.builder("user_stats_offset_counter")
+            .description("Number of times a user's stats have been manually offset")
+            .register(registry);
+    }
+
     /**
      * {@link GetMapping} request to retrieve the <code>Team Competition</code> simple {@link CompetitionSummary}.
      *
@@ -102,6 +118,7 @@ public class TeamCompetitionStatsEndpoint {
     @GetMapping(path = "/overall", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getCompetitionStats() {
         LOGGER.debug("GET request received to show TC overall stats");
+        visitCounter.increment();
         final AllTeamsSummary allTeamsSummary = statsRepository.getAllTeamsSummary();
         return ok(allTeamsSummary.getCompetitionSummary());
     }
@@ -177,6 +194,7 @@ public class TeamCompetitionStatsEndpoint {
         userStatsParser.parseTcStatsForUsersAndWait(Collections.singletonList(user));
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
         LOGGER.info("Updated user with ID {} with points offset: {}", userId, createdOffsetStats);
+        userStatsOffsets.increment();
         return ok();
     }
 

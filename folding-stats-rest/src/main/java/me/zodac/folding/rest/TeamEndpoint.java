@@ -31,6 +31,8 @@ import static me.zodac.folding.rest.response.Responses.created;
 import static me.zodac.folding.rest.response.Responses.notFound;
 import static me.zodac.folding.rest.response.Responses.ok;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.Optional;
@@ -76,6 +78,23 @@ public class TeamEndpoint {
     @Autowired
     private FoldingRepository foldingRepository;
 
+    // Prometheus counters
+    private final Counter teamCreates;
+    private final Counter teamUpdates;
+    private final Counter teamDeletes;
+
+    public TeamEndpoint(final MeterRegistry registry) {
+        teamCreates = Counter.builder("team_create_counter")
+            .description("Number of Team creations through the REST endpoint")
+            .register(registry);
+        teamUpdates = Counter.builder("team_update_counter")
+            .description("Number of Team updates through the REST endpoint")
+            .register(registry);
+        teamDeletes = Counter.builder("team_delete_counter")
+            .description("Number of Team deletions through the REST endpoint")
+            .register(registry);
+    }
+
     /**
      * {@link PostMapping} request to create a {@link Team} based on the input request.
      *
@@ -99,6 +118,7 @@ public class TeamEndpoint {
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
         LOGGER.info("Created team with ID {}", elementWithId.getId());
+        teamCreates.increment();
         return created(elementWithId, elementWithId.getId());
     }
 
@@ -203,6 +223,7 @@ public class TeamEndpoint {
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
         LOGGER.info("Updated team with ID {}", updatedTeamWithId.getId());
+        teamUpdates.increment();
         return ok(updatedTeamWithId, updatedTeamWithId.getId());
     }
 
@@ -232,6 +253,7 @@ public class TeamEndpoint {
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
         LOGGER.info("Deleted team with ID {}", teamId);
+        teamDeletes.increment();
         return ok();
     }
 

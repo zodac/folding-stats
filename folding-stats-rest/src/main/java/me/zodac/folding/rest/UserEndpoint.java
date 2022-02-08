@@ -29,6 +29,8 @@ import static me.zodac.folding.rest.response.Responses.cachedOk;
 import static me.zodac.folding.rest.response.Responses.created;
 import static me.zodac.folding.rest.response.Responses.ok;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import javax.annotation.security.PermitAll;
@@ -72,6 +74,23 @@ public class UserEndpoint {
     @Autowired
     private FoldingRepository foldingRepository;
 
+    // Prometheus counters
+    private final Counter userCreates;
+    private final Counter userUpdates;
+    private final Counter userDeletes;
+
+    public UserEndpoint(final MeterRegistry registry) {
+        userCreates = Counter.builder("user_create_counter")
+            .description("Number of User creations through the REST endpoint")
+            .register(registry);
+        userUpdates = Counter.builder("user_update_counter")
+            .description("Number of User updates through the REST endpoint")
+            .register(registry);
+        userDeletes = Counter.builder("user_delete_counter")
+            .description("Number of User deletions through the REST endpoint")
+            .register(registry);
+    }
+
     /**
      * {@link PostMapping} request to create a {@link User} based on the input request.
      *
@@ -95,6 +114,7 @@ public class UserEndpoint {
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
         LOGGER.info("Created user with ID {}", elementWithId.getId());
+        userCreates.increment();
         return created(elementWithId, elementWithId.getId());
     }
 
@@ -187,6 +207,7 @@ public class UserEndpoint {
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
         LOGGER.info("Updated user with ID {}", updatedUserWithId.getId());
+        userUpdates.increment();
         return ok(updatedUserWithId, updatedUserWithId.getId());
     }
 
@@ -215,6 +236,7 @@ public class UserEndpoint {
         foldingRepository.deleteUser(validatedUser);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
         LOGGER.info("Deleted user with ID {}", userId);
+        userDeletes.increment();
         return ok();
     }
 

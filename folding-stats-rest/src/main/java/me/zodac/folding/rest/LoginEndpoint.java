@@ -26,6 +26,8 @@ package me.zodac.folding.rest;
 
 import static me.zodac.folding.rest.response.Responses.ok;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.util.Map;
 import javax.annotation.security.PermitAll;
 import me.zodac.folding.api.UserAuthenticationResult;
@@ -58,6 +60,23 @@ public class LoginEndpoint {
     @Autowired
     private FoldingRepository foldingRepository;
 
+    // Prometheus counters
+    private final Counter loginAttempts;
+    private final Counter successfulLogins;
+    private final Counter failedLogins;
+
+    public LoginEndpoint(final MeterRegistry registry) {
+        loginAttempts = Counter.builder("login_attempts_counter")
+            .description("Number of login attempts to the admin page")
+            .register(registry);
+        successfulLogins = Counter.builder("login_success_counter")
+            .description("Number of successful login attempts to the admin page")
+            .register(registry);
+        failedLogins = Counter.builder("login_failure_counter")
+            .description("Number of failed login attempts to the admin page")
+            .register(registry);
+    }
+
     /**
      * {@link PostMapping} request to log in as an admin system user.
      *
@@ -72,9 +91,11 @@ public class LoginEndpoint {
     @PostMapping(path = "/admin", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> loginAsAdmin(@RequestBody final LoginCredentials loginCredentials) {
         LOGGER.debug("Login request received");
+        loginAttempts.increment();
 
         if (EncodingUtils.isInvalidBasicAuthentication(loginCredentials.getEncodedUserNameAndPassword())) {
             LOGGER.error("Invalid payload: {}", loginCredentials);
+            failedLogins.increment();
             throw new InvalidLoginCredentialsException(loginCredentials);
         }
 
@@ -89,18 +110,22 @@ public class LoginEndpoint {
 
             if (!userAuthenticationResult.userExists() || !userAuthenticationResult.passwordMatch()) {
                 LOGGER.warn("Invalid user credentials supplied: {}", loginCredentials);
+                failedLogins.increment();
                 throw new UnauthorizedException();
             }
 
             if (!userAuthenticationResult.isAdmin()) {
                 LOGGER.warn("User '{}' is not an admin", userName);
+                failedLogins.increment();
                 throw new ForbiddenException();
             }
 
             LOGGER.info("Admin user '{}' logged in", userName);
+            successfulLogins.increment();
             return ok();
         } catch (final IllegalArgumentException e) {
             LOGGER.error("Encoded username and password was not a valid Base64 string", e);
+            failedLogins.increment();
             throw new InvalidLoginCredentialsException(loginCredentials, e);
         }
     }
