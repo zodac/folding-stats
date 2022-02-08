@@ -155,19 +155,11 @@ COPY --from=cert_builder /usr/local/certs/stats/folding-stats.p12 /usr/local/cer
 COPY --from=cert_builder /usr/local/certs/stats/folding-stats.crt /usr/local/certs/stats/folding-stats.crt
 COPY --from=cert_builder /usr/local/certs/stats/folding-stats.key /usr/local/certs/stats/folding-stats.key
 
-# Install nano to allow user to connect to container and edit logback.xml
-RUN apt-get update && \
-    apt-get install -y \
-      nano \
-    && \
-    apt-get autoremove && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-# Create non-root user, add to root group
-RUN groupadd -g 999 backend_user && \
-    useradd --create-home --system --uid 999 --gid root backend_user
-#USER backend_user
+# Create non-root user, make owner of log directory
+RUN useradd -ms /bin/bash backend_user && \
+    mkdir --parents /var/backend/logs && \
+    chown -R backend_user:backend_user /var/backend/logs
+USER backend_user
 
 # Set default directory to the log directory
 WORKDIR /var/backend/logs/

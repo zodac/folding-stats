@@ -25,5 +25,7 @@ COPY --from=cert_builder /usr/local/certs/metrics/prometheus.key /usr/local/cert
 COPY ./docker/metrics/prometheus/config/prometheus.yml /etc/prometheus/prometheus.yml
 COPY ./docker/metrics/prometheus/config/web-config.yml /etc/prometheus/web-config.yml
 
-# Use root user to have permission on SSL files
+# Make non-root user the owner of log certs directory
 USER root
+RUN chown -R nobody:nobody /usr/local/certs/metrics/
+USER nobody

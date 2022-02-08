@@ -82,7 +82,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
  */
 public final class SecurityInterceptor implements HandlerInterceptor {
 
-    private static final Logger SECURITY_LOGGER = LogManager.getLogger("audit");
+    private static final Logger SECURITY_LOGGER = LogManager.getLogger("security");
 
     private final FoldingRepository foldingRepository;
 

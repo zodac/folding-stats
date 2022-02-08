@@ -36,6 +36,22 @@
         </encoder>
         <rollingPolicy
                 class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>/var/backend/logs/security.log.%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+            <maxFileSize>100MB</maxFileSize>
+            <maxHistory>31</maxHistory>
+            <totalSizeCap>1000MB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="AUDIT_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <append>true</append>
+        <file>/var/backend/logs/audit.log</file>
+        <immediateFlush>true</immediateFlush>
+        <encoder>
+            <pattern>${BASE_CONSOLE_LOG_PATTERN}</pattern>
+            <charset>utf8</charset>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>/var/backend/logs/audit.log.%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
             <maxFileSize>100MB</maxFileSize>
             <maxHistory>31</maxHistory>
@@ -48,9 +64,14 @@
         <appender-ref ref="CONSOLE"/>
     </root>
 
-    <!-- The 'additivity=false' option ensures analytics data only goes to the analytics log -->
-    <logger name="audit" level="DEBUG" additivity="false">
+    <!-- The 'additivity=false' option ensures security data only goes to the security log -->
+    <logger name="security" level="DEBUG" additivity="false">
         <appender-ref ref="SECURITY_LOG"/>
+    </logger>
+
+    <!-- The 'additivity=false' option ensures audit data only goes to the audit log -->
+    <logger name="audit" level="DEBUG" additivity="false">
+        <appender-ref ref="AUDIT_LOG"/>
     </logger>
 
     <!-- Suppress logging for unwanted packages -->
