@@ -124,12 +124,15 @@ services:
       dockerfile: docker/metrics/prometheus/Dockerfile
       args:
         # Docker image versions
+        DEBIAN_VERSION: 11.2
         JAVA_VERSION: 17
         PROMETHEUS_VERSION: v2.33.1
+        # Build arguments
+        ADMIN_USERNAME: "${ADMIN_USER}"
+        ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
     command:
       - --config.file=/etc/prometheus/prometheus.yml
       - --web.config.file=/etc/prometheus/web-config.yml
-      - --log.level=debug
     container_name: prometheus
     hostname: prometheus
     depends_on:

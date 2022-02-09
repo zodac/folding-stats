@@ -150,6 +150,15 @@ COPY ./docker/backend/config/logback.xml /var/backend/logback.xml
 ENV JAVA_HOME "/opt/jdk"
 ENV PATH "${PATH}:${JAVA_HOME}/bin"
 
+# Install nano to allow user to edit logback.xml
+RUN apt-get update && \
+    apt-get install -y \
+      nano \
+    && \
+    apt-get autoremove && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 # Copy SSL certs
 COPY --from=cert_builder /usr/local/certs/stats/folding-stats.p12 /usr/local/certs/stats/folding-stats.p12
 COPY --from=cert_builder /usr/local/certs/stats/folding-stats.crt /usr/local/certs/stats/folding-stats.crt
