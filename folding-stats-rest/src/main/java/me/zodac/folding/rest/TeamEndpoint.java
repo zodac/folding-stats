@@ -83,6 +83,11 @@ public class TeamEndpoint {
     private final Counter teamUpdates;
     private final Counter teamDeletes;
 
+    /**
+     * Constructor to inject {@link MeterRegistry} and configure Prometheus {@link Counter}s.
+     *
+     * @param registry the Prometheus {@link MeterRegistry}
+     */
     public TeamEndpoint(final MeterRegistry registry) {
         teamCreates = Counter.builder("team_create_counter")
             .description("Number of Team creations through the REST endpoint")

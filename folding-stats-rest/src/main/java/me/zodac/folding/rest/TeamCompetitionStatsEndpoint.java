@@ -98,6 +98,11 @@ public class TeamCompetitionStatsEndpoint {
     private final Counter visitCounter;
     private final Counter userStatsOffsets;
 
+    /**
+     * Constructor to inject {@link MeterRegistry} and configure Prometheus {@link Counter}s.
+     *
+     * @param registry the Prometheus {@link MeterRegistry}
+     */
     public TeamCompetitionStatsEndpoint(final MeterRegistry registry) {
         visitCounter = Counter.builder("visit_counter")
             .description("Number of visits to the site")

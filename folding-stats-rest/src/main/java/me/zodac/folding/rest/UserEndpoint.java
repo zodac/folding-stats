@@ -79,6 +79,11 @@ public class UserEndpoint {
     private final Counter userUpdates;
     private final Counter userDeletes;
 
+    /**
+     * Constructor to inject {@link MeterRegistry} and configure Prometheus {@link Counter}s.
+     *
+     * @param registry the Prometheus {@link MeterRegistry}
+     */
     public UserEndpoint(final MeterRegistry registry) {
         userCreates = Counter.builder("user_create_counter")
             .description("Number of User creations through the REST endpoint")

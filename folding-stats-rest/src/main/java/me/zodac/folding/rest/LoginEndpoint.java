@@ -65,6 +65,11 @@ public class LoginEndpoint {
     private final Counter successfulLogins;
     private final Counter failedLogins;
 
+    /**
+     * Constructor to inject {@link MeterRegistry} and configure Prometheus {@link Counter}s.
+     *
+     * @param registry the Prometheus {@link MeterRegistry}
+     */
     public LoginEndpoint(final MeterRegistry registry) {
         loginAttempts = Counter.builder("login_attempts_counter")
             .description("Number of login attempts to the admin page")

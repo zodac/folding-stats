@@ -83,6 +83,11 @@ public class HardwareEndpoint {
     private final Counter hardwareUpdates;
     private final Counter hardwareDeletes;
 
+    /**
+     * Constructor to inject {@link MeterRegistry} and configure Prometheus {@link Counter}s.
+     *
+     * @param registry the Prometheus {@link MeterRegistry}
+     */
     public HardwareEndpoint(final MeterRegistry registry) {
         hardwareCreates = Counter.builder("hardware_create_counter")
             .description("Number of Hardware creations through the REST endpoint")
