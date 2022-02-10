@@ -71,21 +71,24 @@
         <checkstyle.version>9.2</checkstyle.version>
         <errorprone.version>2.9.0</errorprone.version>
         <licenses.version>1</licenses.version>
-        <spotbugs.version>4.5.2</spotbugs.version>
+        <spotbugs.version>4.5.3</spotbugs.version>
         <pitest-junit5-plugin.version>0.15</pitest-junit5-plugin.version>
         <pmd.version>6.41.0</pmd.version>
 
         <!-- Linter Plugin Versions -->
+        <dependency-check-maven.version>6.5.3</dependency-check-maven.version>
         <license-maven-plugin.version>4.2.rc1</license-maven-plugin.version>
         <maven-checkstyle-plugin.version>3.1.2</maven-checkstyle-plugin.version>
         <maven-javadoc-plugin.version>3.3.1</maven-javadoc-plugin.version>
         <maven-pmd-plugin.version>3.15.0</maven-pmd-plugin.version>
         <pitest-maven.version>1.7.3</pitest-maven.version>
-        <spotbugs-maven-plugin.version>4.5.0.0</spotbugs-maven-plugin.version>
+        <spotbugs-maven-plugin.version>4.5.3.0</spotbugs-maven-plugin.version>
 
         <!-- Linter Properties -->
         <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
         <checkstyle-file>${project.parent.basedir}/ci/checkstyle.xml</checkstyle-file>
+        <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
+        <spotbugs-include-file>${project.parent.basedir}/ci/spotbugs-include-filter-file.xml</spotbugs-include-file>
         <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
         <spotbugs-exclude-file>${project.parent.basedir}/ci/spotbugs-exclude-filter-file.xml</spotbugs-exclude-file>
         <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
@@ -200,6 +203,18 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-web</artifactId>
                 <version>${spring-boot.version}</version>
+            </dependency>
+            <!-- Due to CVE-2022-23181 with tomcat-embed-websocket:9.0.56 in spring-boot-starter-web -->
+            <!-- Remove this dependency when the above dependency is updated -->
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-core</artifactId>
+                <version>9.0.58</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat.embed</groupId>
+                <artifactId>tomcat-embed-websocket</artifactId>
+                <version>9.0.58</version>
             </dependency>
 
             <!-- Test Dependencies -->
@@ -354,7 +369,7 @@
                 <!-- Linters -->
 
                 <!-- Manual execution: -->
-                <!-- mvn clean install license:check -Dskip-linters=false -->
+                <!-- mvn license:check -Dlint -->
                 <plugin>
                     <groupId>com.mycila</groupId>
                     <artifactId>license-maven-plugin</artifactId>
@@ -392,7 +407,7 @@
                 </plugin>
 
                 <!-- Manual execution: -->
-                <!-- mvn clean install checkstyle:checkstyle -Dskip-linters=false -->
+                <!-- mvn checkstyle:checkstyle -Dlint -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
@@ -425,7 +440,7 @@
                 </plugin>
 
                 <!-- Manual execution: -->
-                <!-- mvn clean install javadoc:javadoc -Dskip-linters=false -->
+                <!-- mvn javadoc:javadoc -Dlint -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
@@ -452,7 +467,7 @@
                 </plugin>
 
                 <!-- Manual execution: -->
-                <!-- mvn clean install pmd:check -Dskip-linters=false -->
+                <!-- mvn pmd:check -Dlint -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-pmd-plugin</artifactId>
@@ -509,7 +524,7 @@
                 </plugin>
 
                 <!-- Manual execution: -->
-                <!-- mvn clean install org.pitest:pitest-maven:mutationCoverage -->
+                <!-- mvn org.pitest:pitest-maven:mutationCoverage -->
                 <plugin>
                     <groupId>org.pitest</groupId>
                     <artifactId>pitest-maven</artifactId>
@@ -550,12 +565,14 @@
                 </plugin>
 
                 <!-- Manual execution: -->
-                <!-- mvn clean install spotbugs:spotbugs -Dskip-linters=false -->
+                <!-- mvn spotbugs:spotbugs -Dlint -->
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
                     <version>${spotbugs-maven-plugin.version}</version>
                     <configuration>
+                        <effort>max</effort>
+                        <includeFilterFile>${spotbugs-include-file}</includeFilterFile>
                         <excludeFilterFile>${spotbugs-exclude-file}</excludeFilterFile>
                         <skip>${skip-linters}</skip>
                     </configuration>
@@ -575,6 +592,25 @@
                             <version>${spotbugs.version}</version>
                         </dependency>
                     </dependencies>
+                </plugin>
+
+                <!-- Manual execution: -->
+                <!-- mvn dependency-check:check -Dlint -->
+                <plugin>
+                    <groupId>org.owasp</groupId>
+                    <artifactId>dependency-check-maven</artifactId>
+                    <version>${dependency-check-maven.version}</version>
+                    <configuration>
+                        <failBuildOnAnyVulnerability>true</failBuildOnAnyVulnerability>
+                        <skip>${skip-linters}</skip>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
