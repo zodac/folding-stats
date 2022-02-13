@@ -4,7 +4,7 @@ function createHardware() {
     var hardwareMake = document.getElementById("hardware_create_hardware_make_input").value.trim();
     var hardwareType = document.getElementById("hardware_create_hardware_type_input").value.trim();
     var multiplier = document.getElementById("hardware_create_multiplier").value.trim();
-    var averagePpd = document.getElementById("hardware_create_average_ppd").value.trim();
+    var averagePpd = document.getElementById("hardware_create_average_ppd").value.trim().replaceAll(',', "");
 
     var requestData = JSON.stringify(
         {
@@ -61,7 +61,7 @@ function updateHardware() {
     var hardwareMake = document.getElementById("hardware_update_hardware_make_input").value.trim();
     var hardwareType = document.getElementById("hardware_update_hardware_type_input").value.trim();
     var multiplier = document.getElementById("hardware_update_multiplier").value.trim();
-    var averagePpd = document.getElementById("hardware_update_average_ppd").value.trim();
+    var averagePpd = document.getElementById("hardware_update_average_ppd").value.trim().replaceAll(',', "");
 
     var requestData = JSON.stringify(
         {

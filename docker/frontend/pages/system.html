@@ -196,21 +196,23 @@
                         <form id="hardware_create_form" class="row g-3" onsubmit="createHardware(); return false;"
                               action="">
                             <div class="col-auto">
+                                <br/>
                                 <button type="submit" class="btn btn-primary mb-3">Create Hardware</button>
                             </div>
                             <div class="col-auto">
-                                <label for="hardware_create_name" class="visually-hidden">Hardware Name</label>
+                                Hardware Name
                                 <input id="hardware_create_name" class="form-control" type="text"
                                        placeholder="Hardware Name"
                                        aria-label="Hardware Name" required>
                             </div>
                             <div class="col-auto">
-                                <label for="hardware_create_display_name" class="visually-hidden">Display Name</label>
+                                Display Name
                                 <input id="hardware_create_display_name" class="form-control" type="text"
                                        placeholder="Display Name"
                                        aria-label="Display Name" required>
                             </div>
                             <div class="col-auto">
+                                Make
                                 <input class="form-control"
                                        list="hardware_create_hardware_make"
                                        id="hardware_create_hardware_make_input"
@@ -224,6 +226,7 @@
                                 </datalist>
                             </div>
                             <div class="col-auto">
+                                Type
                                 <input class="form-control"
                                        list="hardware_create_hardware_type"
                                        id="hardware_create_hardware_type_input"
@@ -236,14 +239,16 @@
                                 </datalist>
                             </div>
                             <div class="col-auto">
-                                <label for="hardware_create_multiplier" class="visually-hidden">Multiplier</label>
+                                Multiplier
                                 <input id="hardware_create_multiplier" class="form-control" type="number" step="0.01"
                                        placeholder="Multiplier" aria-label="Multiplier" required>
                             </div>
                             <div class="col-auto">
-                                <label for="hardware_create_average_ppd" class="visually-hidden">Multiplier</label>
-                                <input id="hardware_create_average_ppd" class="form-control" type="number" step="1"
-                                       placeholder="Average PPD" aria-label="Average PPD" required>
+                                Average PPD
+                                <input id="hardware_create_average_ppd" class="form-control" type="text"
+                                       pattern="(?<!\S)(?=.)(0|([1-9](\d*|\d{0,2}(,\d{3})*)))?(\.\d*[1-9])?(?!\S)"
+                                       title="Number (with or without commas)" placeholder="Average PPD"
+                                       aria-label="Average PPD">
                             </div>
                         </form>
                     </div>
@@ -266,9 +271,11 @@
                         <form id="hardware_update_form" class="row g-3" onsubmit="updateHardware(); return false;"
                               action="">
                             <div class="col-auto">
+                                <br/>
                                 <button type="submit" class="btn btn-primary mb-3">Update Hardware</button>
                             </div>
                             <div class="col-auto">
+                                Hardware
                                 <input class="form-control"
                                        list="hardware_update_selector"
                                        id="hardware_update_selector_input"
@@ -282,23 +289,24 @@
                                 </datalist>
                             </div>
                             <div class="col-auto" style="display:none;">
-                                <label for="hardware_update_id" class="visually-hidden">Hardware ID</label>
-                                <input id="hardware_update_id" class="form-control" type="text" placeholder="ID"
-                                       aria-label="ID" disabled>
+                                Hardware ID
+                                <input id="hardware_update_id" class="form-control" type="text"
+                                       placeholder="Hardware ID" aria-label="Hardware ID" disabled>
                             </div>
                             <div class="col-auto hardware_update" style="display:none;">
-                                <label for="hardware_update_name" class="visually-hidden">Hardware Name</label>
+                                Hardware Name
                                 <input id="hardware_update_name" class="form-control" type="text"
                                        placeholder="Hardware Name"
                                        aria-label="Hardware Name" required>
                             </div>
                             <div class="col-auto hardware_update" style="display:none;">
-                                <label for="hardware_update_display_name" class="visually-hidden">Display Name</label>
+                                Display Name
                                 <input id="hardware_update_display_name" class="form-control" type="text"
                                        placeholder="Display Name"
                                        aria-label="Display Name" required>
                             </div>
                             <div class="col-auto hardware_update" style="display:none;">
+                                Make
                                 <input class="form-control"
                                        list="hardware_update_hardware_make"
                                        id="hardware_update_hardware_make_input"
@@ -312,6 +320,7 @@
                                 </datalist>
                             </div>
                             <div class="col-auto hardware_update" style="display:none;">
+                                Type
                                 <input class="form-control"
                                        list="hardware_update_hardware_type"
                                        id="hardware_update_hardware_type_input"
@@ -324,14 +333,16 @@
                                 </datalist>
                             </div>
                             <div class="col-auto hardware_update" style="display:none;">
-                                <label for="hardware_update_multiplier" class="visually-hidden">Multiplier</label>
+                                Multiplier
                                 <input id="hardware_update_multiplier" class="form-control" type="number" step="0.01"
                                        placeholder="Multiplier" aria-label="Multiplier" required>
                             </div>
                             <div class="col-auto hardware_update" style="display:none;">
-                                <label for="hardware_update_average_ppd" class="visually-hidden">Multiplier</label>
-                                <input id="hardware_update_average_ppd" class="form-control" type="number" step="1"
-                                       placeholder="Average PPD" aria-label="Average PPD" required>
+                                Average PPD
+                                <input id="hardware_update_average_ppd" class="form-control" type="text"
+                                       pattern="(?<!\S)(?=.)(0|([1-9](\d*|\d{0,2}(,\d{3})*)))?(\.\d*[1-9])?(?!\S)"
+                                       title="Number (with or without commas)" placeholder="Average PPD"
+                                       aria-label="Average PPD">
                             </div>
                         </form>
                     </div>
@@ -353,9 +364,11 @@
                         <form id="hardware_delete_form" class="row g-3" onsubmit="deleteHardware(); return false;"
                               action="">
                             <div class="col-auto">
+                                <br/>
                                 <button type="submit" class="btn btn-danger mb-3">Delete Hardware</button>
                             </div>
                             <div class="col-auto">
+                                Hardware
                                 <input class="form-control"
                                        list="hardware_delete_selector"
                                        id="hardware_delete_selector_input"
@@ -369,21 +382,22 @@
                                 </datalist>
                             </div>
                             <div class="col-auto" style="display:none;">
-                                <label for="hardware_delete_id" class="visually-hidden">Hardware ID</label>
-                                <input id="hardware_delete_id" class="form-control" type="text" placeholder="ID"
-                                       aria-label="ID" disabled>
+                                Hardware ID
+                                <input id="hardware_delete_id" class="form-control" type="text"
+                                       placeholder="Hardware ID" aria-label="Hardware ID" disabled>
                             </div>
                             <div class="col-auto hardware_delete" style="display:none;">
-                                <label for="hardware_delete_name" class="visually-hidden">Hardware Name</label>
+                                Hardware Name
                                 <input id="hardware_delete_name" class="form-control" type="text"
                                        placeholder="Hardware Name" aria-label="Hardware Name" disabled>
                             </div>
                             <div class="col-auto hardware_delete" style="display:none;">
-                                <label for="hardware_delete_display_name" class="visually-hidden">Display Name</label>
+                                Display Name
                                 <input id="hardware_delete_display_name" class="form-control" type="text"
                                        placeholder="Display Name" aria-label="Display Name" disabled>
                             </div>
                             <div class="col-auto hardware_delete" style="display:none;">
+                                Make
                                 <input class="form-control"
                                        list="hardware_delete_hardware_make"
                                        id="hardware_delete_hardware_make_input"
@@ -397,6 +411,7 @@
                                 </datalist>
                             </div>
                             <div class="col-auto hardware_delete" style="display:none;">
+                                Type
                                 <input class="form-control"
                                        list="hardware_delete_hardware_type"
                                        id="hardware_delete_hardware_type_input"
@@ -409,14 +424,16 @@
                                 </datalist>
                             </div>
                             <div class="col-auto hardware_delete" style="display:none;">
-                                <label for="hardware_delete_multiplier" class="visually-hidden">Multiplier</label>
+                                Multiplier
                                 <input id="hardware_delete_multiplier" class="form-control" type="number" step="0.01"
                                        placeholder="Multiplier" aria-label="Multiplier" disabled>
                             </div>
                             <div class="col-auto hardware_delete" style="display:none;">
-                                <label for="hardware_delete_average_ppd" class="visually-hidden">Multiplier</label>
-                                <input id="hardware_delete_average_ppd" class="form-control" type="number" step="1"
-                                       placeholder="Average PPD" aria-label="Average PPD" disabled>
+                                Average PPD
+                                <input id="hardware_delete_average_ppd" class="form-control" type="text"
+                                       pattern="(?<!\S)(?=.)(0|([1-9](\d*|\d{0,2}(,\d{3})*)))?(\.\d*[1-9])?(?!\S)"
+                                       title="Number (with or without commas)" placeholder="Average PPD"
+                                       aria-label="Average PPD">
                             </div>
                         </form>
                     </div>
@@ -444,20 +461,21 @@
                         <form id="team_create_form" class="row g-3" onsubmit="createTeam(); return false;"
                               action="">
                             <div class="col-auto">
+                                <br/>
                                 <button type="submit" class="btn btn-primary mb-3">Create Team</button>
                             </div>
                             <div class="col-auto">
-                                <label for="team_create_name" class="visually-hidden">Team Name</label>
+                                Team Name
                                 <input id="team_create_name" class="form-control" type="text"
                                        placeholder="Team Name" aria-label="Team Name" required>
                             </div>
                             <div class="col-auto">
-                                <label for="team_create_description" class="visually-hidden">Team Description</label>
+                                Team Description
                                 <input id="team_create_description" class="form-control" type="text"
                                        placeholder="Description" aria-label="Description">
                             </div>
                             <div class="col-auto">
-                                <label for="team_create_forum_link" class="visually-hidden">Forum Link</label>
+                                Forum Link
                                 <input id="team_create_forum_link" class="form-control" type="url"
                                        placeholder="Forum Link" aria-label="Forum Link" required>
                             </div>
@@ -480,9 +498,11 @@
                         <form id="team_update_form" class="row g-3" onsubmit="updateTeam(); return false;"
                               action="">
                             <div class="col-auto">
+                                <br/>
                                 <button type="submit" class="btn btn-primary mb-3">Update Team</button>
                             </div>
                             <div class="col-auto">
+                                Team
                                 <input class="form-control"
                                        list="team_update_selector"
                                        id="team_update_selector_input"
@@ -495,23 +515,23 @@
                                     <!-- Will be populated by system.js -->
                                 </datalist>
                             </div>
-                            <div class="col-auto" style="display:none;">
-                                <label for="team_update_id" class="visually-hidden">Team ID</label>
-                                <input id="team_update_id" class="form-control" type="text" placeholder="ID"
-                                       aria-label="ID" disabled>
+                            <div class="col-auto team_update" style="display:none;">
+                                Team ID
+                                <input id="team_update_id" class="form-control" type="text" placeholder="Team ID"
+                                       aria-label="TeamID" disabled>
                             </div>
                             <div class="col-auto team_update" style="display:none;">
-                                <label for="team_update_name" class="visually-hidden">Team Name</label>
+                                Team Name
                                 <input id="team_update_name" class="form-control" type="text"
                                        placeholder="Team Name" aria-label="Team Name" required>
                             </div>
                             <div class="col-auto team_update" style="display:none;">
-                                <label for="team_update_description" class="visually-hidden">Team Description</label>
+                                Team Description
                                 <input id="team_update_description" class="form-control" type="text"
                                        placeholder="Team Description" aria-label="Team Description">
                             </div>
                             <div class="col-auto team_update" style="display:none;">
-                                <label for="team_update_forum_link" class="visually-hidden">Forum Link</label>
+                                Forum Link
                                 <input id="team_update_forum_link" class="form-control" type="url"
                                        placeholder="Forum Link" aria-label="Forum Link" required>
                             </div>
@@ -535,9 +555,11 @@
                         <form id="team_delete_form" class="row g-3" onsubmit="deleteTeam(); return false;"
                               action="">
                             <div class="col-auto">
+                                <br/>
                                 <button type="submit" class="btn btn-danger mb-3">Delete Team</button>
                             </div>
                             <div class="col-auto">
+                                Team
                                 <input class="form-control"
                                        list="team_delete_selector"
                                        id="team_delete_selector_input"
@@ -550,23 +572,23 @@
                                     <!-- Will be populated by system.js -->
                                 </datalist>
                             </div>
-                            <div class="col-auto" style="display:none;">
-                                <label for="team_delete_id" class="visually-hidden">Team ID</label>
-                                <input id="team_delete_id" class="form-control" type="text" placeholder="ID"
-                                       aria-label="ID" disabled>
+                            <div class="col-auto team_update" style="display:none;">
+                                Team ID
+                                <input id="team_delete_id" class="form-control" type="text" placeholder="Team ID"
+                                       aria-label="Team ID" disabled>
                             </div>
                             <div class="col-auto team_delete" style="display:none;">
-                                <label for="team_delete_name" class="visually-hidden">Team Name</label>
+                                Team Name
                                 <input id="team_delete_name" class="form-control" type="text"
                                        placeholder="Team Name" aria-label="Team Name" disabled>
                             </div>
                             <div class="col-auto team_delete" style="display:none;">
-                                <label for="team_delete_description" class="visually-hidden">Team Description</label>
+                                Team Description
                                 <input id="team_delete_description" class="form-control" type="text"
                                        placeholder="Team Description" aria-label="Team Description" disabled>
                             </div>
                             <div class="col-auto team_delete" style="display:none;">
-                                <label for="team_delete_forum_link" class="visually-hidden">Forum Link</label>
+                                Forum Link
                                 <input id="team_delete_forum_link" class="form-control" type="url"
                                        placeholder="Forum Link" aria-label="Forum Link" disabled>
                             </div>
@@ -597,25 +619,27 @@
                         <form id="user_create_form" class="row g-3"
                               onsubmit="createUser(); return false;" action="">
                             <div class="col-auto">
+                                <br/>
                                 <button type="submit" class="btn btn-primary mb-3">Create User</button>
                             </div>
                             <div class="col-auto">
-                                <label for="user_create_folding_name" class="visually-hidden">Folding@Home Name</label>
+                                Folding@Home Name
                                 <input id="user_create_folding_name" class="form-control" type="text" pattern="[^\s]+"
                                        placeholder="Folding@Home Name" aria-label="Folding@Home Name" required>
                             </div>
-                            <div class="col">
-                                <label for="user_create_display_name" class="visually-hidden">Display Name</label>
+                            <div class="col-auto">
+                                Display Name
                                 <input id="user_create_display_name" class="form-control" type="text"
                                        placeholder="Display Name"
                                        aria-label="Display Name" required>
                             </div>
                             <div class="col-auto">
-                                <label for="user_create_passkey" class="visually-hidden">Passkey</label>
+                                Passkey
                                 <input id="user_create_passkey" class="form-control" type="text" maxlength="32"
                                        minlength="32" placeholder="Passkey" aria-label="Passkey" required>
                             </div>
                             <div class="col-auto">
+                                Category
                                 <input class="form-control"
                                        list="user_create_category"
                                        id="user_create_category_input"
@@ -628,17 +652,18 @@
                                     <option value="Wildcard">Wildcard</option>
                                 </datalist>
                             </div>
-                            <div class="col">
-                                <label for="user_create_profile_link" class="visually-hidden">Profile Link</label>
+                            <div class="col-auto">
+                                Profile Link
                                 <input id="user_create_profile_link" class="form-control" type="url"
                                        placeholder="Profile Link" aria-label="Profile Link">
                             </div>
-                            <div class="col">
-                                <label for="user_create_live_stats_link" class="visually-hidden">Live Stats Link</label>
+                            <div class="col-auto">
+                                Live Stats Link
                                 <input id="user_create_live_stats_link" class="form-control" type="url"
                                        placeholder="Live Stats Link" aria-label="Live Stats Link">
                             </div>
                             <div class="col-auto">
+                                Hardware
                                 <input class="form-control"
                                        list="user_create_hardware_selector"
                                        id="user_create_hardware_selector_input"
@@ -651,6 +676,7 @@
                                 </datalist>
                             </div>
                             <div class="col-auto">
+                                Team
                                 <input class="form-control"
                                        list="user_create_team_selector"
                                        id="user_create_team_selector_input"
@@ -663,7 +689,7 @@
                                 </datalist>
                             </div>
                             <div class="mb-3 form-check">
-                                <label for="user_create_is_captain" class="form-check-label">Team Captain</label>
+                                Team Captain
                                 <input id="user_create_is_captain" type="checkbox" class="form-check-input">
                             </div>
                         </form>
@@ -686,9 +712,11 @@
                     <div class="accordion-body">
                         <form id="user_update_form" class="row g-3" onsubmit="updateUser(); return false;" action="">
                             <div class="col-auto">
+                                <br/>
                                 <button type="submit" class="btn btn-primary mb-3">Update User</button>
                             </div>
                             <div class="col-auto">
+                                User
                                 <input class="form-control"
                                        list="user_update_selector"
                                        id="user_update_selector_input"
@@ -702,27 +730,28 @@
                                 </datalist>
                             </div>
                             <div class="col-auto user_update" style="display:none;">
-                                <label for="user_update_id" class="visually-hidden">User ID</label>
-                                <input id="user_update_id" class="form-control" type="text" placeholder="ID"
-                                       aria-label="ID" disabled>
+                                User ID
+                                <input id="user_update_id" class="form-control" type="text" placeholder="User ID"
+                                       aria-label="User ID" disabled>
                             </div>
                             <div class="col-auto user_update" style="display:none;">
-                                <label for="user_update_folding_name" class="visually-hidden">Folding@Home Name</label>
+                                Folding@Home Name
                                 <input id="user_update_folding_name" class="form-control" type="text" pattern="[^\s]+"
                                        placeholder="Folding@Home Name" aria-label="Folding@Home Name" required>
                             </div>
                             <div class="col-auto user_update" style="display:none;">
-                                <label for="user_update_display_name" class="visually-hidden">Display Name</label>
+                                Display Name
                                 <input id="user_update_display_name" class="form-control" type="text"
                                        placeholder="Display Name"
                                        aria-label="Display Name" required>
                             </div>
                             <div class="col-auto user_update" style="display:none;">
-                                <label for="user_update_passkey" class="visually-hidden">Passkey</label>
+                                Passkey
                                 <input id="user_update_passkey" class="form-control" type="text" maxlength="32"
                                        minlength="32" placeholder="Passkey" aria-label="Passkey" required>
                             </div>
                             <div class="col-auto user_update" style="display:none;">
+                                Category
                                 <input class="form-control"
                                        list="user_update_category"
                                        id="user_update_category_input"
@@ -736,16 +765,17 @@
                                 </datalist>
                             </div>
                             <div class="col-auto user_update" style="display:none;">
-                                <label for="user_update_profile_link" class="visually-hidden">Profile Link</label>
+                                Profile Link
                                 <input id="user_update_profile_link" class="form-control" type="url"
                                        placeholder="Profile Link" aria-label="Profile Link">
                             </div>
                             <div class="col-auto user_update" style="display:none;">
-                                <label for="user_update_live_stats_link" class="visually-hidden">Live Stats Link</label>
+                                Live Stats Link
                                 <input id="user_update_live_stats_link" class="form-control" type="url"
                                        placeholder="Live Stats Link" aria-label="Live Stats Link">
                             </div>
                             <div class="col-auto user_update" style="display:none;">
+                                Hardware
                                 <input class="form-control"
                                        list="user_update_hardware_selector"
                                        id="user_update_hardware_selector_input"
@@ -758,6 +788,7 @@
                                 </datalist>
                             </div>
                             <div class="col-auto user_update" style="display:none;">
+                                Team
                                 <input class="form-control"
                                        list="user_update_team_selector"
                                        id="user_update_team_selector_input"
@@ -770,7 +801,7 @@
                                 </datalist>
                             </div>
                             <div class="mb-3 form-check user_update" style="display:none;">
-                                <label for="user_update_is_captain" class="form-check-label">Team Captain</label>
+                                Team Captain
                                 <input id="user_update_is_captain" type="checkbox" class="form-check-input">
                             </div>
                         </form>
@@ -793,9 +824,11 @@
                     <div class="accordion-body">
                         <form id="user_delete_form" class="row g-3" onsubmit="deleteUser(); return false;" action="">
                             <div class="col-auto">
+                                <br/>
                                 <button type="submit" class="btn btn-danger mb-3">Delete User</button>
                             </div>
                             <div class="col-auto">
+                                User
                                 <input class="form-control"
                                        list="user_delete_selector"
                                        id="user_delete_selector_input"
@@ -809,26 +842,27 @@
                                 </datalist>
                             </div>
                             <div class="col-auto user_delete" style="display:none;">
-                                <label for="user_delete_id" class="visually-hidden">User ID</label>
-                                <input id="user_delete_id" class="form-control" type="text" placeholder="ID"
-                                       aria-label="ID" disabled>
+                                User ID
+                                <input id="user_delete_id" class="form-control" type="text" placeholder="User ID"
+                                       aria-label="User ID" disabled>
                             </div>
                             <div class="col-auto user_delete" style="display:none;">
-                                <label for="user_delete_folding_name" class="visually-hidden">Folding@Home Name</label>
+                                Folding@Home Name
                                 <input id="user_delete_folding_name" class="form-control" type="text" pattern="[^\s]+"
                                        placeholder="Folding@Home Name" aria-label="Folding@Home Name" required disabled>
                             </div>
                             <div class="col-auto user_delete" style="display:none;">
-                                <label for="user_delete_display_name" class="visually-hidden">Display Name</label>
+                                Display Name
                                 <input id="user_delete_display_name" class="form-control" type="text"
                                        placeholder="Display Name" aria-label="Display Name" required disabled>
                             </div>
                             <div class="col-auto user_delete" style="display:none;">
-                                <label for="user_delete_passkey" class="visually-hidden">Passkey</label>
+                                Passkey
                                 <input id="user_delete_passkey" class="form-control" type="text" maxlength="32"
                                        minlength="32" placeholder="Passkey" aria-label="Passkey" required disabled>
                             </div>
                             <div class="col-auto user_delete" style="display:none;">
+                                Category
                                 <input class="form-control"
                                        list="user_delete_category"
                                        id="user_delete_category_input"
@@ -842,16 +876,17 @@
                                 </datalist>
                             </div>
                             <div class="col-auto user_delete" style="display:none;">
-                                <label for="user_delete_profile_link" class="visually-hidden">Profile Link</label>
+                                Profile Link
                                 <input id="user_delete_profile_link" class="form-control" type="url"
                                        placeholder="Profile Link" aria-label="Profile Link" disabled>
                             </div>
                             <div class="col-auto user_delete" style="display:none;">
-                                <label for="user_delete_live_stats_link" class="visually-hidden">Live Stats Link</label>
+                                Live Stats Link
                                 <input id="user_delete_live_stats_link" class="form-control" type="url"
                                        placeholder="Live Stats Link" aria-label="Live Stats Link" disabled>
                             </div>
                             <div class="col-auto user_delete" style="display:none;">
+                                Hardware
                                 <input class="form-control"
                                        list="user_delete_hardware_selector"
                                        id="user_delete_hardware_selector_input"
@@ -864,6 +899,7 @@
                                 </datalist>
                             </div>
                             <div class="col-auto user_delete" style="display:none;">
+                                Team
                                 <input class="form-control"
                                        list="user_delete_team_selector"
                                        id="user_delete_team_selector_input"
@@ -876,7 +912,7 @@
                                 </datalist>
                             </div>
                             <div class="mb-3 form-check user_delete" style="display:none;">
-                                <label for="user_delete_is_captain" class="form-check-label">Team Captain</label>
+                                Team Captain
                                 <input id="user_delete_is_captain" type="checkbox" class="form-check-input" disabled>
                             </div>
                         </form>
@@ -899,9 +935,11 @@
                     <div class="accordion-body">
                         <form id="user_offset_form" class="row g-3" onsubmit="offsetUser(); return false;" action="">
                             <div class="col-auto">
+                                <br/>
                                 <button type="submit" class="btn btn-primary mb-3">Edit User Stats</button>
                             </div>
                             <div class="col-auto">
+                                User
                                 <input class="form-control"
                                        list="user_offset_selector"
                                        id="user_offset_selector_input"
@@ -915,21 +953,22 @@
                                 </datalist>
                             </div>
                             <div class="col-auto user_offset" style="display:none;">
-                                <label for="user_offset_id" class="visually-hidden">User ID</label>
-                                <input id="user_offset_id" class="form-control" type="text" placeholder="ID"
-                                       aria-label="ID" disabled>
+                                User ID
+                                <input id="user_offset_id" class="form-control" type="text" placeholder="User ID"
+                                       aria-label="User ID" disabled>
                             </div>
                             <div class="col-auto user_offset" style="display:none;">
-                                <label for="user_offset_folding_name" class="visually-hidden">Folding@Home Name</label>
+                                Folding@Home Name
                                 <input id="user_offset_folding_name" class="form-control" type="text" pattern="[^\s]+"
                                        placeholder="Folding@Home Name" aria-label="Folding@Home Name" required disabled>
                             </div>
                             <div class="col-auto user_offset" style="display:none;">
-                                <label for="user_offset_display_name" class="visually-hidden">Display Name</label>
+                                Display Name
                                 <input id="user_offset_display_name" class="form-control" type="text" pattern="[^\s]+"
                                        placeholder="Display Name" aria-label="Display Name" required disabled>
                             </div>
                             <div class="col-auto user_offset" style="display:none;">
+                                Category
                                 <input class="form-control"
                                        list="user_offset_category"
                                        id="user_offset_category_input"
@@ -943,6 +982,7 @@
                                 </datalist>
                             </div>
                             <div class="col-auto user_offset" style="display:none;">
+                                Hardware
                                 <input class="form-control"
                                        list="user_offset_hardware_selector"
                                        id="user_offset_hardware_selector_input"
@@ -955,6 +995,7 @@
                                 </datalist>
                             </div>
                             <div class="col-auto user_offset" style="display:none;">
+                                Team
                                 <input class="form-control"
                                        list="user_offset_team_selector"
                                        id="user_offset_team_selector_input"
@@ -967,13 +1008,13 @@
                                 </datalist>
                             </div>
                             <div class="col-auto user_offset" style="display:none;">
-                                <label for="user_offset_points" class="visually-hidden">Points</label>
+                                Points
                                 <input id="user_offset_points" class="form-control" type="text"
                                        pattern="(?<!\S)(?=.)(0|([1-9](\d*|\d{0,2}(,\d{3})*)))?(\.\d*[1-9])?(?!\S)"
                                        title="Number (with or without commas)" placeholder="Points" aria-label="Points">
                             </div>
                             <div class="col-auto user_offset" style="display:none;">
-                                <label for="user_offset_units" class="visually-hidden">Units</label>
+                                Units
                                 <input id="user_offset_units" class="form-control" type="text"
                                        pattern="(?<!\S)(?=.)(0|([1-9](\d*|\d{0,2}(,\d{3})*)))?(\.\d*[1-9])?(?!\S)"
                                        title="Number (with or without commas)" placeholder="Units" aria-label="Units">
