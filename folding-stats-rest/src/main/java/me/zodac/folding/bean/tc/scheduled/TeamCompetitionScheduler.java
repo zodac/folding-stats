@@ -29,11 +29,15 @@ import static java.lang.Boolean.parseBoolean;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.TimeZone;
 import me.zodac.folding.api.state.ParsingState;
 import me.zodac.folding.api.state.SystemState;
+import me.zodac.folding.api.tc.change.UserChange;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
+import me.zodac.folding.bean.FoldingRepository;
 import me.zodac.folding.bean.tc.lars.LarsHardwareUpdater;
+import me.zodac.folding.bean.tc.user.UserChangeApplier;
 import me.zodac.folding.bean.tc.user.UserStatsResetter;
 import me.zodac.folding.bean.tc.user.UserStatsStorer;
 import me.zodac.folding.state.ParsingStateManager;
@@ -82,7 +86,13 @@ public class TeamCompetitionScheduler {
     private static final boolean IS_LARS_UPDATE_ENABLED = parseBoolean(EnvironmentVariableUtils.getOrDefault("ENABLE_LARS_HARDWARE_UPDATE", "false"));
 
     @Autowired
+    private FoldingRepository foldingRepository;
+
+    @Autowired
     private LarsHardwareUpdater larsHardwareUpdater;
+
+    @Autowired
+    private UserChangeApplier userChangeApplier;
 
     @Autowired
     private UserStatsResetter userStatsResetter;
@@ -147,6 +157,10 @@ public class TeamCompetitionScheduler {
                 LOGGER.info("Updating hardware from LARS DB");
                 larsHardwareUpdater.retrieveHardwareAndPersist();
             }
+
+            // Retrieve ChangeRequests scheduled for the next month
+            final Collection<UserChange> nextMonthUserChanges = foldingRepository.getAllUserChangesForNextMonth();
+            userChangeApplier.apply(nextMonthUserChanges);
         } catch (final Exception e) {
             LOGGER.error("Error with end of team schedule", e);
         }

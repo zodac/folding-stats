@@ -35,6 +35,8 @@ import me.zodac.folding.api.stats.FoldingStatsRetriever;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.change.UserChange;
+import me.zodac.folding.api.tc.change.UserChangeState;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
@@ -87,6 +89,15 @@ public class FoldingRepository {
     }
 
     /**
+     * Retrieves all {@link Hardware}s.
+     *
+     * @return a {@link Collection} of the retrieved {@link Hardware}
+     */
+    public Collection<Hardware> getAllHardware() {
+        return storage.getAllHardware();
+    }
+
+    /**
      * Retrieves a {@link Hardware}.
      *
      * @param hardwareId the ID of the {@link Hardware} to retrieve
@@ -95,16 +106,7 @@ public class FoldingRepository {
      */
     public Hardware getHardware(final int hardwareId) {
         return storage.getHardware(hardwareId)
-            .orElseThrow(() -> new NotFoundException("hardware", hardwareId));
-    }
-
-    /**
-     * Retrieves all {@link Hardware}.
-     *
-     * @return a {@link Collection} of the retrieved {@link Hardware}
-     */
-    public Collection<Hardware> getAllHardware() {
-        return storage.getAllHardware();
+            .orElseThrow(() -> new NotFoundException(Hardware.class, hardwareId));
     }
 
     /**
@@ -175,6 +177,15 @@ public class FoldingRepository {
     }
 
     /**
+     * Retrieves all {@link Team}.
+     *
+     * @return a {@link Collection} of the retrieved {@link Team}s
+     */
+    public Collection<Team> getAllTeams() {
+        return storage.getAllTeams();
+    }
+
+    /**
      * Retrieves a {@link Team}.
      *
      * @param teamId the ID of the {@link Team} to retrieve
@@ -183,16 +194,7 @@ public class FoldingRepository {
      */
     public Team getTeam(final int teamId) {
         return storage.getTeam(teamId)
-            .orElseThrow(() -> new NotFoundException("team", teamId));
-    }
-
-    /**
-     * Retrieves all {@link Team}.
-     *
-     * @return a {@link Collection} of the retrieved {@link Team}s
-     */
-    public Collection<Team> getAllTeams() {
-        return storage.getAllTeams();
+            .orElseThrow(() -> new NotFoundException(Team.class, teamId));
     }
 
     /**
@@ -245,31 +247,6 @@ public class FoldingRepository {
     }
 
     /**
-     * Retrieves a {@link User}, with the passkey unmodified.
-     *
-     * @param userId the ID of the {@link User} to retrieve
-     * @return the retrieved {@link User}
-     * @throws NotFoundException thrown if the {@link User} cannot be found
-     */
-    public User getUserWithPasskey(final int userId) {
-        return storage.getUser(userId)
-            .orElseThrow(() -> new NotFoundException("user", userId));
-    }
-
-    /**
-     * Retrieves a {@link User}, with the passkey masked.
-     *
-     * @param userId the ID of the {@link User} to retrieve
-     * @return the retrieved {@link User} with no passkey exposed
-     * @throws NotFoundException thrown if the {@link User} cannot be found
-     * @see User#hidePasskey(User)
-     */
-    public User getUserWithoutPasskey(final int userId) {
-        final User userWithPasskey = getUserWithPasskey(userId);
-        return User.hidePasskey(userWithPasskey);
-    }
-
-    /**
      * Retrieves all {@link User}s, with passkeys unmodified.
      *
      * @return a {@link Collection} of the retrieved {@link User}s
@@ -289,6 +266,31 @@ public class FoldingRepository {
             .stream()
             .map(User::hidePasskey)
             .toList();
+    }
+
+    /**
+     * Retrieves a {@link User}, with the passkey unmodified.
+     *
+     * @param userId the ID of the {@link User} to retrieve
+     * @return the retrieved {@link User}
+     * @throws NotFoundException thrown if the {@link User} cannot be found
+     */
+    public User getUserWithPasskey(final int userId) {
+        return storage.getUser(userId)
+            .orElseThrow(() -> new NotFoundException(User.class, userId));
+    }
+
+    /**
+     * Retrieves a {@link User}, with the passkey masked.
+     *
+     * @param userId the ID of the {@link User} to retrieve
+     * @return the retrieved {@link User} with no passkey exposed
+     * @throws NotFoundException thrown if the {@link User} cannot be found
+     * @see User#hidePasskey(User)
+     */
+    public User getUserWithoutPasskey(final int userId) {
+        final User userWithPasskey = getUserWithPasskey(userId);
+        return User.hidePasskey(userWithPasskey);
     }
 
     /**
@@ -534,6 +536,67 @@ public class FoldingRepository {
         }
 
         return userAuthenticationResult;
+    }
+
+    /**
+     * Creates a {@link UserChange}.
+     *
+     * @param userChange the {@link UserChange} to create
+     * @return the created {@link UserChange}, with ID
+     */
+    public UserChange createUserChange(final UserChange userChange) {
+        return storage.createUserChange(userChange);
+    }
+
+    /**
+     * Retrieves all {@link UserChange}s.
+     *
+     * @return a {@link Collection} of the retrieved {@link UserChange}
+     */
+    public Collection<UserChange> getAllUserChanges() {
+        return storage.getAllUserChanges();
+    }
+
+    /**
+     * Retrieves all {@link UserChange}s with any of the given {@link UserChangeState}s.
+     *
+     * @param states the {@link UserChangeState}s to look for
+     * @return a {@link Collection} of the retrieved {@link UserChange}
+     */
+    public Collection<UserChange> getAllUserChanges(final Collection<UserChangeState> states) {
+        return storage.getAllUserChanges(states);
+    }
+
+    /**
+     * Retrieves all {@link UserChange}s that have been approved for {@link UserChangeState#APPROVED_NEXT_MONTH}.
+     *
+     * @return a {@link Collection} of the retrieved {@link UserChange}
+     */
+    public Collection<UserChange> getAllUserChangesForNextMonth() {
+        return storage.getAllUserChanges(Collections.singletonList(UserChangeState.APPROVED_NEXT_MONTH));
+    }
+
+    /**
+     * Retrieves a {@link UserChange}.
+     *
+     * @param userChangeId the ID of the {@link UserChange} to retrieve
+     * @return the retrieved {@link UserChange}
+     * @throws NotFoundException thrown if the {@link UserChange} cannot be found
+     */
+    public UserChange getUserChange(final int userChangeId) {
+        return storage.getUserChange(userChangeId)
+            .orElseThrow(() -> new NotFoundException(UserChange.class, userChangeId));
+    }
+
+    /**
+     * Updates an existing {@link Team}.
+     *
+     * @param userChangeId the ID of the {@link UserChange} to update
+     * @param newState     the new {@link UserChangeState} to be persisted
+     */
+    public void updateUserChange(final int userChangeId, final UserChangeState newState) {
+        // TODO: Create update object here, with new updated_timestamp
+        storage.updateUserChange(userChangeId, newState);
     }
 
     /**

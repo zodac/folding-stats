@@ -18,10 +18,6 @@
             <groupId>me.zodac</groupId>
             <artifactId>folding-stats-api</artifactId>
         </dependency>
-        <dependency>
-            <groupId>me.zodac</groupId>
-            <artifactId>folding-stats-client-library-java</artifactId>
-        </dependency>
 
         <!-- 3PP Dependencies -->
         <dependency>

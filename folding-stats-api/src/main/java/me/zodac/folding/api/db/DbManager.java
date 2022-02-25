@@ -34,6 +34,8 @@ import me.zodac.folding.api.exception.DatabaseConnectionException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.change.UserChange;
+import me.zodac.folding.api.tc.change.UserChangeState;
 import me.zodac.folding.api.tc.result.MonthlyResult;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
@@ -322,4 +324,44 @@ public interface DbManager extends Closeable {
      * @return the {@link UserAuthenticationResult}
      */
     UserAuthenticationResult authenticateSystemUser(final String userName, final String password);
+
+    /**
+     * Creates a {@link UserChange} instance in the DB.
+     *
+     * @param userChange the {@link UserChange} to persist
+     * @return the {@link UserChange} updated with an ID
+     */
+    UserChange createUserChange(UserChange userChange);
+
+    /**
+     * Retrieves all {@link UserChange}s from the DB.
+     *
+     * @return all {@link UserChange}s
+     */
+    Collection<UserChange> getAllUserChanges();
+
+    /**
+     * Retrieves any {@link UserChange}s that contain one of the provided {@code states} from the DB.
+     *
+     * @param states the {@link UserChangeState}s to look for
+     * @return all {@link UserChange}s with any of the provided {@link UserChangeState}s
+     */
+    Collection<UserChange> getAllUserChanges(final Collection<UserChangeState> states);
+
+    /**
+     * Retrieves a {@link UserChange} with the given ID from the DB.
+     *
+     * @param userChangeId the ID of the {@link UserChange} to retrieve
+     * @return an {@link Optional} of the retrieved {@link UserChange}
+     */
+    Optional<UserChange> getUserChange(final int userChangeId);
+
+    /**
+     * Updates an existing {@link UserChange} in the system, matching on ID.
+     *
+     * @param userChangeId the ID of the {@link UserChange} to be updated
+     * @param newState     the new {@link UserChangeState} to be persisted
+     */
+    // TODO: Return object after update
+    void updateUserChange(final int userChangeId, final UserChangeState newState);
 }

@@ -243,19 +243,4 @@ public final class Responses {
             .status(HttpStatus.CONFLICT)
             .body(GSON.toJson(entity));
     }
-
-    /**
-     * A <b>500_INTERNAL_SERVER_ERROR</b> {@link ResponseEntity}.
-     *
-     * <p>
-     * Generally used for cases where an unexpected error has occurred.
-     *
-     * @param <E> the response body type
-     * @return the <b>500_INTERNAL_SERVER_ERROR</b> {@link ResponseEntity}
-     */
-    public static <E> ResponseEntity<E> serverError() {
-        return ResponseEntity
-            .internalServerError()
-            .build();
-    }
 }

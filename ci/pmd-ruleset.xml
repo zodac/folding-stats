@@ -84,7 +84,7 @@
     <!-- Default threshold is a bit high for some of our classes -->
     <rule ref="category/java/design.xml/CyclomaticComplexity">
         <properties>
-            <property name="classReportLevel" value="75"/>
+            <property name="classReportLevel" value="80"/>
             <property name="methodReportLevel" value="20"/>
         </properties>
     </rule>

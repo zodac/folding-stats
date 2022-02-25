@@ -145,6 +145,15 @@ public final class DateTimeUtils {
     }
 
     /**
+     * Get the current {@link LocalDateTime} in {@link ZoneOffset#UTC}.
+     *
+     * @return the current {@link ZoneOffset#UTC} {@link LocalDateTime}
+     */
+    public static LocalDateTime currentUtcLocalDateTime() {
+        return currentUtcDateTime().toLocalDateTime();
+    }
+
+    /**
      * Get the current {@link Timestamp} in {@link ZoneOffset#UTC}.
      *
      * @return the current {@link ZoneOffset#UTC} {@link Timestamp}

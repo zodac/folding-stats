@@ -42,6 +42,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -165,7 +166,8 @@ public class PropagatedExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public String invalidBody(final HttpMessageNotReadableException e) {
-        LOGGER.error("No payload provided: {}", e.getMessage());
+        LOGGER.debug("Payload is null", e);
+        LOGGER.error("Payload is null");
         return GSON.toJson(ErrorResponse.create("Payload is null"));
     }
 
@@ -258,6 +260,24 @@ public class PropagatedExceptionHandler {
         return GSON.toJson(ErrorResponse.create(errorMessage));
     }
 
+
+    /**
+     * Returned when a request made to a REST endpoint has an invalid 'Content-Type' header.
+     *
+     * <p>
+     * Returns a <b>415_UNSUPPORTED_MEDIA_TYPE</b> response with a the invalid 'Content-Type' as the error message body.
+     *
+     * @param e the {@link HttpMediaTypeNotSupportedException}
+     * @return the {@link ErrorResponse} body
+     */
+    @ResponseBody
+    @ResponseStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public String invalidContentType(final HttpMediaTypeNotSupportedException e) {
+        LOGGER.error(e.getMessage());
+        return GSON.toJson(ErrorResponse.create(e.getMessage()));
+    }
+
     /**
      * Returned when a request made to a REST endpoint has an unexpected error.
      *
@@ -272,6 +292,6 @@ public class PropagatedExceptionHandler {
     @ExceptionHandler(Exception.class)
     public String serverError(final Exception e) {
         LOGGER.error("Unhandled exception occurred", e);
-        return GSON.toJson(ErrorResponse.create("Unhandled exception occurred"));
+        return GSON.toJson(ErrorResponse.create("Unhandled exception occurred, please contact admin"));
     }
 }

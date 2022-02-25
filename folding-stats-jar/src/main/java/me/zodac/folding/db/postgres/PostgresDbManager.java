@@ -43,6 +43,7 @@ import static org.jooq.impl.DSL.max;
 import static org.jooq.impl.DSL.month;
 import static org.jooq.impl.DSL.year;
 
+import com.google.gson.Gson;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -53,6 +54,7 @@ import java.time.Month;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -63,6 +65,8 @@ import me.zodac.folding.api.exception.DatabaseConnectionException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.change.UserChange;
+import me.zodac.folding.api.tc.change.UserChangeState;
 import me.zodac.folding.api.tc.result.MonthlyResult;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
@@ -1099,6 +1103,129 @@ public final class PostgresDbManager implements DbManager {
                 .findAny()
                 .orElse(UserAuthenticationResult.userDoesNotExist());
         });
+    }
+
+    @Override
+    public Collection<UserChange> getAllUserChanges() {
+        final String selectSqlStatement = "SELECT * FROM user_changes ORDER BY created_utc_timestamp ASC;";
+
+        try (final Connection connection = dataSource.getConnection();
+             final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement);
+             final ResultSet resultSet = preparedStatement.executeQuery()) {
+            final Collection<UserChange> userChanges = new ArrayList<>();
+            while (resultSet.next()) {
+                userChanges.add(
+                    UserChange.create(
+                        resultSet.getInt("change_id"),
+                        resultSet.getTimestamp("created_utc_timestamp").toLocalDateTime(),
+                        resultSet.getTimestamp("updated_utc_timestamp").toLocalDateTime(),
+                        new Gson().fromJson(resultSet.getString("json_change_request"), User.class),
+                        UserChangeState.get(resultSet.getString("state"))
+                    )
+                );
+            }
+            return userChanges;
+        } catch (final Exception e) {
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public Collection<UserChange> getAllUserChanges(final Collection<UserChangeState> states) {
+        final String selectSqlStatement = "SELECT * FROM user_changes WHERE state IN ("
+            + String.join(",", states.stream().map(s -> String.format("'%s'", s)).toList())
+            + ") ORDER BY created_utc_timestamp ASC;";
+
+        try (final Connection connection = dataSource.getConnection();
+             final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement);
+             final ResultSet resultSet = preparedStatement.executeQuery()) {
+            final Collection<UserChange> userChanges = new ArrayList<>();
+
+            while (resultSet.next()) {
+                userChanges.add(
+                    UserChange.create(
+                        resultSet.getInt("change_id"),
+                        resultSet.getTimestamp("created_utc_timestamp").toLocalDateTime(),
+                        resultSet.getTimestamp("updated_utc_timestamp").toLocalDateTime(),
+                        new Gson().fromJson(resultSet.getString("json_change_request"), User.class),
+                        UserChangeState.get(resultSet.getString("state"))
+                    )
+                );
+            }
+            return userChanges;
+        } catch (final Exception e) {
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public UserChange createUserChange(final UserChange userChange) {
+        final String selectSqlStatement = "INSERT INTO user_changes (created_utc_timestamp, updated_utc_timestamp, json_change_request, state) "
+            + "VALUES (?, ?, ?, ?) RETURNING change_id;";
+
+        try (final Connection connection = dataSource.getConnection();
+             final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
+
+            preparedStatement.setTimestamp(1, DateTimeUtils.toTimestamp(userChange.getCreatedUtcTimestamp()));
+            preparedStatement.setTimestamp(2, DateTimeUtils.toTimestamp(userChange.getUpdatedUtcTimestamp()));
+            preparedStatement.setString(3, new Gson().toJson(userChange.getUser()));
+            preparedStatement.setString(4, userChange.getState().toString());
+
+            try (final ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    final int changeId = resultSet.getInt("change_id");
+                    return UserChange.create(changeId,
+                        userChange.getCreatedUtcTimestamp(),
+                        userChange.getUpdatedUtcTimestamp(),
+                        userChange.getUser(),
+                        userChange.getState());
+                }
+                throw new IllegalStateException("No ID was returned from the DB, but no exception was raised");
+            }
+        } catch (final SQLException e) {
+            throw new DatabaseConnectionException("Error closing connection", e);
+        }
+    }
+
+    @Override
+    public void updateUserChange(final int userChangeId, final UserChangeState newState) {
+        final String statement =
+            "UPDATE user_changes SET state = '" + newState + "', updated_utc_timestamp = '" + DateTimeUtils.currentUtcTimestamp()
+                + "' WHERE change_id = '" + userChangeId + "';";
+
+        try (final Connection connection = dataSource.getConnection();
+             final PreparedStatement preparedStatement = connection.prepareStatement(statement)) {
+            preparedStatement.executeUpdate();
+        } catch (final SQLException e) {
+            throw new DatabaseConnectionException("Error closing connection", e);
+        }
+    }
+
+    @Override
+    public Optional<UserChange> getUserChange(final int userChangeId) {
+        final String selectSqlStatement = "SELECT * FROM user_changes WHERE change_id = '" + userChangeId + "';";
+        LOGGER.info("SQL: {}", selectSqlStatement);
+
+        try (final Connection connection = dataSource.getConnection();
+             final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement);
+             final ResultSet resultSet = preparedStatement.executeQuery()) {
+            if (resultSet.next()) {
+                return Optional.of(
+                    UserChange.create(
+                        resultSet.getInt("change_id"),
+                        resultSet.getTimestamp("created_utc_timestamp").toLocalDateTime(),
+                        resultSet.getTimestamp("updated_utc_timestamp").toLocalDateTime(),
+                        new Gson().fromJson(resultSet.getString("json_change_request"), User.class),
+                        UserChangeState.get(resultSet.getString("state"))
+                    )
+                );
+            }
+            LOGGER.error("No results");
+            return Optional.empty();
+        } catch (final Exception e) {
+            LOGGER.error("Error", e);
+            return Optional.empty();
+        }
     }
 
     private <T> T executeQuery(final Function<DSLContext, T> sqlQuery) {

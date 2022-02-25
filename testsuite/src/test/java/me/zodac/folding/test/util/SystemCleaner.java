@@ -122,6 +122,7 @@ public final class SystemCleaner {
      *     <li>user_offset_tc_stats</li>
      *     <li>user_tc_stats_hourly</li>
      *     <li>user_total_stats</li>
+     *     <li>user_changes</li>
      * </ol>
      *
      * @throws FoldingRestException thrown if an error occurs during cleanup
@@ -132,7 +133,13 @@ public final class SystemCleaner {
         StubbedFoldingEndpointUtils.deleteUnits();
 
         DatabaseUtils.truncateTable("monthly_results");
-        DatabaseUtils.truncateTableAndResetId("user_initial_stats", "user_offset_tc_stats", "user_tc_stats_hourly", "user_total_stats");
+        DatabaseUtils.truncateTableAndResetId(
+            "user_initial_stats",
+            "user_offset_tc_stats",
+            "user_tc_stats_hourly",
+            "user_total_stats",
+            "user_changes"
+        );
 
         TeamCompetitionStatsUtils.manuallyResetStats();
         cleanSystemForSimpleTests();

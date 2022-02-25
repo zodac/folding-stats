@@ -38,6 +38,8 @@ import me.zodac.folding.api.exception.DatabaseConnectionException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.change.UserChange;
+import me.zodac.folding.api.tc.change.UserChangeState;
 import me.zodac.folding.api.tc.result.MonthlyResult;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
@@ -103,35 +105,8 @@ public class Storage {
         });
     }
 
-
     /**
-     * Retrieves a {@link Hardware}.
-     *
-     * <p>
-     * First attempts to retrieve from {@link HardwareCache}, then if none exists, attempts to retrieve from the {@link DbManager}.
-     *
-     * @param hardwareId the ID of the {@link Hardware} to retrieve
-     * @return an {@link Optional} of the retrieved {@link Hardware}
-     * @see DbManager#getHardware(int)
-     */
-    @Cached(HardwareCache.class)
-    public Optional<Hardware> getHardware(final int hardwareId) {
-        final Optional<Hardware> fromCache = hardwareCache.get(hardwareId);
-
-        if (fromCache.isPresent()) {
-            return fromCache;
-        }
-
-        LOGGER.trace("Cache miss! Get hardware");
-        return dbManagerFunction(dbManager -> {
-            final Optional<Hardware> fromDb = dbManager.getHardware(hardwareId);
-            fromDb.ifPresent(hardware -> hardwareCache.add(hardwareId, hardware));
-            return fromDb;
-        });
-    }
-
-    /**
-     * Retrieves all {@link Hardware}.
+     * Retrieves all {@link Hardware}s.
      *
      * <p>
      * First attempts to retrieve from {@link HardwareCache}, then if none exist, attempts to retrieve from the {@link DbManager}.
@@ -155,6 +130,32 @@ public class Storage {
                 hardwareCache.add(hardware.getId(), hardware);
             }
 
+            return fromDb;
+        });
+    }
+
+    /**
+     * Retrieves a {@link Hardware}.
+     *
+     * <p>
+     * First attempts to retrieve from {@link HardwareCache}, then if none exists, attempts to retrieve from the {@link DbManager}.
+     *
+     * @param hardwareId the ID of the {@link Hardware} to retrieve
+     * @return an {@link Optional} of the retrieved {@link Hardware}
+     * @see DbManager#getHardware(int)
+     */
+    @Cached(HardwareCache.class)
+    public Optional<Hardware> getHardware(final int hardwareId) {
+        final Optional<Hardware> fromCache = hardwareCache.get(hardwareId);
+
+        if (fromCache.isPresent()) {
+            return fromCache;
+        }
+
+        LOGGER.trace("Cache miss! Get hardware");
+        return dbManagerFunction(dbManager -> {
+            final Optional<Hardware> fromDb = dbManager.getHardware(hardwareId);
+            fromDb.ifPresent(hardware -> hardwareCache.add(hardwareId, hardware));
             return fromDb;
         });
     }
@@ -225,32 +226,6 @@ public class Storage {
     }
 
     /**
-     * Retrieves a {@link Team}.
-     *
-     * <p>
-     * First attempts to retrieve from {@link TeamCache}, then if none exists, attempts to retrieve from the {@link DbManager}.
-     *
-     * @param teamId the ID of the {@link Team} to retrieve
-     * @return an {@link Optional} of the retrieved {@link Team}
-     * @see DbManager#getTeam(int)
-     */
-    @Cached(TeamCache.class)
-    public Optional<Team> getTeam(final int teamId) {
-        final Optional<Team> fromCache = teamCache.get(teamId);
-
-        if (fromCache.isPresent()) {
-            return fromCache;
-        }
-
-        LOGGER.trace("Cache miss! Get team");
-        return dbManagerFunction(dbManager -> {
-            final Optional<Team> fromDb = dbManager.getTeam(teamId);
-            fromDb.ifPresent(team -> teamCache.add(teamId, team));
-            return fromDb;
-        });
-    }
-
-    /**
      * Retrieves all {@link Team}s.
      *
      * <p>
@@ -275,6 +250,32 @@ public class Storage {
                 teamCache.add(team.getId(), team);
             }
 
+            return fromDb;
+        });
+    }
+
+    /**
+     * Retrieves a {@link Team}.
+     *
+     * <p>
+     * First attempts to retrieve from {@link TeamCache}, then if none exists, attempts to retrieve from the {@link DbManager}.
+     *
+     * @param teamId the ID of the {@link Team} to retrieve
+     * @return an {@link Optional} of the retrieved {@link Team}
+     * @see DbManager#getTeam(int)
+     */
+    @Cached(TeamCache.class)
+    public Optional<Team> getTeam(final int teamId) {
+        final Optional<Team> fromCache = teamCache.get(teamId);
+
+        if (fromCache.isPresent()) {
+            return fromCache;
+        }
+
+        LOGGER.trace("Cache miss! Get team");
+        return dbManagerFunction(dbManager -> {
+            final Optional<Team> fromDb = dbManager.getTeam(teamId);
+            fromDb.ifPresent(team -> teamCache.add(teamId, team));
             return fromDb;
         });
     }
@@ -344,33 +345,6 @@ public class Storage {
         });
     }
 
-
-    /**
-     * Retrieves a {@link User}.
-     *
-     * <p>
-     * First attempts to retrieve from {@link UserCache}, then if none exists, attempts to retrieve from the {@link DbManager}.
-     *
-     * @param userId the ID of the {@link User} to retrieve
-     * @return an {@link Optional} of the retrieved {@link User}
-     * @see DbManager#getUser(int)
-     */
-    @Cached(UserCache.class)
-    public Optional<User> getUser(final int userId) {
-        final Optional<User> fromCache = userCache.get(userId);
-
-        if (fromCache.isPresent()) {
-            return fromCache;
-        }
-
-        LOGGER.trace("Cache miss! Get user");
-        return dbManagerFunction(dbManager -> {
-            final Optional<User> fromDb = dbManager.getUser(userId);
-            fromDb.ifPresent(user -> userCache.add(userId, user));
-            return fromDb;
-        });
-    }
-
     /**
      * Retrieves all {@link User}s.
      *
@@ -400,6 +374,31 @@ public class Storage {
         });
     }
 
+    /**
+     * Retrieves a {@link User}.
+     *
+     * <p>
+     * First attempts to retrieve from {@link UserCache}, then if none exists, attempts to retrieve from the {@link DbManager}.
+     *
+     * @param userId the ID of the {@link User} to retrieve
+     * @return an {@link Optional} of the retrieved {@link User}
+     * @see DbManager#getUser(int)
+     */
+    @Cached(UserCache.class)
+    public Optional<User> getUser(final int userId) {
+        final Optional<User> fromCache = userCache.get(userId);
+
+        if (fromCache.isPresent()) {
+            return fromCache;
+        }
+
+        LOGGER.trace("Cache miss! Get user");
+        return dbManagerFunction(dbManager -> {
+            final Optional<User> fromDb = dbManager.getUser(userId);
+            fromDb.ifPresent(user -> userCache.add(userId, user));
+            return fromDb;
+        });
+    }
 
     /**
      * Updates a {@link User}. Expects the {@link User} to have a valid ID.
@@ -842,6 +841,80 @@ public class Storage {
     @Cached(InitialStatsCache.class)
     public void evictInitialStatsCache() {
         initialStatsCache.removeAll();
+    }
+
+    /**
+     * Creates a {@link UserChange}.
+     *
+     * <p>
+     * Persists it with the {@link DbManager}.
+     *
+     * @param userChange the {@link UserChange} to create
+     * @return the created {@link UserChange}, with ID
+     * @see DbManager#createUserChange(UserChange)
+     */
+    @NotCached
+    public UserChange createUserChange(final UserChange userChange) {
+        return dbManagerFunction(dbManager -> dbManager.createUserChange(userChange));
+    }
+
+    /**
+     * Retrieves all {@link UserChange}s.
+     *
+     * <p>
+     * Attempts to retrieve from the {@link DbManager}.
+     *
+     * @return a {@link Collection} of the retrieved {@link UserChange}
+     * @see DbManager#getAllUserChanges()
+     */
+    @NotCached
+    public Collection<UserChange> getAllUserChanges() {
+        return dbManagerFunction(DbManager::getAllUserChanges);
+    }
+
+    /**
+     * Retrieves all {@link UserChange}s with the given {@link UserChangeState}.
+     *
+     * <p>
+     * Attempts to retrieve from the {@link DbManager}.
+     *
+     * @param states the {@link UserChangeState}s to look for
+     * @return a {@link Collection} of the retrieved {@link UserChange}
+     * @see DbManager#getAllUserChanges(Collection)
+     */
+    @NotCached
+    public Collection<UserChange> getAllUserChanges(final Collection<UserChangeState> states) {
+        return dbManagerFunction(dbManager -> dbManager.getAllUserChanges(states));
+    }
+
+    /**
+     * Retrieves a {@link UserChange}.
+     *
+     * <p>
+     * Attempts to retrieve from the {@link DbManager}.
+     *
+     * @param userChangeId the ID of the {@link UserChange} to retrieve
+     * @return an {@link Optional} of the retrieved {@link UserChange}
+     * @see DbManager#getUserChange(int)
+     */
+    @NotCached
+    public Optional<UserChange> getUserChange(final int userChangeId) {
+        return dbManagerFunction(dbManager -> dbManager.getUserChange(userChangeId));
+    }
+
+    /**
+     * Updates a {@link UserChange}. Expects the {@link UserChange} to have a valid ID.
+     *
+     * <p>
+     * Persists it with the {@link DbManager}.
+     *
+     * @param userChangeId the ID of the {@link UserChange} to update
+     * @param newState     the new {@link UserChangeState} to be persisted
+     * @see DbManager#updateUserChange(int, UserChangeState)
+     */
+    @NotCached
+    public void updateUserChange(final int userChangeId, final UserChangeState newState) {
+        dbManagerConsumer(dbManager -> dbManager.updateUserChange(userChangeId, newState));
     }
 
     /**

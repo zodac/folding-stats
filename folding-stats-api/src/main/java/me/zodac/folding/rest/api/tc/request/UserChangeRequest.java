@@ -22,26 +22,33 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.rest.exception;
+package me.zodac.folding.rest.api.tc.request;
 
-import java.io.Serial;
-import me.zodac.folding.api.ResponsePojo;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
- * {@link Exception} thrown when a requested object cannot be found.
+ * REST request to create/update a {@link me.zodac.folding.api.tc.change.UserChange}.
  */
-public class NotFoundException extends RuntimeException {
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString(doNotUseGetters = true)
+public class UserChangeRequest {
 
-    @Serial
-    private static final long serialVersionUID = -7931149448794408011L;
-
-    /**
-     * Basic constructor.
-     *
-     * @param type the type of object that cannot be found
-     * @param id   the ID of the object that cannot be found
-     */
-    public NotFoundException(final Class<? extends ResponsePojo> type, final int id) {
-        super(String.format("No %s found with ID '%s'", type.getSimpleName(), id));
-    }
+    private int userId;
+    private String foldingUserName;
+    private String passkey;
+    private String liveStatsLink;
+    private int hardwareId;
+    private boolean immediate;
 }

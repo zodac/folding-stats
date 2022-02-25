@@ -174,7 +174,6 @@ public class UserEndpoint {
         return cachedOk(element, untilNextMonthUtc(ChronoUnit.SECONDS));
     }
 
-
     /**
      * {@link PutMapping} request to update an existing {@link User} based on the input request.
      *
