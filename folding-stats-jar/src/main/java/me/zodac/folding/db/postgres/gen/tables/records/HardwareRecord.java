@@ -94,30 +94,30 @@ public class HardwareRecord extends UpdatableRecordImpl<HardwareRecord> implemen
     }
 
     /**
-     * Setter for <code>public.hardware.average_ppd</code>.
-     */
-    public void setAveragePpd(BigDecimal value) {
-        set(5, value);
-    }
-
-    /**
-     * Getter for <code>public.hardware.average_ppd</code>.
-     */
-    public BigDecimal getAveragePpd() {
-        return (BigDecimal) get(5);
-    }
-
-    /**
      * Setter for <code>public.hardware.multiplier</code>.
      */
     public void setMultiplier(BigDecimal value) {
-        set(6, value);
+        set(5, value);
     }
 
     /**
      * Getter for <code>public.hardware.multiplier</code>.
      */
     public BigDecimal getMultiplier() {
+        return (BigDecimal) get(5);
+    }
+
+    /**
+     * Setter for <code>public.hardware.average_ppd</code>.
+     */
+    public void setAveragePpd(BigDecimal value) {
+        set(6, value);
+    }
+
+    /**
+     * Getter for <code>public.hardware.average_ppd</code>.
+     */
+    public BigDecimal getAveragePpd() {
         return (BigDecimal) get(6);
     }
 
@@ -171,12 +171,12 @@ public class HardwareRecord extends UpdatableRecordImpl<HardwareRecord> implemen
 
     @Override
     public Field<BigDecimal> field6() {
-        return Hardware.HARDWARE.AVERAGE_PPD;
+        return Hardware.HARDWARE.MULTIPLIER;
     }
 
     @Override
     public Field<BigDecimal> field7() {
-        return Hardware.HARDWARE.MULTIPLIER;
+        return Hardware.HARDWARE.AVERAGE_PPD;
     }
 
     @Override
@@ -206,12 +206,12 @@ public class HardwareRecord extends UpdatableRecordImpl<HardwareRecord> implemen
 
     @Override
     public BigDecimal component6() {
-        return getAveragePpd();
+        return getMultiplier();
     }
 
     @Override
     public BigDecimal component7() {
-        return getMultiplier();
+        return getAveragePpd();
     }
 
     @Override
@@ -241,12 +241,12 @@ public class HardwareRecord extends UpdatableRecordImpl<HardwareRecord> implemen
 
     @Override
     public BigDecimal value6() {
-        return getAveragePpd();
+        return getMultiplier();
     }
 
     @Override
     public BigDecimal value7() {
-        return getMultiplier();
+        return getAveragePpd();
     }
 
     @Override
@@ -281,13 +281,13 @@ public class HardwareRecord extends UpdatableRecordImpl<HardwareRecord> implemen
 
     @Override
     public HardwareRecord value6(BigDecimal value) {
-        setAveragePpd(value);
+        setMultiplier(value);
         return this;
     }
 
     @Override
     public HardwareRecord value7(BigDecimal value) {
-        setMultiplier(value);
+        setAveragePpd(value);
         return this;
     }
 
@@ -317,7 +317,7 @@ public class HardwareRecord extends UpdatableRecordImpl<HardwareRecord> implemen
     /**
      * Create a detached, initialised HardwareRecord
      */
-    public HardwareRecord(Integer hardwareId, String hardwareName, String displayName, String hardwareMake, String hardwareType, BigDecimal averagePpd, BigDecimal multiplier) {
+    public HardwareRecord(Integer hardwareId, String hardwareName, String displayName, String hardwareMake, String hardwareType, BigDecimal multiplier, BigDecimal averagePpd) {
         super(Hardware.HARDWARE);
 
         setHardwareId(hardwareId);
@@ -325,7 +325,7 @@ public class HardwareRecord extends UpdatableRecordImpl<HardwareRecord> implemen
         setDisplayName(displayName);
         setHardwareMake(hardwareMake);
         setHardwareType(hardwareType);
-        setAveragePpd(averagePpd);
         setMultiplier(multiplier);
+        setAveragePpd(averagePpd);
     }
 }

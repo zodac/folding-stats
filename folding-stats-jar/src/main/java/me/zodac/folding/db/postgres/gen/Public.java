@@ -13,6 +13,7 @@ import me.zodac.folding.db.postgres.gen.tables.PgpArmorHeaders;
 import me.zodac.folding.db.postgres.gen.tables.RetiredUserStats;
 import me.zodac.folding.db.postgres.gen.tables.SystemUsers;
 import me.zodac.folding.db.postgres.gen.tables.Teams;
+import me.zodac.folding.db.postgres.gen.tables.UserChanges;
 import me.zodac.folding.db.postgres.gen.tables.UserInitialStats;
 import me.zodac.folding.db.postgres.gen.tables.UserOffsetTcStats;
 import me.zodac.folding.db.postgres.gen.tables.UserTcStatsHourly;
@@ -107,6 +108,11 @@ public class Public extends SchemaImpl {
     public final Teams TEAMS = Teams.TEAMS;
 
     /**
+     * The table <code>public.user_changes</code>.
+     */
+    public final UserChanges USER_CHANGES = UserChanges.USER_CHANGES;
+
+    /**
      * The table <code>public.user_initial_stats</code>.
      */
     public final UserInitialStats USER_INITIAL_STATS = UserInitialStats.USER_INITIAL_STATS;
@@ -150,6 +156,7 @@ public class Public extends SchemaImpl {
             Sequences.HARDWARE_HARDWARE_ID_SEQ,
             Sequences.RETIRED_USER_STATS_RETIRED_USER_ID_SEQ,
             Sequences.TEAMS_TEAM_ID_SEQ,
+            Sequences.USER_CHANGES_CHANGE_ID_SEQ,
             Sequences.USERS_USER_ID_SEQ);
     }
 
@@ -162,6 +169,7 @@ public class Public extends SchemaImpl {
             RetiredUserStats.RETIRED_USER_STATS,
             SystemUsers.SYSTEM_USERS,
             Teams.TEAMS,
+            UserChanges.USER_CHANGES,
             UserInitialStats.USER_INITIAL_STATS,
             UserOffsetTcStats.USER_OFFSET_TC_STATS,
             UserTcStatsHourly.USER_TC_STATS_HOURLY,

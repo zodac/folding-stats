@@ -40,6 +40,8 @@ import me.zodac.folding.api.tc.HardwareMake;
 import me.zodac.folding.api.tc.HardwareType;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.change.UserChange;
+import me.zodac.folding.api.tc.change.UserChangeState;
 import me.zodac.folding.api.tc.result.MonthlyResult;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
@@ -50,6 +52,7 @@ import me.zodac.folding.db.postgres.gen.tables.records.HardwareRecord;
 import me.zodac.folding.db.postgres.gen.tables.records.MonthlyResultsRecord;
 import me.zodac.folding.db.postgres.gen.tables.records.RetiredUserStatsRecord;
 import me.zodac.folding.db.postgres.gen.tables.records.TeamsRecord;
+import me.zodac.folding.db.postgres.gen.tables.records.UserChangesRecord;
 import me.zodac.folding.db.postgres.gen.tables.records.UserInitialStatsRecord;
 import me.zodac.folding.db.postgres.gen.tables.records.UserOffsetTcStatsRecord;
 import me.zodac.folding.db.postgres.gen.tables.records.UserTcStatsHourlyRecord;
@@ -66,7 +69,7 @@ final class RecordConverter {
 
     // We don't try and reuse the GSON instance available in RestUtilConstants
     // This is because we do not want pretty-print enabled since that would increase the size of the JSON string being persisted in the DB
-    static final Gson MONTHLY_RESULT_GSON = new GsonBuilder()
+    static final Gson GSON = new GsonBuilder()
         .registerTypeAdapter(LocalDateTime.class, LocalDateTimeGsonTypeAdapter.getInstance())
         .disableHtmlEscaping()
         .create();
@@ -236,7 +239,7 @@ final class RecordConverter {
      * @return the converted {@link MonthlyResult}
      */
     static MonthlyResult toMonthlyResult(final MonthlyResultsRecord monthlyResultsRecord) {
-        final MonthlyResult monthlyResult = MONTHLY_RESULT_GSON.fromJson(monthlyResultsRecord.getJsonResult(), MonthlyResult.class);
+        final MonthlyResult monthlyResult = GSON.fromJson(monthlyResultsRecord.getJsonResult(), MonthlyResult.class);
         return MonthlyResult.updateWithEmptyCategories(monthlyResult);
     }
 
@@ -259,6 +262,22 @@ final class RecordConverter {
         }
 
         return UserAuthenticationResult.invalidPassword();
+    }
+
+    /**
+     * Convert a {@link UserChangesRecord} into a {@link UserChange}.
+     *
+     * @param userChangesRecord the {@link UserChangesRecord} to convert
+     * @return the converted {@link UserChange}
+     */
+    static UserChange toUserChange(final UserChangesRecord userChangesRecord) {
+        return UserChange.create(
+            userChangesRecord.getChangeId(),
+            userChangesRecord.getCreatedUtcTimestamp(),
+            userChangesRecord.getUpdatedUtcTimestamp(),
+            GSON.fromJson(userChangesRecord.getJsonChangeRequest(), User.class),
+            UserChangeState.get(userChangesRecord.getState())
+        );
     }
 
     private static boolean getPasswordMatchValue(final Record systemUsersRecord) {

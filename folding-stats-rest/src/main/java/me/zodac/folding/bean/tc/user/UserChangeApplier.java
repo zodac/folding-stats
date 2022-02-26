@@ -81,7 +81,9 @@ public class UserChangeApplier {
         LOGGER.info("Found existing user: {}", existingUser);
         foldingRepository.updateUser(userChange.getUser(), existingUser);
         LOGGER.info("Updated user");
-        foldingRepository.updateUserChange(userChange.getId(), UserChangeState.COMPLETED);
+
+        final UserChange userChangeToUpdate = UserChange.updateWithState(UserChangeState.COMPLETED, userChange);
+        foldingRepository.updateUserChange(userChangeToUpdate);
         LOGGER.info("Updated UserChange to complete");
     }
 }

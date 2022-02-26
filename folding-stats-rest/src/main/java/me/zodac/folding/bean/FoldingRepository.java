@@ -589,14 +589,13 @@ public class FoldingRepository {
     }
 
     /**
-     * Updates an existing {@link Team}.
+     * Updates an existing {@link UserChange}.
      *
-     * @param userChangeId the ID of the {@link UserChange} to update
-     * @param newState     the new {@link UserChangeState} to be persisted
+     * @param userChangeToUpdate the {@link UserChange} with updated values
+     * @return the updated {@link UserChange}
      */
-    public void updateUserChange(final int userChangeId, final UserChangeState newState) {
-        // TODO: Create update object here, with new updated_timestamp
-        storage.updateUserChange(userChangeId, newState);
+    public UserChange updateUserChange(final UserChange userChangeToUpdate) {
+        return storage.updateUserChange(userChangeToUpdate);
     }
 
     /**

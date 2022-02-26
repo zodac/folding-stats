@@ -10,6 +10,7 @@ import me.zodac.folding.db.postgres.gen.tables.PgpArmorHeaders;
 import me.zodac.folding.db.postgres.gen.tables.RetiredUserStats;
 import me.zodac.folding.db.postgres.gen.tables.SystemUsers;
 import me.zodac.folding.db.postgres.gen.tables.Teams;
+import me.zodac.folding.db.postgres.gen.tables.UserChanges;
 import me.zodac.folding.db.postgres.gen.tables.UserInitialStats;
 import me.zodac.folding.db.postgres.gen.tables.UserOffsetTcStats;
 import me.zodac.folding.db.postgres.gen.tables.UserTcStatsHourly;
@@ -91,6 +92,11 @@ public class Tables {
      * The table <code>public.teams</code>.
      */
     public static final Teams TEAMS = Teams.TEAMS;
+
+    /**
+     * The table <code>public.user_changes</code>.
+     */
+    public static final UserChanges USER_CHANGES = UserChanges.USER_CHANGES;
 
     /**
      * The table <code>public.user_initial_stats</code>.

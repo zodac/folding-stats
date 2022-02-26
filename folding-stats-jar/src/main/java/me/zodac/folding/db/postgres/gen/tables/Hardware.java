@@ -77,14 +77,14 @@ public class Hardware extends TableImpl<HardwareRecord> {
     public final TableField<HardwareRecord, String> HARDWARE_TYPE = createField(DSL.name("hardware_type"), SQLDataType.CLOB.nullable(false), this, "");
 
     /**
-     * The column <code>public.hardware.average_ppd</code>.
-     */
-    public final TableField<HardwareRecord, BigDecimal> AVERAGE_PPD = createField(DSL.name("average_ppd"), SQLDataType.NUMERIC.nullable(false), this, "");
-
-    /**
      * The column <code>public.hardware.multiplier</code>.
      */
     public final TableField<HardwareRecord, BigDecimal> MULTIPLIER = createField(DSL.name("multiplier"), SQLDataType.NUMERIC.nullable(false), this, "");
+
+    /**
+     * The column <code>public.hardware.average_ppd</code>.
+     */
+    public final TableField<HardwareRecord, BigDecimal> AVERAGE_PPD = createField(DSL.name("average_ppd"), SQLDataType.NUMERIC.nullable(false), this, "");
 
     private Hardware(Name alias, Table<HardwareRecord> aliased) {
         this(alias, aliased, null);

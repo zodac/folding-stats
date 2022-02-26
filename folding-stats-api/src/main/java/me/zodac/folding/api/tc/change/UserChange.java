@@ -33,6 +33,7 @@ import lombok.Getter;
 import lombok.ToString;
 import me.zodac.folding.api.ResponsePojo;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.util.DateTimeUtils;
 
 /**
  * POJO defining a {@link UserChange} to request a change for a <code>Team Competition</code> {@link User} that must be approved/rejected by an admin.
@@ -57,6 +58,10 @@ public class UserChange implements ResponsePojo {
      *
      * <p>
      * Since the DB auto-generates the ID, this function should be used when creating a {@link UserChange} from the DB response.
+     *
+     * <p>
+     * <b>NOTE:</b> The {@link LocalDateTime}s provided will have their nanoseconds stripped, due to precision errors that can occur after retrieving
+     * a persisted value from the DB.
      *
      * @param id                  the ID
      * @param createdUtcTimestamp the UTC {@link LocalDateTime} for when the {@link UserChange} was created
@@ -89,6 +94,47 @@ public class UserChange implements ResponsePojo {
                                              final LocalDateTime updatedUtcTimestamp,
                                              final User user,
                                              final UserChangeState state) {
-        return new UserChange(EMPTY_USER_CHANGE_ID, createdUtcTimestamp.withNano(0), updatedUtcTimestamp.withNano(0), user, state);
+        return create(EMPTY_USER_CHANGE_ID, createdUtcTimestamp, updatedUtcTimestamp, user, state);
+    }
+
+    /**
+     * Updates a {@link UserChange} with the given ID.
+     *
+     * <p>
+     * Once the {@link UserChange} has been persisted in the DB, we will know its ID. We create a new {@link UserChange} instance with this ID,
+     * which can be used to retrieval/referencing later.
+     *
+     * <p>
+     * <b>NOTE: </b> Will not update the {@code updateUtcTimestamp}, as we are only applying the ID, not the content of the {@link UserChange}.
+     *
+     * @param userChangeId the DB-generated ID
+     * @param userChange   the {@link UserChange} to be updated with the ID
+     * @return the updated {@link UserChange}
+     */
+    public static UserChange updateWithId(final int userChangeId, final UserChange userChange) {
+        return create(
+            userChangeId,
+            userChange.createdUtcTimestamp,
+            userChange.updatedUtcTimestamp,
+            userChange.user,
+            userChange.state
+        );
+    }
+
+    /**
+     * Updates a {@link UserChange} with the given {@link UserChangeState}.
+     *
+     * @param userChangeState the new {@link UserChangeState}
+     * @param userChange      the {@link UserChange} to be updated with the ID
+     * @return the updated {@link UserChange}
+     */
+    public static UserChange updateWithState(final UserChangeState userChangeState, final UserChange userChange) {
+        return create(
+            userChange.getId(),
+            userChange.createdUtcTimestamp,
+            DateTimeUtils.currentUtcLocalDateTime(),
+            userChange.user,
+            userChangeState
+        );
     }
 }

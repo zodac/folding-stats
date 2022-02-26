@@ -214,7 +214,7 @@ public class UserChangeEndpoint {
      *
      * @param userChangeId the ID of the {@link UserChange} to be updated
      * @param request      the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#ok()}
+     * @return {@link me.zodac.folding.rest.response.Responses#ok(Object, int)} containing the updated {@link UserChange}
      * @see UserChangeApplier#apply(UserChange)
      */
     @WriteRequired
@@ -231,7 +231,7 @@ public class UserChangeEndpoint {
      *
      * @param userChangeId the ID of the {@link UserChange} to be updated
      * @param request      the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#ok()}
+     * @return {@link me.zodac.folding.rest.response.Responses#ok(Object, int)} containing the updated {@link UserChange}
      */
     @WriteRequired
     @PutMapping(path = "/{userChangeId}/approve/next", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -247,7 +247,7 @@ public class UserChangeEndpoint {
      *
      * @param userChangeId the ID of the {@link UserChange} to be updated
      * @param request      the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#ok()}
+     * @return {@link me.zodac.folding.rest.response.Responses#ok(Object, int)} containing the updated {@link UserChange}
      */
     @WriteRequired
     @PutMapping(path = "/{userChangeId}/reject", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -262,13 +262,17 @@ public class UserChangeEndpoint {
         final int id = IntegerParser.parsePositive(userChangeId);
 
         // TODO: Check if one exists with ID first, then verify it is in a changeable state
-        foldingRepository.updateUserChange(id, newState); // TODO: Return from the update
+        final UserChange existingUserChange = foldingRepository.getUserChange(id);
+        final UserChange userChangeToUpdate = UserChange.updateWithState(newState, existingUserChange);
+        final UserChange updatedUserChange = foldingRepository.updateUserChange(userChangeToUpdate);
 
         if (newState == UserChangeState.APPROVED_NOW) {
             LOGGER.info("Requested for now, applying change");
             final UserChange cr = foldingRepository.getUserChange(id);
             userChangeApplier.apply(cr);
         }
-        return ok();
+
+        // TODO: Mask passkey
+        return ok(updatedUserChange, updatedUserChange.getId());
     }
 }

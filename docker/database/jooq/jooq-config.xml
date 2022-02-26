@@ -2,7 +2,7 @@
     <!-- Configure the database connection here -->
     <jdbc>
         <driver>org.postgresql.Driver</driver>
-        <url>jdbc:postgresql://192.168.99.100:5433/folding_db</url> <!-- Test container IP -->
+        <url>jdbc:postgresql://127.0.0.1:5433/folding_db</url> <!-- Test container IP -->
         <user>folding_user</user>
         <password>shroot</password>
     </jdbc>

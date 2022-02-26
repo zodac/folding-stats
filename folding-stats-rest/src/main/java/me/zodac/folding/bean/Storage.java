@@ -908,13 +908,13 @@ public class Storage {
      * <p>
      * Persists it with the {@link DbManager}.
      *
-     * @param userChangeId the ID of the {@link UserChange} to update
-     * @param newState     the new {@link UserChangeState} to be persisted
-     * @see DbManager#updateUserChange(int, UserChangeState)
+     * @param userChangeToUpdate the {@link UserChange} with updated values
+     * @return the updated {@link UserChange}
+     * @see DbManager#updateUserChange(UserChange)
      */
     @NotCached
-    public void updateUserChange(final int userChangeId, final UserChangeState newState) {
-        dbManagerConsumer(dbManager -> dbManager.updateUserChange(userChangeId, newState));
+    public UserChange updateUserChange(final UserChange userChangeToUpdate) {
+        return dbManagerFunction(dbManager -> dbManager.updateUserChange(userChangeToUpdate));
     }
 
     /**

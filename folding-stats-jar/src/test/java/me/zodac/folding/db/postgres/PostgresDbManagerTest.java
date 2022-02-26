@@ -30,6 +30,7 @@ import static me.zodac.folding.db.postgres.TestGenerator.nextUserName;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
@@ -44,6 +45,8 @@ import me.zodac.folding.api.tc.HardwareMake;
 import me.zodac.folding.api.tc.HardwareType;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.change.UserChange;
+import me.zodac.folding.api.tc.change.UserChangeState;
 import me.zodac.folding.api.tc.result.MonthlyResult;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
@@ -587,6 +590,38 @@ class PostgresDbManagerTest {
             .contains("read-only");
     }
 
+    @Test
+    void userChangeTest() {
+        final UserChange userChange = generateUserChange();
+        final UserChange createdUserChange = POSTGRES_DB_MANAGER.createUserChange(userChange);
+
+        assertThat(createdUserChange.getId())
+            .isNotZero();
+
+        final Collection<UserChange> allUserChanges = POSTGRES_DB_MANAGER.getAllUserChanges();
+        assertThat(allUserChanges)
+            .hasSize(1);
+
+        final Optional<UserChange> optionalRetrievedUserChange = POSTGRES_DB_MANAGER.getUserChange(createdUserChange.getId());
+        assertThat(optionalRetrievedUserChange)
+            .isPresent();
+
+        final UserChange retrievedUserChange = optionalRetrievedUserChange.get();
+        assertThat(retrievedUserChange)
+            .isEqualTo(createdUserChange);
+
+        final UserChange userChangeToUpdate = UserChange.updateWithState(UserChangeState.COMPLETED, createdUserChange);
+
+        POSTGRES_DB_MANAGER.updateUserChange(userChangeToUpdate);
+        final Optional<UserChange> optionalUpdatedUserChange = POSTGRES_DB_MANAGER.getUserChange(createdUserChange.getId());
+        assertThat(optionalUpdatedUserChange)
+            .isPresent();
+
+        final UserChange updatedUserChange = optionalUpdatedUserChange.get();
+        assertThat(updatedUserChange)
+            .isEqualTo(userChangeToUpdate);
+    }
+
     private Hardware generateHardware() {
         return Hardware.createWithoutId(nextHardwareName(), "hardware", HardwareMake.NVIDIA, HardwareType.GPU, 1.00D, 1L);
     }
@@ -611,5 +646,11 @@ class PostgresDbManagerTest {
 
     private Team createTeam() {
         return POSTGRES_DB_MANAGER.createTeam(generateTeam());
+    }
+
+    private UserChange generateUserChange() {
+        final User user = createUser();
+        final LocalDateTime currentUtcTimestamp = DateTimeUtils.currentUtcLocalDateTime();
+        return UserChange.createWithoutId(currentUtcTimestamp, currentUtcTimestamp, user, UserChangeState.REQUESTED_NOW);
     }
 }

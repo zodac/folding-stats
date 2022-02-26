@@ -359,9 +359,8 @@ public interface DbManager extends Closeable {
     /**
      * Updates an existing {@link UserChange} in the system, matching on ID.
      *
-     * @param userChangeId the ID of the {@link UserChange} to be updated
-     * @param newState     the new {@link UserChangeState} to be persisted
+     * @param userChangeToUpdate the {@link UserChange} with updated values
+     * @return the updated {@link UserChange}
      */
-    // TODO: Return object after update
-    void updateUserChange(final int userChangeId, final UserChangeState newState);
+    UserChange updateUserChange(final UserChange userChangeToUpdate);
 }
