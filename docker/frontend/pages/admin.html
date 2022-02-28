@@ -12,7 +12,7 @@
     <script defer="defer" src="./res/js/bootstrap-5.0.0.bundle.min.js" type="text/javascript"></script>
 
     <!-- Own scripts -->
-    <script defer="defer" src="./res/js/system.min.js" type="text/javascript"></script>
+    <script defer="defer" src="./res/js/admin.min.js" type="text/javascript"></script>
     <script defer="defer" src="./res/js/crud.min.js" type="text/javascript"></script>
     <script defer="defer" src="./res/js/crud_field_populator.min.js" type="text/javascript"></script>
     <script defer="defer" src="./res/js/display_toggle.min.js" type="text/javascript"></script>
@@ -69,10 +69,10 @@
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdownAdminLink" role="button"
                    data-bs-toggle="dropdown" aria-expanded="false">
-                    Admin
+                    System
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                    <li><a class="dropdown-item" href="./system">System</a></li>
+                    <li><a class="dropdown-item" href="./admin">Admin</a></li>
                 </ul>
             </li>
             <li class="nav-item">
@@ -285,7 +285,7 @@
                                           class="hardware_datalist"
                                           aria-label="hardware_update_list"
                                           required>
-                                    <!-- Will be populated by system.js -->
+                                    <!-- Will be populated by admin.js -->
                                 </datalist>
                             </div>
                             <div class="col-auto" style="display:none;">
@@ -378,7 +378,7 @@
                                           class="hardware_datalist"
                                           aria-label="hardware_delete_list"
                                           required>
-                                    <!-- Will be populated by system.js -->
+                                    <!-- Will be populated by admin.js -->
                                 </datalist>
                             </div>
                             <div class="col-auto" style="display:none;">
@@ -512,7 +512,7 @@
                                           class="team_datalist"
                                           aria-label="team_update_list"
                                           required>
-                                    <!-- Will be populated by system.js -->
+                                    <!-- Will be populated by admin.js -->
                                 </datalist>
                             </div>
                             <div class="col-auto team_update" style="display:none;">
@@ -569,7 +569,7 @@
                                           class="team_datalist"
                                           aria-label="team_delete_list"
                                           required>
-                                    <!-- Will be populated by system.js -->
+                                    <!-- Will be populated by admin.js -->
                                 </datalist>
                             </div>
                             <div class="col-auto team_update" style="display:none;">
@@ -672,7 +672,7 @@
                                 <datalist id="user_create_hardware_selector"
                                           class="hardware_datalist"
                                           aria-label="user_create_hardware_selector">
-                                    <!-- Will be populated by system.js -->
+                                    <!-- Will be populated by admin.js -->
                                 </datalist>
                             </div>
                             <div class="col-auto">
@@ -685,7 +685,7 @@
                                 <datalist id="user_create_team_selector"
                                           class="team_datalist"
                                           aria-label="user_create_team_selector">
-                                    <!-- Will be populated by system.js -->
+                                    <!-- Will be populated by admin.js -->
                                 </datalist>
                             </div>
                             <div class="mb-3 form-check">
@@ -726,7 +726,7 @@
                                           class="user_datalist"
                                           aria-label="user_update_list"
                                           required>
-                                    <!-- Will be populated by system.js -->
+                                    <!-- Will be populated by admin.js -->
                                 </datalist>
                             </div>
                             <div class="col-auto user_update" style="display:none;">
@@ -784,7 +784,7 @@
                                 <datalist id="user_update_hardware_selector"
                                           class="hardware_datalist"
                                           aria-label="user_update_hardware_selector">
-                                    <!-- Will be populated by system.js -->
+                                    <!-- Will be populated by admin.js -->
                                 </datalist>
                             </div>
                             <div class="col-auto user_update" style="display:none;">
@@ -797,7 +797,7 @@
                                 <datalist id="user_update_team_selector"
                                           class="team_datalist"
                                           aria-label="user_update_team_selector">
-                                    <!-- Will be populated by system.js -->
+                                    <!-- Will be populated by admin.js -->
                                 </datalist>
                             </div>
                             <div class="mb-3 form-check user_update" style="display:none;">
@@ -838,7 +838,7 @@
                                           class="user_datalist"
                                           aria-label="user_delete_list"
                                           required>
-                                    <!-- Will be populated by system.js -->
+                                    <!-- Will be populated by admin.js -->
                                 </datalist>
                             </div>
                             <div class="col-auto user_delete" style="display:none;">
@@ -895,7 +895,7 @@
                                 <datalist id="user_delete_hardware_selector"
                                           class="hardware_datalist"
                                           aria-label="user_delete_hardware_selector">
-                                    <!-- Will be populated by system.js -->
+                                    <!-- Will be populated by admin.js -->
                                 </datalist>
                             </div>
                             <div class="col-auto user_delete" style="display:none;">
@@ -908,7 +908,7 @@
                                 <datalist id="user_delete_team_selector"
                                           class="team_datalist"
                                           aria-label="user_delete_team_selector">
-                                    <!-- Will be populated by system.js -->
+                                    <!-- Will be populated by admin.js -->
                                 </datalist>
                             </div>
                             <div class="mb-3 form-check user_delete" style="display:none;">
@@ -949,7 +949,7 @@
                                           class="user_datalist"
                                           aria-label="user_offset_list"
                                           required>
-                                    <!-- Will be populated by system.js -->
+                                    <!-- Will be populated by admin.js -->
                                 </datalist>
                             </div>
                             <div class="col-auto user_offset" style="display:none;">
@@ -991,7 +991,7 @@
                                 <datalist id="user_offset_hardware_selector"
                                           class="hardware_datalist"
                                           aria-label="user_offset_hardware_selector">
-                                    <!-- Will be populated by system.js -->
+                                    <!-- Will be populated by admin.js -->
                                 </datalist>
                             </div>
                             <div class="col-auto user_offset" style="display:none;">
@@ -1004,7 +1004,7 @@
                                 <datalist id="user_offset_team_selector"
                                           class="team_datalist"
                                           aria-label="user_offset_team_selector">
-                                    <!-- Will be populated by system.js -->
+                                    <!-- Will be populated by admin.js -->
                                 </datalist>
                             </div>
                             <div class="col-auto user_offset" style="display:none;">
