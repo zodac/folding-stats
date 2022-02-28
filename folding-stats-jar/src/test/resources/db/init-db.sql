@@ -149,15 +149,15 @@ CREATE INDEX index_monthly_results
     ON monthly_results(utc_timestamp);
 
 CREATE TABLE user_changes (
-    change_id SERIAL PRIMARY KEY,
+    user_change_id SERIAL PRIMARY KEY,
     created_utc_timestamp TIMESTAMP,
     updated_utc_timestamp TIMESTAMP,
-    json_change_request TEXT NOT NULL,
+    user_change TEXT NOT NULL,
     state TEXT NOT NULL
 );
 
 CREATE INDEX index_user_changes_id
-    ON user_changes(change_id);
+    ON user_changes(user_change_id);
 
 CREATE INDEX index_user_changes_state
     ON user_changes(state);

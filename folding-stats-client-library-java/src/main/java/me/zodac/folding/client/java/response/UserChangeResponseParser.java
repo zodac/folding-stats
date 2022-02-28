@@ -42,7 +42,7 @@ public final class UserChangeResponseParser {
     }
 
     /**
-     * Returns the {@link UserChange}s retrieved by {@link me.zodac.folding.client.java.request.UserChangeRequestSender#getAll()} or
+     * Returns the {@link UserChange}s retrieved by {@link me.zodac.folding.client.java.request.UserChangeRequestSender#getAll(String, String)} or
      * {@link me.zodac.folding.client.java.request.UserChangeRequestSender#getAll(Collection)}.
      *
      * @param response the {@link HttpResponse} to parse
@@ -55,12 +55,24 @@ public final class UserChangeResponseParser {
     }
 
     /**
-     * Returns the {@link UserChange} retrieved by {@link me.zodac.folding.client.java.request.UserChangeRequestSender#get(int)}.
+     * Returns the {@link UserChange} retrieved by {@link me.zodac.folding.client.java.request.UserChangeRequestSender#get(int, String, String)}.
      *
      * @param response the {@link HttpResponse} to parse
      * @return the retrieved {@link UserChange}
      */
     public static UserChange get(final HttpResponse<String> response) {
+        return RestUtilConstants.GSON.fromJson(response.body(), UserChange.class);
+    }
+
+    /**
+     * Returns the {@link UserChange} updated by {@link me.zodac.folding.client.java.request.UserChangeRequestSender#reject(int, String, String)},
+     * {@link me.zodac.folding.client.java.request.UserChangeRequestSender#approveImmediately(int, String, String)} or
+     * {@link me.zodac.folding.client.java.request.UserChangeRequestSender#approveNextMonth(int, String, String)}.
+     *
+     * @param response the {@link HttpResponse} to parse
+     * @return the updated {@link UserChange}
+     */
+    public static UserChange update(final HttpResponse<String> response) {
         return RestUtilConstants.GSON.fromJson(response.body(), UserChange.class);
     }
 

@@ -31,9 +31,9 @@ public class Sequences {
     public static final Sequence<Integer> TEAMS_TEAM_ID_SEQ = Internal.createSequence("teams_team_id_seq", Public.PUBLIC, SQLDataType.INTEGER.nullable(false), null, null, null, null, false, null);
 
     /**
-     * The sequence <code>public.user_changes_change_id_seq</code>
+     * The sequence <code>public.user_changes_user_change_id_seq</code>
      */
-    public static final Sequence<Integer> USER_CHANGES_CHANGE_ID_SEQ = Internal.createSequence("user_changes_change_id_seq", Public.PUBLIC, SQLDataType.INTEGER.nullable(false), null, null, null, null, false, null);
+    public static final Sequence<Integer> USER_CHANGES_USER_CHANGE_ID_SEQ = Internal.createSequence("user_changes_user_change_id_seq", Public.PUBLIC, SQLDataType.INTEGER.nullable(false), null, null, null, null, false, null);
 
     /**
      * The sequence <code>public.users_user_id_seq</code>

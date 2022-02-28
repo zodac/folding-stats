@@ -32,6 +32,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import me.zodac.folding.api.RequestPojo;
 
 /**
  * REST request to create/update a {@link me.zodac.folding.api.tc.change.UserChange}.
@@ -43,9 +44,10 @@ import lombok.ToString;
 @Setter
 @EqualsAndHashCode
 @ToString(doNotUseGetters = true)
-public class UserChangeRequest {
+public class UserChangeRequest implements RequestPojo {
 
     private int userId;
+    private String existingPasskey;
     private String foldingUserName;
     private String passkey;
     private String liveStatsLink;

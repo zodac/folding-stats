@@ -63,14 +63,17 @@ public record UserChangeRequestSender(String requestUrl) {
     /**
      * Send a <b>GET</b> request to retrieve all {@link UserChange}s in the system.
      *
+     * @param userName the username
+     * @param password the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
-    public HttpResponse<String> getAll() throws FoldingRestException {
+    public HttpResponse<String> getAll(final String userName, final String password) throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(requestUrl))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
             .build();
 
         try {
@@ -116,14 +119,17 @@ public record UserChangeRequestSender(String requestUrl) {
      * Send a <b>GET</b> request to retrieve a {@link UserChange} with the provided {@code userChangeId} in the system.
      *
      * @param userChangeId the ID of the {@link UserChange} to be retrieved
+     * @param userName     the username
+     * @param password     the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
-    public HttpResponse<String> get(final int userChangeId) throws FoldingRestException {
+    public HttpResponse<String> get(final int userChangeId, final String userName, final String password) throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(requestUrl + '/' + userChangeId))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
             .build();
 
         try {

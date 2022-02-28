@@ -79,6 +79,26 @@ public class UserChange implements ResponsePojo {
     }
 
     /**
+     * Creates a {@link UserChange}, using the {@link DateTimeUtils#currentUtcLocalDateTime()}.
+     *
+     * <p>
+     * Since the DB auto-generates the ID, this function should be used when creating a {@link UserChange} from the DB response.
+     *
+     * <p>
+     * <b>NOTE:</b> The {@link LocalDateTime}s provided will have their nanoseconds stripped, due to precision errors that can occur after retrieving
+     * a persisted value from the DB.
+     *
+     * @param user  the {@link User} with changes to be applied
+     * @param state the {@link UserChangeState}
+     * @return the created {@link UserChange}
+     */
+    public static UserChange createNow(final User user,
+                                       final UserChangeState state) {
+        final LocalDateTime currentUtcTime = DateTimeUtils.currentUtcLocalDateTime();
+        return create(EMPTY_USER_CHANGE_ID, currentUtcTime, currentUtcTime, user, state);
+    }
+
+    /**
      * Creates a {@link UserChange}.
      *
      * <p>
@@ -117,6 +137,26 @@ public class UserChange implements ResponsePojo {
             userChange.createdUtcTimestamp,
             userChange.updatedUtcTimestamp,
             userChange.user,
+            userChange.state
+        );
+    }
+
+    /**
+     * Hides the {@code passkey} for the given {@link UserChange}'s {@link User}.
+     *
+     * <p>
+     * Since we do not want {@link User}s' passkeys to be made available through the REST API, we hide most of the passkey, though we leave the first
+     * eight (8) digits visible.
+     *
+     * @param userChange the {@link UserChange} whose {@link User} passkey is to be hidden
+     * @return the updated {@link User}
+     */
+    public static UserChange hidePasskey(final UserChange userChange) {
+        return create(
+            userChange.id,
+            userChange.createdUtcTimestamp,
+            userChange.updatedUtcTimestamp,
+            User.hidePasskey(userChange.user),
             userChange.state
         );
     }

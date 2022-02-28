@@ -29,21 +29,24 @@ import static me.zodac.folding.rest.response.Responses.ok;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
-import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.stream.Collectors;
 import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import me.zodac.folding.api.state.ReadRequired;
 import me.zodac.folding.api.state.WriteRequired;
-import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.change.UserChange;
 import me.zodac.folding.api.tc.change.UserChangeState;
-import me.zodac.folding.api.util.DateTimeUtils;
+import me.zodac.folding.api.tc.validation.UserChangeValidator;
+import me.zodac.folding.api.tc.validation.ValidationResult;
 import me.zodac.folding.bean.FoldingRepository;
 import me.zodac.folding.bean.tc.user.UserChangeApplier;
 import me.zodac.folding.rest.api.tc.request.UserChangeRequest;
+import me.zodac.folding.rest.exception.InvalidStateException;
 import me.zodac.folding.rest.util.IntegerParser;
+import me.zodac.folding.rest.util.ValidationFailureResponseMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,31 +116,19 @@ public class UserChangeEndpoint {
                                     final HttpServletRequest request) {
         LOGGER.info("POST request for user change received at '{}'", request::getRequestURI);
 
-        final User existingUser = foldingRepository.getUserWithPasskey(userChangeRequest.getUserId());
-
-        // TODO: Already existing check needed
-        // TODO: Validation needed
-
-        final User changedUser = User.create(
-            existingUser.getId(),
-            userChangeRequest.getFoldingUserName(),
-            existingUser.getDisplayName(),
-            userChangeRequest.getPasskey(),
-            existingUser.getCategory(),
-            existingUser.getProfileLink(),
-            userChangeRequest.getLiveStatsLink(),
-            foldingRepository.getHardware(userChangeRequest.getHardwareId()),
-            existingUser.getTeam(),
-            existingUser.isUserIsCaptain()
+        final UserChangeValidator userChangeValidator = UserChangeValidator.create();
+        final ValidationResult<UserChange> validationResult = userChangeValidator.validate(
+            userChangeRequest,
+            foldingRepository.getAllUserChangesWithPasskeys(UserChangeState.getOpenStates()),
+            foldingRepository.getAllHardware(),
+            foldingRepository.getAllUsersWithPasskeys()
         );
+        if (validationResult.isFailure()) {
+            return ValidationFailureResponseMapper.map(validationResult);
+        }
 
-        final UserChangeState state = userChangeRequest.isImmediate() ? UserChangeState.REQUESTED_NOW : UserChangeState.REQUESTED_NEXT_MONTH;
-
-        LOGGER.info("User to update: {}", changedUser);
-        LOGGER.info("State: {}", state);
-        final LocalDateTime currentUtcTimestamp = DateTimeUtils.currentUtcLocalDateTime();
-        final UserChange userChange = UserChange.createWithoutId(currentUtcTimestamp, currentUtcTimestamp, changedUser, state);
-        final UserChange createdUserChange = foldingRepository.createUserChange(userChange);
+        final UserChange validatedUserChange = validationResult.output();
+        final UserChange createdUserChange = foldingRepository.createUserChange(validatedUserChange);
 
         userChangeCreates.increment();
         return created(createdUserChange, createdUserChange.getId());
@@ -149,12 +140,12 @@ public class UserChangeEndpoint {
      * @param request the {@link HttpServletRequest}
      * @return {@link me.zodac.folding.rest.response.Responses#ok(Collection)} containing the {@link UserChange}s
      */
+    @RolesAllowed("admin")
     @ReadRequired
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getAll(final HttpServletRequest request) {
         LOGGER.info("GET request for all user changes received at '{}'", request::getRequestURI);
-
-        final Collection<UserChange> userChanges = foldingRepository.getAllUserChanges();
+        final Collection<UserChange> userChanges = foldingRepository.getAllUserChangesWithPasskeys();
         return ok(userChanges);
     }
 
@@ -170,22 +161,16 @@ public class UserChangeEndpoint {
     public ResponseEntity<?> getAllByState(@RequestParam("state") final String state, final HttpServletRequest request) {
         LOGGER.info("GET request for all user changes with state received at '{}'", request::getRequestURI);
 
-        final Collection<UserChangeState> states = new HashSet<>();
+        final Collection<UserChangeState> states = Arrays.stream(state.split(","))
+            .map(UserChangeState::get)
+            .filter(userChangeState -> userChangeState != UserChangeState.INVALID)
+            .collect(Collectors.toSet());
 
-        // TODO: Validate properly
-        if (state.contains(",")) {
-            final String[] rawStates = state.split(",");
-            for (final String rawState : rawStates) {
-                states.add(UserChangeState.get(rawState));
-            }
-            states.remove(UserChangeState.INVALID);
-        } else {
-            states.add(UserChangeState.get(state));
+        if (states.isEmpty()) {
+            return ok();
         }
 
-        final Collection<UserChange> userChanges = foldingRepository.getAllUserChanges(states);
-
-        // TODO: Hide passkeys
+        final Collection<UserChange> userChanges = foldingRepository.getAllUserChangesWithoutPasskeys(states);
         return ok(userChanges);
     }
 
@@ -196,6 +181,7 @@ public class UserChangeEndpoint {
      * @param request      the {@link HttpServletRequest}
      * @return {@link me.zodac.folding.rest.response.Responses#ok(Object)} containing the {@link UserChange}
      */
+    @RolesAllowed("admin")
     @ReadRequired
     @GetMapping(path = "/{userChangeId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getById(@PathVariable("userChangeId") final String userChangeId, final HttpServletRequest request) {
@@ -217,6 +203,7 @@ public class UserChangeEndpoint {
      * @return {@link me.zodac.folding.rest.response.Responses#ok(Object, int)} containing the updated {@link UserChange}
      * @see UserChangeApplier#apply(UserChange)
      */
+    @RolesAllowed("admin")
     @WriteRequired
     @PutMapping(path = "/{userChangeId}/approve/immediate", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> approveImmediately(@PathVariable("userChangeId") final String userChangeId,
@@ -233,6 +220,7 @@ public class UserChangeEndpoint {
      * @param request      the {@link HttpServletRequest}
      * @return {@link me.zodac.folding.rest.response.Responses#ok(Object, int)} containing the updated {@link UserChange}
      */
+    @RolesAllowed("admin")
     @WriteRequired
     @PutMapping(path = "/{userChangeId}/approve/next", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> approveNextMonth(@PathVariable("userChangeId") final String userChangeId,
@@ -249,6 +237,7 @@ public class UserChangeEndpoint {
      * @param request      the {@link HttpServletRequest}
      * @return {@link me.zodac.folding.rest.response.Responses#ok(Object, int)} containing the updated {@link UserChange}
      */
+    @RolesAllowed("admin")
     @WriteRequired
     @PutMapping(path = "/{userChangeId}/reject", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> reject(@PathVariable("userChangeId") final String userChangeId, final HttpServletRequest request) {
@@ -259,20 +248,24 @@ public class UserChangeEndpoint {
 
     private ResponseEntity<?> update(final String userChangeId, final UserChangeState newState) {
         LOGGER.info("Updating UserChange ID {} to state {}", userChangeId, newState);
-        final int id = IntegerParser.parsePositive(userChangeId);
+        final int parsedId = IntegerParser.parsePositive(userChangeId);
 
-        // TODO: Check if one exists with ID first, then verify it is in a changeable state
-        final UserChange existingUserChange = foldingRepository.getUserChange(id);
+        final UserChange existingUserChange = foldingRepository.getUserChange(parsedId);
+        if (existingUserChange.getState().isFinalState()) {
+            throw new InvalidStateException(existingUserChange.getState(), newState);
+        }
+
         final UserChange userChangeToUpdate = UserChange.updateWithState(newState, existingUserChange);
         final UserChange updatedUserChange = foldingRepository.updateUserChange(userChangeToUpdate);
 
         if (newState == UserChangeState.APPROVED_NOW) {
             LOGGER.info("Requested for now, applying change");
-            final UserChange cr = foldingRepository.getUserChange(id);
-            userChangeApplier.apply(cr);
+            final UserChange appliedUserChange = userChangeApplier.apply(updatedUserChange);
+            final UserChange maskedUserChange = UserChange.hidePasskey(appliedUserChange);
+            return ok(maskedUserChange, maskedUserChange.getId());
         }
 
-        // TODO: Mask passkey
-        return ok(updatedUserChange, updatedUserChange.getId());
+        final UserChange maskedUserChange = UserChange.hidePasskey(updatedUserChange);
+        return ok(maskedUserChange, maskedUserChange.getId());
     }
 }

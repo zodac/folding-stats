@@ -52,9 +52,9 @@ public class UserChanges extends TableImpl<UserChangesRecord> {
     }
 
     /**
-     * The column <code>public.user_changes.change_id</code>.
+     * The column <code>public.user_changes.user_change_id</code>.
      */
-    public final TableField<UserChangesRecord, Integer> CHANGE_ID = createField(DSL.name("change_id"), SQLDataType.INTEGER.nullable(false).identity(true), this, "");
+    public final TableField<UserChangesRecord, Integer> USER_CHANGE_ID = createField(DSL.name("user_change_id"), SQLDataType.INTEGER.nullable(false).identity(true), this, "");
 
     /**
      * The column <code>public.user_changes.created_utc_timestamp</code>.
@@ -67,9 +67,9 @@ public class UserChanges extends TableImpl<UserChangesRecord> {
     public final TableField<UserChangesRecord, LocalDateTime> UPDATED_UTC_TIMESTAMP = createField(DSL.name("updated_utc_timestamp"), SQLDataType.LOCALDATETIME(6), this, "");
 
     /**
-     * The column <code>public.user_changes.json_change_request</code>.
+     * The column <code>public.user_changes.user_change</code>.
      */
-    public final TableField<UserChangesRecord, String> JSON_CHANGE_REQUEST = createField(DSL.name("json_change_request"), SQLDataType.CLOB.nullable(false), this, "");
+    public final TableField<UserChangesRecord, String> USER_CHANGE = createField(DSL.name("user_change"), SQLDataType.CLOB.nullable(false), this, "");
 
     /**
      * The column <code>public.user_changes.state</code>.

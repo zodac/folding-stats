@@ -72,10 +72,11 @@ public class UserChangeApplier {
      * {@link UserChange}. Finally, we update the {@link UserChange} to {@link UserChangeState#COMPLETED}.
      *
      * @param userChange the {@link UserChange} to apply
+     * @return the applied {@link UserChange}
      * @see FoldingRepository#getUserWithPasskey(int)
      * @see FoldingRepository#updateUser(User, User)
      */
-    public void apply(final UserChange userChange) {
+    public UserChange apply(final UserChange userChange) {
         LOGGER.info("Applying for UserChange: {}", userChange);
         final User existingUser = foldingRepository.getUserWithPasskey(userChange.getUser().getId());
         LOGGER.info("Found existing user: {}", existingUser);
@@ -83,7 +84,7 @@ public class UserChangeApplier {
         LOGGER.info("Updated user");
 
         final UserChange userChangeToUpdate = UserChange.updateWithState(UserChangeState.COMPLETED, userChange);
-        foldingRepository.updateUserChange(userChangeToUpdate);
-        LOGGER.info("Updated UserChange to complete");
+        LOGGER.info("Updating UserChange to complete");
+        return foldingRepository.updateUserChange(userChangeToUpdate);
     }
 }

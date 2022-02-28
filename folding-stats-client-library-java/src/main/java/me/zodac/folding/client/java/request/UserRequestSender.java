@@ -42,6 +42,7 @@ import me.zodac.folding.rest.util.RestUtilConstants;
  *
  * @param usersUrl the URL to the {@link me.zodac.folding.api.tc.User} REST endpoint
  */
+// TODO: Remove methods that don't use authorization when auth is needed
 public record UserRequestSender(String usersUrl) {
 
     /**

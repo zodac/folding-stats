@@ -36,53 +36,46 @@ public enum UserChangeState {
     /**
      * A {@link UserChange} has been requested, to be applied immediately.
      */
-    REQUESTED_NOW,
+    REQUESTED_NOW(true),
 
     /**
      * A {@link UserChange} has been requested, to be applied next month.
      */
-    REQUESTED_NEXT_MONTH,
+    REQUESTED_NEXT_MONTH(true),
 
     /**
      * A {@link UserChange} has been approved, to be applied immediately.
      */
-    APPROVED_NOW,
+    APPROVED_NOW(true),
 
     /**
      * A {@link UserChange} has been approved, to be applied next month.
      */
-    APPROVED_NEXT_MONTH,
+    APPROVED_NEXT_MONTH(true),
 
     /**
      * A {@link UserChange} has been rejected.
      */
-    REJECTED,
+    REJECTED(false),
 
     /**
      * {@link UserChange} has been applied to the system.
      */
-    COMPLETED,
+    COMPLETED(false),
 
     /**
      * Not a valid {@link UserChangeState}.
      */
-    INVALID;
+    INVALID(false);
 
     private static final Collection<UserChangeState> ALL_VALUES = Stream.of(values())
         .filter(value -> value != INVALID)
         .toList();
 
-    /**
-     * Retrieve all available {@link UserChangeState}s (excluding {@link UserChangeState#INVALID}).
-     *
-     * <p>
-     * Should be used instead of {@link UserChangeState#values()}, as that recalculates the array for each call,
-     * while this method uses a static {@link Collection}.
-     *
-     * @return a {@link Collection} of all {@link UserChangeState}s
-     */
-    public static Collection<UserChangeState> getAllValues() {
-        return ALL_VALUES;
+    private final boolean canBeUpdated;
+
+    UserChangeState(final boolean canBeUpdated) {
+        this.canBeUpdated = canBeUpdated;
     }
 
     /**
@@ -99,4 +92,24 @@ public enum UserChangeState {
             .orElse(UserChangeState.INVALID);
     }
 
+    /**
+     * Retrieve all available {@link UserChangeState}s not in {@link #isFinalState()}.
+     *
+     * @return a {@link Collection} of all {@link UserChangeState}s
+     */
+    public static Collection<UserChangeState> getOpenStates() {
+        return ALL_VALUES
+            .stream()
+            .filter(changeRequestState -> !changeRequestState.isFinalState())
+            .toList();
+    }
+
+    /**
+     * Returns whether the {@link UserChangeState} is a final {@link UserChangeState} and cannot be updated.
+     *
+     * @return <code>true</code> if the {@link UserChangeState} is not permitted to be updated to another value
+     */
+    public boolean isFinalState() {
+        return !canBeUpdated;
+    }
 }

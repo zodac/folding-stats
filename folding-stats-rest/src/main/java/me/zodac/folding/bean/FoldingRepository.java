@@ -549,22 +549,35 @@ public class FoldingRepository {
     }
 
     /**
-     * Retrieves all {@link UserChange}s.
+     * Retrieves all {@link UserChange}s, with {@link User} passkeys unmodified.
      *
      * @return a {@link Collection} of the retrieved {@link UserChange}
      */
-    public Collection<UserChange> getAllUserChanges() {
+    public Collection<UserChange> getAllUserChangesWithPasskeys() {
         return storage.getAllUserChanges();
     }
 
     /**
-     * Retrieves all {@link UserChange}s with any of the given {@link UserChangeState}s.
+     * Retrieves all {@link UserChange}s with any of the given {@link UserChangeState}s, with {@link User} passkeys unmodified.
      *
      * @param states the {@link UserChangeState}s to look for
      * @return a {@link Collection} of the retrieved {@link UserChange}
      */
-    public Collection<UserChange> getAllUserChanges(final Collection<UserChangeState> states) {
+    public Collection<UserChange> getAllUserChangesWithPasskeys(final Collection<UserChangeState> states) {
         return storage.getAllUserChanges(states);
+    }
+
+    /**
+     * Retrieves all {@link UserChange}s with any of the given {@link UserChangeState}s, with {@link User} passkeys masked.
+     *
+     * @param states the {@link UserChangeState}s to look for
+     * @return a {@link Collection} of the retrieved {@link UserChange}
+     */
+    public Collection<UserChange> getAllUserChangesWithoutPasskeys(final Collection<UserChangeState> states) {
+        return getAllUserChangesWithPasskeys(states)
+            .stream()
+            .map(UserChange::hidePasskey)
+            .toList();
     }
 
     /**

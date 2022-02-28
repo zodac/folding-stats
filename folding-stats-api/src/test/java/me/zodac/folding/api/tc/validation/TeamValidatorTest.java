@@ -44,7 +44,7 @@ class TeamValidatorTest {
         final TeamRequest team = TeamRequest.builder()
             .teamName("teamName")
             .teamDescription("teamDescription")
-            .forumLink("http://www.google.com")
+            .forumLink("https://www.google.com")
             .build();
 
         final ValidationResult<Team> response = TeamValidator.validateCreate(team, Collections.emptyList());
@@ -70,7 +70,7 @@ class TeamValidatorTest {
         final TeamRequest team = TeamRequest.builder()
             .teamName(null)
             .teamDescription("teamDescription")
-            .forumLink("http://www.google.com")
+            .forumLink("https://www.google.com")
             .build();
 
         final ValidationResult<Team> response = TeamValidator.validateCreate(team, Collections.emptyList());
@@ -87,14 +87,14 @@ class TeamValidatorTest {
         final Collection<Team> allTeams = List.of(Team.builder()
             .teamName("anotherName")
             .teamDescription("teamDescription")
-            .forumLink("http://www.google.com")
+            .forumLink("https://www.google.com")
             .build()
         );
 
         final TeamRequest team = TeamRequest.builder()
             .teamName("existingName")
             .teamDescription("teamDescription")
-            .forumLink("http://www.google.com")
+            .forumLink("https://www.google.com")
             .build();
 
         final ValidationResult<Team> response = TeamValidator.validateCreate(team, allTeams);
@@ -109,14 +109,14 @@ class TeamValidatorTest {
         final Collection<Team> allTeams = List.of(Team.builder()
             .teamName("existingName")
             .teamDescription("teamDescription")
-            .forumLink("http://www.google.com")
+            .forumLink("https://www.google.com")
             .build()
         );
 
         final TeamRequest team = TeamRequest.builder()
             .teamName("existingName")
             .teamDescription("teamDescription")
-            .forumLink("http://www.google.com")
+            .forumLink("https://www.google.com")
             .build();
 
         final ValidationResult<Team> response = TeamValidator.validateCreate(team, allTeams);
@@ -133,7 +133,7 @@ class TeamValidatorTest {
         final TeamRequest team = TeamRequest.builder()
             .teamName("teamName")
             .teamDescription(null)
-            .forumLink("http://www.google.com")
+            .forumLink("https://www.google.com")
             .build();
 
         final ValidationResult<Team> response = TeamValidator.validateCreate(team, Collections.emptyList());
@@ -180,13 +180,13 @@ class TeamValidatorTest {
         final TeamRequest team = TeamRequest.builder()
             .teamName("teamName")
             .teamDescription("teamDescription")
-            .forumLink("http://www.google.com")
+            .forumLink("https://www.google.com")
             .build();
 
         final Team existingTeam = Team.builder()
             .teamName("teamName")
             .teamDescription("teamDescription2")
-            .forumLink("http://www.google.com")
+            .forumLink("https://www.google.com")
             .build();
 
         final ValidationResult<Team> response = TeamValidator.validateUpdate(team, existingTeam, Collections.emptyList());
@@ -201,7 +201,7 @@ class TeamValidatorTest {
         final Team existingTeam = Team.builder()
             .teamName("teamName")
             .teamDescription("teamDescription2")
-            .forumLink("http://www.google.com")
+            .forumLink("https://www.google.com")
             .build();
 
         final ValidationResult<Team> response = TeamValidator.validateUpdate(null, existingTeam, Collections.emptyList());
@@ -218,7 +218,7 @@ class TeamValidatorTest {
         final TeamRequest team = TeamRequest.builder()
             .teamName("teamName")
             .teamDescription("teamDescription")
-            .forumLink("http://www.google.com")
+            .forumLink("https://www.google.com")
             .build();
 
         final ValidationResult<Team> response = TeamValidator.validateUpdate(team, null, Collections.emptyList());
@@ -235,13 +235,13 @@ class TeamValidatorTest {
         final TeamRequest team = TeamRequest.builder()
             .teamName(null)
             .teamDescription("teamDescription")
-            .forumLink("http://www.google.com")
+            .forumLink("https://www.google.com")
             .build();
 
         final Team existingTeam = Team.builder()
             .teamName("teamName")
             .teamDescription("teamDescription")
-            .forumLink("http://www.google.com")
+            .forumLink("https://www.google.com")
             .build();
 
         final ValidationResult<Team> response = TeamValidator.validateUpdate(team, existingTeam, Collections.emptyList());
@@ -258,21 +258,21 @@ class TeamValidatorTest {
         final TeamRequest team = TeamRequest.builder()
             .teamName("teamName")
             .teamDescription("teamDescription")
-            .forumLink("http://www.google.com")
+            .forumLink("https://www.google.com")
             .build();
 
         final Team existingTeam = Team.builder()
             .id(1)
             .teamName("differentName")
             .teamDescription("teamDescription")
-            .forumLink("http://www.google.com")
+            .forumLink("https://www.google.com")
             .build();
 
         final Collection<Team> allTeams = List.of(Team.builder()
             .id(20)
             .teamName("teamName")
             .teamDescription("teamDescription")
-            .forumLink("http://www.google.com")
+            .forumLink("https://www.google.com")
             .build()
         );
 
@@ -290,21 +290,21 @@ class TeamValidatorTest {
         final TeamRequest team = TeamRequest.builder()
             .teamName("teamName")
             .teamDescription("teamDescription")
-            .forumLink("http://www.google.com")
+            .forumLink("https://www.google.com")
             .build();
 
         final Team existingTeam = Team.builder()
             .id(1)
             .teamName("teamName")
             .teamDescription("teamDescription")
-            .forumLink("http://www.google.com")
+            .forumLink("https://www.google.com")
             .build();
 
         final Collection<Team> allTeams = List.of(Team.builder()
             .id(1)
             .teamName("teamName")
             .teamDescription("teamDescription")
-            .forumLink("http://www.google.com")
+            .forumLink("https://www.google.com")
             .build()
         );
 
@@ -326,7 +326,7 @@ class TeamValidatorTest {
         final Team existingTeam = Team.builder()
             .teamName("teamName")
             .teamDescription("teamDescription")
-            .forumLink("http://www.google.com")
+            .forumLink("https://www.google.com")
             .build();
 
         final ValidationResult<Team> response = TeamValidator.validateUpdate(team, existingTeam, Collections.emptyList());
@@ -341,13 +341,13 @@ class TeamValidatorTest {
         final TeamRequest team = TeamRequest.builder()
             .teamName("teamName")
             .teamDescription(null)
-            .forumLink("http://www.google.com")
+            .forumLink("https://www.google.com")
             .build();
 
         final Team existingTeam = Team.builder()
             .teamName("teamName")
             .teamDescription("teamDescription")
-            .forumLink("http://www.google.com")
+            .forumLink("https://www.google.com")
             .build();
 
         final ValidationResult<Team> response = TeamValidator.validateUpdate(team, existingTeam, Collections.emptyList());
@@ -368,7 +368,7 @@ class TeamValidatorTest {
         final Team existingTeam = Team.builder()
             .teamName("teamName")
             .teamDescription("teamDescription")
-            .forumLink("http://www.google.com")
+            .forumLink("https://www.google.com")
             .build();
 
         final ValidationResult<Team> response = TeamValidator.validateUpdate(team, existingTeam, Collections.emptyList());
@@ -385,7 +385,7 @@ class TeamValidatorTest {
         final Team existingTeam = Team.builder()
             .teamName("teamName")
             .teamDescription("teamDescription")
-            .forumLink("http://www.google.com")
+            .forumLink("https://www.google.com")
             .build();
 
         final ValidationResult<Team> response = TeamValidator.validateDelete(existingTeam, Collections.emptyList());
@@ -401,7 +401,7 @@ class TeamValidatorTest {
             .id(1)
             .teamName("teamName")
             .teamDescription("teamDescription")
-            .forumLink("http://www.google.com")
+            .forumLink("https://www.google.com")
             .build();
 
         final Collection<User> allUsers = List.of(User.builder()
@@ -429,14 +429,14 @@ class TeamValidatorTest {
             .id(1)
             .teamName("teamName")
             .teamDescription("teamDescription")
-            .forumLink("http://www.google.com")
+            .forumLink("https://www.google.com")
             .build();
 
         final Team userTeam = Team.builder()
             .id(2)
             .teamName("teamName2")
             .teamDescription("teamDescription")
-            .forumLink("http://www.google.com")
+            .forumLink("https://www.google.com")
             .build();
 
         final Collection<User> allUsers = List.of(User.builder()

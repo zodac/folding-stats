@@ -24,16 +24,16 @@ public class UserChangesRecord extends UpdatableRecordImpl<UserChangesRecord> im
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>public.user_changes.change_id</code>.
+     * Setter for <code>public.user_changes.user_change_id</code>.
      */
-    public void setChangeId(Integer value) {
+    public void setUserChangeId(Integer value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>public.user_changes.change_id</code>.
+     * Getter for <code>public.user_changes.user_change_id</code>.
      */
-    public Integer getChangeId() {
+    public Integer getUserChangeId() {
         return (Integer) get(0);
     }
 
@@ -66,16 +66,16 @@ public class UserChangesRecord extends UpdatableRecordImpl<UserChangesRecord> im
     }
 
     /**
-     * Setter for <code>public.user_changes.json_change_request</code>.
+     * Setter for <code>public.user_changes.user_change</code>.
      */
-    public void setJsonChangeRequest(String value) {
+    public void setUserChange(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>public.user_changes.json_change_request</code>.
+     * Getter for <code>public.user_changes.user_change</code>.
      */
-    public String getJsonChangeRequest() {
+    public String getUserChange() {
         return (String) get(3);
     }
 
@@ -118,7 +118,7 @@ public class UserChangesRecord extends UpdatableRecordImpl<UserChangesRecord> im
 
     @Override
     public Field<Integer> field1() {
-        return UserChanges.USER_CHANGES.CHANGE_ID;
+        return UserChanges.USER_CHANGES.USER_CHANGE_ID;
     }
 
     @Override
@@ -133,7 +133,7 @@ public class UserChangesRecord extends UpdatableRecordImpl<UserChangesRecord> im
 
     @Override
     public Field<String> field4() {
-        return UserChanges.USER_CHANGES.JSON_CHANGE_REQUEST;
+        return UserChanges.USER_CHANGES.USER_CHANGE;
     }
 
     @Override
@@ -143,7 +143,7 @@ public class UserChangesRecord extends UpdatableRecordImpl<UserChangesRecord> im
 
     @Override
     public Integer component1() {
-        return getChangeId();
+        return getUserChangeId();
     }
 
     @Override
@@ -158,7 +158,7 @@ public class UserChangesRecord extends UpdatableRecordImpl<UserChangesRecord> im
 
     @Override
     public String component4() {
-        return getJsonChangeRequest();
+        return getUserChange();
     }
 
     @Override
@@ -168,7 +168,7 @@ public class UserChangesRecord extends UpdatableRecordImpl<UserChangesRecord> im
 
     @Override
     public Integer value1() {
-        return getChangeId();
+        return getUserChangeId();
     }
 
     @Override
@@ -183,7 +183,7 @@ public class UserChangesRecord extends UpdatableRecordImpl<UserChangesRecord> im
 
     @Override
     public String value4() {
-        return getJsonChangeRequest();
+        return getUserChange();
     }
 
     @Override
@@ -193,7 +193,7 @@ public class UserChangesRecord extends UpdatableRecordImpl<UserChangesRecord> im
 
     @Override
     public UserChangesRecord value1(Integer value) {
-        setChangeId(value);
+        setUserChangeId(value);
         return this;
     }
 
@@ -211,7 +211,7 @@ public class UserChangesRecord extends UpdatableRecordImpl<UserChangesRecord> im
 
     @Override
     public UserChangesRecord value4(String value) {
-        setJsonChangeRequest(value);
+        setUserChange(value);
         return this;
     }
 
@@ -245,13 +245,13 @@ public class UserChangesRecord extends UpdatableRecordImpl<UserChangesRecord> im
     /**
      * Create a detached, initialised UserChangesRecord
      */
-    public UserChangesRecord(Integer changeId, LocalDateTime createdUtcTimestamp, LocalDateTime updatedUtcTimestamp, String jsonChangeRequest, String state) {
+    public UserChangesRecord(Integer userChangeId, LocalDateTime createdUtcTimestamp, LocalDateTime updatedUtcTimestamp, String userChange, String state) {
         super(UserChanges.USER_CHANGES);
 
-        setChangeId(changeId);
+        setUserChangeId(userChangeId);
         setCreatedUtcTimestamp(createdUtcTimestamp);
         setUpdatedUtcTimestamp(updatedUtcTimestamp);
-        setJsonChangeRequest(jsonChangeRequest);
+        setUserChange(userChange);
         setState(state);
     }
 }

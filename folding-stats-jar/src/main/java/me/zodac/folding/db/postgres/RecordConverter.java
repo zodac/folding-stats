@@ -272,10 +272,10 @@ final class RecordConverter {
      */
     static UserChange toUserChange(final UserChangesRecord userChangesRecord) {
         return UserChange.create(
-            userChangesRecord.getChangeId(),
+            userChangesRecord.getUserChangeId(),
             userChangesRecord.getCreatedUtcTimestamp(),
             userChangesRecord.getUpdatedUtcTimestamp(),
-            GSON.fromJson(userChangesRecord.getJsonChangeRequest(), User.class),
+            GSON.fromJson(userChangesRecord.getUserChange(), User.class),
             UserChangeState.get(userChangesRecord.getState())
         );
     }

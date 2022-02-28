@@ -26,12 +26,12 @@ package me.zodac.folding.db.postgres;
 
 import static me.zodac.folding.db.postgres.RecordConverter.GSON;
 import static me.zodac.folding.db.postgres.gen.Routines.crypt;
-import static me.zodac.folding.db.postgres.gen.Tables.USER_CHANGES;
 import static me.zodac.folding.db.postgres.gen.tables.Hardware.HARDWARE;
 import static me.zodac.folding.db.postgres.gen.tables.MonthlyResults.MONTHLY_RESULTS;
 import static me.zodac.folding.db.postgres.gen.tables.RetiredUserStats.RETIRED_USER_STATS;
 import static me.zodac.folding.db.postgres.gen.tables.SystemUsers.SYSTEM_USERS;
 import static me.zodac.folding.db.postgres.gen.tables.Teams.TEAMS;
+import static me.zodac.folding.db.postgres.gen.tables.UserChanges.USER_CHANGES;
 import static me.zodac.folding.db.postgres.gen.tables.UserInitialStats.USER_INITIAL_STATS;
 import static me.zodac.folding.db.postgres.gen.tables.UserOffsetTcStats.USER_OFFSET_TC_STATS;
 import static me.zodac.folding.db.postgres.gen.tables.UserTcStatsHourly.USER_TC_STATS_HOURLY;
@@ -1112,7 +1112,7 @@ public final class PostgresDbManager implements DbManager {
                 .columns(
                     USER_CHANGES.CREATED_UTC_TIMESTAMP,
                     USER_CHANGES.UPDATED_UTC_TIMESTAMP,
-                    USER_CHANGES.JSON_CHANGE_REQUEST,
+                    USER_CHANGES.USER_CHANGE,
                     USER_CHANGES.STATE
                 )
                 .values(
@@ -1121,13 +1121,13 @@ public final class PostgresDbManager implements DbManager {
                     GSON.toJson(userChange.getUser()),
                     userChange.getState().toString()
                 )
-                .returning(USER_CHANGES.CHANGE_ID);
+                .returning(USER_CHANGES.USER_CHANGE_ID);
             LOGGER.debug("Executing SQL: '{}'", query);
 
             final int userChangeId = query
                 .fetch()
                 .get(0)
-                .getChangeId();
+                .getUserChangeId();
             return UserChange.updateWithId(userChangeId, userChange);
         });
     }
@@ -1138,7 +1138,7 @@ public final class PostgresDbManager implements DbManager {
             final var query = queryContext
                 .select()
                 .from(USER_CHANGES)
-                .orderBy(USER_CHANGES.CHANGE_ID.asc());
+                .orderBy(USER_CHANGES.USER_CHANGE_ID.asc());
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
@@ -1157,7 +1157,7 @@ public final class PostgresDbManager implements DbManager {
                 .select()
                 .from(USER_CHANGES)
                 .where(USER_CHANGES.STATE.in(states))
-                .orderBy(USER_CHANGES.CHANGE_ID.asc());
+                .orderBy(USER_CHANGES.USER_CHANGE_ID.asc());
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
@@ -1175,7 +1175,7 @@ public final class PostgresDbManager implements DbManager {
             final var query = queryContext
                 .select()
                 .from(USER_CHANGES)
-                .where(USER_CHANGES.CHANGE_ID.equal(userChangeId)); // TODO: Map to strings versions?
+                .where(USER_CHANGES.USER_CHANGE_ID.equal(userChangeId));
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
@@ -1194,9 +1194,9 @@ public final class PostgresDbManager implements DbManager {
                 .update(USER_CHANGES)
                 .set(USER_CHANGES.CREATED_UTC_TIMESTAMP, userChangeToUpdate.getCreatedUtcTimestamp())
                 .set(USER_CHANGES.UPDATED_UTC_TIMESTAMP, userChangeToUpdate.getUpdatedUtcTimestamp())
-                .set(USER_CHANGES.JSON_CHANGE_REQUEST, GSON.toJson(userChangeToUpdate.getUser()))
+                .set(USER_CHANGES.USER_CHANGE, GSON.toJson(userChangeToUpdate.getUser()))
                 .set(USER_CHANGES.STATE, userChangeToUpdate.getState().toString())
-                .where(USER_CHANGES.CHANGE_ID.equal(userChangeToUpdate.getId()));
+                .where(USER_CHANGES.USER_CHANGE_ID.equal(userChangeToUpdate.getId()));
             LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();

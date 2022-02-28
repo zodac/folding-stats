@@ -35,7 +35,7 @@ public class Indexes {
     public static final Index INDEX_MONTHLY_RESULTS = Internal.createIndex(DSL.name("index_monthly_results"), MonthlyResults.MONTHLY_RESULTS, new OrderField[] { MonthlyResults.MONTHLY_RESULTS.UTC_TIMESTAMP }, false);
     public static final Index INDEX_RETIRED_USER_STATS = Internal.createIndex(DSL.name("index_retired_user_stats"), RetiredUserStats.RETIRED_USER_STATS, new OrderField[] { RetiredUserStats.RETIRED_USER_STATS.RETIRED_USER_ID, RetiredUserStats.RETIRED_USER_STATS.UTC_TIMESTAMP }, false);
     public static final Index INDEX_TEAM_ID = Internal.createIndex(DSL.name("index_team_id"), Teams.TEAMS, new OrderField[] { Teams.TEAMS.TEAM_ID }, false);
-    public static final Index INDEX_USER_CHANGES_ID = Internal.createIndex(DSL.name("index_user_changes_id"), UserChanges.USER_CHANGES, new OrderField[] { UserChanges.USER_CHANGES.CHANGE_ID }, false);
+    public static final Index INDEX_USER_CHANGES_ID = Internal.createIndex(DSL.name("index_user_changes_id"), UserChanges.USER_CHANGES, new OrderField[] { UserChanges.USER_CHANGES.USER_CHANGE_ID }, false);
     public static final Index INDEX_USER_CHANGES_STATE = Internal.createIndex(DSL.name("index_user_changes_state"), UserChanges.USER_CHANGES, new OrderField[] { UserChanges.USER_CHANGES.STATE }, false);
     public static final Index INDEX_USER_ID = Internal.createIndex(DSL.name("index_user_id"), Users.USERS, new OrderField[] { Users.USERS.USER_ID }, false);
     public static final Index INDEX_USER_INITIAL_STATS = Internal.createIndex(DSL.name("index_user_initial_stats"), UserInitialStats.USER_INITIAL_STATS, new OrderField[] { UserInitialStats.USER_INITIAL_STATS.USER_ID, UserInitialStats.USER_INITIAL_STATS.UTC_TIMESTAMP }, false);

@@ -26,11 +26,13 @@ package me.zodac.folding;
 
 import static me.zodac.folding.rest.util.RestUtilConstants.GSON;
 
+import me.zodac.folding.api.tc.change.UserChangeState;
 import me.zodac.folding.rest.exception.ForbiddenException;
 import me.zodac.folding.rest.exception.InvalidDayException;
 import me.zodac.folding.rest.exception.InvalidIdException;
 import me.zodac.folding.rest.exception.InvalidLoginCredentialsException;
 import me.zodac.folding.rest.exception.InvalidMonthException;
+import me.zodac.folding.rest.exception.InvalidStateException;
 import me.zodac.folding.rest.exception.InvalidYearException;
 import me.zodac.folding.rest.exception.NotFoundException;
 import me.zodac.folding.rest.exception.OutOfRangeDayException;
@@ -260,6 +262,24 @@ public class PropagatedExceptionHandler {
         return GSON.toJson(ErrorResponse.create(errorMessage));
     }
 
+    /**
+     * Returned when an invalid request is made to update a {@link UserChangeState}.
+     *
+     * <p>
+     * Returns a <b>400_BAD_REQUEST</b> response with an 'invalid ID' error message body.
+     *
+     * @param e the {@link InvalidStateException}
+     * @return the {@link ErrorResponse} body
+     */
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(InvalidStateException.class)
+    public String invalidState(final InvalidStateException e) {
+        final String errorMessage = String.format("%s '%s' cannot be updated to '%s'", UserChangeState.class.getSimpleName(), e.getFromState(),
+            e.getToState());
+        LOGGER.error(errorMessage);
+        return GSON.toJson(ErrorResponse.create(errorMessage));
+    }
 
     /**
      * Returned when a request made to a REST endpoint has an invalid 'Content-Type' header.
