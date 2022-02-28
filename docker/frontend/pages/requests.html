@@ -12,13 +12,8 @@
     <script defer="defer" src="./res/js/bootstrap-5.0.0.bundle.min.js" type="text/javascript"></script>
 
     <!-- Own scripts -->
-    <script defer="defer" src="./res/js/historic_user_hourly.min.js" type="text/javascript"></script>
+    <script defer="defer" src="./res/js/requests.min.js" type="text/javascript"></script>
     <script defer="defer" src="./res/js/display_toggle.min.js" type="text/javascript"></script>
-    <script defer="defer" src="./res/js/historic_dropdown_populator.min.js" type="text/javascript"></script>
-    <script defer="defer" src="./res/js/html_escaper.min.js" type="text/javascript"></script>
-    <script defer="defer" src="./res/js/ordinal_suffix.min.js" type="text/javascript"></script>
-    <script defer="defer" src="./res/js/padding.min.js" type="text/javascript"></script>
-    <script defer="defer" src="./res/js/table_sorter.min.js" type="text/javascript"></script>
     <script defer="defer" src="./res/js/timer.min.js" type="text/javascript"></script>
     <script defer="defer" src="./res/js/toast.min.js" type="text/javascript"></script>
 </head>
@@ -42,7 +37,7 @@
                 <a class="nav-link" href="./results">Past Results</a>
             </li>
             <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdownUserLink" role="button"
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownUserLink" role="button"
                    data-bs-toggle="dropdown" aria-expanded="false">
                     User Stats
                 </a>
@@ -64,7 +59,7 @@
                 </ul>
             </li>
             <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownAdminLink" role="button"
+                <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdownAdminLink" role="button"
                    data-bs-toggle="dropdown" aria-expanded="false">
                     System
                 </a>
@@ -82,57 +77,10 @@
             id="sec-part"></span>
     </div>
 </nav>
-<h1>User Hourly Stats</h1>
 
-<div class="dropdown" style="display:inline-block">
-    <button class="btn btn-secondary dropdown-toggle" type="button" id="user_dropdown_root" data-bs-toggle="dropdown"
-            aria-haspopup="true" aria-expanded="false">
-        Select User
-    </button>
-    <div id="user_dropdown" class="dropdown-menu" aria-labelledby="user_dropdown">
-        <!-- Will be populated on document load -->
-    </div>
-</div>
-<div class="dropdown" style="display:inline-block">
-    <button class="btn btn-secondary dropdown-toggle" type="button" id="day_dropdown_root" data-bs-toggle="dropdown"
-            aria-haspopup="true" aria-expanded="false">
-        Select Day
-    </button>
-    <div id="day_dropdown" class="dropdown-menu" aria-labelledby="day_dropdown">
-        <!-- Will be populated on document load -->
-    </div>
-</div>
-<div class="dropdown" style="display:inline-block">
-    <button class="btn btn-secondary dropdown-toggle" type="button" id="month_dropdown_root" data-bs-toggle="dropdown"
-            aria-haspopup="true" aria-expanded="false">
-        Select Month
-    </button>
-    <div id="month_dropdown" class="dropdown-menu" aria-labelledby="month_dropdown">
-        <!-- Will be populated on document load -->
-    </div>
-</div>
-<div class="dropdown" style="display:inline-block">
-    <button class="btn btn-secondary dropdown-toggle" type="button" id="year_dropdown_root" data-bs-toggle="dropdown"
-            aria-haspopup="true" aria-expanded="false">
-        Select Year
-    </button>
-    <div id="year_dropdown" class="dropdown-menu" aria-labelledby="year_dropdown">
-        <!-- Will be populated on document load -->
-    </div>
-</div>
+<br/>
 
-<div id="loader" class="loader" style="display: none;"></div>
-
-<!-- Will be populated when user is selected -->
-<div id="historic_stats">
-</div>
-
-<!-- Toasts, which will be triggered to show by JS scripts -->
-<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
-    <div id="toast-refresh" class="toast text-white bg-secondary" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="toast-body">Stats updated, refresh page!</div>
-    </div>
-</div>
+<div id="loader" class="loader"></div>
 
 </body>
 </html>

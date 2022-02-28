@@ -70,6 +70,7 @@ COPY ./docker/frontend/pages/index.html ./index.html
 # The other files are all references relatively, so can get away without the extension to clean up the displayed URL
 COPY ./docker/frontend/pages/results.html ./results
 COPY ./docker/frontend/pages/admin.html ./admin
+COPY ./docker/frontend/pages/requests.html ./requests
 COPY ./docker/frontend/pages/historic/historic_team_daily.html ./historic_team_daily
 COPY ./docker/frontend/pages/historic/historic_team_hourly.html ./historic_team_hourly
 COPY ./docker/frontend/pages/historic/historic_team_monthly.html ./historic_team_monthly
