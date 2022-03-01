@@ -50,7 +50,8 @@ public class UserChange implements ResponsePojo {
     final int id;
     final LocalDateTime createdUtcTimestamp;
     final LocalDateTime updatedUtcTimestamp;
-    final User user;
+    final User previousUser;
+    final User newUser;
     final UserChangeState state;
 
     /**
@@ -66,16 +67,18 @@ public class UserChange implements ResponsePojo {
      * @param id                  the ID
      * @param createdUtcTimestamp the UTC {@link LocalDateTime} for when the {@link UserChange} was created
      * @param updatedUtcTimestamp the UTC {@link LocalDateTime} for when the {@link UserChange} was last updated
-     * @param user                the {@link User} with changes to be applied
+     * @param previousUser        the previous {@link User} to be updated
+     * @param newUser             the {@link User} with changes to be applied
      * @param state               the {@link UserChangeState}
      * @return the created {@link UserChange}
      */
     public static UserChange create(final int id,
                                     final LocalDateTime createdUtcTimestamp,
                                     final LocalDateTime updatedUtcTimestamp,
-                                    final User user,
+                                    final User previousUser,
+                                    final User newUser,
                                     final UserChangeState state) {
-        return new UserChange(id, createdUtcTimestamp.withNano(0), updatedUtcTimestamp.withNano(0), user, state);
+        return new UserChange(id, createdUtcTimestamp.withNano(0), updatedUtcTimestamp.withNano(0), previousUser, newUser, state);
     }
 
     /**
@@ -88,33 +91,14 @@ public class UserChange implements ResponsePojo {
      * <b>NOTE:</b> The {@link LocalDateTime}s provided will have their nanoseconds stripped, due to precision errors that can occur after retrieving
      * a persisted value from the DB.
      *
-     * @param user  the {@link User} with changes to be applied
-     * @param state the {@link UserChangeState}
+     * @param previousUser the previous {@link User} to be updated
+     * @param newUser      the {@link User} with changes to be applied
+     * @param state        the {@link UserChangeState}
      * @return the created {@link UserChange}
      */
-    public static UserChange createNow(final User user,
-                                       final UserChangeState state) {
+    public static UserChange createNow(final User previousUser, final User newUser, final UserChangeState state) {
         final LocalDateTime currentUtcTime = DateTimeUtils.currentUtcLocalDateTime();
-        return create(EMPTY_USER_CHANGE_ID, currentUtcTime, currentUtcTime, user, state);
-    }
-
-    /**
-     * Creates a {@link UserChange}.
-     *
-     * <p>
-     * Since we do not know the ID until the DB has persisted the {@link User}, the {@link #EMPTY_USER_CHANGE_ID} will be used instead.
-     *
-     * @param createdUtcTimestamp the UTC {@link LocalDateTime} for when the {@link UserChange} was created
-     * @param updatedUtcTimestamp the UTC {@link LocalDateTime} for when the {@link UserChange} was last updated
-     * @param user                the {@link User} with changes to be applied
-     * @param state               the {@link UserChangeState}
-     * @return the created {@link UserChange}
-     */
-    public static UserChange createWithoutId(final LocalDateTime createdUtcTimestamp,
-                                             final LocalDateTime updatedUtcTimestamp,
-                                             final User user,
-                                             final UserChangeState state) {
-        return create(EMPTY_USER_CHANGE_ID, createdUtcTimestamp, updatedUtcTimestamp, user, state);
+        return create(EMPTY_USER_CHANGE_ID, currentUtcTime, currentUtcTime, previousUser, newUser, state);
     }
 
     /**
@@ -136,7 +120,8 @@ public class UserChange implements ResponsePojo {
             userChangeId,
             userChange.createdUtcTimestamp,
             userChange.updatedUtcTimestamp,
-            userChange.user,
+            userChange.previousUser,
+            userChange.newUser,
             userChange.state
         );
     }
@@ -156,7 +141,8 @@ public class UserChange implements ResponsePojo {
             userChange.id,
             userChange.createdUtcTimestamp,
             userChange.updatedUtcTimestamp,
-            User.hidePasskey(userChange.user),
+            User.hidePasskey(userChange.previousUser),
+            User.hidePasskey(userChange.newUser),
             userChange.state
         );
     }
@@ -173,7 +159,8 @@ public class UserChange implements ResponsePojo {
             userChange.getId(),
             userChange.createdUtcTimestamp,
             DateTimeUtils.currentUtcLocalDateTime(),
-            userChange.user,
+            userChange.previousUser,
+            userChange.newUser,
             userChangeState
         );
     }

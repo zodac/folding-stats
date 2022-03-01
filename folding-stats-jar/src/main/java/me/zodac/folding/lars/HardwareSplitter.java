@@ -26,6 +26,7 @@ package me.zodac.folding.lars;
 
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
 
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -34,7 +35,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.util.CollectionUtils;
 import org.apache.logging.log4j.LogManager;
@@ -103,7 +103,7 @@ public final class HardwareSplitter {
         return hardwares
             .stream()
             .map(Hardware::getHardwareName)
-            .collect(Collectors.toList());
+            .collect(toSet());
     }
 
     /**

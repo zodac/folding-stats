@@ -22,6 +22,7 @@ A live example of this competition can be seen running for the [ExtremeHW Foldin
             - [User Definition](#user-definition)
             - [User Categories](#user-categories)
     - [Adjustments During The Competition](#adjustments-during-the-competition)
+        - [Requesting User Changes](#requesting-user-changes) 
         - [Offsetting User Stats](#offsetting-user-stats)
         - [Deleting Users](#deleting-users)
         - [Moving A User To Another Team](#moving-a-user-to-another-team)
@@ -246,6 +247,20 @@ the [Category.java](./folding-stats-api/src/main/java/me/zodac/folding/api/tc/Ca
 code. Please read the [Contributing](#contributing) section for more information on how to do this.
 
 ## Adjustments During The Competition
+
+### Requesting User Changes
+
+A user may request some of their data to be changed, reducing the load on the administrator. They can make a request to
+change:
+- Folding@Home Username
+- Folding@Home passkey
+- Live Folding@Home stats link
+- Hardware used
+
+These changes can be requested to be made immediately, or deferred to the next month. The admin may then reject or
+approve these requests (and can override when they should be applied).
+
+Any other changes (like changing the team a user is competing for, for example) must be done by the admin manually.
 
 ### Offsetting User Stats
 

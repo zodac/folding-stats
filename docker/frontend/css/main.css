@@ -58,3 +58,11 @@ table th, table td {
 .github-logo {
     fill: white;
 }
+
+.old-value {
+    color:red;
+}
+
+.new-value {
+    color:green;
+}

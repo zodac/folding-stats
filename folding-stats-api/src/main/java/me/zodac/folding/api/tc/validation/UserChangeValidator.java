@@ -149,7 +149,7 @@ public final class UserChangeValidator {
         final UserChangeState userChangeState =
             userChangeRequest.isImmediate() ? UserChangeState.REQUESTED_NOW : UserChangeState.REQUESTED_NEXT_MONTH;
 
-        final UserChange userChange = UserChange.createNow(userWithChanges, userChangeState);
+        final UserChange userChange = UserChange.createNow(userForUserChange, userWithChanges, userChangeState);
         return ValidationResult.successful(userChange);
     }
 
@@ -211,7 +211,7 @@ public final class UserChangeValidator {
     }
 
     private static boolean isMatchingUserChange(final UserChange userChange, final UserChangeRequest userChangeRequest) {
-        final User user = userChange.getUser();
+        final User user = userChange.getNewUser();
         return user.getId() == userChangeRequest.getUserId()
             && user.getHardware().getId() == userChangeRequest.getHardwareId()
             && Objects.equals(user.getFoldingUserName(), userChangeRequest.getFoldingUserName())

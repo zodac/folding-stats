@@ -21,9 +21,9 @@ public class Sequences {
     public static final Sequence<Integer> HARDWARE_HARDWARE_ID_SEQ = Internal.createSequence("hardware_hardware_id_seq", Public.PUBLIC, SQLDataType.INTEGER.nullable(false), null, null, null, null, false, null);
 
     /**
-     * The sequence <code>public.retired_user_stats_retired_user_id_seq</code>
+     * The sequence <code>public.retired_user_stats_id_seq</code>
      */
-    public static final Sequence<Integer> RETIRED_USER_STATS_RETIRED_USER_ID_SEQ = Internal.createSequence("retired_user_stats_retired_user_id_seq", Public.PUBLIC, SQLDataType.INTEGER.nullable(false), null, null, null, null, false, null);
+    public static final Sequence<Integer> RETIRED_USER_STATS_ID_SEQ = Internal.createSequence("retired_user_stats_id_seq", Public.PUBLIC, SQLDataType.INTEGER.nullable(false), null, null, null, null, false, null);
 
     /**
      * The sequence <code>public.teams_team_id_seq</code>

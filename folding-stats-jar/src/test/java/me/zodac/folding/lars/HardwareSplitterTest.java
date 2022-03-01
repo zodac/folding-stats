@@ -29,7 +29,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import me.zodac.folding.api.tc.Hardware;
 import org.junit.jupiter.api.Test;
 
@@ -66,7 +65,7 @@ class HardwareSplitterTest {
         );
 
         final Collection<Hardware> toCreate = HardwareSplitter.toCreate(lars, existing);
-        final Collection<String> names = toCreate.stream().map(Hardware::getHardwareName).collect(Collectors.toList());
+        final Collection<String> names = toCreate.stream().map(Hardware::getHardwareName).toList();
 
         assertThat(names)
             .hasSize(2)
@@ -98,7 +97,7 @@ class HardwareSplitterTest {
         );
 
         final Collection<Hardware> toDelete = HardwareSplitter.toDelete(lars, existing);
-        final Collection<String> names = toDelete.stream().map(Hardware::getHardwareName).collect(Collectors.toList());
+        final Collection<String> names = toDelete.stream().map(Hardware::getHardwareName).toList();
 
         assertThat(names)
             .hasSize(1)
@@ -143,7 +142,7 @@ class HardwareSplitterTest {
         );
 
         final Map<Hardware, Hardware> toUpdate = HardwareSplitter.toUpdate(lars, existing);
-        final Collection<String> names = toUpdate.keySet().stream().map(Hardware::getHardwareName).collect(Collectors.toList());
+        final Collection<String> names = toUpdate.keySet().stream().map(Hardware::getHardwareName).toList();
 
         assertThat(names)
             .hasSize(2)

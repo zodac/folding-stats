@@ -19,7 +19,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row5;
+import org.jooq.Row6;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -67,9 +67,14 @@ public class UserChanges extends TableImpl<UserChangesRecord> {
     public final TableField<UserChangesRecord, LocalDateTime> UPDATED_UTC_TIMESTAMP = createField(DSL.name("updated_utc_timestamp"), SQLDataType.LOCALDATETIME(6), this, "");
 
     /**
-     * The column <code>public.user_changes.user_change</code>.
+     * The column <code>public.user_changes.previous_user</code>.
      */
-    public final TableField<UserChangesRecord, String> USER_CHANGE = createField(DSL.name("user_change"), SQLDataType.CLOB.nullable(false), this, "");
+    public final TableField<UserChangesRecord, String> PREVIOUS_USER = createField(DSL.name("previous_user"), SQLDataType.CLOB.nullable(false), this, "");
+
+    /**
+     * The column <code>public.user_changes.new_user</code>.
+     */
+    public final TableField<UserChangesRecord, String> NEW_USER = createField(DSL.name("new_user"), SQLDataType.CLOB.nullable(false), this, "");
 
     /**
      * The column <code>public.user_changes.state</code>.
@@ -161,11 +166,11 @@ public class UserChanges extends TableImpl<UserChangesRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row5 type methods
+    // Row6 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row5<Integer, LocalDateTime, LocalDateTime, String, String> fieldsRow() {
-        return (Row5) super.fieldsRow();
+    public Row6<Integer, LocalDateTime, LocalDateTime, String, String, String> fieldsRow() {
+        return (Row6) super.fieldsRow();
     }
 }

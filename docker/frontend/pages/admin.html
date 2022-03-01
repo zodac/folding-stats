@@ -88,21 +88,6 @@
 
 <br/>
 
-<button onclick="toggleMainButtonStyle('hardware_button', this.classList)" class="btn btn-primary" id="hardware_button"
-        href="#hardware_div" data-bs-toggle="collapse" role="button">List of Hardware
-</button>
-<button onclick="toggleMainButtonStyle('teams_button', this.classList)" class="btn btn-primary" id="teams_button"
-        href="#teams_div" data-bs-toggle="collapse" role="button">List of Teams
-</button>
-<button onclick="toggleMainButtonStyle('users_button', this.classList)" class="btn btn-primary" id="users_button"
-        href="#users_div" data-bs-toggle="collapse" role="button">List of Users
-</button>
-
-<!-- These divs will be populated by index.js -->
-<div id="hardware_div" class="collapse"></div>
-<div id="teams_div" class="collapse"></div>
-<div id="users_div" class="collapse"></div>
-
 <!-- Toasts, which will be triggered to show by JS scripts -->
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
     <div id="toast-refresh" class="toast text-white bg-secondary" role="alert" aria-live="assertive" aria-atomic="true">
@@ -120,10 +105,6 @@
          aria-atomic="true">
         <div id="toast-failure-text" class="toast-body"></div>
     </div>
-</div>
-
-<div>
-    <br/>
 </div>
 
 <div id="login_form">

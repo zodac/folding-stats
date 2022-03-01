@@ -78,9 +78,9 @@ public class UserChangeApplier {
      */
     public UserChange apply(final UserChange userChange) {
         LOGGER.info("Applying for UserChange: {}", userChange);
-        final User existingUser = foldingRepository.getUserWithPasskey(userChange.getUser().getId());
+        final User existingUser = foldingRepository.getUserWithPasskey(userChange.getNewUser().getId());
         LOGGER.info("Found existing user: {}", existingUser);
-        foldingRepository.updateUser(userChange.getUser(), existingUser);
+        foldingRepository.updateUser(userChange.getNewUser(), existingUser);
         LOGGER.info("Updated user");
 
         final UserChange userChangeToUpdate = UserChange.updateWithState(UserChangeState.COMPLETED, userChange);

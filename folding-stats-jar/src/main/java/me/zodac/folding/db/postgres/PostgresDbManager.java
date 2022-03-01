@@ -1112,13 +1112,15 @@ public final class PostgresDbManager implements DbManager {
                 .columns(
                     USER_CHANGES.CREATED_UTC_TIMESTAMP,
                     USER_CHANGES.UPDATED_UTC_TIMESTAMP,
-                    USER_CHANGES.USER_CHANGE,
+                    USER_CHANGES.PREVIOUS_USER,
+                    USER_CHANGES.NEW_USER,
                     USER_CHANGES.STATE
                 )
                 .values(
                     userChange.getCreatedUtcTimestamp(),
                     userChange.getUpdatedUtcTimestamp(),
-                    GSON.toJson(userChange.getUser()),
+                    GSON.toJson(userChange.getPreviousUser()),
+                    GSON.toJson(userChange.getNewUser()),
                     userChange.getState().toString()
                 )
                 .returning(USER_CHANGES.USER_CHANGE_ID);
@@ -1194,7 +1196,8 @@ public final class PostgresDbManager implements DbManager {
                 .update(USER_CHANGES)
                 .set(USER_CHANGES.CREATED_UTC_TIMESTAMP, userChangeToUpdate.getCreatedUtcTimestamp())
                 .set(USER_CHANGES.UPDATED_UTC_TIMESTAMP, userChangeToUpdate.getUpdatedUtcTimestamp())
-                .set(USER_CHANGES.USER_CHANGE, GSON.toJson(userChangeToUpdate.getUser()))
+                .set(USER_CHANGES.PREVIOUS_USER, GSON.toJson(userChangeToUpdate.getPreviousUser()))
+                .set(USER_CHANGES.NEW_USER, GSON.toJson(userChangeToUpdate.getNewUser()))
                 .set(USER_CHANGES.STATE, userChangeToUpdate.getState().toString())
                 .where(USER_CHANGES.USER_CHANGE_ID.equal(userChangeToUpdate.getId()));
             LOGGER.debug("Executing SQL: '{}'", query);

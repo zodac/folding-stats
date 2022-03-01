@@ -616,3 +616,86 @@ function offsetUser() {
         });
     });
 }
+
+function createUserChange() {
+    var userId = document.getElementById("user_change_create_id").value
+    var existingPasskey = document.getElementById("user_change_create_existing_passkey").value.trim();
+    var foldingUserName = document.getElementById("user_change_create_folding_name").value.trim();
+    var passkey = document.getElementById("user_change_create_passkey").value.trim();
+    var liveStatsLink = document.getElementById("user_change_create_live_stats_link").value.trim();
+    var hardwareName = document.getElementById("user_change_create_hardware_selector_input").value.trim();
+    var when = document.getElementById("user_change_create_when_input").value.trim();
+
+    var hardwareUrl = encodeURI(REST_ENDPOINT_URL+"/hardware/fields?hardwareName=" + hardwareName)
+    fetch(hardwareUrl)
+    .then(response => {
+        return response.json();
+    })
+    .then(function(jsonResponse) {
+        var hardwareId = jsonResponse['id'];
+        var immediate = when === "Immediately";
+
+        var requestData = JSON.stringify(
+            {
+                "userId": escape(userId),
+                "existingPasskey": escape(existingPasskey),
+                "foldingUserName": escape(foldingUserName),
+                "passkey": escape(passkey),
+                "liveStatsLink": escape(liveStatsLink),
+                "hardwareId": escape(hardwareId),
+                "immediate": immediate
+            }
+        );
+
+        show("loader");
+        var url = encodeURI(REST_ENDPOINT_URL+"/changes")
+        fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: requestData
+        })
+        .then(response => {
+            hide("loader");
+
+            if(response.status != 201){
+                response.json()
+                .then(response => {
+                    failureToast("Request already exists!");
+                    console.error(JSON.stringify(response, null, 2));
+                });
+                return;
+            } else if(response.status != 201){
+                response.json()
+                .then(response => {
+                    failureToast("Failure: " + response["errors"]);
+                    console.error(JSON.stringify(response, null, 2));
+                });
+                return;
+            }
+
+            document.getElementById("user_change_user_selector_input").value = "";
+            document.getElementById("user_change_create_id").value = "";
+            document.getElementById("user_change_create_existing_passkey").value = "";
+            document.getElementById("user_change_create_folding_name").value = "";
+            document.getElementById("user_change_create_passkey").value = "";
+            document.getElementById("user_change_create_live_stats_link").value = "";
+            document.getElementById("user_change_create_hardware_selector_input").value = "";
+            document.getElementById("user_change_create_when_input").value = "";
+
+            userCreateFields = document.querySelectorAll(".user_change_create");
+            for (var i = 0, userCreateField; userCreateField = userCreateFields[i]; i++) {
+                hideElement(userCreateField);
+            }
+
+            successToast("Request created");
+            loadPendingUserChanges();
+        })
+        .catch((error) => {
+            hide("loader");
+            console.error("Unexpected error creating request: ", error);
+            return false;
+        });
+    });
+}

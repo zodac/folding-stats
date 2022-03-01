@@ -453,7 +453,7 @@ class UserChangeValidatorTest {
             .build();
 
         final UserChange existingUserChange = UserChange.builder()
-            .user(User.builder()
+            .newUser(User.builder()
                 .id(user.getId())
                 .foldingUserName(user.getFoldingUserName())
                 .displayName(user.getDisplayName())

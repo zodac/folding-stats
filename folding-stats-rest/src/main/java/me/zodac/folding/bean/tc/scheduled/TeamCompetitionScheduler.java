@@ -60,7 +60,7 @@ import org.springframework.stereotype.Component;
  *
  * <p>
  * The last day of the <code>Team Competition</code> is the final day of the month, and on this day the following actions are performed:
- * <ul>
+ * <ol>
  *     <li>Resets the stats for all users. The reset will occur  at <b>00:15</b>. This time cannot be changed, but the reset can be disabled using
  *     the environment variable:
  *         <ul>
@@ -72,8 +72,9 @@ import org.springframework.stereotype.Component;
  *             <li>{@code ENABLE_MONTHLY_RESULT_STORAGE}</li>
  *         </ul>
  *     </li>
- *     <li>Updates the value of all {@link me.zodac.folding.api.tc.Hardware} from the LARS PPD database.</li>
- * </ul>
+ *     <li>Updates the value of all {@link me.zodac.folding.api.tc.Hardware} from the LARS PPD database</li>
+ *     <li>Applies any pending {@link UserChange}s for the next month with {@link UserChangeApplier}</li>
+ * </ol>
  */
 @Component
 public class TeamCompetitionScheduler {
@@ -116,7 +117,7 @@ public class TeamCompetitionScheduler {
             userStatsResetter.resetTeamCompetitionStats();
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
         } catch (final Exception e) {
-            LOGGER.error("Error with start of team schedule", e);
+            LOGGER.error("Error with start of month schedule", e);
         }
     }
 
@@ -162,7 +163,7 @@ public class TeamCompetitionScheduler {
             final Collection<UserChange> nextMonthUserChanges = foldingRepository.getAllUserChangesForNextMonth();
             userChangeApplier.apply(nextMonthUserChanges);
         } catch (final Exception e) {
-            LOGGER.error("Error with end of team schedule", e);
+            LOGGER.error("Error with end of month schedule", e);
         }
     }
 

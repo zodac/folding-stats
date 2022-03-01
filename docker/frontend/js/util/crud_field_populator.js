@@ -365,3 +365,55 @@ function populateUserOffset(){
         });
     });
 }
+
+function populateUserChangeCreate(){
+    var inputElement = document.getElementById("user_change_user_selector_input");
+    var input = inputElement.value
+
+    if (input == "") {
+        userChangeFields = document.querySelectorAll(".user_change_create");
+        for (var i = 0, userChangeField; userChangeField = userChangeFields[i]; i++) {
+            hideElement(userChangeField);
+        }
+
+        return;
+    }
+
+    show("loader");
+
+    var userId = input.split(":")[0];
+    var url = encodeURI(REST_ENDPOINT_URL+"/users/" + userId)
+    fetch(url)
+    .then(response => {
+        return response.json();
+    })
+    .then(function(jsonResponse) {
+        document.getElementById("user_change_create_id").value = userId;
+        document.getElementById("user_change_create_existing_passkey").value = jsonResponse['passkey'];
+        document.getElementById("user_change_create_folding_name").value = jsonResponse['foldingUserName'];
+        document.getElementById("user_change_create_passkey").value = jsonResponse['passkey'];
+
+        if ("liveStatsLink" in jsonResponse) {
+            document.getElementById("user_change_create_live_stats_link").value = jsonResponse['liveStatsLink'];
+        } else {
+            document.getElementById("user_change_create_live_stats_link").value = "";
+        }
+
+        var hardwareId = jsonResponse['hardware']['id'];
+
+        var hardwareUrl = encodeURI(REST_ENDPOINT_URL+"/hardware/" + hardwareId)
+        fetch(hardwareUrl)
+        .then(response => {
+            return response.json();
+        })
+        .then(function(jsonResponse) {
+            document.getElementById("user_change_create_hardware_selector_input").value = jsonResponse['hardwareName'];
+
+            userChangeFields = document.querySelectorAll(".user_change_create");
+            for (var i = 0, userChangeField; userChangeField = userChangeFields[i]; i++) {
+                showElement(userChangeField);
+            }
+            hide("loader");
+        });
+    });
+}

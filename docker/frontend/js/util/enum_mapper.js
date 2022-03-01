@@ -85,3 +85,42 @@ function getHardwareTypeBackend(value) {
 
     return value;
 }
+
+function getUserChangeStateFrontend(value) {
+    if (value.toLowerCase() === "requested_now"){
+        return "Requested (Immediate)"
+    }
+
+    if (value.toLowerCase() === "requested_next_month"){
+        return "Requested (1st " + nextMonth() + ")"
+    }
+
+    if (value.toLowerCase() === "approved_now"){
+        return "Approved (change in progress...)"
+    }
+
+    if (value.toLowerCase() === "approved_next_month"){
+        return "Approved (will be applied 1st " + nextMonth() + ")"
+    }
+
+    if (value.toLowerCase() === "rejected"){
+        return "Rejected"
+    }
+
+    if (value.toLowerCase() === "completed"){
+        return "Completed"
+    }
+
+    return value;
+}
+
+function nextMonth() {
+    var now = new Date();
+    if (now.getUTCMonth() == 11) {
+        var current = new Date(now.getUTCFullYear() + 1, 0, 1);
+    } else {
+        var current = new Date(now.getUTCFullYear(), now.getUTCMonth() + 1, 1);
+    }
+
+    return current.toLocaleString("default", { month: "long" });
+}

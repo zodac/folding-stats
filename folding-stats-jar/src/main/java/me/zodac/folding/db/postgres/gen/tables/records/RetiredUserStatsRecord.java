@@ -38,30 +38,30 @@ public class RetiredUserStatsRecord extends UpdatableRecordImpl<RetiredUserStats
     }
 
     /**
-     * Setter for <code>public.retired_user_stats.team_id</code>.
-     */
-    public void setTeamId(Integer value) {
-        set(1, value);
-    }
-
-    /**
-     * Getter for <code>public.retired_user_stats.team_id</code>.
-     */
-    public Integer getTeamId() {
-        return (Integer) get(1);
-    }
-
-    /**
      * Setter for <code>public.retired_user_stats.user_id</code>.
      */
     public void setUserId(Integer value) {
-        set(2, value);
+        set(1, value);
     }
 
     /**
      * Getter for <code>public.retired_user_stats.user_id</code>.
      */
     public Integer getUserId() {
+        return (Integer) get(1);
+    }
+
+    /**
+     * Setter for <code>public.retired_user_stats.team_id</code>.
+     */
+    public void setTeamId(Integer value) {
+        set(2, value);
+    }
+
+    /**
+     * Getter for <code>public.retired_user_stats.team_id</code>.
+     */
+    public Integer getTeamId() {
         return (Integer) get(2);
     }
 
@@ -165,12 +165,12 @@ public class RetiredUserStatsRecord extends UpdatableRecordImpl<RetiredUserStats
 
     @Override
     public Field<Integer> field2() {
-        return RetiredUserStats.RETIRED_USER_STATS.TEAM_ID;
+        return RetiredUserStats.RETIRED_USER_STATS.USER_ID;
     }
 
     @Override
     public Field<Integer> field3() {
-        return RetiredUserStats.RETIRED_USER_STATS.USER_ID;
+        return RetiredUserStats.RETIRED_USER_STATS.TEAM_ID;
     }
 
     @Override
@@ -205,12 +205,12 @@ public class RetiredUserStatsRecord extends UpdatableRecordImpl<RetiredUserStats
 
     @Override
     public Integer component2() {
-        return getTeamId();
+        return getUserId();
     }
 
     @Override
     public Integer component3() {
-        return getUserId();
+        return getTeamId();
     }
 
     @Override
@@ -245,12 +245,12 @@ public class RetiredUserStatsRecord extends UpdatableRecordImpl<RetiredUserStats
 
     @Override
     public Integer value2() {
-        return getTeamId();
+        return getUserId();
     }
 
     @Override
     public Integer value3() {
-        return getUserId();
+        return getTeamId();
     }
 
     @Override
@@ -286,13 +286,13 @@ public class RetiredUserStatsRecord extends UpdatableRecordImpl<RetiredUserStats
 
     @Override
     public RetiredUserStatsRecord value2(Integer value) {
-        setTeamId(value);
+        setUserId(value);
         return this;
     }
 
     @Override
     public RetiredUserStatsRecord value3(Integer value) {
-        setUserId(value);
+        setTeamId(value);
         return this;
     }
 
@@ -353,12 +353,12 @@ public class RetiredUserStatsRecord extends UpdatableRecordImpl<RetiredUserStats
     /**
      * Create a detached, initialised RetiredUserStatsRecord
      */
-    public RetiredUserStatsRecord(Integer retiredUserId, Integer teamId, Integer userId, String displayUsername, LocalDateTime utcTimestamp, Long finalPoints, Long finalMultipliedPoints, Integer finalUnits) {
+    public RetiredUserStatsRecord(Integer retiredUserId, Integer userId, Integer teamId, String displayUsername, LocalDateTime utcTimestamp, Long finalPoints, Long finalMultipliedPoints, Integer finalUnits) {
         super(RetiredUserStats.RETIRED_USER_STATS);
 
         setRetiredUserId(retiredUserId);
-        setTeamId(teamId);
         setUserId(userId);
+        setTeamId(teamId);
         setDisplayUsername(displayUsername);
         setUtcTimestamp(utcTimestamp);
         setFinalPoints(finalPoints);

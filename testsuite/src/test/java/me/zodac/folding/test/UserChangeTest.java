@@ -139,7 +139,7 @@ class UserChangeTest {
         assertThat(userChange.getId())
             .as("Expected user change to contain an ID")
             .isNotZero();
-        assertThat(userChange.getUser().getLiveStatsLink())
+        assertThat(userChange.getNewUser().getLiveStatsLink())
             .as("Expected user change to list user with the updated liveStatsLink")
             .isEqualTo(DUMMY_LIVE_STATS_LINK);
     }
@@ -195,7 +195,7 @@ class UserChangeTest {
         throws FoldingRestException {
         final UserChange userChange = createUserChange();
 
-        final User userBeforeChange = UserUtils.get(userChange.getUser().getId());
+        final User userBeforeChange = UserUtils.get(userChange.getNewUser().getId());
         assertThat(userBeforeChange.getLiveStatsLink())
             .as("Expected user's initial liveStatsLink to not be dummy value")
             .isNotEqualTo(DUMMY_LIVE_STATS_LINK);
@@ -211,7 +211,7 @@ class UserChangeTest {
             .as("Expected state to be updated")
             .isEqualTo(UserChangeState.COMPLETED);
 
-        final User userAfterChange = UserUtils.get(userChange.getUser().getId());
+        final User userAfterChange = UserUtils.get(userChange.getNewUser().getId());
         assertThat(userAfterChange.getLiveStatsLink())
             .as("Expected user's liveStatsLink to be updated to dummy value")
             .isEqualTo(DUMMY_LIVE_STATS_LINK);
@@ -471,7 +471,7 @@ class UserChangeTest {
         assertThat(retrievedUserChange)
             .isEqualTo(userChange);
 
-        assertThat(retrievedUserChange.getUser().getPasskey())
+        assertThat(retrievedUserChange.getNewUser().getPasskey())
             .as("Expected the passkey to not be masked")
             .doesNotContain("*");
     }
@@ -499,7 +499,7 @@ class UserChangeTest {
         assertThat(retrievedUserChange)
             .isEqualTo(userChange);
 
-        assertThat(retrievedUserChange.getUser().getPasskey())
+        assertThat(retrievedUserChange.getNewUser().getPasskey())
             .as("Expected the passkey to not be masked")
             .doesNotContain("*");
     }
@@ -532,8 +532,8 @@ class UserChangeTest {
         final UserChange retrievedUserChange = allUserChanges.iterator().next();
 
         final int lengthOfUnmaskedPasskey = 8;
-        final String firstPartOfPasskey = retrievedUserChange.getUser().getPasskey().substring(0, lengthOfUnmaskedPasskey);
-        final String secondPartOfPasskey = retrievedUserChange.getUser().getPasskey().substring(lengthOfUnmaskedPasskey);
+        final String firstPartOfPasskey = retrievedUserChange.getNewUser().getPasskey().substring(0, lengthOfUnmaskedPasskey);
+        final String secondPartOfPasskey = retrievedUserChange.getNewUser().getPasskey().substring(lengthOfUnmaskedPasskey);
 
         assertThat(firstPartOfPasskey)
             .as("Expected the first 8 characters of the passkey to be shown")

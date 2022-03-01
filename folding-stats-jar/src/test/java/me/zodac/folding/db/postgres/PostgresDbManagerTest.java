@@ -30,7 +30,6 @@ import static me.zodac.folding.db.postgres.TestGenerator.nextUserName;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
@@ -649,8 +648,8 @@ class PostgresDbManagerTest {
     }
 
     private UserChange generateUserChange() {
-        final User user = createUser();
-        final LocalDateTime currentUtcTimestamp = DateTimeUtils.currentUtcLocalDateTime();
-        return UserChange.createWithoutId(currentUtcTimestamp, currentUtcTimestamp, user, UserChangeState.REQUESTED_NOW);
+        final User previousUser = createUser();
+        final User newUser = createUser();
+        return UserChange.createNow(previousUser, newUser, UserChangeState.REQUESTED_NOW);
     }
 }

@@ -76,9 +76,9 @@ public class Users extends TableImpl<UsersRecord> {
     public final TableField<UsersRecord, String> CATEGORY = createField(DSL.name("category"), SQLDataType.CLOB.nullable(false), this, "");
 
     /**
-     * The column <code>public.users.profile_link</code>.
+     * The column <code>public.users.hardware_id</code>.
      */
-    public final TableField<UsersRecord, String> PROFILE_LINK = createField(DSL.name("profile_link"), SQLDataType.CLOB, this, "");
+    public final TableField<UsersRecord, Integer> HARDWARE_ID = createField(DSL.name("hardware_id"), SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
      * The column <code>public.users.live_stats_link</code>.
@@ -86,19 +86,19 @@ public class Users extends TableImpl<UsersRecord> {
     public final TableField<UsersRecord, String> LIVE_STATS_LINK = createField(DSL.name("live_stats_link"), SQLDataType.CLOB, this, "");
 
     /**
-     * The column <code>public.users.hardware_id</code>.
+     * The column <code>public.users.profile_link</code>.
      */
-    public final TableField<UsersRecord, Integer> HARDWARE_ID = createField(DSL.name("hardware_id"), SQLDataType.INTEGER.nullable(false), this, "");
-
-    /**
-     * The column <code>public.users.team_id</code>.
-     */
-    public final TableField<UsersRecord, Integer> TEAM_ID = createField(DSL.name("team_id"), SQLDataType.INTEGER.nullable(false), this, "");
+    public final TableField<UsersRecord, String> PROFILE_LINK = createField(DSL.name("profile_link"), SQLDataType.CLOB, this, "");
 
     /**
      * The column <code>public.users.is_captain</code>.
      */
     public final TableField<UsersRecord, Boolean> IS_CAPTAIN = createField(DSL.name("is_captain"), SQLDataType.BOOLEAN.defaultValue(DSL.field("false", SQLDataType.BOOLEAN)), this, "");
+
+    /**
+     * The column <code>public.users.team_id</code>.
+     */
+    public final TableField<UsersRecord, Integer> TEAM_ID = createField(DSL.name("team_id"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.field("1", SQLDataType.INTEGER)), this, "");
 
     private Users(Name alias, Table<UsersRecord> aliased) {
         this(alias, aliased, null);
@@ -211,7 +211,7 @@ public class Users extends TableImpl<UsersRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row10<Integer, String, String, String, String, String, String, Integer, Integer, Boolean> fieldsRow() {
+    public Row10<Integer, String, String, String, String, Integer, String, String, Boolean, Integer> fieldsRow() {
         return (Row10) super.fieldsRow();
     }
 }

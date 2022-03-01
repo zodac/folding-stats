@@ -152,7 +152,8 @@ CREATE TABLE user_changes (
     user_change_id SERIAL PRIMARY KEY,
     created_utc_timestamp TIMESTAMP,
     updated_utc_timestamp TIMESTAMP,
-    user_change TEXT NOT NULL,
+    previous_user TEXT NOT NULL,
+    new_user TEXT NOT NULL,
     state TEXT NOT NULL
 );
 
