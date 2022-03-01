@@ -50,6 +50,7 @@ import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.tc.request.UserChangeRequest;
+import me.zodac.folding.rest.api.tc.request.UserRequest;
 import me.zodac.folding.test.util.TestConstants;
 import me.zodac.folding.test.util.rest.request.UserUtils;
 import org.junit.jupiter.api.AfterAll;
@@ -76,7 +77,7 @@ class UserChangeTest {
 
     @Test
     void whenGettingAllUserChanges_givenNoneHaveBeenCreated_thenEmptyJsonResponseIsReturned_andHas200Status() throws FoldingRestException {
-        final HttpResponse<String> response = USER_CHANGE_REQUEST_SENDER.getAll(ADMIN_USER.userName(), ADMIN_USER.password());
+        final HttpResponse<String> response = USER_CHANGE_REQUEST_SENDER.getAllWithoutPasskeys();
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -93,11 +94,11 @@ class UserChangeTest {
 
     @Test
     void whenGettingAllUserChanges_givenSomeHaveBeenCreated_thenAllAreReturned_andHas200Status() throws FoldingRestException {
-        final UserChange userChange = createUserChange();
+        createUserChange();
         createUserChange();
         createUserChange();
 
-        final HttpResponse<String> response = USER_CHANGE_REQUEST_SENDER.getAll(ADMIN_USER.userName(), ADMIN_USER.password());
+        final HttpResponse<String> response = USER_CHANGE_REQUEST_SENDER.getAllWithoutPasskeys();
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -111,8 +112,35 @@ class UserChangeTest {
         assertThat(allUserChanges)
             .hasSize(3);
 
-        assertThat(allUserChanges.iterator().next())
+        final UserChange retrievedUserChange = allUserChanges.iterator().next();
+        validatePasskeyIsHidden(retrievedUserChange.getNewUser().getPasskey());
+    }
+
+    @Test
+    void whenGettingAllUserChanges_givenSomeHaveBeenCreated_andPasskeysAreRequested_thenAllAreReturned_andPasskeysAreShown_andHas200Status()
+        throws FoldingRestException {
+        final UserChange userChange = createUserChange();
+        createUserChange();
+        createUserChange();
+
+        final HttpResponse<String> response = USER_CHANGE_REQUEST_SENDER.getAllWithPasskeys(ADMIN_USER.userName(), ADMIN_USER.password());
+        assertThat(response.statusCode())
+            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_OK);
+
+        final Collection<UserChange> allUserChanges = UserChangeResponseParser.getAll(response);
+        final int xTotalCount = getTotalCount(response);
+
+        assertThat(xTotalCount)
+            .isEqualTo(3);
+
+        assertThat(allUserChanges)
+            .hasSize(3);
+
+        final UserChange retrievedUserChange = allUserChanges.iterator().next();
+        assertThat(retrievedUserChange)
             .isEqualTo(userChange);
+        validatePasskeyIsShown(retrievedUserChange.getNewUser().getPasskey());
     }
 
     @Test
@@ -228,7 +256,7 @@ class UserChangeTest {
         USER_CHANGE_REQUEST_SENDER.approveNextMonth(userChange2.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
 
         final HttpResponse<String> response =
-            USER_CHANGE_REQUEST_SENDER.getAll(List.of(UserChangeState.REJECTED, UserChangeState.APPROVED_NEXT_MONTH));
+            USER_CHANGE_REQUEST_SENDER.getAllWithoutPasskeys(List.of(UserChangeState.REJECTED, UserChangeState.APPROVED_NEXT_MONTH));
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -241,6 +269,9 @@ class UserChangeTest {
 
         assertThat(allUserChanges)
             .hasSize(2);
+
+        final UserChange retrievedUserChange = allUserChanges.iterator().next();
+        validatePasskeyIsHidden(retrievedUserChange.getNewUser().getPasskey());
     }
 
     @Test
@@ -253,7 +284,7 @@ class UserChangeTest {
         USER_CHANGE_REQUEST_SENDER.approveNextMonth(userChange2.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
 
         final HttpResponse<String> response =
-            USER_CHANGE_REQUEST_SENDER.getAll(List.of(UserChangeState.COMPLETED));
+            USER_CHANGE_REQUEST_SENDER.getAllWithoutPasskeys(List.of(UserChangeState.COMPLETED));
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -266,6 +297,36 @@ class UserChangeTest {
 
         assertThat(allUserChanges)
             .isEmpty();
+    }
+
+    @Test
+    void whenGetAllUserChangesWithState_givenChangesExists_andPasskeysAreRequested_thenChangesAreReturned_andPasskeyIsHidden_andResponseHas200Status()
+        throws FoldingRestException {
+        final UserChange userChange1 = createUserChange();
+        final UserChange userChange2 = createUserChange();
+        createUserChange();
+
+        USER_CHANGE_REQUEST_SENDER.reject(userChange1.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
+        USER_CHANGE_REQUEST_SENDER.approveNextMonth(userChange2.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
+
+        final HttpResponse<String> response =
+            USER_CHANGE_REQUEST_SENDER.getAllWithPasskeys(List.of(UserChangeState.REJECTED, UserChangeState.APPROVED_NEXT_MONTH),
+                ADMIN_USER.userName(), ADMIN_USER.password());
+        assertThat(response.statusCode())
+            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_OK);
+
+        final Collection<UserChange> allUserChanges = UserChangeResponseParser.getAll(response);
+        final int xTotalCount = getTotalCount(response);
+
+        assertThat(xTotalCount)
+            .isEqualTo(2);
+
+        assertThat(allUserChanges)
+            .hasSize(2);
+
+        final UserChange retrievedUserChange = allUserChanges.iterator().next();
+        validatePasskeyIsShown(retrievedUserChange.getNewUser().getPasskey());
     }
 
     @Test
@@ -287,23 +348,6 @@ class UserChangeTest {
         assertThat(secondResponse.statusCode())
             .as("Did not receive a 400_BAD_REQUEST HTTP response: " + secondResponse.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
-    }
-
-    @Test
-    void whenGetAllUserChanges_givenNoAuthentication_thenRequestFails_andResponseHas401Status()
-        throws FoldingRestException, IOException, InterruptedException {
-        createUserChange();
-
-        final HttpRequest request = HttpRequest.newBuilder()
-            .GET()
-            .uri(URI.create(FOLDING_URL + "/changes"))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
-            .build();
-
-        final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-        assertThat(response.statusCode())
-            .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
-            .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
     @Test
@@ -477,71 +521,25 @@ class UserChangeTest {
     }
 
     @Test
-    void whenGetAllUserChanges_givenChangesExists_thenChangesAreReturned_andPasskeyIsNotHidden_andResponseHas200Status() throws FoldingRestException {
-        final UserChange userChange = createUserChange();
-
-        final HttpResponse<String> response = USER_CHANGE_REQUEST_SENDER.getAll(ADMIN_USER.userName(), ADMIN_USER.password());
-        assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
-            .isEqualTo(HttpURLConnection.HTTP_OK);
-
-        final Collection<UserChange> allUserChanges = UserChangeResponseParser.getAll(response);
-        final int xTotalCount = getTotalCount(response);
-
-        assertThat(xTotalCount)
-            .isEqualTo(1);
-
-        assertThat(allUserChanges)
-            .hasSize(1);
-
-        final UserChange retrievedUserChange = allUserChanges.iterator().next();
-
-        assertThat(retrievedUserChange)
-            .isEqualTo(userChange);
-
-        assertThat(retrievedUserChange.getNewUser().getPasskey())
-            .as("Expected the passkey to not be masked")
-            .doesNotContain("*");
-    }
-
-    @Test
-    void whenGetAllUserChangesWithState_givenChangesExists_thenChangesAreReturned_andPasskeyIsHidden_andResponseHas200Status()
+    void whenCreatingUserChange_givenUserChangeWithNewPasskey_andNewPasskeyHasNoValidWorkUnits_thenRequestFails_andResponseHas400Status()
         throws FoldingRestException {
-        final UserChange userChange1 = createUserChange();
-        final UserChange userChange2 = createUserChange();
-        createUserChange();
+        final UserRequest userRequest = generateUser();
+        final User user = UserUtils.create(userRequest);
 
-        USER_CHANGE_REQUEST_SENDER.reject(userChange1.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
-        USER_CHANGE_REQUEST_SENDER.approveNextMonth(userChange2.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
+        final UserChangeRequest userChangeRequest = UserChangeRequest.builder()
+            .userId(user.getId())
+            .foldingUserName(user.getFoldingUserName())
+            .existingPasskey("DummyPasskey12345678901234567891")
+            .passkey(user.getPasskey())
+            .liveStatsLink(DUMMY_LIVE_STATS_LINK)
+            .hardwareId(user.getHardware().getId())
+            .immediate(true)
+            .build();
 
-        final HttpResponse<String> response =
-            USER_CHANGE_REQUEST_SENDER.getAll(List.of(UserChangeState.REJECTED, UserChangeState.APPROVED_NEXT_MONTH));
+        final HttpResponse<String> response = USER_CHANGE_REQUEST_SENDER.create(userChangeRequest);
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
-            .isEqualTo(HttpURLConnection.HTTP_OK);
-
-        final Collection<UserChange> allUserChanges = UserChangeResponseParser.getAll(response);
-        final int xTotalCount = getTotalCount(response);
-
-        assertThat(xTotalCount)
-            .isEqualTo(2);
-
-        assertThat(allUserChanges)
-            .hasSize(2);
-
-        final UserChange retrievedUserChange = allUserChanges.iterator().next();
-
-        final int lengthOfUnmaskedPasskey = 8;
-        final String firstPartOfPasskey = retrievedUserChange.getNewUser().getPasskey().substring(0, lengthOfUnmaskedPasskey);
-        final String secondPartOfPasskey = retrievedUserChange.getNewUser().getPasskey().substring(lengthOfUnmaskedPasskey);
-
-        assertThat(firstPartOfPasskey)
-            .as("Expected the first 8 characters of the passkey to be shown")
-            .doesNotContain("*");
-
-        assertThat(secondPartOfPasskey)
-            .as("Expected the remaining 24 characters of the passkey to be masked")
-            .doesNotContainPattern(Pattern.compile("[a-zA-Z]"));
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
     private static UserChange createUserChange() throws FoldingRestException {
@@ -566,5 +564,25 @@ class UserChangeTest {
             .hardwareId(user.getHardware().getId())
             .immediate(true)
             .build();
+    }
+
+    private static void validatePasskeyIsHidden(final String passkey) {
+        final int lengthOfUnmaskedPasskey = 8;
+        final String firstPartOfPasskey = passkey.substring(0, lengthOfUnmaskedPasskey);
+        final String secondPartOfPasskey = passkey.substring(lengthOfUnmaskedPasskey);
+
+        assertThat(firstPartOfPasskey)
+            .as("Expected the first 8 characters of the passkey to be shown")
+            .doesNotContain("*");
+
+        assertThat(secondPartOfPasskey)
+            .as("Expected the remaining 24 characters of the passkey to be masked")
+            .doesNotContainPattern(Pattern.compile("[a-zA-Z]"));
+    }
+
+    private static void validatePasskeyIsShown(final String passkey) {
+        assertThat(passkey)
+            .as("Expected the passkey to not be masked")
+            .doesNotContain("*");
     }
 }

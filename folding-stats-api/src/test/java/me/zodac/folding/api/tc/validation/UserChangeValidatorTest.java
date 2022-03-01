@@ -34,6 +34,9 @@ import me.zodac.folding.api.tc.HardwareMake;
 import me.zodac.folding.api.tc.HardwareType;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.change.UserChange;
+import me.zodac.folding.api.tc.validation.retriever.ExternalConnectionFoldingStatsRetriever;
+import me.zodac.folding.api.tc.validation.retriever.NoUnitsFoldingStatsRetriever;
+import me.zodac.folding.api.tc.validation.retriever.ValidFoldingStatsRetriever;
 import me.zodac.folding.rest.api.tc.request.UserChangeRequest;
 import org.junit.jupiter.api.Test;
 
@@ -59,7 +62,7 @@ class UserChangeValidatorTest {
             .liveStatsLink("https://www.google.ie")
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create();
+        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<UserChange> response = userChangeValidator.validate(
             userChange,
             Collections.emptyList(),
@@ -77,7 +80,7 @@ class UserChangeValidatorTest {
         final Hardware hardware = generateHardware();
         final User user = generateUser(hardware);
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create();
+        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<UserChange> response = userChangeValidator.validate(
             null,
             Collections.emptyList(),
@@ -106,7 +109,7 @@ class UserChangeValidatorTest {
             .liveStatsLink("https://www.google.ie")
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create();
+        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<UserChange> response = userChangeValidator.validate(
             userChange,
             Collections.emptyList(),
@@ -135,7 +138,7 @@ class UserChangeValidatorTest {
             .liveStatsLink("https://www.google.ie")
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create();
+        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<UserChange> response = userChangeValidator.validate(
             userChange,
             Collections.emptyList(),
@@ -164,7 +167,7 @@ class UserChangeValidatorTest {
             .liveStatsLink("https://www.google.ie")
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create();
+        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<UserChange> response = userChangeValidator.validate(
             userChange,
             Collections.emptyList(),
@@ -193,7 +196,7 @@ class UserChangeValidatorTest {
             .liveStatsLink("https://www.google.ie")
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create();
+        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<UserChange> response = userChangeValidator.validate(
             userChange,
             Collections.emptyList(),
@@ -222,7 +225,7 @@ class UserChangeValidatorTest {
             .liveStatsLink(null)
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create();
+        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<UserChange> response = userChangeValidator.validate(
             userChange,
             Collections.emptyList(),
@@ -249,7 +252,7 @@ class UserChangeValidatorTest {
             .liveStatsLink("invalidUrl")
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create();
+        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<UserChange> response = userChangeValidator.validate(
             userChange,
             Collections.emptyList(),
@@ -278,7 +281,7 @@ class UserChangeValidatorTest {
             .liveStatsLink("https://www.google.ie")
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create();
+        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<UserChange> response = userChangeValidator.validate(
             userChange,
             Collections.emptyList(),
@@ -307,7 +310,7 @@ class UserChangeValidatorTest {
             .liveStatsLink("https://www.google.ie")
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create();
+        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<UserChange> response = userChangeValidator.validate(
             userChange,
             Collections.emptyList(),
@@ -336,7 +339,7 @@ class UserChangeValidatorTest {
             .liveStatsLink("https://www.google.ie")
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create();
+        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<UserChange> response = userChangeValidator.validate(
             userChange,
             Collections.emptyList(),
@@ -365,7 +368,7 @@ class UserChangeValidatorTest {
             .liveStatsLink("https://www.google.ie")
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create();
+        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<UserChange> response = userChangeValidator.validate(
             userChange,
             Collections.emptyList(),
@@ -394,7 +397,7 @@ class UserChangeValidatorTest {
             .liveStatsLink("https://www.google.ie")
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create();
+        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<UserChange> response = userChangeValidator.validate(
             userChange,
             Collections.emptyList(),
@@ -423,7 +426,7 @@ class UserChangeValidatorTest {
             .liveStatsLink(user.getLiveStatsLink())
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create();
+        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<UserChange> response = userChangeValidator.validate(
             userChange,
             Collections.emptyList(),
@@ -466,7 +469,7 @@ class UserChangeValidatorTest {
                 .build())
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create();
+        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
         final ValidationResult<UserChange> response = userChangeValidator.validate(
             userChange,
             List.of(existingUserChange),
@@ -479,6 +482,70 @@ class UserChangeValidatorTest {
 
         assertThat(response.getErrors())
             .containsOnly("Payload conflicts with an existing object on: [foldingUserName, passkey, liveStatsLink, hardwareId]");
+    }
+
+    @Test
+    void whenValidating_givenUserWorkUnitsCannotBeAccessed_thenFailureResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final User user = generateUser(hardware);
+
+        final UserChangeRequest userChange = UserChangeRequest.builder()
+            .existingPasskey(user.getPasskey())
+            .foldingUserName(user.getFoldingUserName())
+            .passkey("DummyPasskey12345678901234567891")
+            .hardwareId(hardware.getId())
+            .userId(user.getId())
+            .liveStatsLink("https://www.google.ie")
+            .build();
+
+        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ExternalConnectionFoldingStatsRetriever());
+        final ValidationResult<UserChange> response = userChangeValidator.validate(
+            userChange,
+            Collections.emptyList(),
+            List.of(hardware),
+            List.of(user)
+        );
+
+        assertThat(response.isFailure())
+            .isTrue();
+
+        assertThat(response.getErrors())
+            .containsOnly(
+                String.format("Unable to connect to 'https://www.google.com' to check stats for Folding@Home user '%s': Error connecting",
+                    userChange.getFoldingUserName())
+            );
+    }
+
+    @Test
+    void whenValidating_givenNewUserHasNoWorkUnitsCompleted_thenFailureResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final User user = generateUser(hardware);
+
+        final UserChangeRequest userChange = UserChangeRequest.builder()
+            .existingPasskey(user.getPasskey())
+            .foldingUserName(user.getFoldingUserName())
+            .passkey("DummyPasskey12345678901234567891")
+            .hardwareId(hardware.getId())
+            .userId(user.getId())
+            .liveStatsLink("https://www.google.ie")
+            .build();
+
+        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new NoUnitsFoldingStatsRetriever());
+        final ValidationResult<UserChange> response = userChangeValidator.validate(
+            userChange,
+            Collections.emptyList(),
+            List.of(hardware),
+            List.of(user)
+        );
+
+        assertThat(response.isFailure())
+            .isTrue();
+
+        assertThat(response.getErrors())
+            .containsOnly(
+                String.format("User '%s' has 0 Work Units with passkey '%s', there must be at least one completed Work Unit before adding the user",
+                    userChange.getFoldingUserName(), userChange.getPasskey())
+            );
     }
 
     private static Hardware generateHardware() {

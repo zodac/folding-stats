@@ -47,6 +47,7 @@ import me.zodac.folding.rest.api.tc.request.UserChangeRequest;
 import me.zodac.folding.rest.exception.InvalidStateException;
 import me.zodac.folding.rest.util.IntegerParser;
 import me.zodac.folding.rest.util.ValidationFailureResponseMapper;
+import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,18 +117,18 @@ public class UserChangeEndpoint {
                                     final HttpServletRequest request) {
         LOGGER.info("POST request for user change received at '{}'", request::getRequestURI);
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create();
-        final ValidationResult<UserChange> validationResult = userChangeValidator.validate(
+        final UserChangeValidator userChangeValidator = UserChangeValidator.create(HttpFoldingStatsRetriever.create());
+        final ValidationResult<UserChange> validationResultForUserChange = userChangeValidator.validate(
             userChangeRequest,
             foldingRepository.getAllUserChangesWithPasskeys(UserChangeState.getOpenStates()),
             foldingRepository.getAllHardware(),
             foldingRepository.getAllUsersWithPasskeys()
         );
-        if (validationResult.isFailure()) {
-            return ValidationFailureResponseMapper.map(validationResult);
+        if (validationResultForUserChange.isFailure()) {
+            return ValidationFailureResponseMapper.map(validationResultForUserChange);
         }
 
-        final UserChange validatedUserChange = validationResult.output();
+        final UserChange validatedUserChange = validationResultForUserChange.output();
         final UserChange createdUserChange = foldingRepository.createUserChange(validatedUserChange);
 
         userChangeCreates.increment();
@@ -140,10 +141,24 @@ public class UserChangeEndpoint {
      * @param request the {@link HttpServletRequest}
      * @return {@link me.zodac.folding.rest.response.Responses#ok(Collection)} containing the {@link UserChange}s
      */
-    @RolesAllowed("admin")
     @ReadRequired
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getAll(final HttpServletRequest request) {
+    public ResponseEntity<?> getAllWithoutPasskey(final HttpServletRequest request) {
+        LOGGER.info("GET request for all user changes received at '{}'", request::getRequestURI);
+        final Collection<UserChange> userChanges = foldingRepository.getAllUserChangesWithoutPasskeys();
+        return ok(userChanges);
+    }
+
+    /**
+     * {@link GetMapping} request to retrieve all {@link UserChange}s.
+     *
+     * @param request the {@link HttpServletRequest}
+     * @return {@link me.zodac.folding.rest.response.Responses#ok(Collection)} containing the {@link UserChange}s
+     */
+    @RolesAllowed("admin")
+    @ReadRequired
+    @GetMapping(path = "/passkey", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getAllWithPasskey(final HttpServletRequest request) {
         LOGGER.info("GET request for all user changes received at '{}'", request::getRequestURI);
         final Collection<UserChange> userChanges = foldingRepository.getAllUserChangesWithPasskeys();
         return ok(userChanges);
@@ -156,9 +171,36 @@ public class UserChangeEndpoint {
      * @param request the {@link HttpServletRequest}
      * @return {@link me.zodac.folding.rest.response.Responses#ok(Collection)} containing the {@link UserChange}s
      */
+    @RolesAllowed("admin")
+    @ReadRequired
+    @GetMapping(path = "/passkey/fields", produces = MediaType.APPLICATION_JSON_VALUE)
+    // TODO: Add time window
+    public ResponseEntity<?> getAllByStateWithPasskeys(@RequestParam("state") final String state, final HttpServletRequest request) {
+        LOGGER.info("GET request for all user changes with state received at '{}'", request::getRequestURI);
+
+        final Collection<UserChangeState> states = Arrays.stream(state.split(","))
+            .map(UserChangeState::get)
+            .filter(userChangeState -> userChangeState != UserChangeState.INVALID)
+            .collect(Collectors.toSet());
+
+        if (states.isEmpty()) {
+            return ok();
+        }
+
+        final Collection<UserChange> userChanges = foldingRepository.getAllUserChangesWithPasskeys(states);
+        return ok(userChanges);
+    }
+
+    /**
+     * {@link GetMapping} request to retrieve all {@link UserChange}s with one of the provides {@link UserChangeState}s.
+     *
+     * @param state   a comma-separated {@link String} of the {@link UserChangeState}s to look for
+     * @param request the {@link HttpServletRequest}
+     * @return {@link me.zodac.folding.rest.response.Responses#ok(Collection)} containing the {@link UserChange}s
+     */
     @ReadRequired
     @GetMapping(path = "/fields", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getAllByState(@RequestParam("state") final String state, final HttpServletRequest request) {
+    public ResponseEntity<?> getAllByStateWithoutPasskeys(@RequestParam("state") final String state, final HttpServletRequest request) {
         LOGGER.info("GET request for all user changes with state received at '{}'", request::getRequestURI);
 
         final Collection<UserChangeState> states = Arrays.stream(state.split(","))

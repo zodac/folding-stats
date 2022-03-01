@@ -387,8 +387,9 @@ function createUser() {
                 document.getElementById("user_create_hardware_selector_input").value = "";
                 document.getElementById("user_create_team_selector_input").value = "";
                 document.getElementById("user_create_is_captain").checked = false;
+
                 successToast("User '" + displayName + "' created");
-                loadUsers();
+                loadUsersAdmin();
             })
             .catch((error) => {
                 hide("loader");
@@ -481,7 +482,7 @@ function updateUser() {
                 }
 
                 successToast("User '" + displayName + "' updated");
-                loadUsers();
+                loadUsersAdmin();
             })
             .catch((error) => {
                 hide("loader");
@@ -535,7 +536,7 @@ function deleteUser() {
         }
 
         successToast("User '" + displayName + "' deleted");
-        loadUsers();
+        loadUsersAdmin();
     })
     .catch((error) => {
         hide("loader");
@@ -607,7 +608,7 @@ function offsetUser() {
             }
 
             successToast("User '" + displayName + "' stats updated: " + offsetPoints + " points, " + offsetUnits + " units");
-            loadUsers();
+            loadUsersAdmin();
         })
         .catch((error) => {
             hide("loader");
@@ -659,7 +660,7 @@ function createUserChange() {
         .then(response => {
             hide("loader");
 
-            if(response.status != 201){
+            if(response.status == 409){
                 response.json()
                 .then(response => {
                     failureToast("Request already exists!");
@@ -697,5 +698,75 @@ function createUserChange() {
             console.error("Unexpected error creating request: ", error);
             return false;
         });
+    });
+}
+
+function approveUserChangeNow(id){
+    var url = encodeURI(REST_ENDPOINT_URL+"/changes/" + id + "/approve/immediate")
+    fetch(url, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": sessionGet("Authorization")
+        }
+    })
+    .then(response => {
+        hide("loader");
+        successToast("Request approved (now)");
+
+        loadPendingUserChangesAdmin();
+        loadCompletedUserChangesAdmin();
+        loadUsersAdmin();
+    })
+    .catch((error) => {
+        hide("loader");
+        console.error("Unexpected error approving request (now): ", error);
+        return false;
+    });
+}
+
+function approveUserChangeNextMonth(id){
+    var url = encodeURI(REST_ENDPOINT_URL+"/changes/" + id + "/approve/next")
+    fetch(url, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": sessionGet("Authorization")
+        }
+    })
+    .then(response => {
+        hide("loader");
+        successToast("Request approved (next month)");
+
+        loadPendingUserChangesAdmin();
+        loadCompletedUserChangesAdmin();
+    })
+    .catch((error) => {
+        hide("loader");
+        console.error("Unexpected error approving request (next month): ", error);
+        return false;
+    });
+}
+
+function rejectUserChange(id){
+    var url = encodeURI(REST_ENDPOINT_URL+"/changes/" + id + "/reject")
+    fetch(url, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": sessionGet("Authorization")
+        }
+    })
+    .then(response => {
+        hide("loader");
+        successToast("Request rejected");
+
+        loadPendingUserChangesAdmin();
+        loadCompletedUserChangesAdmin();
+    })
+    .catch((error) => {
+        hide("loader");
+        console.error("Unexpected error rejecting request: ", error);
+        return false;
     });
 }

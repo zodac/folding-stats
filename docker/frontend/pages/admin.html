@@ -126,7 +126,17 @@
 
 <div id="admin_functions" style="display:none;">
     <h2 class="navbar-brand">Admin Functions</h2>
-    <button onclick="toggleMainButtonStyle('hardware_admin_button', this.classList)" class="btn btn-primary"
+    <button onclick="toggleMainButtonStyle('pending_user_changes_button', this.classList)" class="btn btn-primary"
+            id="pending_user_changes_button" href="#pending_user_changes_div" data-bs-toggle="collapse" role="button">
+        Pending Requests
+    </button>
+    <button onclick="toggleMainButtonStyle('completed_user_changes_button', this.classList)" class="btn btn-primary"
+            id="completed_user_changes_button" href="#completed_user_changes_div" data-bs-toggle="collapse"
+            role="button">
+        Completed Requests
+    </button>
+    <button onclick="toggleMainButtonStyle('hardware_admin_button', this.classList); window.open()"
+            class="btn btn-primary"
             id="hardware_admin_button" href="#hardware_admin_functions" data-bs-toggle="collapse" role="button">Hardware
     </button>
     <button onclick="toggleMainButtonStyle('teams_admin_button', this.classList)" class="btn btn-primary"
@@ -135,6 +145,14 @@
     <button onclick="toggleMainButtonStyle('user_admin_button', this.classList)" class="btn btn-primary"
             id="user_admin_button" href="#user_admin_functions" data-bs-toggle="collapse" role="button">Users
     </button>
+
+    <div>
+        <br/>
+    </div>
+
+    <!-- These divs will be populated by admin.js -->
+    <div id="pending_user_changes_div" class="collapse"></div>
+    <div id="completed_user_changes_div" class="collapse"></div>
 
     <div>
         <br/>
@@ -162,6 +180,9 @@
 
     <div id="hardware_admin_functions" class="collapse">
         <h1 class="navbar-brand">Hardware Admin Functions</h1>
+        <!-- This div will be populated by admin.js -->
+        <div id="hardware_div"></div>
+
         <div id="hardware_accordion" class="accordion bg-dark text-light">
 
             <div id="hardware_create_accordion_parent" class="accordion-item bg-dark">
@@ -426,6 +447,9 @@
 
     <div id="team_admin_functions" class="collapse">
         <h1 class="navbar-brand">Team Admin Functions</h1>
+        <!-- This div will be populated by admin.js -->
+        <div id="teams_div"></div>
+
         <div id="team_accordion" class="accordion bg-dark text-light">
 
             <div id="team_create_accordion_parent" class="accordion-item bg-dark">
@@ -583,6 +607,9 @@
 
     <div id="user_admin_functions" class="collapse">
         <h1 class="navbar-brand">User Admin Functions</h1>
+        <!-- This div will be populated by admin.js -->
+        <div id="users_div"></div>
+
         <div id="user_accordion" class="accordion bg-dark text-light">
 
             <div id="user_create_accordion_parent" class="accordion-item bg-dark">

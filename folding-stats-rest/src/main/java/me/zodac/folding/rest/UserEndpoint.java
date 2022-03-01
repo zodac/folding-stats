@@ -139,6 +139,22 @@ public class UserEndpoint {
     }
 
     /**
+     * {@link GetMapping} request to retrieve all {@link User}s.
+     *
+     * @param request the {@link HttpServletRequest}
+     * @return {@link me.zodac.folding.rest.response.Responses#cachedOk(Collection, long)} containing the {@link User}s
+     */
+    @RolesAllowed("admin")
+    @ReadRequired
+    @PermitAll
+    @GetMapping(path = "/all/passkey", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getAllWithPasskeys(final HttpServletRequest request) {
+        LOGGER.debug("GET request received for all users at '{}'", request::getRequestURI);
+        final Collection<User> elements = foldingRepository.getAllUsersWithPasskeys();
+        return cachedOk(elements, untilNextMonthUtc(ChronoUnit.SECONDS));
+    }
+
+    /**
      * {@link GetMapping} request to retrieve a {@link User} by {@code userId}.
      *
      * @param userId  the ID of the {@link User} to retrieve
@@ -148,6 +164,7 @@ public class UserEndpoint {
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    // TODO: Force int param?
     public ResponseEntity<?> getById(@PathVariable("userId") final String userId, final HttpServletRequest request) {
         LOGGER.debug("GET request for user received at '{}'", request::getRequestURI);
 

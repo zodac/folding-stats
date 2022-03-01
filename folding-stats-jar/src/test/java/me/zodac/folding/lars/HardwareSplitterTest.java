@@ -114,10 +114,6 @@ class HardwareSplitterTest {
                 .multiplier(1.00D)
                 .build(),
             Hardware.builder()
-                .hardwareName("Test1") // Duplicate value, should be ignored
-                .multiplier(2.00D)
-                .build(),
-            Hardware.builder()
                 .hardwareName("Test2")
                 .multiplier(1.00D)
                 .build(),
@@ -128,6 +124,10 @@ class HardwareSplitterTest {
             Hardware.builder()
                 .hardwareName("Test4")
                 .multiplier(1.00D)
+                .build(),
+            Hardware.builder()
+                .hardwareName("Test4") // Duplicate value, should be ignored
+                .multiplier(2.00D)
                 .build()
         );
         final Collection<Hardware> existing = Set.of(

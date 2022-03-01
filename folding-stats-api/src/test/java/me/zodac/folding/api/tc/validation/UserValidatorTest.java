@@ -29,18 +29,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import me.zodac.folding.api.exception.ExternalConnectionException;
-import me.zodac.folding.api.stats.FoldingStatsDetails;
-import me.zodac.folding.api.stats.FoldingStatsRetriever;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.HardwareMake;
 import me.zodac.folding.api.tc.HardwareType;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.tc.stats.Stats;
-import me.zodac.folding.api.tc.stats.UserStats;
-import me.zodac.folding.api.util.DateTimeUtils;
+import me.zodac.folding.api.tc.validation.retriever.ExternalConnectionFoldingStatsRetriever;
+import me.zodac.folding.api.tc.validation.retriever.NoUnitsFoldingStatsRetriever;
+import me.zodac.folding.api.tc.validation.retriever.ValidFoldingStatsRetriever;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 import org.junit.jupiter.api.Test;
 
@@ -2727,44 +2724,5 @@ class UserValidatorTest {
             .teamDescription("teamDescription")
             .forumLink("https://www.google.com")
             .build();
-    }
-
-    private static class ValidFoldingStatsRetriever implements FoldingStatsRetriever {
-
-        @Override
-        public Stats getStats(final FoldingStatsDetails foldingStatsDetails) {
-            return Stats.create(1L, 1);
-        }
-
-        @Override
-        public UserStats getTotalStats(final User user) {
-            return UserStats.create(user.getId(), DateTimeUtils.currentUtcTimestamp(), 1L, 1);
-        }
-    }
-
-    private static class NoUnitsFoldingStatsRetriever implements FoldingStatsRetriever {
-
-        @Override
-        public Stats getStats(final FoldingStatsDetails foldingStatsDetails) {
-            return Stats.create(0L, 0);
-        }
-
-        @Override
-        public UserStats getTotalStats(final User user) {
-            return UserStats.create(user.getId(), DateTimeUtils.currentUtcTimestamp(), 0L, 0);
-        }
-    }
-
-    private static class ExternalConnectionFoldingStatsRetriever implements FoldingStatsRetriever {
-
-        @Override
-        public Stats getStats(final FoldingStatsDetails foldingStatsDetails) throws ExternalConnectionException {
-            throw new ExternalConnectionException("https://www.google.com", "Error connecting");
-        }
-
-        @Override
-        public UserStats getTotalStats(final User user) throws ExternalConnectionException {
-            throw new ExternalConnectionException("https://www.google.com", "Error connecting");
-        }
     }
 }

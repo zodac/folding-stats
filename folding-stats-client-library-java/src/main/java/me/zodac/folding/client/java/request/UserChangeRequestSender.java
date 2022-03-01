@@ -61,17 +61,17 @@ public record UserChangeRequestSender(String requestUrl) {
     }
 
     /**
-     * Send a <b>GET</b> request to retrieve all {@link UserChange}s in the system.
+     * Send a <b>GET</b> request to retrieve all {@link UserChange}s in the system, with passkeys shown.
      *
      * @param userName the username
      * @param password the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
-    public HttpResponse<String> getAll(final String userName, final String password) throws FoldingRestException {
+    public HttpResponse<String> getAllWithPasskeys(final String userName, final String password) throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(requestUrl))
+            .uri(URI.create(requestUrl + "/passkey"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
             .build();
@@ -80,20 +80,76 @@ public record UserChangeRequestSender(String requestUrl) {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new FoldingRestException("Error sending HTTP request to get all user changes", e);
+            throw new FoldingRestException("Error sending HTTP request to get all user changes with passkeys", e);
         } catch (final IOException e) {
-            throw new FoldingRestException("Error sending HTTP request to get all user changes", e);
+            throw new FoldingRestException("Error sending HTTP request to get all user changes with passkeys", e);
         }
     }
 
     /**
-     * Send a <b>GET</b> request to retrieve all {@link UserChange}s in the system with a specific {@link UserChangeState}.
+     * Send a <b>GET</b> request to retrieve all {@link UserChange}s in the system with a specific {@link UserChangeState}, with passkeys shown.
+     *
+     * @param userChangeStates the {@link UserChangeState}s to look for
+     * @param userName         the username
+     * @param password         the password
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     */
+    public HttpResponse<String> getAllWithPasskeys(final Collection<UserChangeState> userChangeStates, final String userName,
+                                                   final String password) throws FoldingRestException {
+        final String commaSeparatedStates = userChangeStates
+            .stream()
+            .map(UserChangeState::toString)
+            .collect(Collectors.joining(","));
+
+        final HttpRequest request = HttpRequest.newBuilder()
+            .GET()
+            .uri(URI.create(requestUrl + "/passkey/fields?state=" + commaSeparatedStates))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
+            .build();
+
+        try {
+            return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException("Error sending HTTP request to get all user changes with states with passkeys", e);
+        } catch (final IOException e) {
+            throw new FoldingRestException("Error sending HTTP request to get all user changes with states with passkeys", e);
+        }
+    }
+
+    /**
+     * Send a <b>GET</b> request to retrieve all {@link UserChange}s in the system, with passkeys hidden.
+     *
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     */
+    public HttpResponse<String> getAllWithoutPasskeys() throws FoldingRestException {
+        final HttpRequest request = HttpRequest.newBuilder()
+            .GET()
+            .uri(URI.create(requestUrl))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .build();
+
+        try {
+            return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException("Error sending HTTP request to get all user changes without passkeys", e);
+        } catch (final IOException e) {
+            throw new FoldingRestException("Error sending HTTP request to get all user changes without passkeys", e);
+        }
+    }
+
+    /**
+     * Send a <b>GET</b> request to retrieve all {@link UserChange}s in the system with a specific {@link UserChangeState}, with passkeys hidden.
      *
      * @param userChangeStates the {@link UserChangeState}s to look for
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
-    public HttpResponse<String> getAll(final Collection<UserChangeState> userChangeStates) throws FoldingRestException {
+    public HttpResponse<String> getAllWithoutPasskeys(final Collection<UserChangeState> userChangeStates) throws FoldingRestException {
         final String commaSeparatedStates = userChangeStates
             .stream()
             .map(UserChangeState::toString)
@@ -109,9 +165,9 @@ public record UserChangeRequestSender(String requestUrl) {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new FoldingRestException("Error sending HTTP request to get all user changes with states", e);
+            throw new FoldingRestException("Error sending HTTP request to get all user changes with states without passkeys", e);
         } catch (final IOException e) {
-            throw new FoldingRestException("Error sending HTTP request to get all user changes with states", e);
+            throw new FoldingRestException("Error sending HTTP request to get all user changes with states without passkeys", e);
         }
     }
 

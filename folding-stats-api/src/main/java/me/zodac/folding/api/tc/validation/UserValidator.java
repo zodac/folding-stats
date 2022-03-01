@@ -187,7 +187,7 @@ public final class UserValidator {
      *     {@link Category#maximumPermittedAmountForAllCategories()}</li>
      *     <li>If the {@link User} is updating its {@link Category} must not cause its {@link Category} to exceed the
      *     {@link Category#permittedUsers()}</li>
-     *     <li>The 'foldingUserName' and 'passkey' combination has at least 1 Work Unit successfully completed</li>
+     *     <li>The 'foldingUserName' and 'passkey' combination (if either has changed) has at least 1 Work Unit successfully completed</li>
      * </ul>
      *
      * @param userRequest  the {@link UserRequest} to validate

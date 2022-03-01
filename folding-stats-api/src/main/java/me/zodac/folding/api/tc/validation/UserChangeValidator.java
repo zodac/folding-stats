@@ -34,10 +34,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
+import me.zodac.folding.api.exception.ExternalConnectionException;
+import me.zodac.folding.api.stats.FoldingStatsDetails;
+import me.zodac.folding.api.stats.FoldingStatsRetriever;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.change.UserChange;
 import me.zodac.folding.api.tc.change.UserChangeState;
+import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.rest.api.tc.request.UserChangeRequest;
 
 /**
@@ -45,21 +49,24 @@ import me.zodac.folding.rest.api.tc.request.UserChangeRequest;
  */
 public final class UserChangeValidator {
 
+    private final FoldingStatsRetriever foldingStatsRetriever;
+
     // These fields will be set during validation for ease of re-use
-    private Hardware hardwareForUserChange;
-    private User userForUserChange;
+    private Hardware newHardware;
+    private User previousUser;
 
-    private UserChangeValidator() {
-
+    private UserChangeValidator(final FoldingStatsRetriever foldingStatsRetriever) {
+        this.foldingStatsRetriever = foldingStatsRetriever;
     }
 
     /**
      * Create an instance of {@link UserChangeValidator}.
      *
+     * @param foldingStatsRetriever the {@link FoldingStatsRetriever} to verify the user stats
      * @return the created {@link UserChangeValidator}
      */
-    public static UserChangeValidator create() {
-        return new UserChangeValidator();
+    public static UserChangeValidator create(final FoldingStatsRetriever foldingStatsRetriever) {
+        return new UserChangeValidator(foldingStatsRetriever);
     }
 
     /**
@@ -79,6 +86,7 @@ public final class UserChangeValidator {
      *     {@link UserChange}</li>
      *     <li>If fields 'userId, 'hardwareId, 'foldingUserName', 'passkey' and 'liveStatsLink' are valid, they must not be the same values already in
      *     use by the {@link User}</li>
+     *     <li>The 'foldingUserName' and 'passkey' combination (if either has changed) has at least 1 Work Unit successfully completed</li>
      * </ul>
      *
      * @param userChangeRequest              the {@link UserChangeRequest} to validate
@@ -134,30 +142,70 @@ public final class UserChangeValidator {
                 List.of("foldingUserName", "passkey", "liveStatsLink", "hardwareId"));
         }
 
-        final User userWithChanges = User.create(
-            userForUserChange.getId(),
+        final String workUnitError = validateUpdateUserWorkUnits(userChangeRequest.getFoldingUserName(), previousUser.getFoldingUserName(),
+            userChangeRequest.getPasskey(), previousUser.getPasskey());
+        if (workUnitError != null) {
+            return ValidationResult.failure(userChangeRequest, List.of(workUnitError));
+        }
+
+        final User newUser = User.create(
+            previousUser.getId(),
             userChangeRequest.getFoldingUserName(),
-            userForUserChange.getDisplayName(),
+            previousUser.getDisplayName(),
             userChangeRequest.getPasskey(),
-            userForUserChange.getCategory(),
-            userForUserChange.getProfileLink(),
+            previousUser.getCategory(),
+            previousUser.getProfileLink(),
             userChangeRequest.getLiveStatsLink(),
-            hardwareForUserChange,
-            userForUserChange.getTeam(),
-            userForUserChange.isUserIsCaptain()
+            newHardware,
+            previousUser.getTeam(),
+            previousUser.isUserIsCaptain()
         );
         final UserChangeState userChangeState =
             userChangeRequest.isImmediate() ? UserChangeState.REQUESTED_NOW : UserChangeState.REQUESTED_NEXT_MONTH;
 
-        final UserChange userChange = UserChange.createNow(userForUserChange, userWithChanges, userChangeState);
+        final UserChange userChange = UserChange.createNow(previousUser, newUser, userChangeState);
         return ValidationResult.successful(userChange);
     }
 
+    private String validateUpdateUserWorkUnits(final String newFoldingUserName,
+                                               final String previousFoldingUserName,
+                                               final String newPasskey,
+                                               final String previousPasskey) {
+        final boolean isFoldingUserNameChange = !newFoldingUserName.equalsIgnoreCase(previousFoldingUserName);
+        final boolean isPasskeyChange = !newPasskey.equalsIgnoreCase(previousPasskey);
+
+        if (isFoldingUserNameChange || isPasskeyChange) {
+            final FoldingStatsDetails foldingStatsDetails = FoldingStatsDetails.create(newFoldingUserName, newPasskey);
+            return validateUserWorkUnits(foldingStatsDetails);
+        }
+
+        return null;
+    }
+
+    private String validateUserWorkUnits(final FoldingStatsDetails foldingStatsDetails) {
+        try {
+            final Stats statsForUserAndPasskey = foldingStatsRetriever.getStats(foldingStatsDetails);
+
+            if (statsForUserAndPasskey.getUnits() == 0) {
+                return String.format(
+                    "User '%s' has 0 Work Units with passkey '%s', there must be at least one completed Work Unit before adding the user",
+                    foldingStatsDetails.foldingUserName(), foldingStatsDetails.passkey());
+            }
+        } catch (final ExternalConnectionException e) {
+            return String.format("Unable to connect to '%s' to check stats for Folding@Home user '%s': %s", e.getUrl(),
+                foldingStatsDetails.foldingUserName(), e.getMessage());
+        } catch (final Exception e) {
+            return String.format("Unable to check stats for Folding@Home user '%s': %s", foldingStatsDetails.foldingUserName(), e.getMessage());
+        }
+
+        return null;
+    }
+
     private boolean isUserChangeUnnecessary(final UserChangeRequest userChangeRequest) {
-        return userForUserChange.getHardware().getId() == userChangeRequest.getHardwareId()
-            && userForUserChange.getFoldingUserName().equals(userChangeRequest.getFoldingUserName())
-            && userForUserChange.getPasskey().equals(userChangeRequest.getPasskey())
-            && isEqualSafe(userForUserChange.getLiveStatsLink(), userChangeRequest.getLiveStatsLink());
+        return previousUser.getHardware().getId() == userChangeRequest.getHardwareId()
+            && previousUser.getFoldingUserName().equals(userChangeRequest.getFoldingUserName())
+            && previousUser.getPasskey().equals(userChangeRequest.getPasskey())
+            && isEqualSafe(previousUser.getLiveStatsLink(), userChangeRequest.getLiveStatsLink());
     }
 
     private String hardware(final UserChangeRequest userChangeRequest, final Collection<Hardware> allHardware) {
@@ -175,7 +223,7 @@ public final class UserChangeValidator {
             return String.format("Field 'hardwareId' must be one of: %s", availableHardware);
         }
 
-        hardwareForUserChange = optionalHardware.get();
+        newHardware = optionalHardware.get();
         return null;
     }
 
@@ -194,7 +242,7 @@ public final class UserChangeValidator {
             return String.format("Field 'userId' must be one of: %s", availableUsers);
         }
 
-        userForUserChange = optionalUser.get();
+        previousUser = optionalUser.get();
         return null;
     }
 
@@ -234,7 +282,7 @@ public final class UserChangeValidator {
     }
 
     private String existingPasskey(final UserChangeRequest userChangeRequest) {
-        return userForUserChange.getPasskey().equals(userChangeRequest.getExistingPasskey())
+        return previousUser.getPasskey().equals(userChangeRequest.getExistingPasskey())
             ? null
             : "Field 'existingPasskey' does not match the existing passkey for the user";
     }

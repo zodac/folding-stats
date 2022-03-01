@@ -29,6 +29,7 @@ import java.lang.reflect.Type;
 import java.net.http.HttpResponse;
 import java.util.Collection;
 import me.zodac.folding.api.tc.change.UserChange;
+import me.zodac.folding.client.java.request.UserChangeRequestSender;
 import me.zodac.folding.rest.api.tc.request.UserChangeRequest;
 import me.zodac.folding.rest.util.RestUtilConstants;
 
@@ -42,8 +43,9 @@ public final class UserChangeResponseParser {
     }
 
     /**
-     * Returns the {@link UserChange}s retrieved by {@link me.zodac.folding.client.java.request.UserChangeRequestSender#getAll(String, String)} or
-     * {@link me.zodac.folding.client.java.request.UserChangeRequestSender#getAll(Collection)}.
+     * Returns the {@link UserChange}s retrieved by {@link UserChangeRequestSender#getAllWithoutPasskeys()},
+     * {@link UserChangeRequestSender#getAllWithoutPasskeys(Collection)}, {@link UserChangeRequestSender#getAllWithPasskeys(String, String)} or
+     * {@link UserChangeRequestSender#getAllWithPasskeys(Collection, String, String)}.
      *
      * @param response the {@link HttpResponse} to parse
      * @return the retrieved {@link UserChange}s

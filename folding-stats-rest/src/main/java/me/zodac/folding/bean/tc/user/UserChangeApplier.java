@@ -77,14 +77,12 @@ public class UserChangeApplier {
      * @see FoldingRepository#updateUser(User, User)
      */
     public UserChange apply(final UserChange userChange) {
-        LOGGER.info("Applying for UserChange: {}", userChange);
-        final User existingUser = foldingRepository.getUserWithPasskey(userChange.getNewUser().getId());
-        LOGGER.info("Found existing user: {}", existingUser);
-        foldingRepository.updateUser(userChange.getNewUser(), existingUser);
-        LOGGER.info("Updated user");
+        LOGGER.info("Applying UserChange {} for: {}", userChange.getId(), userChange.getNewUser().getDisplayName());
+        foldingRepository.updateUser(userChange.getNewUser(), userChange.getPreviousUser());
+        LOGGER.debug("Updated user");
 
         final UserChange userChangeToUpdate = UserChange.updateWithState(UserChangeState.COMPLETED, userChange);
-        LOGGER.info("Updating UserChange to complete");
+        LOGGER.debug("Updating UserChange to complete");
         return foldingRepository.updateUserChange(userChangeToUpdate);
     }
 }
