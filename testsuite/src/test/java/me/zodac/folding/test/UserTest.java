@@ -303,19 +303,6 @@ class UserTest {
     }
 
     @Test
-    void whenGettingUser_givenAnOutOfRangeUserId_thenResponseHas400Status() throws FoldingRestException {
-        final HttpResponse<String> response = USER_REQUEST_SENDER.get(TestConstants.OUT_OF_RANGE_ID);
-
-        assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
-            .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
-
-        assertThat(response.body())
-            .as("Did not receive valid error message: " + response.body())
-            .contains("out of range");
-    }
-
-    @Test
     void whenGettingUser_givenInvalidUserId_thenResponseHas400Status() throws IOException, InterruptedException {
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
@@ -343,20 +330,6 @@ class UserTest {
         assertThat(response.statusCode())
             .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
-    }
-
-    @Test
-    void whenUpdatingUser_givenOutOfRangeUserId_thenResponseHas400Status() throws FoldingRestException {
-        final UserRequest updatedUser = generateUser();
-        final HttpResponse<String> response =
-            USER_REQUEST_SENDER.update(TestConstants.OUT_OF_RANGE_ID, updatedUser, ADMIN_USER.userName(), ADMIN_USER.password());
-        assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
-            .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
-
-        assertThat(response.body())
-            .as("Did not receive valid error message: " + response.body())
-            .contains("out of range");
     }
 
     @Test
@@ -412,15 +385,6 @@ class UserTest {
         assertThat(response.statusCode())
             .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
-    }
-
-    @Test
-    void whenDeletingUser_givenOutOfRangeUserId_thenResponseHas400Status() throws FoldingRestException {
-        final HttpResponse<Void> response = USER_REQUEST_SENDER.delete(TestConstants.OUT_OF_RANGE_ID, ADMIN_USER.userName(), ADMIN_USER.password());
-
-        assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
-            .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
     @Test

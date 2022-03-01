@@ -48,7 +48,6 @@ import me.zodac.folding.api.tc.validation.ValidationResult;
 import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.bean.FoldingRepository;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
-import me.zodac.folding.rest.util.IntegerParser;
 import me.zodac.folding.rest.util.ValidationFailureResponseMapper;
 import me.zodac.folding.state.SystemStateManager;
 import org.apache.logging.log4j.LogManager;
@@ -152,11 +151,10 @@ public class HardwareEndpoint {
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/{hardwareId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getById(@PathVariable("hardwareId") final String hardwareId, final HttpServletRequest request) {
+    public ResponseEntity<?> getById(@PathVariable("hardwareId") final int hardwareId, final HttpServletRequest request) {
         LOGGER.debug("GET request for hardware received at '{}'", request::getRequestURI);
 
-        final int parsedId = IntegerParser.parsePositive(hardwareId);
-        final Hardware element = foldingRepository.getHardware(parsedId);
+        final Hardware element = foldingRepository.getHardware(hardwareId);
         return cachedOk(element, untilNextMonthUtc(ChronoUnit.SECONDS));
     }
 
@@ -204,13 +202,12 @@ public class HardwareEndpoint {
     @WriteRequired
     @RolesAllowed("admin")
     @PutMapping(path = "/{hardwareId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> updateById(@PathVariable("hardwareId") final String hardwareId,
+    public ResponseEntity<?> updateById(@PathVariable("hardwareId") final int hardwareId,
                                         @RequestBody final HardwareRequest hardwareRequest,
                                         final HttpServletRequest request) {
         LOGGER.debug("PUT request for hardware received at '{}'", request::getRequestURI);
 
-        final int parsedId = IntegerParser.parsePositive(hardwareId);
-        final Hardware existingHardware = foldingRepository.getHardware(parsedId);
+        final Hardware existingHardware = foldingRepository.getHardware(hardwareId);
 
         if (existingHardware.isEqualRequest(hardwareRequest)) {
             LOGGER.debug("No change necessary");
@@ -243,11 +240,10 @@ public class HardwareEndpoint {
     @WriteRequired
     @RolesAllowed("admin")
     @DeleteMapping(path = "/{hardwareId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> deleteById(@PathVariable("hardwareId") final String hardwareId, final HttpServletRequest request) {
+    public ResponseEntity<?> deleteById(@PathVariable("hardwareId") final int hardwareId, final HttpServletRequest request) {
         LOGGER.debug("DELETE request for hardware received at '{}'", request::getRequestURI);
 
-        final int parsedId = IntegerParser.parsePositive(hardwareId);
-        final Hardware hardware = foldingRepository.getHardware(parsedId);
+        final Hardware hardware = foldingRepository.getHardware(hardwareId);
 
         final ValidationResult<Hardware> validationResult = validateDelete(hardware);
         if (validationResult.isFailure()) {

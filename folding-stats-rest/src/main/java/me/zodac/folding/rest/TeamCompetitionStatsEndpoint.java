@@ -54,7 +54,6 @@ import me.zodac.folding.rest.api.tc.CompetitionSummary;
 import me.zodac.folding.rest.api.tc.UserSummary;
 import me.zodac.folding.rest.api.tc.leaderboard.TeamLeaderboardEntry;
 import me.zodac.folding.rest.api.tc.leaderboard.UserCategoryLeaderboardEntry;
-import me.zodac.folding.rest.util.IntegerParser;
 import me.zodac.folding.state.SystemStateManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -152,11 +151,10 @@ public class TeamCompetitionStatsEndpoint {
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getTeamCompetitionStatsForUser(@PathVariable("userId") final String userId, final HttpServletRequest request) {
+    public ResponseEntity<?> getTeamCompetitionStatsForUser(@PathVariable("userId") final int userId, final HttpServletRequest request) {
         LOGGER.debug("GET request received to show TC stats for user received at '{}'", request::getRequestURI);
 
-        final int parsedId = IntegerParser.parsePositive(userId);
-        final User user = foldingRepository.getUserWithoutPasskey(parsedId);
+        final User user = foldingRepository.getUserWithoutPasskey(userId);
 
         final AllTeamsSummary allTeamsSummary = statsRepository.getAllTeamsSummary();
         final Collection<UserSummary> userSummaries = allTeamsSummary.getTeams()
@@ -184,13 +182,12 @@ public class TeamCompetitionStatsEndpoint {
     @WriteRequired
     @RolesAllowed("admin")
     @PatchMapping(path = "/users/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> updateUserWithOffset(@PathVariable("userId") final String userId,
+    public ResponseEntity<?> updateUserWithOffset(@PathVariable("userId") final int userId,
                                                   @RequestBody final OffsetTcStats offsetTcStats,
                                                   final HttpServletRequest request) {
         LOGGER.debug("PATCH request to update offset for user received at '{}': {}", request::getRequestURI, () -> offsetTcStats);
 
-        final int parsedId = IntegerParser.parsePositive(userId);
-        final User user = foldingRepository.getUserWithPasskey(parsedId);
+        final User user = foldingRepository.getUserWithPasskey(userId);
         final Hardware hardware = user.getHardware();
         final OffsetTcStats offsetTcStatsToPersist = OffsetTcStats.updateWithHardwareMultiplier(offsetTcStats, hardware.getMultiplier());
         final OffsetTcStats createdOffsetStats = statsRepository.createOrUpdateOffsetStats(user, offsetTcStatsToPersist);

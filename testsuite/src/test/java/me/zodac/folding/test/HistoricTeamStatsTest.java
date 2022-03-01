@@ -242,19 +242,6 @@ class HistoricTeamStatsTest {
     }
 
     @Test
-    void whenGettingHourlyStats_givenOutOfRangeTeamId_thenResponseHas400Status() throws FoldingRestException {
-        final HttpResponse<String> response =
-            HISTORIC_STATS_REQUEST_SENDER.getHourlyTeamStats(TestConstants.OUT_OF_RANGE_ID, Year.parse("2020"), Month.of(4), 12);
-        assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
-            .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
-
-        assertThat(response.body())
-            .as("Did not receive valid error message: " + response.body())
-            .contains("out of range");
-    }
-
-    @Test
     void whenGettingHourlyStats_givenInvalidTeamId_thenResponseHasA400Status() throws IOException, InterruptedException {
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
@@ -443,19 +430,6 @@ class HistoricTeamStatsTest {
         assertThat(response.statusCode())
             .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
-    }
-
-    @Test
-    void whenGettingDailyStats_givenOutOfRangeTeamId_thenResponseHas400Status() throws FoldingRestException {
-        final HttpResponse<String> response =
-            HISTORIC_STATS_REQUEST_SENDER.getDailyTeamStats(TestConstants.OUT_OF_RANGE_ID, Year.parse("2020"), Month.of(4));
-        assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
-            .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
-
-        assertThat(response.body())
-            .as("Did not receive valid error message: " + response.body())
-            .contains("out of range");
     }
 
     @Test
@@ -653,18 +627,6 @@ class HistoricTeamStatsTest {
         assertThat(response.statusCode())
             .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
-    }
-
-    @Test
-    void whenGettingMonthlyStats_givenOutOfRangeTeamId_thenResponseHas400Status() throws FoldingRestException {
-        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getMonthlyTeamStats(TestConstants.OUT_OF_RANGE_ID, Year.parse("2020"));
-        assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
-            .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
-
-        assertThat(response.body())
-            .as("Did not receive valid error message: " + response.body())
-            .contains("out of range");
     }
 
     @Test

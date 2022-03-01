@@ -36,6 +36,5 @@ public class TestConstants {
 
     // ID
     public static final int NON_EXISTING_ID = 9_999;
-    public static final int OUT_OF_RANGE_ID = -1;
     public static final String INVALID_FORMAT_ID = "id";
 }

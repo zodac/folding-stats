@@ -31,6 +31,7 @@ import org.springframework.http.ResponseEntity;
 /**
  * Utility class used to convert a {@link ValidationResult} into a {@link ResponseEntity} for REST endpoints.
  */
+// TODO: Remove
 public final class ValidationFailureResponseMapper {
 
     private ValidationFailureResponseMapper() {

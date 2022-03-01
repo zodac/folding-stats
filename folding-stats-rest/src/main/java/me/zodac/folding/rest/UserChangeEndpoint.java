@@ -45,7 +45,6 @@ import me.zodac.folding.bean.FoldingRepository;
 import me.zodac.folding.bean.tc.user.UserChangeApplier;
 import me.zodac.folding.rest.api.tc.request.UserChangeRequest;
 import me.zodac.folding.rest.exception.InvalidStateException;
-import me.zodac.folding.rest.util.IntegerParser;
 import me.zodac.folding.rest.util.ValidationFailureResponseMapper;
 import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.apache.logging.log4j.LogManager;
@@ -226,11 +225,10 @@ public class UserChangeEndpoint {
     @RolesAllowed("admin")
     @ReadRequired
     @GetMapping(path = "/{userChangeId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getById(@PathVariable("userChangeId") final String userChangeId, final HttpServletRequest request) {
+    public ResponseEntity<?> getById(@PathVariable("userChangeId") final int userChangeId, final HttpServletRequest request) {
         LOGGER.info("GET request for user change received at '{}'", request::getRequestURI);
 
-        final int parsedId = IntegerParser.parsePositive(userChangeId);
-        final UserChange userChange = foldingRepository.getUserChange(parsedId);
+        final UserChange userChange = foldingRepository.getUserChange(userChangeId);
         return ok(userChange);
     }
 
@@ -248,8 +246,7 @@ public class UserChangeEndpoint {
     @RolesAllowed("admin")
     @WriteRequired
     @PutMapping(path = "/{userChangeId}/approve/immediate", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> approveImmediately(@PathVariable("userChangeId") final String userChangeId,
-                                                final HttpServletRequest request) {
+    public ResponseEntity<?> approveImmediately(@PathVariable("userChangeId") final int userChangeId, final HttpServletRequest request) {
         LOGGER.info("PUT request to approve user change immediately received at '{}'", request::getRequestURI);
         userChangeImmediateApprovals.increment();
         return update(userChangeId, UserChangeState.APPROVED_NOW);
@@ -265,8 +262,7 @@ public class UserChangeEndpoint {
     @RolesAllowed("admin")
     @WriteRequired
     @PutMapping(path = "/{userChangeId}/approve/next", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> approveNextMonth(@PathVariable("userChangeId") final String userChangeId,
-                                              final HttpServletRequest request) {
+    public ResponseEntity<?> approveNextMonth(@PathVariable("userChangeId") final int userChangeId, final HttpServletRequest request) {
         LOGGER.info("PUT request to approve user change next month received at '{}'", request::getRequestURI);
         userChangeNextMonthApprovals.increment();
         return update(userChangeId, UserChangeState.APPROVED_NEXT_MONTH);
@@ -282,17 +278,16 @@ public class UserChangeEndpoint {
     @RolesAllowed("admin")
     @WriteRequired
     @PutMapping(path = "/{userChangeId}/reject", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> reject(@PathVariable("userChangeId") final String userChangeId, final HttpServletRequest request) {
+    public ResponseEntity<?> reject(@PathVariable("userChangeId") final int userChangeId, final HttpServletRequest request) {
         LOGGER.info("PUT request to reject user change received at '{}'", request::getRequestURI);
         userChangeRejects.increment();
         return update(userChangeId, UserChangeState.REJECTED);
     }
 
-    private ResponseEntity<?> update(final String userChangeId, final UserChangeState newState) {
+    private ResponseEntity<?> update(final int userChangeId, final UserChangeState newState) {
         LOGGER.info("Updating UserChange ID {} to state {}", userChangeId, newState);
-        final int parsedId = IntegerParser.parsePositive(userChangeId);
 
-        final UserChange existingUserChange = foldingRepository.getUserChange(parsedId);
+        final UserChange existingUserChange = foldingRepository.getUserChange(userChangeId);
         if (existingUserChange.getState().isFinalState()) {
             throw new InvalidStateException(existingUserChange.getState(), newState);
         }

@@ -29,14 +29,12 @@ import static me.zodac.folding.rest.util.RestUtilConstants.GSON;
 import me.zodac.folding.api.tc.change.UserChangeState;
 import me.zodac.folding.rest.exception.ForbiddenException;
 import me.zodac.folding.rest.exception.InvalidDayException;
-import me.zodac.folding.rest.exception.InvalidIdException;
 import me.zodac.folding.rest.exception.InvalidLoginCredentialsException;
 import me.zodac.folding.rest.exception.InvalidMonthException;
 import me.zodac.folding.rest.exception.InvalidStateException;
 import me.zodac.folding.rest.exception.InvalidYearException;
 import me.zodac.folding.rest.exception.NotFoundException;
 import me.zodac.folding.rest.exception.OutOfRangeDayException;
-import me.zodac.folding.rest.exception.OutOfRangeIdException;
 import me.zodac.folding.rest.exception.ServiceUnavailableException;
 import me.zodac.folding.rest.exception.UnauthorizedException;
 import me.zodac.folding.rest.response.ErrorResponse;
@@ -49,6 +47,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 /**
  * {@link ControllerAdvice} used to return responses for propagated exceptions. These exceptions are to be propagated out of the REST endpoints and
@@ -120,37 +119,19 @@ public class PropagatedExceptionHandler {
     }
 
     /**
-     * Returned when a request made to a REST endpoint has an out of range ID.
-     *
-     * <p>
-     * Returns a <b>400_BAD_REQUEST</b> response with an 'out of range ID' error message body.
-     *
-     * @param e the {@link OutOfRangeIdException}
-     * @return the {@link ErrorResponse} body
-     */
-    @ResponseBody
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(OutOfRangeIdException.class)
-    public String idOutOfRange(final OutOfRangeIdException e) {
-        final String errorMessage = String.format("The ID '%s' is out of range", e.getId());
-        LOGGER.error(errorMessage);
-        return GSON.toJson(ErrorResponse.create(errorMessage));
-    }
-
-    /**
-     * Returned when a request made to a REST endpoint has an invalid ID.
+     * Returned when a request made to a REST endpoint has an invalid parameter type.
      *
      * <p>
      * Returns a <b>400_BAD_REQUEST</b> response with an 'invalid ID' error message body.
      *
-     * @param e the {@link InvalidIdException}
+     * @param e the {@link MethodArgumentTypeMismatchException}
      * @return the {@link ErrorResponse} body
      */
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(InvalidIdException.class)
-    public String invalidId(final InvalidIdException e) {
-        final String errorMessage = String.format("The ID '%s' is not a valid format", e.getId());
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public String invalidId(final MethodArgumentTypeMismatchException e) {
+        final String errorMessage = String.format("The input is not a valid format: %s", e.getMessage());
         LOGGER.error(errorMessage);
         return GSON.toJson(ErrorResponse.create(errorMessage));
     }

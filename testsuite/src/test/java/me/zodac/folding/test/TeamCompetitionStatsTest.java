@@ -922,19 +922,6 @@ class TeamCompetitionStatsTest {
     }
 
     @Test
-    void whenGettingStatsForUser_givenOutOfRangeUserId_thenResponseHas400Status() throws FoldingRestException {
-        final HttpResponse<String> response = TEAM_COMPETITION_REQUEST_SENDER.getStatsForUser(TestConstants.OUT_OF_RANGE_ID);
-
-        assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
-            .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
-
-        assertThat(response.body())
-            .as("Did not receive valid error message: " + response.body())
-            .contains("out of range");
-    }
-
-    @Test
     void whenGettingStatsForUser_givenAnInvalidUserId_thenResponseHas400Status() throws IOException, InterruptedException {
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
@@ -972,15 +959,6 @@ class TeamCompetitionStatsTest {
         assertThat(response.statusCode())
             .as("Was able to patch user, was expected user to not be found: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
-    }
-
-    @Test
-    void whenPatchingUserWithPointsOffsets_givenOutOfRangeUserId_thenResponseHas400Status() throws FoldingRestException {
-        final HttpResponse<Void> response =
-            TEAM_COMPETITION_REQUEST_SENDER.offset(TestConstants.OUT_OF_RANGE_ID, 100L, 1_000L, 10, ADMIN_USER.userName(), ADMIN_USER.password());
-        assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
-            .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
     @Test

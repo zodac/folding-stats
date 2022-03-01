@@ -44,7 +44,6 @@ import me.zodac.folding.api.tc.validation.UserValidator;
 import me.zodac.folding.api.tc.validation.ValidationResult;
 import me.zodac.folding.bean.FoldingRepository;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
-import me.zodac.folding.rest.util.IntegerParser;
 import me.zodac.folding.rest.util.ValidationFailureResponseMapper;
 import me.zodac.folding.state.SystemStateManager;
 import me.zodac.folding.stats.HttpFoldingStatsRetriever;
@@ -164,12 +163,10 @@ public class UserEndpoint {
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    // TODO: Force int param?
-    public ResponseEntity<?> getById(@PathVariable("userId") final String userId, final HttpServletRequest request) {
+    public ResponseEntity<?> getById(@PathVariable("userId") final int userId, final HttpServletRequest request) {
         LOGGER.debug("GET request for user received at '{}'", request::getRequestURI);
 
-        final int parsedId = IntegerParser.parsePositive(userId);
-        final User element = foldingRepository.getUserWithoutPasskey(parsedId);
+        final User element = foldingRepository.getUserWithoutPasskey(userId);
         return cachedOk(element, untilNextMonthUtc(ChronoUnit.SECONDS));
     }
 
@@ -183,11 +180,10 @@ public class UserEndpoint {
     @ReadRequired
     @RolesAllowed("admin")
     @GetMapping(path = "/{userId}/passkey", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getByIdWithPasskey(@PathVariable("userId") final String userId, final HttpServletRequest request) {
+    public ResponseEntity<?> getByIdWithPasskey(@PathVariable("userId") final int userId, final HttpServletRequest request) {
         LOGGER.debug("GET request for user with passkey received at '{}'", request::getRequestURI);
 
-        final int parsedId = IntegerParser.parsePositive(userId);
-        final User element = foldingRepository.getUserWithPasskey(parsedId);
+        final User element = foldingRepository.getUserWithPasskey(userId);
         return cachedOk(element, untilNextMonthUtc(ChronoUnit.SECONDS));
     }
 
@@ -202,13 +198,12 @@ public class UserEndpoint {
     @WriteRequired
     @RolesAllowed("admin")
     @PutMapping(path = "/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> updateById(@PathVariable("userId") final String userId,
+    public ResponseEntity<?> updateById(@PathVariable("userId") final int userId,
                                         @RequestBody final UserRequest userRequest,
                                         final HttpServletRequest request) {
         LOGGER.debug("PUT request for user received at '{}'", request::getRequestURI);
 
-        final int parsedId = IntegerParser.parsePositive(userId);
-        final User existingUser = foldingRepository.getUserWithPasskey(parsedId);
+        final User existingUser = foldingRepository.getUserWithPasskey(userId);
 
         if (existingUser.isEqualRequest(userRequest)) {
             LOGGER.debug("No change necessary");
@@ -242,11 +237,10 @@ public class UserEndpoint {
     @WriteRequired
     @RolesAllowed("admin")
     @DeleteMapping(path = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> deleteById(@PathVariable("userId") final String userId, final HttpServletRequest request) {
+    public ResponseEntity<?> deleteById(@PathVariable("userId") final int userId, final HttpServletRequest request) {
         LOGGER.debug("DELETE request for user received at '{}'", request::getRequestURI);
 
-        final int parsedId = IntegerParser.parsePositive(userId);
-        final User user = foldingRepository.getUserWithoutPasskey(parsedId);
+        final User user = foldingRepository.getUserWithoutPasskey(userId);
 
         final ValidationResult<User> validationResult = validateDelete(user);
         if (validationResult.isFailure()) {

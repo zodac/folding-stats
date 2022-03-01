@@ -226,19 +226,6 @@ class HardwareTest {
     }
 
     @Test
-    void whenGettingHardware_givenOutOfRangeHardwareId_thenResponseHas400Status() throws FoldingRestException {
-        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get(TestConstants.OUT_OF_RANGE_ID);
-
-        assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
-            .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
-
-        assertThat(response.body())
-            .as("Did not receive valid error message: " + response.body())
-            .contains("out of range");
-    }
-
-    @Test
     void whenGettingHardware_givenNonExistingHardwareName_thenNoJsonResponseIsReturned_andHas404Status() throws FoldingRestException {
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get("nonExistingName");
 
@@ -284,20 +271,6 @@ class HardwareTest {
     }
 
     @Test
-    void whenUpdatingHardware_givenOutOfRangeHardwareId_thenResponseHas400Status() throws FoldingRestException {
-        final HardwareRequest updatedHardware = generateHardware();
-        final HttpResponse<String> response =
-            HARDWARE_REQUEST_SENDER.update(TestConstants.OUT_OF_RANGE_ID, updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
-        assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
-            .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
-
-        assertThat(response.body())
-            .as("Did not receive valid error message: " + response.body())
-            .contains("out of range");
-    }
-
-    @Test
     void whenUpdatingHardware_givenInvalidHardwareId_thenResponseHas400Status() throws IOException, InterruptedException, FoldingRestException {
         final Hardware createdHardware = create(generateHardware());
 
@@ -332,16 +305,6 @@ class HardwareTest {
         assertThat(response.statusCode())
             .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
-    }
-
-    @Test
-    void whenDeletingHardware_givenOutOfRangeHardwareId_thenResponseHas400Status() throws FoldingRestException {
-        final HttpResponse<Void> response =
-            HARDWARE_REQUEST_SENDER.delete(TestConstants.OUT_OF_RANGE_ID, ADMIN_USER.userName(), ADMIN_USER.password());
-
-        assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
-            .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
     @Test

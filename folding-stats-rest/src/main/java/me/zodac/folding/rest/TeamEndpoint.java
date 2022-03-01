@@ -48,7 +48,6 @@ import me.zodac.folding.api.tc.validation.ValidationResult;
 import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.bean.FoldingRepository;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
-import me.zodac.folding.rest.util.IntegerParser;
 import me.zodac.folding.rest.util.ValidationFailureResponseMapper;
 import me.zodac.folding.state.SystemStateManager;
 import org.apache.logging.log4j.LogManager;
@@ -152,11 +151,10 @@ public class TeamEndpoint {
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/{teamId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getById(@PathVariable("teamId") final String teamId, final HttpServletRequest request) {
+    public ResponseEntity<?> getById(@PathVariable("teamId") final int teamId, final HttpServletRequest request) {
         LOGGER.debug("GET request for team received at '{}'", request::getRequestURI);
 
-        final int parsedId = IntegerParser.parsePositive(teamId);
-        final Team element = foldingRepository.getTeam(parsedId);
+        final Team element = foldingRepository.getTeam(teamId);
         return cachedOk(element, untilNextMonthUtc(ChronoUnit.SECONDS));
     }
 
@@ -203,13 +201,12 @@ public class TeamEndpoint {
     @WriteRequired
     @RolesAllowed("admin")
     @PutMapping(path = "/{teamId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> updateById(@PathVariable("teamId") final String teamId,
+    public ResponseEntity<?> updateById(@PathVariable("teamId") final int teamId,
                                         @RequestBody final TeamRequest teamRequest,
                                         final HttpServletRequest request) {
         LOGGER.debug("PUT request for team received at '{}'", request::getRequestURI);
 
-        final int parsedId = IntegerParser.parsePositive(teamId);
-        final Team existingTeam = foldingRepository.getTeam(parsedId);
+        final Team existingTeam = foldingRepository.getTeam(teamId);
 
         if (existingTeam.isEqualRequest(teamRequest)) {
             LOGGER.debug("No change necessary");
@@ -242,11 +239,10 @@ public class TeamEndpoint {
     @WriteRequired
     @RolesAllowed("admin")
     @DeleteMapping(path = "/{teamId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> deleteById(@PathVariable("teamId") final String teamId, final HttpServletRequest request) {
+    public ResponseEntity<?> deleteById(@PathVariable("teamId") final int teamId, final HttpServletRequest request) {
         LOGGER.debug("DELETE request for team received at '{}'", request::getRequestURI);
 
-        final int parsedId = IntegerParser.parsePositive(teamId);
-        final Team team = foldingRepository.getTeam(parsedId);
+        final Team team = foldingRepository.getTeam(teamId);
 
         final ValidationResult<Team> validationResult = validateDelete(team);
         if (validationResult.isFailure()) {

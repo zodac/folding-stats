@@ -257,19 +257,6 @@ class TeamTest {
     }
 
     @Test
-    void whenGettingTeam_givenOutOfRangeTeamId_thenResponseHas400Status() throws FoldingRestException {
-        final HttpResponse<String> response = TEAM_REQUEST_SENDER.get(TestConstants.OUT_OF_RANGE_ID);
-
-        assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
-            .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
-
-        assertThat(response.body())
-            .as("Did not receive valid error message: " + response.body())
-            .contains("out of range");
-    }
-
-    @Test
     void whenGettingTeam_givenInvalidTeamId_thenResponseHas400Status() throws IOException, InterruptedException {
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
@@ -300,20 +287,6 @@ class TeamTest {
         assertThat(response.body())
             .as("Did not receive an empty JSON response: " + response.body())
             .isEmpty();
-    }
-
-    @Test
-    void whenUpdatingTeam_givenOutOfRangeTeamId_thenResponseHas400Status() throws FoldingRestException {
-        final TeamRequest updatedTeam = generateTeam();
-        final HttpResponse<String> response =
-            TEAM_REQUEST_SENDER.update(TestConstants.OUT_OF_RANGE_ID, updatedTeam, ADMIN_USER.userName(), ADMIN_USER.password());
-        assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
-            .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
-
-        assertThat(response.body())
-            .as("Did not receive valid error message: " + response.body())
-            .contains("out of range");
     }
 
     @Test
@@ -351,15 +324,6 @@ class TeamTest {
         assertThat(response.statusCode())
             .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
-    }
-
-    @Test
-    void whenDeletingTeam_givenOutOfRangeTeamId_thenResponseHas400Status() throws FoldingRestException {
-        final HttpResponse<Void> response = TEAM_REQUEST_SENDER.delete(TestConstants.OUT_OF_RANGE_ID, ADMIN_USER.userName(), ADMIN_USER.password());
-
-        assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
-            .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
     @Test

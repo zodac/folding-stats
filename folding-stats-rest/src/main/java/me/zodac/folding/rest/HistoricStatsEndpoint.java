@@ -41,7 +41,6 @@ import me.zodac.folding.bean.FoldingRepository;
 import me.zodac.folding.bean.StatsRepository;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import me.zodac.folding.rest.util.DateDetails;
-import me.zodac.folding.rest.util.IntegerParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,7 +82,7 @@ public class HistoricStatsEndpoint {
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/users/{userId}/{year}/{month}/{day}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getUserHistoricStatsHourly(@PathVariable("userId") final String userId,
+    public ResponseEntity<?> getUserHistoricStatsHourly(@PathVariable("userId") final int userId,
                                                         @PathVariable("year") final String year,
                                                         @PathVariable("month") final String month,
                                                         @PathVariable("day") final String day,
@@ -91,8 +90,7 @@ public class HistoricStatsEndpoint {
         LOGGER.debug("GET request received to show hourly TC user stats at '{}'", request::getRequestURI);
 
         final DateDetails date = DateDetails.of(year, month, day);
-        final int parsedId = IntegerParser.parsePositive(userId);
-        final User user = foldingRepository.getUserWithPasskey(parsedId);
+        final User user = foldingRepository.getUserWithPasskey(userId);
         final Collection<HistoricStats> historicStats = statsRepository.getHistoricStats(user, date.year(), date.month(), date.day());
         return cachedOk(historicStats, CACHE_EXPIRATION_TIME);
     }
@@ -109,15 +107,14 @@ public class HistoricStatsEndpoint {
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/users/{userId}/{year}/{month}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getUserHistoricStatsDaily(@PathVariable("userId") final String userId,
+    public ResponseEntity<?> getUserHistoricStatsDaily(@PathVariable("userId") final int userId,
                                                        @PathVariable("year") final String year,
                                                        @PathVariable("month") final String month,
                                                        final HttpServletRequest request) {
         LOGGER.debug("GET request received to show daily TC user stats at '{}'", request::getRequestURI);
 
         final DateDetails date = DateDetails.of(year, month);
-        final int parsedId = IntegerParser.parsePositive(userId);
-        final User user = foldingRepository.getUserWithPasskey(parsedId);
+        final User user = foldingRepository.getUserWithPasskey(userId);
         final Collection<HistoricStats> historicStats = statsRepository.getHistoricStats(user, date.year(), date.month());
         return cachedOk(historicStats, CACHE_EXPIRATION_TIME);
     }
@@ -133,14 +130,13 @@ public class HistoricStatsEndpoint {
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/users/{userId}/{year}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getUserHistoricStatsMonthly(@PathVariable("userId") final String userId,
+    public ResponseEntity<?> getUserHistoricStatsMonthly(@PathVariable("userId") final int userId,
                                                          @PathVariable("year") final String year,
                                                          final HttpServletRequest request) {
         LOGGER.debug("GET request received to show monthly TC user stats at '{}'", request::getRequestURI);
 
         final DateDetails date = DateDetails.of(year);
-        final int parsedId = IntegerParser.parsePositive(userId);
-        final User user = foldingRepository.getUserWithPasskey(parsedId);
+        final User user = foldingRepository.getUserWithPasskey(userId);
         final Collection<HistoricStats> historicStats = statsRepository.getHistoricStats(user, date.year());
         return cachedOk(historicStats, CACHE_EXPIRATION_TIME);
     }
@@ -158,7 +154,7 @@ public class HistoricStatsEndpoint {
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/teams/{teamId}/{year}/{month}/{day}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getTeamHistoricStatsHourly(@PathVariable("teamId") final String teamId,
+    public ResponseEntity<?> getTeamHistoricStatsHourly(@PathVariable("teamId") final int teamId,
                                                         @PathVariable("year") final String year,
                                                         @PathVariable("month") final String month,
                                                         @PathVariable("day") final String day,
@@ -166,8 +162,7 @@ public class HistoricStatsEndpoint {
         LOGGER.debug("GET request received to show hourly TC user stats at '{}'", request::getRequestURI);
 
         final DateDetails date = DateDetails.of(year, month, day);
-        final int parsedId = IntegerParser.parsePositive(teamId);
-        final Team team = foldingRepository.getTeam(parsedId);
+        final Team team = foldingRepository.getTeam(teamId);
 
         final Collection<User> teamUsers = foldingRepository.getUsersOnTeam(team);
         final List<HistoricStats> teamHourlyStats = new ArrayList<>(teamUsers.size());
@@ -194,15 +189,14 @@ public class HistoricStatsEndpoint {
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/teams/{teamId}/{year}/{month}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getTeamHistoricStatsDaily(@PathVariable("teamId") final String teamId,
+    public ResponseEntity<?> getTeamHistoricStatsDaily(@PathVariable("teamId") final int teamId,
                                                        @PathVariable("year") final String year,
                                                        @PathVariable("month") final String month,
                                                        final HttpServletRequest request) {
         LOGGER.debug("GET request received to show daily TC user stats at '{}'", request::getRequestURI);
 
         final DateDetails date = DateDetails.of(year, month);
-        final int parsedId = IntegerParser.parsePositive(teamId);
-        final Team team = foldingRepository.getTeam(parsedId);
+        final Team team = foldingRepository.getTeam(teamId);
 
         final Collection<User> teamUsers = foldingRepository.getUsersOnTeam(team);
         final List<HistoricStats> teamDailyStats = new ArrayList<>(teamUsers.size());
@@ -228,14 +222,13 @@ public class HistoricStatsEndpoint {
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/teams/{teamId}/{year}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getTeamHistoricStatsMonthly(@PathVariable("teamId") final String teamId,
+    public ResponseEntity<?> getTeamHistoricStatsMonthly(@PathVariable("teamId") final int teamId,
                                                          @PathVariable("year") final String year,
                                                          final HttpServletRequest request) {
         LOGGER.info("GET request received to show monthly TC team stats at '{}'", request::getRequestURI);
-        
+
         final DateDetails date = DateDetails.of(year);
-        final int parsedId = IntegerParser.parsePositive(teamId);
-        final Team team = foldingRepository.getTeam(parsedId);
+        final Team team = foldingRepository.getTeam(teamId);
 
         final Collection<User> teamUsers = foldingRepository.getUsersOnTeam(team);
         final List<HistoricStats> teamMonthlyStats = new ArrayList<>(teamUsers.size());
