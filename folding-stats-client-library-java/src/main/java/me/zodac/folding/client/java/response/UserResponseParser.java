@@ -41,7 +41,10 @@ public final class UserResponseParser {
     }
 
     /**
-     * Returns the {@link User}s retrieved by {@link me.zodac.folding.client.java.request.UserRequestSender#getAll()}.
+     * Returns the {@link User}s retrieved by {@link me.zodac.folding.client.java.request.UserRequestSender#getAllWithoutPasskeys()},
+     * {@link me.zodac.folding.client.java.request.UserRequestSender#getAllWithoutPasskeys(String)},
+     * {@link me.zodac.folding.client.java.request.UserRequestSender#getAllWithPasskeys(String, String)} or
+     * {@link me.zodac.folding.client.java.request.UserRequestSender#getAllWithPasskeys(String, String, String)}.
      *
      * @param response the {@link HttpResponse} to parse
      * @return the retrieved {@link User}s
@@ -53,7 +56,8 @@ public final class UserResponseParser {
     }
 
     /**
-     * Returns the {@link User} retrieved by {@link me.zodac.folding.client.java.request.UserRequestSender#get(int)}.
+     * Returns the {@link User} retrieved by {@link me.zodac.folding.client.java.request.UserRequestSender#get(int)} or
+     * {@link me.zodac.folding.client.java.request.UserRequestSender#get(int, String)}.
      *
      * @param response the {@link HttpResponse} to parse
      * @return the retrieved {@link User}
@@ -64,7 +68,7 @@ public final class UserResponseParser {
 
     /**
      * Returns the {@link User} created by
-     * {@link me.zodac.folding.client.java.request.UserRequestSender#create(me.zodac.folding.rest.api.tc.request.UserRequest)}.
+     * {@link me.zodac.folding.client.java.request.UserRequestSender#create(me.zodac.folding.rest.api.tc.request.UserRequest, String, String)}.
      *
      * @param response the {@link HttpResponse} to parse
      * @return the created {@link User}
@@ -75,7 +79,7 @@ public final class UserResponseParser {
 
     /**
      * Returns the {@link User} updated by
-     * {@link me.zodac.folding.client.java.request.UserRequestSender#update(int, me.zodac.folding.rest.api.tc.request.UserRequest)}.
+     * {@link me.zodac.folding.client.java.request.UserRequestSender#update(int, me.zodac.folding.rest.api.tc.request.UserRequest, String, String)}.
      *
      * @param response the {@link HttpResponse} to parse
      * @return the updated {@link User}

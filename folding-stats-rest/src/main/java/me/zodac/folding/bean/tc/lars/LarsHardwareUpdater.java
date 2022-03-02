@@ -86,6 +86,15 @@ public class LarsHardwareUpdater {
      * </pre>
      */
     public void retrieveHardwareAndPersist() {
+        try {
+            retrieveGpusAndPersist();
+            LOGGER.info("LARS update complete");
+        } catch (final Exception e) {
+            LOGGER.warn("Unexpected error updating LARS hardware data", e);
+        }
+    }
+
+    private void retrieveGpusAndPersist() {
         final String gpuDbUrl = LARS_URL_ROOT + "/gpu_ppd/overall_ranks";
         final List<LarsGpu> larsGpus = LarsGpuRetriever.retrieveGpus(gpuDbUrl);
         LOGGER.debug("Retrieved GPUs from LARS DB: {}", larsGpus);
@@ -98,7 +107,7 @@ public class LarsHardwareUpdater {
 
         final LarsGpu bestGpu = larsGpus.get(0);
         final long bestPpd = bestGpu.getAveragePpd();
-        LOGGER.info("Best PPD is '{}' for '{}', will compare to this", formatWithCommas(bestPpd), bestGpu.getModelInfo());
+        LOGGER.info("Best GPU PPD is '{}' for '{}', will compare to this", formatWithCommas(bestPpd), bestGpu.getModelInfo());
 
         final Collection<Hardware> lars = larsGpus
             .stream()
@@ -108,7 +117,7 @@ public class LarsHardwareUpdater {
 
         for (final Hardware hardware : HardwareSplitter.toDelete(lars, existing)) {
             foldingRepository.deleteHardware(hardware);
-            LOGGER.info("Deleted hardware '{}' (ID: {})", hardware.getHardwareName(), hardware.getId());
+            LOGGER.info("Deleted GPU hardware '{}' (ID: {})", hardware.getHardwareName(), hardware.getId());
         }
 
         for (final Map.Entry<Hardware, Hardware> entry : HardwareSplitter.toUpdate(lars, existing).entrySet()) {
@@ -120,7 +129,7 @@ public class LarsHardwareUpdater {
                 foldingRepository.updateHardware(updatedHardwareWithId, existingHardware);
 
                 LOGGER.info("""
-                        LARS updated hardware:
+                        LARS updated GPU hardware:
                         {}
                         ID: {}
                         Multiplier: {} -> {}
@@ -133,16 +142,14 @@ public class LarsHardwareUpdater {
                     formatWithCommas(existingHardware.getAveragePpd()),
                     formatWithCommas(updatedHardware.getAveragePpd()));
             } catch (final Exception e) {
-                LOGGER.warn("Unexpected error connecting to Folding@Home stats to verify new hardware", e);
+                LOGGER.warn("Unexpected error connecting to Folding@Home stats to verify new GPU hardware", e);
             }
         }
 
         for (final Hardware hardware : HardwareSplitter.toCreate(lars, existing)) {
             final Hardware createdHardware = foldingRepository.createHardware(hardware);
-            LOGGER.info("Created hardware '{}' (ID: {})", createdHardware.getHardwareName(), createdHardware.getId());
+            LOGGER.info("Created GPU hardware '{}' (ID: {})", createdHardware.getHardwareName(), createdHardware.getId());
         }
-
-        LOGGER.info("LARS update complete");
     }
 
     private static Hardware toHardware(final LarsGpu larsGpu, final long bestPpd) {

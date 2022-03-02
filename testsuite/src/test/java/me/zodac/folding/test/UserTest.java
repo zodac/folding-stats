@@ -27,6 +27,8 @@ package me.zodac.folding.test;
 import static me.zodac.folding.api.util.EncodingUtils.encodeBasicAuthentication;
 import static me.zodac.folding.rest.util.RestUtilConstants.GSON;
 import static me.zodac.folding.rest.util.RestUtilConstants.HTTP_CLIENT;
+import static me.zodac.folding.test.util.PasskeyChecker.assertPasskeyIsHidden;
+import static me.zodac.folding.test.util.PasskeyChecker.assertPasskeyIsShown;
 import static me.zodac.folding.test.util.SystemCleaner.cleanSystemForSimpleTests;
 import static me.zodac.folding.test.util.TestAuthenticationData.ADMIN_USER;
 import static me.zodac.folding.test.util.TestAuthenticationData.INVALID_PASSWORD;
@@ -56,7 +58,6 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Collection;
-import java.util.regex.Pattern;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
@@ -70,6 +71,7 @@ import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
+import me.zodac.folding.rest.util.RestUtilConstants;
 import me.zodac.folding.test.util.TestConstants;
 import me.zodac.folding.test.util.TestGenerator;
 import me.zodac.folding.test.util.rest.request.HardwareUtils;
@@ -77,20 +79,16 @@ import me.zodac.folding.test.util.rest.request.StubbedFoldingEndpointUtils;
 import me.zodac.folding.test.util.rest.request.TeamUtils;
 import me.zodac.folding.test.util.rest.request.UserUtils;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 
 /**
  * Tests for the {@link User} REST endpoint at <code>/folding/users</code>.
  */
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class UserTest {
 
-    @BeforeAll
-    static void setUp() throws FoldingRestException {
+    @BeforeEach
+    void setUp() throws FoldingRestException {
         cleanSystemForSimpleTests();
     }
 
@@ -100,9 +98,8 @@ class UserTest {
     }
 
     @Test
-    @Order(1)
     void whenGettingAllUsers_givenNoUserHasBeenCreated_thenAnEmptyJsonResponseIsReturned_andHas200Status() throws FoldingRestException {
-        final HttpResponse<String> response = USER_REQUEST_SENDER.getAll();
+        final HttpResponse<String> response = USER_REQUEST_SENDER.getAllWithoutPasskeys();
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -115,6 +112,53 @@ class UserTest {
 
         assertThat(allUsers)
             .isEmpty();
+    }
+
+    @Test
+    void whenGettingAllUsers_givenSomeUsersHaveBeenCreated_thenAllAreReturned_andPasskeyIsHidden_andHas200Status() throws FoldingRestException {
+        create(generateUser());
+        create(generateUser());
+
+        final HttpResponse<String> response = USER_REQUEST_SENDER.getAllWithoutPasskeys();
+        assertThat(response.statusCode())
+            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_OK);
+
+        final Collection<User> allUsers = UserResponseParser.getAll(response);
+        final int xTotalCount = getTotalCount(response);
+
+        assertThat(xTotalCount)
+            .isEqualTo(2);
+
+        assertThat(allUsers)
+            .hasSize(2);
+
+        final User retrievedUser = allUsers.iterator().next();
+        assertPasskeyIsHidden(retrievedUser.getPasskey());
+    }
+
+    @Test
+    void whenGettingAllUsers_givenSomeUsersHaveBeenCreated_andPasskeysAreRequest_thenAllAreReturned_andPasskeyIsShown_andHas200Status()
+        throws FoldingRestException {
+        create(generateUser());
+        create(generateUser());
+
+        final HttpResponse<String> response = USER_REQUEST_SENDER.getAllWithPasskeys(ADMIN_USER.userName(), ADMIN_USER.password());
+        assertThat(response.statusCode())
+            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_OK);
+
+        final Collection<User> allUsers = UserResponseParser.getAll(response);
+        final int xTotalCount = getTotalCount(response);
+
+        assertThat(xTotalCount)
+            .isEqualTo(2);
+
+        assertThat(allUsers)
+            .hasSize(2);
+
+        final User retrievedUser = allUsers.iterator().next();
+        assertPasskeyIsShown(retrievedUser.getPasskey());
     }
 
     @Test
@@ -150,18 +194,7 @@ class UserTest {
         assertThat(user.getId())
             .as("Did not receive the expected user: " + response.body())
             .isEqualTo(userId);
-
-        final int lengthOfUnmaskedPasskey = 8;
-        final String firstPartOfPasskey = user.getPasskey().substring(0, lengthOfUnmaskedPasskey);
-        final String secondPartOfPasskey = user.getPasskey().substring(lengthOfUnmaskedPasskey);
-
-        assertThat(firstPartOfPasskey)
-            .as("Expected the first 8 characters of the passkey to be shown")
-            .doesNotContain("*");
-
-        assertThat(secondPartOfPasskey)
-            .as("Expected the remaining 24 characters of the passkey to be masked")
-            .doesNotContainPattern(Pattern.compile("[a-zA-Z]"));
+        assertPasskeyIsHidden(user.getPasskey());
     }
 
     @Test
@@ -177,11 +210,7 @@ class UserTest {
         assertThat(user.getId())
             .as("Did not receive the expected user: " + response.body())
             .isEqualTo(userId);
-
-        assertThat(user.getPasskey())
-            .as("Expected the the passkey to be shown completely")
-            .containsPattern(Pattern.compile("[a-zA-Z]"))
-            .doesNotContain("*");
+        assertPasskeyIsShown(user.getPasskey());
     }
 
     @Test
@@ -434,18 +463,7 @@ class UserTest {
             .extracting("id", "foldingUserName", "displayName", "category", "profileLink", "liveStatsLink", "userIsCaptain")
             .containsExactly(createdUser.getId(), createdUser.getFoldingUserName(), createdUser.getDisplayName(), createdUser.getCategory(),
                 createdUser.getProfileLink(), createdUser.getLiveStatsLink(), createdUser.isUserIsCaptain());
-
-        final int lengthOfUnmaskedPasskey = 8;
-        final String firstPartOfPasskey = actual.getPasskey().substring(0, lengthOfUnmaskedPasskey);
-        final String secondPartOfPasskey = actual.getPasskey().substring(lengthOfUnmaskedPasskey);
-
-        assertThat(firstPartOfPasskey)
-            .as("Expected the first 8 characters of the passkey to be shown")
-            .doesNotContain("*");
-
-        assertThat(secondPartOfPasskey)
-            .as("Expected the remaining 24 characters of the passkey to be masked")
-            .doesNotContainPattern(Pattern.compile("[a-zA-Z]"));
+        assertPasskeyIsHidden(actual.getPasskey());
     }
 
     @Test
@@ -470,18 +488,18 @@ class UserTest {
     }
 
     @Test
-    void whenGettingAllUsers_givenRequestUsesPreviousEntityTag_andUsersHaveNotChanged_thenResponseHas304Status_andNoBody()
+    void whenGettingAllUsersWithoutPasskeys_givenRequestUsesPreviousEntityTag_andUsersHaveNotChanged_thenResponseHas304Status_andNoBody()
         throws FoldingRestException {
         create(generateUser());
 
-        final HttpResponse<String> response = USER_REQUEST_SENDER.getAll();
+        final HttpResponse<String> response = USER_REQUEST_SENDER.getAllWithoutPasskeys();
         assertThat(response.statusCode())
             .as("Expected first GET request to have a 200_OK HTTP response")
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final String eTag = getEntityTag(response);
 
-        final HttpResponse<String> cachedResponse = USER_REQUEST_SENDER.getAll(eTag);
+        final HttpResponse<String> cachedResponse = USER_REQUEST_SENDER.getAllWithoutPasskeys(eTag);
         assertThat(cachedResponse.statusCode())
             .as("Expected second request to have a 304_NOT_MODIFIED HTTP response")
             .isEqualTo(HttpURLConnection.HTTP_NOT_MODIFIED);
@@ -492,18 +510,49 @@ class UserTest {
     }
 
     @Test
-    void whenCreatingUser_givenNoAuthentication_thenRequestFails_andResponseHas401Status() throws FoldingRestException {
+    void whenGettingAllUsersWithPasskeys_givenRequestUsesPreviousEntityTag_andUsersHaveNotChanged_thenResponseHas304Status_andNoBody()
+        throws FoldingRestException {
+        create(generateUser());
+
+        final HttpResponse<String> response = USER_REQUEST_SENDER.getAllWithPasskeys(ADMIN_USER.userName(), ADMIN_USER.password());
+        assertThat(response.statusCode())
+            .as("Expected first GET request to have a 200_OK HTTP response")
+            .isEqualTo(HttpURLConnection.HTTP_OK);
+
+        final String eTag = getEntityTag(response);
+
+        final HttpResponse<String> cachedResponse = USER_REQUEST_SENDER.getAllWithPasskeys(eTag, ADMIN_USER.userName(), ADMIN_USER.password());
+        assertThat(cachedResponse.statusCode())
+            .as("Expected second request to have a 304_NOT_MODIFIED HTTP response")
+            .isEqualTo(HttpURLConnection.HTTP_NOT_MODIFIED);
+
+        assertThat(UserResponseParser.getAll(cachedResponse))
+            .as("Expected cached response to have the same content as the non-cached response")
+            .isNull();
+    }
+
+    @Test
+    void whenCreatingUser_givenNoAuthentication_thenRequestFails_andResponseHas401Status()
+        throws FoldingRestException, IOException, InterruptedException {
         final UserRequest userToCreate = generateUser();
         StubbedFoldingEndpointUtils.enableUser(userToCreate);
 
-        final HttpResponse<String> response = USER_REQUEST_SENDER.create(userToCreate);
+        final HttpRequest request = HttpRequest.newBuilder()
+            .POST(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(userToCreate)))
+            .uri(URI.create(FOLDING_URL + "/users"))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .build();
+
+        final HttpResponse<String> response = RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+
         assertThat(response.statusCode())
             .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
     @Test
-    void whenUpdatingUser_givenNoAuthentication_thenRequestFails_andResponseHas401Status() throws FoldingRestException {
+    void whenUpdatingUser_givenNoAuthentication_thenRequestFails_andResponseHas401Status()
+        throws FoldingRestException, IOException, InterruptedException {
         final User createdUser = create(generateUser());
 
         final UserRequest userToUpdate = UserRequest.builder()
@@ -519,17 +568,32 @@ class UserTest {
             .build();
         StubbedFoldingEndpointUtils.enableUser(userToUpdate);
 
-        final HttpResponse<String> response = USER_REQUEST_SENDER.update(createdUser.getId(), userToUpdate);
+        final HttpRequest request = HttpRequest.newBuilder()
+            .PUT(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(userToUpdate)))
+            .uri(URI.create(FOLDING_URL + "/users/" + createdUser.getId()))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .build();
+
+        final HttpResponse<String> response = RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+
         assertThat(response.statusCode())
             .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
     @Test
-    void whenDeletingUser_givenNoAuthentication_thenRequestFails_andResponseHas401Status() throws FoldingRestException {
+    void whenDeletingUser_givenNoAuthentication_thenRequestFails_andResponseHas401Status()
+        throws FoldingRestException, IOException, InterruptedException {
         final int userId = create(generateUser()).getId();
 
-        final HttpResponse<Void> response = USER_REQUEST_SENDER.delete(userId);
+        final HttpRequest request = HttpRequest.newBuilder()
+            .DELETE()
+            .uri(URI.create(FOLDING_URL + "/users/" + userId))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .build();
+
+        final HttpResponse<Void> response = RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
+
         assertThat(response.statusCode())
             .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);

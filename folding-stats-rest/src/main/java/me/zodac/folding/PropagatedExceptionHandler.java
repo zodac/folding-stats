@@ -27,7 +27,6 @@ package me.zodac.folding;
 import static me.zodac.folding.rest.util.RestUtilConstants.GSON;
 
 import me.zodac.folding.api.exception.ConflictException;
-import me.zodac.folding.api.exception.NullObjectException;
 import me.zodac.folding.api.exception.UsedByException;
 import me.zodac.folding.api.exception.ValidationException;
 import me.zodac.folding.api.tc.change.UserChangeState;
@@ -281,23 +280,6 @@ public class PropagatedExceptionHandler {
     public String validationFailure(final ValidationException e) {
         LOGGER.error("Object failed validation: {}", e.getValidationFailure());
         return GSON.toJson(e.getValidationFailure());
-    }
-
-    /**
-     * Returned when an input object is <code>null</code>.
-     *
-     * <p>
-     * Returns a <b>400_BAD_REQUEST</b> response with an error message body.
-     *
-     * @param e the {@link NullObjectException}
-     * @return the {@link NullObjectException.NullObjectFailure} body
-     */
-    @ResponseBody
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(NullObjectException.class)
-    public String nullObject(final NullObjectException e) {
-        LOGGER.error("Input object was null");
-        return GSON.toJson(e.getNullObjectFailure());
     }
 
     /**

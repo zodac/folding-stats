@@ -29,13 +29,11 @@ import static java.lang.Boolean.parseBoolean;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.TimeZone;
 import me.zodac.folding.api.state.ParsingState;
 import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.tc.change.UserChange;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
-import me.zodac.folding.bean.FoldingRepository;
 import me.zodac.folding.bean.tc.lars.LarsHardwareUpdater;
 import me.zodac.folding.bean.tc.user.UserChangeApplier;
 import me.zodac.folding.bean.tc.user.UserStatsResetter;
@@ -85,9 +83,6 @@ public class TeamCompetitionScheduler {
     private static final boolean IS_MONTHLY_RESULT_ENABLED =
         parseBoolean(EnvironmentVariableUtils.getOrDefault("ENABLE_MONTHLY_RESULT_STORAGE", "false"));
     private static final boolean IS_LARS_UPDATE_ENABLED = parseBoolean(EnvironmentVariableUtils.getOrDefault("ENABLE_LARS_HARDWARE_UPDATE", "false"));
-
-    @Autowired
-    private FoldingRepository foldingRepository;
 
     @Autowired
     private LarsHardwareUpdater larsHardwareUpdater;
@@ -141,8 +136,6 @@ public class TeamCompetitionScheduler {
 
             LOGGER.trace("Method #endOfTeamCompetition() fired");
 
-            // TODO: Make the below executions best effort
-
             if (IS_MONTHLY_RESULT_ENABLED) {
                 LOGGER.info("Storing TC stats for new month");
                 userStatsStorer.storeMonthlyResult();
@@ -161,9 +154,7 @@ public class TeamCompetitionScheduler {
                 larsHardwareUpdater.retrieveHardwareAndPersist();
             }
 
-            // Retrieve ChangeRequests scheduled for the next month
-            final Collection<UserChange> nextMonthUserChanges = foldingRepository.getAllUserChangesForNextMonth();
-            userChangeApplier.apply(nextMonthUserChanges);
+            userChangeApplier.applyAllForNextMonth();
         } catch (final Exception e) {
             LOGGER.error("Error with end of month schedule", e);
         }

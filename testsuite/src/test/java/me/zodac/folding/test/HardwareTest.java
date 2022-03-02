@@ -53,6 +53,7 @@ import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
+import me.zodac.folding.rest.util.RestUtilConstants;
 import me.zodac.folding.test.util.TestConstants;
 import me.zodac.folding.test.util.TestGenerator;
 import me.zodac.folding.test.util.rest.request.HardwareUtils;
@@ -410,16 +411,24 @@ class HardwareTest {
     }
 
     @Test
-    void whenCreatingHardware_givenNoAuthentication_thenRequestFails_andResponseHas401Status() throws FoldingRestException {
+    void whenCreatingHardware_givenNoAuthentication_thenRequestFails_andResponseHas401Status() throws IOException, InterruptedException {
         final HardwareRequest hardwareToCreate = generateHardware();
-        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.create(hardwareToCreate);
+
+        final HttpRequest request = HttpRequest.newBuilder()
+            .POST(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(hardwareToCreate)))
+            .uri(URI.create(FOLDING_URL + "/hardware/"))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .build();
+
+        final HttpResponse<String> response = RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
             .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
     @Test
-    void whenUpdatingHardware_givenNoAuthentication_thenRequestFails_andResponseHas401Status() throws FoldingRestException {
+    void whenUpdatingHardware_givenNoAuthentication_thenRequestFails_andResponseHas401Status()
+        throws FoldingRestException, IOException, InterruptedException {
         final Hardware createdHardware = create(generateHardware());
 
         final HardwareRequest updatedHardware = HardwareRequest.builder()
@@ -428,17 +437,30 @@ class HardwareTest {
             .multiplier(createdHardware.getMultiplier())
             .build();
 
-        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.update(createdHardware.getId(), updatedHardware);
+        final HttpRequest request = HttpRequest.newBuilder()
+            .PUT(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(updatedHardware)))
+            .uri(URI.create(FOLDING_URL + "/hardware/" + createdHardware.getId()))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .build();
+
+        final HttpResponse<String> response = RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
             .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
     @Test
-    void whenDeletingHardware_givenNoAuthentication_thenRequestFails_andResponseHas401Status() throws FoldingRestException {
+    void whenDeletingHardware_givenNoAuthentication_thenRequestFails_andResponseHas401Status()
+        throws FoldingRestException, IOException, InterruptedException {
         final int hardwareId = create(generateHardware()).getId();
 
-        final HttpResponse<Void> response = HARDWARE_REQUEST_SENDER.delete(hardwareId);
+        final HttpRequest request = HttpRequest.newBuilder()
+            .DELETE()
+            .uri(URI.create(FOLDING_URL + "/hardware/" + hardwareId))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .build();
+
+        final HttpResponse<Void> response = RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
         assertThat(response.statusCode())
             .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);

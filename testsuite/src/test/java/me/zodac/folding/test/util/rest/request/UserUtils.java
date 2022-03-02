@@ -98,7 +98,7 @@ public final class UserUtils {
      * @throws FoldingRestException thrown if an error occurs retrieving the {@link User}s
      */
     public static Collection<User> getAll() throws FoldingRestException {
-        final HttpResponse<String> response = USER_REQUEST_SENDER.getAll();
+        final HttpResponse<String> response = USER_REQUEST_SENDER.getAllWithoutPasskeys();
         if (response.statusCode() == HttpURLConnection.HTTP_OK) {
             return UserResponseParser.getAll(response);
         }
@@ -114,7 +114,7 @@ public final class UserUtils {
      * @throws FoldingRestException thrown if an error occurs retrieving the {@link User} count
      */
     public static int getNumberOfUsers() throws FoldingRestException {
-        final HttpResponse<String> response = USER_REQUEST_SENDER.getAll();
+        final HttpResponse<String> response = USER_REQUEST_SENDER.getAllWithoutPasskeys();
         return getTotalCount(response);
     }
 

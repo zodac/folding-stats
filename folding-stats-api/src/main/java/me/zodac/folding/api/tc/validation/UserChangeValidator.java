@@ -37,7 +37,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 import me.zodac.folding.api.exception.ConflictException;
 import me.zodac.folding.api.exception.ExternalConnectionException;
-import me.zodac.folding.api.exception.NullObjectException;
 import me.zodac.folding.api.exception.ValidationException;
 import me.zodac.folding.api.stats.FoldingStatsDetails;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
@@ -80,7 +79,6 @@ public final class UserChangeValidator {
      * <p>
      * Validation checks include:
      * <ul>
-     *     <li>Input {@code userChangeRequest} must not be <b>null</b></li>
      *     <li>Field 'hardwareId' must match an existing {@link Hardware}</li>
      *     <li>Field 'userId' must match an existing {@link User}</li>
      *     <li>Field 'foldingUserName' must not be empty, must only include alphanumeric characters or underscore (_), period (.) or hyphen (-)</li>
@@ -100,18 +98,13 @@ public final class UserChangeValidator {
      * @param allHardware                    all {@link Hardware} in the system
      * @param allUsersWithPasskeys           all {@link User}s in the system, with passkeys
      * @return the validated {@link UserChange}
-     * @throws ConflictException thrown if the input conflicts with an existing {@link UserChange}
-     *                           @throws NullObjectException thrown if the input is <code>null</code>
-     *                           @throws ValidationException thrown  if the input fails validation
+     * @throws ConflictException   thrown if the input conflicts with an existing {@link UserChange}
+     * @throws ValidationException thrown  if the input fails validation
      */
     public UserChange validate(final UserChangeRequest userChangeRequest,
                                final Collection<UserChange> allOpenUserChangesWithPasskeys,
                                final Collection<Hardware> allHardware,
                                final Collection<User> allUsersWithPasskeys) {
-        if (userChangeRequest == null) {
-            throw new NullObjectException();
-        }
-
         // Hardware and User must be validated first, since they may be used by other validation checks
         final List<String> hardwareAndUserFailureMessages = Stream.of(
                 hardware(userChangeRequest, allHardware),

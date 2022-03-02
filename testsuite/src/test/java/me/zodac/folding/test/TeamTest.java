@@ -53,6 +53,7 @@ import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
+import me.zodac.folding.rest.util.RestUtilConstants;
 import me.zodac.folding.test.util.TestConstants;
 import me.zodac.folding.test.util.TestGenerator;
 import me.zodac.folding.test.util.rest.request.TeamUtils;
@@ -420,17 +421,25 @@ class TeamTest {
     }
 
     @Test
-    void whenCreatingTeam_givenNoAuthentication_thenRequestFails_andResponseHas401Status() throws FoldingRestException {
+    void whenCreatingTeam_givenNoAuthentication_thenRequestFails_andResponseHas401Status() throws IOException, InterruptedException {
         final TeamRequest teamToCreate = generateTeam();
 
-        final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(teamToCreate);
+        final HttpRequest request = HttpRequest.newBuilder()
+            .POST(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(teamToCreate)))
+            .uri(URI.create(FOLDING_URL + "/teams/"))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .build();
+
+        final HttpResponse<String> response = RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+
         assertThat(response.statusCode())
             .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
     @Test
-    void whenUpdatingTeam_givenNoAuthentication_thenRequestFails_andResponseHas401Status() throws FoldingRestException {
+    void whenUpdatingTeam_givenNoAuthentication_thenRequestFails_andResponseHas401Status()
+        throws FoldingRestException, IOException, InterruptedException {
         final Team createdTeam = create(generateTeam());
 
         final TeamRequest teamToUpdate = TeamRequest.builder()
@@ -439,17 +448,31 @@ class TeamTest {
             .forumLink(createdTeam.getForumLink())
             .build();
 
-        final HttpResponse<String> response = TEAM_REQUEST_SENDER.update(createdTeam.getId(), teamToUpdate);
+        final HttpRequest request = HttpRequest.newBuilder()
+            .PUT(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(teamToUpdate)))
+            .uri(URI.create(FOLDING_URL + "/teams/" + createdTeam.getId()))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .build();
+
+        final HttpResponse<String> response = RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+
         assertThat(response.statusCode())
             .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
     @Test
-    void whenDeletingTeam_givenNoAuthentication_thenRequestFails_andResponseHas401Status() throws FoldingRestException {
+    void whenDeletingTeam_givenNoAuthentication_thenRequestFails_andResponseHas401Status()
+        throws FoldingRestException, IOException, InterruptedException {
         final int teamId = create(generateTeam()).getId();
 
-        final HttpResponse<Void> response = TEAM_REQUEST_SENDER.delete(teamId);
+        final HttpRequest request = HttpRequest.newBuilder()
+            .DELETE()
+            .uri(URI.create(FOLDING_URL + "/teams/" + teamId))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .build();
+
+        final HttpResponse<Void> response = RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
         assertThat(response.statusCode())
             .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);

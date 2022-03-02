@@ -65,7 +65,7 @@ public final class TeamResponseParser {
 
     /**
      * Returns the {@link Team} created by
-     * {@link me.zodac.folding.client.java.request.TeamRequestSender#create(me.zodac.folding.rest.api.tc.request.TeamRequest)}.
+     * {@link me.zodac.folding.client.java.request.TeamRequestSender#create(me.zodac.folding.rest.api.tc.request.TeamRequest, String, String)}.
      *
      * @param response the {@link HttpResponse} to parse
      * @return the created {@link Team}
@@ -76,7 +76,7 @@ public final class TeamResponseParser {
 
     /**
      * Returns the {@link Team} updated by
-     * {@link me.zodac.folding.client.java.request.TeamRequestSender#update(int, me.zodac.folding.rest.api.tc.request.TeamRequest)}.
+     * {@link me.zodac.folding.client.java.request.TeamRequestSender#update(int, me.zodac.folding.rest.api.tc.request.TeamRequest, String, String)}.
      *
      * @param response the {@link HttpResponse} to parse
      * @return the updated {@link Team}

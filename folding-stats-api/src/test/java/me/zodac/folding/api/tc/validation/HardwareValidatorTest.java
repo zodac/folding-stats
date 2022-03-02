@@ -34,7 +34,6 @@ import static org.assertj.core.api.Assertions.catchThrowableOfType;
 import java.util.Collection;
 import java.util.List;
 import me.zodac.folding.api.exception.ConflictException;
-import me.zodac.folding.api.exception.NullObjectException;
 import me.zodac.folding.api.exception.UsedByException;
 import me.zodac.folding.api.exception.ValidationException;
 import me.zodac.folding.api.tc.Hardware;
@@ -65,13 +64,6 @@ class HardwareValidatorTest {
         assertThat(response)
             .as("Expected validation to pass")
             .isNotNull();
-    }
-
-    @Test
-    void whenValidatingCreate_givenNullHardware_thenFailureResponseIsReturned() {
-        final NullObjectException e = catchThrowableOfType(() -> validateCreate(null, emptyList()), NullObjectException.class);
-        assertThat(e.getNullObjectFailure().getError())
-            .contains("Payload is null");
     }
 
     @Test
@@ -275,38 +267,6 @@ class HardwareValidatorTest {
         assertThat(response)
             .as("Expected validation to pass")
             .isNotNull();
-    }
-
-    @Test
-    void whenValidatingUpdate_givenNullHardware_thenFailureResponseIsReturned() {
-        final Hardware existingHardware = Hardware.builder()
-            .hardwareName("existingName")
-            .displayName("displayName")
-            .hardwareMake(HardwareMake.AMD)
-            .hardwareType(HardwareType.GPU)
-            .multiplier(1.00D)
-            .averagePpd(1L)
-            .build();
-
-        final NullObjectException e = catchThrowableOfType(() -> validateUpdate(null, existingHardware, emptyList()), NullObjectException.class);
-        assertThat(e.getNullObjectFailure().getError())
-            .contains("Payload is null");
-    }
-
-    @Test
-    void whenValidatingUpdate_givenNullExistingHardware_thenFailureResponseIsReturned() {
-        final HardwareRequest hardware = HardwareRequest.builder()
-            .hardwareName(null)
-            .displayName("displayName")
-            .hardwareMake(HardwareMake.AMD.toString())
-            .hardwareType(HardwareType.GPU.toString())
-            .multiplier(1.00D)
-            .averagePpd(1L)
-            .build();
-
-        final NullObjectException e = catchThrowableOfType(() -> validateUpdate(hardware, null, emptyList()), NullObjectException.class);
-        assertThat(e.getNullObjectFailure().getError())
-            .contains("Payload is null");
     }
 
     @Test

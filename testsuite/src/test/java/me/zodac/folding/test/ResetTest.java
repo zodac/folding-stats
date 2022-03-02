@@ -26,6 +26,7 @@ package me.zodac.folding.test;
 
 import static me.zodac.folding.test.util.SystemCleaner.cleanSystemForComplexTests;
 import static me.zodac.folding.test.util.TestAuthenticationData.ADMIN_USER;
+import static me.zodac.folding.test.util.TestConstants.FOLDING_URL;
 import static me.zodac.folding.test.util.TestGenerator.generateHardwareFromCategory;
 import static me.zodac.folding.test.util.TestGenerator.generateTeam;
 import static me.zodac.folding.test.util.TestGenerator.generateUserWithTeamIdAndCategory;
@@ -39,16 +40,22 @@ import static me.zodac.folding.test.util.rest.request.UserUtils.USER_REQUEST_SEN
 import static me.zodac.folding.test.util.rest.request.UserUtils.create;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
+import me.zodac.folding.rest.api.header.ContentType;
+import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.tc.AllTeamsSummary;
 import me.zodac.folding.rest.api.tc.TeamSummary;
 import me.zodac.folding.rest.api.tc.UserSummary;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
+import me.zodac.folding.rest.util.RestUtilConstants;
 import me.zodac.folding.test.util.rest.request.HardwareUtils;
 import me.zodac.folding.test.util.rest.request.StubbedFoldingEndpointUtils;
 import me.zodac.folding.test.util.rest.request.TeamCompetitionStatsUtils;
@@ -86,8 +93,14 @@ class ResetTest {
     }
 
     @Test
-    void whenResetOccurs_givenNoAuthentication_thenRequestFails_andResponseHasA401Status() throws FoldingRestException {
-        final HttpResponse<Void> response = TEAM_COMPETITION_REQUEST_SENDER.manualReset();
+    void whenResetOccurs_givenNoAuthentication_thenRequestFails_andResponseHasA401Status() throws IOException, InterruptedException {
+        final HttpRequest request = HttpRequest.newBuilder()
+            .POST(HttpRequest.BodyPublishers.noBody())
+            .uri(URI.create(FOLDING_URL + "/stats/manual/reset"))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .build();
+
+        final HttpResponse<Void> response = RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
         assertThat(response.statusCode())
             .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);

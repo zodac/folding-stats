@@ -53,6 +53,7 @@ import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.tc.leaderboard.TeamLeaderboardEntry;
 import me.zodac.folding.rest.api.tc.leaderboard.UserCategoryLeaderboardEntry;
+import me.zodac.folding.rest.util.RestUtilConstants;
 import me.zodac.folding.test.util.rest.request.StubbedFoldingEndpointUtils;
 import me.zodac.folding.test.util.rest.request.TeamUtils;
 import me.zodac.folding.test.util.rest.request.UserUtils;
@@ -369,8 +370,15 @@ class MonthlyResultTest {
     }
 
     @Test
-    void whenManualSaveOccurs_givenNoAuthentication_thenRequestFails_andResponseHasA401Status() throws FoldingRestException {
-        final HttpResponse<Void> response = MONTHLY_RESULT_REQUEST_SENDER.manualSave();
+    void whenManualSaveOccurs_givenNoAuthentication_thenRequestFails_andResponseHasA401Status() throws IOException, InterruptedException {
+        final HttpRequest request = HttpRequest.newBuilder()
+            .POST(HttpRequest.BodyPublishers.noBody())
+            .uri(URI.create(FOLDING_URL + "/results/manual/save"))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .build();
+
+        final HttpResponse<Void> response = RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
+
         assertThat(response.statusCode())
             .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);

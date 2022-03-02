@@ -32,9 +32,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import me.zodac.folding.api.RequestPojo;
+import me.zodac.folding.api.ResponsePojo;
 
 /**
- * Exception thrown when an object being validated conflicts with an existing object.
+ * Exception thrown when a {@link RequestPojo} being validated conflicts with an existing {@link ResponsePojo}.
  */
 public class ConflictException extends RuntimeException {
 
@@ -47,25 +49,25 @@ public class ConflictException extends RuntimeException {
     private final ConflictFailure conflictFailure;
 
     /**
-     * Constructor with failing object, the object it conflicts with and the attributes they conflict on.
+     * Constructor with failing {@link RequestPojo}, the {@link ResponsePojo} it conflicts with and the attributes they conflict on.
      *
-     * @param invalidObject         the {@link Object} that failed validation
-     * @param conflictingObject     the {@link Object} it conflicts with
+     * @param invalidObject         the {@link RequestPojo} that failed validation
+     * @param conflictingObject     the {@link ResponsePojo} it conflicts with
      * @param conflictingAttributes the attribute field names that they conflict on
      */
-    public ConflictException(final Object invalidObject, final Object conflictingObject, final Collection<String> conflictingAttributes) {
+    public ConflictException(final RequestPojo invalidObject, final ResponsePojo conflictingObject, final Collection<String> conflictingAttributes) {
         super();
         conflictFailure = new ConflictFailure(invalidObject, conflictingObject, conflictingAttributes);
     }
 
     /**
-     * Constructor with failing object, the object it conflicts with and the attribute they conflict on.
+     * Constructor with failing {@link RequestPojo}, the {@link ResponsePojo} it conflicts with and the attribute they conflict on.
      *
-     * @param invalidObject        the {@link Object} that failed validation
-     * @param conflictingObject    the {@link Object} it conflicts with
+     * @param invalidObject        the {@link RequestPojo} that failed validation
+     * @param conflictingObject    the {@link ResponsePojo} it conflicts with
      * @param conflictingAttribute the attribute field name that they conflict on
      */
-    public ConflictException(final Object invalidObject, final Object conflictingObject, final String conflictingAttribute) {
+    public ConflictException(final RequestPojo invalidObject, final ResponsePojo conflictingObject, final String conflictingAttribute) {
         this(invalidObject, conflictingObject, List.of(conflictingAttribute));
     }
 
@@ -87,8 +89,8 @@ public class ConflictException extends RuntimeException {
     @Setter
     public static class ConflictFailure {
 
-        private Object invalidObject; // TODO: types?
-        private Object conflictingObject;
+        private RequestPojo invalidObject;
+        private ResponsePojo conflictingObject;
         private Collection<String> conflictingAttributes;
     }
 }

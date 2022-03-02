@@ -34,7 +34,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 import me.zodac.folding.api.exception.ConflictException;
-import me.zodac.folding.api.exception.NullObjectException;
 import me.zodac.folding.api.exception.UsedByException;
 import me.zodac.folding.api.exception.ValidationException;
 import me.zodac.folding.api.tc.Hardware;
@@ -66,14 +65,9 @@ public final class TeamValidator {
      * @param allTeams    all {@link Team}s on the system
      * @return the validated {@link Team}
      * @throws ConflictException   thrown if the input conflicts with an existing {@link Hardware}
-     * @throws NullObjectException thrown if the input is <code>null</code>
      * @throws ValidationException thrown if the input fails validation
      */
     public static Team validateCreate(final TeamRequest teamRequest, final Collection<Team> allTeams) {
-        if (teamRequest == null) {
-            throw new NullObjectException();
-        }
-
         // The teamName must be unique
         final Optional<Team> teamWithMatchingName = getTeamWithName(teamRequest.getTeamName(), allTeams);
         if (teamWithMatchingName.isPresent()) {
@@ -110,14 +104,9 @@ public final class TeamValidator {
      *                     @param allTeams all {@link Team}s on the system
      * @return the validated {@link Team}
      * @throws ConflictException   thrown if the input conflicts with an existing {@link Hardware}
-     * @throws NullObjectException thrown if the input is <code>null</code>
      * @throws ValidationException thrown if the input fails validation
      */
     public static Team validateUpdate(final TeamRequest teamRequest, final Team existingTeam, final Collection<Team> allTeams) {
-        if (teamRequest == null || existingTeam == null) {
-            throw new NullObjectException();
-        }
-
         // The teamName must be unique, unless replacing the same team
         final Optional<Team> teamWithMatchingName = getTeamWithName(teamRequest.getTeamName(), allTeams);
         if (teamWithMatchingName.isPresent() && teamWithMatchingName.get().getId() != existingTeam.getId()) {

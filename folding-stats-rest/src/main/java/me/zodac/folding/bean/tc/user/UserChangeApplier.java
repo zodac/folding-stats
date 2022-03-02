@@ -46,21 +46,27 @@ public class UserChangeApplier {
     private FoldingRepository foldingRepository;
 
     /**
-     * Applies all provides {@link UserChange}s.
+     * Applies all {@link UserChange}s in {@link UserChangeState#APPROVED_NEXT_MONTH}.
      *
      * <p>
      * If the application of any {@link UserChange} fails, it will be logged, but will not stop execution of the remaining {@link UserChange}s
      *
-     * @param userChanges the {@link UserChange}s to apply
      * @see #apply(UserChange)
+     * @see FoldingRepository#getAllUserChangesForNextMonth()
      */
-    public void apply(final Collection<UserChange> userChanges) {
-        for (final UserChange userChange : userChanges) {
-            try {
-                apply(userChange);
-            } catch (final Exception e) {
-                LOGGER.warn("Error occurred applying UserChange {}", userChange, e);
+    public void applyAllForNextMonth() {
+        try {
+            final Collection<UserChange> nextMonthUserChanges = foldingRepository.getAllUserChangesForNextMonth();
+
+            for (final UserChange userChange : nextMonthUserChanges) {
+                try {
+                    apply(userChange);
+                } catch (final Exception e) {
+                    LOGGER.warn("Error occurred applying user change '{}'", userChange, e);
+                }
             }
+        } catch (final Exception e) {
+            LOGGER.warn("Unexpected error applying next month's user changes", e);
         }
     }
 
@@ -77,12 +83,12 @@ public class UserChangeApplier {
      * @see FoldingRepository#updateUser(User, User)
      */
     public UserChange apply(final UserChange userChange) {
-        LOGGER.info("Applying UserChange {} for: {}", userChange.getId(), userChange.getNewUser().getDisplayName());
+        LOGGER.info("Applying user change '{}' for: {}", userChange.getId(), userChange.getNewUser().getDisplayName());
         foldingRepository.updateUser(userChange.getNewUser(), userChange.getPreviousUser());
         LOGGER.debug("Updated user");
 
         final UserChange userChangeToUpdate = UserChange.updateWithState(UserChangeState.COMPLETED, userChange);
-        LOGGER.debug("Updating UserChange to complete");
+        LOGGER.debug("Updating user change to complete");
         return foldingRepository.updateUserChange(userChangeToUpdate);
     }
 }

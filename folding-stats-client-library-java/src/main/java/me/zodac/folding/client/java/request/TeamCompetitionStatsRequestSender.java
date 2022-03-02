@@ -315,16 +315,12 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<Void> manualUpdate(final boolean async, final String userName, final String password) throws FoldingRestException {
-        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+        final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.noBody())
             .uri(URI.create(statsUrl + "/manual/update?async=" + async))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
-
-        if (StringUtils.isNeitherBlank(userName, password)) {
-            requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
-        }
-
-        final HttpRequest request = requestBuilder.build();
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
+            .build();
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
@@ -334,17 +330,6 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
         } catch (final IOException e) {
             throw new FoldingRestException("Error sending HTTP request to manually trigger update of TC stats", e);
         }
-    }
-
-    /**
-     * Sends a <b>POST</b> request to manually reset the <code>Team Competition</code> stats for all {@link me.zodac.folding.api.tc.User}s and
-     * {@link me.zodac.folding.api.tc.Team}s.
-     *
-     * @return the {@link HttpResponse} from the {@link HttpRequest}
-     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
-     */
-    public HttpResponse<Void> manualReset() throws FoldingRestException {
-        return manualReset(null, null);
     }
 
     /**
@@ -357,16 +342,12 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<Void> manualReset(final String userName, final String password) throws FoldingRestException {
-        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+        final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.noBody())
             .uri(URI.create(statsUrl + "/manual/reset"))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
-
-        if (StringUtils.isNeitherBlank(userName, password)) {
-            requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
-        }
-
-        final HttpRequest request = requestBuilder.build();
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
+            .build();
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
@@ -376,25 +357,6 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
         } catch (final IOException e) {
             throw new FoldingRestException("Error sending HTTP request to manually trigger monthly reset of TC stats", e);
         }
-    }
-
-    /**
-     * Send a <b>PATCH</b> request to retrieve update {@link me.zodac.folding.api.tc.User}s with the given {@code userId} with a points/unit offset.
-     *
-     * <p>
-     * <b>NOTE:</b> If either the {@code pointsOffset} or {@code multipliedPointsOffset} are set to <b>0</b>, then it will be calculated
-     * based on the hardware multiplier of the {@link me.zodac.folding.api.tc.User}.
-     *
-     * @param userId                 the ID of the {@link me.zodac.folding.api.tc.User} to update
-     * @param pointsOffset           the additional (unmultiplied) points to add to the {@link me.zodac.folding.api.tc.User}
-     * @param multipliedPointsOffset the additional (multiplied) points to add to the {@link me.zodac.folding.api.tc.User}
-     * @param unitsOffset            the additional units to add to the {@link me.zodac.folding.api.tc.User}
-     * @return the {@link HttpResponse} from the {@link HttpRequest}
-     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
-     */
-    public HttpResponse<Void> offset(final int userId, final long pointsOffset, final long multipliedPointsOffset, final int unitsOffset)
-        throws FoldingRestException {
-        return offset(userId, pointsOffset, multipliedPointsOffset, unitsOffset, null, null);
     }
 
     /**
@@ -417,16 +379,12 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
                                      final String userName, final String password) throws FoldingRestException {
         final OffsetTcStats offsetTcStats = OffsetTcStats.create(pointsOffset, multipliedPointsOffset, unitsOffset);
 
-        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+        final HttpRequest request = HttpRequest.newBuilder()
             .method("PATCH", HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(offsetTcStats)))
             .uri(URI.create(statsUrl + "/users/" + userId))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
-
-        if (StringUtils.isNeitherBlank(userName, password)) {
-            requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
-        }
-
-        final HttpRequest request = requestBuilder.build();
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
+            .build();
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());

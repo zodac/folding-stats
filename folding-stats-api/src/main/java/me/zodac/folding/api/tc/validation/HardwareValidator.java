@@ -33,7 +33,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 import me.zodac.folding.api.exception.ConflictException;
-import me.zodac.folding.api.exception.NullObjectException;
 import me.zodac.folding.api.exception.UsedByException;
 import me.zodac.folding.api.exception.ValidationException;
 import me.zodac.folding.api.tc.Hardware;
@@ -45,6 +44,7 @@ import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 /**
  * Validator class to validate a {@link Hardware} or {@link HardwareRequest}.
  */
+// TODO: Split class into API/REST validators - API into the RequestPojo, REST by moving this class to correct module
 public final class HardwareValidator {
 
     // The hardware with the highest PPD will have a multiplier of <b>1.00</b>, and all others will be based on that
@@ -61,7 +61,6 @@ public final class HardwareValidator {
      * <p>
      * Validation checks include:
      * <ul>
-     *     <li>Input {@code hardwareRequest} must not be <b>null</b></li>
      *     <li>Field 'hardwareName' must not be empty</li>
      *     <li>If field 'hardwareName' is valid, it must not be used by another {@link Hardware}</li>
      *     <li>Field 'displayName' must not be empty</li>
@@ -75,14 +74,9 @@ public final class HardwareValidator {
      *                        @param allHardware      all existing {@link Hardware}s in the system
      * @return the validated {@link Hardware}
      * @throws ConflictException   thrown if the input conflicts with an existing {@link Hardware}
-     * @throws NullObjectException thrown if the input is <code>null</code>
      * @throws ValidationException thrown  if the input fails validation
      */
     public static Hardware validateCreate(final HardwareRequest hardwareRequest, final Collection<Hardware> allHardware) {
-        if (hardwareRequest == null) { // TODO: Necessary check?
-            throw new NullObjectException();
-        }
-
         // The hardwareName must be unique
         final Optional<Hardware> hardwareWithMatchingName = getHardwareWithName(hardwareRequest.getHardwareName(), allHardware);
         if (hardwareWithMatchingName.isPresent()) {
@@ -113,7 +107,6 @@ public final class HardwareValidator {
      * <p>
      * Validation checks include:
      * <ul>
-     *     <li>Input {@code hardwareRequest} and {@code existingHardware} must not be <b>null</b></li>
      *     <li>Field 'hardwareName' must not be empty</li>
      *     <li>If field 'hardwareName' is valid, it must not be used by another {@link Hardware}, unless it is the {@link Hardware} to be
      *     updated</li>
@@ -129,16 +122,11 @@ public final class HardwareValidator {
      * @param allHardware      all existing {@link Hardware}s in the system
      * @return the validated {@link Hardware}
      * @throws ConflictException   thrown if the input conflicts with an existing {@link Hardware}
-     * @throws NullObjectException thrown if the input is <code>null</code>
      * @throws ValidationException thrown if the input fails validation
      */
     public static Hardware validateUpdate(final HardwareRequest hardwareRequest,
                                           final Hardware existingHardware,
                                           final Collection<Hardware> allHardware) {
-        if (hardwareRequest == null || existingHardware == null) {
-            throw new NullObjectException();
-        }
-
         // The hardwareName must be unique, unless replacing the same hardware
         final Optional<Hardware> hardwareWithMatchingName = getHardwareWithName(hardwareRequest.getHardwareName(), allHardware);
         if (hardwareWithMatchingName.isPresent() && hardwareWithMatchingName.get().getId() != existingHardware.getId()) {

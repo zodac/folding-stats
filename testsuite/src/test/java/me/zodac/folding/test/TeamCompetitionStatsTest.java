@@ -57,6 +57,7 @@ import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.client.java.response.TeamCompetitionStatsResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
@@ -68,6 +69,7 @@ import me.zodac.folding.rest.api.tc.TeamSummary;
 import me.zodac.folding.rest.api.tc.UserSummary;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
+import me.zodac.folding.rest.util.RestUtilConstants;
 import me.zodac.folding.test.util.TestConstants;
 import me.zodac.folding.test.util.rest.request.HardwareUtils;
 import me.zodac.folding.test.util.rest.request.StubbedFoldingEndpointUtils;
@@ -977,12 +979,21 @@ class TeamCompetitionStatsTest {
     }
 
     @Test
-    void whenPatchingUserWithPointsOffsets_givenNoAuthentication_thenRequestFails_andResponseHas401Status() throws FoldingRestException {
+    void whenPatchingUserWithPointsOffsets_givenNoAuthentication_thenRequestFails_andResponseHas401Status()
+        throws FoldingRestException, IOException, InterruptedException {
         final Hardware hardware = HardwareUtils.create(generateHardware());
         final UserRequest user = generateUserWithHardwareId(hardware.getId());
 
         final int userId = UserUtils.create(user).getId();
-        final HttpResponse<Void> response = TEAM_COMPETITION_REQUEST_SENDER.offset(userId, 100L, Math.round(100L * hardware.getMultiplier()), 10);
+
+        final OffsetTcStats offsetTcStats = OffsetTcStats.create(100L, Math.round(100L * hardware.getMultiplier()), 10);
+        final HttpRequest request = HttpRequest.newBuilder()
+            .method("PATCH", HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(offsetTcStats)))
+            .uri(URI.create(FOLDING_URL + "/stats/users/" + userId))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .build();
+
+        final HttpResponse<Void> response = RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
         assertThat(response.statusCode())
             .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);

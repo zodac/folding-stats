@@ -375,6 +375,22 @@ traits:
         description: "An error occurred connecting to an external system to verify the user"
       503:
         description: "The system is not in a valid state to execute write requests"
+  /all/passkey
+    get:
+      is: [ "adminOnly", "cached" ]
+      description: "Retrieves all users with passkeys shown"
+      responses:
+        200:
+          description: "All users have been retrieved"
+          body:
+            application/json:
+              example: !include responses/users/usersGetAllPasskey.json
+          headers:
+            eTag:
+              description: "An EntityTag which can be used to retrieve a cached version of the response in future requests"
+              type: string
+        503:
+          description: "The system is not in a valid state to execute read requests"
   /{userId}:
     uriParameters:
       userId:
@@ -454,8 +470,8 @@ traits:
           description: "The system is not in a valid state to execute write requests"
     /passkey:
       get:
-        is: [ "cached" ]
-        description: "Retrieves the user with the given ID with passkey exposed"
+        is: [ "adminOnly", "cached" ]
+        description: "Retrieves the user with the given ID with passkey shown"
         responses:
           200:
             description: "The user has been retrieved from the system"

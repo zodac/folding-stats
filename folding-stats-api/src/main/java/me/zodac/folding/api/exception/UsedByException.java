@@ -31,6 +31,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import me.zodac.folding.api.ResponsePojo;
 
 /**
  * Exception thrown when an object being deleted is still in use by another object.
@@ -48,10 +49,10 @@ public class UsedByException extends RuntimeException {
     /**
      * Constructor with failing object and objects using it.
      *
-     * @param invalidObject the {@link Object} that failed validation
-     * @param usedBy        a {@link Collection} of the objects using the failing object
+     * @param invalidObject the {@link ResponsePojo} that failed validation
+     * @param usedBy        a {@link Collection} of the {@link ResponsePojo}s using the failing {@link ResponsePojo}
      */
-    public UsedByException(final Object invalidObject, final Collection<?> usedBy) { // TODO: Use interface instead of '?'?
+    public UsedByException(final ResponsePojo invalidObject, final Collection<? extends ResponsePojo> usedBy) {
         super();
         usedByFailure = new UsedByFailure(invalidObject, usedBy);
     }
@@ -74,7 +75,7 @@ public class UsedByException extends RuntimeException {
     @Setter
     public static class UsedByFailure {
 
-        private Object invalidObject;
-        private Collection<?> usedBy;
+        private ResponsePojo invalidObject;
+        private Collection<? extends ResponsePojo> usedBy;
     }
 }

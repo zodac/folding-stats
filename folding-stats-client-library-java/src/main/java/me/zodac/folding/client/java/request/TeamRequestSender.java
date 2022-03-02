@@ -198,17 +198,6 @@ public record TeamRequestSender(String teamsUrl) {
     /**
      * Send a <b>POST</b> request to create the given {@link TeamRequest} in the system.
      *
-     * @param team the {@link TeamRequest} to create
-     * @return the {@link HttpResponse} from the {@link HttpRequest}
-     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
-     */
-    public HttpResponse<String> create(final TeamRequest team) throws FoldingRestException {
-        return create(team, null, null);
-    }
-
-    /**
-     * Send a <b>POST</b> request to create the given {@link TeamRequest} in the system.
-     *
      * @param team     the {@link TeamRequest} to create
      * @param userName the username
      * @param password the password
@@ -235,18 +224,6 @@ public record TeamRequestSender(String teamsUrl) {
         } catch (final IOException e) {
             throw new FoldingRestException("Error sending HTTP request to create team", e);
         }
-    }
-
-    /**
-     * Send a <b>PUT</b> request to update the given {@link TeamRequest} in the system.
-     *
-     * @param teamId the ID of the {@link me.zodac.folding.api.tc.Team} to update
-     * @param team   the {@link TeamRequest} to update
-     * @return the {@link HttpResponse} from the {@link HttpRequest}
-     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
-     */
-    public HttpResponse<String> update(final int teamId, final TeamRequest team) throws FoldingRestException {
-        return update(teamId, team, null, null);
     }
 
     /**
@@ -285,17 +262,6 @@ public record TeamRequestSender(String teamsUrl) {
     /**
      * Send a <b>DELETE</b> request to remove a {@link me.zodac.folding.api.tc.Team} with the given {@code teamId}.
      *
-     * @param teamId the ID of the {@link me.zodac.folding.api.tc.Team} to remove
-     * @return the {@link HttpResponse} from the {@link HttpRequest}
-     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
-     */
-    public HttpResponse<Void> delete(final int teamId) throws FoldingRestException {
-        return delete(teamId, null, null);
-    }
-
-    /**
-     * Send a <b>DELETE</b> request to remove a {@link me.zodac.folding.api.tc.Team} with the given {@code teamId}.
-     *
      * @param teamId   the ID of the {@link me.zodac.folding.api.tc.Team} to remove
      * @param userName the username
      * @param password the password
@@ -303,16 +269,12 @@ public record TeamRequestSender(String teamsUrl) {
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<Void> delete(final int teamId, final String userName, final String password) throws FoldingRestException {
-        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+        final HttpRequest request = HttpRequest.newBuilder()
             .DELETE()
             .uri(URI.create(teamsUrl + '/' + teamId))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
-
-        if (StringUtils.isNeitherBlank(userName, password)) {
-            requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
-        }
-
-        final HttpRequest request = requestBuilder.build();
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
+            .build();
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());

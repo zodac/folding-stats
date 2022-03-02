@@ -34,7 +34,6 @@ import static org.assertj.core.api.Assertions.catchThrowableOfType;
 import java.util.Collection;
 import java.util.List;
 import me.zodac.folding.api.exception.ConflictException;
-import me.zodac.folding.api.exception.NullObjectException;
 import me.zodac.folding.api.exception.UsedByException;
 import me.zodac.folding.api.exception.ValidationException;
 import me.zodac.folding.api.tc.Team;
@@ -60,13 +59,6 @@ class TeamValidatorTest {
         assertThat(response)
             .as("Expected validation to pass")
             .isNotNull();
-    }
-
-    @Test
-    void whenValidatingCreate_givenNullTeam_thenFailureResponseIsReturned() {
-        final NullObjectException e = catchThrowableOfType(() -> validateCreate(null, emptyList()), NullObjectException.class);
-        assertThat(e.getNullObjectFailure().getError())
-            .contains("Payload is null");
     }
 
     @Test
@@ -189,32 +181,6 @@ class TeamValidatorTest {
         assertThat(response)
             .as("Expected validation to pass")
             .isNotNull();
-    }
-
-    @Test
-    void whenValidatingUpdate_givenNullTeam_thenFailureResponseIsReturned() {
-        final Team existingTeam = Team.builder()
-            .teamName("teamName")
-            .teamDescription("teamDescription2")
-            .forumLink("https://www.google.com")
-            .build();
-
-        final NullObjectException e = catchThrowableOfType(() -> validateUpdate(null, existingTeam, emptyList()), NullObjectException.class);
-        assertThat(e.getNullObjectFailure().getError())
-            .contains("Payload is null");
-    }
-
-    @Test
-    void whenValidatingUpdate_givenNullExistingTeam_thenFailureResponseIsReturned() {
-        final TeamRequest team = TeamRequest.builder()
-            .teamName("teamName")
-            .teamDescription("teamDescription")
-            .forumLink("https://www.google.com")
-            .build();
-
-        final NullObjectException e = catchThrowableOfType(() -> validateUpdate(team, null, emptyList()), NullObjectException.class);
-        assertThat(e.getNullObjectFailure().getError())
-            .contains("Payload is null");
     }
 
     @Test

@@ -26,6 +26,8 @@ package me.zodac.folding.test;
 
 import static me.zodac.folding.api.util.EncodingUtils.encodeBasicAuthentication;
 import static me.zodac.folding.rest.util.RestUtilConstants.HTTP_CLIENT;
+import static me.zodac.folding.test.util.PasskeyChecker.assertPasskeyIsHidden;
+import static me.zodac.folding.test.util.PasskeyChecker.assertPasskeyIsShown;
 import static me.zodac.folding.test.util.SystemCleaner.cleanSystemForComplexTests;
 import static me.zodac.folding.test.util.TestAuthenticationData.ADMIN_USER;
 import static me.zodac.folding.test.util.TestConstants.FOLDING_URL;
@@ -40,7 +42,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Collection;
 import java.util.List;
-import java.util.regex.Pattern;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.change.UserChange;
 import me.zodac.folding.api.tc.change.UserChangeState;
@@ -94,7 +95,7 @@ class UserChangeTest {
     }
 
     @Test
-    void whenGettingAllUserChanges_givenSomeHaveBeenCreated_thenAllAreReturned_andHas200Status() throws FoldingRestException {
+    void whenGettingAllUserChanges_givenSomeHaveBeenCreated_thenAllAreReturned_andPasskeyIsHidden_andHas200Status() throws FoldingRestException {
         createUserChange();
         createUserChange();
         createUserChange();
@@ -114,7 +115,7 @@ class UserChangeTest {
             .hasSize(3);
 
         final UserChange retrievedUserChange = allUserChanges.iterator().next();
-        validatePasskeyIsHidden(retrievedUserChange.getNewUser().getPasskey());
+        assertPasskeyIsHidden(retrievedUserChange.getNewUser().getPasskey());
     }
 
     @Test
@@ -141,7 +142,7 @@ class UserChangeTest {
         final UserChange retrievedUserChange = allUserChanges.iterator().next();
         assertThat(retrievedUserChange)
             .isEqualTo(userChange);
-        validatePasskeyIsShown(retrievedUserChange.getNewUser().getPasskey());
+        assertPasskeyIsShown(retrievedUserChange.getNewUser().getPasskey());
     }
 
     @Test
@@ -272,7 +273,7 @@ class UserChangeTest {
             .hasSize(2);
 
         final UserChange retrievedUserChange = allUserChanges.iterator().next();
-        validatePasskeyIsHidden(retrievedUserChange.getNewUser().getPasskey());
+        assertPasskeyIsHidden(retrievedUserChange.getNewUser().getPasskey());
     }
 
     @Test
@@ -327,7 +328,7 @@ class UserChangeTest {
             .hasSize(2);
 
         final UserChange retrievedUserChange = allUserChanges.iterator().next();
-        validatePasskeyIsShown(retrievedUserChange.getNewUser().getPasskey());
+        assertPasskeyIsShown(retrievedUserChange.getNewUser().getPasskey());
     }
 
     @Test
@@ -566,25 +567,5 @@ class UserChangeTest {
             .hardwareId(user.getHardware().getId())
             .immediate(true)
             .build();
-    }
-
-    private static void validatePasskeyIsHidden(final String passkey) {
-        final int lengthOfUnmaskedPasskey = 8;
-        final String firstPartOfPasskey = passkey.substring(0, lengthOfUnmaskedPasskey);
-        final String secondPartOfPasskey = passkey.substring(lengthOfUnmaskedPasskey);
-
-        assertThat(firstPartOfPasskey)
-            .as("Expected the first 8 characters of the passkey to be shown")
-            .doesNotContain("*");
-
-        assertThat(secondPartOfPasskey)
-            .as("Expected the remaining 24 characters of the passkey to be masked")
-            .doesNotContainPattern(Pattern.compile("[a-zA-Z]"));
-    }
-
-    private static void validatePasskeyIsShown(final String passkey) {
-        assertThat(passkey)
-            .as("Expected the passkey to not be masked")
-            .doesNotContain("*");
     }
 }

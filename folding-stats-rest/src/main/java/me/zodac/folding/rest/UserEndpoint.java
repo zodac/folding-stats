@@ -125,7 +125,7 @@ public class UserEndpoint {
     @PermitAll
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getAll(final HttpServletRequest request) {
-        LOGGER.debug("GET request received for all users at '{}'", request::getRequestURI);
+        LOGGER.debug("GET request received for all users without passkeys at '{}'", request::getRequestURI);
         final Collection<User> elements = foldingRepository.getAllUsersWithoutPasskeys();
         return cachedOk(elements, untilNextMonthUtc(ChronoUnit.SECONDS));
     }
@@ -141,7 +141,7 @@ public class UserEndpoint {
     @PermitAll
     @GetMapping(path = "/all/passkey", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getAllWithPasskeys(final HttpServletRequest request) {
-        LOGGER.debug("GET request received for all users at '{}'", request::getRequestURI);
+        LOGGER.debug("GET request received for all users with passkeys at '{}'", request::getRequestURI);
         final Collection<User> elements = foldingRepository.getAllUsersWithPasskeys();
         return cachedOk(elements, untilNextMonthUtc(ChronoUnit.SECONDS));
     }

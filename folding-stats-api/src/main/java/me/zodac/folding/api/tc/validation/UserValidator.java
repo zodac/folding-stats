@@ -36,7 +36,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import me.zodac.folding.api.exception.ConflictException;
 import me.zodac.folding.api.exception.ExternalConnectionException;
-import me.zodac.folding.api.exception.NullObjectException;
 import me.zodac.folding.api.exception.ValidationException;
 import me.zodac.folding.api.stats.FoldingStatsDetails;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
@@ -88,7 +87,6 @@ public final class UserValidator {
      * <p>
      * Validation checks include:
      * <ul>
-     *     <li>Input {@code userRequest} must not be <b>null</b></li>
      *     <li>Field 'foldingUserName' must not be empty, must only include alphanumeric characters or underscore (_), period (.) or hyphen (-)</li>
      *     <li>Field 'displayName' must not be empty</li>
      *     <li>Field 'passkey' must not be empty, must be 32-characters long, and must only include alphanumeric characters</li>
@@ -110,17 +108,12 @@ public final class UserValidator {
      * @param allTeams    all existing {@link Team}s in the system
      * @return the validated {@link User}
      * @throws ConflictException   thrown if the input conflicts with an existing {@link User}
-     * @throws NullObjectException thrown if the input is <code>null</code>
      * @throws ValidationException thrown  if the input fails validation
      */
     public User validateCreate(final UserRequest userRequest,
                                final Collection<User> allUsers,
                                final Collection<Hardware> allHardware,
                                final Collection<Team> allTeams) {
-        if (userRequest == null) {
-            throw new NullObjectException();
-        }
-
         // The foldingUserName and passkey must be unique
         final Optional<User> matchingUser = getUserWithFoldingUserNameAndPasskey(userRequest, allUsers);
         if (matchingUser.isPresent()) {
@@ -177,7 +170,6 @@ public final class UserValidator {
      * <p>
      * Validation checks include:
      * <ul>
-     *     <li>Input {@code userRequest} and {@code existingUser} must not be <b>null</b></li>
      *     <li>Field 'foldingUserName' must not be empty</li>
      *     <li>Field 'displayName' must not be empty</li>
      *     <li>Field 'passkey' must not be empty, must be 32-characters long, and must only include alphanumeric characters</li>
@@ -202,16 +194,14 @@ public final class UserValidator {
      * @param allHardware  all existing {@link Hardware}s in the system
      * @param allTeams     all existing {@link Team}s in the system
      * @return the validated {@link User}
+     * @throws ConflictException   thrown if the input conflicts with an existing {@link User}
+     * @throws ValidationException thrown  if the input fails validation
      */
     public User validateUpdate(final UserRequest userRequest,
                                final User existingUser,
                                final Collection<User> allUsers,
                                final Collection<Hardware> allHardware,
                                final Collection<Team> allTeams) {
-        if (userRequest == null || existingUser == null) {
-            throw new NullObjectException();
-        }
-
         // The foldingUserName and passkey must be unique, unless replacing the same user
         final Optional<User> matchingUser = getUserWithFoldingUserNameAndPasskey(userRequest, allUsers);
         if (matchingUser.isPresent() && matchingUser.get().getId() != existingUser.getId()) {

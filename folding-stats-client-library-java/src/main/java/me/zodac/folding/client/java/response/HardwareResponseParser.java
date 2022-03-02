@@ -29,6 +29,7 @@ import java.lang.reflect.Type;
 import java.net.http.HttpResponse;
 import java.util.Collection;
 import me.zodac.folding.api.tc.Hardware;
+import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 import me.zodac.folding.rest.util.RestUtilConstants;
 
 /**
@@ -65,7 +66,7 @@ public final class HardwareResponseParser {
 
     /**
      * Returns the {@link Hardware} created by
-     * {@link me.zodac.folding.client.java.request.HardwareRequestSender#create(me.zodac.folding.rest.api.tc.request.HardwareRequest)}.
+     * {@link me.zodac.folding.client.java.request.HardwareRequestSender#create(HardwareRequest, String, String)}.
      *
      * @param response the {@link HttpResponse} to parse
      * @return the created {@link Hardware}
@@ -76,7 +77,7 @@ public final class HardwareResponseParser {
 
     /**
      * Returns the {@link Hardware} updated by
-     * {@link me.zodac.folding.client.java.request.HardwareRequestSender#update(int, me.zodac.folding.rest.api.tc.request.HardwareRequest)}.
+     * {@link me.zodac.folding.client.java.request.HardwareRequestSender#update(int, HardwareRequest, String, String)}.
      *
      * @param response the {@link HttpResponse} to parse
      * @return the updated {@link Hardware}

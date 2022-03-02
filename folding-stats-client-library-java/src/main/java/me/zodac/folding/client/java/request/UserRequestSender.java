@@ -42,7 +42,6 @@ import me.zodac.folding.rest.util.RestUtilConstants;
  *
  * @param usersUrl the URL to the {@link me.zodac.folding.api.tc.User} REST endpoint
  */
-// TODO: Remove methods that don't use authorization when auth is needed
 public record UserRequestSender(String usersUrl) {
 
     /**
@@ -58,18 +57,17 @@ public record UserRequestSender(String usersUrl) {
     }
 
     /**
-     * Send a <b>GET</b> request to retrieve all {@link me.zodac.folding.api.tc.User}s in the system.
+     * Send a <b>GET</b> request to retrieve all {@link me.zodac.folding.api.tc.User}s in the system, with passkeys hidden.
      *
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
-     * @see #getAll(String)
      */
-    public HttpResponse<String> getAll() throws FoldingRestException {
-        return getAll(null);
+    public HttpResponse<String> getAllWithoutPasskeys() throws FoldingRestException {
+        return getAllWithoutPasskeys(null);
     }
 
     /**
-     * Send a <b>GET</b> request to retrieve all {@link me.zodac.folding.api.tc.User}s in the system.
+     * Send a <b>GET</b> request to retrieve all {@link me.zodac.folding.api.tc.User}s in the system, with passkeys hidden.
      *
      * <p>
      * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.api.tc.User} based on the <code>ETag</code>, an empty
@@ -78,13 +76,60 @@ public record UserRequestSender(String usersUrl) {
      * @param entityTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve cached {@link me.zodac.folding.api.tc.User}s
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
-     * @see #getAll()
      */
-    public HttpResponse<String> getAll(final String entityTag) throws FoldingRestException {
+    public HttpResponse<String> getAllWithoutPasskeys(final String entityTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(usersUrl))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
+
+        if (StringUtils.isNotBlank(entityTag)) {
+            requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), entityTag);
+        }
+
+        final HttpRequest request = requestBuilder.build();
+
+        try {
+            return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FoldingRestException("Error sending HTTP request to get all users", e);
+        } catch (final IOException e) {
+            throw new FoldingRestException("Error sending HTTP request to get all users", e);
+        }
+    }
+
+    /**
+     * Send a <b>GET</b> request to retrieve all {@link me.zodac.folding.api.tc.User}s in the system, with passkeys shown.
+     *
+     * @param userName the username
+     * @param password the password
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     */
+    public HttpResponse<String> getAllWithPasskeys(final String userName, final String password) throws FoldingRestException {
+        return getAllWithPasskeys(null, userName, password);
+    }
+
+    /**
+     * Send a <b>GET</b> request to retrieve all {@link me.zodac.folding.api.tc.User}s in the system, with passkeys shown.
+     *
+     * <p>
+     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.api.tc.User} based on the <code>ETag</code>, an empty
+     * {@link HttpResponse#body()} is returned.
+     *
+     * @param entityTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve cached {@link me.zodac.folding.api.tc.User}s
+     * @param userName  the username
+     * @param password  the password
+     * @return the {@link HttpResponse} from the {@link HttpRequest}
+     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
+     */
+    public HttpResponse<String> getAllWithPasskeys(final String entityTag, final String userName, final String password) throws FoldingRestException {
+        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+            .GET()
+            .uri(URI.create(usersUrl + "/all/passkey"))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
 
         if (StringUtils.isNotBlank(entityTag)) {
             requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), entityTag);
@@ -208,17 +253,6 @@ public record UserRequestSender(String usersUrl) {
     /**
      * Send a <b>POST</b> request to create the given {@link UserRequest} in the system.
      *
-     * @param user the {@link UserRequest} to create
-     * @return the {@link HttpResponse} from the {@link HttpRequest}
-     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
-     */
-    public HttpResponse<String> create(final UserRequest user) throws FoldingRestException {
-        return create(user, null, null);
-    }
-
-    /**
-     * Send a <b>POST</b> request to create the given {@link UserRequest} in the system.
-     *
      * @param user     the {@link UserRequest} to create
      * @param userName the username
      * @param password the password
@@ -226,16 +260,11 @@ public record UserRequestSender(String usersUrl) {
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<String> create(final UserRequest user, final String userName, final String password) throws FoldingRestException {
-        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+        final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(user)))
             .uri(URI.create(usersUrl))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
-
-        if (StringUtils.isNeitherBlank(userName, password)) {
-            requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
-        }
-
-        final HttpRequest request = requestBuilder.build();
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password)).build();
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -245,18 +274,6 @@ public record UserRequestSender(String usersUrl) {
         } catch (final IOException e) {
             throw new FoldingRestException("Error sending HTTP request to create user", e);
         }
-    }
-
-    /**
-     * Send a <b>PUT</b> request to update the given {@link UserRequest} in the system.
-     *
-     * @param userId the ID of the {@link me.zodac.folding.api.tc.User} to update
-     * @param user   the {@link UserRequest} to update
-     * @return the {@link HttpResponse} from the {@link HttpRequest}
-     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
-     */
-    public HttpResponse<String> update(final int userId, final UserRequest user) throws FoldingRestException {
-        return update(userId, user, null, null);
     }
 
     /**
@@ -271,16 +288,12 @@ public record UserRequestSender(String usersUrl) {
      */
     public HttpResponse<String> update(final int userId, final UserRequest user, final String userName, final String password)
         throws FoldingRestException {
-        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+        final HttpRequest request = HttpRequest.newBuilder()
             .PUT(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(user)))
             .uri(URI.create(usersUrl + '/' + userId))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
-
-        if (StringUtils.isNeitherBlank(userName, password)) {
-            requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
-        }
-
-        final HttpRequest request = requestBuilder.build();
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
+            .build();
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -295,17 +308,6 @@ public record UserRequestSender(String usersUrl) {
     /**
      * Send a <b>DELETE</b> request to remove a {@link me.zodac.folding.api.tc.User} with the given {@code userId}.
      *
-     * @param userId the ID of the {@link me.zodac.folding.api.tc.User} to remove
-     * @return the {@link HttpResponse} from the {@link HttpRequest}
-     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
-     */
-    public HttpResponse<Void> delete(final int userId) throws FoldingRestException {
-        return delete(userId, null, null);
-    }
-
-    /**
-     * Send a <b>DELETE</b> request to remove a {@link me.zodac.folding.api.tc.User} with the given {@code userId}.
-     *
      * @param userId   the ID of the {@link me.zodac.folding.api.tc.User} to remove
      * @param userName the username
      * @param password the password
@@ -313,16 +315,12 @@ public record UserRequestSender(String usersUrl) {
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<Void> delete(final int userId, final String userName, final String password) throws FoldingRestException {
-        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+        final HttpRequest request = HttpRequest.newBuilder()
             .DELETE()
             .uri(URI.create(usersUrl + '/' + userId))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
-
-        if (StringUtils.isNeitherBlank(userName, password)) {
-            requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
-        }
-
-        final HttpRequest request = requestBuilder.build();
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
+            .build();
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());

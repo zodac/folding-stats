@@ -151,32 +151,18 @@ public record MonthlyResultRequestSender(String monthlyResultUrl) {
     /**
      * Sends a <b>POST</b> request to manually save the result of the <code>Team Competition</code> for the current month.
      *
-     * @return the {@link HttpResponse} from the {@link HttpRequest}
-     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
-     */
-    public HttpResponse<Void> manualSave() throws FoldingRestException {
-        return manualSave(null, null);
-    }
-
-    /**
-     * Sends a <b>POST</b> request to manually save the result of the <code>Team Competition</code> for the current month.
-     *
      * @param userName the username
      * @param password the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<Void> manualSave(final String userName, final String password) throws FoldingRestException {
-        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+        final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.noBody())
             .uri(URI.create(monthlyResultUrl + "/manual/save"))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
-
-        if (StringUtils.isNeitherBlank(userName, password)) {
-            requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
-        }
-
-        final HttpRequest request = requestBuilder.build();
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
+            .build();
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());

@@ -30,7 +30,6 @@ import static org.assertj.core.api.Assertions.catchThrowableOfType;
 
 import java.util.List;
 import me.zodac.folding.api.exception.ConflictException;
-import me.zodac.folding.api.exception.NullObjectException;
 import me.zodac.folding.api.exception.ValidationException;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
@@ -136,19 +135,6 @@ class UserChangeValidatorTest {
         assertThat(response)
             .as("Expected validation to pass")
             .isNotNull();
-    }
-
-    @Test
-    void whenValidating_givenNullUserChange_thenFailureResponseIsReturned() {
-        final Hardware hardware = generateHardware();
-        final User user = generateUser(hardware);
-
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
-
-        final NullObjectException e =
-            catchThrowableOfType(() -> userChangeValidator.validate(null, emptyList(), List.of(hardware), List.of(user)), NullObjectException.class);
-        assertThat(e.getNullObjectFailure().getError())
-            .contains("Payload is null");
     }
 
     @Test

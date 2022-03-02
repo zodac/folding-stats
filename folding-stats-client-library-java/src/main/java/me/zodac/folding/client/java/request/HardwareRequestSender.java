@@ -196,17 +196,6 @@ public record HardwareRequestSender(String hardwareUrl) {
     }
 
     /**
-     * Send a <b>POST</b> request to create the given {@link HardwareRequest} in the system.
-     *
-     * @param hardware the {@link HardwareRequest} to create
-     * @return the {@link HttpResponse} from the {@link HttpRequest}
-     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
-     */
-    public HttpResponse<String> create(final HardwareRequest hardware) throws FoldingRestException {
-        return create(hardware, null, null);
-    }
-
-    /**
      * Send a <b>POST</b> request to create the given {@link HardwareRequest} in the system, using the supplied {@code userName}
      * and {@code password} for authentication.
      *
@@ -217,16 +206,12 @@ public record HardwareRequestSender(String hardwareUrl) {
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<String> create(final HardwareRequest hardware, final String userName, final String password) throws FoldingRestException {
-        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+        final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(hardware)))
             .uri(URI.create(hardwareUrl))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
-
-        if (StringUtils.isNeitherBlank(userName, password)) {
-            requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
-        }
-
-        final HttpRequest request = requestBuilder.build();
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
+            .build();
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -236,18 +221,6 @@ public record HardwareRequestSender(String hardwareUrl) {
         } catch (final IOException e) {
             throw new FoldingRestException("Error sending HTTP request to create hardware", e);
         }
-    }
-
-    /**
-     * Send a <b>PUT</b> request to update the given {@link HardwareRequest} in the system.
-     *
-     * @param hardwareId the ID of the {@link me.zodac.folding.api.tc.Hardware} to update
-     * @param hardware   the {@link HardwareRequest} to update
-     * @return the {@link HttpResponse} from the {@link HttpRequest}
-     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
-     */
-    public HttpResponse<String> update(final int hardwareId, final HardwareRequest hardware) throws FoldingRestException {
-        return update(hardwareId, hardware, null, null);
     }
 
     /**
@@ -262,16 +235,12 @@ public record HardwareRequestSender(String hardwareUrl) {
      */
     public HttpResponse<String> update(final int hardwareId, final HardwareRequest hardware, final String userName, final String password)
         throws FoldingRestException {
-        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+        final HttpRequest request = HttpRequest.newBuilder()
             .PUT(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(hardware)))
             .uri(URI.create(hardwareUrl + '/' + hardwareId))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
-
-        if (StringUtils.isNeitherBlank(userName, password)) {
-            requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
-        }
-
-        final HttpRequest request = requestBuilder.build();
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
+            .build();
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -287,33 +256,18 @@ public record HardwareRequestSender(String hardwareUrl) {
      * Send a <b>DELETE</b> request to remove a {@link me.zodac.folding.api.tc.Hardware} with the given {@code hardwareId}.
      *
      * @param hardwareId the ID of the {@link me.zodac.folding.api.tc.Hardware} to remove
-     * @return the {@link HttpResponse} from the {@link HttpRequest}
-     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
-     */
-    public HttpResponse<Void> delete(final int hardwareId) throws FoldingRestException {
-        return delete(hardwareId, null, null);
-    }
-
-    /**
-     * Send a <b>DELETE</b> request to remove a {@link me.zodac.folding.api.tc.Hardware} with the given {@code hardwareId}.
-     *
-     * @param hardwareId the ID of the {@link me.zodac.folding.api.tc.Hardware} to remove
      * @param userName   the username
      * @param password   the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<Void> delete(final int hardwareId, final String userName, final String password) throws FoldingRestException {
-        final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+        final HttpRequest request = HttpRequest.newBuilder()
             .DELETE()
             .uri(URI.create(hardwareUrl + '/' + hardwareId))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
-
-        if (StringUtils.isNeitherBlank(userName, password)) {
-            requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
-        }
-
-        final HttpRequest request = requestBuilder.build();
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
+            .build();
 
         try {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());

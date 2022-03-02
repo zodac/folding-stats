@@ -31,7 +31,6 @@ import static org.assertj.core.api.Assertions.catchThrowableOfType;
 import java.util.ArrayList;
 import java.util.List;
 import me.zodac.folding.api.exception.ConflictException;
-import me.zodac.folding.api.exception.NullObjectException;
 import me.zodac.folding.api.exception.ValidationException;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
@@ -80,16 +79,6 @@ class UserValidatorTest {
         assertThat(response)
             .as("Expected validation to pass")
             .isNotNull();
-    }
-
-    @Test
-    void whenValidatingCreate_givenNullUser_thenFailureResponseIsReturned() {
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-
-        final NullObjectException e =
-            catchThrowableOfType(() -> userValidator.validateCreate(null, emptyList(), emptyList(), emptyList()), NullObjectException.class);
-        assertThat(e.getNullObjectFailure().getError())
-            .contains("Payload is null");
     }
 
     @Test
@@ -969,58 +958,6 @@ class UserValidatorTest {
         assertThat(response)
             .as("Expected validation to pass")
             .isNotNull();
-    }
-
-    @Test
-    void whenValidatingUpdate_givenNullUser_thenFailureResponseIsReturned() {
-        final Hardware hardware = generateHardware();
-        final Team team = generateTeam();
-
-        final User existingUser = User.builder()
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .hardware(hardware)
-            .team(team)
-            .build();
-
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-
-        final NullObjectException e =
-            catchThrowableOfType(() -> userValidator.validateUpdate(null, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
-                NullObjectException.class);
-        assertThat(e.getNullObjectFailure().getError())
-            .contains("Payload is null");
-    }
-
-    @Test
-    void whenValidatingUpdate_givenNullExistingUser_thenFailureResponseIsReturned() {
-        final Hardware hardware = generateHardware();
-        final Team team = generateTeam();
-
-        final UserRequest user = UserRequest.builder()
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU.toString())
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .hardwareId(hardware.getId())
-            .teamId(team.getId())
-            .build();
-
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-
-        final NullObjectException e =
-            catchThrowableOfType(() -> userValidator.validateUpdate(user, null, emptyList(), List.of(hardware), List.of(team)),
-                NullObjectException.class);
-        assertThat(e.getNullObjectFailure().getError())
-            .contains("Payload is null");
     }
 
     @Test
