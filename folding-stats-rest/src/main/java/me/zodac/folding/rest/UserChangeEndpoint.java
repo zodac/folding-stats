@@ -40,12 +40,10 @@ import me.zodac.folding.api.state.WriteRequired;
 import me.zodac.folding.api.tc.change.UserChange;
 import me.zodac.folding.api.tc.change.UserChangeState;
 import me.zodac.folding.api.tc.validation.UserChangeValidator;
-import me.zodac.folding.api.tc.validation.ValidationResult;
 import me.zodac.folding.bean.FoldingRepository;
 import me.zodac.folding.bean.tc.user.UserChangeApplier;
 import me.zodac.folding.rest.api.tc.request.UserChangeRequest;
 import me.zodac.folding.rest.exception.InvalidStateException;
-import me.zodac.folding.rest.util.ValidationFailureResponseMapper;
 import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -117,17 +115,13 @@ public class UserChangeEndpoint {
         LOGGER.info("POST request for user change received at '{}'", request::getRequestURI);
 
         final UserChangeValidator userChangeValidator = UserChangeValidator.create(HttpFoldingStatsRetriever.create());
-        final ValidationResult<UserChange> validationResultForUserChange = userChangeValidator.validate(
+        final UserChange validatedUserChange = userChangeValidator.validate(
             userChangeRequest,
             foldingRepository.getAllUserChangesWithPasskeys(UserChangeState.getOpenStates()),
             foldingRepository.getAllHardware(),
             foldingRepository.getAllUsersWithPasskeys()
         );
-        if (validationResultForUserChange.isFailure()) {
-            return ValidationFailureResponseMapper.map(validationResultForUserChange);
-        }
 
-        final UserChange validatedUserChange = validationResultForUserChange.output();
         final UserChange createdUserChange = foldingRepository.createUserChange(validatedUserChange);
 
         userChangeCreates.increment();

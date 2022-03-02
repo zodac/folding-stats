@@ -44,11 +44,9 @@ import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.state.WriteRequired;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.validation.TeamValidator;
-import me.zodac.folding.api.tc.validation.ValidationResult;
 import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.bean.FoldingRepository;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
-import me.zodac.folding.rest.util.ValidationFailureResponseMapper;
 import me.zodac.folding.state.SystemStateManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -112,12 +110,7 @@ public class TeamEndpoint {
     public ResponseEntity<?> create(@RequestBody final TeamRequest teamRequest, final HttpServletRequest request) {
         LOGGER.debug("POST request received to create team at '{}' with request: {}", request::getRequestURI, () -> teamRequest);
 
-        final ValidationResult<Team> validationResult = validateCreate(teamRequest);
-        if (validationResult.isFailure()) {
-            return ValidationFailureResponseMapper.map(validationResult);
-        }
-        final Team validatedTeam = validationResult.output();
-
+        final Team validatedTeam = validateCreate(teamRequest);
         final Team elementWithId = foldingRepository.createTeam(validatedTeam);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
@@ -213,11 +206,7 @@ public class TeamEndpoint {
             return ok(existingTeam);
         }
 
-        final ValidationResult<Team> validationResult = validateUpdate(teamRequest, existingTeam);
-        if (validationResult.isFailure()) {
-            return ValidationFailureResponseMapper.map(validationResult);
-        }
-        final Team validatedHardware = validationResult.output();
+        final Team validatedHardware = validateUpdate(teamRequest, existingTeam);
 
         // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
         final Team teamWithId = Team.updateWithId(existingTeam.getId(), validatedHardware);
@@ -244,12 +233,7 @@ public class TeamEndpoint {
 
         final Team team = foldingRepository.getTeam(teamId);
 
-        final ValidationResult<Team> validationResult = validateDelete(team);
-        if (validationResult.isFailure()) {
-            return ValidationFailureResponseMapper.map(validationResult);
-        }
-        final Team validatedTeam = validationResult.output();
-
+        final Team validatedTeam = validateDelete(team);
         foldingRepository.deleteTeam(validatedTeam);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
@@ -258,15 +242,15 @@ public class TeamEndpoint {
         return ok();
     }
 
-    private ValidationResult<Team> validateCreate(final TeamRequest teamRequest) {
+    private Team validateCreate(final TeamRequest teamRequest) {
         return TeamValidator.validateCreate(teamRequest, foldingRepository.getAllTeams());
     }
 
-    private ValidationResult<Team> validateUpdate(final TeamRequest teamRequest, final Team existingTeam) {
+    private Team validateUpdate(final TeamRequest teamRequest, final Team existingTeam) {
         return TeamValidator.validateUpdate(teamRequest, existingTeam, foldingRepository.getAllTeams());
     }
 
-    private ValidationResult<Team> validateDelete(final Team team) {
+    private Team validateDelete(final Team team) {
         return TeamValidator.validateDelete(team, foldingRepository.getAllUsersWithoutPasskeys());
     }
 }

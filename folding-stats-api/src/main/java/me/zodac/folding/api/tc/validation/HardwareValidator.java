@@ -32,6 +32,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
+import me.zodac.folding.api.exception.ConflictException;
+import me.zodac.folding.api.exception.NullObjectException;
+import me.zodac.folding.api.exception.UsedByException;
+import me.zodac.folding.api.exception.ValidationException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.HardwareMake;
 import me.zodac.folding.api.tc.HardwareType;
@@ -69,17 +73,20 @@ public final class HardwareValidator {
      *
      * @param hardwareRequest the {@link HardwareRequest} to validate
      *                        @param allHardware      all existing {@link Hardware}s in the system
-     * @return the {@link ValidationResult}
+     * @return the validated {@link Hardware}
+     * @throws ConflictException   thrown if the input conflicts with an existing {@link Hardware}
+     * @throws NullObjectException thrown if the input is <code>null</code>
+     * @throws ValidationException thrown  if the input fails validation
      */
-    public static ValidationResult<Hardware> validateCreate(final HardwareRequest hardwareRequest, final Collection<Hardware> allHardware) {
-        if (hardwareRequest == null) {
-            return ValidationResult.nullObject();
+    public static Hardware validateCreate(final HardwareRequest hardwareRequest, final Collection<Hardware> allHardware) {
+        if (hardwareRequest == null) { // TODO: Necessary check?
+            throw new NullObjectException();
         }
 
         // The hardwareName must be unique
         final Optional<Hardware> hardwareWithMatchingName = getHardwareWithName(hardwareRequest.getHardwareName(), allHardware);
         if (hardwareWithMatchingName.isPresent()) {
-            return ValidationResult.conflictingWith(hardwareRequest, hardwareWithMatchingName.get(), List.of("hardwareName"));
+            throw new ConflictException(hardwareRequest, hardwareWithMatchingName.get(), "hardwareName");
         }
 
         final List<String> failureMessages = Stream.of(
@@ -94,11 +101,10 @@ public final class HardwareValidator {
             .toList();
 
         if (!failureMessages.isEmpty()) {
-            return ValidationResult.failure(hardwareRequest, failureMessages);
+            throw new ValidationException(hardwareRequest, failureMessages);
         }
 
-        final Hardware convertedHardware = Hardware.createWithoutId(hardwareRequest);
-        return ValidationResult.successful(convertedHardware);
+        return Hardware.createWithoutId(hardwareRequest);
     }
 
     /**
@@ -121,19 +127,22 @@ public final class HardwareValidator {
      * @param hardwareRequest  the {@link HardwareRequest} to validate
      * @param existingHardware the already existing {@link Hardware} in the system to be updated
      * @param allHardware      all existing {@link Hardware}s in the system
-     * @return the {@link ValidationResult}
+     * @return the validated {@link Hardware}
+     * @throws ConflictException   thrown if the input conflicts with an existing {@link Hardware}
+     * @throws NullObjectException thrown if the input is <code>null</code>
+     * @throws ValidationException thrown if the input fails validation
      */
-    public static ValidationResult<Hardware> validateUpdate(final HardwareRequest hardwareRequest,
-                                                            final Hardware existingHardware,
-                                                            final Collection<Hardware> allHardware) {
+    public static Hardware validateUpdate(final HardwareRequest hardwareRequest,
+                                          final Hardware existingHardware,
+                                          final Collection<Hardware> allHardware) {
         if (hardwareRequest == null || existingHardware == null) {
-            return ValidationResult.nullObject();
+            throw new NullObjectException();
         }
 
         // The hardwareName must be unique, unless replacing the same hardware
         final Optional<Hardware> hardwareWithMatchingName = getHardwareWithName(hardwareRequest.getHardwareName(), allHardware);
         if (hardwareWithMatchingName.isPresent() && hardwareWithMatchingName.get().getId() != existingHardware.getId()) {
-            return ValidationResult.conflictingWith(hardwareRequest, hardwareWithMatchingName.get(), List.of("hardwareName"));
+            throw new ConflictException(hardwareRequest, hardwareWithMatchingName.get(), "hardwareName");
         }
 
         final List<String> failureMessages = Stream.of(
@@ -148,11 +157,10 @@ public final class HardwareValidator {
             .toList();
 
         if (!failureMessages.isEmpty()) {
-            return ValidationResult.failure(hardwareRequest, failureMessages);
+            throw new ValidationException(hardwareRequest, failureMessages);
         }
 
-        final Hardware convertedHardware = Hardware.createWithoutId(hardwareRequest);
-        return ValidationResult.successful(convertedHardware);
+        return Hardware.createWithoutId(hardwareRequest);
     }
 
     /**
@@ -163,16 +171,17 @@ public final class HardwareValidator {
      *
      * @param hardware the {@link Hardware} to validate
      * @param allUsers all existing {@link User}s in the system
-     * @return the {@link ValidationResult}
+     * @return the validated {@link Hardware}
+     * @throws UsedByException thrown if the {@link Hardware} is in use by a {@link User}
      */
-    public static ValidationResult<Hardware> validateDelete(final Hardware hardware, final Collection<User> allUsers) {
+    public static Hardware validateDelete(final Hardware hardware, final Collection<User> allUsers) {
         final Collection<User> usersWithMatchingHardware = getUsersWithHardware(hardware.getId(), allUsers);
 
         if (!usersWithMatchingHardware.isEmpty()) {
-            return ValidationResult.usedBy(hardware, usersWithMatchingHardware);
+            throw new UsedByException(hardware, usersWithMatchingHardware);
         }
 
-        return ValidationResult.successful(hardware);
+        return hardware;
     }
 
     private static Optional<Hardware> getHardwareWithName(final String hardwareName, final Collection<Hardware> allHardware) {

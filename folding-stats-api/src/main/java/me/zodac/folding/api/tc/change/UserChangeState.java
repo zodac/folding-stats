@@ -93,6 +93,19 @@ public enum UserChangeState {
     }
 
     /**
+     * Retrieve all available {@link UserChangeState}s (excluding {@link UserChangeState#INVALID}).
+     *
+     * <p>
+     * Should be used instead of {@link UserChangeState#values()}, as that recalculates the array for each call,
+     * while this method uses a static {@link UserChangeState}.
+     *
+     * @return a {@link Collection} of all {@link UserChangeState}s
+     */
+    public static Collection<UserChangeState> getAllValues() {
+        return ALL_VALUES;
+    }
+
+    /**
      * Retrieve all available {@link UserChangeState}s not in {@link #isFinalState()}.
      *
      * @return a {@link Collection} of all {@link UserChangeState}s

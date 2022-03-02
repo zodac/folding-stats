@@ -34,7 +34,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+import me.zodac.folding.api.exception.ConflictException;
 import me.zodac.folding.api.exception.ExternalConnectionException;
+import me.zodac.folding.api.exception.NullObjectException;
+import me.zodac.folding.api.exception.ValidationException;
 import me.zodac.folding.api.stats.FoldingStatsDetails;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
 import me.zodac.folding.api.tc.Category;
@@ -105,20 +108,23 @@ public final class UserValidator {
      * @param allUsers    all existing {@link User}s in the system
      * @param allHardware all existing {@link Hardware}s in the system
      * @param allTeams    all existing {@link Team}s in the system
-     * @return the {@link ValidationResult}
+     * @return the validated {@link User}
+     * @throws ConflictException   thrown if the input conflicts with an existing {@link User}
+     * @throws NullObjectException thrown if the input is <code>null</code>
+     * @throws ValidationException thrown  if the input fails validation
      */
-    public ValidationResult<User> validateCreate(final UserRequest userRequest,
-                                                 final Collection<User> allUsers,
-                                                 final Collection<Hardware> allHardware,
-                                                 final Collection<Team> allTeams) {
+    public User validateCreate(final UserRequest userRequest,
+                               final Collection<User> allUsers,
+                               final Collection<Hardware> allHardware,
+                               final Collection<Team> allTeams) {
         if (userRequest == null) {
-            return ValidationResult.nullObject();
+            throw new NullObjectException();
         }
 
         // The foldingUserName and passkey must be unique
         final Optional<User> matchingUser = getUserWithFoldingUserNameAndPasskey(userRequest, allUsers);
         if (matchingUser.isPresent()) {
-            return ValidationResult.conflictingWith(userRequest, matchingUser.get(), List.of("foldingUserName", "passkey"));
+            throw new ConflictException(userRequest, matchingUser.get(), List.of("foldingUserName", "passkey"));
         }
 
         // Hardware and team must be validated first, since they may be used by other validation checks
@@ -130,7 +136,7 @@ public final class UserValidator {
             .toList();
 
         if (!hardwareAndTeamFailureMessages.isEmpty()) {
-            return ValidationResult.failure(userRequest, hardwareAndTeamFailureMessages);
+            throw new ValidationException(userRequest, hardwareAndTeamFailureMessages);
         }
 
         final List<String> failureMessages = Stream.of(
@@ -145,7 +151,7 @@ public final class UserValidator {
             .toList();
 
         if (!failureMessages.isEmpty()) {
-            return ValidationResult.failure(userRequest, failureMessages);
+            throw new ValidationException(userRequest, failureMessages);
         }
 
         final Collection<User> usersOnTeam = getUsersOnTeam(teamForUser.getId(), allUsers);
@@ -159,10 +165,10 @@ public final class UserValidator {
             .toList();
 
         if (!complexFailureMessages.isEmpty()) {
-            return ValidationResult.failure(userRequest, complexFailureMessages);
+            throw new ValidationException(userRequest, complexFailureMessages);
         }
 
-        return ValidationResult.successful(User.createWithoutId(userRequest, hardwareForUser, teamForUser));
+        return User.createWithoutId(userRequest, hardwareForUser, teamForUser);
     }
 
     /**
@@ -195,21 +201,21 @@ public final class UserValidator {
      * @param allUsers     all existing {@link User}s in the system
      * @param allHardware  all existing {@link Hardware}s in the system
      * @param allTeams     all existing {@link Team}s in the system
-     * @return the {@link ValidationResult}
+     * @return the validated {@link User}
      */
-    public ValidationResult<User> validateUpdate(final UserRequest userRequest,
-                                                 final User existingUser,
-                                                 final Collection<User> allUsers,
-                                                 final Collection<Hardware> allHardware,
-                                                 final Collection<Team> allTeams) {
+    public User validateUpdate(final UserRequest userRequest,
+                               final User existingUser,
+                               final Collection<User> allUsers,
+                               final Collection<Hardware> allHardware,
+                               final Collection<Team> allTeams) {
         if (userRequest == null || existingUser == null) {
-            return ValidationResult.nullObject();
+            throw new NullObjectException();
         }
 
         // The foldingUserName and passkey must be unique, unless replacing the same user
         final Optional<User> matchingUser = getUserWithFoldingUserNameAndPasskey(userRequest, allUsers);
         if (matchingUser.isPresent() && matchingUser.get().getId() != existingUser.getId()) {
-            return ValidationResult.conflictingWith(userRequest, matchingUser.get(), List.of("foldingUserName", "passkey"));
+            throw new ConflictException(userRequest, matchingUser.get(), List.of("foldingUserName", "passkey"));
         }
 
         // Hardware and team must be validated first, since they may be used by other validation checks
@@ -221,7 +227,7 @@ public final class UserValidator {
             .toList();
 
         if (!hardwareAndTeamFailureMessages.isEmpty()) {
-            return ValidationResult.failure(userRequest, hardwareAndTeamFailureMessages);
+            throw new ValidationException(userRequest, hardwareAndTeamFailureMessages);
         }
 
         final List<String> failureMessages = Stream.of(
@@ -237,7 +243,7 @@ public final class UserValidator {
 
         // All subsequent checks will be heavier, so best to return early if any failures occur
         if (!failureMessages.isEmpty()) {
-            return ValidationResult.failure(userRequest, failureMessages);
+            throw new ValidationException(userRequest, failureMessages);
         }
 
         final Collection<User> usersOnTeam = getUsersOnTeam(teamForUser.getId(), allUsers);
@@ -251,10 +257,10 @@ public final class UserValidator {
             .toList();
 
         if (!complexFailureMessages.isEmpty()) {
-            return ValidationResult.failure(userRequest, complexFailureMessages);
+            throw new ValidationException(userRequest, complexFailureMessages);
         }
 
-        return ValidationResult.successful(User.createWithoutId(userRequest, hardwareForUser, teamForUser));
+        return User.createWithoutId(userRequest, hardwareForUser, teamForUser);
     }
 
     /**
@@ -264,15 +270,14 @@ public final class UserValidator {
      * If the {@link User} is their {@link Team} captain, they cannot be deleted.
      *
      * @param user the {@link User} to delete
-     * @return the {@link ValidationResult}
+     * @return the validated {@link User}
      */
-    public ValidationResult<User> validateDelete(final User user) {
+    public User validateDelete(final User user) {
         if (user.isUserIsCaptain()) {
-            return ValidationResult.failure(user,
-                List.of(String.format("Cannot delete user '%s' since they are team captain", user.getDisplayName())));
+            throw new ValidationException(user, String.format("Cannot delete user '%s' since they are team captain", user.getDisplayName()));
         }
 
-        return ValidationResult.successful(user);
+        return user;
     }
 
     private String validateNewUserWorkUnits(final UserRequest userRequest) {

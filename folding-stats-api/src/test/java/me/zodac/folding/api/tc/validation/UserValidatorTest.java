@@ -24,11 +24,15 @@
 
 package me.zodac.folding.api.tc.validation;
 
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowableOfType;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import me.zodac.folding.api.exception.ConflictException;
+import me.zodac.folding.api.exception.NullObjectException;
+import me.zodac.folding.api.exception.ValidationException;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.HardwareMake;
@@ -67,31 +71,25 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateCreate(user,
-            Collections.emptyList(),
+        final User response = userValidator.validateCreate(user,
+            emptyList(),
             List.of(hardware),
             List.of(team)
         );
 
-        assertThat(response.isFailure())
-            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
-            .isFalse();
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
     }
 
     @Test
     void whenValidatingCreate_givenNullUser_thenFailureResponseIsReturned() {
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateCreate(null,
-            Collections.emptyList(),
-            Collections.emptyList(),
-            Collections.emptyList()
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
-            .containsOnly("Payload is null");
+        final NullObjectException e =
+            catchThrowableOfType(() -> userValidator.validateCreate(null, emptyList(), emptyList(), emptyList()), NullObjectException.class);
+        assertThat(e.getNullObjectFailure().getError())
+            .contains("Payload is null");
     }
 
     @Test
@@ -112,16 +110,10 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateCreate(user,
-            Collections.emptyList(),
-            List.of(hardware),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), List.of(hardware), List.of(team)), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'category' must be one of: [AMD_GPU, NVIDIA_GPU, WILDCARD]");
     }
 
@@ -143,16 +135,10 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateCreate(user,
-            Collections.emptyList(),
-            List.of(hardware),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), List.of(hardware), List.of(team)), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen");
     }
 
@@ -174,16 +160,10 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateCreate(user,
-            Collections.emptyList(),
-            List.of(hardware),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), List.of(hardware), List.of(team)), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen");
     }
 
@@ -205,16 +185,10 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateCreate(user,
-            Collections.emptyList(),
-            List.of(hardware),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), List.of(hardware), List.of(team)), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'displayName' must not be empty");
     }
 
@@ -236,16 +210,10 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateCreate(user,
-            Collections.emptyList(),
-            List.of(hardware),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), List.of(hardware), List.of(team)), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'passkey' must be 32 characters long and include only alphanumeric characters");
     }
 
@@ -267,16 +235,10 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateCreate(user,
-            Collections.emptyList(),
-            List.of(hardware),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), List.of(hardware), List.of(team)), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'passkey' must be 32 characters long and include only alphanumeric characters");
     }
 
@@ -298,15 +260,15 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateCreate(user,
-            Collections.emptyList(),
+        final User response = userValidator.validateCreate(user,
+            emptyList(),
             List.of(hardware),
             List.of(team)
         );
 
-        assertThat(response.isFailure())
-            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
-            .isFalse();
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
     }
 
     @Test
@@ -327,16 +289,10 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateCreate(user,
-            Collections.emptyList(),
-            List.of(hardware),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), List.of(hardware), List.of(team)), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'profileLink' is not a valid link: 'invalidUrl'");
     }
 
@@ -358,15 +314,15 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateCreate(user,
-            Collections.emptyList(),
+        final User response = userValidator.validateCreate(user,
+            emptyList(),
             List.of(hardware),
             List.of(team)
         );
 
-        assertThat(response.isFailure())
-            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
-            .isFalse();
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
     }
 
     @Test
@@ -387,16 +343,10 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateCreate(user,
-            Collections.emptyList(),
-            List.of(hardware),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), List.of(hardware), List.of(team)), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'liveStatsLink' is not a valid link: 'invalidUrl'");
     }
 
@@ -433,15 +383,15 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateCreate(user,
+        final User response = userValidator.validateCreate(user,
             List.of(otherUser),
             List.of(hardware, otherHardware),
             List.of(team, otherTeam)
         );
 
-        assertThat(response.isFailure())
-            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
-            .isFalse();
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
     }
 
     @Test
@@ -477,17 +427,18 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateCreate(user,
-            List.of(otherUser),
-            List.of(hardware, otherHardware),
-            List.of(team, otherTeam)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
+        final ConflictException e = catchThrowableOfType(
+            () -> userValidator.validateCreate(user, List.of(otherUser), List.of(hardware, otherHardware), List.of(team, otherTeam)),
+            ConflictException.class);
+        assertThat(e.getConflictFailure().getConflictingAttributes())
+            .containsOnly(
+                "foldingUserName",
+                "passkey"
+            );
 
-        assertThat(response.getErrors())
-            .containsOnly("Payload conflicts with an existing object on: [foldingUserName, passkey]");
+        assertThat(e.getConflictFailure().getConflictingObject())
+            .isNotNull();
     }
 
     @Test
@@ -516,16 +467,10 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateCreate(user,
-            Collections.emptyList(),
-            List.of(hardware),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), List.of(hardware), List.of(team)), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly(String.format("Category '%s' cannot be filled by hardware of make '%s', must be one of: %s", Category.AMD_GPU,
                 hardware.getHardwareMake(), Category.AMD_GPU.supportedHardwareMakes()));
     }
@@ -556,16 +501,10 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateCreate(user,
-            Collections.emptyList(),
-            List.of(hardware),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), List.of(hardware), List.of(team)), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly(String.format("Category '%s' cannot be filled by hardware of type '%s', must be one of: %s", Category.AMD_GPU,
                 hardware.getHardwareType(), Category.AMD_GPU.supportedHardwareTypes()));
     }
@@ -596,16 +535,10 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateCreate(user,
-            Collections.emptyList(),
-            List.of(hardware),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), List.of(hardware), List.of(team)), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly(String.format("Field 'hardwareId' must be one of: [%s: %s]", hardware.getId(), hardware.getHardwareName()));
     }
 
@@ -626,16 +559,10 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateCreate(user,
-            Collections.emptyList(),
-            Collections.emptyList(),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), emptyList(), List.of(team)), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("No hardware exist on the system");
     }
 
@@ -665,16 +592,10 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateCreate(user,
-            Collections.emptyList(),
-            List.of(hardware),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), List.of(hardware), List.of(team)), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly(String.format("Field 'teamId' must be one of: [%s: %s]", team.getId(), team.getTeamName()));
     }
 
@@ -695,16 +616,10 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateCreate(user,
-            Collections.emptyList(),
-            List.of(hardware),
-            Collections.emptyList()
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), List.of(hardware), emptyList()), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("No teams exist on the system");
     }
 
@@ -738,15 +653,15 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateCreate(user,
+        final User response = userValidator.validateCreate(user,
             List.of(currentCaptain),
             List.of(hardware),
             List.of(team)
         );
 
-        assertThat(response.isFailure())
-            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
-            .isFalse();
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
     }
 
     @Test
@@ -779,15 +694,15 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateCreate(user,
+        final User response = userValidator.validateCreate(user,
             List.of(currentCaptain),
             List.of(hardware),
             List.of(team)
         );
 
-        assertThat(response.isFailure())
-            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
-            .isFalse();
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
     }
 
     @Test
@@ -826,16 +741,10 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateCreate(user,
-            usersOnTeam,
-            List.of(hardware),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateCreate(user, usersOnTeam, List.of(hardware), List.of(team)), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly(String.format("Team '%s' has %s users, maximum permitted is %s", team.getTeamName(), usersOnTeam.size(),
                 Category.maximumPermittedAmountForAllCategories()));
     }
@@ -876,15 +785,15 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateCreate(user,
+        final User response = userValidator.validateCreate(user,
             usersOnTeamInCategory,
             List.of(hardware),
             List.of(team)
         );
 
-        assertThat(response.isFailure())
-            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
-            .isFalse();
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
     }
 
     @Test
@@ -923,16 +832,11 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateCreate(user,
-            usersOnTeamInCategory,
-            List.of(hardware),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateCreate(user, usersOnTeamInCategory, List.of(hardware), List.of(team)),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly(String.format("Team '%s' already has %s users in category '%s', only %s permitted", team.getTeamName(),
                 usersOnTeamInCategory.size(), Category.NVIDIA_GPU, Category.NVIDIA_GPU.permittedUsers()));
     }
@@ -955,18 +859,16 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new NoUnitsFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateCreate(user,
-            Collections.emptyList(),
-            List.of(hardware),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
-            .containsOnly("User 'user' has 0 Work Units with passkey 'DummyPasskey12345678901234567890', "
-                + "there must be at least one completed Work Unit before adding the user");
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), List.of(hardware), List.of(team)), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
+            .containsOnly(
+                String.format(
+                    "User '%s' has 0 Work Units with passkey '%s', there must be at least one completed Work Unit before adding the user",
+                    user.getDisplayName(), user.getPasskey()
+                )
+            );
     }
 
     @Test
@@ -987,46 +889,13 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ExternalConnectionFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateCreate(user,
-            Collections.emptyList(),
-            List.of(hardware),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
-            .containsOnly("Unable to connect to 'https://www.google.com' to check stats for user 'user': Error connecting");
-    }
-
-    @Test
-    void whenValidatingCreate_givenNoHardware_thenFailureResponseIsReturned_andNoOtherValidationErrorsAreReturned() {
-        final Team team = generateTeam();
-
-        final UserRequest user = UserRequest.builder()
-            .foldingUserName(null)
-            .displayName(null)
-            .passkey("invalid")
-            .category("invalid")
-            .profileLink("invalid")
-            .liveStatsLink("invalid")
-            .userIsCaptain(true)
-            .teamId(team.getId())
-            .build();
-
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateCreate(user,
-            Collections.emptyList(),
-            Collections.emptyList(),
-            List.of(team)
-        );
-
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
-            .containsOnly("No hardware exist on the system");
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), List.of(hardware), List.of(team)), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
+            .containsOnly(
+                String.format("Unable to connect to 'https://www.google.com' to check stats for user '%s': Error connecting",
+                    user.getDisplayName()));
     }
 
     @Test
@@ -1047,23 +916,17 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateCreate(user,
-            Collections.emptyList(),
-            Collections.emptyList(),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), List.of(hardware), List.of(team)), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly(
-                "No hardware exist on the system",
-                "No hardware exist on the system",
-                "No hardware exist on the system",
-                "No hardware exist on the system",
-                "No hardware exist on the system",
-                "No hardware exist on the system"
+                "Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen",
+                "Field 'displayName' must not be empty",
+                "Field 'passkey' must be 32 characters long and include only alphanumeric characters",
+                "Field 'category' must be one of: [AMD_GPU, NVIDIA_GPU, WILDCARD]",
+                "Field 'profileLink' is not a valid link: 'invalid'",
+                "Field 'liveStatsLink' is not a valid link: 'invalid'"
             );
     }
 
@@ -1097,15 +960,15 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
+        final User response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser),
             List.of(hardware),
             List.of(team)
         );
 
-        assertThat(response.isFailure())
-            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
-            .isFalse();
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
     }
 
     @Test
@@ -1126,17 +989,12 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateUpdate(null, existingUser,
-            List.of(existingUser),
-            Collections.emptyList(),
-            Collections.emptyList()
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
-            .containsOnly("Payload is null");
+        final NullObjectException e =
+            catchThrowableOfType(() -> userValidator.validateUpdate(null, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
+                NullObjectException.class);
+        assertThat(e.getNullObjectFailure().getError())
+            .contains("Payload is null");
     }
 
     @Test
@@ -1157,17 +1015,12 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateUpdate(user, null,
-            Collections.emptyList(),
-            Collections.emptyList(),
-            Collections.emptyList()
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
-            .containsOnly("Payload is null");
+        final NullObjectException e =
+            catchThrowableOfType(() -> userValidator.validateUpdate(user, null, emptyList(), List.of(hardware), List.of(team)),
+                NullObjectException.class);
+        assertThat(e.getNullObjectFailure().getError())
+            .contains("Payload is null");
     }
 
     @Test
@@ -1200,16 +1053,11 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
-            List.of(existingUser),
-            List.of(hardware),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'category' must be one of: [AMD_GPU, NVIDIA_GPU, WILDCARD]");
     }
 
@@ -1243,16 +1091,11 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
-            List.of(existingUser),
-            List.of(hardware),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen");
     }
 
@@ -1286,16 +1129,11 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
-            List.of(existingUser),
-            List.of(hardware),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen");
     }
 
@@ -1329,16 +1167,11 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
-            List.of(existingUser),
-            List.of(hardware),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'displayName' must not be empty");
     }
 
@@ -1372,16 +1205,11 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
-            List.of(existingUser),
-            List.of(hardware),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'passkey' must be 32 characters long and include only alphanumeric characters");
     }
 
@@ -1415,16 +1243,11 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
-            List.of(existingUser),
-            List.of(hardware),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'passkey' must be 32 characters long and include only alphanumeric characters");
     }
 
@@ -1458,16 +1281,11 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
-            List.of(existingUser),
-            List.of(hardware),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'passkey' must be 32 characters long and include only alphanumeric characters");
     }
 
@@ -1501,15 +1319,15 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
+        final User response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser),
             List.of(hardware),
             List.of(team)
         );
 
-        assertThat(response.isFailure())
-            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
-            .isFalse();
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
     }
 
     @Test
@@ -1542,16 +1360,11 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
-            List.of(existingUser),
-            List.of(hardware),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'profileLink' is not a valid link: 'invalidUrl'");
     }
 
@@ -1585,15 +1398,15 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
+        final User response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser),
             List.of(hardware),
             List.of(team)
         );
 
-        assertThat(response.isFailure())
-            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
-            .isFalse();
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
     }
 
     @Test
@@ -1626,16 +1439,11 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
-            List.of(existingUser),
-            List.of(hardware),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'liveStatsLink' is not a valid link: 'invalidUrl'");
     }
 
@@ -1686,17 +1494,18 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
-            List.of(existingUser, otherUser),
-            List.of(hardware, otherHardware),
-            List.of(team, otherTeam)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
+        final ConflictException e = catchThrowableOfType(
+            () -> userValidator.validateUpdate(user, existingUser, List.of(existingUser, otherUser), List.of(hardware, otherHardware),
+                List.of(team, otherTeam)), ConflictException.class);
+        assertThat(e.getConflictFailure().getConflictingAttributes())
+            .containsOnly(
+                "foldingUserName",
+                "passkey"
+            );
 
-        assertThat(response.getErrors())
-            .containsOnly("Payload conflicts with an existing object on: [foldingUserName, passkey]");
+        assertThat(e.getConflictFailure().getConflictingObject())
+            .isNotNull();
     }
 
     @Test
@@ -1730,15 +1539,15 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
+        final User response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser),
             List.of(hardware),
             List.of(team)
         );
 
-        assertThat(response.isFailure())
-            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
-            .isFalse();
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
     }
 
     @Test
@@ -1772,15 +1581,15 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
+        final User response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser),
             List.of(hardware),
             List.of(team)
         );
 
-        assertThat(response.isFailure())
-            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
-            .isFalse();
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
     }
 
     @Test
@@ -1828,15 +1637,15 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
+        final User response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser, currentCaptain),
             List.of(hardware),
             List.of(team, oldTeam)
         );
 
-        assertThat(response.isFailure())
-            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
-            .isFalse();
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
     }
 
     @Test
@@ -1883,15 +1692,15 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
+        final User response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser, currentCaptain),
             List.of(hardware),
             List.of(team)
         );
 
-        assertThat(response.isFailure())
-            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
-            .isFalse();
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
     }
 
     @Test
@@ -1938,15 +1747,15 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
+        final User response = userValidator.validateUpdate(user, existingUser,
             List.of(currentCaptain, existingUser),
             List.of(hardware),
             List.of(team)
         );
 
-        assertThat(response.isFailure())
-            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
-            .isFalse();
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
     }
 
     @Test
@@ -2002,18 +1811,14 @@ class UserValidatorTest {
         allUsers.add(existingUser);
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
-            allUsers,
-            List.of(hardware),
-            List.of(team, oldTeam)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, allUsers, List.of(hardware), List.of(team)),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly(String.format("Team '%s' has %s users, maximum permitted is %s", team.getTeamName(), usersOnTeam.size(),
-                Category.maximumPermittedAmountForAllCategories()));
+                Category.maximumPermittedAmountForAllCategories())
+            );
     }
 
     @Test
@@ -2069,18 +1874,14 @@ class UserValidatorTest {
         allUsers.add(existingUser);
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
-            allUsers,
-            List.of(hardware),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, allUsers, List.of(hardware), List.of(team)),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly(String.format("Team '%s' already has %s users in category '%s', only %s permitted", team.getTeamName(),
-                usersOnTeamInCategory.size(), Category.NVIDIA_GPU, Category.NVIDIA_GPU.permittedUsers()));
+                usersOnTeamInCategory.size(), Category.NVIDIA_GPU, Category.NVIDIA_GPU.permittedUsers())
+            );
     }
 
     @Test
@@ -2135,18 +1936,14 @@ class UserValidatorTest {
         allUsers.add(existingUser);
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
-            allUsers,
-            List.of(hardware),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, allUsers, List.of(hardware), List.of(team)),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly(String.format("Team '%s' already has %s users in category '%s', only %s permitted", team.getTeamName(),
-                usersOnTeamInCategory.size(), Category.NVIDIA_GPU, Category.NVIDIA_GPU.permittedUsers()));
+                usersOnTeamInCategory.size(), Category.NVIDIA_GPU, Category.NVIDIA_GPU.permittedUsers())
+            );
     }
 
     @Test
@@ -2188,18 +1985,14 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
-            List.of(existingUser),
-            List.of(hardware),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly(String.format("Category '%s' cannot be filled by hardware of make '%s', must be one of: %s", Category.AMD_GPU,
-                hardware.getHardwareMake(), Category.AMD_GPU.supportedHardwareMakes()));
+                hardware.getHardwareMake(), Category.AMD_GPU.supportedHardwareMakes())
+            );
     }
 
     @Test
@@ -2241,18 +2034,14 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
-            List.of(existingUser),
-            List.of(hardware),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly(String.format("Category '%s' cannot be filled by hardware of type '%s', must be one of: %s", Category.AMD_GPU,
-                hardware.getHardwareType(), Category.AMD_GPU.supportedHardwareTypes()));
+                hardware.getHardwareType(), Category.AMD_GPU.supportedHardwareTypes())
+            );
     }
 
     @Test
@@ -2293,16 +2082,11 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
-            List.of(existingUser),
-            List.of(hardware),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly(String.format("Field 'hardwareId' must be one of: [%s: %s]", hardware.getId(), hardware.getHardwareName()));
     }
 
@@ -2334,16 +2118,11 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
-            List.of(existingUser),
-            Collections.emptyList(),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), emptyList(), List.of(team)),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("No hardware exist on the system");
     }
 
@@ -2382,16 +2161,11 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
-            List.of(existingUser),
-            List.of(hardware),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly(String.format("Field 'teamId' must be one of: [%s: %s]", team.getId(), team.getTeamName()));
     }
 
@@ -2423,16 +2197,11 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
-            List.of(existingUser),
-            List.of(hardware),
-            Collections.emptyList()
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), emptyList()),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("No teams exist on the system");
     }
 
@@ -2466,15 +2235,15 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new NoUnitsFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
+        final User response = userValidator.validateUpdate(user, existingUser,
             List.of(existingUser),
             List.of(hardware),
             List.of(team)
         );
 
-        assertThat(response.isFailure())
-            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
-            .isFalse();
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
     }
 
     @Test
@@ -2507,18 +2276,15 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new NoUnitsFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
-            List.of(existingUser),
-            List.of(hardware),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
-            .containsOnly("User 'user' has 0 Work Units with passkey 'DummyPasskey12345678901234567890', "
-                + "there must be at least one completed Work Unit before adding the user");
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
+            .containsOnly(String.format(
+                "User '%s' has 0 Work Units with passkey '%s', there must be at least one completed Work Unit before adding the user",
+                user.getDisplayName(), user.getPasskey())
+            );
     }
 
     @Test
@@ -2551,57 +2317,14 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ExternalConnectionFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
-            List.of(existingUser),
-            List.of(hardware),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
-            .containsOnly("Unable to connect to 'https://www.google.com' to check stats for user 'user': Error connecting");
-    }
-
-    @Test
-    void whenValidatingUpdate_givenNoHardware_thenFailureResponseIsReturned_andNoOtherValidationErrorsAreReturned() {
-        final Team team = generateTeam();
-
-        final UserRequest user = UserRequest.builder()
-            .foldingUserName(null)
-            .displayName(null)
-            .passkey("invalid")
-            .category("invalid")
-            .profileLink("invalid")
-            .liveStatsLink("invalid")
-            .userIsCaptain(true)
-            .teamId(team.getId())
-            .build();
-
-        final User existingUser = User.builder()
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .team(team)
-            .build();
-
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
-            List.of(existingUser),
-            Collections.emptyList(),
-            List.of(team)
-        );
-
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
-            .containsOnly("No hardware exist on the system");
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
+            .containsOnly(String.format("Unable to connect to 'https://www.google.com' to check stats for user '%s': Error connecting",
+                user.getDisplayName())
+            );
     }
 
     @Test
@@ -2633,16 +2356,11 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateUpdate(user, existingUser,
-            List.of(existingUser),
-            List.of(hardware),
-            List.of(team)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly(
                 "Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen",
                 "Field 'displayName' must not be empty",
@@ -2671,11 +2389,11 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateDelete(userToDelete);
+        final User response = userValidator.validateDelete(userToDelete);
 
-        assertThat(response.isFailure())
-            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
-            .isFalse();
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
     }
 
     @Test
@@ -2696,12 +2414,9 @@ class UserValidatorTest {
             .build();
 
         final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<User> response = userValidator.validateDelete(userToDelete);
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e = catchThrowableOfType(() -> userValidator.validateDelete(userToDelete), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly(String.format("Cannot delete user '%s' since they are team captain", userToDelete.getDisplayName()));
     }
 

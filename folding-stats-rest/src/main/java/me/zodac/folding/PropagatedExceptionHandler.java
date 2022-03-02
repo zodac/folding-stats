@@ -26,6 +26,10 @@ package me.zodac.folding;
 
 import static me.zodac.folding.rest.util.RestUtilConstants.GSON;
 
+import me.zodac.folding.api.exception.ConflictException;
+import me.zodac.folding.api.exception.NullObjectException;
+import me.zodac.folding.api.exception.UsedByException;
+import me.zodac.folding.api.exception.ValidationException;
 import me.zodac.folding.api.tc.change.UserChangeState;
 import me.zodac.folding.rest.exception.ForbiddenException;
 import me.zodac.folding.rest.exception.InvalidDayException;
@@ -122,7 +126,7 @@ public class PropagatedExceptionHandler {
      * Returned when a request made to a REST endpoint has an invalid parameter type.
      *
      * <p>
-     * Returns a <b>400_BAD_REQUEST</b> response with an 'invalid ID' error message body.
+     * Returns a <b>400_BAD_REQUEST</b> response with an invalid input error message body.
      *
      * @param e the {@link MethodArgumentTypeMismatchException}
      * @return the {@link ErrorResponse} body
@@ -260,6 +264,74 @@ public class PropagatedExceptionHandler {
             e.getToState());
         LOGGER.error(errorMessage);
         return GSON.toJson(ErrorResponse.create(errorMessage));
+    }
+
+    /**
+     * Returned when an input object fails validation.
+     *
+     * <p>
+     * Returns a <b>400_BAD_REQUEST</b> response with the validation failures as the error message body.
+     *
+     * @param e the {@link ValidationException}
+     * @return the {@link ValidationException.ValidationFailure} body
+     */
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ValidationException.class)
+    public String validationFailure(final ValidationException e) {
+        LOGGER.error("Object failed validation: {}", e.getValidationFailure());
+        return GSON.toJson(e.getValidationFailure());
+    }
+
+    /**
+     * Returned when an input object is <code>null</code>.
+     *
+     * <p>
+     * Returns a <b>400_BAD_REQUEST</b> response with an error message body.
+     *
+     * @param e the {@link NullObjectException}
+     * @return the {@link NullObjectException.NullObjectFailure} body
+     */
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(NullObjectException.class)
+    public String nullObject(final NullObjectException e) {
+        LOGGER.error("Input object was null");
+        return GSON.toJson(e.getNullObjectFailure());
+    }
+
+    /**
+     * Returned when an input object conflicts with an existing object.
+     *
+     * <p>
+     * Returns a <b>409_CONFLICT</b> response with an error message body.
+     *
+     * @param e the {@link ConflictException}
+     * @return the {@link ConflictException.ConflictFailure} body
+     */
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(ConflictException.class)
+    public String conflictedObject(final ConflictException e) {
+        LOGGER.error("Object conflicts with an existing object: {}", e.getConflictFailure());
+        return GSON.toJson(e.getConflictFailure());
+    }
+
+    /**
+     * Returned when an object to be deleted is in use by another existing object.
+     *
+     * <p>
+     * Returns a <b>409_CONFLICT</b> response with an error message body.
+     *
+     * @param e the {@link UsedByException}
+     * @return the {@link UsedByException.UsedByFailure} body
+     */
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(UsedByException.class)
+    public String inUse(final UsedByException e) {
+        LOGGER.error("Object is used by an existing object: {}", e.getUsedByFailure());
+        return GSON.toJson(e.getUsedByFailure());
     }
 
     /**

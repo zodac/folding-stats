@@ -1,0 +1,94 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2021-2022 zodac.me
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package me.zodac.folding.api.exception;
+
+import java.io.Serial;
+import java.util.Collection;
+import java.util.List;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+/**
+ * Exception thrown when an object being validated conflicts with an existing object.
+ */
+public class ConflictException extends RuntimeException {
+
+    @Serial
+    private static final long serialVersionUID = 8362273370218302973L;
+
+    /**
+     * The actual failure to be returned.
+     */
+    private final ConflictFailure conflictFailure;
+
+    /**
+     * Constructor with failing object, the object it conflicts with and the attributes they conflict on.
+     *
+     * @param invalidObject         the {@link Object} that failed validation
+     * @param conflictingObject     the {@link Object} it conflicts with
+     * @param conflictingAttributes the attribute field names that they conflict on
+     */
+    public ConflictException(final Object invalidObject, final Object conflictingObject, final Collection<String> conflictingAttributes) {
+        super();
+        conflictFailure = new ConflictFailure(invalidObject, conflictingObject, conflictingAttributes);
+    }
+
+    /**
+     * Constructor with failing object, the object it conflicts with and the attribute they conflict on.
+     *
+     * @param invalidObject        the {@link Object} that failed validation
+     * @param conflictingObject    the {@link Object} it conflicts with
+     * @param conflictingAttribute the attribute field name that they conflict on
+     */
+    public ConflictException(final Object invalidObject, final Object conflictingObject, final String conflictingAttribute) {
+        this(invalidObject, conflictingObject, List.of(conflictingAttribute));
+    }
+
+    /**
+     * The {@link ConflictFailure}.
+     *
+     * @return the {@link ConflictFailure}
+     */
+    public ConflictFailure getConflictFailure() {
+        return conflictFailure;
+    }
+
+    /**
+     * Failure object used for REST response.
+     */
+    @NoArgsConstructor
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @Getter
+    @Setter
+    public static class ConflictFailure {
+
+        private Object invalidObject; // TODO: types?
+        private Object conflictingObject;
+        private Collection<String> conflictingAttributes;
+    }
+}

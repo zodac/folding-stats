@@ -44,11 +44,9 @@ import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.state.WriteRequired;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.validation.HardwareValidator;
-import me.zodac.folding.api.tc.validation.ValidationResult;
 import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.bean.FoldingRepository;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
-import me.zodac.folding.rest.util.ValidationFailureResponseMapper;
 import me.zodac.folding.state.SystemStateManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -112,12 +110,7 @@ public class HardwareEndpoint {
     public ResponseEntity<?> create(@RequestBody final HardwareRequest hardwareRequest, final HttpServletRequest request) {
         LOGGER.info("POST request received to create hardware at '{}' with request: {}", request::getRequestURI, () -> hardwareRequest);
 
-        final ValidationResult<Hardware> validationResult = validateCreate(hardwareRequest);
-        if (validationResult.isFailure()) {
-            return ValidationFailureResponseMapper.map(validationResult);
-        }
-        final Hardware validatedHardware = validationResult.output();
-
+        final Hardware validatedHardware = validateCreate(hardwareRequest);
         final Hardware elementWithId = foldingRepository.createHardware(validatedHardware);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
@@ -214,11 +207,7 @@ public class HardwareEndpoint {
             return ok(existingHardware);
         }
 
-        final ValidationResult<Hardware> validationResult = validateUpdate(hardwareRequest, existingHardware);
-        if (validationResult.isFailure()) {
-            return ValidationFailureResponseMapper.map(validationResult);
-        }
-        final Hardware validatedHardware = validationResult.output();
+        final Hardware validatedHardware = validateUpdate(hardwareRequest, existingHardware);
 
         // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
         final Hardware hardwareWithId = Hardware.updateWithId(existingHardware.getId(), validatedHardware);
@@ -244,12 +233,7 @@ public class HardwareEndpoint {
         LOGGER.debug("DELETE request for hardware received at '{}'", request::getRequestURI);
 
         final Hardware hardware = foldingRepository.getHardware(hardwareId);
-
-        final ValidationResult<Hardware> validationResult = validateDelete(hardware);
-        if (validationResult.isFailure()) {
-            return ValidationFailureResponseMapper.map(validationResult);
-        }
-        final Hardware validatedHardware = validationResult.output();
+        final Hardware validatedHardware = validateDelete(hardware);
 
         foldingRepository.deleteHardware(validatedHardware);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
@@ -258,15 +242,15 @@ public class HardwareEndpoint {
         return ok();
     }
 
-    private ValidationResult<Hardware> validateCreate(final HardwareRequest hardwareRequest) {
+    private Hardware validateCreate(final HardwareRequest hardwareRequest) {
         return HardwareValidator.validateCreate(hardwareRequest, foldingRepository.getAllHardware());
     }
 
-    private ValidationResult<Hardware> validateUpdate(final HardwareRequest hardwareRequest, final Hardware existingHardware) {
+    private Hardware validateUpdate(final HardwareRequest hardwareRequest, final Hardware existingHardware) {
         return HardwareValidator.validateUpdate(hardwareRequest, existingHardware, foldingRepository.getAllHardware());
     }
 
-    private ValidationResult<Hardware> validateDelete(final Hardware hardware) {
+    private Hardware validateDelete(final Hardware hardware) {
         return HardwareValidator.validateDelete(hardware, foldingRepository.getAllUsersWithoutPasskeys());
     }
 }

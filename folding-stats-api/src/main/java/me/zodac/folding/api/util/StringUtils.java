@@ -99,4 +99,15 @@ public final class StringUtils {
         final String scheme = uri.getScheme();
         return scheme != null && VALID_URL_SCHEMES.contains(scheme.toLowerCase(Locale.UK));
     }
+
+    /**
+     * Checks if the two {@link String}s are equal, even if one of them is <code>null</code>.
+     *
+     * @param first  the first {@link String}
+     * @param second the second {@link String}
+     * @return <code>true</code> if the {@link String}s are equal
+     */
+    public static boolean isEqualSafe(final String first, final String second) {
+        return isBlank(first) ? isBlank(second) : first.equals(second);
+    }
 }

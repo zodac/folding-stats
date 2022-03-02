@@ -41,10 +41,8 @@ import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.state.WriteRequired;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.validation.UserValidator;
-import me.zodac.folding.api.tc.validation.ValidationResult;
 import me.zodac.folding.bean.FoldingRepository;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
-import me.zodac.folding.rest.util.ValidationFailureResponseMapper;
 import me.zodac.folding.state.SystemStateManager;
 import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.apache.logging.log4j.LogManager;
@@ -108,12 +106,7 @@ public class UserEndpoint {
     public ResponseEntity<?> create(@RequestBody final UserRequest userRequest, final HttpServletRequest request) {
         LOGGER.debug("POST request received to create user at '{}' with request: {}", request::getRequestURI, () -> userRequest);
 
-        final ValidationResult<User> validationResult = validateCreate(userRequest);
-        if (validationResult.isFailure()) {
-            return ValidationFailureResponseMapper.map(validationResult);
-        }
-        final User validatedUser = validationResult.output();
-
+        final User validatedUser = validateCreate(userRequest);
         final User elementWithId = foldingRepository.createUser(validatedUser);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
@@ -211,11 +204,7 @@ public class UserEndpoint {
             return ok(userWithHiddenPasskey);
         }
 
-        final ValidationResult<User> validationResult = validateUpdate(userRequest, existingUser);
-        if (validationResult.isFailure()) {
-            return ValidationFailureResponseMapper.map(validationResult);
-        }
-        final User validatedUser = validationResult.output();
+        final User validatedUser = validateUpdate(userRequest, existingUser);
 
         // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
         final User userWithId = User.updateWithId(existingUser.getId(), validatedUser);
@@ -241,12 +230,7 @@ public class UserEndpoint {
         LOGGER.debug("DELETE request for user received at '{}'", request::getRequestURI);
 
         final User user = foldingRepository.getUserWithoutPasskey(userId);
-
-        final ValidationResult<User> validationResult = validateDelete(user);
-        if (validationResult.isFailure()) {
-            return ValidationFailureResponseMapper.map(validationResult);
-        }
-        final User validatedUser = validationResult.output();
+        final User validatedUser = validateDelete(user);
 
         foldingRepository.deleteUser(validatedUser);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
@@ -255,7 +239,7 @@ public class UserEndpoint {
         return ok();
     }
 
-    private ValidationResult<User> validateCreate(final UserRequest userRequest) {
+    private User validateCreate(final UserRequest userRequest) {
         final UserValidator userValidator = UserValidator.create(HttpFoldingStatsRetriever.create());
         return userValidator.validateCreate(
             userRequest,
@@ -265,7 +249,7 @@ public class UserEndpoint {
         );
     }
 
-    private ValidationResult<User> validateUpdate(final UserRequest userRequest, final User existingUser) {
+    private User validateUpdate(final UserRequest userRequest, final User existingUser) {
         final UserValidator userValidator = UserValidator.create(HttpFoldingStatsRetriever.create());
         return userValidator.validateUpdate(
             userRequest,
@@ -276,7 +260,7 @@ public class UserEndpoint {
         );
     }
 
-    private ValidationResult<User> validateDelete(final User existingUser) {
+    private User validateDelete(final User existingUser) {
         final UserValidator userValidator = UserValidator.create(HttpFoldingStatsRetriever.create());
         return userValidator.validateDelete(existingUser);
     }

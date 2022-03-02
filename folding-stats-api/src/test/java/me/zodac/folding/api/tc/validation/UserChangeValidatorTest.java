@@ -24,16 +24,21 @@
 
 package me.zodac.folding.api.tc.validation;
 
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowableOfType;
 
-import java.util.Collections;
 import java.util.List;
+import me.zodac.folding.api.exception.ConflictException;
+import me.zodac.folding.api.exception.NullObjectException;
+import me.zodac.folding.api.exception.ValidationException;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.HardwareMake;
 import me.zodac.folding.api.tc.HardwareType;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.change.UserChange;
+import me.zodac.folding.api.tc.change.UserChangeState;
 import me.zodac.folding.api.tc.validation.retriever.ExternalConnectionFoldingStatsRetriever;
 import me.zodac.folding.api.tc.validation.retriever.NoUnitsFoldingStatsRetriever;
 import me.zodac.folding.api.tc.validation.retriever.ValidFoldingStatsRetriever;
@@ -60,19 +65,77 @@ class UserChangeValidatorTest {
             .hardwareId(hardware.getId())
             .userId(user.getId())
             .liveStatsLink("https://www.google.ie")
+            .immediate(true)
             .build();
 
         final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<UserChange> response = userChangeValidator.validate(
+        final UserChange response = userChangeValidator.validate(
             userChange,
-            Collections.emptyList(),
+            emptyList(),
             List.of(hardware),
             List.of(user)
         );
 
-        assertThat(response.isFailure())
-            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
-            .isFalse();
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
+
+        assertThat(response.getState())
+            .isEqualTo(UserChangeState.REQUESTED_NOW);
+    }
+
+    @Test
+    void whenValidating_givenValidPasskeyChange_thenSuccessResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final User user = generateUser(hardware);
+
+        final UserChangeRequest userChange = UserChangeRequest.builder()
+            .existingPasskey(user.getPasskey())
+            .foldingUserName(user.getFoldingUserName())
+            .passkey("DummyPasskey12345678901234567891")
+            .hardwareId(hardware.getId())
+            .userId(user.getId())
+            .liveStatsLink("https://www.google.ie")
+            .build();
+
+        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
+        final UserChange response = userChangeValidator.validate(
+            userChange,
+            emptyList(),
+            List.of(hardware),
+            List.of(user)
+        );
+
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
+    }
+
+    @Test
+    void whenValidating_givenValidFoldingUserNameChange_thenSuccessResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final User user = generateUser(hardware);
+
+        final UserChangeRequest userChange = UserChangeRequest.builder()
+            .existingPasskey(user.getPasskey())
+            .foldingUserName("-folding.Name_2")
+            .passkey(user.getPasskey())
+            .hardwareId(hardware.getId())
+            .userId(user.getId())
+            .liveStatsLink("https://www.google.ie")
+            .build();
+
+        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
+        final UserChange response = userChangeValidator.validate(
+            userChange,
+            emptyList(),
+            List.of(hardware),
+            List.of(user)
+        );
+
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
     }
 
     @Test
@@ -81,18 +144,11 @@ class UserChangeValidatorTest {
         final User user = generateUser(hardware);
 
         final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<UserChange> response = userChangeValidator.validate(
-            null,
-            Collections.emptyList(),
-            List.of(hardware),
-            List.of(user)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
-            .containsOnly("Payload is null");
+        final NullObjectException e =
+            catchThrowableOfType(() -> userChangeValidator.validate(null, emptyList(), List.of(hardware), List.of(user)), NullObjectException.class);
+        assertThat(e.getNullObjectFailure().getError())
+            .contains("Payload is null");
     }
 
     @Test
@@ -110,17 +166,11 @@ class UserChangeValidatorTest {
             .build();
 
         final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<UserChange> response = userChangeValidator.validate(
-            userChange,
-            Collections.emptyList(),
-            List.of(hardware),
-            List.of(user)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userChangeValidator.validate(userChange, emptyList(), List.of(hardware), List.of(user)),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen");
     }
 
@@ -139,17 +189,11 @@ class UserChangeValidatorTest {
             .build();
 
         final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<UserChange> response = userChangeValidator.validate(
-            userChange,
-            Collections.emptyList(),
-            List.of(hardware),
-            List.of(user)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userChangeValidator.validate(userChange, emptyList(), List.of(hardware), List.of(user)),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen");
     }
 
@@ -168,17 +212,11 @@ class UserChangeValidatorTest {
             .build();
 
         final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<UserChange> response = userChangeValidator.validate(
-            userChange,
-            Collections.emptyList(),
-            List.of(hardware),
-            List.of(user)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userChangeValidator.validate(userChange, emptyList(), List.of(hardware), List.of(user)),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'passkey' must be 32 characters long and include only alphanumeric characters");
     }
 
@@ -197,17 +235,11 @@ class UserChangeValidatorTest {
             .build();
 
         final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<UserChange> response = userChangeValidator.validate(
-            userChange,
-            Collections.emptyList(),
-            List.of(hardware),
-            List.of(user)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userChangeValidator.validate(userChange, emptyList(), List.of(hardware), List.of(user)),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'passkey' must be 32 characters long and include only alphanumeric characters");
     }
 
@@ -226,16 +258,16 @@ class UserChangeValidatorTest {
             .build();
 
         final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<UserChange> response = userChangeValidator.validate(
+        final UserChange response = userChangeValidator.validate(
             userChange,
-            Collections.emptyList(),
+            emptyList(),
             List.of(hardware),
             List.of(user)
         );
 
-        assertThat(response.isFailure())
-            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
-            .isFalse();
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
     }
 
     @Test
@@ -253,17 +285,11 @@ class UserChangeValidatorTest {
             .build();
 
         final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<UserChange> response = userChangeValidator.validate(
-            userChange,
-            Collections.emptyList(),
-            List.of(hardware),
-            List.of(user)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userChangeValidator.validate(userChange, emptyList(), List.of(hardware), List.of(user)),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'liveStatsLink' is not a valid link: 'invalidUrl'");
     }
 
@@ -282,17 +308,11 @@ class UserChangeValidatorTest {
             .build();
 
         final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<UserChange> response = userChangeValidator.validate(
-            userChange,
-            Collections.emptyList(),
-            List.of(hardware),
-            List.of(user)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userChangeValidator.validate(userChange, emptyList(), List.of(hardware), List.of(user)),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly(String.format("Field 'hardwareId' must be one of: [%s: %s]", hardware.getId(), hardware.getHardwareName()));
     }
 
@@ -311,17 +331,10 @@ class UserChangeValidatorTest {
             .build();
 
         final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<UserChange> response = userChangeValidator.validate(
-            userChange,
-            Collections.emptyList(),
-            Collections.emptyList(),
-            List.of(user)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userChangeValidator.validate(userChange, emptyList(), emptyList(), List.of(user)), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("No hardware exist on the system");
     }
 
@@ -340,17 +353,11 @@ class UserChangeValidatorTest {
             .build();
 
         final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<UserChange> response = userChangeValidator.validate(
-            userChange,
-            Collections.emptyList(),
-            List.of(hardware),
-            List.of(user)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userChangeValidator.validate(userChange, emptyList(), List.of(hardware), List.of(user)),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly(String.format("Field 'userId' must be one of: [%s: %s]", user.getId(), user.getDisplayName()));
     }
 
@@ -369,17 +376,11 @@ class UserChangeValidatorTest {
             .build();
 
         final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<UserChange> response = userChangeValidator.validate(
-            userChange,
-            Collections.emptyList(),
-            List.of(hardware),
-            Collections.emptyList()
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userChangeValidator.validate(userChange, emptyList(), List.of(hardware), emptyList()),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("No users exist on the system");
     }
 
@@ -398,17 +399,11 @@ class UserChangeValidatorTest {
             .build();
 
         final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<UserChange> response = userChangeValidator.validate(
-            userChange,
-            Collections.emptyList(),
-            List.of(hardware),
-            List.of(user)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userChangeValidator.validate(userChange, emptyList(), List.of(hardware), List.of(user)),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'existingPasskey' does not match the existing passkey for the user");
     }
 
@@ -427,17 +422,11 @@ class UserChangeValidatorTest {
             .build();
 
         final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<UserChange> response = userChangeValidator.validate(
-            userChange,
-            Collections.emptyList(),
-            List.of(hardware),
-            List.of(user)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userChangeValidator.validate(userChange, emptyList(), List.of(hardware), List.of(user)),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("User already has the values supplied in UserChangeRequest");
     }
 
@@ -470,18 +459,20 @@ class UserChangeValidatorTest {
             .build();
 
         final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
-        final ValidationResult<UserChange> response = userChangeValidator.validate(
-            userChange,
-            List.of(existingUserChange),
-            List.of(hardware),
-            List.of(user)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
+        final ConflictException e =
+            catchThrowableOfType(() -> userChangeValidator.validate(userChange, List.of(existingUserChange), List.of(hardware), List.of(user)),
+                ConflictException.class);
+        assertThat(e.getConflictFailure().getConflictingAttributes())
+            .containsOnly(
+                "foldingUserName",
+                "passkey",
+                "liveStatsLink",
+                "hardwareId"
+            );
 
-        assertThat(response.getErrors())
-            .containsOnly("Payload conflicts with an existing object on: [foldingUserName, passkey, liveStatsLink, hardwareId]");
+        assertThat(e.getConflictFailure().getConflictingObject())
+            .isNotNull();
     }
 
     @Test
@@ -499,17 +490,11 @@ class UserChangeValidatorTest {
             .build();
 
         final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ExternalConnectionFoldingStatsRetriever());
-        final ValidationResult<UserChange> response = userChangeValidator.validate(
-            userChange,
-            Collections.emptyList(),
-            List.of(hardware),
-            List.of(user)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userChangeValidator.validate(userChange, emptyList(), List.of(hardware), List.of(user)),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly(
                 String.format("Unable to connect to 'https://www.google.com' to check stats for Folding@Home user '%s': Error connecting",
                     userChange.getFoldingUserName())
@@ -531,19 +516,14 @@ class UserChangeValidatorTest {
             .build();
 
         final UserChangeValidator userChangeValidator = UserChangeValidator.create(new NoUnitsFoldingStatsRetriever());
-        final ValidationResult<UserChange> response = userChangeValidator.validate(
-            userChange,
-            Collections.emptyList(),
-            List.of(hardware),
-            List.of(user)
-        );
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e =
+            catchThrowableOfType(() -> userChangeValidator.validate(userChange, emptyList(), List.of(hardware), List.of(user)),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly(
-                String.format("User '%s' has 0 Work Units with passkey '%s', there must be at least one completed Work Unit before adding the user",
+                String.format(
+                    "User '%s' has 0 Work Units with passkey '%s', there must be at least one completed Work Unit before adding the user",
                     userChange.getFoldingUserName(), userChange.getPasskey())
             );
     }

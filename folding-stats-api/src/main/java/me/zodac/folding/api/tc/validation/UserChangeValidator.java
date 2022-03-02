@@ -28,13 +28,17 @@ import static me.zodac.folding.api.tc.validation.UserValidator.FOLDING_USER_NAME
 import static me.zodac.folding.api.tc.validation.UserValidator.PASSKEY_PATTERN;
 import static me.zodac.folding.api.util.StringUtils.isBlank;
 import static me.zodac.folding.api.util.StringUtils.isBlankOrValidUrl;
+import static me.zodac.folding.api.util.StringUtils.isEqualSafe;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
+import me.zodac.folding.api.exception.ConflictException;
 import me.zodac.folding.api.exception.ExternalConnectionException;
+import me.zodac.folding.api.exception.NullObjectException;
+import me.zodac.folding.api.exception.ValidationException;
 import me.zodac.folding.api.stats.FoldingStatsDetails;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
 import me.zodac.folding.api.tc.Hardware;
@@ -42,6 +46,7 @@ import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.change.UserChange;
 import me.zodac.folding.api.tc.change.UserChangeState;
 import me.zodac.folding.api.tc.stats.Stats;
+import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.rest.api.tc.request.UserChangeRequest;
 
 /**
@@ -94,14 +99,17 @@ public final class UserChangeValidator {
      *                                       passkeys
      * @param allHardware                    all {@link Hardware} in the system
      * @param allUsersWithPasskeys           all {@link User}s in the system, with passkeys
-     * @return the {@link ValidationResult}
+     * @return the validated {@link UserChange}
+     * @throws ConflictException thrown if the input conflicts with an existing {@link UserChange}
+     *                           @throws NullObjectException thrown if the input is <code>null</code>
+     *                           @throws ValidationException thrown  if the input fails validation
      */
-    public ValidationResult<UserChange> validate(final UserChangeRequest userChangeRequest,
-                                                 final Collection<UserChange> allOpenUserChangesWithPasskeys,
-                                                 final Collection<Hardware> allHardware,
-                                                 final Collection<User> allUsersWithPasskeys) {
+    public UserChange validate(final UserChangeRequest userChangeRequest,
+                               final Collection<UserChange> allOpenUserChangesWithPasskeys,
+                               final Collection<Hardware> allHardware,
+                               final Collection<User> allUsersWithPasskeys) {
         if (userChangeRequest == null) {
-            return ValidationResult.nullObject();
+            throw new NullObjectException();
         }
 
         // Hardware and User must be validated first, since they may be used by other validation checks
@@ -113,7 +121,7 @@ public final class UserChangeValidator {
             .toList();
 
         if (!hardwareAndUserFailureMessages.isEmpty()) {
-            return ValidationResult.failure(userChangeRequest, hardwareAndUserFailureMessages);
+            throw new ValidationException(userChangeRequest, hardwareAndUserFailureMessages);
         }
 
         // Validate the content is not-malformed
@@ -123,29 +131,29 @@ public final class UserChangeValidator {
                 passkey(userChangeRequest),
                 liveStatsLink(userChangeRequest)
             )
-            .filter(Objects::nonNull)
+            .filter(StringUtils::isNotBlank)
             .toList();
 
         if (!failureMessages.isEmpty()) {
-            return ValidationResult.failure(userChangeRequest, failureMessages);
+            throw new ValidationException(userChangeRequest, failureMessages);
         }
 
         // Check if the user already has the values in the UserChangeRequest
         if (isUserChangeUnnecessary(userChangeRequest)) {
-            return ValidationResult.failure(userChangeRequest, List.of("User already has the values supplied in UserChangeRequest"));
+            throw new ValidationException(userChangeRequest, "User already has the values supplied in UserChangeRequest");
         }
 
         // Check if an existing UserChange has already been made (and not rejected)
         final Optional<UserChange> matchingUserChange = findExistingUserChange(userChangeRequest, allOpenUserChangesWithPasskeys);
         if (matchingUserChange.isPresent()) {
-            return ValidationResult.conflictingWith(userChangeRequest, matchingUserChange.get(),
+            throw new ConflictException(userChangeRequest, matchingUserChange.get(),
                 List.of("foldingUserName", "passkey", "liveStatsLink", "hardwareId"));
         }
 
         final String workUnitError = validateUpdateUserWorkUnits(userChangeRequest.getFoldingUserName(), previousUser.getFoldingUserName(),
             userChangeRequest.getPasskey(), previousUser.getPasskey());
         if (workUnitError != null) {
-            return ValidationResult.failure(userChangeRequest, List.of(workUnitError));
+            throw new ValidationException(userChangeRequest, workUnitError);
         }
 
         final User newUser = User.create(
@@ -163,8 +171,7 @@ public final class UserChangeValidator {
         final UserChangeState userChangeState =
             userChangeRequest.isImmediate() ? UserChangeState.REQUESTED_NOW : UserChangeState.REQUESTED_NEXT_MONTH;
 
-        final UserChange userChange = UserChange.createNow(previousUser, newUser, userChangeState);
-        return ValidationResult.successful(userChange);
+        return UserChange.createNow(previousUser, newUser, userChangeState);
     }
 
     private String validateUpdateUserWorkUnits(final String newFoldingUserName,
@@ -303,13 +310,5 @@ public final class UserChangeValidator {
         return isBlankOrValidUrl(userChangeRequest.getLiveStatsLink())
             ? null
             : String.format("Field 'liveStatsLink' is not a valid link: '%s'", userChangeRequest.getLiveStatsLink());
-    }
-
-    private static boolean isEqualSafe(final String first, final String second) {
-        return isEmpty(first) ? isEmpty(second) : first.equals(second);
-    }
-
-    private static boolean isEmpty(final String input) {
-        return input == null || input.isBlank();
     }
 }

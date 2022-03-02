@@ -22,19 +22,54 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.api.tc.validation;
+package me.zodac.folding.api.exception;
 
-import java.util.Collection;
+import java.io.Serial;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
- * Simple interface defining the errors for a {@link ValidationFailure}.
+ * Exception thrown when an object being validated is <code>null</code>.
  */
-public interface ValidationFailure {
+public class NullObjectException extends RuntimeException {
+
+    @Serial
+    private static final long serialVersionUID = 5326193784803168548L;
 
     /**
-     * The errors for a failed {@link ValidationFailure}.
-     *
-     * @return a {@link Collection} of the validation error {@link String}s
+     * The actual failure to be returned.
      */
-    Collection<String> getErrors();
+    private final NullObjectFailure nullObjectFailure;
+
+    /**
+     * Constructor with default {@link NullObjectFailure}.
+     */
+    public NullObjectException() {
+        super();
+        nullObjectFailure = new NullObjectFailure("Payload is null");
+    }
+
+    /**
+     * The {@link NullObjectFailure}.
+     *
+     * @return the {@link NullObjectFailure}
+     */
+    public NullObjectFailure getNullObjectFailure() {
+        return nullObjectFailure;
+    }
+
+    /**
+     * Failure object used for REST response.
+     */
+    @NoArgsConstructor
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @Getter
+    @Setter
+    public static class NullObjectFailure {
+
+        private String error;
+    }
 }

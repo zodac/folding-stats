@@ -24,11 +24,19 @@
 
 package me.zodac.folding.api.tc.validation;
 
+import static java.util.Collections.emptyList;
+import static me.zodac.folding.api.tc.validation.TeamValidator.validateCreate;
+import static me.zodac.folding.api.tc.validation.TeamValidator.validateDelete;
+import static me.zodac.folding.api.tc.validation.TeamValidator.validateUpdate;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowableOfType;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+import me.zodac.folding.api.exception.ConflictException;
+import me.zodac.folding.api.exception.NullObjectException;
+import me.zodac.folding.api.exception.UsedByException;
+import me.zodac.folding.api.exception.ValidationException;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
@@ -47,22 +55,18 @@ class TeamValidatorTest {
             .forumLink("https://www.google.com")
             .build();
 
-        final ValidationResult<Team> response = TeamValidator.validateCreate(team, Collections.emptyList());
+        final Team response = validateCreate(team, emptyList());
 
-        assertThat(response.isFailure())
-            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
-            .isFalse();
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
     }
 
     @Test
     void whenValidatingCreate_givenNullTeam_thenFailureResponseIsReturned() {
-        final ValidationResult<Team> response = TeamValidator.validateCreate(null, Collections.emptyList());
-
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
-            .containsOnly("Payload is null");
+        final NullObjectException e = catchThrowableOfType(() -> validateCreate(null, emptyList()), NullObjectException.class);
+        assertThat(e.getNullObjectFailure().getError())
+            .contains("Payload is null");
     }
 
     @Test
@@ -73,12 +77,8 @@ class TeamValidatorTest {
             .forumLink("https://www.google.com")
             .build();
 
-        final ValidationResult<Team> response = TeamValidator.validateCreate(team, Collections.emptyList());
-
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e = catchThrowableOfType(() -> validateCreate(team, emptyList()), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'teamName' must not be empty");
     }
 
@@ -97,11 +97,11 @@ class TeamValidatorTest {
             .forumLink("https://www.google.com")
             .build();
 
-        final ValidationResult<Team> response = TeamValidator.validateCreate(team, allTeams);
+        final Team response = validateCreate(team, allTeams);
 
-        assertThat(response.isFailure())
-            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
-            .isFalse();
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
     }
 
     @Test
@@ -119,13 +119,12 @@ class TeamValidatorTest {
             .forumLink("https://www.google.com")
             .build();
 
-        final ValidationResult<Team> response = TeamValidator.validateCreate(team, allTeams);
+        final ConflictException e = catchThrowableOfType(() -> validateCreate(team, allTeams), ConflictException.class);
+        assertThat(e.getConflictFailure().getConflictingAttributes())
+            .containsOnly("teamName");
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
-            .containsOnly("Payload conflicts with an existing object on: [teamName]");
+        assertThat(e.getConflictFailure().getConflictingObject())
+            .isNotNull();
     }
 
     @Test
@@ -136,11 +135,11 @@ class TeamValidatorTest {
             .forumLink("https://www.google.com")
             .build();
 
-        final ValidationResult<Team> response = TeamValidator.validateCreate(team, Collections.emptyList());
+        final Team response = validateCreate(team, emptyList());
 
-        assertThat(response.isFailure())
-            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
-            .isFalse();
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
     }
 
     @Test
@@ -151,11 +150,11 @@ class TeamValidatorTest {
             .forumLink(null)
             .build();
 
-        final ValidationResult<Team> response = TeamValidator.validateCreate(team, Collections.emptyList());
+        final Team response = validateCreate(team, emptyList());
 
-        assertThat(response.isFailure())
-            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
-            .isFalse();
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
     }
 
     @Test
@@ -166,12 +165,8 @@ class TeamValidatorTest {
             .forumLink("invalidUrl")
             .build();
 
-        final ValidationResult<Team> response = TeamValidator.validateCreate(team, Collections.emptyList());
-
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e = catchThrowableOfType(() -> validateCreate(team, emptyList()), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'forumLink' is not a valid link: 'invalidUrl'");
     }
 
@@ -189,11 +184,11 @@ class TeamValidatorTest {
             .forumLink("https://www.google.com")
             .build();
 
-        final ValidationResult<Team> response = TeamValidator.validateUpdate(team, existingTeam, Collections.emptyList());
+        final Team response = validateUpdate(team, existingTeam, emptyList());
 
-        assertThat(response.isFailure())
-            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
-            .isFalse();
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
     }
 
     @Test
@@ -204,13 +199,9 @@ class TeamValidatorTest {
             .forumLink("https://www.google.com")
             .build();
 
-        final ValidationResult<Team> response = TeamValidator.validateUpdate(null, existingTeam, Collections.emptyList());
-
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
-            .containsOnly("Payload is null");
+        final NullObjectException e = catchThrowableOfType(() -> validateUpdate(null, existingTeam, emptyList()), NullObjectException.class);
+        assertThat(e.getNullObjectFailure().getError())
+            .contains("Payload is null");
     }
 
     @Test
@@ -221,13 +212,9 @@ class TeamValidatorTest {
             .forumLink("https://www.google.com")
             .build();
 
-        final ValidationResult<Team> response = TeamValidator.validateUpdate(team, null, Collections.emptyList());
-
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
-            .containsOnly("Payload is null");
+        final NullObjectException e = catchThrowableOfType(() -> validateUpdate(team, null, emptyList()), NullObjectException.class);
+        assertThat(e.getNullObjectFailure().getError())
+            .contains("Payload is null");
     }
 
     @Test
@@ -244,12 +231,8 @@ class TeamValidatorTest {
             .forumLink("https://www.google.com")
             .build();
 
-        final ValidationResult<Team> response = TeamValidator.validateUpdate(team, existingTeam, Collections.emptyList());
-
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e = catchThrowableOfType(() -> validateUpdate(team, existingTeam, emptyList()), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'teamName' must not be empty");
     }
 
@@ -276,13 +259,12 @@ class TeamValidatorTest {
             .build()
         );
 
-        final ValidationResult<Team> response = TeamValidator.validateUpdate(team, existingTeam, allTeams);
+        final ConflictException e = catchThrowableOfType(() -> validateUpdate(team, existingTeam, allTeams), ConflictException.class);
+        assertThat(e.getConflictFailure().getConflictingAttributes())
+            .containsOnly("teamName");
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
-            .containsOnly("Payload conflicts with an existing object on: [teamName]");
+        assertThat(e.getConflictFailure().getConflictingObject())
+            .isNotNull();
     }
 
     @Test
@@ -308,11 +290,11 @@ class TeamValidatorTest {
             .build()
         );
 
-        final ValidationResult<Team> response = TeamValidator.validateUpdate(team, existingTeam, allTeams);
+        final Team response = validateUpdate(team, existingTeam, allTeams);
 
-        assertThat(response.isFailure())
-            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
-            .isFalse();
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
     }
 
     @Test
@@ -329,11 +311,11 @@ class TeamValidatorTest {
             .forumLink("https://www.google.com")
             .build();
 
-        final ValidationResult<Team> response = TeamValidator.validateUpdate(team, existingTeam, Collections.emptyList());
+        final Team response = validateUpdate(team, existingTeam, emptyList());
 
-        assertThat(response.isFailure())
-            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
-            .isFalse();
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
     }
 
     @Test
@@ -350,11 +332,11 @@ class TeamValidatorTest {
             .forumLink("https://www.google.com")
             .build();
 
-        final ValidationResult<Team> response = TeamValidator.validateUpdate(team, existingTeam, Collections.emptyList());
+        final Team response = validateUpdate(team, existingTeam, emptyList());
 
-        assertThat(response.isFailure())
-            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
-            .isFalse();
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
     }
 
     @Test
@@ -371,12 +353,8 @@ class TeamValidatorTest {
             .forumLink("https://www.google.com")
             .build();
 
-        final ValidationResult<Team> response = TeamValidator.validateUpdate(team, existingTeam, Collections.emptyList());
-
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e = catchThrowableOfType(() -> validateUpdate(team, existingTeam, emptyList()), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'forumLink' is not a valid link: 'invalidUrl'");
     }
 
@@ -388,11 +366,11 @@ class TeamValidatorTest {
             .forumLink("https://www.google.com")
             .build();
 
-        final ValidationResult<Team> response = TeamValidator.validateDelete(existingTeam, Collections.emptyList());
+        final Team response = validateDelete(existingTeam, emptyList());
 
-        assertThat(response.isFailure())
-            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
-            .isFalse();
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
     }
 
     @Test
@@ -410,16 +388,13 @@ class TeamValidatorTest {
             .build()
         );
 
-        final ValidationResult<Team> response = TeamValidator.validateDelete(existingTeam, allUsers);
+        final UsedByException e = catchThrowableOfType(() -> validateDelete(existingTeam, allUsers), UsedByException.class);
+        final List<?> usedBy = List.of(e.getUsedByFailure().getUsedBy());
+        assertThat(usedBy)
+            .hasSize(1);
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
-            .as("Response" + response.validationFailure().toString())
-            .containsOnly("Payload is used by an existing object");
-
-        assertThat(response.validationFailure().toString())
+        assertThat(usedBy.get(0).toString())
+            .contains("DummyPas************************")
             .doesNotContain("DummyPasskey12345678901234567890");
     }
 
@@ -444,10 +419,10 @@ class TeamValidatorTest {
             .build()
         );
 
-        final ValidationResult<Team> response = TeamValidator.validateDelete(existingTeam, allUsers);
+        final Team response = validateDelete(existingTeam, allUsers);
 
-        assertThat(response.isFailure())
-            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
-            .isFalse();
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
     }
 }

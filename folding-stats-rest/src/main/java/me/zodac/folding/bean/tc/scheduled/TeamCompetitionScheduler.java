@@ -141,6 +141,8 @@ public class TeamCompetitionScheduler {
 
             LOGGER.trace("Method #endOfTeamCompetition() fired");
 
+            // TODO: Make the below executions best effort
+
             if (IS_MONTHLY_RESULT_ENABLED) {
                 LOGGER.info("Storing TC stats for new month");
                 userStatsStorer.storeMonthlyResult();

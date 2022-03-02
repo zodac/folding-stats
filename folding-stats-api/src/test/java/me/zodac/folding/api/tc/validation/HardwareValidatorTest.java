@@ -24,11 +24,19 @@
 
 package me.zodac.folding.api.tc.validation;
 
+import static java.util.Collections.emptyList;
+import static me.zodac.folding.api.tc.validation.HardwareValidator.validateCreate;
+import static me.zodac.folding.api.tc.validation.HardwareValidator.validateDelete;
+import static me.zodac.folding.api.tc.validation.HardwareValidator.validateUpdate;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowableOfType;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+import me.zodac.folding.api.exception.ConflictException;
+import me.zodac.folding.api.exception.NullObjectException;
+import me.zodac.folding.api.exception.UsedByException;
+import me.zodac.folding.api.exception.ValidationException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.HardwareMake;
 import me.zodac.folding.api.tc.HardwareType;
@@ -52,22 +60,18 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final ValidationResult<Hardware> response = HardwareValidator.validateCreate(hardware, Collections.emptyList());
+        final Hardware response = validateCreate(hardware, emptyList());
 
-        assertThat(response.isFailure())
-            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
-            .isFalse();
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
     }
 
     @Test
     void whenValidatingCreate_givenNullHardware_thenFailureResponseIsReturned() {
-        final ValidationResult<Hardware> response = HardwareValidator.validateCreate(null, Collections.emptyList());
-
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
-            .containsOnly("Payload is null");
+        final NullObjectException e = catchThrowableOfType(() -> validateCreate(null, emptyList()), NullObjectException.class);
+        assertThat(e.getNullObjectFailure().getError())
+            .contains("Payload is null");
     }
 
     @Test
@@ -81,12 +85,8 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final ValidationResult<Hardware> response = HardwareValidator.validateCreate(hardware, Collections.emptyList());
-
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e = catchThrowableOfType(() -> validateCreate(hardware, emptyList()), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'hardwareName' must not be empty");
     }
 
@@ -111,11 +111,11 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final ValidationResult<Hardware> response = HardwareValidator.validateCreate(hardware, allHardware);
+        final Hardware response = validateCreate(hardware, allHardware);
 
-        assertThat(response.isFailure())
-            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
-            .isFalse();
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
     }
 
     @Test
@@ -139,13 +139,12 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final ValidationResult<Hardware> response = HardwareValidator.validateCreate(hardware, allHardware);
+        final ConflictException e = catchThrowableOfType(() -> validateCreate(hardware, allHardware), ConflictException.class);
+        assertThat(e.getConflictFailure().getConflictingAttributes())
+            .containsOnly("hardwareName");
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
-            .containsOnly("Payload conflicts with an existing object on: [hardwareName]");
+        assertThat(e.getConflictFailure().getConflictingObject())
+            .isNotNull();
     }
 
     @Test
@@ -159,12 +158,8 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final ValidationResult<Hardware> response = HardwareValidator.validateCreate(hardware, Collections.emptyList());
-
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e = catchThrowableOfType(() -> validateCreate(hardware, emptyList()), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'displayName' must not be empty");
     }
 
@@ -179,12 +174,8 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final ValidationResult<Hardware> response = HardwareValidator.validateCreate(hardware, Collections.emptyList());
-
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e = catchThrowableOfType(() -> validateCreate(hardware, emptyList()), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'hardwareMake' must be one of: [AMD, INTEL, NVIDIA]");
     }
 
@@ -199,12 +190,8 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final ValidationResult<Hardware> response = HardwareValidator.validateCreate(hardware, Collections.emptyList());
-
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e = catchThrowableOfType(() -> validateCreate(hardware, emptyList()), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'hardwareType' must be one of: [CPU, GPU]");
     }
 
@@ -219,12 +206,8 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final ValidationResult<Hardware> response = HardwareValidator.validateCreate(hardware, Collections.emptyList());
-
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e = catchThrowableOfType(() -> validateCreate(hardware, emptyList()), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'multiplier' must be 1.00 or higher");
     }
 
@@ -239,12 +222,8 @@ class HardwareValidatorTest {
             .averagePpd(-1L)
             .build();
 
-        final ValidationResult<Hardware> response = HardwareValidator.validateCreate(hardware, Collections.emptyList());
-
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e = catchThrowableOfType(() -> validateCreate(hardware, emptyList()), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'averagePpd' must be 1 or higher");
     }
 
@@ -259,14 +238,8 @@ class HardwareValidatorTest {
             .averagePpd(-1L)
             .build();
 
-        final ValidationResult<Hardware> response = HardwareValidator.validateCreate(hardware, Collections.emptyList());
-
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
-            .as("Did not receive expected error messages")
-            .hasSize(6)
+        final ValidationException e = catchThrowableOfType(() -> validateCreate(hardware, emptyList()), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly(
                 "Field 'hardwareName' must not be empty",
                 "Field 'displayName' must not be empty",
@@ -297,11 +270,11 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final ValidationResult<Hardware> response = HardwareValidator.validateUpdate(hardware, existingHardware, Collections.emptyList());
+        final Hardware response = validateUpdate(hardware, existingHardware, emptyList());
 
-        assertThat(response.isFailure())
-            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
-            .isFalse();
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
     }
 
     @Test
@@ -315,13 +288,9 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final ValidationResult<Hardware> response = HardwareValidator.validateUpdate(null, existingHardware, Collections.emptyList());
-
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
-            .containsOnly("Payload is null");
+        final NullObjectException e = catchThrowableOfType(() -> validateUpdate(null, existingHardware, emptyList()), NullObjectException.class);
+        assertThat(e.getNullObjectFailure().getError())
+            .contains("Payload is null");
     }
 
     @Test
@@ -335,13 +304,9 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final ValidationResult<Hardware> response = HardwareValidator.validateUpdate(hardware, null, Collections.emptyList());
-
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
-            .containsOnly("Payload is null");
+        final NullObjectException e = catchThrowableOfType(() -> validateUpdate(hardware, null, emptyList()), NullObjectException.class);
+        assertThat(e.getNullObjectFailure().getError())
+            .contains("Payload is null");
     }
 
     @Test
@@ -364,12 +329,8 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final ValidationResult<Hardware> response = HardwareValidator.validateUpdate(hardware, existingHardware, Collections.emptyList());
-
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e = catchThrowableOfType(() -> validateUpdate(hardware, existingHardware, emptyList()), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'hardwareName' must not be empty");
     }
 
@@ -405,13 +366,12 @@ class HardwareValidatorTest {
             .build()
         );
 
-        final ValidationResult<Hardware> response = HardwareValidator.validateUpdate(hardware, existingHardware, allHardware);
+        final ConflictException e = catchThrowableOfType(() -> validateUpdate(hardware, existingHardware, allHardware), ConflictException.class);
+        assertThat(e.getConflictFailure().getConflictingAttributes())
+            .containsOnly("hardwareName");
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
-            .containsOnly("Payload conflicts with an existing object on: [hardwareName]");
+        assertThat(e.getConflictFailure().getConflictingObject())
+            .isNotNull();
     }
 
     @Test
@@ -446,11 +406,11 @@ class HardwareValidatorTest {
             .build()
         );
 
-        final ValidationResult<Hardware> response = HardwareValidator.validateUpdate(hardware, existingHardware, allHardware);
+        final Hardware response = validateUpdate(hardware, existingHardware, allHardware);
 
-        assertThat(response.isFailure())
-            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
-            .isFalse();
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
     }
 
     @Test
@@ -473,12 +433,8 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final ValidationResult<Hardware> response = HardwareValidator.validateUpdate(hardware, existingHardware, Collections.emptyList());
-
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e = catchThrowableOfType(() -> validateUpdate(hardware, existingHardware, emptyList()), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'displayName' must not be empty");
     }
 
@@ -502,12 +458,8 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final ValidationResult<Hardware> response = HardwareValidator.validateUpdate(hardware, existingHardware, Collections.emptyList());
-
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e = catchThrowableOfType(() -> validateUpdate(hardware, existingHardware, emptyList()), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'hardwareMake' must be one of: [AMD, INTEL, NVIDIA]");
     }
 
@@ -531,12 +483,8 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final ValidationResult<Hardware> response = HardwareValidator.validateUpdate(hardware, existingHardware, Collections.emptyList());
-
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e = catchThrowableOfType(() -> validateUpdate(hardware, existingHardware, emptyList()), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'hardwareType' must be one of: [CPU, GPU]");
     }
 
@@ -560,13 +508,10 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final ValidationResult<Hardware> response = HardwareValidator.validateUpdate(hardware, existingHardware, Collections.emptyList());
-
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e = catchThrowableOfType(() -> validateUpdate(hardware, existingHardware, emptyList()), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'multiplier' must be 1.00 or higher");
+
     }
 
     @Test
@@ -589,12 +534,8 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final ValidationResult<Hardware> response = HardwareValidator.validateUpdate(hardware, existingHardware, Collections.emptyList());
-
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
+        final ValidationException e = catchThrowableOfType(() -> validateUpdate(hardware, existingHardware, emptyList()), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'averagePpd' must be 1 or higher");
     }
 
@@ -618,14 +559,8 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final ValidationResult<Hardware> response = HardwareValidator.validateUpdate(hardware, existingHardware, Collections.emptyList());
-
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
-            .as("Did not receive expected error messages")
-            .hasSize(5)
+        final ValidationException e = catchThrowableOfType(() -> validateUpdate(hardware, existingHardware, emptyList()), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
             .containsOnly(
                 "Field 'displayName' must not be empty",
                 "Field 'hardwareMake' must be one of: [AMD, INTEL, NVIDIA]",
@@ -646,11 +581,11 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final ValidationResult<Hardware> response = HardwareValidator.validateDelete(existingHardware, Collections.emptyList());
+        final Hardware response = validateDelete(existingHardware, emptyList());
 
-        assertThat(response.isFailure())
-            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
-            .isFalse();
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
     }
 
     @Test
@@ -671,15 +606,13 @@ class HardwareValidatorTest {
             .build()
         );
 
-        final ValidationResult<Hardware> response = HardwareValidator.validateDelete(existingHardware, allUsers);
+        final UsedByException e = catchThrowableOfType(() -> validateDelete(existingHardware, allUsers), UsedByException.class);
+        final List<?> usedBy = List.of(e.getUsedByFailure().getUsedBy());
+        assertThat(usedBy)
+            .hasSize(1);
 
-        assertThat(response.isFailure())
-            .isTrue();
-
-        assertThat(response.getErrors())
-            .containsOnly("Payload is used by an existing object");
-
-        assertThat(response.validationFailure().toString())
+        assertThat(usedBy.get(0).toString())
+            .contains("DummyPas************************")
             .doesNotContain("DummyPasskey12345678901234567890");
     }
 
@@ -710,10 +643,10 @@ class HardwareValidatorTest {
             .build()
         );
 
-        final ValidationResult<Hardware> response = HardwareValidator.validateDelete(existingHardware, allUsers);
+        final Hardware response = validateDelete(existingHardware, allUsers);
 
-        assertThat(response.isFailure())
-            .as("Expected validation to pass, instead failed with errors: " + response.getErrors())
-            .isFalse();
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
     }
 }

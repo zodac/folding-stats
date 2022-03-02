@@ -33,6 +33,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
+import me.zodac.folding.api.exception.ConflictException;
+import me.zodac.folding.api.exception.NullObjectException;
+import me.zodac.folding.api.exception.UsedByException;
+import me.zodac.folding.api.exception.ValidationException;
+import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
@@ -59,17 +64,20 @@ public final class TeamValidator {
      *
      * @param teamRequest the {@link TeamRequest} to validate
      * @param allTeams    all {@link Team}s on the system
-     * @return the {@link ValidationResult}
+     * @return the validated {@link Team}
+     * @throws ConflictException   thrown if the input conflicts with an existing {@link Hardware}
+     * @throws NullObjectException thrown if the input is <code>null</code>
+     * @throws ValidationException thrown if the input fails validation
      */
-    public static ValidationResult<Team> validateCreate(final TeamRequest teamRequest, final Collection<Team> allTeams) {
+    public static Team validateCreate(final TeamRequest teamRequest, final Collection<Team> allTeams) {
         if (teamRequest == null) {
-            return ValidationResult.nullObject();
+            throw new NullObjectException();
         }
 
         // The teamName must be unique
         final Optional<Team> teamWithMatchingName = getTeamWithName(teamRequest.getTeamName(), allTeams);
         if (teamWithMatchingName.isPresent()) {
-            return ValidationResult.conflictingWith(teamRequest, teamWithMatchingName.get(), List.of("teamName"));
+            throw new ConflictException(teamRequest, teamWithMatchingName.get(), "teamName");
         }
 
         final List<String> failureMessages = Stream.of(
@@ -80,11 +88,10 @@ public final class TeamValidator {
             .toList();
 
         if (!failureMessages.isEmpty()) {
-            return ValidationResult.failure(teamRequest, failureMessages);
+            throw new ValidationException(teamRequest, failureMessages);
         }
 
-        final Team convertedTeam = Team.createWithoutId(teamRequest);
-        return ValidationResult.successful(convertedTeam);
+        return Team.createWithoutId(teamRequest);
     }
 
     /**
@@ -101,17 +108,20 @@ public final class TeamValidator {
      * @param teamRequest  the {@link TeamRequest} to validate
      * @param existingTeam the already existing {@link Team} in the system to be updated
      *                     @param allTeams all {@link Team}s on the system
-     * @return the {@link ValidationResult}
+     * @return the validated {@link Team}
+     * @throws ConflictException   thrown if the input conflicts with an existing {@link Hardware}
+     * @throws NullObjectException thrown if the input is <code>null</code>
+     * @throws ValidationException thrown if the input fails validation
      */
-    public static ValidationResult<Team> validateUpdate(final TeamRequest teamRequest, final Team existingTeam, final Collection<Team> allTeams) {
+    public static Team validateUpdate(final TeamRequest teamRequest, final Team existingTeam, final Collection<Team> allTeams) {
         if (teamRequest == null || existingTeam == null) {
-            return ValidationResult.nullObject();
+            throw new NullObjectException();
         }
 
         // The teamName must be unique, unless replacing the same team
         final Optional<Team> teamWithMatchingName = getTeamWithName(teamRequest.getTeamName(), allTeams);
         if (teamWithMatchingName.isPresent() && teamWithMatchingName.get().getId() != existingTeam.getId()) {
-            return ValidationResult.conflictingWith(teamRequest, teamWithMatchingName.get(), List.of("teamName"));
+            throw new ConflictException(teamRequest, teamWithMatchingName.get(), "teamName");
         }
 
         final List<String> failureMessages = Stream.of(
@@ -122,11 +132,10 @@ public final class TeamValidator {
             .toList();
 
         if (!failureMessages.isEmpty()) {
-            return ValidationResult.failure(teamRequest, failureMessages);
+            throw new ValidationException(teamRequest, failureMessages);
         }
 
-        final Team convertedTeam = Team.createWithoutId(teamRequest);
-        return ValidationResult.successful(convertedTeam);
+        return Team.createWithoutId(teamRequest);
     }
 
     /**
@@ -137,16 +146,17 @@ public final class TeamValidator {
      *
      * @param team     the {@link Team} to validate
      * @param allUsers all {@link User}s on the system
-     * @return the {@link ValidationResult}
+     * @return the validated {@link Team}
+     * @throws UsedByException thrown if the {@link Team} is in use by a {@link User}
      */
-    public static ValidationResult<Team> validateDelete(final Team team, final Collection<User> allUsers) {
+    public static Team validateDelete(final Team team, final Collection<User> allUsers) {
         final Collection<User> usersWithMatchingTeam = getUsersOnTeam(team.getId(), allUsers);
 
         if (!usersWithMatchingTeam.isEmpty()) {
-            return ValidationResult.usedBy(team, usersWithMatchingTeam);
+            throw new UsedByException(team, usersWithMatchingTeam);
         }
 
-        return ValidationResult.successful(team);
+        return team;
     }
 
     private static Optional<Team> getTeamWithName(final String teamName, final Collection<Team> allTeams) {
