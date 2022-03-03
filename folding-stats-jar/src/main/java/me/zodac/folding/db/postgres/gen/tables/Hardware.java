@@ -67,24 +67,24 @@ public class Hardware extends TableImpl<HardwareRecord> {
     public final TableField<HardwareRecord, String> DISPLAY_NAME = createField(DSL.name("display_name"), SQLDataType.CLOB.nullable(false), this, "");
 
     /**
+     * The column <code>public.hardware.hardware_make</code>.
+     */
+    public final TableField<HardwareRecord, String> HARDWARE_MAKE = createField(DSL.name("hardware_make"), SQLDataType.CLOB.nullable(false), this, "");
+
+    /**
+     * The column <code>public.hardware.hardware_type</code>.
+     */
+    public final TableField<HardwareRecord, String> HARDWARE_TYPE = createField(DSL.name("hardware_type"), SQLDataType.CLOB.nullable(false), this, "");
+
+    /**
      * The column <code>public.hardware.multiplier</code>.
      */
     public final TableField<HardwareRecord, BigDecimal> MULTIPLIER = createField(DSL.name("multiplier"), SQLDataType.NUMERIC.nullable(false), this, "");
 
     /**
-     * The column <code>public.hardware.hardware_type</code>.
-     */
-    public final TableField<HardwareRecord, String> HARDWARE_TYPE = createField(DSL.name("hardware_type"), SQLDataType.CLOB.nullable(false).defaultValue(DSL.field("'GPU'::text", SQLDataType.CLOB)), this, "");
-
-    /**
-     * The column <code>public.hardware.hardware_make</code>.
-     */
-    public final TableField<HardwareRecord, String> HARDWARE_MAKE = createField(DSL.name("hardware_make"), SQLDataType.CLOB.nullable(false).defaultValue(DSL.field("''::text", SQLDataType.CLOB)), this, "");
-
-    /**
      * The column <code>public.hardware.average_ppd</code>.
      */
-    public final TableField<HardwareRecord, BigDecimal> AVERAGE_PPD = createField(DSL.name("average_ppd"), SQLDataType.NUMERIC.nullable(false).defaultValue(DSL.field("1.0", SQLDataType.NUMERIC)), this, "");
+    public final TableField<HardwareRecord, BigDecimal> AVERAGE_PPD = createField(DSL.name("average_ppd"), SQLDataType.NUMERIC.nullable(false), this, "");
 
     private Hardware(Name alias, Table<HardwareRecord> aliased) {
         this(alias, aliased, null);
@@ -141,7 +141,7 @@ public class Hardware extends TableImpl<HardwareRecord> {
 
     @Override
     public List<UniqueKey<HardwareRecord>> getKeys() {
-        return Arrays.<UniqueKey<HardwareRecord>>asList(Keys.HARDWARE_PKEY, Keys.UNIQUE_HARDWARE);
+        return Arrays.<UniqueKey<HardwareRecord>>asList(Keys.HARDWARE_PKEY, Keys.HARDWARE_HARDWARE_NAME_KEY);
     }
 
     @Override
@@ -175,7 +175,7 @@ public class Hardware extends TableImpl<HardwareRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row7<Integer, String, String, BigDecimal, String, String, BigDecimal> fieldsRow() {
+    public Row7<Integer, String, String, String, String, BigDecimal, BigDecimal> fieldsRow() {
         return (Row7) super.fieldsRow();
     }
 }

@@ -42,8 +42,8 @@ services:
     hostname: backend-dev # Using a dash as Java's URI builder will fail with an underscore
     environment:
       # External URL configuration
-      LARS_URL_ROOT: "https://folding.lar.systems"
-      STATS_URL_ROOT: "https://api2.foldingathome.org"
+      LARS_URL_ROOT: "http://backend-dev:8081/folding"
+      STATS_URL_ROOT: "http://backend-dev:8081/folding"
       REDIRECT_URL: "http://127.0.0.1:81/"
       # Spring configuration
       DEPLOYMENT_TYPE: "test"

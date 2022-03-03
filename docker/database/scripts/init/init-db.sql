@@ -111,9 +111,12 @@ CREATE TABLE retired_user_stats (
     final_multiplied_points BIGINT NOT NULL,
     final_units INT NOT NULL,
     CONSTRAINT fk_team_id
-            FOREIGN KEY(team_id)
-            REFERENCES teams(team_id)
-            ON DELETE CASCADE
+          FOREIGN KEY(team_id)
+          REFERENCES teams(team_id)
+          ON DELETE CASCADE,
+    CONSTRAINT fk_user_id
+        FOREIGN KEY(user_id)
+        REFERENCES users(user_id)
 );
 
 CREATE INDEX index_retired_user_stats
@@ -152,9 +155,14 @@ CREATE TABLE user_changes (
     user_change_id SERIAL PRIMARY KEY,
     created_utc_timestamp TIMESTAMP,
     updated_utc_timestamp TIMESTAMP,
+    user_id INT NOT NULL,
     previous_user TEXT NOT NULL,
     new_user TEXT NOT NULL,
-    state TEXT NOT NULL
+    state TEXT NOT NULL,
+    CONSTRAINT fk_user_id
+        FOREIGN KEY(user_id)
+        REFERENCES users(user_id)
+        ON DELETE CASCADE
 );
 
 CREATE INDEX index_user_changes_id

@@ -1112,6 +1112,7 @@ public final class PostgresDbManager implements DbManager {
                 .columns(
                     USER_CHANGES.CREATED_UTC_TIMESTAMP,
                     USER_CHANGES.UPDATED_UTC_TIMESTAMP,
+                    USER_CHANGES.USER_ID,
                     USER_CHANGES.PREVIOUS_USER,
                     USER_CHANGES.NEW_USER,
                     USER_CHANGES.STATE
@@ -1119,6 +1120,7 @@ public final class PostgresDbManager implements DbManager {
                 .values(
                     userChange.getCreatedUtcTimestamp(),
                     userChange.getUpdatedUtcTimestamp(),
+                    userChange.getPreviousUser().getId(),
                     GSON.toJson(userChange.getPreviousUser()),
                     GSON.toJson(userChange.getNewUser()),
                     userChange.getState().toString()

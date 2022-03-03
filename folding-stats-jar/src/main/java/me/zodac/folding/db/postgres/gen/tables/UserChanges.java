@@ -19,7 +19,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row6;
+import org.jooq.Row7;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -65,6 +65,11 @@ public class UserChanges extends TableImpl<UserChangesRecord> {
      * The column <code>public.user_changes.updated_utc_timestamp</code>.
      */
     public final TableField<UserChangesRecord, LocalDateTime> UPDATED_UTC_TIMESTAMP = createField(DSL.name("updated_utc_timestamp"), SQLDataType.LOCALDATETIME(6), this, "");
+
+    /**
+     * The column <code>public.user_changes.user_id</code>.
+     */
+    public final TableField<UserChangesRecord, Integer> USER_ID = createField(DSL.name("user_id"), SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
      * The column <code>public.user_changes.previous_user</code>.
@@ -140,6 +145,20 @@ public class UserChanges extends TableImpl<UserChangesRecord> {
     }
 
     @Override
+    public List<ForeignKey<UserChangesRecord, ?>> getReferences() {
+        return Arrays.<ForeignKey<UserChangesRecord, ?>>asList(Keys.USER_CHANGES__FK_USER_ID);
+    }
+
+    private transient Users _users;
+
+    public Users users() {
+        if (_users == null)
+            _users = new Users(this, Keys.USER_CHANGES__FK_USER_ID);
+
+        return _users;
+    }
+
+    @Override
     public UserChanges as(String alias) {
         return new UserChanges(DSL.name(alias), this);
     }
@@ -166,11 +185,11 @@ public class UserChanges extends TableImpl<UserChangesRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row6 type methods
+    // Row7 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row6<Integer, LocalDateTime, LocalDateTime, String, String, String> fieldsRow() {
-        return (Row6) super.fieldsRow();
+    public Row7<Integer, LocalDateTime, LocalDateTime, Integer, String, String, String> fieldsRow() {
+        return (Row7) super.fieldsRow();
     }
 }

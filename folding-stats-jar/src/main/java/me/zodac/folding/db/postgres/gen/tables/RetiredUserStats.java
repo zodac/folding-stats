@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
+import me.zodac.folding.db.postgres.gen.Indexes;
 import me.zodac.folding.db.postgres.gen.Keys;
 import me.zodac.folding.db.postgres.gen.Public;
 import me.zodac.folding.db.postgres.gen.tables.records.RetiredUserStatsRecord;
@@ -15,6 +16,7 @@ import me.zodac.folding.db.postgres.gen.tables.records.RetiredUserStatsRecord;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Identity;
+import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Row8;
@@ -55,14 +57,14 @@ public class RetiredUserStats extends TableImpl<RetiredUserStatsRecord> {
     public final TableField<RetiredUserStatsRecord, Integer> RETIRED_USER_ID = createField(DSL.name("retired_user_id"), SQLDataType.INTEGER.nullable(false).identity(true), this, "");
 
     /**
-     * The column <code>public.retired_user_stats.user_id</code>.
-     */
-    public final TableField<RetiredUserStatsRecord, Integer> USER_ID = createField(DSL.name("user_id"), SQLDataType.INTEGER.nullable(false), this, "");
-
-    /**
      * The column <code>public.retired_user_stats.team_id</code>.
      */
     public final TableField<RetiredUserStatsRecord, Integer> TEAM_ID = createField(DSL.name("team_id"), SQLDataType.INTEGER.nullable(false), this, "");
+
+    /**
+     * The column <code>public.retired_user_stats.user_id</code>.
+     */
+    public final TableField<RetiredUserStatsRecord, Integer> USER_ID = createField(DSL.name("user_id"), SQLDataType.INTEGER.nullable(false), this, "");
 
     /**
      * The column <code>public.retired_user_stats.display_username</code>.
@@ -128,6 +130,11 @@ public class RetiredUserStats extends TableImpl<RetiredUserStatsRecord> {
     }
 
     @Override
+    public List<Index> getIndexes() {
+        return Arrays.<Index>asList(Indexes.INDEX_RETIRED_USER_STATS);
+    }
+
+    @Override
     public Identity<RetiredUserStatsRecord, Integer> getIdentity() {
         return (Identity<RetiredUserStatsRecord, Integer>) super.getIdentity();
     }
@@ -139,7 +146,7 @@ public class RetiredUserStats extends TableImpl<RetiredUserStatsRecord> {
 
     @Override
     public List<UniqueKey<RetiredUserStatsRecord>> getKeys() {
-        return Arrays.<UniqueKey<RetiredUserStatsRecord>>asList(Keys.RETIRED_USER_STATS_PKEY, Keys.USER_ID_UNIQUE);
+        return Arrays.<UniqueKey<RetiredUserStatsRecord>>asList(Keys.RETIRED_USER_STATS_PKEY, Keys.RETIRED_USER_STATS_USER_ID_KEY);
     }
 
     @Override

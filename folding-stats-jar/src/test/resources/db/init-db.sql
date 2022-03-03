@@ -139,7 +139,6 @@ CREATE TABLE user_tc_stats_hourly (
 CREATE INDEX index_user_tc_stats_hourly
     ON user_tc_stats_hourly(user_id, utc_timestamp);
 
-
 CREATE TABLE monthly_results (
     utc_timestamp TIMESTAMP PRIMARY KEY,
     json_result TEXT NOT NULL
@@ -152,9 +151,14 @@ CREATE TABLE user_changes (
     user_change_id SERIAL PRIMARY KEY,
     created_utc_timestamp TIMESTAMP,
     updated_utc_timestamp TIMESTAMP,
+    user_id INT NOT NULL,
     previous_user TEXT NOT NULL,
     new_user TEXT NOT NULL,
-    state TEXT NOT NULL
+    state TEXT NOT NULL,
+    CONSTRAINT fk_user_id
+        FOREIGN KEY(user_id)
+        REFERENCES users(user_id)
+        ON DELETE CASCADE
 );
 
 CREATE INDEX index_user_changes_id

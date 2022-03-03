@@ -6,6 +6,7 @@ package me.zodac.folding.db.postgres.gen;
 
 import me.zodac.folding.db.postgres.gen.tables.Hardware;
 import me.zodac.folding.db.postgres.gen.tables.MonthlyResults;
+import me.zodac.folding.db.postgres.gen.tables.RetiredUserStats;
 import me.zodac.folding.db.postgres.gen.tables.Teams;
 import me.zodac.folding.db.postgres.gen.tables.UserChanges;
 import me.zodac.folding.db.postgres.gen.tables.UserInitialStats;
@@ -32,6 +33,7 @@ public class Indexes {
 
     public static final Index INDEX_HARDWARE_ID = Internal.createIndex(DSL.name("index_hardware_id"), Hardware.HARDWARE, new OrderField[] { Hardware.HARDWARE.HARDWARE_ID }, false);
     public static final Index INDEX_MONTHLY_RESULTS = Internal.createIndex(DSL.name("index_monthly_results"), MonthlyResults.MONTHLY_RESULTS, new OrderField[] { MonthlyResults.MONTHLY_RESULTS.UTC_TIMESTAMP }, false);
+    public static final Index INDEX_RETIRED_USER_STATS = Internal.createIndex(DSL.name("index_retired_user_stats"), RetiredUserStats.RETIRED_USER_STATS, new OrderField[] { RetiredUserStats.RETIRED_USER_STATS.RETIRED_USER_ID, RetiredUserStats.RETIRED_USER_STATS.UTC_TIMESTAMP }, false);
     public static final Index INDEX_TEAM_ID = Internal.createIndex(DSL.name("index_team_id"), Teams.TEAMS, new OrderField[] { Teams.TEAMS.TEAM_ID }, false);
     public static final Index INDEX_USER_CHANGES_ID = Internal.createIndex(DSL.name("index_user_changes_id"), UserChanges.USER_CHANGES, new OrderField[] { UserChanges.USER_CHANGES.USER_CHANGE_ID }, false);
     public static final Index INDEX_USER_CHANGES_STATE = Internal.createIndex(DSL.name("index_user_changes_state"), UserChanges.USER_CHANGES, new OrderField[] { UserChanges.USER_CHANGES.STATE }, false);

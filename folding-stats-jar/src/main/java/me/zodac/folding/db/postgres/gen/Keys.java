@@ -45,11 +45,11 @@ public class Keys {
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
+    public static final UniqueKey<HardwareRecord> HARDWARE_HARDWARE_NAME_KEY = Internal.createUniqueKey(Hardware.HARDWARE, DSL.name("hardware_hardware_name_key"), new TableField[] { Hardware.HARDWARE.HARDWARE_NAME }, true);
     public static final UniqueKey<HardwareRecord> HARDWARE_PKEY = Internal.createUniqueKey(Hardware.HARDWARE, DSL.name("hardware_pkey"), new TableField[] { Hardware.HARDWARE.HARDWARE_ID }, true);
-    public static final UniqueKey<HardwareRecord> UNIQUE_HARDWARE = Internal.createUniqueKey(Hardware.HARDWARE, DSL.name("unique_hardware"), new TableField[] { Hardware.HARDWARE.HARDWARE_NAME }, true);
     public static final UniqueKey<MonthlyResultsRecord> MONTHLY_RESULTS_PKEY = Internal.createUniqueKey(MonthlyResults.MONTHLY_RESULTS, DSL.name("monthly_results_pkey"), new TableField[] { MonthlyResults.MONTHLY_RESULTS.UTC_TIMESTAMP }, true);
     public static final UniqueKey<RetiredUserStatsRecord> RETIRED_USER_STATS_PKEY = Internal.createUniqueKey(RetiredUserStats.RETIRED_USER_STATS, DSL.name("retired_user_stats_pkey"), new TableField[] { RetiredUserStats.RETIRED_USER_STATS.RETIRED_USER_ID }, true);
-    public static final UniqueKey<RetiredUserStatsRecord> USER_ID_UNIQUE = Internal.createUniqueKey(RetiredUserStats.RETIRED_USER_STATS, DSL.name("user_id_unique"), new TableField[] { RetiredUserStats.RETIRED_USER_STATS.USER_ID }, true);
+    public static final UniqueKey<RetiredUserStatsRecord> RETIRED_USER_STATS_USER_ID_KEY = Internal.createUniqueKey(RetiredUserStats.RETIRED_USER_STATS, DSL.name("retired_user_stats_user_id_key"), new TableField[] { RetiredUserStats.RETIRED_USER_STATS.USER_ID }, true);
     public static final UniqueKey<SystemUsersRecord> SYSTEM_USERS_PKEY = Internal.createUniqueKey(SystemUsers.SYSTEM_USERS, DSL.name("system_users_pkey"), new TableField[] { SystemUsers.SYSTEM_USERS.USER_NAME }, true);
     public static final UniqueKey<TeamsRecord> TEAMS_PKEY = Internal.createUniqueKey(Teams.TEAMS, DSL.name("teams_pkey"), new TableField[] { Teams.TEAMS.TEAM_ID }, true);
     public static final UniqueKey<TeamsRecord> TEAMS_TEAM_NAME_KEY = Internal.createUniqueKey(Teams.TEAMS, DSL.name("teams_team_name_key"), new TableField[] { Teams.TEAMS.TEAM_NAME }, true);
@@ -67,6 +67,7 @@ public class Keys {
     // -------------------------------------------------------------------------
 
     public static final ForeignKey<RetiredUserStatsRecord, TeamsRecord> RETIRED_USER_STATS__FK_TEAM_ID = Internal.createForeignKey(RetiredUserStats.RETIRED_USER_STATS, DSL.name("fk_team_id"), new TableField[] { RetiredUserStats.RETIRED_USER_STATS.TEAM_ID }, Keys.TEAMS_PKEY, new TableField[] { Teams.TEAMS.TEAM_ID }, true);
+    public static final ForeignKey<UserChangesRecord, UsersRecord> USER_CHANGES__FK_USER_ID = Internal.createForeignKey(UserChanges.USER_CHANGES, DSL.name("fk_user_id"), new TableField[] { UserChanges.USER_CHANGES.USER_ID }, Keys.USERS_PKEY, new TableField[] { Users.USERS.USER_ID }, true);
     public static final ForeignKey<UserInitialStatsRecord, UsersRecord> USER_INITIAL_STATS__FK_USER_ID = Internal.createForeignKey(UserInitialStats.USER_INITIAL_STATS, DSL.name("fk_user_id"), new TableField[] { UserInitialStats.USER_INITIAL_STATS.USER_ID }, Keys.USERS_PKEY, new TableField[] { Users.USERS.USER_ID }, true);
     public static final ForeignKey<UserOffsetTcStatsRecord, UsersRecord> USER_OFFSET_TC_STATS__FK_USER_ID = Internal.createForeignKey(UserOffsetTcStats.USER_OFFSET_TC_STATS, DSL.name("fk_user_id"), new TableField[] { UserOffsetTcStats.USER_OFFSET_TC_STATS.USER_ID }, Keys.USERS_PKEY, new TableField[] { Users.USERS.USER_ID }, true);
     public static final ForeignKey<UserTcStatsHourlyRecord, UsersRecord> USER_TC_STATS_HOURLY__FK_USER_ID = Internal.createForeignKey(UserTcStatsHourly.USER_TC_STATS_HOURLY, DSL.name("fk_user_id"), new TableField[] { UserTcStatsHourly.USER_TC_STATS_HOURLY.USER_ID }, Keys.USERS_PKEY, new TableField[] { Users.USERS.USER_ID }, true);

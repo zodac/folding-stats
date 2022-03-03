@@ -32,6 +32,7 @@ import static me.zodac.folding.test.util.SystemCleaner.cleanSystemForComplexTest
 import static me.zodac.folding.test.util.TestAuthenticationData.ADMIN_USER;
 import static me.zodac.folding.test.util.TestConstants.FOLDING_URL;
 import static me.zodac.folding.test.util.TestGenerator.generateUser;
+import static me.zodac.folding.test.util.rest.request.UserUtils.USER_REQUEST_SENDER;
 import static me.zodac.folding.test.util.rest.response.HttpResponseHeaderUtils.getTotalCount;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -245,6 +246,28 @@ class UserChangeTest {
         assertThat(userAfterChange.getLiveStatsLink())
             .as("Expected user's liveStatsLink to be updated to dummy value")
             .isEqualTo(DUMMY_LIVE_STATS_LINK);
+    }
+
+    @Test
+    void whenApproveUserChangeImmediately_givenUserHasBeenDeleted_thenChangeIsNotApplied_andResponseHas404Status() throws FoldingRestException {
+        final UserChange userChange = createUserChange();
+
+        final User userBeforeChange = UserUtils.get(userChange.getNewUser().getId());
+        assertThat(userBeforeChange.getLiveStatsLink())
+            .as("Expected user's initial liveStatsLink to not be dummy value")
+            .isNotEqualTo(DUMMY_LIVE_STATS_LINK);
+
+        final HttpResponse<Void> deleteUserResponse =
+            USER_REQUEST_SENDER.delete(userChange.getPreviousUser().getId(), ADMIN_USER.userName(), ADMIN_USER.password());
+        assertThat(deleteUserResponse.statusCode())
+            .as("Did not receive a 200_OK HTTP response: " + deleteUserResponse.body())
+            .isEqualTo(HttpURLConnection.HTTP_OK);
+
+        final HttpResponse<String> response =
+            USER_CHANGE_REQUEST_SENDER.approveImmediately(userChange.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
+        assertThat(response.statusCode())
+            .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
     }
 
     @Test
