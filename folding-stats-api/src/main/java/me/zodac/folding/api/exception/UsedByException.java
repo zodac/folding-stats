@@ -31,10 +31,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import me.zodac.folding.api.ResponsePojo;
 
 /**
- * Exception thrown when an object being deleted is still in use by another object.
+ * Exception thrown when a {@link ResponsePojo} being deleted is still in use by another {@link ResponsePojo}.
  */
 public class UsedByException extends RuntimeException {
 
@@ -67,12 +68,13 @@ public class UsedByException extends RuntimeException {
     }
 
     /**
-     * Failure object used for REST response.
+     * Failure POJO used for REST response.
      */
     @NoArgsConstructor
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     @Getter
     @Setter
+    @ToString(doNotUseGetters = true)
     public static class UsedByFailure {
 
         private ResponsePojo invalidObject;

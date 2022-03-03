@@ -17,6 +17,191 @@ traits:
         type: string
         required: false
 
+/change:
+  get:
+    description: "Retrieves all user changes with passkeys hidden"
+      responses:
+        200:
+          description: "All user changes have been retrieved"
+          body:
+            application/json:
+              example: !include responses/changes/userChangeGetAll.json
+          headers:
+            eTag:
+              description: "An EntityTag which can be used to retrieve a cached version of the response in future requests"
+              type: string
+        503:
+          description: "The system is not in a valid state to execute read requests"
+  post:
+    description: "Creates a new user change with the given properties"
+    body:
+      application/json:
+        example: !include requests/changes/userChangePost.json
+    responses:
+      201:
+        description: "The user change has been created"
+        body:
+          application/json:
+            example: !include responses/changes/userChangePost.json
+        headers:
+          location:
+            description: "The URL to the created user change"
+            type: string
+      400:
+        description: "The given payload is invalid"
+        body:
+          application/json:
+            example: !include responses/changes/userChangePostBadRequest.json
+      409:
+        description: "A user change with the same 'userId, 'hardwareId, 'foldingUserName', 'passkey' and 'liveStatsLink' already exists"
+        body:
+          application/json:
+            example: !include responses/changes/userChangePostConflict.json
+      502:
+        description: "An error occurred connecting to an external system to verify the user change"
+      503:
+        description: "The system is not in a valid state to execute write requests"
+  /fields:
+    get:
+      queryParameters:
+        state:
+          displayName: state
+          type: string
+          description: A comma-separated list of UserChangeState: [REQUESTED_NOW, REQUESTED_NEXT_MONTH, APPROVED_NOW, APPROVED_NEXT_MONTH, REJECTED, COMPLETED]
+          example: REJECTED
+          required: true
+      description: "Retrieves all user changes with given state with passkeys hidden"
+      responses:
+        200:
+          description: "All user changes have been retrieved"
+          body:
+            application/json:
+              example: !include responses/changes/userChangeGetAllState.json
+          headers:
+            eTag:
+              description: "An EntityTag which can be used to retrieve a cached version of the response in future requests"
+              type: string
+        503:
+          description: "The system is not in a valid state to execute read requests"
+  /passkey:
+    get:
+      description: "Retrieves all user changes with passkeys shown"
+      responses:
+        200:
+          description: "All user changes have been retrieved"
+          body:
+            application/json:
+              example: !include responses/changes/userChangeGetAllPasskey.json
+          headers:
+            eTag:
+              description: "An EntityTag which can be used to retrieve a cached version of the response in future requests"
+              type: string
+        503:
+          description: "The system is not in a valid state to execute read requests"
+    /fields:
+      get:
+      queryParameters:
+        state:
+          displayName: state
+          type: string
+          description: A comma-separated list of UserChangeState: [REQUESTED_NOW, REQUESTED_NEXT_MONTH, APPROVED_NOW, APPROVED_NEXT_MONTH, REJECTED, COMPLETED]
+          example: REJECTED
+          required: true
+      description: "Retrieves all user changes with given state with passkeys shown"
+      responses:
+        200:
+          description: "All user changes have been retrieved"
+          body:
+            application/json:
+              example: !include responses/changes/userChangeGetAllStatePasskey.json
+          headers:
+            eTag:
+              description: "An EntityTag which can be used to retrieve a cached version of the response in future requests"
+              type: string
+        503:
+          description: "The system is not in a valid state to execute read requests"
+  /{userChangeId}:
+    uriParameters:
+      userChangeId:
+        description: "The ID of the user change"
+        type: integer
+        required: true
+    get:
+      is: [ "adminOnly" ]
+      description: "Retrieves the user change with the given ID with passkey shown"
+      responses:
+        200:
+          description: "The user change has been retrieved from the system"
+          body:
+            application/json:
+              example: !include responses/changes/userChangeGet.json
+        400:
+          description: "The provided ID is an invalid integer"
+          body:
+            application/json:
+              example: !include responses/changes/userChangeGetBadRequest.json
+        404:
+          description: "No user change exists with the given ID"
+        503:
+          description: "The system is not in a valid state to execute read requests"
+    /approve/immediate:
+      put:
+        is: [ "adminOnly" ]
+        description: "Approves the user change and applies it immediately to the user"
+        responses:
+          200:
+            description: "The user change has been approved and applied"
+            body:
+              application/json:
+                example: !include responses/changes/userChangeApproveImmediate.json
+          400:
+            description: "The user change cannot be approved due to its current state"
+            body:
+              application/json:
+                example: !include responses/changes/userChangeApproveImmediateBadRequest.json
+          404:
+            description: "No user change exists with the given ID"
+          503:
+            description: "The system is not in a valid state to execute write requests"
+    /approve/next:
+      put:
+        is: [ "adminOnly" ]
+        description: "Approves the user change and schedules it to be applied next month"
+        responses:
+          200:
+            description: "The user change has been approved and updated"
+            body:
+              application/json:
+                example: !include responses/changes/userChangeApproveNextMonth.json
+          400:
+            description: "The user change cannot be approved due to its current state"
+            body:
+              application/json:
+                example: !include responses/changes/userChangeApproveNextMonthBadRequest.json
+          404:
+            description: "No user change exists with the given ID"
+          503:
+            description: "The system is not in a valid state to execute write requests"
+    /reject:
+      put:
+        is: [ "adminOnly" ]
+        description: "Rejects the user change"
+        responses:
+          200:
+            description: "The user change has been rejected"
+            body:
+              application/json:
+                example: !include responses/changes/userChangeReject.json
+          400:
+            description: "The user change cannot be approved due to its current state"
+            body:
+              application/json:
+                example: !include responses/changes/userChangeRejectBadRequest.json
+          404:
+            description: "No user change exists with the given ID"
+          503:
+            description: "The system is not in a valid state to execute write requests"
+    
 /hardware:
   get:
     is: [ "cached" ]
@@ -85,7 +270,7 @@ traits:
             application/json:
               example: !include responses/hardware/hardwareGet.json
         400:
-          description: "The provided ID is an invalid integer, or out of range"
+          description: "The provided ID is an invalid integer"
           body:
             application/json:
               example: !include responses/hardware/hardwareGetBadRequest.json
@@ -128,7 +313,7 @@ traits:
             application/json:
               example: !include responses/hardware/hardwareGet.json
         400:
-          description: "The provided ID is an invalid integer, or out of range"
+          description: "The provided ID is an invalid integer"
           body:
             application/json:
               example: !include responses/hardware/hardwareGetBadRequest.json
@@ -239,7 +424,7 @@ traits:
             application/json:
               example: !include responses/teams/teamGet.json
         400:
-          description: "The provided ID is an invalid integer, or out of range"
+          description: "The provided ID is an invalid integer"
           body:
             application/json:
               example: !include responses/teams/teamGetBadRequest.json
@@ -282,7 +467,7 @@ traits:
             application/json:
               example: !include responses/teams/teamsGet.json
         400:
-          description: "The provided ID is an invalid integer, or out of range"
+          description: "The provided ID is an invalid integer"
           body:
             application/json:
               example: !include responses/teams/teamsGetBadRequest.json
@@ -426,7 +611,7 @@ traits:
             application/json:
               example: !include responses/users/usersGet.json
         400:
-          description: "The provided ID is an invalid integer, or out of range"
+          description: "The provided ID is an invalid integer"
           body:
             application/json:
               example: !include responses/users/usersGetBadRequest.json
@@ -479,7 +664,7 @@ traits:
               application/json:
                 example: !include responses/users/usersGetPasskey.json
           400:
-            description: "The provided ID is an invalid integer, or out of range"
+            description: "The provided ID is an invalid integer"
             body:
               application/json:
                 example: !include responses/users/usersGetBadRequest.json

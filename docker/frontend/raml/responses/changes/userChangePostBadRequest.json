@@ -1,0 +1,14 @@
+{
+  "invalidObject": {
+    "userId": 1,
+    "existingPasskey": "12345678912345678912345678912345",
+    "foldingUserName": "User1",
+    "passkey": "12345678912345678912345678912345",
+    "liveStatsLink": "https://www.google.com",
+    "hardwareId": 1,
+    "immediate": true
+  },
+  "errors": [
+    "Field 'existingPasskey' does not match the existing passkey for the user"
+  ]
+}

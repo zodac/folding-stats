@@ -32,6 +32,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  * Exception thrown when an object being validated fails a validation constraint.
@@ -78,12 +79,13 @@ public class ValidationException extends RuntimeException {
     }
 
     /**
-     * Failure object used for REST response.
+     * Failure POJO used for REST response.
      */
     @NoArgsConstructor
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     @Getter
     @Setter
+    @ToString(doNotUseGetters = true)
     public static class ValidationFailure {
 
         private Object invalidObject;

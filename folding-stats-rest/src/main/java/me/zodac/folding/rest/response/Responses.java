@@ -222,25 +222,4 @@ public final class Responses {
             .notFound()
             .build();
     }
-
-    /**
-     * A <b>409_CONFLICT</b> {@link ResponseEntity}.
-     *
-     * <p>
-     * Generally used for cases where the REST request is trying to do one of the following:
-     * <ul>
-     *     <li>Create a resource that already exists</li>
-     *     <li>Update a resource with a value that conflicts with another resource</li>
-     *     <li>Delete a resource that is being used by another resource</li>
-     * </ul>
-     *
-     * @param entity the entity in the payload that caused the error
-     * @param <E>    the response body type
-     * @return the <b>409_CONFLICT</b> {@link ResponseEntity}
-     */
-    public static <E> ResponseEntity<String> conflict(final E entity) {
-        return ResponseEntity
-            .status(HttpStatus.CONFLICT)
-            .body(GSON.toJson(entity));
-    }
 }

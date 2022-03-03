@@ -32,6 +32,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import me.zodac.folding.api.RequestPojo;
 import me.zodac.folding.api.ResponsePojo;
 
@@ -81,12 +82,13 @@ public class ConflictException extends RuntimeException {
     }
 
     /**
-     * Failure object used for REST response.
+     * Failure POJO used for REST response.
      */
     @NoArgsConstructor
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     @Getter
     @Setter
+    @ToString(doNotUseGetters = true)
     public static class ConflictFailure {
 
         private RequestPojo invalidObject;
