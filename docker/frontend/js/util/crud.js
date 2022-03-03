@@ -663,14 +663,14 @@ function createUserChange() {
             if(response.status == 409){
                 response.json()
                 .then(response => {
-                    failureToast("Request already exists!");
+                    failureToastPermanent("Request already exists!");
                     console.error(JSON.stringify(response, null, 2));
                 });
                 return;
             } else if(response.status != 201){
                 response.json()
                 .then(response => {
-                    failureToast("Failure: " + response["errors"]);
+                    failureToastPermanent("Failure: " + response["errors"]);
                     console.error(JSON.stringify(response, null, 2));
                 });
                 return;

@@ -25,3 +25,8 @@ function failureToast(text){
     document.getElementById("toast-failure-text").innerHTML = escape(text);
     showToast("toast-failure", true);
 }
+
+function failureToastPermanent(text){
+    document.getElementById("toast-failure-text").innerHTML = escape(text);
+    showToast("toast-failure", false);
+}
