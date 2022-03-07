@@ -58,7 +58,7 @@ class InvalidUrlTest {
 
         final String redirectLocation = response.headers()
             .firstValue("Location")
-            .orElse("no location header");
+            .orElseThrow(() -> new AssertionError("no location header"));
 
         assertThat(redirectLocation)
             .as("Expected redirect to go to home page: " + response.body() + ", " + response.headers())

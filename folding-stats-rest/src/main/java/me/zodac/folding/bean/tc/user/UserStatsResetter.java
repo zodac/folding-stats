@@ -28,9 +28,6 @@ import java.util.Collection;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.bean.FoldingRepository;
 import me.zodac.folding.bean.StatsRepository;
-import me.zodac.folding.cache.RetiredTcStatsCache;
-import me.zodac.folding.cache.TcStatsCache;
-import me.zodac.folding.cache.TotalStatsCache;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +59,7 @@ public class UserStatsResetter {
      * <li>Retrieves the current stats for all {@link User}s and updates their initial stats to these current values</li>
      * <li>Remove offset stats for all users</li>
      * <li>Delete all retired user stats</li>
-     * <li>Invalidate all stats caches ({@link TcStatsCache}/{@link TotalStatsCache}/{@link RetiredTcStatsCache})</li>
+     * <li>Invalidate all stats caches</li>
      * <li>Execute a new stats update to set all values to <b>0</b></li>
      * </ol>
      *

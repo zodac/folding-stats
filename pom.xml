@@ -33,6 +33,7 @@
         <skip-tests>true</skip-tests>
 
         <!-- 3PP Versions -->
+        <caffeine.version>3.0.5</caffeine.version>
         <commons-text.version>1.9</commons-text.version>
         <gson.version>2.9.0</gson.version>
         <hikariCP.version>5.0.1</hikariCP.version>
@@ -116,6 +117,11 @@
             </dependency>
 
             <!-- 3PP Dependencies -->
+            <dependency>
+                <groupId>com.github.ben-manes.caffeine</groupId>
+                <artifactId>caffeine</artifactId>
+                <version>${caffeine.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-text</artifactId>

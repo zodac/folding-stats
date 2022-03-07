@@ -24,7 +24,10 @@
 
 package me.zodac.folding.bean;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
@@ -45,15 +48,6 @@ import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
-import me.zodac.folding.cache.AllTeamsSummaryCache;
-import me.zodac.folding.cache.HardwareCache;
-import me.zodac.folding.cache.InitialStatsCache;
-import me.zodac.folding.cache.OffsetTcStatsCache;
-import me.zodac.folding.cache.RetiredTcStatsCache;
-import me.zodac.folding.cache.TcStatsCache;
-import me.zodac.folding.cache.TeamCache;
-import me.zodac.folding.cache.TotalStatsCache;
-import me.zodac.folding.cache.UserCache;
 import me.zodac.folding.db.DbManagerRetriever;
 import me.zodac.folding.rest.api.tc.AllTeamsSummary;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
@@ -72,35 +66,64 @@ import org.springframework.stereotype.Component;
 public class Storage {
 
     private static final Logger LOGGER = LogManager.getLogger();
+    private static final int ALL_TEAMS_SUMMARY_ID = 1; // We only ever have one entry
+
+    private static final int STANDARD_CACHE_SIZE = 25;
+    private static final Duration STANDARD_CACHE_EXPIRATION_TIME = Duration.ofHours(1);
 
     // POJO caches
-    private final HardwareCache hardwareCache = HardwareCache.getInstance();
-    private final TeamCache teamCache = TeamCache.getInstance();
-    private final UserCache userCache = UserCache.getInstance();
+    private final Cache<Integer, Hardware> hardwareCache = Caffeine.newBuilder()
+        .maximumSize(300)
+        .expireAfterWrite(Duration.ofDays(30))
+        .build();
+    private final Cache<Integer, Team> teamCache = Caffeine.newBuilder()
+        .maximumSize(STANDARD_CACHE_SIZE)
+        .build();
+    private final Cache<Integer, User> userCache = Caffeine.newBuilder()
+        .maximumSize(STANDARD_CACHE_SIZE)
+        .build();
 
     // Stats caches
-    private final AllTeamsSummaryCache allTeamsSummaryCache = AllTeamsSummaryCache.getInstance();
-    private final InitialStatsCache initialStatsCache = InitialStatsCache.getInstance();
-    private final OffsetTcStatsCache offsetTcStatsCache = OffsetTcStatsCache.getInstance();
-    private final RetiredTcStatsCache retiredTcStatsCache = RetiredTcStatsCache.getInstance();
-    private final TcStatsCache tcStatsCache = TcStatsCache.getInstance();
-    private final TotalStatsCache totalStatsCache = TotalStatsCache.getInstance();
+    private final Cache<Integer, AllTeamsSummary> allTeamsSummaryCache = Caffeine.newBuilder()
+        .maximumSize(1)
+        .expireAfterWrite(STANDARD_CACHE_EXPIRATION_TIME)
+        .build();
+    private final Cache<Integer, UserStats> initialStatsCache = Caffeine.newBuilder()
+        .maximumSize(STANDARD_CACHE_SIZE)
+        .expireAfterWrite(STANDARD_CACHE_EXPIRATION_TIME)
+        .build();
+    private final Cache<Integer, OffsetTcStats> offsetTcStatsCache = Caffeine.newBuilder()
+        .maximumSize(STANDARD_CACHE_SIZE)
+        .expireAfterWrite(STANDARD_CACHE_EXPIRATION_TIME)
+        .build();
+    private final Cache<Integer, RetiredUserTcStats> retiredTcStatsCache = Caffeine.newBuilder()
+        .maximumSize(STANDARD_CACHE_SIZE)
+        .expireAfterWrite(STANDARD_CACHE_EXPIRATION_TIME)
+        .build();
+    private final Cache<Integer, UserTcStats> tcStatsCache = Caffeine.newBuilder()
+        .maximumSize(STANDARD_CACHE_SIZE)
+        .expireAfterWrite(STANDARD_CACHE_EXPIRATION_TIME)
+        .build();
+    private final Cache<Integer, UserStats> totalStatsCache = Caffeine.newBuilder()
+        .maximumSize(STANDARD_CACHE_SIZE)
+        .expireAfterWrite(STANDARD_CACHE_EXPIRATION_TIME)
+        .build();
 
     /**
      * Creates a {@link Hardware}.
      *
      * <p>
-     * Persists it with the {@link DbManager}, then adds it to the {@link HardwareCache}.
+     * Persists it with the {@link DbManager}, then adds it to the {@code hardwareCache}.
      *
      * @param hardware the {@link Hardware} to create
      * @return the created {@link Hardware}, with ID
      * @see DbManager#createHardware(Hardware)
      */
-    @Cached(HardwareCache.class)
+    @Cached
     public Hardware createHardware(final Hardware hardware) {
         return dbManagerFunction(dbManager -> {
             final Hardware hardwareWithId = dbManager.createHardware(hardware);
-            hardwareCache.add(hardwareWithId.getId(), hardwareWithId);
+            hardwareCache.put(hardwareWithId.getId(), hardwareWithId);
             return hardwareWithId;
         });
     }
@@ -109,14 +132,14 @@ public class Storage {
      * Retrieves all {@link Hardware}s.
      *
      * <p>
-     * First attempts to retrieve from {@link HardwareCache}, then if none exist, attempts to retrieve from the {@link DbManager}.
+     * First attempts to retrieve from {@code hardwareCache}, then if none exist, attempts to retrieve from the {@link DbManager}.
      *
      * @return a {@link Collection} of the retrieved {@link Hardware}
      * @see DbManager#getAllHardware()
      */
-    @Cached(HardwareCache.class)
+    @Cached
     public Collection<Hardware> getAllHardware() {
-        final Collection<Hardware> fromCache = hardwareCache.getAll();
+        final Collection<Hardware> fromCache = hardwareCache.asMap().values();
 
         if (!fromCache.isEmpty()) {
             return fromCache;
@@ -127,7 +150,7 @@ public class Storage {
             final Collection<Hardware> fromDb = dbManager.getAllHardware();
 
             for (final Hardware hardware : fromDb) {
-                hardwareCache.add(hardware.getId(), hardware);
+                hardwareCache.put(hardware.getId(), hardware);
             }
 
             return fromDb;
@@ -138,24 +161,24 @@ public class Storage {
      * Retrieves a {@link Hardware}.
      *
      * <p>
-     * First attempts to retrieve from {@link HardwareCache}, then if none exists, attempts to retrieve from the {@link DbManager}.
+     * First attempts to retrieve from {@code hardwareCache}, then if none exists, attempts to retrieve from the {@link DbManager}.
      *
      * @param hardwareId the ID of the {@link Hardware} to retrieve
      * @return an {@link Optional} of the retrieved {@link Hardware}
      * @see DbManager#getHardware(int)
      */
-    @Cached(HardwareCache.class)
+    @Cached
     public Optional<Hardware> getHardware(final int hardwareId) {
-        final Optional<Hardware> fromCache = hardwareCache.get(hardwareId);
+        final Hardware fromCache = hardwareCache.getIfPresent(hardwareId);
 
-        if (fromCache.isPresent()) {
-            return fromCache;
+        if (fromCache != null) {
+            return Optional.of(fromCache);
         }
 
         LOGGER.trace("Cache miss! Get hardware");
         return dbManagerFunction(dbManager -> {
             final Optional<Hardware> fromDb = dbManager.getHardware(hardwareId);
-            fromDb.ifPresent(hardware -> hardwareCache.add(hardwareId, hardware));
+            fromDb.ifPresent(hardware -> hardwareCache.put(hardwareId, hardware));
             return fromDb;
         });
     }
@@ -164,26 +187,26 @@ public class Storage {
      * Updates a {@link Hardware}. Expects the {@link Hardware} to have a valid ID.
      *
      * <p>
-     * Persists it with the {@link DbManager}, then updates it in the {@link HardwareCache}.
+     * Persists it with the {@link DbManager}, then updates it in the {@code hardwareCache}.
      *
      * <p>
-     * Also updates the {@link UserCache} with an updated version of any {@link User} that references this {@link Hardware}.
+     * Also updates the {@code userCache} with an updated version of any {@link User} that references this {@link Hardware}.
      *
      * @param hardwareToUpdate the {@link Hardware} to update
      * @return the updated {@link Hardware}
      * @see DbManager#updateHardware(Hardware)
      */
-    @Cached({HardwareCache.class, UserCache.class})
+    @Cached
     public Hardware updateHardware(final Hardware hardwareToUpdate) {
         return dbManagerFunction(dbManager -> {
             final Hardware updatedHardware = dbManager.updateHardware(hardwareToUpdate);
-            hardwareCache.add(updatedHardware.getId(), updatedHardware);
+            hardwareCache.put(updatedHardware.getId(), updatedHardware);
 
             getAllUsers()
                 .stream()
                 .filter(user -> user.getHardware().getId() == updatedHardware.getId())
                 .map(user -> User.updateHardware(user, updatedHardware))
-                .forEach(updatedUser -> userCache.add(updatedUser.getId(), updatedUser));
+                .forEach(updatedUser -> userCache.put(updatedUser.getId(), updatedUser));
 
             return updatedHardware;
         });
@@ -193,16 +216,16 @@ public class Storage {
      * Deletes a {@link Hardware}.
      *
      * <p>
-     * Deletes it with the {@link DbManager}, then removes it to the {@link HardwareCache}.
+     * Deletes it with the {@link DbManager}, then removes it from the {@code hardwareCache}.
      *
      * @param hardwareId the ID of the {@link Hardware} to delete
      * @see DbManager#deleteHardware(int)
      */
-    @Cached(HardwareCache.class)
+    @Cached
     public void deleteHardware(final int hardwareId) {
         dbManagerConsumer(dbManager -> {
             dbManager.deleteHardware(hardwareId);
-            hardwareCache.remove(hardwareId);
+            hardwareCache.invalidate(hardwareId);
         });
     }
 
@@ -210,17 +233,17 @@ public class Storage {
      * Creates a {@link Team}.
      *
      * <p>
-     * Persists it with the {@link DbManager}, then adds it to the {@link TeamCache}.
+     * Persists it with the {@link DbManager}, then adds it to the {@code teamCache}.
      *
      * @param team the {@link Team} to create
      * @return the created {@link Team}, with ID
      * @see DbManager#createTeam(Team)
      */
-    @Cached(TeamCache.class)
+    @Cached
     public Team createTeam(final Team team) {
         return dbManagerFunction(dbManager -> {
             final Team teamWithId = dbManager.createTeam(team);
-            teamCache.add(teamWithId.getId(), teamWithId);
+            teamCache.put(teamWithId.getId(), teamWithId);
             return teamWithId;
         });
     }
@@ -229,14 +252,14 @@ public class Storage {
      * Retrieves all {@link Team}s.
      *
      * <p>
-     * First attempts to retrieve from {@link TeamCache}, then if none exist, attempts to retrieve from the {@link DbManager}.
+     * First attempts to retrieve from {@code teamCache}, then if none exist, attempts to retrieve from the {@link DbManager}.
      *
      * @return a {@link Collection} of the retrieved {@link Team}s
      * @see DbManager#getAllTeams()
      */
-    @Cached(TeamCache.class)
+    @Cached
     public Collection<Team> getAllTeams() {
-        final Collection<Team> fromCache = teamCache.getAll();
+        final Collection<Team> fromCache = teamCache.asMap().values();
 
         if (!fromCache.isEmpty()) {
             return fromCache;
@@ -247,7 +270,7 @@ public class Storage {
             final Collection<Team> fromDb = dbManager.getAllTeams();
 
             for (final Team team : fromDb) {
-                teamCache.add(team.getId(), team);
+                teamCache.put(team.getId(), team);
             }
 
             return fromDb;
@@ -258,24 +281,24 @@ public class Storage {
      * Retrieves a {@link Team}.
      *
      * <p>
-     * First attempts to retrieve from {@link TeamCache}, then if none exists, attempts to retrieve from the {@link DbManager}.
+     * First attempts to retrieve from {@code teamCache}, then if none exists, attempts to retrieve from the {@link DbManager}.
      *
      * @param teamId the ID of the {@link Team} to retrieve
      * @return an {@link Optional} of the retrieved {@link Team}
      * @see DbManager#getTeam(int)
      */
-    @Cached(TeamCache.class)
+    @Cached
     public Optional<Team> getTeam(final int teamId) {
-        final Optional<Team> fromCache = teamCache.get(teamId);
+        final Team fromCache = teamCache.getIfPresent(teamId);
 
-        if (fromCache.isPresent()) {
-            return fromCache;
+        if (fromCache != null) {
+            return Optional.of(fromCache);
         }
 
         LOGGER.trace("Cache miss! Get team");
         return dbManagerFunction(dbManager -> {
             final Optional<Team> fromDb = dbManager.getTeam(teamId);
-            fromDb.ifPresent(team -> teamCache.add(teamId, team));
+            fromDb.ifPresent(team -> teamCache.put(teamId, team));
             return fromDb;
         });
     }
@@ -284,26 +307,26 @@ public class Storage {
      * Updates a {@link Team}. Expects the {@link Team} to have a valid ID.
      *
      * <p>
-     * Persists it with the {@link DbManager}, then updates it in the {@link TeamCache}.
+     * Persists it with the {@link DbManager}, then updates it in the {@code teamCache}.
      *
      * <p>
-     * Also updates the {@link UserCache} with an updated version of any {@link User} that references this {@link Team}.
+     * Also updates the {@code userCache} with an updated version of any {@link User} that references this {@link Team}.
      *
      * @param teamToUpdate the {@link Team} to update
      * @return the updated {@link Team}
      * @see DbManager#updateTeam(Team)
      */
-    @Cached({TeamCache.class, UserCache.class})
+    @Cached
     public Team updateTeam(final Team teamToUpdate) {
         return dbManagerFunction(dbManager -> {
             final Team updatedTeam = dbManager.updateTeam(teamToUpdate);
-            teamCache.add(updatedTeam.getId(), updatedTeam);
+            teamCache.put(updatedTeam.getId(), updatedTeam);
 
             getAllUsers()
                 .stream()
                 .filter(user -> user.getTeam().getId() == updatedTeam.getId())
                 .map(user -> User.updateTeam(user, updatedTeam))
-                .forEach(updatedUser -> userCache.add(updatedUser.getId(), updatedUser));
+                .forEach(updatedUser -> userCache.put(updatedUser.getId(), updatedUser));
 
             return updatedTeam;
         });
@@ -313,16 +336,16 @@ public class Storage {
      * Deletes a {@link Team}.
      *
      * <p>
-     * Deletes it with the {@link DbManager}, then removes it to the {@link Team}.
+     * Deletes it with the {@link DbManager}, then removes it from the {@code teamCache}.
      *
      * @param teamId the ID of the {@link Team} to delete
      * @see DbManager#deleteTeam(int)
      */
-    @Cached(TeamCache.class)
+    @Cached
     public void deleteTeam(final int teamId) {
         dbManagerConsumer(dbManager -> {
             dbManager.deleteTeam(teamId);
-            teamCache.remove(teamId);
+            teamCache.invalidate(teamId);
         });
     }
 
@@ -330,17 +353,17 @@ public class Storage {
      * Creates a {@link User}.
      *
      * <p>
-     * Persists it with the {@link DbManager}, then adds it to the {@link UserCache}.
+     * Persists it with the {@link DbManager}, then adds it to the {@code userCache}.
      *
      * @param user the {@link User} to create
      * @return the created {@link User}, with ID
      * @see DbManager#createUser(User)
      */
-    @Cached(UserCache.class)
+    @Cached
     public User createUser(final User user) {
         return dbManagerFunction(dbManager -> {
             final User userWithId = dbManager.createUser(user);
-            userCache.add(userWithId.getId(), userWithId);
+            userCache.put(userWithId.getId(), userWithId);
             return userWithId;
         });
     }
@@ -349,14 +372,14 @@ public class Storage {
      * Retrieves all {@link User}s.
      *
      * <p>
-     * First attempts to retrieve from {@link UserCache}, then if none exist, attempts to retrieve from the {@link DbManager}.
+     * First attempts to retrieve from {@code userCache}, then if none exist, attempts to retrieve from the {@link DbManager}.
      *
      * @return a {@link Collection} of the retrieved {@link User}s
      * @see DbManager#getAllUsers()
      */
-    @Cached(UserCache.class)
+    @Cached
     public Collection<User> getAllUsers() {
-        final Collection<User> fromCache = userCache.getAll();
+        final Collection<User> fromCache = userCache.asMap().values();
 
         if (!fromCache.isEmpty()) {
             return fromCache;
@@ -367,7 +390,7 @@ public class Storage {
             final Collection<User> fromDb = dbManager.getAllUsers();
 
             for (final User user : fromDb) {
-                userCache.add(user.getId(), user);
+                userCache.put(user.getId(), user);
             }
 
             return fromDb;
@@ -378,24 +401,24 @@ public class Storage {
      * Retrieves a {@link User}.
      *
      * <p>
-     * First attempts to retrieve from {@link UserCache}, then if none exists, attempts to retrieve from the {@link DbManager}.
+     * First attempts to retrieve from {@code userCache}, then if none exists, attempts to retrieve from the {@link DbManager}.
      *
      * @param userId the ID of the {@link User} to retrieve
      * @return an {@link Optional} of the retrieved {@link User}
      * @see DbManager#getUser(int)
      */
-    @Cached(UserCache.class)
+    @Cached
     public Optional<User> getUser(final int userId) {
-        final Optional<User> fromCache = userCache.get(userId);
+        final User fromCache = userCache.getIfPresent(userId);
 
-        if (fromCache.isPresent()) {
-            return fromCache;
+        if (fromCache != null) {
+            return Optional.of(fromCache);
         }
 
         LOGGER.trace("Cache miss! Get user");
         return dbManagerFunction(dbManager -> {
             final Optional<User> fromDb = dbManager.getUser(userId);
-            fromDb.ifPresent(user -> userCache.add(userId, user));
+            fromDb.ifPresent(user -> userCache.put(userId, user));
             return fromDb;
         });
     }
@@ -404,17 +427,17 @@ public class Storage {
      * Updates a {@link User}. Expects the {@link User} to have a valid ID.
      *
      * <p>
-     * Persists it with the {@link DbManager}, then updates it in the {@link UserCache}.
+     * Persists it with the {@link DbManager}, then updates it in the {@code userCache}.
      *
      * @param userToUpdate the {@link User} to update
      * @return the updated {@link User}
      * @see DbManager#updateUser(User)
      */
-    @Cached(UserCache.class)
+    @Cached
     public User updateUser(final User userToUpdate) {
         return dbManagerFunction(dbManager -> {
             final User updatedUser = dbManager.updateUser(userToUpdate);
-            userCache.add(updatedUser.getId(), updatedUser);
+            userCache.put(updatedUser.getId(), updatedUser);
             return updatedUser;
         });
     }
@@ -423,31 +446,31 @@ public class Storage {
      * Deletes a {@link User}.
      *
      * <p>
-     * Deletes it with the {@link DbManager}, then removes it to the {@link UserCache}.
+     * Deletes it with the {@link DbManager}, then removes it from the {@code userCache}.
      *
      * <p>
      * Also removes the {@link User}'s values from the stats caches:
      * <ul>
-     *     <li>{@link InitialStatsCache}</li>
-     *     <li>{@link OffsetTcStatsCache}</li>
-     *     <li>{@link TcStatsCache}</li>
-     *     <li>{@link TotalStatsCache}</li>
+     *     <li>{@code initialStatsCache}</li>
+     *     <li>{@code offsetTcStatsCache}</li>
+     *     <li>{@code tcStatsCache}</li>
+     *     <li>{@code totalStatsCache}</li>
      * </ul>
      *
      * @param userId the ID of the {@link User} to delete
      * @see DbManager#deleteUser(int)
      */
-    @Cached({UserCache.class, InitialStatsCache.class, OffsetTcStatsCache.class, TcStatsCache.class, TotalStatsCache.class})
+    @Cached
     public void deleteUser(final int userId) {
         dbManagerConsumer(dbManager -> {
             dbManager.deleteUser(userId);
-            userCache.remove(userId);
+            userCache.invalidate(userId);
 
             // Remove the user entry from all stats caches
-            offsetTcStatsCache.remove(userId);
-            totalStatsCache.remove(userId);
-            initialStatsCache.remove(userId);
-            tcStatsCache.remove(userId);
+            offsetTcStatsCache.invalidate(userId);
+            totalStatsCache.invalidate(userId);
+            initialStatsCache.invalidate(userId);
+            tcStatsCache.invalidate(userId);
         });
     }
 
@@ -484,16 +507,16 @@ public class Storage {
      * Creates a {@link RetiredUserTcStats} for a {@link User} that has been deleted from a {@link Team}.
      *
      * <p>
-     * Persists it with the {@link DbManager}, then adds it to the {@link RetiredTcStatsCache}.
+     * Persists it with the {@link DbManager}, then adds it to the {@code retiredTcStatsCache}.
      *
      * @param retiredUserTcStats the {@link RetiredUserTcStats} for the deleted {@link User}
      * @return the {@link RetiredUserTcStats}
      */
-    @Cached(RetiredTcStatsCache.class)
+    @Cached
     public RetiredUserTcStats createRetiredUserStats(final RetiredUserTcStats retiredUserTcStats) {
         return dbManagerFunction(dbManager -> {
             final RetiredUserTcStats createdRetiredUserTcStats = dbManager.createRetiredUserStats(retiredUserTcStats);
-            retiredTcStatsCache.add(createdRetiredUserTcStats.getRetiredUserId(), createdRetiredUserTcStats);
+            retiredTcStatsCache.put(createdRetiredUserTcStats.getRetiredUserId(), createdRetiredUserTcStats);
             return createdRetiredUserTcStats;
         });
     }
@@ -502,14 +525,14 @@ public class Storage {
      * Retrieves all {@link RetiredUserTcStats}.
      *
      * <p>
-     * First attempts to retrieve from {@link RetiredTcStatsCache}, then if none exist, attempts to retrieve from the {@link DbManager}.
+     * First attempts to retrieve from {@code retiredTcStatsCache}, then if none exist, attempts to retrieve from the {@link DbManager}.
      *
      * @return a {@link Collection} of the retrieved {@link RetiredUserTcStats}
      * @see DbManager#getAllRetiredUserStats()
      */
-    @Cached(RetiredTcStatsCache.class)
+    @Cached
     public Collection<RetiredUserTcStats> getAllRetiredUsers() {
-        final Collection<RetiredUserTcStats> fromCache = retiredTcStatsCache.getAll();
+        final Collection<RetiredUserTcStats> fromCache = retiredTcStatsCache.asMap().values();
 
         if (!fromCache.isEmpty()) {
             return fromCache;
@@ -520,7 +543,7 @@ public class Storage {
             final Collection<RetiredUserTcStats> fromDb = dbManager.getAllRetiredUserStats();
 
             for (final RetiredUserTcStats retiredUserTcStats : fromDb) {
-                retiredTcStatsCache.add(retiredUserTcStats.getRetiredUserId(), retiredUserTcStats);
+                retiredTcStatsCache.put(retiredUserTcStats.getRetiredUserId(), retiredUserTcStats);
             }
 
             return fromDb;
@@ -531,13 +554,13 @@ public class Storage {
      * Deletes all {@link RetiredUserTcStats} for all {@link Team}s.
      *
      * <p>
-     * Also evicts the {@link RetiredTcStatsCache}.
+     * Also evicts the {@code retiredTcStatsCache}.
      */
-    @Cached(RetiredTcStatsCache.class)
+    @Cached
     public void deleteAllRetiredUserTcStats() {
         dbManagerConsumer(dbManager -> {
             dbManager.deleteAllRetiredUserStats();
-            retiredTcStatsCache.removeAll();
+            retiredTcStatsCache.invalidateAll();
         });
     }
 
@@ -600,16 +623,16 @@ public class Storage {
      * Creates a {@link UserStats} for the total overall stats for a {@link User}.
      *
      * <p>
-     * Persists it with the {@link DbManager}, then adds it to the {@link TotalStatsCache}.
+     * Persists it with the {@link DbManager}, then adds it to the {@code totalStatsCache}.
      *
      * @param userStats the {@link UserStats} to be created
      * @return the created {@link UserStats}
      */
-    @Cached(TotalStatsCache.class)
+    @Cached
     public UserStats createTotalStats(final UserStats userStats) {
         return dbManagerFunction(dbManager -> {
             final UserStats fromDb = dbManager.createTotalStats(userStats);
-            totalStatsCache.add(fromDb.getUserId(), fromDb);
+            totalStatsCache.put(fromDb.getUserId(), fromDb);
             return fromDb;
         });
     }
@@ -618,24 +641,24 @@ public class Storage {
      * Retrieves the {@link UserStats} for a {@link User} with the provided ID.
      *
      * <p>
-     * First attempts to retrieve from {@link TotalStatsCache}, then if none exists, attempts to retrieve from the {@link DbManager}.
+     * First attempts to retrieve from {@code totalStatsCache}, then if none exists, attempts to retrieve from the {@link DbManager}.
      *
      * @param userId the ID of the {@link User} to whose {@link UserStats} are to be retrieved
      * @return an {@link Optional} of the retrieved {@link UserStats}
      * @see DbManager#getTotalStats(int)
      */
-    @Cached(TotalStatsCache.class)
+    @Cached
     public Optional<UserStats> getTotalStats(final int userId) {
-        final Optional<UserStats> fromCache = totalStatsCache.get(userId);
+        final UserStats fromCache = totalStatsCache.getIfPresent(userId);
 
-        if (fromCache.isPresent()) {
-            return fromCache;
+        if (fromCache != null) {
+            return Optional.of(fromCache);
         }
 
         LOGGER.trace("Cache miss! Total stats");
         return dbManagerFunction(dbManager -> {
             final Optional<UserStats> fromDb = dbManager.getTotalStats(userId);
-            fromDb.ifPresent(userStats -> totalStatsCache.add(userId, userStats));
+            fromDb.ifPresent(userStats -> totalStatsCache.put(userId, userStats));
             return fromDb;
         });
     }
@@ -644,7 +667,7 @@ public class Storage {
      * Creates an {@link OffsetTcStats}, defining the offset points/units for the provided {@link User}.
      *
      * <p>
-     * Persists it with the {@link DbManager}, then adds it to the {@link OffsetTcStatsCache}.
+     * Persists it with the {@link DbManager}, then adds it to the {@code offsetTcStatsCache}.
      *
      * <p>
      * If an {@link OffsetTcStats} already exists for the {@link User}, the existing values are updated to be the addition of both
@@ -654,11 +677,11 @@ public class Storage {
      * @param offsetTcStats the {@link OffsetTcStats} to be created
      * @return the created/updated {@link OffsetTcStats}, or {@link OffsetTcStats#empty()}
      */
-    @Cached(OffsetTcStatsCache.class)
+    @Cached
     public OffsetTcStats createOrUpdateOffsetStats(final int userId, final OffsetTcStats offsetTcStats) {
         return dbManagerFunction(dbManager -> {
             final OffsetTcStats fromDb = dbManager.createOrUpdateOffsetStats(userId, offsetTcStats);
-            offsetTcStatsCache.add(userId, fromDb);
+            offsetTcStatsCache.put(userId, fromDb);
             return fromDb;
         });
     }
@@ -667,24 +690,24 @@ public class Storage {
      * Retrieves the {@link OffsetTcStats} for a {@link User} with the provided ID.
      *
      * <p>
-     * First attempts to retrieve from {@link OffsetTcStatsCache}, then if none exists, attempts to retrieve from the {@link DbManager}.
+     * First attempts to retrieve from {@code offsetTcStatsCache}, then if none exists, attempts to retrieve from the {@link DbManager}.
      *
      * @param userId the ID of the {@link User} to whose {@link OffsetTcStats} are to be retrieved
      * @return an {@link Optional} of the retrieved {@link OffsetTcStats}
      * @see DbManager#getOffsetStats(int)
      */
-    @Cached(OffsetTcStatsCache.class)
+    @Cached
     public Optional<OffsetTcStats> getOffsetStats(final int userId) {
-        final Optional<OffsetTcStats> fromCache = offsetTcStatsCache.get(userId);
+        final OffsetTcStats fromCache = offsetTcStatsCache.getIfPresent(userId);
 
-        if (fromCache.isPresent()) {
-            return fromCache;
+        if (fromCache != null) {
+            return Optional.of(fromCache);
         }
 
         LOGGER.trace("Cache miss! Offset stats");
         return dbManagerFunction(dbManager -> {
             final Optional<OffsetTcStats> fromDb = dbManager.getOffsetStats(userId);
-            fromDb.ifPresent(offsetTcStats -> offsetTcStatsCache.add(userId, offsetTcStats));
+            fromDb.ifPresent(offsetTcStats -> offsetTcStatsCache.put(userId, offsetTcStats));
             return fromDb;
         });
     }
@@ -693,15 +716,15 @@ public class Storage {
      * Deletes the {@link OffsetTcStats} for a {@link User} with the provided ID.
      *
      * <p>
-     * Also evicts the {@link User} ID from the {@link OffsetTcStatsCache}.
+     * Also evicts the {@link User} ID from the {@code offsetTcStatsCache}.
      *
      * @param userId the ID of the {@link User} to whose {@link OffsetTcStats} are to be deleted
      */
-    @Cached(OffsetTcStatsCache.class)
+    @Cached
     public void deleteOffsetStats(final int userId) {
         dbManagerConsumer(dbManager -> {
             dbManager.deleteOffsetStats(userId);
-            offsetTcStatsCache.remove(userId);
+            offsetTcStatsCache.invalidate(userId);
         });
     }
 
@@ -709,13 +732,13 @@ public class Storage {
      * Deletes the {@link OffsetTcStats} for all {@link User}s in the system.
      *
      * <p>
-     * Also evicts the {@link OffsetTcStatsCache}.
+     * Also evicts the {@code offsetTcStatsCache}.
      */
-    @Cached(OffsetTcStatsCache.class)
+    @Cached
     public void deleteAllOffsetTcStats() {
         dbManagerConsumer(dbManager -> {
             dbManager.deleteAllOffsetStats();
-            offsetTcStatsCache.removeAll();
+            offsetTcStatsCache.invalidateAll();
         });
     }
 
@@ -723,16 +746,16 @@ public class Storage {
      * Creates a {@link UserTcStats} for a {@link User}'s <code>Team Competition</code> stats for a specific hour.
      *
      * <p>
-     * Persists it with the {@link DbManager}, then adds it to the {@link TcStatsCache}.
+     * Persists it with the {@link DbManager}, then adds it to the {@code tcStatsCache}.
      *
      * @param userTcStats the {@link UserTcStats} to be created
      * @return the created {@link UserTcStats}
      */
-    @Cached(TcStatsCache.class)
+    @Cached
     public UserTcStats createHourlyTcStats(final UserTcStats userTcStats) {
         return dbManagerFunction(dbManager -> {
             final UserTcStats fromDb = dbManager.createHourlyTcStats(userTcStats);
-            tcStatsCache.add(userTcStats.getUserId(), fromDb);
+            tcStatsCache.put(userTcStats.getUserId(), fromDb);
             return fromDb;
         });
     }
@@ -741,23 +764,23 @@ public class Storage {
      * Retrieves the latest {@link UserTcStats} for the provided {@link User}.
      *
      * <p>
-     * First attempts to retrieve from {@link TcStatsCache}, then if none exists, attempts to retrieve from the {@link DbManager}.
+     * First attempts to retrieve from {@code tcStatsCache}, then if none exists, attempts to retrieve from the {@link DbManager}.
      *
      * @param userId the ID of the {@link User} whose {@link UserTcStats} are to be retrieved
      * @return an {@link Optional} of the retrieved {@link UserTcStats}
      */
-    @Cached(TcStatsCache.class)
+    @Cached
     public Optional<UserTcStats> getHourlyTcStats(final int userId) {
-        final Optional<UserTcStats> fromCache = tcStatsCache.get(userId);
+        final UserTcStats fromCache = tcStatsCache.getIfPresent(userId);
 
-        if (fromCache.isPresent()) {
-            return fromCache;
+        if (fromCache != null) {
+            return Optional.of(fromCache);
         }
 
         LOGGER.trace("Cache miss! Hourly TC stats");
         return dbManagerFunction(dbManager -> {
             final Optional<UserTcStats> fromDb = dbManager.getHourlyTcStats(userId);
-            fromDb.ifPresent(userTcStats -> tcStatsCache.add(userId, userTcStats));
+            fromDb.ifPresent(userTcStats -> tcStatsCache.put(userId, userTcStats));
             return fromDb;
         });
     }
@@ -766,16 +789,16 @@ public class Storage {
      * Creates a {@link UserStats} for the initial overall stats for the provided {@link User} at the start of the monitoring period.
      *
      * <p>
-     * Persists it with the {@link DbManager}, then adds it to the {@link InitialStatsCache}.
+     * Persists it with the {@link DbManager}, then adds it to the {@code initialStatsCache}.
      *
      * @param userStats the {@link UserStats} to be created
      * @return the created {@link UserStats}
      */
-    @Cached(InitialStatsCache.class)
+    @Cached
     public UserStats createInitialStats(final UserStats userStats) {
         return dbManagerFunction(dbManager -> {
             final UserStats fromDb = dbManager.createInitialStats(userStats);
-            initialStatsCache.add(fromDb.getUserId(), fromDb);
+            initialStatsCache.put(fromDb.getUserId(), fromDb);
             return fromDb;
         });
     }
@@ -784,36 +807,36 @@ public class Storage {
      * Retrieves the initial {@link UserStats} for the provided {@link User} ID.
      *
      * <p>
-     * First attempts to retrieve from {@link InitialStatsCache}, then if none exists, attempts to retrieve from the {@link DbManager}.
+     * First attempts to retrieve from {@code initialStatsCache}, then if none exists, attempts to retrieve from the {@link DbManager}.
      *
      * @param userId the ID of the {@link User} whose {@link UserStats} are to be retrieved
      * @return an {@link Optional} of the retrieved {@link UserStats}
      */
-    @Cached(InitialStatsCache.class)
+    @Cached
     public Optional<UserStats> getInitialStats(final int userId) {
-        final Optional<UserStats> fromCache = initialStatsCache.get(userId);
+        final UserStats fromCache = initialStatsCache.getIfPresent(userId);
 
-        if (fromCache.isPresent()) {
-            return fromCache;
+        if (fromCache != null) {
+            return Optional.of(fromCache);
         }
 
         LOGGER.trace("Cache miss! Initial stats");
         return dbManagerFunction(dbManager -> {
             final Optional<UserStats> fromDb = dbManager.getInitialStats(userId);
-            fromDb.ifPresent(userStats -> initialStatsCache.add(userId, userStats));
+            fromDb.ifPresent(userStats -> initialStatsCache.put(userId, userStats));
             return fromDb;
         });
     }
 
     /**
-     * Creates a {@link AllTeamsSummary}.
+     * Creates a {@link AllTeamsSummary}, then adds it to {@code allTeamsSummaryCache}.
      *
      * @param allTeamsSummary the {@link AllTeamsSummary} to be created
      * @return the created {@link AllTeamsSummary}
      */
-    @Cached(AllTeamsSummaryCache.class)
+    @Cached
     public AllTeamsSummary createAllTeamsSummary(final AllTeamsSummary allTeamsSummary) {
-        this.allTeamsSummaryCache.add(AllTeamsSummaryCache.ALL_TEAMS_SUMMARY_ID, allTeamsSummary);
+        this.allTeamsSummaryCache.put(ALL_TEAMS_SUMMARY_ID, allTeamsSummary);
         return allTeamsSummary;
     }
 
@@ -822,25 +845,25 @@ public class Storage {
      *
      * @return an {@link Optional} of the latest {@link AllTeamsSummary}
      */
-    @Cached(AllTeamsSummaryCache.class)
+    @Cached
     public Optional<AllTeamsSummary> getAllTeamsSummary() {
-        return allTeamsSummaryCache.get(AllTeamsSummaryCache.ALL_TEAMS_SUMMARY_ID);
+        return Optional.ofNullable(allTeamsSummaryCache.getIfPresent(ALL_TEAMS_SUMMARY_ID));
     }
 
     /**
-     * Evicts all {@link User}s from the {@link TotalStatsCache}.
+     * Evicts all {@link User}s from the {@code totalStatsCache}.
      */
-    @Cached(TotalStatsCache.class)
+    @Cached
     public void evictTcStatsCache() {
-        tcStatsCache.removeAll();
+        tcStatsCache.invalidateAll();
     }
 
     /**
-     * Evicts all {@link User}s from the {@link InitialStatsCache}.
+     * Evicts all {@link User}s from the {@code initialStatsCache}.
      */
-    @Cached(InitialStatsCache.class)
+    @Cached
     public void evictInitialStatsCache() {
-        initialStatsCache.removeAll();
+        initialStatsCache.invalidateAll();
     }
 
     /**
@@ -920,32 +943,22 @@ public class Storage {
     /**
      * Prints the contents of caches to the system log.
      */
-    @Cached({
-        AllTeamsSummaryCache.class,
-        HardwareCache.class,
-        InitialStatsCache.class,
-        OffsetTcStatsCache.class,
-        RetiredTcStatsCache.class,
-        TcStatsCache.class,
-        TeamCache.class,
-        TotalStatsCache.class,
-        UserCache.class
-    })
+    @Cached
     public void printCacheContents() {
         // POJOs
-        LOGGER.info("HardwareCache: {}", hardwareCache.getCacheContents());
-        LOGGER.info("TeamCache: {}", teamCache.getCacheContents());
-        LOGGER.info("UserCache: {}", userCache.getCacheContents());
+        LOGGER.info("HardwareCache: {}", hardwareCache.asMap());
+        LOGGER.info("TeamCache: {}", teamCache.asMap());
+        LOGGER.info("UserCache: {}", userCache.asMap());
 
         // Stats
-        LOGGER.info("InitialStatsCache: {}", initialStatsCache.getCacheContents());
-        LOGGER.info("OffsetStatsCache: {}", offsetTcStatsCache.getCacheContents());
-        LOGGER.info("RetiredTcStatsCache: {}", retiredTcStatsCache.getCacheContents());
-        LOGGER.info("TcStatsCache: {}", tcStatsCache.getCacheContents());
-        LOGGER.info("TotalStatsCache: {}", totalStatsCache.getCacheContents());
+        LOGGER.info("InitialStatsCache: {}", initialStatsCache.asMap());
+        LOGGER.info("OffsetStatsCache: {}", offsetTcStatsCache.asMap());
+        LOGGER.info("RetiredTcStatsCache: {}", retiredTcStatsCache.asMap());
+        LOGGER.info("TcStatsCache: {}", tcStatsCache.asMap());
+        LOGGER.info("TotalStatsCache: {}", totalStatsCache.asMap());
 
         // TC overall
-        LOGGER.info("AllTeamsSummaryCache: {}", allTeamsSummaryCache.getCacheContents());
+        LOGGER.info("AllTeamsSummaryCache: {}", allTeamsSummaryCache.asMap());
     }
 
     private <T> T dbManagerFunction(final Function<DbManager, T> function) {
