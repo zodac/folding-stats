@@ -111,9 +111,9 @@ CREATE TABLE retired_user_stats (
     final_multiplied_points BIGINT NOT NULL,
     final_units INT NOT NULL,
     CONSTRAINT fk_team_id
-            FOREIGN KEY(team_id)
-            REFERENCES teams(team_id)
-            ON DELETE CASCADE
+          FOREIGN KEY(team_id)
+          REFERENCES teams(team_id)
+          ON DELETE CASCADE
 );
 
 CREATE INDEX index_retired_user_stats
@@ -138,6 +138,7 @@ CREATE TABLE user_tc_stats_hourly (
 
 CREATE INDEX index_user_tc_stats_hourly
     ON user_tc_stats_hourly(user_id, utc_timestamp);
+
 
 CREATE TABLE monthly_results (
     utc_timestamp TIMESTAMP PRIMARY KEY,

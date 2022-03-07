@@ -58,7 +58,7 @@ public class LarsGpu {
      * @param manufacturer the manufacturer
      * @param modelInfo    the model information
      * @param rank         the {@link LarsGpu}'s PPD rank compared to all other {@link LarsGpu}s
-     * @param averagePpd   the average PPD for all operating systems
+     * @param averagePpd   the average PPD for the {@link LarsGpu} across all operating systems
      * @return the created {@link LarsGpu}
      */
     public static LarsGpu create(final String displayName, final String manufacturer, final String modelInfo, final int rank, final long averagePpd) {

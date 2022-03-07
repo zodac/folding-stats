@@ -113,10 +113,7 @@ CREATE TABLE retired_user_stats (
     CONSTRAINT fk_team_id
           FOREIGN KEY(team_id)
           REFERENCES teams(team_id)
-          ON DELETE CASCADE,
-    CONSTRAINT fk_user_id
-        FOREIGN KEY(user_id)
-        REFERENCES users(user_id)
+          ON DELETE CASCADE
 );
 
 CREATE INDEX index_retired_user_stats

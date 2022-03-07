@@ -37,11 +37,11 @@ public class UnexpectedExceptionFoldingStatsRetriever implements FoldingStatsRet
 
     @Override
     public Stats getStats(final FoldingStatsDetails foldingStatsDetails) {
-        throw new RuntimeException("Error");
+        throw new IllegalStateException("Error");
     }
 
     @Override
     public UserStats getTotalStats(final User user) {
-        throw new RuntimeException("Error");
+        throw new IllegalStateException("Error");
     }
 }

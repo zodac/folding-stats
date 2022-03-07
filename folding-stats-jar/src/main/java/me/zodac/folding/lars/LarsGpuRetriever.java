@@ -62,8 +62,8 @@ public final class LarsGpuRetriever {
         LOGGER.debug("Retrieving LARS GPU data from: '{}'", gpuDatabaseUrl);
 
         try {
-            final Document doc = Jsoup.connect(gpuDatabaseUrl).get();
-            final Element databaseTable = doc.getElementById("primary-datatable"); // Should be non-null
+            final Document doc = Jsoup.connect(gpuDatabaseUrl).get(); // TODO: Make this configurable to load from file, then add unit tests
+            final Element databaseTable = doc.getElementById("primary-datatable");
 
             if (databaseTable == null) {
                 LOGGER.warn("Unable to find the 'primary-database' table");
