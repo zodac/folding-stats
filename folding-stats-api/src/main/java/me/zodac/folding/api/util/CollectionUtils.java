@@ -39,7 +39,7 @@ public final class CollectionUtils {
     }
 
     /**
-     * Checks that there are no matches between the two {@link Collection}s.
+     * Checks if there are no matches between the two {@link Collection}s.
      *
      * @param first  the first {@link Collection}
      * @param second the second {@link Collection}
@@ -52,7 +52,7 @@ public final class CollectionUtils {
     }
 
     /**
-     * Returns and elements that exist only in the first {@link Collection}, and do not also exist in the second {@link Collection}.
+     * Returns any elements that exist only in the first {@link Collection}, and do not also exist in the second {@link Collection}.
      *
      * @param first  the first {@link Collection}
      * @param second the second {@link Collection}

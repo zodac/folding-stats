@@ -40,6 +40,7 @@ import me.zodac.folding.api.tc.change.UserChange;
 import me.zodac.folding.api.tc.change.UserChangeState;
 import me.zodac.folding.api.tc.validation.retriever.ExternalConnectionFoldingStatsRetriever;
 import me.zodac.folding.api.tc.validation.retriever.NoUnitsFoldingStatsRetriever;
+import me.zodac.folding.api.tc.validation.retriever.UnexpectedExceptionFoldingStatsRetriever;
 import me.zodac.folding.api.tc.validation.retriever.ValidFoldingStatsRetriever;
 import me.zodac.folding.rest.api.tc.request.UserChangeRequest;
 import org.junit.jupiter.api.Test;
@@ -462,6 +463,33 @@ class UserChangeValidatorTest {
     }
 
     @Test
+    void whenValidating_givenNewUserHasNoWorkUnitsCompleted_thenFailureResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final User user = generateUser(hardware);
+
+        final UserChangeRequest userChange = UserChangeRequest.builder()
+            .existingPasskey(user.getPasskey())
+            .foldingUserName(user.getFoldingUserName())
+            .passkey("DummyPasskey12345678901234567891")
+            .hardwareId(hardware.getId())
+            .userId(user.getId())
+            .liveStatsLink("https://www.google.ie")
+            .build();
+
+        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new NoUnitsFoldingStatsRetriever());
+
+        final ValidationException e =
+            catchThrowableOfType(() -> userChangeValidator.validate(userChange, emptyList(), List.of(hardware), List.of(user)),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
+            .containsOnly(
+                String.format(
+                    "User '%s' has 0 Work Units with passkey '%s', there must be at least one completed Work Unit before adding the user",
+                    userChange.getFoldingUserName(), userChange.getPasskey())
+            );
+    }
+
+    @Test
     void whenValidating_givenUserWorkUnitsCannotBeAccessed_thenFailureResponseIsReturned() {
         final Hardware hardware = generateHardware();
         final User user = generateUser(hardware);
@@ -488,7 +516,7 @@ class UserChangeValidatorTest {
     }
 
     @Test
-    void whenValidating_givenNewUserHasNoWorkUnitsCompleted_thenFailureResponseIsReturned() {
+    void whenValidating_givenUnexpectedErrorWhenAccessingUserWorkUnits_thenFailureResponseIsReturned() {
         final Hardware hardware = generateHardware();
         final User user = generateUser(hardware);
 
@@ -501,17 +529,13 @@ class UserChangeValidatorTest {
             .liveStatsLink("https://www.google.ie")
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new NoUnitsFoldingStatsRetriever());
+        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new UnexpectedExceptionFoldingStatsRetriever());
 
         final ValidationException e =
             catchThrowableOfType(() -> userChangeValidator.validate(userChange, emptyList(), List.of(hardware), List.of(user)),
                 ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
-            .containsOnly(
-                String.format(
-                    "User '%s' has 0 Work Units with passkey '%s', there must be at least one completed Work Unit before adding the user",
-                    userChange.getFoldingUserName(), userChange.getPasskey())
-            );
+            .containsOnly(String.format("Unable to check stats for Folding@Home user '%s': Error", user.getFoldingUserName()));
     }
 
     private static Hardware generateHardware() {

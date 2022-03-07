@@ -62,7 +62,7 @@ class StringUtilsTest {
     }
 
     @Test
-    void whenIsBlankOrValidUrl_givenInputIsValidFileUrl_thenFalseIsReturned() {
+    void whenIsBlankOrValidUrl_givenInputIsInvalidUrlScheme_thenFalseIsReturned() {
         final boolean result = StringUtils.isBlankOrValidUrl("file://www.google.com");
         assertThat(result)
             .isFalse();
@@ -70,7 +70,7 @@ class StringUtilsTest {
 
     @Test
     void whenIsBlankOrValidUrl_givenInputIsInvalidUrl_thenFalseIsReturned() {
-        final boolean result = StringUtils.isBlankOrValidUrl("invalidUrl");
+        final boolean result = StringUtils.isBlankOrValidUrl("http://www.google.com/q?s=^query");
         assertThat(result)
             .isFalse();
     }
@@ -129,6 +129,34 @@ class StringUtilsTest {
         final boolean result = StringUtils.isNotBlank("validString");
         assertThat(result)
             .isTrue();
+    }
+
+    @Test
+    void whenIsNeitherBlank_givenFirstInputIsNotBlank_andSecondInputIsNotBlank_thenTrueIsReturned() {
+        final boolean result = StringUtils.isNeitherBlank("value", "value");
+        assertThat(result)
+            .isTrue();
+    }
+
+    @Test
+    void whenIsNeitherBlank_givenFirstInputIsBlank_andSecondInputIsBlank_thenFalseIsReturned() {
+        final boolean result = StringUtils.isNeitherBlank(null, null);
+        assertThat(result)
+            .isFalse();
+    }
+
+    @Test
+    void whenIsNeitherBlank_givenFirstInputIsNotBlank_andSecondInputIsBlank_thenFalseIsReturned() {
+        final boolean result = StringUtils.isNeitherBlank("value", null);
+        assertThat(result)
+            .isFalse();
+    }
+
+    @Test
+    void whenIsNeitherBlank_givenFirstInputIsBlank_andSecondInputIsNotBlank_thenFalseIsReturned() {
+        final boolean result = StringUtils.isNeitherBlank(null, "value");
+        assertThat(result)
+            .isFalse();
     }
 
     @Test

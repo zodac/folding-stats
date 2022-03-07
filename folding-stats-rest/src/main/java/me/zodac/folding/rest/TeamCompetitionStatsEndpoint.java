@@ -43,7 +43,6 @@ import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
-import me.zodac.folding.api.util.ProcessingType;
 import me.zodac.folding.bean.FoldingRepository;
 import me.zodac.folding.bean.StatsRepository;
 import me.zodac.folding.bean.tc.LeaderboardStatsGenerator;
@@ -265,5 +264,21 @@ public class TeamCompetitionStatsEndpoint {
         userStatsResetter.resetTeamCompetitionStats();
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
         return ok();
+    }
+
+    /**
+     * Defines the possible types of executions for long-running tasks.
+     */
+    private enum ProcessingType {
+
+        /**
+         * Marks a specific function, method or task to be run in a background process, if possible.
+         */
+        ASYNCHRONOUS,
+
+        /**
+         * Marks a specific function, method or task to be run in the main process and block until completed, if possible.
+         */
+        SYNCHRONOUS
     }
 }

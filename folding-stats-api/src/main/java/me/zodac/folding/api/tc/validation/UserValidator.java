@@ -28,7 +28,6 @@ import static me.zodac.folding.api.util.StringUtils.isBlank;
 import static me.zodac.folding.api.util.StringUtils.isBlankOrValidUrl;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -367,10 +366,6 @@ public final class UserValidator {
     }
 
     private static Collection<User> getUsersOnTeam(final int teamId, final Collection<User> allUsers) {
-        if (teamId == Team.EMPTY_TEAM_ID) {
-            return Collections.emptyList();
-        }
-
         return allUsers
             .stream()
             .filter(user -> user.getTeam().getId() == teamId)

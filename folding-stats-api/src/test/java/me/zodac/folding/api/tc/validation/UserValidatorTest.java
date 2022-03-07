@@ -40,6 +40,7 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.validation.retriever.ExternalConnectionFoldingStatsRetriever;
 import me.zodac.folding.api.tc.validation.retriever.NoUnitsFoldingStatsRetriever;
+import me.zodac.folding.api.tc.validation.retriever.UnexpectedExceptionFoldingStatsRetriever;
 import me.zodac.folding.api.tc.validation.retriever.ValidFoldingStatsRetriever;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 import org.junit.jupiter.api.Test;
@@ -885,6 +886,31 @@ class UserValidatorTest {
             .containsOnly(
                 String.format("Unable to connect to 'https://www.google.com' to check stats for user '%s': Error connecting",
                     user.getDisplayName()));
+    }
+
+    @Test
+    void whenValidatingCreate_givenUnexpectedErrorWhenAccessingUserWorkUnits_thenFailureResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
+
+        final UserRequest user = UserRequest.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .profileLink("https://www.google.com")
+            .liveStatsLink("https://www.google.com")
+            .userIsCaptain(true)
+            .hardwareId(hardware.getId())
+            .teamId(team.getId())
+            .build();
+
+        final UserValidator userValidator = UserValidator.create(new UnexpectedExceptionFoldingStatsRetriever());
+
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), List.of(hardware), List.of(team)), ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
+            .containsOnly(String.format("Unable to check stats for user '%s': Error", user.getDisplayName()));
     }
 
     @Test
@@ -2262,6 +2288,44 @@ class UserValidatorTest {
             .containsOnly(String.format("Unable to connect to 'https://www.google.com' to check stats for user '%s': Error connecting",
                 user.getDisplayName())
             );
+    }
+
+    @Test
+    void whenValidatingUpdate_givenUnexpectedErrorWhenAccessingUserWorkUnits_thenFailureResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
+
+        final UserRequest user = UserRequest.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .profileLink("https://www.google.com")
+            .liveStatsLink("https://www.google.com")
+            .userIsCaptain(true)
+            .hardwareId(hardware.getId())
+            .teamId(team.getId())
+            .build();
+
+        final User existingUser = User.builder()
+            .foldingUserName("oldUserName")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU)
+            .profileLink("https://www.google.com")
+            .liveStatsLink("https://www.google.com")
+            .userIsCaptain(true)
+            .hardware(hardware)
+            .team(team)
+            .build();
+
+        final UserValidator userValidator = UserValidator.create(new UnexpectedExceptionFoldingStatsRetriever());
+
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
+            .containsOnly(String.format("Unable to check stats for user '%s': Error", user.getDisplayName()));
     }
 
     @Test

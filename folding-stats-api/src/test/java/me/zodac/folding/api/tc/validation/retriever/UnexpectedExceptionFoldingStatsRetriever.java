@@ -22,20 +22,26 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.api.util;
+package me.zodac.folding.api.tc.validation.retriever;
+
+import me.zodac.folding.api.stats.FoldingStatsDetails;
+import me.zodac.folding.api.stats.FoldingStatsRetriever;
+import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.tc.stats.Stats;
+import me.zodac.folding.api.tc.stats.UserStats;
 
 /**
- * Defines the possible types of executions for long-running tasks.
+ * A test implementation of {@link FoldingStatsRetriever} that simulates an unexpected {@link Exception} being thrown.
  */
-public enum ProcessingType {
+public class UnexpectedExceptionFoldingStatsRetriever implements FoldingStatsRetriever {
 
-    /**
-     * Marks a specific function, method or task to be run in a background process, if possible.
-     */
-    ASYNCHRONOUS,
+    @Override
+    public Stats getStats(final FoldingStatsDetails foldingStatsDetails) {
+        throw new RuntimeException("Error");
+    }
 
-    /**
-     * Marks a specific function, method or task to be run in the main process and block until completed, if possible.
-     */
-    SYNCHRONOUS
+    @Override
+    public UserStats getTotalStats(final User user) {
+        throw new RuntimeException("Error");
+    }
 }
