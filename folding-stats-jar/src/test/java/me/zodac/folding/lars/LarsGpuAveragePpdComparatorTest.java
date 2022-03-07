@@ -34,14 +34,13 @@ import org.junit.jupiter.api.Test;
  */
 class LarsGpuAveragePpdComparatorTest {
 
-    private static final LarsGpuAveragePpdComparator COMPARATOR = LarsGpuAveragePpdComparator.create();
-
     @Test
     void whenCompareLarsGpus_givenFirstGpuHasHigherAveragePpd_thenMinusOneIsReturned() {
         final LarsGpu first = LarsGpu.create("larsGpu", "nVidia", "GTX 480", 1, 200_000L);
         final LarsGpu second = LarsGpu.create("larsGpu", "nVidia", "GTX 480", 1, 100_000L);
 
-        assertThat(COMPARATOR.compare(first, second))
+        final LarsGpuAveragePpdComparator comparator = LarsGpuAveragePpdComparator.create();
+        assertThat(comparator.compare(first, second))
             .isEqualTo(-1);
     }
 
@@ -50,7 +49,8 @@ class LarsGpuAveragePpdComparatorTest {
         final LarsGpu first = LarsGpu.create("larsGpu", "nVidia", "GTX 480", 1, 100_000L);
         final LarsGpu second = LarsGpu.create("larsGpu", "nVidia", "GTX 480", 1, 200_000L);
 
-        assertThat(COMPARATOR.compare(first, second))
+        final LarsGpuAveragePpdComparator comparator = LarsGpuAveragePpdComparator.create();
+        assertThat(comparator.compare(first, second))
             .isOne();
     }
 
@@ -59,7 +59,8 @@ class LarsGpuAveragePpdComparatorTest {
         final LarsGpu first = LarsGpu.create("larsGpu", "nVidia", "GTX 480", 1, 100_000L);
         final LarsGpu second = LarsGpu.create("larsGpu", "nVidia", "GTX 480", 1, 100_000L);
 
-        assertThat(COMPARATOR.compare(first, second))
+        final LarsGpuAveragePpdComparator comparator = LarsGpuAveragePpdComparator.create();
+        assertThat(comparator.compare(first, second))
             .isZero();
     }
 }
