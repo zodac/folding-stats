@@ -24,6 +24,11 @@
 
 package me.zodac.folding.rest.api.tc.request;
 
+import static me.zodac.folding.api.util.StringUtils.isBlank;
+
+import java.util.Collection;
+import java.util.Objects;
+import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,6 +38,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import me.zodac.folding.api.RequestPojo;
+import me.zodac.folding.api.tc.HardwareMake;
+import me.zodac.folding.api.tc.HardwareType;
 
 /**
  * REST request to create/update a {@link me.zodac.folding.api.tc.Hardware}.
@@ -46,10 +53,64 @@ import me.zodac.folding.api.RequestPojo;
 @ToString(doNotUseGetters = true)
 public class HardwareRequest implements RequestPojo {
 
+    // The hardware with the highest PPD will have a multiplier of <b>1.00</b>, and all others will be based on that
+    private static final double MINIMUM_MULTIPLIER_VALUE = 1.00D;
+    private static final long MINIMUM_AVERAGE_PPD_VALUE = 1L;
+
     private String hardwareName;
     private String displayName;
     private String hardwareMake;
     private String hardwareType;
     private double multiplier;
     private long averagePpd;
+
+    @Override
+    public Collection<String> validate() {
+        return Stream.of(
+                validateHardwareName(),
+                validateDisplayName(),
+                validateHardwareMake(),
+                validateHardwareType(),
+                validateMultiplier(),
+                validateAveragePpd()
+            )
+            .filter(Objects::nonNull)
+            .toList();
+    }
+
+    private String validateHardwareName() {
+        return isBlank(hardwareName)
+            ? "Field 'hardwareName' must not be empty"
+            : null;
+    }
+
+    private String validateDisplayName() {
+        return isBlank(displayName)
+            ? "Field 'displayName' must not be empty"
+            : null;
+    }
+
+    private String validateHardwareMake() {
+        return HardwareMake.get(hardwareMake) == HardwareMake.INVALID
+            ? String.format("Field 'hardwareMake' must be one of: %s", HardwareMake.getAllValues())
+            : null;
+    }
+
+    private String validateHardwareType() {
+        return HardwareType.get(hardwareType) == HardwareType.INVALID
+            ? String.format("Field 'hardwareType' must be one of: %s", HardwareType.getAllValues())
+            : null;
+    }
+
+    private String validateMultiplier() {
+        return multiplier >= MINIMUM_MULTIPLIER_VALUE
+            ? null
+            : String.format("Field 'multiplier' must be %.2f or higher", MINIMUM_MULTIPLIER_VALUE);
+    }
+
+    private String validateAveragePpd() {
+        return averagePpd >= MINIMUM_AVERAGE_PPD_VALUE
+            ? null
+            : String.format("Field 'averagePpd' must be %d or higher", MINIMUM_AVERAGE_PPD_VALUE);
+    }
 }

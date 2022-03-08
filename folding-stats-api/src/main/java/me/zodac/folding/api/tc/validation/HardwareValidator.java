@@ -28,10 +28,7 @@ import static me.zodac.folding.api.util.StringUtils.isBlank;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Stream;
 import me.zodac.folding.api.exception.ConflictException;
 import me.zodac.folding.api.exception.UsedByException;
 import me.zodac.folding.api.exception.ValidationException;
@@ -46,10 +43,6 @@ import me.zodac.folding.rest.api.tc.request.HardwareRequest;
  */
 // TODO: Split class into API/REST validators - API into the RequestPojo, REST by moving this class to correct module
 public final class HardwareValidator {
-
-    // The hardware with the highest PPD will have a multiplier of <b>1.00</b>, and all others will be based on that
-    private static final double MINIMUM_MULTIPLIER_VALUE = 1.00D;
-    private static final long MINIMUM_AVERAGE_PPD_VALUE = 1L;
 
     private HardwareValidator() {
 
@@ -83,17 +76,7 @@ public final class HardwareValidator {
             throw new ConflictException(hardwareRequest, hardwareWithMatchingName.get(), "hardwareName");
         }
 
-        final List<String> failureMessages = Stream.of(
-                hardwareName(hardwareRequest),
-                displayName(hardwareRequest),
-                hardwareMake(hardwareRequest),
-                hardwareType(hardwareRequest),
-                multiplier(hardwareRequest),
-                averagePpd(hardwareRequest)
-            )
-            .filter(Objects::nonNull)
-            .toList();
-
+        final Collection<String> failureMessages = hardwareRequest.validate();
         if (!failureMessages.isEmpty()) {
             throw new ValidationException(hardwareRequest, failureMessages);
         }
@@ -133,17 +116,7 @@ public final class HardwareValidator {
             throw new ConflictException(hardwareRequest, hardwareWithMatchingName.get(), "hardwareName");
         }
 
-        final List<String> failureMessages = Stream.of(
-                hardwareName(hardwareRequest),
-                displayName(hardwareRequest),
-                hardwareMake(hardwareRequest),
-                hardwareType(hardwareRequest),
-                multiplier(hardwareRequest),
-                averagePpd(hardwareRequest)
-            )
-            .filter(Objects::nonNull)
-            .toList();
-
+        final Collection<String> failureMessages = hardwareRequest.validate();
         if (!failureMessages.isEmpty()) {
             throw new ValidationException(hardwareRequest, failureMessages);
         }
@@ -193,41 +166,5 @@ public final class HardwareValidator {
             .filter(user -> user.getHardware().getId() == hardwareId)
             .map(User::hidePasskey)
             .toList();
-    }
-
-    private static String hardwareName(final HardwareRequest hardwareRequest) {
-        return isBlank(hardwareRequest.getHardwareName())
-            ? "Field 'hardwareName' must not be empty"
-            : null;
-    }
-
-    private static String displayName(final HardwareRequest hardwareRequest) {
-        return isBlank(hardwareRequest.getDisplayName())
-            ? "Field 'displayName' must not be empty"
-            : null;
-    }
-
-    private static String hardwareMake(final HardwareRequest hardwareRequest) {
-        return HardwareMake.get(hardwareRequest.getHardwareMake()) == HardwareMake.INVALID
-            ? String.format("Field 'hardwareMake' must be one of: %s", HardwareMake.getAllValues())
-            : null;
-    }
-
-    private static String hardwareType(final HardwareRequest hardwareRequest) {
-        return HardwareType.get(hardwareRequest.getHardwareType()) == HardwareType.INVALID
-            ? String.format("Field 'hardwareType' must be one of: %s", HardwareType.getAllValues())
-            : null;
-    }
-
-    private static String multiplier(final HardwareRequest hardwareRequest) {
-        return hardwareRequest.getMultiplier() >= MINIMUM_MULTIPLIER_VALUE
-            ? null
-            : String.format("Field 'multiplier' must be %.2f or higher", MINIMUM_MULTIPLIER_VALUE);
-    }
-
-    private static String averagePpd(final HardwareRequest hardwareRequest) {
-        return hardwareRequest.getAveragePpd() >= MINIMUM_AVERAGE_PPD_VALUE
-            ? null
-            : String.format("Field 'averagePpd' must be %d or higher", MINIMUM_AVERAGE_PPD_VALUE);
     }
 }

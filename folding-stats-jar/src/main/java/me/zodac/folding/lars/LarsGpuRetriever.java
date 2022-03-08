@@ -24,7 +24,6 @@
 
 package me.zodac.folding.lars;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -57,46 +56,56 @@ public final class LarsGpuRetriever {
      *
      * @param gpuDatabaseUrl the URL to the LARS GPU database
      * @return a {@link Collection} of parsed {@link LarsGpu}s sorted by {@link LarsGpu#getAveragePpd()}
+     * @see #retrieveGpus(Document)
      */
     public static List<LarsGpu> retrieveGpus(final String gpuDatabaseUrl) {
         LOGGER.debug("Retrieving LARS GPU data from: '{}'", gpuDatabaseUrl);
 
         try {
-            final Document doc = Jsoup.connect(gpuDatabaseUrl).get(); // TODO: Make this configurable to load from file, then add unit tests
-            final Element databaseTable = doc.getElementById("primary-datatable");
-
-            if (databaseTable == null) {
-                LOGGER.warn("Unable to find the 'primary-database' table");
-                return Collections.emptyList();
-            }
-
-            final Element databaseBody = databaseTable.getElementsByTag("tbody").first();
-
-            if (databaseBody == null) {
-                LOGGER.warn("Unable to find a 'tbody' entry in the database table");
-                return Collections.emptyList();
-            }
-
-            final Elements databaseEntries = databaseBody.getElementsByTag("tr");
-            if (databaseEntries.isEmpty()) {
-                LOGGER.warn("No 'tr' entries found in the database table");
-                return Collections.emptyList();
-            }
-
-            return databaseEntries
-                .stream()
-                .map(LarsGpuRetriever::safeParse)
-                .filter(Objects::nonNull)
-                .sorted(LarsGpuAveragePpdComparator.create())
-                .toList();
-        } catch (final IOException e) {
-            LOGGER.debug("Unable to connect to LARS GPU DB at '{}'", gpuDatabaseUrl, e);
-            LOGGER.warn("Unable to connect to LARS GPU DB at '{}': {}", gpuDatabaseUrl, e.getMessage());
-            return Collections.emptyList();
+            final Document doc = Jsoup.connect(gpuDatabaseUrl).get();
+            return retrieveGpus(doc);
         } catch (final Exception e) {
-            LOGGER.warn("Unexpected error retrieving data from LARS GPU DB", e);
+            LOGGER.warn("Error retrieving data from LARS GPU DB", e);
             return Collections.emptyList();
         }
+    }
+
+    /**
+     * Will retrieve the {@link me.zodac.folding.api.tc.HardwareType#GPU} data from the supplied {@link Document}.
+     *
+     * <p>
+     * If an error occurs retrieving any individual {@link LarsGpu}, it will be logged, and we continue processing the remainder.
+     *
+     * @param doc the HTML page from the LARS GPU DB
+     * @return a {@link Collection} of parsed {@link LarsGpu}s sorted by {@link LarsGpu#getAveragePpd()}
+     */
+    public static List<LarsGpu> retrieveGpus(final Document doc) {
+        final Element databaseTable = doc.getElementById("primary-datatable");
+
+        if (databaseTable == null) {
+            LOGGER.warn("Unable to find the 'primary-database' table");
+            return Collections.emptyList();
+        }
+
+        final Element databaseBody = databaseTable.getElementsByTag("tbody").first();
+
+        if (databaseBody == null) {
+            LOGGER.warn("Unable to find a 'tbody' entry in the database table");
+            return Collections.emptyList();
+        }
+
+        final Elements databaseEntries = databaseBody.getElementsByTag("tr");
+        if (databaseEntries.isEmpty()) {
+            LOGGER.warn("No 'tr' entries found in the database table");
+            return Collections.emptyList();
+        }
+
+        return databaseEntries
+            .stream()
+            .map(LarsGpuRetriever::safeParse)
+            .filter(Objects::nonNull)
+            .sorted(LarsGpuAveragePpdComparator.create())
+            .toList();
     }
 
     private static LarsGpu safeParse(final Element element) {
@@ -105,9 +114,6 @@ public final class LarsGpuRetriever {
         } catch (final LarsParseException e) {
             LOGGER.debug("Error parsing GPU entry: {}", element, e);
             LOGGER.warn("Error parsing GPU entry: {}", e.getMessage());
-            return null;
-        } catch (final Exception e) {
-            LOGGER.warn("Unexpected error parsing GPU entry: {}", element, e);
             return null;
         }
     }

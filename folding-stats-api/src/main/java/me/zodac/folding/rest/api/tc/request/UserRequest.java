@@ -24,6 +24,14 @@
 
 package me.zodac.folding.rest.api.tc.request;
 
+import static me.zodac.folding.api.tc.validation.UserValidator.FOLDING_USER_NAME_PATTERN;
+import static me.zodac.folding.api.tc.validation.UserValidator.PASSKEY_PATTERN;
+import static me.zodac.folding.api.util.StringUtils.isBlank;
+import static me.zodac.folding.api.util.StringUtils.isBlankOrValidUrl;
+
+import java.util.Collection;
+import java.util.Objects;
+import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,6 +41,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import me.zodac.folding.api.RequestPojo;
+import me.zodac.folding.api.tc.Category;
 
 /**
  * REST request to create/update a {@link me.zodac.folding.api.tc.User}.
@@ -55,4 +64,54 @@ public class UserRequest implements RequestPojo {
     private int hardwareId;
     private int teamId;
     private boolean userIsCaptain;
+
+    @Override
+    public Collection<String> validate() {
+        return Stream.of(
+                validateFoldingUserName(),
+                validateDisplayName(),
+                validatePasskey(),
+                validateCategory(),
+                validateProfileLink(),
+                validateLiveStatsLink()
+            )
+            .filter(Objects::nonNull)
+            .toList();
+    }
+
+    private String validateFoldingUserName() {
+        return isBlank(foldingUserName) || !FOLDING_USER_NAME_PATTERN.matcher(foldingUserName).find()
+            ? "Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen"
+            : null;
+    }
+
+    private String validateDisplayName() {
+        return isBlank(displayName)
+            ? "Field 'displayName' must not be empty"
+            : null;
+    }
+
+    private String validatePasskey() {
+        return isBlank(passkey) || !PASSKEY_PATTERN.matcher(passkey).find()
+            ? "Field 'passkey' must be 32 characters long and include only alphanumeric characters"
+            : null;
+    }
+
+    private String validateCategory() {
+        return Category.get(category) == Category.INVALID
+            ? String.format("Field 'category' must be one of: %s", Category.getAllValues())
+            : null;
+    }
+
+    private String validateProfileLink() {
+        return isBlankOrValidUrl(profileLink)
+            ? null
+            : String.format("Field 'profileLink' is not a valid link: '%s'", profileLink);
+    }
+
+    private String validateLiveStatsLink() {
+        return isBlankOrValidUrl(liveStatsLink)
+            ? null
+            : String.format("Field 'liveStatsLink' is not a valid link: '%s'", liveStatsLink);
+    }
 }

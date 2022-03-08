@@ -25,14 +25,10 @@
 package me.zodac.folding.api.tc.validation;
 
 import static me.zodac.folding.api.util.StringUtils.isBlank;
-import static me.zodac.folding.api.util.StringUtils.isBlankOrValidUrl;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Stream;
 import me.zodac.folding.api.exception.ConflictException;
 import me.zodac.folding.api.exception.UsedByException;
 import me.zodac.folding.api.exception.ValidationException;
@@ -74,13 +70,7 @@ public final class TeamValidator {
             throw new ConflictException(teamRequest, teamWithMatchingName.get(), "teamName");
         }
 
-        final List<String> failureMessages = Stream.of(
-                teamName(teamRequest),
-                forumLink(teamRequest)
-            )
-            .filter(Objects::nonNull)
-            .toList();
-
+        final Collection<String> failureMessages = teamRequest.validate();
         if (!failureMessages.isEmpty()) {
             throw new ValidationException(teamRequest, failureMessages);
         }
@@ -113,13 +103,7 @@ public final class TeamValidator {
             throw new ConflictException(teamRequest, teamWithMatchingName.get(), "teamName");
         }
 
-        final List<String> failureMessages = Stream.of(
-                teamName(teamRequest),
-                forumLink(teamRequest)
-            )
-            .filter(Objects::nonNull)
-            .toList();
-
+        final Collection<String> failureMessages = teamRequest.validate();
         if (!failureMessages.isEmpty()) {
             throw new ValidationException(teamRequest, failureMessages);
         }
@@ -169,17 +153,5 @@ public final class TeamValidator {
             .filter(user -> user.getTeam().getId() == teamId)
             .map(User::hidePasskey)
             .toList();
-    }
-
-    private static String teamName(final TeamRequest teamRequest) {
-        return isBlank(teamRequest.getTeamName())
-            ? "Field 'teamName' must not be empty"
-            : null;
-    }
-
-    private static String forumLink(final TeamRequest teamRequest) {
-        return isBlankOrValidUrl(teamRequest.getForumLink())
-            ? null
-            : String.format("Field 'forumLink' is not a valid link: '%s'", teamRequest.getForumLink());
     }
 }

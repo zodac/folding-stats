@@ -24,9 +24,22 @@
 
 package me.zodac.folding.api;
 
+import java.util.Collection;
+
 /**
  * Marker interface for POJOs are sent in a REST request to the service.
  */
 public interface RequestPojo {
 
+    /**
+     * Simple check that validates that the REST payload is valid. Checks can include:
+     * <ul>
+     *     <li>{@link String} fields are not <code>null</code> or empty</li>
+     *     <li>Numeric fields are not out of range</li>
+     *     <li>Enum fields are not invalid</li>
+     * </ul>
+     *
+     * @return {@link String} {@link Collection} of any validation failures, or empty if the {@link RequestPojo} is valid
+     */
+    Collection<String> validate();
 }

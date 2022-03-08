@@ -25,7 +25,6 @@
 package me.zodac.folding.api.tc.validation;
 
 import static me.zodac.folding.api.util.StringUtils.isBlank;
-import static me.zodac.folding.api.util.StringUtils.isBlankOrValidUrl;
 
 import java.util.Collection;
 import java.util.List;
@@ -131,19 +130,15 @@ public final class UserValidator {
             throw new ValidationException(userRequest, hardwareAndTeamFailureMessages);
         }
 
-        final List<String> failureMessages = Stream.of(
-                foldingUserName(userRequest),
-                displayName(userRequest),
-                passkey(userRequest),
-                category(userRequest),
-                profileLink(userRequest),
-                liveStatsLink(userRequest)
-            )
-            .filter(Objects::nonNull)
-            .toList();
-
+        // Validate the content is not-malformed
+        final Collection<String> failureMessages = userRequest.validate();
         if (!failureMessages.isEmpty()) {
             throw new ValidationException(userRequest, failureMessages);
+        }
+
+        final String categoryValidation = validateCategoryIsValidForHardware(userRequest);
+        if (categoryValidation != null) {
+            throw new ValidationException(userRequest, categoryValidation);
         }
 
         final Collection<User> usersOnTeam = getUsersOnTeam(teamForUser.getId(), allUsers);
@@ -219,20 +214,15 @@ public final class UserValidator {
             throw new ValidationException(userRequest, hardwareAndTeamFailureMessages);
         }
 
-        final List<String> failureMessages = Stream.of(
-                foldingUserName(userRequest),
-                displayName(userRequest),
-                passkey(userRequest),
-                category(userRequest),
-                profileLink(userRequest),
-                liveStatsLink(userRequest)
-            )
-            .filter(Objects::nonNull)
-            .toList();
-
-        // All subsequent checks will be heavier, so best to return early if any failures occur
+        // Validate the content is not-malformed
+        final Collection<String> failureMessages = userRequest.validate();
         if (!failureMessages.isEmpty()) {
             throw new ValidationException(userRequest, failureMessages);
+        }
+
+        final String categoryValidation = validateCategoryIsValidForHardware(userRequest);
+        if (categoryValidation != null) {
+            throw new ValidationException(userRequest, categoryValidation);
         }
 
         final Collection<User> usersOnTeam = getUsersOnTeam(teamForUser.getId(), allUsers);
@@ -386,29 +376,8 @@ public final class UserValidator {
             .findAny();
     }
 
-    private static String foldingUserName(final UserRequest userRequest) {
-        return isBlank(userRequest.getFoldingUserName()) || !FOLDING_USER_NAME_PATTERN.matcher(userRequest.getFoldingUserName()).find()
-            ? "Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen"
-            : null;
-    }
-
-    private static String displayName(final UserRequest userRequest) {
-        return isBlank(userRequest.getDisplayName())
-            ? "Field 'displayName' must not be empty"
-            : null;
-    }
-
-    private static String passkey(final UserRequest userRequest) {
-        return isBlank(userRequest.getPasskey()) || !PASSKEY_PATTERN.matcher(userRequest.getPasskey()).find()
-            ? "Field 'passkey' must be 32 characters long and include only alphanumeric characters"
-            : null;
-    }
-
-    private String category(final UserRequest userRequest) {
+    private String validateCategoryIsValidForHardware(final UserRequest userRequest) {
         final Category category = Category.get(userRequest.getCategory());
-        if (category == Category.INVALID) {
-            return String.format("Field 'category' must be one of: %s", Category.getAllValues());
-        }
 
         if (!category.isHardwareMakeSupported(hardwareForUser.getHardwareMake())) {
             return String.format("Category '%s' cannot be filled by hardware of make '%s', must be one of: %s", category,
@@ -421,18 +390,6 @@ public final class UserValidator {
         }
 
         return null;
-    }
-
-    private static String profileLink(final UserRequest userRequest) {
-        return isBlankOrValidUrl(userRequest.getProfileLink())
-            ? null
-            : String.format("Field 'profileLink' is not a valid link: '%s'", userRequest.getProfileLink());
-    }
-
-    private static String liveStatsLink(final UserRequest userRequest) {
-        return isBlankOrValidUrl(userRequest.getLiveStatsLink())
-            ? null
-            : String.format("Field 'liveStatsLink' is not a valid link: '%s'", userRequest.getLiveStatsLink());
     }
 
     private String hardware(final UserRequest userRequest, final Collection<Hardware> allHardware) {

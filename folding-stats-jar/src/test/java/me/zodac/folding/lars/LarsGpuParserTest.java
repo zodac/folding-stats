@@ -275,7 +275,7 @@ class LarsGpuParserTest {
     }
 
     private static Document readFromFile(final String fileName, final Map<String, String> substitutionValues) throws URISyntaxException, IOException {
-        final String filePath = "lars" + File.separator + fileName;
+        final String filePath = "lars" + File.separator + "parser" + File.separator + fileName;
         final String fileContents =
             Files.readString(Paths.get(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource(filePath)).toURI()),
                 StandardCharsets.UTF_8);

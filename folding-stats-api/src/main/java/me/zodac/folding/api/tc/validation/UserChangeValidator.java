@@ -24,10 +24,6 @@
 
 package me.zodac.folding.api.tc.validation;
 
-import static me.zodac.folding.api.tc.validation.UserValidator.FOLDING_USER_NAME_PATTERN;
-import static me.zodac.folding.api.tc.validation.UserValidator.PASSKEY_PATTERN;
-import static me.zodac.folding.api.util.StringUtils.isBlank;
-import static me.zodac.folding.api.util.StringUtils.isBlankOrValidUrl;
 import static me.zodac.folding.api.util.StringUtils.isEqualSafe;
 
 import java.util.Collection;
@@ -45,7 +41,6 @@ import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.change.UserChange;
 import me.zodac.folding.api.tc.change.UserChangeState;
 import me.zodac.folding.api.tc.stats.Stats;
-import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.rest.api.tc.request.UserChangeRequest;
 
 /**
@@ -118,17 +113,14 @@ public final class UserChangeValidator {
         }
 
         // Validate the content is not-malformed
-        final List<String> failureMessages = Stream.of(
-                existingPasskey(userChangeRequest),
-                foldingUserName(userChangeRequest),
-                passkey(userChangeRequest),
-                liveStatsLink(userChangeRequest)
-            )
-            .filter(StringUtils::isNotBlank)
-            .toList();
-
+        final Collection<String> failureMessages = userChangeRequest.validate();
         if (!failureMessages.isEmpty()) {
             throw new ValidationException(userChangeRequest, failureMessages);
+        }
+
+        final String existingPasskeyValidation = validateExistingPasskeyMatchesExistingUser(userChangeRequest);
+        if (existingPasskeyValidation != null) {
+            throw new ValidationException(userChangeRequest, existingPasskeyValidation);
         }
 
         // Check if the user already has the values in the UserChangeRequest
@@ -281,27 +273,9 @@ public final class UserChangeValidator {
             .findAny();
     }
 
-    private String existingPasskey(final UserChangeRequest userChangeRequest) {
+    private String validateExistingPasskeyMatchesExistingUser(final UserChangeRequest userChangeRequest) {
         return previousUser.getPasskey().equals(userChangeRequest.getExistingPasskey())
             ? null
             : "Field 'existingPasskey' does not match the existing passkey for the user";
-    }
-
-    private static String foldingUserName(final UserChangeRequest userChangeRequest) {
-        return isBlank(userChangeRequest.getFoldingUserName()) || !FOLDING_USER_NAME_PATTERN.matcher(userChangeRequest.getFoldingUserName()).find()
-            ? "Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen"
-            : null;
-    }
-
-    private static String passkey(final UserChangeRequest userChangeRequest) {
-        return isBlank(userChangeRequest.getPasskey()) || !PASSKEY_PATTERN.matcher(userChangeRequest.getPasskey()).find()
-            ? "Field 'passkey' must be 32 characters long and include only alphanumeric characters"
-            : null;
-    }
-
-    private static String liveStatsLink(final UserChangeRequest userChangeRequest) {
-        return isBlankOrValidUrl(userChangeRequest.getLiveStatsLink())
-            ? null
-            : String.format("Field 'liveStatsLink' is not a valid link: '%s'", userChangeRequest.getLiveStatsLink());
     }
 }

@@ -24,6 +24,12 @@
 
 package me.zodac.folding.rest.api.tc.request;
 
+import static me.zodac.folding.api.util.StringUtils.isBlank;
+import static me.zodac.folding.api.util.StringUtils.isBlankOrValidUrl;
+
+import java.util.Collection;
+import java.util.Objects;
+import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -49,4 +55,26 @@ public class TeamRequest implements RequestPojo {
     private String teamName;
     private String teamDescription;
     private String forumLink;
+
+    @Override
+    public Collection<String> validate() {
+        return Stream.of(
+                validateTeamName(),
+                validateForumLink()
+            )
+            .filter(Objects::nonNull)
+            .toList();
+    }
+
+    private String validateTeamName() {
+        return isBlank(teamName)
+            ? "Field 'teamName' must not be empty"
+            : null;
+    }
+
+    private String validateForumLink() {
+        return isBlankOrValidUrl(forumLink)
+            ? null
+            : String.format("Field 'forumLink' is not a valid link: '%s'", forumLink);
+    }
 }
