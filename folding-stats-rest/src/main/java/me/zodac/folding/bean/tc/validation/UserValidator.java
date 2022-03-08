@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.api.tc.validation;
+package me.zodac.folding.bean.tc.validation;
 
 import static me.zodac.folding.api.util.StringUtils.isBlank;
 
@@ -30,7 +30,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import me.zodac.folding.api.exception.ConflictException;
 import me.zodac.folding.api.exception.ExternalConnectionException;
@@ -47,17 +46,8 @@ import me.zodac.folding.rest.api.tc.request.UserRequest;
 /**
  * Validator class to validate a {@link User} or {@link UserRequest}.
  */
+// TODO: Inject FoldingRepository
 public final class UserValidator {
-
-    /**
-     * {@link Pattern} defining a valid Folding@Home username.
-     */
-    public static final Pattern FOLDING_USER_NAME_PATTERN = Pattern.compile("^[a-zA-Z0-9._-]*$");
-
-    /**
-     * {@link Pattern} defining a valid Folding@home passkey for a user.
-     */
-    public static final Pattern PASSKEY_PATTERN = Pattern.compile("[a-zA-Z0-9]{32}");
 
     private final FoldingStatsRetriever foldingStatsRetriever;
 

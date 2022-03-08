@@ -22,26 +22,27 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.api.tc.validation.retriever;
+package me.zodac.folding.bean.tc.validation.retriever;
 
 import me.zodac.folding.api.stats.FoldingStatsDetails;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
+import me.zodac.folding.api.util.DateTimeUtils;
 
 /**
- * A test implementation of {@link FoldingStatsRetriever} that simulates an unexpected {@link Exception} being thrown.
+ * A test implementation of {@link FoldingStatsRetriever} that simulates a response with at least 1 Work Unit.
  */
-public class UnexpectedExceptionFoldingStatsRetriever implements FoldingStatsRetriever {
+public class ValidFoldingStatsRetriever implements FoldingStatsRetriever {
 
     @Override
     public Stats getStats(final FoldingStatsDetails foldingStatsDetails) {
-        throw new IllegalStateException("Error");
+        return Stats.create(1L, 1);
     }
 
     @Override
     public UserStats getTotalStats(final User user) {
-        throw new IllegalStateException("Error");
+        return UserStats.create(user.getId(), DateTimeUtils.currentUtcTimestamp(), 1L, 1);
     }
 }

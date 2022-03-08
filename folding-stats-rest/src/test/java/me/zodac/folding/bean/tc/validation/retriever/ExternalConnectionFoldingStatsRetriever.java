@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.api.tc.validation.retriever;
+package me.zodac.folding.bean.tc.validation.retriever;
 
 import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.stats.FoldingStatsDetails;

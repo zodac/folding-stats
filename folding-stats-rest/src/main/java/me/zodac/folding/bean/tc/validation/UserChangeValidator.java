@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.api.tc.validation;
+package me.zodac.folding.bean.tc.validation;
 
 import static me.zodac.folding.api.util.StringUtils.isEqualSafe;
 

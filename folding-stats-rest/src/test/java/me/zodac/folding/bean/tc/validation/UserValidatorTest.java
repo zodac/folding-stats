@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.api.tc.validation;
+package me.zodac.folding.bean.tc.validation;
 
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,10 +38,10 @@ import me.zodac.folding.api.tc.HardwareMake;
 import me.zodac.folding.api.tc.HardwareType;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.api.tc.validation.retriever.ExternalConnectionFoldingStatsRetriever;
-import me.zodac.folding.api.tc.validation.retriever.NoUnitsFoldingStatsRetriever;
-import me.zodac.folding.api.tc.validation.retriever.UnexpectedExceptionFoldingStatsRetriever;
-import me.zodac.folding.api.tc.validation.retriever.ValidFoldingStatsRetriever;
+import me.zodac.folding.bean.tc.validation.retriever.ExternalConnectionFoldingStatsRetriever;
+import me.zodac.folding.bean.tc.validation.retriever.NoUnitsFoldingStatsRetriever;
+import me.zodac.folding.bean.tc.validation.retriever.UnexpectedExceptionFoldingStatsRetriever;
+import me.zodac.folding.bean.tc.validation.retriever.ValidFoldingStatsRetriever;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 import org.junit.jupiter.api.Test;
 

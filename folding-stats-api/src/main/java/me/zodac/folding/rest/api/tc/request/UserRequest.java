@@ -24,13 +24,12 @@
 
 package me.zodac.folding.rest.api.tc.request;
 
-import static me.zodac.folding.api.tc.validation.UserValidator.FOLDING_USER_NAME_PATTERN;
-import static me.zodac.folding.api.tc.validation.UserValidator.PASSKEY_PATTERN;
 import static me.zodac.folding.api.util.StringUtils.isBlank;
 import static me.zodac.folding.api.util.StringUtils.isBlankOrValidUrl;
 
 import java.util.Collection;
 import java.util.Objects;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -54,6 +53,16 @@ import me.zodac.folding.api.tc.Category;
 @EqualsAndHashCode
 @ToString(doNotUseGetters = true)
 public class UserRequest implements RequestPojo {
+
+    /**
+     * {@link Pattern} defining a valid Folding@Home username.
+     */
+    public static final Pattern FOLDING_USER_NAME_PATTERN = Pattern.compile("^[a-zA-Z0-9._-]*$");
+
+    /**
+     * {@link Pattern} defining a valid Folding@home passkey for a user.
+     */
+    public static final Pattern PASSKEY_PATTERN = Pattern.compile("[a-zA-Z0-9]{32}");
 
     private String foldingUserName;
     private String displayName;

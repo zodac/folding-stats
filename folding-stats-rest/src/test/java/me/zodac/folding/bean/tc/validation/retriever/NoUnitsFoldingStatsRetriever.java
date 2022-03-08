@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.api.tc.validation.retriever;
+package me.zodac.folding.bean.tc.validation.retriever;
 
 import me.zodac.folding.api.stats.FoldingStatsDetails;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
@@ -32,17 +32,17 @@ import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.util.DateTimeUtils;
 
 /**
- * A test implementation of {@link FoldingStatsRetriever} that simulates a response with at least 1 Work Unit.
+ * A test implementation of {@link FoldingStatsRetriever} that simulates a response returning 0 Work Units.
  */
-public class ValidFoldingStatsRetriever implements FoldingStatsRetriever {
+public class NoUnitsFoldingStatsRetriever implements FoldingStatsRetriever {
 
     @Override
     public Stats getStats(final FoldingStatsDetails foldingStatsDetails) {
-        return Stats.create(1L, 1);
+        return Stats.create(0L, 0);
     }
 
     @Override
     public UserStats getTotalStats(final User user) {
-        return UserStats.create(user.getId(), DateTimeUtils.currentUtcTimestamp(), 1L, 1);
+        return UserStats.create(user.getId(), DateTimeUtils.currentUtcTimestamp(), 0L, 0);
     }
 }

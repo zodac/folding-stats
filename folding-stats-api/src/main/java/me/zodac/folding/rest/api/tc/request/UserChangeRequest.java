@@ -24,10 +24,10 @@
 
 package me.zodac.folding.rest.api.tc.request;
 
-import static me.zodac.folding.api.tc.validation.UserValidator.FOLDING_USER_NAME_PATTERN;
-import static me.zodac.folding.api.tc.validation.UserValidator.PASSKEY_PATTERN;
 import static me.zodac.folding.api.util.StringUtils.isBlank;
 import static me.zodac.folding.api.util.StringUtils.isBlankOrValidUrl;
+import static me.zodac.folding.rest.api.tc.request.UserRequest.FOLDING_USER_NAME_PATTERN;
+import static me.zodac.folding.rest.api.tc.request.UserRequest.PASSKEY_PATTERN;
 
 import java.util.Collection;
 import java.util.stream.Stream;

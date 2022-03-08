@@ -22,12 +22,12 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.api.tc.validation;
+package me.zodac.folding.bean.tc.validation;
 
 import static java.util.Collections.emptyList;
-import static me.zodac.folding.api.tc.validation.HardwareValidator.validateCreate;
-import static me.zodac.folding.api.tc.validation.HardwareValidator.validateDelete;
-import static me.zodac.folding.api.tc.validation.HardwareValidator.validateUpdate;
+import static me.zodac.folding.bean.tc.validation.HardwareValidator.validateCreate;
+import static me.zodac.folding.bean.tc.validation.HardwareValidator.validateDelete;
+import static me.zodac.folding.bean.tc.validation.HardwareValidator.validateUpdate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowableOfType;
 

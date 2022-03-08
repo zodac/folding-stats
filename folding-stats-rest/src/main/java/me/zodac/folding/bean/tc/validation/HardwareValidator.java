@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.api.tc.validation;
+package me.zodac.folding.bean.tc.validation;
 
 import static me.zodac.folding.api.util.StringUtils.isBlank;
 
@@ -41,7 +41,6 @@ import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 /**
  * Validator class to validate a {@link Hardware} or {@link HardwareRequest}.
  */
-// TODO: Split class into API/REST validators - API into the RequestPojo, REST by moving this class to correct module
 public final class HardwareValidator {
 
     private HardwareValidator() {
