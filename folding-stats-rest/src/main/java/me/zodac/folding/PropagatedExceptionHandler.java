@@ -46,6 +46,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -155,6 +156,23 @@ public class PropagatedExceptionHandler {
         LOGGER.debug("Payload is null", e);
         LOGGER.error("Payload is null");
         return GSON.toJson(ErrorResponse.create("Payload is null"));
+    }
+
+    /**
+     * Returned when a request made to a REST endpoint has a missing request parameter
+     *
+     * <p>
+     * Returns a <b>400_BAD_REQUEST</b> response with the error message body.
+     *
+     * @param e the {@link MissingServletRequestParameterException}
+     * @return the {@link ErrorResponse} body
+     */
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public String missingParameter(final MissingServletRequestParameterException e) {
+        LOGGER.error("Missing parameter", e);
+        return GSON.toJson(ErrorResponse.create(e.getMessage()));
     }
 
     /**

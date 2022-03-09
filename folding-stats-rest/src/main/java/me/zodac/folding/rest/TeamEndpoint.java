@@ -30,6 +30,7 @@ import static me.zodac.folding.rest.response.Responses.cachedOk;
 import static me.zodac.folding.rest.response.Responses.created;
 import static me.zodac.folding.rest.response.Responses.notFound;
 import static me.zodac.folding.rest.response.Responses.ok;
+import static me.zodac.folding.rest.util.RequestParameterExtractor.extractParameters;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -167,7 +168,7 @@ public class TeamEndpoint {
     @PermitAll
     @GetMapping(path = "/fields", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getByTeamName(@RequestParam("teamName") final String teamName, final HttpServletRequest request) {
-        LOGGER.debug("GET request for team received at '{}'", request::getRequestURI);
+        LOGGER.debug("GET request for team received at '{}?{}'", request::getRequestURI, () -> extractParameters(request));
         if (StringUtils.isBlank(teamName)) {
             final String errorMessage = String.format("Input 'teamName' must not be blank: '%s'", teamName);
             LOGGER.error(errorMessage);

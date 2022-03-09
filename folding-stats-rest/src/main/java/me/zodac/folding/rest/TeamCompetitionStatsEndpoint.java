@@ -26,6 +26,7 @@ package me.zodac.folding.rest;
 
 import static me.zodac.folding.rest.response.Responses.notFound;
 import static me.zodac.folding.rest.response.Responses.ok;
+import static me.zodac.folding.rest.util.RequestParameterExtractor.extractParameters;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -239,14 +240,16 @@ public class TeamCompetitionStatsEndpoint {
     /**
      * {@link PostMapping} request to manually update the <code>Team Competition</code> stats.
      *
-     * @param async whether the execution should be performed asynchronously or synchronously
+     * @param async   whether the execution should be performed asynchronously or synchronously
+     * @param request the {@link HttpServletRequest}
      * @return {@link me.zodac.folding.rest.response.Responses#ok()}
      */
     @WriteRequired
     @RolesAllowed("admin")
     @PostMapping(path = "/manual/update")
-    public ResponseEntity<?> updateStats(@RequestParam(value = "async", required = false) final boolean async) {
-        LOGGER.info("GET request received to manually update TC stats");
+    public ResponseEntity<?> updateStats(@RequestParam(value = "async", required = false, defaultValue = "false") final boolean async,
+                                         final HttpServletRequest request) {
+        LOGGER.info("GET request received to manually update TC stats at '{}?{}", request::getRequestURI, () -> extractParameters(request));
         final Collection<User> users = foldingRepository.getAllUsersWithPasskeys();
         final ProcessingType processingType = async ? ProcessingType.ASYNCHRONOUS : ProcessingType.SYNCHRONOUS;
         if (processingType == ProcessingType.SYNCHRONOUS) {

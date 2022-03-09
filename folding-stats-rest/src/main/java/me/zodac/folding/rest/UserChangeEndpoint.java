@@ -26,6 +26,7 @@ package me.zodac.folding.rest;
 
 import static me.zodac.folding.rest.response.Responses.created;
 import static me.zodac.folding.rest.response.Responses.ok;
+import static me.zodac.folding.rest.util.RequestParameterExtractor.extractParameters;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -44,6 +45,7 @@ import me.zodac.folding.bean.tc.user.UserChangeApplier;
 import me.zodac.folding.bean.tc.validation.UserChangeValidator;
 import me.zodac.folding.rest.api.tc.request.UserChangeRequest;
 import me.zodac.folding.rest.exception.InvalidStateException;
+import me.zodac.folding.rest.response.Responses;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -168,9 +170,8 @@ public class UserChangeEndpoint {
     @RolesAllowed("admin")
     @ReadRequired
     @GetMapping(path = "/passkey/fields", produces = MediaType.APPLICATION_JSON_VALUE)
-    // TODO: Add time window
     public ResponseEntity<?> getAllByStateWithPasskeys(@RequestParam("state") final String state, final HttpServletRequest request) {
-        LOGGER.info("GET request for all user changes with state received at '{}'", request::getRequestURI);
+        LOGGER.info("GET request for all user changes with state received at '{}?{}'", request::getRequestURI, () -> extractParameters(request));
 
         final Collection<UserChangeState> states = Arrays.stream(state.split(","))
             .map(UserChangeState::get)
@@ -188,14 +189,19 @@ public class UserChangeEndpoint {
     /**
      * {@link GetMapping} request to retrieve all {@link UserChange}s with one of the provides {@link UserChangeState}s.
      *
-     * @param state   a comma-separated {@link String} of the {@link UserChangeState}s to look for
-     * @param request the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#ok(Collection)} containing the {@link UserChange}s
+     * @param state          a comma-separated {@link String} of the {@link UserChangeState}s to look for
+     * @param numberOfMonths the number of months back from which to retrieve {@link UserChange}s (<b>0</b> means retrieve all)
+     * @param request        the {@link HttpServletRequest}
+     * @return {@link Responses#ok(Collection)} containing the {@link UserChange}s
      */
     @ReadRequired
     @GetMapping(path = "/fields", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getAllByStateWithoutPasskeys(@RequestParam("state") final String state, final HttpServletRequest request) {
-        LOGGER.info("GET request for all user changes with state received at '{}'", request::getRequestURI);
+    // TODO: Collapse these similar functions
+    public ResponseEntity<?> getAllByStateWithoutPasskeys(@RequestParam("state") final String state,
+                                                          @RequestParam(value = "numberOfMonths", required = false, defaultValue = "0")
+                                                          final int numberOfMonths,
+                                                          final HttpServletRequest request) {
+        LOGGER.info("GET request for all user changes with state received at '{}?{}'", request::getRequestURI, () -> extractParameters(request));
 
         final Collection<UserChangeState> states = Arrays.stream(state.split(","))
             .map(UserChangeState::get)
@@ -206,7 +212,7 @@ public class UserChangeEndpoint {
             return ok();
         }
 
-        final Collection<UserChange> userChanges = foldingRepository.getAllUserChangesWithoutPasskeys(states);
+        final Collection<UserChange> userChanges = foldingRepository.getAllUserChangesWithoutPasskeys(states, numberOfMonths);
         return ok(userChanges);
     }
 
@@ -220,6 +226,7 @@ public class UserChangeEndpoint {
     @RolesAllowed("admin")
     @ReadRequired
     @GetMapping(path = "/{userChangeId}", produces = MediaType.APPLICATION_JSON_VALUE)
+
     public ResponseEntity<?> getById(@PathVariable("userChangeId") final int userChangeId, final HttpServletRequest request) {
         LOGGER.info("GET request for user change received at '{}'", request::getRequestURI);
 

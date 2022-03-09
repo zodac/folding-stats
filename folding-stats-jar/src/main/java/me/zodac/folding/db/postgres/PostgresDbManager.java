@@ -1155,7 +1155,13 @@ public final class PostgresDbManager implements DbManager {
     }
 
     @Override
-    public Collection<UserChange> getAllUserChanges(final Collection<UserChangeState> states) {
+    public Collection<UserChange> getAllUserChanges(final Collection<UserChangeState> states, final int numberOfMonths) {
+        return numberOfMonths == 0
+            ? getAllUserChangesWithState(states)
+            : getAllUserChangesWithStateForPastMonths(states, numberOfMonths);
+    }
+
+    private List<UserChange> getAllUserChangesWithState(final Collection<UserChangeState> states) {
         return executeQuery(queryContext -> {
             final var query = queryContext
                 .select()
@@ -1163,6 +1169,29 @@ public final class PostgresDbManager implements DbManager {
                 .where(USER_CHANGES.STATE.in(states))
                 .orderBy(USER_CHANGES.USER_CHANGE_ID.asc());
             LOGGER.debug("Executing SQL: '{}'", query);
+
+            return query
+                .fetch()
+                .into(USER_CHANGES)
+                .stream()
+                .map(RecordConverter::toUserChange)
+                .toList();
+        });
+    }
+
+    private List<UserChange> getAllUserChangesWithStateForPastMonths(final Collection<UserChangeState> states, final int numberOfMonths) {
+        final LocalDateTime toTime = DateTimeUtils.currentUtcLocalDateTime();
+        final LocalDateTime fromTime = toTime.minusMonths(numberOfMonths);
+        LOGGER.info("Looking between {} and {}", fromTime, toTime);
+
+        return executeQuery(queryContext -> {
+            final var query = queryContext
+                .select()
+                .from(USER_CHANGES)
+                .where(USER_CHANGES.STATE.in(states))
+                .and(USER_CHANGES.UPDATED_UTC_TIMESTAMP.between(fromTime).and(toTime))
+                .orderBy(USER_CHANGES.USER_CHANGE_ID.asc());
+            LOGGER.info("Executing SQL: '{}'", query);
 
             return query
                 .fetch()

@@ -343,10 +343,11 @@ public interface DbManager extends Closeable {
     /**
      * Retrieves any {@link UserChange}s that contain one of the provided {@code states} from the DB.
      *
-     * @param states the {@link UserChangeState}s to look for
+     * @param states         the {@link UserChangeState}s to look for
+     * @param numberOfMonths the number of months back from which to retrieve {@link UserChange}s (<b>0</b> means retrieve all)
      * @return all {@link UserChange}s with any of the provided {@link UserChangeState}s
      */
-    Collection<UserChange> getAllUserChanges(final Collection<UserChangeState> states);
+    Collection<UserChange> getAllUserChanges(final Collection<UserChangeState> states, final int numberOfMonths);
 
     /**
      * Retrieves a {@link UserChange} with the given ID from the DB.

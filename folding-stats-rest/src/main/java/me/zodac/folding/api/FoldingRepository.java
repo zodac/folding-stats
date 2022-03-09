@@ -34,7 +34,6 @@ import me.zodac.folding.api.tc.change.UserChangeState;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
-import me.zodac.folding.bean.Storage;
 import me.zodac.folding.bean.tc.user.UserStatsParser;
 import me.zodac.folding.rest.exception.NotFoundException;
 import me.zodac.folding.state.ParsingStateManager;
@@ -45,12 +44,8 @@ import me.zodac.folding.state.ParsingStateManager;
  *     <li>{@link Hardware}</li>
  *     <li>{@link Team}</li>
  *     <li>{@link User}</li>
+ *     <li>{@link UserChange}</li>
  * </ul>
- *
- * <p>
- * For the most part, this will serve as a wrapper to {@link Storage}, which knows how to perform CRUD operations on the backend storage and caches.
- * But since some logic is needed for special cases (like retrieving the latest Folding@Home stats for a {@link User} when it is created), we
- * implement that logic here, and delegate any CRUD needs to {@link Storage}.
  */
 public interface FoldingRepository {
 
@@ -270,10 +265,11 @@ public interface FoldingRepository {
     /**
      * Retrieves all {@link UserChange}s with any of the given {@link UserChangeState}s, with {@link User} passkeys masked.
      *
-     * @param states the {@link UserChangeState}s to look for
+     * @param states         the {@link UserChangeState}s to look for
+     * @param numberOfMonths the number of months back from which to retrieve {@link UserChange}s (<b>0</b> means retrieve all)
      * @return a {@link Collection} of the retrieved {@link UserChange}
      */
-    Collection<UserChange> getAllUserChangesWithoutPasskeys(final Collection<UserChangeState> states);
+    Collection<UserChange> getAllUserChangesWithoutPasskeys(final Collection<UserChangeState> states, final int numberOfMonths);
 
     /**
      * Retrieves all {@link UserChange}s that have been approved for {@link UserChangeState#APPROVED_NEXT_MONTH}.

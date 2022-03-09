@@ -97,8 +97,10 @@ public class TeamCompetitionScheduler {
      * @param userStatsResetter   the {@link UserStatsResetter}
      * @param userStatsStorer     the {@link UserStatsStorer}
      */
-    public TeamCompetitionScheduler(final LarsHardwareUpdater larsHardwareUpdater, final UserChangeApplier userChangeApplier,
-                                    final UserStatsResetter userStatsResetter, final UserStatsStorer userStatsStorer) {
+    public TeamCompetitionScheduler(final LarsHardwareUpdater larsHardwareUpdater,
+                                    final UserChangeApplier userChangeApplier,
+                                    final UserStatsResetter userStatsResetter,
+                                    final UserStatsStorer userStatsStorer) {
         this.larsHardwareUpdater = larsHardwareUpdater;
         this.userChangeApplier = userChangeApplier;
         this.userStatsResetter = userStatsResetter;

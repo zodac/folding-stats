@@ -70,6 +70,12 @@ traits:
           description: A comma-separated list of UserChangeState: [REQUESTED_NOW, REQUESTED_NEXT_MONTH, APPROVED_NOW, APPROVED_NEXT_MONTH, REJECTED, COMPLETED]
           example: REJECTED
           required: true
+        numberOfMonths:
+          displayName: numberOfMonths
+          type: int
+          description: The number of months worth of UserChanges to retrieve (0 will return all UserChanges)
+          example: 3
+          required:
       description: "Retrieves all user changes with given state with passkeys hidden"
       responses:
         200:

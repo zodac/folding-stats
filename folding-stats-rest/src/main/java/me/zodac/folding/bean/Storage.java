@@ -901,13 +901,14 @@ public class Storage {
      * <p>
      * Attempts to retrieve from the {@link DbManager}.
      *
-     * @param states the {@link UserChangeState}s to look for
+     * @param states         the {@link UserChangeState}s to look for
+     * @param numberOfMonths the number of months back from which to retrieve {@link UserChange}s (<b>0</b> means retrieve all)
      * @return a {@link Collection} of the retrieved {@link UserChange}
-     * @see DbManager#getAllUserChanges(Collection)
+     * @see DbManager#getAllUserChanges(Collection, int)
      */
     @NotCached
-    public Collection<UserChange> getAllUserChanges(final Collection<UserChangeState> states) {
-        return dbManagerFunction(dbManager -> dbManager.getAllUserChanges(states));
+    public Collection<UserChange> getAllUserChanges(final Collection<UserChangeState> states, final int numberOfMonths) {
+        return dbManagerFunction(dbManager -> dbManager.getAllUserChanges(states, numberOfMonths));
     }
 
     /**

@@ -10,7 +10,7 @@ String.prototype.format = function() {
 };
 
 function loadUserChanges(states, id_prefix, title) {
-    fetch(REST_ENDPOINT_URL+"/changes/fields?state=" + states)
+    fetch(REST_ENDPOINT_URL+"/changes/fields?state=" + states + "&numberOfMonths=3")
     .then(response => {
         return response.json();
     })
@@ -28,7 +28,7 @@ function loadUserChanges(states, id_prefix, title) {
 
         usersTitle = document.createElement("h2");
         usersTitle.setAttribute("class", "navbar-brand");
-        usersTitle.innerHTML = title;
+        usersTitle.innerHTML = title + " (Past 3 Months)";
         usersDiv.append(usersTitle);
 
         usersTableDiv = document.createElement("div");

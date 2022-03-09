@@ -30,6 +30,7 @@ import static me.zodac.folding.rest.response.Responses.cachedOk;
 import static me.zodac.folding.rest.response.Responses.created;
 import static me.zodac.folding.rest.response.Responses.notFound;
 import static me.zodac.folding.rest.response.Responses.ok;
+import static me.zodac.folding.rest.util.RequestParameterExtractor.extractParameters;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -168,7 +169,7 @@ public class HardwareEndpoint {
     @PermitAll
     @GetMapping(path = "/fields", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getByHardwareName(@RequestParam("hardwareName") final String hardwareName, final HttpServletRequest request) {
-        LOGGER.info("GET request for hardware received at '{}'", request::getRequestURI);
+        LOGGER.info("GET request for hardware received at '{}?{}'", request::getRequestURI, () -> extractParameters(request));
 
         if (StringUtils.isBlank(hardwareName)) {
             final String errorMessage = String.format("Input 'hardwareName' must not be blank: '%s'", hardwareName);

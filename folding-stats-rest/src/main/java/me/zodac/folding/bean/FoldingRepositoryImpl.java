@@ -56,6 +56,7 @@ import org.springframework.stereotype.Component;
  *     <li>{@link Hardware}</li>
  *     <li>{@link Team}</li>
  *     <li>{@link User}</li>
+ *     <li>{@link UserChange}</li>
  * </ul>
  *
  * <p>
@@ -437,7 +438,7 @@ public class FoldingRepositoryImpl implements FoldingRepository {
 
     @Override
     public Collection<UserChange> getAllUserChangesWithPasskeys(final Collection<UserChangeState> states) {
-        return storage.getAllUserChanges(states);
+        return storage.getAllUserChanges(states, 0);
     }
 
     @Override
@@ -449,8 +450,8 @@ public class FoldingRepositoryImpl implements FoldingRepository {
     }
 
     @Override
-    public Collection<UserChange> getAllUserChangesWithoutPasskeys(final Collection<UserChangeState> states) {
-        return getAllUserChangesWithPasskeys(states)
+    public Collection<UserChange> getAllUserChangesWithoutPasskeys(final Collection<UserChangeState> states, final int numberOfMonths) {
+        return storage.getAllUserChanges(states, numberOfMonths)
             .stream()
             .map(UserChange::hidePasskey)
             .toList();
@@ -458,7 +459,7 @@ public class FoldingRepositoryImpl implements FoldingRepository {
 
     @Override
     public Collection<UserChange> getAllUserChangesForNextMonth() {
-        return storage.getAllUserChanges(Collections.singletonList(UserChangeState.APPROVED_NEXT_MONTH));
+        return storage.getAllUserChanges(Collections.singletonList(UserChangeState.APPROVED_NEXT_MONTH), 0);
     }
 
     @Override
