@@ -69,9 +69,9 @@
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>/var/backend/logs/sql.log.%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
-            <maxFileSize>100MB</maxFileSize>
+            <maxFileSize>10MB</maxFileSize>
             <maxHistory>31</maxHistory>
-            <totalSizeCap>1000MB</totalSizeCap>
+            <totalSizeCap>100MB</totalSizeCap>
         </rollingPolicy>
     </appender>
 
@@ -91,7 +91,7 @@
     </logger>
 
     <!-- The 'additivity=false' option ensures audit data only goes to the audit log -->
-    <logger name="sql" level="DEBUG" additivity="false">
+    <logger name="sql" level="INFO" additivity="false">
         <appender-ref ref="SQL_LOG"/>
     </logger>
 

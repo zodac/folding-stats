@@ -22,7 +22,7 @@ A live example of this competition can be seen running for the [ExtremeHW Foldin
             - [User Definition](#user-definition)
             - [User Categories](#user-categories)
     - [Adjustments During The Competition](#adjustments-during-the-competition)
-        - [Requesting User Changes](#requesting-user-changes) 
+        - [Requesting User Changes](#requesting-user-changes)
         - [Offsetting User Stats](#offsetting-user-stats)
         - [Deleting Users](#deleting-users)
         - [Moving A User To Another Team](#moving-a-user-to-another-team)
@@ -252,6 +252,7 @@ code. Please read the [Contributing](#contributing) section for more information
 
 A user may request some of their data to be changed, reducing the load on the administrator. They can make a request to
 change:
+
 - Folding@Home Username
 - Folding@Home passkey
 - Live Folding@Home stats link
@@ -358,6 +359,8 @@ The system currently has multiple logs available:
     - This is where all logging
       for [SecurityInterceptor.java](./folding-stats-rest/src/main/java/me/zodac/folding/rest/interceptor/SecurityInterceptor.java)
       is written, detailing login attempts or access requests to WRITE operations. This is not printed to the console.
+- sql.log
+    - This is used to log all SQL queries made to the DB
 
 These can be accessed and viewed by:
 
