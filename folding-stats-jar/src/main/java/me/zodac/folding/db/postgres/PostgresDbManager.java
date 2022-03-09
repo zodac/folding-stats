@@ -87,6 +87,7 @@ import org.jooq.impl.DSL;
  */
 public final class PostgresDbManager implements DbManager {
 
+    // TODO: Add a SQL logger
     private static final Logger LOGGER = LogManager.getLogger();
     private static final int SINGLE_RESULT = 1;
 
@@ -1182,7 +1183,6 @@ public final class PostgresDbManager implements DbManager {
     private List<UserChange> getAllUserChangesWithStateForPastMonths(final Collection<UserChangeState> states, final int numberOfMonths) {
         final LocalDateTime toTime = DateTimeUtils.currentUtcLocalDateTime();
         final LocalDateTime fromTime = toTime.minusMonths(numberOfMonths);
-        LOGGER.info("Looking between {} and {}", fromTime, toTime);
 
         return executeQuery(queryContext -> {
             final var query = queryContext

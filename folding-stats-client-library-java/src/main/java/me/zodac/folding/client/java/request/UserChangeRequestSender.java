@@ -104,7 +104,7 @@ public record UserChangeRequestSender(String requestUrl) {
 
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(requestUrl + "/passkey/fields?state=" + commaSeparatedStates))
+            .uri(URI.create(requestUrl + "/passkey?state=" + commaSeparatedStates))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
             .build();
@@ -157,7 +157,7 @@ public record UserChangeRequestSender(String requestUrl) {
 
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(requestUrl + "/fields?state=" + commaSeparatedStates))
+            .uri(URI.create(requestUrl + "?state=" + commaSeparatedStates))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
             .build();
 

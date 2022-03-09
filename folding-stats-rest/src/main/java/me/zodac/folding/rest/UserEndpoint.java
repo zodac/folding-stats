@@ -65,6 +65,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/users")
 public class UserEndpoint {
 
+    // TODO: Add a REST audit logger for write requests
     private static final Logger LOGGER = LogManager.getLogger();
 
     private final FoldingRepository foldingRepository;

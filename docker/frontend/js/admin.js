@@ -463,7 +463,7 @@ function loadTeams() {
 };
 
 function loadUserChangesAdmin(states, id_prefix, title) {
-    var url = encodeURI(REST_ENDPOINT_URL+"/changes/passkey/fields?state=" + states)
+    var url = encodeURI(REST_ENDPOINT_URL+"/changes/passkey?state=" + states)
     fetch(url, {
         headers: {
             "Authorization": sessionGet("Authorization")

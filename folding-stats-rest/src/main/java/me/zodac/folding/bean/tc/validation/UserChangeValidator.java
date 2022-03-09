@@ -209,7 +209,7 @@ public class UserChangeValidator {
     }
 
     private Optional<UserChange> findExistingUserChange(final UserChangeRequest userChangeRequest) {
-        return foldingRepository.getAllUserChangesWithPasskeys(UserChangeState.getOpenStates())
+        return foldingRepository.getAllUserChangesWithPasskeys(UserChangeState.getOpenStates(), 0)
             .stream()
             .filter(userChange -> isMatchingUserChange(userChange, userChangeRequest))
             .findAny();

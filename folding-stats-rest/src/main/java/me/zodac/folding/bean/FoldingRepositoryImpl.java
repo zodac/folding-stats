@@ -432,21 +432,8 @@ public class FoldingRepositoryImpl implements FoldingRepository {
     }
 
     @Override
-    public Collection<UserChange> getAllUserChangesWithPasskeys() {
-        return storage.getAllUserChanges();
-    }
-
-    @Override
-    public Collection<UserChange> getAllUserChangesWithPasskeys(final Collection<UserChangeState> states) {
-        return storage.getAllUserChanges(states, 0);
-    }
-
-    @Override
-    public Collection<UserChange> getAllUserChangesWithoutPasskeys() {
-        return getAllUserChangesWithPasskeys()
-            .stream()
-            .map(UserChange::hidePasskey)
-            .toList();
+    public Collection<UserChange> getAllUserChangesWithPasskeys(final Collection<UserChangeState> states, final int numberOfMonths) {
+        return storage.getAllUserChanges(states, numberOfMonths);
     }
 
     @Override

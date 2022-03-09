@@ -10,7 +10,7 @@ String.prototype.format = function() {
 };
 
 function loadUserChanges(states, id_prefix, title) {
-    fetch(REST_ENDPOINT_URL+"/changes/fields?state=" + states + "&numberOfMonths=3")
+    fetch(REST_ENDPOINT_URL+"/changes?state=" + states + "&numberOfMonths=3")
     .then(response => {
         return response.json();
     })

@@ -19,19 +19,32 @@ traits:
 
 /change:
   get:
+    queryParameters:
+      numberOfMonths:
+        displayName: numberOfMonths
+        type: int
+        description: The number of months worth of UserChanges to retrieve ('0' will return all)
+        example: 3
+        required: false
+      state:
+        displayName: state
+        type: string
+        description: A comma-separated list of UserChangeState: [REQUESTED_NOW, REQUESTED_NEXT_MONTH, APPROVED_NOW, APPROVED_NEXT_MONTH, REJECTED, COMPLETED] ('*' will return all)
+        example: REJECTED,COMPLETED
+        required: false
     description: "Retrieves all user changes with passkeys hidden"
-      responses:
-        200:
-          description: "All user changes have been retrieved"
-          body:
-            application/json:
-              example: !include responses/changes/userChangeGetAll.json
-          headers:
-            eTag:
-              description: "An EntityTag which can be used to retrieve a cached version of the response in future requests"
-              type: string
-        503:
-          description: "The system is not in a valid state to execute read requests"
+    responses:
+      200:
+        description: "All user changes have been retrieved"
+        body:
+          application/json:
+            example: !include responses/changes/userChangeGetAll.json
+        headers:
+          eTag:
+            description: "An EntityTag which can be used to retrieve a cached version of the response in future requests"
+            type: string
+      503:
+        description: "The system is not in a valid state to execute read requests"
   post:
     description: "Creates a new user change with the given properties"
     body:
@@ -61,36 +74,21 @@ traits:
         description: "An error occurred connecting to an external system to verify the user change"
       503:
         description: "The system is not in a valid state to execute write requests"
-  /fields:
+  /passkey:
     get:
       queryParameters:
-        state:
-          displayName: state
-          type: string
-          description: A comma-separated list of UserChangeState: [REQUESTED_NOW, REQUESTED_NEXT_MONTH, APPROVED_NOW, APPROVED_NEXT_MONTH, REJECTED, COMPLETED]
-          example: REJECTED
-          required: true
         numberOfMonths:
           displayName: numberOfMonths
           type: int
-          description: The number of months worth of UserChanges to retrieve (0 will return all UserChanges)
+          description: The number of months worth of UserChanges to retrieve ('0' will return all)
           example: 3
-          required:
-      description: "Retrieves all user changes with given state with passkeys hidden"
-      responses:
-        200:
-          description: "All user changes have been retrieved"
-          body:
-            application/json:
-              example: !include responses/changes/userChangeGetAllState.json
-          headers:
-            eTag:
-              description: "An EntityTag which can be used to retrieve a cached version of the response in future requests"
-              type: string
-        503:
-          description: "The system is not in a valid state to execute read requests"
-  /passkey:
-    get:
+          required: false
+        state:
+          displayName: state
+          type: string
+          description: A comma-separated list of UserChangeState: [REQUESTED_NOW, REQUESTED_NEXT_MONTH, APPROVED_NOW, APPROVED_NEXT_MONTH, REJECTED, COMPLETED] ('*' will return all)
+          example: REJECTED,COMPLETED
+          required: false
       description: "Retrieves all user changes with passkeys shown"
       responses:
         200:
@@ -98,28 +96,6 @@ traits:
           body:
             application/json:
               example: !include responses/changes/userChangeGetAllPasskey.json
-          headers:
-            eTag:
-              description: "An EntityTag which can be used to retrieve a cached version of the response in future requests"
-              type: string
-        503:
-          description: "The system is not in a valid state to execute read requests"
-    /fields:
-      get:
-      queryParameters:
-        state:
-          displayName: state
-          type: string
-          description: A comma-separated list of UserChangeState: [REQUESTED_NOW, REQUESTED_NEXT_MONTH, APPROVED_NOW, APPROVED_NEXT_MONTH, REJECTED, COMPLETED]
-          example: REJECTED
-          required: true
-      description: "Retrieves all user changes with given state with passkeys shown"
-      responses:
-        200:
-          description: "All user changes have been retrieved"
-          body:
-            application/json:
-              example: !include responses/changes/userChangeGetAllStatePasskey.json
           headers:
             eTag:
               description: "An EntityTag which can be used to retrieve a cached version of the response in future requests"
