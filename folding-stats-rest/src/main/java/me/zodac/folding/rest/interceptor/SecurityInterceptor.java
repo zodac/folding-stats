@@ -40,12 +40,13 @@ import javax.servlet.http.HttpServletResponse;
 import me.zodac.folding.api.FoldingRepository;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.util.EncodingUtils;
-import me.zodac.folding.bean.StatsRepository;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.exception.ForbiddenException;
 import me.zodac.folding.rest.exception.UnauthorizedException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.HttpRequestHandler;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.method.HandlerMethod;
@@ -80,29 +81,21 @@ import org.springframework.web.servlet.HandlerInterceptor;
  *
  * @see FoldingRepository#authenticateSystemUser(String, String)
  */
+@Component
 public final class SecurityInterceptor implements HandlerInterceptor {
 
     private static final Logger SECURITY_LOGGER = LogManager.getLogger("security");
 
     private final FoldingRepository foldingRepository;
 
-    private SecurityInterceptor(final FoldingRepository foldingRepository) {
-        this.foldingRepository = foldingRepository;
-    }
-
     /**
-     * Creates an instance of {@link SecurityInterceptor}.
-     *
-     * <p>
-     * Since we must instantiate a new object to register in {@link me.zodac.folding.InterceptorRegister}, we cannot use an
-     * {@link org.springframework.beans.factory.annotation.Autowired} {@link StatsRepository}. Instead, the
-     * {@link me.zodac.folding.InterceptorRegister} will pass in its own injected {@link StatsRepository}.
+     * {@link Autowired} constructor.
      *
      * @param foldingRepository the {@link FoldingRepository}
-     * @return the created {@link SecurityInterceptor}
      */
-    public static SecurityInterceptor create(final FoldingRepository foldingRepository) {
-        return new SecurityInterceptor(foldingRepository);
+    @Autowired
+    public SecurityInterceptor(final FoldingRepository foldingRepository) {
+        this.foldingRepository = foldingRepository;
     }
 
     @Override

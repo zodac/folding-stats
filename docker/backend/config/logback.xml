@@ -59,6 +59,22 @@
         </rollingPolicy>
     </appender>
 
+    <appender name="SQL_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <append>true</append>
+        <file>/var/backend/logs/sql.log</file>
+        <immediateFlush>true</immediateFlush>
+        <encoder>
+            <pattern>${BASE_CONSOLE_LOG_PATTERN}</pattern>
+            <charset>utf8</charset>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>/var/backend/logs/sql.log.%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+            <maxFileSize>100MB</maxFileSize>
+            <maxHistory>31</maxHistory>
+            <totalSizeCap>1000MB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
     <root level="INFO">
         <appender-ref ref="SERVER_LOG"/>
         <appender-ref ref="CONSOLE"/>
@@ -72,6 +88,11 @@
     <!-- The 'additivity=false' option ensures audit data only goes to the audit log -->
     <logger name="audit" level="DEBUG" additivity="false">
         <appender-ref ref="AUDIT_LOG"/>
+    </logger>
+
+    <!-- The 'additivity=false' option ensures audit data only goes to the audit log -->
+    <logger name="sql" level="DEBUG" additivity="false">
+        <appender-ref ref="SQL_LOG"/>
     </logger>
 
     <!-- Suppress logging for unwanted packages -->

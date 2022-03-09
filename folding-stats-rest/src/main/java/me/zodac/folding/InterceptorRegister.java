@@ -24,7 +24,6 @@
 
 package me.zodac.folding;
 
-import me.zodac.folding.api.FoldingRepository;
 import me.zodac.folding.rest.interceptor.SecurityInterceptor;
 import me.zodac.folding.rest.interceptor.StateInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,27 +39,30 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class InterceptorRegister implements WebMvcConfigurer {
 
-    private final FoldingRepository foldingRepository;
+    private final SecurityInterceptor securityInterceptor;
+    private final StateInterceptor stateInterceptor;
 
     /**
      * {@link Autowired} constructor.
      *
-     * @param foldingRepository the {@link FoldingRepository}
+     * @param securityInterceptor the {@link SecurityInterceptor}
+     * @param stateInterceptor    the {@link StateInterceptor}
      */
     @Autowired
-    public InterceptorRegister(final FoldingRepository foldingRepository) {
-        this.foldingRepository = foldingRepository;
+    public InterceptorRegister(final SecurityInterceptor securityInterceptor, final StateInterceptor stateInterceptor) {
+        this.securityInterceptor = securityInterceptor;
+        this.stateInterceptor = stateInterceptor;
     }
 
     @Override
     public void addInterceptors(final InterceptorRegistry registry) {
         registry
-            .addInterceptor(SecurityInterceptor.create(foldingRepository))
+            .addInterceptor(securityInterceptor)
             .addPathPatterns("/**")
             .excludePathPatterns("/error", "/login/admin");
 
         registry
-            .addInterceptor(StateInterceptor.create())
+            .addInterceptor(stateInterceptor)
             .addPathPatterns("/**")
             .excludePathPatterns("/error", "/login/admin");
     }

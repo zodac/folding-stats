@@ -33,6 +33,7 @@ import me.zodac.folding.rest.exception.ServiceUnavailableException;
 import me.zodac.folding.state.SystemStateManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Component;
 import org.springframework.web.HttpRequestHandler;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.method.HandlerMethod;
@@ -50,18 +51,10 @@ import org.springframework.web.servlet.HandlerInterceptor;
  *
  * @see SystemStateManager
  */
-public final class StateInterceptor implements HandlerInterceptor {
+@Component
+public class StateInterceptor implements HandlerInterceptor {
 
     private static final Logger LOGGER = LogManager.getLogger();
-
-    /**
-     * Creates an instance of {@link StateInterceptor}.
-     *
-     * @return the created {@link StateInterceptor}
-     */
-    public static StateInterceptor create() {
-        return new StateInterceptor();
-    }
 
     @Override
     public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler) {
