@@ -30,10 +30,10 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.Map;
 import javax.annotation.security.PermitAll;
+import me.zodac.folding.api.FoldingRepository;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.state.ReadRequired;
 import me.zodac.folding.api.util.EncodingUtils;
-import me.zodac.folding.bean.FoldingRepository;
 import me.zodac.folding.rest.api.LoginCredentials;
 import me.zodac.folding.rest.exception.ForbiddenException;
 import me.zodac.folding.rest.exception.InvalidLoginCredentialsException;
@@ -57,8 +57,7 @@ public class LoginEndpoint {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @Autowired
-    private FoldingRepository foldingRepository;
+    private final FoldingRepository foldingRepository;
 
     // Prometheus counters
     private final Counter loginAttempts;
@@ -66,11 +65,14 @@ public class LoginEndpoint {
     private final Counter failedLogins;
 
     /**
-     * Constructor to inject {@link MeterRegistry} and configure Prometheus {@link Counter}s.
+     * {@link Autowired} constructor to inject {@link MeterRegistry} and configure Prometheus {@link Counter}s.
      *
-     * @param registry the Prometheus {@link MeterRegistry}
+     * @param foldingRepository the {@link FoldingRepository}
+     * @param registry          the Prometheus {@link MeterRegistry}
      */
-    public LoginEndpoint(final MeterRegistry registry) {
+    public LoginEndpoint(final FoldingRepository foldingRepository, final MeterRegistry registry) {
+        this.foldingRepository = foldingRepository;
+
         loginAttempts = Counter.builder("login_attempts_counter")
             .description("Number of login attempts to the admin page")
             .register(registry);
@@ -89,7 +91,7 @@ public class LoginEndpoint {
      * @return {@link me.zodac.folding.rest.response.Responses#ok(Object)}
      * @throws InvalidLoginCredentialsException thrown if the input {@link LoginCredentials} are in an incorrect format
      * @throws UnauthorizedException            thrown if the user does not exist, or the password is incorrect
-     * @throws ForbiddenException               thown if the user and password is accepted, but it does not have the correct role
+     * @throws ForbiddenException               thrown if the user and password is accepted, but it does not have the correct role
      */
     @ReadRequired
     @PermitAll

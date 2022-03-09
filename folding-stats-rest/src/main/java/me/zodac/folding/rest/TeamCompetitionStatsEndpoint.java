@@ -36,6 +36,7 @@ import java.util.Map;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
+import me.zodac.folding.api.FoldingRepository;
 import me.zodac.folding.api.state.ReadRequired;
 import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.state.WriteRequired;
@@ -43,7 +44,6 @@ import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
-import me.zodac.folding.bean.FoldingRepository;
 import me.zodac.folding.bean.StatsRepository;
 import me.zodac.folding.bean.tc.LeaderboardStatsGenerator;
 import me.zodac.folding.bean.tc.user.UserStatsParser;
@@ -77,31 +77,39 @@ public class TeamCompetitionStatsEndpoint {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @Autowired
-    private FoldingRepository foldingRepository;
-
-    @Autowired
-    private LeaderboardStatsGenerator leaderboardStatsGenerator;
-
-    @Autowired
-    private StatsRepository statsRepository;
-
-    @Autowired
-    private UserStatsParser userStatsParser;
-
-    @Autowired
-    private UserStatsResetter userStatsResetter;
+    private final FoldingRepository foldingRepository;
+    private final LeaderboardStatsGenerator leaderboardStatsGenerator;
+    private final StatsRepository statsRepository;
+    private final UserStatsParser userStatsParser;
+    private final UserStatsResetter userStatsResetter;
 
     // Prometheus counters
     private final Counter visitCounter;
     private final Counter userStatsOffsets;
 
     /**
-     * Constructor to inject {@link MeterRegistry} and configure Prometheus {@link Counter}s.
+     * {@link Autowired} constructor to inject {@link MeterRegistry} and configure Prometheus {@link Counter}s.
      *
-     * @param registry the Prometheus {@link MeterRegistry}
+     * @param foldingRepository         the {@link FoldingRepository}
+     * @param leaderboardStatsGenerator the {@link LeaderboardStatsGenerator}
+     * @param registry                  the Prometheus {@link MeterRegistry}
+     * @param statsRepository           the {@link StatsRepository}
+     * @param userStatsParser           the {@link UserStatsParser}
+     * @param userStatsResetter         the {@link UserStatsResetter}
      */
-    public TeamCompetitionStatsEndpoint(final MeterRegistry registry) {
+    @Autowired
+    public TeamCompetitionStatsEndpoint(final FoldingRepository foldingRepository,
+                                        final LeaderboardStatsGenerator leaderboardStatsGenerator,
+                                        final MeterRegistry registry,
+                                        final StatsRepository statsRepository,
+                                        final UserStatsParser userStatsParser,
+                                        final UserStatsResetter userStatsResetter) {
+        this.foldingRepository = foldingRepository;
+        this.leaderboardStatsGenerator = leaderboardStatsGenerator;
+        this.statsRepository = statsRepository;
+        this.userStatsParser = userStatsParser;
+        this.userStatsResetter = userStatsResetter;
+
         visitCounter = Counter.builder("visit_counter")
             .description("Number of visits to the site")
             .register(registry);

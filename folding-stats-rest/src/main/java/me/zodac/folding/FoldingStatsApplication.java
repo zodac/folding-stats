@@ -25,11 +25,11 @@
 package me.zodac.folding;
 
 import java.util.Collection;
+import me.zodac.folding.api.FoldingRepository;
 import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
-import me.zodac.folding.bean.FoldingRepository;
 import me.zodac.folding.bean.StatsRepository;
 import me.zodac.folding.state.SystemStateManager;
 import org.apache.logging.log4j.LogManager;

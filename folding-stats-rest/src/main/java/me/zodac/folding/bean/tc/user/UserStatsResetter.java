@@ -25,8 +25,8 @@
 package me.zodac.folding.bean.tc.user;
 
 import java.util.Collection;
+import me.zodac.folding.api.FoldingRepository;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.bean.FoldingRepository;
 import me.zodac.folding.bean.StatsRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

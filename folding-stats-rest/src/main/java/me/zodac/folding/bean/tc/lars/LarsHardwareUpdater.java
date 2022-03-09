@@ -30,12 +30,12 @@ import static me.zodac.folding.api.util.NumberUtils.formatWithCommas;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import me.zodac.folding.api.FoldingRepository;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.HardwareMake;
 import me.zodac.folding.api.tc.HardwareType;
 import me.zodac.folding.api.tc.lars.LarsGpu;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
-import me.zodac.folding.bean.FoldingRepository;
 import me.zodac.folding.lars.HardwareSplitter;
 import me.zodac.folding.lars.LarsGpuRetriever;
 import org.apache.logging.log4j.LogManager;
@@ -53,8 +53,17 @@ public class LarsHardwareUpdater {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final String LARS_URL_ROOT = EnvironmentVariableUtils.getOrDefault("LARS_URL_ROOT", "https://folding.lar.systems");
 
+    private final FoldingRepository foldingRepository;
+
+    /**
+     * {@link Autowired} constructor.
+     *
+     * @param foldingRepository the {@link FoldingRepository}
+     */
     @Autowired
-    private FoldingRepository foldingRepository;
+    public LarsHardwareUpdater(final FoldingRepository foldingRepository) {
+        this.foldingRepository = foldingRepository;
+    }
 
     /**
      * Retrieves {@link me.zodac.folding.api.tc.HardwareType} data from LARS, creates {@link Hardware} instances, then updates to the DB.

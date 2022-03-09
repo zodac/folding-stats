@@ -42,11 +42,19 @@ public class UserStatsStorer {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @Autowired
-    private StatsRepository statsRepository;
+    private final LeaderboardStatsGenerator leaderboardStatsGenerator;
+    private final StatsRepository statsRepository;
 
-    @Autowired
-    private LeaderboardStatsGenerator leaderboardStatsGenerator;
+    /**
+     * {@link Autowired} constructor.
+     *
+     * @param leaderboardStatsGenerator the {@link LeaderboardStatsGenerator}
+     * @param statsRepository           the {@link StatsRepository}
+     */
+    public UserStatsStorer(final LeaderboardStatsGenerator leaderboardStatsGenerator, final StatsRepository statsRepository) {
+        this.leaderboardStatsGenerator = leaderboardStatsGenerator;
+        this.statsRepository = statsRepository;
+    }
 
     /**
      * Stores the {@link MonthlyResult} for the current {@link java.time.ZoneOffset#UTC} date-time.

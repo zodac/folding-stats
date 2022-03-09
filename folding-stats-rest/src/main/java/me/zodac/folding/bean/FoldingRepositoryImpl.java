@@ -28,6 +28,7 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
+import me.zodac.folding.api.FoldingRepository;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.state.ParsingState;
@@ -44,7 +45,6 @@ import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.bean.tc.user.UserStatsParser;
 import me.zodac.folding.rest.exception.NotFoundException;
 import me.zodac.folding.state.ParsingStateManager;
-import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,61 +64,51 @@ import org.springframework.stereotype.Component;
  * implement that logic here, and delegate any CRUD needs to {@link Storage}.
  */
 @Component
-public class FoldingRepository {
+public class FoldingRepositoryImpl implements FoldingRepository {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final FoldingStatsRetriever FOLDING_STATS_RETRIEVER = HttpFoldingStatsRetriever.create();
 
-    @Autowired
-    private StatsRepository statsRepository;
-
-    @Autowired
-    private Storage storage;
-
-    @Autowired
-    private UserStatsParser userStatsParser;
+    private final FoldingStatsRetriever foldingStatsRetriever;
+    private final StatsRepository statsRepository;
+    private final Storage storage;
+    private final UserStatsParser userStatsParser;
 
     /**
-     * Creates a {@link Hardware}.
+     * {@link Autowired} constructor.
      *
-     * @param hardware the {@link Hardware} to create
-     * @return the created {@link Hardware}, with ID
+     * @param foldingStatsRetriever the {@link FoldingStatsRetriever}
+     * @param statsRepository       the {@link StatsRepository}
+     * @param storage               the {@link Storage}
+     * @param userStatsParser       the {@link UserStatsParser}
      */
+    @Autowired
+    public FoldingRepositoryImpl(final FoldingStatsRetriever foldingStatsRetriever,
+                                 final StatsRepository statsRepository,
+                                 final Storage storage,
+                                 final UserStatsParser userStatsParser) {
+        this.foldingStatsRetriever = foldingStatsRetriever;
+        this.statsRepository = statsRepository;
+        this.storage = storage;
+        this.userStatsParser = userStatsParser;
+    }
+
+    @Override
     public Hardware createHardware(final Hardware hardware) {
         return storage.createHardware(hardware);
     }
 
-    /**
-     * Retrieves all {@link Hardware}s.
-     *
-     * @return a {@link Collection} of the retrieved {@link Hardware}
-     */
+    @Override
     public Collection<Hardware> getAllHardware() {
         return storage.getAllHardware();
     }
 
-    /**
-     * Retrieves a {@link Hardware}.
-     *
-     * @param hardwareId the ID of the {@link Hardware} to retrieve
-     * @return the retrieved {@link Hardware}
-     * @throws NotFoundException thrown if the {@link Hardware} cannot be found
-     */
+    @Override
     public Hardware getHardware(final int hardwareId) {
         return storage.getHardware(hardwareId)
             .orElseThrow(() -> new NotFoundException(Hardware.class, hardwareId));
     }
 
-    /**
-     * Updates an existing {@link Hardware}.
-     *
-     * <p>
-     * Also handles state change to any {@link User}s using this {@link Hardware} if necessary.
-     *
-     * @param hardwareToUpdate the {@link Hardware} with updated values
-     * @param existingHardware the existing {@link Hardware}
-     * @return the updated {@link Hardware}
-     */
+    @Override
     public Hardware updateHardware(final Hardware hardwareToUpdate, final Hardware existingHardware) {
         final Hardware updatedHardware = storage.updateHardware(hardwareToUpdate);
 
@@ -145,26 +135,12 @@ public class FoldingRepository {
             .toList();
     }
 
-    /**
-     * Deletes a {@link Hardware}.
-     *
-     * @param hardware the {@link Hardware} to delete
-     */
+    @Override
     public void deleteHardware(final Hardware hardware) {
         storage.deleteHardware(hardware.getId());
     }
 
-    /**
-     * Creates a {@link Team}.
-     *
-     * <p>
-     * If the system is not in {@link ParsingState#DISABLED}, we will also update stats for all {@link User}s.
-     *
-     * @param team the {@link Team} to create
-     * @return the created {@link Team}, with ID
-     * @see ParsingStateManager
-     * @see UserStatsParser#parseTcStatsForUsersAndWait(Collection)
-     */
+    @Override
     public Team createTeam(final Team team) {
         final Team createdTeam = storage.createTeam(team);
 
@@ -176,56 +152,28 @@ public class FoldingRepository {
         return createdTeam;
     }
 
-    /**
-     * Retrieves all {@link Team}.
-     *
-     * @return a {@link Collection} of the retrieved {@link Team}s
-     */
+    @Override
     public Collection<Team> getAllTeams() {
         return storage.getAllTeams();
     }
 
-    /**
-     * Retrieves a {@link Team}.
-     *
-     * @param teamId the ID of the {@link Team} to retrieve
-     * @return the retrieved {@link Team}
-     * @throws NotFoundException thrown if the {@link Team} cannot be found
-     */
+    @Override
     public Team getTeam(final int teamId) {
         return storage.getTeam(teamId)
             .orElseThrow(() -> new NotFoundException(Team.class, teamId));
     }
 
-    /**
-     * Updates an existing {@link Team}.
-     *
-     * @param teamToUpdate the {@link Team} with updated values
-     * @return the updated {@link Team}
-     */
+    @Override
     public Team updateTeam(final Team teamToUpdate) {
         return storage.updateTeam(teamToUpdate);
     }
 
-    /**
-     * Deletes a {@link Team}.
-     *
-     * @param team the {@link Team} to delete
-     */
+    @Override
     public void deleteTeam(final Team team) {
         storage.deleteTeam(team.getId());
     }
 
-    /**
-     * Creates a {@link User}.
-     *
-     * <p>
-     * Creates initial {@link UserStats} on creation. Also triggers a new <code>Team Competition</code> stats parse.
-     *
-     * @param user the {@link User} to create
-     * @return the created {@link User}, with ID
-     * @see me.zodac.folding.bean.tc.user.UserStatsParser#parseTcStatsForUsers(Collection)
-     */
+    @Override
     public User createUser(final User user) {
         if (isUserCaptainAndCaptainExistsOnTeam(user)) {
             removeCaptaincyFromExistingTeamCaptain(user.getTeam());
@@ -235,7 +183,7 @@ public class FoldingRepository {
 
         try {
             // When adding a new user, we configure the initial stats DB/cache
-            final UserStats currentUserStats = FOLDING_STATS_RETRIEVER.getTotalStats(createdUser);
+            final UserStats currentUserStats = foldingStatsRetriever.getTotalStats(createdUser);
             final UserStats initialStats = statsRepository.createInitialStats(currentUserStats);
             LOGGER.info("User '{}' (ID: {}) created with initial stats: {}", createdUser.getDisplayName(), createdUser.getId(), initialStats);
             userStatsParser.parseTcStatsForUsers(Collections.singletonList(createdUser));
@@ -246,21 +194,12 @@ public class FoldingRepository {
         return createdUser;
     }
 
-    /**
-     * Retrieves all {@link User}s, with passkeys unmodified.
-     *
-     * @return a {@link Collection} of the retrieved {@link User}s
-     */
+    @Override
     public Collection<User> getAllUsersWithPasskeys() {
         return storage.getAllUsers();
     }
 
-    /**
-     * Retrieves all {@link User}s, with passkeys masked.
-     *
-     * @return a {@link Collection} of the retrieved {@link User}s
-     * @see User#hidePasskey(User)
-     */
+    @Override
     public Collection<User> getAllUsersWithoutPasskeys() {
         return getAllUsersWithPasskeys()
             .stream()
@@ -268,41 +207,19 @@ public class FoldingRepository {
             .toList();
     }
 
-    /**
-     * Retrieves a {@link User}, with the passkey unmodified.
-     *
-     * @param userId the ID of the {@link User} to retrieve
-     * @return the retrieved {@link User}
-     * @throws NotFoundException thrown if the {@link User} cannot be found
-     */
+    @Override
     public User getUserWithPasskey(final int userId) {
         return storage.getUser(userId)
             .orElseThrow(() -> new NotFoundException(User.class, userId));
     }
 
-    /**
-     * Retrieves a {@link User}, with the passkey masked.
-     *
-     * @param userId the ID of the {@link User} to retrieve
-     * @return the retrieved {@link User} with no passkey exposed
-     * @throws NotFoundException thrown if the {@link User} cannot be found
-     * @see User#hidePasskey(User)
-     */
+    @Override
     public User getUserWithoutPasskey(final int userId) {
         final User userWithPasskey = getUserWithPasskey(userId);
         return User.hidePasskey(userWithPasskey);
     }
 
-    /**
-     * Updates an existing {@link User}.
-     *
-     * <p>
-     * Also handles state change to this {@link User} if necessary.
-     *
-     * @param userToUpdate the {@link User} with updated values
-     * @param existingUser the existing {@link User}
-     * @return the updated {@link User}
-     */
+    @Override
     public User updateUser(final User userToUpdate, final User existingUser) {
         if (isUserCaptainAndCaptainExistsOnTeam(userToUpdate)) {
             final boolean isCaptainChange = userToUpdate.isUserIsCaptain() != existingUser.isUserIsCaptain();
@@ -373,7 +290,7 @@ public class FoldingRepository {
         }
 
         try {
-            final UserStats userTotalStats = FOLDING_STATS_RETRIEVER.getTotalStats(userWithStateChange);
+            final UserStats userTotalStats = foldingStatsRetriever.getTotalStats(userWithStateChange);
             LOGGER.debug("Setting initial stats to: {}", userTotalStats);
             statsRepository.createInitialStats(userTotalStats);
 
@@ -464,15 +381,7 @@ public class FoldingRepository {
             .findAny();
     }
 
-    /**
-     * Deletes a {@link User}.
-     *
-     * <p>
-     * If the {@link User} has any <code>Team Competition</code> {@link UserTcStats}, those are retained for their {@link Team} as
-     * {@link RetiredUserTcStats}.
-     *
-     * @param user the {@link User} to delete
-     */
+    @Override
     public void deleteUser(final User user) {
         // Retrieve the user's stats before deleting the user, so we can use the values for the retried user stats
         final UserTcStats userStats = storage.getHourlyTcStats(user.getId())
@@ -490,15 +399,7 @@ public class FoldingRepository {
             createdRetiredUserTcStats.getRetiredUserId());
     }
 
-    /**
-     * Retrieves all {@link User}s currently referencing the provided {@link Team}.
-     *
-     * <p>
-     * The {@link User} {@code passkey} will be masked with {@link User#hidePasskey(User)}.
-     *
-     * @param team the {@link Team} to check for
-     * @return a {@link Collection} of {@link User}s using the {@link Team}
-     */
+    @Override
     public Collection<User> getUsersOnTeam(final Team team) {
         if (team.getId() == Team.EMPTY_TEAM_ID) {
             return Collections.emptyList();
@@ -511,21 +412,7 @@ public class FoldingRepository {
             .toList();
     }
 
-    /**
-     * Authenticates a system user and retrieves its roles.
-     *
-     * <p>
-     * The following scenarios are considered:
-     * <ul>
-     *     <li>The user does not exist</li>
-     *     <li>The user exists but the password is incorrect</li>
-     *     <li>The user exists, and the password is correct</li>
-     * </ul>
-     *
-     * @param userName the system user username
-     * @param password the system user password
-     * @return the {@link UserAuthenticationResult}
-     */
+    @Override
     public UserAuthenticationResult authenticateSystemUser(final String userName, final String password) {
         final UserAuthenticationResult userAuthenticationResult = storage.authenticateSystemUser(userName, password);
 
@@ -538,40 +425,22 @@ public class FoldingRepository {
         return userAuthenticationResult;
     }
 
-    /**
-     * Creates a {@link UserChange}.
-     *
-     * @param userChange the {@link UserChange} to create
-     * @return the created {@link UserChange}, with ID
-     */
+    @Override
     public UserChange createUserChange(final UserChange userChange) {
         return storage.createUserChange(userChange);
     }
 
-    /**
-     * Retrieves all {@link UserChange}s, with {@link User} passkeys unmodified.
-     *
-     * @return a {@link Collection} of the retrieved {@link UserChange}
-     */
+    @Override
     public Collection<UserChange> getAllUserChangesWithPasskeys() {
         return storage.getAllUserChanges();
     }
 
-    /**
-     * Retrieves all {@link UserChange}s with any of the given {@link UserChangeState}s, with {@link User} passkeys unmodified.
-     *
-     * @param states the {@link UserChangeState}s to look for
-     * @return a {@link Collection} of the retrieved {@link UserChange}
-     */
+    @Override
     public Collection<UserChange> getAllUserChangesWithPasskeys(final Collection<UserChangeState> states) {
         return storage.getAllUserChanges(states);
     }
 
-    /**
-     * Retrieves all {@link UserChange}s, with {@link User} passkeys masked.
-     *
-     * @return a {@link Collection} of the retrieved {@link UserChange}
-     */
+    @Override
     public Collection<UserChange> getAllUserChangesWithoutPasskeys() {
         return getAllUserChangesWithPasskeys()
             .stream()
@@ -579,12 +448,7 @@ public class FoldingRepository {
             .toList();
     }
 
-    /**
-     * Retrieves all {@link UserChange}s with any of the given {@link UserChangeState}s, with {@link User} passkeys masked.
-     *
-     * @param states the {@link UserChangeState}s to look for
-     * @return a {@link Collection} of the retrieved {@link UserChange}
-     */
+    @Override
     public Collection<UserChange> getAllUserChangesWithoutPasskeys(final Collection<UserChangeState> states) {
         return getAllUserChangesWithPasskeys(states)
             .stream()
@@ -592,40 +456,23 @@ public class FoldingRepository {
             .toList();
     }
 
-    /**
-     * Retrieves all {@link UserChange}s that have been approved for {@link UserChangeState#APPROVED_NEXT_MONTH}.
-     *
-     * @return a {@link Collection} of the retrieved {@link UserChange}
-     */
+    @Override
     public Collection<UserChange> getAllUserChangesForNextMonth() {
         return storage.getAllUserChanges(Collections.singletonList(UserChangeState.APPROVED_NEXT_MONTH));
     }
 
-    /**
-     * Retrieves a {@link UserChange}.
-     *
-     * @param userChangeId the ID of the {@link UserChange} to retrieve
-     * @return the retrieved {@link UserChange}
-     * @throws NotFoundException thrown if the {@link UserChange} cannot be found
-     */
+    @Override
     public UserChange getUserChange(final int userChangeId) {
         return storage.getUserChange(userChangeId)
             .orElseThrow(() -> new NotFoundException(UserChange.class, userChangeId));
     }
 
-    /**
-     * Updates an existing {@link UserChange}.
-     *
-     * @param userChangeToUpdate the {@link UserChange} with updated values
-     * @return the updated {@link UserChange}
-     */
+    @Override
     public UserChange updateUserChange(final UserChange userChangeToUpdate) {
         return storage.updateUserChange(userChangeToUpdate);
     }
 
-    /**
-     * Debug function which will print the contents of any caches being used to the system log.
-     */
+    @Override
     public void printCacheContents() {
         storage.printCacheContents();
     }

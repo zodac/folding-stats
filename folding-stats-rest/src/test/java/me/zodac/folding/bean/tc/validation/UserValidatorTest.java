@@ -24,12 +24,10 @@
 
 package me.zodac.folding.bean.tc.validation;
 
-import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowableOfType;
 
-import java.util.ArrayList;
-import java.util.List;
+import me.zodac.folding.api.FoldingRepository;
 import me.zodac.folding.api.exception.ConflictException;
 import me.zodac.folding.api.exception.ValidationException;
 import me.zodac.folding.api.tc.Category;
@@ -52,6 +50,7 @@ class UserValidatorTest {
 
     private static int hardwareId = 1;
     private static int teamId = 1;
+    private static int userId = 1;
 
     @Test
     void whenValidatingCreate_givenValidUser_thenSuccessResponseIsReturned() {
@@ -70,12 +69,12 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final User response = userValidator.validateCreate(user,
-            emptyList(),
-            List.of(hardware),
-            List.of(team)
-        );
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
+
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final User response = userValidator.create(user);
 
         assertThat(response)
             .as("Expected validation to pass")
@@ -99,10 +98,12 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), List.of(hardware), List.of(team)), ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'category' must be one of: [AMD_GPU, NVIDIA_GPU, WILDCARD]");
     }
@@ -123,11 +124,12 @@ class UserValidatorTest {
             .hardwareId(hardware.getId())
             .teamId(team.getId())
             .build();
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), List.of(hardware), List.of(team)), ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen");
     }
@@ -149,10 +151,12 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), List.of(hardware), List.of(team)), ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen");
     }
@@ -174,10 +178,12 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), List.of(hardware), List.of(team)), ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'displayName' must not be empty");
     }
@@ -199,10 +205,12 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), List.of(hardware), List.of(team)), ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'passkey' must be 32 characters long and include only alphanumeric characters");
     }
@@ -224,10 +232,12 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), List.of(hardware), List.of(team)), ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'passkey' must be 32 characters long and include only alphanumeric characters");
     }
@@ -249,12 +259,12 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final User response = userValidator.validateCreate(user,
-            emptyList(),
-            List.of(hardware),
-            List.of(team)
-        );
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
+
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final User response = userValidator.create(user);
 
         assertThat(response)
             .as("Expected validation to pass")
@@ -278,10 +288,12 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), List.of(hardware), List.of(team)), ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'profileLink' is not a valid link: 'invalidUrl'");
     }
@@ -303,12 +315,12 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final User response = userValidator.validateCreate(user,
-            emptyList(),
-            List.of(hardware),
-            List.of(team)
-        );
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
+
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final User response = userValidator.create(user);
 
         assertThat(response)
             .as("Expected validation to pass")
@@ -332,10 +344,12 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), List.of(hardware), List.of(team)), ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'liveStatsLink' is not a valid link: 'invalidUrl'");
     }
@@ -372,12 +386,15 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final User response = userValidator.validateCreate(user,
-            List.of(otherUser),
-            List.of(hardware, otherHardware),
-            List.of(team, otherTeam)
-        );
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createHardware(otherHardware);
+        foldingRepository.createTeam(team);
+        foldingRepository.createTeam(otherTeam);
+        foldingRepository.createUser(otherUser);
+
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final User response = userValidator.create(user);
 
         assertThat(response)
             .as("Expected validation to pass")
@@ -416,11 +433,15 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createHardware(otherHardware);
+        foldingRepository.createTeam(team);
+        foldingRepository.createTeam(otherTeam);
+        foldingRepository.createUser(otherUser);
 
-        final ConflictException e = catchThrowableOfType(
-            () -> userValidator.validateCreate(user, List.of(otherUser), List.of(hardware, otherHardware), List.of(team, otherTeam)),
-            ConflictException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ConflictException e = catchThrowableOfType(() -> userValidator.create(user), ConflictException.class);
         assertThat(e.getConflictFailure().getConflictingAttributes())
             .containsOnly(
                 "foldingUserName",
@@ -456,10 +477,12 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), List.of(hardware), List.of(team)), ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly(String.format("Category '%s' cannot be filled by hardware of make '%s', must be one of: %s", Category.AMD_GPU,
                 hardware.getHardwareMake(), Category.AMD_GPU.supportedHardwareMakes()));
@@ -490,10 +513,12 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), List.of(hardware), List.of(team)), ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly(String.format("Category '%s' cannot be filled by hardware of type '%s', must be one of: %s", Category.AMD_GPU,
                 hardware.getHardwareType(), Category.AMD_GPU.supportedHardwareTypes()));
@@ -524,10 +549,12 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), List.of(hardware), List.of(team)), ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly(String.format("Field 'hardwareId' must be one of: [%s: %s]", hardware.getId(), hardware.getHardwareName()));
     }
@@ -548,12 +575,13 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createTeam(team);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), emptyList(), List.of(team)), ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
-            .containsOnly("No hardware exist on the system");
+            .containsOnly("No hardwares exist on the system");
     }
 
     @Test
@@ -581,10 +609,12 @@ class UserValidatorTest {
             .teamId(1)
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), List.of(hardware), List.of(team)), ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly(String.format("Field 'teamId' must be one of: [%s: %s]", team.getId(), team.getTeamName()));
     }
@@ -605,10 +635,11 @@ class UserValidatorTest {
             .teamId(1)
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), List.of(hardware), emptyList()), ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("No teams exist on the system");
     }
@@ -642,12 +673,13 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final User response = userValidator.validateCreate(user,
-            List.of(currentCaptain),
-            List.of(hardware),
-            List.of(team)
-        );
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
+        foldingRepository.createUser(currentCaptain);
+
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final User response = userValidator.create(user);
 
         assertThat(response)
             .as("Expected validation to pass")
@@ -683,12 +715,13 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final User response = userValidator.validateCreate(user,
-            List.of(currentCaptain),
-            List.of(hardware),
-            List.of(team)
-        );
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
+        foldingRepository.createUser(currentCaptain);
+
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final User response = userValidator.create(user);
 
         assertThat(response)
             .as("Expected validation to pass")
@@ -699,24 +732,6 @@ class UserValidatorTest {
     void whenValidatingCreate_givenTeamAlreadyHasMaximumTotalUsers_thenFailureResponseIsReturned() {
         final Hardware hardware = generateHardware();
         final Team team = generateTeam();
-
-        final List<User> usersOnTeam = new ArrayList<>(Category.maximumPermittedAmountForAllCategories());
-
-        for (int i = 0; i < Category.maximumPermittedAmountForAllCategories(); i++) {
-            usersOnTeam.add(
-                User.builder()
-                    .foldingUserName("user" + 0)
-                    .displayName("user" + 0)
-                    .passkey("DummyPasskey12345678901234567891")
-                    .category(Category.WILDCARD)
-                    .profileLink("https://www.google.com")
-                    .liveStatsLink("https://www.google.com")
-                    .userIsCaptain(false)
-                    .hardware(hardware)
-                    .team(team)
-                    .build()
-            );
-        }
 
         final UserRequest user = UserRequest.builder()
             .foldingUserName("user")
@@ -730,12 +745,31 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateCreate(user, usersOnTeam, List.of(hardware), List.of(team)), ValidationException.class);
+        for (int i = 0; i < Category.maximumPermittedAmountForAllCategories(); i++) {
+            foldingRepository.createUser(
+                User.builder()
+                    .id(userId++)
+                    .foldingUserName("user" + i)
+                    .displayName("user" + i)
+                    .passkey("DummyPasskey12345678901234567891")
+                    .category(Category.WILDCARD)
+                    .profileLink("https://www.google.com")
+                    .liveStatsLink("https://www.google.com")
+                    .userIsCaptain(false)
+                    .hardware(hardware)
+                    .team(team)
+                    .build()
+            );
+        }
+
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
-            .containsOnly(String.format("Team '%s' has %s users, maximum permitted is %s", team.getTeamName(), usersOnTeam.size(),
+            .containsOnly(String.format("Team '%1$s' has %2$s users, maximum permitted is %2$s", team.getTeamName(),
                 Category.maximumPermittedAmountForAllCategories()));
     }
 
@@ -744,10 +778,24 @@ class UserValidatorTest {
         final Hardware hardware = generateHardware();
         final Team team = generateTeam();
 
-        final List<User> usersOnTeamInCategory = new ArrayList<>(Category.NVIDIA_GPU.permittedUsers());
+        final UserRequest user = UserRequest.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .profileLink("https://www.google.com")
+            .liveStatsLink("https://www.google.com")
+            .userIsCaptain(true)
+            .hardwareId(hardware.getId())
+            .teamId(team.getId())
+            .build();
+
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
 
         for (int i = 0; i < Category.AMD_GPU.permittedUsers(); i++) {
-            usersOnTeamInCategory.add(
+            foldingRepository.createUser(
                 User.builder()
                     .foldingUserName("user" + 0)
                     .displayName("user" + 0)
@@ -762,6 +810,19 @@ class UserValidatorTest {
             );
         }
 
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final User response = userValidator.create(user);
+
+        assertThat(response)
+            .as("Expected validation to pass")
+            .isNotNull();
+    }
+
+    @Test
+    void whenValidatingCreate_givenTeamAlreadyHasMaximumUsersInCategory_thenFailureResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
+
         final UserRequest user = UserRequest.builder()
             .foldingUserName("user")
             .displayName("user")
@@ -774,27 +835,12 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final User response = userValidator.validateCreate(user,
-            usersOnTeamInCategory,
-            List.of(hardware),
-            List.of(team)
-        );
-
-        assertThat(response)
-            .as("Expected validation to pass")
-            .isNotNull();
-    }
-
-    @Test
-    void whenValidatingCreate_givenTeamAlreadyHasMaximumUsersInCategory_thenFailureResponseIsReturned() {
-        final Hardware hardware = generateHardware();
-        final Team team = generateTeam();
-
-        final List<User> usersOnTeamInCategory = new ArrayList<>(Category.NVIDIA_GPU.permittedUsers());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
 
         for (int i = 0; i < Category.NVIDIA_GPU.permittedUsers(); i++) {
-            usersOnTeamInCategory.add(
+            foldingRepository.createUser(
                 User.builder()
                     .foldingUserName("user" + 0)
                     .displayName("user" + 0)
@@ -809,26 +855,12 @@ class UserValidatorTest {
             );
         }
 
-        final UserRequest user = UserRequest.builder()
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU.toString())
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .hardwareId(hardware.getId())
-            .teamId(team.getId())
-            .build();
-
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateCreate(user, usersOnTeamInCategory, List.of(hardware), List.of(team)),
-                ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
-            .containsOnly(String.format("Team '%s' already has %s users in category '%s', only %s permitted", team.getTeamName(),
-                usersOnTeamInCategory.size(), Category.NVIDIA_GPU, Category.NVIDIA_GPU.permittedUsers()));
+            .containsOnly(
+                String.format("Team '%1$s' already has %3$s users in category '%2$s', only %3$s permitted", team.getTeamName(), Category.NVIDIA_GPU,
+                    Category.NVIDIA_GPU.permittedUsers()));
     }
 
     @Test
@@ -848,16 +880,16 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new NoUnitsFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), List.of(hardware), List.of(team)), ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new NoUnitsFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly(
-                String.format(
-                    "User '%s' has 0 Work Units with passkey '%s', there must be at least one completed Work Unit before adding the user",
-                    user.getDisplayName(), user.getPasskey()
-                )
+                String.format("User '%s' has 0 Work Units with passkey '%s', there must be at least one completed Work Unit before adding the user",
+                    user.getDisplayName(), user.getPasskey())
             );
     }
 
@@ -878,14 +910,16 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ExternalConnectionFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), List.of(hardware), List.of(team)), ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ExternalConnectionFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
-            .containsOnly(
-                String.format("Unable to connect to 'https://www.google.com' to check stats for user '%s': Error connecting",
-                    user.getDisplayName()));
+            .containsOnly(String.format("Unable to connect to 'https://www.google.com' to check stats for user '%s': Error connecting",
+                user.getDisplayName())
+            );
     }
 
     @Test
@@ -905,10 +939,12 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new UnexpectedExceptionFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), List.of(hardware), List.of(team)), ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new UnexpectedExceptionFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly(String.format("Unable to check stats for user '%s': Error", user.getDisplayName()));
     }
@@ -930,10 +966,12 @@ class UserValidatorTest {
             .teamId(team.getId())
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateCreate(user, emptyList(), List.of(hardware), List.of(team)), ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly(
                 "Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen",
@@ -974,12 +1012,13 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final User response = userValidator.validateUpdate(user, existingUser,
-            List.of(existingUser),
-            List.of(hardware),
-            List.of(team)
-        );
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
+        foldingRepository.createUser(existingUser);
+
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final User response = userValidator.update(user, existingUser);
 
         assertThat(response)
             .as("Expected validation to pass")
@@ -1015,11 +1054,13 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
+        foldingRepository.createUser(existingUser);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
-                ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'category' must be one of: [AMD_GPU, NVIDIA_GPU, WILDCARD]");
     }
@@ -1053,11 +1094,13 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
+        foldingRepository.createUser(existingUser);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
-                ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen");
     }
@@ -1091,11 +1134,13 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
+        foldingRepository.createUser(existingUser);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
-                ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen");
     }
@@ -1129,11 +1174,13 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
+        foldingRepository.createUser(existingUser);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
-                ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'displayName' must not be empty");
     }
@@ -1167,11 +1214,13 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
+        foldingRepository.createUser(existingUser);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
-                ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'passkey' must be 32 characters long and include only alphanumeric characters");
     }
@@ -1205,11 +1254,13 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
+        foldingRepository.createUser(existingUser);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
-                ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'passkey' must be 32 characters long and include only alphanumeric characters");
     }
@@ -1243,11 +1294,13 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
+        foldingRepository.createUser(existingUser);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
-                ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'passkey' must be 32 characters long and include only alphanumeric characters");
     }
@@ -1281,12 +1334,13 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final User response = userValidator.validateUpdate(user, existingUser,
-            List.of(existingUser),
-            List.of(hardware),
-            List.of(team)
-        );
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
+        foldingRepository.createUser(existingUser);
+
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final User response = userValidator.update(user, existingUser);
 
         assertThat(response)
             .as("Expected validation to pass")
@@ -1322,11 +1376,13 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
+        foldingRepository.createUser(existingUser);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
-                ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'profileLink' is not a valid link: 'invalidUrl'");
     }
@@ -1360,12 +1416,13 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final User response = userValidator.validateUpdate(user, existingUser,
-            List.of(existingUser),
-            List.of(hardware),
-            List.of(team)
-        );
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
+        foldingRepository.createUser(existingUser);
+
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final User response = userValidator.update(user, existingUser);
 
         assertThat(response)
             .as("Expected validation to pass")
@@ -1401,11 +1458,13 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
+        foldingRepository.createUser(existingUser);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
-                ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'liveStatsLink' is not a valid link: 'invalidUrl'");
     }
@@ -1416,7 +1475,7 @@ class UserValidatorTest {
         final Team otherTeam = generateTeam();
 
         final User otherUser = User.builder()
-            .id(1)
+            .id(userId++)
             .foldingUserName("user")
             .displayName("user")
             .passkey("DummyPasskey12345678901234567890")
@@ -1444,7 +1503,7 @@ class UserValidatorTest {
             .build();
 
         final User existingUser = User.builder()
-            .id(2)
+            .id(userId++)
             .foldingUserName("differentUser")
             .displayName("user")
             .passkey("DummyPasskey12345678901234567890")
@@ -1456,11 +1515,16 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createHardware(otherHardware);
+        foldingRepository.createTeam(team);
+        foldingRepository.createTeam(otherTeam);
+        foldingRepository.createUser(existingUser);
+        foldingRepository.createUser(otherUser);
 
-        final ConflictException e = catchThrowableOfType(
-            () -> userValidator.validateUpdate(user, existingUser, List.of(existingUser, otherUser), List.of(hardware, otherHardware),
-                List.of(team, otherTeam)), ConflictException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ConflictException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ConflictException.class);
         assertThat(e.getConflictFailure().getConflictingAttributes())
             .containsOnly(
                 "foldingUserName",
@@ -1475,6 +1539,7 @@ class UserValidatorTest {
     void whenValidatingUpdate_givenUserWithFoldingUserNameAndPasskeyExists_andExistingUserIsTheOneBeingUpdated_thenSuccessResponseIsReturned() {
         final Hardware hardware = generateHardware();
         final Team team = generateTeam();
+        final int commonUserId = userId++;
 
         final UserRequest user = UserRequest.builder()
             .foldingUserName("user")
@@ -1489,7 +1554,7 @@ class UserValidatorTest {
             .build();
 
         final User existingUser = User.builder()
-            .id(1)
+            .id(commonUserId)
             .foldingUserName("user")
             .displayName("user")
             .passkey("DummyPasskey12345678901234567890")
@@ -1501,12 +1566,13 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final User response = userValidator.validateUpdate(user, existingUser,
-            List.of(existingUser),
-            List.of(hardware),
-            List.of(team)
-        );
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
+        foldingRepository.createUser(existingUser);
+
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final User response = userValidator.update(user, existingUser);
 
         assertThat(response)
             .as("Expected validation to pass")
@@ -1543,12 +1609,13 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final User response = userValidator.validateUpdate(user, existingUser,
-            List.of(existingUser),
-            List.of(hardware),
-            List.of(team)
-        );
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
+        foldingRepository.createUser(existingUser);
+
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final User response = userValidator.update(user, existingUser);
 
         assertThat(response)
             .as("Expected validation to pass")
@@ -1599,12 +1666,15 @@ class UserValidatorTest {
             .team(oldTeam)
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final User response = userValidator.validateUpdate(user, existingUser,
-            List.of(existingUser, currentCaptain),
-            List.of(hardware),
-            List.of(team, oldTeam)
-        );
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
+        foldingRepository.createTeam(oldTeam);
+        foldingRepository.createUser(existingUser);
+        foldingRepository.createUser(currentCaptain);
+
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final User response = userValidator.update(user, existingUser);
 
         assertThat(response)
             .as("Expected validation to pass")
@@ -1654,12 +1724,14 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final User response = userValidator.validateUpdate(user, existingUser,
-            List.of(existingUser, currentCaptain),
-            List.of(hardware),
-            List.of(team)
-        );
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
+        foldingRepository.createUser(existingUser);
+        foldingRepository.createUser(currentCaptain);
+
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final User response = userValidator.update(user, existingUser);
 
         assertThat(response)
             .as("Expected validation to pass")
@@ -1697,7 +1769,7 @@ class UserValidatorTest {
             .build();
 
         final User existingUser = User.builder()
-            .id(1)
+            .id(userId++)
             .foldingUserName("user")
             .displayName("user")
             .passkey("DummyPasskey12345678901234567890")
@@ -1709,12 +1781,14 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final User response = userValidator.validateUpdate(user, existingUser,
-            List.of(currentCaptain, existingUser),
-            List.of(hardware),
-            List.of(team)
-        );
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
+        foldingRepository.createUser(existingUser);
+        foldingRepository.createUser(currentCaptain);
+
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final User response = userValidator.update(user, existingUser);
 
         assertThat(response)
             .as("Expected validation to pass")
@@ -1727,11 +1801,40 @@ class UserValidatorTest {
         final Team team = generateTeam();
         final Team oldTeam = generateTeam();
 
-        final List<User> usersOnTeam = new ArrayList<>(Category.maximumPermittedAmountForAllCategories());
+        final UserRequest user = UserRequest.builder()
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU.toString())
+            .profileLink("https://www.google.com")
+            .liveStatsLink("https://www.google.com")
+            .userIsCaptain(false)
+            .hardwareId(hardware.getId())
+            .teamId(team.getId())
+            .build();
+
+        final User existingUser = User.builder()
+            .id(userId++)
+            .foldingUserName("user")
+            .displayName("user")
+            .passkey("DummyPasskey12345678901234567890")
+            .category(Category.NVIDIA_GPU)
+            .profileLink("https://www.google.com")
+            .liveStatsLink("https://www.google.com")
+            .userIsCaptain(false)
+            .hardware(hardware)
+            .team(oldTeam)
+            .build();
+
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
+        foldingRepository.createUser(existingUser);
 
         for (int i = 0; i < Category.maximumPermittedAmountForAllCategories(); i++) {
-            usersOnTeam.add(
+            foldingRepository.createUser(
                 User.builder()
+                    .id(userId++)
                     .foldingUserName("user" + 0)
                     .displayName("user" + 0)
                     .passkey("DummyPasskey12345678901234567891")
@@ -1745,41 +1848,10 @@ class UserValidatorTest {
             );
         }
 
-        final UserRequest user = UserRequest.builder()
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU.toString())
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(false)
-            .hardwareId(hardware.getId())
-            .teamId(team.getId())
-            .build();
-
-        final User existingUser = User.builder()
-            .id(1)
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(false)
-            .hardware(hardware)
-            .team(oldTeam)
-            .build();
-
-        final List<User> allUsers = new ArrayList<>(usersOnTeam);
-        allUsers.add(existingUser);
-
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, allUsers, List.of(hardware), List.of(team)),
-                ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
-            .containsOnly(String.format("Team '%s' has %s users, maximum permitted is %s", team.getTeamName(), usersOnTeam.size(),
+            .containsOnly(String.format("Team '%1$s' has %2$s users, maximum permitted is %2$s", team.getTeamName(),
                 Category.maximumPermittedAmountForAllCategories())
             );
     }
@@ -1790,24 +1862,6 @@ class UserValidatorTest {
         final Team team = generateTeam();
         final Team oldTeam = generateTeam();
 
-        final List<User> usersOnTeamInCategory = new ArrayList<>(Category.NVIDIA_GPU.permittedUsers());
-
-        for (int i = 0; i < Category.NVIDIA_GPU.permittedUsers(); i++) {
-            usersOnTeamInCategory.add(
-                User.builder()
-                    .foldingUserName("user" + 0)
-                    .displayName("user" + 0)
-                    .passkey("DummyPasskey12345678901234567891")
-                    .category(Category.NVIDIA_GPU)
-                    .profileLink("https://www.google.com")
-                    .liveStatsLink("https://www.google.com")
-                    .userIsCaptain(false)
-                    .hardware(hardware)
-                    .team(team)
-                    .build()
-            );
-        }
-
         final UserRequest user = UserRequest.builder()
             .foldingUserName("user")
             .displayName("user")
@@ -1821,7 +1875,7 @@ class UserValidatorTest {
             .build();
 
         final User existingUser = User.builder()
-            .id(1)
+            .id(userId++)
             .foldingUserName("user")
             .displayName("user")
             .passkey("DummyPasskey12345678901234567890")
@@ -1833,32 +1887,17 @@ class UserValidatorTest {
             .team(oldTeam)
             .build();
 
-        final List<User> allUsers = new ArrayList<>(usersOnTeamInCategory);
-        allUsers.add(existingUser);
-
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, allUsers, List.of(hardware), List.of(team)),
-                ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
-            .containsOnly(String.format("Team '%s' already has %s users in category '%s', only %s permitted", team.getTeamName(),
-                usersOnTeamInCategory.size(), Category.NVIDIA_GPU, Category.NVIDIA_GPU.permittedUsers())
-            );
-    }
-
-    @Test
-    void whenValidatingUpdate_givenCategoryIsUpdated_andTeamAlreadyHasMaximumUsersInCategory_thenFailureResponseIsReturned() {
-        final Hardware hardware = generateHardware();
-        final Team team = generateTeam();
-
-        final List<User> usersOnTeamInCategory = new ArrayList<>(Category.NVIDIA_GPU.permittedUsers());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
+        foldingRepository.createUser(existingUser);
 
         for (int i = 0; i < Category.NVIDIA_GPU.permittedUsers(); i++) {
-            usersOnTeamInCategory.add(
+            foldingRepository.createUser(
                 User.builder()
-                    .foldingUserName("user" + 0)
-                    .displayName("user" + 0)
+                    .id(userId++)
+                    .foldingUserName("user" + i)
+                    .displayName("user" + i)
                     .passkey("DummyPasskey12345678901234567891")
                     .category(Category.NVIDIA_GPU)
                     .profileLink("https://www.google.com")
@@ -1869,6 +1908,21 @@ class UserValidatorTest {
                     .build()
             );
         }
+
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e =
+            catchThrowableOfType(() -> userValidator.update(user, existingUser),
+                ValidationException.class);
+        assertThat(e.getValidationFailure().getErrors())
+            .containsOnly(String.format("Team '%1$s' already has %3$s users in category '%2$s', only %3$s permitted", team.getTeamName(),
+                Category.NVIDIA_GPU, Category.NVIDIA_GPU.permittedUsers())
+            );
+    }
+
+    @Test
+    void whenValidatingUpdate_givenCategoryIsUpdated_andTeamAlreadyHasMaximumUsersInCategory_thenFailureResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final Team team = generateTeam();
 
         final UserRequest user = UserRequest.builder()
             .foldingUserName("user")
@@ -1883,7 +1937,7 @@ class UserValidatorTest {
             .build();
 
         final User existingUser = User.builder()
-            .id(1)
+            .id(userId++)
             .foldingUserName("user")
             .displayName("user")
             .passkey("DummyPasskey12345678901234567890")
@@ -1895,17 +1949,34 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final List<User> allUsers = new ArrayList<>(usersOnTeamInCategory);
-        allUsers.add(existingUser);
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
+        foldingRepository.createUser(existingUser);
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
+        for (int i = 0; i < Category.NVIDIA_GPU.permittedUsers(); i++) {
+            foldingRepository.createUser(
+                User.builder()
+                    .id(userId++)
+                    .foldingUserName("user" + 0)
+                    .displayName("user" + 0)
+                    .passkey("DummyPasskey12345678901234567891")
+                    .category(Category.NVIDIA_GPU)
+                    .profileLink("https://www.google.com")
+                    .liveStatsLink("https://www.google.com")
+                    .userIsCaptain(false)
+                    .hardware(hardware)
+                    .team(team)
+                    .build()
+            );
+        }
 
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, allUsers, List.of(hardware), List.of(team)),
-                ValidationException.class);
+            catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
-            .containsOnly(String.format("Team '%s' already has %s users in category '%s', only %s permitted", team.getTeamName(),
-                usersOnTeamInCategory.size(), Category.NVIDIA_GPU, Category.NVIDIA_GPU.permittedUsers())
+            .containsOnly(String.format("Team '%1$s' already has %3$s users in category '%2$s', only %3$s permitted", team.getTeamName(),
+                Category.NVIDIA_GPU, Category.NVIDIA_GPU.permittedUsers())
             );
     }
 
@@ -1935,7 +2006,7 @@ class UserValidatorTest {
             .build();
 
         final User existingUser = User.builder()
-            .id(1)
+            .id(userId++)
             .foldingUserName("user")
             .displayName("user")
             .passkey("DummyPasskey12345678901234567890")
@@ -1947,11 +2018,13 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
+        foldingRepository.createUser(existingUser);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
-                ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly(String.format("Category '%s' cannot be filled by hardware of make '%s', must be one of: %s", Category.AMD_GPU,
                 hardware.getHardwareMake(), Category.AMD_GPU.supportedHardwareMakes())
@@ -1984,7 +2057,7 @@ class UserValidatorTest {
             .build();
 
         final User existingUser = User.builder()
-            .id(1)
+            .id(userId++)
             .foldingUserName("user")
             .displayName("user")
             .passkey("DummyPasskey12345678901234567890")
@@ -1996,11 +2069,13 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
+        foldingRepository.createUser(existingUser);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
-                ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly(String.format("Category '%s' cannot be filled by hardware of type '%s', must be one of: %s", Category.AMD_GPU,
                 hardware.getHardwareType(), Category.AMD_GPU.supportedHardwareTypes())
@@ -2033,6 +2108,7 @@ class UserValidatorTest {
             .build();
 
         final User existingUser = User.builder()
+            .id(userId++)
             .foldingUserName("user")
             .displayName("user")
             .passkey("DummyPasskey12345678901234567890")
@@ -2044,11 +2120,13 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
+        foldingRepository.createUser(existingUser);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
-                ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly(String.format("Field 'hardwareId' must be one of: [%s: %s]", hardware.getId(), hardware.getHardwareName()));
     }
@@ -2070,6 +2148,7 @@ class UserValidatorTest {
             .build();
 
         final User existingUser = User.builder()
+            .id(userId++)
             .foldingUserName("user")
             .displayName("user")
             .passkey("DummyPasskey12345678901234567890")
@@ -2080,13 +2159,14 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createTeam(team);
+        foldingRepository.createUser(existingUser);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), emptyList(), List.of(team)),
-                ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
-            .containsOnly("No hardware exist on the system");
+            .containsOnly("No hardwares exist on the system");
     }
 
     @Test
@@ -2112,6 +2192,7 @@ class UserValidatorTest {
             .build();
 
         final User existingUser = User.builder()
+            .id(userId++)
             .foldingUserName("user")
             .displayName("user")
             .passkey("DummyPasskey12345678901234567890")
@@ -2123,11 +2204,13 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
+        foldingRepository.createUser(existingUser);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
-                ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly(String.format("Field 'teamId' must be one of: [%s: %s]", team.getId(), team.getTeamName()));
     }
@@ -2149,6 +2232,7 @@ class UserValidatorTest {
             .build();
 
         final User existingUser = User.builder()
+            .id(userId++)
             .foldingUserName("user")
             .displayName("user")
             .passkey("DummyPasskey12345678901234567890")
@@ -2159,11 +2243,12 @@ class UserValidatorTest {
             .hardware(hardware)
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createUser(existingUser);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), emptyList()),
-                ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("No teams exist on the system");
     }
@@ -2186,6 +2271,7 @@ class UserValidatorTest {
             .build();
 
         final User existingUser = User.builder()
+            .id(userId++)
             .foldingUserName("user")
             .displayName("user")
             .passkey("DummyPasskey12345678901234567890")
@@ -2197,12 +2283,13 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new NoUnitsFoldingStatsRetriever());
-        final User response = userValidator.validateUpdate(user, existingUser,
-            List.of(existingUser),
-            List.of(hardware),
-            List.of(team)
-        );
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
+        foldingRepository.createUser(existingUser);
+
+        final UserValidator userValidator = new UserValidator(foldingRepository, new NoUnitsFoldingStatsRetriever());
+        final User response = userValidator.update(user, existingUser);
 
         assertThat(response)
             .as("Expected validation to pass")
@@ -2227,6 +2314,7 @@ class UserValidatorTest {
             .build();
 
         final User existingUser = User.builder()
+            .id(userId++)
             .foldingUserName("oldUserName")
             .displayName("user")
             .passkey("DummyPasskey12345678901234567890")
@@ -2238,11 +2326,13 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new NoUnitsFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
+        foldingRepository.createUser(existingUser);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
-                ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new NoUnitsFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly(String.format(
                 "User '%s' has 0 Work Units with passkey '%s', there must be at least one completed Work Unit before adding the user",
@@ -2268,6 +2358,7 @@ class UserValidatorTest {
             .build();
 
         final User existingUser = User.builder()
+            .id(userId++)
             .foldingUserName("oldUserName")
             .displayName("user")
             .passkey("DummyPasskey12345678901234567890")
@@ -2279,11 +2370,13 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ExternalConnectionFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
+        foldingRepository.createUser(existingUser);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
-                ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ExternalConnectionFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly(String.format("Unable to connect to 'https://www.google.com' to check stats for user '%s': Error connecting",
                 user.getDisplayName())
@@ -2308,6 +2401,7 @@ class UserValidatorTest {
             .build();
 
         final User existingUser = User.builder()
+            .id(userId++)
             .foldingUserName("oldUserName")
             .displayName("user")
             .passkey("DummyPasskey12345678901234567890")
@@ -2319,11 +2413,13 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new UnexpectedExceptionFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
+        foldingRepository.createUser(existingUser);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
-                ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new UnexpectedExceptionFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly(String.format("Unable to check stats for user '%s': Error", user.getDisplayName()));
     }
@@ -2346,6 +2442,7 @@ class UserValidatorTest {
             .build();
 
         final User existingUser = User.builder()
+            .id(userId++)
             .foldingUserName("user")
             .displayName("user")
             .passkey("DummyPasskey12345678901234567890")
@@ -2356,11 +2453,13 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createTeam(team);
+        foldingRepository.createUser(existingUser);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userValidator.validateUpdate(user, existingUser, List.of(existingUser), List.of(hardware), List.of(team)),
-                ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly(
                 "Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen",
@@ -2378,6 +2477,7 @@ class UserValidatorTest {
         final Team team = generateTeam();
 
         final User userToDelete = User.builder()
+            .id(userId++)
             .foldingUserName("user")
             .displayName("user")
             .passkey("DummyPasskey12345678901234567890")
@@ -2389,8 +2489,10 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
-        final User response = userValidator.validateDelete(userToDelete);
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final User response = userValidator.delete(userToDelete);
 
         assertThat(response)
             .as("Expected validation to pass")
@@ -2403,6 +2505,7 @@ class UserValidatorTest {
         final Team team = generateTeam();
 
         final User userToDelete = User.builder()
+            .id(userId++)
             .foldingUserName("user")
             .displayName("user")
             .passkey("DummyPasskey12345678901234567890")
@@ -2414,9 +2517,10 @@ class UserValidatorTest {
             .team(team)
             .build();
 
-        final UserValidator userValidator = UserValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
 
-        final ValidationException e = catchThrowableOfType(() -> userValidator.validateDelete(userToDelete), ValidationException.class);
+        final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userValidator.delete(userToDelete), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly(String.format("Cannot delete user '%s' since they are team captain", userToDelete.getDisplayName()));
     }

@@ -35,16 +35,15 @@ import java.util.stream.Collectors;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
+import me.zodac.folding.api.FoldingRepository;
 import me.zodac.folding.api.state.ReadRequired;
 import me.zodac.folding.api.state.WriteRequired;
 import me.zodac.folding.api.tc.change.UserChange;
 import me.zodac.folding.api.tc.change.UserChangeState;
-import me.zodac.folding.bean.FoldingRepository;
 import me.zodac.folding.bean.tc.user.UserChangeApplier;
 import me.zodac.folding.bean.tc.validation.UserChangeValidator;
 import me.zodac.folding.rest.api.tc.request.UserChangeRequest;
 import me.zodac.folding.rest.exception.InvalidStateException;
-import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,11 +67,9 @@ public class UserChangeEndpoint {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @Autowired
-    private UserChangeApplier userChangeApplier;
-
-    @Autowired
-    private FoldingRepository foldingRepository;
+    private final FoldingRepository foldingRepository;
+    private final UserChangeApplier userChangeApplier;
+    private final UserChangeValidator userChangeValidator;
 
     // Prometheus counters
     private final Counter userChangeCreates;
@@ -81,11 +78,22 @@ public class UserChangeEndpoint {
     private final Counter userChangeNextMonthApprovals;
 
     /**
-     * Constructor to inject {@link MeterRegistry} and configure Prometheus {@link Counter}s.
+     * {@link Autowired} constructor to inject {@link MeterRegistry} and configure Prometheus {@link Counter}s.
      *
-     * @param registry the Prometheus {@link MeterRegistry}
+     * @param foldingRepository   the {@link FoldingRepository}
+     * @param registry            the Prometheus {@link MeterRegistry}
+     * @param userChangeApplier   the {@link UserChangeApplier}
+     * @param userChangeValidator the {@link UserChangeValidator}
      */
-    public UserChangeEndpoint(final MeterRegistry registry) {
+    @Autowired
+    public UserChangeEndpoint(final FoldingRepository foldingRepository,
+                              final MeterRegistry registry,
+                              final UserChangeApplier userChangeApplier,
+                              final UserChangeValidator userChangeValidator) {
+        this.foldingRepository = foldingRepository;
+        this.userChangeApplier = userChangeApplier;
+        this.userChangeValidator = userChangeValidator;
+
         userChangeCreates = Counter.builder("user_change_create_counter")
             .description("Number of UserChange creations through the REST endpoint")
             .register(registry);
@@ -114,14 +122,7 @@ public class UserChangeEndpoint {
                                     final HttpServletRequest request) {
         LOGGER.info("POST request for user change received at '{}'", request::getRequestURI);
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create(HttpFoldingStatsRetriever.create());
-        final UserChange validatedUserChange = userChangeValidator.validate(
-            userChangeRequest,
-            foldingRepository.getAllUserChangesWithPasskeys(UserChangeState.getOpenStates()),
-            foldingRepository.getAllHardware(),
-            foldingRepository.getAllUsersWithPasskeys()
-        );
-
+        final UserChange validatedUserChange = userChangeValidator.validate(userChangeRequest);
         final UserChange createdUserChange = foldingRepository.createUserChange(validatedUserChange);
 
         userChangeCreates.increment();

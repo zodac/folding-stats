@@ -36,15 +36,14 @@ import java.util.Collection;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
+import me.zodac.folding.api.FoldingRepository;
 import me.zodac.folding.api.state.ReadRequired;
 import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.state.WriteRequired;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.bean.FoldingRepository;
 import me.zodac.folding.bean.tc.validation.UserValidator;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 import me.zodac.folding.state.SystemStateManager;
-import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,8 +67,8 @@ public class UserEndpoint {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @Autowired
-    private FoldingRepository foldingRepository;
+    private final FoldingRepository foldingRepository;
+    private final UserValidator userValidator;
 
     // Prometheus counters
     private final Counter userCreates;
@@ -77,11 +76,17 @@ public class UserEndpoint {
     private final Counter userDeletes;
 
     /**
-     * Constructor to inject {@link MeterRegistry} and configure Prometheus {@link Counter}s.
+     * {@link Autowired} constructor to inject {@link MeterRegistry} and configure Prometheus {@link Counter}s.
      *
-     * @param registry the Prometheus {@link MeterRegistry}
+     * @param foldingRepository the {@link FoldingRepository}
+     * @param registry          the Prometheus {@link MeterRegistry}
+     * @param userValidator     the {@link UserValidator}
      */
-    public UserEndpoint(final MeterRegistry registry) {
+    @Autowired
+    public UserEndpoint(final FoldingRepository foldingRepository, final MeterRegistry registry, final UserValidator userValidator) {
+        this.foldingRepository = foldingRepository;
+        this.userValidator = userValidator;
+
         userCreates = Counter.builder("user_create_counter")
             .description("Number of User creations through the REST endpoint")
             .register(registry);
@@ -106,7 +111,7 @@ public class UserEndpoint {
     public ResponseEntity<?> create(@RequestBody final UserRequest userRequest, final HttpServletRequest request) {
         LOGGER.debug("POST request received to create user at '{}' with request: {}", request::getRequestURI, () -> userRequest);
 
-        final User validatedUser = validateCreate(userRequest);
+        final User validatedUser = userValidator.create(userRequest);
         final User elementWithId = foldingRepository.createUser(validatedUser);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
@@ -204,7 +209,7 @@ public class UserEndpoint {
             return ok(userWithHiddenPasskey);
         }
 
-        final User validatedUser = validateUpdate(userRequest, existingUser);
+        final User validatedUser = userValidator.update(userRequest, existingUser);
 
         // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
         final User userWithId = User.updateWithId(existingUser.getId(), validatedUser);
@@ -230,38 +235,12 @@ public class UserEndpoint {
         LOGGER.debug("DELETE request for user received at '{}'", request::getRequestURI);
 
         final User user = foldingRepository.getUserWithoutPasskey(userId);
-        final User validatedUser = validateDelete(user);
+        final User validatedUser = userValidator.delete(user);
 
         foldingRepository.deleteUser(validatedUser);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
         LOGGER.info("Deleted user with ID {}", userId);
         userDeletes.increment();
         return ok();
-    }
-
-    private User validateCreate(final UserRequest userRequest) {
-        final UserValidator userValidator = UserValidator.create(HttpFoldingStatsRetriever.create());
-        return userValidator.validateCreate(
-            userRequest,
-            foldingRepository.getAllUsersWithPasskeys(),
-            foldingRepository.getAllHardware(),
-            foldingRepository.getAllTeams()
-        );
-    }
-
-    private User validateUpdate(final UserRequest userRequest, final User existingUser) {
-        final UserValidator userValidator = UserValidator.create(HttpFoldingStatsRetriever.create());
-        return userValidator.validateUpdate(
-            userRequest,
-            existingUser,
-            foldingRepository.getAllUsersWithPasskeys(),
-            foldingRepository.getAllHardware(),
-            foldingRepository.getAllTeams()
-        );
-    }
-
-    private User validateDelete(final User existingUser) {
-        final UserValidator userValidator = UserValidator.create(HttpFoldingStatsRetriever.create());
-        return userValidator.validateDelete(existingUser);
     }
 }

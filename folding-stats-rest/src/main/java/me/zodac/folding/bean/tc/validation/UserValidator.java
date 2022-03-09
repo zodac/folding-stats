@@ -28,9 +28,8 @@ import static me.zodac.folding.api.util.StringUtils.isBlank;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Stream;
+import me.zodac.folding.api.FoldingRepository;
 import me.zodac.folding.api.exception.ConflictException;
 import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.exception.ValidationException;
@@ -42,31 +41,31 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
+import me.zodac.folding.rest.exception.NotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Validator class to validate a {@link User} or {@link UserRequest}.
  */
-// TODO: Inject FoldingRepository
-public final class UserValidator {
+@Component
+public class UserValidator {
 
+    private static final Collection<String> CONFLICTING_ATTRIBUTES = List.of("foldingUserName", "passkey");
+
+    private final FoldingRepository foldingRepository;
     private final FoldingStatsRetriever foldingStatsRetriever;
 
-    // These fields will be set during validation for ease of re-use
-    private Hardware hardwareForUser;
-    private Team teamForUser;
-
-    private UserValidator(final FoldingStatsRetriever foldingStatsRetriever) {
-        this.foldingStatsRetriever = foldingStatsRetriever;
-    }
-
     /**
-     * Create an instance of {@link UserValidator}.
+     * {@link Autowired} constructor.
      *
-     * @param foldingStatsRetriever the {@link FoldingStatsRetriever} to verify the user stats
-     * @return the created {@link UserValidator}
+     * @param foldingRepository     the {@link FoldingRepository}
+     * @param foldingStatsRetriever the {@link FoldingStatsRetriever}
      */
-    public static UserValidator create(final FoldingStatsRetriever foldingStatsRetriever) {
-        return new UserValidator(foldingStatsRetriever);
+    @Autowired
+    public UserValidator(final FoldingRepository foldingRepository, final FoldingStatsRetriever foldingStatsRetriever) {
+        this.foldingRepository = foldingRepository;
+        this.foldingStatsRetriever = foldingStatsRetriever;
     }
 
     /**
@@ -91,59 +90,23 @@ public final class UserValidator {
      * </ul>
      *
      * @param userRequest the {@link UserRequest} to validate
-     * @param allUsers    all existing {@link User}s in the system
-     * @param allHardware all existing {@link Hardware}s in the system
-     * @param allTeams    all existing {@link Team}s in the system
      * @return the validated {@link User}
      * @throws ConflictException   thrown if the input conflicts with an existing {@link User}
-     * @throws ValidationException thrown  if the input fails validation
+     * @throws ValidationException thrown if the input fails validation
      */
-    public User validateCreate(final UserRequest userRequest,
-                               final Collection<User> allUsers,
-                               final Collection<Hardware> allHardware,
-                               final Collection<Team> allTeams) {
+    public User create(final UserRequest userRequest) {
         // The foldingUserName and passkey must be unique
-        final Optional<User> matchingUser = getUserWithFoldingUserNameAndPasskey(userRequest, allUsers);
+        final Optional<User> matchingUser = getUserWithFoldingUserNameAndPasskey(userRequest);
         if (matchingUser.isPresent()) {
-            throw new ConflictException(userRequest, matchingUser.get(), List.of("foldingUserName", "passkey"));
+            throw new ConflictException(userRequest, matchingUser.get(), CONFLICTING_ATTRIBUTES);
         }
 
-        // Hardware and team must be validated first, since they may be used by other validation checks
-        final List<String> hardwareAndTeamFailureMessages = Stream.of(
-                hardware(userRequest, allHardware),
-                team(userRequest, allTeams)
-            )
-            .filter(Objects::nonNull)
-            .toList();
-
-        if (!hardwareAndTeamFailureMessages.isEmpty()) {
-            throw new ValidationException(userRequest, hardwareAndTeamFailureMessages);
-        }
-
-        // Validate the content is not-malformed
-        final Collection<String> failureMessages = userRequest.validate();
-        if (!failureMessages.isEmpty()) {
-            throw new ValidationException(userRequest, failureMessages);
-        }
-
-        final String categoryValidation = validateCategoryIsValidForHardware(userRequest);
-        if (categoryValidation != null) {
-            throw new ValidationException(userRequest, categoryValidation);
-        }
-
-        final Collection<User> usersOnTeam = getUsersOnTeam(teamForUser.getId(), allUsers);
-        final Category category = Category.get(userRequest.getCategory());
-
-        final List<String> complexFailureMessages = Stream.of(
-                validateNewUserDoesNotExceedTeamLimits(usersOnTeam, category),
-                validateNewUserWorkUnits(userRequest)
-            )
-            .filter(Objects::nonNull)
-            .toList();
-
-        if (!complexFailureMessages.isEmpty()) {
-            throw new ValidationException(userRequest, complexFailureMessages);
-        }
+        userRequest.validate();
+        final Hardware hardwareForUser = hardware(userRequest);
+        final Team teamForUser = team(userRequest);
+        final Category category = validateCategoryIsValidForHardware(userRequest, hardwareForUser);
+        validateNewUserDoesNotExceedTeamLimits(userRequest, teamForUser, category);
+        validateUserWorkUnits(userRequest);
 
         return User.createWithoutId(userRequest, hardwareForUser, teamForUser);
     }
@@ -174,60 +137,24 @@ public final class UserValidator {
      *
      * @param userRequest  the {@link UserRequest} to validate
      * @param existingUser the already existing {@link User} in the system to be updated
-     * @param allUsers     all existing {@link User}s in the system
-     * @param allHardware  all existing {@link Hardware}s in the system
-     * @param allTeams     all existing {@link Team}s in the system
      * @return the validated {@link User}
      * @throws ConflictException   thrown if the input conflicts with an existing {@link User}
-     * @throws ValidationException thrown  if the input fails validation
+     * @throws ValidationException thrown if the input fails validation
      */
-    public User validateUpdate(final UserRequest userRequest,
-                               final User existingUser,
-                               final Collection<User> allUsers,
-                               final Collection<Hardware> allHardware,
-                               final Collection<Team> allTeams) {
+    public User update(final UserRequest userRequest,
+                       final User existingUser) {
         // The foldingUserName and passkey must be unique, unless replacing the same user
-        final Optional<User> matchingUser = getUserWithFoldingUserNameAndPasskey(userRequest, allUsers);
+        final Optional<User> matchingUser = getUserWithFoldingUserNameAndPasskey(userRequest);
         if (matchingUser.isPresent() && matchingUser.get().getId() != existingUser.getId()) {
-            throw new ConflictException(userRequest, matchingUser.get(), List.of("foldingUserName", "passkey"));
+            throw new ConflictException(userRequest, matchingUser.get(), CONFLICTING_ATTRIBUTES);
         }
 
-        // Hardware and team must be validated first, since they may be used by other validation checks
-        final List<String> hardwareAndTeamFailureMessages = Stream.of(
-                hardware(userRequest, allHardware),
-                team(userRequest, allTeams)
-            )
-            .filter(Objects::nonNull)
-            .toList();
-
-        if (!hardwareAndTeamFailureMessages.isEmpty()) {
-            throw new ValidationException(userRequest, hardwareAndTeamFailureMessages);
-        }
-
-        // Validate the content is not-malformed
-        final Collection<String> failureMessages = userRequest.validate();
-        if (!failureMessages.isEmpty()) {
-            throw new ValidationException(userRequest, failureMessages);
-        }
-
-        final String categoryValidation = validateCategoryIsValidForHardware(userRequest);
-        if (categoryValidation != null) {
-            throw new ValidationException(userRequest, categoryValidation);
-        }
-
-        final Collection<User> usersOnTeam = getUsersOnTeam(teamForUser.getId(), allUsers);
-        final Category category = Category.get(userRequest.getCategory());
-
-        final List<String> complexFailureMessages = Stream.of(
-                validateUpdatedUserDoesNotExceedTeamLimits(userRequest, existingUser, usersOnTeam, category),
-                validateUpdateUserWorkUnits(userRequest, existingUser)
-            )
-            .filter(Objects::nonNull)
-            .toList();
-
-        if (!complexFailureMessages.isEmpty()) {
-            throw new ValidationException(userRequest, complexFailureMessages);
-        }
+        userRequest.validate();
+        final Hardware hardwareForUser = hardware(userRequest);
+        final Team teamForUser = team(userRequest);
+        final Category category = validateCategoryIsValidForHardware(userRequest, hardwareForUser);
+        validateUpdatedUserDoesNotExceedTeamLimits(userRequest, existingUser, teamForUser, category);
+        validateUpdateUserWorkUnits(userRequest, existingUser);
 
         return User.createWithoutId(userRequest, hardwareForUser, teamForUser);
     }
@@ -241,7 +168,7 @@ public final class UserValidator {
      * @param user the {@link User} to delete
      * @return the validated {@link User}
      */
-    public User validateDelete(final User user) {
+    public User delete(final User user) {
         if (user.isUserIsCaptain()) {
             throw new ValidationException(user, String.format("Cannot delete user '%s' since they are team captain", user.getDisplayName()));
         }
@@ -249,48 +176,49 @@ public final class UserValidator {
         return user;
     }
 
-    private String validateNewUserWorkUnits(final UserRequest userRequest) {
-        return validateUserWorkUnits(userRequest);
-    }
-
-    private String validateUpdateUserWorkUnits(final UserRequest userRequest, final User existingUser) {
+    private void validateUpdateUserWorkUnits(final UserRequest userRequest, final User existingUser) {
         final boolean isFoldingUserNameChange = !userRequest.getFoldingUserName().equalsIgnoreCase(existingUser.getFoldingUserName());
         final boolean isPasskeyChange = !userRequest.getPasskey().equalsIgnoreCase(existingUser.getPasskey());
 
         if (isFoldingUserNameChange || isPasskeyChange) {
-            return validateUserWorkUnits(userRequest);
+            validateUserWorkUnits(userRequest);
         }
-
-        return null;
     }
 
-    private String validateUserWorkUnits(final UserRequest userRequest) {
+    private void validateUserWorkUnits(final UserRequest userRequest) {
+        final Stats statsForUserAndPasskey = getStatsForUserAndPasskey(userRequest);
+
+        if (statsForUserAndPasskey.getUnits() == 0) {
+            throw new ValidationException(userRequest,
+                String.format("User '%s' has 0 Work Units with passkey '%s', there must be at least one completed Work Unit before adding the user",
+                    userRequest.getFoldingUserName(), userRequest.getPasskey()));
+        }
+    }
+
+    private Stats getStatsForUserAndPasskey(final UserRequest userRequest) {
         try {
             final FoldingStatsDetails foldingStatsDetails = FoldingStatsDetails.create(userRequest.getFoldingUserName(), userRequest.getPasskey());
-            final Stats statsForUserAndPasskey = foldingStatsRetriever.getStats(foldingStatsDetails);
-
-            if (statsForUserAndPasskey.getUnits() == 0) {
-                return String.format(
-                    "User '%s' has 0 Work Units with passkey '%s', there must be at least one completed Work Unit before adding the user",
-                    userRequest.getFoldingUserName(), userRequest.getPasskey());
-            }
+            return foldingStatsRetriever.getStats(foldingStatsDetails);
         } catch (final ExternalConnectionException e) {
-            return String.format("Unable to connect to '%s' to check stats for user '%s': %s", e.getUrl(), userRequest.getDisplayName(),
-                e.getMessage());
+            throw new ValidationException(userRequest,
+                String.format("Unable to connect to '%s' to check stats for user '%s': %s", e.getUrl(), userRequest.getDisplayName(),
+                    e.getMessage()), e);
         } catch (final Exception e) {
-            return String.format("Unable to check stats for user '%s': %s", userRequest.getDisplayName(), e.getMessage());
+            throw new ValidationException(userRequest,
+                String.format("Unable to check stats for user '%s': %s", userRequest.getDisplayName(), e.getMessage()), e);
         }
-
-        return null;
     }
 
-    private String validateUpdatedUserDoesNotExceedTeamLimits(final UserRequest userRequest, final User existingUser,
-                                                              final Collection<User> usersOnTeam,
-                                                              final Category category) {
+    private void validateUpdatedUserDoesNotExceedTeamLimits(final UserRequest userRequest,
+                                                            final User existingUser,
+                                                            final Team teamForUser,
+                                                            final Category category) {
         final boolean userIsChangingTeams = userRequest.getTeamId() != existingUser.getTeam().getId();
+        final Collection<User> usersOnTeam = foldingRepository.getUsersOnTeam(teamForUser);
+
         if (userIsChangingTeams) {
             // If we are changing teams, we need to ensure there is enough space in the team and category
-            return validateNewUserDoesNotExceedTeamLimits(usersOnTeam, category);
+            validateNewUserDoesNotExceedTeamLimits(userRequest, teamForUser, category);
         }
 
         final boolean userIsChangingCategory = category != existingUser.getCategory();
@@ -303,18 +231,19 @@ public final class UserValidator {
                 .count();
 
             if (numberOfUsersInTeamWithCategory >= permittedNumberForCategory) {
-                return String.format("Team '%s' already has %s users in category '%s', only %s permitted",
-                    teamForUser.getTeamName(), numberOfUsersInTeamWithCategory, category, permittedNumberForCategory);
+                throw new ValidationException(userRequest,
+                    String.format("Team '%s' already has %s users in category '%s', only %s permitted", teamForUser.getTeamName(),
+                        numberOfUsersInTeamWithCategory, category, permittedNumberForCategory));
             }
         }
-
-        return null;
     }
 
-    private String validateNewUserDoesNotExceedTeamLimits(final Collection<User> usersOnTeam, final Category category) {
+    private void validateNewUserDoesNotExceedTeamLimits(final UserRequest userRequest, final Team teamForUser, final Category category) {
+        final Collection<User> usersOnTeam = foldingRepository.getUsersOnTeam(teamForUser);
         if (usersOnTeam.size() == Category.maximumPermittedAmountForAllCategories()) {
-            return String.format("Team '%s' has %s users, maximum permitted is %s", teamForUser.getTeamName(), usersOnTeam.size(),
-                Category.maximumPermittedAmountForAllCategories());
+            throw new ValidationException(userRequest,
+                String.format("Team '%s' has %s users, maximum permitted is %s", teamForUser.getTeamName(), usersOnTeam.size(),
+                    Category.maximumPermittedAmountForAllCategories()));
         }
 
         final int permittedNumberForCategory = category.permittedUsers();
@@ -324,14 +253,13 @@ public final class UserValidator {
             .count();
 
         if (numberOfUsersInTeamWithCategory == permittedNumberForCategory) {
-            return String.format("Team '%s' already has %s users in category '%s', only %s permitted", teamForUser.getTeamName(),
-                numberOfUsersInTeamWithCategory, category, permittedNumberForCategory);
+            throw new ValidationException(userRequest,
+                String.format("Team '%s' already has %s users in category '%s', only %s permitted", teamForUser.getTeamName(),
+                    numberOfUsersInTeamWithCategory, category, permittedNumberForCategory));
         }
-
-        return null;
     }
 
-    private static Optional<User> getUserWithFoldingUserNameAndPasskey(final UserRequest userRequest, final Collection<User> allUsers) {
+    private Optional<User> getUserWithFoldingUserNameAndPasskey(final UserRequest userRequest) {
         final String foldingUserName = userRequest.getFoldingUserName();
         final String passkey = userRequest.getPasskey();
 
@@ -339,84 +267,62 @@ public final class UserValidator {
             return Optional.empty();
         }
 
-        return allUsers
+        return foldingRepository.getAllUsersWithPasskeys()
             .stream()
             .filter(user -> user.getFoldingUserName().equalsIgnoreCase(foldingUserName) && user.getPasskey().equalsIgnoreCase(passkey))
             .findAny();
     }
 
-    private static Collection<User> getUsersOnTeam(final int teamId, final Collection<User> allUsers) {
-        return allUsers
-            .stream()
-            .filter(user -> user.getTeam().getId() == teamId)
-            .toList();
-    }
-
-    private static Optional<Hardware> getHardware(final int hardwareId, final Collection<Hardware> allHardware) {
-        return allHardware
-            .stream()
-            .filter(hardware -> hardware.getId() == hardwareId)
-            .findAny();
-    }
-
-    private static Optional<Team> getTeam(final int teamId, final Collection<Team> allTeams) {
-        return allTeams
-            .stream()
-            .filter(team -> team.getId() == teamId)
-            .findAny();
-    }
-
-    private String validateCategoryIsValidForHardware(final UserRequest userRequest) {
+    private Category validateCategoryIsValidForHardware(final UserRequest userRequest, final Hardware hardwareForUser) {
         final Category category = Category.get(userRequest.getCategory());
 
         if (!category.isHardwareMakeSupported(hardwareForUser.getHardwareMake())) {
-            return String.format("Category '%s' cannot be filled by hardware of make '%s', must be one of: %s", category,
-                hardwareForUser.getHardwareMake(), category.supportedHardwareMakes());
+            throw new ValidationException(userRequest,
+                String.format("Category '%s' cannot be filled by hardware of make '%s', must be one of: %s", category,
+                    hardwareForUser.getHardwareMake(), category.supportedHardwareMakes()));
         }
 
         if (!category.isHardwareTypeSupported(hardwareForUser.getHardwareType())) {
-            return String.format("Category '%s' cannot be filled by hardware of type '%s', must be one of: %s", category,
-                hardwareForUser.getHardwareType(), category.supportedHardwareTypes());
+            throw new ValidationException(userRequest,
+                String.format("Category '%s' cannot be filled by hardware of type '%s', must be one of: %s", category,
+                    hardwareForUser.getHardwareType(), category.supportedHardwareTypes()));
         }
 
-        return null;
+        return category;
     }
 
-    private String hardware(final UserRequest userRequest, final Collection<Hardware> allHardware) {
-        if (allHardware.isEmpty()) {
-            return "No hardware exist on the system";
-        }
+    private Hardware hardware(final UserRequest userRequest) {
+        try {
+            return foldingRepository.getHardware(userRequest.getHardwareId());
+        } catch (final NotFoundException e) {
+            final Collection<Hardware> allHardwares = foldingRepository.getAllHardware();
+            if (allHardwares.isEmpty()) {
+                throw new ValidationException(userRequest, "No hardwares exist on the system", e);
+            }
 
-        final Optional<Hardware> optionalHardware = getHardware(userRequest.getHardwareId(), allHardware);
-        if (optionalHardware.isEmpty()) {
-            final List<String> availableHardware = allHardware
+            final List<String> availableHardwares = allHardwares
                 .stream()
                 .map(hardware -> String.format("%s: %s", hardware.getId(), hardware.getHardwareName()))
                 .toList();
-
-            return String.format("Field 'hardwareId' must be one of: %s", availableHardware);
+            throw new ValidationException(userRequest, String.format("Field 'hardwareId' must be one of: %s", availableHardwares), e);
         }
-
-        hardwareForUser = optionalHardware.get();
-        return null;
     }
 
-    private String team(final UserRequest userRequest, final Collection<Team> allTeams) {
-        if (allTeams.isEmpty()) {
-            return "No teams exist on the system";
-        }
+    private Team team(final UserRequest userRequest) {
+        try {
+            return foldingRepository.getTeam(userRequest.getTeamId());
+        } catch (final NotFoundException e) {
+            final Collection<Team> allTeams = foldingRepository.getAllTeams();
+            if (allTeams.isEmpty()) {
+                throw new ValidationException(userRequest, "No teams exist on the system", e);
+            }
 
-        final Optional<Team> optionalTeam = getTeam(userRequest.getTeamId(), allTeams);
-        if (optionalTeam.isEmpty()) {
             final List<String> availableTeams = allTeams
                 .stream()
                 .map(team -> String.format("%s: %s", team.getId(), team.getTeamName()))
                 .toList();
 
-            return String.format("Field 'teamId' must be one of: %s", availableTeams);
+            throw new ValidationException(userRequest, String.format("Field 'teamId' must be one of: %s", availableTeams), e);
         }
-
-        teamForUser = optionalTeam.get();
-        return null;
     }
 }

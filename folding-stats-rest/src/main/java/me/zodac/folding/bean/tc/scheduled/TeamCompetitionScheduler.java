@@ -84,17 +84,26 @@ public class TeamCompetitionScheduler {
         parseBoolean(EnvironmentVariableUtils.getOrDefault("ENABLE_MONTHLY_RESULT_STORAGE", "false"));
     private static final boolean IS_LARS_UPDATE_ENABLED = parseBoolean(EnvironmentVariableUtils.getOrDefault("ENABLE_LARS_HARDWARE_UPDATE", "false"));
 
-    @Autowired
-    private LarsHardwareUpdater larsHardwareUpdater;
+    private final LarsHardwareUpdater larsHardwareUpdater;
+    private final UserChangeApplier userChangeApplier;
+    private final UserStatsResetter userStatsResetter;
+    private final UserStatsStorer userStatsStorer;
 
-    @Autowired
-    private UserChangeApplier userChangeApplier;
-
-    @Autowired
-    private UserStatsResetter userStatsResetter;
-
-    @Autowired
-    private UserStatsStorer userStatsStorer;
+    /**
+     * {@link Autowired} constructor.
+     *
+     * @param larsHardwareUpdater the {@link LarsHardwareUpdater}
+     * @param userChangeApplier   the {@link UserChangeApplier}
+     * @param userStatsResetter   the {@link UserStatsResetter}
+     * @param userStatsStorer     the {@link UserStatsStorer}
+     */
+    public TeamCompetitionScheduler(final LarsHardwareUpdater larsHardwareUpdater, final UserChangeApplier userChangeApplier,
+                                    final UserStatsResetter userStatsResetter, final UserStatsStorer userStatsStorer) {
+        this.larsHardwareUpdater = larsHardwareUpdater;
+        this.userChangeApplier = userChangeApplier;
+        this.userStatsResetter = userStatsResetter;
+        this.userStatsStorer = userStatsStorer;
+    }
 
     /**
      * Scheduled execution to prepare the <code>Team Competition</code> for the new month.

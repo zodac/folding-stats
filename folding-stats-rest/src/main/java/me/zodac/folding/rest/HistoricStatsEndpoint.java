@@ -34,10 +34,10 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.security.PermitAll;
 import javax.servlet.http.HttpServletRequest;
+import me.zodac.folding.api.FoldingRepository;
 import me.zodac.folding.api.state.ReadRequired;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.bean.FoldingRepository;
 import me.zodac.folding.bean.StatsRepository;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import me.zodac.folding.rest.util.DateDetails;
@@ -63,11 +63,19 @@ public class HistoricStatsEndpoint {
     // Stat updates occur every hour, so we must invalidate responses every hour
     private static final int CACHE_EXPIRATION_TIME = (int) TimeUnit.HOURS.toSeconds(1);
 
-    @Autowired
-    private FoldingRepository foldingRepository;
+    private final FoldingRepository foldingRepository;
+    private final StatsRepository statsRepository;
 
-    @Autowired
-    private StatsRepository statsRepository;
+    /**
+     * {@link Autowired} constructor.
+     *
+     * @param foldingRepository the {@link FoldingRepository}
+     * @param statsRepository   the {@link StatsRepository}
+     */
+    public HistoricStatsEndpoint(final FoldingRepository foldingRepository, final StatsRepository statsRepository) {
+        this.foldingRepository = foldingRepository;
+        this.statsRepository = statsRepository;
+    }
 
     /**
      * {@link GetMapping} request to retrieve a {@link User}'s hourly {@link HistoricStats} for a single {@code day}.

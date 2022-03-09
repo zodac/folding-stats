@@ -52,8 +52,16 @@ public class LeaderboardStatsGenerator {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @Autowired
-    private StatsRepository statsRepository;
+    private final StatsRepository statsRepository;
+
+    /**
+     * {@link Autowired} constructor.
+     *
+     * @param statsRepository the {@link StatsRepository}
+     */
+    public LeaderboardStatsGenerator(final StatsRepository statsRepository) {
+        this.statsRepository = statsRepository;
+    }
 
     /**
      * Generates the {@link me.zodac.folding.api.tc.Team} leaderboards.

@@ -24,7 +24,7 @@
 
 package me.zodac.folding;
 
-import me.zodac.folding.bean.FoldingRepository;
+import me.zodac.folding.api.FoldingRepository;
 import me.zodac.folding.rest.interceptor.SecurityInterceptor;
 import me.zodac.folding.rest.interceptor.StateInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,8 +40,17 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class InterceptorRegister implements WebMvcConfigurer {
 
+    private final FoldingRepository foldingRepository;
+
+    /**
+     * {@link Autowired} constructor.
+     *
+     * @param foldingRepository the {@link FoldingRepository}
+     */
     @Autowired
-    private FoldingRepository foldingRepository;
+    public InterceptorRegister(final FoldingRepository foldingRepository) {
+        this.foldingRepository = foldingRepository;
+    }
 
     @Override
     public void addInterceptors(final InterceptorRegistry registry) {

@@ -192,23 +192,6 @@ public final class Responses {
     }
 
     /**
-     * A <b>400_BAD_REQUEST</b> {@link ResponseEntity}.
-     *
-     * <p>
-     * Generally used for cases where the REST request has some invalid data. This can be malformed data, or an
-     * invalid payload, or any other similar error.
-     *
-     * @param entity the entity in the payload that caused the error
-     * @param <E>    the response body type
-     * @return the <b>400_BAD_REQUEST</b> {@link ResponseEntity}
-     */
-    public static <E> ResponseEntity<String> badRequest(final E entity) {
-        return ResponseEntity
-            .badRequest()
-            .body(GSON.toJson(entity));
-    }
-
-    /**
      * A <b>404_NOT_FOUND</b> {@link ResponseEntity}.
      *
      * <p>

@@ -24,15 +24,11 @@
 
 package me.zodac.folding.bean.tc.validation;
 
-import static java.util.Collections.emptyList;
-import static me.zodac.folding.bean.tc.validation.HardwareValidator.validateCreate;
-import static me.zodac.folding.bean.tc.validation.HardwareValidator.validateDelete;
-import static me.zodac.folding.bean.tc.validation.HardwareValidator.validateUpdate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowableOfType;
 
-import java.util.Collection;
 import java.util.List;
+import me.zodac.folding.api.FoldingRepository;
 import me.zodac.folding.api.exception.ConflictException;
 import me.zodac.folding.api.exception.UsedByException;
 import me.zodac.folding.api.exception.ValidationException;
@@ -59,7 +55,10 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final Hardware response = validateCreate(hardware, emptyList());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+
+        final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
+        final Hardware response = hardwareValidator.create(hardware);
 
         assertThat(response)
             .as("Expected validation to pass")
@@ -77,23 +76,16 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final ValidationException e = catchThrowableOfType(() -> validateCreate(hardware, emptyList()), ValidationException.class);
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+
+        final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
+        final ValidationException e = catchThrowableOfType(() -> hardwareValidator.create(hardware), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'hardwareName' must not be empty");
     }
 
     @Test
     void whenValidatingCreate_givenOtherHardwareAlreadyExists_thenSuccessResponseIsReturned() {
-        final Collection<Hardware> allHardware = List.of(Hardware.builder()
-            .hardwareName("anotherName")
-            .displayName("displayName")
-            .hardwareMake(HardwareMake.AMD)
-            .hardwareType(HardwareType.GPU)
-            .multiplier(1.00D)
-            .averagePpd(1L)
-            .build()
-        );
-
         final HardwareRequest hardware = HardwareRequest.builder()
             .hardwareName("existingName")
             .displayName("displayName")
@@ -103,7 +95,20 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final Hardware response = validateCreate(hardware, allHardware);
+        final Hardware existingHardware = Hardware.builder()
+            .hardwareName("anotherName")
+            .displayName("displayName")
+            .hardwareMake(HardwareMake.AMD)
+            .hardwareType(HardwareType.GPU)
+            .multiplier(1.00D)
+            .averagePpd(1L)
+            .build();
+
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(existingHardware);
+
+        final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
+        final Hardware response = hardwareValidator.create(hardware);
 
         assertThat(response)
             .as("Expected validation to pass")
@@ -112,16 +117,6 @@ class HardwareValidatorTest {
 
     @Test
     void whenValidatingCreate_givenHardwareWithNameAlreadyExists_thenFailureResponseIsReturned() {
-        final Collection<Hardware> allHardware = List.of(Hardware.builder()
-            .hardwareName("existingName")
-            .displayName("displayName")
-            .hardwareMake(HardwareMake.AMD)
-            .hardwareType(HardwareType.GPU)
-            .multiplier(1.00D)
-            .averagePpd(1L)
-            .build()
-        );
-
         final HardwareRequest hardware = HardwareRequest.builder()
             .hardwareName("existingName")
             .displayName("displayName")
@@ -131,7 +126,20 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final ConflictException e = catchThrowableOfType(() -> validateCreate(hardware, allHardware), ConflictException.class);
+        final Hardware existingHardware = Hardware.builder()
+            .hardwareName("existingName")
+            .displayName("displayName")
+            .hardwareMake(HardwareMake.AMD)
+            .hardwareType(HardwareType.GPU)
+            .multiplier(1.00D)
+            .averagePpd(1L)
+            .build();
+
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(existingHardware);
+
+        final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
+        final ConflictException e = catchThrowableOfType(() -> hardwareValidator.create(hardware), ConflictException.class);
         assertThat(e.getConflictFailure().getConflictingAttributes())
             .containsOnly("hardwareName");
 
@@ -150,7 +158,10 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final ValidationException e = catchThrowableOfType(() -> validateCreate(hardware, emptyList()), ValidationException.class);
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+
+        final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
+        final ValidationException e = catchThrowableOfType(() -> hardwareValidator.create(hardware), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'displayName' must not be empty");
     }
@@ -166,7 +177,10 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final ValidationException e = catchThrowableOfType(() -> validateCreate(hardware, emptyList()), ValidationException.class);
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+
+        final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
+        final ValidationException e = catchThrowableOfType(() -> hardwareValidator.create(hardware), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'hardwareMake' must be one of: [AMD, INTEL, NVIDIA]");
     }
@@ -182,7 +196,10 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final ValidationException e = catchThrowableOfType(() -> validateCreate(hardware, emptyList()), ValidationException.class);
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+
+        final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
+        final ValidationException e = catchThrowableOfType(() -> hardwareValidator.create(hardware), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'hardwareType' must be one of: [CPU, GPU]");
     }
@@ -198,7 +215,10 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final ValidationException e = catchThrowableOfType(() -> validateCreate(hardware, emptyList()), ValidationException.class);
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+
+        final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
+        final ValidationException e = catchThrowableOfType(() -> hardwareValidator.create(hardware), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'multiplier' must be 1.00 or higher");
     }
@@ -214,7 +234,10 @@ class HardwareValidatorTest {
             .averagePpd(-1L)
             .build();
 
-        final ValidationException e = catchThrowableOfType(() -> validateCreate(hardware, emptyList()), ValidationException.class);
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+
+        final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
+        final ValidationException e = catchThrowableOfType(() -> hardwareValidator.create(hardware), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'averagePpd' must be 1 or higher");
     }
@@ -230,7 +253,10 @@ class HardwareValidatorTest {
             .averagePpd(-1L)
             .build();
 
-        final ValidationException e = catchThrowableOfType(() -> validateCreate(hardware, emptyList()), ValidationException.class);
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+
+        final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
+        final ValidationException e = catchThrowableOfType(() -> hardwareValidator.create(hardware), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly(
                 "Field 'hardwareName' must not be empty",
@@ -262,7 +288,10 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final Hardware response = validateUpdate(hardware, existingHardware, emptyList());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+
+        final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
+        final Hardware response = hardwareValidator.update(hardware, existingHardware);
 
         assertThat(response)
             .as("Expected validation to pass")
@@ -289,7 +318,11 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final ValidationException e = catchThrowableOfType(() -> validateUpdate(hardware, existingHardware, emptyList()), ValidationException.class);
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+
+        final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
+        final ValidationException e =
+            catchThrowableOfType(() -> hardwareValidator.update(hardware, existingHardware), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'hardwareName' must not be empty");
     }
@@ -315,7 +348,7 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final Collection<Hardware> allHardware = List.of(Hardware.builder()
+        final Hardware otherHardware = Hardware.builder()
             .id(20)
             .hardwareName("hardwareName")
             .displayName("displayName")
@@ -323,10 +356,14 @@ class HardwareValidatorTest {
             .hardwareType(HardwareType.GPU)
             .multiplier(1.00D)
             .averagePpd(1L)
-            .build()
-        );
+            .build();
 
-        final ConflictException e = catchThrowableOfType(() -> validateUpdate(hardware, existingHardware, allHardware), ConflictException.class);
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(otherHardware);
+
+        final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
+        final ConflictException e =
+            catchThrowableOfType(() -> hardwareValidator.update(hardware, existingHardware), ConflictException.class);
         assertThat(e.getConflictFailure().getConflictingAttributes())
             .containsOnly("hardwareName");
 
@@ -355,7 +392,7 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final Collection<Hardware> allHardware = List.of(Hardware.builder()
+        final Hardware otherHardware = Hardware.builder()
             .id(1)
             .hardwareName("hardwareName")
             .displayName("displayName")
@@ -363,10 +400,13 @@ class HardwareValidatorTest {
             .hardwareType(HardwareType.GPU)
             .multiplier(1.00D)
             .averagePpd(1L)
-            .build()
-        );
+            .build();
 
-        final Hardware response = validateUpdate(hardware, existingHardware, allHardware);
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(otherHardware);
+
+        final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
+        final Hardware response = hardwareValidator.update(hardware, existingHardware);
 
         assertThat(response)
             .as("Expected validation to pass")
@@ -393,7 +433,11 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final ValidationException e = catchThrowableOfType(() -> validateUpdate(hardware, existingHardware, emptyList()), ValidationException.class);
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+
+        final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
+        final ValidationException e =
+            catchThrowableOfType(() -> hardwareValidator.update(hardware, existingHardware), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'displayName' must not be empty");
     }
@@ -418,7 +462,11 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final ValidationException e = catchThrowableOfType(() -> validateUpdate(hardware, existingHardware, emptyList()), ValidationException.class);
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+
+        final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
+        final ValidationException e =
+            catchThrowableOfType(() -> hardwareValidator.update(hardware, existingHardware), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'hardwareMake' must be one of: [AMD, INTEL, NVIDIA]");
     }
@@ -443,7 +491,11 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final ValidationException e = catchThrowableOfType(() -> validateUpdate(hardware, existingHardware, emptyList()), ValidationException.class);
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+
+        final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
+        final ValidationException e =
+            catchThrowableOfType(() -> hardwareValidator.update(hardware, existingHardware), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'hardwareType' must be one of: [CPU, GPU]");
     }
@@ -468,10 +520,13 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final ValidationException e = catchThrowableOfType(() -> validateUpdate(hardware, existingHardware, emptyList()), ValidationException.class);
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+
+        final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
+        final ValidationException e =
+            catchThrowableOfType(() -> hardwareValidator.update(hardware, existingHardware), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'multiplier' must be 1.00 or higher");
-
     }
 
     @Test
@@ -494,7 +549,11 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final ValidationException e = catchThrowableOfType(() -> validateUpdate(hardware, existingHardware, emptyList()), ValidationException.class);
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+
+        final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
+        final ValidationException e =
+            catchThrowableOfType(() -> hardwareValidator.update(hardware, existingHardware), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'averagePpd' must be 1 or higher");
     }
@@ -519,7 +578,11 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final ValidationException e = catchThrowableOfType(() -> validateUpdate(hardware, existingHardware, emptyList()), ValidationException.class);
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+
+        final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
+        final ValidationException e =
+            catchThrowableOfType(() -> hardwareValidator.update(hardware, existingHardware), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly(
                 "Field 'displayName' must not be empty",
@@ -541,7 +604,10 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final Hardware response = validateDelete(existingHardware, emptyList());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+
+        final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
+        final Hardware response = hardwareValidator.delete(existingHardware);
 
         assertThat(response)
             .as("Expected validation to pass")
@@ -560,13 +626,16 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final Collection<User> allUsers = List.of(User.builder()
+        final User existingUser = User.builder()
             .passkey("DummyPasskey12345678901234567890")
             .hardware(existingHardware)
-            .build()
-        );
+            .build();
 
-        final UsedByException e = catchThrowableOfType(() -> validateDelete(existingHardware, allUsers), UsedByException.class);
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createUser(existingUser);
+
+        final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
+        final UsedByException e = catchThrowableOfType(() -> hardwareValidator.delete(existingHardware), UsedByException.class);
         final List<?> usedBy = List.of(e.getUsedByFailure().getUsedBy());
         assertThat(usedBy)
             .hasSize(1);
@@ -598,12 +667,16 @@ class HardwareValidatorTest {
             .averagePpd(1L)
             .build();
 
-        final Collection<User> allUsers = List.of(User.builder()
+        final User existingUser = User.builder()
             .hardware(userHardware)
-            .build()
-        );
+            .passkey("DummyPasskey12345678901234567890")
+            .build();
 
-        final Hardware response = validateDelete(existingHardware, allUsers);
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createUser(existingUser);
+
+        final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
+        final Hardware response = hardwareValidator.delete(existingHardware);
 
         assertThat(response)
             .as("Expected validation to pass")

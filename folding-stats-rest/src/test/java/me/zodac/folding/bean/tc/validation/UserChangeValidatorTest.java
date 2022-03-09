@@ -24,17 +24,17 @@
 
 package me.zodac.folding.bean.tc.validation;
 
-import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowableOfType;
 
-import java.util.List;
+import me.zodac.folding.api.FoldingRepository;
 import me.zodac.folding.api.exception.ConflictException;
 import me.zodac.folding.api.exception.ValidationException;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.HardwareMake;
 import me.zodac.folding.api.tc.HardwareType;
+import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.change.UserChange;
 import me.zodac.folding.api.tc.change.UserChangeState;
@@ -51,6 +51,7 @@ import org.junit.jupiter.api.Test;
 class UserChangeValidatorTest {
 
     private static int hardwareId = 1;
+    private static int teamId = 1;
     private static int userId = 1;
 
     @Test
@@ -68,16 +69,22 @@ class UserChangeValidatorTest {
             .immediate(true)
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
-        final UserChange response = userChangeValidator.validate(
-            userChange,
-            emptyList(),
-            List.of(hardware),
-            List.of(user)
-        );
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createUser(user);
+
+        final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final UserChange response = userChangeValidator.validate(userChange);
 
         assertThat(response)
             .as("Expected validation to pass")
+            .isNotNull();
+
+        assertThat(response.getNewUser())
+            .isNotNull();
+        assertThat(response.getNewUser().getHardware())
+            .isNotNull();
+        assertThat(response.getNewUser().getTeam())
             .isNotNull();
 
         assertThat(response.getState())
@@ -98,13 +105,12 @@ class UserChangeValidatorTest {
             .liveStatsLink("https://www.google.ie")
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
-        final UserChange response = userChangeValidator.validate(
-            userChange,
-            emptyList(),
-            List.of(hardware),
-            List.of(user)
-        );
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createUser(user);
+
+        final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final UserChange response = userChangeValidator.validate(userChange);
 
         assertThat(response)
             .as("Expected validation to pass")
@@ -125,13 +131,12 @@ class UserChangeValidatorTest {
             .liveStatsLink("https://www.google.ie")
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
-        final UserChange response = userChangeValidator.validate(
-            userChange,
-            emptyList(),
-            List.of(hardware),
-            List.of(user)
-        );
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createUser(user);
+
+        final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final UserChange response = userChangeValidator.validate(userChange);
 
         assertThat(response)
             .as("Expected validation to pass")
@@ -152,11 +157,12 @@ class UserChangeValidatorTest {
             .liveStatsLink("https://www.google.ie")
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createUser(user);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userChangeValidator.validate(userChange, emptyList(), List.of(hardware), List.of(user)),
-                ValidationException.class);
+        final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userChangeValidator.validate(userChange), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen");
     }
@@ -175,11 +181,12 @@ class UserChangeValidatorTest {
             .liveStatsLink("https://www.google.ie")
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createUser(user);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userChangeValidator.validate(userChange, emptyList(), List.of(hardware), List.of(user)),
-                ValidationException.class);
+        final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userChangeValidator.validate(userChange), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen");
     }
@@ -198,11 +205,12 @@ class UserChangeValidatorTest {
             .liveStatsLink("https://www.google.ie")
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createUser(user);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userChangeValidator.validate(userChange, emptyList(), List.of(hardware), List.of(user)),
-                ValidationException.class);
+        final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userChangeValidator.validate(userChange), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'passkey' must be 32 characters long and include only alphanumeric characters");
     }
@@ -221,11 +229,12 @@ class UserChangeValidatorTest {
             .liveStatsLink("https://www.google.ie")
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createUser(user);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userChangeValidator.validate(userChange, emptyList(), List.of(hardware), List.of(user)),
-                ValidationException.class);
+        final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userChangeValidator.validate(userChange), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'passkey' must be 32 characters long and include only alphanumeric characters");
     }
@@ -244,13 +253,12 @@ class UserChangeValidatorTest {
             .liveStatsLink(null)
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
-        final UserChange response = userChangeValidator.validate(
-            userChange,
-            emptyList(),
-            List.of(hardware),
-            List.of(user)
-        );
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createUser(user);
+
+        final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final UserChange response = userChangeValidator.validate(userChange);
 
         assertThat(response)
             .as("Expected validation to pass")
@@ -271,11 +279,12 @@ class UserChangeValidatorTest {
             .liveStatsLink("invalidUrl")
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createUser(user);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userChangeValidator.validate(userChange, emptyList(), List.of(hardware), List.of(user)),
-                ValidationException.class);
+        final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userChangeValidator.validate(userChange), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'liveStatsLink' is not a valid link: 'invalidUrl'");
     }
@@ -294,11 +303,12 @@ class UserChangeValidatorTest {
             .liveStatsLink("https://www.google.ie")
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createUser(user);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userChangeValidator.validate(userChange, emptyList(), List.of(hardware), List.of(user)),
-                ValidationException.class);
+        final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userChangeValidator.validate(userChange), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly(String.format("Field 'hardwareId' must be one of: [%s: %s]", hardware.getId(), hardware.getHardwareName()));
     }
@@ -317,12 +327,13 @@ class UserChangeValidatorTest {
             .liveStatsLink("https://www.google.ie")
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createUser(user);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userChangeValidator.validate(userChange, emptyList(), emptyList(), List.of(user)), ValidationException.class);
+        final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userChangeValidator.validate(userChange), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
-            .containsOnly("No hardware exist on the system");
+            .containsOnly("No hardwares exist on the system");
     }
 
     @Test
@@ -339,11 +350,12 @@ class UserChangeValidatorTest {
             .liveStatsLink("https://www.google.ie")
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createUser(user);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userChangeValidator.validate(userChange, emptyList(), List.of(hardware), List.of(user)),
-                ValidationException.class);
+        final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userChangeValidator.validate(userChange), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly(String.format("Field 'userId' must be one of: [%s: %s]", user.getId(), user.getDisplayName()));
     }
@@ -362,11 +374,11 @@ class UserChangeValidatorTest {
             .liveStatsLink("https://www.google.ie")
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userChangeValidator.validate(userChange, emptyList(), List.of(hardware), emptyList()),
-                ValidationException.class);
+        final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userChangeValidator.validate(userChange), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("No users exist on the system");
     }
@@ -385,11 +397,12 @@ class UserChangeValidatorTest {
             .liveStatsLink("https://www.google.ie")
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createUser(user);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userChangeValidator.validate(userChange, emptyList(), List.of(hardware), List.of(user)),
-                ValidationException.class);
+        final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userChangeValidator.validate(userChange), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'existingPasskey' does not match the existing passkey for the user");
     }
@@ -408,11 +421,12 @@ class UserChangeValidatorTest {
             .liveStatsLink(user.getLiveStatsLink())
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createUser(user);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userChangeValidator.validate(userChange, emptyList(), List.of(hardware), List.of(user)),
-                ValidationException.class);
+        final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userChangeValidator.validate(userChange), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("User already has the values supplied in UserChangeRequest");
     }
@@ -443,13 +457,16 @@ class UserChangeValidatorTest {
                 .userIsCaptain(user.isUserIsCaptain())
                 .hardware(user.getHardware())
                 .build())
+            .state(UserChangeState.APPROVED_NEXT_MONTH)
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createUser(user);
+        foldingRepository.createUserChange(existingUserChange);
 
-        final ConflictException e =
-            catchThrowableOfType(() -> userChangeValidator.validate(userChange, List.of(existingUserChange), List.of(hardware), List.of(user)),
-                ConflictException.class);
+        final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final ConflictException e = catchThrowableOfType(() -> userChangeValidator.validate(userChange), ConflictException.class);
         assertThat(e.getConflictFailure().getConflictingAttributes())
             .containsOnly(
                 "foldingUserName",
@@ -459,6 +476,47 @@ class UserChangeValidatorTest {
             );
 
         assertThat(e.getConflictFailure().getConflictingObject())
+            .isNotNull();
+    }
+
+    @Test
+    void whenValidating_givenMatchingUserChangeExistsWithDifferentLink_thenSuccessResponseIsReturned() {
+        final Hardware hardware = generateHardware();
+        final User user = generateUser(hardware);
+
+        final UserChangeRequest userChange = UserChangeRequest.builder()
+            .existingPasskey(user.getPasskey())
+            .foldingUserName(user.getFoldingUserName())
+            .passkey(user.getPasskey())
+            .hardwareId(hardware.getId())
+            .userId(user.getId())
+            .liveStatsLink("https://www.google.ie")
+            .build();
+
+        final UserChange existingUserChange = UserChange.builder()
+            .newUser(User.builder()
+                .id(user.getId())
+                .foldingUserName(user.getFoldingUserName())
+                .displayName(user.getDisplayName())
+                .passkey(user.getPasskey())
+                .category(user.getCategory())
+                .profileLink(user.getProfileLink())
+                .liveStatsLink("https://www.google.com")
+                .userIsCaptain(user.isUserIsCaptain())
+                .hardware(user.getHardware())
+                .build())
+            .state(UserChangeState.APPROVED_NEXT_MONTH)
+            .build();
+
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createUser(user);
+        foldingRepository.createUserChange(existingUserChange);
+
+        final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final UserChange response = userChangeValidator.validate(userChange);
+        assertThat(response)
+            .as("Expected validation to pass")
             .isNotNull();
     }
 
@@ -490,8 +548,13 @@ class UserChangeValidatorTest {
                 .build())
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ValidFoldingStatsRetriever());
-        final UserChange response = userChangeValidator.validate(userChange, List.of(existingUserChange), List.of(hardware), List.of(user));
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createUser(user);
+        foldingRepository.createUserChange(existingUserChange);
+
+        final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new ValidFoldingStatsRetriever());
+        final UserChange response = userChangeValidator.validate(userChange);
         assertThat(response)
             .as("Expected validation to pass")
             .isNotNull();
@@ -511,11 +574,12 @@ class UserChangeValidatorTest {
             .liveStatsLink("https://www.google.ie")
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new NoUnitsFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createUser(user);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userChangeValidator.validate(userChange, emptyList(), List.of(hardware), List.of(user)),
-                ValidationException.class);
+        final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new NoUnitsFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userChangeValidator.validate(userChange), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly(
                 String.format(
@@ -538,11 +602,12 @@ class UserChangeValidatorTest {
             .liveStatsLink("https://www.google.ie")
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new NoUnitsFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createUser(user);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userChangeValidator.validate(userChange, emptyList(), List.of(hardware), List.of(user)),
-                ValidationException.class);
+        final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new NoUnitsFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userChangeValidator.validate(userChange), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly(
                 String.format(
@@ -565,14 +630,15 @@ class UserChangeValidatorTest {
             .liveStatsLink("https://www.google.ie")
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new ExternalConnectionFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createUser(user);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userChangeValidator.validate(userChange, emptyList(), List.of(hardware), List.of(user)),
-                ValidationException.class);
+        final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new ExternalConnectionFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userChangeValidator.validate(userChange), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly(
-                String.format("Unable to connect to 'https://www.google.com' to check stats for Folding@Home user '%s': Error connecting",
+                String.format("Unable to connect to 'https://www.google.com' to check stats for user '%s': Error connecting",
                     userChange.getFoldingUserName())
             );
     }
@@ -591,13 +657,14 @@ class UserChangeValidatorTest {
             .liveStatsLink("https://www.google.ie")
             .build();
 
-        final UserChangeValidator userChangeValidator = UserChangeValidator.create(new UnexpectedExceptionFoldingStatsRetriever());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createHardware(hardware);
+        foldingRepository.createUser(user);
 
-        final ValidationException e =
-            catchThrowableOfType(() -> userChangeValidator.validate(userChange, emptyList(), List.of(hardware), List.of(user)),
-                ValidationException.class);
+        final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new UnexpectedExceptionFoldingStatsRetriever());
+        final ValidationException e = catchThrowableOfType(() -> userChangeValidator.validate(userChange), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
-            .containsOnly(String.format("Unable to check stats for Folding@Home user '%s': Error", user.getFoldingUserName()));
+            .containsOnly(String.format("Unable to check stats for user '%s': Error", user.getFoldingUserName()));
     }
 
     private static Hardware generateHardware() {
@@ -612,6 +679,15 @@ class UserChangeValidatorTest {
             .build();
     }
 
+    private static Team generateTeam() {
+        return Team.builder()
+            .id(teamId++)
+            .teamName("teamName")
+            .teamDescription("teamDescription")
+            .forumLink("https://www.google.com")
+            .build();
+    }
+
     private static User generateUser(final Hardware hardware) {
         return User.builder()
             .id(userId++)
@@ -623,6 +699,7 @@ class UserChangeValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardware(hardware)
+            .team(generateTeam())
             .build();
     }
 }

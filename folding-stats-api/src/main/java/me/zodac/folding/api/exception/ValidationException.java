@@ -33,6 +33,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import me.zodac.folding.api.RequestPojo;
+import me.zodac.folding.api.ResponsePojo;
 
 /**
  * Exception thrown when an object being validated fails a validation constraint.
@@ -48,23 +50,46 @@ public class ValidationException extends RuntimeException {
     private final ValidationFailure validationFailure;
 
     /**
-     * Constructor with failing object and a single errors.
+     * Constructor with failing {@link ResponsePojo} and a single error.
      *
-     * @param invalidObject the {@link Object} that failed validation
+     * @param invalidObject the {@link ResponsePojo} that failed validation
      * @param error         the error
      */
-    public ValidationException(final Object invalidObject, final String error) {
-        super();
+    public ValidationException(final ResponsePojo invalidObject, final String error) {
+        super(error);
         validationFailure = new ValidationFailure(invalidObject, List.of(error));
     }
 
     /**
-     * Constructor with failing object and multiple errors.
+     * Constructor with failing {@link RequestPojo} and a single error.
      *
-     * @param invalidObject the {@link Object} that failed validation
+     * @param invalidObject the {@link RequestPojo} that failed validation
+     * @param error         the error
+     */
+    public ValidationException(final RequestPojo invalidObject, final String error) {
+        super(error);
+        validationFailure = new ValidationFailure(invalidObject, List.of(error));
+    }
+
+    /**
+     * Constructor with failing {@link RequestPojo}, a single error and the cause {@link Throwable}.
+     *
+     * @param invalidObject the {@link RequestPojo} that failed validation
+     * @param error         the error
+     * @param cause         the cause {@link Throwable}
+     */
+    public ValidationException(final RequestPojo invalidObject, final String error, final Throwable cause) {
+        super(error, cause);
+        validationFailure = new ValidationFailure(invalidObject, List.of(error));
+    }
+
+    /**
+     * Constructor with failing {@link RequestPojo} and multiple errors.
+     *
+     * @param invalidObject the {@link RequestPojo} that failed validation
      * @param errors        a {@link Collection} of the errors
      */
-    public ValidationException(final Object invalidObject, final Collection<String> errors) {
+    public ValidationException(final RequestPojo invalidObject, final Collection<String> errors) {
         super();
         validationFailure = new ValidationFailure(invalidObject, errors);
     }

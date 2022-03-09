@@ -30,6 +30,7 @@ import static me.zodac.folding.rest.api.tc.request.UserRequest.FOLDING_USER_NAME
 import static me.zodac.folding.rest.api.tc.request.UserRequest.PASSKEY_PATTERN;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -40,7 +41,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import me.zodac.folding.api.RequestPojo;
-import me.zodac.folding.api.util.StringUtils;
+import me.zodac.folding.api.exception.ValidationException;
 
 /**
  * REST request to create/update a {@link me.zodac.folding.api.tc.change.UserChange}.
@@ -63,14 +64,17 @@ public class UserChangeRequest implements RequestPojo {
     private boolean immediate;
 
     @Override
-    public Collection<String> validate() {
-        return Stream.of(
+    public void validate() {
+        final Collection<String> failureMessages = Stream.of(
                 validateFoldingUserName(),
                 validatePasskey(),
                 validateLiveStatsLink()
             )
-            .filter(StringUtils::isNotBlank)
+            .filter(Objects::nonNull)
             .toList();
+        if (!failureMessages.isEmpty()) {
+            throw new ValidationException(this, failureMessages);
+        }
     }
 
     private String validateFoldingUserName() {

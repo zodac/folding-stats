@@ -39,6 +39,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import me.zodac.folding.api.RequestPojo;
+import me.zodac.folding.api.exception.ValidationException;
 
 /**
  * REST request to create/update a {@link me.zodac.folding.api.tc.Team}.
@@ -57,13 +58,16 @@ public class TeamRequest implements RequestPojo {
     private String forumLink;
 
     @Override
-    public Collection<String> validate() {
-        return Stream.of(
+    public void validate() {
+        final Collection<String> failureMessages = Stream.of(
                 validateTeamName(),
                 validateForumLink()
             )
             .filter(Objects::nonNull)
             .toList();
+        if (!failureMessages.isEmpty()) {
+            throw new ValidationException(this, failureMessages);
+        }
     }
 
     private String validateTeamName() {

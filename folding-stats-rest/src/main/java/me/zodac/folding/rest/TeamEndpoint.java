@@ -39,12 +39,12 @@ import java.util.Optional;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
+import me.zodac.folding.api.FoldingRepository;
 import me.zodac.folding.api.state.ReadRequired;
 import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.state.WriteRequired;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.util.StringUtils;
-import me.zodac.folding.bean.FoldingRepository;
 import me.zodac.folding.bean.tc.validation.TeamValidator;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
 import me.zodac.folding.state.SystemStateManager;
@@ -72,8 +72,8 @@ public class TeamEndpoint {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @Autowired
-    private FoldingRepository foldingRepository;
+    private final FoldingRepository foldingRepository;
+    private final TeamValidator teamValidator;
 
     // Prometheus counters
     private final Counter teamCreates;
@@ -81,11 +81,16 @@ public class TeamEndpoint {
     private final Counter teamDeletes;
 
     /**
-     * Constructor to inject {@link MeterRegistry} and configure Prometheus {@link Counter}s.
+     * {@link Autowired} constructor to inject {@link MeterRegistry} and configure Prometheus {@link Counter}s.
      *
-     * @param registry the Prometheus {@link MeterRegistry}
+     * @param foldingRepository the {@link FoldingRepository}
+     * @param registry          the Prometheus {@link MeterRegistry}
+     * @param teamValidator     the {@link TeamValidator}
      */
-    public TeamEndpoint(final MeterRegistry registry) {
+    public TeamEndpoint(final FoldingRepository foldingRepository, final MeterRegistry registry, final TeamValidator teamValidator) {
+        this.foldingRepository = foldingRepository;
+        this.teamValidator = teamValidator;
+
         teamCreates = Counter.builder("team_create_counter")
             .description("Number of Team creations through the REST endpoint")
             .register(registry);
@@ -110,7 +115,7 @@ public class TeamEndpoint {
     public ResponseEntity<?> create(@RequestBody final TeamRequest teamRequest, final HttpServletRequest request) {
         LOGGER.debug("POST request received to create team at '{}' with request: {}", request::getRequestURI, () -> teamRequest);
 
-        final Team validatedTeam = validateCreate(teamRequest);
+        final Team validatedTeam = teamValidator.create(teamRequest);
         final Team elementWithId = foldingRepository.createTeam(validatedTeam);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
@@ -206,7 +211,7 @@ public class TeamEndpoint {
             return ok(existingTeam);
         }
 
-        final Team validatedHardware = validateUpdate(teamRequest, existingTeam);
+        final Team validatedHardware = teamValidator.update(teamRequest, existingTeam);
 
         // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
         final Team teamWithId = Team.updateWithId(existingTeam.getId(), validatedHardware);
@@ -233,24 +238,12 @@ public class TeamEndpoint {
 
         final Team team = foldingRepository.getTeam(teamId);
 
-        final Team validatedTeam = validateDelete(team);
+        final Team validatedTeam = teamValidator.delete(team);
         foldingRepository.deleteTeam(validatedTeam);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
         LOGGER.info("Deleted team with ID {}", teamId);
         teamDeletes.increment();
         return ok();
-    }
-
-    private Team validateCreate(final TeamRequest teamRequest) {
-        return TeamValidator.validateCreate(teamRequest, foldingRepository.getAllTeams());
-    }
-
-    private Team validateUpdate(final TeamRequest teamRequest, final Team existingTeam) {
-        return TeamValidator.validateUpdate(teamRequest, existingTeam, foldingRepository.getAllTeams());
-    }
-
-    private Team validateDelete(final Team team) {
-        return TeamValidator.validateDelete(team, foldingRepository.getAllUsersWithoutPasskeys());
     }
 }

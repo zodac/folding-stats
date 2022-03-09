@@ -58,11 +58,20 @@ public class MonthlyResultEndpoint {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @Autowired
-    private StatsRepository statsRepository;
+    private final StatsRepository statsRepository;
+    private final UserStatsStorer userStatsStorer;
 
+    /**
+     * {@link Autowired} constructor.
+     *
+     * @param statsRepository the {@link StatsRepository}
+     * @param userStatsStorer the {@link UserStatsStorer}
+     */
     @Autowired
-    private UserStatsStorer userStatsStorer;
+    public MonthlyResultEndpoint(final StatsRepository statsRepository, final UserStatsStorer userStatsStorer) {
+        this.statsRepository = statsRepository;
+        this.userStatsStorer = userStatsStorer;
+    }
 
     /**
      * {@link GetMapping} request that retrieves a {@link MonthlyResult} for the given {@link Month}/{@link Year}.

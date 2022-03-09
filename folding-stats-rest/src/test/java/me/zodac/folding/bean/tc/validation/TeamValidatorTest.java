@@ -24,15 +24,11 @@
 
 package me.zodac.folding.bean.tc.validation;
 
-import static java.util.Collections.emptyList;
-import static me.zodac.folding.bean.tc.validation.TeamValidator.validateCreate;
-import static me.zodac.folding.bean.tc.validation.TeamValidator.validateDelete;
-import static me.zodac.folding.bean.tc.validation.TeamValidator.validateUpdate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowableOfType;
 
-import java.util.Collection;
 import java.util.List;
+import me.zodac.folding.api.FoldingRepository;
 import me.zodac.folding.api.exception.ConflictException;
 import me.zodac.folding.api.exception.UsedByException;
 import me.zodac.folding.api.exception.ValidationException;
@@ -54,7 +50,10 @@ class TeamValidatorTest {
             .forumLink("https://www.google.com")
             .build();
 
-        final Team response = validateCreate(team, emptyList());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+
+        final TeamValidator teamValidator = new TeamValidator(foldingRepository);
+        final Team response = teamValidator.create(team);
 
         assertThat(response)
             .as("Expected validation to pass")
@@ -69,27 +68,33 @@ class TeamValidatorTest {
             .forumLink("https://www.google.com")
             .build();
 
-        final ValidationException e = catchThrowableOfType(() -> validateCreate(team, emptyList()), ValidationException.class);
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+
+        final TeamValidator teamValidator = new TeamValidator(foldingRepository);
+        final ValidationException e = catchThrowableOfType(() -> teamValidator.create(team), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'teamName' must not be empty");
     }
 
     @Test
     void whenValidatingCreate_givenOtherTeamAlreadyExists_thenSuccessResponseIsReturned() {
-        final Collection<Team> allTeams = List.of(Team.builder()
-            .teamName("anotherName")
-            .teamDescription("teamDescription")
-            .forumLink("https://www.google.com")
-            .build()
-        );
-
         final TeamRequest team = TeamRequest.builder()
             .teamName("existingName")
             .teamDescription("teamDescription")
             .forumLink("https://www.google.com")
             .build();
 
-        final Team response = validateCreate(team, allTeams);
+        final Team existingTeam = Team.builder()
+            .teamName("anotherName")
+            .teamDescription("teamDescription")
+            .forumLink("https://www.google.com")
+            .build();
+
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createTeam(existingTeam);
+
+        final TeamValidator teamValidator = new TeamValidator(foldingRepository);
+        final Team response = teamValidator.create(team);
 
         assertThat(response)
             .as("Expected validation to pass")
@@ -98,20 +103,23 @@ class TeamValidatorTest {
 
     @Test
     void whenValidatingCreate_givenTeamWithNameAlreadyExists_thenFailureResponseIsReturned() {
-        final Collection<Team> allTeams = List.of(Team.builder()
-            .teamName("existingName")
-            .teamDescription("teamDescription")
-            .forumLink("https://www.google.com")
-            .build()
-        );
-
         final TeamRequest team = TeamRequest.builder()
             .teamName("existingName")
             .teamDescription("teamDescription")
             .forumLink("https://www.google.com")
             .build();
 
-        final ConflictException e = catchThrowableOfType(() -> validateCreate(team, allTeams), ConflictException.class);
+        final Team existingTeam = Team.builder()
+            .teamName("existingName")
+            .teamDescription("teamDescription")
+            .forumLink("https://www.google.com")
+            .build();
+
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createTeam(existingTeam);
+
+        final TeamValidator teamValidator = new TeamValidator(foldingRepository);
+        final ConflictException e = catchThrowableOfType(() -> teamValidator.create(team), ConflictException.class);
         assertThat(e.getConflictFailure().getConflictingAttributes())
             .containsOnly("teamName");
 
@@ -127,7 +135,10 @@ class TeamValidatorTest {
             .forumLink("https://www.google.com")
             .build();
 
-        final Team response = validateCreate(team, emptyList());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+
+        final TeamValidator teamValidator = new TeamValidator(foldingRepository);
+        final Team response = teamValidator.create(team);
 
         assertThat(response)
             .as("Expected validation to pass")
@@ -142,7 +153,10 @@ class TeamValidatorTest {
             .forumLink(null)
             .build();
 
-        final Team response = validateCreate(team, emptyList());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+
+        final TeamValidator teamValidator = new TeamValidator(foldingRepository);
+        final Team response = teamValidator.create(team);
 
         assertThat(response)
             .as("Expected validation to pass")
@@ -157,7 +171,10 @@ class TeamValidatorTest {
             .forumLink("invalidUrl")
             .build();
 
-        final ValidationException e = catchThrowableOfType(() -> validateCreate(team, emptyList()), ValidationException.class);
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+
+        final TeamValidator teamValidator = new TeamValidator(foldingRepository);
+        final ValidationException e = catchThrowableOfType(() -> teamValidator.create(team), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'forumLink' is not a valid link: 'invalidUrl'");
     }
@@ -176,7 +193,10 @@ class TeamValidatorTest {
             .forumLink("https://www.google.com")
             .build();
 
-        final Team response = validateUpdate(team, existingTeam, emptyList());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+
+        final TeamValidator teamValidator = new TeamValidator(foldingRepository);
+        final Team response = teamValidator.update(team, existingTeam);
 
         assertThat(response)
             .as("Expected validation to pass")
@@ -197,7 +217,11 @@ class TeamValidatorTest {
             .forumLink("https://www.google.com")
             .build();
 
-        final ValidationException e = catchThrowableOfType(() -> validateUpdate(team, existingTeam, emptyList()), ValidationException.class);
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+
+        final TeamValidator teamValidator = new TeamValidator(foldingRepository);
+        final ValidationException e =
+            catchThrowableOfType(() -> teamValidator.update(team, existingTeam), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'teamName' must not be empty");
     }
@@ -217,15 +241,18 @@ class TeamValidatorTest {
             .forumLink("https://www.google.com")
             .build();
 
-        final Collection<Team> allTeams = List.of(Team.builder()
+        final Team otherTeam = Team.builder()
             .id(20)
             .teamName("teamName")
             .teamDescription("teamDescription")
             .forumLink("https://www.google.com")
-            .build()
-        );
+            .build();
 
-        final ConflictException e = catchThrowableOfType(() -> validateUpdate(team, existingTeam, allTeams), ConflictException.class);
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createTeam(otherTeam);
+
+        final TeamValidator teamValidator = new TeamValidator(foldingRepository);
+        final ConflictException e = catchThrowableOfType(() -> teamValidator.update(team, existingTeam), ConflictException.class);
         assertThat(e.getConflictFailure().getConflictingAttributes())
             .containsOnly("teamName");
 
@@ -248,15 +275,18 @@ class TeamValidatorTest {
             .forumLink("https://www.google.com")
             .build();
 
-        final Collection<Team> allTeams = List.of(Team.builder()
+        final Team otherTeam = Team.builder()
             .id(1)
             .teamName("teamName")
             .teamDescription("teamDescription")
             .forumLink("https://www.google.com")
-            .build()
-        );
+            .build();
 
-        final Team response = validateUpdate(team, existingTeam, allTeams);
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createTeam(otherTeam);
+
+        final TeamValidator teamValidator = new TeamValidator(foldingRepository);
+        final Team response = teamValidator.update(team, existingTeam);
 
         assertThat(response)
             .as("Expected validation to pass")
@@ -277,7 +307,10 @@ class TeamValidatorTest {
             .forumLink("https://www.google.com")
             .build();
 
-        final Team response = validateUpdate(team, existingTeam, emptyList());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+
+        final TeamValidator teamValidator = new TeamValidator(foldingRepository);
+        final Team response = teamValidator.update(team, existingTeam);
 
         assertThat(response)
             .as("Expected validation to pass")
@@ -298,7 +331,10 @@ class TeamValidatorTest {
             .forumLink("https://www.google.com")
             .build();
 
-        final Team response = validateUpdate(team, existingTeam, emptyList());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+
+        final TeamValidator teamValidator = new TeamValidator(foldingRepository);
+        final Team response = teamValidator.update(team, existingTeam);
 
         assertThat(response)
             .as("Expected validation to pass")
@@ -319,7 +355,11 @@ class TeamValidatorTest {
             .forumLink("https://www.google.com")
             .build();
 
-        final ValidationException e = catchThrowableOfType(() -> validateUpdate(team, existingTeam, emptyList()), ValidationException.class);
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+
+        final TeamValidator teamValidator = new TeamValidator(foldingRepository);
+        final ValidationException e =
+            catchThrowableOfType(() -> teamValidator.update(team, existingTeam), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly("Field 'forumLink' is not a valid link: 'invalidUrl'");
     }
@@ -332,7 +372,10 @@ class TeamValidatorTest {
             .forumLink("https://www.google.com")
             .build();
 
-        final Team response = validateDelete(existingTeam, emptyList());
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+
+        final TeamValidator teamValidator = new TeamValidator(foldingRepository);
+        final Team response = teamValidator.delete(existingTeam);
 
         assertThat(response)
             .as("Expected validation to pass")
@@ -348,13 +391,16 @@ class TeamValidatorTest {
             .forumLink("https://www.google.com")
             .build();
 
-        final Collection<User> allUsers = List.of(User.builder()
+        final User existingUser = User.builder()
             .passkey("DummyPasskey12345678901234567890")
             .team(existingTeam)
-            .build()
-        );
+            .build();
 
-        final UsedByException e = catchThrowableOfType(() -> validateDelete(existingTeam, allUsers), UsedByException.class);
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createUser(existingUser);
+
+        final TeamValidator teamValidator = new TeamValidator(foldingRepository);
+        final UsedByException e = catchThrowableOfType(() -> teamValidator.delete(existingTeam), UsedByException.class);
         final List<?> usedBy = List.of(e.getUsedByFailure().getUsedBy());
         assertThat(usedBy)
             .hasSize(1);
@@ -380,12 +426,16 @@ class TeamValidatorTest {
             .forumLink("https://www.google.com")
             .build();
 
-        final Collection<User> allUsers = List.of(User.builder()
+        final User existingUser = User.builder()
             .team(userTeam)
-            .build()
-        );
+            .passkey("DummyPasskey12345678901234567890")
+            .build();
 
-        final Team response = validateDelete(existingTeam, allUsers);
+        final FoldingRepository foldingRepository = new MockFoldingRepository();
+        foldingRepository.createUser(existingUser);
+
+        final TeamValidator teamValidator = new TeamValidator(foldingRepository);
+        final Team response = teamValidator.delete(existingTeam);
 
         assertThat(response)
             .as("Expected validation to pass")

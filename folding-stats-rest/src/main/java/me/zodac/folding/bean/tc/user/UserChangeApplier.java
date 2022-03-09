@@ -25,10 +25,10 @@
 package me.zodac.folding.bean.tc.user;
 
 import java.util.Collection;
+import me.zodac.folding.api.FoldingRepository;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.change.UserChange;
 import me.zodac.folding.api.tc.change.UserChangeState;
-import me.zodac.folding.bean.FoldingRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,8 +42,17 @@ public class UserChangeApplier {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private final FoldingRepository foldingRepository;
+
+    /**
+     * {@link Autowired} constructor.
+     *
+     * @param foldingRepository the {@link FoldingRepository}
+     */
     @Autowired
-    private FoldingRepository foldingRepository;
+    public UserChangeApplier(final FoldingRepository foldingRepository) {
+        this.foldingRepository = foldingRepository;
+    }
 
     /**
      * Applies all {@link UserChange}s in {@link UserChangeState#APPROVED_NEXT_MONTH}.

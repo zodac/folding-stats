@@ -24,11 +24,10 @@
 
 package me.zodac.folding.bean.tc.validation;
 
-import static me.zodac.folding.api.util.StringUtils.isBlank;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
+import me.zodac.folding.api.FoldingRepository;
 import me.zodac.folding.api.exception.ConflictException;
 import me.zodac.folding.api.exception.UsedByException;
 import me.zodac.folding.api.exception.ValidationException;
@@ -36,14 +35,27 @@ import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Validator class to validate a {@link Team} or {@link TeamRequest}.
  */
-public final class TeamValidator {
+@Component
+public class TeamValidator {
 
-    private TeamValidator() {
+    private static final String CONFLICTING_ATTRIBUTE = "teamName";
 
+    private final FoldingRepository foldingRepository;
+
+    /**
+     * {@link Autowired} constructor.
+     *
+     * @param foldingRepository the {@link FoldingRepository}
+     */
+    @Autowired
+    public TeamValidator(final FoldingRepository foldingRepository) {
+        this.foldingRepository = foldingRepository;
     }
 
     /**
@@ -58,23 +70,18 @@ public final class TeamValidator {
      * </ul>
      *
      * @param teamRequest the {@link TeamRequest} to validate
-     * @param allTeams    all {@link Team}s on the system
      * @return the validated {@link Team}
      * @throws ConflictException   thrown if the input conflicts with an existing {@link Hardware}
      * @throws ValidationException thrown if the input fails validation
      */
-    public static Team validateCreate(final TeamRequest teamRequest, final Collection<Team> allTeams) {
+    public Team create(final TeamRequest teamRequest) {
         // The teamName must be unique
-        final Optional<Team> teamWithMatchingName = getTeamWithName(teamRequest.getTeamName(), allTeams);
+        final Optional<Team> teamWithMatchingName = getTeamWithName(teamRequest.getTeamName());
         if (teamWithMatchingName.isPresent()) {
-            throw new ConflictException(teamRequest, teamWithMatchingName.get(), "teamName");
+            throw new ConflictException(teamRequest, teamWithMatchingName.get(), CONFLICTING_ATTRIBUTE);
         }
 
-        final Collection<String> failureMessages = teamRequest.validate();
-        if (!failureMessages.isEmpty()) {
-            throw new ValidationException(teamRequest, failureMessages);
-        }
-
+        teamRequest.validate();
         return Team.createWithoutId(teamRequest);
     }
 
@@ -91,23 +98,18 @@ public final class TeamValidator {
      *
      * @param teamRequest  the {@link TeamRequest} to validate
      * @param existingTeam the already existing {@link Team} in the system to be updated
-     *                     @param allTeams all {@link Team}s on the system
      * @return the validated {@link Team}
      * @throws ConflictException   thrown if the input conflicts with an existing {@link Hardware}
      * @throws ValidationException thrown if the input fails validation
      */
-    public static Team validateUpdate(final TeamRequest teamRequest, final Team existingTeam, final Collection<Team> allTeams) {
+    public Team update(final TeamRequest teamRequest, final Team existingTeam) {
         // The teamName must be unique, unless replacing the same team
-        final Optional<Team> teamWithMatchingName = getTeamWithName(teamRequest.getTeamName(), allTeams);
+        final Optional<Team> teamWithMatchingName = getTeamWithName(teamRequest.getTeamName());
         if (teamWithMatchingName.isPresent() && teamWithMatchingName.get().getId() != existingTeam.getId()) {
-            throw new ConflictException(teamRequest, teamWithMatchingName.get(), "teamName");
+            throw new ConflictException(teamRequest, teamWithMatchingName.get(), CONFLICTING_ATTRIBUTE);
         }
 
-        final Collection<String> failureMessages = teamRequest.validate();
-        if (!failureMessages.isEmpty()) {
-            throw new ValidationException(teamRequest, failureMessages);
-        }
-
+        teamRequest.validate();
         return Team.createWithoutId(teamRequest);
     }
 
@@ -117,13 +119,12 @@ public final class TeamValidator {
      * <p>
      * If the {@link Team} is in use by a {@link User}, it cannot be deleted.
      *
-     * @param team     the {@link Team} to validate
-     * @param allUsers all {@link User}s on the system
+     * @param team the {@link Team} to validate
      * @return the validated {@link Team}
      * @throws UsedByException thrown if the {@link Team} is in use by a {@link User}
      */
-    public static Team validateDelete(final Team team, final Collection<User> allUsers) {
-        final Collection<User> usersWithMatchingTeam = getUsersOnTeam(team.getId(), allUsers);
+    public Team delete(final Team team) {
+        final Collection<User> usersWithMatchingTeam = getUsersOnTeam(team.getId());
 
         if (!usersWithMatchingTeam.isEmpty()) {
             throw new UsedByException(team, usersWithMatchingTeam);
@@ -132,26 +133,21 @@ public final class TeamValidator {
         return team;
     }
 
-    private static Optional<Team> getTeamWithName(final String teamName, final Collection<Team> allTeams) {
-        if (isBlank(teamName)) {
-            return Optional.empty();
-        }
-
-        return allTeams
+    private Optional<Team> getTeamWithName(final String teamName) {
+        return foldingRepository.getAllTeams()
             .stream()
             .filter(team -> team.getTeamName().equalsIgnoreCase(teamName))
             .findAny();
     }
 
-    private static Collection<User> getUsersOnTeam(final int teamId, final Collection<User> allUsers) {
+    private Collection<User> getUsersOnTeam(final int teamId) {
         if (teamId == Team.EMPTY_TEAM_ID) {
             return Collections.emptyList();
         }
 
-        return allUsers
+        return foldingRepository.getAllUsersWithoutPasskeys()
             .stream()
             .filter(user -> user.getTeam().getId() == teamId)
-            .map(User::hidePasskey)
             .toList();
     }
 }

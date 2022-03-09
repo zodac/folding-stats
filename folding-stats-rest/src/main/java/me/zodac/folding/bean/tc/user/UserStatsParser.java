@@ -40,7 +40,6 @@ import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.bean.StatsRepository;
 import me.zodac.folding.state.ParsingStateManager;
 import me.zodac.folding.state.SystemStateManager;
-import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,10 +53,21 @@ import org.springframework.stereotype.Component;
 public class UserStatsParser {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final FoldingStatsRetriever FOLDING_STATS_RETRIEVER = HttpFoldingStatsRetriever.create();
 
+    private final FoldingStatsRetriever foldingStatsRetriever;
+    private final StatsRepository statsRepository;
+
+    /**
+     * {@link Autowired} constructor.
+     *
+     * @param foldingStatsRetriever the {@link FoldingStatsRetriever}
+     * @param statsRepository       the {@link StatsRepository}
+     */
     @Autowired
-    private StatsRepository statsRepository;
+    public UserStatsParser(final FoldingStatsRetriever foldingStatsRetriever, final StatsRepository statsRepository) {
+        this.foldingStatsRetriever = foldingStatsRetriever;
+        this.statsRepository = statsRepository;
+    }
 
     /**
      * Parses the latest TC stats for the given {@link User}s.
@@ -129,9 +139,9 @@ public class UserStatsParser {
         calculateAndPersistTcStats(user, initialStats, offsetTcStats, createdTotalStats);
     }
 
-    private static UserStats getTotalStatsForUserOrEmpty(final User user) {
+    private UserStats getTotalStatsForUserOrEmpty(final User user) {
         try {
-            return FOLDING_STATS_RETRIEVER.getTotalStats(user);
+            return foldingStatsRetriever.getTotalStats(user);
         } catch (final ExternalConnectionException e) {
             LOGGER.warn("Error connecting to Folding@Home API at '{}'", e.getUrl(), e);
         }

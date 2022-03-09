@@ -27,7 +27,7 @@ package me.zodac.folding.rest;
 import static me.zodac.folding.rest.response.Responses.ok;
 
 import javax.annotation.security.RolesAllowed;
-import me.zodac.folding.bean.FoldingRepository;
+import me.zodac.folding.api.FoldingRepository;
 import me.zodac.folding.bean.tc.lars.LarsHardwareUpdater;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -50,11 +50,19 @@ public class DebugEndpoint {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @Autowired
-    private FoldingRepository foldingRepository;
+    private final FoldingRepository foldingRepository;
+    private final LarsHardwareUpdater larsHardwareUpdater;
 
-    @Autowired
-    private LarsHardwareUpdater larsHardwareUpdater;
+    /**
+     * {@link Autowired} constructor.
+     *
+     * @param foldingRepository   the {@link FoldingRepository}
+     * @param larsHardwareUpdater the {@link LarsHardwareUpdater}
+     */
+    public DebugEndpoint(final FoldingRepository foldingRepository, final LarsHardwareUpdater larsHardwareUpdater) {
+        this.foldingRepository = foldingRepository;
+        this.larsHardwareUpdater = larsHardwareUpdater;
+    }
 
     /**
      * {@link PostMapping} request to print the contents of all caches to the system log.

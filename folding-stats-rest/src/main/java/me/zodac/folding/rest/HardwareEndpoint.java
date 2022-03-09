@@ -39,12 +39,12 @@ import java.util.Optional;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
+import me.zodac.folding.api.FoldingRepository;
 import me.zodac.folding.api.state.ReadRequired;
 import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.state.WriteRequired;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.util.StringUtils;
-import me.zodac.folding.bean.FoldingRepository;
 import me.zodac.folding.bean.tc.validation.HardwareValidator;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 import me.zodac.folding.state.SystemStateManager;
@@ -72,8 +72,8 @@ public class HardwareEndpoint {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @Autowired
-    private FoldingRepository foldingRepository;
+    private final HardwareValidator hardwareValidator;
+    private final FoldingRepository foldingRepository;
 
     // Prometheus counters
     private final Counter hardwareCreates;
@@ -81,11 +81,17 @@ public class HardwareEndpoint {
     private final Counter hardwareDeletes;
 
     /**
-     * Constructor to inject {@link MeterRegistry} and configure Prometheus {@link Counter}s.
+     * {@link Autowired} constructor to inject {@link MeterRegistry} and configure Prometheus {@link Counter}s.
      *
-     * @param registry the Prometheus {@link MeterRegistry}
+     * @param hardwareValidator the {@link HardwareValidator}
+     * @param foldingRepository the {@link FoldingRepository}
+     * @param registry          the Prometheus {@link MeterRegistry}
      */
-    public HardwareEndpoint(final MeterRegistry registry) {
+    @Autowired
+    public HardwareEndpoint(final HardwareValidator hardwareValidator, final FoldingRepository foldingRepository, final MeterRegistry registry) {
+        this.hardwareValidator = hardwareValidator;
+        this.foldingRepository = foldingRepository;
+
         hardwareCreates = Counter.builder("hardware_create_counter")
             .description("Number of Hardware creations through the REST endpoint")
             .register(registry);
@@ -110,7 +116,7 @@ public class HardwareEndpoint {
     public ResponseEntity<?> create(@RequestBody final HardwareRequest hardwareRequest, final HttpServletRequest request) {
         LOGGER.info("POST request received to create hardware at '{}' with request: {}", request::getRequestURI, () -> hardwareRequest);
 
-        final Hardware validatedHardware = validateCreate(hardwareRequest);
+        final Hardware validatedHardware = hardwareValidator.create(hardwareRequest);
         final Hardware elementWithId = foldingRepository.createHardware(validatedHardware);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
@@ -207,7 +213,7 @@ public class HardwareEndpoint {
             return ok(existingHardware);
         }
 
-        final Hardware validatedHardware = validateUpdate(hardwareRequest, existingHardware);
+        final Hardware validatedHardware = hardwareValidator.update(hardwareRequest, existingHardware);
 
         // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
         final Hardware hardwareWithId = Hardware.updateWithId(existingHardware.getId(), validatedHardware);
@@ -233,24 +239,12 @@ public class HardwareEndpoint {
         LOGGER.debug("DELETE request for hardware received at '{}'", request::getRequestURI);
 
         final Hardware hardware = foldingRepository.getHardware(hardwareId);
-        final Hardware validatedHardware = validateDelete(hardware);
+        final Hardware validatedHardware = hardwareValidator.delete(hardware);
 
         foldingRepository.deleteHardware(validatedHardware);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
         LOGGER.info("Deleted hardware with ID {}", hardwareId);
         hardwareDeletes.increment();
         return ok();
-    }
-
-    private Hardware validateCreate(final HardwareRequest hardwareRequest) {
-        return HardwareValidator.validateCreate(hardwareRequest, foldingRepository.getAllHardware());
-    }
-
-    private Hardware validateUpdate(final HardwareRequest hardwareRequest, final Hardware existingHardware) {
-        return HardwareValidator.validateUpdate(hardwareRequest, existingHardware, foldingRepository.getAllHardware());
-    }
-
-    private Hardware validateDelete(final Hardware hardware) {
-        return HardwareValidator.validateDelete(hardware, foldingRepository.getAllUsersWithoutPasskeys());
     }
 }

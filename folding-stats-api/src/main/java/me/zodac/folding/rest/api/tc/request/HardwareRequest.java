@@ -38,6 +38,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import me.zodac.folding.api.RequestPojo;
+import me.zodac.folding.api.exception.ValidationException;
 import me.zodac.folding.api.tc.HardwareMake;
 import me.zodac.folding.api.tc.HardwareType;
 
@@ -65,8 +66,8 @@ public class HardwareRequest implements RequestPojo {
     private long averagePpd;
 
     @Override
-    public Collection<String> validate() {
-        return Stream.of(
+    public void validate() {
+        final Collection<String> failureMessages = Stream.of(
                 validateHardwareName(),
                 validateDisplayName(),
                 validateHardwareMake(),
@@ -76,6 +77,9 @@ public class HardwareRequest implements RequestPojo {
             )
             .filter(Objects::nonNull)
             .toList();
+        if (!failureMessages.isEmpty()) {
+            throw new ValidationException(this, failureMessages);
+        }
     }
 
     private String validateHardwareName() {

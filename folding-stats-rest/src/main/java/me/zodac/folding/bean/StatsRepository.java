@@ -65,8 +65,17 @@ public class StatsRepository {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private final Storage storage;
+
+    /**
+     * {@link Autowired} constructor.
+     *
+     * @param storage the {@link Storage}
+     */
     @Autowired
-    private Storage storage;
+    public StatsRepository(final Storage storage) {
+        this.storage = storage;
+    }
 
     /**
      * Creates a {@link MonthlyResult} for the <code>Team Competition</code>.

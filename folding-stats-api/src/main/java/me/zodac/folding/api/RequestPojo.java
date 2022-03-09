@@ -24,8 +24,6 @@
 
 package me.zodac.folding.api;
 
-import java.util.Collection;
-
 /**
  * Marker interface for POJOs are sent in a REST request to the service.
  */
@@ -39,7 +37,7 @@ public interface RequestPojo {
      *     <li>Enum fields are not invalid</li>
      * </ul>
      *
-     * @return {@link String} {@link Collection} of any validation failures, or empty if the {@link RequestPojo} is valid
+     * @throws me.zodac.folding.api.exception.ValidationException thrown if there are any validation failures
      */
-    Collection<String> validate();
+    void validate();
 }
