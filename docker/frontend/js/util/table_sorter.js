@@ -17,30 +17,35 @@ function sortTable(columnIndex, tableId) {
             shouldSwitch = false;
           
             // Get the two elements you want to compare, one from current row and one from the next
-            first = rows[i].getElementsByTagName("td")[columnIndex];
-            second = rows[i + 1].getElementsByTagName("td")[columnIndex];
+            firstElement = rows[i].getElementsByTagName("td")[columnIndex]
+            secondElement = rows[i + 1].getElementsByTagName("td")[columnIndex]
+
+            // Removing commas to check formatted numbers
+            // Making lowercase so sort is case-insensitive
+            first = firstElement.innerHTML.replaceAll(",", "").toLowerCase();
+            second = secondElement.innerHTML.replaceAll(",", "").toLowerCase();
          
             // Check if the two rows should switch place, based on the direction, asc or desc
             if (dir == "asc") {
-                if (isNaN(first.innerHTML) || isNaN(second.innerHTML)){
-                    if (first.innerHTML.toLowerCase() > second.innerHTML.toLowerCase()) {
+                if (isNaN(first) || isNaN(second)){
+                    if (first > second) {
                         shouldSwitch = true;
                         break;
                     }
                 } else {
-                    if (parseInt(first.innerHTML) > parseInt(second.innerHTML)) {
+                    if (parseInt(first) > parseInt(second)) {
                         shouldSwitch = true;
                         break;
                     }
                 }
             } else if (dir == "desc") {
-                if (isNaN(first.innerHTML) || isNaN(second.innerHTML)){
-                    if (first.innerHTML.toLowerCase() < second.innerHTML.toLowerCase()) {
+                if (isNaN(first) || isNaN(second)){
+                    if (first < second) {
                         shouldSwitch = true;
                         break;
                     }
                 } else {
-                    if (parseInt(first.innerHTML) < parseInt(second.innerHTML)) {
+                    if (parseInt(first) < parseInt(second)) {
                         shouldSwitch = true;
                         break;
                     }

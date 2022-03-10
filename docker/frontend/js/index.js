@@ -87,8 +87,8 @@ function loadTeamLeaderboard() {
         return response.json();
     })
     .then(function(jsonResponse){
-        const leaderboardHeaders = ["Rank", "Team", "Points", "Units", "Points To Leader", "Points To Next"];
-        const leaderboardProperties = [ "rank", "teamName", "teamMultipliedPoints", "teamUnits", "diffToLeader", "diffToNext"];
+        const leaderboardHeaders = ["Rank", "Team", "Points", "Units", "Points To Leader", "Points To Next", "Points/WU"];
+        const leaderboardProperties = [ "rank", "teamName", "teamMultipliedPoints", "teamUnits", "diffToLeader", "diffToNext", "pointsPerUnit"];
 
         leaderboardDiv = document.getElementById("leaderboard_div");
 
@@ -104,6 +104,11 @@ function loadTeamLeaderboard() {
         leaderboardTableHeaderRow = document.createElement("tr");
         leaderboardHeaders.forEach(function (header, i) {
             leaderboardTableHeader = document.createElement("th");
+
+            if(header != "Team" && header != "Rank"){
+                leaderboardTableHeader.setAttribute("style", "text-align:right");
+            }
+
             leaderboardTableHeader.setAttribute("onclick", "sortTable("+i+", 'leaderboard')");
             leaderboardTableHeader.setAttribute("scope", "col");
             leaderboardTableHeader.innerHTML = header;
@@ -122,6 +127,10 @@ function loadTeamLeaderboard() {
             leaderboardProperties.forEach(function(property){
                 leaderboardCell = document.createElement("td");
 
+                if(property != "teamName" && property != "rank"){
+                    leaderboardCell.setAttribute("style", "text-align:right");
+                }
+
                 if (property === "teamMultipliedPoints") {
                     leaderboardCell.setAttribute("data-bs-toggle", "tooltip");
                     leaderboardCell.setAttribute("data-placement", "top");
@@ -130,6 +139,12 @@ function loadTeamLeaderboard() {
                     leaderboardCell.innerHTML = team['teamMultipliedPoints'].toLocaleString();
                 } else if (property === "teamName") {
                     leaderboardCell.innerHTML = team['team']['teamName'].toLocaleString();
+                } else if (property === "pointsPerUnit"){
+                    leaderboardCell.setAttribute("data-bs-toggle", "tooltip");
+                    leaderboardCell.setAttribute("data-placement", "top");
+                    leaderboardCell.setAttribute("title", "Unmultiplied: " + (team['teamPoints']/team['teamUnits']).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0}));
+                    new bootstrap.Tooltip(leaderboardCell);
+                    leaderboardCell.innerHTML = (team['teamMultipliedPoints']/team['teamUnits']).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
                 } else {
                     leaderboardCell.innerHTML = team[property].toLocaleString();
                 }

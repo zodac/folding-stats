@@ -360,7 +360,7 @@ The system currently has multiple logs available:
       for [SecurityInterceptor.java](./folding-stats-rest/src/main/java/me/zodac/folding/rest/interceptor/SecurityInterceptor.java)
       is written, detailing login attempts or access requests to WRITE operations. This is not printed to the console.
 - sql.log
-    - This is used to log all SQL queries made to the DB
+    - This is used to log all SQL queries made to the DB. This is not printed to the console.
 
 These can be accessed and viewed by:
 
