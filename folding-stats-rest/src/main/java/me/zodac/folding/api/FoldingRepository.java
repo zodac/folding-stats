@@ -55,7 +55,7 @@ public interface FoldingRepository {
      * @param hardware the {@link Hardware} to create
      * @return the created {@link Hardware}, with ID
      */
-    Hardware createHardware(final Hardware hardware);
+    Hardware createHardware(Hardware hardware);
 
     /**
      * Retrieves all {@link Hardware}s.
@@ -71,7 +71,7 @@ public interface FoldingRepository {
      * @return the retrieved {@link Hardware}
      * @throws NotFoundException thrown if the {@link Hardware} cannot be found
      */
-    Hardware getHardware(final int hardwareId);
+    Hardware getHardware(int hardwareId);
 
     /**
      * Updates an existing {@link Hardware}.
@@ -83,14 +83,14 @@ public interface FoldingRepository {
      * @param existingHardware the existing {@link Hardware}
      * @return the updated {@link Hardware}
      */
-    Hardware updateHardware(final Hardware hardwareToUpdate, final Hardware existingHardware);
+    Hardware updateHardware(Hardware hardwareToUpdate, Hardware existingHardware);
 
     /**
      * Deletes a {@link Hardware}.
      *
      * @param hardware the {@link Hardware} to delete
      */
-    void deleteHardware(final Hardware hardware);
+    void deleteHardware(Hardware hardware);
 
     /**
      * Creates a {@link Team}.
@@ -103,7 +103,7 @@ public interface FoldingRepository {
      * @see ParsingStateManager
      * @see UserStatsParser#parseTcStatsForUsersAndWait(Collection)
      */
-    Team createTeam(final Team team);
+    Team createTeam(Team team);
 
     /**
      * Retrieves all {@link Team}.
@@ -119,7 +119,7 @@ public interface FoldingRepository {
      * @return the retrieved {@link Team}
      * @throws NotFoundException thrown if the {@link Team} cannot be found
      */
-    Team getTeam(final int teamId);
+    Team getTeam(int teamId);
 
     /**
      * Updates an existing {@link Team}.
@@ -127,14 +127,14 @@ public interface FoldingRepository {
      * @param teamToUpdate the {@link Team} with updated values
      * @return the updated {@link Team}
      */
-    Team updateTeam(final Team teamToUpdate);
+    Team updateTeam(Team teamToUpdate);
 
     /**
      * Deletes a {@link Team}.
      *
      * @param team the {@link Team} to delete
      */
-    void deleteTeam(final Team team);
+    void deleteTeam(Team team);
 
     /**
      * Creates a {@link User}.
@@ -145,7 +145,7 @@ public interface FoldingRepository {
      * @param user the {@link User} to create
      * @return the created {@link User}, with ID
      */
-    User createUser(final User user);
+    User createUser(User user);
 
     /**
      * Retrieves all {@link User}s, with passkeys unmodified.
@@ -169,7 +169,7 @@ public interface FoldingRepository {
      * @return the retrieved {@link User}
      * @throws NotFoundException thrown if the {@link User} cannot be found
      */
-    User getUserWithPasskey(final int userId);
+    User getUserWithPasskey(int userId);
 
     /**
      * Retrieves a {@link User}, with the passkey masked.
@@ -179,7 +179,7 @@ public interface FoldingRepository {
      * @throws NotFoundException thrown if the {@link User} cannot be found
      * @see User#hidePasskey(User)
      */
-    User getUserWithoutPasskey(final int userId);
+    User getUserWithoutPasskey(int userId);
 
     /**
      * Updates an existing {@link User}.
@@ -191,7 +191,7 @@ public interface FoldingRepository {
      * @param existingUser the existing {@link User}
      * @return the updated {@link User}
      */
-    User updateUser(final User userToUpdate, final User existingUser);
+    User updateUser(User userToUpdate, User existingUser);
 
     /**
      * Deletes a {@link User}.
@@ -202,7 +202,7 @@ public interface FoldingRepository {
      *
      * @param user the {@link User} to delete
      */
-    void deleteUser(final User user);
+    void deleteUser(User user);
 
     /**
      * Retrieves all {@link User}s currently referencing the provided {@link Team}.
@@ -213,7 +213,7 @@ public interface FoldingRepository {
      * @param team the {@link Team} to check for
      * @return a {@link Collection} of {@link User}s using the {@link Team}
      */
-    Collection<User> getUsersOnTeam(final Team team);
+    Collection<User> getUsersOnTeam(Team team);
 
     /**
      * Authenticates a system user and retrieves its roles.
@@ -230,7 +230,7 @@ public interface FoldingRepository {
      * @param password the system user password
      * @return the {@link UserAuthenticationResult}
      */
-    UserAuthenticationResult authenticateSystemUser(final String userName, final String password);
+    UserAuthenticationResult authenticateSystemUser(String userName, String password);
 
     /**
      * Creates a {@link UserChange}.
@@ -238,7 +238,7 @@ public interface FoldingRepository {
      * @param userChange the {@link UserChange} to create
      * @return the created {@link UserChange}, with ID
      */
-    UserChange createUserChange(final UserChange userChange);
+    UserChange createUserChange(UserChange userChange);
 
     /**
      * Retrieves all {@link UserChange}s with any of the given {@link UserChangeState}s, with {@link User} passkeys unmodified.
@@ -247,7 +247,7 @@ public interface FoldingRepository {
      * @param numberOfMonths the number of months back from which to retrieve {@link UserChange}s (<b>0</b> means retrieve all)
      * @return a {@link Collection} of the retrieved {@link UserChange}
      */
-    Collection<UserChange> getAllUserChangesWithPasskeys(final Collection<UserChangeState> states, final int numberOfMonths);
+    Collection<UserChange> getAllUserChangesWithPasskeys(Collection<UserChangeState> states, int numberOfMonths);
 
     /**
      * Retrieves all {@link UserChange}s with any of the given {@link UserChangeState}s, with {@link User} passkeys masked.
@@ -256,7 +256,7 @@ public interface FoldingRepository {
      * @param numberOfMonths the number of months back from which to retrieve {@link UserChange}s (<b>0</b> means retrieve all)
      * @return a {@link Collection} of the retrieved {@link UserChange}
      */
-    Collection<UserChange> getAllUserChangesWithoutPasskeys(final Collection<UserChangeState> states, final int numberOfMonths);
+    Collection<UserChange> getAllUserChangesWithoutPasskeys(Collection<UserChangeState> states, int numberOfMonths);
 
     /**
      * Retrieves all {@link UserChange}s that have been approved for {@link UserChangeState#APPROVED_NEXT_MONTH}.
@@ -272,7 +272,7 @@ public interface FoldingRepository {
      * @return the retrieved {@link UserChange}
      * @throws NotFoundException thrown if the {@link UserChange} cannot be found
      */
-    UserChange getUserChange(final int userChangeId);
+    UserChange getUserChange(int userChangeId);
 
     /**
      * Updates an existing {@link UserChange}.
@@ -280,7 +280,7 @@ public interface FoldingRepository {
      * @param userChangeToUpdate the {@link UserChange} with updated values
      * @return the updated {@link UserChange}
      */
-    UserChange updateUserChange(final UserChange userChangeToUpdate);
+    UserChange updateUserChange(UserChange userChangeToUpdate);
 
     /**
      * Debug function which will print the contents of any caches being used to the system log.

@@ -104,6 +104,9 @@
         <!-- Don't agree, not worth it -->
         <exclude name="AvoidDuplicateLiterals"/>
 
+        <!-- Sometimes I *want* multiple loggers -->
+        <exclude name="MoreThanOneLogger"/>
+
         <!-- Quite a few false positives -->
         <!-- Caught by SonarQube analysis -->
         <exclude name="BeanMembersShouldSerialize"/>

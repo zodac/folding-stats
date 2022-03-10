@@ -57,7 +57,7 @@ public interface DbManager extends Closeable {
      * @param hardware the {@link Hardware} to persist
      * @return the {@link Hardware} updated with an ID
      */
-    Hardware createHardware(final Hardware hardware);
+    Hardware createHardware(Hardware hardware);
 
     /**
      * Retrieves all {@link Hardware}s from the DB.
@@ -72,7 +72,7 @@ public interface DbManager extends Closeable {
      * @param hardwareId the ID of the {@link Hardware} to retrieve
      * @return an {@link Optional} of the retrieved {@link Hardware}
      */
-    Optional<Hardware> getHardware(final int hardwareId);
+    Optional<Hardware> getHardware(int hardwareId);
 
     /**
      * Updates an existing {@link Hardware} in the system, matching on ID.
@@ -80,14 +80,14 @@ public interface DbManager extends Closeable {
      * @param hardwareToUpdate the updated {@link Hardware} to be persisted in the DB
      * @return the updated {@link Hardware}
      */
-    Hardware updateHardware(final Hardware hardwareToUpdate);
+    Hardware updateHardware(Hardware hardwareToUpdate);
 
     /**
      * Deletes an existing {@link Hardware} from the system.
      *
      * @param hardwareId the ID of the {@link Hardware} to delete
      */
-    void deleteHardware(final int hardwareId);
+    void deleteHardware(int hardwareId);
 
     /**
      * Creates a {@link Team} instance in the DB.
@@ -95,7 +95,7 @@ public interface DbManager extends Closeable {
      * @param team the {@link Team} to persist
      * @return the {@link Team} updated with an ID
      */
-    Team createTeam(final Team team);
+    Team createTeam(Team team);
 
     /**
      * Retrieves all {@link Team}s from the DB.
@@ -110,7 +110,7 @@ public interface DbManager extends Closeable {
      * @param teamId the ID of the {@link Team} to retrieve
      * @return an {@link Optional} of the retrieved {@link Team}
      */
-    Optional<Team> getTeam(final int teamId);
+    Optional<Team> getTeam(int teamId);
 
     /**
      * Updates an existing {@link Team} in the system, matching on ID.
@@ -118,14 +118,14 @@ public interface DbManager extends Closeable {
      * @param teamToUpdate the updated {@link Team} to be persisted in the DB
      * @return the updated {@link Team}
      */
-    Team updateTeam(final Team teamToUpdate);
+    Team updateTeam(Team teamToUpdate);
 
     /**
      * Deletes an existing {@link Team} from the system.
      *
      * @param teamId the ID of the {@link Team} to delete
      */
-    void deleteTeam(final int teamId);
+    void deleteTeam(int teamId);
 
     /**
      * Creates a {@link User} instance in the DB.
@@ -133,7 +133,7 @@ public interface DbManager extends Closeable {
      * @param user the {@link User} to persist
      * @return the {@link User} updated with an ID
      */
-    User createUser(final User user);
+    User createUser(User user);
 
     /**
      * Retrieves all {@link User}s from the DB.
@@ -148,7 +148,7 @@ public interface DbManager extends Closeable {
      * @param userId the ID of the {@link User} to retrieve
      * @return an {@link Optional} of the retrieved {@link User}
      */
-    Optional<User> getUser(final int userId);
+    Optional<User> getUser(int userId);
 
     /**
      * Updates an existing {@link User} in the system, matching on ID.
@@ -156,14 +156,14 @@ public interface DbManager extends Closeable {
      * @param userToUpdate the updated {@link User} to be persisted in the DB
      * @return the updated {@link User}
      */
-    User updateUser(final User userToUpdate);
+    User updateUser(User userToUpdate);
 
     /**
      * Deletes an existing {@link User} from the system.
      *
      * @param userId the ID of the {@link User} to delete
      */
-    void deleteUser(final int userId);
+    void deleteUser(int userId);
 
     /**
      * Creates a {@link UserTcStats} for a {@link User}'s <code>Team Competition</code> stats for a specific hour.
@@ -171,7 +171,7 @@ public interface DbManager extends Closeable {
      * @param userTcStats the {@link UserTcStats} to be created
      * @return the created {@link UserTcStats}
      */
-    UserTcStats createHourlyTcStats(final UserTcStats userTcStats);
+    UserTcStats createHourlyTcStats(UserTcStats userTcStats);
 
     /**
      * Retrieves the latest {@link UserTcStats} for the provided {@link User}.
@@ -179,7 +179,7 @@ public interface DbManager extends Closeable {
      * @param userId the ID of the {@link User} whose {@link UserTcStats} are to be retrieved
      * @return an {@link Optional} of the retrieved {@link UserTcStats}
      */
-    Optional<UserTcStats> getHourlyTcStats(final int userId);
+    Optional<UserTcStats> getHourlyTcStats(int userId);
 
     /**
      * Retrieves the {@link HistoricStats} for a given {@link User} ID for a specific {@code day}/{@link Month}/{@link Year}.
@@ -190,7 +190,7 @@ public interface DbManager extends Closeable {
      * @param day    the day of the {@link Month} of the {@link HistoricStats}
      * @return the hourly {@link HistoricStats} for the {@link User} for the given {@code day}
      */
-    Collection<HistoricStats> getHistoricStatsHourly(final int userId, final Year year, final Month month, final int day);
+    Collection<HistoricStats> getHistoricStatsHourly(int userId, Year year, Month month, int day);
 
     /**
      * Retrieves the {@link HistoricStats} for a given {@link User} ID for a specific {@link Month}/{@link Year}.
@@ -200,7 +200,7 @@ public interface DbManager extends Closeable {
      * @param month  the {@link Month} of the {@link HistoricStats}
      * @return the daily {@link HistoricStats} for the {@link User} for the given {@link Month}
      */
-    Collection<HistoricStats> getHistoricStatsDaily(final int userId, final Year year, final Month month);
+    Collection<HistoricStats> getHistoricStatsDaily(int userId, Year year, Month month);
 
     /**
      * Retrieves the {@link HistoricStats} for a given {@link User} ID for a specific {@link Year}.
@@ -209,7 +209,7 @@ public interface DbManager extends Closeable {
      * @param year   the {@link Year} of the {@link HistoricStats}
      * @return the monthly {@link HistoricStats} for the {@link User} for the given {@link Year}
      */
-    Collection<HistoricStats> getHistoricStatsMonthly(final int userId, final Year year);
+    Collection<HistoricStats> getHistoricStatsMonthly(int userId, Year year);
 
     /**
      * Creates a {@link UserStats} for the initial overall stats for the provided {@link User} at the start of the monitoring period.
@@ -217,7 +217,7 @@ public interface DbManager extends Closeable {
      * @param userStats the {@link UserStats} to be created
      * @return the created {@link UserStats}
      */
-    UserStats createInitialStats(final UserStats userStats);
+    UserStats createInitialStats(UserStats userStats);
 
     /**
      * Retrieves the initial {@link UserStats} for the provided {@link User} ID.
@@ -225,7 +225,7 @@ public interface DbManager extends Closeable {
      * @param userId the ID of the {@link User} whose {@link UserStats} are to be retrieved
      * @return an {@link Optional} of the retrieved {@link UserStats}
      */
-    Optional<UserStats> getInitialStats(final int userId);
+    Optional<UserStats> getInitialStats(int userId);
 
     /**
      * Creates a {@link UserStats} for the total overall stats for a {@link User}.
@@ -233,7 +233,7 @@ public interface DbManager extends Closeable {
      * @param userStats the {@link UserStats} to be created
      * @return the created {@link UserStats}
      */
-    UserStats createTotalStats(final UserStats userStats);
+    UserStats createTotalStats(UserStats userStats);
 
     /**
      * Retrieves the {@link UserStats} for a {@link User} with the provided ID.
@@ -241,7 +241,7 @@ public interface DbManager extends Closeable {
      * @param userId the ID of the {@link User} to whose {@link UserStats} are to be retrieved
      * @return an {@link Optional} of the retrieved {@link UserStats}
      */
-    Optional<UserStats> getTotalStats(final int userId);
+    Optional<UserStats> getTotalStats(int userId);
 
     /**
      * Creates an {@link OffsetTcStats}, defining the offset points/units for the provided {@link User}.
@@ -254,7 +254,7 @@ public interface DbManager extends Closeable {
      * @param offsetTcStats the {@link OffsetTcStats} to be created
      * @return the created/updated {@link OffsetTcStats}, or {@link OffsetTcStats#empty()}
      */
-    OffsetTcStats createOrUpdateOffsetStats(final int userId, final OffsetTcStats offsetTcStats);
+    OffsetTcStats createOrUpdateOffsetStats(int userId, OffsetTcStats offsetTcStats);
 
     /**
      * Retrieves the {@link OffsetTcStats} for a {@link User} with the provided ID.
@@ -262,14 +262,14 @@ public interface DbManager extends Closeable {
      * @param userId the ID of the {@link User} to whose {@link OffsetTcStats} are to be retrieved
      * @return an {@link Optional} of the retrieved {@link OffsetTcStats}
      */
-    Optional<OffsetTcStats> getOffsetStats(final int userId);
+    Optional<OffsetTcStats> getOffsetStats(int userId);
 
     /**
      * Deletes the {@link OffsetTcStats} for a {@link User} with the provided ID.
      *
      * @param userId the ID of the {@link User} to whose {@link OffsetTcStats} are to be deleted
      */
-    void deleteOffsetStats(final int userId);
+    void deleteOffsetStats(int userId);
 
     /**
      * Deletes the {@link OffsetTcStats} in the DB.
@@ -282,7 +282,7 @@ public interface DbManager extends Closeable {
      * @param retiredUserTcStats the {@link RetiredUserTcStats} for the deleted {@link User}
      * @return the {@link RetiredUserTcStats}
      */
-    RetiredUserTcStats createRetiredUserStats(final RetiredUserTcStats retiredUserTcStats);
+    RetiredUserTcStats createRetiredUserStats(RetiredUserTcStats retiredUserTcStats);
 
     /**
      * Retrieves all {@link RetiredUserTcStats} from the DB.
@@ -302,7 +302,7 @@ public interface DbManager extends Closeable {
      * @param monthlyResult a {@link MonthlyResult} for the <code>Team Competition</code>
      * @return the <code>Team Competition</code> {@link MonthlyResult}
      */
-    MonthlyResult createMonthlyResult(final MonthlyResult monthlyResult);
+    MonthlyResult createMonthlyResult(MonthlyResult monthlyResult);
 
     /**
      * Retrieves the {@link MonthlyResult} of the <code>Team Competition</code> for the given {@link Month} and {@link Year} from the DB.
@@ -311,7 +311,7 @@ public interface DbManager extends Closeable {
      * @param year  the {@link Year} of the {@link MonthlyResult} to be retrieved
      * @return an {@link Optional} of the <code>Team Competition</code> {@link MonthlyResult}
      */
-    Optional<MonthlyResult> getMonthlyResult(final Month month, final Year year);
+    Optional<MonthlyResult> getMonthlyResult(Month month, Year year);
 
     /**
      * Authenticates a system user against the DB.
@@ -323,7 +323,7 @@ public interface DbManager extends Closeable {
      * @param password the system user password
      * @return the {@link UserAuthenticationResult}
      */
-    UserAuthenticationResult authenticateSystemUser(final String userName, final String password);
+    UserAuthenticationResult authenticateSystemUser(String userName, String password);
 
     /**
      * Creates a {@link UserChange} instance in the DB.
@@ -347,7 +347,7 @@ public interface DbManager extends Closeable {
      * @param numberOfMonths the number of months back from which to retrieve {@link UserChange}s (<b>0</b> means retrieve all)
      * @return all {@link UserChange}s with any of the provided {@link UserChangeState}s
      */
-    Collection<UserChange> getAllUserChanges(final Collection<UserChangeState> states, final int numberOfMonths);
+    Collection<UserChange> getAllUserChanges(Collection<UserChangeState> states, int numberOfMonths);
 
     /**
      * Retrieves a {@link UserChange} with the given ID from the DB.
@@ -355,7 +355,7 @@ public interface DbManager extends Closeable {
      * @param userChangeId the ID of the {@link UserChange} to retrieve
      * @return an {@link Optional} of the retrieved {@link UserChange}
      */
-    Optional<UserChange> getUserChange(final int userChangeId);
+    Optional<UserChange> getUserChange(int userChangeId);
 
     /**
      * Updates an existing {@link UserChange} in the system, matching on ID.
@@ -363,5 +363,5 @@ public interface DbManager extends Closeable {
      * @param userChangeToUpdate the {@link UserChange} with updated values
      * @return the updated {@link UserChange}
      */
-    UserChange updateUserChange(final UserChange userChangeToUpdate);
+    UserChange updateUserChange(UserChange userChangeToUpdate);
 }

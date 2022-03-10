@@ -41,7 +41,7 @@ public interface FoldingStatsRetriever {
      * @return the {@link Stats} for the {@link FoldingStatsDetails}
      * @throws ExternalConnectionException thrown if an error occurs connecting to an external service
      */
-    Stats getStats(final FoldingStatsDetails foldingStatsDetails) throws ExternalConnectionException;
+    Stats getStats(FoldingStatsDetails foldingStatsDetails) throws ExternalConnectionException;
 
     /**
      * Gets the total {@link UserStats} for the given {@link User}.
@@ -50,5 +50,5 @@ public interface FoldingStatsRetriever {
      * @return the {@link UserStats} for the {@link User}
      * @throws ExternalConnectionException thrown if an error occurs connecting to an external service
      */
-    UserStats getTotalStats(final User user) throws ExternalConnectionException;
+    UserStats getTotalStats(User user) throws ExternalConnectionException;
 }
