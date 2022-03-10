@@ -26,6 +26,8 @@ package me.zodac.folding.bean.tc.user;
 
 import static me.zodac.folding.api.util.NumberUtils.formatWithCommas;
 
+import io.prometheus.client.CollectorRegistry;
+import io.prometheus.client.Summary;
 import java.util.Collection;
 import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.state.ParsingState;
@@ -57,16 +59,30 @@ public class UserStatsParser {
     private final FoldingStatsRetriever foldingStatsRetriever;
     private final StatsRepository statsRepository;
 
+    // Prometheus summaries
+    private final Summary summary;
+
     /**
      * {@link Autowired} constructor.
      *
+     * @param registry              the {@link CollectorRegistry}
      * @param foldingStatsRetriever the {@link FoldingStatsRetriever}
      * @param statsRepository       the {@link StatsRepository}
      */
     @Autowired
-    public UserStatsParser(final FoldingStatsRetriever foldingStatsRetriever, final StatsRepository statsRepository) {
+    public UserStatsParser(final CollectorRegistry registry,
+                           final FoldingStatsRetriever foldingStatsRetriever,
+                           final StatsRepository statsRepository) {
         this.foldingStatsRetriever = foldingStatsRetriever;
         this.statsRepository = statsRepository;
+
+        summary = Summary.build()
+            .quantile(0.5, 0.05)   // Add 50th percentile (= median) with 5% tolerated error
+            .quantile(0.9, 0.01)   // Add 90th percentile with 1% tolerated error
+            .quantile(0.99, 0.001) // Add 99th percentile with 0.1% tolerated error
+            .name("user_stats_retrieval")
+            .help("Stats Retrieval For A Single User")
+            .register(registry);
     }
 
     /**
@@ -109,6 +125,7 @@ public class UserStatsParser {
     }
 
     private void updateTcStatsForUser(final User user) {
+        final Summary.Timer timer = summary.startTimer();
         LOGGER.debug("Updating stats for '{}': {}", user.getDisplayName(), user);
         if (StringUtils.isBlank(user.getPasskey())) {
             LOGGER.warn("Not parsing TC stats for user, missing passkey: {}", user);
@@ -137,6 +154,7 @@ public class UserStatsParser {
 
         final UserStats createdTotalStats = statsRepository.createTotalStats(totalStats);
         calculateAndPersistTcStats(user, initialStats, offsetTcStats, createdTotalStats);
+        timer.observeDuration();
     }
 
     private UserStats getTotalStatsForUserOrEmpty(final User user) {
