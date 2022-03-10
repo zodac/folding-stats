@@ -125,36 +125,41 @@ public class UserStatsParser {
     }
 
     private void updateTcStatsForUser(final User user) {
-        final Summary.Timer timer = summary.startTimer();
-        LOGGER.debug("Updating stats for '{}': {}", user.getDisplayName(), user);
-        if (StringUtils.isBlank(user.getPasskey())) {
-            LOGGER.warn("Not parsing TC stats for user, missing passkey: {}", user);
-            return;
-        }
+        try (final Summary.Timer timer = summary.startTimer()) {
+            LOGGER.trace("Starting timer: {}", timer);
 
-        final Stats initialStats = statsRepository.getInitialStats(user);
-        if (initialStats.isEmpty()) {
-            LOGGER.warn("Retrieved empty initial stats for user: {}", user);
-            return;
-        }
+            LOGGER.debug("Updating stats for '{}': {}", user.getDisplayName(), user);
+            if (StringUtils.isBlank(user.getPasskey())) {
+                LOGGER.warn("Not parsing TC stats for user, missing passkey: {}", user);
+                return;
+            }
 
-        final OffsetTcStats offsetTcStats = statsRepository.getOffsetStats(user);
-        if (offsetTcStats.isEmpty()) {
-            LOGGER.trace("Retrieved empty stats offset for user: {}", () -> user);
-        } else {
-            LOGGER.debug("{}: {} offset points | {} offset units", user::getDisplayName,
-                () -> formatWithCommas(offsetTcStats.getMultipliedPointsOffset()), () -> formatWithCommas(offsetTcStats.getUnitsOffset()));
-        }
+            final Stats initialStats = statsRepository.getInitialStats(user);
+            if (initialStats.isEmpty()) {
+                LOGGER.warn("Retrieved empty initial stats for user: {}", user);
+                return;
+            }
 
-        final UserStats totalStats = getTotalStatsForUserOrEmpty(user);
-        if (totalStats.isEmpty()) {
-            LOGGER.warn("Retrieved empty total stats for user: {}", user);
-            return;
-        }
+            final OffsetTcStats offsetTcStats = statsRepository.getOffsetStats(user);
+            if (offsetTcStats.isEmpty()) {
+                LOGGER.trace("Retrieved empty stats offset for user: {}", () -> user);
+            } else {
+                LOGGER.debug("{}: {} offset points | {} offset units", user::getDisplayName,
+                    () -> formatWithCommas(offsetTcStats.getMultipliedPointsOffset()), () -> formatWithCommas(offsetTcStats.getUnitsOffset()));
+            }
 
-        final UserStats createdTotalStats = statsRepository.createTotalStats(totalStats);
-        calculateAndPersistTcStats(user, initialStats, offsetTcStats, createdTotalStats);
-        timer.observeDuration();
+            final UserStats totalStats = getTotalStatsForUserOrEmpty(user);
+            if (totalStats.isEmpty()) {
+                LOGGER.warn("Retrieved empty total stats for user: {}", user);
+                return;
+            }
+
+            final UserStats createdTotalStats = statsRepository.createTotalStats(totalStats);
+            calculateAndPersistTcStats(user, initialStats, offsetTcStats, createdTotalStats);
+
+            LOGGER.trace("Ending timer: {}", timer);
+            timer.observeDuration();
+        }
     }
 
     private UserStats getTotalStatsForUserOrEmpty(final User user) {
