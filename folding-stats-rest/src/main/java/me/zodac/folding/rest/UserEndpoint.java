@@ -65,8 +65,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/users")
 public class UserEndpoint {
 
-    // TODO: Add a REST audit logger for write requests
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger AUDIT_LOGGER = LogManager.getLogger("audit");
 
     private final FoldingRepository foldingRepository;
     private final UserValidator userValidator;
@@ -110,13 +109,13 @@ public class UserEndpoint {
     @RolesAllowed("admin")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> create(@RequestBody final UserRequest userRequest, final HttpServletRequest request) {
-        LOGGER.debug("POST request received to create user at '{}' with request: {}", request::getRequestURI, () -> userRequest);
+        AUDIT_LOGGER.info("POST request received to create user at '{}' with request: {}", request::getRequestURI, () -> userRequest);
 
         final User validatedUser = userValidator.create(userRequest);
         final User elementWithId = foldingRepository.createUser(validatedUser);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
-        LOGGER.info("Created user with ID {}", elementWithId.getId());
+        AUDIT_LOGGER.info("Created user with ID {}", elementWithId.getId());
         userCreates.increment();
         return created(elementWithId, elementWithId.getId());
     }
@@ -131,7 +130,7 @@ public class UserEndpoint {
     @PermitAll
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getAll(final HttpServletRequest request) {
-        LOGGER.debug("GET request received for all users without passkeys at '{}'", request::getRequestURI);
+        AUDIT_LOGGER.debug("GET request received for all users without passkeys at '{}'", request::getRequestURI);
         final Collection<User> elements = foldingRepository.getAllUsersWithoutPasskeys();
         return cachedOk(elements, untilNextMonthUtc(ChronoUnit.SECONDS));
     }
@@ -144,10 +143,9 @@ public class UserEndpoint {
      */
     @RolesAllowed("admin")
     @ReadRequired
-    @PermitAll
     @GetMapping(path = "/all/passkey", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getAllWithPasskeys(final HttpServletRequest request) {
-        LOGGER.debug("GET request received for all users with passkeys at '{}'", request::getRequestURI);
+        AUDIT_LOGGER.info("GET request received for all users with passkeys at '{}'", request::getRequestURI);
         final Collection<User> elements = foldingRepository.getAllUsersWithPasskeys();
         return cachedOk(elements, untilNextMonthUtc(ChronoUnit.SECONDS));
     }
@@ -163,7 +161,7 @@ public class UserEndpoint {
     @PermitAll
     @GetMapping(path = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getById(@PathVariable("userId") final int userId, final HttpServletRequest request) {
-        LOGGER.debug("GET request for user received at '{}'", request::getRequestURI);
+        AUDIT_LOGGER.debug("GET request for user received at '{}'", request::getRequestURI);
 
         final User element = foldingRepository.getUserWithoutPasskey(userId);
         return cachedOk(element, untilNextMonthUtc(ChronoUnit.SECONDS));
@@ -180,7 +178,7 @@ public class UserEndpoint {
     @RolesAllowed("admin")
     @GetMapping(path = "/{userId}/passkey", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getByIdWithPasskey(@PathVariable("userId") final int userId, final HttpServletRequest request) {
-        LOGGER.debug("GET request for user with passkey received at '{}'", request::getRequestURI);
+        AUDIT_LOGGER.info("GET request for user with passkey received at '{}'", request::getRequestURI);
 
         final User element = foldingRepository.getUserWithPasskey(userId);
         return cachedOk(element, untilNextMonthUtc(ChronoUnit.SECONDS));
@@ -200,12 +198,12 @@ public class UserEndpoint {
     public ResponseEntity<?> updateById(@PathVariable("userId") final int userId,
                                         @RequestBody final UserRequest userRequest,
                                         final HttpServletRequest request) {
-        LOGGER.debug("PUT request for user received at '{}'", request::getRequestURI);
+        AUDIT_LOGGER.info("PUT request for user received at '{}' with request {}", request::getRequestURI, () -> userRequest);
 
         final User existingUser = foldingRepository.getUserWithPasskey(userId);
 
         if (existingUser.isEqualRequest(userRequest)) {
-            LOGGER.debug("No change necessary");
+            AUDIT_LOGGER.info("Request is same as existing user");
             final User userWithHiddenPasskey = User.hidePasskey(existingUser);
             return ok(userWithHiddenPasskey);
         }
@@ -217,7 +215,7 @@ public class UserEndpoint {
         final User updatedUserWithId = foldingRepository.updateUser(userWithId, existingUser);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
-        LOGGER.info("Updated user with ID {}", updatedUserWithId.getId());
+        AUDIT_LOGGER.info("Updated user with ID {}", updatedUserWithId.getId());
         userUpdates.increment();
         return ok(updatedUserWithId, updatedUserWithId.getId());
     }
@@ -233,14 +231,14 @@ public class UserEndpoint {
     @RolesAllowed("admin")
     @DeleteMapping(path = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> deleteById(@PathVariable("userId") final int userId, final HttpServletRequest request) {
-        LOGGER.debug("DELETE request for user received at '{}'", request::getRequestURI);
+        AUDIT_LOGGER.info("DELETE request for user received at '{}'", request::getRequestURI);
 
         final User user = foldingRepository.getUserWithoutPasskey(userId);
         final User validatedUser = userValidator.delete(user);
 
         foldingRepository.deleteUser(validatedUser);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
-        LOGGER.info("Deleted user with ID {}", userId);
+        AUDIT_LOGGER.info("Deleted user with ID {}", userId);
         userDeletes.increment();
         return ok();
     }

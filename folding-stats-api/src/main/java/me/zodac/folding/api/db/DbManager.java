@@ -166,6 +166,46 @@ public interface DbManager extends Closeable {
     void deleteUser(int userId);
 
     /**
+     * Creates a {@link UserChange} instance in the DB.
+     *
+     * @param userChange the {@link UserChange} to persist
+     * @return the {@link UserChange} updated with an ID
+     */
+    UserChange createUserChange(UserChange userChange);
+
+    /**
+     * Retrieves all {@link UserChange}s from the DB.
+     *
+     * @return all {@link UserChange}s
+     */
+    Collection<UserChange> getAllUserChanges();
+
+    /**
+     * Retrieves any {@link UserChange}s that contain one of the provided {@code states} from the DB.
+     *
+     * @param states         the {@link UserChangeState}s to look for
+     * @param numberOfMonths the number of months back from which to retrieve {@link UserChange}s (<b>0</b> means retrieve all)
+     * @return all {@link UserChange}s with any of the provided {@link UserChangeState}s
+     */
+    Collection<UserChange> getAllUserChanges(Collection<UserChangeState> states, int numberOfMonths);
+
+    /**
+     * Retrieves a {@link UserChange} with the given ID from the DB.
+     *
+     * @param userChangeId the ID of the {@link UserChange} to retrieve
+     * @return an {@link Optional} of the retrieved {@link UserChange}
+     */
+    Optional<UserChange> getUserChange(int userChangeId);
+
+    /**
+     * Updates an existing {@link UserChange} in the system, matching on ID.
+     *
+     * @param userChangeToUpdate the {@link UserChange} with updated values
+     * @return the updated {@link UserChange}
+     */
+    UserChange updateUserChange(UserChange userChangeToUpdate);
+
+    /**
      * Creates a {@link UserTcStats} for a {@link User}'s <code>Team Competition</code> stats for a specific hour.
      *
      * @param userTcStats the {@link UserTcStats} to be created
@@ -324,44 +364,4 @@ public interface DbManager extends Closeable {
      * @return the {@link UserAuthenticationResult}
      */
     UserAuthenticationResult authenticateSystemUser(String userName, String password);
-
-    /**
-     * Creates a {@link UserChange} instance in the DB.
-     *
-     * @param userChange the {@link UserChange} to persist
-     * @return the {@link UserChange} updated with an ID
-     */
-    UserChange createUserChange(UserChange userChange);
-
-    /**
-     * Retrieves all {@link UserChange}s from the DB.
-     *
-     * @return all {@link UserChange}s
-     */
-    Collection<UserChange> getAllUserChanges();
-
-    /**
-     * Retrieves any {@link UserChange}s that contain one of the provided {@code states} from the DB.
-     *
-     * @param states         the {@link UserChangeState}s to look for
-     * @param numberOfMonths the number of months back from which to retrieve {@link UserChange}s (<b>0</b> means retrieve all)
-     * @return all {@link UserChange}s with any of the provided {@link UserChangeState}s
-     */
-    Collection<UserChange> getAllUserChanges(Collection<UserChangeState> states, int numberOfMonths);
-
-    /**
-     * Retrieves a {@link UserChange} with the given ID from the DB.
-     *
-     * @param userChangeId the ID of the {@link UserChange} to retrieve
-     * @return an {@link Optional} of the retrieved {@link UserChange}
-     */
-    Optional<UserChange> getUserChange(int userChangeId);
-
-    /**
-     * Updates an existing {@link UserChange} in the system, matching on ID.
-     *
-     * @param userChangeToUpdate the {@link UserChange} with updated values
-     * @return the updated {@link UserChange}
-     */
-    UserChange updateUserChange(UserChange userChangeToUpdate);
 }

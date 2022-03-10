@@ -55,7 +55,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/login")
 public class LoginEndpoint {
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger AUDIT_LOGGER = LogManager.getLogger("audit");
 
     private final FoldingRepository foldingRepository;
 
@@ -97,11 +97,11 @@ public class LoginEndpoint {
     @PermitAll
     @PostMapping(path = "/admin", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> loginAsAdmin(@RequestBody final LoginCredentials loginCredentials) {
-        LOGGER.debug("Login request received");
+        AUDIT_LOGGER.info("Login request received");
         loginAttempts.increment();
 
         if (EncodingUtils.isInvalidBasicAuthentication(loginCredentials.getEncodedUserNameAndPassword())) {
-            LOGGER.error("Invalid payload: {}", loginCredentials);
+            AUDIT_LOGGER.error("Invalid payload: {}", loginCredentials);
             failedLogins.increment();
             throw new InvalidLoginCredentialsException(loginCredentials);
         }
@@ -111,27 +111,27 @@ public class LoginEndpoint {
                 EncodingUtils.decodeBasicAuthentication(loginCredentials.getEncodedUserNameAndPassword());
             final String userName = decodedUserNameAndPassword.get(EncodingUtils.DECODED_USERNAME_KEY);
             final String password = decodedUserNameAndPassword.get(EncodingUtils.DECODED_PASSWORD_KEY);
-            LOGGER.debug("Login request received for user: '{}'", userName);
+            AUDIT_LOGGER.debug("Login request received for user: '{}'", userName);
 
             final UserAuthenticationResult userAuthenticationResult = foldingRepository.authenticateSystemUser(userName, password);
 
             if (!userAuthenticationResult.userExists() || !userAuthenticationResult.passwordMatch()) {
-                LOGGER.warn("Invalid user credentials supplied: {}", loginCredentials);
+                AUDIT_LOGGER.warn("Invalid user credentials supplied: {}", loginCredentials);
                 failedLogins.increment();
                 throw new UnauthorizedException();
             }
 
             if (!userAuthenticationResult.isAdmin()) {
-                LOGGER.warn("User '{}' is not an admin", userName);
+                AUDIT_LOGGER.warn("User '{}' is not an admin", userName);
                 failedLogins.increment();
                 throw new ForbiddenException();
             }
 
-            LOGGER.info("Admin user '{}' logged in", userName);
+            AUDIT_LOGGER.info("Admin user '{}' logged in", userName);
             successfulLogins.increment();
             return ok();
         } catch (final IllegalArgumentException e) {
-            LOGGER.error("Encoded username and password was not a valid Base64 string", e);
+            AUDIT_LOGGER.error("Encoded username and password was not a valid Base64 string", e);
             failedLogins.increment();
             throw new InvalidLoginCredentialsException(loginCredentials, e);
         }

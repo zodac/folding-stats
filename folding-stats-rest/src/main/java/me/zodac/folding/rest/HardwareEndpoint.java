@@ -25,10 +25,8 @@
 package me.zodac.folding.rest;
 
 import static me.zodac.folding.api.util.DateTimeUtils.untilNextMonthUtc;
-import static me.zodac.folding.rest.response.Responses.badRequest;
 import static me.zodac.folding.rest.response.Responses.cachedOk;
 import static me.zodac.folding.rest.response.Responses.created;
-import static me.zodac.folding.rest.response.Responses.notFound;
 import static me.zodac.folding.rest.response.Responses.ok;
 import static me.zodac.folding.rest.util.RequestParameterExtractor.extractParameters;
 
@@ -36,7 +34,6 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
-import java.util.Optional;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
@@ -45,9 +42,9 @@ import me.zodac.folding.api.state.ReadRequired;
 import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.state.WriteRequired;
 import me.zodac.folding.api.tc.Hardware;
-import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.bean.tc.validation.HardwareValidator;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
+import me.zodac.folding.rest.exception.NotFoundException;
 import me.zodac.folding.state.SystemStateManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -71,7 +68,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/hardware")
 public class HardwareEndpoint {
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger AUDIT_LOGGER = LogManager.getLogger("audit");
 
     private final HardwareValidator hardwareValidator;
     private final FoldingRepository foldingRepository;
@@ -115,13 +112,13 @@ public class HardwareEndpoint {
     @RolesAllowed("admin")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> create(@RequestBody final HardwareRequest hardwareRequest, final HttpServletRequest request) {
-        LOGGER.info("POST request received to create hardware at '{}' with request: {}", request::getRequestURI, () -> hardwareRequest);
+        AUDIT_LOGGER.info("POST request received to create hardware at '{}' with request: {}", request::getRequestURI, () -> hardwareRequest);
 
         final Hardware validatedHardware = hardwareValidator.create(hardwareRequest);
         final Hardware elementWithId = foldingRepository.createHardware(validatedHardware);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
-        LOGGER.info("Created hardware with ID {}", elementWithId.getId());
+        AUDIT_LOGGER.info("Created hardware with ID {}", elementWithId.getId());
         hardwareCreates.increment();
         return created(elementWithId, elementWithId.getId());
     }
@@ -136,7 +133,7 @@ public class HardwareEndpoint {
     @PermitAll
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getAll(final HttpServletRequest request) {
-        LOGGER.debug("GET request received for all hardwares at '{}'", request::getRequestURI);
+        AUDIT_LOGGER.debug("GET request received for all hardwares at '{}'", request::getRequestURI);
         final Collection<Hardware> elements = foldingRepository.getAllHardware();
         return cachedOk(elements, untilNextMonthUtc(ChronoUnit.SECONDS));
     }
@@ -152,7 +149,7 @@ public class HardwareEndpoint {
     @PermitAll
     @GetMapping(path = "/{hardwareId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getById(@PathVariable("hardwareId") final int hardwareId, final HttpServletRequest request) {
-        LOGGER.debug("GET request for hardware received at '{}'", request::getRequestURI);
+        AUDIT_LOGGER.debug("GET request for hardware received at '{}'", request::getRequestURI);
 
         final Hardware element = foldingRepository.getHardware(hardwareId);
         return cachedOk(element, untilNextMonthUtc(ChronoUnit.SECONDS));
@@ -169,26 +166,15 @@ public class HardwareEndpoint {
     @PermitAll
     @GetMapping(path = "/fields", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getByHardwareName(@RequestParam("hardwareName") final String hardwareName, final HttpServletRequest request) {
-        LOGGER.info("GET request for hardware received at '{}?{}'", request::getRequestURI, () -> extractParameters(request));
+        AUDIT_LOGGER.debug("GET request for hardware received at '{}?{}'", request::getRequestURI, () -> extractParameters(request));
 
-        if (StringUtils.isBlank(hardwareName)) {
-            final String errorMessage = String.format("Input 'hardwareName' must not be blank: '%s'", hardwareName);
-            LOGGER.error(errorMessage);
-            return badRequest(errorMessage);
-        }
-
-        final Optional<Hardware> optionalHardware = foldingRepository.getAllHardware()
+        final Hardware retrievedHardware = foldingRepository.getAllHardware()
             .stream()
             .filter(hardware -> hardware.getHardwareName().equalsIgnoreCase(hardwareName))
-            .findAny();
+            .findAny()
+            .orElseThrow(() -> new NotFoundException(Hardware.class, hardwareName));
 
-        if (optionalHardware.isEmpty()) {
-            LOGGER.error("No hardware found with 'hardwareName' '{}'", hardwareName);
-            return notFound();
-        }
-
-        final Hardware element = optionalHardware.get();
-        return cachedOk(element, untilNextMonthUtc(ChronoUnit.SECONDS));
+        return cachedOk(retrievedHardware, untilNextMonthUtc(ChronoUnit.SECONDS));
     }
 
     /**
@@ -205,12 +191,12 @@ public class HardwareEndpoint {
     public ResponseEntity<?> updateById(@PathVariable("hardwareId") final int hardwareId,
                                         @RequestBody final HardwareRequest hardwareRequest,
                                         final HttpServletRequest request) {
-        LOGGER.debug("PUT request for hardware received at '{}'", request::getRequestURI);
+        AUDIT_LOGGER.info("PUT request for hardware received at '{}' with request {}", request::getRequestURI, () -> hardwareRequest);
 
         final Hardware existingHardware = foldingRepository.getHardware(hardwareId);
 
         if (existingHardware.isEqualRequest(hardwareRequest)) {
-            LOGGER.debug("No change necessary");
+            AUDIT_LOGGER.info("Request is same as existing hardware");
             return ok(existingHardware);
         }
 
@@ -221,7 +207,7 @@ public class HardwareEndpoint {
         final Hardware updatedHardwareWithId = foldingRepository.updateHardware(hardwareWithId, existingHardware);
 
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
-        LOGGER.info("Updated hardware with ID {}", updatedHardwareWithId.getId());
+        AUDIT_LOGGER.info("Updated hardware with ID {}", updatedHardwareWithId.getId());
         hardwareUpdates.increment();
         return ok(updatedHardwareWithId, updatedHardwareWithId.getId());
     }
@@ -237,14 +223,14 @@ public class HardwareEndpoint {
     @RolesAllowed("admin")
     @DeleteMapping(path = "/{hardwareId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> deleteById(@PathVariable("hardwareId") final int hardwareId, final HttpServletRequest request) {
-        LOGGER.debug("DELETE request for hardware received at '{}'", request::getRequestURI);
+        AUDIT_LOGGER.info("DELETE request for hardware received at '{}'", request::getRequestURI);
 
         final Hardware hardware = foldingRepository.getHardware(hardwareId);
         final Hardware validatedHardware = hardwareValidator.delete(hardware);
 
         foldingRepository.deleteHardware(validatedHardware);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
-        LOGGER.info("Deleted hardware with ID {}", hardwareId);
+        AUDIT_LOGGER.info("Deleted hardware with ID {}", hardwareId);
         hardwareDeletes.increment();
         return ok();
     }

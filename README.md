@@ -1,4 +1,4 @@
-# Folding@Home Team Competition
+``# Folding@Home Team Competition
 
 The *Folding@Home Team Competition* is a competition where members of a [Folding@Home](https://foldingathome.org/) team
 can group together into sub-teams to compete against each other, while still continuing to contribute to their parent
@@ -297,10 +297,11 @@ To check the status of any containers, the following command can be used:
 This will show any docker containers (running and stopped) on the system and their status. When the system first comes
 online, you you should see the following:
 
-    CONTAINER ID   IMAGE                    COMMAND                  CREATED                  STATUS                            PORTS                           NAMES
-    6d314cbbb902   folding-stats_frontend   "httpd-foreground"       Less than a second ago   Up Less than a second             80/tcp, 0.0.0.0:443->443/tcp    frontend
-    a7b722f8a178   folding-stats_backend    "/startup.sh"            2 seconds ago            Up 1 second (health: starting)    0.0.0.0:8443->8443/tcp          backend
-    312f5f61ec87   folding-stats_database   "docker-entrypoint.s…"   3 seconds ago            Up 3 seconds (health: starting)   0.0.0.0:5432->5432/tcp          database
+    CONTAINER ID   IMAGE                      COMMAND                  CREATED                  STATUS                            PORTS                                           NAMES
+    6d314cbbb902   folding-stats_frontend     "httpd-foreground"       Less than a second ago   Up Less than a second             80/tcp, 0.0.0.0:443->443/tcp, :::443->443/tcp   frontend
+    306642a8aa39   folding-stats_prometheus   "/bin/prometheus --c…"   2 seconds ago            Up 1 second                       0.0.0.0:9090->9090/tcp, :::9090->9090/tcp       prometheus
+    a7b722f8a178   folding-stats_backend      "/startup.sh"            2 seconds ago            Up 1 second (health: starting)    0.0.0.0:8443->8443/tcp, :::8443->8443/tcp       backend
+    312f5f61ec87   folding-stats_database     "docker-entrypoint.s…"   3 seconds ago            Up 3 seconds (health: starting)   0.0.0.0:5432->5432/tcp, :::5432->5432/tcp       database
 
 (Note that your `CONTAINER ID` value will be different.)
 
@@ -308,17 +309,19 @@ Pay attention to the `STATUS` value. When the system first comes online, the `ba
 take a minute or two to start up, as seen by the value **health: starting**. Once they are successfully online,
 the `STATUS` will change to:
 
-    CONTAINER ID   IMAGE                    COMMAND                  CREATED         STATUS                   PORTS                         NAMES
-    6d314cbbb902   folding-stats_frontend   "httpd-foreground"       2 minutes ago   Up 2 minutes             80/tcp, 0.0.0.0:443->443/tcp  frontend
-    a7b722f8a178   folding-stats_backend    "/startup.sh"            2 minutes ago   Up 2 minutes (healthy)   0.0.0.0:8443->8443/tcp        backend
-    312f5f61ec87   folding-stats_database   "docker-entrypoint.s…"   2 minutes ago   Up 2 minutes (healthy)   0.0.0.0:5432->5432/tcp        database
+    CONTAINER ID   IMAGE                    COMMAND                  CREATED         STATUS                   PORTS                                           NAMES
+    7092e5a354eb   folding-stats_frontend     "httpd-foreground"       17 hours ago   Up 17 hours             80/tcp, 0.0.0.0:443->443/tcp, :::443->443/tcp   frontend
+    306642a8aa39   folding-stats_prometheus   "/bin/prometheus --c…"   17 hours ago   Up 16 hours             0.0.0.0:9090->9090/tcp, :::9090->9090/tcp       prometheus
+    6d2128137d5a   folding-stats_backend      "/startup.sh"            17 hours ago   Up 17 hours (healthy)   0.0.0.0:8443->8443/tcp, :::8443->8443/tcp       backend
+    e713645e6a43   folding-stats_database     "docker-entrypoint.s…"   17 hours ago   Up 17 hours (healthy)   0.0.0.0:5432->5432/tcp, :::5432->5432/tcp       database
 
 However, if one or more of the containers has stopped, you may see a container marked as **Exited**:
 
-    CONTAINER ID   IMAGE                        COMMAND                  CREATED         STATUS                      PORTS                          NAMES
-    6d314cbbb902   folding-stats_frontend       "httpd-foreground"       5 minutes ago   Up 5 minutes                80/tcp, 0.0.0.0:443->443/tcp   frontend
-    a7b722f8a178   folding-stats_backend        "/startup.sh"            5 minutes ago   Exited (0) 10 seconds ago                                  backend
-    312f5f61ec87   folding-stats_database       "docker-entrypoint.s…"   5 minutes ago   Up 5 minutes (healthy)      0.0.0.0:5432->5432/tcp         database
+    CONTAINER ID   IMAGE                        COMMAND                  CREATED         STATUS                             PORTS                                           NAMES
+    7092e5a354eb   folding-stats_frontend     "httpd-foreground"       17 hours ago   Up 17 hours                           80/tcp, 0.0.0.0:443->443/tcp, :::443->443/tcp   frontend
+    306642a8aa39   folding-stats_prometheus   "/bin/prometheus --c…"   17 hours ago   Exited (0) 10 seconds ago             0.0.0.0:9090->9090/tcp, :::9090->9090/tcp       prometheus
+    6d2128137d5a   folding-stats_backend      "/startup.sh"            17 hours ago   Up 17 hours (healthy)                 0.0.0.0:8443->8443/tcp, :::8443->8443/tcp       backend
+    e713645e6a43   folding-stats_database     "docker-entrypoint.s…"   17 hours ago   Up 17 hours (healthy)                 0.0.0.0:5432->5432/tcp, :::5432->5432/tcp       database
 
 ### Restarting Containers
 
@@ -352,15 +355,14 @@ the `backend` container and view the system log there.
 
 The system currently has multiple logs available:
 
-- server.log
-    - This is the general application log, where most logging will be written to. It will also be printed to the
-      console.
-- security.log
-    - This is where all logging
-      for [SecurityInterceptor.java](./folding-stats-rest/src/main/java/me/zodac/folding/rest/interceptor/SecurityInterceptor.java)
-      is written, detailing login attempts or access requests to WRITE operations. This is not printed to the console.
-- sql.log
-    - This is used to log all SQL queries made to the DB. This is not printed to the console.
+
+| Log File Name  | Description                                                                                                                                                                                                                           | Log Level | Printed To Console? |
+|----------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|---------------------|
+| _audit.log_    | This log is for REST requests on the system.<br/>Input payloads will be logged here.                                                                                                                                                  | INFO      | NO                  |
+| _security.log_ | This is where all logging for [SecurityInterceptor.java](./folding-stats-rest/src/main/java/me/zodac/folding/rest/interceptor/SecurityInterceptor.java)is written.<br/>Details login attempts or access requests to WRITE operations. | DEBUG     | NO                  |
+| _server.log_   | This is the general application log, where most logging will be written to.                                                                                                                                                           | INFO      | YES                 |
+| _sql.log_      | This is used to log all SQL queries made to the DB.                                                                                                                                                                                   | INFO      | NO                  |
+| _stats.log_    | This is used to log user stats retrieval.                                                                                                                                                                                             | DEBUG     | NO                  |
 
 These can be accessed and viewed by:
 
@@ -394,8 +396,8 @@ to:
 Save and exit the `nano` editor. After 60 seconds, re-run the failing use-case and the log level will be changed.
 Remember to reset the log level back to **INFO** when finished to avoid the logs getting too large.
 
-Also note, that for those more familiar with logback, additional loggers may be defined here, or specific packages can
-have their log levels changed.
+Also note, that for those more familiar with logback, additional loggers are defined here and can also have their log
+levels changes. And specific packages can have their log levels explicitly, of which there are some examples already.
 
 ### Extracting Logs On Container Crash
 
@@ -418,8 +420,11 @@ Then create a simple container, attaching the `folding-stats_backend_logs` volum
 
 We can then copy the logs from the `dummy` container to our local machine:
 
-    docker cp dummy:/root/server.log ./server.log
     docker cp dummy:/root/audit.log ./audit.log
+    docker cp dummy:/root/security.log ./security.log
+    docker cp dummy:/root/server.log ./server.log
+    docker cp dummy:/root/sql.log ./sql.log
+    docker cp dummy:/root/stats.log ./stats.log
 
 And finally remove the `dummy` container:
 
@@ -468,3 +473,4 @@ there.
 # License
 
 The source code is released under the [MIT License](http://www.opensource.org/licenses/MIT).
+``

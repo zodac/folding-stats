@@ -76,7 +76,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/stats")
 public class TeamCompetitionStatsEndpoint {
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger AUDIT_LOGGER = LogManager.getLogger("audit");
 
     private final FoldingRepository foldingRepository;
     private final LeaderboardStatsGenerator leaderboardStatsGenerator;
@@ -129,7 +129,7 @@ public class TeamCompetitionStatsEndpoint {
     @PermitAll
     @GetMapping(path = "/overall", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getCompetitionStats() {
-        LOGGER.debug("GET request received to show TC overall stats");
+        AUDIT_LOGGER.debug("GET request received to show TC overall stats");
         visitCounter.increment();
         final AllTeamsSummary allTeamsSummary = statsRepository.getAllTeamsSummary();
         return ok(allTeamsSummary.getCompetitionSummary());
@@ -144,7 +144,7 @@ public class TeamCompetitionStatsEndpoint {
     @PermitAll
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getTeamCompetitionStats() {
-        LOGGER.debug("GET request received to show TC stats");
+        AUDIT_LOGGER.debug("GET request received to show TC stats");
         final AllTeamsSummary allTeamsSummary = statsRepository.getAllTeamsSummary();
         return ok(allTeamsSummary);
     }
@@ -160,7 +160,7 @@ public class TeamCompetitionStatsEndpoint {
     @PermitAll
     @GetMapping(path = "/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getTeamCompetitionStatsForUser(@PathVariable("userId") final int userId, final HttpServletRequest request) {
-        LOGGER.debug("GET request received to show TC stats for user received at '{}'", request::getRequestURI);
+        AUDIT_LOGGER.debug("GET request received to show TC stats for user received at '{}'", request::getRequestURI);
 
         final User user = foldingRepository.getUserWithoutPasskey(userId);
 
@@ -193,7 +193,7 @@ public class TeamCompetitionStatsEndpoint {
     public ResponseEntity<?> updateUserWithOffset(@PathVariable("userId") final int userId,
                                                   @RequestBody final OffsetTcStats offsetTcStats,
                                                   final HttpServletRequest request) {
-        LOGGER.debug("PATCH request to update offset for user received at '{}': {}", request::getRequestURI, () -> offsetTcStats);
+        AUDIT_LOGGER.info("PATCH request to update offset for user received at '{}' with request {}", request::getRequestURI, () -> offsetTcStats);
 
         final User user = foldingRepository.getUserWithPasskey(userId);
         final Hardware hardware = user.getHardware();
@@ -203,7 +203,7 @@ public class TeamCompetitionStatsEndpoint {
         SystemStateManager.next(SystemState.UPDATING_STATS);
         userStatsParser.parseTcStatsForUsersAndWait(Collections.singletonList(user));
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
-        LOGGER.info("Updated user with ID {} with points offset: {}", userId, createdOffsetStats);
+        AUDIT_LOGGER.info("Updated user with ID {} with points offset: {}", userId, createdOffsetStats);
         userStatsOffsets.increment();
         return ok();
     }
@@ -217,7 +217,7 @@ public class TeamCompetitionStatsEndpoint {
     @PermitAll
     @GetMapping(path = "/leaderboard", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getTeamLeaderboard() {
-        LOGGER.debug("GET request received to show TC leaderboard");
+        AUDIT_LOGGER.debug("GET request received to show TC leaderboard");
         final List<TeamLeaderboardEntry> teamSummaries = leaderboardStatsGenerator.generateTeamLeaderboards();
         return ok(teamSummaries);
     }
@@ -231,9 +231,8 @@ public class TeamCompetitionStatsEndpoint {
     @PermitAll
     @GetMapping(path = "/category", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getCategoryLeaderboard() {
-        LOGGER.debug("GET request received to show TC category leaderboard");
-        final Map<Category, List<UserCategoryLeaderboardEntry>> categoryLeaderboard =
-            leaderboardStatsGenerator.generateUserCategoryLeaderboards();
+        AUDIT_LOGGER.debug("GET request received to show TC category leaderboard");
+        final Map<Category, List<UserCategoryLeaderboardEntry>> categoryLeaderboard = leaderboardStatsGenerator.generateUserCategoryLeaderboards();
         return ok(categoryLeaderboard);
     }
 
@@ -249,13 +248,13 @@ public class TeamCompetitionStatsEndpoint {
     @PostMapping(path = "/manual/update")
     public ResponseEntity<?> updateStats(@RequestParam(value = "async", required = false, defaultValue = "false") final boolean async,
                                          final HttpServletRequest request) {
-        LOGGER.info("GET request received to manually update TC stats at '{}?{}", request::getRequestURI, () -> extractParameters(request));
+        AUDIT_LOGGER.info("GET request received to manually update TC stats at '{}?{}", request::getRequestURI, () -> extractParameters(request));
         final Collection<User> users = foldingRepository.getAllUsersWithPasskeys();
-        final ProcessingType processingType = async ? ProcessingType.ASYNCHRONOUS : ProcessingType.SYNCHRONOUS;
-        if (processingType == ProcessingType.SYNCHRONOUS) {
-            userStatsParser.parseTcStatsForUsersAndWait(users);
-        } else {
+
+        if (async) {
             userStatsParser.parseTcStatsForUsers(users);
+        } else {
+            userStatsParser.parseTcStatsForUsersAndWait(users);
         }
         return ok();
     }
@@ -269,27 +268,11 @@ public class TeamCompetitionStatsEndpoint {
     @RolesAllowed("admin")
     @PostMapping(path = "/manual/reset")
     public ResponseEntity<?> resetStats() {
-        LOGGER.info("GET request received to manually reset TC stats");
+        AUDIT_LOGGER.info("GET request received to manually reset TC stats");
 
         SystemStateManager.next(SystemState.RESETTING_STATS);
         userStatsResetter.resetTeamCompetitionStats();
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
         return ok();
-    }
-
-    /**
-     * Defines the possible types of executions for long-running tasks.
-     */
-    private enum ProcessingType {
-
-        /**
-         * Marks a specific function, method or task to be run in a background process, if possible.
-         */
-        ASYNCHRONOUS,
-
-        /**
-         * Marks a specific function, method or task to be run in the main process and block until completed, if possible.
-         */
-        SYNCHRONOUS
     }
 }

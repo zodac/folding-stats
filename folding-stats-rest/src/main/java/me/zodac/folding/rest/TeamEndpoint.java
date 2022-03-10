@@ -25,10 +25,8 @@
 package me.zodac.folding.rest;
 
 import static me.zodac.folding.api.util.DateTimeUtils.untilNextMonthUtc;
-import static me.zodac.folding.rest.response.Responses.badRequest;
 import static me.zodac.folding.rest.response.Responses.cachedOk;
 import static me.zodac.folding.rest.response.Responses.created;
-import static me.zodac.folding.rest.response.Responses.notFound;
 import static me.zodac.folding.rest.response.Responses.ok;
 import static me.zodac.folding.rest.util.RequestParameterExtractor.extractParameters;
 
@@ -36,7 +34,6 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
-import java.util.Optional;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
@@ -45,9 +42,9 @@ import me.zodac.folding.api.state.ReadRequired;
 import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.state.WriteRequired;
 import me.zodac.folding.api.tc.Team;
-import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.bean.tc.validation.TeamValidator;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
+import me.zodac.folding.rest.exception.NotFoundException;
 import me.zodac.folding.state.SystemStateManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -71,7 +68,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/teams")
 public class TeamEndpoint {
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger AUDIT_LOGGER = LogManager.getLogger("audit");
 
     private final FoldingRepository foldingRepository;
     private final TeamValidator teamValidator;
@@ -114,13 +111,13 @@ public class TeamEndpoint {
     @RolesAllowed("admin")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> create(@RequestBody final TeamRequest teamRequest, final HttpServletRequest request) {
-        LOGGER.debug("POST request received to create team at '{}' with request: {}", request::getRequestURI, () -> teamRequest);
+        AUDIT_LOGGER.info("POST request received to create team at '{}' with request: {}", request::getRequestURI, () -> teamRequest);
 
         final Team validatedTeam = teamValidator.create(teamRequest);
         final Team elementWithId = foldingRepository.createTeam(validatedTeam);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
-        LOGGER.info("Created team with ID {}", elementWithId.getId());
+        AUDIT_LOGGER.info("Created team with ID {}", elementWithId.getId());
         teamCreates.increment();
         return created(elementWithId, elementWithId.getId());
     }
@@ -135,7 +132,7 @@ public class TeamEndpoint {
     @PermitAll
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getAll(final HttpServletRequest request) {
-        LOGGER.debug("GET request received for all teams at '{}'", request::getRequestURI);
+        AUDIT_LOGGER.debug("GET request received for all teams at '{}'", request::getRequestURI);
         final Collection<Team> elements = foldingRepository.getAllTeams();
         return cachedOk(elements, untilNextMonthUtc(ChronoUnit.SECONDS));
     }
@@ -151,7 +148,7 @@ public class TeamEndpoint {
     @PermitAll
     @GetMapping(path = "/{teamId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getById(@PathVariable("teamId") final int teamId, final HttpServletRequest request) {
-        LOGGER.debug("GET request for team received at '{}'", request::getRequestURI);
+        AUDIT_LOGGER.debug("GET request for team received at '{}'", request::getRequestURI);
 
         final Team element = foldingRepository.getTeam(teamId);
         return cachedOk(element, untilNextMonthUtc(ChronoUnit.SECONDS));
@@ -168,25 +165,15 @@ public class TeamEndpoint {
     @PermitAll
     @GetMapping(path = "/fields", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getByTeamName(@RequestParam("teamName") final String teamName, final HttpServletRequest request) {
-        LOGGER.debug("GET request for team received at '{}?{}'", request::getRequestURI, () -> extractParameters(request));
-        if (StringUtils.isBlank(teamName)) {
-            final String errorMessage = String.format("Input 'teamName' must not be blank: '%s'", teamName);
-            LOGGER.error(errorMessage);
-            return badRequest(errorMessage);
-        }
+        AUDIT_LOGGER.debug("GET request for team received at '{}?{}'", request::getRequestURI, () -> extractParameters(request));
 
-        final Optional<Team> optionalTeam = foldingRepository.getAllTeams()
+        final Team retrievedTeam = foldingRepository.getAllTeams()
             .stream()
             .filter(team -> team.getTeamName().equalsIgnoreCase(teamName))
-            .findAny();
+            .findAny()
+            .orElseThrow(() -> new NotFoundException(Team.class, teamName));
 
-        if (optionalTeam.isEmpty()) {
-            LOGGER.error("No team found with 'teamName' '{}'", teamName);
-            return notFound();
-        }
-
-        final Team element = optionalTeam.get();
-        return cachedOk(element, untilNextMonthUtc(ChronoUnit.SECONDS));
+        return cachedOk(retrievedTeam, untilNextMonthUtc(ChronoUnit.SECONDS));
     }
 
     /**
@@ -203,12 +190,12 @@ public class TeamEndpoint {
     public ResponseEntity<?> updateById(@PathVariable("teamId") final int teamId,
                                         @RequestBody final TeamRequest teamRequest,
                                         final HttpServletRequest request) {
-        LOGGER.debug("PUT request for team received at '{}'", request::getRequestURI);
+        AUDIT_LOGGER.info("PUT request for team received at '{}' with request {}", request::getRequestURI, () -> teamRequest);
 
         final Team existingTeam = foldingRepository.getTeam(teamId);
 
         if (existingTeam.isEqualRequest(teamRequest)) {
-            LOGGER.debug("No change necessary");
+            AUDIT_LOGGER.info("Request is same as existing team");
             return ok(existingTeam);
         }
 
@@ -219,7 +206,7 @@ public class TeamEndpoint {
         final Team updatedTeamWithId = foldingRepository.updateTeam(teamWithId);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
-        LOGGER.info("Updated team with ID {}", updatedTeamWithId.getId());
+        AUDIT_LOGGER.info("Updated team with ID {}", updatedTeamWithId.getId());
         teamUpdates.increment();
         return ok(updatedTeamWithId, updatedTeamWithId.getId());
     }
@@ -235,7 +222,7 @@ public class TeamEndpoint {
     @RolesAllowed("admin")
     @DeleteMapping(path = "/{teamId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> deleteById(@PathVariable("teamId") final int teamId, final HttpServletRequest request) {
-        LOGGER.debug("DELETE request for team received at '{}'", request::getRequestURI);
+        AUDIT_LOGGER.info("DELETE request for team received at '{}'", request::getRequestURI);
 
         final Team team = foldingRepository.getTeam(teamId);
 
@@ -243,7 +230,7 @@ public class TeamEndpoint {
         foldingRepository.deleteTeam(validatedTeam);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
-        LOGGER.info("Deleted team with ID {}", teamId);
+        AUDIT_LOGGER.info("Deleted team with ID {}", teamId);
         teamDeletes.increment();
         return ok();
     }

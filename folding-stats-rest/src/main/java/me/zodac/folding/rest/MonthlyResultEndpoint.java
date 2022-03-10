@@ -56,7 +56,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/results")
 public class MonthlyResultEndpoint {
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger AUDIT_LOGGER = LogManager.getLogger("audit");
 
     private final StatsRepository statsRepository;
     private final UserStatsStorer userStatsStorer;
@@ -87,7 +87,7 @@ public class MonthlyResultEndpoint {
     public ResponseEntity<?> getMonthlyResult(@PathVariable("year") final String year,
                                               @PathVariable("month") final String month,
                                               final HttpServletRequest request) {
-        LOGGER.debug("GET request received to retrieve monthly TC result at '{}'", request::getRequestURI);
+        AUDIT_LOGGER.debug("GET request received to retrieve monthly TC result at '{}'", request::getRequestURI);
 
         final DateDetails date = DateDetails.of(year, month);
         final Optional<MonthlyResult> monthlyResult = statsRepository.getMonthlyResult(date.month(), date.year());
@@ -103,7 +103,7 @@ public class MonthlyResultEndpoint {
     @RolesAllowed("admin")
     @PostMapping(path = "/manual/save")
     public ResponseEntity<?> saveMonthlyResult() {
-        LOGGER.info("GET request received to manually store monthly TC result");
+        AUDIT_LOGGER.info("GET request received to manually store monthly TC result");
         userStatsStorer.storeMonthlyResult();
         return ok();
     }

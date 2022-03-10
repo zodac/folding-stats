@@ -37,7 +37,6 @@ import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
-import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.bean.StatsRepository;
 import me.zodac.folding.state.ParsingStateManager;
@@ -58,6 +57,7 @@ public class UserStatsParser {
 
     private final FoldingStatsRetriever foldingStatsRetriever;
     private final StatsRepository statsRepository;
+    private final UserTcStatsCalculator userTcStatsCalculator;
 
     // Prometheus summaries
     private final Summary summary;
@@ -68,13 +68,16 @@ public class UserStatsParser {
      * @param registry              the {@link CollectorRegistry}
      * @param foldingStatsRetriever the {@link FoldingStatsRetriever}
      * @param statsRepository       the {@link StatsRepository}
+     * @param userTcStatsCalculator the {@link UserTcStatsCalculator}
      */
     @Autowired
     public UserStatsParser(final CollectorRegistry registry,
                            final FoldingStatsRetriever foldingStatsRetriever,
-                           final StatsRepository statsRepository) {
+                           final StatsRepository statsRepository,
+                           final UserTcStatsCalculator userTcStatsCalculator) {
         this.foldingStatsRetriever = foldingStatsRetriever;
         this.statsRepository = statsRepository;
+        this.userTcStatsCalculator = userTcStatsCalculator;
 
         summary = Summary.build()
             .quantile(0.5, 0.05)   // Add 50th percentile (= median) with 5% tolerated error
@@ -111,7 +114,7 @@ public class UserStatsParser {
         ParsingStateManager.next(ParsingState.ENABLED_TEAM_COMPETITION);
         SystemStateManager.next(SystemState.UPDATING_STATS);
 
-        LOGGER.info("Parsing Folding stats:");
+        LOGGER.info("Starting Folding stats parsing");
         for (final User user : users) {
             try {
                 updateTcStatsForUser(user);
@@ -119,7 +122,7 @@ public class UserStatsParser {
                 LOGGER.error("Error updating TC stats for user '{}' (ID: {})", user.getDisplayName(), user.getId(), e);
             }
         }
-        LOGGER.info("Finished parsing Folding stats");
+        LOGGER.info("Finished Folding stats parsing");
 
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
     }
@@ -155,7 +158,7 @@ public class UserStatsParser {
             }
 
             final UserStats createdTotalStats = statsRepository.createTotalStats(totalStats);
-            calculateAndPersistTcStats(user, initialStats, offsetTcStats, createdTotalStats);
+            userTcStatsCalculator.calculateAndPersist(user, initialStats, offsetTcStats, createdTotalStats);
 
             LOGGER.trace("Ending timer: {}", timer);
             timer.observeDuration();
@@ -170,27 +173,5 @@ public class UserStatsParser {
         }
 
         return UserStats.empty();
-    }
-
-    private void calculateAndPersistTcStats(final User user,
-                                            final Stats initialStats,
-                                            final OffsetTcStats offsetTcStats,
-                                            final UserStats totalStats) {
-        final double hardwareMultiplier = user.getHardware().getMultiplier();
-        final long points = Math.max(0, totalStats.getPoints() - initialStats.getPoints());
-        final long multipliedPoints = Math.round(points * hardwareMultiplier);
-        final int units = Math.max(0, totalStats.getUnits() - initialStats.getUnits());
-
-        final UserTcStats statsBeforeOffset = UserTcStats.create(user.getId(), totalStats.getTimestamp(), points, multipliedPoints, units);
-        final UserTcStats hourlyUserTcStats = statsBeforeOffset.updateWithOffsets(offsetTcStats);
-
-        LOGGER.debug("{} (ID: {}): {} total points (unmultiplied) | {} total units", user::getDisplayName, user::getId,
-            () -> formatWithCommas(totalStats.getPoints()), () -> formatWithCommas(totalStats.getUnits()));
-        LOGGER.debug("{} (ID: {}): {} TC multiplied points (pre-offset) | {} TC units (pre-offset)", user::getDisplayName, user::getId,
-            () -> formatWithCommas(multipliedPoints), () -> formatWithCommas(units));
-
-        final UserTcStats createdHourlyTcStats = statsRepository.createHourlyTcStats(hourlyUserTcStats);
-        LOGGER.info("{} (ID: {}): {} TC points | {} TC units", user.getDisplayName(), user.getId(),
-            formatWithCommas(createdHourlyTcStats.getMultipliedPoints()), formatWithCommas(createdHourlyTcStats.getUnits()));
     }
 }

@@ -58,7 +58,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/historic")
 public class HistoricStatsEndpoint {
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger AUDIT_LOGGER = LogManager.getLogger("audit");
 
     // Stat updates occur every hour, so we must invalidate responses every hour
     private static final int CACHE_EXPIRATION_TIME = (int) TimeUnit.HOURS.toSeconds(1);
@@ -95,7 +95,7 @@ public class HistoricStatsEndpoint {
                                                         @PathVariable("month") final String month,
                                                         @PathVariable("day") final String day,
                                                         final HttpServletRequest request) {
-        LOGGER.debug("GET request received to show hourly TC user stats at '{}'", request::getRequestURI);
+        AUDIT_LOGGER.debug("GET request received to show hourly TC user stats at '{}'", request::getRequestURI);
 
         final DateDetails date = DateDetails.of(year, month, day);
         final User user = foldingRepository.getUserWithPasskey(userId);
@@ -119,7 +119,7 @@ public class HistoricStatsEndpoint {
                                                        @PathVariable("year") final String year,
                                                        @PathVariable("month") final String month,
                                                        final HttpServletRequest request) {
-        LOGGER.debug("GET request received to show daily TC user stats at '{}'", request::getRequestURI);
+        AUDIT_LOGGER.debug("GET request received to show daily TC user stats at '{}'", request::getRequestURI);
 
         final DateDetails date = DateDetails.of(year, month);
         final User user = foldingRepository.getUserWithPasskey(userId);
@@ -141,7 +141,7 @@ public class HistoricStatsEndpoint {
     public ResponseEntity<?> getUserHistoricStatsMonthly(@PathVariable("userId") final int userId,
                                                          @PathVariable("year") final String year,
                                                          final HttpServletRequest request) {
-        LOGGER.debug("GET request received to show monthly TC user stats at '{}'", request::getRequestURI);
+        AUDIT_LOGGER.debug("GET request received to show monthly TC user stats at '{}'", request::getRequestURI);
 
         final DateDetails date = DateDetails.of(year);
         final User user = foldingRepository.getUserWithPasskey(userId);
@@ -167,7 +167,7 @@ public class HistoricStatsEndpoint {
                                                         @PathVariable("month") final String month,
                                                         @PathVariable("day") final String day,
                                                         final HttpServletRequest request) {
-        LOGGER.debug("GET request received to show hourly TC user stats at '{}'", request::getRequestURI);
+        AUDIT_LOGGER.debug("GET request received to show hourly TC user stats at '{}'", request::getRequestURI);
 
         final DateDetails date = DateDetails.of(year, month, day);
         final Team team = foldingRepository.getTeam(teamId);
@@ -176,7 +176,7 @@ public class HistoricStatsEndpoint {
         final List<HistoricStats> teamHourlyStats = new ArrayList<>(teamUsers.size());
 
         for (final User user : teamUsers) {
-            LOGGER.debug("Getting historic stats for user with ID: {}", user.getId());
+            AUDIT_LOGGER.debug("Getting historic stats for user with ID: {}", user.getId());
             final Collection<HistoricStats> dailyStats = statsRepository.getHistoricStats(user, date.year(), date.month(), date.day());
             teamHourlyStats.addAll(dailyStats);
         }
@@ -201,7 +201,7 @@ public class HistoricStatsEndpoint {
                                                        @PathVariable("year") final String year,
                                                        @PathVariable("month") final String month,
                                                        final HttpServletRequest request) {
-        LOGGER.debug("GET request received to show daily TC user stats at '{}'", request::getRequestURI);
+        AUDIT_LOGGER.debug("GET request received to show daily TC user stats at '{}'", request::getRequestURI);
 
         final DateDetails date = DateDetails.of(year, month);
         final Team team = foldingRepository.getTeam(teamId);
@@ -210,7 +210,7 @@ public class HistoricStatsEndpoint {
         final List<HistoricStats> teamDailyStats = new ArrayList<>(teamUsers.size());
 
         for (final User user : teamUsers) {
-            LOGGER.debug("Getting historic stats for user with ID: {}", user.getId());
+            AUDIT_LOGGER.debug("Getting historic stats for user with ID: {}", user.getId());
             final Collection<HistoricStats> dailyStats = statsRepository.getHistoricStats(user, date.year(), date.month());
             teamDailyStats.addAll(dailyStats);
         }
@@ -233,7 +233,7 @@ public class HistoricStatsEndpoint {
     public ResponseEntity<?> getTeamHistoricStatsMonthly(@PathVariable("teamId") final int teamId,
                                                          @PathVariable("year") final String year,
                                                          final HttpServletRequest request) {
-        LOGGER.info("GET request received to show monthly TC team stats at '{}'", request::getRequestURI);
+        AUDIT_LOGGER.debug("GET request received to show monthly TC team stats at '{}'", request::getRequestURI);
 
         final DateDetails date = DateDetails.of(year);
         final Team team = foldingRepository.getTeam(teamId);
@@ -242,7 +242,7 @@ public class HistoricStatsEndpoint {
         final List<HistoricStats> teamMonthlyStats = new ArrayList<>(teamUsers.size());
 
         for (final User user : teamUsers) {
-            LOGGER.debug("Getting historic stats for user with ID: {}", user.getId());
+            AUDIT_LOGGER.debug("Getting historic stats for user with ID: {}", user.getId());
             final Collection<HistoricStats> monthlyStats = statsRepository.getHistoricStats(user, date.year());
             teamMonthlyStats.addAll(monthlyStats);
         }

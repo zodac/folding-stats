@@ -67,7 +67,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/changes")
 public class UserChangeEndpoint {
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger AUDIT_LOGGER = LogManager.getLogger("audit");
     private static final String ALL_STATES_OPTION = "*";
 
     private final FoldingRepository foldingRepository;
@@ -123,7 +123,7 @@ public class UserChangeEndpoint {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> create(@RequestBody final UserChangeRequest userChangeRequest,
                                     final HttpServletRequest request) {
-        LOGGER.info("POST request for user change received at '{}'", request::getRequestURI);
+        AUDIT_LOGGER.info("POST request for user change received at '{}' with request: {}", request::getRequestURI, () -> userChangeRequest);
 
         final UserChange validatedUserChange = userChangeValidator.validate(userChangeRequest);
         final UserChange createdUserChange = foldingRepository.createUserChange(validatedUserChange);
@@ -145,7 +145,7 @@ public class UserChangeEndpoint {
     public ResponseEntity<?> getAll(@RequestParam(value = "state", required = false, defaultValue = ALL_STATES_OPTION) final String state,
                                     @RequestParam(value = "numberOfMonths", required = false, defaultValue = "0") final int numberOfMonths,
                                     final HttpServletRequest request) {
-        LOGGER.info("GET request for all user changes received at '{}?{}'", request::getRequestURI, () -> extractParameters(request));
+        AUDIT_LOGGER.debug("GET request for all user changes received at '{}?{}'", request::getRequestURI, () -> extractParameters(request));
 
         final Collection<UserChangeState> states = getStatesBasedOnInput(state);
         if (states.isEmpty()) {
@@ -182,7 +182,8 @@ public class UserChangeEndpoint {
                                                 @RequestParam(value = "numberOfMonths", required = false, defaultValue = "0")
                                                 final int numberOfMonths,
                                                 final HttpServletRequest request) {
-        LOGGER.info("GET request for all user changes with passkey received at '{}?{}'", request::getRequestURI, () -> extractParameters(request));
+        AUDIT_LOGGER.info("GET request for all user changes with passkey received at '{}?{}'", request::getRequestURI,
+            () -> extractParameters(request));
 
         final Collection<UserChangeState> states = getStatesBasedOnInput(state);
         if (states.isEmpty()) {
@@ -203,9 +204,8 @@ public class UserChangeEndpoint {
     @RolesAllowed("admin")
     @ReadRequired
     @GetMapping(path = "/{userChangeId}", produces = MediaType.APPLICATION_JSON_VALUE)
-
     public ResponseEntity<?> getById(@PathVariable("userChangeId") final int userChangeId, final HttpServletRequest request) {
-        LOGGER.info("GET request for user change received at '{}'", request::getRequestURI);
+        AUDIT_LOGGER.info("GET request for user change received at '{}'", request::getRequestURI);
 
         final UserChange userChange = foldingRepository.getUserChange(userChangeId);
         return ok(userChange);
@@ -226,7 +226,7 @@ public class UserChangeEndpoint {
     @WriteRequired
     @PutMapping(path = "/{userChangeId}/approve/immediate", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> approveImmediately(@PathVariable("userChangeId") final int userChangeId, final HttpServletRequest request) {
-        LOGGER.info("PUT request to approve user change immediately received at '{}'", request::getRequestURI);
+        AUDIT_LOGGER.info("PUT request to approve user change immediately received at '{}'", request::getRequestURI);
         userChangeImmediateApprovals.increment();
         return update(userChangeId, UserChangeState.APPROVED_NOW);
     }
@@ -242,7 +242,7 @@ public class UserChangeEndpoint {
     @WriteRequired
     @PutMapping(path = "/{userChangeId}/approve/next", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> approveNextMonth(@PathVariable("userChangeId") final int userChangeId, final HttpServletRequest request) {
-        LOGGER.info("PUT request to approve user change next month received at '{}'", request::getRequestURI);
+        AUDIT_LOGGER.info("PUT request to approve user change next month received at '{}'", request::getRequestURI);
         userChangeNextMonthApprovals.increment();
         return update(userChangeId, UserChangeState.APPROVED_NEXT_MONTH);
     }
@@ -258,13 +258,13 @@ public class UserChangeEndpoint {
     @WriteRequired
     @PutMapping(path = "/{userChangeId}/reject", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> reject(@PathVariable("userChangeId") final int userChangeId, final HttpServletRequest request) {
-        LOGGER.info("PUT request to reject user change received at '{}'", request::getRequestURI);
+        AUDIT_LOGGER.info("PUT request to reject user change received at '{}'", request::getRequestURI);
         userChangeRejects.increment();
         return update(userChangeId, UserChangeState.REJECTED);
     }
 
     private ResponseEntity<?> update(final int userChangeId, final UserChangeState newState) {
-        LOGGER.info("Updating UserChange ID {} to state {}", userChangeId, newState);
+        AUDIT_LOGGER.debug("Updating UserChange ID {} to state {}", userChangeId, newState);
 
         final UserChange existingUserChange = foldingRepository.getUserChange(userChangeId);
         if (existingUserChange.getState().isFinalState()) {
@@ -275,7 +275,7 @@ public class UserChangeEndpoint {
         final UserChange updatedUserChange = foldingRepository.updateUserChange(userChangeToUpdate);
 
         if (newState == UserChangeState.APPROVED_NOW) {
-            LOGGER.info("Requested for now, applying change");
+            AUDIT_LOGGER.info("User change has been set to {}, applying change immediately", UserChangeState.APPROVED_NOW);
             final UserChange appliedUserChange = userChangeApplier.apply(updatedUserChange);
             final UserChange maskedUserChange = UserChange.hidePasskey(appliedUserChange);
             return ok(maskedUserChange, maskedUserChange.getId());

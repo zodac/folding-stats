@@ -48,7 +48,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/debug")
 public class DebugEndpoint {
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger AUDIT_LOGGER = LogManager.getLogger("audit");
 
     private final FoldingRepository foldingRepository;
     private final LarsHardwareUpdater larsHardwareUpdater;
@@ -73,7 +73,7 @@ public class DebugEndpoint {
     @RolesAllowed("admin")
     @PostMapping(path = "/lars", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> startLarsUpdate() {
-        LOGGER.info("GET request received to manually update hardware from LARS DB");
+        AUDIT_LOGGER.info("GET request received to manually update hardware from LARS DB");
         larsHardwareUpdater.retrieveHardwareAndPersist();
         return ok();
     }
@@ -87,7 +87,7 @@ public class DebugEndpoint {
     @RolesAllowed("admin")
     @PostMapping(path = "/caches", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> printCaches() {
-        LOGGER.info("Printing cache contents");
+        AUDIT_LOGGER.info("Printing cache contents");
         foldingRepository.printCacheContents();
         return ok();
     }

@@ -44,4 +44,14 @@ public class NotFoundException extends RuntimeException {
     public NotFoundException(final Class<? extends ResponsePojo> type, final int id) {
         super(String.format("No %s found with ID '%s'", type.getSimpleName(), id));
     }
+
+    /**
+     * Basic constructor.
+     *
+     * @param type the type of object that cannot be found
+     * @param name the name of the object that cannot be found
+     */
+    public NotFoundException(final Class<? extends ResponsePojo> type, final String name) {
+        super(String.format("No %s found with name '%s'", type.getSimpleName(), name));
+    }
 }

@@ -87,7 +87,6 @@ import org.jooq.impl.DSL;
  */
 public final class PostgresDbManager implements DbManager {
 
-    private static final Logger LOGGER = LogManager.getLogger();
     private static final Logger SQL_LOGGER = LogManager.getLogger("sql");
     private static final int SINGLE_RESULT = 1;
 
@@ -129,7 +128,7 @@ public final class PostgresDbManager implements DbManager {
                     BigDecimal.valueOf(hardware.getAveragePpd())
                 )
                 .returning(HARDWARE.HARDWARE_ID);
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             final int hardwareId = query
                 .fetch()
@@ -146,7 +145,7 @@ public final class PostgresDbManager implements DbManager {
                 .select()
                 .from(HARDWARE)
                 .orderBy(HARDWARE.HARDWARE_ID.asc());
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
                 .fetch()
@@ -164,7 +163,7 @@ public final class PostgresDbManager implements DbManager {
                 .select()
                 .from(HARDWARE)
                 .where(HARDWARE.HARDWARE_ID.equal(hardwareId));
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
                 .fetch()
@@ -187,7 +186,7 @@ public final class PostgresDbManager implements DbManager {
                 .set(HARDWARE.MULTIPLIER, BigDecimal.valueOf(hardwareToUpdate.getMultiplier()))
                 .set(HARDWARE.AVERAGE_PPD, BigDecimal.valueOf(hardwareToUpdate.getAveragePpd()))
                 .where(HARDWARE.HARDWARE_ID.equal(hardwareToUpdate.getId()));
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
         });
@@ -202,7 +201,7 @@ public final class PostgresDbManager implements DbManager {
             final var query = queryContext
                 .deleteFrom(HARDWARE)
                 .where(HARDWARE.HARDWARE_ID.equal(hardwareId));
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
         });
@@ -216,7 +215,7 @@ public final class PostgresDbManager implements DbManager {
                 .columns(TEAMS.TEAM_NAME, TEAMS.TEAM_DESCRIPTION, TEAMS.FORUM_LINK)
                 .values(team.getTeamName(), team.getTeamDescription(), team.getForumLink())
                 .returning(TEAMS.TEAM_ID);
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             final int teamId = query
                 .fetch()
@@ -233,7 +232,7 @@ public final class PostgresDbManager implements DbManager {
                 .select()
                 .from(TEAMS)
                 .orderBy(TEAMS.TEAM_ID.asc());
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
                 .fetch()
@@ -251,7 +250,7 @@ public final class PostgresDbManager implements DbManager {
                 .select()
                 .from(TEAMS)
                 .where(TEAMS.TEAM_ID.equal(teamId));
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
                 .fetch()
@@ -271,7 +270,7 @@ public final class PostgresDbManager implements DbManager {
                 .set(TEAMS.TEAM_DESCRIPTION, teamToUpdate.getTeamDescription())
                 .set(TEAMS.FORUM_LINK, teamToUpdate.getForumLink())
                 .where(TEAMS.TEAM_ID.equal(teamToUpdate.getId()));
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
         });
@@ -287,7 +286,7 @@ public final class PostgresDbManager implements DbManager {
             final var query = queryContext
                 .deleteFrom(TEAMS)
                 .where(TEAMS.TEAM_ID.equal(teamId));
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
         });
@@ -321,7 +320,7 @@ public final class PostgresDbManager implements DbManager {
                     user.isUserIsCaptain()
                 )
                 .returning(USERS.USER_ID);
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             final int userId = query
                 .fetch()
@@ -342,7 +341,7 @@ public final class PostgresDbManager implements DbManager {
                 .leftJoin(TEAMS)
                 .on(USERS.TEAM_ID.equal(TEAMS.TEAM_ID))
                 .orderBy(USERS.USER_ID.asc());
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
                 .fetch()
@@ -363,7 +362,7 @@ public final class PostgresDbManager implements DbManager {
                 .leftJoin(TEAMS)
                 .on(USERS.TEAM_ID.equal(TEAMS.TEAM_ID))
                 .where(USERS.USER_ID.equal(userId));
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
                 .fetch()
@@ -388,7 +387,7 @@ public final class PostgresDbManager implements DbManager {
                 .set(USERS.TEAM_ID, userToUpdate.getTeam().getId())
                 .set(USERS.IS_CAPTAIN, userToUpdate.isUserIsCaptain())
                 .where(USERS.USER_ID.equal(userToUpdate.getId()));
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
         });
@@ -403,15 +402,150 @@ public final class PostgresDbManager implements DbManager {
             final var query = queryContext
                 .deleteFrom(USERS)
                 .where(USERS.USER_ID.equal(userId));
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
         });
     }
 
     @Override
+    public UserChange createUserChange(final UserChange userChange) {
+        return executeQuery(queryContext -> {
+            final var query = queryContext
+                .insertInto(USER_CHANGES)
+                .columns(
+                    USER_CHANGES.CREATED_UTC_TIMESTAMP,
+                    USER_CHANGES.UPDATED_UTC_TIMESTAMP,
+                    USER_CHANGES.USER_ID,
+                    USER_CHANGES.PREVIOUS_USER,
+                    USER_CHANGES.NEW_USER,
+                    USER_CHANGES.STATE
+                )
+                .values(
+                    userChange.getCreatedUtcTimestamp(),
+                    userChange.getUpdatedUtcTimestamp(),
+                    userChange.getPreviousUser().getId(),
+                    GSON.toJson(userChange.getPreviousUser()),
+                    GSON.toJson(userChange.getNewUser()),
+                    userChange.getState().toString()
+                )
+                .returning(USER_CHANGES.USER_CHANGE_ID);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
+
+            final int userChangeId = query
+                .fetch()
+                .get(0)
+                .getUserChangeId();
+            return UserChange.updateWithId(userChangeId, userChange);
+        });
+    }
+
+    @Override
+    public Collection<UserChange> getAllUserChanges() {
+        return executeQuery(queryContext -> {
+            final var query = queryContext
+                .select()
+                .from(USER_CHANGES)
+                .orderBy(USER_CHANGES.USER_CHANGE_ID.asc());
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
+
+            return query
+                .fetch()
+                .into(USER_CHANGES)
+                .stream()
+                .map(RecordConverter::toUserChange)
+                .toList();
+        });
+    }
+
+    @Override
+    public Collection<UserChange> getAllUserChanges(final Collection<UserChangeState> states, final int numberOfMonths) {
+        return numberOfMonths == 0
+            ? getAllUserChangesWithState(states)
+            : getAllUserChangesWithStateForPastMonths(states, numberOfMonths);
+    }
+
+    private List<UserChange> getAllUserChangesWithState(final Collection<UserChangeState> states) {
+        return executeQuery(queryContext -> {
+            final var query = queryContext
+                .select()
+                .from(USER_CHANGES)
+                .where(USER_CHANGES.STATE.in(states))
+                .orderBy(USER_CHANGES.USER_CHANGE_ID.asc());
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
+
+            return query
+                .fetch()
+                .into(USER_CHANGES)
+                .stream()
+                .map(RecordConverter::toUserChange)
+                .toList();
+        });
+    }
+
+    private List<UserChange> getAllUserChangesWithStateForPastMonths(final Collection<UserChangeState> states, final int numberOfMonths) {
+        final LocalDateTime toTime = DateTimeUtils.currentUtcLocalDateTime();
+        final LocalDateTime fromTime = toTime.minusMonths(numberOfMonths);
+
+        return executeQuery(queryContext -> {
+            final var query = queryContext
+                .select()
+                .from(USER_CHANGES)
+                .where(USER_CHANGES.STATE.in(states))
+                .and(USER_CHANGES.UPDATED_UTC_TIMESTAMP.between(fromTime).and(toTime))
+                .orderBy(USER_CHANGES.USER_CHANGE_ID.asc());
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
+
+            return query
+                .fetch()
+                .into(USER_CHANGES)
+                .stream()
+                .map(RecordConverter::toUserChange)
+                .toList();
+        });
+    }
+
+    @Override
+    public Optional<UserChange> getUserChange(final int userChangeId) {
+        return executeQuery(queryContext -> {
+            final var query = queryContext
+                .select()
+                .from(USER_CHANGES)
+                .where(USER_CHANGES.USER_CHANGE_ID.equal(userChangeId));
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
+
+            return query
+                .fetch()
+                .into(USER_CHANGES)
+                .stream()
+                .map(RecordConverter::toUserChange)
+                .findAny();
+        });
+    }
+
+    @Override
+    public UserChange updateUserChange(final UserChange userChangeToUpdate) {
+        executeQuery(queryContext -> {
+            final var query = queryContext
+                .update(USER_CHANGES)
+                .set(USER_CHANGES.CREATED_UTC_TIMESTAMP, userChangeToUpdate.getCreatedUtcTimestamp())
+                .set(USER_CHANGES.UPDATED_UTC_TIMESTAMP, userChangeToUpdate.getUpdatedUtcTimestamp())
+                .set(USER_CHANGES.PREVIOUS_USER, GSON.toJson(userChangeToUpdate.getPreviousUser()))
+                .set(USER_CHANGES.NEW_USER, GSON.toJson(userChangeToUpdate.getNewUser()))
+                .set(USER_CHANGES.STATE, userChangeToUpdate.getState().toString())
+                .where(USER_CHANGES.USER_CHANGE_ID.equal(userChangeToUpdate.getId()));
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
+
+            return query.execute();
+        });
+
+        // The DB makes no change to this object, so we simply return the provided one
+        return userChangeToUpdate;
+    }
+
+    @Override
     public UserTcStats createHourlyTcStats(final UserTcStats userTcStats) {
-        SQL_LOGGER.info("Inserting TC stats for user ID: {}", userTcStats::getUserId);
+        SQL_LOGGER.debug("Inserting TC stats for user ID: {}", userTcStats::getUserId);
 
         executeQuery(queryContext -> {
             final var query = queryContext
@@ -430,7 +564,7 @@ public final class PostgresDbManager implements DbManager {
                     userTcStats.getMultipliedPoints(),
                     userTcStats.getUnits()
                 );
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
         });
@@ -441,8 +575,6 @@ public final class PostgresDbManager implements DbManager {
 
     @Override
     public Optional<UserTcStats> getHourlyTcStats(final int userId) {
-        SQL_LOGGER.info("Getting current TC stats for user {}", userId);
-
         return executeQuery(queryContext -> {
             final var query = queryContext
                 .select(
@@ -456,7 +588,7 @@ public final class PostgresDbManager implements DbManager {
                 .where(USER_TC_STATS_HOURLY.USER_ID.equal(userId))
                 .orderBy(USER_TC_STATS_HOURLY.UTC_TIMESTAMP.desc())
                 .limit(SINGLE_RESULT);
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
                 .fetch()
@@ -490,7 +622,7 @@ public final class PostgresDbManager implements DbManager {
             preparedStatement.setTimestamp(2, DateTimeUtils.getTimestampOf(year, month, day, 23, 59, 59));
             preparedStatement.setInt(3, userId);
 
-            SQL_LOGGER.info("Executing prepared statement: '{}'", preparedStatement);
+            SQL_LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
             try (final ResultSet resultSet = preparedStatement.executeQuery()) {
 
                 final List<HistoricStats> userStats = new ArrayList<>();
@@ -524,7 +656,8 @@ public final class PostgresDbManager implements DbManager {
                 return userStats;
             }
         } catch (final DatabaseConnectionException e) {
-            LOGGER.warn("Unable to get the stats for the first hour of {}/{}/{} for user {}", year, DateTimeUtils.formatMonth(month), day, userId);
+            SQL_LOGGER.warn("Unable to get the stats for the first hour of {}/{}/{} for user {}", year, DateTimeUtils.formatMonth(month), day,
+                userId);
             throw e;
         } catch (final SQLException e) {
             throw new DatabaseConnectionException("Error opening connection to the DB", e);
@@ -532,7 +665,7 @@ public final class PostgresDbManager implements DbManager {
     }
 
     private UserTcStats getCurrentDayFirstHourTcStats(final int userId, final int day, final Month month, final Year year) {
-        SQL_LOGGER.info("Getting current day's first hour TC stats for user {} on {}/{}/{}", () -> userId, year::getValue, month::getValue,
+        SQL_LOGGER.debug("Getting current day's first hour TC stats for user {} on {}/{}/{}", () -> userId, year::getValue, month::getValue,
             () -> day);
 
         return executeQuery(queryContext -> {
@@ -553,7 +686,7 @@ public final class PostgresDbManager implements DbManager {
                 .groupBy(hour(USER_TC_STATS_HOURLY.UTC_TIMESTAMP))
                 .orderBy(hour(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).asc())
                 .limit(SINGLE_RESULT);
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
                 .fetch()
@@ -566,7 +699,7 @@ public final class PostgresDbManager implements DbManager {
     }
 
     private UserTcStats getPreviousDayLastHourTcStats(final int userId, final int day, final Month month, final Year year) {
-        SQL_LOGGER.info("Getting previous day's last hour TC stats for user {} on {}/{}/{}", () -> userId, year::getValue, month::getValue,
+        SQL_LOGGER.debug("Getting previous day's last hour TC stats for user {} on {}/{}/{}", () -> userId, year::getValue, month::getValue,
             () -> day);
 
         return executeQuery(queryContext -> {
@@ -587,7 +720,7 @@ public final class PostgresDbManager implements DbManager {
                 .groupBy(hour(USER_TC_STATS_HOURLY.UTC_TIMESTAMP))
                 .orderBy(hour(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).desc())
                 .limit(SINGLE_RESULT);
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
                 .fetch()
@@ -616,14 +749,14 @@ public final class PostgresDbManager implements DbManager {
             // If no stats in previous day (meaning we are getting historic stats for the first day available),
             // we need to remove the initial points from the current day's points
             final UserStats initialStats = getInitialStats(userId).orElse(UserStats.empty());
-            SQL_LOGGER.info("Removing initial stats from current day's first hour stats: {} - {}", firstHourTcStatsCurrentDay, initialStats);
+            SQL_LOGGER.debug("Removing initial stats from current day's first hour stats: {} - {}", firstHourTcStatsCurrentDay, initialStats);
 
             // Since we didn't get any previous day's stats, we don't need to worry about the hardware multiplier having been changed
             // As a result, we will get the user's current hardware and use that multiplier
             final Optional<User> optionalUser = getUser(userId);
 
             if (optionalUser.isEmpty()) {
-                LOGGER.warn("Could not find user with ID {}, returning empty stats for first hour of day", userId);
+                SQL_LOGGER.warn("Could not find user with ID {}, returning empty stats for first hour of day", userId);
                 return UserTcStats.empty(userId);
             }
 
@@ -674,7 +807,7 @@ public final class PostgresDbManager implements DbManager {
             preparedStatement.setInt(2, year.getValue());
             preparedStatement.setInt(3, userId);
 
-            SQL_LOGGER.info("Executing prepared statement: '{}'", preparedStatement);
+            SQL_LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
             try (final ResultSet resultSet = preparedStatement.executeQuery()) {
 
                 final List<HistoricStats> userStats = new ArrayList<>();
@@ -685,7 +818,8 @@ public final class PostgresDbManager implements DbManager {
                     final UserTcStats userTcStats = getTcStatsForFirstDayOfMonth(localDateTime, userId);
 
                     if (userTcStats.isEmpty()) {
-                        LOGGER.warn("Error getting historic stats for first day of {} for user with ID {}", DateTimeUtils.formatMonth(month), userId);
+                        SQL_LOGGER.warn("Error getting historic stats for first day of {} for user with ID {}", DateTimeUtils.formatMonth(month),
+                            userId);
                     } else {
                         userStats.add(
                             HistoricStats.create(
@@ -719,7 +853,7 @@ public final class PostgresDbManager implements DbManager {
 
     @Override
     public Collection<HistoricStats> getHistoricStatsMonthly(final int userId, final Year year) {
-        SQL_LOGGER.info("Getting historic monthly user TC stats for {} for user {}", year, userId);
+        SQL_LOGGER.debug("Getting historic monthly user TC stats for {} for user {}", year, userId);
 
         return executeQuery(queryContext -> {
             final var query = queryContext
@@ -734,7 +868,7 @@ public final class PostgresDbManager implements DbManager {
                 .and(USER_TC_STATS_HOURLY.USER_ID.equal(userId))
                 .groupBy(month(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).cast(int.class))
                 .orderBy(month(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).cast(int.class).asc());
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.fetch()
                 .into(USER_TC_STATS_HOURLY)
@@ -745,7 +879,7 @@ public final class PostgresDbManager implements DbManager {
     }
 
     private UserTcStats getTcStatsForFirstDayOfMonth(final LocalDateTime localDateTime, final int userId) {
-        SQL_LOGGER.info("Getting TC stats for user {} on {}", userId, localDateTime);
+        SQL_LOGGER.debug("Getting TC stats for user {} on {}", userId, localDateTime);
 
         return executeQuery(queryContext -> {
             final var query = queryContext
@@ -757,7 +891,7 @@ public final class PostgresDbManager implements DbManager {
                 .and(USER_TC_STATS_HOURLY.USER_ID.equal(userId))
                 .orderBy(hour(USER_TC_STATS_HOURLY.UTC_TIMESTAMP).desc())
                 .limit(SINGLE_RESULT);
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
                 .fetch()
@@ -771,7 +905,7 @@ public final class PostgresDbManager implements DbManager {
 
     @Override
     public UserStats createInitialStats(final UserStats userStats) {
-        SQL_LOGGER.info("Inserting initial stats for user {} to DB", userStats::getUserId);
+        SQL_LOGGER.debug("Inserting initial stats for user {} to DB", userStats::getUserId);
 
         executeQuery(queryContext -> {
             final var query = queryContext
@@ -787,7 +921,7 @@ public final class PostgresDbManager implements DbManager {
                     DateTimeUtils.toUtcLocalDateTime(userStats.getTimestamp()),
                     userStats.getPoints(),
                     userStats.getUnits());
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
         });
@@ -797,7 +931,7 @@ public final class PostgresDbManager implements DbManager {
 
     @Override
     public Optional<UserStats> getInitialStats(final int userId) {
-        SQL_LOGGER.info("Getting initial stats for user ID: {}", userId);
+        SQL_LOGGER.debug("Getting initial stats for user ID: {}", userId);
 
         return executeQuery(queryContext -> {
             final var query = queryContext
@@ -806,7 +940,7 @@ public final class PostgresDbManager implements DbManager {
                 .where(USER_INITIAL_STATS.USER_ID.equal(userId))
                 .orderBy(USER_INITIAL_STATS.UTC_TIMESTAMP.desc())
                 .limit(SINGLE_RESULT);
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
                 .fetch()
@@ -819,7 +953,7 @@ public final class PostgresDbManager implements DbManager {
 
     @Override
     public UserStats createTotalStats(final UserStats userStats) {
-        SQL_LOGGER.info("Inserting total stats for user ID {} to DB", userStats::getUserId);
+        SQL_LOGGER.debug("Inserting total stats for user ID {} to DB", userStats::getUserId);
 
         executeQuery(queryContext -> {
             final var query = queryContext
@@ -827,7 +961,7 @@ public final class PostgresDbManager implements DbManager {
                 .columns(USER_TOTAL_STATS.USER_ID, USER_TOTAL_STATS.UTC_TIMESTAMP, USER_TOTAL_STATS.TOTAL_POINTS, USER_TOTAL_STATS.TOTAL_UNITS)
                 .values(userStats.getUserId(), DateTimeUtils.toUtcLocalDateTime(userStats.getTimestamp()), userStats.getPoints(),
                     userStats.getUnits());
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
         });
@@ -838,7 +972,7 @@ public final class PostgresDbManager implements DbManager {
 
     @Override
     public Optional<UserStats> getTotalStats(final int userId) {
-        SQL_LOGGER.info("Getting total stats for user ID: {}", userId);
+        SQL_LOGGER.debug("Getting total stats for user ID: {}", userId);
 
         return executeQuery(queryContext -> {
             final var query = queryContext
@@ -847,7 +981,7 @@ public final class PostgresDbManager implements DbManager {
                 .where(USER_TOTAL_STATS.USER_ID.equal(userId))
                 .orderBy(USER_TOTAL_STATS.UTC_TIMESTAMP.desc())
                 .limit(SINGLE_RESULT);
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
                 .fetch()
@@ -860,7 +994,7 @@ public final class PostgresDbManager implements DbManager {
 
     @Override
     public OffsetTcStats createOrUpdateOffsetStats(final int userId, final OffsetTcStats offsetTcStats) {
-        SQL_LOGGER.info("Adding/updating offset stats for user {}", userId);
+        SQL_LOGGER.debug("Adding/updating offset stats for user {}", userId);
 
         return executeQuery(queryContext -> {
             final LocalDateTime currentUtcLocalDateTime = DateTimeUtils.toUtcLocalDateTime(DateTimeUtils.currentUtcTimestamp());
@@ -888,7 +1022,7 @@ public final class PostgresDbManager implements DbManager {
                     USER_OFFSET_TC_STATS.OFFSET_MULTIPLIED_POINTS.plus(offsetTcStats.getMultipliedPointsOffset()))
                 .set(USER_OFFSET_TC_STATS.OFFSET_UNITS, USER_OFFSET_TC_STATS.OFFSET_UNITS.plus(offsetTcStats.getUnitsOffset()))
                 .returning();
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
                 .fetch()
@@ -902,8 +1036,6 @@ public final class PostgresDbManager implements DbManager {
 
     @Override
     public Optional<OffsetTcStats> getOffsetStats(final int userId) {
-        SQL_LOGGER.info("Getting offset stats for user ID: {}", userId);
-
         return executeQuery(queryContext -> {
             final var query = queryContext
                 .select(USER_OFFSET_TC_STATS.OFFSET_POINTS, USER_OFFSET_TC_STATS.OFFSET_MULTIPLIED_POINTS, USER_OFFSET_TC_STATS.OFFSET_UNITS)
@@ -911,7 +1043,7 @@ public final class PostgresDbManager implements DbManager {
                 .where(USER_OFFSET_TC_STATS.USER_ID.equal(userId))
                 .orderBy(USER_OFFSET_TC_STATS.UTC_TIMESTAMP.desc())
                 .limit(SINGLE_RESULT);
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
                 .fetch()
@@ -924,13 +1056,11 @@ public final class PostgresDbManager implements DbManager {
 
     @Override
     public void deleteOffsetStats(final int userId) {
-        SQL_LOGGER.info("Deleting offset stats for user ID {}", userId);
-
         executeQuery(queryContext -> {
             final var query = queryContext
                 .deleteFrom(USER_OFFSET_TC_STATS)
                 .where(USER_OFFSET_TC_STATS.USER_ID.equal(userId));
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
         });
@@ -938,12 +1068,10 @@ public final class PostgresDbManager implements DbManager {
 
     @Override
     public void deleteAllOffsetStats() {
-        SQL_LOGGER.info("Deleting offset stats for all users");
-
         executeQuery(queryContext -> {
             final var query = queryContext
                 .deleteFrom(USER_OFFSET_TC_STATS);
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
         });
@@ -951,8 +1079,6 @@ public final class PostgresDbManager implements DbManager {
 
     @Override
     public RetiredUserTcStats createRetiredUserStats(final RetiredUserTcStats retiredUserTcStats) {
-        SQL_LOGGER.info("Persisting retired user ID {} for team ID {}", retiredUserTcStats.getUserId(), retiredUserTcStats.getTeamId());
-
         return executeQuery(queryContext -> {
             final LocalDateTime currentUtcLocalDateTime = DateTimeUtils.toUtcLocalDateTime(DateTimeUtils.currentUtcTimestamp());
 
@@ -985,7 +1111,7 @@ public final class PostgresDbManager implements DbManager {
                 .set(RETIRED_USER_STATS.FINAL_MULTIPLIED_POINTS, retiredUserTcStats.getMultipliedPoints())
                 .set(RETIRED_USER_STATS.FINAL_UNITS, retiredUserTcStats.getUnits())
                 .returning();
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             final int retiredUserId = query
                 .fetch()
@@ -997,14 +1123,12 @@ public final class PostgresDbManager implements DbManager {
 
     @Override
     public Collection<RetiredUserTcStats> getAllRetiredUserStats() {
-        SQL_LOGGER.info("Getting all retired user stats");
-
         return executeQuery(queryContext -> {
             final var query = queryContext
                 .select()
                 .from(RETIRED_USER_STATS)
                 .orderBy(RETIRED_USER_STATS.RETIRED_USER_ID.asc());
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
                 .fetch()
@@ -1017,12 +1141,10 @@ public final class PostgresDbManager implements DbManager {
 
     @Override
     public void deleteAllRetiredUserStats() {
-        SQL_LOGGER.info("Deleting all retired users");
-
         executeQuery(queryContext -> {
             final var query = queryContext
                 .deleteFrom(RETIRED_USER_STATS);
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
         });
@@ -1030,7 +1152,7 @@ public final class PostgresDbManager implements DbManager {
 
     @Override
     public MonthlyResult createMonthlyResult(final MonthlyResult monthlyResult) {
-        SQL_LOGGER.info("Persisting monthly result for {}/{}",
+        SQL_LOGGER.debug("Persisting monthly result for {}/{}",
             () -> monthlyResult.getUtcTimestamp().getYear(),
             () -> DateTimeUtils.formatMonth(monthlyResult.getUtcTimestamp().getMonth())
         );
@@ -1041,7 +1163,7 @@ public final class PostgresDbManager implements DbManager {
                 .columns(MONTHLY_RESULTS.UTC_TIMESTAMP, MONTHLY_RESULTS.JSON_RESULT)
                 .values(monthlyResult.getUtcTimestamp(), GSON.toJson(monthlyResult));
 
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
         });
@@ -1052,7 +1174,7 @@ public final class PostgresDbManager implements DbManager {
 
     @Override
     public Optional<MonthlyResult> getMonthlyResult(final Month month, final Year year) {
-        SQL_LOGGER.info("Retrieving monthly result for {}/{}", () -> year, () -> DateTimeUtils.formatMonth(month));
+        SQL_LOGGER.debug("Retrieving monthly result for {}/{}", () -> year, () -> DateTimeUtils.formatMonth(month));
 
         return executeQuery(queryContext -> {
             final var query = queryContext
@@ -1063,7 +1185,7 @@ public final class PostgresDbManager implements DbManager {
                 .orderBy(MONTHLY_RESULTS.UTC_TIMESTAMP.desc())
                 .limit(SINGLE_RESULT);
 
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
                 .fetch()
@@ -1076,7 +1198,7 @@ public final class PostgresDbManager implements DbManager {
 
     @Override
     public UserAuthenticationResult authenticateSystemUser(final String userName, final String password) {
-        SQL_LOGGER.info("Checking if supplied username '{}' and password is valid user, then returning roles", userName);
+        SQL_LOGGER.debug("Checking if supplied username '{}' and password is valid user, then returning roles", userName);
 
         return executeQuery(queryContext -> {
             final var query = queryContext
@@ -1098,7 +1220,7 @@ public final class PostgresDbManager implements DbManager {
                 )
                 .from(SYSTEM_USERS)
                 .where(SYSTEM_USERS.USER_NAME.equal(userName));
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
+            SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query
                 .fetch()
@@ -1107,141 +1229,6 @@ public final class PostgresDbManager implements DbManager {
                 .findAny()
                 .orElse(UserAuthenticationResult.userDoesNotExist());
         });
-    }
-
-    @Override
-    public UserChange createUserChange(final UserChange userChange) {
-        return executeQuery(queryContext -> {
-            final var query = queryContext
-                .insertInto(USER_CHANGES)
-                .columns(
-                    USER_CHANGES.CREATED_UTC_TIMESTAMP,
-                    USER_CHANGES.UPDATED_UTC_TIMESTAMP,
-                    USER_CHANGES.USER_ID,
-                    USER_CHANGES.PREVIOUS_USER,
-                    USER_CHANGES.NEW_USER,
-                    USER_CHANGES.STATE
-                )
-                .values(
-                    userChange.getCreatedUtcTimestamp(),
-                    userChange.getUpdatedUtcTimestamp(),
-                    userChange.getPreviousUser().getId(),
-                    GSON.toJson(userChange.getPreviousUser()),
-                    GSON.toJson(userChange.getNewUser()),
-                    userChange.getState().toString()
-                )
-                .returning(USER_CHANGES.USER_CHANGE_ID);
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
-
-            final int userChangeId = query
-                .fetch()
-                .get(0)
-                .getUserChangeId();
-            return UserChange.updateWithId(userChangeId, userChange);
-        });
-    }
-
-    @Override
-    public Collection<UserChange> getAllUserChanges() {
-        return executeQuery(queryContext -> {
-            final var query = queryContext
-                .select()
-                .from(USER_CHANGES)
-                .orderBy(USER_CHANGES.USER_CHANGE_ID.asc());
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
-
-            return query
-                .fetch()
-                .into(USER_CHANGES)
-                .stream()
-                .map(RecordConverter::toUserChange)
-                .toList();
-        });
-    }
-
-    @Override
-    public Collection<UserChange> getAllUserChanges(final Collection<UserChangeState> states, final int numberOfMonths) {
-        return numberOfMonths == 0
-            ? getAllUserChangesWithState(states)
-            : getAllUserChangesWithStateForPastMonths(states, numberOfMonths);
-    }
-
-    private List<UserChange> getAllUserChangesWithState(final Collection<UserChangeState> states) {
-        return executeQuery(queryContext -> {
-            final var query = queryContext
-                .select()
-                .from(USER_CHANGES)
-                .where(USER_CHANGES.STATE.in(states))
-                .orderBy(USER_CHANGES.USER_CHANGE_ID.asc());
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
-
-            return query
-                .fetch()
-                .into(USER_CHANGES)
-                .stream()
-                .map(RecordConverter::toUserChange)
-                .toList();
-        });
-    }
-
-    private List<UserChange> getAllUserChangesWithStateForPastMonths(final Collection<UserChangeState> states, final int numberOfMonths) {
-        final LocalDateTime toTime = DateTimeUtils.currentUtcLocalDateTime();
-        final LocalDateTime fromTime = toTime.minusMonths(numberOfMonths);
-
-        return executeQuery(queryContext -> {
-            final var query = queryContext
-                .select()
-                .from(USER_CHANGES)
-                .where(USER_CHANGES.STATE.in(states))
-                .and(USER_CHANGES.UPDATED_UTC_TIMESTAMP.between(fromTime).and(toTime))
-                .orderBy(USER_CHANGES.USER_CHANGE_ID.asc());
-            SQL_LOGGER.debug("Executing SQL: '{}'", query);
-
-            return query
-                .fetch()
-                .into(USER_CHANGES)
-                .stream()
-                .map(RecordConverter::toUserChange)
-                .toList();
-        });
-    }
-
-    @Override
-    public Optional<UserChange> getUserChange(final int userChangeId) {
-        return executeQuery(queryContext -> {
-            final var query = queryContext
-                .select()
-                .from(USER_CHANGES)
-                .where(USER_CHANGES.USER_CHANGE_ID.equal(userChangeId));
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
-
-            return query
-                .fetch()
-                .into(USER_CHANGES)
-                .stream()
-                .map(RecordConverter::toUserChange)
-                .findAny();
-        });
-    }
-
-    @Override
-    public UserChange updateUserChange(final UserChange userChangeToUpdate) {
-        executeQuery(queryContext -> {
-            final var query = queryContext
-                .update(USER_CHANGES)
-                .set(USER_CHANGES.CREATED_UTC_TIMESTAMP, userChangeToUpdate.getCreatedUtcTimestamp())
-                .set(USER_CHANGES.UPDATED_UTC_TIMESTAMP, userChangeToUpdate.getUpdatedUtcTimestamp())
-                .set(USER_CHANGES.PREVIOUS_USER, GSON.toJson(userChangeToUpdate.getPreviousUser()))
-                .set(USER_CHANGES.NEW_USER, GSON.toJson(userChangeToUpdate.getNewUser()))
-                .set(USER_CHANGES.STATE, userChangeToUpdate.getState().toString())
-                .where(USER_CHANGES.USER_CHANGE_ID.equal(userChangeToUpdate.getId()));
-            SQL_LOGGER.info("Executing SQL: '{}'", query);
-
-            return query.execute();
-        });
-
-        // The DB makes no change to this object, so we simply return the provided one
-        return userChangeToUpdate;
     }
 
     private <T> T executeQuery(final Function<DSLContext, T> sqlQuery) {
