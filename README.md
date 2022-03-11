@@ -1,4 +1,4 @@
-``# Folding@Home Team Competition
+# Folding@Home Team Competition
 
 The *Folding@Home Team Competition* is a competition where members of a [Folding@Home](https://foldingathome.org/) team
 can group together into sub-teams to compete against each other, while still continuing to contribute to their parent
@@ -409,10 +409,12 @@ system.
 For example, first check the available volumes:
 
     $ docker volume ls
-    DRIVER VOLUME NAME
-    local 97f3b514d34ebc85ebd71c61d1701b7faf585c2c755c62f78bea798b5a150c35
-    local folding-stats_database_content
-    local folding-stats_backend_logs
+    DRIVER    VOLUME NAME
+    local     folding-stats_backend_certs
+    local     folding-stats_backend_logs
+    local     folding-stats_database_content
+    local     folding-stats_prometheus_certs
+    local     folding-stats_prometheus_data
 
 Then create a simple container, attaching the `folding-stats_backend_logs` volume (in read-only mode):
 
