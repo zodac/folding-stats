@@ -89,7 +89,7 @@ public class UserTcStatsCalculator {
         final UserTcStats hourlyUserTcStats = statsBeforeOffset.updateWithOffsets(offsetTcStats);
 
         // Only debug log if user has some points
-        if (multipliedPoints != 0L) {
+        if (multipliedPoints != UserTcStats.DEFAULT_MULTIPLIED_POINTS) {
             STATS_LOGGER.debug("{} (ID: {}): {} total points (unmultiplied) | {} total units", user::getDisplayName, user::getId,
                 () -> formatWithCommas(totalStats.getPoints()), () -> formatWithCommas(totalStats.getUnits()));
             STATS_LOGGER.debug("{} (ID: {}): {} TC multiplied points (pre-offset) | {} TC units (pre-offset)", user::getDisplayName, user::getId,

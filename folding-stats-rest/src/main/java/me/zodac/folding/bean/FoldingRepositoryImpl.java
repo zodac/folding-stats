@@ -386,7 +386,7 @@ public class FoldingRepositoryImpl implements FoldingRepository {
     public void deleteUser(final User user) {
         // Retrieve the user's stats before deleting the user, so we can use the values for the retried user stats
         final UserTcStats userStats = storage.getHourlyTcStats(user.getId())
-            .orElse(UserTcStats.empty());
+            .orElse(UserTcStats.empty(user.getId()));
         storage.deleteUser(user.getId());
 
         if (userStats.isEmptyStats()) {

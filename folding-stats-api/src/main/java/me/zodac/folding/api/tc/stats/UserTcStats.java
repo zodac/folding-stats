@@ -28,7 +28,6 @@ import java.sql.Timestamp;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.util.DateTimeUtils;
 
 /**
@@ -40,7 +39,10 @@ import me.zodac.folding.api.util.DateTimeUtils;
 @ToString(doNotUseGetters = true, callSuper = true)
 public class UserTcStats extends UserStats {
 
-    private static final long DEFAULT_MULTIPLIED_POINTS = 0L;
+    /**
+     * The default number of multiplied points, <code>0</code>.
+     */
+    public static final long DEFAULT_MULTIPLIED_POINTS = 0L;
 
     private final long multipliedPoints;
 
@@ -81,15 +83,6 @@ public class UserTcStats extends UserStats {
      */
     public static UserTcStats empty(final int userId) {
         return create(userId, DateTimeUtils.currentUtcTimestamp(), Stats.DEFAULT_POINTS, DEFAULT_MULTIPLIED_POINTS, Stats.DEFAULT_UNITS);
-    }
-
-    /**
-     * Creates an empty instance of {@link UserTcStats}, with no values.
-     *
-     * @return the empty {@link UserTcStats}
-     */
-    public static UserTcStats empty() {
-        return empty(User.EMPTY_USER_ID);
     }
 
     /**
