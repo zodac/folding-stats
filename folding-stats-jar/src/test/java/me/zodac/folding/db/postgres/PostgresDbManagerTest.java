@@ -426,11 +426,7 @@ class PostgresDbManagerTest {
             List.of(
                 TeamLeaderboardEntry.create(
                     TeamSummary.createWithDefaultRank(
-                        Team.builder()
-                            .id(1)
-                            .teamName("Team 1")
-                            .teamDescription("Test Team 1")
-                            .build(),
+                        generateTeam(),
                         "Captain1",
                         Collections.emptyList(),
                         Collections.emptyList()
@@ -441,29 +437,7 @@ class PostgresDbManagerTest {
             Map.of(Category.AMD_GPU, List.of(
                     UserCategoryLeaderboardEntry.create(
                         UserSummary.createWithDefaultRank(
-                            User.builder()
-                                .id(1)
-                                .foldingUserName("User1")
-                                .displayName("User 1")
-                                .category(Category.AMD_GPU)
-                                .hardware(
-                                    Hardware.createWithoutId(
-                                        "Hardware1",
-                                        "Hardware 1",
-                                        HardwareMake.AMD,
-                                        HardwareType.GPU,
-                                        1.00D,
-                                        1L
-                                    )
-                                )
-                                .team(
-                                    Team.builder()
-                                        .id(1)
-                                        .teamName("Team 1")
-                                        .teamDescription("Test Team 1")
-                                        .build()
-                                )
-                                .build(),
+                            generateUser(),
                             0L,
                             0L,
                             0
@@ -484,11 +458,7 @@ class PostgresDbManagerTest {
             List.of(
                 TeamLeaderboardEntry.create(
                     TeamSummary.createWithDefaultRank(
-                        Team.builder()
-                            .id(2)
-                            .teamName("Team 2")
-                            .teamDescription("Test Team 2")
-                            .build(),
+                        generateTeam(),
                         "Captain2",
                         Collections.emptyList(),
                         Collections.emptyList()
@@ -499,30 +469,7 @@ class PostgresDbManagerTest {
             Map.of(Category.NVIDIA_GPU, List.of(
                     UserCategoryLeaderboardEntry.create(
                         UserSummary.createWithDefaultRank(
-                            User.builder()
-                                .id(2)
-                                .foldingUserName("User2")
-                                .displayName("User 2")
-                                .category(Category.NVIDIA_GPU)
-                                .hardware(
-                                    Hardware.createWithoutId(
-                                        "Hardware2",
-                                        "Hardware 2",
-                                        HardwareMake.NVIDIA,
-                                        HardwareType.GPU,
-                                        1.00D,
-                                        1L
-                                    )
-                                )
-                                .team(
-                                    Team.builder()
-                                        .id(2)
-                                        .teamName("Team 2")
-                                        .teamDescription("Test Team 2")
-                                        .build()
-                                )
-                                .build(),
-
+                            generateUser(),
                             0L,
                             0L,
                             0
@@ -621,33 +568,33 @@ class PostgresDbManagerTest {
             .isEqualTo(userChangeToUpdate);
     }
 
-    private Hardware generateHardware() {
+    private static Hardware generateHardware() {
         return Hardware.createWithoutId(nextHardwareName(), "hardware", HardwareMake.NVIDIA, HardwareType.GPU, 1.00D, 1L);
     }
 
-    private Hardware createHardware() {
+    private static Hardware createHardware() {
         return POSTGRES_DB_MANAGER.createHardware(generateHardware());
     }
 
-    private User generateUser() {
+    private static User generateUser() {
         final Hardware hardware = createHardware();
         final Team team = createTeam();
         return User.createWithoutId(nextUserName(), "user", "passkey", Category.NVIDIA_GPU, "", "", hardware, team, true);
     }
 
-    private User createUser() {
+    private static User createUser() {
         return POSTGRES_DB_MANAGER.createUser(generateUser());
     }
 
-    private Team generateTeam() {
+    private static Team generateTeam() {
         return Team.createWithoutId(nextTeamName(), "team", "");
     }
 
-    private Team createTeam() {
+    private static Team createTeam() {
         return POSTGRES_DB_MANAGER.createTeam(generateTeam());
     }
 
-    private UserChange generateUserChange() {
+    private static UserChange generateUserChange() {
         final User previousUser = createUser();
         final User newUser = createUser();
         return UserChange.createNow(previousUser, newUser, UserChangeState.REQUESTED_NOW);

@@ -24,6 +24,7 @@
 
 package me.zodac.folding.stats.http.response;
 
+import com.google.gson.annotations.SerializedName;
 import java.util.Comparator;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -58,8 +59,13 @@ import lombok.ToString;
 @ToString(doNotUseGetters = true)
 class UnitsApiInstance implements Comparable<UnitsApiInstance> {
 
+    @SerializedName("finished")
     private int finished;
+
+    @SerializedName("expired")
     private int expired;
+
+    @SerializedName("active")
     private int active;
 
     @Override

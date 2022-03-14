@@ -95,6 +95,18 @@
         <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
         <pmd-ruleset>${project.parent.basedir}/ci/pmd-ruleset.xml</pmd-ruleset>
         <pitest-test-strength-threshold>100</pitest-test-strength-threshold>
+
+        <!-- ProGuard 3PP Versions -->
+        <proguard-base.version>7.2.1</proguard-base.version>
+        <proguard-core.version>8.0.7</proguard-core.version>
+
+        <!-- ProGuard Plugin Versions -->
+        <proguard-maven-plugin.version>2.5.3</proguard-maven-plugin.version>
+
+        <!-- ProGuard Properties -->
+        <!-- Each module must have own ProGuard definition -->
+        <proguard-file>${project.basedir}/proguard-rules.cfg</proguard-file>
+        <proguard-classifier>optimized</proguard-classifier>
     </properties>
 
     <dependencyManagement>
@@ -104,16 +116,19 @@
                 <groupId>me.zodac</groupId>
                 <artifactId>folding-stats-api</artifactId>
                 <version>${project.version}</version>
+                <classifier>${proguard-classifier}</classifier>
             </dependency>
             <dependency>
                 <groupId>me.zodac</groupId>
                 <artifactId>folding-stats-client-library-java</artifactId>
                 <version>${project.version}</version>
+                <classifier>${proguard-classifier}</classifier>
             </dependency>
             <dependency>
                 <groupId>me.zodac</groupId>
                 <artifactId>folding-stats-jar</artifactId>
                 <version>${project.version}</version>
+                <classifier>${proguard-classifier}</classifier>
             </dependency>
 
             <!-- 3PP Dependencies -->
@@ -617,6 +632,45 @@
                             </goals>
                         </execution>
                     </executions>
+                </plugin>
+
+                <plugin>
+                    <groupId>com.github.wvengen</groupId>
+                    <artifactId>proguard-maven-plugin</artifactId>
+                    <version>${proguard-maven-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>proguard</goal>
+                            </goals>
+                            <configuration>
+                                <attachArtifactClassifier>${proguard-classifier}</attachArtifactClassifier>
+                                <includeDependency>true</includeDependency>
+                                <attach>true</attach>
+                                <options>
+                                    <option>-include ${proguard-file}</option>
+                                </options>
+                                <libs>
+                                    <lib>${java.home}/jmods</lib>
+                                </libs>
+                            </configuration>
+                        </execution>
+                    </executions>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.guardsquare</groupId>
+                            <artifactId>proguard-base</artifactId>
+                            <version>${proguard-base.version}</version>
+                            <scope>runtime</scope>
+                        </dependency>
+                        <dependency>
+                            <groupId>com.guardsquare</groupId>
+                            <artifactId>proguard-core</artifactId>
+                            <version>${proguard-core.version}</version>
+                            <scope>runtime</scope>
+                        </dependency>
+                    </dependencies>
                 </plugin>
             </plugins>
         </pluginManagement>

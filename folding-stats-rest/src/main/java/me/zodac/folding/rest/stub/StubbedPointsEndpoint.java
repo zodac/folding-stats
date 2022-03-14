@@ -33,6 +33,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -59,6 +61,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/user")
 public class StubbedPointsEndpoint {
 
+    private static final Logger LOGGER = LogManager.getLogger();
     private static final long NO_POINTS = 0L;
 
     private final Map<String, Long> pointsByUserAndPasskey = new HashMap<>();
@@ -73,6 +76,7 @@ public class StubbedPointsEndpoint {
     @GetMapping(value = "/{foldingUserName}/stats", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PointsResponse> getUserPoints(@PathVariable("foldingUserName") final String foldingUserName,
                                                         @RequestParam("passkey") final String passkey) {
+        LOGGER.debug("Getting points for '{}:{}'", foldingUserName, passkey);
         return ResponseEntity
             .ok()
             .body(createResponse(foldingUserName, passkey));
@@ -93,6 +97,7 @@ public class StubbedPointsEndpoint {
     public ResponseEntity<Void> updateUserPoints(@PathVariable("foldingUserName") final String foldingUserName,
                                                  @RequestParam("passkey") final String passkey,
                                                  @RequestParam("points") final long points) {
+        LOGGER.debug("Adding {} points for '{}:{}'", points, foldingUserName, passkey);
         final String key = foldingUserName + passkey;
 
         if (points == NO_POINTS) {
@@ -114,6 +119,7 @@ public class StubbedPointsEndpoint {
      */
     @DeleteMapping
     public ResponseEntity<Void> deleteUserPoints() {
+        LOGGER.debug("Deleting all points: {}", pointsByUserAndPasskey);
         pointsByUserAndPasskey.clear();
         return ResponseEntity
             .ok()

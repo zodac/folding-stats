@@ -17,6 +17,7 @@
         <dependency>
             <groupId>me.zodac</groupId>
             <artifactId>folding-stats-api</artifactId>
+            <classifier>${proguard-classifier}</classifier>
         </dependency>
 
         <!-- 3PP Dependencies -->
@@ -28,6 +29,11 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>com.github.wvengen</groupId>
+                <artifactId>proguard-maven-plugin</artifactId>
+            </plugin>
+
             <!-- Execute linters -->
             <plugin>
                 <groupId>org.owasp</groupId>

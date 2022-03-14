@@ -54,23 +54,23 @@ public final class StatsResponseParser {
      * Extracts the points from a {@link HttpResponse} that was received by{@link me.zodac.folding.stats.http.request.PointsUrlBuilder} and
      * {@link StatsRequestSender}. Converts the {@link HttpResponse} to a {@link PointsApiInstance} then extracts the earned points.
      *
-     * @param response the {@link HttpResponse} to parse
+     * @param httpResponse the {@link HttpResponse} to parse
      * @return the points for a user/passkey
      */
-    public static long getPointsFromResponse(final StatsResponse response) {
-        final PointsApiInstance pointsApiInstance = parsePointsResponse(response);
+    public static long getPointsFromResponse(final HttpResponse<String> httpResponse) {
+        final PointsApiInstance pointsApiInstance = parsePointsResponse(httpResponse);
         return pointsApiInstance.getEarned();
     }
 
-    private static PointsApiInstance parsePointsResponse(final StatsResponse response) {
+    private static PointsApiInstance parsePointsResponse(final HttpResponse<String> httpResponse) {
         try {
-            return GSON.fromJson(response.responseBody(), PointsApiInstance.class);
+            return GSON.fromJson(httpResponse.body(), PointsApiInstance.class);
         } catch (final JsonSyntaxException e) {
-            LOGGER.warn("Error parsing the points JSON response from the API: '{}'", response.responseBody(), e);
+            LOGGER.warn("Error parsing the points JSON response from the API: '{}'", httpResponse.body(), e);
             throw e;
         } catch (final Exception e) {
-            LOGGER.warn("Unexpected error parsing points JSON response from the API with status code {}: '{}'", response.statusCode(),
-                response.responseBody(), e);
+            LOGGER.warn("Unexpected error parsing points JSON response from the API with status code {}: '{}'", httpResponse.statusCode(),
+                httpResponse.body(), e);
             throw e;
         }
     }
@@ -80,11 +80,11 @@ public final class StatsResponseParser {
      * {@link StatsRequestSender}. Converts the {@link HttpResponse} to a {@link UnitsApiInstance} then extracts the finished units.
      *
      * @param foldingStatsDetails the Folding@Home username/passkey, used for logging in case of an issue
-     * @param response            the {@link HttpResponse} to parse
+     * @param httpResponse        the {@link HttpResponse} to parse
      * @return the Work Units for a user/passkey
      */
-    public static int getUnitsFromResponse(final FoldingStatsDetails foldingStatsDetails, final StatsResponse response) {
-        final List<UnitsApiInstance> unitsApiInstances = parseUnitsResponse(response);
+    public static int getUnitsFromResponse(final FoldingStatsDetails foldingStatsDetails, final HttpResponse<String> httpResponse) {
+        final List<UnitsApiInstance> unitsApiInstances = parseUnitsResponse(httpResponse);
 
         if (unitsApiInstances.isEmpty()) {
             LOGGER.warn("No valid units found for user/passkey: '{}/{}'", foldingStatsDetails.foldingUserName(), foldingStatsDetails.passkey());
@@ -101,23 +101,23 @@ public final class StatsResponseParser {
             .get(0);
 
         if (unitsApiInstances.size() > EXPECTED_NUMBER_OF_UNIT_RESPONSES) {
-            LOGGER.warn("Too many unit responses returned for user, using {} from response: {}", firstEntry, response.responseBody());
+            LOGGER.warn("Too many unit responses returned for user, using {} from response: {}", firstEntry, httpResponse.body());
         }
 
         return firstEntry.getFinished();
     }
 
-    private static List<UnitsApiInstance> parseUnitsResponse(final StatsResponse response) {
+    private static List<UnitsApiInstance> parseUnitsResponse(final HttpResponse<String> httpResponse) {
         try {
             final Type collectionType = new TypeToken<Collection<UnitsApiInstance>>() {
             }.getType();
-            return GSON.fromJson(response.responseBody(), collectionType);
+            return GSON.fromJson(httpResponse.body(), collectionType);
         } catch (final JsonSyntaxException e) {
-            LOGGER.warn("Error parsing the units JSON response from the API: '{}'", response.responseBody(), e);
+            LOGGER.warn("Error parsing the units JSON response from the API: '{}'", httpResponse.body(), e);
             throw e;
         } catch (final Exception e) {
-            LOGGER.warn("Unexpected error parsing units JSON response from the API with status code {}: '{}'", response.statusCode(),
-                response.responseBody(), e);
+            LOGGER.warn("Unexpected error parsing units JSON response from the API with status code {}: '{}'", httpResponse.statusCode(),
+                httpResponse.body(), e);
             throw e;
         }
     }

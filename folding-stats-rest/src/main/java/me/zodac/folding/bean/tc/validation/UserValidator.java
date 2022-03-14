@@ -42,6 +42,7 @@ import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 import me.zodac.folding.rest.exception.NotFoundException;
+import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -187,8 +188,9 @@ public class UserValidator {
 
     private void validateUserWorkUnits(final UserRequest userRequest) {
         final Stats statsForUserAndPasskey = getStatsForUserAndPasskey(userRequest);
+        LogManager.getLogger().info("Found stats: {}", statsForUserAndPasskey);
 
-        if (statsForUserAndPasskey.getUnits() == 0) {
+        if (statsForUserAndPasskey.getUnits() == Stats.DEFAULT_POINTS) {
             throw new ValidationException(userRequest,
                 String.format("User '%s' has 0 Work Units with passkey '%s', there must be at least one completed Work Unit before adding the user",
                     userRequest.getFoldingUserName(), userRequest.getPasskey()));

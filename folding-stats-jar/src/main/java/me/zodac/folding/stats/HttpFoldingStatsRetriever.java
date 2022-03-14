@@ -40,7 +40,6 @@ import me.zodac.folding.api.util.DateTimeUtils;
 import me.zodac.folding.stats.http.request.PointsUrlBuilder;
 import me.zodac.folding.stats.http.request.StatsRequestUrl;
 import me.zodac.folding.stats.http.request.UnitsUrlBuilder;
-import me.zodac.folding.stats.http.response.StatsResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -91,9 +90,7 @@ public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
         LOGGER.debug("Sending points request to: {}", pointsRequestUrl);
         final HttpResponse<String> response = sendFoldingRequest(pointsRequestUrl);
         LOGGER.debug("Points response: {}", response::body);
-
-        final StatsResponse statsResponse = StatsResponse.create(response);
-        return getPointsFromResponse(statsResponse);
+        return getPointsFromResponse(response);
     }
 
     private static int getUnits(final FoldingStatsDetails foldingStatsDetails) throws ExternalConnectionException {
@@ -105,8 +102,6 @@ public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
         LOGGER.debug("Sending units request to: {}", unitsRequestUrl);
         final HttpResponse<String> response = sendFoldingRequest(unitsRequestUrl);
         LOGGER.debug("Units response: {}", response::body);
-
-        final StatsResponse statsResponse = StatsResponse.create(response);
-        return getUnitsFromResponse(foldingStatsDetails, statsResponse);
+        return getUnitsFromResponse(foldingStatsDetails, response);
     }
 }

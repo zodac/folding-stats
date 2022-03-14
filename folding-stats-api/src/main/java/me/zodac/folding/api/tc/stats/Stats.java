@@ -42,12 +42,12 @@ public class Stats {
     /**
      * Initial value for points.
      */
-    protected static final long DEFAULT_POINTS = 0L;
+    public static final long DEFAULT_POINTS = 0L;
 
     /**
      * Initial value for units.
      */
-    protected static final int DEFAULT_UNITS = 0;
+    public static final int DEFAULT_UNITS = 0;
 
     private final long points;
     private final int units;

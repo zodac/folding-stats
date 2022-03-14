@@ -36,6 +36,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -60,6 +62,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/bonus")
 public class StubbedUnitsEndpoint {
 
+    private static final Logger LOGGER = LogManager.getLogger();
     private static final int NO_UNITS = 0;
 
     private final Map<String, Integer> unitsByUserAndPasskey = new HashMap<>();
@@ -74,6 +77,7 @@ public class StubbedUnitsEndpoint {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<UnitsResponse>> getUserUnits(@RequestParam("user") final String foldingUserName,
                                                                   @RequestParam("passkey") final String passkey) {
+        LOGGER.debug("Getting units for '{}:{}'", foldingUserName, passkey);
         return ResponseEntity
             .ok()
             .body(createResponse(foldingUserName, passkey));
@@ -94,6 +98,7 @@ public class StubbedUnitsEndpoint {
     public ResponseEntity<Void> updateUserUnits(@RequestParam("user") final String foldingUserName,
                                                 @RequestParam("passkey") final String passkey,
                                                 @RequestParam("units") final int units) {
+        LOGGER.debug("Adding {} units for '{}:{}'", units, foldingUserName, passkey);
         final String key = foldingUserName + passkey;
 
         if (units == NO_UNITS) {
@@ -115,6 +120,7 @@ public class StubbedUnitsEndpoint {
      */
     @DeleteMapping
     public ResponseEntity<Void> deleteUserUnits() {
+        LOGGER.debug("Deleting all units: {}", unitsByUserAndPasskey);
         unitsByUserAndPasskey.clear();
         return ResponseEntity
             .ok()

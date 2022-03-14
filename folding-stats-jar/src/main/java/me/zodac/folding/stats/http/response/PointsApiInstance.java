@@ -24,6 +24,7 @@
 
 package me.zodac.folding.stats.http.response;
 
+import com.google.gson.annotations.SerializedName;
 import java.util.Comparator;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -56,6 +57,7 @@ import lombok.ToString;
 @ToString(doNotUseGetters = true)
 class PointsApiInstance implements Comparable<PointsApiInstance> {
 
+    @SerializedName("earned")
     private long earned;
 
     @Override

@@ -12,15 +12,21 @@
     <artifactId>folding-stats-rest</artifactId>
     <name>[${project.parent.artifactId}] REST module</name>
 
+    <properties>
+        <main-class>me.zodac.folding.FoldingStatsApplication</main-class>
+    </properties>
+
     <dependencies>
         <!-- Project Dependencies -->
         <dependency>
             <groupId>me.zodac</groupId>
             <artifactId>folding-stats-api</artifactId>
+            <classifier>${proguard-classifier}</classifier>
         </dependency>
         <dependency>
             <groupId>me.zodac</groupId>
             <artifactId>folding-stats-jar</artifactId>
+            <classifier>${proguard-classifier}</classifier>
         </dependency>
 
         <!-- 3PP Dependencies -->
@@ -102,7 +108,6 @@
                         </execution>
                     </executions>
                     <configuration>
-                        <!--suppress UnresolvedMavenProperty Value may not be configured, optional -->
                         <mainClass>${main-class}</mainClass>
                     </configuration>
                 </plugin>
