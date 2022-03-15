@@ -225,18 +225,6 @@
                 <artifactId>spring-boot-starter-web</artifactId>
                 <version>${spring-boot.version}</version>
             </dependency>
-            <!-- Due to CVE-2022-23181 with tomcat-embed-websocket:9.0.56 in spring-boot-starter-web -->
-            <!-- Remove this dependency when the above dependency is updated -->
-            <dependency>
-                <groupId>org.apache.tomcat.embed</groupId>
-                <artifactId>tomcat-embed-core</artifactId>
-                <version>9.0.58</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.tomcat.embed</groupId>
-                <artifactId>tomcat-embed-websocket</artifactId>
-                <version>9.0.58</version>
-            </dependency>
 
             <!-- Test Dependencies -->
             <dependency>
