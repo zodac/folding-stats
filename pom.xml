@@ -23,7 +23,7 @@
 
         <!-- License Properties -->
         <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
-        <license-file>${project.parent.basedir}/license-template.txt</license-file>
+        <license-file>${project.parent.basedir}/ci/license-template.txt</license-file>
 
         <!-- Lint Properties -->
         <skip-linters>true</skip-linters>
