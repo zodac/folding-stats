@@ -9,8 +9,8 @@
         <version>2.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>testsuite</artifactId>
-    <name>[${project.parent.artifactId}] TestSuite module</name>
+    <artifactId>testsuite-integration</artifactId>
+    <name>[${project.parent.artifactId}] Integration TestSuite module</name>
 
     <dependencies>
         <!-- Project Dependencies -->
