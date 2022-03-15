@@ -7,26 +7,26 @@ function showToast(id, autohide) {
                 delay: 3000 // 3 seconds
             }
         )
-        .show();
+        .show()
 }
 
 function closeToast(id) {
     new bootstrap
         .Toast(document.getElementById(id))
-        .dispose();
+        .dispose()
 }
 
 function successToast(text){
-    document.getElementById("toast-success-text").innerHTML = escape(text);
-    showToast("toast-success", true);
+    document.getElementById("toast-success-text").innerHTML = escape(text)
+    showToast("toast-success", true)
 }
 
 function failureToast(text){
-    document.getElementById("toast-failure-text").innerHTML = escape(text);
-    showToast("toast-failure", true);
+    document.getElementById("toast-failure-text").innerHTML = escape(text)
+    showToast("toast-failure", true)
 }
 
 function failureToastPermanent(text){
-    document.getElementById("toast-failure-text").innerHTML = escape(text);
-    showToast("toast-failure", false);
+    document.getElementById("toast-failure-text").innerHTML = escape(text)
+    showToast("toast-failure", false)
 }

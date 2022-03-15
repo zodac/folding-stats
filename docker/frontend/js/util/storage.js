@@ -1,23 +1,23 @@
 function localGet(propertyName) {
-    return localStorage.getItem(propertyName);
+    return localStorage.getItem(propertyName)
 }
 
 function localSet(propertyName, propertyValue) {
-    localStorage.setItem(propertyName, propertyValue);
+    localStorage.setItem(propertyName, propertyValue)
 }
 
 function localContains(propertyName) {
-    return localGet(propertyName) !== null;
+    return localGet(propertyName) !== null
 }
 
 function sessionGet(propertyName) {
-    return sessionStorage.getItem(propertyName);
+    return sessionStorage.getItem(propertyName)
 }
 
 function sessionSet(propertyName, propertyValue) {
-    sessionStorage.setItem(propertyName, propertyValue);
+    sessionStorage.setItem(propertyName, propertyValue)
 }
 
 function sessionContains(propertyName) {
-    return sessionGet(propertyName) !== null;
+    return sessionGet(propertyName) !== null
 }

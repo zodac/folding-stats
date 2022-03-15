@@ -75,5 +75,5 @@ function updateTimer() {
     }
 
     // We want to check every 1s regardless of whether we're in the update period or not
-    setTimeout(updateTimer, 1000 - (new Date()).getUTCMilliseconds());
+    setTimeout(updateTimer, 1000 - (new Date()).getUTCMilliseconds())
 }

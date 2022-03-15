@@ -1,89 +1,89 @@
 function getCategoryFrontend(value) {
     if (value.toLowerCase() === "amd_gpu") {
-        return "AMD GPU";
+        return "AMD GPU"
     }
 
     if (value.toLowerCase() === "nvidia_gpu") {
-        return "nVidia GPU";
+        return "nVidia GPU"
     }
 
     if (value.toLowerCase() === "wildcard") {
-        return "Wildcard";
+        return "Wildcard"
     }
 
-    return value;
+    return value
 }
 
 function getCategoryBackend(value) {
     if (value.toLowerCase() === "amd gpu") {
-        return "amd_gpu";
+        return "amd_gpu"
     }
 
     if (value.toLowerCase() === "nvidia gpu") {
-        return "nvidia_gpu";
+        return "nvidia_gpu"
     }
 
     if (value.toLowerCase() === "wildcard") {
-        return "wildcard";
+        return "wildcard"
     }
 
-    return value;
+    return value
 }
 
 function getHardwareMakeFrontend(value) {
     if (value.toLowerCase() === "amd") {
-        return "AMD";
+        return "AMD"
     }
 
     if (value.toLowerCase() === "nvidia") {
-        return "nVidia";
+        return "nVidia"
     }
 
     if (value.toLowerCase() === "intel") {
-        return "Intel";
+        return "Intel"
     }
 
-    return value;
+    return value
 }
 
 function getHardwareMakeBackend(value) {
     if (value.toLowerCase() === "amd gpu") {
-        return "AMD";
+        return "AMD"
     }
 
     if (value.toLowerCase() === "nvidia") {
-        return "NVIDIA";
+        return "NVIDIA"
     }
 
     if (value.toLowerCase() === "intel") {
-        return "INTEL";
+        return "INTEL"
     }
 
-    return value;
+    return value
 }
 
 function getHardwareTypeFrontend(value) {
     if (value.toLowerCase() === "gpu") {
-        return "GPU";
+        return "GPU"
     }
 
     if (value.toLowerCase() === "cpu") {
-        return "CPU";
+        return "CPU"
     }
 
-    return value;
+    return value
 }
 
 function getHardwareTypeBackend(value) {
     if (value.toLowerCase() === "gpu") {
-        return "GPU";
+        return "GPU"
     }
 
     if (value.toLowerCase() === "cpu") {
-        return "CPU";
+        return "CPU"
     }
 
-    return value;
+    return value
 }
 
 function getUserChangeStateFrontend(value) {
@@ -111,16 +111,16 @@ function getUserChangeStateFrontend(value) {
         return "Completed"
     }
 
-    return value;
+    return value
 }
 
 function nextMonth() {
-    var now = new Date();
+    var now = new Date()
     if (now.getUTCMonth() == 11) {
-        var current = new Date(now.getUTCFullYear() + 1, 0, 1);
+        var current = new Date(now.getUTCFullYear() + 1, 0, 1)
     } else {
-        var current = new Date(now.getUTCFullYear(), now.getUTCMonth() + 1, 1);
+        var current = new Date(now.getUTCFullYear(), now.getUTCMonth() + 1, 1)
     }
 
-    return current.toLocaleString("default", { month: "long" });
+    return current.toLocaleString("default", { month: "long" })
 }

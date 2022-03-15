@@ -5,20 +5,20 @@ function sortJsonByKey(key) {
 
         if (isNaN(firstVal) || isNaN(secondVal)){
             if (firstVal > secondVal) {
-                return 1;
+                return 1
             }
             if (firstVal < secondVal) {
-                return -1;
+                return -1
             }
-            return 0;
+            return 0
         } else {
             if (parseInt(firstVal) > parseInt(secondVal)) {
-                return 1;
+                return 1
             }
             if (parseInt(firstVal) < parseInt(secondVal)) {
-                return -1;
+                return -1
             }
-            return 0;
+            return 0
         }
     }
 }
