@@ -24,14 +24,12 @@
 
 package me.zodac.folding.rest;
 
-import static me.zodac.folding.api.util.DateTimeUtils.untilNextMonthUtc;
 import static me.zodac.folding.rest.response.Responses.cachedOk;
 import static me.zodac.folding.rest.response.Responses.created;
 import static me.zodac.folding.rest.response.Responses.ok;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
-import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -132,7 +130,7 @@ public class UserEndpoint {
     public ResponseEntity<?> getAll(final HttpServletRequest request) {
         AUDIT_LOGGER.debug("GET request received for all users without passkeys at '{}'", request::getRequestURI);
         final Collection<User> elements = foldingRepository.getAllUsersWithoutPasskeys();
-        return cachedOk(elements, untilNextMonthUtc(ChronoUnit.SECONDS));
+        return cachedOk(elements);
     }
 
     /**
@@ -147,7 +145,7 @@ public class UserEndpoint {
     public ResponseEntity<?> getAllWithPasskeys(final HttpServletRequest request) {
         AUDIT_LOGGER.info("GET request received for all users with passkeys at '{}'", request::getRequestURI);
         final Collection<User> elements = foldingRepository.getAllUsersWithPasskeys();
-        return cachedOk(elements, untilNextMonthUtc(ChronoUnit.SECONDS));
+        return cachedOk(elements);
     }
 
     /**
@@ -155,7 +153,7 @@ public class UserEndpoint {
      *
      * @param userId  the ID of the {@link User} to retrieve
      * @param request the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#cachedOk(Object, long)} containing the {@link User}
+     * @return {@link me.zodac.folding.rest.response.Responses#cachedOk(Object)} containing the {@link User}
      */
     @ReadRequired
     @PermitAll
@@ -164,7 +162,7 @@ public class UserEndpoint {
         AUDIT_LOGGER.debug("GET request for user received at '{}'", request::getRequestURI);
 
         final User element = foldingRepository.getUserWithoutPasskey(userId);
-        return cachedOk(element, untilNextMonthUtc(ChronoUnit.SECONDS));
+        return cachedOk(element);
     }
 
     /**
@@ -172,7 +170,7 @@ public class UserEndpoint {
      *
      * @param userId  the ID of the {@link User} to retrieve
      * @param request the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#cachedOk(Object, long)} containing the {@link User}
+     * @return {@link me.zodac.folding.rest.response.Responses#cachedOk(Object)} containing the {@link User}
      */
     @ReadRequired
     @RolesAllowed("admin")
@@ -181,7 +179,7 @@ public class UserEndpoint {
         AUDIT_LOGGER.info("GET request for user with passkey received at '{}'", request::getRequestURI);
 
         final User element = foldingRepository.getUserWithPasskey(userId);
-        return cachedOk(element, untilNextMonthUtc(ChronoUnit.SECONDS));
+        return cachedOk(element);
     }
 
     /**

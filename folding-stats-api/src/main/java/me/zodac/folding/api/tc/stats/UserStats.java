@@ -37,6 +37,8 @@ import me.zodac.folding.api.util.DateTimeUtils;
 @ToString(doNotUseGetters = true, callSuper = true)
 public class UserStats extends Stats {
 
+    private static final DateTimeUtils DATE_TIME_UTILS = DateTimeUtils.create();
+
     private final int userId;
     private final Timestamp timestamp;
 
@@ -68,13 +70,25 @@ public class UserStats extends Stats {
     }
 
     /**
+     * Creates an instance of {@link UserStats}.
+     *
+     * @param userId the ID of the {@link User}
+     * @param points the points
+     * @param units  the units
+     * @return the created {@link UserStats}
+     */
+    public static UserStats createNow(final int userId, final long points, final int units) {
+        return create(userId, DATE_TIME_UTILS.currentUtcTimestamp(), points, units);
+    }
+
+    /**
      * Creates an empty instance of {@link UserStats}, with no values. Can be used where no stats are necessary, but
      * an {@link java.util.Optional} is not clean enough.
      *
      * @return the empty {@link UserStats}
      */
     public static UserStats empty() {
-        return create(User.EMPTY_USER_ID, DateTimeUtils.currentUtcTimestamp(), Stats.DEFAULT_POINTS, Stats.DEFAULT_UNITS);
+        return create(User.EMPTY_USER_ID, DATE_TIME_UTILS.currentUtcTimestamp(), Stats.DEFAULT_POINTS, Stats.DEFAULT_UNITS);
     }
 
     /**

@@ -51,7 +51,7 @@ import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
-import me.zodac.folding.api.util.DateTimeUtils;
+import me.zodac.folding.api.util.DateTimeConverterUtils;
 import me.zodac.folding.rest.api.tc.TeamSummary;
 import me.zodac.folding.rest.api.tc.UserSummary;
 import me.zodac.folding.rest.api.tc.leaderboard.TeamLeaderboardEntry;
@@ -231,7 +231,7 @@ class PostgresDbManagerTest {
 
         final long points = 100L;
         final int units = 10;
-        POSTGRES_DB_MANAGER.createInitialStats(UserStats.create(userId, DateTimeUtils.currentUtcTimestamp(), points, units));
+        POSTGRES_DB_MANAGER.createInitialStats(UserStats.createNow(userId, points, units));
 
         final Optional<UserStats> userStatsAfterUpdate = POSTGRES_DB_MANAGER.getInitialStats(userId);
         assertThat(userStatsAfterUpdate)
@@ -251,7 +251,7 @@ class PostgresDbManagerTest {
 
         final long points = 100L;
         final int units = 10;
-        POSTGRES_DB_MANAGER.createTotalStats(UserStats.create(userId, DateTimeUtils.currentUtcTimestamp(), points, units));
+        POSTGRES_DB_MANAGER.createTotalStats(UserStats.createNow(userId, points, units));
 
         final Optional<UserStats> userStatsAfterUpdate = POSTGRES_DB_MANAGER.getTotalStats(userId);
         assertThat(userStatsAfterUpdate)
@@ -277,7 +277,7 @@ class PostgresDbManagerTest {
         final int units = 5;
 
         final RetiredUserTcStats initialRetiredUserTcStats = RetiredUserTcStats.createWithoutId(team.getId(), userToRetire.getDisplayName(),
-            UserTcStats.create(userToRetire.getId(), DateTimeUtils.currentUtcTimestamp(), points, multipliedPoints, units));
+            UserTcStats.createNow(userToRetire.getId(), points, multipliedPoints, units));
         POSTGRES_DB_MANAGER.createRetiredUserStats(initialRetiredUserTcStats);
 
         final Collection<RetiredUserTcStats> retiredUserStats = POSTGRES_DB_MANAGER.getAllRetiredUserStats();
@@ -358,7 +358,7 @@ class PostgresDbManagerTest {
         final long points = 100L;
         final long multipliedPoints = 1_000L;
         final int units = 5;
-        final UserTcStats userTcStats = UserTcStats.create(userId, DateTimeUtils.currentUtcTimestamp(), points, multipliedPoints, units);
+        final UserTcStats userTcStats = UserTcStats.createNow(userId, points, multipliedPoints, units);
         POSTGRES_DB_MANAGER.createHourlyTcStats(userTcStats);
 
         final Optional<UserTcStats> retrievedUserTcStats = POSTGRES_DB_MANAGER.getHourlyTcStats(userId);
@@ -390,23 +390,23 @@ class PostgresDbManagerTest {
         final long currentDayFirstMultipliedPoints = 2_000L;
         final int currentDayFirstUnits = 10;
         final UserTcStats currentDayFirstUserTcStats = UserTcStats
-            .create(userId, DateTimeUtils.getTimestampOf(year, month, yesterday, 0, 0, 0), currentDayFirstPoints, currentDayFirstMultipliedPoints,
-                currentDayFirstUnits);
+            .create(userId, DateTimeConverterUtils.getTimestampOf(year, month, yesterday, 0, 0, 0), currentDayFirstPoints,
+                currentDayFirstMultipliedPoints, currentDayFirstUnits);
         POSTGRES_DB_MANAGER.createHourlyTcStats(currentDayFirstUserTcStats);
 
         final long currentDaySecondPoints = 300L;
         final long currentDaySecondMultipliedPoints = 3_000L;
         final int currentDaySecondUnits = 15;
         final UserTcStats currentDaySecondUserTcStats = UserTcStats
-            .create(userId, DateTimeUtils.getTimestampOf(year, month, yesterday, 1, 0, 0), currentDaySecondPoints, currentDaySecondMultipliedPoints,
-                currentDaySecondUnits);
+            .create(userId, DateTimeConverterUtils.getTimestampOf(year, month, yesterday, 1, 0, 0), currentDaySecondPoints,
+                currentDaySecondMultipliedPoints, currentDaySecondUnits);
         POSTGRES_DB_MANAGER.createHourlyTcStats(currentDaySecondUserTcStats);
 
         final long currentDayThirdPoints = 300L;
         final long currentDayThirdMultipliedPoints = 3_000L;
         final int currentDayThirdUnits = 15;
         final UserTcStats currentDayThirdUserTcStats = UserTcStats
-            .create(userId, DateTimeUtils.getTimestampOf(year, month, day, 1, 0, 0), currentDayThirdPoints, currentDayThirdMultipliedPoints,
+            .create(userId, DateTimeConverterUtils.getTimestampOf(year, month, day, 1, 0, 0), currentDayThirdPoints, currentDayThirdMultipliedPoints,
                 currentDayThirdUnits);
         POSTGRES_DB_MANAGER.createHourlyTcStats(currentDayThirdUserTcStats);
 
@@ -448,7 +448,7 @@ class PostgresDbManagerTest {
                 Category.NVIDIA_GPU, Collections.emptyList(),
                 Category.WILDCARD, Collections.emptyList()
             ),
-            DateTimeUtils.getLocalDateTimeOf(firstResultYear, firstResultMonth)
+            DateTimeConverterUtils.getLocalDateTimeOf(firstResultYear, firstResultMonth)
         );
         POSTGRES_DB_MANAGER.createMonthlyResult(firstResult);
 
@@ -480,7 +480,7 @@ class PostgresDbManagerTest {
                 Category.AMD_GPU, Collections.emptyList(),
                 Category.WILDCARD, Collections.emptyList()
             ),
-            DateTimeUtils.getLocalDateTimeOf(secondResultYear, secondResultMonth)
+            DateTimeConverterUtils.getLocalDateTimeOf(secondResultYear, secondResultMonth)
         );
         POSTGRES_DB_MANAGER.createMonthlyResult(secondResult);
 

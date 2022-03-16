@@ -26,8 +26,10 @@ package me.zodac.folding.rest.response;
 
 import static me.zodac.folding.rest.util.RestUtilConstants.GSON;
 
+import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
+import me.zodac.folding.api.util.DateTimeUtils;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -38,6 +40,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
  * Utility class to simplify returning a {@link ResponseEntity} in the REST layer.
  */
 public final class Responses {
+
+    private static final DateTimeUtils DATE_TIME_UTILS = DateTimeUtils.create();
 
     private Responses() {
 
@@ -112,19 +116,35 @@ public final class Responses {
      *
      * <p>
      * Generally used for cases where an HTTP request is sent to request something from the system, but no response is
-     * required, such as a delete request, for example.
+     * required, such as a delete request, for example. Will cache the response until the start of the next UTC month.
      *
-     * @param entity               the entity being retrieved
-     * @param cachePeriodInSeconds the cache period for the entity in seconds
-     * @param <E>                  the response body type
+     * @param entity the entity being retrieved
+     * @param <E>    the response body type
      * @return the <b>200_OK</b> {@link ResponseEntity}
+     * @see DateTimeUtils#untilNextMonthUtc(ChronoUnit)
      */
-    public static <E> ResponseEntity<String> cachedOk(final E entity, final long cachePeriodInSeconds) {
+    public static <E> ResponseEntity<String> cachedOk(final E entity) {
         return ResponseEntity
             .ok()
-            .cacheControl(CacheControl.maxAge(cachePeriodInSeconds, TimeUnit.SECONDS))
+            .cacheControl(CacheControl.maxAge(DATE_TIME_UTILS.untilNextMonthUtc(ChronoUnit.SECONDS), TimeUnit.SECONDS))
             .eTag(String.valueOf(entity.hashCode()))
             .body(GSON.toJson(entity));
+    }
+
+    /**
+     * A <b>200_OK</b> {@link ResponseEntity}.
+     *
+     * <p>
+     * Generally used for cases where an HTTP request is sent to retrieve a {@link Collection} of {@link me.zodac.folding.api.ResponsePojo} resources.
+     * Will cache the response until the start of the next UTC month.
+     *
+     * @param entities the {@link Collection} of entities being retrieved
+     * @param <E>      the response body type
+     * @return the <b>200_OK</b> {@link ResponseEntity}
+     * @see DateTimeUtils#untilNextMonthUtc(ChronoUnit)
+     */
+    public static <E> ResponseEntity<String> cachedOk(final Collection<E> entities) {
+        return cachedOk(entities, DATE_TIME_UTILS.untilNextMonthUtc(ChronoUnit.SECONDS));
     }
 
     /**
@@ -137,6 +157,7 @@ public final class Responses {
      * @param cachePeriodInSeconds the cache period for the entity in seconds
      * @param <E>                  the response body type
      * @return the <b>200_OK</b> {@link ResponseEntity}
+     * @see DateTimeUtils#untilNextMonthUtc(ChronoUnit)
      */
     public static <E> ResponseEntity<String> cachedOk(final Collection<E> entities, final long cachePeriodInSeconds) {
         return ResponseEntity
@@ -173,22 +194,6 @@ public final class Responses {
             .status(httpStatus)
             .header(HttpHeaders.LOCATION, location)
             .body(GSON.toJson(entity));
-    }
-
-    /**
-     * A <b>400_BAD_REQUEST</b> {@link ResponseEntity}.
-     *
-     * <p>
-     * Generally used for cases where the REST request has some invalid data. This can be malformed data, or an
-     * invalid payload, or any other similar error.
-     *
-     * @param errorMessage an error message defining what part of the input payload caused the error
-     * @return the <b>400_BAD_REQUEST</b> {@link ResponseEntity}
-     */
-    public static ResponseEntity<String> badRequest(final String errorMessage) {
-        return ResponseEntity
-            .badRequest()
-            .body(GSON.toJson(ErrorResponse.create(errorMessage)));
     }
 
     /**

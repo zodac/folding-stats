@@ -32,116 +32,36 @@ import java.time.OffsetDateTime;
 import java.time.Year;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.Locale;
+import java.util.function.Supplier;
 
 /**
- * Utility class with convenient date/time-based functions.
+ * Convenience class with convenient date/time-based functions.
  */
-public final class DateTimeUtils {
-
-    private DateTimeUtils() {
-
-    }
+public record DateTimeUtils(Supplier<OffsetDateTime> timeSupplier) {
 
     /**
-     * Calculates the number of {@link ChronoUnit}s between the {@link #currentUtcDateTime()} and the start of next {@link Month}.
+     * Creates a {@link DateTimeUtils} with a default {@link Supplier} for the current UTC time.
      *
-     * @param chronoUnit the {@link ChronoUnit} of the response
-     * @return the number of {@link ChronoUnit}s until <code>00:00:000</code> {@link ZoneOffset#UTC} of the 1st of next {@link Month}
+     * @return the created {@link DateTimeUtils}
      */
-    public static long untilNextMonthUtc(final ChronoUnit chronoUnit) {
-        final int currentMonth = currentUtcMonth().getValue();
-        final int nextMonth = currentMonth == 12 ? 1 : (currentMonth + 1);
-        final int currentYear = currentUtcYear().getValue();
-        final int nextMonthYear = currentMonth == 12 ? (currentYear + 1) : currentYear;
-
-        final String nextMonthAsDate = String.format("%s-%02d-01T00:00:00Z", nextMonthYear, nextMonth);
-
-        return chronoUnit.between(
-            Instant.now().atZone(ZoneOffset.UTC),
-            Instant.parse(nextMonthAsDate).atZone(ZoneOffset.UTC)
-        );
+    public static DateTimeUtils create() {
+        return new DateTimeUtils(() -> OffsetDateTime.now(ZoneOffset.UTC));
     }
 
     /**
-     * Formats the input {@link Month} with correct capitalisation, based on {@link Locale#UK}.
+     * Creates a {@link DateTimeUtils} with the provided {@link Supplier} for the current UTC time.
      *
      * <p>
-     * <b>NOTE:</b> This should only be used for logging. Any values making it to the frontend should be formatted there,
-     * otherwise we may end up formatting with the incorrect style.
+     * Required to allow for testing since we cannot reliable unit test functions that use the actual current time, and instead need to supply a test
+     * time that can be asserted against.
      *
-     * @param month the {@link Month} to be formatted
-     * @return the formatted {@link Month}
-     */
-    public static String formatMonth(final Month month) {
-        final String monthAsString = month.toString();
-        return monthAsString.substring(0, 1).toUpperCase(Locale.UK) + monthAsString.substring(1).toLowerCase(Locale.UK);
-    }
-
-    /**
-     * Get the {@link LocalDateTime} for the given values.
+     * <p>
+     * Should not be used outside of tests unless absolutely necessary.
      *
-     * @param year   the {@link Year}
-     * @param month  the {@link Month}
-     * @param day    the day of the {@link Month}
-     * @param hour   the hour
-     * @param minute the minute
-     * @param second the second
-     * @return the {@link LocalDateTime}
+     * @return the created {@link DateTimeUtils}
      */
-    public static LocalDateTime getLocalDateTimeOf(final Year year, final Month month, final int day, final int hour, final int minute,
-                                                   final int second) {
-        return LocalDateTime.of(year.getValue(), month.getValue(), day, hour, minute, second);
-    }
-
-    /**
-     * Get the {@link LocalDateTime} for the given values.
-     *
-     * @param year  the {@link Year}
-     * @param month the {@link Month}
-     * @return the {@link LocalDateTime}
-     */
-    public static LocalDateTime getLocalDateTimeOf(final Year year, final Month month) {
-        return LocalDateTime.of(year.getValue(), month.getValue(), 1, 0, 0, 0);
-    }
-
-    /**
-     * Get the {@link Timestamp} in {@link ZoneOffset#UTC} for the given values.
-     *
-     * @param year   the {@link Year}
-     * @param month  the {@link Month}
-     * @param day    the day of the {@link Month}
-     * @param hour   the hour
-     * @param minute the minute
-     * @param second the second
-     * @return the {@link ZoneOffset#UTC} {@link Timestamp}
-     */
-    public static Timestamp getTimestampOf(final Year year, final Month month, final int day, final int hour, final int minute, final int second) {
-        return toTimestamp(LocalDateTime.of(year.getValue(), month.getValue(), day, hour, minute, second));
-    }
-
-    /**
-     * Convert the given {@link LocalDateTime} into a {@link Timestamp} in {@link ZoneOffset#UTC}.
-     *
-     * @param localDateTime the {@link LocalDateTime} to convert
-     * @return the {@link ZoneOffset#UTC} {@link Timestamp}
-     */
-    public static Timestamp toTimestamp(final LocalDateTime localDateTime) {
-        return new Timestamp(localDateTime.toInstant(ZoneOffset.UTC).toEpochMilli());
-    }
-
-    /**
-     * Convert the given {@link Timestamp} into a {@link LocalDateTime} in {@link ZoneOffset#UTC}.
-     *
-     * @param date the {@link Date} to convert
-     * @return the {@link ZoneOffset#UTC} {@link LocalDateTime}
-     */
-    public static LocalDateTime toUtcLocalDateTime(final Date date) {
-        return date
-            .toInstant()
-            .atOffset(ZoneOffset.UTC)
-            .toLocalDateTime();
+    static DateTimeUtils createWithSupplier(final Supplier<OffsetDateTime> timeSupplier) {
+        return new DateTimeUtils(timeSupplier);
     }
 
     /**
@@ -149,7 +69,7 @@ public final class DateTimeUtils {
      *
      * @return the current {@link ZoneOffset#UTC} {@link LocalDateTime}
      */
-    public static LocalDateTime currentUtcLocalDateTime() {
+    public LocalDateTime currentUtcLocalDateTime() {
         return currentUtcDateTime().toLocalDateTime();
     }
 
@@ -158,17 +78,8 @@ public final class DateTimeUtils {
      *
      * @return the current {@link ZoneOffset#UTC} {@link Timestamp}
      */
-    public static Timestamp currentUtcTimestamp() {
+    public Timestamp currentUtcTimestamp() {
         return new Timestamp(currentUtcDateTime().toInstant().toEpochMilli());
-    }
-
-    /**
-     * Get the current {@link Month} in {@link ZoneOffset#UTC}.
-     *
-     * @return the current {@link ZoneOffset#UTC} {@link Month}
-     */
-    public static Month currentUtcMonth() {
-        return currentUtcDateTime().toLocalDate().getMonth();
     }
 
     /**
@@ -176,16 +87,40 @@ public final class DateTimeUtils {
      *
      * @return the current {@link ZoneOffset#UTC} {@link Year}
      */
-    public static Year currentUtcYear() {
-        return Year.now(ZoneOffset.UTC);
+    public Year currentUtcYear() {
+        return Year.from(currentUtcDateTime());
     }
 
     /**
-     * Get the current {@link OffsetDateTime} in {@link ZoneOffset#UTC}.
+     * Get the current {@link Month} in {@link ZoneOffset#UTC}.
      *
-     * @return the current {@link ZoneOffset#UTC} {@link OffsetDateTime}
+     * @return the current {@link ZoneOffset#UTC} {@link Month}
      */
-    public static OffsetDateTime currentUtcDateTime() {
-        return OffsetDateTime.now(ZoneOffset.UTC);
+    public Month currentUtcMonth() {
+        return currentUtcDateTime().toLocalDate().getMonth();
+    }
+
+    /**
+     * Calculates the number of {@link ChronoUnit}s between the {@link #currentUtcDateTime()} and the start of next {@link Month}.
+     *
+     * @param chronoUnit the {@link ChronoUnit} of the response
+     * @return the number of {@link ChronoUnit}s until <code>00:00:000</code> {@link ZoneOffset#UTC} of the 1st of next {@link Month}
+     */
+    public long untilNextMonthUtc(final ChronoUnit chronoUnit) {
+        final int currentMonth = currentUtcMonth().getValue();
+        final int nextMonth = currentMonth == 12 ? 1 : (currentMonth + 1);
+        final int currentYear = currentUtcYear().getValue();
+        final int nextMonthYear = currentMonth == 12 ? (currentYear + 1) : currentYear;
+
+        final String nextMonthAsDate = String.format("%s-%02d-01T00:00:00Z", nextMonthYear, nextMonth);
+
+        return chronoUnit.between(
+            currentUtcDateTime().toInstant(),
+            Instant.parse(nextMonthAsDate).atZone(ZoneOffset.UTC)
+        );
+    }
+
+    private OffsetDateTime currentUtcDateTime() {
+        return timeSupplier.get();
     }
 }

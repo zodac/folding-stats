@@ -24,6 +24,7 @@
 
 package me.zodac.folding.db.postgres;
 
+import static me.zodac.folding.api.util.DateTimeConverterUtils.formatMonth;
 import static me.zodac.folding.db.postgres.RecordConverter.GSON;
 import static me.zodac.folding.db.postgres.gen.Routines.crypt;
 import static me.zodac.folding.db.postgres.gen.tables.Hardware.HARDWARE;
@@ -73,6 +74,7 @@ import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
+import me.zodac.folding.api.util.DateTimeConverterUtils;
 import me.zodac.folding.api.util.DateTimeUtils;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import org.apache.logging.log4j.LogManager;
@@ -89,6 +91,7 @@ import org.jooq.impl.DSL;
  */
 public final class PostgresDbManager implements DbManager {
 
+    private static final DateTimeUtils DATE_TIME_UTILS = DateTimeUtils.create();
     private static final Logger SQL_LOGGER = LogManager.getLogger("sql");
     private static final int SINGLE_RESULT = 1;
 
@@ -486,7 +489,7 @@ public final class PostgresDbManager implements DbManager {
     }
 
     private List<UserChange> getAllUserChangesWithStateForPastMonths(final Collection<UserChangeState> states, final int numberOfMonths) {
-        final LocalDateTime toTime = DateTimeUtils.currentUtcLocalDateTime();
+        final LocalDateTime toTime = DATE_TIME_UTILS.currentUtcLocalDateTime();
         final LocalDateTime fromTime = toTime.minusMonths(numberOfMonths);
 
         return executeQuery(queryContext -> {
@@ -561,7 +564,7 @@ public final class PostgresDbManager implements DbManager {
                 )
                 .values(
                     userTcStats.getUserId(),
-                    DateTimeUtils.toUtcLocalDateTime(userTcStats.getTimestamp()),
+                    DateTimeConverterUtils.toUtcLocalDateTime(userTcStats.getTimestamp()),
                     userTcStats.getPoints(),
                     userTcStats.getMultipliedPoints(),
                     userTcStats.getUnits()
@@ -603,7 +606,7 @@ public final class PostgresDbManager implements DbManager {
 
     @Override
     public Collection<HistoricStats> getHistoricStatsHourly(final int userId, final Year year, final Month month, final int day) {
-        SQL_LOGGER.info("Getting historic hourly user TC stats for {}/{}/{} for user {}", () -> year, () -> DateTimeUtils.formatMonth(month),
+        SQL_LOGGER.info("Getting historic hourly user TC stats for {}/{}/{} for user {}", () -> year, () -> formatMonth(month),
             () -> day,
             () -> userId);
 
@@ -620,8 +623,8 @@ public final class PostgresDbManager implements DbManager {
         try (final Connection connection = dataSource.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
 
-            preparedStatement.setTimestamp(1, DateTimeUtils.getTimestampOf(year, month, day, 0, 0, 0));
-            preparedStatement.setTimestamp(2, DateTimeUtils.getTimestampOf(year, month, day, 23, 59, 59));
+            preparedStatement.setTimestamp(1, DateTimeConverterUtils.getTimestampOf(year, month, day, 0, 0, 0));
+            preparedStatement.setTimestamp(2, DateTimeConverterUtils.getTimestampOf(year, month, day, 23, 59, 59));
             preparedStatement.setInt(3, userId);
 
             SQL_LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
@@ -658,7 +661,7 @@ public final class PostgresDbManager implements DbManager {
                 return userStats;
             }
         } catch (final DatabaseConnectionException e) {
-            SQL_LOGGER.warn("Unable to get the stats for the first hour of {}/{}/{} for user {}", year, DateTimeUtils.formatMonth(month), day,
+            SQL_LOGGER.warn("Unable to get the stats for the first hour of {}/{}/{} for user {}", year, formatMonth(month), day,
                 userId);
             throw e;
         } catch (final SQLException e) {
@@ -671,8 +674,8 @@ public final class PostgresDbManager implements DbManager {
             () -> day);
 
         return executeQuery(queryContext -> {
-            final LocalDateTime start = DateTimeUtils.getLocalDateTimeOf(year, month, day, 0, 0, 0);
-            final LocalDateTime end = DateTimeUtils.getLocalDateTimeOf(year, month, day, 0, 59, 59);
+            final LocalDateTime start = DateTimeConverterUtils.getLocalDateTimeOf(year, month, day, 0, 0, 0);
+            final LocalDateTime end = DateTimeConverterUtils.getLocalDateTimeOf(year, month, day, 0, 59, 59);
 
             final var query = queryContext
                 .select(
@@ -705,8 +708,8 @@ public final class PostgresDbManager implements DbManager {
             () -> day);
 
         return executeQuery(queryContext -> {
-            final LocalDateTime start = DateTimeUtils.getLocalDateTimeOf(year, month, day, 23, 0, 0);
-            final LocalDateTime end = DateTimeUtils.getLocalDateTimeOf(year, month, day, 23, 59, 59);
+            final LocalDateTime start = DateTimeConverterUtils.getLocalDateTimeOf(year, month, day, 23, 0, 0);
+            final LocalDateTime end = DateTimeConverterUtils.getLocalDateTimeOf(year, month, day, 23, 59, 59);
 
             final var query = queryContext
                 .select(
@@ -788,7 +791,7 @@ public final class PostgresDbManager implements DbManager {
 
     @Override
     public Collection<HistoricStats> getHistoricStatsDaily(final int userId, final Year year, final Month month) {
-        SQL_LOGGER.info("Getting historic daily user TC stats for {}/{} for user {}", () -> DateTimeUtils.formatMonth(month), () -> year,
+        SQL_LOGGER.info("Getting historic daily user TC stats for {}/{} for user {}", () -> formatMonth(month), () -> year,
             () -> userId);
 
         final String selectSqlStatement = "SELECT utc_timestamp::DATE AS daily_timestamp, "
@@ -820,7 +823,7 @@ public final class PostgresDbManager implements DbManager {
                     final UserTcStats userTcStats = getTcStatsForFirstDayOfMonth(localDateTime, userId);
 
                     if (userTcStats.isEmpty()) {
-                        SQL_LOGGER.warn("Error getting historic stats for first day of {} for user with ID {}", DateTimeUtils.formatMonth(month),
+                        SQL_LOGGER.warn("Error getting historic stats for first day of {} for user with ID {}", formatMonth(month),
                             userId);
                     } else {
                         userStats.add(
@@ -920,7 +923,7 @@ public final class PostgresDbManager implements DbManager {
                 )
                 .values(
                     userStats.getUserId(),
-                    DateTimeUtils.toUtcLocalDateTime(userStats.getTimestamp()),
+                    DateTimeConverterUtils.toUtcLocalDateTime(userStats.getTimestamp()),
                     userStats.getPoints(),
                     userStats.getUnits());
             SQL_LOGGER.debug("Executing SQL: '{}'", query);
@@ -961,7 +964,7 @@ public final class PostgresDbManager implements DbManager {
             final var query = queryContext
                 .insertInto(USER_TOTAL_STATS)
                 .columns(USER_TOTAL_STATS.USER_ID, USER_TOTAL_STATS.UTC_TIMESTAMP, USER_TOTAL_STATS.TOTAL_POINTS, USER_TOTAL_STATS.TOTAL_UNITS)
-                .values(userStats.getUserId(), DateTimeUtils.toUtcLocalDateTime(userStats.getTimestamp()), userStats.getPoints(),
+                .values(userStats.getUserId(), DateTimeConverterUtils.toUtcLocalDateTime(userStats.getTimestamp()), userStats.getPoints(),
                     userStats.getUnits());
             SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
@@ -999,7 +1002,7 @@ public final class PostgresDbManager implements DbManager {
         SQL_LOGGER.debug("Adding/updating offset stats for user {}", userId);
 
         return executeQuery(queryContext -> {
-            final LocalDateTime currentUtcLocalDateTime = DateTimeUtils.toUtcLocalDateTime(DateTimeUtils.currentUtcTimestamp());
+            final LocalDateTime currentUtcLocalDateTime = DATE_TIME_UTILS.currentUtcLocalDateTime();
 
             final var query = queryContext
                 .insertInto(USER_OFFSET_TC_STATS)
@@ -1082,7 +1085,7 @@ public final class PostgresDbManager implements DbManager {
     @Override
     public RetiredUserTcStats createRetiredUserStats(final RetiredUserTcStats retiredUserTcStats) {
         return executeQuery(queryContext -> {
-            final LocalDateTime currentUtcLocalDateTime = DateTimeUtils.toUtcLocalDateTime(DateTimeUtils.currentUtcTimestamp());
+            final LocalDateTime currentUtcLocalDateTime = DATE_TIME_UTILS.currentUtcLocalDateTime();
 
             final var query = queryContext
                 .insertInto(RETIRED_USER_STATS)
@@ -1156,7 +1159,7 @@ public final class PostgresDbManager implements DbManager {
     public MonthlyResult createMonthlyResult(final MonthlyResult monthlyResult) {
         SQL_LOGGER.debug("Persisting monthly result for {}/{}",
             () -> monthlyResult.getUtcTimestamp().getYear(),
-            () -> DateTimeUtils.formatMonth(monthlyResult.getUtcTimestamp().getMonth())
+            () -> formatMonth(monthlyResult.getUtcTimestamp().getMonth())
         );
 
         executeQuery(queryContext -> {
@@ -1176,7 +1179,7 @@ public final class PostgresDbManager implements DbManager {
 
     @Override
     public Optional<MonthlyResult> getMonthlyResult(final Month month, final Year year) {
-        SQL_LOGGER.debug("Retrieving monthly result for {}/{}", () -> year, () -> DateTimeUtils.formatMonth(month));
+        SQL_LOGGER.debug("Retrieving monthly result for {}/{}", () -> year, () -> formatMonth(month));
 
         return executeQuery(queryContext -> {
             final var query = queryContext

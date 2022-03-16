@@ -29,7 +29,6 @@ import me.zodac.folding.api.stats.FoldingStatsRetriever;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
-import me.zodac.folding.api.util.DateTimeUtils;
 
 /**
  * A test implementation of {@link FoldingStatsRetriever} that simulates a response with at least 1 Work Unit.
@@ -43,6 +42,6 @@ public class ValidFoldingStatsRetriever implements FoldingStatsRetriever {
 
     @Override
     public UserStats getTotalStats(final User user) {
-        return UserStats.create(user.getId(), DateTimeUtils.currentUtcTimestamp(), 1L, 1);
+        return UserStats.createNow(user.getId(), 1L, 1);
     }
 }

@@ -44,6 +44,8 @@ public class UserTcStats extends UserStats {
      */
     public static final long DEFAULT_MULTIPLIED_POINTS = 0L;
 
+    private static final DateTimeUtils DATE_TIME_UTILS = DateTimeUtils.create();
+
     private final long multipliedPoints;
 
     /**
@@ -75,6 +77,19 @@ public class UserTcStats extends UserStats {
     }
 
     /**
+     * Creates an instance of {@link UserTcStats}.
+     *
+     * @param userId           the ID of the {@link me.zodac.folding.api.tc.User}
+     * @param points           the points
+     * @param multipliedPoints the multiplied points
+     * @param units            the units
+     * @return the created {@link UserTcStats}
+     */
+    public static UserTcStats createNow(final int userId, final long points, final long multipliedPoints, final int units) {
+        return create(userId, DATE_TIME_UTILS.currentUtcTimestamp(), points, multipliedPoints, units);
+    }
+
+    /**
      * Creates an empty instance of {@link UserTcStats}, with no values. Can be used where no stats are necessary, but
      * an {@link java.util.Optional} is not clean enough.
      *
@@ -82,7 +97,7 @@ public class UserTcStats extends UserStats {
      * @return the empty {@link UserTcStats}
      */
     public static UserTcStats empty(final int userId) {
-        return create(userId, DateTimeUtils.currentUtcTimestamp(), Stats.DEFAULT_POINTS, DEFAULT_MULTIPLIED_POINTS, Stats.DEFAULT_UNITS);
+        return create(userId, DATE_TIME_UTILS.currentUtcTimestamp(), Stats.DEFAULT_POINTS, DEFAULT_MULTIPLIED_POINTS, Stats.DEFAULT_UNITS);
     }
 
     /**

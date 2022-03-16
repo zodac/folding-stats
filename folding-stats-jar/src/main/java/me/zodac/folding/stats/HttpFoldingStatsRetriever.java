@@ -29,14 +29,12 @@ import static me.zodac.folding.stats.http.response.StatsResponseParser.getPoints
 import static me.zodac.folding.stats.http.response.StatsResponseParser.getUnitsFromResponse;
 
 import java.net.http.HttpResponse;
-import java.sql.Timestamp;
 import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.stats.FoldingStatsDetails;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
-import me.zodac.folding.api.util.DateTimeUtils;
 import me.zodac.folding.stats.http.request.PointsUrlBuilder;
 import me.zodac.folding.stats.http.request.StatsRequestUrl;
 import me.zodac.folding.stats.http.request.UnitsUrlBuilder;
@@ -76,9 +74,8 @@ public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
 
     @Override
     public UserStats getTotalStats(final User user) throws ExternalConnectionException {
-        final Timestamp currentUtcTime = DateTimeUtils.currentUtcTimestamp();
         final Stats userStats = getStats(FoldingStatsDetails.createFromUser(user));
-        return UserStats.create(user.getId(), currentUtcTime, userStats.getPoints(), userStats.getUnits());
+        return UserStats.createNow(user.getId(), userStats.getPoints(), userStats.getUnits());
     }
 
     private static long getPoints(final FoldingStatsDetails foldingStatsDetails) throws ExternalConnectionException {

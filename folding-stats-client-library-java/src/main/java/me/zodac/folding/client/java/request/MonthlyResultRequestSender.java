@@ -46,6 +46,8 @@ import me.zodac.folding.rest.util.RestUtilConstants;
  */
 public record MonthlyResultRequestSender(String monthlyResultUrl) {
 
+    private static final DateTimeUtils DATE_TIME_UTILS = DateTimeUtils.create();
+
     /**
      * Create an instance of {@link MonthlyResultRequestSender}.
      *
@@ -89,7 +91,7 @@ public record MonthlyResultRequestSender(String monthlyResultUrl) {
      * @see #getMonthlyResult(Year, Month, String)
      */
     public HttpResponse<String> getCurrentMonthlyResult(final String entityTag) throws FoldingRestException {
-        return getMonthlyResult(DateTimeUtils.currentUtcYear(), DateTimeUtils.currentUtcMonth(), entityTag);
+        return getMonthlyResult(DATE_TIME_UTILS.currentUtcYear(), DATE_TIME_UTILS.currentUtcMonth(), entityTag);
     }
 
     /**

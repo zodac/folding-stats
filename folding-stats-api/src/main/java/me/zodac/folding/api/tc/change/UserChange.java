@@ -46,6 +46,7 @@ import me.zodac.folding.api.util.DateTimeUtils;
 public class UserChange implements ResponsePojo {
 
     private static final int EMPTY_USER_CHANGE_ID = 0;
+    private static final DateTimeUtils DATE_TIME_UTILS = DateTimeUtils.create();
 
     final int id;
     final LocalDateTime createdUtcTimestamp;
@@ -97,7 +98,7 @@ public class UserChange implements ResponsePojo {
      * @return the created {@link UserChange}
      */
     public static UserChange createNow(final User previousUser, final User newUser, final UserChangeState state) {
-        final LocalDateTime currentUtcTime = DateTimeUtils.currentUtcLocalDateTime();
+        final LocalDateTime currentUtcTime = DATE_TIME_UTILS.currentUtcLocalDateTime();
         return create(EMPTY_USER_CHANGE_ID, currentUtcTime, currentUtcTime, previousUser, newUser, state);
     }
 
@@ -158,7 +159,7 @@ public class UserChange implements ResponsePojo {
         return create(
             userChange.getId(),
             userChange.createdUtcTimestamp,
-            DateTimeUtils.currentUtcLocalDateTime(),
+            DATE_TIME_UTILS.currentUtcLocalDateTime(),
             userChange.previousUser,
             userChange.newUser,
             userChangeState

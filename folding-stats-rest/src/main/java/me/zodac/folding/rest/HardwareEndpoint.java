@@ -24,7 +24,6 @@
 
 package me.zodac.folding.rest;
 
-import static me.zodac.folding.api.util.DateTimeUtils.untilNextMonthUtc;
 import static me.zodac.folding.rest.response.Responses.cachedOk;
 import static me.zodac.folding.rest.response.Responses.created;
 import static me.zodac.folding.rest.response.Responses.ok;
@@ -32,7 +31,6 @@ import static me.zodac.folding.rest.util.RequestParameterExtractor.extractParame
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
-import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -135,7 +133,7 @@ public class HardwareEndpoint {
     public ResponseEntity<?> getAll(final HttpServletRequest request) {
         AUDIT_LOGGER.debug("GET request received for all hardwares at '{}'", request::getRequestURI);
         final Collection<Hardware> elements = foldingRepository.getAllHardware();
-        return cachedOk(elements, untilNextMonthUtc(ChronoUnit.SECONDS));
+        return cachedOk(elements);
     }
 
     /**
@@ -143,7 +141,7 @@ public class HardwareEndpoint {
      *
      * @param hardwareId the ID of the {@link Hardware} to retrieve
      * @param request    the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#cachedOk(Object, long)} containing the {@link Hardware}
+     * @return {@link me.zodac.folding.rest.response.Responses#cachedOk(Object)} containing the {@link Hardware}
      */
     @ReadRequired
     @PermitAll
@@ -152,7 +150,7 @@ public class HardwareEndpoint {
         AUDIT_LOGGER.debug("GET request for hardware received at '{}'", request::getRequestURI);
 
         final Hardware element = foldingRepository.getHardware(hardwareId);
-        return cachedOk(element, untilNextMonthUtc(ChronoUnit.SECONDS));
+        return cachedOk(element);
     }
 
     /**
@@ -160,7 +158,7 @@ public class HardwareEndpoint {
      *
      * @param hardwareName the {@code hardwareName} of the {@link Hardware} to retrieve
      * @param request      the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#cachedOk(Object, long)} containing the {@link Hardware}
+     * @return {@link me.zodac.folding.rest.response.Responses#cachedOk(Object)} containing the {@link Hardware}
      */
     @ReadRequired
     @PermitAll
@@ -174,7 +172,7 @@ public class HardwareEndpoint {
             .findAny()
             .orElseThrow(() -> new NotFoundException(Hardware.class, hardwareName));
 
-        return cachedOk(retrievedHardware, untilNextMonthUtc(ChronoUnit.SECONDS));
+        return cachedOk(retrievedHardware);
     }
 
     /**

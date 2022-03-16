@@ -47,7 +47,7 @@ import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
-import me.zodac.folding.api.util.DateTimeUtils;
+import me.zodac.folding.api.util.DateTimeConverterUtils;
 import me.zodac.folding.db.postgres.gen.tables.records.HardwareRecord;
 import me.zodac.folding.db.postgres.gen.tables.records.MonthlyResultsRecord;
 import me.zodac.folding.db.postgres.gen.tables.records.RetiredUserStatsRecord;
@@ -145,7 +145,7 @@ final class RecordConverter {
     static UserTcStats toUserTcStats(final UserTcStatsHourlyRecord userTcStatsHourlyRecord) {
         return UserTcStats.create(
             userTcStatsHourlyRecord.getUserId(),
-            DateTimeUtils.toTimestamp(userTcStatsHourlyRecord.getUtcTimestamp()),
+            DateTimeConverterUtils.toTimestamp(userTcStatsHourlyRecord.getUtcTimestamp()),
             userTcStatsHourlyRecord.getTcPoints(),
             userTcStatsHourlyRecord.getTcPointsMultiplied(),
             userTcStatsHourlyRecord.getTcUnits()
@@ -176,7 +176,7 @@ final class RecordConverter {
     static UserStats toUserStats(final UserTotalStatsRecord userTotalStatsRecord) {
         return UserStats.create(
             userTotalStatsRecord.getUserId(),
-            DateTimeUtils.toTimestamp(userTotalStatsRecord.getUtcTimestamp()),
+            DateTimeConverterUtils.toTimestamp(userTotalStatsRecord.getUtcTimestamp()),
             userTotalStatsRecord.getTotalPoints(),
             userTotalStatsRecord.getTotalUnits()
         );
@@ -191,7 +191,7 @@ final class RecordConverter {
     static UserStats toUserStats(final UserInitialStatsRecord userInitialStatsRecord) {
         return UserStats.create(
             userInitialStatsRecord.getUserId(),
-            DateTimeUtils.toTimestamp(userInitialStatsRecord.getUtcTimestamp()),
+            DateTimeConverterUtils.toTimestamp(userInitialStatsRecord.getUtcTimestamp()),
             userInitialStatsRecord.getInitialPoints(),
             userInitialStatsRecord.getInitialUnits()
         );
@@ -224,7 +224,7 @@ final class RecordConverter {
             retiredUserStatsRecord.getDisplayUsername(),
             UserTcStats.create(
                 retiredUserStatsRecord.getUserId(),
-                DateTimeUtils.toTimestamp(retiredUserStatsRecord.getUtcTimestamp()),
+                DateTimeConverterUtils.toTimestamp(retiredUserStatsRecord.getUtcTimestamp()),
                 retiredUserStatsRecord.getFinalPoints(),
                 retiredUserStatsRecord.getFinalMultipliedPoints(),
                 retiredUserStatsRecord.getFinalUnits()

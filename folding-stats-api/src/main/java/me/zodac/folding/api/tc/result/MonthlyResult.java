@@ -50,6 +50,8 @@ import me.zodac.folding.rest.api.tc.leaderboard.UserCategoryLeaderboardEntry;
 @ToString(doNotUseGetters = true)
 public class MonthlyResult {
 
+    private static final DateTimeUtils DATE_TIME_UTILS = DateTimeUtils.create();
+
     private final List<TeamLeaderboardEntry> teamLeaderboard;
     private final Map<Category, List<UserCategoryLeaderboardEntry>> userCategoryLeaderboard;
     private final LocalDateTime utcTimestamp;
@@ -72,7 +74,7 @@ public class MonthlyResult {
      * Creates a {@link MonthlyResult}.
      *
      * <p>
-     * Uses the current {@link java.time.ZoneOffset#UTC} {@link LocalDateTime} from {@link DateTimeUtils#currentUtcDateTime()}.
+     * Uses the current {@link java.time.ZoneOffset#UTC} {@link LocalDateTime} from {@link DateTimeUtils#currentUtcLocalDateTime()}.
      *
      * @param teamLeaderboard         the leaderboard for {@link me.zodac.folding.api.tc.Team}s
      * @param userCategoryLeaderboard the leaderboard for {@link me.zodac.folding.api.tc.User} {@link Category}s
@@ -80,7 +82,7 @@ public class MonthlyResult {
      */
     public static MonthlyResult create(final List<TeamLeaderboardEntry> teamLeaderboard,
                                        final Map<Category, List<UserCategoryLeaderboardEntry>> userCategoryLeaderboard) {
-        return create(teamLeaderboard, userCategoryLeaderboard, DateTimeUtils.currentUtcDateTime().toLocalDateTime());
+        return create(teamLeaderboard, userCategoryLeaderboard, DATE_TIME_UTILS.currentUtcLocalDateTime());
     }
 
     /**
