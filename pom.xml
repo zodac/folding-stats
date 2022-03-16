@@ -60,6 +60,7 @@
         <junit-jupiter.version>5.8.2</junit-jupiter.version>
 
         <!-- Plugin Versions -->
+        <jmeter-maven-plugin.version>3.5.0</jmeter-maven-plugin.version>
         <maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-dependency-plugin.version>3.2.0</maven-dependency-plugin.version>
@@ -275,6 +276,37 @@
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <groupId>com.lazerycode.jmeter</groupId>
+                    <artifactId>jmeter-maven-plugin</artifactId>
+                    <version>${jmeter-maven-plugin.version}</version>
+                    <!-- Configuration defining test files handled by module -->
+                    <executions>
+                        <!-- Generate JMeter configuration -->
+                        <execution>
+                            <id>configuration</id>
+                            <goals>
+                                <goal>configure</goal>
+                            </goals>
+                        </execution>
+
+                        <!-- Run JMeter tests -->
+                        <execution>
+                            <id>jmeter-tests</id>
+                            <goals>
+                                <goal>jmeter</goal>
+                            </goals>
+                        </execution>
+
+                        <!-- Fail build on errors in test -->
+                        <execution>
+                            <id>jmeter-check-results</id>
+                            <goals>
+                                <goal>results</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-clean-plugin</artifactId>
                     <version>${maven-clean-plugin.version}</version>
@@ -379,6 +411,25 @@
                 </plugin>
 
                 <!-- Linters -->
+
+                <!-- Manual execution: -->
+                <!-- mvn dependency-check:check -Dlint -->
+                <plugin>
+                    <groupId>org.owasp</groupId>
+                    <artifactId>dependency-check-maven</artifactId>
+                    <version>${dependency-check-maven.version}</version>
+                    <configuration>
+                        <failBuildOnAnyVulnerability>true</failBuildOnAnyVulnerability>
+                        <skip>${skip-linters}</skip>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
 
                 <!-- Manual execution: -->
                 <!-- mvn license:check -Dlint -->
@@ -606,25 +657,7 @@
                     </dependencies>
                 </plugin>
 
-                <!-- Manual execution: -->
-                <!-- mvn dependency-check:check -Dlint -->
-                <plugin>
-                    <groupId>org.owasp</groupId>
-                    <artifactId>dependency-check-maven</artifactId>
-                    <version>${dependency-check-maven.version}</version>
-                    <configuration>
-                        <failBuildOnAnyVulnerability>true</failBuildOnAnyVulnerability>
-                        <skip>${skip-linters}</skip>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>check</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-
+                <!-- ProGuard Obfuscation Plugin -->
                 <plugin>
                     <groupId>com.github.wvengen</groupId>
                     <artifactId>proguard-maven-plugin</artifactId>

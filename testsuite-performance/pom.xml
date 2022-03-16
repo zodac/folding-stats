@@ -11,4 +11,21 @@
 
     <artifactId>testsuite-performance</artifactId>
     <name>[${project.parent.artifactId}] Performance TestSuite module</name>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.lazerycode.jmeter</groupId>
+                <artifactId>jmeter-maven-plugin</artifactId>
+                <configuration>
+                    <skipTests>${skip-performance-tests}</skipTests>
+
+                    <!-- List of JMeter test files to be executed -->
+                    <testFilesIncluded>
+                        <jMeterTestFile>Hardware.jmx</jMeterTestFile>
+                    </testFilesIncluded>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
