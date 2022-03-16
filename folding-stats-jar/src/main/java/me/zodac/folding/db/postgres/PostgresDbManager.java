@@ -44,6 +44,8 @@ import static org.jooq.impl.DSL.max;
 import static org.jooq.impl.DSL.month;
 import static org.jooq.impl.DSL.year;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -1242,8 +1244,12 @@ public final class PostgresDbManager implements DbManager {
 
     @Override
     public void close() {
-        if (dataSource instanceof PostgresDataSource postgresDataSource) {
-            postgresDataSource.close();
+        if (dataSource instanceof Closeable closeable) {
+            try {
+                closeable.close();
+            } catch (final IOException e) {
+                SQL_LOGGER.warn("Error closing dataSource", e);
+            }
         }
     }
 }

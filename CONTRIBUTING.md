@@ -3,7 +3,8 @@
 # Developing folding-stats
 
 - [Java](#java)
-- [Docker Containers](#docker-containers)
+- [Docker](#docker)
+    - [Docker Containers](#containers)
 - [Database Management](#database-management)
     - [Adding Support for Another Database](#adding-support-for-another-database)
     - [Database Querying With jOOQ](#database-querying-with-jooq)
@@ -29,7 +30,9 @@
 
 # Java
 
-# Docker Containers
+# Docker
+
+## Containers
 
 # Database Management
 
