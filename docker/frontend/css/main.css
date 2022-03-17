@@ -66,3 +66,17 @@ table th, table td {
 .new-value {
     color:green;
 }
+
+#footer {
+    position: fixed;
+    bottom: 5px;
+    width: 100%;
+    height: 27px;
+    background-color: #212529!important; /* Same as nav bar */
+}
+
+#footer-content {
+    font-size: 12px;
+    text-align: center;
+    padding: 1px;
+}
