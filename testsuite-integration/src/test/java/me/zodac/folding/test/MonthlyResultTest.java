@@ -92,15 +92,15 @@ class MonthlyResultTest {
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final MonthlyResult monthlyResult = MonthlyResultResponseParser.getMonthlyResult(response);
-        assertThat(monthlyResult.getTeamLeaderboard())
+        assertThat(monthlyResult.teamLeaderboard())
             .as("Expected no results in team leaderboard")
             .isEmpty();
 
-        assertThat(monthlyResult.getUserCategoryLeaderboard().keySet())
+        assertThat(monthlyResult.userCategoryLeaderboard().keySet())
             .as("Expected each category to have an entry in user category leaderboard")
             .hasSize(Category.getAllValues().size());
 
-        for (final Map.Entry<Category, List<UserCategoryLeaderboardEntry>> categoryEntry : monthlyResult.getUserCategoryLeaderboard().entrySet()) {
+        for (final Map.Entry<Category, List<UserCategoryLeaderboardEntry>> categoryEntry : monthlyResult.userCategoryLeaderboard().entrySet()) {
             assertThat(categoryEntry.getValue())
                 .as("Expected category '" + categoryEntry.getKey() + "' to have no results")
                 .isEmpty();
@@ -115,15 +115,15 @@ class MonthlyResultTest {
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final MonthlyResult monthlyResult = MonthlyResultResponseParser.getMonthlyResult(response);
-        assertThat(monthlyResult.getTeamLeaderboard())
+        assertThat(monthlyResult.teamLeaderboard())
             .as("Expected no results in team leaderboard")
             .isEmpty();
 
-        assertThat(monthlyResult.getUserCategoryLeaderboard().keySet())
+        assertThat(monthlyResult.userCategoryLeaderboard().keySet())
             .as("Expected each category to have an entry in user category leaderboard")
             .hasSize(Category.getAllValues().size());
 
-        for (final Map.Entry<Category, List<UserCategoryLeaderboardEntry>> categoryEntry : monthlyResult.getUserCategoryLeaderboard().entrySet()) {
+        for (final Map.Entry<Category, List<UserCategoryLeaderboardEntry>> categoryEntry : monthlyResult.userCategoryLeaderboard().entrySet()) {
             assertThat(categoryEntry.getValue())
                 .as("Expected category '" + categoryEntry.getKey() + "' to have no results")
                 .isEmpty();
@@ -146,11 +146,11 @@ class MonthlyResultTest {
 
         final MonthlyResult monthlyResult = MonthlyResultResponseParser.getMonthlyResult(response);
 
-        assertThat(monthlyResult.getTeamLeaderboard())
+        assertThat(monthlyResult.teamLeaderboard())
             .as("Expected one result in team leaderboard")
             .hasSize(1);
 
-        final TeamLeaderboardEntry teamLeaderboardEntry = monthlyResult.getTeamLeaderboard().get(0);
+        final TeamLeaderboardEntry teamLeaderboardEntry = monthlyResult.teamLeaderboard().get(0);
         assertThat(teamLeaderboardEntry.getTeam().getTeamName())
             .as("Expected result team to have same name as input team")
             .isEqualTo(team.getTeamName());
@@ -158,19 +158,19 @@ class MonthlyResultTest {
             .as("Expected result team to have same points as user")
             .isEqualTo(10_000L);
 
-        assertThat(monthlyResult.getUserCategoryLeaderboard().get(Category.AMD_GPU))
+        assertThat(monthlyResult.userCategoryLeaderboard().get(Category.AMD_GPU))
             .as("Expected no results in " + Category.AMD_GPU + " category leaderboard")
             .isEmpty();
 
-        assertThat(monthlyResult.getUserCategoryLeaderboard().get(Category.WILDCARD))
+        assertThat(monthlyResult.userCategoryLeaderboard().get(Category.WILDCARD))
             .as("Expected no results in " + Category.WILDCARD + " category leaderboard")
             .isEmpty();
 
-        assertThat(monthlyResult.getUserCategoryLeaderboard().get(Category.NVIDIA_GPU))
+        assertThat(monthlyResult.userCategoryLeaderboard().get(Category.NVIDIA_GPU))
             .as("Expected one result in " + Category.NVIDIA_GPU + " category leaderboard")
             .hasSize(1);
 
-        final UserCategoryLeaderboardEntry userCategoryLeaderboardEntry = monthlyResult.getUserCategoryLeaderboard().get(Category.NVIDIA_GPU).get(0);
+        final UserCategoryLeaderboardEntry userCategoryLeaderboardEntry = monthlyResult.userCategoryLeaderboard().get(Category.NVIDIA_GPU).get(0);
         assertThat(userCategoryLeaderboardEntry.getUser().getTeam().getTeamName())
             .as("Expected result user to have same team name as input team")
             .isEqualTo(team.getTeamName());
@@ -209,13 +209,13 @@ class MonthlyResultTest {
 
         final MonthlyResult monthlyResult = MonthlyResultResponseParser.getMonthlyResult(response);
 
-        assertThat(monthlyResult.getTeamLeaderboard())
+        assertThat(monthlyResult.teamLeaderboard())
             .as("Expected three results in team leaderboard")
             .hasSize(3);
 
-        final TeamLeaderboardEntry firstTeamLeaderboardEntry = monthlyResult.getTeamLeaderboard().get(0);
-        final TeamLeaderboardEntry secondTeamLeaderboardEntry = monthlyResult.getTeamLeaderboard().get(1);
-        final TeamLeaderboardEntry thirdTeamLeaderboardEntry = monthlyResult.getTeamLeaderboard().get(2);
+        final TeamLeaderboardEntry firstTeamLeaderboardEntry = monthlyResult.teamLeaderboard().get(0);
+        final TeamLeaderboardEntry secondTeamLeaderboardEntry = monthlyResult.teamLeaderboard().get(1);
+        final TeamLeaderboardEntry thirdTeamLeaderboardEntry = monthlyResult.teamLeaderboard().get(2);
 
         assertThat(firstTeamLeaderboardEntry.getTeam().getTeamName())
             .as("Expected team in first to be the third created team")
@@ -238,9 +238,9 @@ class MonthlyResultTest {
             .as("Expected team in third to have the same points as first created user")
             .isEqualTo(10_000L);
 
-        final List<UserCategoryLeaderboardEntry> amdLeaderboard = monthlyResult.getUserCategoryLeaderboard().get(Category.AMD_GPU);
-        final List<UserCategoryLeaderboardEntry> wildcardLeaderboard = monthlyResult.getUserCategoryLeaderboard().get(Category.WILDCARD);
-        final List<UserCategoryLeaderboardEntry> nvidiaLeaderboard = monthlyResult.getUserCategoryLeaderboard().get(Category.NVIDIA_GPU);
+        final List<UserCategoryLeaderboardEntry> amdLeaderboard = monthlyResult.userCategoryLeaderboard().get(Category.AMD_GPU);
+        final List<UserCategoryLeaderboardEntry> wildcardLeaderboard = monthlyResult.userCategoryLeaderboard().get(Category.WILDCARD);
+        final List<UserCategoryLeaderboardEntry> nvidiaLeaderboard = monthlyResult.userCategoryLeaderboard().get(Category.NVIDIA_GPU);
 
         assertThat(amdLeaderboard)
             .hasSize(1);
@@ -297,11 +297,11 @@ class MonthlyResultTest {
 
         final MonthlyResult monthlyResult = MonthlyResultResponseParser.getMonthlyResult(response);
 
-        assertThat(monthlyResult.getTeamLeaderboard())
+        assertThat(monthlyResult.teamLeaderboard())
             .as("Expected one result in team leaderboard")
             .hasSize(1);
 
-        final TeamLeaderboardEntry teamLeaderboardEntry = monthlyResult.getTeamLeaderboard().get(0);
+        final TeamLeaderboardEntry teamLeaderboardEntry = monthlyResult.teamLeaderboard().get(0);
         assertThat(teamLeaderboardEntry.getTeam().getTeamName())
             .as("Expected result team to have same name as input team")
             .isEqualTo(team.getTeamName());
@@ -309,19 +309,19 @@ class MonthlyResultTest {
             .as("Expected result team to have same points as user's last update")
             .isEqualTo(22_000L);
 
-        assertThat(monthlyResult.getUserCategoryLeaderboard().get(Category.AMD_GPU))
+        assertThat(monthlyResult.userCategoryLeaderboard().get(Category.AMD_GPU))
             .as("Expected no results in " + Category.AMD_GPU + " category leaderboard")
             .isEmpty();
 
-        assertThat(monthlyResult.getUserCategoryLeaderboard().get(Category.WILDCARD))
+        assertThat(monthlyResult.userCategoryLeaderboard().get(Category.WILDCARD))
             .as("Expected no results in " + Category.WILDCARD + " category leaderboard")
             .isEmpty();
 
-        assertThat(monthlyResult.getUserCategoryLeaderboard().get(Category.NVIDIA_GPU))
+        assertThat(monthlyResult.userCategoryLeaderboard().get(Category.NVIDIA_GPU))
             .as("Expected one result in " + Category.NVIDIA_GPU + " category leaderboard")
             .hasSize(1);
 
-        final UserCategoryLeaderboardEntry userCategoryLeaderboardEntry = monthlyResult.getUserCategoryLeaderboard().get(Category.NVIDIA_GPU).get(0);
+        final UserCategoryLeaderboardEntry userCategoryLeaderboardEntry = monthlyResult.userCategoryLeaderboard().get(Category.NVIDIA_GPU).get(0);
         assertThat(userCategoryLeaderboardEntry.getUser().getTeam().getTeamName())
             .as("Expected result user to have same team name as input team")
             .isEqualTo(team.getTeamName());

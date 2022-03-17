@@ -1134,15 +1134,15 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
     @Override
     public MonthlyResult createMonthlyResult(final MonthlyResult monthlyResult) {
         SQL_LOGGER.debug("Persisting monthly result for {}/{}",
-            () -> monthlyResult.getUtcTimestamp().getYear(),
-            () -> formatMonth(monthlyResult.getUtcTimestamp().getMonth())
+            () -> monthlyResult.utcTimestamp().getYear(),
+            () -> formatMonth(monthlyResult.utcTimestamp().getMonth())
         );
 
         executeQuery(queryContext -> {
             final var query = queryContext
                 .insertInto(MONTHLY_RESULTS)
                 .columns(MONTHLY_RESULTS.UTC_TIMESTAMP, MONTHLY_RESULTS.JSON_RESULT)
-                .values(monthlyResult.getUtcTimestamp(), GSON.toJson(monthlyResult));
+                .values(monthlyResult.utcTimestamp(), GSON.toJson(monthlyResult));
 
             SQL_LOGGER.debug("Executing SQL: '{}'", query);
 

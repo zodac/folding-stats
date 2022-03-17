@@ -635,6 +635,6 @@ public class UserStatsStorer {
         }
 
         final MonthlyResult createdMonthlyResult = statsRepository.createMonthlyResult(monthlyResult);
-        LOGGER.info("Storing TC results for {}", createdMonthlyResult.getUtcTimestamp());
+        LOGGER.info("Storing TC results for {}", createdMonthlyResult.utcTimestamp());
     }
 }

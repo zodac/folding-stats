@@ -29,12 +29,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.util.DateTimeUtils;
 import me.zodac.folding.rest.api.tc.leaderboard.TeamLeaderboardEntry;
@@ -43,18 +37,11 @@ import me.zodac.folding.rest.api.tc.leaderboard.UserCategoryLeaderboardEntry;
 /**
  * POJO containing the overall result for a single month of the <code>Team Competition</code>.
  */
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
-@Getter
-@EqualsAndHashCode
-@ToString(doNotUseGetters = true)
-public class MonthlyResult {
+public record MonthlyResult(List<TeamLeaderboardEntry> teamLeaderboard,
+                            Map<Category, List<UserCategoryLeaderboardEntry>> userCategoryLeaderboard,
+                            LocalDateTime utcTimestamp) {
 
     private static final DateTimeUtils DATE_TIME_UTILS = DateTimeUtils.create();
-
-    private final List<TeamLeaderboardEntry> teamLeaderboard;
-    private final Map<Category, List<UserCategoryLeaderboardEntry>> userCategoryLeaderboard;
-    private final LocalDateTime utcTimestamp;
 
     /**
      * Creates a {@link MonthlyResult}.
@@ -115,7 +102,7 @@ public class MonthlyResult {
      * @return the updated {@link MonthlyResult}
      */
     public static MonthlyResult updateWithEmptyCategories(final MonthlyResult monthlyResult) {
-        final Map<Category, List<UserCategoryLeaderboardEntry>> categories = new HashMap<>(monthlyResult.getUserCategoryLeaderboard());
+        final Map<Category, List<UserCategoryLeaderboardEntry>> categories = new HashMap<>(monthlyResult.userCategoryLeaderboard());
 
         for (final Category category : Category.getAllValues()) {
             if (!categories.containsKey(category)) {
