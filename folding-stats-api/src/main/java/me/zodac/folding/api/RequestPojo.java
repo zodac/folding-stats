@@ -29,15 +29,4 @@ package me.zodac.folding.api;
  */
 public interface RequestPojo {
 
-    /**
-     * Simple check that validates that the REST payload is valid. Checks can include:
-     * <ul>
-     *     <li>{@link String} fields are not <code>null</code> or empty</li>
-     *     <li>Numeric fields are not out of range</li>
-     *     <li>Enum fields are not invalid</li>
-     * </ul>
-     *
-     * @throws me.zodac.folding.api.exception.ValidationException thrown if there are any validation failures
-     */
-    void validate();
 }

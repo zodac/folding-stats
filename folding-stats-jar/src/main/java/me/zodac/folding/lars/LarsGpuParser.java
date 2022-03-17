@@ -36,7 +36,7 @@ import org.jsoup.select.Elements;
  */
 final class LarsGpuParser {
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LARS_LOGGER = LogManager.getLogger("lars");
     private static final int EXPECTED_SPAN_ELEMENTS = 3;
     private static final int EXPECTED_TD_ELEMENTS = 7;
     private static final int INVALID_RANK = 0;
@@ -54,7 +54,7 @@ final class LarsGpuParser {
      * @throws LarsParseException thrown if an error occurs parsing the input {@link Element}
      */
     static LarsGpu parseSingleGpuEntry(final Element gpuEntry) throws LarsParseException {
-        LOGGER.debug("Parsing GPU entry '{}'", gpuEntry);
+        LARS_LOGGER.debug("Parsing GPU entry '{}'", gpuEntry);
 
         final String displayName = parseDisplayName(gpuEntry);
         final String manufacturer = parseManufacturer(gpuEntry, displayName);

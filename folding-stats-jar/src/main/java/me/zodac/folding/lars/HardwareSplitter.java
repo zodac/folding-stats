@@ -48,7 +48,7 @@ import org.apache.logging.log4j.Logger;
  */
 public final class HardwareSplitter {
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LARS_LOGGER = LogManager.getLogger("lars");
 
     private HardwareSplitter() {
 
@@ -73,7 +73,7 @@ public final class HardwareSplitter {
             .filter(hardwareFromLars -> hardwareNamesOnlyInLars.contains(hardwareFromLars.getHardwareName()))
             .collect(toCollection(() -> new TreeSet<>(HardwareNameComparator.create())));
 
-        LOGGER.info("{} from LARS, {} in DB, {} to create", fromLars.size(), inDb.size(), toCreate.size());
+        LARS_LOGGER.info("{} from LARS, {} in DB, {} to create", fromLars.size(), inDb.size(), toCreate.size());
         return toCreate;
     }
 
@@ -95,7 +95,7 @@ public final class HardwareSplitter {
             .stream()
             .filter(hardwareInDb -> hardwareNamesNoLongerInLars.contains(hardwareInDb.getHardwareName()))
             .collect(toCollection(() -> new TreeSet<>(HardwareNameComparator.create())));
-        LOGGER.info("{} from LARS, {} in DB, {} to delete", fromLars.size(), inDb.size(), toDelete.size());
+        LARS_LOGGER.info("{} from LARS, {} in DB, {} to delete", fromLars.size(), inDb.size(), toDelete.size());
         return toDelete;
     }
 
@@ -150,7 +150,7 @@ public final class HardwareSplitter {
             }
         }
 
-        LOGGER.info("{} from LARS, {} in DB, {} to update", fromLars.size(), inDb.size(), toUpdate.size());
+        LARS_LOGGER.info("{} from LARS, {} in DB, {} to update", fromLars.size(), inDb.size(), toUpdate.size());
         return toUpdate;
     }
 }

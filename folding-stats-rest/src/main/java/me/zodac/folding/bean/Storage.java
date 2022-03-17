@@ -882,20 +882,6 @@ public class Storage {
     }
 
     /**
-     * Retrieves all {@link UserChange}s.
-     *
-     * <p>
-     * Attempts to retrieve from the {@link DbManager}.
-     *
-     * @return a {@link Collection} of the retrieved {@link UserChange}
-     * @see DbManager#getAllUserChanges()
-     */
-    @NotCached
-    public Collection<UserChange> getAllUserChanges() {
-        return dbManagerFunction(DbManager::getAllUserChanges);
-    }
-
-    /**
      * Retrieves all {@link UserChange}s with the given {@link UserChangeState}.
      *
      * <p>

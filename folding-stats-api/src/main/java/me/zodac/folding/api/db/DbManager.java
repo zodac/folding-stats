@@ -174,13 +174,6 @@ public interface DbManager extends Closeable {
     UserChange createUserChange(UserChange userChange);
 
     /**
-     * Retrieves all {@link UserChange}s from the DB.
-     *
-     * @return all {@link UserChange}s
-     */
-    Collection<UserChange> getAllUserChanges();
-
-    /**
      * Retrieves any {@link UserChange}s that contain one of the provided {@code states} from the DB.
      *
      * @param states         the {@link UserChangeState}s to look for

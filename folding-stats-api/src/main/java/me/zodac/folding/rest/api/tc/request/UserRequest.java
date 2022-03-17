@@ -42,6 +42,7 @@ import lombok.ToString;
 import me.zodac.folding.api.RequestPojo;
 import me.zodac.folding.api.exception.ValidationException;
 import me.zodac.folding.api.tc.Category;
+import me.zodac.folding.api.tc.HardwareMake;
 
 /**
  * REST request to create/update a {@link me.zodac.folding.api.tc.User}.
@@ -75,7 +76,20 @@ public class UserRequest implements RequestPojo {
     private int teamId;
     private boolean userIsCaptain;
 
-    @Override
+    /**
+     * Simple check that validates that the REST payload is valid. Checks that:
+     * <ul>
+     *     <li>'foldingUserName' matches {@link #FOLDING_USER_NAME_PATTERN}</li>
+     *     <li>'displayName' is not null or empty</li>
+     *     <li>'passkey' matches {@link #PASSKEY_PATTERN}</li>
+     *     <li>'hardwareMake' is a valid {@link HardwareMake}</li>
+     *     <li>'category' is a valid {@link Category}</li>
+     *     <li>'profileLink' is null or empty, or else is a valid {@link java.net.URI}</li>
+     *     <li>'liveStatsLink' is null or empty, or else is a valid {@link java.net.URI}</li>
+     * </ul>
+     *
+     * @throws me.zodac.folding.api.exception.ValidationException thrown if there are any validation failures
+     */
     public void validate() {
         final Collection<String> failureMessages = Stream.of(
                 validateFoldingUserName(),

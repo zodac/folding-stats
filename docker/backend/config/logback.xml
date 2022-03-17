@@ -80,6 +80,7 @@
     </appender>
 
     <!-- Log for stats retrieval -->
+    <!-- Monthly rollover -->
     <appender name="STATS_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <append>true</append>
         <file>/var/backend/logs/stats.log</file>
@@ -89,7 +90,24 @@
             <charset>utf8</charset>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>/var/backend/logs/stats.log.%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+            <fileNamePattern>/var/backend/logs/stats.log.%d{yyyy-MM}.%i.log.zip</fileNamePattern>
+            <maxFileSize>100MB</maxFileSize>
+            <maxHistory>31</maxHistory>
+            <totalSizeCap>1000MB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <!-- Log for LARS update -->
+    <appender name="LARS_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <append>true</append>
+        <file>/var/backend/logs/lars.log</file>
+        <immediateFlush>true</immediateFlush>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%-5logger{5}] %msg%n</pattern>
+            <charset>utf8</charset>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>/var/backend/logs/lars.log.%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
             <maxFileSize>100MB</maxFileSize>
             <maxHistory>31</maxHistory>
             <totalSizeCap>1000MB</totalSizeCap>
@@ -121,7 +139,13 @@
         <appender-ref ref="STATS_LOG"/>
     </logger>
 
+    <!-- The 'additivity=false' option ensures stats data only goes to the stats log -->
+    <logger name="lars" level="DEBUG" additivity="false">
+        <appender-ref ref="LARS_LOG"/>
+    </logger>
+
     <!-- Suppress logging for unwanted packages -->
+
     <!-- Not interested in the jOOQ startup messages -->
     <logger name="org.jooq" level="WARN">
         <appender-ref ref="SERVER_LOG"/>

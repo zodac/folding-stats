@@ -42,7 +42,7 @@ import org.jsoup.select.Elements;
  */
 public final class LarsGpuRetriever {
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LARS_LOGGER = LogManager.getLogger("lars");
 
     private LarsGpuRetriever() {
 
@@ -59,13 +59,13 @@ public final class LarsGpuRetriever {
      * @see #retrieveGpus(Document)
      */
     public static List<LarsGpu> retrieveGpus(final String gpuDatabaseUrl) {
-        LOGGER.debug("Retrieving LARS GPU data from: '{}'", gpuDatabaseUrl);
+        LARS_LOGGER.debug("Retrieving LARS GPU data from: '{}'", gpuDatabaseUrl);
 
         try {
             final Document doc = Jsoup.connect(gpuDatabaseUrl).get();
             return retrieveGpus(doc);
         } catch (final Exception e) {
-            LOGGER.warn("Error retrieving data from LARS GPU DB", e);
+            LARS_LOGGER.warn("Error retrieving data from LARS GPU DB", e);
             return Collections.emptyList();
         }
     }
@@ -83,20 +83,20 @@ public final class LarsGpuRetriever {
         final Element databaseTable = doc.getElementById("primary-datatable");
 
         if (databaseTable == null) {
-            LOGGER.warn("Unable to find the 'primary-database' table");
+            LARS_LOGGER.warn("Unable to find the 'primary-database' table");
             return Collections.emptyList();
         }
 
         final Element databaseBody = databaseTable.getElementsByTag("tbody").first();
 
         if (databaseBody == null) {
-            LOGGER.warn("Unable to find a 'tbody' entry in the database table");
+            LARS_LOGGER.warn("Unable to find a 'tbody' entry in the database table");
             return Collections.emptyList();
         }
 
         final Elements databaseEntries = databaseBody.getElementsByTag("tr");
         if (databaseEntries.isEmpty()) {
-            LOGGER.warn("No 'tr' entries found in the database table");
+            LARS_LOGGER.warn("No 'tr' entries found in the database table");
             return Collections.emptyList();
         }
 
@@ -112,8 +112,8 @@ public final class LarsGpuRetriever {
         try {
             return LarsGpuParser.parseSingleGpuEntry(element);
         } catch (final LarsParseException e) {
-            LOGGER.debug("Error parsing GPU entry: {}", element, e);
-            LOGGER.warn("Error parsing GPU entry: {}", e.getMessage());
+            LARS_LOGGER.debug("Error parsing GPU entry: {}", element, e);
+            LARS_LOGGER.warn("Error parsing GPU entry: {}", e.getMessage());
             return null;
         }
     }

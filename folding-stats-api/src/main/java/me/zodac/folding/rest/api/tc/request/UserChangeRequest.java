@@ -63,7 +63,16 @@ public class UserChangeRequest implements RequestPojo {
     private int hardwareId;
     private boolean immediate;
 
-    @Override
+    /**
+     * Simple check that validates that the REST payload is valid. Checks that:
+     * <ul>
+     *     <li>'foldingUserName' matches {@link UserRequest#FOLDING_USER_NAME_PATTERN}</li>
+     *     <li>'passkey' matches {@link UserRequest#PASSKEY_PATTERN}</li>
+     *     <li>'liveStatsLink' is null or empty, or else is a valid {@link java.net.URI}</li>
+     * </ul>
+     *
+     * @throws me.zodac.folding.api.exception.ValidationException thrown if there are any validation failures
+     */
     public void validate() {
         final Collection<String> failureMessages = Stream.of(
                 validateFoldingUserName(),

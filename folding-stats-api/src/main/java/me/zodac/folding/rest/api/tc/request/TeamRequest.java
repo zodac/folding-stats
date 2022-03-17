@@ -57,7 +57,15 @@ public class TeamRequest implements RequestPojo {
     private String teamDescription;
     private String forumLink;
 
-    @Override
+    /**
+     * Simple check that validates that the REST payload is valid. Checks that:
+     * <ul>
+     *     <li>'teamName' is not null or empty</li>
+     *     <li>'forumLink' is null or empty, or else is a valid {@link java.net.URI}</li>
+     * </ul>
+     *
+     * @throws me.zodac.folding.api.exception.ValidationException thrown if there are any validation failures
+     */
     public void validate() {
         final Collection<String> failureMessages = Stream.of(
                 validateTeamName(),

@@ -26,40 +26,42 @@ package me.zodac.folding.lars;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import me.zodac.folding.api.tc.lars.LarsGpu;
+import me.zodac.folding.api.tc.Hardware;
+import me.zodac.folding.api.tc.HardwareMake;
+import me.zodac.folding.api.tc.HardwareType;
 import org.junit.jupiter.api.Test;
 
 /**
- * Unit tests for {@link LarsGpuAveragePpdComparator}.
+ * Unit tests for {@link HardwareNameComparator}.
  */
-class LarsGpuAveragePpdComparatorTest {
+class HardwareNameComparatorTest {
 
     @Test
-    void whenCompareLarsGpus_givenFirstGpuHasHigherAveragePpd_thenMinusOneIsReturned() {
-        final LarsGpu first = LarsGpu.create("larsGpu", "nVidia", "GTX 480", 1, 200_000L);
-        final LarsGpu second = LarsGpu.create("larsGpu", "nVidia", "GTX 480", 1, 100_000L);
+    void whenCompareLarsGpus_givenFirstGpuHasEarlierHardwareName_thenMinusOneIsReturned() {
+        final Hardware first = Hardware.createWithoutId("abc", "displayName", HardwareMake.AMD, HardwareType.GPU, 1.00D, 0L);
+        final Hardware second = Hardware.createWithoutId("cba", "displayName", HardwareMake.AMD, HardwareType.GPU, 1.00D, 0L);
 
-        final LarsGpuAveragePpdComparator comparator = LarsGpuAveragePpdComparator.create();
+        final HardwareNameComparator comparator = HardwareNameComparator.create();
         assertThat(comparator.compare(first, second))
             .isNegative();
     }
 
     @Test
-    void whenCompareLarsGpus_givenSecondGpuHasHigherAveragePpd_thenOneIsReturned() {
-        final LarsGpu first = LarsGpu.create("larsGpu", "nVidia", "GTX 480", 1, 100_000L);
-        final LarsGpu second = LarsGpu.create("larsGpu", "nVidia", "GTX 480", 1, 200_000L);
+    void whenCompareLarsGpus_givenSecondGpuHasLaterHardwareName_thenOneIsReturned() {
+        final Hardware first = Hardware.createWithoutId("cba", "displayName", HardwareMake.AMD, HardwareType.GPU, 1.00D, 0L);
+        final Hardware second = Hardware.createWithoutId("abc", "displayName", HardwareMake.AMD, HardwareType.GPU, 1.00D, 0L);
 
-        final LarsGpuAveragePpdComparator comparator = LarsGpuAveragePpdComparator.create();
+        final HardwareNameComparator comparator = HardwareNameComparator.create();
         assertThat(comparator.compare(first, second))
             .isPositive();
     }
 
     @Test
-    void whenCompareLarsGpus_givenBothGpusHaveSameAveragePpd_thenZeroIsReturned() {
-        final LarsGpu first = LarsGpu.create("larsGpu", "nVidia", "GTX 480", 1, 100_000L);
-        final LarsGpu second = LarsGpu.create("larsGpu", "nVidia", "GTX 480", 1, 100_000L);
+    void whenCompareLarsGpus_givenBothGpusHaveSameHardwareName_thenZeroIsReturned() {
+        final Hardware first = Hardware.createWithoutId("abc", "displayName", HardwareMake.AMD, HardwareType.GPU, 1.00D, 0L);
+        final Hardware second = Hardware.createWithoutId("abc", "displayName", HardwareMake.AMD, HardwareType.GPU, 1.00D, 0L);
 
-        final LarsGpuAveragePpdComparator comparator = LarsGpuAveragePpdComparator.create();
+        final HardwareNameComparator comparator = HardwareNameComparator.create();
         assertThat(comparator.compare(first, second))
             .isZero();
     }

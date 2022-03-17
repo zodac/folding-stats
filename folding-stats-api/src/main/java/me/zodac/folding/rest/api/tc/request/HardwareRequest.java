@@ -65,7 +65,19 @@ public class HardwareRequest implements RequestPojo {
     private double multiplier;
     private long averagePpd;
 
-    @Override
+    /**
+     * Simple check that validates that the REST payload is valid. Checks that:
+     * <ul>
+     *     <li>'hardwareName' is not null or empty</li>
+     *     <li>'displayName' is not null or empty</li>
+     *     <li>'hardwareMake' is a valid {@link HardwareMake}</li>
+     *     <li>'hardwareType' is a valid {@link HardwareType}</li>
+     *     <li>'multiplier' is at least <b>1.00</b></li>
+     *     <li>'averagePpd' is at least <b>1</b></li>
+     * </ul>
+     *
+     * @throws me.zodac.folding.api.exception.ValidationException thrown if there are any validation failures
+     */
     public void validate() {
         final Collection<String> failureMessages = Stream.of(
                 validateHardwareName(),

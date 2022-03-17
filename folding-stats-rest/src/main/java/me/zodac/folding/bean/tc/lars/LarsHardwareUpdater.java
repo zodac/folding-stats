@@ -50,7 +50,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class LarsHardwareUpdater {
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LARS_LOGGER = LogManager.getLogger("lars");
     private static final String LARS_URL_ROOT = EnvironmentVariableUtils.getOrDefault("LARS_URL_ROOT", "https://folding.lar.systems");
 
     private final FoldingRepository foldingRepository;
@@ -97,26 +97,26 @@ public class LarsHardwareUpdater {
     public void retrieveHardwareAndPersist() {
         try {
             retrieveGpusAndPersist();
-            LOGGER.info("LARS update complete");
+            LARS_LOGGER.info("LARS update complete");
         } catch (final Exception e) {
-            LOGGER.warn("Unexpected error updating LARS hardware data", e);
+            LARS_LOGGER.warn("Unexpected error updating LARS hardware data", e);
         }
     }
 
     private void retrieveGpusAndPersist() {
         final String gpuDbUrl = LARS_URL_ROOT + "/gpu_ppd/overall_ranks";
         final List<LarsGpu> larsGpus = LarsGpuRetriever.retrieveGpus(gpuDbUrl);
-        LOGGER.debug("Retrieved GPUs from LARS DB: {}", larsGpus);
-        LOGGER.info("Retrieved {} GPUs from LARS DB", larsGpus.size());
+        LARS_LOGGER.debug("Retrieved GPUs from LARS DB: {}", larsGpus);
+        LARS_LOGGER.info("Retrieved {} GPUs from LARS DB", larsGpus.size());
 
         if (larsGpus.isEmpty()) {
-            LOGGER.warn("No GPUs retrieved from LARs DB");
+            LARS_LOGGER.warn("No GPUs retrieved from LARs DB");
             return;
         }
 
         final LarsGpu bestGpu = larsGpus.get(0);
         final long bestPpd = bestGpu.getAveragePpd();
-        LOGGER.info("Best GPU PPD is '{}' for '{}', will compare to this", formatWithCommas(bestPpd), bestGpu.getModelInfo());
+        LARS_LOGGER.info("Best GPU PPD is '{}' for '{}', will compare to this", formatWithCommas(bestPpd), bestGpu.getModelInfo());
 
         final Collection<Hardware> lars = larsGpus
             .stream()
@@ -126,7 +126,7 @@ public class LarsHardwareUpdater {
 
         for (final Hardware hardware : HardwareSplitter.toDelete(lars, existing)) {
             foldingRepository.deleteHardware(hardware);
-            LOGGER.info("Deleted GPU hardware '{}' (ID: {})", hardware.getHardwareName(), hardware.getId());
+            LARS_LOGGER.info("Deleted GPU hardware '{}' (ID: {})", hardware.getHardwareName(), hardware.getId());
         }
 
         for (final Map.Entry<Hardware, Hardware> entry : HardwareSplitter.toUpdate(lars, existing).entrySet()) {
@@ -137,7 +137,7 @@ public class LarsHardwareUpdater {
 
                 foldingRepository.updateHardware(updatedHardwareWithId, existingHardware);
 
-                LOGGER.info("""
+                LARS_LOGGER.info("""
                         LARS updated GPU hardware:
                         {}
                         ID: {}
@@ -151,13 +151,13 @@ public class LarsHardwareUpdater {
                     formatWithCommas(existingHardware.getAveragePpd()),
                     formatWithCommas(updatedHardware.getAveragePpd()));
             } catch (final Exception e) {
-                LOGGER.warn("Unexpected error connecting to Folding@Home stats to verify new GPU hardware", e);
+                LARS_LOGGER.warn("Unexpected error connecting to Folding@Home stats to verify new GPU hardware", e);
             }
         }
 
         for (final Hardware hardware : HardwareSplitter.toCreate(lars, existing)) {
             final Hardware createdHardware = foldingRepository.createHardware(hardware);
-            LOGGER.info("Created GPU hardware '{}' (ID: {})", createdHardware.getHardwareName(), createdHardware.getId());
+            LARS_LOGGER.info("Created GPU hardware '{}' (ID: {})", createdHardware.getHardwareName(), createdHardware.getId());
         }
     }
 

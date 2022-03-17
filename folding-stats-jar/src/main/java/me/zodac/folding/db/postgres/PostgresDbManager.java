@@ -89,17 +89,11 @@ import org.jooq.impl.DSL;
  * <p>
  * Uses <b>jOOQ</b> for code generation for the DB tables/schemas, rather than direct SQL queries. See existing methods for examples.
  */
-public final class PostgresDbManager implements DbManager {
+public record PostgresDbManager(DataSource dataSource) implements DbManager {
 
     private static final DateTimeUtils DATE_TIME_UTILS = DateTimeUtils.create();
     private static final Logger SQL_LOGGER = LogManager.getLogger("sql");
     private static final int SINGLE_RESULT = 1;
-
-    private final DataSource dataSource;
-
-    private PostgresDbManager(final DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
 
     /**
      * Creates an instance of {@link PostgresDbManager}.
@@ -442,24 +436,6 @@ public final class PostgresDbManager implements DbManager {
                 .get(0)
                 .getUserChangeId();
             return UserChange.updateWithId(userChangeId, userChange);
-        });
-    }
-
-    @Override
-    public Collection<UserChange> getAllUserChanges() {
-        return executeQuery(queryContext -> {
-            final var query = queryContext
-                .select()
-                .from(USER_CHANGES)
-                .orderBy(USER_CHANGES.USER_CHANGE_ID.asc());
-            SQL_LOGGER.debug("Executing SQL: '{}'", query);
-
-            return query
-                .fetch()
-                .into(USER_CHANGES)
-                .stream()
-                .map(RecordConverter::toUserChange)
-                .toList();
         });
     }
 
