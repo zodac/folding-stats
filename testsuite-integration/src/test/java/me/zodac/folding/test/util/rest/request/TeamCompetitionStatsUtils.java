@@ -168,7 +168,7 @@ public final class TeamCompetitionStatsUtils {
      */
     public static void offsetUserPoints(final User user, final long points) throws FoldingRestException {
         final HttpResponse<Void> response =
-            TEAM_COMPETITION_REQUEST_SENDER.offset(user.getId(), points, Math.round(points * user.getHardware().getMultiplier()), 0,
+            TEAM_COMPETITION_REQUEST_SENDER.offset(user.getId(), points, Math.round(points * user.getHardware().multiplier()), 0,
                 ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())

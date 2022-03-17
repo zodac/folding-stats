@@ -90,7 +90,7 @@ public final class SystemCleaner {
                 .category(userWithPasskey.getCategory().toString())
                 .profileLink(userWithPasskey.getProfileLink())
                 .liveStatsLink(userWithPasskey.getLiveStatsLink())
-                .hardwareId(userWithPasskey.getHardware().getId())
+                .hardwareId(userWithPasskey.getHardware().id())
                 .teamId(userWithPasskey.getTeam().getId())
                 .userIsCaptain(false)
                 .build();
@@ -104,7 +104,7 @@ public final class SystemCleaner {
         }
 
         for (final Hardware hardware : HardwareUtils.getAll()) {
-            HARDWARE_REQUEST_SENDER.delete(hardware.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
+            HARDWARE_REQUEST_SENDER.delete(hardware.id(), ADMIN_USER.userName(), ADMIN_USER.password());
         }
 
         DatabaseUtils.truncateTableAndResetId("hardware", "users", "teams");

@@ -116,7 +116,7 @@ public class HardwareValidator {
     public Hardware update(final HardwareRequest hardwareRequest, final Hardware existingHardware) {
         // The hardwareName must be unique, unless replacing the same hardware
         final Optional<Hardware> hardwareWithMatchingName = getHardwareWithName(hardwareRequest.getHardwareName());
-        if (hardwareWithMatchingName.isPresent() && hardwareWithMatchingName.get().getId() != existingHardware.getId()) {
+        if (hardwareWithMatchingName.isPresent() && hardwareWithMatchingName.get().id() != existingHardware.id()) {
             throw new ConflictException(hardwareRequest, hardwareWithMatchingName.get(), CONFLICTING_ATTRIBUTE);
         }
 
@@ -135,7 +135,7 @@ public class HardwareValidator {
      * @throws UsedByException thrown if the {@link Hardware} is in use by a {@link User}
      */
     public Hardware delete(final Hardware hardware) {
-        final Collection<User> usersWithMatchingHardware = getUsersWithHardware(hardware.getId());
+        final Collection<User> usersWithMatchingHardware = getUsersWithHardware(hardware.id());
 
         if (!usersWithMatchingHardware.isEmpty()) {
             throw new UsedByException(hardware, usersWithMatchingHardware);
@@ -147,7 +147,7 @@ public class HardwareValidator {
     private Optional<Hardware> getHardwareWithName(final String hardwareName) {
         return foldingRepository.getAllHardware()
             .stream()
-            .filter(hardware -> hardware.getHardwareName().equalsIgnoreCase(hardwareName))
+            .filter(hardware -> hardware.hardwareName().equalsIgnoreCase(hardwareName))
             .findAny();
     }
 
@@ -158,7 +158,7 @@ public class HardwareValidator {
 
         return foldingRepository.getAllUsersWithoutPasskeys()
             .stream()
-            .filter(user -> user.getHardware().getId() == hardwareId)
+            .filter(user -> user.getHardware().id() == hardwareId)
             .map(User::hidePasskey)
             .toList();
     }

@@ -75,7 +75,7 @@ class PostgresDbManagerTest {
     void hardwareTest() {
         final Hardware hardware = generateHardware();
         final Hardware createdHardware = POSTGRES_DB_MANAGER.createHardware(hardware);
-        assertThat(createdHardware.getId())
+        assertThat(createdHardware.id())
             .isNotEqualTo(Hardware.EMPTY_HARDWARE_ID);
 
         // Not explicitly handling this case, the validator should ensure no duplicate creates are attempted
@@ -86,7 +86,7 @@ class PostgresDbManagerTest {
         assertThat(allHardware)
             .hasSize(1);
 
-        final Optional<Hardware> optionalRetrievedHardware = POSTGRES_DB_MANAGER.getHardware(createdHardware.getId());
+        final Optional<Hardware> optionalRetrievedHardware = POSTGRES_DB_MANAGER.getHardware(createdHardware.id());
         assertThat(optionalRetrievedHardware)
             .isPresent();
 
@@ -94,18 +94,18 @@ class PostgresDbManagerTest {
         assertThat(retrievedHardware)
             .isEqualTo(createdHardware);
 
-        final Hardware hardwareToUpdate = Hardware.builder()
-            .id(retrievedHardware.getId())
-            .hardwareName(retrievedHardware.getHardwareName())
-            .displayName(retrievedHardware.getDisplayName())
-            .hardwareMake(retrievedHardware.getHardwareMake())
-            .hardwareType(retrievedHardware.getHardwareType())
-            .multiplier(retrievedHardware.getMultiplier())
-            .averagePpd(retrievedHardware.getAveragePpd())
-            .build();
+        final Hardware hardwareToUpdate = Hardware.create(
+            retrievedHardware.id(),
+            retrievedHardware.hardwareName(),
+            retrievedHardware.displayName(),
+            retrievedHardware.hardwareMake(),
+            retrievedHardware.hardwareType(),
+            retrievedHardware.multiplier(),
+            retrievedHardware.averagePpd()
+        );
 
         POSTGRES_DB_MANAGER.updateHardware(hardwareToUpdate);
-        final Optional<Hardware> optionalUpdatedHardware = POSTGRES_DB_MANAGER.getHardware(createdHardware.getId());
+        final Optional<Hardware> optionalUpdatedHardware = POSTGRES_DB_MANAGER.getHardware(createdHardware.id());
         assertThat(optionalUpdatedHardware)
             .isPresent();
 
@@ -113,7 +113,7 @@ class PostgresDbManagerTest {
         assertThat(updatedHardware)
             .isEqualTo(hardwareToUpdate);
 
-        POSTGRES_DB_MANAGER.deleteHardware(createdHardware.getId());
+        POSTGRES_DB_MANAGER.deleteHardware(createdHardware.id());
 
         final Collection<Hardware> allHardwareAfterDelete = POSTGRES_DB_MANAGER.getAllHardware();
         assertThat(allHardwareAfterDelete)

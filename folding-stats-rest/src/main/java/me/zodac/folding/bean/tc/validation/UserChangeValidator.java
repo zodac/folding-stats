@@ -164,7 +164,7 @@ public class UserChangeValidator {
     }
 
     private void isUserChangeUnnecessary(final UserChangeRequest userChangeRequest, final User previousUser) {
-        if (previousUser.getHardware().getId() == userChangeRequest.getHardwareId()
+        if (previousUser.getHardware().id() == userChangeRequest.getHardwareId()
             && previousUser.getFoldingUserName().equals(userChangeRequest.getFoldingUserName())
             && previousUser.getPasskey().equals(userChangeRequest.getPasskey())
             && isEqualSafe(previousUser.getLiveStatsLink(), userChangeRequest.getLiveStatsLink())) {
@@ -183,7 +183,7 @@ public class UserChangeValidator {
 
             final List<String> availableHardwares = allHardwares
                 .stream()
-                .map(hardware -> String.format("%s: %s", hardware.getId(), hardware.getHardwareName()))
+                .map(hardware -> String.format("%s: %s", hardware.id(), hardware.hardwareName()))
                 .toList();
 
             throw new ValidationException(userChangeRequest, String.format("Field 'hardwareId' must be one of: %s", availableHardwares), e);
@@ -218,7 +218,7 @@ public class UserChangeValidator {
     private static boolean isMatchingUserChange(final UserChange userChange, final UserChangeRequest userChangeRequest) {
         final User user = userChange.newUser();
         return user.getId() == userChangeRequest.getUserId()
-            && user.getHardware().getId() == userChangeRequest.getHardwareId()
+            && user.getHardware().id() == userChangeRequest.getHardwareId()
             && Objects.equals(user.getFoldingUserName(), userChangeRequest.getFoldingUserName())
             && Objects.equals(user.getPasskey(), userChangeRequest.getPasskey())
             && Objects.equals(user.getLiveStatsLink(), userChangeRequest.getLiveStatsLink());

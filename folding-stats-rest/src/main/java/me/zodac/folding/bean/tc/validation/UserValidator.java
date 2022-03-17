@@ -276,16 +276,16 @@ public class UserValidator {
     private Category validateCategoryIsValidForHardware(final UserRequest userRequest, final Hardware hardwareForUser) {
         final Category category = Category.get(userRequest.getCategory());
 
-        if (!category.isHardwareMakeSupported(hardwareForUser.getHardwareMake())) {
+        if (!category.isHardwareMakeSupported(hardwareForUser.hardwareMake())) {
             throw new ValidationException(userRequest,
                 String.format("Category '%s' cannot be filled by hardware of make '%s', must be one of: %s", category,
-                    hardwareForUser.getHardwareMake(), category.supportedHardwareMakes()));
+                    hardwareForUser.hardwareMake(), category.supportedHardwareMakes()));
         }
 
-        if (!category.isHardwareTypeSupported(hardwareForUser.getHardwareType())) {
+        if (!category.isHardwareTypeSupported(hardwareForUser.hardwareType())) {
             throw new ValidationException(userRequest,
                 String.format("Category '%s' cannot be filled by hardware of type '%s', must be one of: %s", category,
-                    hardwareForUser.getHardwareType(), category.supportedHardwareTypes()));
+                    hardwareForUser.hardwareType(), category.supportedHardwareTypes()));
         }
 
         return category;
@@ -302,7 +302,7 @@ public class UserValidator {
 
             final List<String> availableHardwares = allHardwares
                 .stream()
-                .map(hardware -> String.format("%s: %s", hardware.getId(), hardware.getHardwareName()))
+                .map(hardware -> String.format("%s: %s", hardware.id(), hardware.hardwareName()))
                 .toList();
             throw new ValidationException(userRequest, String.format("Field 'hardwareId' must be one of: %s", availableHardwares), e);
         }

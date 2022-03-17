@@ -31,9 +31,19 @@ import me.zodac.folding.api.util.DateTimeUtils;
 
 /**
  * POJO defining a {@link UserChange} to request a change for a <code>Team Competition</code> {@link User} that must be approved/rejected by an admin.
+ *
+ * @param id                  the ID
+ * @param createdUtcTimestamp the UTC {@link LocalDateTime} for when the {@link UserChange} was created
+ * @param updatedUtcTimestamp the UTC {@link LocalDateTime} for when the {@link UserChange} was last updated
+ * @param previousUser        the previous {@link User} to be updated
+ * @param newUser             the {@link User} with changes to be applied
+ * @param state               the {@link UserChangeState}
  */
-public record UserChange(int id, LocalDateTime createdUtcTimestamp, LocalDateTime updatedUtcTimestamp,
-                         User previousUser, User newUser,
+public record UserChange(int id,
+                         LocalDateTime createdUtcTimestamp,
+                         LocalDateTime updatedUtcTimestamp,
+                         User previousUser,
+                         User newUser,
                          UserChangeState state
 ) implements ResponsePojo {
 

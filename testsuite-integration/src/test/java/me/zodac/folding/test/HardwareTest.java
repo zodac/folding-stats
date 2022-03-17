@@ -117,7 +117,7 @@ class HardwareTest {
 
     @Test
     void whenGettingHardware_givenValidHardwareId_thenHardwareIsReturned_andHas200Status() throws FoldingRestException {
-        final int hardwareId = create(generateHardware()).getId();
+        final int hardwareId = create(generateHardware()).id();
 
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get(hardwareId);
         assertThat(response.statusCode())
@@ -125,14 +125,14 @@ class HardwareTest {
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Hardware hardware = HardwareResponseParser.get(response);
-        assertThat(hardware.getId())
+        assertThat(hardware.id())
             .as("Did not receive the expected hardware: " + response.body())
             .isEqualTo(hardwareId);
     }
 
     @Test
     void whenGettingHardware_givenValidHardwareName_thenHardwareIsReturned_andHas200Status() throws FoldingRestException {
-        final String hardwareName = create(generateHardware()).getHardwareName();
+        final String hardwareName = create(generateHardware()).hardwareName();
 
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get(hardwareName);
         assertThat(response.statusCode())
@@ -140,7 +140,7 @@ class HardwareTest {
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Hardware hardware = HardwareResponseParser.get(response);
-        assertThat(hardware.getHardwareName())
+        assertThat(hardware.hardwareName())
             .as("Did not receive the expected hardware: " + response.body())
             .isEqualTo(hardwareName);
     }
@@ -152,16 +152,16 @@ class HardwareTest {
         final int initialSize = HardwareUtils.getNumberOfHardware();
 
         final HardwareRequest updatedHardware = HardwareRequest.builder()
-            .hardwareName(createdHardware.getHardwareName())
-            .displayName(createdHardware.getDisplayName())
-            .hardwareMake(createdHardware.getHardwareMake().toString())
-            .hardwareType(createdHardware.getHardwareType().toString())
-            .multiplier(createdHardware.getMultiplier())
-            .averagePpd(createdHardware.getAveragePpd())
+            .hardwareName(createdHardware.hardwareName())
+            .displayName(createdHardware.displayName())
+            .hardwareMake(createdHardware.hardwareMake().toString())
+            .hardwareType(createdHardware.hardwareType().toString())
+            .multiplier(createdHardware.multiplier())
+            .averagePpd(createdHardware.averagePpd())
             .build();
 
         final HttpResponse<String> response =
-            HARDWARE_REQUEST_SENDER.update(createdHardware.getId(), updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
+            HARDWARE_REQUEST_SENDER.update(createdHardware.id(), updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -182,7 +182,7 @@ class HardwareTest {
     @Test
     void whenDeletingHardware_givenValidHardwareId_thenHardwareIsDeleted_andHas200Status_andHardwareCountIsReduced_andHardwareCannotBeRetrievedAgain()
         throws FoldingRestException {
-        final int hardwareId = create(generateHardware()).getId();
+        final int hardwareId = create(generateHardware()).id();
         final int initialSize = HardwareUtils.getNumberOfHardware();
 
         final HttpResponse<Void> response = HARDWARE_REQUEST_SENDER.delete(hardwareId, ADMIN_USER.userName(), ADMIN_USER.password());
@@ -276,9 +276,9 @@ class HardwareTest {
         final Hardware createdHardware = create(generateHardware());
 
         final HardwareRequest updatedHardware = HardwareRequest.builder()
-            .hardwareName(createdHardware.getHardwareName())
-            .displayName(createdHardware.getDisplayName())
-            .multiplier(createdHardware.getMultiplier())
+            .hardwareName(createdHardware.hardwareName())
+            .displayName(createdHardware.displayName())
+            .multiplier(createdHardware.multiplier())
             .build();
 
         final HttpRequest request = HttpRequest.newBuilder()
@@ -333,16 +333,16 @@ class HardwareTest {
         final Hardware createdHardware = create(generateHardware());
 
         final HardwareRequest updatedHardware = HardwareRequest.builder()
-            .hardwareName(createdHardware.getHardwareName())
-            .displayName(createdHardware.getDisplayName())
-            .hardwareMake(createdHardware.getHardwareMake().toString())
-            .hardwareType(createdHardware.getHardwareType().toString())
-            .multiplier(createdHardware.getMultiplier())
-            .averagePpd(createdHardware.getAveragePpd())
+            .hardwareName(createdHardware.hardwareName())
+            .displayName(createdHardware.displayName())
+            .hardwareMake(createdHardware.hardwareMake().toString())
+            .hardwareType(createdHardware.hardwareType().toString())
+            .multiplier(createdHardware.multiplier())
+            .averagePpd(createdHardware.averagePpd())
             .build();
 
         final HttpResponse<String> updateResponse =
-            HARDWARE_REQUEST_SENDER.update(createdHardware.getId(), updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
+            HARDWARE_REQUEST_SENDER.update(createdHardware.id(), updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(updateResponse.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + updateResponse.body())
@@ -356,7 +356,7 @@ class HardwareTest {
 
     @Test
     void whenDeletingHardware_givenTheHardwareIsLinkedToUser_thenResponseHas409Status() throws FoldingRestException {
-        final int hardwareId = create(generateHardware()).getId();
+        final int hardwareId = create(generateHardware()).id();
         final UserRequest user = TestGenerator.generateUserWithHardwareId(hardwareId);
         UserUtils.create(user);
 
@@ -369,7 +369,7 @@ class HardwareTest {
     @Test
     void whenGettingHardwareById_givenRequestUsesPreviousEntityTag_andHardwareHasNotChanged_thenResponseHas304Status_andNoBody()
         throws FoldingRestException {
-        final int hardwareId = create(generateHardware()).getId();
+        final int hardwareId = create(generateHardware()).id();
 
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get(hardwareId);
         assertThat(response.statusCode())
@@ -432,14 +432,14 @@ class HardwareTest {
         final Hardware createdHardware = create(generateHardware());
 
         final HardwareRequest updatedHardware = HardwareRequest.builder()
-            .hardwareName(createdHardware.getHardwareName())
-            .displayName(createdHardware.getDisplayName())
-            .multiplier(createdHardware.getMultiplier())
+            .hardwareName(createdHardware.hardwareName())
+            .displayName(createdHardware.displayName())
+            .multiplier(createdHardware.multiplier())
             .build();
 
         final HttpRequest request = HttpRequest.newBuilder()
             .PUT(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(updatedHardware)))
-            .uri(URI.create(FOLDING_URL + "/hardware/" + createdHardware.getId()))
+            .uri(URI.create(FOLDING_URL + "/hardware/" + createdHardware.id()))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
             .build();
 
@@ -452,7 +452,7 @@ class HardwareTest {
     @Test
     void whenDeletingHardware_givenNoAuthentication_thenRequestFails_andResponseHas401Status()
         throws FoldingRestException, IOException, InterruptedException {
-        final int hardwareId = create(generateHardware()).getId();
+        final int hardwareId = create(generateHardware()).id();
 
         final HttpRequest request = HttpRequest.newBuilder()
             .DELETE()
@@ -516,7 +516,7 @@ class HardwareTest {
     @Test
     void whenUpdatingHardware_givenEmptyPayload_thenRequestFails_andResponseHas400Status()
         throws FoldingRestException, IOException, InterruptedException {
-        final int hardwareId = create(generateHardware()).getId();
+        final int hardwareId = create(generateHardware()).id();
 
         final HttpRequest request = HttpRequest.newBuilder()
             .PUT(HttpRequest.BodyPublishers.noBody())

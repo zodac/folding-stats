@@ -197,7 +197,7 @@ public class TeamCompetitionStatsEndpoint {
 
         final User user = foldingRepository.getUserWithPasskey(userId);
         final Hardware hardware = user.getHardware();
-        final OffsetTcStats offsetTcStatsToPersist = OffsetTcStats.updateWithHardwareMultiplier(offsetTcStats, hardware.getMultiplier());
+        final OffsetTcStats offsetTcStatsToPersist = OffsetTcStats.updateWithHardwareMultiplier(offsetTcStats, hardware.multiplier());
         final OffsetTcStats createdOffsetStats = statsRepository.createOrUpdateOffsetStats(user, offsetTcStatsToPersist);
 
         SystemStateManager.next(SystemState.UPDATING_STATS);

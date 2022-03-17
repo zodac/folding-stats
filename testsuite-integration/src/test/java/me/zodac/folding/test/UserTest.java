@@ -227,7 +227,7 @@ class UserTest {
             .category(createdUser.getCategory().toString())
             .profileLink(createdUser.getProfileLink())
             .liveStatsLink(createdUser.getLiveStatsLink())
-            .hardwareId(createdUser.getHardware().getId())
+            .hardwareId(createdUser.getHardware().id())
             .teamId(createdUser.getTeam().getId())
             .userIsCaptain(createdUser.isUserIsCaptain())
             .build();
@@ -374,7 +374,7 @@ class UserTest {
             .category(createdUser.getCategory().toString())
             .profileLink(createdUser.getProfileLink())
             .liveStatsLink(createdUser.getLiveStatsLink())
-            .hardwareId(createdUser.getHardware().getId())
+            .hardwareId(createdUser.getHardware().id())
             .teamId(createdUser.getTeam().getId())
             .userIsCaptain(createdUser.isUserIsCaptain())
             .build();
@@ -445,7 +445,7 @@ class UserTest {
             .category(createdUser.getCategory().toString())
             .profileLink(createdUser.getProfileLink())
             .liveStatsLink(createdUser.getLiveStatsLink())
-            .hardwareId(createdUser.getHardware().getId())
+            .hardwareId(createdUser.getHardware().id())
             .teamId(createdUser.getTeam().getId())
             .userIsCaptain(createdUser.isUserIsCaptain())
             .build();
@@ -562,7 +562,7 @@ class UserTest {
             .category(createdUser.getCategory().toString())
             .profileLink(createdUser.getProfileLink())
             .liveStatsLink(createdUser.getLiveStatsLink())
-            .hardwareId(createdUser.getHardware().getId())
+            .hardwareId(createdUser.getHardware().id())
             .teamId(createdUser.getTeam().getId())
             .userIsCaptain(createdUser.isUserIsCaptain())
             .build();
@@ -692,7 +692,7 @@ class UserTest {
             .category(createdUser.getCategory().toString())
             .profileLink(createdUser.getProfileLink())
             .liveStatsLink("")
-            .hardwareId(createdUser.getHardware().getId())
+            .hardwareId(createdUser.getHardware().id())
             .teamId(createdUser.getTeam().getId())
             .userIsCaptain(createdUser.isUserIsCaptain())
             .build();
@@ -713,7 +713,7 @@ class UserTest {
     @Test
     void whenUpdatingHardware_givenUserUsesTheHardware_thenUserWillReflectTheChanges_andResponseHas200Status() throws FoldingRestException {
         final Hardware hardware = HardwareUtils.create(generateHardware());
-        final UserRequest userRequest = generateUserWithHardwareId(hardware.getId());
+        final UserRequest userRequest = generateUserWithHardwareId(hardware.id());
         final User user = create(userRequest);
         final User initialUser = UserUtils.get(user.getId());
 
@@ -723,15 +723,15 @@ class UserTest {
 
         final HardwareRequest hardwareUpdateRequest = HardwareRequest.builder()
             .hardwareName("updatedHardwareName")
-            .displayName(hardware.getDisplayName())
-            .hardwareMake(hardware.getHardwareMake().toString())
-            .hardwareType(hardware.getHardwareType().toString())
-            .multiplier(hardware.getMultiplier())
-            .averagePpd(hardware.getAveragePpd())
+            .displayName(hardware.displayName())
+            .hardwareMake(hardware.hardwareMake().toString())
+            .hardwareType(hardware.hardwareType().toString())
+            .multiplier(hardware.multiplier())
+            .averagePpd(hardware.averagePpd())
             .build();
 
         final HttpResponse<String> response =
-            HARDWARE_REQUEST_SENDER.update(hardware.getId(), hardwareUpdateRequest, ADMIN_USER.userName(), ADMIN_USER.password());
+            HARDWARE_REQUEST_SENDER.update(hardware.id(), hardwareUpdateRequest, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -817,7 +817,7 @@ class UserTest {
             .displayName("newUser")
             .passkey("DummyPasskey12345678901234567890")
             .category(Category.AMD_GPU.toString())
-            .hardwareId(newHardware.getId())
+            .hardwareId(newHardware.id())
             .teamId(existingCaptain.getTeam().getId())
             .userIsCaptain(true)
             .build();
@@ -846,7 +846,7 @@ class UserTest {
             .displayName("newUser")
             .passkey("DummyPasskey12345678901234567890")
             .category(Category.AMD_GPU.toString())
-            .hardwareId(newHardware.getId())
+            .hardwareId(newHardware.id())
             .teamId(existingCaptain.getTeam().getId())
             .build());
 
@@ -864,7 +864,7 @@ class UserTest {
             .displayName("newUser")
             .passkey("DummyPasskey12345678901234567890")
             .category(Category.AMD_GPU.toString())
-            .hardwareId(newHardware.getId())
+            .hardwareId(newHardware.id())
             .teamId(existingCaptain.getTeam().getId())
             .userIsCaptain(true)
             .build());
@@ -900,7 +900,7 @@ class UserTest {
             .displayName(firstTeamCaptain.getDisplayName())
             .passkey(firstTeamCaptain.getPasskey())
             .category(Category.WILDCARD.toString())
-            .hardwareId(firstTeamCaptain.getHardware().getId())
+            .hardwareId(firstTeamCaptain.getHardware().id())
             .teamId(secondTeamCaptain.getTeam().getId())
             .userIsCaptain(firstTeamCaptain.isUserIsCaptain())
             .build());

@@ -36,6 +36,10 @@ import me.zodac.folding.rest.api.tc.leaderboard.UserCategoryLeaderboardEntry;
 
 /**
  * POJO containing the overall result for a single month of the <code>Team Competition</code>.
+ *
+ * @param teamLeaderboard         the leaderboard for {@link me.zodac.folding.api.tc.Team}s
+ * @param userCategoryLeaderboard the leaderboard for {@link me.zodac.folding.api.tc.User} {@link Category}s
+ * @param utcTimestamp            the {@link java.time.ZoneOffset#UTC} {@link LocalDateTime} for the {@link MonthlyResult}
  */
 public record MonthlyResult(List<TeamLeaderboardEntry> teamLeaderboard,
                             Map<Category, List<UserCategoryLeaderboardEntry>> userCategoryLeaderboard,

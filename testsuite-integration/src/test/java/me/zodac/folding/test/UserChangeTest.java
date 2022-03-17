@@ -157,7 +157,7 @@ class UserChangeTest {
             .existingPasskey(user.getPasskey())
             .passkey(user.getPasskey())
             .liveStatsLink(DUMMY_LIVE_STATS_LINK)
-            .hardwareId(user.getHardware().getId())
+            .hardwareId(user.getHardware().id())
             .immediate(true)
             .build();
 
@@ -454,7 +454,7 @@ class UserChangeTest {
             .existingPasskey("dummyPasskey")
             .passkey(user.getPasskey())
             .liveStatsLink(DUMMY_LIVE_STATS_LINK)
-            .hardwareId(user.getHardware().getId())
+            .hardwareId(user.getHardware().id())
             .immediate(true)
             .build();
 
@@ -488,7 +488,7 @@ class UserChangeTest {
             .existingPasskey(user.getPasskey())
             .passkey(user.getPasskey())
             .liveStatsLink(user.getLiveStatsLink())
-            .hardwareId(user.getHardware().getId())
+            .hardwareId(user.getHardware().id())
             .immediate(true)
             .build();
 
@@ -558,7 +558,7 @@ class UserChangeTest {
             .existingPasskey("DummyPasskey12345678901234567891")
             .passkey(user.getPasskey())
             .liveStatsLink(DUMMY_LIVE_STATS_LINK)
-            .hardwareId(user.getHardware().getId())
+            .hardwareId(user.getHardware().id())
             .immediate(true)
             .build();
 
@@ -587,7 +587,7 @@ class UserChangeTest {
             .existingPasskey(user.getPasskey())
             .passkey(user.getPasskey())
             .liveStatsLink(DUMMY_LIVE_STATS_LINK)
-            .hardwareId(user.getHardware().getId())
+            .hardwareId(user.getHardware().id())
             .immediate(true)
             .build();
     }

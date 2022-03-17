@@ -65,7 +65,7 @@ public class UserTcStatsCalculator {
      * The stats for the update are calculated as:
      * <ol>
      *     <li>The initial points are subtracted from the total points to give the {@link User}'s <code>pre-offset TC points</code></li>
-     *     <li>These TC points are multiplied by the {@link Hardware#getMultiplier()} for the {@link User}'s <code>TC multiplier points</code></li>
+     *     <li>These TC points are multiplied by the {@link Hardware#multiplier()} for the {@link User}'s <code>TC multiplier points</code></li>
      *     <li>The initial units are subtracted from the total units to give the {@link User}'s <code>TC units</code></li>
      *     <li>Any {@link OffsetTcStats} are then applied (positive or negative) to give the {@link User}'s <code>final TC stats</code></li>
      * </ol>
@@ -80,7 +80,7 @@ public class UserTcStatsCalculator {
      * @see StatsRepository#createHourlyTcStats(UserTcStats)
      */
     public void calculateAndPersist(final User user, final Stats initialStats, final OffsetTcStats offsetTcStats, final UserStats totalStats) {
-        final double hardwareMultiplier = user.getHardware().getMultiplier();
+        final double hardwareMultiplier = user.getHardware().multiplier();
         final long points = Math.max(0, totalStats.getPoints() - initialStats.getPoints());
         final long multipliedPoints = Math.round(points * hardwareMultiplier);
         final int units = Math.max(0, totalStats.getUnits() - initialStats.getUnits());

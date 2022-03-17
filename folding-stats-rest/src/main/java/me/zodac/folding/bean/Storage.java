@@ -123,7 +123,7 @@ public class Storage {
     public Hardware createHardware(final Hardware hardware) {
         return dbManagerFunction(dbManager -> {
             final Hardware hardwareWithId = dbManager.createHardware(hardware);
-            hardwareCache.put(hardwareWithId.getId(), hardwareWithId);
+            hardwareCache.put(hardwareWithId.id(), hardwareWithId);
             return hardwareWithId;
         });
     }
@@ -150,7 +150,7 @@ public class Storage {
             final Collection<Hardware> fromDb = dbManager.getAllHardware();
 
             for (final Hardware hardware : fromDb) {
-                hardwareCache.put(hardware.getId(), hardware);
+                hardwareCache.put(hardware.id(), hardware);
             }
 
             return fromDb;
@@ -200,11 +200,11 @@ public class Storage {
     public Hardware updateHardware(final Hardware hardwareToUpdate) {
         return dbManagerFunction(dbManager -> {
             final Hardware updatedHardware = dbManager.updateHardware(hardwareToUpdate);
-            hardwareCache.put(updatedHardware.getId(), updatedHardware);
+            hardwareCache.put(updatedHardware.id(), updatedHardware);
 
             getAllUsers()
                 .stream()
-                .filter(user -> user.getHardware().getId() == updatedHardware.getId())
+                .filter(user -> user.getHardware().id() == updatedHardware.id())
                 .map(user -> User.updateHardware(user, updatedHardware))
                 .forEach(updatedUser -> userCache.put(updatedUser.getId(), updatedUser));
 

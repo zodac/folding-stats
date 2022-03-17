@@ -65,7 +65,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -94,7 +94,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -121,7 +121,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -147,7 +147,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -174,7 +174,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -201,7 +201,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -228,7 +228,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -255,7 +255,7 @@ class UserValidatorTest {
             .profileLink(null)
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -284,7 +284,7 @@ class UserValidatorTest {
             .profileLink("invalidUrl")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -311,7 +311,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink(null)
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -340,7 +340,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("invalidUrl")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -382,7 +382,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -429,7 +429,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -454,15 +454,7 @@ class UserValidatorTest {
 
     @Test
     void whenValidatingCreate_givenUserWithMisMatchingHardwareMakeAndCategory_thenFailureResponseIsReturned() {
-        final Hardware hardware = Hardware.builder()
-            .id(hardwareId++)
-            .hardwareName("hardwareName")
-            .displayName("displayName")
-            .hardwareMake(HardwareMake.NVIDIA)
-            .hardwareType(HardwareType.GPU)
-            .multiplier(1.00D)
-            .averagePpd(1L)
-            .build();
+        final Hardware hardware = generateHardware();
         final Team team = generateTeam();
 
         final UserRequest user = UserRequest.builder()
@@ -473,7 +465,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -485,20 +477,20 @@ class UserValidatorTest {
         final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly(String.format("Category '%s' cannot be filled by hardware of make '%s', must be one of: %s", Category.AMD_GPU,
-                hardware.getHardwareMake(), Category.AMD_GPU.supportedHardwareMakes()));
+                hardware.hardwareMake(), Category.AMD_GPU.supportedHardwareMakes()));
     }
 
     @Test
     void whenValidatingCreate_givenUserWithMisMatchingHardwareTypeAndCategory_thenFailureResponseIsReturned() {
-        final Hardware hardware = Hardware.builder()
-            .id(hardwareId++)
-            .hardwareName("hardwareName")
-            .displayName("displayName")
-            .hardwareMake(HardwareMake.AMD)
-            .hardwareType(HardwareType.CPU)
-            .multiplier(1.00D)
-            .averagePpd(1L)
-            .build();
+        final Hardware hardware = Hardware.create(
+            hardwareId++,
+            "hardwareName",
+            "displayName",
+            HardwareMake.AMD,
+            HardwareType.CPU,
+            1.00D,
+            1L
+        );
         final Team team = generateTeam();
 
         final UserRequest user = UserRequest.builder()
@@ -509,7 +501,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -521,20 +513,20 @@ class UserValidatorTest {
         final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly(String.format("Category '%s' cannot be filled by hardware of type '%s', must be one of: %s", Category.AMD_GPU,
-                hardware.getHardwareType(), Category.AMD_GPU.supportedHardwareTypes()));
+                hardware.hardwareType(), Category.AMD_GPU.supportedHardwareTypes()));
     }
 
     @Test
     void whenValidatingCreate_givenUserWithHardwareWithNonExistingId_thenFailureResponseIsReturned() {
-        final Hardware hardware = Hardware.builder()
-            .id(99)
-            .hardwareName("hardwareName")
-            .displayName("displayName")
-            .hardwareMake(HardwareMake.NVIDIA)
-            .hardwareType(HardwareType.GPU)
-            .multiplier(1.00D)
-            .averagePpd(1L)
-            .build();
+        final Hardware hardware = Hardware.create(
+            99,
+            "hardwareName",
+            "displayName",
+            HardwareMake.NVIDIA,
+            HardwareType.GPU,
+            1.00D,
+            1L
+        );
         final Team team = generateTeam();
 
         final UserRequest user = UserRequest.builder()
@@ -556,7 +548,7 @@ class UserValidatorTest {
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
-            .containsOnly(String.format("Field 'hardwareId' must be one of: [%s: %s]", hardware.getId(), hardware.getHardwareName()));
+            .containsOnly(String.format("Field 'hardwareId' must be one of: [%s: %s]", hardware.id(), hardware.hardwareName()));
     }
 
     @Test
@@ -586,15 +578,15 @@ class UserValidatorTest {
 
     @Test
     void whenValidatingCreate_givenUserWithTeamWithNonExistingId_thenFailureResponseIsReturned() {
-        final Hardware hardware = Hardware.builder()
-            .id(99)
-            .hardwareName("hardwareName")
-            .displayName("displayName")
-            .hardwareMake(HardwareMake.NVIDIA)
-            .hardwareType(HardwareType.GPU)
-            .multiplier(1.00D)
-            .averagePpd(1L)
-            .build();
+        final Hardware hardware = Hardware.create(
+            99,
+            "hardwareName",
+            "displayName",
+            HardwareMake.NVIDIA,
+            HardwareType.GPU,
+            1.00D,
+            1L
+        );
         final Team team = generateTeam();
 
         final UserRequest user = UserRequest.builder()
@@ -605,7 +597,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(1)
             .build();
 
@@ -631,7 +623,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(1)
             .build();
 
@@ -669,7 +661,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -711,7 +703,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(false)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -741,7 +733,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(false)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -786,7 +778,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -831,7 +823,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -876,7 +868,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -906,7 +898,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -935,7 +927,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -962,7 +954,7 @@ class UserValidatorTest {
             .profileLink("invalid")
             .liveStatsLink("invalid")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -996,7 +988,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -1038,7 +1030,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -1078,7 +1070,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -1118,7 +1110,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -1158,7 +1150,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -1198,7 +1190,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -1238,7 +1230,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -1278,7 +1270,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -1318,7 +1310,7 @@ class UserValidatorTest {
             .profileLink(null)
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -1360,7 +1352,7 @@ class UserValidatorTest {
             .profileLink("invalidUrl")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -1400,7 +1392,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink(null)
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -1442,7 +1434,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("invalidUrl")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -1498,7 +1490,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -1549,7 +1541,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -1592,7 +1584,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -1649,7 +1641,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -1707,7 +1699,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -1764,7 +1756,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(false)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -1809,7 +1801,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(false)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -1870,7 +1862,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -1932,7 +1924,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -1982,15 +1974,7 @@ class UserValidatorTest {
 
     @Test
     void whenValidatingUpdate_givenUserWithMisMatchingHardwareMakeAndCategory_thenFailureResponseIsReturned() {
-        final Hardware hardware = Hardware.builder()
-            .id(hardwareId++)
-            .hardwareName("hardwareName")
-            .displayName("displayName")
-            .hardwareMake(HardwareMake.NVIDIA)
-            .hardwareType(HardwareType.GPU)
-            .multiplier(1.00D)
-            .averagePpd(1L)
-            .build();
+        final Hardware hardware = generateHardware();
         final Team team = generateTeam();
 
         final UserRequest user = UserRequest.builder()
@@ -2001,7 +1985,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -2027,21 +2011,21 @@ class UserValidatorTest {
         final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly(String.format("Category '%s' cannot be filled by hardware of make '%s', must be one of: %s", Category.AMD_GPU,
-                hardware.getHardwareMake(), Category.AMD_GPU.supportedHardwareMakes())
+                hardware.hardwareMake(), Category.AMD_GPU.supportedHardwareMakes())
             );
     }
 
     @Test
     void whenValidatingUpdate_givenUserWithMisMatchingHardwareTypeAndCategory_thenFailureResponseIsReturned() {
-        final Hardware hardware = Hardware.builder()
-            .id(hardwareId++)
-            .hardwareName("hardwareName")
-            .displayName("displayName")
-            .hardwareMake(HardwareMake.AMD)
-            .hardwareType(HardwareType.CPU)
-            .multiplier(1.00D)
-            .averagePpd(1L)
-            .build();
+        final Hardware hardware = Hardware.create(
+            hardwareId++,
+            "hardwareName",
+            "displayName",
+            HardwareMake.AMD,
+            HardwareType.CPU,
+            1.00D,
+            1L
+        );
         final Team team = generateTeam();
 
         final UserRequest user = UserRequest.builder()
@@ -2052,7 +2036,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -2078,21 +2062,22 @@ class UserValidatorTest {
         final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly(String.format("Category '%s' cannot be filled by hardware of type '%s', must be one of: %s", Category.AMD_GPU,
-                hardware.getHardwareType(), Category.AMD_GPU.supportedHardwareTypes())
+                hardware.hardwareType(), Category.AMD_GPU.supportedHardwareTypes())
             );
     }
 
     @Test
     void whenValidatingUpdate_givenUserWithHardwareWithNonExistingId_thenFailureResponseIsReturned() {
-        final Hardware hardware = Hardware.builder()
-            .id(99)
-            .hardwareName("hardwareName")
-            .displayName("displayName")
-            .hardwareMake(HardwareMake.NVIDIA)
-            .hardwareType(HardwareType.GPU)
-            .multiplier(1.00D)
-            .averagePpd(1L)
-            .build();
+        final Hardware hardware = Hardware.create(
+            99,
+            "hardwareName",
+            "displayName",
+            HardwareMake.NVIDIA,
+            HardwareType.GPU,
+            1.00D,
+            1L
+        );
+
         final Team team = generateTeam();
 
         final UserRequest user = UserRequest.builder()
@@ -2128,7 +2113,7 @@ class UserValidatorTest {
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
-            .containsOnly(String.format("Field 'hardwareId' must be one of: [%s: %s]", hardware.getId(), hardware.getHardwareName()));
+            .containsOnly(String.format("Field 'hardwareId' must be one of: [%s: %s]", hardware.id(), hardware.hardwareName()));
     }
 
     @Test
@@ -2187,7 +2172,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(1)
             .build();
 
@@ -2227,7 +2212,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(1)
             .build();
 
@@ -2266,7 +2251,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -2309,7 +2294,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -2353,7 +2338,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -2396,7 +2381,7 @@ class UserValidatorTest {
             .profileLink("https://www.google.com")
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -2437,7 +2422,7 @@ class UserValidatorTest {
             .profileLink("invalid")
             .liveStatsLink("invalid")
             .userIsCaptain(true)
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 
@@ -2526,15 +2511,15 @@ class UserValidatorTest {
     }
 
     private static Hardware generateHardware() {
-        return Hardware.builder()
-            .id(hardwareId++)
-            .hardwareName("hardwareName")
-            .displayName("displayName")
-            .hardwareMake(HardwareMake.NVIDIA)
-            .hardwareType(HardwareType.GPU)
-            .multiplier(1.00D)
-            .averagePpd(1L)
-            .build();
+        return Hardware.create(
+            hardwareId++,
+            "hardwareName",
+            "displayName",
+            HardwareMake.NVIDIA,
+            HardwareType.GPU,
+            1.00D,
+            1L
+        );
     }
 
     private static Team generateTeam() {

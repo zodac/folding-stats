@@ -70,7 +70,7 @@ public final class HardwareSplitter {
 
         final Set<Hardware> toCreate = fromLars
             .stream()
-            .filter(hardwareFromLars -> hardwareNamesOnlyInLars.contains(hardwareFromLars.getHardwareName()))
+            .filter(hardwareFromLars -> hardwareNamesOnlyInLars.contains(hardwareFromLars.hardwareName()))
             .collect(toCollection(() -> new TreeSet<>(HardwareNameComparator.create())));
 
         LARS_LOGGER.info("{} from LARS, {} in DB, {} to create", fromLars.size(), inDb.size(), toCreate.size());
@@ -93,7 +93,7 @@ public final class HardwareSplitter {
 
         final Set<Hardware> toDelete = inDb
             .stream()
-            .filter(hardwareInDb -> hardwareNamesNoLongerInLars.contains(hardwareInDb.getHardwareName()))
+            .filter(hardwareInDb -> hardwareNamesNoLongerInLars.contains(hardwareInDb.hardwareName()))
             .collect(toCollection(() -> new TreeSet<>(HardwareNameComparator.create())));
         LARS_LOGGER.info("{} from LARS, {} in DB, {} to delete", fromLars.size(), inDb.size(), toDelete.size());
         return toDelete;
@@ -102,7 +102,7 @@ public final class HardwareSplitter {
     private static Collection<String> getHardwareNames(final Collection<Hardware> hardwares) {
         return hardwares
             .stream()
-            .map(Hardware::getHardwareName)
+            .map(Hardware::hardwareName)
             .collect(toSet());
     }
 
@@ -122,12 +122,12 @@ public final class HardwareSplitter {
 
         final Map<String, Hardware> fromLarsHardware = new HashMap<>();
         for (final Hardware hardwareFromLars : fromLars) {
-            fromLarsHardware.putIfAbsent(hardwareFromLars.getHardwareName().toLowerCase(Locale.UK), hardwareFromLars);
+            fromLarsHardware.putIfAbsent(hardwareFromLars.hardwareName().toLowerCase(Locale.UK), hardwareFromLars);
         }
 
         final Map<String, Hardware> inDbHardware = inDb
             .stream()
-            .collect(toMap(hardware -> hardware.getHardwareName().toLowerCase(Locale.UK), hardware -> hardware));
+            .collect(toMap(hardware -> hardware.hardwareName().toLowerCase(Locale.UK), hardware -> hardware));
 
         fromLarsHardware.keySet().retainAll(inDbHardware.keySet());
         final Map<Hardware, Hardware> larsHardwareAlreadyInDb = fromLarsHardware.entrySet()
@@ -140,12 +140,12 @@ public final class HardwareSplitter {
             final Hardware existingHardware = entry.getValue();
 
             // Using BigDecimal since equality checks with doubles can be imprecise
-            final BigDecimal updatedMultiplier = BigDecimal.valueOf(updatedHardware.getMultiplier());
-            final BigDecimal existingMultiplier = BigDecimal.valueOf(existingHardware.getMultiplier());
+            final BigDecimal updatedMultiplier = BigDecimal.valueOf(updatedHardware.multiplier());
+            final BigDecimal existingMultiplier = BigDecimal.valueOf(existingHardware.multiplier());
 
             // We know the name is already equal, now we check multiplier and average PPD
             // If the stats have not changed since the last update, no need to update again now
-            if (!updatedMultiplier.equals(existingMultiplier) || updatedHardware.getAveragePpd() != existingHardware.getAveragePpd()) {
+            if (!updatedMultiplier.equals(existingMultiplier) || updatedHardware.averagePpd() != existingHardware.averagePpd()) {
                 toUpdate.put(updatedHardware, existingHardware);
             }
         }

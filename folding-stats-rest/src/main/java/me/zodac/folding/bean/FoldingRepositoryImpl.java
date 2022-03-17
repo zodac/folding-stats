@@ -126,19 +126,19 @@ public class FoldingRepositoryImpl implements FoldingRepository {
     }
 
     private Collection<User> getUsersWithHardware(final Hardware hardware) {
-        if (hardware.getId() == Hardware.EMPTY_HARDWARE_ID) {
+        if (hardware.id() == Hardware.EMPTY_HARDWARE_ID) {
             return Collections.emptyList();
         }
 
         return getAllUsersWithPasskeys()
             .stream()
-            .filter(user -> user.getHardware().getId() == hardware.getId())
+            .filter(user -> user.getHardware().id() == hardware.id())
             .toList();
     }
 
     @Override
     public void deleteHardware(final Hardware hardware) {
-        storage.deleteHardware(hardware.getId());
+        storage.deleteHardware(hardware.id());
     }
 
     @Override
@@ -247,7 +247,7 @@ public class FoldingRepositoryImpl implements FoldingRepository {
     }
 
     private boolean isUserStateChange(final User updatedUser, final User existingUser) {
-        if (existingUser.getHardware().getId() != updatedUser.getHardware().getId()) {
+        if (existingUser.getHardware().id() != updatedUser.getHardware().id()) {
             LOGGER.debug("User '{}' (ID: {}) had state change to hardware, {} -> {}", existingUser.getDisplayName(),
                 existingUser.getId(), existingUser.getHardware(), updatedUser.getHardware());
             return true;
@@ -271,13 +271,13 @@ public class FoldingRepositoryImpl implements FoldingRepository {
 
     private boolean isHardwareStateChange(final Hardware updatedHardware, final Hardware existingHardware) {
         // Using BigDecimal since equality checks with doubles can be imprecise
-        final BigDecimal existingMultiplier = BigDecimal.valueOf(existingHardware.getMultiplier());
-        final BigDecimal updatedMultiplier = BigDecimal.valueOf(updatedHardware.getMultiplier());
+        final BigDecimal existingMultiplier = BigDecimal.valueOf(existingHardware.multiplier());
+        final BigDecimal updatedMultiplier = BigDecimal.valueOf(updatedHardware.multiplier());
         final boolean isMultiplierChange = !existingMultiplier.equals(updatedMultiplier);
 
         if (isMultiplierChange) {
-            LOGGER.debug("Hardware '{}' (ID: {}) had state change to multiplier, {} -> {}", updatedHardware.getId(),
-                updatedHardware.getHardwareName(), existingHardware.getMultiplier(), updatedHardware.getMultiplier());
+            LOGGER.debug("Hardware '{}' (ID: {}) had state change to multiplier, {} -> {}", updatedHardware.id(),
+                updatedHardware.hardwareName(), existingHardware.multiplier(), updatedHardware.multiplier());
         }
 
         return isMultiplierChange;

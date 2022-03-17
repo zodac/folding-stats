@@ -30,7 +30,7 @@ import java.util.Comparator;
 import me.zodac.folding.api.tc.Hardware;
 
 /**
- * Custom {@link Comparator} that allows for sorting of {@link Hardware}s by only comparing the value of {@link Hardware#getHardwareName()}.
+ * Custom {@link Comparator} that allows for sorting of {@link Hardware}s by only comparing the value of {@link Hardware#hardwareName()}.
  */
 final class HardwareNameComparator implements Comparator<Hardware>, Serializable {
 
@@ -52,6 +52,6 @@ final class HardwareNameComparator implements Comparator<Hardware>, Serializable
 
     @Override
     public int compare(final Hardware first, final Hardware second) {
-        return String.CASE_INSENSITIVE_ORDER.compare(first.getHardwareName(), second.getHardwareName());
+        return String.CASE_INSENSITIVE_ORDER.compare(first.hardwareName(), second.hardwareName());
     }
 }

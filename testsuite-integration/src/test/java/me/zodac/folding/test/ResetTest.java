@@ -117,7 +117,7 @@ class ResetTest {
             .displayName("displayName")
             .passkey("DummyPasskey12345678901234567890")
             .category(Category.NVIDIA_GPU.toString())
-            .hardwareId(captainHardware.getId())
+            .hardwareId(captainHardware.id())
             .teamId(team.getId())
             .userIsCaptain(true)
             .build();
@@ -128,7 +128,7 @@ class ResetTest {
             .displayName("displayName")
             .passkey("DummyPasskey12345678901234567890")
             .category(Category.AMD_GPU.toString())
-            .hardwareId(hardware.getId())
+            .hardwareId(hardware.id())
             .teamId(team.getId())
             .build();
 

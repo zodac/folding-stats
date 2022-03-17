@@ -172,7 +172,7 @@ class LarsTest {
             .hasSize(2);
 
         final Hardware hardwareAfterSecondUpdate = allHardwareAfterSecondUpdate.iterator().next();
-        assertThat(hardwareAfterSecondUpdate.getHardwareName())
+        assertThat(hardwareAfterSecondUpdate.hardwareName())
             .as("Expected second hardware to have been deleted from the system")
             .isNotEqualTo("Hardware #2");
     }

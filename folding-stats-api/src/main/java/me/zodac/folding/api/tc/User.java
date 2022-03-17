@@ -258,7 +258,7 @@ public class User implements ResponsePojo {
      * @return <code>true</code> if the input{@link UserRequest} is equal to the {@link User}
      */
     public boolean isEqualRequest(final UserRequest userRequest) {
-        return hardware.getId() == userRequest.getHardwareId()
+        return hardware.id() == userRequest.getHardwareId()
             && team.getId() == userRequest.getTeamId()
             && userIsCaptain == userRequest.isUserIsCaptain()
             && Objects.equals(foldingUserName, userRequest.getFoldingUserName())

@@ -116,9 +116,9 @@ public class HardwareEndpoint {
         final Hardware elementWithId = foldingRepository.createHardware(validatedHardware);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
-        AUDIT_LOGGER.info("Created hardware with ID {}", elementWithId.getId());
+        AUDIT_LOGGER.info("Created hardware with ID {}", elementWithId.id());
         hardwareCreates.increment();
-        return created(elementWithId, elementWithId.getId());
+        return created(elementWithId, elementWithId.id());
     }
 
     /**
@@ -168,7 +168,7 @@ public class HardwareEndpoint {
 
         final Hardware retrievedHardware = foldingRepository.getAllHardware()
             .stream()
-            .filter(hardware -> hardware.getHardwareName().equalsIgnoreCase(hardwareName))
+            .filter(hardware -> hardware.hardwareName().equalsIgnoreCase(hardwareName))
             .findAny()
             .orElseThrow(() -> new NotFoundException(Hardware.class, hardwareName));
 
@@ -201,13 +201,13 @@ public class HardwareEndpoint {
         final Hardware validatedHardware = hardwareValidator.update(hardwareRequest, existingHardware);
 
         // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
-        final Hardware hardwareWithId = Hardware.updateWithId(existingHardware.getId(), validatedHardware);
+        final Hardware hardwareWithId = Hardware.updateWithId(existingHardware.id(), validatedHardware);
         final Hardware updatedHardwareWithId = foldingRepository.updateHardware(hardwareWithId, existingHardware);
 
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
-        AUDIT_LOGGER.info("Updated hardware with ID {}", updatedHardwareWithId.getId());
+        AUDIT_LOGGER.info("Updated hardware with ID {}", updatedHardwareWithId.id());
         hardwareUpdates.increment();
-        return ok(updatedHardwareWithId, updatedHardwareWithId.getId());
+        return ok(updatedHardwareWithId, updatedHardwareWithId.id());
     }
 
     /**

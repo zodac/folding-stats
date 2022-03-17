@@ -50,7 +50,7 @@ class MockFoldingRepository implements FoldingRepository {
 
     @Override
     public Hardware createHardware(final Hardware hardware) {
-        hardwares.put(hardware.getId(), hardware);
+        hardwares.put(hardware.id(), hardware);
         return hardware;
     }
 
@@ -68,13 +68,13 @@ class MockFoldingRepository implements FoldingRepository {
 
     @Override
     public Hardware updateHardware(final Hardware hardwareToUpdate, final Hardware existingHardware) {
-        hardwares.put(hardwareToUpdate.getId(), hardwareToUpdate);
+        hardwares.put(hardwareToUpdate.id(), hardwareToUpdate);
         return hardwareToUpdate;
     }
 
     @Override
     public void deleteHardware(final Hardware hardware) {
-        hardwares.remove(hardware.getId());
+        hardwares.remove(hardware.id());
     }
 
     @Override

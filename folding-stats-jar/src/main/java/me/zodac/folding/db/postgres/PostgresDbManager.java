@@ -119,12 +119,12 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
                     HARDWARE.AVERAGE_PPD
                 )
                 .values(
-                    hardware.getHardwareName(),
-                    hardware.getDisplayName(),
-                    hardware.getHardwareMake().toString(),
-                    hardware.getHardwareType().toString(),
-                    BigDecimal.valueOf(hardware.getMultiplier()),
-                    BigDecimal.valueOf(hardware.getAveragePpd())
+                    hardware.hardwareName(),
+                    hardware.displayName(),
+                    hardware.hardwareMake().toString(),
+                    hardware.hardwareType().toString(),
+                    BigDecimal.valueOf(hardware.multiplier()),
+                    BigDecimal.valueOf(hardware.averagePpd())
                 )
                 .returning(HARDWARE.HARDWARE_ID);
             SQL_LOGGER.debug("Executing SQL: '{}'", query);
@@ -178,13 +178,13 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
         executeQuery(queryContext -> {
             final var query = queryContext
                 .update(HARDWARE)
-                .set(HARDWARE.HARDWARE_NAME, hardwareToUpdate.getHardwareName())
-                .set(HARDWARE.DISPLAY_NAME, hardwareToUpdate.getDisplayName())
-                .set(HARDWARE.HARDWARE_MAKE, hardwareToUpdate.getHardwareMake().toString())
-                .set(HARDWARE.HARDWARE_TYPE, hardwareToUpdate.getHardwareType().toString())
-                .set(HARDWARE.MULTIPLIER, BigDecimal.valueOf(hardwareToUpdate.getMultiplier()))
-                .set(HARDWARE.AVERAGE_PPD, BigDecimal.valueOf(hardwareToUpdate.getAveragePpd()))
-                .where(HARDWARE.HARDWARE_ID.equal(hardwareToUpdate.getId()));
+                .set(HARDWARE.HARDWARE_NAME, hardwareToUpdate.hardwareName())
+                .set(HARDWARE.DISPLAY_NAME, hardwareToUpdate.displayName())
+                .set(HARDWARE.HARDWARE_MAKE, hardwareToUpdate.hardwareMake().toString())
+                .set(HARDWARE.HARDWARE_TYPE, hardwareToUpdate.hardwareType().toString())
+                .set(HARDWARE.MULTIPLIER, BigDecimal.valueOf(hardwareToUpdate.multiplier()))
+                .set(HARDWARE.AVERAGE_PPD, BigDecimal.valueOf(hardwareToUpdate.averagePpd()))
+                .where(HARDWARE.HARDWARE_ID.equal(hardwareToUpdate.id()));
             SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
@@ -314,7 +314,7 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
                     user.getCategory().toString(),
                     user.getProfileLink(),
                     user.getLiveStatsLink(),
-                    user.getHardware().getId(),
+                    user.getHardware().id(),
                     user.getTeam().getId(),
                     user.isUserIsCaptain()
                 )
@@ -382,7 +382,7 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
                 .set(USERS.CATEGORY, userToUpdate.getCategory().toString())
                 .set(USERS.PROFILE_LINK, userToUpdate.getProfileLink())
                 .set(USERS.LIVE_STATS_LINK, userToUpdate.getLiveStatsLink())
-                .set(USERS.HARDWARE_ID, userToUpdate.getHardware().getId())
+                .set(USERS.HARDWARE_ID, userToUpdate.getHardware().id())
                 .set(USERS.TEAM_ID, userToUpdate.getTeam().getId())
                 .set(USERS.IS_CAPTAIN, userToUpdate.isUserIsCaptain())
                 .where(USERS.USER_ID.equal(userToUpdate.getId()));
@@ -743,7 +743,7 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
 
             final User user = optionalUser.get();
             final Hardware hardware = user.getHardware();
-            final double hardwareMultiplier = hardware.getMultiplier();
+            final double hardwareMultiplier = hardware.multiplier();
 
             return UserTcStats.create(
                 firstHourTcStatsCurrentDay.getUserId(),

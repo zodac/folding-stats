@@ -30,6 +30,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import me.zodac.folding.api.tc.Hardware;
+import me.zodac.folding.api.tc.HardwareMake;
+import me.zodac.folding.api.tc.HardwareType;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -40,32 +42,18 @@ class HardwareSplitterTest {
     @Test
     void testToCreate() {
         final Collection<Hardware> lars = Set.of(
-            Hardware.builder()
-                .hardwareName("Test1")
-                .build(),
-            Hardware.builder()
-                .hardwareName("Test2")
-                .build(),
-            Hardware.builder()
-                .hardwareName("Test3")
-                .build(),
-            Hardware.builder()
-                .hardwareName("Test4")
-                .averagePpd(1)
-                .build()
+            createHardware("Test1"),
+            createHardware("Test2"),
+            createHardware("Test3"),
+            createHardwareWithAveragePpd("Test4", 1L)
         );
         final Collection<Hardware> existing = Set.of(
-            Hardware.builder()
-                .hardwareName("Test1")
-                .build(),
-            Hardware.builder()
-                .hardwareName("Test4")
-                .averagePpd(2)
-                .build()
+            createHardware("Test1"),
+            createHardwareWithAveragePpd("Test4", 2L)
         );
 
         final Collection<Hardware> toCreate = HardwareSplitter.toCreate(lars, existing);
-        final Collection<String> names = toCreate.stream().map(Hardware::getHardwareName).toList();
+        final Collection<String> names = toCreate.stream().map(Hardware::hardwareName).toList();
 
         assertThat(names)
             .hasSize(2)
@@ -78,26 +66,16 @@ class HardwareSplitterTest {
     @Test
     void testToDelete() {
         final Collection<Hardware> lars = Set.of(
-            Hardware.builder()
-                .hardwareName("Test2")
-                .averagePpd(1)
-                .build(),
-            Hardware.builder()
-                .hardwareName("Test3")
-                .build()
+            createHardwareWithAveragePpd("Test2", 2L),
+            createHardware("Test3")
         );
         final Collection<Hardware> existing = Set.of(
-            Hardware.builder()
-                .hardwareName("Test1")
-                .build(),
-            Hardware.builder()
-                .hardwareName("Test2")
-                .averagePpd(2)
-                .build()
+            createHardware("Test1"),
+            createHardwareWithAveragePpd("Test2", 2L)
         );
 
         final Collection<Hardware> toDelete = HardwareSplitter.toDelete(lars, existing);
-        final Collection<String> names = toDelete.stream().map(Hardware::getHardwareName).toList();
+        final Collection<String> names = toDelete.stream().map(Hardware::hardwareName).toList();
 
         assertThat(names)
             .hasSize(1)
@@ -109,44 +87,20 @@ class HardwareSplitterTest {
     @Test
     void testToUpdate() {
         final Collection<Hardware> lars = Set.of(
-            Hardware.builder()
-                .hardwareName("Test1")
-                .multiplier(1.00D)
-                .build(),
-            Hardware.builder()
-                .hardwareName("Test2")
-                .multiplier(1.00D)
-                .build(),
-            Hardware.builder()
-                .hardwareName("Test3")
-                .multiplier(1.00D)
-                .build(),
-            Hardware.builder()
-                .hardwareName("Test4")
-                .multiplier(1.00D)
-                .build(),
-            Hardware.builder()
-                .hardwareName("Test4") // Duplicate value, should be ignored
-                .multiplier(2.00D)
-                .build()
+            createHardwareWithMultiplier("Test1", 1.00D),
+            createHardwareWithMultiplier("Test2", 1.00D),
+            createHardwareWithMultiplier("Test3", 1.00D),
+            createHardwareWithMultiplier("Test4", 1.00D),
+            createHardwareWithMultiplier("Test4", 2.00D) // Duplicate value, should be ignored
         );
         final Collection<Hardware> existing = Set.of(
-            Hardware.builder()
-                .hardwareName("Test1")
-                .multiplier(2.00D)
-                .build(),
-            Hardware.builder()
-                .hardwareName("Test2")
-                .multiplier(2.00D)
-                .build(),
-            Hardware.builder()
-                .hardwareName("Test3")
-                .multiplier(1.00D)
-                .build()
+            createHardwareWithMultiplier("Test1", 2.00D),
+            createHardwareWithMultiplier("Test2", 2.00D),
+            createHardwareWithMultiplier("Test3", 1.00D)
         );
 
         final Map<Hardware, Hardware> toUpdate = HardwareSplitter.toUpdate(lars, existing);
-        final Collection<String> names = toUpdate.keySet().stream().map(Hardware::getHardwareName).toList();
+        final Collection<String> names = toUpdate.keySet().stream().map(Hardware::hardwareName).toList();
 
         assertThat(names)
             .hasSize(2)
@@ -154,5 +108,17 @@ class HardwareSplitterTest {
                 "Test1",
                 "Test2"
             );
+    }
+
+    private static Hardware createHardware(final String hardwareName) {
+        return createHardwareWithMultiplier(hardwareName, 1.00D);
+    }
+
+    private static Hardware createHardwareWithMultiplier(final String hardwareName, final double multiplier) {
+        return Hardware.createWithoutId(hardwareName, "", HardwareMake.AMD, HardwareType.GPU, multiplier, 1L);
+    }
+
+    private static Hardware createHardwareWithAveragePpd(final String hardwareName, final long averagePpd) {
+        return Hardware.createWithoutId(hardwareName, "", HardwareMake.AMD, HardwareType.GPU, 1.00D, averagePpd);
     }
 }
