@@ -42,9 +42,11 @@ RUN minify --verbose --match=\.*.css$ --type=css --output /docker/apache/site/re
 FROM httpd:2.4-alpine
 
 # Updating system packages, and installing any required packages
+# Upgrading expact from 2.4.4-r0 due to CVE-2022-25315
 RUN apk update && apk upgrade && \
     apk add \
-      brotli
+      brotli \
+      expat=2.4.7-r0
 
 # Apache configuration (SSL certs are provided through a volume mount)
 COPY ./docker/frontend/conf/httpd.conf /usr/local/apache2/conf/httpd.conf
@@ -86,3 +88,9 @@ ARG TITLE
 RUN grep -rl '%FORUM_LINK%' . | xargs sed -i "s|%FORUM_LINK%|${FORUM_LINK}|g" && \
     grep -rl '%ROOT_URL%' . | xargs sed -i "s|%ROOT_URL%|${ROOT_URL}|g" && \
     grep -rl '%TITLE%' . | xargs sed -i "s|%TITLE%|${TITLE}|g"
+
+# Create non-root user, make owner of log directory
+RUN adduser -D frontend_user && \
+    mkdir --parents /usr/local/apache2/logs && \
+    chown -R frontend_user:frontend_user /usr/local/apache2/logs
+USER frontend_user

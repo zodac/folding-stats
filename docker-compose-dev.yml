@@ -84,6 +84,7 @@ services:
         ADMIN_PASSWORD: "shroot"
         READ_ONLY_USERNAME: "root2"
         READ_ONLY_PASSWORD: "shroot2"
+        POSTGRES_USER: "folding_user"
     container_name: database_dev
     hostname: database_dev
     environment:

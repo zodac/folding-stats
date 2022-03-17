@@ -84,10 +84,10 @@ COPY ./docker/backend/config/logback.xml /var/backend/logback.xml
 ENV JAVA_HOME "/opt/jdk"
 ENV PATH "${PATH}:${JAVA_HOME}/bin"
 
-# Install:
+# Updating system packages, and installing:
 # - curl to run healthcheck
 # - nano to allow user to edit logback.xml
-RUN apt-get update && \
+RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y \
       curl \
       nano \

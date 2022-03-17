@@ -92,12 +92,13 @@ services:
       dockerfile: docker/database/Dockerfile
       args:
         # Docker image versions
-        POSTGRES_VERSION: 14.1
+        POSTGRES_VERSION: 14.2
         # Build arguments
         ADMIN_USERNAME: "${ADMIN_USER}"
         ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
         READ_ONLY_USERNAME: "${READ_ONLY_USER}"
         READ_ONLY_PASSWORD: "${READ_ONLY_PASSWORD}"
+        POSTGRES_USER: "${DB_USER}"
     container_name: database
     hostname: database
     environment:
@@ -132,7 +133,7 @@ services:
         # Docker image versions
         DEBIAN_VERSION: 11.2
         JAVA_VERSION: 17
-        PROMETHEUS_VERSION: v2.33.1
+        PROMETHEUS_VERSION: v2.34.0
         # Build arguments
         ADMIN_USERNAME: "${ADMIN_USER}"
         ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
