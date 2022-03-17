@@ -80,7 +80,6 @@
     </appender>
 
     <!-- Log for stats retrieval -->
-    <!-- Monthly rollover -->
     <appender name="STATS_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <append>true</append>
         <file>/var/backend/logs/stats.log</file>
@@ -90,7 +89,7 @@
             <charset>utf8</charset>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>/var/backend/logs/stats.log.%d{yyyy-MM}.%i.log.zip</fileNamePattern>
+            <fileNamePattern>/var/backend/logs/stats.log.%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
             <maxFileSize>100MB</maxFileSize>
             <maxHistory>31</maxHistory>
             <totalSizeCap>1000MB</totalSizeCap>
@@ -98,6 +97,7 @@
     </appender>
 
     <!-- Log for LARS update -->
+    <!-- Monthly rollover -->
     <appender name="LARS_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <append>true</append>
         <file>/var/backend/logs/lars.log</file>
@@ -107,7 +107,7 @@
             <charset>utf8</charset>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>/var/backend/logs/lars.log.%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+            <fileNamePattern>/var/backend/logs/lars.log.%d{yyyy-MM}.%i.log.zip</fileNamePattern>
             <maxFileSize>100MB</maxFileSize>
             <maxHistory>31</maxHistory>
             <totalSizeCap>1000MB</totalSizeCap>
