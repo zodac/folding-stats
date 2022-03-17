@@ -129,7 +129,7 @@ public class UserChangeEndpoint {
         final UserChange createdUserChange = foldingRepository.createUserChange(validatedUserChange);
 
         userChangeCreates.increment();
-        return created(createdUserChange, createdUserChange.getId());
+        return created(createdUserChange, createdUserChange.id());
     }
 
     /**
@@ -267,8 +267,8 @@ public class UserChangeEndpoint {
         AUDIT_LOGGER.debug("Updating UserChange ID {} to state {}", userChangeId, newState);
 
         final UserChange existingUserChange = foldingRepository.getUserChange(userChangeId);
-        if (existingUserChange.getState().isFinalState()) {
-            throw new InvalidStateException(existingUserChange.getState(), newState);
+        if (existingUserChange.state().isFinalState()) {
+            throw new InvalidStateException(existingUserChange.state(), newState);
         }
 
         final UserChange userChangeToUpdate = UserChange.updateWithState(newState, existingUserChange);
@@ -278,10 +278,10 @@ public class UserChangeEndpoint {
             AUDIT_LOGGER.info("User change has been set to {}, applying change immediately", UserChangeState.APPROVED_NOW);
             final UserChange appliedUserChange = userChangeApplier.apply(updatedUserChange);
             final UserChange maskedUserChange = UserChange.hidePasskey(appliedUserChange);
-            return ok(maskedUserChange, maskedUserChange.getId());
+            return ok(maskedUserChange, maskedUserChange.id());
         }
 
         final UserChange maskedUserChange = UserChange.hidePasskey(updatedUserChange);
-        return ok(maskedUserChange, maskedUserChange.getId());
+        return ok(maskedUserChange, maskedUserChange.id());
     }
 }

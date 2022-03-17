@@ -169,7 +169,7 @@ class MockFoldingRepository implements FoldingRepository {
 
     @Override
     public UserChange createUserChange(final UserChange userChange) {
-        userChanges.put(userChange.getId(), userChange);
+        userChanges.put(userChange.id(), userChange);
         return userChange;
     }
 
@@ -177,7 +177,7 @@ class MockFoldingRepository implements FoldingRepository {
     public Collection<UserChange> getAllUserChangesWithPasskeys(final Collection<UserChangeState> states, final int numberOfMonths) {
         return userChanges.values()
             .stream()
-            .filter(userChange -> states.contains(userChange.getState()))
+            .filter(userChange -> states.contains(userChange.state()))
             .toList();
     }
 
@@ -193,7 +193,7 @@ class MockFoldingRepository implements FoldingRepository {
     public Collection<UserChange> getAllUserChangesForNextMonth() {
         return userChanges.values()
             .stream()
-            .filter(userChange -> userChange.getState() == UserChangeState.APPROVED_NEXT_MONTH)
+            .filter(userChange -> userChange.state() == UserChangeState.APPROVED_NEXT_MONTH)
             .toList();
     }
 
@@ -206,7 +206,7 @@ class MockFoldingRepository implements FoldingRepository {
 
     @Override
     public UserChange updateUserChange(final UserChange userChangeToUpdate) {
-        userChanges.put(userChangeToUpdate.getId(), userChangeToUpdate);
+        userChanges.put(userChangeToUpdate.id(), userChangeToUpdate);
         return userChangeToUpdate;
     }
 

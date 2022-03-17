@@ -541,14 +541,14 @@ class PostgresDbManagerTest {
         final UserChange userChange = generateUserChange();
         final UserChange createdUserChange = POSTGRES_DB_MANAGER.createUserChange(userChange);
 
-        assertThat(createdUserChange.getId())
+        assertThat(createdUserChange.id())
             .isNotZero();
 
         final Collection<UserChange> allUserChanges = POSTGRES_DB_MANAGER.getAllUserChanges(UserChangeState.getAllValues(), 0);
         assertThat(allUserChanges)
             .hasSize(1);
 
-        final Optional<UserChange> optionalRetrievedUserChange = POSTGRES_DB_MANAGER.getUserChange(createdUserChange.getId());
+        final Optional<UserChange> optionalRetrievedUserChange = POSTGRES_DB_MANAGER.getUserChange(createdUserChange.id());
         assertThat(optionalRetrievedUserChange)
             .isPresent();
 
@@ -559,7 +559,7 @@ class PostgresDbManagerTest {
         final UserChange userChangeToUpdate = UserChange.updateWithState(UserChangeState.COMPLETED, createdUserChange);
 
         POSTGRES_DB_MANAGER.updateUserChange(userChangeToUpdate);
-        final Optional<UserChange> optionalUpdatedUserChange = POSTGRES_DB_MANAGER.getUserChange(createdUserChange.getId());
+        final Optional<UserChange> optionalUpdatedUserChange = POSTGRES_DB_MANAGER.getUserChange(createdUserChange.id());
         assertThat(optionalUpdatedUserChange)
             .isPresent();
 

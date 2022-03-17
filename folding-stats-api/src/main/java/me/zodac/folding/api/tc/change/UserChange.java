@@ -25,12 +25,6 @@
 package me.zodac.folding.api.tc.change;
 
 import java.time.LocalDateTime;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
 import me.zodac.folding.api.ResponsePojo;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.util.DateTimeUtils;
@@ -38,22 +32,13 @@ import me.zodac.folding.api.util.DateTimeUtils;
 /**
  * POJO defining a {@link UserChange} to request a change for a <code>Team Competition</code> {@link User} that must be approved/rejected by an admin.
  */
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
-@Getter
-@EqualsAndHashCode
-@ToString(doNotUseGetters = true)
-public class UserChange implements ResponsePojo {
+public record UserChange(int id, LocalDateTime createdUtcTimestamp, LocalDateTime updatedUtcTimestamp,
+                         User previousUser, User newUser,
+                         UserChangeState state
+) implements ResponsePojo {
 
     private static final int EMPTY_USER_CHANGE_ID = 0;
     private static final DateTimeUtils DATE_TIME_UTILS = DateTimeUtils.create();
-
-    final int id;
-    final LocalDateTime createdUtcTimestamp;
-    final LocalDateTime updatedUtcTimestamp;
-    final User previousUser;
-    final User newUser;
-    final UserChangeState state;
 
     /**
      * Creates a {@link UserChange}.
@@ -157,7 +142,7 @@ public class UserChange implements ResponsePojo {
      */
     public static UserChange updateWithState(final UserChangeState userChangeState, final UserChange userChange) {
         return create(
-            userChange.getId(),
+            userChange.id,
             userChange.createdUtcTimestamp,
             DATE_TIME_UTILS.currentUtcLocalDateTime(),
             userChange.previousUser,

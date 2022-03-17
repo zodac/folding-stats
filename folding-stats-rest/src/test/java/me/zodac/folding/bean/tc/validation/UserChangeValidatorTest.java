@@ -80,14 +80,14 @@ class UserChangeValidatorTest {
             .as("Expected validation to pass")
             .isNotNull();
 
-        assertThat(response.getNewUser())
+        assertThat(response.newUser())
             .isNotNull();
-        assertThat(response.getNewUser().getHardware())
+        assertThat(response.newUser().getHardware())
             .isNotNull();
-        assertThat(response.getNewUser().getTeam())
+        assertThat(response.newUser().getTeam())
             .isNotNull();
 
-        assertThat(response.getState())
+        assertThat(response.state())
             .isEqualTo(UserChangeState.REQUESTED_NOW);
     }
 
@@ -445,8 +445,9 @@ class UserChangeValidatorTest {
             .liveStatsLink("https://www.google.ie")
             .build();
 
-        final UserChange existingUserChange = UserChange.builder()
-            .newUser(User.builder()
+        final UserChange existingUserChange = UserChange.createNow(
+            user,
+            User.builder()
                 .id(user.getId())
                 .foldingUserName(user.getFoldingUserName())
                 .displayName(user.getDisplayName())
@@ -456,9 +457,9 @@ class UserChangeValidatorTest {
                 .liveStatsLink("https://www.google.ie")
                 .userIsCaptain(user.isUserIsCaptain())
                 .hardware(user.getHardware())
-                .build())
-            .state(UserChangeState.APPROVED_NEXT_MONTH)
-            .build();
+                .build(),
+            UserChangeState.APPROVED_NEXT_MONTH
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -493,8 +494,9 @@ class UserChangeValidatorTest {
             .liveStatsLink("https://www.google.ie")
             .build();
 
-        final UserChange existingUserChange = UserChange.builder()
-            .newUser(User.builder()
+        final UserChange existingUserChange = UserChange.createNow(
+            user,
+            User.builder()
                 .id(user.getId())
                 .foldingUserName(user.getFoldingUserName())
                 .displayName(user.getDisplayName())
@@ -504,9 +506,9 @@ class UserChangeValidatorTest {
                 .liveStatsLink("https://www.google.com")
                 .userIsCaptain(user.isUserIsCaptain())
                 .hardware(user.getHardware())
-                .build())
-            .state(UserChangeState.APPROVED_NEXT_MONTH)
-            .build();
+                .build(),
+            UserChangeState.APPROVED_NEXT_MONTH
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -534,8 +536,9 @@ class UserChangeValidatorTest {
             .liveStatsLink("https://www.google.ie")
             .build();
 
-        final UserChange existingUserChange = UserChange.builder()
-            .newUser(User.builder()
+        final UserChange existingUserChange = UserChange.createNow(
+            user,
+            User.builder()
                 .id(99)
                 .foldingUserName(user.getFoldingUserName())
                 .displayName(user.getDisplayName())
@@ -545,8 +548,9 @@ class UserChangeValidatorTest {
                 .liveStatsLink("https://www.google.ie")
                 .userIsCaptain(user.isUserIsCaptain())
                 .hardware(user.getHardware())
-                .build())
-            .build();
+                .build(),
+            UserChangeState.APPROVED_NOW
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);

@@ -92,12 +92,12 @@ public class UserChangeApplier {
      * @see FoldingRepository#updateUser(User, User)
      */
     public UserChange apply(final UserChange userChange) {
-        LOGGER.info("Applying user change '{}' for: {}", userChange.getId(), userChange.getNewUser().getDisplayName());
+        LOGGER.info("Applying user change '{}' for: {}", userChange.id(), userChange.newUser().getDisplayName());
 
         // Explicitly retrieve the user, in case it was deleted after the change was requested
-        final User existingUser = foldingRepository.getUserWithPasskey(userChange.getNewUser().getId());
+        final User existingUser = foldingRepository.getUserWithPasskey(userChange.newUser().getId());
 
-        foldingRepository.updateUser(userChange.getNewUser(), existingUser);
+        foldingRepository.updateUser(userChange.newUser(), existingUser);
         LOGGER.debug("Updated user");
 
         final UserChange userChangeToUpdate = UserChange.updateWithState(UserChangeState.COMPLETED, userChange);

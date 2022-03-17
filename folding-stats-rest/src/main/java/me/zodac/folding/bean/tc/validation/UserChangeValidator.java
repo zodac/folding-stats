@@ -216,7 +216,7 @@ public class UserChangeValidator {
     }
 
     private static boolean isMatchingUserChange(final UserChange userChange, final UserChangeRequest userChangeRequest) {
-        final User user = userChange.getNewUser();
+        final User user = userChange.newUser();
         return user.getId() == userChangeRequest.getUserId()
             && user.getHardware().getId() == userChangeRequest.getHardwareId()
             && Objects.equals(user.getFoldingUserName(), userChangeRequest.getFoldingUserName())

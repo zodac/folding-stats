@@ -116,7 +116,7 @@ class UserChangeTest {
             .hasSize(3);
 
         final UserChange retrievedUserChange = allUserChanges.iterator().next();
-        assertPasskeyIsHidden(retrievedUserChange.getNewUser().getPasskey());
+        assertPasskeyIsHidden(retrievedUserChange.newUser().getPasskey());
     }
 
     @Test
@@ -143,7 +143,7 @@ class UserChangeTest {
         final UserChange retrievedUserChange = allUserChanges.iterator().next();
         assertThat(retrievedUserChange)
             .isEqualTo(userChange);
-        assertPasskeyIsShown(retrievedUserChange.getNewUser().getPasskey());
+        assertPasskeyIsShown(retrievedUserChange.newUser().getPasskey());
     }
 
     @Test
@@ -167,10 +167,10 @@ class UserChangeTest {
             .isEqualTo(HttpURLConnection.HTTP_CREATED);
 
         final UserChange userChange = UserChangeResponseParser.create(response);
-        assertThat(userChange.getId())
+        assertThat(userChange.id())
             .as("Expected user change to contain an ID")
             .isNotZero();
-        assertThat(userChange.getNewUser().getLiveStatsLink())
+        assertThat(userChange.newUser().getLiveStatsLink())
             .as("Expected user change to list user with the updated liveStatsLink")
             .isEqualTo(DUMMY_LIVE_STATS_LINK);
     }
@@ -179,7 +179,7 @@ class UserChangeTest {
     void whenGetUserChange_givenChangeExists_thenChangeIsReturned_andResponseHas200Status() throws FoldingRestException {
         final UserChange userChange = createUserChange();
 
-        final HttpResponse<String> response = USER_CHANGE_REQUEST_SENDER.get(userChange.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
+        final HttpResponse<String> response = USER_CHANGE_REQUEST_SENDER.get(userChange.id(), ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -194,13 +194,13 @@ class UserChangeTest {
     void whenRejectUserChange_givenChangeExists_thenChangeStateIsUpdated_andResponseHas200Status() throws FoldingRestException {
         final UserChange userChange = createUserChange();
 
-        final HttpResponse<String> response = USER_CHANGE_REQUEST_SENDER.reject(userChange.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
+        final HttpResponse<String> response = USER_CHANGE_REQUEST_SENDER.reject(userChange.id(), ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final UserChange updatedUserChange = UserChangeResponseParser.update(response);
-        assertThat(updatedUserChange.getState())
+        assertThat(updatedUserChange.state())
             .as("Expected state to be updated")
             .isEqualTo(UserChangeState.REJECTED);
     }
@@ -210,13 +210,13 @@ class UserChangeTest {
         final UserChange userChange = createUserChange();
 
         final HttpResponse<String> response =
-            USER_CHANGE_REQUEST_SENDER.approveNextMonth(userChange.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
+            USER_CHANGE_REQUEST_SENDER.approveNextMonth(userChange.id(), ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final UserChange updatedUserChange = UserChangeResponseParser.update(response);
-        assertThat(updatedUserChange.getState())
+        assertThat(updatedUserChange.state())
             .as("Expected state to be updated")
             .isEqualTo(UserChangeState.APPROVED_NEXT_MONTH);
     }
@@ -226,23 +226,23 @@ class UserChangeTest {
         throws FoldingRestException {
         final UserChange userChange = createUserChange();
 
-        final User userBeforeChange = UserUtils.get(userChange.getNewUser().getId());
+        final User userBeforeChange = UserUtils.get(userChange.newUser().getId());
         assertThat(userBeforeChange.getLiveStatsLink())
             .as("Expected user's initial liveStatsLink to not be dummy value")
             .isNotEqualTo(DUMMY_LIVE_STATS_LINK);
 
         final HttpResponse<String> response =
-            USER_CHANGE_REQUEST_SENDER.approveImmediately(userChange.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
+            USER_CHANGE_REQUEST_SENDER.approveImmediately(userChange.id(), ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final UserChange updatedUserChange = UserChangeResponseParser.update(response);
-        assertThat(updatedUserChange.getState())
+        assertThat(updatedUserChange.state())
             .as("Expected state to be updated")
             .isEqualTo(UserChangeState.COMPLETED);
 
-        final User userAfterChange = UserUtils.get(userChange.getNewUser().getId());
+        final User userAfterChange = UserUtils.get(userChange.newUser().getId());
         assertThat(userAfterChange.getLiveStatsLink())
             .as("Expected user's liveStatsLink to be updated to dummy value")
             .isEqualTo(DUMMY_LIVE_STATS_LINK);
@@ -252,19 +252,19 @@ class UserChangeTest {
     void whenApproveUserChangeImmediately_givenUserHasBeenDeleted_thenChangeIsNotApplied_andResponseHas404Status() throws FoldingRestException {
         final UserChange userChange = createUserChange();
 
-        final User userBeforeChange = UserUtils.get(userChange.getNewUser().getId());
+        final User userBeforeChange = UserUtils.get(userChange.newUser().getId());
         assertThat(userBeforeChange.getLiveStatsLink())
             .as("Expected user's initial liveStatsLink to not be dummy value")
             .isNotEqualTo(DUMMY_LIVE_STATS_LINK);
 
         final HttpResponse<Void> deleteUserResponse =
-            USER_REQUEST_SENDER.delete(userChange.getPreviousUser().getId(), ADMIN_USER.userName(), ADMIN_USER.password());
+            USER_REQUEST_SENDER.delete(userChange.previousUser().getId(), ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(deleteUserResponse.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + deleteUserResponse.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final HttpResponse<String> response =
-            USER_CHANGE_REQUEST_SENDER.approveImmediately(userChange.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
+            USER_CHANGE_REQUEST_SENDER.approveImmediately(userChange.id(), ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
             .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
@@ -277,8 +277,8 @@ class UserChangeTest {
         final UserChange userChange2 = createUserChange();
         createUserChange();
 
-        USER_CHANGE_REQUEST_SENDER.reject(userChange1.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
-        USER_CHANGE_REQUEST_SENDER.approveNextMonth(userChange2.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
+        USER_CHANGE_REQUEST_SENDER.reject(userChange1.id(), ADMIN_USER.userName(), ADMIN_USER.password());
+        USER_CHANGE_REQUEST_SENDER.approveNextMonth(userChange2.id(), ADMIN_USER.userName(), ADMIN_USER.password());
 
         final HttpResponse<String> response =
             USER_CHANGE_REQUEST_SENDER.getAllWithoutPasskeys(List.of(UserChangeState.REJECTED, UserChangeState.APPROVED_NEXT_MONTH));
@@ -296,7 +296,7 @@ class UserChangeTest {
             .hasSize(2);
 
         final UserChange retrievedUserChange = allUserChanges.iterator().next();
-        assertPasskeyIsHidden(retrievedUserChange.getNewUser().getPasskey());
+        assertPasskeyIsHidden(retrievedUserChange.newUser().getPasskey());
     }
 
     @Test
@@ -305,8 +305,8 @@ class UserChangeTest {
         final UserChange userChange2 = createUserChange();
         createUserChange();
 
-        USER_CHANGE_REQUEST_SENDER.reject(userChange1.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
-        USER_CHANGE_REQUEST_SENDER.approveNextMonth(userChange2.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
+        USER_CHANGE_REQUEST_SENDER.reject(userChange1.id(), ADMIN_USER.userName(), ADMIN_USER.password());
+        USER_CHANGE_REQUEST_SENDER.approveNextMonth(userChange2.id(), ADMIN_USER.userName(), ADMIN_USER.password());
 
         final HttpResponse<String> response =
             USER_CHANGE_REQUEST_SENDER.getAllWithoutPasskeys(List.of(UserChangeState.COMPLETED));
@@ -331,8 +331,8 @@ class UserChangeTest {
         final UserChange userChange2 = createUserChange();
         createUserChange();
 
-        USER_CHANGE_REQUEST_SENDER.reject(userChange1.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
-        USER_CHANGE_REQUEST_SENDER.approveNextMonth(userChange2.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
+        USER_CHANGE_REQUEST_SENDER.reject(userChange1.id(), ADMIN_USER.userName(), ADMIN_USER.password());
+        USER_CHANGE_REQUEST_SENDER.approveNextMonth(userChange2.id(), ADMIN_USER.userName(), ADMIN_USER.password());
 
         final HttpResponse<String> response =
             USER_CHANGE_REQUEST_SENDER.getAllWithPasskeys(List.of(UserChangeState.REJECTED, UserChangeState.APPROVED_NEXT_MONTH),
@@ -351,25 +351,25 @@ class UserChangeTest {
             .hasSize(2);
 
         final UserChange retrievedUserChange = allUserChanges.iterator().next();
-        assertPasskeyIsShown(retrievedUserChange.getNewUser().getPasskey());
+        assertPasskeyIsShown(retrievedUserChange.newUser().getPasskey());
     }
 
     @Test
     void whenApproveUserChange_givenChangeHasPreviouslyBeenRejected_thenApprovalWillFail_andResponseHas400Status() throws FoldingRestException {
         final UserChange userChange = createUserChange();
 
-        final HttpResponse<String> response = USER_CHANGE_REQUEST_SENDER.reject(userChange.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
+        final HttpResponse<String> response = USER_CHANGE_REQUEST_SENDER.reject(userChange.id(), ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final UserChange updatedUserChange = UserChangeResponseParser.update(response);
-        assertThat(updatedUserChange.getState())
+        assertThat(updatedUserChange.state())
             .as("Expected state to be updated")
             .isEqualTo(UserChangeState.REJECTED);
 
         final HttpResponse<String> secondResponse =
-            USER_CHANGE_REQUEST_SENDER.approveImmediately(userChange.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
+            USER_CHANGE_REQUEST_SENDER.approveImmediately(userChange.id(), ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(secondResponse.statusCode())
             .as("Did not receive a 400_BAD_REQUEST HTTP response: " + secondResponse.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
@@ -382,7 +382,7 @@ class UserChangeTest {
 
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(FOLDING_URL + "/changes/" + userChange.getId()))
+            .uri(URI.create(FOLDING_URL + "/changes/" + userChange.id()))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
             .build();
 
@@ -399,7 +399,7 @@ class UserChangeTest {
 
         final HttpRequest request = HttpRequest.newBuilder()
             .PUT(HttpRequest.BodyPublishers.noBody())
-            .uri(URI.create(FOLDING_URL + "/changes/" + userChange.getId() + "/reject"))
+            .uri(URI.create(FOLDING_URL + "/changes/" + userChange.id() + "/reject"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
             .build();
 
@@ -416,7 +416,7 @@ class UserChangeTest {
 
         final HttpRequest request = HttpRequest.newBuilder()
             .PUT(HttpRequest.BodyPublishers.noBody())
-            .uri(URI.create(FOLDING_URL + "/changes/" + userChange.getId() + "/approve/immediate"))
+            .uri(URI.create(FOLDING_URL + "/changes/" + userChange.id() + "/approve/immediate"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
             .build();
 
@@ -433,7 +433,7 @@ class UserChangeTest {
 
         final HttpRequest request = HttpRequest.newBuilder()
             .PUT(HttpRequest.BodyPublishers.noBody())
-            .uri(URI.create(FOLDING_URL + "/changes/" + userChange.getId() + "/approve/next"))
+            .uri(URI.create(FOLDING_URL + "/changes/" + userChange.id() + "/approve/next"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
             .build();
 
@@ -531,7 +531,7 @@ class UserChangeTest {
     void whenGetUserChange_givenChangeExists_thenChangeIsReturned_andPasskeyIsNotHidden_andResponseHas200Status() throws FoldingRestException {
         final UserChange userChange = createUserChange();
 
-        final HttpResponse<String> response = USER_CHANGE_REQUEST_SENDER.get(userChange.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
+        final HttpResponse<String> response = USER_CHANGE_REQUEST_SENDER.get(userChange.id(), ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -541,7 +541,7 @@ class UserChangeTest {
         assertThat(retrievedUserChange)
             .isEqualTo(userChange);
 
-        assertThat(retrievedUserChange.getNewUser().getPasskey())
+        assertThat(retrievedUserChange.newUser().getPasskey())
             .as("Expected the passkey to not be masked")
             .doesNotContain("*");
     }

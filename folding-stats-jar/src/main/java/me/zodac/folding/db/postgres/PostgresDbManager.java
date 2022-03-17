@@ -421,12 +421,12 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
                     USER_CHANGES.STATE
                 )
                 .values(
-                    userChange.getCreatedUtcTimestamp(),
-                    userChange.getUpdatedUtcTimestamp(),
-                    userChange.getPreviousUser().getId(),
-                    GSON.toJson(userChange.getPreviousUser()),
-                    GSON.toJson(userChange.getNewUser()),
-                    userChange.getState().toString()
+                    userChange.createdUtcTimestamp(),
+                    userChange.updatedUtcTimestamp(),
+                    userChange.previousUser().getId(),
+                    GSON.toJson(userChange.previousUser()),
+                    GSON.toJson(userChange.newUser()),
+                    userChange.state().toString()
                 )
                 .returning(USER_CHANGES.USER_CHANGE_ID);
             SQL_LOGGER.debug("Executing SQL: '{}'", query);
@@ -509,12 +509,12 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
         executeQuery(queryContext -> {
             final var query = queryContext
                 .update(USER_CHANGES)
-                .set(USER_CHANGES.CREATED_UTC_TIMESTAMP, userChangeToUpdate.getCreatedUtcTimestamp())
-                .set(USER_CHANGES.UPDATED_UTC_TIMESTAMP, userChangeToUpdate.getUpdatedUtcTimestamp())
-                .set(USER_CHANGES.PREVIOUS_USER, GSON.toJson(userChangeToUpdate.getPreviousUser()))
-                .set(USER_CHANGES.NEW_USER, GSON.toJson(userChangeToUpdate.getNewUser()))
-                .set(USER_CHANGES.STATE, userChangeToUpdate.getState().toString())
-                .where(USER_CHANGES.USER_CHANGE_ID.equal(userChangeToUpdate.getId()));
+                .set(USER_CHANGES.CREATED_UTC_TIMESTAMP, userChangeToUpdate.createdUtcTimestamp())
+                .set(USER_CHANGES.UPDATED_UTC_TIMESTAMP, userChangeToUpdate.updatedUtcTimestamp())
+                .set(USER_CHANGES.PREVIOUS_USER, GSON.toJson(userChangeToUpdate.previousUser()))
+                .set(USER_CHANGES.NEW_USER, GSON.toJson(userChangeToUpdate.newUser()))
+                .set(USER_CHANGES.STATE, userChangeToUpdate.state().toString())
+                .where(USER_CHANGES.USER_CHANGE_ID.equal(userChangeToUpdate.id()));
             SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
