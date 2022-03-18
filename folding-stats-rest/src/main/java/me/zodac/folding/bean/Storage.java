@@ -204,9 +204,9 @@ public class Storage {
 
             getAllUsers()
                 .stream()
-                .filter(user -> user.getHardware().id() == updatedHardware.id())
+                .filter(user -> user.hardware().id() == updatedHardware.id())
                 .map(user -> User.updateHardware(user, updatedHardware))
-                .forEach(updatedUser -> userCache.put(updatedUser.getId(), updatedUser));
+                .forEach(updatedUser -> userCache.put(updatedUser.id(), updatedUser));
 
             return updatedHardware;
         });
@@ -324,9 +324,9 @@ public class Storage {
 
             getAllUsers()
                 .stream()
-                .filter(user -> user.getTeam().id() == updatedTeam.id())
+                .filter(user -> user.team().id() == updatedTeam.id())
                 .map(user -> User.updateTeam(user, updatedTeam))
-                .forEach(updatedUser -> userCache.put(updatedUser.getId(), updatedUser));
+                .forEach(updatedUser -> userCache.put(updatedUser.id(), updatedUser));
 
             return updatedTeam;
         });
@@ -363,7 +363,7 @@ public class Storage {
     public User createUser(final User user) {
         return dbManagerFunction(dbManager -> {
             final User userWithId = dbManager.createUser(user);
-            userCache.put(userWithId.getId(), userWithId);
+            userCache.put(userWithId.id(), userWithId);
             return userWithId;
         });
     }
@@ -390,7 +390,7 @@ public class Storage {
             final Collection<User> fromDb = dbManager.getAllUsers();
 
             for (final User user : fromDb) {
-                userCache.put(user.getId(), user);
+                userCache.put(user.id(), user);
             }
 
             return fromDb;
@@ -437,7 +437,7 @@ public class Storage {
     public User updateUser(final User userToUpdate) {
         return dbManagerFunction(dbManager -> {
             final User updatedUser = dbManager.updateUser(userToUpdate);
-            userCache.put(updatedUser.getId(), updatedUser);
+            userCache.put(updatedUser.id(), updatedUser);
             return updatedUser;
         });
     }

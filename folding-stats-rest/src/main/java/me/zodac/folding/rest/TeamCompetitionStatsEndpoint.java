@@ -171,7 +171,7 @@ public class TeamCompetitionStatsEndpoint {
             .toList();
 
         for (final UserSummary userSummary : userSummaries) {
-            if (userSummary.getUser().getId() == user.getId()) {
+            if (userSummary.getUser().id() == user.id()) {
                 return ok(userSummary);
             }
         }
@@ -196,7 +196,7 @@ public class TeamCompetitionStatsEndpoint {
         AUDIT_LOGGER.info("PATCH request to update offset for user received at '{}' with request {}", request::getRequestURI, () -> offsetTcStats);
 
         final User user = foldingRepository.getUserWithPasskey(userId);
-        final Hardware hardware = user.getHardware();
+        final Hardware hardware = user.hardware();
         final OffsetTcStats offsetTcStatsToPersist = OffsetTcStats.updateWithHardwareMultiplier(offsetTcStats, hardware.multiplier());
         final OffsetTcStats createdOffsetStats = statsRepository.createOrUpdateOffsetStats(user, offsetTcStatsToPersist);
 

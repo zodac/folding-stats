@@ -110,9 +110,9 @@ public class StatsRepository {
      * @return the hourly {@link HistoricStats} for the {@link User}
      */
     public Collection<HistoricStats> getHistoricStats(final User user, final Year year, final Month month, final int day) {
-        final Collection<HistoricStats> historicStats = storage.getHistoricStats(user.getId(), year, month, day);
+        final Collection<HistoricStats> historicStats = storage.getHistoricStats(user.id(), year, month, day);
         if (historicStats.isEmpty()) {
-            LOGGER.warn("No stats retrieved for user with ID {} on {}/{}/{}, returning empty", user.getId(), year.getValue(), month.getValue(), day);
+            LOGGER.warn("No stats retrieved for user with ID {} on {}/{}/{}, returning empty", user.id(), year.getValue(), month.getValue(), day);
         }
 
         return historicStats;
@@ -127,9 +127,9 @@ public class StatsRepository {
      * @return the daily {@link HistoricStats} for the {@link User}
      */
     public Collection<HistoricStats> getHistoricStats(final User user, final Year year, final Month month) {
-        final Collection<HistoricStats> historicStats = storage.getHistoricStats(user.getId(), year, month, 0);
+        final Collection<HistoricStats> historicStats = storage.getHistoricStats(user.id(), year, month, 0);
         if (historicStats.isEmpty()) {
-            LOGGER.warn("No stats retrieved for user with ID {} on {}/{}, returning empty", user.getId(), year.getValue(), month.getValue());
+            LOGGER.warn("No stats retrieved for user with ID {} on {}/{}, returning empty", user.id(), year.getValue(), month.getValue());
         }
 
         return historicStats;
@@ -143,9 +143,9 @@ public class StatsRepository {
      * @return the monthly {@link HistoricStats} for the {@link User}
      */
     public Collection<HistoricStats> getHistoricStats(final User user, final Year year) {
-        final Collection<HistoricStats> historicStats = storage.getHistoricStats(user.getId(), year, null, 0);
+        final Collection<HistoricStats> historicStats = storage.getHistoricStats(user.id(), year, null, 0);
         if (historicStats.isEmpty()) {
-            LOGGER.warn("No stats retrieved for user with ID {} on {}, returning empty", user.getId(), year.getValue());
+            LOGGER.warn("No stats retrieved for user with ID {} on {}, returning empty", user.id(), year.getValue());
         }
 
         return historicStats;
@@ -168,7 +168,7 @@ public class StatsRepository {
      * @return the {@link UserStats} for the {@link User}, or {@link UserStats#empty()} if none can be found
      */
     public UserStats getTotalStats(final User user) {
-        return storage.getTotalStats(user.getId())
+        return storage.getTotalStats(user.id())
             .orElse(UserStats.empty());
     }
 
@@ -183,8 +183,8 @@ public class StatsRepository {
      * @return the created {@link OffsetTcStats}, or {@link OffsetTcStats#empty()}
      */
     public OffsetTcStats createOffsetStats(final User user, final OffsetTcStats offsetTcStats) {
-        storage.deleteOffsetStats(user.getId());
-        return storage.createOrUpdateOffsetStats(user.getId(), offsetTcStats);
+        storage.deleteOffsetStats(user.id());
+        return storage.createOrUpdateOffsetStats(user.id(), offsetTcStats);
     }
 
     /**
@@ -199,7 +199,7 @@ public class StatsRepository {
      * @return the created/updated {@link OffsetTcStats}, or {@link OffsetTcStats#empty()}
      */
     public OffsetTcStats createOrUpdateOffsetStats(final User user, final OffsetTcStats offsetTcStats) {
-        return storage.createOrUpdateOffsetStats(user.getId(), offsetTcStats);
+        return storage.createOrUpdateOffsetStats(user.id(), offsetTcStats);
     }
 
     /**
@@ -209,7 +209,7 @@ public class StatsRepository {
      * @return the {@link OffsetTcStats} for the {@link User}, or {@link OffsetTcStats#empty()} if none can be found
      */
     public OffsetTcStats getOffsetStats(final User user) {
-        return storage.getOffsetStats(user.getId())
+        return storage.getOffsetStats(user.id())
             .orElse(OffsetTcStats.empty());
     }
 
@@ -230,8 +230,8 @@ public class StatsRepository {
      * @return the {@link UserTcStats} for the {@link User}, or {@link UserTcStats#empty(int)} if none can be found
      */
     public UserTcStats getHourlyTcStats(final User user) {
-        return storage.getHourlyTcStats(user.getId())
-            .orElse(UserTcStats.empty(user.getId()));
+        return storage.getHourlyTcStats(user.id())
+            .orElse(UserTcStats.empty(user.id()));
     }
 
     /**
@@ -251,7 +251,7 @@ public class StatsRepository {
      * @return the {@link UserStats} for the {@link User}, or {@link UserStats#empty()} if none can be found
      */
     public UserStats getInitialStats(final User user) {
-        return storage.getInitialStats(user.getId())
+        return storage.getInitialStats(user.id())
             .orElse(UserStats.empty());
     }
 
@@ -288,7 +288,7 @@ public class StatsRepository {
      */
     public void resetAllTeamCompetitionUserStats() {
         for (final User user : storage.getAllUsers()) {
-            LOGGER.info("Resetting TC stats for {}", user.getDisplayName());
+            LOGGER.info("Resetting TC stats for {}", user.displayName());
             final UserStats totalStats = getTotalStats(user);
             createInitialStats(totalStats);
         }
@@ -373,7 +373,7 @@ public class StatsRepository {
     private Collection<User> getUsersFromTeam(final Team team) {
         return storage.getAllUsers()
             .stream()
-            .filter(user -> user.getTeam().id() == team.id())
+            .filter(user -> user.team().id() == team.id())
             .toList();
     }
 
@@ -386,15 +386,15 @@ public class StatsRepository {
 
     private UserSummary getTcStatsForUser(final User user) {
         final UserTcStats userTcStats = getHourlyTcStats(user);
-        LOGGER.debug("Results for {}: {} points | {} multiplied points | {} units", user::getDisplayName, userTcStats::getPoints,
+        LOGGER.debug("Results for {}: {} points | {} multiplied points | {} units", user::displayName, userTcStats::getPoints,
             userTcStats::getMultipliedPoints, userTcStats::getUnits);
         return UserSummary.createWithDefaultRank(user, userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits());
     }
 
     private static String getCaptainDisplayName(final String teamName, final Collection<User> usersOnTeam) {
         for (final User user : usersOnTeam) {
-            if (user.isUserIsCaptain()) {
-                return user.getDisplayName();
+            if (user.userIsCaptain()) {
+                return user.displayName();
             }
         }
 

@@ -35,6 +35,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
+import me.zodac.folding.rest.api.header.ContentType;
+import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 
 /**
@@ -78,7 +80,7 @@ public final class StubbedFoldingEndpointUtils {
      * @throws FoldingRestException thrown if an error occurs sending the HTTP request
      */
     public static void addPoints(final User user, final long points) throws FoldingRestException {
-        addPoints(user.getFoldingUserName(), user.getPasskey(), points);
+        addPoints(user.foldingUserName(), user.passkey(), points);
     }
 
     /**
@@ -95,7 +97,7 @@ public final class StubbedFoldingEndpointUtils {
         final HttpRequest pointsRequest = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.noBody())
             .uri(URI.create(String.format(POINTS_URL_FORMAT, foldingUserName, passkey, points)))
-            .header("Content-Type", "application/json")
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
         try {
@@ -120,13 +122,13 @@ public final class StubbedFoldingEndpointUtils {
         final HttpRequest pointsRequest = HttpRequest.newBuilder()
             .DELETE()
             .uri(URI.create(POINTS_URL_ROOT))
-            .header("Content-Type", "application/json")
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
         try {
             final HttpResponse<Void> response = HTTP_CLIENT.send(pointsRequest, HttpResponse.BodyHandlers.discarding());
             assertThat(response.statusCode())
-                .as("Expected a 201_OK")
+                .as("Expected a 200_OK")
                 .isEqualTo(HttpURLConnection.HTTP_OK);
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -143,7 +145,7 @@ public final class StubbedFoldingEndpointUtils {
      * @throws FoldingRestException thrown if an error occurs sending the HTTP request
      */
     public static void addUnits(final User user, final int units) throws FoldingRestException {
-        addUnits(user.getFoldingUserName(), user.getPasskey(), units);
+        addUnits(user.foldingUserName(), user.passkey(), units);
     }
 
     /**
@@ -160,7 +162,7 @@ public final class StubbedFoldingEndpointUtils {
         final HttpRequest unitsRequest = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.noBody())
             .uri(URI.create(String.format(UNIT_URL_FORMAT, foldingUserName, passkey, units)))
-            .header("Content-Type", "application/json")
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
         try {
@@ -185,13 +187,13 @@ public final class StubbedFoldingEndpointUtils {
         final HttpRequest unitsRequest = HttpRequest.newBuilder()
             .DELETE()
             .uri(URI.create(UNIT_URL_ROOT))
-            .header("Content-Type", "application/json")
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
         try {
             final HttpResponse<Void> response = HTTP_CLIENT.send(unitsRequest, HttpResponse.BodyHandlers.discarding());
             assertThat(response.statusCode())
-                .as("Expected a 201_OK")
+                .as("Expected a 200_OK")
                 .isEqualTo(HttpURLConnection.HTTP_OK);
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();

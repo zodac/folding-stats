@@ -359,17 +359,18 @@ class UserValidatorTest {
         final Hardware otherHardware = generateHardware();
         final Team otherTeam = generateTeam();
 
-        final User otherUser = User.builder()
-            .foldingUserName("user1")
-            .displayName("user1")
-            .passkey("DummyPasskey12345678901234567891")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(false)
-            .hardware(otherHardware)
-            .team(otherTeam)
-            .build();
+        final User otherUser = User.create(
+            userId++,
+            "user1",
+            "user1",
+            "DummyPasskey12345678901234567891",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            otherHardware,
+            otherTeam,
+            false
+        );
 
         final Hardware hardware = generateHardware();
         final Team team = generateTeam();
@@ -406,17 +407,18 @@ class UserValidatorTest {
         final Hardware otherHardware = generateHardware();
         final Team otherTeam = generateTeam();
 
-        final User otherUser = User.builder()
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .hardware(otherHardware)
-            .team(otherTeam)
-            .build();
+        final User otherUser = User.create(
+            userId++,
+            "user",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            otherHardware,
+            otherTeam,
+            true
+        );
 
         final Hardware hardware = generateHardware();
         final Team team = generateTeam();
@@ -641,17 +643,18 @@ class UserValidatorTest {
         final Hardware hardware = generateHardware();
         final Team team = generateTeam();
 
-        final User currentCaptain = User.builder()
-            .foldingUserName("user1")
-            .displayName("user1")
-            .passkey("DummyPasskey12345678901234567891")
-            .category(Category.WILDCARD)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .hardware(hardware)
-            .team(team)
-            .build();
+        final User currentCaptain = User.create(
+            userId++,
+            "user1",
+            "user1",
+            "DummyPasskey12345678901234567891",
+            Category.WILDCARD,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            team,
+            true
+        );
 
         final UserRequest user = UserRequest.builder()
             .foldingUserName("user")
@@ -683,17 +686,18 @@ class UserValidatorTest {
         final Hardware hardware = generateHardware();
         final Team team = generateTeam();
 
-        final User currentCaptain = User.builder()
-            .foldingUserName("user1")
-            .displayName("user1")
-            .passkey("DummyPasskey12345678901234567891")
-            .category(Category.WILDCARD)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .hardware(hardware)
-            .team(team)
-            .build();
+        final User currentCaptain = User.create(
+            userId++,
+            "user1",
+            "user1",
+            "DummyPasskey12345678901234567891",
+            Category.WILDCARD,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            team,
+            true
+        );
 
         final UserRequest user = UserRequest.builder()
             .foldingUserName("user")
@@ -743,18 +747,18 @@ class UserValidatorTest {
 
         for (int i = 0; i < Category.maximumPermittedAmountForAllCategories(); i++) {
             foldingRepository.createUser(
-                User.builder()
-                    .id(userId++)
-                    .foldingUserName("user" + i)
-                    .displayName("user" + i)
-                    .passkey("DummyPasskey12345678901234567891")
-                    .category(Category.WILDCARD)
-                    .profileLink("https://www.google.com")
-                    .liveStatsLink("https://www.google.com")
-                    .userIsCaptain(false)
-                    .hardware(hardware)
-                    .team(team)
-                    .build()
+                User.create(
+                    userId++,
+                    "user" + i,
+                    "user" + i,
+                    "DummyPasskey12345678901234567891",
+                    Category.WILDCARD,
+                    "https://www.google.com",
+                    "https://www.google.com",
+                    hardware,
+                    team,
+                    false
+                )
             );
         }
 
@@ -788,17 +792,18 @@ class UserValidatorTest {
 
         for (int i = 0; i < Category.AMD_GPU.permittedUsers(); i++) {
             foldingRepository.createUser(
-                User.builder()
-                    .foldingUserName("user" + 0)
-                    .displayName("user" + 0)
-                    .passkey("DummyPasskey12345678901234567891")
-                    .category(Category.AMD_GPU)
-                    .profileLink("https://www.google.com")
-                    .liveStatsLink("https://www.google.com")
-                    .userIsCaptain(false)
-                    .hardware(hardware)
-                    .team(team)
-                    .build()
+                User.create(
+                    userId++,
+                    "user" + i,
+                    "user" + i,
+                    "DummyPasskey12345678901234567891",
+                    Category.AMD_GPU,
+                    "https://www.google.com",
+                    "https://www.google.com",
+                    hardware,
+                    team,
+                    false
+                )
             );
         }
 
@@ -833,17 +838,18 @@ class UserValidatorTest {
 
         for (int i = 0; i < Category.NVIDIA_GPU.permittedUsers(); i++) {
             foldingRepository.createUser(
-                User.builder()
-                    .foldingUserName("user" + 0)
-                    .displayName("user" + 0)
-                    .passkey("DummyPasskey12345678901234567891")
-                    .category(Category.NVIDIA_GPU)
-                    .profileLink("https://www.google.com")
-                    .liveStatsLink("https://www.google.com")
-                    .userIsCaptain(false)
-                    .hardware(hardware)
-                    .team(team)
-                    .build()
+                User.create(
+                    userId++,
+                    "user" + i,
+                    "user" + i,
+                    "DummyPasskey12345678901234567891",
+                    Category.NVIDIA_GPU,
+                    "https://www.google.com",
+                    "https://www.google.com",
+                    hardware,
+                    team,
+                    false
+                )
             );
         }
 
@@ -992,17 +998,18 @@ class UserValidatorTest {
             .teamId(team.id())
             .build();
 
-        final User existingUser = User.builder()
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .hardware(hardware)
-            .team(team)
-            .build();
+        final User existingUser = User.create(
+            userId++,
+            "user",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            team,
+            true
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -1034,17 +1041,18 @@ class UserValidatorTest {
             .teamId(team.id())
             .build();
 
-        final User existingUser = User.builder()
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .hardware(hardware)
-            .team(team)
-            .build();
+        final User existingUser = User.create(
+            userId++,
+            "user",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            team,
+            true
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -1074,17 +1082,18 @@ class UserValidatorTest {
             .teamId(team.id())
             .build();
 
-        final User existingUser = User.builder()
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .hardware(hardware)
-            .team(team)
-            .build();
+        final User existingUser = User.create(
+            userId++,
+            "user",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            team,
+            true
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -1114,17 +1123,18 @@ class UserValidatorTest {
             .teamId(team.id())
             .build();
 
-        final User existingUser = User.builder()
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .hardware(hardware)
-            .team(team)
-            .build();
+        final User existingUser = User.create(
+            userId++,
+            "user",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            team,
+            true
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -1154,17 +1164,18 @@ class UserValidatorTest {
             .teamId(team.id())
             .build();
 
-        final User existingUser = User.builder()
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .hardware(hardware)
-            .team(team)
-            .build();
+        final User existingUser = User.create(
+            userId++,
+            "user",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            team,
+            true
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -1194,17 +1205,18 @@ class UserValidatorTest {
             .teamId(team.id())
             .build();
 
-        final User existingUser = User.builder()
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .hardware(hardware)
-            .team(team)
-            .build();
+        final User existingUser = User.create(
+            userId++,
+            "user",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            team,
+            true
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -1234,17 +1246,18 @@ class UserValidatorTest {
             .teamId(team.id())
             .build();
 
-        final User existingUser = User.builder()
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .hardware(hardware)
-            .team(team)
-            .build();
+        final User existingUser = User.create(
+            userId++,
+            "user",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            team,
+            true
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -1274,17 +1287,18 @@ class UserValidatorTest {
             .teamId(team.id())
             .build();
 
-        final User existingUser = User.builder()
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .hardware(hardware)
-            .team(team)
-            .build();
+        final User existingUser = User.create(
+            userId++,
+            "user",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            team,
+            true
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -1314,17 +1328,18 @@ class UserValidatorTest {
             .teamId(team.id())
             .build();
 
-        final User existingUser = User.builder()
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .hardware(hardware)
-            .team(team)
-            .build();
+        final User existingUser = User.create(
+            userId++,
+            "user",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            team,
+            true
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -1356,17 +1371,18 @@ class UserValidatorTest {
             .teamId(team.id())
             .build();
 
-        final User existingUser = User.builder()
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .hardware(hardware)
-            .team(team)
-            .build();
+        final User existingUser = User.create(
+            userId++,
+            "user",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            team,
+            true
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -1396,17 +1412,18 @@ class UserValidatorTest {
             .teamId(team.id())
             .build();
 
-        final User existingUser = User.builder()
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .hardware(hardware)
-            .team(team)
-            .build();
+        final User existingUser = User.create(
+            userId++,
+            "user",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            team,
+            true
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -1438,17 +1455,18 @@ class UserValidatorTest {
             .teamId(team.id())
             .build();
 
-        final User existingUser = User.builder()
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .hardware(hardware)
-            .team(team)
-            .build();
+        final User existingUser = User.create(
+            userId++,
+            "user",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            team,
+            true
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -1466,18 +1484,18 @@ class UserValidatorTest {
         final Hardware otherHardware = generateHardware();
         final Team otherTeam = generateTeam();
 
-        final User otherUser = User.builder()
-            .id(userId++)
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .hardware(otherHardware)
-            .team(otherTeam)
-            .build();
+        final User otherUser = User.create(
+            userId++,
+            "user",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            otherHardware,
+            otherTeam,
+            true
+        );
 
         final Hardware hardware = generateHardware();
         final Team team = generateTeam();
@@ -1494,18 +1512,18 @@ class UserValidatorTest {
             .teamId(team.id())
             .build();
 
-        final User existingUser = User.builder()
-            .id(userId++)
-            .foldingUserName("differentUser")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .hardware(hardware)
-            .team(team)
-            .build();
+        final User existingUser = User.create(
+            userId++,
+            "differentUser",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            team,
+            true
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -1545,18 +1563,18 @@ class UserValidatorTest {
             .teamId(team.id())
             .build();
 
-        final User existingUser = User.builder()
-            .id(commonUserId)
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .hardware(hardware)
-            .team(team)
-            .build();
+        final User existingUser = User.create(
+            commonUserId,
+            "user",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            team,
+            true
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -1588,18 +1606,18 @@ class UserValidatorTest {
             .teamId(team.id())
             .build();
 
-        final User existingUser = User.builder()
-            .id(1)
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .hardware(hardware)
-            .team(team)
-            .build();
+        final User existingUser = User.create(
+            1,
+            "user",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            team,
+            true
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -1620,18 +1638,18 @@ class UserValidatorTest {
         final Team team = generateTeam();
         final Team oldTeam = generateTeam();
 
-        final User currentCaptain = User.builder()
-            .id(2)
-            .foldingUserName("otherUser")
-            .displayName("otherUser")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.AMD_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .hardware(hardware)
-            .team(team)
-            .build();
+        final User currentCaptain = User.create(
+            2,
+            "otherUser",
+            "otherUser",
+            "DummyPasskey12345678901234567890",
+            Category.AMD_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            team,
+            true
+        );
 
         final UserRequest user = UserRequest.builder()
             .foldingUserName("user")
@@ -1645,18 +1663,18 @@ class UserValidatorTest {
             .teamId(team.id())
             .build();
 
-        final User existingUser = User.builder()
-            .id(1)
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .hardware(hardware)
-            .team(oldTeam)
-            .build();
+        final User existingUser = User.create(
+            1,
+            "user",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            oldTeam,
+            true
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -1678,18 +1696,18 @@ class UserValidatorTest {
         final Hardware hardware = generateHardware();
         final Team team = generateTeam();
 
-        final User currentCaptain = User.builder()
-            .id(2)
-            .foldingUserName("otherUser")
-            .displayName("otherUser")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.AMD_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .hardware(hardware)
-            .team(team)
-            .build();
+        final User currentCaptain = User.create(
+            2,
+            "otherUser",
+            "otherUser",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            team,
+            true
+        );
 
         final UserRequest user = UserRequest.builder()
             .foldingUserName("user")
@@ -1703,18 +1721,18 @@ class UserValidatorTest {
             .teamId(team.id())
             .build();
 
-        final User existingUser = User.builder()
-            .id(1)
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(false)
-            .hardware(hardware)
-            .team(team)
-            .build();
+        final User existingUser = User.create(
+            1,
+            "user",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            team,
+            false
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -1735,18 +1753,18 @@ class UserValidatorTest {
         final Hardware hardware = generateHardware();
         final Team team = generateTeam();
 
-        final User currentCaptain = User.builder()
-            .id(2)
-            .foldingUserName("user1")
-            .displayName("user1")
-            .passkey("DummyPasskey12345678901234567891")
-            .category(Category.WILDCARD)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .hardware(hardware)
-            .team(team)
-            .build();
+        final User currentCaptain = User.create(
+            2,
+            "user1",
+            "user1",
+            "DummyPasskey12345678901234567891",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            team,
+            true
+        );
 
         final UserRequest user = UserRequest.builder()
             .foldingUserName("user")
@@ -1760,18 +1778,18 @@ class UserValidatorTest {
             .teamId(team.id())
             .build();
 
-        final User existingUser = User.builder()
-            .id(userId++)
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(false)
-            .hardware(hardware)
-            .team(team)
-            .build();
+        final User existingUser = User.create(
+            userId++,
+            "user",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            team,
+            false
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -1805,18 +1823,18 @@ class UserValidatorTest {
             .teamId(team.id())
             .build();
 
-        final User existingUser = User.builder()
-            .id(userId++)
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(false)
-            .hardware(hardware)
-            .team(oldTeam)
-            .build();
+        final User existingUser = User.create(
+            userId++,
+            "user",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            oldTeam,
+            false
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -1825,18 +1843,18 @@ class UserValidatorTest {
 
         for (int i = 0; i < Category.maximumPermittedAmountForAllCategories(); i++) {
             foldingRepository.createUser(
-                User.builder()
-                    .id(userId++)
-                    .foldingUserName("user" + 0)
-                    .displayName("user" + 0)
-                    .passkey("DummyPasskey12345678901234567891")
-                    .category(Category.WILDCARD)
-                    .profileLink("https://www.google.com")
-                    .liveStatsLink("https://www.google.com")
-                    .userIsCaptain(false)
-                    .hardware(hardware)
-                    .team(team)
-                    .build()
+                User.create(
+                    userId++,
+                    "user" + i,
+                    "user" + i,
+                    "DummyPasskey12345678901234567891",
+                    Category.WILDCARD,
+                    "https://www.google.com",
+                    "https://www.google.com",
+                    hardware,
+                    team,
+                    false
+                )
             );
         }
 
@@ -1866,18 +1884,18 @@ class UserValidatorTest {
             .teamId(team.id())
             .build();
 
-        final User existingUser = User.builder()
-            .id(userId++)
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(false)
-            .hardware(hardware)
-            .team(oldTeam)
-            .build();
+        final User existingUser = User.create(
+            userId++,
+            "user",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            oldTeam,
+            false
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -1886,18 +1904,18 @@ class UserValidatorTest {
 
         for (int i = 0; i < Category.NVIDIA_GPU.permittedUsers(); i++) {
             foldingRepository.createUser(
-                User.builder()
-                    .id(userId++)
-                    .foldingUserName("user" + i)
-                    .displayName("user" + i)
-                    .passkey("DummyPasskey12345678901234567891")
-                    .category(Category.NVIDIA_GPU)
-                    .profileLink("https://www.google.com")
-                    .liveStatsLink("https://www.google.com")
-                    .userIsCaptain(false)
-                    .hardware(hardware)
-                    .team(team)
-                    .build()
+                User.create(
+                    userId++,
+                    "user" + i,
+                    "user" + i,
+                    "DummyPasskey12345678901234567891",
+                    Category.NVIDIA_GPU,
+                    "https://www.google.com",
+                    "https://www.google.com",
+                    hardware,
+                    team,
+                    false
+                )
             );
         }
 
@@ -1928,18 +1946,18 @@ class UserValidatorTest {
             .teamId(team.id())
             .build();
 
-        final User existingUser = User.builder()
-            .id(userId++)
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.AMD_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(false)
-            .hardware(hardware)
-            .team(team)
-            .build();
+        final User existingUser = User.create(
+            userId++,
+            "user",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.AMD_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            team,
+            false
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -1948,18 +1966,18 @@ class UserValidatorTest {
 
         for (int i = 0; i < Category.NVIDIA_GPU.permittedUsers(); i++) {
             foldingRepository.createUser(
-                User.builder()
-                    .id(userId++)
-                    .foldingUserName("user" + 0)
-                    .displayName("user" + 0)
-                    .passkey("DummyPasskey12345678901234567891")
-                    .category(Category.NVIDIA_GPU)
-                    .profileLink("https://www.google.com")
-                    .liveStatsLink("https://www.google.com")
-                    .userIsCaptain(false)
-                    .hardware(hardware)
-                    .team(team)
-                    .build()
+                User.create(
+                    userId++,
+                    "user" + i,
+                    "user" + i,
+                    "DummyPasskey12345678901234567891",
+                    Category.NVIDIA_GPU,
+                    "https://www.google.com",
+                    "https://www.google.com",
+                    hardware,
+                    team,
+                    false
+                )
             );
         }
 
@@ -1989,18 +2007,18 @@ class UserValidatorTest {
             .teamId(team.id())
             .build();
 
-        final User existingUser = User.builder()
-            .id(userId++)
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(false)
-            .hardware(hardware)
-            .team(team)
-            .build();
+        final User existingUser = User.create(
+            userId++,
+            "user",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            team,
+            false
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -2040,18 +2058,18 @@ class UserValidatorTest {
             .teamId(team.id())
             .build();
 
-        final User existingUser = User.builder()
-            .id(userId++)
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(false)
-            .hardware(hardware)
-            .team(team)
-            .build();
+        final User existingUser = User.create(
+            userId++,
+            "user",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            team,
+            false
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -2092,18 +2110,18 @@ class UserValidatorTest {
             .teamId(team.id())
             .build();
 
-        final User existingUser = User.builder()
-            .id(userId++)
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .hardware(hardware)
-            .team(team)
-            .build();
+        final User existingUser = User.create(
+            userId++,
+            "user",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            team,
+            true
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -2132,17 +2150,18 @@ class UserValidatorTest {
             .teamId(team.id())
             .build();
 
-        final User existingUser = User.builder()
-            .id(userId++)
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .team(team)
-            .build();
+        final User existingUser = User.create(
+            userId++,
+            "user",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            null,
+            team,
+            true
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createTeam(team);
@@ -2176,18 +2195,18 @@ class UserValidatorTest {
             .teamId(1)
             .build();
 
-        final User existingUser = User.builder()
-            .id(userId++)
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .hardware(hardware)
-            .team(team)
-            .build();
+        final User existingUser = User.create(
+            userId++,
+            "user",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            team,
+            true
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -2216,17 +2235,18 @@ class UserValidatorTest {
             .teamId(1)
             .build();
 
-        final User existingUser = User.builder()
-            .id(userId++)
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .hardware(hardware)
-            .build();
+        final User existingUser = User.create(
+            userId++,
+            "user",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            null,
+            true
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -2255,18 +2275,18 @@ class UserValidatorTest {
             .teamId(team.id())
             .build();
 
-        final User existingUser = User.builder()
-            .id(userId++)
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .hardware(hardware)
-            .team(team)
-            .build();
+        final User existingUser = User.create(
+            userId++,
+            "user",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            team,
+            true
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -2298,18 +2318,18 @@ class UserValidatorTest {
             .teamId(team.id())
             .build();
 
-        final User existingUser = User.builder()
-            .id(userId++)
-            .foldingUserName("oldUserName")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .hardware(hardware)
-            .team(team)
-            .build();
+        final User existingUser = User.create(
+            userId++,
+            "oldUserName",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            team,
+            true
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -2342,18 +2362,18 @@ class UserValidatorTest {
             .teamId(team.id())
             .build();
 
-        final User existingUser = User.builder()
-            .id(userId++)
-            .foldingUserName("oldUserName")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .hardware(hardware)
-            .team(team)
-            .build();
+        final User existingUser = User.create(
+            userId++,
+            "oldUserName",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            team,
+            true
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -2385,18 +2405,18 @@ class UserValidatorTest {
             .teamId(team.id())
             .build();
 
-        final User existingUser = User.builder()
-            .id(userId++)
-            .foldingUserName("oldUserName")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .hardware(hardware)
-            .team(team)
-            .build();
+        final User existingUser = User.create(
+            userId++,
+            "oldUserName",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            team,
+            true
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -2426,17 +2446,18 @@ class UserValidatorTest {
             .teamId(team.id())
             .build();
 
-        final User existingUser = User.builder()
-            .id(userId++)
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .team(team)
-            .build();
+        final User existingUser = User.create(
+            userId++,
+            "user",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            team,
+            true
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -2461,18 +2482,18 @@ class UserValidatorTest {
         final Hardware hardware = generateHardware();
         final Team team = generateTeam();
 
-        final User userToDelete = User.builder()
-            .id(userId++)
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(false)
-            .hardware(hardware)
-            .team(team)
-            .build();
+        final User userToDelete = User.create(
+            userId++,
+            "user",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            team,
+            false
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
 
@@ -2489,25 +2510,25 @@ class UserValidatorTest {
         final Hardware hardware = generateHardware();
         final Team team = generateTeam();
 
-        final User userToDelete = User.builder()
-            .id(userId++)
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .hardware(hardware)
-            .team(team)
-            .build();
+        final User userToDelete = User.create(
+            userId++,
+            "user",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            team,
+            true
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.delete(userToDelete), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
-            .containsOnly(String.format("Cannot delete user '%s' since they are team captain", userToDelete.getDisplayName()));
+            .containsOnly(String.format("Cannot delete user '%s' since they are team captain", userToDelete.displayName()));
     }
 
     private static Hardware generateHardware() {

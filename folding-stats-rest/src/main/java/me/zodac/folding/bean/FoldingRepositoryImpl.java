@@ -117,7 +117,7 @@ public class FoldingRepositoryImpl implements FoldingRepository {
             final Collection<User> usersUsingThisHardware = getUsersWithHardware(updatedHardware);
 
             for (final User userUsingHardware : usersUsingThisHardware) {
-                LOGGER.debug("User '{}' (ID: {}) had state change to hardware", userUsingHardware.getDisplayName(), userUsingHardware.getId());
+                LOGGER.debug("User '{}' (ID: {}) had state change to hardware", userUsingHardware.displayName(), userUsingHardware.id());
                 handleStateChange(userUsingHardware);
             }
         }
@@ -132,7 +132,7 @@ public class FoldingRepositoryImpl implements FoldingRepository {
 
         return getAllUsersWithPasskeys()
             .stream()
-            .filter(user -> user.getHardware().id() == hardware.id())
+            .filter(user -> user.hardware().id() == hardware.id())
             .toList();
     }
 
@@ -177,7 +177,7 @@ public class FoldingRepositoryImpl implements FoldingRepository {
     @Override
     public User createUser(final User user) {
         if (isUserCaptainAndCaptainExistsOnTeam(user)) {
-            removeCaptaincyFromExistingTeamCaptain(user.getTeam());
+            removeCaptaincyFromExistingTeamCaptain(user.team());
         }
 
         final User createdUser = storage.createUser(user);
@@ -186,10 +186,10 @@ public class FoldingRepositoryImpl implements FoldingRepository {
             // When adding a new user, we configure the initial stats DB/cache
             final UserStats currentUserStats = foldingStatsRetriever.getTotalStats(createdUser);
             final UserStats initialStats = statsRepository.createInitialStats(currentUserStats);
-            LOGGER.info("User '{}' (ID: {}) created with initial stats: {}", createdUser.getDisplayName(), createdUser.getId(), initialStats);
+            LOGGER.info("User '{}' (ID: {}) created with initial stats: {}", createdUser.displayName(), createdUser.id(), initialStats);
             userStatsParser.parseTcStatsForUsers(Collections.singletonList(createdUser));
         } catch (final ExternalConnectionException e) {
-            LOGGER.error("Error retrieving initial stats for user '{}' (ID: {})", createdUser.getDisplayName(), createdUser.getId(), e);
+            LOGGER.error("Error retrieving initial stats for user '{}' (ID: {})", createdUser.displayName(), createdUser.id(), e);
         }
 
         return createdUser;
@@ -223,17 +223,17 @@ public class FoldingRepositoryImpl implements FoldingRepository {
     @Override
     public User updateUser(final User userToUpdate, final User existingUser) {
         if (isUserCaptainAndCaptainExistsOnTeam(userToUpdate)) {
-            final boolean isCaptainChange = userToUpdate.isUserIsCaptain() != existingUser.isUserIsCaptain();
-            final boolean isTeamChange = userToUpdate.getTeam().id() != existingUser.getTeam().id();
+            final boolean isCaptainChange = userToUpdate.userIsCaptain() != existingUser.userIsCaptain();
+            final boolean isTeamChange = userToUpdate.team().id() != existingUser.team().id();
 
             if (isCaptainChange || isTeamChange) {
-                removeCaptaincyFromExistingTeamCaptain(userToUpdate.getTeam());
+                removeCaptaincyFromExistingTeamCaptain(userToUpdate.team());
             }
         }
 
         // Perform any stats handling before updating the user
         if (isUserTeamChange(userToUpdate, existingUser)) {
-            handleTeamChange(userToUpdate, existingUser.getTeam());
+            handleTeamChange(userToUpdate, existingUser.team());
         }
 
         final User updatedUser = storage.updateUser(userToUpdate);
@@ -247,25 +247,25 @@ public class FoldingRepositoryImpl implements FoldingRepository {
     }
 
     private boolean isUserStateChange(final User updatedUser, final User existingUser) {
-        if (existingUser.getHardware().id() != updatedUser.getHardware().id()) {
-            LOGGER.debug("User '{}' (ID: {}) had state change to hardware, {} -> {}", existingUser.getDisplayName(),
-                existingUser.getId(), existingUser.getHardware(), updatedUser.getHardware());
+        if (existingUser.hardware().id() != updatedUser.hardware().id()) {
+            LOGGER.debug("User '{}' (ID: {}) had state change to hardware, {} -> {}", existingUser.displayName(),
+                existingUser.id(), existingUser.hardware(), updatedUser.hardware());
             return true;
         }
 
-        if (!existingUser.getFoldingUserName().equalsIgnoreCase(updatedUser.getFoldingUserName())) {
+        if (!existingUser.foldingUserName().equalsIgnoreCase(updatedUser.foldingUserName())) {
             LOGGER.debug("User '{}' (ID: {}) had state change to Folding username, {} -> {}",
-                existingUser.getDisplayName(), existingUser.getId(), existingUser.getFoldingUserName(), updatedUser.getFoldingUserName());
+                existingUser.displayName(), existingUser.id(), existingUser.foldingUserName(), updatedUser.foldingUserName());
             return true;
         }
 
-        if (!existingUser.getPasskey().equalsIgnoreCase(updatedUser.getPasskey())) {
-            LOGGER.debug("User '{}' (ID: {}) had state change to passkey, {} -> {}", existingUser.getDisplayName(),
-                existingUser.getId(), existingUser.getPasskey(), updatedUser.getPasskey());
+        if (!existingUser.passkey().equalsIgnoreCase(updatedUser.passkey())) {
+            LOGGER.debug("User '{}' (ID: {}) had state change to passkey, {} -> {}", existingUser.displayName(),
+                existingUser.id(), existingUser.passkey(), updatedUser.passkey());
             return true;
         }
 
-        LOGGER.debug("No state change required for updated user '{}' (ID: {})", updatedUser.getDisplayName(), updatedUser.getId());
+        LOGGER.debug("No state change required for updated user '{}' (ID: {})", updatedUser.displayName(), updatedUser.id());
         return false;
     }
 
@@ -286,7 +286,7 @@ public class FoldingRepositoryImpl implements FoldingRepository {
     private void handleStateChange(final User userWithStateChange) {
         if (ParsingStateManager.current() == ParsingState.DISABLED) {
             LOGGER.info("Received a state change for user '{}' (ID: {}), but system is not currently parsing stats",
-                userWithStateChange.getDisplayName(), userWithStateChange.getId());
+                userWithStateChange.displayName(), userWithStateChange.id());
             return;
         }
 
@@ -300,16 +300,16 @@ public class FoldingRepositoryImpl implements FoldingRepository {
             final OffsetTcStats createdOffsetStats = statsRepository.createOffsetStats(userWithStateChange, offsetTcStats);
             LOGGER.debug("Added offset stats of: {}", createdOffsetStats);
 
-            LOGGER.info("Handled state change for user '{}' (ID: {})", userWithStateChange.getDisplayName(), userWithStateChange.getId());
+            LOGGER.info("Handled state change for user '{}' (ID: {})", userWithStateChange.displayName(), userWithStateChange.id());
         } catch (final ExternalConnectionException e) {
-            LOGGER.error("Unable to update the state of user '{}' (ID: {})", userWithStateChange.getDisplayName(), userWithStateChange.getId(), e);
+            LOGGER.error("Unable to update the state of user '{}' (ID: {})", userWithStateChange.displayName(), userWithStateChange.id(), e);
         }
     }
 
     private boolean isUserTeamChange(final User updatedUser, final User existingUser) {
-        if (updatedUser.getTeam().id() != existingUser.getTeam().id()) {
-            LOGGER.info("User '{}' (ID: {}) moved from team '{}' -> '{}'", existingUser.getDisplayName(), existingUser.getId(),
-                updatedUser.getTeam().teamName(), existingUser.getTeam().teamName());
+        if (updatedUser.team().id() != existingUser.team().id()) {
+            LOGGER.info("User '{}' (ID: {}) moved from team '{}' -> '{}'", existingUser.displayName(), existingUser.id(),
+                updatedUser.team().teamName(), existingUser.team().teamName());
             return true;
         }
 
@@ -319,7 +319,7 @@ public class FoldingRepositoryImpl implements FoldingRepository {
     private void handleTeamChange(final User userWithTeamChange, final Team oldTeam) {
         if (ParsingStateManager.current() == ParsingState.DISABLED) {
             LOGGER.info("Received a team change for user '{}' (ID: {}), but system is not currently parsing stats",
-                userWithTeamChange.getDisplayName(), userWithTeamChange.getId());
+                userWithTeamChange.displayName(), userWithTeamChange.id());
             return;
         }
 
@@ -328,9 +328,9 @@ public class FoldingRepositoryImpl implements FoldingRepository {
 
         if (!userStats.isEmptyStats()) {
             final RetiredUserTcStats retiredUserTcStats =
-                RetiredUserTcStats.createWithoutId(oldTeam.id(), userWithTeamChange.getDisplayName(), userStats);
+                RetiredUserTcStats.createWithoutId(oldTeam.id(), userWithTeamChange.displayName(), userStats);
             final RetiredUserTcStats createdRetiredUserTcStats = statsRepository.createRetiredUserStats(retiredUserTcStats);
-            LOGGER.info("User '{}' (ID: {}) retired with retired stats ID: {}", userWithTeamChange.getDisplayName(), userWithTeamChange.getId(),
+            LOGGER.info("User '{}' (ID: {}) retired with retired stats ID: {}", userWithTeamChange.displayName(), userWithTeamChange.id(),
                 createdRetiredUserTcStats.getRetiredUserId());
         }
 
@@ -342,15 +342,15 @@ public class FoldingRepositoryImpl implements FoldingRepository {
         final Collection<User> users = getAllUsersWithPasskeys();
         userStatsParser.parseTcStatsForUsersAndWait(users);
 
-        LOGGER.info("Handled team change for user '{}' (ID: {})", userWithTeamChange.getDisplayName(), userWithTeamChange.getId());
+        LOGGER.info("Handled team change for user '{}' (ID: {})", userWithTeamChange.displayName(), userWithTeamChange.id());
     }
 
     private boolean isUserCaptainAndCaptainExistsOnTeam(final User user) {
-        if (!user.isUserIsCaptain()) {
+        if (!user.userIsCaptain()) {
             return false;
         }
 
-        final Team team = user.getTeam();
+        final Team team = user.team();
         final Optional<User> existingCaptainOptional = getCaptainOfTeam(team);
         if (existingCaptainOptional.isEmpty()) {
             return false;
@@ -358,7 +358,7 @@ public class FoldingRepositoryImpl implements FoldingRepository {
 
         final User existingCaptain = existingCaptainOptional.get();
         LOGGER.info("Captain '{} (ID: {})' already exists for team '{}', will be replaced by '{}' (ID: {})",
-            existingCaptain.getDisplayName(), existingCaptain.getId(), team.teamName(), user.getDisplayName(), user.getId()
+            existingCaptain.displayName(), existingCaptain.id(), team.teamName(), user.displayName(), user.id()
         );
         return true;
     }
@@ -378,25 +378,25 @@ public class FoldingRepositoryImpl implements FoldingRepository {
     private Optional<User> getCaptainOfTeam(final Team team) {
         return getUsersOnTeam(team)
             .stream()
-            .filter(User::isUserIsCaptain)
+            .filter(User::userIsCaptain)
             .findAny();
     }
 
     @Override
     public void deleteUser(final User user) {
         // Retrieve the user's stats before deleting the user, so we can use the values for the retried user stats
-        final UserTcStats userStats = storage.getHourlyTcStats(user.getId())
-            .orElse(UserTcStats.empty(user.getId()));
-        storage.deleteUser(user.getId());
+        final UserTcStats userStats = storage.getHourlyTcStats(user.id())
+            .orElse(UserTcStats.empty(user.id()));
+        storage.deleteUser(user.id());
 
         if (userStats.isEmptyStats()) {
-            LOGGER.warn("User '{}' (ID: {}) has no stats, not saving any retired stats", user.getDisplayName(), user.getId());
+            LOGGER.warn("User '{}' (ID: {}) has no stats, not saving any retired stats", user.displayName(), user.id());
             return;
         }
 
         final RetiredUserTcStats retiredUserTcStats = RetiredUserTcStats.createWithoutId(user, userStats);
         final RetiredUserTcStats createdRetiredUserTcStats = storage.createRetiredUserStats(retiredUserTcStats);
-        LOGGER.info("User '{}' (ID: {}) retired with retired stats ID: {}", user.getDisplayName(), user.getId(),
+        LOGGER.info("User '{}' (ID: {}) retired with retired stats ID: {}", user.displayName(), user.id(),
             createdRetiredUserTcStats.getRetiredUserId());
     }
 
@@ -408,7 +408,7 @@ public class FoldingRepositoryImpl implements FoldingRepository {
 
         return getAllUsersWithPasskeys()
             .stream()
-            .filter(user -> user.getTeam().id() == team.id())
+            .filter(user -> user.team().id() == team.id())
             .map(User::hidePasskey)
             .toList();
     }

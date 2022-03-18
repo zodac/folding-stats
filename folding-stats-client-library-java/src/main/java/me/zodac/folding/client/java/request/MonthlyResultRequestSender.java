@@ -132,7 +132,7 @@ public record MonthlyResultRequestSender(String monthlyResultUrl) {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(monthlyResultUrl + "/result/" + year.getValue() + '/' + month.getValue()))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNotBlank(entityTag)) {
             requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), entityTag);
@@ -162,7 +162,7 @@ public record MonthlyResultRequestSender(String monthlyResultUrl) {
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.noBody())
             .uri(URI.create(monthlyResultUrl + "/manual/save"))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
             .build();
 

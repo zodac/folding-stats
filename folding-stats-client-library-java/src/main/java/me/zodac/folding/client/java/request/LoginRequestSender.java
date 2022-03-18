@@ -83,7 +83,7 @@ public record LoginRequestSender(String loginUrl) {
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(loginCredentials)))
             .uri(URI.create(loginUrl + "/admin"))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
         try {

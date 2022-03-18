@@ -60,11 +60,11 @@ class UserChangeValidatorTest {
         final User user = generateUser(hardware);
 
         final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.getPasskey())
-            .foldingUserName(user.getFoldingUserName())
-            .passkey(user.getPasskey())
+            .existingPasskey(user.passkey())
+            .foldingUserName(user.foldingUserName())
+            .passkey(user.passkey())
             .hardwareId(hardware.id())
-            .userId(user.getId())
+            .userId(user.id())
             .liveStatsLink("https://www.google.ie")
             .immediate(true)
             .build();
@@ -82,9 +82,9 @@ class UserChangeValidatorTest {
 
         assertThat(response.newUser())
             .isNotNull();
-        assertThat(response.newUser().getHardware())
+        assertThat(response.newUser().hardware())
             .isNotNull();
-        assertThat(response.newUser().getTeam())
+        assertThat(response.newUser().team())
             .isNotNull();
 
         assertThat(response.state())
@@ -97,11 +97,11 @@ class UserChangeValidatorTest {
         final User user = generateUser(hardware);
 
         final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.getPasskey())
-            .foldingUserName(user.getFoldingUserName())
+            .existingPasskey(user.passkey())
+            .foldingUserName(user.foldingUserName())
             .passkey("DummyPasskey12345678901234567891")
             .hardwareId(hardware.id())
-            .userId(user.getId())
+            .userId(user.id())
             .liveStatsLink("https://www.google.ie")
             .build();
 
@@ -123,11 +123,11 @@ class UserChangeValidatorTest {
         final User user = generateUser(hardware);
 
         final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.getPasskey())
+            .existingPasskey(user.passkey())
             .foldingUserName("-folding.Name_2")
-            .passkey(user.getPasskey())
+            .passkey(user.passkey())
             .hardwareId(hardware.id())
-            .userId(user.getId())
+            .userId(user.id())
             .liveStatsLink("https://www.google.ie")
             .build();
 
@@ -149,11 +149,11 @@ class UserChangeValidatorTest {
         final User user = generateUser(hardware);
 
         final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.getPasskey())
+            .existingPasskey(user.passkey())
             .foldingUserName(null)
-            .passkey(user.getPasskey())
+            .passkey(user.passkey())
             .hardwareId(hardware.id())
-            .userId(user.getId())
+            .userId(user.id())
             .liveStatsLink("https://www.google.ie")
             .build();
 
@@ -173,11 +173,11 @@ class UserChangeValidatorTest {
         final User user = generateUser(hardware);
 
         final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.getPasskey())
+            .existingPasskey(user.passkey())
             .foldingUserName("folding*Name")
-            .passkey(user.getPasskey())
+            .passkey(user.passkey())
             .hardwareId(hardware.id())
-            .userId(user.getId())
+            .userId(user.id())
             .liveStatsLink("https://www.google.ie")
             .build();
 
@@ -197,11 +197,11 @@ class UserChangeValidatorTest {
         final User user = generateUser(hardware);
 
         final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.getPasskey())
-            .foldingUserName(user.getFoldingUserName())
+            .existingPasskey(user.passkey())
+            .foldingUserName(user.foldingUserName())
             .passkey(null)
             .hardwareId(hardware.id())
-            .userId(user.getId())
+            .userId(user.id())
             .liveStatsLink("https://www.google.ie")
             .build();
 
@@ -221,11 +221,11 @@ class UserChangeValidatorTest {
         final User user = generateUser(hardware);
 
         final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.getPasskey())
-            .foldingUserName(user.getFoldingUserName())
+            .existingPasskey(user.passkey())
+            .foldingUserName(user.foldingUserName())
             .passkey("DummyPasskey1234567890123456789*")
             .hardwareId(hardware.id())
-            .userId(user.getId())
+            .userId(user.id())
             .liveStatsLink("https://www.google.ie")
             .build();
 
@@ -245,11 +245,11 @@ class UserChangeValidatorTest {
         final User user = generateUser(hardware);
 
         final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.getPasskey())
-            .foldingUserName(user.getFoldingUserName())
-            .passkey(user.getPasskey())
+            .existingPasskey(user.passkey())
+            .foldingUserName(user.foldingUserName())
+            .passkey(user.passkey())
             .hardwareId(hardware.id())
-            .userId(user.getId())
+            .userId(user.id())
             .liveStatsLink(null)
             .build();
 
@@ -271,11 +271,11 @@ class UserChangeValidatorTest {
         final User user = generateUser(hardware);
 
         final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.getPasskey())
-            .foldingUserName(user.getFoldingUserName())
-            .passkey(user.getPasskey())
+            .existingPasskey(user.passkey())
+            .foldingUserName(user.foldingUserName())
+            .passkey(user.passkey())
             .hardwareId(hardware.id())
-            .userId(user.getId())
+            .userId(user.id())
             .liveStatsLink("invalidUrl")
             .build();
 
@@ -295,11 +295,11 @@ class UserChangeValidatorTest {
         final User user = generateUser(hardware);
 
         final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.getPasskey())
-            .foldingUserName(user.getFoldingUserName())
-            .passkey(user.getPasskey())
+            .existingPasskey(user.passkey())
+            .foldingUserName(user.foldingUserName())
+            .passkey(user.passkey())
             .hardwareId(-1)
-            .userId(user.getId())
+            .userId(user.id())
             .liveStatsLink("https://www.google.ie")
             .build();
 
@@ -319,11 +319,11 @@ class UserChangeValidatorTest {
         final User user = generateUser(hardware);
 
         final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.getPasskey())
-            .foldingUserName(user.getFoldingUserName())
-            .passkey(user.getPasskey())
+            .existingPasskey(user.passkey())
+            .foldingUserName(user.foldingUserName())
+            .passkey(user.passkey())
             .hardwareId(-1)
-            .userId(user.getId())
+            .userId(user.id())
             .liveStatsLink("https://www.google.ie")
             .build();
 
@@ -342,9 +342,9 @@ class UserChangeValidatorTest {
         final User user = generateUser(hardware);
 
         final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.getPasskey())
-            .foldingUserName(user.getFoldingUserName())
-            .passkey(user.getPasskey())
+            .existingPasskey(user.passkey())
+            .foldingUserName(user.foldingUserName())
+            .passkey(user.passkey())
             .hardwareId(hardware.id())
             .userId(-1)
             .liveStatsLink("https://www.google.ie")
@@ -357,7 +357,7 @@ class UserChangeValidatorTest {
         final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userChangeValidator.validate(userChange), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
-            .containsOnly(String.format("Field 'userId' must be one of: [%s: %s]", user.getId(), user.getDisplayName()));
+            .containsOnly(String.format("Field 'userId' must be one of: [%s: %s]", user.id(), user.displayName()));
     }
 
     @Test
@@ -366,9 +366,9 @@ class UserChangeValidatorTest {
         final User user = generateUser(hardware);
 
         final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.getPasskey())
-            .foldingUserName(user.getFoldingUserName())
-            .passkey(user.getPasskey())
+            .existingPasskey(user.passkey())
+            .foldingUserName(user.foldingUserName())
+            .passkey(user.passkey())
             .hardwareId(hardware.id())
             .userId(-1)
             .liveStatsLink("https://www.google.ie")
@@ -390,10 +390,10 @@ class UserChangeValidatorTest {
 
         final UserChangeRequest userChange = UserChangeRequest.builder()
             .existingPasskey("DummyPasskey11111111111111111111")
-            .foldingUserName(user.getFoldingUserName())
-            .passkey(user.getPasskey())
+            .foldingUserName(user.foldingUserName())
+            .passkey(user.passkey())
             .hardwareId(hardware.id())
-            .userId(user.getId())
+            .userId(user.id())
             .liveStatsLink("https://www.google.ie")
             .build();
 
@@ -413,12 +413,12 @@ class UserChangeValidatorTest {
         final User user = generateUser(hardware);
 
         final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.getPasskey())
-            .foldingUserName(user.getFoldingUserName())
-            .passkey(user.getPasskey())
+            .existingPasskey(user.passkey())
+            .foldingUserName(user.foldingUserName())
+            .passkey(user.passkey())
             .hardwareId(hardware.id())
-            .userId(user.getId())
-            .liveStatsLink(user.getLiveStatsLink())
+            .userId(user.id())
+            .liveStatsLink(user.liveStatsLink())
             .build();
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -437,27 +437,28 @@ class UserChangeValidatorTest {
         final User user = generateUser(hardware);
 
         final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.getPasskey())
-            .foldingUserName(user.getFoldingUserName())
-            .passkey(user.getPasskey())
+            .existingPasskey(user.passkey())
+            .foldingUserName(user.foldingUserName())
+            .passkey(user.passkey())
             .hardwareId(hardware.id())
-            .userId(user.getId())
+            .userId(user.id())
             .liveStatsLink("https://www.google.ie")
             .build();
 
         final UserChange existingUserChange = UserChange.createNow(
             user,
-            User.builder()
-                .id(user.getId())
-                .foldingUserName(user.getFoldingUserName())
-                .displayName(user.getDisplayName())
-                .passkey(user.getPasskey())
-                .category(user.getCategory())
-                .profileLink(user.getProfileLink())
-                .liveStatsLink("https://www.google.ie")
-                .userIsCaptain(user.isUserIsCaptain())
-                .hardware(user.getHardware())
-                .build(),
+            User.create(
+                user.id(),
+                user.foldingUserName(),
+                user.displayName(),
+                user.passkey(),
+                user.category(),
+                user.profileLink(),
+                "https://www.google.ie",
+                user.hardware(),
+                null,
+                user.userIsCaptain()
+            ),
             UserChangeState.APPROVED_NEXT_MONTH
         );
 
@@ -486,27 +487,28 @@ class UserChangeValidatorTest {
         final User user = generateUser(hardware);
 
         final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.getPasskey())
-            .foldingUserName(user.getFoldingUserName())
-            .passkey(user.getPasskey())
+            .existingPasskey(user.passkey())
+            .foldingUserName(user.foldingUserName())
+            .passkey(user.passkey())
             .hardwareId(hardware.id())
-            .userId(user.getId())
+            .userId(user.id())
             .liveStatsLink("https://www.google.ie")
             .build();
 
         final UserChange existingUserChange = UserChange.createNow(
             user,
-            User.builder()
-                .id(user.getId())
-                .foldingUserName(user.getFoldingUserName())
-                .displayName(user.getDisplayName())
-                .passkey(user.getPasskey())
-                .category(user.getCategory())
-                .profileLink(user.getProfileLink())
-                .liveStatsLink("https://www.google.com")
-                .userIsCaptain(user.isUserIsCaptain())
-                .hardware(user.getHardware())
-                .build(),
+            User.create(
+                user.id(),
+                user.foldingUserName(),
+                user.displayName(),
+                user.passkey(),
+                user.category(),
+                user.profileLink(),
+                "https://www.google.com",
+                user.hardware(),
+                null,
+                user.userIsCaptain()
+            ),
             UserChangeState.APPROVED_NEXT_MONTH
         );
 
@@ -528,27 +530,28 @@ class UserChangeValidatorTest {
         final User user = generateUser(hardware);
 
         final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.getPasskey())
-            .foldingUserName(user.getFoldingUserName())
-            .passkey(user.getPasskey())
+            .existingPasskey(user.passkey())
+            .foldingUserName(user.foldingUserName())
+            .passkey(user.passkey())
             .hardwareId(hardware.id())
-            .userId(user.getId())
+            .userId(user.id())
             .liveStatsLink("https://www.google.ie")
             .build();
 
         final UserChange existingUserChange = UserChange.createNow(
             user,
-            User.builder()
-                .id(99)
-                .foldingUserName(user.getFoldingUserName())
-                .displayName(user.getDisplayName())
-                .passkey(user.getPasskey())
-                .category(user.getCategory())
-                .profileLink(user.getProfileLink())
-                .liveStatsLink("https://www.google.ie")
-                .userIsCaptain(user.isUserIsCaptain())
-                .hardware(user.getHardware())
-                .build(),
+            User.create(
+                99,
+                user.foldingUserName(),
+                user.displayName(),
+                user.passkey(),
+                user.category(),
+                user.profileLink(),
+                "https://www.google.ie",
+                user.hardware(),
+                null,
+                user.userIsCaptain()
+            ),
             UserChangeState.APPROVED_NOW
         );
 
@@ -570,11 +573,11 @@ class UserChangeValidatorTest {
         final User user = generateUser(hardware);
 
         final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.getPasskey())
-            .foldingUserName(user.getFoldingUserName())
+            .existingPasskey(user.passkey())
+            .foldingUserName(user.foldingUserName())
             .passkey("DummyPasskey12345678901234567891")
             .hardwareId(hardware.id())
-            .userId(user.getId())
+            .userId(user.id())
             .liveStatsLink("https://www.google.ie")
             .build();
 
@@ -598,11 +601,11 @@ class UserChangeValidatorTest {
         final User user = generateUser(hardware);
 
         final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.getPasskey())
+            .existingPasskey(user.passkey())
             .foldingUserName("-folding.Name_2")
-            .passkey(user.getPasskey())
+            .passkey(user.passkey())
             .hardwareId(hardware.id())
-            .userId(user.getId())
+            .userId(user.id())
             .liveStatsLink("https://www.google.ie")
             .build();
 
@@ -626,11 +629,11 @@ class UserChangeValidatorTest {
         final User user = generateUser(hardware);
 
         final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.getPasskey())
-            .foldingUserName(user.getFoldingUserName())
+            .existingPasskey(user.passkey())
+            .foldingUserName(user.foldingUserName())
             .passkey("DummyPasskey12345678901234567891")
             .hardwareId(hardware.id())
-            .userId(user.getId())
+            .userId(user.id())
             .liveStatsLink("https://www.google.ie")
             .build();
 
@@ -653,11 +656,11 @@ class UserChangeValidatorTest {
         final User user = generateUser(hardware);
 
         final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.getPasskey())
-            .foldingUserName(user.getFoldingUserName())
+            .existingPasskey(user.passkey())
+            .foldingUserName(user.foldingUserName())
             .passkey("DummyPasskey12345678901234567891")
             .hardwareId(hardware.id())
-            .userId(user.getId())
+            .userId(user.id())
             .liveStatsLink("https://www.google.ie")
             .build();
 
@@ -668,7 +671,7 @@ class UserChangeValidatorTest {
         final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new UnexpectedExceptionFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userChangeValidator.validate(userChange), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
-            .containsOnly(String.format("Unable to check stats for user '%s': Error", user.getFoldingUserName()));
+            .containsOnly(String.format("Unable to check stats for user '%s': Error", user.foldingUserName()));
     }
 
     private static Hardware generateHardware() {
@@ -693,17 +696,17 @@ class UserChangeValidatorTest {
     }
 
     private static User generateUser(final Hardware hardware) {
-        return User.builder()
-            .id(userId++)
-            .foldingUserName("-folding.Name_1")
-            .displayName("user")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU)
-            .profileLink("https://www.google.com")
-            .liveStatsLink("https://www.google.com")
-            .userIsCaptain(true)
-            .hardware(hardware)
-            .team(generateTeam())
-            .build();
+        return User.create(
+            userId++,
+            "-folding.Name_1",
+            "user",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            hardware,
+            generateTeam(),
+            true
+        );
     }
 }

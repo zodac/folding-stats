@@ -174,7 +174,7 @@ class PostgresDbManagerTest {
         final User user = generateUser();
         final User createdUser = POSTGRES_DB_MANAGER.createUser(user);
 
-        assertThat(createdUser.getId())
+        assertThat(createdUser.id())
             .isNotEqualTo(User.EMPTY_USER_ID);
 
         // Not explicitly handling this case, the validator should ensure no duplicate creates are attempted
@@ -185,7 +185,7 @@ class PostgresDbManagerTest {
         assertThat(allUsers)
             .hasSize(1);
 
-        final Optional<User> optionalRetrievedUser = POSTGRES_DB_MANAGER.getUser(createdUser.getId());
+        final Optional<User> optionalRetrievedUser = POSTGRES_DB_MANAGER.getUser(createdUser.id());
         assertThat(optionalRetrievedUser)
             .isPresent();
 
@@ -193,21 +193,21 @@ class PostgresDbManagerTest {
         assertThat(retrievedUser)
             .isEqualTo(createdUser);
 
-        final User userToUpdate = User.builder()
-            .id(retrievedUser.getId())
-            .foldingUserName(retrievedUser.getFoldingUserName())
-            .displayName(retrievedUser.getDisplayName())
-            .passkey(retrievedUser.getPasskey())
-            .category(Category.AMD_GPU)
-            .profileLink(retrievedUser.getProfileLink())
-            .liveStatsLink(retrievedUser.getLiveStatsLink())
-            .hardware(retrievedUser.getHardware())
-            .team(retrievedUser.getTeam())
-            .userIsCaptain(retrievedUser.isUserIsCaptain())
-            .build();
+        final User userToUpdate = User.create(
+            retrievedUser.id(),
+            retrievedUser.foldingUserName(),
+            retrievedUser.displayName(),
+            retrievedUser.passkey(),
+            Category.AMD_GPU,
+            retrievedUser.profileLink(),
+            retrievedUser.liveStatsLink(),
+            retrievedUser.hardware(),
+            retrievedUser.team(),
+            retrievedUser.userIsCaptain()
+        );
 
         POSTGRES_DB_MANAGER.updateUser(userToUpdate);
-        final Optional<User> optionalUpdatedUser = POSTGRES_DB_MANAGER.getUser(createdUser.getId());
+        final Optional<User> optionalUpdatedUser = POSTGRES_DB_MANAGER.getUser(createdUser.id());
         assertThat(optionalUpdatedUser)
             .isPresent();
 
@@ -215,7 +215,7 @@ class PostgresDbManagerTest {
         assertThat(updatedUser)
             .isEqualTo(userToUpdate);
 
-        POSTGRES_DB_MANAGER.deleteUser(createdUser.getId());
+        POSTGRES_DB_MANAGER.deleteUser(createdUser.id());
 
         final Collection<User> allUsersAfterDelete = POSTGRES_DB_MANAGER.getAllUsers();
         assertThat(allUsersAfterDelete)
@@ -224,7 +224,7 @@ class PostgresDbManagerTest {
 
     @Test
     void initialUserStatsTest() {
-        final int userId = createUser().getId();
+        final int userId = createUser().id();
 
         assertThat(POSTGRES_DB_MANAGER.getInitialStats(userId))
             .isEmpty();
@@ -244,7 +244,7 @@ class PostgresDbManagerTest {
 
     @Test
     void totalStatsTest() {
-        final int userId = createUser().getId();
+        final int userId = createUser().id();
 
         assertThat(POSTGRES_DB_MANAGER.getTotalStats(userId))
             .isEmpty();
@@ -265,19 +265,19 @@ class PostgresDbManagerTest {
     @Test
     void retiredUserStatsTest() {
         final User userToRetire = createUser();
-        final Team team = userToRetire.getTeam();
+        final Team team = userToRetire.team();
 
         assertThat(POSTGRES_DB_MANAGER.getAllRetiredUserStats())
             .isEmpty();
 
-        POSTGRES_DB_MANAGER.deleteUser(userToRetire.getId());
+        POSTGRES_DB_MANAGER.deleteUser(userToRetire.id());
 
         final long points = 100L;
         final long multipliedPoints = 1_000L;
         final int units = 5;
 
-        final RetiredUserTcStats initialRetiredUserTcStats = RetiredUserTcStats.createWithoutId(team.id(), userToRetire.getDisplayName(),
-            UserTcStats.createNow(userToRetire.getId(), points, multipliedPoints, units));
+        final RetiredUserTcStats initialRetiredUserTcStats = RetiredUserTcStats.createWithoutId(team.id(), userToRetire.displayName(),
+            UserTcStats.createNow(userToRetire.id(), points, multipliedPoints, units));
         POSTGRES_DB_MANAGER.createRetiredUserStats(initialRetiredUserTcStats);
 
         final Collection<RetiredUserTcStats> retiredUserStats = POSTGRES_DB_MANAGER.getAllRetiredUserStats();
@@ -301,7 +301,7 @@ class PostgresDbManagerTest {
 
     @Test
     void offsetStatsTest() {
-        final int userId = createUser().getId();
+        final int userId = createUser().id();
 
         assertThat(POSTGRES_DB_MANAGER.getOffsetStats(userId))
             .isEmpty();
@@ -335,7 +335,7 @@ class PostgresDbManagerTest {
         assertThat(thirdOffsetStatsActual)
             .isEqualTo(expectedOffsetStats);
 
-        final int secondUserId = createUser().getId();
+        final int secondUserId = createUser().id();
         POSTGRES_DB_MANAGER.createOrUpdateOffsetStats(secondUserId, offsetStats);
 
         POSTGRES_DB_MANAGER.deleteOffsetStats(userId);
@@ -351,7 +351,7 @@ class PostgresDbManagerTest {
 
     @Test
     void hourlyTcStatsTest() {
-        final int userId = createUser().getId();
+        final int userId = createUser().id();
         assertThat(POSTGRES_DB_MANAGER.getHourlyTcStats(userId))
             .isEmpty();
 
@@ -372,7 +372,7 @@ class PostgresDbManagerTest {
 
     @Test
     void historicTest() {
-        final int userId = createUser().getId();
+        final int userId = createUser().id();
 
         final Year year = Year.of(2020);
         final Month month = Month.APRIL;

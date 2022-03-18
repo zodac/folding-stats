@@ -42,12 +42,12 @@ public enum Category {
     /**
      * {@link User} is using an {@link HardwareMake#AMD} {@link HardwareType#GPU} as their {@link Hardware}.
      */
-    AMD_GPU(getCategoryCount("USERS_IN_AMD_GPU"), HardwareMake.AMD, HardwareType.GPU),
+    AMD_GPU(getCategoryCount("USERS_IN_AMD_GPU"), HardwareMake.AMD),
 
     /**
      * {@link User} is using an {@link HardwareMake#NVIDIA} {@link HardwareType#GPU} as their {@link Hardware}.
      */
-    NVIDIA_GPU(getCategoryCount("USERS_IN_NVIDIA_GPU"), HardwareMake.NVIDIA, HardwareType.GPU),
+    NVIDIA_GPU(getCategoryCount("USERS_IN_NVIDIA_GPU"), HardwareMake.NVIDIA),
 
     /**
      * {@link User} is permitted to use any {@link HardwareMake} and {@link HardwareType} as their {@link Hardware}.
@@ -87,12 +87,11 @@ public enum Category {
      *
      * @param permittedUsers the maximum number of {@link User}s permitted in the {@link Category}
      * @param hardwareMake   a supported {@link HardwareMake} for a piece of {@link Hardware} used by a {@link User}
-     * @param hardwareType   a supported {@link HardwareType} for a piece of {@link Hardware} used by a {@link User}
      */
-    Category(final int permittedUsers, final HardwareMake hardwareMake, final HardwareType hardwareType) {
+    Category(final int permittedUsers, final HardwareMake hardwareMake) {
         this.permittedUsers = permittedUsers;
         supportedHardwareMakes = EnumSet.of(hardwareMake);
-        supportedHardwareTypes = EnumSet.of(hardwareType);
+        supportedHardwareTypes = EnumSet.of(HardwareType.GPU);
     }
 
     /**

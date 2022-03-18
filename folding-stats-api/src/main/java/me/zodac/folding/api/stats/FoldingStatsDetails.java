@@ -49,6 +49,6 @@ public record FoldingStatsDetails(String foldingUserName, String passkey) {
      * @return the created {@link FoldingStatsDetails}
      */
     public static FoldingStatsDetails createFromUser(final User user) {
-        return create(user.getFoldingUserName(), user.getPasskey());
+        return create(user.foldingUserName(), user.passkey());
     }
 }

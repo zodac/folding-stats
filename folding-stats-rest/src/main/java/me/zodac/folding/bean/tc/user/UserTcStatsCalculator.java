@@ -80,24 +80,24 @@ public class UserTcStatsCalculator {
      * @see StatsRepository#createHourlyTcStats(UserTcStats)
      */
     public void calculateAndPersist(final User user, final Stats initialStats, final OffsetTcStats offsetTcStats, final UserStats totalStats) {
-        final double hardwareMultiplier = user.getHardware().multiplier();
+        final double hardwareMultiplier = user.hardware().multiplier();
         final long points = Math.max(0, totalStats.getPoints() - initialStats.getPoints());
         final long multipliedPoints = Math.round(points * hardwareMultiplier);
         final int units = Math.max(0, totalStats.getUnits() - initialStats.getUnits());
 
-        final UserTcStats statsBeforeOffset = UserTcStats.create(user.getId(), totalStats.getTimestamp(), points, multipliedPoints, units);
+        final UserTcStats statsBeforeOffset = UserTcStats.create(user.id(), totalStats.getTimestamp(), points, multipliedPoints, units);
         final UserTcStats hourlyUserTcStats = statsBeforeOffset.updateWithOffsets(offsetTcStats);
 
         // Only debug log if user has some points
         if (multipliedPoints != UserTcStats.DEFAULT_MULTIPLIED_POINTS) {
-            STATS_LOGGER.debug("{} (ID: {}): {} total points (unmultiplied) | {} total units", user::getDisplayName, user::getId,
+            STATS_LOGGER.debug("{} (ID: {}): {} total points (unmultiplied) | {} total units", user::displayName, user::id,
                 () -> formatWithCommas(totalStats.getPoints()), () -> formatWithCommas(totalStats.getUnits()));
-            STATS_LOGGER.debug("{} (ID: {}): {} TC multiplied points (pre-offset) | {} TC units (pre-offset)", user::getDisplayName, user::getId,
+            STATS_LOGGER.debug("{} (ID: {}): {} TC multiplied points (pre-offset) | {} TC units (pre-offset)", user::displayName, user::id,
                 () -> formatWithCommas(multipliedPoints), () -> formatWithCommas(units));
         }
 
         final UserTcStats createdHourlyTcStats = statsRepository.createHourlyTcStats(hourlyUserTcStats);
-        STATS_LOGGER.info("{} (ID: {}): {} TC points | {} TC units", user.getDisplayName(), user.getId(),
+        STATS_LOGGER.info("{} (ID: {}): {} TC points | {} TC units", user.displayName(), user.id(),
             formatWithCommas(createdHourlyTcStats.getMultipliedPoints()), formatWithCommas(createdHourlyTcStats.getUnits()));
     }
 }

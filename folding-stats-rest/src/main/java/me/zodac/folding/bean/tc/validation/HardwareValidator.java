@@ -158,7 +158,7 @@ public class HardwareValidator {
 
         return foldingRepository.getAllUsersWithoutPasskeys()
             .stream()
-            .filter(user -> user.getHardware().id() == hardwareId)
+            .filter(user -> user.hardware().id() == hardwareId)
             .map(User::hidePasskey)
             .toList();
     }

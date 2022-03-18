@@ -58,7 +58,7 @@ public final class LarsUtils {
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.noBody())
             .uri(URI.create(FOLDING_URL + "/debug/lars"))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
             .build();
 
@@ -91,7 +91,7 @@ public final class LarsUtils {
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(larsGpu)))
             .uri(URI.create(FOLDING_URL + "/gpu_ppd/overall_ranks"))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
         try {
@@ -118,7 +118,7 @@ public final class LarsUtils {
         final HttpRequest request = HttpRequest.newBuilder()
             .DELETE()
             .uri(URI.create(FOLDING_URL + "/gpu_ppd/overall_ranks/"))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
             .build();
 

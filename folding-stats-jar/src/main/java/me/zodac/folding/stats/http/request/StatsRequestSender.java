@@ -127,8 +127,9 @@ public final class StatsRequestSender {
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(requestUrl))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
-            .header(RestHeader.CACHE_CONTROL.headerName(), CacheControl.NO_CACHE.cacheControl())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
+            .header(RestHeader.CACHE_CONTROL.headerName(),
+                CacheControl.NO_CACHE.cacheControlValue() + " " + CacheControl.NO_STORE.cacheControlValue())
             .build();
 
         final String cachedResponseBody = CACHED_RESPONSE_BODIES.get(requestUrl);

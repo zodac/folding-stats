@@ -176,7 +176,7 @@ public class HistoricStatsEndpoint {
         final List<HistoricStats> teamHourlyStats = new ArrayList<>(teamUsers.size());
 
         for (final User user : teamUsers) {
-            AUDIT_LOGGER.debug("Getting historic stats for user with ID: {}", user.getId());
+            AUDIT_LOGGER.debug("Getting historic stats for user with ID: {}", user.id());
             final Collection<HistoricStats> dailyStats = statsRepository.getHistoricStats(user, date.year(), date.month(), date.day());
             teamHourlyStats.addAll(dailyStats);
         }
@@ -210,7 +210,7 @@ public class HistoricStatsEndpoint {
         final List<HistoricStats> teamDailyStats = new ArrayList<>(teamUsers.size());
 
         for (final User user : teamUsers) {
-            AUDIT_LOGGER.debug("Getting historic stats for user with ID: {}", user.getId());
+            AUDIT_LOGGER.debug("Getting historic stats for user with ID: {}", user.id());
             final Collection<HistoricStats> dailyStats = statsRepository.getHistoricStats(user, date.year(), date.month());
             teamDailyStats.addAll(dailyStats);
         }
@@ -242,7 +242,7 @@ public class HistoricStatsEndpoint {
         final List<HistoricStats> teamMonthlyStats = new ArrayList<>(teamUsers.size());
 
         for (final User user : teamUsers) {
-            AUDIT_LOGGER.debug("Getting historic stats for user with ID: {}", user.getId());
+            AUDIT_LOGGER.debug("Getting historic stats for user with ID: {}", user.id());
             final Collection<HistoricStats> monthlyStats = statsRepository.getHistoricStats(user, date.year());
             teamMonthlyStats.addAll(monthlyStats);
         }

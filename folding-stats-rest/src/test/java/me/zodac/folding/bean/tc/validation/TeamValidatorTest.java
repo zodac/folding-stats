@@ -32,6 +32,7 @@ import me.zodac.folding.api.FoldingRepository;
 import me.zodac.folding.api.exception.ConflictException;
 import me.zodac.folding.api.exception.UsedByException;
 import me.zodac.folding.api.exception.ValidationException;
+import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
@@ -43,6 +44,7 @@ import org.junit.jupiter.api.Test;
 class TeamValidatorTest {
 
     private static int teamId = 1;
+    private static int userId = 1;
 
     @Test
     void whenValidatingCreate_givenValidTeam_thenSuccessResponseIsReturned() {
@@ -376,10 +378,18 @@ class TeamValidatorTest {
             "https://www.google.com"
         );
 
-        final User existingUser = User.builder()
-            .passkey("DummyPasskey12345678901234567890")
-            .team(existingTeam)
-            .build();
+        final User existingUser = User.create(
+            userId++,
+            "userName",
+            "userName",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            null,
+            existingTeam,
+            false
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createUser(existingUser);
@@ -411,10 +421,18 @@ class TeamValidatorTest {
             "https://www.google.com"
         );
 
-        final User existingUser = User.builder()
-            .team(userTeam)
-            .passkey("DummyPasskey12345678901234567890")
-            .build();
+        final User existingUser = User.create(
+            userId++,
+            "userName",
+            "userName",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            null,
+            userTeam,
+            false
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createUser(existingUser);

@@ -32,6 +32,7 @@ import me.zodac.folding.api.FoldingRepository;
 import me.zodac.folding.api.exception.ConflictException;
 import me.zodac.folding.api.exception.UsedByException;
 import me.zodac.folding.api.exception.ValidationException;
+import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.HardwareMake;
 import me.zodac.folding.api.tc.HardwareType;
@@ -45,6 +46,7 @@ import org.junit.jupiter.api.Test;
 class HardwareValidatorTest {
 
     private static int hardwareId = 1;
+    private static int userId = 1;
 
     @Test
     void whenValidatingCreate_givenValidHardware_thenSuccessResponseIsReturned() {
@@ -559,10 +561,18 @@ class HardwareValidatorTest {
     void whenValidatingDelete_givenHardwareThatIsBeingUsedByUser_thenFailureResponseIsReturned() {
         final Hardware existingHardware = generateHardware();
 
-        final User existingUser = User.builder()
-            .passkey("DummyPasskey12345678901234567890")
-            .hardware(existingHardware)
-            .build();
+        final User existingUser = User.create(
+            userId++,
+            "userName",
+            "userName",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            existingHardware,
+            null,
+            false
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createUser(existingUser);
@@ -591,10 +601,18 @@ class HardwareValidatorTest {
             1L
         );
 
-        final User existingUser = User.builder()
-            .hardware(userHardware)
-            .passkey("DummyPasskey12345678901234567890")
-            .build();
+        final User existingUser = User.create(
+            userId++,
+            "userName",
+            "userName",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU,
+            "https://www.google.com",
+            "https://www.google.com",
+            userHardware,
+            null,
+            false
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createUser(existingUser);

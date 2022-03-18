@@ -171,12 +171,12 @@ class MonthlyResultTest {
             .hasSize(1);
 
         final UserCategoryLeaderboardEntry userCategoryLeaderboardEntry = monthlyResult.userCategoryLeaderboard().get(Category.NVIDIA_GPU).get(0);
-        assertThat(userCategoryLeaderboardEntry.getUser().getTeam().teamName())
+        assertThat(userCategoryLeaderboardEntry.getUser().team().teamName())
             .as("Expected result user to have same team name as input team")
             .isEqualTo(team.teamName());
-        assertThat(userCategoryLeaderboardEntry.getUser().getFoldingUserName())
+        assertThat(userCategoryLeaderboardEntry.getUser().foldingUserName())
             .as("Expected result user to have same name as input user")
-            .isEqualTo(user.getFoldingUserName());
+            .isEqualTo(user.foldingUserName());
         assertThat(userCategoryLeaderboardEntry.getMultipliedPoints())
             .as("Expected result user to have same points as input user")
             .isEqualTo(10_000L);
@@ -244,33 +244,33 @@ class MonthlyResultTest {
 
         assertThat(amdLeaderboard)
             .hasSize(1);
-        assertThat(amdLeaderboard.get(0).getUser().getFoldingUserName())
+        assertThat(amdLeaderboard.get(0).getUser().foldingUserName())
             .as("Expected user in first to be the third created user")
-            .isEqualTo(thirdUser.getFoldingUserName());
+            .isEqualTo(thirdUser.foldingUserName());
         assertThat(amdLeaderboard.get(0).getMultipliedPoints())
             .as("Expected user in first have the same points as third created user")
             .isEqualTo(11_000L);
 
         assertThat(wildcardLeaderboard)
             .hasSize(1);
-        assertThat(wildcardLeaderboard.get(0).getUser().getFoldingUserName())
+        assertThat(wildcardLeaderboard.get(0).getUser().foldingUserName())
             .as("Expected user in first to be the fourth created user")
-            .isEqualTo(fourthUser.getFoldingUserName());
+            .isEqualTo(fourthUser.foldingUserName());
         assertThat(wildcardLeaderboard.get(0).getMultipliedPoints())
             .as("Expected user in first have the same points as fourth created user")
             .isEqualTo(30_000L);
 
         assertThat(nvidiaLeaderboard)
             .hasSize(2);
-        assertThat(nvidiaLeaderboard.get(0).getUser().getFoldingUserName())
+        assertThat(nvidiaLeaderboard.get(0).getUser().foldingUserName())
             .as("Expected user in first to be the first created user")
-            .isEqualTo(firstUser.getFoldingUserName());
+            .isEqualTo(firstUser.foldingUserName());
         assertThat(nvidiaLeaderboard.get(0).getMultipliedPoints())
             .as("Expected user in first have the same points as first created user")
             .isEqualTo(10_000L);
-        assertThat(nvidiaLeaderboard.get(1).getUser().getFoldingUserName())
+        assertThat(nvidiaLeaderboard.get(1).getUser().foldingUserName())
             .as("Expected user in second to be the second created user")
-            .isEqualTo(secondUser.getFoldingUserName());
+            .isEqualTo(secondUser.foldingUserName());
         assertThat(nvidiaLeaderboard.get(1).getMultipliedPoints())
             .as("Expected user in second have the same points as second created user")
             .isEqualTo(9_000L);
@@ -322,12 +322,12 @@ class MonthlyResultTest {
             .hasSize(1);
 
         final UserCategoryLeaderboardEntry userCategoryLeaderboardEntry = monthlyResult.userCategoryLeaderboard().get(Category.NVIDIA_GPU).get(0);
-        assertThat(userCategoryLeaderboardEntry.getUser().getTeam().teamName())
+        assertThat(userCategoryLeaderboardEntry.getUser().team().teamName())
             .as("Expected result user to have same team name as input team")
             .isEqualTo(team.teamName());
-        assertThat(userCategoryLeaderboardEntry.getUser().getFoldingUserName())
+        assertThat(userCategoryLeaderboardEntry.getUser().foldingUserName())
             .as("Expected result user to have same name as input user")
-            .isEqualTo(user.getFoldingUserName());
+            .isEqualTo(user.foldingUserName());
         assertThat(userCategoryLeaderboardEntry.getMultipliedPoints())
             .as("Expected result user to have same points as input user's last update")
             .isEqualTo(22_000L);
@@ -338,7 +338,7 @@ class MonthlyResultTest {
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(FOLDING_URL + "/results/result/2000/invalidMonth"))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -352,7 +352,7 @@ class MonthlyResultTest {
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(FOLDING_URL + "/results/result/invalidYear/01"))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -374,7 +374,7 @@ class MonthlyResultTest {
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.noBody())
             .uri(URI.create(FOLDING_URL + "/results/manual/save"))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
         final HttpResponse<Void> response = RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());

@@ -76,27 +76,27 @@ public final class SystemCleaner {
         DatabaseUtils.truncateTableAndResetId("retired_user_stats");
 
         for (final User user : UserUtils.getAll()) {
-            if (!user.isUserIsCaptain()) {
-                USER_REQUEST_SENDER.delete(user.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
+            if (!user.userIsCaptain()) {
+                USER_REQUEST_SENDER.delete(user.id(), ADMIN_USER.userName(), ADMIN_USER.password());
                 continue;
             }
 
             // Captains must be unset as captains before they can be deleted
-            final User userWithPasskey = UserUtils.getWithPasskey(user.getId());
+            final User userWithPasskey = UserUtils.getWithPasskey(user.id());
             final UserRequest userNoLongerCaptain = UserRequest.builder()
-                .foldingUserName(userWithPasskey.getFoldingUserName())
-                .displayName(userWithPasskey.getDisplayName())
-                .passkey(userWithPasskey.getPasskey())
-                .category(userWithPasskey.getCategory().toString())
-                .profileLink(userWithPasskey.getProfileLink())
-                .liveStatsLink(userWithPasskey.getLiveStatsLink())
-                .hardwareId(userWithPasskey.getHardware().id())
-                .teamId(userWithPasskey.getTeam().id())
+                .foldingUserName(userWithPasskey.foldingUserName())
+                .displayName(userWithPasskey.displayName())
+                .passkey(userWithPasskey.passkey())
+                .category(userWithPasskey.category().toString())
+                .profileLink(userWithPasskey.profileLink())
+                .liveStatsLink(userWithPasskey.liveStatsLink())
+                .hardwareId(userWithPasskey.hardware().id())
+                .teamId(userWithPasskey.team().id())
                 .userIsCaptain(false)
                 .build();
 
-            USER_REQUEST_SENDER.update(userWithPasskey.getId(), userNoLongerCaptain, ADMIN_USER.userName(), ADMIN_USER.password());
-            USER_REQUEST_SENDER.delete(userWithPasskey.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
+            USER_REQUEST_SENDER.update(userWithPasskey.id(), userNoLongerCaptain, ADMIN_USER.userName(), ADMIN_USER.password());
+            USER_REQUEST_SENDER.delete(userWithPasskey.id(), ADMIN_USER.userName(), ADMIN_USER.password());
         }
 
         for (final Team team : TeamUtils.getAll()) {

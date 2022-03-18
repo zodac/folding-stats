@@ -83,7 +83,7 @@ public record HardwareRequestSender(String hardwareUrl) {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(hardwareUrl))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNotBlank(entityTag)) {
             requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), entityTag);
@@ -130,7 +130,7 @@ public record HardwareRequestSender(String hardwareUrl) {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(hardwareUrl + '/' + hardwareId))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNotBlank(entityTag)) {
             requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), entityTag);
@@ -177,7 +177,7 @@ public record HardwareRequestSender(String hardwareUrl) {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(hardwareUrl + "/fields?hardwareName=" + hardwareName))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNotBlank(entityTag)) {
             requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), entityTag);
@@ -209,7 +209,7 @@ public record HardwareRequestSender(String hardwareUrl) {
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(hardware)))
             .uri(URI.create(hardwareUrl))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
             .build();
 
@@ -238,7 +238,7 @@ public record HardwareRequestSender(String hardwareUrl) {
         final HttpRequest request = HttpRequest.newBuilder()
             .PUT(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(hardware)))
             .uri(URI.create(hardwareUrl + '/' + hardwareId))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
             .build();
 
@@ -265,7 +265,7 @@ public record HardwareRequestSender(String hardwareUrl) {
         final HttpRequest request = HttpRequest.newBuilder()
             .DELETE()
             .uri(URI.create(hardwareUrl + '/' + hardwareId))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
             .build();
 

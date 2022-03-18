@@ -47,7 +47,7 @@ class InvalidUrlTest {
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(FOLDING_URL + "/invalid"))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
         final HttpResponse<Void> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());

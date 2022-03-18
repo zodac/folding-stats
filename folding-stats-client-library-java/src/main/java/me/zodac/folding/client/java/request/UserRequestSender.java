@@ -81,7 +81,7 @@ public record UserRequestSender(String usersUrl) {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(usersUrl))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNotBlank(entityTag)) {
             requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), entityTag);
@@ -128,7 +128,7 @@ public record UserRequestSender(String usersUrl) {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(usersUrl + "/all/passkey"))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
 
         if (StringUtils.isNotBlank(entityTag)) {
@@ -176,7 +176,7 @@ public record UserRequestSender(String usersUrl) {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(usersUrl + '/' + userId))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNotBlank(entityTag)) {
             requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), entityTag);
@@ -228,7 +228,7 @@ public record UserRequestSender(String usersUrl) {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(usersUrl + '/' + userId + "/passkey"))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNotBlank(entityTag)) {
             requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), entityTag);
@@ -263,7 +263,7 @@ public record UserRequestSender(String usersUrl) {
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(user)))
             .uri(URI.create(usersUrl))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password)).build();
 
         try {
@@ -291,7 +291,7 @@ public record UserRequestSender(String usersUrl) {
         final HttpRequest request = HttpRequest.newBuilder()
             .PUT(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(user)))
             .uri(URI.create(usersUrl + '/' + userId))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
             .build();
 
@@ -318,7 +318,7 @@ public record UserRequestSender(String usersUrl) {
         final HttpRequest request = HttpRequest.newBuilder()
             .DELETE()
             .uri(URI.create(usersUrl + '/' + userId))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
             .build();
 

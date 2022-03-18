@@ -244,7 +244,7 @@ class HardwareTest {
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(FOLDING_URL + "/hardware/" + TestConstants.INVALID_FORMAT_ID))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -284,7 +284,7 @@ class HardwareTest {
         final HttpRequest request = HttpRequest.newBuilder()
             .PUT(HttpRequest.BodyPublishers.ofString(GSON.toJson(updatedHardware)))
             .uri(URI.create(FOLDING_URL + "/hardware/" + TestConstants.INVALID_FORMAT_ID))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
             .build();
 
@@ -313,7 +313,7 @@ class HardwareTest {
         final HttpRequest request = HttpRequest.newBuilder()
             .DELETE()
             .uri(URI.create(FOLDING_URL + "/hardware/" + TestConstants.INVALID_FORMAT_ID))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
             .build();
 
@@ -417,7 +417,7 @@ class HardwareTest {
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(hardwareToCreate)))
             .uri(URI.create(FOLDING_URL + "/hardware/"))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
         final HttpResponse<String> response = RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -440,7 +440,7 @@ class HardwareTest {
         final HttpRequest request = HttpRequest.newBuilder()
             .PUT(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(updatedHardware)))
             .uri(URI.create(FOLDING_URL + "/hardware/" + createdHardware.id()))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
         final HttpResponse<String> response = RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -457,7 +457,7 @@ class HardwareTest {
         final HttpRequest request = HttpRequest.newBuilder()
             .DELETE()
             .uri(URI.create(FOLDING_URL + "/hardware/" + hardwareId))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
         final HttpResponse<Void> response = RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
@@ -503,7 +503,7 @@ class HardwareTest {
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.noBody())
             .uri(URI.create(FOLDING_URL + "/hardware"))
-            .header("Content-Type", "application/json")
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header("Authorization", encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
             .build();
 
@@ -521,7 +521,7 @@ class HardwareTest {
         final HttpRequest request = HttpRequest.newBuilder()
             .PUT(HttpRequest.BodyPublishers.noBody())
             .uri(URI.create(FOLDING_URL + "/hardware/" + hardwareId))
-            .header("Content-Type", "application/json")
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header("Authorization", encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
             .build();
 
@@ -538,7 +538,7 @@ class HardwareTest {
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(hardwareToCreate)))
             .uri(URI.create(FOLDING_URL + "/hardware/"))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.TEXT.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.TEXT.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
             .build();
 

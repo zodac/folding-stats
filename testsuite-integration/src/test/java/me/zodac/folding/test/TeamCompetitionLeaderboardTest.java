@@ -204,42 +204,42 @@ class TeamCompetitionLeaderboardTest {
             .isEmpty();
 
         final UserCategoryLeaderboardEntry firstResult = firstCategoryUsers.get(0);
-        assertThat(firstResult.getUser().getDisplayName())
+        assertThat(firstResult.getUser().displayName())
             .as("Did not receive the expected user for rank 1, " + Category.AMD_GPU + ": " + response.body())
-            .isEqualTo(secondUser.getDisplayName());
+            .isEqualTo(secondUser.displayName());
         assertThat(firstResult)
             .as("Did not receive the expected result for rank 1, " + Category.AMD_GPU + ": " + response.body())
             .extracting("rank", "multipliedPoints", "diffToLeader", "diffToNext")
             .containsExactly(1, 15_000L, 0L, 0L);
 
         final UserCategoryLeaderboardEntry secondResult = firstCategoryUsers.get(1);
-        assertThat(secondResult.getUser().getDisplayName())
+        assertThat(secondResult.getUser().displayName())
             .as("Did not receive the expected user for rank 2, " + Category.AMD_GPU + ": " + response.body())
-            .isEqualTo(firstUser.getDisplayName());
+            .isEqualTo(firstUser.displayName());
         assertThat(secondResult)
             .as("Did not receive the expected result for rank 2, " + Category.AMD_GPU + ": " + response.body())
             .extracting("rank", "multipliedPoints", "diffToLeader", "diffToNext")
             .containsExactly(2, 10_000L, 5_000L, 5_000L);
 
         final UserCategoryLeaderboardEntry thirdResult = firstCategoryUsers.get(2);
-        assertThat(thirdResult.getUser().getDisplayName())
+        assertThat(thirdResult.getUser().displayName())
             .as("Did not receive the expected user for rank 3, " + Category.AMD_GPU + ": " + response.body())
-            .isEqualTo(thirdUser.getDisplayName());
+            .isEqualTo(thirdUser.displayName());
         assertThat(thirdResult)
             .as("Did not receive the expected result for rank 3, " + Category.AMD_GPU + ": " + response.body())
             .extracting("rank", "multipliedPoints", "diffToLeader", "diffToNext")
             .containsExactly(3, 1_000L, 14_000L, 9_000L);
 
         final UserCategoryLeaderboardEntry fourthResult = secondCategoryUsers.get(0);
-        assertThat(fourthResult.getUser().getDisplayName())
+        assertThat(fourthResult.getUser().displayName())
             .as("Did not receive the expected user for rank 1, " + Category.NVIDIA_GPU + ": " + response.body())
-            .isEqualTo(fourthUser.getDisplayName());
+            .isEqualTo(fourthUser.displayName());
         assertThat(fourthResult)
             .as("Did not receive the expected result for rank 1, category " + Category.NVIDIA_GPU + ":" + response.body())
             .extracting("rank", "multipliedPoints", "diffToLeader", "diffToNext")
             .containsExactly(1, 1_000L, 0L, 0L);
 
-        assertThat(fourthResult.getUser().getPasskey())
+        assertThat(fourthResult.getUser().passkey())
             .as("Expected user passkey to be masked: " + response.body())
             .contains("*");
     }

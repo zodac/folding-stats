@@ -119,7 +119,7 @@ public class UserStatsParser {
             try {
                 updateTcStatsForUser(user);
             } catch (final Exception e) {
-                LOGGER.error("Error updating TC stats for user '{}' (ID: {})", user.getDisplayName(), user.getId(), e);
+                LOGGER.error("Error updating TC stats for user '{}' (ID: {})", user.displayName(), user.id(), e);
             }
         }
         LOGGER.info("Finished Folding stats parsing");
@@ -131,8 +131,8 @@ public class UserStatsParser {
         try (final Summary.Timer timer = summary.startTimer()) {
             LOGGER.trace("Starting timer: {}", timer);
 
-            LOGGER.debug("Updating stats for '{}': {}", user.getDisplayName(), user);
-            if (StringUtils.isBlank(user.getPasskey())) {
+            LOGGER.debug("Updating stats for '{}': {}", user.displayName(), user);
+            if (StringUtils.isBlank(user.passkey())) {
                 LOGGER.warn("Not parsing TC stats for user, missing passkey: {}", user);
                 return;
             }
@@ -147,7 +147,7 @@ public class UserStatsParser {
             if (offsetTcStats.isEmpty()) {
                 LOGGER.trace("Retrieved empty stats offset for user: {}", () -> user);
             } else {
-                LOGGER.debug("{}: {} offset points | {} offset units", user::getDisplayName,
+                LOGGER.debug("{}: {} offset points | {} offset units", user::displayName,
                     () -> formatWithCommas(offsetTcStats.getMultipliedPointsOffset()), () -> formatWithCommas(offsetTcStats.getUnitsOffset()));
             }
 

@@ -72,7 +72,7 @@ public record UserChangeRequestSender(String requestUrl) {
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(requestUrl + "/passkey"))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
             .build();
 
@@ -105,7 +105,7 @@ public record UserChangeRequestSender(String requestUrl) {
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(requestUrl + "/passkey?state=" + commaSeparatedStates))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
             .build();
 
@@ -129,7 +129,7 @@ public record UserChangeRequestSender(String requestUrl) {
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(requestUrl))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
         try {
@@ -158,7 +158,7 @@ public record UserChangeRequestSender(String requestUrl) {
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(requestUrl + "?state=" + commaSeparatedStates))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
         try {
@@ -184,7 +184,7 @@ public record UserChangeRequestSender(String requestUrl) {
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(requestUrl + '/' + userChangeId))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
             .build();
 
@@ -209,7 +209,7 @@ public record UserChangeRequestSender(String requestUrl) {
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(userChangeRequest)))
             .uri(URI.create(requestUrl))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
         try {
@@ -268,7 +268,7 @@ public record UserChangeRequestSender(String requestUrl) {
         final HttpRequest request = HttpRequest.newBuilder()
             .PUT(HttpRequest.BodyPublishers.noBody())
             .uri(URI.create(requestUrl + '/' + userChangeId + endpoint))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
             .build();
 

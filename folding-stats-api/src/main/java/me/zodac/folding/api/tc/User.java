@@ -25,16 +25,9 @@
 package me.zodac.folding.api.tc;
 
 import java.util.Objects;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
 import me.zodac.folding.api.ResponsePojo;
 import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
-
 
 /**
  * POJO defining a single {@link User} Folding on a username/passkey combination to participate in the <code>Team Competition</code>.
@@ -50,12 +43,17 @@ import me.zodac.folding.rest.api.tc.request.UserRequest;
  * Each {@link User} can join a {@link Team} in order to have their Folding@Home stats retrieved, and they can
  * contribute to the <code>Team Competition</code>.
  */
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
-@Getter
-@EqualsAndHashCode
-@ToString(doNotUseGetters = true)
-public class User implements ResponsePojo {
+public record User(int id,
+                   String foldingUserName,
+                   String displayName,
+                   String passkey,
+                   Category category,
+                   String profileLink,
+                   String liveStatsLink,
+                   Hardware hardware,
+                   Team team,
+                   boolean userIsCaptain
+) implements ResponsePojo {
 
     /**
      * The default {@link User} ID. Since the REST request would not know the ID until the DB has created the object,
@@ -65,17 +63,6 @@ public class User implements ResponsePojo {
 
     private static final int PASSKEY_LENGTH_NOT_TO_HIDE = 8;
     private static final String PASSKEY_MASK = "************************"; // 24 characters
-
-    private final int id;
-    private final String foldingUserName;
-    private final String displayName;
-    private final String passkey;
-    private final Category category;
-    private final String profileLink;
-    private final String liveStatsLink;
-    private final Hardware hardware;
-    private final Team team;
-    private final boolean userIsCaptain;
 
     /**
      * Creates a {@link User}.

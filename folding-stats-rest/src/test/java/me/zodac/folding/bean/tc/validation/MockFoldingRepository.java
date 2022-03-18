@@ -108,7 +108,7 @@ class MockFoldingRepository implements FoldingRepository {
 
     @Override
     public User createUser(final User user) {
-        users.put(user.getId(), user);
+        users.put(user.id(), user);
         return user;
     }
 
@@ -140,13 +140,13 @@ class MockFoldingRepository implements FoldingRepository {
 
     @Override
     public User updateUser(final User userToUpdate, final User existingUser) {
-        users.put(userToUpdate.getId(), userToUpdate);
+        users.put(userToUpdate.id(), userToUpdate);
         return userToUpdate;
     }
 
     @Override
     public void deleteUser(final User user) {
-        users.remove(user.getId());
+        users.remove(user.id());
     }
 
     @Override
@@ -157,7 +157,7 @@ class MockFoldingRepository implements FoldingRepository {
 
         return getAllUsersWithPasskeys()
             .stream()
-            .filter(user -> user.getTeam().id() == team.id())
+            .filter(user -> user.team().id() == team.id())
             .map(User::hidePasskey)
             .toList();
     }

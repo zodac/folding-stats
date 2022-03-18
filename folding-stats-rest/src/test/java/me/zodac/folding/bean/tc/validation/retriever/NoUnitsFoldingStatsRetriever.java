@@ -42,6 +42,6 @@ public class NoUnitsFoldingStatsRetriever implements FoldingStatsRetriever {
 
     @Override
     public UserStats getTotalStats(final User user) {
-        return UserStats.createNow(user.getId(), 0L, 0);
+        return UserStats.createNow(user.id(), 0L, 0);
     }
 }

@@ -108,16 +108,16 @@ public class UserChangeValidator {
         final Hardware newHardware = hardware(userChangeRequest);
 
         final User newUser = User.create(
-            previousUser.getId(),
+            previousUser.id(),
             userChangeRequest.getFoldingUserName(),
-            previousUser.getDisplayName(),
+            previousUser.displayName(),
             userChangeRequest.getPasskey(),
-            previousUser.getCategory(),
-            previousUser.getProfileLink(),
+            previousUser.category(),
+            previousUser.profileLink(),
             userChangeRequest.getLiveStatsLink(),
             newHardware,
-            previousUser.getTeam(),
-            previousUser.isUserIsCaptain()
+            previousUser.team(),
+            previousUser.userIsCaptain()
         );
         final UserChangeState userChangeState =
             userChangeRequest.isImmediate() ? UserChangeState.REQUESTED_NOW : UserChangeState.REQUESTED_NEXT_MONTH;
@@ -127,9 +127,9 @@ public class UserChangeValidator {
 
     private void validateUpdateUserWorkUnits(final UserChangeRequest userChangeRequest, final User previousUser) {
         final String newFoldingUserName = userChangeRequest.getFoldingUserName();
-        final String oldFoldingUserName = previousUser.getFoldingUserName();
+        final String oldFoldingUserName = previousUser.foldingUserName();
         final String newPasskey = userChangeRequest.getPasskey();
-        final String oldPasskey = previousUser.getPasskey();
+        final String oldPasskey = previousUser.passkey();
 
         final boolean isFoldingUserNameChange = !newFoldingUserName.equalsIgnoreCase(oldFoldingUserName);
         final boolean isPasskeyChange = !newPasskey.equalsIgnoreCase(oldPasskey);
@@ -164,10 +164,10 @@ public class UserChangeValidator {
     }
 
     private void isUserChangeUnnecessary(final UserChangeRequest userChangeRequest, final User previousUser) {
-        if (previousUser.getHardware().id() == userChangeRequest.getHardwareId()
-            && previousUser.getFoldingUserName().equals(userChangeRequest.getFoldingUserName())
-            && previousUser.getPasskey().equals(userChangeRequest.getPasskey())
-            && isEqualSafe(previousUser.getLiveStatsLink(), userChangeRequest.getLiveStatsLink())) {
+        if (previousUser.hardware().id() == userChangeRequest.getHardwareId()
+            && previousUser.foldingUserName().equals(userChangeRequest.getFoldingUserName())
+            && previousUser.passkey().equals(userChangeRequest.getPasskey())
+            && isEqualSafe(previousUser.liveStatsLink(), userChangeRequest.getLiveStatsLink())) {
             throw new ValidationException(userChangeRequest, "User already has the values supplied in UserChangeRequest");
         }
     }
@@ -201,7 +201,7 @@ public class UserChangeValidator {
 
             final List<String> availableUsers = allUsers
                 .stream()
-                .map(user -> String.format("%s: %s", user.getId(), user.getDisplayName()))
+                .map(user -> String.format("%s: %s", user.id(), user.displayName()))
                 .toList();
 
             throw new ValidationException(userChangeRequest, String.format("Field 'userId' must be one of: %s", availableUsers), e);
@@ -217,15 +217,15 @@ public class UserChangeValidator {
 
     private static boolean isMatchingUserChange(final UserChange userChange, final UserChangeRequest userChangeRequest) {
         final User user = userChange.newUser();
-        return user.getId() == userChangeRequest.getUserId()
-            && user.getHardware().id() == userChangeRequest.getHardwareId()
-            && Objects.equals(user.getFoldingUserName(), userChangeRequest.getFoldingUserName())
-            && Objects.equals(user.getPasskey(), userChangeRequest.getPasskey())
-            && Objects.equals(user.getLiveStatsLink(), userChangeRequest.getLiveStatsLink());
+        return user.id() == userChangeRequest.getUserId()
+            && user.hardware().id() == userChangeRequest.getHardwareId()
+            && Objects.equals(user.foldingUserName(), userChangeRequest.getFoldingUserName())
+            && Objects.equals(user.passkey(), userChangeRequest.getPasskey())
+            && Objects.equals(user.liveStatsLink(), userChangeRequest.getLiveStatsLink());
     }
 
     private void validateExistingPasskeyMatchesExistingUser(final UserChangeRequest userChangeRequest, final User previousUser) {
-        if (!previousUser.getPasskey().equals(userChangeRequest.getExistingPasskey())) {
+        if (!previousUser.passkey().equals(userChangeRequest.getExistingPasskey())) {
             throw new ValidationException(userChangeRequest, "Field 'existingPasskey' does not match the existing passkey for the user");
         }
     }

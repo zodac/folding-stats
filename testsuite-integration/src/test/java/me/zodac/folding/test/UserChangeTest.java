@@ -117,7 +117,7 @@ class UserChangeTest {
             .hasSize(3);
 
         final UserChange retrievedUserChange = allUserChanges.iterator().next();
-        assertPasskeyIsHidden(retrievedUserChange.newUser().getPasskey());
+        assertPasskeyIsHidden(retrievedUserChange.newUser().passkey());
     }
 
     @Test
@@ -144,7 +144,7 @@ class UserChangeTest {
         final UserChange retrievedUserChange = allUserChanges.iterator().next();
         assertThat(retrievedUserChange)
             .isEqualTo(userChange);
-        assertPasskeyIsShown(retrievedUserChange.newUser().getPasskey());
+        assertPasskeyIsShown(retrievedUserChange.newUser().passkey());
     }
 
     @Test
@@ -153,12 +153,12 @@ class UserChangeTest {
         final User user = UserUtils.create(generateUser());
 
         final UserChangeRequest userChangeRequest = UserChangeRequest.builder()
-            .userId(user.getId())
-            .foldingUserName(user.getFoldingUserName())
-            .existingPasskey(user.getPasskey())
-            .passkey(user.getPasskey())
+            .userId(user.id())
+            .foldingUserName(user.foldingUserName())
+            .existingPasskey(user.passkey())
+            .passkey(user.passkey())
             .liveStatsLink(DUMMY_LIVE_STATS_LINK)
-            .hardwareId(user.getHardware().id())
+            .hardwareId(user.hardware().id())
             .immediate(true)
             .build();
 
@@ -171,7 +171,7 @@ class UserChangeTest {
         assertThat(userChange.id())
             .as("Expected user change to contain an ID")
             .isNotZero();
-        assertThat(userChange.newUser().getLiveStatsLink())
+        assertThat(userChange.newUser().liveStatsLink())
             .as("Expected user change to list user with the updated liveStatsLink")
             .isEqualTo(DUMMY_LIVE_STATS_LINK);
     }
@@ -227,8 +227,8 @@ class UserChangeTest {
         throws FoldingRestException {
         final UserChange userChange = createUserChange();
 
-        final User userBeforeChange = UserUtils.get(userChange.newUser().getId());
-        assertThat(userBeforeChange.getLiveStatsLink())
+        final User userBeforeChange = UserUtils.get(userChange.newUser().id());
+        assertThat(userBeforeChange.liveStatsLink())
             .as("Expected user's initial liveStatsLink to not be dummy value")
             .isNotEqualTo(DUMMY_LIVE_STATS_LINK);
 
@@ -243,8 +243,8 @@ class UserChangeTest {
             .as("Expected state to be updated")
             .isEqualTo(UserChangeState.COMPLETED);
 
-        final User userAfterChange = UserUtils.get(userChange.newUser().getId());
-        assertThat(userAfterChange.getLiveStatsLink())
+        final User userAfterChange = UserUtils.get(userChange.newUser().id());
+        assertThat(userAfterChange.liveStatsLink())
             .as("Expected user's liveStatsLink to be updated to dummy value")
             .isEqualTo(DUMMY_LIVE_STATS_LINK);
     }
@@ -253,13 +253,13 @@ class UserChangeTest {
     void whenApproveUserChangeImmediately_givenUserHasBeenDeleted_thenChangeIsNotApplied_andResponseHas404Status() throws FoldingRestException {
         final UserChange userChange = createUserChange();
 
-        final User userBeforeChange = UserUtils.get(userChange.newUser().getId());
-        assertThat(userBeforeChange.getLiveStatsLink())
+        final User userBeforeChange = UserUtils.get(userChange.newUser().id());
+        assertThat(userBeforeChange.liveStatsLink())
             .as("Expected user's initial liveStatsLink to not be dummy value")
             .isNotEqualTo(DUMMY_LIVE_STATS_LINK);
 
         final HttpResponse<Void> deleteUserResponse =
-            USER_REQUEST_SENDER.delete(userChange.previousUser().getId(), ADMIN_USER.userName(), ADMIN_USER.password());
+            USER_REQUEST_SENDER.delete(userChange.previousUser().id(), ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(deleteUserResponse.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + deleteUserResponse.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -297,7 +297,7 @@ class UserChangeTest {
             .hasSize(2);
 
         final UserChange retrievedUserChange = allUserChanges.iterator().next();
-        assertPasskeyIsHidden(retrievedUserChange.newUser().getPasskey());
+        assertPasskeyIsHidden(retrievedUserChange.newUser().passkey());
     }
 
     @Test
@@ -352,7 +352,7 @@ class UserChangeTest {
             .hasSize(2);
 
         final UserChange retrievedUserChange = allUserChanges.iterator().next();
-        assertPasskeyIsShown(retrievedUserChange.newUser().getPasskey());
+        assertPasskeyIsShown(retrievedUserChange.newUser().passkey());
     }
 
     @Test
@@ -384,7 +384,7 @@ class UserChangeTest {
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(FOLDING_URL + "/changes/" + userChange.id()))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -401,7 +401,7 @@ class UserChangeTest {
         final HttpRequest request = HttpRequest.newBuilder()
             .PUT(HttpRequest.BodyPublishers.noBody())
             .uri(URI.create(FOLDING_URL + "/changes/" + userChange.id() + "/reject"))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -418,7 +418,7 @@ class UserChangeTest {
         final HttpRequest request = HttpRequest.newBuilder()
             .PUT(HttpRequest.BodyPublishers.noBody())
             .uri(URI.create(FOLDING_URL + "/changes/" + userChange.id() + "/approve/immediate"))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -435,7 +435,7 @@ class UserChangeTest {
         final HttpRequest request = HttpRequest.newBuilder()
             .PUT(HttpRequest.BodyPublishers.noBody())
             .uri(URI.create(FOLDING_URL + "/changes/" + userChange.id() + "/approve/next"))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -450,12 +450,12 @@ class UserChangeTest {
         final User user = UserUtils.create(generateUser());
 
         final UserChangeRequest userChangeRequest = UserChangeRequest.builder()
-            .userId(user.getId())
-            .foldingUserName(user.getFoldingUserName())
+            .userId(user.id())
+            .foldingUserName(user.foldingUserName())
             .existingPasskey("dummyPasskey")
-            .passkey(user.getPasskey())
+            .passkey(user.passkey())
             .liveStatsLink(DUMMY_LIVE_STATS_LINK)
-            .hardwareId(user.getHardware().id())
+            .hardwareId(user.hardware().id())
             .immediate(true)
             .build();
 
@@ -484,12 +484,12 @@ class UserChangeTest {
         final User user = UserUtils.create(generateUser());
 
         final UserChangeRequest userChangeRequest = UserChangeRequest.builder()
-            .userId(user.getId())
-            .foldingUserName(user.getFoldingUserName())
-            .existingPasskey(user.getPasskey())
-            .passkey(user.getPasskey())
-            .liveStatsLink(user.getLiveStatsLink())
-            .hardwareId(user.getHardware().id())
+            .userId(user.id())
+            .foldingUserName(user.foldingUserName())
+            .existingPasskey(user.passkey())
+            .passkey(user.passkey())
+            .liveStatsLink(user.liveStatsLink())
+            .hardwareId(user.hardware().id())
             .immediate(true)
             .build();
 
@@ -518,7 +518,7 @@ class UserChangeTest {
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(FOLDING_URL + "/changes/" + TestConstants.INVALID_FORMAT_ID))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
             .build();
 
@@ -542,7 +542,7 @@ class UserChangeTest {
         assertThat(retrievedUserChange)
             .isEqualTo(userChange);
 
-        assertThat(retrievedUserChange.newUser().getPasskey())
+        assertThat(retrievedUserChange.newUser().passkey())
             .as("Expected the passkey to not be masked")
             .doesNotContain("*");
     }
@@ -554,12 +554,12 @@ class UserChangeTest {
         final User user = UserUtils.create(userRequest);
 
         final UserChangeRequest userChangeRequest = UserChangeRequest.builder()
-            .userId(user.getId())
-            .foldingUserName(user.getFoldingUserName())
+            .userId(user.id())
+            .foldingUserName(user.foldingUserName())
             .existingPasskey("DummyPasskey12345678901234567891")
-            .passkey(user.getPasskey())
+            .passkey(user.passkey())
             .liveStatsLink(DUMMY_LIVE_STATS_LINK)
-            .hardwareId(user.getHardware().id())
+            .hardwareId(user.hardware().id())
             .immediate(true)
             .build();
 
@@ -574,19 +574,19 @@ class UserChangeTest {
         final User user = UserUtils.create(generateUser());
 
         final UserChangeRequest userChangeRequest = UserChangeRequest.builder()
-            .userId(user.getId())
-            .foldingUserName(user.getFoldingUserName())
-            .existingPasskey(user.getPasskey())
-            .passkey(user.getPasskey())
+            .userId(user.id())
+            .foldingUserName(user.foldingUserName())
+            .existingPasskey(user.passkey())
+            .passkey(user.passkey())
             .liveStatsLink(DUMMY_LIVE_STATS_LINK)
-            .hardwareId(user.getHardware().id())
+            .hardwareId(user.hardware().id())
             .immediate(true)
             .build();
 
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(userChangeRequest)))
             .uri(URI.create(FOLDING_URL + "/changes/"))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.TEXT.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.TEXT.contentTypeValue())
             .build();
 
         final HttpResponse<String> response = RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -609,12 +609,12 @@ class UserChangeTest {
 
     private static UserChangeRequest generateUserChange(final User user) {
         return UserChangeRequest.builder()
-            .userId(user.getId())
-            .foldingUserName(user.getFoldingUserName())
-            .existingPasskey(user.getPasskey())
-            .passkey(user.getPasskey())
+            .userId(user.id())
+            .foldingUserName(user.foldingUserName())
+            .existingPasskey(user.passkey())
+            .passkey(user.passkey())
             .liveStatsLink(DUMMY_LIVE_STATS_LINK)
-            .hardwareId(user.getHardware().id())
+            .hardwareId(user.hardware().id())
             .immediate(true)
             .build();
     }

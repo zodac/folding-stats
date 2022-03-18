@@ -74,7 +74,7 @@ class HistoricUserStatsTest {
 
     @Test
     void whenGettingHourlyStats_andValidUserIdIsGiven_andUserHasNoStats_thenNoStatsAreReturned_andResponseHas200Status() throws FoldingRestException {
-        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).id();
 
         final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getHourlyUserStats(userId, Year.parse("2020"), Month.of(4), 12);
         assertThat(response.statusCode())
@@ -88,7 +88,7 @@ class HistoricUserStatsTest {
 
     @Test
     void whenGettingHourlyStats_andValidUserIdIsGiven_andUserHasSomeStats_thenStatsAreReturned_andResponseHas200Status() throws FoldingRestException {
-        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).id();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10)
         );
@@ -106,7 +106,7 @@ class HistoricUserStatsTest {
     @Test
     void whenGettingHourlyStats_andUserHasMultipleStats_thenEachStatsEntryIsDiffedFromPreviousHour_andResponseHas200Status()
         throws FoldingRestException {
-        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).id();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-04-11 23:00:00", 0L, 0L, 0),
             TestStats.create(userId, "2020-04-12 13:00:00", 20L, 200L, 2),
@@ -134,7 +134,7 @@ class HistoricUserStatsTest {
     @Test
     void whenGettingHourlyStats_andUserHasMultipleStatsInSameHour_thenMaxStatsInHourAreReturned_andResponseHas200Status()
         throws FoldingRestException {
-        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).id();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-04-11 23:00:00", 0L, 0L, 0),
             TestStats.create(userId, "2020-04-12 13:00:00", 50L, 500L, 5),
@@ -163,7 +163,7 @@ class HistoricUserStatsTest {
     @Test
     void whenGettingHourlyStats_givenRequestUsesPreviousEntityTag_andStatsHaveNotChanged_thenResponseHas304Status_andNoBody()
         throws FoldingRestException {
-        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).id();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10)
         );
@@ -201,7 +201,7 @@ class HistoricUserStatsTest {
             .GET()
             .uri(URI.create(
                 FOLDING_URL + "/historic/users/" + TestConstants.INVALID_FORMAT_ID + '/' + Year.parse("2020") + '/' + Month.of(4) + '/' + 12))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -217,7 +217,7 @@ class HistoricUserStatsTest {
 
     @Test
     void whenGettingHourlyStats_andInvalidDateIsGiven_thenResponseHas400Status() throws FoldingRestException {
-        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).id();
         final int invalidDay = 35;
 
         final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getHourlyUserStats(userId, Year.parse("2020"), Month.of(4), invalidDay);
@@ -228,7 +228,7 @@ class HistoricUserStatsTest {
 
     @Test
     void whenGettingDailyStats_andValidUserIdIsGiven_andUserHasNoStats_thenNoStatsAreReturned_andResponseHas200Status() throws FoldingRestException {
-        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).id();
 
         final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getDailyUserStats(userId, Year.parse("2020"), Month.of(4));
         assertThat(response.statusCode())
@@ -242,7 +242,7 @@ class HistoricUserStatsTest {
 
     @Test
     void whenGettingDailyStats_andValidUserIdIsGiven_andUserHasSomeStats_thenStatsAreReturned_andResponseHas200Status() throws FoldingRestException {
-        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).id();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10)
         );
@@ -260,7 +260,7 @@ class HistoricUserStatsTest {
     @Test
     void whenGettingDailyStats_andUserHasMultipleStats_thenEachStatsEntryIsDiffedFromPreviousDay_andResponseHas200Status()
         throws FoldingRestException {
-        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).id();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-04-12 13:00:00", 20L, 200L, 2),
             TestStats.create(userId, "2020-04-13 13:00:00", 100L, 1_000L, 10)
@@ -286,7 +286,7 @@ class HistoricUserStatsTest {
 
     @Test
     void whenGettingDailyStats_andUserHasMultipleStatsInSameDay_thenMaxStatsInDayAreReturned_andResponseHas200Status() throws FoldingRestException {
-        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).id();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-04-12 13:00:00", 10L, 100L, 1),
             TestStats.create(userId, "2020-04-13 14:00:00", 50L, 500L, 5),
@@ -314,7 +314,7 @@ class HistoricUserStatsTest {
     @Test
     void whenGettingDailyStats_givenRequestUsesPreviousEntityTag_andStatsHaveNotChanged_thenResponseHas304Status_andNoBody()
         throws FoldingRestException {
-        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).id();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10)
         );
@@ -350,7 +350,7 @@ class HistoricUserStatsTest {
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(FOLDING_URL + "/historic/users/" + TestConstants.INVALID_FORMAT_ID + '/' + Year.parse("2020") + '/' + Month.of(4)))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -366,13 +366,13 @@ class HistoricUserStatsTest {
 
     @Test
     void whenGettingDailyStats_andInvalidDateIsGiven_thenResponseHas400Status() throws FoldingRestException, IOException, InterruptedException {
-        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).id();
         final int invalidMonth = 25;
 
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(FOLDING_URL + "/historic/users/" + userId + '/' + "2020" + '/' + invalidMonth))
-            .header("Content-Type", "application/json");
+            .uri(URI.create(FOLDING_URL + "/historic/users/" + userId + "/2020/" + invalidMonth))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         final HttpRequest request = requestBuilder.build();
 
@@ -386,7 +386,7 @@ class HistoricUserStatsTest {
     @Test
     void whenGettingMonthlyStats_andValidUserIdIsGiven_andUserHasNoStats_thenNoStatsAreReturned_andResponseHas200Status()
         throws FoldingRestException {
-        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).id();
 
         final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getMonthlyUserStats(userId, Year.parse("2020"));
         assertThat(response.statusCode())
@@ -401,7 +401,7 @@ class HistoricUserStatsTest {
     @Test
     void whenGettingMonthlyStats_andValidUserIdIsGiven_andUserHasSomeStats_thenStatsAreReturned_andResponseHas200Status()
         throws FoldingRestException {
-        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).id();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10)
         );
@@ -419,7 +419,7 @@ class HistoricUserStatsTest {
     @Test
     void whenGettingMonthlyStats_andUserHasMultipleStats_thenEachStatsEntryIsDiffedFromPreviousMonth_andResponseHas200Status()
         throws FoldingRestException {
-        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).id();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-03-12 13:00:00", 20L, 200L, 2), // No diff from this result, since stats are reset each month
             TestStats.create(userId, "2020-04-12 13:00:00", 100L, 1_000L, 10)
@@ -446,7 +446,7 @@ class HistoricUserStatsTest {
     @Test
     void whenGettingMonthlyStats_andUserHasMultipleStatsInSameMonth_thenMaxStatsInMonthAreReturned_andResponseHas200Status()
         throws FoldingRestException {
-        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).id();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-03-12 13:00:00", 50L, 500L, 5), // No diff from this result, since stats are reset each month
             TestStats.create(userId, "2020-04-13 14:00:00", 100L, 1_000L, 10),
@@ -474,7 +474,7 @@ class HistoricUserStatsTest {
     @Test
     void whenGettingMonthlyStats_givenRequestUsesPreviousEntityTag_andStatsHaveNotChanged_thenResponseHas304Status_andNoBody()
         throws FoldingRestException {
-        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).id();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10)
         );
@@ -509,7 +509,7 @@ class HistoricUserStatsTest {
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(FOLDING_URL + "/historic/users/" + TestConstants.INVALID_FORMAT_ID + '/' + Year.parse("2020")))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -525,12 +525,12 @@ class HistoricUserStatsTest {
 
     @Test
     void whenGettingMonthlyStats_andInvalidDateIsGiven_thenResponseHas400Status() throws FoldingRestException, IOException, InterruptedException {
-        final int userId = UserUtils.create(TestGenerator.generateUser()).getId();
+        final int userId = UserUtils.create(TestGenerator.generateUser()).id();
 
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(FOLDING_URL + "/historic/users/" + userId + "/invalidYear"))
-            .header("Content-Type", "application/json");
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         final HttpRequest request = requestBuilder.build();
 

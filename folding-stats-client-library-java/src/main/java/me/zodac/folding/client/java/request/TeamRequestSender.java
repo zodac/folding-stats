@@ -83,7 +83,7 @@ public record TeamRequestSender(String teamsUrl) {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(teamsUrl))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNotBlank(entityTag)) {
             requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), entityTag);
@@ -130,7 +130,7 @@ public record TeamRequestSender(String teamsUrl) {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(teamsUrl + '/' + teamId))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNotBlank(entityTag)) {
             requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), entityTag);
@@ -177,7 +177,7 @@ public record TeamRequestSender(String teamsUrl) {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(teamsUrl + "/fields?teamName=" + teamName))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNotBlank(entityTag)) {
             requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), entityTag);
@@ -208,7 +208,7 @@ public record TeamRequestSender(String teamsUrl) {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(team)))
             .uri(URI.create(teamsUrl))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNeitherBlank(userName, password)) {
             requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
@@ -241,7 +241,7 @@ public record TeamRequestSender(String teamsUrl) {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .PUT(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(team)))
             .uri(URI.create(teamsUrl + '/' + teamId))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNeitherBlank(userName, password)) {
             requestBuilder.header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
@@ -272,7 +272,7 @@ public record TeamRequestSender(String teamsUrl) {
         final HttpRequest request = HttpRequest.newBuilder()
             .DELETE()
             .uri(URI.create(teamsUrl + '/' + teamId))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
             .build();
 

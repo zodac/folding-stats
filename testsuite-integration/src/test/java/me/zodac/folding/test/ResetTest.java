@@ -97,7 +97,7 @@ class ResetTest {
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.noBody())
             .uri(URI.create(FOLDING_URL + "/stats/manual/reset"))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
         final HttpResponse<Void> response = RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
@@ -132,7 +132,7 @@ class ResetTest {
             .teamId(team.id())
             .build();
 
-        final int userToRetireId = create(userToRetire).getId();
+        final int userToRetireId = create(userToRetire).id();
 
         manuallyUpdateStats();
 

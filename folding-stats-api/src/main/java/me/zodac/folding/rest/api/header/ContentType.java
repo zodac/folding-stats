@@ -55,7 +55,7 @@ public enum ContentType {
      *
      * @return the {@link ContentType} value
      */
-    public String contentType() {
+    public String contentTypeValue() {
         return contentTypeValue;
     }
 }

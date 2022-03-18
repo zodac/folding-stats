@@ -155,7 +155,7 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
             .GET()
             .uri(URI.create(
                 historicStatsUrl + '/' + historicStatsType.endpointUrl + '/' + id + '/' + year.getValue() + '/' + month.getValue() + '/' + day))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNotBlank(entityTag)) {
             requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), entityTag);
@@ -276,7 +276,7 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(historicStatsUrl + '/' + historicStatsType.endpointUrl + '/' + id + '/' + year.getValue() + '/' + month.getValue()))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNotBlank(entityTag)) {
             requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), entityTag);
@@ -392,7 +392,7 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(historicStatsUrl + '/' + historicStatsType.endpointUrl + '/' + id + '/' + year.getValue()))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType());
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNotBlank(entityTag)) {
             requestBuilder.header(RestHeader.IF_NONE_MATCH.headerName(), entityTag);

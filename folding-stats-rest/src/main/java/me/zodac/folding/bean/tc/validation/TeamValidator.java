@@ -147,7 +147,7 @@ public class TeamValidator {
 
         return foldingRepository.getAllUsersWithoutPasskeys()
             .stream()
-            .filter(user -> user.getTeam().id() == teamId)
+            .filter(user -> user.team().id() == teamId)
             .toList();
     }
 }

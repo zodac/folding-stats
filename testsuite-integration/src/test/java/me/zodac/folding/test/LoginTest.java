@@ -38,6 +38,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import me.zodac.folding.client.java.request.LoginRequestSender;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
+import me.zodac.folding.rest.api.header.ContentType;
+import me.zodac.folding.rest.api.header.RestHeader;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -76,7 +78,7 @@ class LoginTest {
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.noBody())
             .uri(URI.create(FOLDING_URL + "/login/admin"))
-            .header("Content-Type", "application/json")
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
         try {

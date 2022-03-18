@@ -145,7 +145,7 @@ public class UserValidator {
                        final User existingUser) {
         // The foldingUserName and passkey must be unique, unless replacing the same user
         final Optional<User> matchingUser = getUserWithFoldingUserNameAndPasskey(userRequest);
-        if (matchingUser.isPresent() && matchingUser.get().getId() != existingUser.getId()) {
+        if (matchingUser.isPresent() && matchingUser.get().id() != existingUser.id()) {
             throw new ConflictException(userRequest, matchingUser.get(), CONFLICTING_ATTRIBUTES);
         }
 
@@ -169,16 +169,16 @@ public class UserValidator {
      * @return the validated {@link User}
      */
     public User delete(final User user) {
-        if (user.isUserIsCaptain()) {
-            throw new ValidationException(user, String.format("Cannot delete user '%s' since they are team captain", user.getDisplayName()));
+        if (user.userIsCaptain()) {
+            throw new ValidationException(user, String.format("Cannot delete user '%s' since they are team captain", user.displayName()));
         }
 
         return user;
     }
 
     private void validateUpdateUserWorkUnits(final UserRequest userRequest, final User existingUser) {
-        final boolean isFoldingUserNameChange = !userRequest.getFoldingUserName().equalsIgnoreCase(existingUser.getFoldingUserName());
-        final boolean isPasskeyChange = !userRequest.getPasskey().equalsIgnoreCase(existingUser.getPasskey());
+        final boolean isFoldingUserNameChange = !userRequest.getFoldingUserName().equalsIgnoreCase(existingUser.foldingUserName());
+        final boolean isPasskeyChange = !userRequest.getPasskey().equalsIgnoreCase(existingUser.passkey());
 
         if (isFoldingUserNameChange || isPasskeyChange) {
             validateUserWorkUnits(userRequest);
@@ -213,7 +213,7 @@ public class UserValidator {
                                                             final User existingUser,
                                                             final Team teamForUser,
                                                             final Category category) {
-        final boolean userIsChangingTeams = userRequest.getTeamId() != existingUser.getTeam().id();
+        final boolean userIsChangingTeams = userRequest.getTeamId() != existingUser.team().id();
         final Collection<User> usersOnTeam = foldingRepository.getUsersOnTeam(teamForUser);
 
         if (userIsChangingTeams) {
@@ -221,13 +221,13 @@ public class UserValidator {
             validateNewUserDoesNotExceedTeamLimits(userRequest, teamForUser, category);
         }
 
-        final boolean userIsChangingCategory = category != existingUser.getCategory();
+        final boolean userIsChangingCategory = category != existingUser.category();
         if (userIsChangingCategory) {
             // If we are staying on the team but changing category, we need to ensure there is space in the category
             final int permittedNumberForCategory = category.permittedUsers();
             final long numberOfUsersInTeamWithCategory = usersOnTeam
                 .stream()
-                .filter(user -> user.getId() != existingUser.getId() && user.getCategory() == category)
+                .filter(user -> user.id() != existingUser.id() && user.category() == category)
                 .count();
 
             if (numberOfUsersInTeamWithCategory >= permittedNumberForCategory) {
@@ -249,7 +249,7 @@ public class UserValidator {
         final int permittedNumberForCategory = category.permittedUsers();
         final long numberOfUsersInTeamWithCategory = usersOnTeam
             .stream()
-            .filter(user -> user.getCategory() == category)
+            .filter(user -> user.category() == category)
             .count();
 
         if (numberOfUsersInTeamWithCategory == permittedNumberForCategory) {
@@ -269,7 +269,7 @@ public class UserValidator {
 
         return foldingRepository.getAllUsersWithPasskeys()
             .stream()
-            .filter(user -> user.getFoldingUserName().equalsIgnoreCase(foldingUserName) && user.getPasskey().equalsIgnoreCase(passkey))
+            .filter(user -> user.foldingUserName().equalsIgnoreCase(foldingUserName) && user.passkey().equalsIgnoreCase(passkey))
             .findAny();
     }
 

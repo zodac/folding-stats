@@ -164,7 +164,7 @@ public class LeaderboardStatsGenerator {
         for (final Category category : Category.getAllValues()) {
             final List<UserSummary> usersInCategory = usersInAllTeams
                 .stream()
-                .filter(userSummary -> userSummary.getUser().getCategory() == category)
+                .filter(userSummary -> userSummary.getUser().category() == category)
                 .toList();
 
             usersByCategory.put(category, usersInCategory);

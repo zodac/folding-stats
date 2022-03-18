@@ -308,15 +308,15 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
                     USERS.IS_CAPTAIN
                 )
                 .values(
-                    user.getFoldingUserName(),
-                    user.getDisplayName(),
-                    user.getPasskey(),
-                    user.getCategory().toString(),
-                    user.getProfileLink(),
-                    user.getLiveStatsLink(),
-                    user.getHardware().id(),
-                    user.getTeam().id(),
-                    user.isUserIsCaptain()
+                    user.foldingUserName(),
+                    user.displayName(),
+                    user.passkey(),
+                    user.category().toString(),
+                    user.profileLink(),
+                    user.liveStatsLink(),
+                    user.hardware().id(),
+                    user.team().id(),
+                    user.userIsCaptain()
                 )
                 .returning(USERS.USER_ID);
             SQL_LOGGER.debug("Executing SQL: '{}'", query);
@@ -376,16 +376,16 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
         executeQuery(queryContext -> {
             final var query = queryContext
                 .update(USERS)
-                .set(USERS.FOLDING_USERNAME, userToUpdate.getFoldingUserName())
-                .set(USERS.DISPLAY_USERNAME, userToUpdate.getDisplayName())
-                .set(USERS.PASSKEY, userToUpdate.getPasskey())
-                .set(USERS.CATEGORY, userToUpdate.getCategory().toString())
-                .set(USERS.PROFILE_LINK, userToUpdate.getProfileLink())
-                .set(USERS.LIVE_STATS_LINK, userToUpdate.getLiveStatsLink())
-                .set(USERS.HARDWARE_ID, userToUpdate.getHardware().id())
-                .set(USERS.TEAM_ID, userToUpdate.getTeam().id())
-                .set(USERS.IS_CAPTAIN, userToUpdate.isUserIsCaptain())
-                .where(USERS.USER_ID.equal(userToUpdate.getId()));
+                .set(USERS.FOLDING_USERNAME, userToUpdate.foldingUserName())
+                .set(USERS.DISPLAY_USERNAME, userToUpdate.displayName())
+                .set(USERS.PASSKEY, userToUpdate.passkey())
+                .set(USERS.CATEGORY, userToUpdate.category().toString())
+                .set(USERS.PROFILE_LINK, userToUpdate.profileLink())
+                .set(USERS.LIVE_STATS_LINK, userToUpdate.liveStatsLink())
+                .set(USERS.HARDWARE_ID, userToUpdate.hardware().id())
+                .set(USERS.TEAM_ID, userToUpdate.team().id())
+                .set(USERS.IS_CAPTAIN, userToUpdate.userIsCaptain())
+                .where(USERS.USER_ID.equal(userToUpdate.id()));
             SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
@@ -423,7 +423,7 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
                 .values(
                     userChange.createdUtcTimestamp(),
                     userChange.updatedUtcTimestamp(),
-                    userChange.previousUser().getId(),
+                    userChange.previousUser().id(),
                     GSON.toJson(userChange.previousUser()),
                     GSON.toJson(userChange.newUser()),
                     userChange.state().toString()
@@ -742,7 +742,7 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
             }
 
             final User user = optionalUser.get();
-            final Hardware hardware = user.getHardware();
+            final Hardware hardware = user.hardware();
             final double hardwareMultiplier = hardware.multiplier();
 
             return UserTcStats.create(

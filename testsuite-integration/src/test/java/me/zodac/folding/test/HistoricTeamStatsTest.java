@@ -96,7 +96,7 @@ class HistoricTeamStatsTest {
     @Test
     void whenGettingHourlyStats_andValidTeamIdIsGiven_andUserHasSomeStats_thenStatsAreReturned_andResponseHas200Status() throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).getId();
+        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).id();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-04-11 23:00:00", 0L, 0L, 0),
             TestStats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10)
@@ -116,7 +116,7 @@ class HistoricTeamStatsTest {
     void whenGettingHourlyStats_andTeamHasMultipleStatsForSingleUser_thenEachStatsEntryIsDiffedFromPreviousHour_andResponseHas200Status()
         throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).getId();
+        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).id();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-04-11 23:00:00", 0L, 0L, 0),
             TestStats.create(userId, "2020-04-12 13:00:00", 20L, 200L, 2),
@@ -132,7 +132,7 @@ class HistoricTeamStatsTest {
         assertThat(results)
             .hasSize(2);
 
-        final HistoricStats result = results.get(1); // Ignore first result, as it is the "base" stats for the team
+        final HistoricStats result = results.get(1); // Ignore first result, as it is the "initial" stats for the team
         assertThat(result.getPoints())
             .isEqualTo(80L);
         assertThat(result.getMultipliedPoints())
@@ -145,7 +145,7 @@ class HistoricTeamStatsTest {
     void whenGettingHourlyStats_andUserHasMultipleStatsInSameHour_thenMaxStatsInHourAreReturned_andResponseHas200Status()
         throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).getId();
+        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).id();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-04-11 23:00:00", 0L, 0L, 0),
             TestStats.create(userId, "2020-04-12 13:00:00", 50L, 500L, 5),
@@ -162,7 +162,7 @@ class HistoricTeamStatsTest {
         assertThat(results)
             .hasSize(2);
 
-        final HistoricStats result = results.get(1); // Ignore first result, as it is the "base" stats for the team
+        final HistoricStats result = results.get(1); // Ignore first result, as it is the "initial" stats for the team
         assertThat(result.getPoints())
             .isEqualTo(60L);
         assertThat(result.getMultipliedPoints())
@@ -175,8 +175,8 @@ class HistoricTeamStatsTest {
     void whenGettingHourlyStats_andTeamHasMultipleUsersInSameHour_thenCombinedStatsForAllUsersAreReturned_andResponseHas200Status()
         throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        final int firstUserId = UserUtils.create(generateUserWithTeamIdAndCategory(team.id(), Category.AMD_GPU)).getId();
-        final int secondUserId = UserUtils.create(generateUserWithTeamIdAndCategory(team.id(), Category.NVIDIA_GPU)).getId();
+        final int firstUserId = UserUtils.create(generateUserWithTeamIdAndCategory(team.id(), Category.AMD_GPU)).id();
+        final int secondUserId = UserUtils.create(generateUserWithTeamIdAndCategory(team.id(), Category.NVIDIA_GPU)).id();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(firstUserId, "2020-04-11 23:00:00", 0L, 0L, 0),
             TestStats.create(secondUserId, "2020-04-11 23:00:00", 0L, 0L, 0),
@@ -196,7 +196,7 @@ class HistoricTeamStatsTest {
         assertThat(results)
             .hasSize(2);
 
-        final HistoricStats result = results.get(1); // Ignore first result, as it is the "base" stats for the team
+        final HistoricStats result = results.get(1); // Ignore first result, as it is the "initial" stats for the team
         assertThat(result.getPoints())
             .isEqualTo(210L);
         assertThat(result.getMultipliedPoints())
@@ -209,7 +209,7 @@ class HistoricTeamStatsTest {
     void whenGettingHourlyStats_givenRequestUsesPreviousEntityTag_andStatsHaveNotChanged_thenResponseHas304Status_andNoBody()
         throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).getId();
+        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).id();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10)
         );
@@ -247,7 +247,7 @@ class HistoricTeamStatsTest {
             .GET()
             .uri(URI.create(
                 FOLDING_URL + "/historic/teams/" + TestConstants.INVALID_FORMAT_ID + '/' + Year.parse("2020") + '/' + Month.of(4) + '/' + 12))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -293,7 +293,7 @@ class HistoricTeamStatsTest {
     @Test
     void whenGettingDailyStats_andValidTeamIdIsGiven_andUserHasSomeStats_thenStatsAreReturned_andResponseHas200Status() throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).getId();
+        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).id();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10)
         );
@@ -312,7 +312,7 @@ class HistoricTeamStatsTest {
     void whenGettingDailyStats_andTeamHasMultipleStatsForSameUser_thenEachStatsEntryIsDiffedFromPreviousDay_andResponseHas200Status()
         throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).getId();
+        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).id();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-04-12 13:00:00", 20L, 200L, 2),
             TestStats.create(userId, "2020-04-13 13:00:00", 100L, 1_000L, 10)
@@ -327,7 +327,7 @@ class HistoricTeamStatsTest {
         assertThat(results)
             .hasSize(2);
 
-        final HistoricStats result = results.get(1); // Ignore first result, as it is the "base" stats for the team
+        final HistoricStats result = results.get(1); // Ignore first result, as it is the "initial" stats for the team
         assertThat(result.getPoints())
             .isEqualTo(80L);
         assertThat(result.getMultipliedPoints())
@@ -339,7 +339,7 @@ class HistoricTeamStatsTest {
     @Test
     void whenGettingDailyStats_andUserHasMultipleStatsInSameDay_thenMaxStatsInDayAreReturned_andResponseHas200Status() throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).getId();
+        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).id();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-04-12 13:00:00", 10L, 100L, 1),
             TestStats.create(userId, "2020-04-13 14:00:00", 50L, 500L, 5),
@@ -355,7 +355,7 @@ class HistoricTeamStatsTest {
         assertThat(results)
             .hasSize(2);
 
-        final HistoricStats result = results.get(1); // Ignore first result, as it is the "base" stats for the team
+        final HistoricStats result = results.get(1); // Ignore first result, as it is the "initial" stats for the team
         assertThat(result.getPoints())
             .isEqualTo(100L);
         assertThat(result.getMultipliedPoints())
@@ -368,8 +368,8 @@ class HistoricTeamStatsTest {
     void whenGettingDailyStats_andTeamHasMultipleUsersInSameDay_thenCombinedStatsForAllUsersAreReturned_andResponseHas200Status()
         throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        final int firstUserId = UserUtils.create(generateUserWithTeamIdAndCategory(team.id(), Category.AMD_GPU)).getId();
-        final int secondUserId = UserUtils.create(generateUserWithTeamIdAndCategory(team.id(), Category.NVIDIA_GPU)).getId();
+        final int firstUserId = UserUtils.create(generateUserWithTeamIdAndCategory(team.id(), Category.AMD_GPU)).id();
+        final int secondUserId = UserUtils.create(generateUserWithTeamIdAndCategory(team.id(), Category.NVIDIA_GPU)).id();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(firstUserId, "2020-04-12 13:00:00", 50L, 500L, 5),
             TestStats.create(secondUserId, "2020-04-12 13:00:00", 50L, 500L, 5),
@@ -387,7 +387,7 @@ class HistoricTeamStatsTest {
         assertThat(results)
             .hasSize(2);
 
-        final HistoricStats result = results.get(1); // Ignore first result, as it is the "base" stats for the team
+        final HistoricStats result = results.get(1); // Ignore first result, as it is the "initial" stats for the team
         assertThat(result.getPoints())
             .isEqualTo(210L);
         assertThat(result.getMultipliedPoints())
@@ -400,7 +400,7 @@ class HistoricTeamStatsTest {
     void whenGettingDailyStats_givenRequestUsesPreviousEntityTag_andStatsHaveNotChanged_thenResponseHas304Status_andNoBody()
         throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).getId();
+        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).id();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10)
         );
@@ -437,7 +437,7 @@ class HistoricTeamStatsTest {
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(FOLDING_URL + "/historic/teams/" + TestConstants.INVALID_FORMAT_ID + '/' + Year.parse("2020") + '/' + Month.of(4)))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -459,8 +459,8 @@ class HistoricTeamStatsTest {
 
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(FOLDING_URL + "/historic/teams/" + team.id() + '/' + "2020" + '/' + invalidMonth))
-            .header("Content-Type", "application/json");
+            .uri(URI.create(FOLDING_URL + "/historic/teams/" + team.id() + "/2020/" + invalidMonth))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         final HttpRequest request = requestBuilder.build();
 
@@ -491,7 +491,7 @@ class HistoricTeamStatsTest {
     void whenGettingMonthlyStats_andValidTeamIdIsGiven_andUserHasSomeStats_thenStatsAreReturned_andResponseHas200Status()
         throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).getId();
+        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).id();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10)
         );
@@ -510,7 +510,7 @@ class HistoricTeamStatsTest {
     void whenGettingMonthlyStats_andUserHasMultipleStats_thenEachStatsEntryIsDiffedFromPreviousMonth_andResponseHas200Status()
         throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).getId();
+        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).id();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-03-12 13:00:00", 20L, 200L, 2), // No diff from this result, since stats are reset each month
             TestStats.create(userId, "2020-04-12 13:00:00", 100L, 1_000L, 10)
@@ -525,7 +525,7 @@ class HistoricTeamStatsTest {
         assertThat(results)
             .hasSize(2);
 
-        final HistoricStats result = results.get(1); // Ignore first result, as it is the "base" stats for the team
+        final HistoricStats result = results.get(1); // Ignore first result, as it is the "initial" stats for the team
         assertThat(result.getPoints())
             .isEqualTo(100L);
         assertThat(result.getMultipliedPoints())
@@ -538,7 +538,7 @@ class HistoricTeamStatsTest {
     void whenGettingMonthlyStats_andUserHasMultipleStatsInSameMonth_thenMaxStatsInMonthAreReturned_andResponseHas200Status()
         throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).getId();
+        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).id();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-03-12 13:00:00", 50L, 500L, 5), // No diff from this result, since stats are reset each month
             TestStats.create(userId, "2020-04-13 14:00:00", 100L, 1_000L, 10),
@@ -554,7 +554,7 @@ class HistoricTeamStatsTest {
         assertThat(results)
             .hasSize(2);
 
-        final HistoricStats result = results.get(1); // Ignore first result, as it is the "base" stats for the team
+        final HistoricStats result = results.get(1); // Ignore first result, as it is the "initial" stats for the team
         assertThat(result.getPoints())
             .isEqualTo(110L);
         assertThat(result.getMultipliedPoints())
@@ -567,8 +567,8 @@ class HistoricTeamStatsTest {
     void whenGettingMonthlyStats_andTeamHasMultipleUsersInSameMonth_thenCombinedStatsForAllUsersAreReturned_andResponseHas200Status()
         throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        final int firstUserId = UserUtils.create(generateUserWithTeamIdAndCategory(team.id(), Category.AMD_GPU)).getId();
-        final int secondUserId = UserUtils.create(generateUserWithTeamIdAndCategory(team.id(), Category.NVIDIA_GPU)).getId();
+        final int firstUserId = UserUtils.create(generateUserWithTeamIdAndCategory(team.id(), Category.AMD_GPU)).id();
+        final int secondUserId = UserUtils.create(generateUserWithTeamIdAndCategory(team.id(), Category.NVIDIA_GPU)).id();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(firstUserId, "2020-03-12 13:00:00", 50L, 500L, 5), // No diff from this result, since stats are reset each month
             TestStats.create(secondUserId, "2020-03-12 13:00:00", 50L, 500L, 5),
@@ -586,7 +586,7 @@ class HistoricTeamStatsTest {
         assertThat(results)
             .hasSize(2);
 
-        final HistoricStats result = results.get(1); // Ignore first result, as it is the "base" stats for the team
+        final HistoricStats result = results.get(1); // Ignore first result, as it is the "initial" stats for the team
         assertThat(result.getPoints())
             .isEqualTo(310L);
         assertThat(result.getMultipliedPoints())
@@ -599,7 +599,7 @@ class HistoricTeamStatsTest {
     void whenGettingMonthlyStats_givenRequestUsesPreviousEntityTag_andStatsHaveNotChanged_thenResponseHas304Status_andNoBody()
         throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).getId();
+        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).id();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10)
         );
@@ -634,7 +634,7 @@ class HistoricTeamStatsTest {
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(FOLDING_URL + "/historic/teams/" + TestConstants.INVALID_FORMAT_ID + '/' + Year.parse("2020")))
-            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentType())
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -656,7 +656,7 @@ class HistoricTeamStatsTest {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(FOLDING_URL + "/historic/teams/" + team.id() + "/invalidYear"))
-            .header("Content-Type", "application/json");
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         final HttpRequest request = requestBuilder.build();
 

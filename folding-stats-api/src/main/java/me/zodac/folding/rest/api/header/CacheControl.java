@@ -32,7 +32,12 @@ public enum CacheControl {
     /**
      * The <code>no-cache</code> value.
      */
-    NO_CACHE("no-cache");
+    NO_CACHE("no-cache"),
+
+    /**
+     * The <code>no-store</code> value.
+     */
+    NO_STORE("no-store");
 
     private final String cacheControlValue;
 
@@ -50,7 +55,7 @@ public enum CacheControl {
      *
      * @return the {@link CacheControl} value
      */
-    public String cacheControl() {
+    public String cacheControlValue() {
         return cacheControlValue;
     }
 }

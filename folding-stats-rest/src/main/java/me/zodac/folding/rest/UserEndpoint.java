@@ -113,9 +113,9 @@ public class UserEndpoint {
         final User elementWithId = foldingRepository.createUser(validatedUser);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
-        AUDIT_LOGGER.info("Created user with ID {}", elementWithId.getId());
+        AUDIT_LOGGER.info("Created user with ID {}", elementWithId.id());
         userCreates.increment();
-        return created(elementWithId, elementWithId.getId());
+        return created(elementWithId, elementWithId.id());
     }
 
     /**
@@ -209,13 +209,13 @@ public class UserEndpoint {
         final User validatedUser = userValidator.update(userRequest, existingUser);
 
         // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
-        final User userWithId = User.updateWithId(existingUser.getId(), validatedUser);
+        final User userWithId = User.updateWithId(existingUser.id(), validatedUser);
         final User updatedUserWithId = foldingRepository.updateUser(userWithId, existingUser);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
-        AUDIT_LOGGER.info("Updated user with ID {}", updatedUserWithId.getId());
+        AUDIT_LOGGER.info("Updated user with ID {}", updatedUserWithId.id());
         userUpdates.increment();
-        return ok(updatedUserWithId, updatedUserWithId.getId());
+        return ok(updatedUserWithId, updatedUserWithId.id());
     }
 
     /**
