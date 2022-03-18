@@ -530,4 +530,21 @@ class HardwareTest {
             .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
+
+    @Test
+    void whenCreatingHardware_andContentTypeIsNotJson_thenResponse415Status() throws IOException, InterruptedException {
+        final HardwareRequest hardwareToCreate = generateHardware();
+
+        final HttpRequest request = HttpRequest.newBuilder()
+            .POST(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(hardwareToCreate)))
+            .uri(URI.create(FOLDING_URL + "/hardware/"))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.TEXT.contentType())
+            .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
+            .build();
+
+        final HttpResponse<String> response = RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+        assertThat(response.statusCode())
+            .as("Did not receive a 415_UNSUPPORTED_MEDIA_TYPE HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_UNSUPPORTED_TYPE);
+    }
 }

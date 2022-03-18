@@ -24,8 +24,6 @@
 
 package me.zodac.folding.bean.tc.scheduled;
 
-import static java.lang.Boolean.parseBoolean;
-
 import java.util.Collection;
 import me.zodac.folding.api.FoldingRepository;
 import me.zodac.folding.api.state.ParsingState;
@@ -48,8 +46,7 @@ import org.springframework.stereotype.Component;
 public class StatsScheduler {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final boolean IS_STATS_SCHEDULED_PARSING_ENABLED =
-        parseBoolean(EnvironmentVariableUtils.getOrDefault("ENABLE_STATS_SCHEDULED_PARSING", "false"));
+    private static final boolean IS_STATS_SCHEDULED_PARSING_ENABLED = EnvironmentVariableUtils.getBoolean("ENABLE_STATS_SCHEDULED_PARSING");
 
     @Autowired
     private FoldingRepository foldingRepository;

@@ -54,6 +54,7 @@ import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.tc.request.UserChangeRequest;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
+import me.zodac.folding.rest.util.RestUtilConstants;
 import me.zodac.folding.test.util.TestConstants;
 import me.zodac.folding.test.util.rest.request.UserUtils;
 import org.junit.jupiter.api.AfterAll;
@@ -566,6 +567,32 @@ class UserChangeTest {
         assertThat(response.statusCode())
             .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+    }
+
+    @Test
+    void whenCreatingUserChange_andContentTypeIsNotJson_thenResponse415Status() throws IOException, InterruptedException, FoldingRestException {
+        final User user = UserUtils.create(generateUser());
+
+        final UserChangeRequest userChangeRequest = UserChangeRequest.builder()
+            .userId(user.getId())
+            .foldingUserName(user.getFoldingUserName())
+            .existingPasskey(user.getPasskey())
+            .passkey(user.getPasskey())
+            .liveStatsLink(DUMMY_LIVE_STATS_LINK)
+            .hardwareId(user.getHardware().id())
+            .immediate(true)
+            .build();
+
+        final HttpRequest request = HttpRequest.newBuilder()
+            .POST(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(userChangeRequest)))
+            .uri(URI.create(FOLDING_URL + "/changes/"))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.TEXT.contentType())
+            .build();
+
+        final HttpResponse<String> response = RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+        assertThat(response.statusCode())
+            .as("Did not receive a 415_UNSUPPORTED_MEDIA_TYPE HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_UNSUPPORTED_TYPE);
     }
 
     private static UserChange createUserChange() throws FoldingRestException {

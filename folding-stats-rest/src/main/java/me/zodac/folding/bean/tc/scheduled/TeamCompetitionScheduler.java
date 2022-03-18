@@ -24,8 +24,6 @@
 
 package me.zodac.folding.bean.tc.scheduled;
 
-import static java.lang.Boolean.parseBoolean;
-
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Calendar;
@@ -78,11 +76,9 @@ import org.springframework.stereotype.Component;
 public class TeamCompetitionScheduler {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final boolean IS_MONTHLY_RESET_ENABLED =
-        parseBoolean(EnvironmentVariableUtils.getOrDefault("ENABLE_STATS_MONTHLY_RESET", "false"));
-    private static final boolean IS_MONTHLY_RESULT_ENABLED =
-        parseBoolean(EnvironmentVariableUtils.getOrDefault("ENABLE_MONTHLY_RESULT_STORAGE", "false"));
-    private static final boolean IS_LARS_UPDATE_ENABLED = parseBoolean(EnvironmentVariableUtils.getOrDefault("ENABLE_LARS_HARDWARE_UPDATE", "false"));
+    private static final boolean IS_MONTHLY_RESET_ENABLED = EnvironmentVariableUtils.getBoolean("ENABLE_STATS_MONTHLY_RESET");
+    private static final boolean IS_MONTHLY_RESULT_ENABLED = EnvironmentVariableUtils.getBoolean("ENABLE_MONTHLY_RESULT_STORAGE");
+    private static final boolean IS_LARS_UPDATE_ENABLED = EnvironmentVariableUtils.getBoolean("ENABLE_LARS_HARDWARE_UPDATE");
 
     private final LarsHardwareUpdater larsHardwareUpdater;
     private final UserChangeApplier userChangeApplier;

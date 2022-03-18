@@ -180,15 +180,7 @@ public enum Category {
         return supportedHardwareTypes;
     }
 
-    private static int getCategoryCount(final String categoryVariable) {
-        return convertToIntOrDefault(EnvironmentVariableUtils.get(categoryVariable));
-    }
-
-    private static int convertToIntOrDefault(final String input) {
-        try {
-            return Integer.parseInt(input);
-        } catch (final NumberFormatException e) {
-            return DEFAULT_USERS_PER_CATEGORY;
-        }
+    private static int getCategoryCount(final String categoryEnvironmentVariable) {
+        return EnvironmentVariableUtils.getIntOrDefault(categoryEnvironmentVariable, DEFAULT_USERS_PER_CATEGORY);
     }
 }

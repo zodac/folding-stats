@@ -91,6 +91,64 @@ class EnvironmentVariablesUtilsTest {
             .isEqualTo("defaultValue");
     }
 
+    @Test
+    void whenGetBoolean_givenVariableIsNotSet_thenFalseIsReturned() {
+        final String propertyName = getSystemPropertyName();
+
+        final boolean result = EnvironmentVariableUtils.getBoolean(propertyName);
+        assertThat(result)
+            .isFalse();
+    }
+
+    @Test
+    void whenGetBoolean_givenVariableIsSet_andValueIsNotValidBoolean_thenFalseIsReturned() {
+        final String propertyName = getSystemPropertyName();
+
+        System.setProperty(propertyName, "value");
+        final boolean result = EnvironmentVariableUtils.getBoolean(propertyName);
+        assertThat(result)
+            .isFalse();
+    }
+
+    @Test
+    void whenGetBoolean_givenVariableIsSet_andValueIsPositiveBoolean_thenTrueIsReturned() {
+        final String propertyName = getSystemPropertyName();
+
+        System.setProperty(propertyName, "tRuE");
+        final boolean result = EnvironmentVariableUtils.getBoolean(propertyName);
+        assertThat(result)
+            .isTrue();
+    }
+
+    @Test
+    void whenGetIntOrDefault_givenVariableIsNotSet_thenDefaultIsReturned() {
+        final String propertyName = getSystemPropertyName();
+
+        final int result = EnvironmentVariableUtils.getIntOrDefault(propertyName, 0);
+        assertThat(result)
+            .isZero();
+    }
+
+    @Test
+    void whenGetIntOrDefault_givenVariableIsSet_andValueIsNotValidInt_thenDefaultIsReturned() {
+        final String propertyName = getSystemPropertyName();
+
+        System.setProperty(propertyName, "value");
+        final int result = EnvironmentVariableUtils.getIntOrDefault(propertyName, 0);
+        assertThat(result)
+            .isZero();
+    }
+
+    @Test
+    void whenGetBoolean_givenVariableIsSet_andValueIsValidInt_thenValueIsReturned() {
+        final String propertyName = getSystemPropertyName();
+
+        System.setProperty(propertyName, "1");
+        final int result = EnvironmentVariableUtils.getIntOrDefault(propertyName, 0);
+        assertThat(result)
+            .isOne();
+    }
+
     private static Map.Entry<String, String> getEnvironmentVariableThatIsNotAlsoSystemProperty() {
         final Set<String> systemProperties = System.getProperties().keySet().stream().map(Object::toString).collect(Collectors.toSet());
         final Set<String> environmentVariables = new HashSet<>(System.getenv().keySet());

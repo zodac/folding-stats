@@ -915,6 +915,24 @@ class UserTest {
             .isFalse();
     }
 
+    @Test
+    void whenCreatingUser_andContentTypeIsNotJson_thenResponse415Status() throws IOException, InterruptedException, FoldingRestException {
+        final UserRequest userToCreate = generateUser();
+        StubbedFoldingEndpointUtils.enableUser(userToCreate);
+
+        final HttpRequest request = HttpRequest.newBuilder()
+            .POST(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(userToCreate)))
+            .uri(URI.create(FOLDING_URL + "/users/"))
+            .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.TEXT.contentType())
+            .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
+            .build();
+
+        final HttpResponse<String> response = RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+        assertThat(response.statusCode())
+            .as("Did not receive a 415_UNSUPPORTED_MEDIA_TYPE HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_UNSUPPORTED_TYPE);
+    }
+
     private static User findUserById(final Collection<User> users, final int id) {
         for (final User user : users) {
             if (user.getId() == id) {
