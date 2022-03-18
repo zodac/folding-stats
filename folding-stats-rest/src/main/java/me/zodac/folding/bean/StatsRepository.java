@@ -350,10 +350,10 @@ public class StatsRepository {
     }
 
     private TeamSummary getTcTeamResult(final Team team) {
-        LOGGER.debug("Converting team '{}' for TC stats", team::getTeamName);
+        LOGGER.debug("Converting team '{}' for TC stats", team::teamName);
 
         final Collection<User> usersOnTeam = getUsersFromTeam(team);
-        LOGGER.debug("Found {} users for team '{}': {}", usersOnTeam.size(), team.getTeamName(), usersOnTeam);
+        LOGGER.debug("Found {} users for team '{}': {}", usersOnTeam.size(), team.teamName(), usersOnTeam);
 
         final Collection<UserSummary> activeUserSummaries = usersOnTeam
             .stream()
@@ -366,21 +366,21 @@ public class StatsRepository {
             .map(RetiredUserSummary::createWithDefaultRank)
             .toList();
 
-        final String captainDisplayName = getCaptainDisplayName(team.getTeamName(), usersOnTeam);
+        final String captainDisplayName = getCaptainDisplayName(team.teamName(), usersOnTeam);
         return TeamSummary.createWithDefaultRank(team, captainDisplayName, activeUserSummaries, retiredUserSummaries);
     }
 
     private Collection<User> getUsersFromTeam(final Team team) {
         return storage.getAllUsers()
             .stream()
-            .filter(user -> user.getTeam().getId() == team.getId())
+            .filter(user -> user.getTeam().id() == team.id())
             .toList();
     }
 
     private Collection<RetiredUserTcStats> getAllRetiredUsersForTeam(final Team team) {
         return storage.getAllRetiredUsers()
             .stream()
-            .filter(retiredUserTcStats -> retiredUserTcStats.getTeamId() == team.getId())
+            .filter(retiredUserTcStats -> retiredUserTcStats.getTeamId() == team.id())
             .toList();
     }
 

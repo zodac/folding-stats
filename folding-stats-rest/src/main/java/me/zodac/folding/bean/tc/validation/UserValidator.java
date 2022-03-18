@@ -213,7 +213,7 @@ public class UserValidator {
                                                             final User existingUser,
                                                             final Team teamForUser,
                                                             final Category category) {
-        final boolean userIsChangingTeams = userRequest.getTeamId() != existingUser.getTeam().getId();
+        final boolean userIsChangingTeams = userRequest.getTeamId() != existingUser.getTeam().id();
         final Collection<User> usersOnTeam = foldingRepository.getUsersOnTeam(teamForUser);
 
         if (userIsChangingTeams) {
@@ -232,7 +232,7 @@ public class UserValidator {
 
             if (numberOfUsersInTeamWithCategory >= permittedNumberForCategory) {
                 throw new ValidationException(userRequest,
-                    String.format("Team '%s' already has %s users in category '%s', only %s permitted", teamForUser.getTeamName(),
+                    String.format("Team '%s' already has %s users in category '%s', only %s permitted", teamForUser.teamName(),
                         numberOfUsersInTeamWithCategory, category, permittedNumberForCategory));
             }
         }
@@ -242,7 +242,7 @@ public class UserValidator {
         final Collection<User> usersOnTeam = foldingRepository.getUsersOnTeam(teamForUser);
         if (usersOnTeam.size() == Category.maximumPermittedAmountForAllCategories()) {
             throw new ValidationException(userRequest,
-                String.format("Team '%s' has %s users, maximum permitted is %s", teamForUser.getTeamName(), usersOnTeam.size(),
+                String.format("Team '%s' has %s users, maximum permitted is %s", teamForUser.teamName(), usersOnTeam.size(),
                     Category.maximumPermittedAmountForAllCategories()));
         }
 
@@ -254,7 +254,7 @@ public class UserValidator {
 
         if (numberOfUsersInTeamWithCategory == permittedNumberForCategory) {
             throw new ValidationException(userRequest,
-                String.format("Team '%s' already has %s users in category '%s', only %s permitted", teamForUser.getTeamName(),
+                String.format("Team '%s' already has %s users in category '%s', only %s permitted", teamForUser.teamName(),
                     numberOfUsersInTeamWithCategory, category, permittedNumberForCategory));
         }
     }
@@ -319,7 +319,7 @@ public class UserValidator {
 
             final List<String> availableTeams = allTeams
                 .stream()
-                .map(team -> String.format("%s: %s", team.getId(), team.getTeamName()))
+                .map(team -> String.format("%s: %s", team.id(), team.teamName()))
                 .toList();
 
             throw new ValidationException(userRequest, String.format("Field 'teamId' must be one of: %s", availableTeams), e);

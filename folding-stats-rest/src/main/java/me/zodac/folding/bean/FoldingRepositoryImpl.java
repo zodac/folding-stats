@@ -171,7 +171,7 @@ public class FoldingRepositoryImpl implements FoldingRepository {
 
     @Override
     public void deleteTeam(final Team team) {
-        storage.deleteTeam(team.getId());
+        storage.deleteTeam(team.id());
     }
 
     @Override
@@ -224,7 +224,7 @@ public class FoldingRepositoryImpl implements FoldingRepository {
     public User updateUser(final User userToUpdate, final User existingUser) {
         if (isUserCaptainAndCaptainExistsOnTeam(userToUpdate)) {
             final boolean isCaptainChange = userToUpdate.isUserIsCaptain() != existingUser.isUserIsCaptain();
-            final boolean isTeamChange = userToUpdate.getTeam().getId() != existingUser.getTeam().getId();
+            final boolean isTeamChange = userToUpdate.getTeam().id() != existingUser.getTeam().id();
 
             if (isCaptainChange || isTeamChange) {
                 removeCaptaincyFromExistingTeamCaptain(userToUpdate.getTeam());
@@ -307,9 +307,9 @@ public class FoldingRepositoryImpl implements FoldingRepository {
     }
 
     private boolean isUserTeamChange(final User updatedUser, final User existingUser) {
-        if (updatedUser.getTeam().getId() != existingUser.getTeam().getId()) {
+        if (updatedUser.getTeam().id() != existingUser.getTeam().id()) {
             LOGGER.info("User '{}' (ID: {}) moved from team '{}' -> '{}'", existingUser.getDisplayName(), existingUser.getId(),
-                updatedUser.getTeam().getTeamName(), existingUser.getTeam().getTeamName());
+                updatedUser.getTeam().teamName(), existingUser.getTeam().teamName());
             return true;
         }
 
@@ -328,7 +328,7 @@ public class FoldingRepositoryImpl implements FoldingRepository {
 
         if (!userStats.isEmptyStats()) {
             final RetiredUserTcStats retiredUserTcStats =
-                RetiredUserTcStats.createWithoutId(oldTeam.getId(), userWithTeamChange.getDisplayName(), userStats);
+                RetiredUserTcStats.createWithoutId(oldTeam.id(), userWithTeamChange.getDisplayName(), userStats);
             final RetiredUserTcStats createdRetiredUserTcStats = statsRepository.createRetiredUserStats(retiredUserTcStats);
             LOGGER.info("User '{}' (ID: {}) retired with retired stats ID: {}", userWithTeamChange.getDisplayName(), userWithTeamChange.getId(),
                 createdRetiredUserTcStats.getRetiredUserId());
@@ -358,7 +358,7 @@ public class FoldingRepositoryImpl implements FoldingRepository {
 
         final User existingCaptain = existingCaptainOptional.get();
         LOGGER.info("Captain '{} (ID: {})' already exists for team '{}', will be replaced by '{}' (ID: {})",
-            existingCaptain.getDisplayName(), existingCaptain.getId(), team.getTeamName(), user.getDisplayName(), user.getId()
+            existingCaptain.getDisplayName(), existingCaptain.getId(), team.teamName(), user.getDisplayName(), user.getId()
         );
         return true;
     }
@@ -402,13 +402,13 @@ public class FoldingRepositoryImpl implements FoldingRepository {
 
     @Override
     public Collection<User> getUsersOnTeam(final Team team) {
-        if (team.getId() == Team.EMPTY_TEAM_ID) {
+        if (team.id() == Team.EMPTY_TEAM_ID) {
             return Collections.emptyList();
         }
 
         return getAllUsersWithPasskeys()
             .stream()
-            .filter(user -> user.getTeam().getId() == team.getId())
+            .filter(user -> user.getTeam().id() == team.id())
             .map(User::hidePasskey)
             .toList();
     }

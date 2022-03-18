@@ -118,7 +118,7 @@ class ResetTest {
             .passkey("DummyPasskey12345678901234567890")
             .category(Category.NVIDIA_GPU.toString())
             .hardwareId(captainHardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .userIsCaptain(true)
             .build();
         create(captainUser);
@@ -129,7 +129,7 @@ class ResetTest {
             .passkey("DummyPasskey12345678901234567890")
             .category(Category.AMD_GPU.toString())
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final int userToRetireId = create(userToRetire).getId();
@@ -137,7 +137,7 @@ class ResetTest {
         manuallyUpdateStats();
 
         final AllTeamsSummary result = TeamCompetitionStatsUtils.getStats();
-        final TeamSummary teamSummary = getTeamFromCompetition(result, team.getTeamName());
+        final TeamSummary teamSummary = getTeamFromCompetition(result, team.teamName());
 
         assertThat(teamSummary.getActiveUsers())
             .as("Expected exactly 2 active users at start: " + teamSummary)
@@ -155,7 +155,7 @@ class ResetTest {
         manuallyUpdateStats();
 
         final AllTeamsSummary resultAfterRetirement = TeamCompetitionStatsUtils.getStats();
-        final TeamSummary teamSummaryAfterRetirement = getTeamFromCompetition(resultAfterRetirement, team.getTeamName());
+        final TeamSummary teamSummaryAfterRetirement = getTeamFromCompetition(resultAfterRetirement, team.teamName());
 
         assertThat(teamSummaryAfterRetirement.getActiveUsers())
             .as("Expected exactly 1 active users after retirement: " + teamSummaryAfterRetirement)
@@ -168,7 +168,7 @@ class ResetTest {
         manuallyResetStats();
 
         final AllTeamsSummary resultAfterReset = TeamCompetitionStatsUtils.getStats();
-        final TeamSummary teamSummaryAfterReset = getTeamFromCompetition(resultAfterReset, team.getTeamName());
+        final TeamSummary teamSummaryAfterReset = getTeamFromCompetition(resultAfterReset, team.teamName());
 
         assertThat(teamSummaryAfterReset.getActiveUsers())
             .as("Expected exactly 1 active users after reset: " + teamSummaryAfterReset)
@@ -183,15 +183,15 @@ class ResetTest {
     void whenResetOccurs_thenStatsAreResetForCompetitionAndTeamsAndUsers() throws FoldingRestException {
         final Team firstTeam = TeamUtils.create(generateTeam());
 
-        final UserRequest firstUser = generateUserWithTeamIdAndCategory(firstTeam.getId(), Category.NVIDIA_GPU);
+        final UserRequest firstUser = generateUserWithTeamIdAndCategory(firstTeam.id(), Category.NVIDIA_GPU);
         firstUser.setUserIsCaptain(true);
         create(firstUser);
 
-        final UserRequest secondUser = generateUserWithTeamIdAndCategory(firstTeam.getId(), Category.AMD_GPU);
+        final UserRequest secondUser = generateUserWithTeamIdAndCategory(firstTeam.id(), Category.AMD_GPU);
         create(secondUser);
 
         final Team secondTeam = TeamUtils.create(generateTeam());
-        final UserRequest thirdUser = generateUserWithTeamIdAndCategory(secondTeam.getId(), Category.AMD_GPU);
+        final UserRequest thirdUser = generateUserWithTeamIdAndCategory(secondTeam.id(), Category.AMD_GPU);
         thirdUser.setUserIsCaptain(true);
         create(thirdUser);
 
@@ -208,8 +208,8 @@ class ResetTest {
             .as("Expected points from all three users: " + result)
             .isEqualTo(firstUserPoints + secondUserPoints + thirdUserPoints);
 
-        final TeamSummary firstTeamSummary = getTeamFromCompetition(result, firstTeam.getTeamName());
-        final TeamSummary secondTeamSummary = getTeamFromCompetition(result, secondTeam.getTeamName());
+        final TeamSummary firstTeamSummary = getTeamFromCompetition(result, firstTeam.teamName());
+        final TeamSummary secondTeamSummary = getTeamFromCompetition(result, secondTeam.teamName());
 
         assertThat(firstTeamSummary.getTeamPoints())
             .as("Expected points for team for first and second user: " + firstTeamSummary)
@@ -242,8 +242,8 @@ class ResetTest {
             .as("Expected no points overall: " + result)
             .isZero();
 
-        final TeamSummary firstTeamSummaryAfterReset = getTeamFromCompetition(resultAfterReset, firstTeam.getTeamName());
-        final TeamSummary secondTeamSummaryAfterReset = getTeamFromCompetition(resultAfterReset, secondTeam.getTeamName());
+        final TeamSummary firstTeamSummaryAfterReset = getTeamFromCompetition(resultAfterReset, firstTeam.teamName());
+        final TeamSummary secondTeamSummaryAfterReset = getTeamFromCompetition(resultAfterReset, secondTeam.teamName());
 
         assertThat(firstTeamSummaryAfterReset.getTeamPoints())
             .as("Expected no points for team: " + firstTeamSummaryAfterReset)

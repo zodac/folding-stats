@@ -32,6 +32,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import me.zodac.folding.api.ResponsePojo;
+import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 
 
@@ -104,8 +105,8 @@ public class User implements ResponsePojo {
                               final Hardware hardware,
                               final Team team,
                               final boolean isCaptain) {
-        final String profileLinkOrNull = isEmpty(profileLink) ? null : profileLink;
-        final String liveStatsLinkOrNull = isEmpty(liveStatsLink) ? null : liveStatsLink;
+        final String profileLinkOrNull = StringUtils.isBlank(profileLink) ? null : profileLink;
+        final String liveStatsLinkOrNull = StringUtils.isBlank(liveStatsLink) ? null : liveStatsLink;
         return new User(userId, foldingUserName, displayName, passkey, category, profileLinkOrNull, liveStatsLinkOrNull, hardware, team, isCaptain);
     }
 
@@ -243,10 +244,6 @@ public class User implements ResponsePojo {
         return passkey.substring(0, endIndex).concat(PASSKEY_MASK);
     }
 
-    private static boolean isEmpty(final String input) {
-        return input == null || input.isBlank();
-    }
-
     /**
      * Checks if the input {@link UserRequest} is equal to the {@link User}.
      *
@@ -259,7 +256,7 @@ public class User implements ResponsePojo {
      */
     public boolean isEqualRequest(final UserRequest userRequest) {
         return hardware.id() == userRequest.getHardwareId()
-            && team.getId() == userRequest.getTeamId()
+            && team.id() == userRequest.getTeamId()
             && userIsCaptain == userRequest.isUserIsCaptain()
             && Objects.equals(foldingUserName, userRequest.getFoldingUserName())
             && Objects.equals(displayName, userRequest.getDisplayName())

@@ -243,7 +243,7 @@ public class Storage {
     public Team createTeam(final Team team) {
         return dbManagerFunction(dbManager -> {
             final Team teamWithId = dbManager.createTeam(team);
-            teamCache.put(teamWithId.getId(), teamWithId);
+            teamCache.put(teamWithId.id(), teamWithId);
             return teamWithId;
         });
     }
@@ -270,7 +270,7 @@ public class Storage {
             final Collection<Team> fromDb = dbManager.getAllTeams();
 
             for (final Team team : fromDb) {
-                teamCache.put(team.getId(), team);
+                teamCache.put(team.id(), team);
             }
 
             return fromDb;
@@ -320,11 +320,11 @@ public class Storage {
     public Team updateTeam(final Team teamToUpdate) {
         return dbManagerFunction(dbManager -> {
             final Team updatedTeam = dbManager.updateTeam(teamToUpdate);
-            teamCache.put(updatedTeam.getId(), updatedTeam);
+            teamCache.put(updatedTeam.id(), updatedTeam);
 
             getAllUsers()
                 .stream()
-                .filter(user -> user.getTeam().getId() == updatedTeam.getId())
+                .filter(user -> user.getTeam().id() == updatedTeam.id())
                 .map(user -> User.updateTeam(user, updatedTeam))
                 .forEach(updatedUser -> userCache.put(updatedUser.getId(), updatedUser));
 

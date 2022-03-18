@@ -79,7 +79,7 @@ class MockFoldingRepository implements FoldingRepository {
 
     @Override
     public Team createTeam(final Team team) {
-        teams.put(team.getId(), team);
+        teams.put(team.id(), team);
         return team;
     }
 
@@ -97,13 +97,13 @@ class MockFoldingRepository implements FoldingRepository {
 
     @Override
     public Team updateTeam(final Team teamToUpdate) {
-        teams.put(teamToUpdate.getId(), teamToUpdate);
+        teams.put(teamToUpdate.id(), teamToUpdate);
         return teamToUpdate;
     }
 
     @Override
     public void deleteTeam(final Team team) {
-        teams.remove(team.getId());
+        teams.remove(team.id());
     }
 
     @Override
@@ -151,13 +151,13 @@ class MockFoldingRepository implements FoldingRepository {
 
     @Override
     public Collection<User> getUsersOnTeam(final Team team) {
-        if (team.getId() == Team.EMPTY_TEAM_ID) {
+        if (team.id() == Team.EMPTY_TEAM_ID) {
             return Collections.emptyList();
         }
 
         return getAllUsersWithPasskeys()
             .stream()
-            .filter(user -> user.getTeam().getId() == team.getId())
+            .filter(user -> user.getTeam().id() == team.id())
             .map(User::hidePasskey)
             .toList();
     }

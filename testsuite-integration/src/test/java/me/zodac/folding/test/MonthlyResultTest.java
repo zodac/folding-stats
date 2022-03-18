@@ -81,7 +81,7 @@ class MonthlyResultTest {
     @Test
     void whenGettingMonthlyResult_andGivenMonthHasNoStats_thenEmptyResultIsReturned_andResponseHas200Status() throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        UserUtils.create(generateUserWithTeamIdAndCategory(team.getId(), Category.NVIDIA_GPU));
+        UserUtils.create(generateUserWithTeamIdAndCategory(team.id(), Category.NVIDIA_GPU));
 
         manuallyUpdateStats();
         MONTHLY_RESULT_REQUEST_SENDER.manualSave(ADMIN_USER.userName(), ADMIN_USER.password());
@@ -133,7 +133,7 @@ class MonthlyResultTest {
     @Test
     void whenGettingMonthlyResult_andGivenMonthHasOneUser_thenResultIsReturned_andResponseHas200Status() throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        final User user = UserUtils.create(generateUserWithTeamIdAndCategory(team.getId(), Category.NVIDIA_GPU));
+        final User user = UserUtils.create(generateUserWithTeamIdAndCategory(team.id(), Category.NVIDIA_GPU));
 
         StubbedFoldingEndpointUtils.addPoints(user, 10_000L);
         manuallyUpdateStats();
@@ -151,9 +151,9 @@ class MonthlyResultTest {
             .hasSize(1);
 
         final TeamLeaderboardEntry teamLeaderboardEntry = monthlyResult.teamLeaderboard().get(0);
-        assertThat(teamLeaderboardEntry.getTeam().getTeamName())
+        assertThat(teamLeaderboardEntry.getTeam().teamName())
             .as("Expected result team to have same name as input team")
-            .isEqualTo(team.getTeamName());
+            .isEqualTo(team.teamName());
         assertThat(teamLeaderboardEntry.getTeamMultipliedPoints())
             .as("Expected result team to have same points as user")
             .isEqualTo(10_000L);
@@ -171,9 +171,9 @@ class MonthlyResultTest {
             .hasSize(1);
 
         final UserCategoryLeaderboardEntry userCategoryLeaderboardEntry = monthlyResult.userCategoryLeaderboard().get(Category.NVIDIA_GPU).get(0);
-        assertThat(userCategoryLeaderboardEntry.getUser().getTeam().getTeamName())
+        assertThat(userCategoryLeaderboardEntry.getUser().getTeam().teamName())
             .as("Expected result user to have same team name as input team")
-            .isEqualTo(team.getTeamName());
+            .isEqualTo(team.teamName());
         assertThat(userCategoryLeaderboardEntry.getUser().getFoldingUserName())
             .as("Expected result user to have same name as input user")
             .isEqualTo(user.getFoldingUserName());
@@ -186,17 +186,17 @@ class MonthlyResultTest {
     void whenGettingMonthlyResult_andGivenMonthHasMultipleUsers_thenResultIsReturnedWithCorrectRanks_andResponseHas200Stats()
         throws FoldingRestException {
         final Team firstTeam = TeamUtils.create(generateTeam());
-        final User firstUser = UserUtils.create(generateUserWithTeamIdAndCategory(firstTeam.getId(), Category.NVIDIA_GPU));
+        final User firstUser = UserUtils.create(generateUserWithTeamIdAndCategory(firstTeam.id(), Category.NVIDIA_GPU));
         StubbedFoldingEndpointUtils.addPoints(firstUser, 10_000L);
 
         final Team secondTeam = TeamUtils.create(generateTeam());
-        final User secondUser = UserUtils.create(generateUserWithTeamIdAndCategory(secondTeam.getId(), Category.NVIDIA_GPU));
-        final User thirdUser = UserUtils.create(generateUserWithTeamIdAndCategory(secondTeam.getId(), Category.AMD_GPU));
+        final User secondUser = UserUtils.create(generateUserWithTeamIdAndCategory(secondTeam.id(), Category.NVIDIA_GPU));
+        final User thirdUser = UserUtils.create(generateUserWithTeamIdAndCategory(secondTeam.id(), Category.AMD_GPU));
         StubbedFoldingEndpointUtils.addPoints(secondUser, 9_000L);
         StubbedFoldingEndpointUtils.addPoints(thirdUser, 11_000L);
 
         final Team thirdTeam = TeamUtils.create(generateTeam());
-        final User fourthUser = UserUtils.create(generateUserWithTeamIdAndCategory(thirdTeam.getId(), Category.WILDCARD));
+        final User fourthUser = UserUtils.create(generateUserWithTeamIdAndCategory(thirdTeam.id(), Category.WILDCARD));
         StubbedFoldingEndpointUtils.addPoints(fourthUser, 30_000L);
 
         manuallyUpdateStats();
@@ -217,23 +217,23 @@ class MonthlyResultTest {
         final TeamLeaderboardEntry secondTeamLeaderboardEntry = monthlyResult.teamLeaderboard().get(1);
         final TeamLeaderboardEntry thirdTeamLeaderboardEntry = monthlyResult.teamLeaderboard().get(2);
 
-        assertThat(firstTeamLeaderboardEntry.getTeam().getTeamName())
+        assertThat(firstTeamLeaderboardEntry.getTeam().teamName())
             .as("Expected team in first to be the third created team")
-            .isEqualTo(thirdTeam.getTeamName());
+            .isEqualTo(thirdTeam.teamName());
         assertThat(firstTeamLeaderboardEntry.getTeamMultipliedPoints())
             .as("Expected team in first to have the same points as fourth created user")
             .isEqualTo(30_000L);
 
-        assertThat(secondTeamLeaderboardEntry.getTeam().getTeamName())
+        assertThat(secondTeamLeaderboardEntry.getTeam().teamName())
             .as("Expected team in second to be the second created team")
-            .isEqualTo(secondTeam.getTeamName());
+            .isEqualTo(secondTeam.teamName());
         assertThat(secondTeamLeaderboardEntry.getTeamMultipliedPoints())
             .as("Expected team in second to have the same points as second and third created users")
             .isEqualTo(20_000L);
 
-        assertThat(thirdTeamLeaderboardEntry.getTeam().getTeamName())
+        assertThat(thirdTeamLeaderboardEntry.getTeam().teamName())
             .as("Expected team in third to be the first created team")
-            .isEqualTo(firstTeam.getTeamName());
+            .isEqualTo(firstTeam.teamName());
         assertThat(thirdTeamLeaderboardEntry.getTeamMultipliedPoints())
             .as("Expected team in third to have the same points as first created user")
             .isEqualTo(10_000L);
@@ -280,7 +280,7 @@ class MonthlyResultTest {
     void whenGettingMonthlyResult_andGivenMonthHasMultipleEntriesForMonth_thenLatestResultIsReturnedWithCorrectRanks_andResponseHas200Stats()
         throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        final User user = UserUtils.create(generateUserWithTeamIdAndCategory(team.getId(), Category.NVIDIA_GPU));
+        final User user = UserUtils.create(generateUserWithTeamIdAndCategory(team.id(), Category.NVIDIA_GPU));
 
         StubbedFoldingEndpointUtils.addPoints(user, 10_000L);
         manuallyUpdateStats();
@@ -302,9 +302,9 @@ class MonthlyResultTest {
             .hasSize(1);
 
         final TeamLeaderboardEntry teamLeaderboardEntry = monthlyResult.teamLeaderboard().get(0);
-        assertThat(teamLeaderboardEntry.getTeam().getTeamName())
+        assertThat(teamLeaderboardEntry.getTeam().teamName())
             .as("Expected result team to have same name as input team")
-            .isEqualTo(team.getTeamName());
+            .isEqualTo(team.teamName());
         assertThat(teamLeaderboardEntry.getTeamMultipliedPoints())
             .as("Expected result team to have same points as user's last update")
             .isEqualTo(22_000L);
@@ -322,9 +322,9 @@ class MonthlyResultTest {
             .hasSize(1);
 
         final UserCategoryLeaderboardEntry userCategoryLeaderboardEntry = monthlyResult.userCategoryLeaderboard().get(Category.NVIDIA_GPU).get(0);
-        assertThat(userCategoryLeaderboardEntry.getUser().getTeam().getTeamName())
+        assertThat(userCategoryLeaderboardEntry.getUser().getTeam().teamName())
             .as("Expected result user to have same team name as input team")
-            .isEqualTo(team.getTeamName());
+            .isEqualTo(team.teamName());
         assertThat(userCategoryLeaderboardEntry.getUser().getFoldingUserName())
             .as("Expected result user to have same name as input user")
             .isEqualTo(user.getFoldingUserName());

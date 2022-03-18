@@ -66,7 +66,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -95,7 +95,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -122,7 +122,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -148,7 +148,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -175,7 +175,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -202,7 +202,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -229,7 +229,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -256,7 +256,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -285,7 +285,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -312,7 +312,7 @@ class UserValidatorTest {
             .liveStatsLink(null)
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -341,7 +341,7 @@ class UserValidatorTest {
             .liveStatsLink("invalidUrl")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -383,7 +383,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -430,7 +430,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -466,7 +466,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -502,7 +502,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -538,7 +538,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(1)
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -564,7 +564,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(1)
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -608,7 +608,7 @@ class UserValidatorTest {
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
-            .containsOnly(String.format("Field 'teamId' must be one of: [%s: %s]", team.getId(), team.getTeamName()));
+            .containsOnly(String.format("Field 'teamId' must be one of: [%s: %s]", team.id(), team.teamName()));
     }
 
     @Test
@@ -662,7 +662,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -704,7 +704,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(false)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -734,7 +734,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(false)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -761,7 +761,7 @@ class UserValidatorTest {
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
-            .containsOnly(String.format("Team '%1$s' has %2$s users, maximum permitted is %2$s", team.getTeamName(),
+            .containsOnly(String.format("Team '%1$s' has %2$s users, maximum permitted is %2$s", team.teamName(),
                 Category.maximumPermittedAmountForAllCategories()));
     }
 
@@ -779,7 +779,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -824,7 +824,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -851,7 +851,7 @@ class UserValidatorTest {
         final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
             .containsOnly(
-                String.format("Team '%1$s' already has %3$s users in category '%2$s', only %3$s permitted", team.getTeamName(), Category.NVIDIA_GPU,
+                String.format("Team '%1$s' already has %3$s users in category '%2$s', only %3$s permitted", team.teamName(), Category.NVIDIA_GPU,
                     Category.NVIDIA_GPU.permittedUsers()));
     }
 
@@ -869,7 +869,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -899,7 +899,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -928,7 +928,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -955,7 +955,7 @@ class UserValidatorTest {
             .liveStatsLink("invalid")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -989,7 +989,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final User existingUser = User.builder()
@@ -1031,7 +1031,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final User existingUser = User.builder()
@@ -1071,7 +1071,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final User existingUser = User.builder()
@@ -1111,7 +1111,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final User existingUser = User.builder()
@@ -1151,7 +1151,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final User existingUser = User.builder()
@@ -1191,7 +1191,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final User existingUser = User.builder()
@@ -1231,7 +1231,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final User existingUser = User.builder()
@@ -1271,7 +1271,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final User existingUser = User.builder()
@@ -1311,7 +1311,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final User existingUser = User.builder()
@@ -1353,7 +1353,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final User existingUser = User.builder()
@@ -1393,7 +1393,7 @@ class UserValidatorTest {
             .liveStatsLink(null)
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final User existingUser = User.builder()
@@ -1435,7 +1435,7 @@ class UserValidatorTest {
             .liveStatsLink("invalidUrl")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final User existingUser = User.builder()
@@ -1491,7 +1491,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final User existingUser = User.builder()
@@ -1542,7 +1542,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final User existingUser = User.builder()
@@ -1585,7 +1585,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final User existingUser = User.builder()
@@ -1642,7 +1642,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final User existingUser = User.builder()
@@ -1700,7 +1700,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final User existingUser = User.builder()
@@ -1757,7 +1757,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(false)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final User existingUser = User.builder()
@@ -1802,7 +1802,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(false)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final User existingUser = User.builder()
@@ -1843,7 +1843,7 @@ class UserValidatorTest {
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
-            .containsOnly(String.format("Team '%1$s' has %2$s users, maximum permitted is %2$s", team.getTeamName(),
+            .containsOnly(String.format("Team '%1$s' has %2$s users, maximum permitted is %2$s", team.teamName(),
                 Category.maximumPermittedAmountForAllCategories())
             );
     }
@@ -1863,7 +1863,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final User existingUser = User.builder()
@@ -1906,7 +1906,7 @@ class UserValidatorTest {
             catchThrowableOfType(() -> userValidator.update(user, existingUser),
                 ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
-            .containsOnly(String.format("Team '%1$s' already has %3$s users in category '%2$s', only %3$s permitted", team.getTeamName(),
+            .containsOnly(String.format("Team '%1$s' already has %3$s users in category '%2$s', only %3$s permitted", team.teamName(),
                 Category.NVIDIA_GPU, Category.NVIDIA_GPU.permittedUsers())
             );
     }
@@ -1925,7 +1925,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final User existingUser = User.builder()
@@ -1967,7 +1967,7 @@ class UserValidatorTest {
         final ValidationException e =
             catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
-            .containsOnly(String.format("Team '%1$s' already has %3$s users in category '%2$s', only %3$s permitted", team.getTeamName(),
+            .containsOnly(String.format("Team '%1$s' already has %3$s users in category '%2$s', only %3$s permitted", team.teamName(),
                 Category.NVIDIA_GPU, Category.NVIDIA_GPU.permittedUsers())
             );
     }
@@ -1986,7 +1986,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final User existingUser = User.builder()
@@ -2037,7 +2037,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final User existingUser = User.builder()
@@ -2089,7 +2089,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(1)
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final User existingUser = User.builder()
@@ -2129,7 +2129,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(1)
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final User existingUser = User.builder()
@@ -2157,12 +2157,12 @@ class UserValidatorTest {
     @Test
     void whenValidatingUpdate_givenUserWithTeamWithNonExistingId_thenFailureResponseIsReturned() {
         final Hardware hardware = generateHardware();
-        final Team team = Team.builder()
-            .id(99)
-            .teamName("teamName")
-            .teamDescription("teamDescription")
-            .forumLink("https://www.google.com")
-            .build();
+        final Team team = Team.create(
+            99,
+            "teamName",
+            "teamDescription",
+            "https://www.google.com"
+        );
 
         final UserRequest user = UserRequest.builder()
             .foldingUserName("user")
@@ -2197,7 +2197,7 @@ class UserValidatorTest {
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
         assertThat(e.getValidationFailure().getErrors())
-            .containsOnly(String.format("Field 'teamId' must be one of: [%s: %s]", team.getId(), team.getTeamName()));
+            .containsOnly(String.format("Field 'teamId' must be one of: [%s: %s]", team.id(), team.teamName()));
     }
 
     @Test
@@ -2252,7 +2252,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final User existingUser = User.builder()
@@ -2295,7 +2295,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final User existingUser = User.builder()
@@ -2339,7 +2339,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final User existingUser = User.builder()
@@ -2382,7 +2382,7 @@ class UserValidatorTest {
             .liveStatsLink("https://www.google.com")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final User existingUser = User.builder()
@@ -2423,7 +2423,7 @@ class UserValidatorTest {
             .liveStatsLink("invalid")
             .userIsCaptain(true)
             .hardwareId(hardware.id())
-            .teamId(team.getId())
+            .teamId(team.id())
             .build();
 
         final User existingUser = User.builder()
@@ -2523,11 +2523,11 @@ class UserValidatorTest {
     }
 
     private static Team generateTeam() {
-        return Team.builder()
-            .id(teamId++)
-            .teamName("teamName")
-            .teamDescription("teamDescription")
-            .forumLink("https://www.google.com")
-            .build();
+        return Team.create(
+            teamId++,
+            "teamName",
+            "teamDescription",
+            "https://www.google.com"
+        );
     }
 }

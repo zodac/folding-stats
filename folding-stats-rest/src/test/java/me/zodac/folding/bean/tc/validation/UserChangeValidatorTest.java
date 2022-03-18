@@ -684,12 +684,12 @@ class UserChangeValidatorTest {
     }
 
     private static Team generateTeam() {
-        return Team.builder()
-            .id(teamId++)
-            .teamName("teamName")
-            .teamDescription("teamDescription")
-            .forumLink("https://www.google.com")
-            .build();
+        return Team.create(
+            teamId++,
+            "teamName",
+            "teamDescription",
+            "https://www.google.com"
+        );
     }
 
     private static User generateUser(final Hardware hardware) {

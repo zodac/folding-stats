@@ -115,9 +115,9 @@ public class TeamEndpoint {
         final Team elementWithId = foldingRepository.createTeam(validatedTeam);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
-        AUDIT_LOGGER.info("Created team with ID {}", elementWithId.getId());
+        AUDIT_LOGGER.info("Created team with ID {}", elementWithId.id());
         teamCreates.increment();
-        return created(elementWithId, elementWithId.getId());
+        return created(elementWithId, elementWithId.id());
     }
 
     /**
@@ -167,7 +167,7 @@ public class TeamEndpoint {
 
         final Team retrievedTeam = foldingRepository.getAllTeams()
             .stream()
-            .filter(team -> team.getTeamName().equalsIgnoreCase(teamName))
+            .filter(team -> team.teamName().equalsIgnoreCase(teamName))
             .findAny()
             .orElseThrow(() -> new NotFoundException(Team.class, teamName));
 
@@ -200,13 +200,13 @@ public class TeamEndpoint {
         final Team validatedHardware = teamValidator.update(teamRequest, existingTeam);
 
         // The payload 'should' have the ID, but it's not guaranteed if the correct URL is used
-        final Team teamWithId = Team.updateWithId(existingTeam.getId(), validatedHardware);
+        final Team teamWithId = Team.updateWithId(existingTeam.id(), validatedHardware);
         final Team updatedTeamWithId = foldingRepository.updateTeam(teamWithId);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
-        AUDIT_LOGGER.info("Updated team with ID {}", updatedTeamWithId.getId());
+        AUDIT_LOGGER.info("Updated team with ID {}", updatedTeamWithId.id());
         teamUpdates.increment();
-        return ok(updatedTeamWithId, updatedTeamWithId.getId());
+        return ok(updatedTeamWithId, updatedTeamWithId.id());
     }
 
     /**

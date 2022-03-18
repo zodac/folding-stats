@@ -126,7 +126,7 @@ class PostgresDbManagerTest {
         final Team team = generateTeam();
         final Team createdTeam = POSTGRES_DB_MANAGER.createTeam(team);
 
-        assertThat(createdTeam.getId())
+        assertThat(createdTeam.id())
             .isNotEqualTo(Team.EMPTY_TEAM_ID);
 
         // Not explicitly handling this case, the validator should ensure no duplicate creates are attempted
@@ -137,7 +137,7 @@ class PostgresDbManagerTest {
         assertThat(allTeams)
             .hasSize(1);
 
-        final Optional<Team> optionalRetrievedTeam = POSTGRES_DB_MANAGER.getTeam(createdTeam.getId());
+        final Optional<Team> optionalRetrievedTeam = POSTGRES_DB_MANAGER.getTeam(createdTeam.id());
         assertThat(optionalRetrievedTeam)
             .isPresent();
 
@@ -145,15 +145,15 @@ class PostgresDbManagerTest {
         assertThat(retrievedTeam)
             .isEqualTo(createdTeam);
 
-        final Team teamToUpdate = Team.builder()
-            .id(retrievedTeam.getId())
-            .teamName(retrievedTeam.getTeamName())
-            .teamDescription("Updated description")
-            .forumLink(retrievedTeam.getForumLink())
-            .build();
+        final Team teamToUpdate = Team.create(
+            retrievedTeam.id(),
+            retrievedTeam.teamName(),
+            "Updated description",
+            retrievedTeam.forumLink()
+        );
 
         POSTGRES_DB_MANAGER.updateTeam(teamToUpdate);
-        final Optional<Team> optionalUpdatedTeam = POSTGRES_DB_MANAGER.getTeam(createdTeam.getId());
+        final Optional<Team> optionalUpdatedTeam = POSTGRES_DB_MANAGER.getTeam(createdTeam.id());
         assertThat(optionalUpdatedTeam)
             .isPresent();
 
@@ -161,7 +161,7 @@ class PostgresDbManagerTest {
         assertThat(updatedTeam)
             .isEqualTo(teamToUpdate);
 
-        POSTGRES_DB_MANAGER.deleteTeam(createdTeam.getId());
+        POSTGRES_DB_MANAGER.deleteTeam(createdTeam.id());
 
         final Collection<Team> allTeamsAfterDelete = POSTGRES_DB_MANAGER.getAllTeams();
         assertThat(allTeamsAfterDelete)
@@ -276,7 +276,7 @@ class PostgresDbManagerTest {
         final long multipliedPoints = 1_000L;
         final int units = 5;
 
-        final RetiredUserTcStats initialRetiredUserTcStats = RetiredUserTcStats.createWithoutId(team.getId(), userToRetire.getDisplayName(),
+        final RetiredUserTcStats initialRetiredUserTcStats = RetiredUserTcStats.createWithoutId(team.id(), userToRetire.getDisplayName(),
             UserTcStats.createNow(userToRetire.getId(), points, multipliedPoints, units));
         POSTGRES_DB_MANAGER.createRetiredUserStats(initialRetiredUserTcStats);
 

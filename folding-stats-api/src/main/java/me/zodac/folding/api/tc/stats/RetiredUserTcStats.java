@@ -106,7 +106,7 @@ public class RetiredUserTcStats extends UserTcStats {
      * @return the created {@link RetiredUserTcStats}
      */
     public static RetiredUserTcStats createWithoutId(final User user, final UserTcStats retiredTcStats) {
-        return create(EMPTY_RETIRED_USER_ID, user.getTeam().getId(), user.getDisplayName(), retiredTcStats);
+        return create(EMPTY_RETIRED_USER_ID, user.getTeam().id(), user.getDisplayName(), retiredTcStats);
     }
 
     /**

@@ -105,7 +105,7 @@ public class TeamValidator {
     public Team update(final TeamRequest teamRequest, final Team existingTeam) {
         // The teamName must be unique, unless replacing the same team
         final Optional<Team> teamWithMatchingName = getTeamWithName(teamRequest.getTeamName());
-        if (teamWithMatchingName.isPresent() && teamWithMatchingName.get().getId() != existingTeam.getId()) {
+        if (teamWithMatchingName.isPresent() && teamWithMatchingName.get().id() != existingTeam.id()) {
             throw new ConflictException(teamRequest, teamWithMatchingName.get(), CONFLICTING_ATTRIBUTE);
         }
 
@@ -124,7 +124,7 @@ public class TeamValidator {
      * @throws UsedByException thrown if the {@link Team} is in use by a {@link User}
      */
     public Team delete(final Team team) {
-        final Collection<User> usersWithMatchingTeam = getUsersOnTeam(team.getId());
+        final Collection<User> usersWithMatchingTeam = getUsersOnTeam(team.id());
 
         if (!usersWithMatchingTeam.isEmpty()) {
             throw new UsedByException(team, usersWithMatchingTeam);
@@ -136,7 +136,7 @@ public class TeamValidator {
     private Optional<Team> getTeamWithName(final String teamName) {
         return foldingRepository.getAllTeams()
             .stream()
-            .filter(team -> team.getTeamName().equalsIgnoreCase(teamName))
+            .filter(team -> team.teamName().equalsIgnoreCase(teamName))
             .findAny();
     }
 
@@ -147,7 +147,7 @@ public class TeamValidator {
 
         return foldingRepository.getAllUsersWithoutPasskeys()
             .stream()
-            .filter(user -> user.getTeam().getId() == teamId)
+            .filter(user -> user.getTeam().id() == teamId)
             .toList();
     }
 }

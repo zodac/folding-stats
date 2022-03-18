@@ -42,6 +42,8 @@ import org.junit.jupiter.api.Test;
  */
 class TeamValidatorTest {
 
+    private static int teamId = 1;
+
     @Test
     void whenValidatingCreate_givenValidTeam_thenSuccessResponseIsReturned() {
         final TeamRequest team = TeamRequest.builder()
@@ -84,11 +86,12 @@ class TeamValidatorTest {
             .forumLink("https://www.google.com")
             .build();
 
-        final Team existingTeam = Team.builder()
-            .teamName("anotherName")
-            .teamDescription("teamDescription")
-            .forumLink("https://www.google.com")
-            .build();
+        final Team existingTeam = Team.create(
+            teamId++,
+            "anotherName",
+            "teamDescription",
+            "https://www.google.com"
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createTeam(existingTeam);
@@ -109,11 +112,12 @@ class TeamValidatorTest {
             .forumLink("https://www.google.com")
             .build();
 
-        final Team existingTeam = Team.builder()
-            .teamName("existingName")
-            .teamDescription("teamDescription")
-            .forumLink("https://www.google.com")
-            .build();
+        final Team existingTeam = Team.create(
+            teamId++,
+            "existingName",
+            "teamDescription",
+            "https://www.google.com"
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createTeam(existingTeam);
@@ -187,11 +191,12 @@ class TeamValidatorTest {
             .forumLink("https://www.google.com")
             .build();
 
-        final Team existingTeam = Team.builder()
-            .teamName("teamName")
-            .teamDescription("teamDescription2")
-            .forumLink("https://www.google.com")
-            .build();
+        final Team existingTeam = Team.create(
+            teamId++,
+            "teamName",
+            "teamDescription2",
+            "https://www.google.com"
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
 
@@ -211,11 +216,7 @@ class TeamValidatorTest {
             .forumLink("https://www.google.com")
             .build();
 
-        final Team existingTeam = Team.builder()
-            .teamName("teamName")
-            .teamDescription("teamDescription")
-            .forumLink("https://www.google.com")
-            .build();
+        final Team existingTeam = generateTeam();
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
 
@@ -234,19 +235,19 @@ class TeamValidatorTest {
             .forumLink("https://www.google.com")
             .build();
 
-        final Team existingTeam = Team.builder()
-            .id(1)
-            .teamName("differentName")
-            .teamDescription("teamDescription")
-            .forumLink("https://www.google.com")
-            .build();
+        final Team existingTeam = Team.create(
+            1,
+            "differentName",
+            "teamDescription",
+            "https://www.google.com"
+        );
 
-        final Team otherTeam = Team.builder()
-            .id(20)
-            .teamName("teamName")
-            .teamDescription("teamDescription")
-            .forumLink("https://www.google.com")
-            .build();
+        final Team otherTeam = Team.create(
+            20,
+            "teamName",
+            "teamDescription",
+            "https://www.google.com"
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createTeam(otherTeam);
@@ -268,19 +269,19 @@ class TeamValidatorTest {
             .forumLink("https://www.google.com")
             .build();
 
-        final Team existingTeam = Team.builder()
-            .id(1)
-            .teamName("teamName")
-            .teamDescription("teamDescription")
-            .forumLink("https://www.google.com")
-            .build();
+        final Team existingTeam = Team.create(
+            1,
+            "teamName",
+            "teamDescription",
+            "https://www.google.com"
+        );
 
-        final Team otherTeam = Team.builder()
-            .id(1)
-            .teamName("teamName")
-            .teamDescription("teamDescription")
-            .forumLink("https://www.google.com")
-            .build();
+        final Team otherTeam = Team.create(
+            1,
+            "teamName",
+            "teamDescription",
+            "https://www.google.com"
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createTeam(otherTeam);
@@ -301,11 +302,7 @@ class TeamValidatorTest {
             .forumLink(null)
             .build();
 
-        final Team existingTeam = Team.builder()
-            .teamName("teamName")
-            .teamDescription("teamDescription")
-            .forumLink("https://www.google.com")
-            .build();
+        final Team existingTeam = generateTeam();
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
 
@@ -325,11 +322,7 @@ class TeamValidatorTest {
             .forumLink("https://www.google.com")
             .build();
 
-        final Team existingTeam = Team.builder()
-            .teamName("teamName")
-            .teamDescription("teamDescription")
-            .forumLink("https://www.google.com")
-            .build();
+        final Team existingTeam = generateTeam();
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
 
@@ -349,11 +342,7 @@ class TeamValidatorTest {
             .forumLink("invalidUrl")
             .build();
 
-        final Team existingTeam = Team.builder()
-            .teamName("teamName")
-            .teamDescription("teamDescription")
-            .forumLink("https://www.google.com")
-            .build();
+        final Team existingTeam = generateTeam();
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
 
@@ -366,11 +355,7 @@ class TeamValidatorTest {
 
     @Test
     void whenValidatingDelete_givenTeamThatIsNotBeingUsed_thenSuccessResponseIsReturned() {
-        final Team existingTeam = Team.builder()
-            .teamName("teamName")
-            .teamDescription("teamDescription")
-            .forumLink("https://www.google.com")
-            .build();
+        final Team existingTeam = generateTeam();
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
 
@@ -384,12 +369,12 @@ class TeamValidatorTest {
 
     @Test
     void whenValidatingDelete_givenTeamThatIsBeingUsedByUser_thenFailureResponseIsReturned() {
-        final Team existingTeam = Team.builder()
-            .id(1)
-            .teamName("teamName")
-            .teamDescription("teamDescription")
-            .forumLink("https://www.google.com")
-            .build();
+        final Team existingTeam = Team.create(
+            1,
+            "teamName",
+            "teamDescription",
+            "https://www.google.com"
+        );
 
         final User existingUser = User.builder()
             .passkey("DummyPasskey12345678901234567890")
@@ -412,19 +397,19 @@ class TeamValidatorTest {
 
     @Test
     void whenValidatingDelete_givenTeamExistsButIsNotBeingUsedByUser_thenSuccessResponseIsReturned() {
-        final Team existingTeam = Team.builder()
-            .id(1)
-            .teamName("teamName")
-            .teamDescription("teamDescription")
-            .forumLink("https://www.google.com")
-            .build();
+        final Team existingTeam = Team.create(
+            1,
+            "teamName",
+            "teamDescription",
+            "https://www.google.com"
+        );
 
-        final Team userTeam = Team.builder()
-            .id(2)
-            .teamName("teamName2")
-            .teamDescription("teamDescription")
-            .forumLink("https://www.google.com")
-            .build();
+        final Team userTeam = Team.create(
+            2,
+            "teamName2",
+            "teamDescription",
+            "https://www.google.com"
+        );
 
         final User existingUser = User.builder()
             .team(userTeam)
@@ -440,5 +425,14 @@ class TeamValidatorTest {
         assertThat(response)
             .as("Expected validation to pass")
             .isNotNull();
+    }
+
+    private static Team generateTeam() {
+        return Team.create(
+            teamId++,
+            "teamName",
+            "teamDescription",
+            "https://www.google.com"
+        );
     }
 }

@@ -94,7 +94,7 @@ public final class TeamCompetitionStatsUtils {
      */
     public static TeamSummary getTeamFromCompetition(final AllTeamsSummary allTeamsSummary, final String teamName) throws FoldingRestException {
         for (final TeamSummary teamSummary : allTeamsSummary.getTeams()) {
-            if (teamSummary.getTeam().getTeamName().equalsIgnoreCase(teamName)) {
+            if (teamSummary.getTeam().teamName().equalsIgnoreCase(teamName)) {
                 return teamSummary;
             }
         }

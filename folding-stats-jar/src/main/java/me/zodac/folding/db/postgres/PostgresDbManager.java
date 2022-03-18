@@ -212,7 +212,7 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
             final var query = queryContext
                 .insertInto(TEAMS)
                 .columns(TEAMS.TEAM_NAME, TEAMS.TEAM_DESCRIPTION, TEAMS.FORUM_LINK)
-                .values(team.getTeamName(), team.getTeamDescription(), team.getForumLink())
+                .values(team.teamName(), team.teamDescription(), team.forumLink())
                 .returning(TEAMS.TEAM_ID);
             SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
@@ -265,10 +265,10 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
         executeQuery(queryContext -> {
             final var query = queryContext
                 .update(TEAMS)
-                .set(TEAMS.TEAM_NAME, teamToUpdate.getTeamName())
-                .set(TEAMS.TEAM_DESCRIPTION, teamToUpdate.getTeamDescription())
-                .set(TEAMS.FORUM_LINK, teamToUpdate.getForumLink())
-                .where(TEAMS.TEAM_ID.equal(teamToUpdate.getId()));
+                .set(TEAMS.TEAM_NAME, teamToUpdate.teamName())
+                .set(TEAMS.TEAM_DESCRIPTION, teamToUpdate.teamDescription())
+                .set(TEAMS.FORUM_LINK, teamToUpdate.forumLink())
+                .where(TEAMS.TEAM_ID.equal(teamToUpdate.id()));
             SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
@@ -315,7 +315,7 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
                     user.getProfileLink(),
                     user.getLiveStatsLink(),
                     user.getHardware().id(),
-                    user.getTeam().getId(),
+                    user.getTeam().id(),
                     user.isUserIsCaptain()
                 )
                 .returning(USERS.USER_ID);
@@ -383,7 +383,7 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
                 .set(USERS.PROFILE_LINK, userToUpdate.getProfileLink())
                 .set(USERS.LIVE_STATS_LINK, userToUpdate.getLiveStatsLink())
                 .set(USERS.HARDWARE_ID, userToUpdate.getHardware().id())
-                .set(USERS.TEAM_ID, userToUpdate.getTeam().getId())
+                .set(USERS.TEAM_ID, userToUpdate.getTeam().id())
                 .set(USERS.IS_CAPTAIN, userToUpdate.isUserIsCaptain())
                 .where(USERS.USER_ID.equal(userToUpdate.getId()));
             SQL_LOGGER.debug("Executing SQL: '{}'", query);

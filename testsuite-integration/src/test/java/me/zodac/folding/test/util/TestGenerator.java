@@ -153,7 +153,7 @@ public final class TestGenerator {
      */
     public static UserRequest generateUser() throws FoldingRestException {
         final int hardwareId = HardwareUtils.create(generateHardware()).id();
-        final int teamId = TeamUtils.create(generateTeam()).getId();
+        final int teamId = TeamUtils.create(generateTeam()).id();
         final String userName = nextUserName();
 
         return UserRequest.builder()
@@ -175,7 +175,7 @@ public final class TestGenerator {
      */
     public static UserRequest generateCaptainUser() throws FoldingRestException {
         final int hardwareId = HardwareUtils.create(generateHardware()).id();
-        final int teamId = TeamUtils.create(generateTeam()).getId();
+        final int teamId = TeamUtils.create(generateTeam()).id();
         final String userName = nextUserName();
 
         return UserRequest.builder()
@@ -198,7 +198,7 @@ public final class TestGenerator {
      *                              or {@link TeamUtils#create(TeamRequest)}
      */
     public static UserRequest generateUserWithHardwareId(final int hardwareId) throws FoldingRestException {
-        final int teamId = TeamUtils.create(generateTeam()).getId();
+        final int teamId = TeamUtils.create(generateTeam()).id();
         final String userName = nextUserName();
 
         return UserRequest.builder()
@@ -285,7 +285,7 @@ public final class TestGenerator {
      */
     public static UserRequest generateUserWithLiveStatsLink(final String liveStatsLink) throws FoldingRestException {
         final int hardwareId = HardwareUtils.create(generateHardware()).id();
-        final int teamId = TeamUtils.create(generateTeam()).getId();
+        final int teamId = TeamUtils.create(generateTeam()).id();
         final String userName = nextUserName();
 
         return UserRequest.builder()

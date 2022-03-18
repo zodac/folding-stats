@@ -91,7 +91,7 @@ public final class SystemCleaner {
                 .profileLink(userWithPasskey.getProfileLink())
                 .liveStatsLink(userWithPasskey.getLiveStatsLink())
                 .hardwareId(userWithPasskey.getHardware().id())
-                .teamId(userWithPasskey.getTeam().getId())
+                .teamId(userWithPasskey.getTeam().id())
                 .userIsCaptain(false)
                 .build();
 
@@ -100,7 +100,7 @@ public final class SystemCleaner {
         }
 
         for (final Team team : TeamUtils.getAll()) {
-            TEAM_REQUEST_SENDER.delete(team.getId(), ADMIN_USER.userName(), ADMIN_USER.password());
+            TEAM_REQUEST_SENDER.delete(team.id(), ADMIN_USER.userName(), ADMIN_USER.password());
         }
 
         for (final Hardware hardware : HardwareUtils.getAll()) {

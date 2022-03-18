@@ -25,12 +25,6 @@
 package me.zodac.folding.api.tc;
 
 import java.util.Objects;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
 import me.zodac.folding.api.ResponsePojo;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
 
@@ -39,25 +33,15 @@ import me.zodac.folding.rest.api.tc.request.TeamRequest;
  * defined by the {@link Category}.
  *
  * <p>
- * While each {@link Team} is made up of {@link User}s we do not keep any reference to the {@link User} in this object.
+ * While each {@link Team} is made up of {@link User}s we do not keep any reference to the {@link User} in this class.
  */
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
-@Getter
-@EqualsAndHashCode
-@ToString(doNotUseGetters = true)
-public class Team implements ResponsePojo {
+public record Team(int id, String teamName, String teamDescription, String forumLink) implements ResponsePojo {
 
     /**
      * The default {@link Team} ID. Since the REST request would not know the ID until the DB has created the object,
      * we use this and update the ID later.
      */
     public static final int EMPTY_TEAM_ID = 0;
-
-    private final int id;
-    private final String teamName;
-    private final String teamDescription;
-    private final String forumLink;
 
     /**
      * Creates a {@link Team}.

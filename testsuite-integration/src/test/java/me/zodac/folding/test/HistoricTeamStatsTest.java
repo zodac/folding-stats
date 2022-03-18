@@ -81,9 +81,9 @@ class HistoricTeamStatsTest {
     void whenGettingHourlyStats_andValidTeamIdIsGiven_andAllUsersHaveNoStats_thenNoStatsAreReturned_andResponseHas200Status()
         throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        UserUtils.create(generateUserWithTeamId(team.getId()));
+        UserUtils.create(generateUserWithTeamId(team.id()));
 
-        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getHourlyTeamStats(team.getId(), Year.parse("2020"), Month.of(4), 12);
+        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getHourlyTeamStats(team.id(), Year.parse("2020"), Month.of(4), 12);
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -96,13 +96,13 @@ class HistoricTeamStatsTest {
     @Test
     void whenGettingHourlyStats_andValidTeamIdIsGiven_andUserHasSomeStats_thenStatsAreReturned_andResponseHas200Status() throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        final int userId = UserUtils.create(generateUserWithTeamId(team.getId())).getId();
+        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).getId();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-04-11 23:00:00", 0L, 0L, 0),
             TestStats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10)
         );
 
-        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getHourlyTeamStats(team.getId(), Year.parse("2020"), Month.of(4), 12);
+        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getHourlyTeamStats(team.id(), Year.parse("2020"), Month.of(4), 12);
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -116,14 +116,14 @@ class HistoricTeamStatsTest {
     void whenGettingHourlyStats_andTeamHasMultipleStatsForSingleUser_thenEachStatsEntryIsDiffedFromPreviousHour_andResponseHas200Status()
         throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        final int userId = UserUtils.create(generateUserWithTeamId(team.getId())).getId();
+        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).getId();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-04-11 23:00:00", 0L, 0L, 0),
             TestStats.create(userId, "2020-04-12 13:00:00", 20L, 200L, 2),
             TestStats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10)
         );
 
-        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getHourlyTeamStats(team.getId(), Year.parse("2020"), Month.of(4), 12);
+        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getHourlyTeamStats(team.id(), Year.parse("2020"), Month.of(4), 12);
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -145,7 +145,7 @@ class HistoricTeamStatsTest {
     void whenGettingHourlyStats_andUserHasMultipleStatsInSameHour_thenMaxStatsInHourAreReturned_andResponseHas200Status()
         throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        final int userId = UserUtils.create(generateUserWithTeamId(team.getId())).getId();
+        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).getId();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-04-11 23:00:00", 0L, 0L, 0),
             TestStats.create(userId, "2020-04-12 13:00:00", 50L, 500L, 5),
@@ -153,7 +153,7 @@ class HistoricTeamStatsTest {
             TestStats.create(userId, "2020-04-12 14:30:00", 110L, 1_100L, 11)
         );
 
-        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getHourlyTeamStats(team.getId(), Year.parse("2020"), Month.of(4), 12);
+        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getHourlyTeamStats(team.id(), Year.parse("2020"), Month.of(4), 12);
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -175,8 +175,8 @@ class HistoricTeamStatsTest {
     void whenGettingHourlyStats_andTeamHasMultipleUsersInSameHour_thenCombinedStatsForAllUsersAreReturned_andResponseHas200Status()
         throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        final int firstUserId = UserUtils.create(generateUserWithTeamIdAndCategory(team.getId(), Category.AMD_GPU)).getId();
-        final int secondUserId = UserUtils.create(generateUserWithTeamIdAndCategory(team.getId(), Category.NVIDIA_GPU)).getId();
+        final int firstUserId = UserUtils.create(generateUserWithTeamIdAndCategory(team.id(), Category.AMD_GPU)).getId();
+        final int secondUserId = UserUtils.create(generateUserWithTeamIdAndCategory(team.id(), Category.NVIDIA_GPU)).getId();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(firstUserId, "2020-04-11 23:00:00", 0L, 0L, 0),
             TestStats.create(secondUserId, "2020-04-11 23:00:00", 0L, 0L, 0),
@@ -187,7 +187,7 @@ class HistoricTeamStatsTest {
             TestStats.create(secondUserId, "2020-04-12 14:30:00", 200L, 2_000L, 20)
         );
 
-        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getHourlyTeamStats(team.getId(), Year.parse("2020"), Month.of(4), 12);
+        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getHourlyTeamStats(team.id(), Year.parse("2020"), Month.of(4), 12);
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -209,12 +209,12 @@ class HistoricTeamStatsTest {
     void whenGettingHourlyStats_givenRequestUsesPreviousEntityTag_andStatsHaveNotChanged_thenResponseHas304Status_andNoBody()
         throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        final int userId = UserUtils.create(generateUserWithTeamId(team.getId())).getId();
+        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).getId();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10)
         );
 
-        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getHourlyTeamStats(team.getId(), Year.parse("2020"), Month.of(4), 12);
+        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getHourlyTeamStats(team.id(), Year.parse("2020"), Month.of(4), 12);
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -222,7 +222,7 @@ class HistoricTeamStatsTest {
         final String eTag = getEntityTag(response);
 
         final HttpResponse<String> cachedResponse =
-            HISTORIC_STATS_REQUEST_SENDER.getHourlyTeamStats(team.getId(), Year.parse("2020"), Month.of(4), 12, eTag);
+            HISTORIC_STATS_REQUEST_SENDER.getHourlyTeamStats(team.id(), Year.parse("2020"), Month.of(4), 12, eTag);
         assertThat(cachedResponse.statusCode())
             .as("Expected second request to have a 304_NOT_MODIFIED HTTP response")
             .isEqualTo(HttpURLConnection.HTTP_NOT_MODIFIED);
@@ -264,11 +264,11 @@ class HistoricTeamStatsTest {
     @Test
     void whenGettingHourlyStats_andInvalidDateIsGiven_thenResponseHas400Status() throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        UserUtils.create(generateUserWithTeamId(team.getId()));
+        UserUtils.create(generateUserWithTeamId(team.id()));
         final int invalidDay = 35;
 
         final HttpResponse<String> response =
-            HISTORIC_STATS_REQUEST_SENDER.getHourlyTeamStats(team.getId(), Year.parse("2020"), Month.of(4), invalidDay);
+            HISTORIC_STATS_REQUEST_SENDER.getHourlyTeamStats(team.id(), Year.parse("2020"), Month.of(4), invalidDay);
         assertThat(response.statusCode())
             .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
@@ -278,9 +278,9 @@ class HistoricTeamStatsTest {
     void whenGettingDailyStats_andValidTeamIdIsGiven_andAllUsersHaveNoStats_thenNoStatsAreReturned_andResponseHas200Status()
         throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        UserUtils.create(generateUserWithTeamId(team.getId()));
+        UserUtils.create(generateUserWithTeamId(team.id()));
 
-        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getDailyTeamStats(team.getId(), Year.parse("2020"), Month.of(4));
+        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getDailyTeamStats(team.id(), Year.parse("2020"), Month.of(4));
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -293,12 +293,12 @@ class HistoricTeamStatsTest {
     @Test
     void whenGettingDailyStats_andValidTeamIdIsGiven_andUserHasSomeStats_thenStatsAreReturned_andResponseHas200Status() throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        final int userId = UserUtils.create(generateUserWithTeamId(team.getId())).getId();
+        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).getId();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10)
         );
 
-        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getDailyTeamStats(team.getId(), Year.parse("2020"), Month.of(4));
+        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getDailyTeamStats(team.id(), Year.parse("2020"), Month.of(4));
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -312,13 +312,13 @@ class HistoricTeamStatsTest {
     void whenGettingDailyStats_andTeamHasMultipleStatsForSameUser_thenEachStatsEntryIsDiffedFromPreviousDay_andResponseHas200Status()
         throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        final int userId = UserUtils.create(generateUserWithTeamId(team.getId())).getId();
+        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).getId();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-04-12 13:00:00", 20L, 200L, 2),
             TestStats.create(userId, "2020-04-13 13:00:00", 100L, 1_000L, 10)
         );
 
-        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getDailyTeamStats(team.getId(), Year.parse("2020"), Month.of(4));
+        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getDailyTeamStats(team.id(), Year.parse("2020"), Month.of(4));
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -339,14 +339,14 @@ class HistoricTeamStatsTest {
     @Test
     void whenGettingDailyStats_andUserHasMultipleStatsInSameDay_thenMaxStatsInDayAreReturned_andResponseHas200Status() throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        final int userId = UserUtils.create(generateUserWithTeamId(team.getId())).getId();
+        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).getId();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-04-12 13:00:00", 10L, 100L, 1),
             TestStats.create(userId, "2020-04-13 14:00:00", 50L, 500L, 5),
             TestStats.create(userId, "2020-04-13 15:00:00", 110L, 1_100L, 11)
         );
 
-        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getDailyTeamStats(team.getId(), Year.parse("2020"), Month.of(4));
+        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getDailyTeamStats(team.id(), Year.parse("2020"), Month.of(4));
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -368,8 +368,8 @@ class HistoricTeamStatsTest {
     void whenGettingDailyStats_andTeamHasMultipleUsersInSameDay_thenCombinedStatsForAllUsersAreReturned_andResponseHas200Status()
         throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        final int firstUserId = UserUtils.create(generateUserWithTeamIdAndCategory(team.getId(), Category.AMD_GPU)).getId();
-        final int secondUserId = UserUtils.create(generateUserWithTeamIdAndCategory(team.getId(), Category.NVIDIA_GPU)).getId();
+        final int firstUserId = UserUtils.create(generateUserWithTeamIdAndCategory(team.id(), Category.AMD_GPU)).getId();
+        final int secondUserId = UserUtils.create(generateUserWithTeamIdAndCategory(team.id(), Category.NVIDIA_GPU)).getId();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(firstUserId, "2020-04-12 13:00:00", 50L, 500L, 5),
             TestStats.create(secondUserId, "2020-04-12 13:00:00", 50L, 500L, 5),
@@ -378,7 +378,7 @@ class HistoricTeamStatsTest {
             TestStats.create(secondUserId, "2020-04-13 14:30:00", 200L, 2_000L, 20)
         );
 
-        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getDailyTeamStats(team.getId(), Year.parse("2020"), Month.of(4));
+        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getDailyTeamStats(team.id(), Year.parse("2020"), Month.of(4));
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -400,12 +400,12 @@ class HistoricTeamStatsTest {
     void whenGettingDailyStats_givenRequestUsesPreviousEntityTag_andStatsHaveNotChanged_thenResponseHas304Status_andNoBody()
         throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        final int userId = UserUtils.create(generateUserWithTeamId(team.getId())).getId();
+        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).getId();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10)
         );
 
-        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getDailyTeamStats(team.getId(), Year.parse("2020"), Month.of(4));
+        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getDailyTeamStats(team.id(), Year.parse("2020"), Month.of(4));
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -413,7 +413,7 @@ class HistoricTeamStatsTest {
         final String eTag = getEntityTag(response);
 
         final HttpResponse<String> cachedResponse =
-            HISTORIC_STATS_REQUEST_SENDER.getDailyTeamStats(team.getId(), Year.parse("2020"), Month.of(4), eTag);
+            HISTORIC_STATS_REQUEST_SENDER.getDailyTeamStats(team.id(), Year.parse("2020"), Month.of(4), eTag);
         assertThat(cachedResponse.statusCode())
             .as("Expected second request to have a 304_NOT_MODIFIED HTTP response")
             .isEqualTo(HttpURLConnection.HTTP_NOT_MODIFIED);
@@ -454,12 +454,12 @@ class HistoricTeamStatsTest {
     @Test
     void whenGettingDailyStats_andInvalidDateIsGiven_thenResponseHas400Status() throws FoldingRestException, IOException, InterruptedException {
         final Team team = TeamUtils.create(generateTeam());
-        UserUtils.create(generateUserWithTeamId(team.getId()));
+        UserUtils.create(generateUserWithTeamId(team.id()));
         final int invalidMonth = 25;
 
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(FOLDING_URL + "/historic/teams/" + team.getId() + '/' + "2020" + '/' + invalidMonth))
+            .uri(URI.create(FOLDING_URL + "/historic/teams/" + team.id() + '/' + "2020" + '/' + invalidMonth))
             .header("Content-Type", "application/json");
 
         final HttpRequest request = requestBuilder.build();
@@ -475,9 +475,9 @@ class HistoricTeamStatsTest {
     void whenGettingMonthlyStats_andValidTeamIdIsGiven_andAllUsersHaveNoStats_thenNoStatsAreReturned_andResponseHas200Status()
         throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        UserUtils.create(generateUserWithTeamId(team.getId()));
+        UserUtils.create(generateUserWithTeamId(team.id()));
 
-        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getMonthlyTeamStats(team.getId(), Year.parse("2020"));
+        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getMonthlyTeamStats(team.id(), Year.parse("2020"));
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -491,12 +491,12 @@ class HistoricTeamStatsTest {
     void whenGettingMonthlyStats_andValidTeamIdIsGiven_andUserHasSomeStats_thenStatsAreReturned_andResponseHas200Status()
         throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        final int userId = UserUtils.create(generateUserWithTeamId(team.getId())).getId();
+        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).getId();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10)
         );
 
-        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getMonthlyTeamStats(team.getId(), Year.parse("2020"));
+        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getMonthlyTeamStats(team.id(), Year.parse("2020"));
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -510,13 +510,13 @@ class HistoricTeamStatsTest {
     void whenGettingMonthlyStats_andUserHasMultipleStats_thenEachStatsEntryIsDiffedFromPreviousMonth_andResponseHas200Status()
         throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        final int userId = UserUtils.create(generateUserWithTeamId(team.getId())).getId();
+        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).getId();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-03-12 13:00:00", 20L, 200L, 2), // No diff from this result, since stats are reset each month
             TestStats.create(userId, "2020-04-12 13:00:00", 100L, 1_000L, 10)
         );
 
-        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getMonthlyTeamStats(team.getId(), Year.parse("2020"));
+        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getMonthlyTeamStats(team.id(), Year.parse("2020"));
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -538,14 +538,14 @@ class HistoricTeamStatsTest {
     void whenGettingMonthlyStats_andUserHasMultipleStatsInSameMonth_thenMaxStatsInMonthAreReturned_andResponseHas200Status()
         throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        final int userId = UserUtils.create(generateUserWithTeamId(team.getId())).getId();
+        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).getId();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-03-12 13:00:00", 50L, 500L, 5), // No diff from this result, since stats are reset each month
             TestStats.create(userId, "2020-04-13 14:00:00", 100L, 1_000L, 10),
             TestStats.create(userId, "2020-04-13 15:00:00", 110L, 1_100L, 11)
         );
 
-        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getMonthlyTeamStats(team.getId(), Year.parse("2020"));
+        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getMonthlyTeamStats(team.id(), Year.parse("2020"));
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -567,8 +567,8 @@ class HistoricTeamStatsTest {
     void whenGettingMonthlyStats_andTeamHasMultipleUsersInSameMonth_thenCombinedStatsForAllUsersAreReturned_andResponseHas200Status()
         throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        final int firstUserId = UserUtils.create(generateUserWithTeamIdAndCategory(team.getId(), Category.AMD_GPU)).getId();
-        final int secondUserId = UserUtils.create(generateUserWithTeamIdAndCategory(team.getId(), Category.NVIDIA_GPU)).getId();
+        final int firstUserId = UserUtils.create(generateUserWithTeamIdAndCategory(team.id(), Category.AMD_GPU)).getId();
+        final int secondUserId = UserUtils.create(generateUserWithTeamIdAndCategory(team.id(), Category.NVIDIA_GPU)).getId();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(firstUserId, "2020-03-12 13:00:00", 50L, 500L, 5), // No diff from this result, since stats are reset each month
             TestStats.create(secondUserId, "2020-03-12 13:00:00", 50L, 500L, 5),
@@ -577,7 +577,7 @@ class HistoricTeamStatsTest {
             TestStats.create(secondUserId, "2020-04-13 14:30:00", 200L, 2_000L, 20)
         );
 
-        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getMonthlyTeamStats(team.getId(), Year.parse("2020"));
+        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getMonthlyTeamStats(team.id(), Year.parse("2020"));
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -599,19 +599,19 @@ class HistoricTeamStatsTest {
     void whenGettingMonthlyStats_givenRequestUsesPreviousEntityTag_andStatsHaveNotChanged_thenResponseHas304Status_andNoBody()
         throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        final int userId = UserUtils.create(generateUserWithTeamId(team.getId())).getId();
+        final int userId = UserUtils.create(generateUserWithTeamId(team.id())).getId();
         DatabaseUtils.insertStats("user_tc_stats_hourly",
             TestStats.create(userId, "2020-04-12 14:00:00", 100L, 1_000L, 10)
         );
 
-        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getMonthlyTeamStats(team.getId(), Year.parse("2020"));
+        final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getMonthlyTeamStats(team.id(), Year.parse("2020"));
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final String eTag = getEntityTag(response);
 
-        final HttpResponse<String> cachedResponse = HISTORIC_STATS_REQUEST_SENDER.getMonthlyTeamStats(team.getId(), Year.parse("2020"), eTag);
+        final HttpResponse<String> cachedResponse = HISTORIC_STATS_REQUEST_SENDER.getMonthlyTeamStats(team.id(), Year.parse("2020"), eTag);
         assertThat(cachedResponse.statusCode())
             .as("Expected second request to have a 304_NOT_MODIFIED HTTP response")
             .isEqualTo(HttpURLConnection.HTTP_NOT_MODIFIED);
@@ -651,11 +651,11 @@ class HistoricTeamStatsTest {
     @Test
     void whenGettingMonthlyStats_andInvalidDateIsGiven_thenResponseHas400Status() throws FoldingRestException, IOException, InterruptedException {
         final Team team = TeamUtils.create(generateTeam());
-        UserUtils.create(generateUserWithTeamId(team.getId()));
+        UserUtils.create(generateUserWithTeamId(team.id()));
 
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(FOLDING_URL + "/historic/teams/" + team.getId() + "/invalidYear"))
+            .uri(URI.create(FOLDING_URL + "/historic/teams/" + team.id() + "/invalidYear"))
             .header("Content-Type", "application/json");
 
         final HttpRequest request = requestBuilder.build();

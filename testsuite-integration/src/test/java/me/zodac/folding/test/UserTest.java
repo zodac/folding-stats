@@ -228,7 +228,7 @@ class UserTest {
             .profileLink(createdUser.getProfileLink())
             .liveStatsLink(createdUser.getLiveStatsLink())
             .hardwareId(createdUser.getHardware().id())
-            .teamId(createdUser.getTeam().getId())
+            .teamId(createdUser.getTeam().id())
             .userIsCaptain(createdUser.isUserIsCaptain())
             .build();
         StubbedFoldingEndpointUtils.enableUser(userToUpdate);
@@ -375,7 +375,7 @@ class UserTest {
             .profileLink(createdUser.getProfileLink())
             .liveStatsLink(createdUser.getLiveStatsLink())
             .hardwareId(createdUser.getHardware().id())
-            .teamId(createdUser.getTeam().getId())
+            .teamId(createdUser.getTeam().id())
             .userIsCaptain(createdUser.isUserIsCaptain())
             .build();
         StubbedFoldingEndpointUtils.enableUser(userToUpdate);
@@ -446,7 +446,7 @@ class UserTest {
             .profileLink(createdUser.getProfileLink())
             .liveStatsLink(createdUser.getLiveStatsLink())
             .hardwareId(createdUser.getHardware().id())
-            .teamId(createdUser.getTeam().getId())
+            .teamId(createdUser.getTeam().id())
             .userIsCaptain(createdUser.isUserIsCaptain())
             .build();
 
@@ -563,7 +563,7 @@ class UserTest {
             .profileLink(createdUser.getProfileLink())
             .liveStatsLink(createdUser.getLiveStatsLink())
             .hardwareId(createdUser.getHardware().id())
-            .teamId(createdUser.getTeam().getId())
+            .teamId(createdUser.getTeam().id())
             .userIsCaptain(createdUser.isUserIsCaptain())
             .build();
         StubbedFoldingEndpointUtils.enableUser(userToUpdate);
@@ -693,7 +693,7 @@ class UserTest {
             .profileLink(createdUser.getProfileLink())
             .liveStatsLink("")
             .hardwareId(createdUser.getHardware().id())
-            .teamId(createdUser.getTeam().getId())
+            .teamId(createdUser.getTeam().id())
             .userIsCaptain(createdUser.isUserIsCaptain())
             .build();
 
@@ -763,7 +763,7 @@ class UserTest {
     @Test
     void whenUpdatingTeam_givenUserIsOnTheTeam_thenUserWillReflectTheChanges_andResponseHas200Status() throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
-        final UserRequest userRequest = generateUserWithTeamId(team.getId());
+        final UserRequest userRequest = generateUserWithTeamId(team.id());
         final User user = create(userRequest);
         final User initialUser = UserUtils.get(user.getId());
 
@@ -773,12 +773,12 @@ class UserTest {
 
         final TeamRequest teamUpdateRequest = TeamRequest.builder()
             .teamName("updatedTeamName")
-            .teamDescription(team.getTeamDescription())
-            .forumLink(team.getForumLink())
+            .teamDescription(team.teamDescription())
+            .forumLink(team.forumLink())
             .build();
 
         final HttpResponse<String> response =
-            TEAM_REQUEST_SENDER.update(team.getId(), teamUpdateRequest, ADMIN_USER.userName(), ADMIN_USER.password());
+            TEAM_REQUEST_SENDER.update(team.id(), teamUpdateRequest, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -818,7 +818,7 @@ class UserTest {
             .passkey("DummyPasskey12345678901234567890")
             .category(Category.AMD_GPU.toString())
             .hardwareId(newHardware.id())
-            .teamId(existingCaptain.getTeam().getId())
+            .teamId(existingCaptain.getTeam().id())
             .userIsCaptain(true)
             .build();
 
@@ -847,7 +847,7 @@ class UserTest {
             .passkey("DummyPasskey12345678901234567890")
             .category(Category.AMD_GPU.toString())
             .hardwareId(newHardware.id())
-            .teamId(existingCaptain.getTeam().getId())
+            .teamId(existingCaptain.getTeam().id())
             .build());
 
         final User retrievedExistingCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(existingCaptain.getId()));
@@ -865,7 +865,7 @@ class UserTest {
             .passkey("DummyPasskey12345678901234567890")
             .category(Category.AMD_GPU.toString())
             .hardwareId(newHardware.id())
-            .teamId(existingCaptain.getTeam().getId())
+            .teamId(existingCaptain.getTeam().id())
             .userIsCaptain(true)
             .build());
 
@@ -901,7 +901,7 @@ class UserTest {
             .passkey(firstTeamCaptain.getPasskey())
             .category(Category.WILDCARD.toString())
             .hardwareId(firstTeamCaptain.getHardware().id())
-            .teamId(secondTeamCaptain.getTeam().getId())
+            .teamId(secondTeamCaptain.getTeam().id())
             .userIsCaptain(firstTeamCaptain.isUserIsCaptain())
             .build());
 
