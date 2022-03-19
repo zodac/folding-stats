@@ -65,7 +65,7 @@ public record UserAuthenticationResult(boolean userExists, boolean passwordMatch
     /**
      * Checks if the {@code userRoles} of the {@link UserAuthenticationResult} contain the 'admin' user role.
      *
-     * @return <code>true</code> if the {@code userRoles} contains the 'admin' user role
+     * @return {@code true} if the {@code userRoles} contains the 'admin' user role
      */
     public boolean isAdmin() {
         return userRoles.contains(ADMIN_ROLE);

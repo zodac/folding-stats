@@ -30,7 +30,7 @@ import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.util.DateTimeUtils;
 
 /**
- * POJO defining a {@link UserChange} to request a change for a <code>Team Competition</code> {@link User} that must be approved/rejected by an admin.
+ * POJO defining a {@link UserChange} to request a change for a {@code Team Competition} {@link User} that must be approved/rejected by an admin.
  *
  * @param id                  the ID
  * @param createdUtcTimestamp the UTC {@link LocalDateTime} for when the {@link UserChange} was created

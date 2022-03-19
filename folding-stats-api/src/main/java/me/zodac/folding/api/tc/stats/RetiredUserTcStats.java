@@ -32,7 +32,7 @@ import me.zodac.folding.api.tc.User;
 
 /**
  * POJO that extends {@link UserTcStats} adding a retired user ID, team ID and a display name.When a
- * {@link me.zodac.folding.api.tc.User} is deleted, their stats are stored for the remainder of the <code>Team Competition</code>
+ * {@link me.zodac.folding.api.tc.User} is deleted, their stats are stored for the remainder of the {@code Team Competition}
  * period for their team.
  */
 @Getter

@@ -34,12 +34,12 @@ import java.util.Map;
 public final class EncodingUtils {
 
     /**
-     * Key for the <code>username</code> value returned by {@link #decodeAuthentication(String)} and {@link #decodeBasicAuthentication(String)}.
+     * Key for the {@code username} value returned by {@link #decodeAuthentication(String)} and {@link #decodeBasicAuthentication(String)}.
      */
     public static final String DECODED_USERNAME_KEY = "userName";
 
     /**
-     * Key for the <code>password</code> value returned by {@link #decodeAuthentication(String)} and {@link #decodeBasicAuthentication(String)}.
+     * Key for the {@code password} value returned by {@link #decodeAuthentication(String)} and {@link #decodeBasicAuthentication(String)}.
      */
     public static final String DECODED_PASSWORD_KEY = "password";
 
@@ -74,7 +74,7 @@ public final class EncodingUtils {
      * Checks if the authorization payload contains the {@value BASIC_AUTHENTICATION_SCHEME} authentication scheme.
      *
      * @param authorizationPayload the value to check
-     * @return <code>true</code> if the value is <b>not</b> a basic authentication payload
+     * @return {@code true} if the value is <b>not</b> a basic authentication payload
      */
     public static boolean isInvalidBasicAuthentication(final String authorizationPayload) {
         return authorizationPayload == null || !authorizationPayload.contains(BASIC_AUTHENTICATION_SCHEME);

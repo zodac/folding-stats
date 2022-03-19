@@ -38,7 +38,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
- * {@link Scheduled} {@link Component} which schedules the <code>Team Competition</code> stats retrieval for the system. The
+ * {@link Scheduled} {@link Component} which schedules the {@code Team Competition} stats retrieval for the system. The
  * system will update stats using {@link UserStatsParser} every hour at <b>55</b> minutes past the hour.
  * It will also only run from the 3rd of the month until the end of the month.
  */
@@ -55,7 +55,7 @@ public class StatsScheduler {
     private UserStatsParser userStatsParser;
 
     /**
-     * Scheduled execution to parse <code>Team Competition</code> stats.
+     * Scheduled execution to parse {@code Team Competition} stats.
      */
     @Scheduled(cron = "0 55 * 3-31 * *", zone = "UTC")
     public void scheduledTeamCompetitionStatsParsing() {

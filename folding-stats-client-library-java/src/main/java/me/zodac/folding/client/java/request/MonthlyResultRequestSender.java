@@ -51,7 +51,7 @@ public record MonthlyResultRequestSender(String monthlyResultUrl) {
     /**
      * Create an instance of {@link MonthlyResultRequestSender}.
      *
-     * @param foldingUrl the root URL of the <code>/folding</code> endpoint, i.e:
+     * @param foldingUrl the root URL of the {@code /folding} endpoint, i.e:
      *                   <pre>http://127.0.0.1:8080/folding</pre>
      * @return the created {@link MonthlyResultRequestSender}
      */
@@ -81,10 +81,10 @@ public record MonthlyResultRequestSender(String monthlyResultUrl) {
      * <b>NOTE:</b> The {@link me.zodac.folding.api.tc.result.MonthlyResult} are based on {@link java.time.ZoneOffset#UTC}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.api.tc.result.MonthlyResult} based on the <code>ETag</code>, an empty
+     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.api.tc.result.MonthlyResult} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
-     * @param entityTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached
+     * @param entityTag the {@code ETag} from a previous {@link HttpResponse}, to retrieve a cached
      *                  {@link me.zodac.folding.api.tc.result.MonthlyResult}
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
@@ -117,12 +117,12 @@ public record MonthlyResultRequestSender(String monthlyResultUrl) {
      * <b>NOTE:</b> The {@link me.zodac.folding.api.tc.result.MonthlyResult} are based on {@link java.time.ZoneOffset#UTC}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.api.tc.result.MonthlyResult} based on the <code>ETag</code>, an empty
+     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.api.tc.result.MonthlyResult} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
      * @param year      the {@link Year} of the {@link me.zodac.folding.api.tc.result.MonthlyResult}
      * @param month     the {@link Month} of the {@link me.zodac.folding.api.tc.result.MonthlyResult}
-     * @param entityTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached
+     * @param entityTag the {@code ETag} from a previous {@link HttpResponse}, to retrieve a cached
      *                  {@link me.zodac.folding.api.tc.result.MonthlyResult}
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
@@ -151,7 +151,7 @@ public record MonthlyResultRequestSender(String monthlyResultUrl) {
     }
 
     /**
-     * Sends a <b>POST</b> request to manually save the result of the <code>Team Competition</code> for the current month.
+     * Sends a <b>POST</b> request to manually save the result of the {@code Team Competition} for the current month.
      *
      * @param userName the username
      * @param password the password

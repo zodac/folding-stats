@@ -76,7 +76,7 @@ public enum SystemState {
     /**
      * Checks if a {@link OperationType#READ} operation is blocked by the {@link SystemState}.
      *
-     * @return <code>true</code> if {@link OperationType#READ} operations are blocked
+     * @return {@code true} if {@link OperationType#READ} operations are blocked
      */
     public boolean isReadBlocked() {
         return !permittedOperationTypes.contains(READ);
@@ -85,7 +85,7 @@ public enum SystemState {
     /**
      * Checks if a {@link OperationType#WRITE} operation is blocked by the {@link SystemState}.
      *
-     * @return <code>true</code> if {@link OperationType#WRITE} operations are blocked
+     * @return {@code true} if {@link OperationType#WRITE} operations are blocked
      */
     public boolean isWriteBlocked() {
         return !permittedOperationTypes.contains(WRITE);

@@ -30,12 +30,12 @@ package me.zodac.folding.rest.api.header;
 public enum ContentType {
 
     /**
-     * The <code>application/json</code> value.
+     * The {@code application/json} value.
      */
     JSON("application/json"),
 
     /**
-     * The <code>plain/text</code> value.
+     * The {@code plain/text} value.
      */
     TEXT("plain/text");
 

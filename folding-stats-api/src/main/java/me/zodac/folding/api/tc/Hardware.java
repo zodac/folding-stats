@@ -29,7 +29,7 @@ import me.zodac.folding.api.ResponsePojo;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 
 /**
- * POJO defining a piece of {@link Hardware} for use in the <code>Team Competition</code>.
+ * POJO defining a piece of {@link Hardware} for use in the {@code Team Competition}.
  *
  * <p>
  * Each {@link Hardware} will have a multiplier which is calculated from the LARS PPD database, where the best piece of {@link Hardware} has a
@@ -40,7 +40,7 @@ import me.zodac.folding.rest.api.tc.request.HardwareRequest;
  *
  * @param id           the ID
  * @param hardwareName the LARS DB name
- * @param displayName  the display name for the <code>Team Competition</code>
+ * @param displayName  the display name for the {@code Team Competition}
  * @param hardwareMake the {@link HardwareMake} of the {@link Hardware}
  * @param hardwareType the {@link HardwareType} of the {@link Hardware}
  * @param multiplier   the calculated multiplier
@@ -70,7 +70,7 @@ public record Hardware(int id,
      *
      * @param id           the ID
      * @param hardwareName the LARS DB name
-     * @param displayName  the display name for the <code>Team Competition</code>
+     * @param displayName  the display name for the {@code Team Competition}
      * @param hardwareMake the {@link HardwareMake} of the {@link Hardware}
      * @param hardwareType the {@link HardwareType} of the {@link Hardware}
      * @param multiplier   the calculated multiplier
@@ -94,7 +94,7 @@ public record Hardware(int id,
      * Since we do not know the ID until the DB has persisted the {@link Hardware}, the {@link #EMPTY_HARDWARE_ID} will be used instead.
      *
      * @param hardwareName the LARS DB name
-     * @param displayName  the display name for the <code>Team Competition</code>
+     * @param displayName  the display name for the {@code Team Competition}
      * @param hardwareMake the {@link HardwareMake} of the {@link Hardware}
      * @param hardwareType the {@link HardwareType} of the {@link Hardware}
      * @param multiplier   the calculated multiplier
@@ -164,7 +164,7 @@ public record Hardware(int id,
      * if it is the same as an existing {@link Hardware}.
      *
      * @param hardwareRequest input {@link HardwareRequest}
-     * @return <code>true</code> if the input{@link HardwareRequest} is equal to the {@link Hardware}
+     * @return {@code true} if the input{@link HardwareRequest} is equal to the {@link Hardware}
      */
     public boolean isEqualRequest(final HardwareRequest hardwareRequest) {
         return Double.compare(multiplier, hardwareRequest.getMultiplier()) == 0

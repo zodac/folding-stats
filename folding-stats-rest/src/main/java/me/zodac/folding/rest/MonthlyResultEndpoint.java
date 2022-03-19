@@ -50,7 +50,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * REST endpoints for <code>Team Competition</code> {@link MonthlyResult}s.
+ * REST endpoints for {@code Team Competition} {@link MonthlyResult}s.
  */
 @RestController
 @RequestMapping("/results")

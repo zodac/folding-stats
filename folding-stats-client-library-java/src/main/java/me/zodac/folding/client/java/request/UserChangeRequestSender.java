@@ -51,7 +51,7 @@ public record UserChangeRequestSender(String requestUrl) {
     /**
      * Create an instance of {@link UserChangeRequestSender}.
      *
-     * @param foldingUrl the root URL of the <code>/folding</code> endpoint, i.e:
+     * @param foldingUrl the root URL of the {@code /folding} endpoint, i.e:
      *                   <pre>http://127.0.0.1:8080/folding</pre>
      * @return the created {@link UserChangeRequestSender}
      */

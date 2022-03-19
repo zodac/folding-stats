@@ -41,20 +41,20 @@ public final class HttpResponseHeaderUtils {
     }
 
     /**
-     * Retrieves the value of the <code>ETag</code> header from the {@link HttpResponse}.
+     * Retrieves the value of the {@code ETag} header from the {@link HttpResponse}.
      *
-     * @param response the {@link HttpResponse} from which to extract the <code>ETag</code> header
-     * @return the value of the <code>ETag</code> header
+     * @param response the {@link HttpResponse} from which to extract the {@code ETag} header
+     * @return the value of the {@code ETag} header
      */
     public static String getEntityTag(final HttpResponse<String> response) {
         return getHeader(response, "ETag");
     }
 
     /**
-     * Retrieves the value of the <code>X-Total-Count</code> header from the {@link HttpResponse}.
+     * Retrieves the value of the {@code X-Total-Count} header from the {@link HttpResponse}.
      *
-     * @param response the {@link HttpResponse} from which to extract the <code>X-Total-Count</code> header
-     * @return the value of the <code>X-Total-Count</code> header
+     * @param response the {@link HttpResponse} from which to extract the {@code X-Total-Count} header
+     * @return the value of the {@code X-Total-Count} header
      */
     public static int getTotalCount(final HttpResponse<String> response) {
         final String headerValue = getHeader(response, "X-Total-Count");

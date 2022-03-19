@@ -33,7 +33,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Summary of the total stats of the <code>Team Competition</code>.
+ * Summary of the total stats of the {@code Team Competition}.
  */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)

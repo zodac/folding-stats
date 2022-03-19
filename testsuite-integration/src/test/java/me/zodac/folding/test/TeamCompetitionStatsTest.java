@@ -81,7 +81,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for the <code>Team Competition</code> stats calculation.
+ * Tests for the {@code Team Competition} stats calculation.
  *
  * <p>
  * Since the TC stats are done on the full system (meaning all {@link Team}s), we wipe the system before each test with a {@link BeforeEach} method.

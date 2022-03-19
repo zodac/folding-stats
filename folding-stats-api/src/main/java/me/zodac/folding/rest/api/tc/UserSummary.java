@@ -34,7 +34,7 @@ import lombok.ToString;
 import me.zodac.folding.api.tc.User;
 
 /**
- * Summary of the stats of an active {@link User} in the <code>Team Competition</code>.
+ * Summary of the stats of an active {@link User} in the {@code Team Competition}.
  */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)

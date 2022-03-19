@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
- * Intercepts all REST requests and sets the <code>Access-Control-*</code> headers.
+ * Intercepts all REST requests and sets the {@code Access-Control-*} headers.
  */
 @Component
 public class CorsFilter extends OncePerRequestFilter {

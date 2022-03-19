@@ -39,16 +39,16 @@ import me.zodac.folding.rest.api.tc.AllTeamsSummary;
 import me.zodac.folding.rest.util.RestUtilConstants;
 
 /**
- * Convenience class to send HTTP requests to the <code>Team Competition</code> stats REST endpoint.
+ * Convenience class to send HTTP requests to the {@code Team Competition} stats REST endpoint.
  *
- * @param statsUrl the URL to the <code>Team Competition</code> stats} REST endpoint
+ * @param statsUrl the URL to the {@code Team Competition} stats} REST endpoint
  */
 public record TeamCompetitionStatsRequestSender(String statsUrl) {
 
     /**
      * Create an instance of {@link TeamCompetitionStatsRequestSender}.
      *
-     * @param foldingUrl the root URL of the <code>/folding</code> endpoint, i.e:
+     * @param foldingUrl the root URL of the {@code /folding} endpoint, i.e:
      *                   <pre>http://127.0.0.1:8080/folding</pre>
      * @return the created {@link TeamCompetitionStatsRequestSender}
      */
@@ -58,7 +58,7 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
     }
 
     /**
-     * Send a <b>GET</b> request to retrieve the <code>Team Competition</code> {@link AllTeamsSummary}.
+     * Send a <b>GET</b> request to retrieve the {@code Team Competition} {@link AllTeamsSummary}.
      *
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
@@ -69,13 +69,13 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
     }
 
     /**
-     * Send a <b>GET</b> request to retrieve the <code>Team Competition</code> {@link AllTeamsSummary}.
+     * Send a <b>GET</b> request to retrieve the {@code Team Competition} {@link AllTeamsSummary}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached {@link AllTeamsSummary} based on the <code>ETag</code>, an empty
+     * <b>NOTE:</b> If the server has a cached {@link AllTeamsSummary} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
-     * @param entityTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached
+     * @param entityTag the {@code ETag} from a previous {@link HttpResponse}, to retrieve a cached
      *                  {@link AllTeamsSummary}
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
@@ -104,7 +104,7 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
     }
 
     /**
-     * Send a <b>GET</b> request to retrieve the <code>Team Competition</code> {@link AllTeamsSummary}.
+     * Send a <b>GET</b> request to retrieve the {@code Team Competition} {@link AllTeamsSummary}.
      *
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
@@ -115,13 +115,13 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
     }
 
     /**
-     * Send a <b>GET</b> request to retrieve the <code>Team Competition</code> {@link AllTeamsSummary}.
+     * Send a <b>GET</b> request to retrieve the {@code Team Competition} {@link AllTeamsSummary}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached {@link AllTeamsSummary} based on the <code>ETag</code>, an empty
+     * <b>NOTE:</b> If the server has a cached {@link AllTeamsSummary} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
-     * @param entityTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached
+     * @param entityTag the {@code ETag} from a previous {@link HttpResponse}, to retrieve a cached
      *                  {@link AllTeamsSummary}
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
@@ -150,7 +150,7 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
     }
 
     /**
-     * Send a <b>GET</b> request to retrieve the <code>Team Competition</code> {@link me.zodac.folding.rest.api.tc.UserSummary} for a
+     * Send a <b>GET</b> request to retrieve the {@code Team Competition} {@link me.zodac.folding.rest.api.tc.UserSummary} for a
      * {@link me.zodac.folding.api.tc.User}.
      *
      * @param userId the ID of the {@link me.zodac.folding.api.tc.User} whose {@link me.zodac.folding.rest.api.tc.UserSummary} is to be retrieved
@@ -163,15 +163,15 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
     }
 
     /**
-     * Send a <b>GET</b> request to retrieve the <code>Team Competition</code> {@link me.zodac.folding.rest.api.tc.UserSummary} for a
+     * Send a <b>GET</b> request to retrieve the {@code Team Competition} {@link me.zodac.folding.rest.api.tc.UserSummary} for a
      * {@link me.zodac.folding.api.tc.User}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.rest.api.tc.UserSummary} based on the <code>ETag</code>, an empty
+     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.rest.api.tc.UserSummary} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
      * @param userId    the ID of the {@link me.zodac.folding.api.tc.User} whose {@link me.zodac.folding.rest.api.tc.UserSummary} is to be retrieved
-     * @param entityTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached
+     * @param entityTag the {@code ETag} from a previous {@link HttpResponse}, to retrieve a cached
      *                  {@link me.zodac.folding.rest.api.tc.UserSummary}
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
@@ -200,7 +200,7 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
     }
 
     /**
-     * Send a <b>GET</b> request to retrieve the overall <code>Team Competition</code> {@link me.zodac.folding.api.tc.Team} leaderboard.
+     * Send a <b>GET</b> request to retrieve the overall {@code Team Competition} {@link me.zodac.folding.api.tc.Team} leaderboard.
      *
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
@@ -211,12 +211,12 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
     }
 
     /**
-     * Send a <b>GET</b> request to retrieve the overall <code>Team Competition</code> {@link me.zodac.folding.api.tc.Team} leaderboard.
+     * Send a <b>GET</b> request to retrieve the overall {@code Team Competition} {@link me.zodac.folding.api.tc.Team} leaderboard.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached {@link HttpResponse} based on the <code>ETag</code>, an empty {@link HttpResponse#body()} is returned.
+     * <b>NOTE:</b> If the server has a cached {@link HttpResponse} based on the {@code ETag}, an empty {@link HttpResponse#body()} is returned.
      *
-     * @param entityTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached {@link HttpResponse}
+     * @param entityTag the {@code ETag} from a previous {@link HttpResponse}, to retrieve a cached {@link HttpResponse}
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      * @see #getTeamLeaderboard()
@@ -244,7 +244,7 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
     }
 
     /**
-     * Send a <b>GET</b> request to retrieve the <code>Team Competition</code> category leaderboard.
+     * Send a <b>GET</b> request to retrieve the {@code Team Competition} category leaderboard.
      *
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
@@ -255,12 +255,12 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
     }
 
     /**
-     * Send a <b>GET</b> request to retrieve the <code>Team Competition</code> category leaderboard.
+     * Send a <b>GET</b> request to retrieve the {@code Team Competition} category leaderboard.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached {@link HttpResponse} based on the <code>ETag</code>, an empty {@link HttpResponse#body()} is returned.
+     * <b>NOTE:</b> If the server has a cached {@link HttpResponse} based on the {@code ETag}, an empty {@link HttpResponse#body()} is returned.
      *
-     * @param entityTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached{@link HttpResponse}
+     * @param entityTag the {@code ETag} from a previous {@link HttpResponse}, to retrieve a cached{@link HttpResponse}
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      * @see #getCategoryLeaderboard()
@@ -288,7 +288,7 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
     }
 
     /**
-     * Sends a <b>POST</b> request to manually trigger an update of the <code>Team Competition</code> stats for all
+     * Sends a <b>POST</b> request to manually trigger an update of the {@code Team Competition} stats for all
      * {@link me.zodac.folding.api.tc.User}s and {@link me.zodac.folding.api.tc.Team}s.
      *
      * <p>
@@ -305,7 +305,7 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
     }
 
     /**
-     * Sends a <b>POST</b> request to manually trigger an update of the <code>Team Competition</code> stats for all
+     * Sends a <b>POST</b> request to manually trigger an update of the {@code Team Competition} stats for all
      * {@link me.zodac.folding.api.tc.User}s and {@link me.zodac.folding.api.tc.Team}s.
      *
      * @param async    should the update be performed asynchronously, or wait for the result
@@ -333,7 +333,7 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
     }
 
     /**
-     * Sends a <b>POST</b> request to manually reset the <code>Team Competition</code> stats for all {@link me.zodac.folding.api.tc.User}s and
+     * Sends a <b>POST</b> request to manually reset the {@code Team Competition} stats for all {@link me.zodac.folding.api.tc.User}s and
      * {@link me.zodac.folding.api.tc.Team}s.
      *
      * @param userName the username

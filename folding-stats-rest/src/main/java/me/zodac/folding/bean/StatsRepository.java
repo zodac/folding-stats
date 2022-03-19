@@ -49,7 +49,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * {@link Component} used for CRUD operations for <code>folding-stats</code> stats classes:
+ * {@link Component} used for CRUD operations for {@code folding-stats} stats classes:
  * <ul>
  *     <li>{@link AllTeamsSummary}</li>
  *     <li>{@link HistoricStats}</li>
@@ -78,10 +78,10 @@ public class StatsRepository {
     }
 
     /**
-     * Creates a {@link MonthlyResult} for the <code>Team Competition</code>.
+     * Creates a {@link MonthlyResult} for the {@code Team Competition}.
      *
-     * @param monthlyResult a {@link MonthlyResult} for the <code>Team Competition</code>
-     * @return the <code>Team Competition</code> {@link MonthlyResult}
+     * @param monthlyResult a {@link MonthlyResult} for the {@code Team Competition}
+     * @return the {@code Team Competition} {@link MonthlyResult}
      */
 
     public MonthlyResult createMonthlyResult(final MonthlyResult monthlyResult) {
@@ -89,11 +89,11 @@ public class StatsRepository {
     }
 
     /**
-     * Retrieves the {@link MonthlyResult} of the <code>Team Competition</code> for the provided {@link Month} and {@link Year}.
+     * Retrieves the {@link MonthlyResult} of the {@code Team Competition} for the provided {@link Month} and {@link Year}.
      *
      * @param month the {@link Month} of the {@link MonthlyResult} to be retrieved
      * @param year  the {@link Year} of the {@link MonthlyResult} to be retrieved
-     * @return an {@link Optional} of the <code>Team Competition</code> {@link MonthlyResult}
+     * @return an {@link Optional} of the {@code Team Competition} {@link MonthlyResult}
      */
 
     public Optional<MonthlyResult> getMonthlyResult(final Month month, final Year year) {
@@ -214,7 +214,7 @@ public class StatsRepository {
     }
 
     /**
-     * Creates a {@link UserTcStats} for a {@link User}'s <code>Team Competition</code> stats for a specific hour.
+     * Creates a {@link UserTcStats} for a {@link User}'s {@code Team Competition} stats for a specific hour.
      *
      * @param userTcStats the {@link UserTcStats} to be created
      * @return the created {@link UserTcStats}
@@ -266,7 +266,7 @@ public class StatsRepository {
     }
 
     /**
-     * Resets all {@link User}s for the <code>Team Competition</code>. Performs the following actions:
+     * Resets all {@link User}s for the {@code Team Competition}. Performs the following actions:
      *
      * <ul>
      *      <li>

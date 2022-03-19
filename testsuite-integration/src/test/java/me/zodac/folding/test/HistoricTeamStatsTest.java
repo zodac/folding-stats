@@ -61,7 +61,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for <code>Team Competition</code> {@link HistoricStats} for {@link Team}s.
+ * Tests for {@code Team Competition} {@link HistoricStats} for {@link Team}s.
  */
 class HistoricTeamStatsTest {
 

@@ -51,7 +51,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * {@link Component} used for CRUD operations for <code>folding-stats</code> classes:
+ * {@link Component} used for CRUD operations for {@code folding-stats} classes:
  * <ul>
  *     <li>{@link Hardware}</li>
  *     <li>{@link Team}</li>

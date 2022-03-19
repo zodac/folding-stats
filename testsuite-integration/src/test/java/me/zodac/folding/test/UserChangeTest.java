@@ -62,7 +62,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for the {@link User} REST endpoint at <code>/folding/change</code>.
+ * Tests for the {@link User} REST endpoint at {@code /folding/change}.
  */
 class UserChangeTest {
 

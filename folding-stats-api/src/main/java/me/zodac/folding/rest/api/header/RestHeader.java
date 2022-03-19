@@ -30,22 +30,22 @@ package me.zodac.folding.rest.api.header;
 public enum RestHeader {
 
     /**
-     * The <code>Authorization</code> header.
+     * The {@code Authorization} header.
      */
     AUTHORIZATION("Authorization"),
 
     /**
-     * The <code>Cache-Control</code> header.
+     * The {@code Cache-Control} header.
      */
     CACHE_CONTROL("Cache-Control"),
 
     /**
-     * The <code>Content-Type</code> header.
+     * The {@code Content-Type} header.
      */
     CONTENT_TYPE("Content-Type"),
 
     /**
-     * The <code>If-None-Match</code> header.
+     * The {@code If-None-Match} header.
      */
     IF_NONE_MATCH("If-None-Match");
 

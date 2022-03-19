@@ -68,7 +68,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 /**
- * Tests for the monthly reset of the <code>Team Competition</code> {@link AllTeamsSummary}.
+ * Tests for the monthly reset of the {@code Team Competition} {@link AllTeamsSummary}.
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ResetTest {

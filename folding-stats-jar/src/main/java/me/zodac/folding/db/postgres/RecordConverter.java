@@ -247,7 +247,7 @@ final class RecordConverter {
      * Convert a {@link Record} into an appropriate {@link UserAuthenticationResult}.
      *
      * <p>
-     * Expects a field called <code>is_password_match</code> as a {@link Boolean} value determining whether
+     * Expects a field called {@code is_password_match} as a {@link Boolean} value determining whether
      * a supplied password matches the hashed value in the DB.
      *
      * @param systemUsersRecord the {@link Record} to convert

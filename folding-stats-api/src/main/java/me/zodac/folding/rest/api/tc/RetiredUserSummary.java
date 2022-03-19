@@ -34,7 +34,7 @@ import lombok.ToString;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 
 /**
- * Summary of the stats of a retired {@link me.zodac.folding.api.tc.User} in the <code>Team Competition</code>.
+ * Summary of the stats of a retired {@link me.zodac.folding.api.tc.User} in the {@code Team Competition}.
  */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)

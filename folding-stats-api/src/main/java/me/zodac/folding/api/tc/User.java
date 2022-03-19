@@ -30,7 +30,7 @@ import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 
 /**
- * POJO defining a single {@link User} Folding on a username/passkey combination to participate in the <code>Team Competition</code>.
+ * POJO defining a single {@link User} Folding on a username/passkey combination to participate in the {@code Team Competition}.
  *
  * <p>
  * Ideally this username/passkey will only be used on a single piece of {@link Hardware}. Though we cannot verify
@@ -41,7 +41,7 @@ import me.zodac.folding.rest.api.tc.request.UserRequest;
  *
  * <p>
  * Each {@link User} can join a {@link Team} in order to have their Folding@Home stats retrieved, and they can
- * contribute to the <code>Team Competition</code>.
+ * contribute to the {@code Team Competition}.
  */
 public record User(int id,
                    String foldingUserName,
@@ -72,7 +72,7 @@ public record User(int id,
      *
      * @param userId          the ID
      * @param foldingUserName the Folding@Home username
-     * @param displayName     the display name for the <code>Team Competition</code>
+     * @param displayName     the display name for the {@code Team Competition}
      * @param passkey         the Folding@Home passkey for this user
      * @param category        the {@link Category} the user is eligible for when added to a {@link Team}
      * @param profileLink     a URL linking to the {@link User}'s profile on their forum
@@ -104,7 +104,7 @@ public record User(int id,
      * Since we do not know the ID until the DB has persisted the {@link User}, the {@link #EMPTY_USER_ID} will be used instead.
      *
      * @param foldingUserName the Folding@Home username
-     * @param displayName     the display name for the <code>Team Competition</code>
+     * @param displayName     the display name for the {@code Team Competition}
      * @param passkey         the Folding@Home passkey for this user
      * @param category        the {@link Category} the user is eligible for when added to a {@link Team}
      * @param profileLink     a URL linking to the {@link User}'s profile on their forum
@@ -239,7 +239,7 @@ public record User(int id,
      * if it is the same as an existing {@link User}.
      *
      * @param userRequest input {@link UserRequest}
-     * @return <code>true</code> if the input{@link UserRequest} is equal to the {@link User}
+     * @return {@code true} if the input{@link UserRequest} is equal to the {@link User}
      */
     public boolean isEqualRequest(final UserRequest userRequest) {
         return hardware.id() == userRequest.getHardwareId()

@@ -35,7 +35,7 @@ import me.zodac.folding.rest.api.tc.leaderboard.TeamLeaderboardEntry;
 import me.zodac.folding.rest.api.tc.leaderboard.UserCategoryLeaderboardEntry;
 
 /**
- * POJO containing the overall result for a single month of the <code>Team Competition</code>.
+ * POJO containing the overall result for a single month of the {@code Team Competition}.
  *
  * @param teamLeaderboard         the leaderboard for {@link me.zodac.folding.api.tc.Team}s
  * @param userCategoryLeaderboard the leaderboard for {@link me.zodac.folding.api.tc.User} {@link Category}s
@@ -123,7 +123,7 @@ public record MonthlyResult(List<TeamLeaderboardEntry> teamLeaderboard,
      * <p>
      * This can occur if a month's stats have been reset before attempting to create the {@link MonthlyResult}
      *
-     * @return <code>true</code> if no {@link TeamLeaderboardEntry} has any points or units.
+     * @return {@code true} if no {@link TeamLeaderboardEntry} has any points or units.
      */
     public boolean hasNoStats() {
         long totalTeamPoints = 0L;

@@ -52,7 +52,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * REST endpoints for <code>Team Competition</code> {@link HistoricStats}.
+ * REST endpoints for {@code Team Competition} {@link HistoricStats}.
  */
 @RestController
 @RequestMapping("/historic")

@@ -35,7 +35,7 @@ public enum ParsingState {
     DISABLED,
 
     /**
-     * System is parsing <code>Team Competition</code> stats.
+     * System is parsing {@code Team Competition} stats.
      */
     ENABLED_TEAM_COMPETITION
 }

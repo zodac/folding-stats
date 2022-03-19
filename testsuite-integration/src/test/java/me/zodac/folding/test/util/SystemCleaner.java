@@ -111,7 +111,7 @@ public final class SystemCleaner {
     }
 
     /**
-     * Utility function that cleans the system for complex <code>Team Competition</code> stats-based tests to be executed.
+     * Utility function that cleans the system for complex {@code Team Competition} stats-based tests to be executed.
      *
      * <p>
      * Cleans the stats DB tables, resets the stubbed Folding endpoints for units and points, then executes the {@link #cleanSystemForSimpleTests()}.

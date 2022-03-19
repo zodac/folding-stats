@@ -38,7 +38,7 @@ import me.zodac.folding.rest.api.tc.TeamSummary;
  * POJO for the {@link Team} leaderboard, summarising the stats for a {@link Team}.
  *
  * <p>
- * Available at the <code>folding/stats/leaderboard</code> REST endpoint.
+ * Available at the {@code folding/stats/leaderboard} REST endpoint.
  */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)

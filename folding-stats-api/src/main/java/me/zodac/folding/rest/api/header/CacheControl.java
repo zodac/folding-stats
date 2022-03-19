@@ -30,12 +30,12 @@ package me.zodac.folding.rest.api.header;
 public enum CacheControl {
 
     /**
-     * The <code>no-cache</code> value.
+     * The {@code no-cache} value.
      */
     NO_CACHE("no-cache"),
 
     /**
-     * The <code>no-store</code> value.
+     * The {@code no-store} value.
      */
     NO_STORE("no-store");
 

@@ -47,7 +47,7 @@ public record UserRequestSender(String usersUrl) {
     /**
      * Create an instance of {@link UserRequestSender}.
      *
-     * @param foldingUrl the root URL of the <code>/folding</code> endpoint, i.e:
+     * @param foldingUrl the root URL of the {@code /folding} endpoint, i.e:
      *                   <pre>http://127.0.0.1:8080/folding</pre>
      * @return the created {@link UserRequestSender}
      */
@@ -70,10 +70,10 @@ public record UserRequestSender(String usersUrl) {
      * Send a <b>GET</b> request to retrieve all {@link me.zodac.folding.api.tc.User}s in the system, with passkeys hidden.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.api.tc.User} based on the <code>ETag</code>, an empty
+     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.api.tc.User} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
-     * @param entityTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve cached {@link me.zodac.folding.api.tc.User}s
+     * @param entityTag the {@code ETag} from a previous {@link HttpResponse}, to retrieve cached {@link me.zodac.folding.api.tc.User}s
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
@@ -115,10 +115,10 @@ public record UserRequestSender(String usersUrl) {
      * Send a <b>GET</b> request to retrieve all {@link me.zodac.folding.api.tc.User}s in the system, with passkeys shown.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.api.tc.User} based on the <code>ETag</code>, an empty
+     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.api.tc.User} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
-     * @param entityTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve cached {@link me.zodac.folding.api.tc.User}s
+     * @param entityTag the {@code ETag} from a previous {@link HttpResponse}, to retrieve cached {@link me.zodac.folding.api.tc.User}s
      * @param userName  the username
      * @param password  the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
@@ -163,11 +163,11 @@ public record UserRequestSender(String usersUrl) {
      * Send a <b>GET</b> request to retrieve a single {@link me.zodac.folding.api.tc.User} with the given {@code userId}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.api.tc.User} based on the <code>ETag</code>, an empty
+     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.api.tc.User} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
      * @param userId    the ID of the {@link me.zodac.folding.api.tc.User} to be retrieved
-     * @param entityTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached {@link me.zodac.folding.api.tc.User}
+     * @param entityTag the {@code ETag} from a previous {@link HttpResponse}, to retrieve a cached {@link me.zodac.folding.api.tc.User}
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      * @see #get(int)
@@ -212,11 +212,11 @@ public record UserRequestSender(String usersUrl) {
      * Send a <b>GET</b> request to retrieve a single {@link me.zodac.folding.api.tc.User} with passkey with the given {@code userId}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.api.tc.User} based on the <code>ETag</code>, an empty
+     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.api.tc.User} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
      * @param userId    the ID of the {@link me.zodac.folding.api.tc.User} to be retrieved
-     * @param entityTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached {@link me.zodac.folding.api.tc.User}
+     * @param entityTag the {@code ETag} from a previous {@link HttpResponse}, to retrieve a cached {@link me.zodac.folding.api.tc.User}
      * @param userName  the username
      * @param password  the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}

@@ -38,10 +38,10 @@ import me.zodac.folding.api.tc.Team;
 
 /**
  * Summary of the stats of a {@link Team}s and its {@link me.zodac.folding.api.tc.User}s in
- * the <code>Team Competition</code>.
+ * the {@code Team Competition}.
  *
  * <p>
- * Available at the <code>folding/stats</code> REST endpoint.
+ * Available at the {@code folding/stats} REST endpoint.
  */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)

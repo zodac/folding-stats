@@ -39,7 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Calculates a {@link User}'s <code>Team Competition</code> {@link UserTcStats} and persists.
+ * Calculates a {@link User}'s {@code Team Competition} {@link UserTcStats} and persists.
  */
 @Component
 public class UserTcStatsCalculator {
@@ -64,14 +64,14 @@ public class UserTcStatsCalculator {
      * <p>
      * The stats for the update are calculated as:
      * <ol>
-     *     <li>The initial points are subtracted from the total points to give the {@link User}'s <code>pre-offset TC points</code></li>
-     *     <li>These TC points are multiplied by the {@link Hardware#multiplier()} for the {@link User}'s <code>TC multiplier points</code></li>
-     *     <li>The initial units are subtracted from the total units to give the {@link User}'s <code>TC units</code></li>
-     *     <li>Any {@link OffsetTcStats} are then applied (positive or negative) to give the {@link User}'s <code>final TC stats</code></li>
+     *     <li>The initial points are subtracted from the total points to give the {@link User}'s {@code pre-offset TC points}</li>
+     *     <li>These TC points are multiplied by the {@link Hardware#multiplier()} for the {@link User}'s {@code TC multiplier points}</li>
+     *     <li>The initial units are subtracted from the total units to give the {@link User}'s {@code TC units}</li>
+     *     <li>Any {@link OffsetTcStats} are then applied (positive or negative) to give the {@link User}'s {@code final TC stats}</li>
      * </ol>
      *
      * <p>
-     * The <code>final TC stats</code> are then persisted in the DB.
+     * The {@code final TC stats} are then persisted in the DB.
      *
      * @param user          the {@link User}
      * @param initialStats  the {@link User}'s initial {@link Stats}

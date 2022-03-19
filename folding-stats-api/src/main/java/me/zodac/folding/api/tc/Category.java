@@ -32,7 +32,7 @@ import java.util.stream.Stream;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
 
 /**
- * Lists the possible {@link Team} categories for a {@link User} taking part in the <code>Team Competition</code>.
+ * Lists the possible {@link Team} categories for a {@link User} taking part in the {@code Team Competition}.
  *
  * <p>
  * None of these have a user-friendly display name defined, as those will be handled by the frontend.

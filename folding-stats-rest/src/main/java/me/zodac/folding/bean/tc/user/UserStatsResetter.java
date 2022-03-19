@@ -34,7 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Resets the stats for the <code>Team Competition</code>.
+ * Resets the stats for the {@code Team Competition}.
  */
 @Component
 public class UserStatsResetter {
@@ -51,7 +51,7 @@ public class UserStatsResetter {
     private UserStatsParser userStatsParser;
 
     /**
-     * Resets the <code>Team Competition</code> stats for all {@link User}s.
+     * Resets the {@code Team Competition} stats for all {@link User}s.
      *
      * <p>
      * Actions performed:

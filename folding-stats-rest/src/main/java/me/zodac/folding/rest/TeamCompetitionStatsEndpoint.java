@@ -70,7 +70,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * REST endpoint for <code>Team Competition</code> stats.
+ * REST endpoint for {@code Team Competition} stats.
  */
 @RestController
 @RequestMapping("/stats")
@@ -121,7 +121,7 @@ public class TeamCompetitionStatsEndpoint {
     }
 
     /**
-     * {@link GetMapping} request to retrieve the <code>Team Competition</code> simple {@link CompetitionSummary}.
+     * {@link GetMapping} request to retrieve the {@code Team Competition} simple {@link CompetitionSummary}.
      *
      * @return {@link me.zodac.folding.rest.response.Responses#ok()} containing the {@link CompetitionSummary}
      */
@@ -136,7 +136,7 @@ public class TeamCompetitionStatsEndpoint {
     }
 
     /**
-     * {@link GetMapping} request to retrieve the <code>Team Competition</code> overall {@link AllTeamsSummary}.
+     * {@link GetMapping} request to retrieve the {@code Team Competition} overall {@link AllTeamsSummary}.
      *
      * @return {@link me.zodac.folding.rest.response.Responses#ok()} containing the {@link AllTeamsSummary}
      */
@@ -150,7 +150,7 @@ public class TeamCompetitionStatsEndpoint {
     }
 
     /**
-     * {@link GetMapping} request to retrieve the <code>Team Competition</code> {@link UserSummary} for the given {@link User}.
+     * {@link GetMapping} request to retrieve the {@code Team Competition} {@link UserSummary} for the given {@link User}.
      *
      * @param userId  the ID of the {@link User} whose {@link UserSummary} is to be retrieved
      * @param request the {@link HttpServletRequest}
@@ -209,7 +209,7 @@ public class TeamCompetitionStatsEndpoint {
     }
 
     /**
-     * {@link GetMapping} request to retrieve the <code>Team Competition</code> {@link TeamLeaderboardEntry}s.
+     * {@link GetMapping} request to retrieve the {@code Team Competition} {@link TeamLeaderboardEntry}s.
      *
      * @return {@link me.zodac.folding.rest.response.Responses#ok()} containing the {@link TeamLeaderboardEntry}s
      */
@@ -223,7 +223,7 @@ public class TeamCompetitionStatsEndpoint {
     }
 
     /**
-     * {@link GetMapping} request to retrieve the <code>Team Competition</code> {@link UserCategoryLeaderboardEntry}s by {@link Category}.
+     * {@link GetMapping} request to retrieve the {@code Team Competition} {@link UserCategoryLeaderboardEntry}s by {@link Category}.
      *
      * @return {@link me.zodac.folding.rest.response.Responses#ok()} containing the {@link UserCategoryLeaderboardEntry}s
      */
@@ -237,7 +237,7 @@ public class TeamCompetitionStatsEndpoint {
     }
 
     /**
-     * {@link PostMapping} request to manually update the <code>Team Competition</code> stats.
+     * {@link PostMapping} request to manually update the {@code Team Competition} stats.
      *
      * @param async   whether the execution should be performed asynchronously or synchronously
      * @param request the {@link HttpServletRequest}
@@ -260,7 +260,7 @@ public class TeamCompetitionStatsEndpoint {
     }
 
     /**
-     * {@link PostMapping} request to manually reset the <code>Team Competition</code> stats.
+     * {@link PostMapping} request to manually reset the {@code Team Competition} stats.
      *
      * @return {@link me.zodac.folding.rest.response.Responses#ok()}
      */

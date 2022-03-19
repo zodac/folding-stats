@@ -46,7 +46,7 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
     /**
      * Create an instance of {@link HistoricStatsRequestSender}.
      *
-     * @param foldingUrl the root URL of the <code>/folding</code> endpoint, i.e:
+     * @param foldingUrl the root URL of the {@code /folding} endpoint, i.e:
      *                   <pre>http://127.0.0.1:8080/folding</pre>
      * @return the created {@link HistoricStatsRequestSender}
      */
@@ -83,7 +83,7 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
      * <b>NOTE:</b> The {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are based on {@link java.time.ZoneOffset#UTC}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the <code>ETag</code>, an empty
+     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
      * @param userId    the ID of the {@link me.zodac.folding.api.tc.User} whose {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are to be
@@ -91,7 +91,7 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
      * @param year      the {@link Year} of the {@link me.zodac.folding.rest.api.tc.historic.HistoricStats}
      * @param month     the {@link Month} of the {@link me.zodac.folding.rest.api.tc.historic.HistoricStats}
      * @param day       the day of the {@link Month} of the {@link me.zodac.folding.rest.api.tc.historic.HistoricStats}
-     * @param entityTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached
+     * @param entityTag the {@code ETag} from a previous {@link HttpResponse}, to retrieve a cached
      *                  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats}
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
@@ -130,7 +130,7 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
      * <b>NOTE:</b> The {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are based on {@link java.time.ZoneOffset#UTC}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the <code>ETag</code>, an empty
+     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
      * @param teamId    the ID of the {@link me.zodac.folding.api.tc.Team} whose {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are to be
@@ -138,7 +138,7 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
      * @param year      the {@link Year} of the {@link me.zodac.folding.rest.api.tc.historic.HistoricStats}
      * @param month     the {@link Month} of the {@link me.zodac.folding.rest.api.tc.historic.HistoricStats}
      * @param day       the day of the {@link Month} of the {@link me.zodac.folding.rest.api.tc.historic.HistoricStats}
-     * @param entityTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached
+     * @param entityTag the {@code ETag} from a previous {@link HttpResponse}, to retrieve a cached
      *                  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats}
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
@@ -181,7 +181,7 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
      * <b>NOTE:</b> The {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are based on {@link java.time.ZoneOffset#UTC}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the <code>ETag</code>, an empty
+     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
      * @param userId the ID of the {@link me.zodac.folding.api.tc.User} whose {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are to be
@@ -204,14 +204,14 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
      * <b>NOTE:</b> The {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are based on {@link java.time.ZoneOffset#UTC}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the <code>ETag</code>, an empty
+     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
      * @param userId    the ID of the {@link me.zodac.folding.api.tc.User} whose {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are to be
      *                  retrieved
      * @param year      the {@link Year} of the {@link me.zodac.folding.rest.api.tc.historic.HistoricStats}
      * @param month     the {@link Month} of the {@link me.zodac.folding.rest.api.tc.historic.HistoricStats}
-     * @param entityTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached
+     * @param entityTag the {@code ETag} from a previous {@link HttpResponse}, to retrieve a cached
      *                  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats}
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
@@ -230,7 +230,7 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
      * <b>NOTE:</b> The {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are based on {@link java.time.ZoneOffset#UTC}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the <code>ETag</code>, an empty
+     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
      * @param teamId the ID of the {@link me.zodac.folding.api.tc.Team} whose {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are to be
@@ -253,14 +253,14 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
      * <b>NOTE:</b> The {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are based on {@link java.time.ZoneOffset#UTC}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the <code>ETag</code>, an empty
+     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
      * @param teamId    the ID of the {@link me.zodac.folding.api.tc.Team} whose {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are to be
      *                  retrieved
      * @param year      the {@link Year} of the {@link me.zodac.folding.rest.api.tc.historic.HistoricStats}
      * @param month     the {@link Month} of the {@link me.zodac.folding.rest.api.tc.historic.HistoricStats}
-     * @param entityTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached
+     * @param entityTag the {@code ETag} from a previous {@link HttpResponse}, to retrieve a cached
      *                  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats}
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
@@ -303,7 +303,7 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
      * <b>NOTE:</b> The {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are based on {@link java.time.ZoneOffset#UTC}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the <code>ETag</code>, an empty
+     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
      * @param userId the ID of the {@link me.zodac.folding.api.tc.User} whose {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are to be
@@ -325,13 +325,13 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
      * <b>NOTE:</b> The {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are based on {@link java.time.ZoneOffset#UTC}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the <code>ETag</code>, an empty
+     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
      * @param userId    the ID of the {@link me.zodac.folding.api.tc.User} whose {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are to be
      *                  retrieved
      * @param year      the {@link Year} of the {@link me.zodac.folding.rest.api.tc.historic.HistoricStats}
-     * @param entityTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached
+     * @param entityTag the {@code ETag} from a previous {@link HttpResponse}, to retrieve a cached
      *                  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats}
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
@@ -349,7 +349,7 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
      * <b>NOTE:</b> The {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are based on {@link java.time.ZoneOffset#UTC}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the <code>ETag</code>, an empty
+     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
      * @param teamId the ID of the {@link me.zodac.folding.api.tc.Team} whose {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are to be
@@ -371,13 +371,13 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
      * <b>NOTE:</b> The {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are based on {@link java.time.ZoneOffset#UTC}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the <code>ETag</code>, an empty
+     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
      * @param teamId    the ID of the {@link me.zodac.folding.api.tc.Team} whose {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are to be
      *                  retrieved
      * @param year      the {@link Year} of the {@link me.zodac.folding.rest.api.tc.historic.HistoricStats}
-     * @param entityTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached
+     * @param entityTag the {@code ETag} from a previous {@link HttpResponse}, to retrieve a cached
      *                  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats}
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}

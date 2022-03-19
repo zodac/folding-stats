@@ -47,7 +47,7 @@ public record HardwareRequestSender(String hardwareUrl) {
     /**
      * Create an instance of {@link HardwareRequestSender}.
      *
-     * @param foldingUrl the root URL of the <code>/folding</code> endpoint, i.e:
+     * @param foldingUrl the root URL of the {@code /folding} endpoint, i.e:
      *                   <pre>http://127.0.0.1:8080/folding</pre>
      * @return the created {@link HardwareRequestSender}
      */
@@ -71,10 +71,10 @@ public record HardwareRequestSender(String hardwareUrl) {
      * Send a <b>GET</b> request to retrieve all {@link me.zodac.folding.api.tc.Hardware}s in the system.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.api.tc.Hardware} based on the <code>ETag</code>, an empty
+     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.api.tc.Hardware} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
-     * @param entityTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve cached {@link me.zodac.folding.api.tc.Hardware}
+     * @param entityTag the {@code ETag} from a previous {@link HttpResponse}, to retrieve cached {@link me.zodac.folding.api.tc.Hardware}
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      * @see #getAll()
@@ -117,11 +117,11 @@ public record HardwareRequestSender(String hardwareUrl) {
      * Send a <b>GET</b> request to retrieve a single {@link me.zodac.folding.api.tc.Hardware} with the given {@code hardwareId}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.api.tc.Hardware} based on the <code>ETag</code>, an empty
+     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.api.tc.Hardware} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
      * @param hardwareId the ID of the {@link me.zodac.folding.api.tc.Hardware} to be retrieved
-     * @param entityTag  the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached {@link me.zodac.folding.api.tc.Hardware}
+     * @param entityTag  the {@code ETag} from a previous {@link HttpResponse}, to retrieve a cached {@link me.zodac.folding.api.tc.Hardware}
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      * @see #get(int)
@@ -164,11 +164,11 @@ public record HardwareRequestSender(String hardwareUrl) {
      * Send a <b>GET</b> request to retrieve a single {@link me.zodac.folding.api.tc.Hardware} with the given {@code hardwareName}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.api.tc.Hardware} based on the <code>ETag</code>, an empty
+     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.api.tc.Hardware} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
      * @param hardwareName the {@code hardwareName} of the {@link me.zodac.folding.api.tc.Hardware} to be retrieved
-     * @param entityTag    the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached {@link me.zodac.folding.api.tc.Hardware}
+     * @param entityTag    the {@code ETag} from a previous {@link HttpResponse}, to retrieve a cached {@link me.zodac.folding.api.tc.Hardware}
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      * @see #get(String)

@@ -43,7 +43,7 @@ import me.zodac.folding.rest.api.header.RestHeader;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for the login REST endpoint at <code>/folding/login</code>.
+ * Tests for the login REST endpoint at {@code /folding/login}.
  */
 class LoginTest {
 

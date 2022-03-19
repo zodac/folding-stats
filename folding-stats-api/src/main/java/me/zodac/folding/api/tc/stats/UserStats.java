@@ -120,7 +120,7 @@ public class UserStats extends Stats {
      * <p>
      * This is distinct from {@link #isEmpty()}, as it does not check the {@code userId}.
      *
-     * @return <code>true</code> is there are <b>0</b> stats
+     * @return {@code true} is there are <b>0</b> stats
      */
     public boolean isEmptyStats() {
         return super.isEmpty();

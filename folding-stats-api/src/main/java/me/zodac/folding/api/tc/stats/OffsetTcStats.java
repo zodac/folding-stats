@@ -33,7 +33,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * POJO defining a stats offset for a {@link me.zodac.folding.api.tc.User} within the <code>Team Competition</code>. In the case of a manual change
+ * POJO defining a stats offset for a {@link me.zodac.folding.api.tc.User} within the {@code Team Competition}. In the case of a manual change
  * of points/units being required for a {@link me.zodac.folding.api.tc.User}, this object will define that offset.
  */
 @NoArgsConstructor
@@ -116,7 +116,7 @@ public class OffsetTcStats {
      * Checks if the {@link OffsetTcStats} instance has no offset values for {@code pointsOffset}, {@code multipliedPointsOffset} and
      * {@code unitsOffset}.
      *
-     * @return <code>true</code> if the {@link OffsetTcStats} instance is {@link OffsetTcStats#empty()}
+     * @return {@code true} if the {@link OffsetTcStats} instance is {@link OffsetTcStats#empty()}
      */
     public boolean isEmpty() {
         return pointsOffset == DEFAULT_POINTS && multipliedPointsOffset == DEFAULT_MULTIPLIED_POINTS && unitsOffset == DEFAULT_UNITS;

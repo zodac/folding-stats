@@ -44,7 +44,7 @@ public final class CollectionUtils {
      * @param first  the first {@link Collection}
      * @param second the second {@link Collection}
      * @param <E>    the type of the elements in the {@link Collection}s
-     * @return <code>true</code> if there are no common elements in the two {@link Collection}s
+     * @return {@code true} if there are no common elements in the two {@link Collection}s
      * @see Collections#disjoint(Collection, Collection)
      */
     public static <E> boolean containsNoMatches(final Collection<E> first, final Collection<E> second) {

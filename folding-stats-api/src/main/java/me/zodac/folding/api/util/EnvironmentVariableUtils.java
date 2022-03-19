@@ -74,7 +74,7 @@ public final class EnvironmentVariableUtils {
      * The returned value is then converted to a {@link Boolean}.
      *
      * @param variableName the property to search for
-     * @return the value of the property as a {@link Boolean}, defaulting to <code>false</code> if the value does not exist or is not valid
+     * @return the value of the property as a {@link Boolean}, defaulting to {@code false} if the value does not exist or is not valid
      */
     public static boolean getBoolean(final String variableName) {
         final String value = System.getProperty(variableName, System.getenv(variableName));

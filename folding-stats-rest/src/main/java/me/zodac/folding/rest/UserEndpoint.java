@@ -57,7 +57,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * REST endpoints for <code>Team Competition</code> {@link User}s.
+ * REST endpoints for {@code Team Competition} {@link User}s.
  */
 @RestController
 @RequestMapping("/users")

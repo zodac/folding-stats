@@ -62,7 +62,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Test for the saving of each month's <code>Team Competition</code> results.
+ * Test for the saving of each month's {@code Team Competition} results.
  */
 class MonthlyResultTest {
 

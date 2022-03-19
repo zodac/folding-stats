@@ -66,7 +66,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 /**
- * Tests for the {@link Team} REST endpoint at <code>/folding/teams</code>.
+ * Tests for the {@link Team} REST endpoint at {@code /folding/teams}.
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class TeamTest {

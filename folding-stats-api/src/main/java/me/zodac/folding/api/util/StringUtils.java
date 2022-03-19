@@ -41,13 +41,13 @@ public final class StringUtils {
     }
 
     /**
-     * Checks if the provided {@link String} is <code>null</code>, and if it is not, that it is a valid URL.
+     * Checks if the provided {@link String} is {@code null}, and if it is not, that it is a valid URL.
      *
      * <p>
      * <b>NOTE:</b> Only supports <b>HTTP</b> or <b>HTTPS</b> URLs.
      *
      * @param input the {@link String} to check
-     * @return <code>true</code> if the {@link String} is either empty, or a valid URL
+     * @return {@code true} if the {@link String} is either empty, or a valid URL
      */
     public static boolean isBlankOrValidUrl(final String input) {
         if (isBlank(input)) {
@@ -58,31 +58,31 @@ public final class StringUtils {
     }
 
     /**
-     * Checks if the provided {@link String} is <code>null</code>, or {@link String#isBlank()}.
+     * Checks if the provided {@link String} is {@code null}, or {@link String#isBlank()}.
      *
      * @param input the {@link String} to check
-     * @return <code>true</code> if the {@link String} is either <code>null</code> or {@link String#isBlank()}
+     * @return {@code true} if the {@link String} is either {@code null} or {@link String#isBlank()}
      */
     public static boolean isBlank(final String input) {
         return input == null || input.isBlank();
     }
 
     /**
-     * Checks if the provided {@link String} is not <code>null</code>, and is not {@link String#isBlank()}.
+     * Checks if the provided {@link String} is not {@code null}, and is not {@link String#isBlank()}.
      *
      * @param input the {@link String} to check
-     * @return <code>true</code> if the {@link String} is neither <code>null</code> nor {@link String#isBlank()}
+     * @return {@code true} if the {@link String} is neither {@code null} nor {@link String#isBlank()}
      */
     public static boolean isNotBlank(final String input) {
         return !isBlank(input);
     }
 
     /**
-     * Checks if the two provided {@link String}s are not <code>null</code>, and are not {@link String#isBlank()}.
+     * Checks if the two provided {@link String}s are not {@code null}, and are not {@link String#isBlank()}.
      *
      * @param first  the first {@link String} to check
      * @param second the second {@link String} to check
-     * @return <code>true</code> if the {@link String}s are neither <code>null</code> nor {@link String#isBlank()}
+     * @return {@code true} if the {@link String}s are neither {@code null} nor {@link String#isBlank()}
      */
     public static boolean isNeitherBlank(final String first, final String second) {
         return isNotBlank(first) && isNotBlank(second);
@@ -101,11 +101,11 @@ public final class StringUtils {
     }
 
     /**
-     * Checks if the two {@link String}s are equal, even if one of them is <code>null</code>.
+     * Checks if the two {@link String}s are equal, even if one of them is {@code null}.
      *
      * @param first  the first {@link String}
      * @param second the second {@link String}
-     * @return <code>true</code> if the {@link String}s are equal
+     * @return {@code true} if the {@link String}s are equal
      */
     public static boolean isEqualSafe(final String first, final String second) {
         return isBlank(first) ? isBlank(second) : first.equals(second);

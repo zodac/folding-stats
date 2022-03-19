@@ -34,7 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Stores the stats results for the <code>Team Competition</code>. Takes the current stats and stores them with the current
+ * Stores the stats results for the {@code Team Competition}. Takes the current stats and stores them with the current
  * {@link java.time.ZoneOffset#UTC} {@link LocalDateTime}.
  */
 @Component

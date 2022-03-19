@@ -120,7 +120,7 @@ public enum UserChangeState {
     /**
      * Returns whether the {@link UserChangeState} is a final {@link UserChangeState} and cannot be updated.
      *
-     * @return <code>true</code> if the {@link UserChangeState} is not permitted to be updated to another value
+     * @return {@code true} if the {@link UserChangeState} is not permitted to be updated to another value
      */
     public boolean isFinalState() {
         return !canBeUpdated;

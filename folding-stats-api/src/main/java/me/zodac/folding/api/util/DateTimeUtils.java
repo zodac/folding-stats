@@ -104,7 +104,7 @@ public record DateTimeUtils(Supplier<OffsetDateTime> timeSupplier) {
      * Calculates the number of {@link ChronoUnit}s between the {@link #currentUtcDateTime()} and the start of next {@link Month}.
      *
      * @param chronoUnit the {@link ChronoUnit} of the response
-     * @return the number of {@link ChronoUnit}s until <code>00:00:000</code> {@link ZoneOffset#UTC} of the 1st of next {@link Month}
+     * @return the number of {@link ChronoUnit}s until {@code 00:00:000} {@link ZoneOffset#UTC} of the 1st of next {@link Month}
      */
     public long untilNextMonthUtc(final ChronoUnit chronoUnit) {
         final int currentMonth = currentUtcMonth().getValue();

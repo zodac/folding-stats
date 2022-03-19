@@ -136,7 +136,7 @@ public final class TeamCompetitionStatsUtils {
     }
 
     /**
-     * Executes a manual reset of the <code>Team Competition</code> stats.
+     * Executes a manual reset of the {@code Team Competition} stats.
      *
      * @throws FoldingRestException thrown if an error occurs sending the HTTP request
      */
@@ -148,7 +148,7 @@ public final class TeamCompetitionStatsUtils {
     }
 
     /**
-     * Executes a manual update of the <code>Team Competition</code> stats.
+     * Executes a manual update of the {@code Team Competition} stats.
      *
      * @throws FoldingRestException thrown if an error occurs sending the HTTP request
      */

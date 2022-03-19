@@ -39,7 +39,7 @@ import me.zodac.folding.rest.exception.NotFoundException;
 import me.zodac.folding.state.ParsingStateManager;
 
 /**
- * Interface used for CRUD operations for <code>folding-stats</code> classes:
+ * Interface used for CRUD operations for {@code folding-stats} classes:
  * <ul>
  *     <li>{@link Hardware}</li>
  *     <li>{@link Team}</li>
@@ -140,7 +140,7 @@ public interface FoldingRepository {
      * Creates a {@link User}.
      *
      * <p>
-     * Creates initial {@link UserStats} on creation. Also triggers a new <code>Team Competition</code> stats parse.
+     * Creates initial {@link UserStats} on creation. Also triggers a new {@code Team Competition} stats parse.
      *
      * @param user the {@link User} to create
      * @return the created {@link User}, with ID
@@ -197,7 +197,7 @@ public interface FoldingRepository {
      * Deletes a {@link User}.
      *
      * <p>
-     * If the {@link User} has any <code>Team Competition</code> {@link UserTcStats}, those are retained for their {@link Team} as
+     * If the {@link User} has any {@code Team Competition} {@link UserTcStats}, those are retained for their {@link Team} as
      * {@link RetiredUserTcStats}.
      *
      * @param user the {@link User} to delete

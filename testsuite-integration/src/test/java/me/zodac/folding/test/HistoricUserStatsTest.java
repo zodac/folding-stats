@@ -56,7 +56,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for <code>Team Competition</code> {@link HistoricStats} for {@link me.zodac.folding.api.tc.User}s.
+ * Tests for {@code Team Competition} {@link HistoricStats} for {@link me.zodac.folding.api.tc.User}s.
  */
 class HistoricUserStatsTest {
 

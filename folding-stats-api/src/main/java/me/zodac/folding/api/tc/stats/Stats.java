@@ -67,7 +67,7 @@ public class Stats {
      * Checks if the {@link Stats} instance has both {@code points} set to <b>0L</b> and {@code unitsOffset} set to
      * <b>0</b>.
      *
-     * @return <code>true</code> if the {@link Stats} instance is empty
+     * @return {@code true} if the {@link Stats} instance is empty
      */
     public boolean isEmpty() {
         return points == DEFAULT_POINTS && units == DEFAULT_UNITS;

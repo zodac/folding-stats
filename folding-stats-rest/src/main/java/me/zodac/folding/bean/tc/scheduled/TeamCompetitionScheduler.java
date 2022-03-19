@@ -45,17 +45,17 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
- * {@link Scheduled} {@link Component} which schedules the beginning and end of the <code>Team Competition</code>.
+ * {@link Scheduled} {@link Component} which schedules the beginning and end of the {@code Team Competition}.
  *
  * <p>
- * The first day of the <code>Team Competition</code> is set to the <b>3rd</b> of the month, and on this day it will reset the stats for all users.
+ * The first day of the {@code Team Competition} is set to the <b>3rd</b> of the month, and on this day it will reset the stats for all users.
  * The reset will occur at <b>00:15</b>. This time cannot be changed, but the reset can be disabled using the environment variable:
  * <ul>
  *     <li>{@code ENABLE_STATS_MONTHLY_RESET}</li>
  * </ul>
  *
  * <p>
- * The last day of the <code>Team Competition</code> is the final day of the month, and on this day the following actions are performed:
+ * The last day of the {@code Team Competition} is the final day of the month, and on this day the following actions are performed:
  * <ol>
  *     <li>Resets the stats for all users. The reset will occur  at <b>00:15</b>. This time cannot be changed, but the reset can be disabled using
  *     the environment variable:
@@ -104,7 +104,7 @@ public class TeamCompetitionScheduler {
     }
 
     /**
-     * Scheduled execution to prepare the <code>Team Competition</code> for the new month.
+     * Scheduled execution to prepare the {@code Team Competition} for the new month.
      *
      * @see UserStatsResetter#resetTeamCompetitionStats()
      */
@@ -124,7 +124,7 @@ public class TeamCompetitionScheduler {
     }
 
     /**
-     * Scheduled execution to finalise the <code>Team Competition</code> at the end of a month.
+     * Scheduled execution to finalise the {@code Team Competition} at the end of a month.
      *
      * @see UserStatsStorer#storeMonthlyResult()
      * @see UserStatsResetter#resetTeamCompetitionStats()

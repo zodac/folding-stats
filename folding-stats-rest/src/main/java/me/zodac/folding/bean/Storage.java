@@ -475,13 +475,13 @@ public class Storage {
     }
 
     /**
-     * Creates a {@link MonthlyResult} for the <code>Team Competition</code>.
+     * Creates a {@link MonthlyResult} for the {@code Team Competition}.
      *
      * <p>
      * Persists it with the {@link DbManager}, but does not cache it.
      *
-     * @param monthlyResult a {@link MonthlyResult} for the <code>Team Competition</code>
-     * @return the <code>Team Competition</code> {@link MonthlyResult}
+     * @param monthlyResult a {@link MonthlyResult} for the {@code Team Competition}
+     * @return the {@code Team Competition} {@link MonthlyResult}
      */
     @NotCached
     public MonthlyResult createMonthlyResult(final MonthlyResult monthlyResult) {
@@ -489,14 +489,14 @@ public class Storage {
     }
 
     /**
-     * Retrieves the {@link MonthlyResult} of the <code>Team Competition</code> for the given {@link Month} and {@link Year}.
+     * Retrieves the {@link MonthlyResult} of the {@code Team Competition} for the given {@link Month} and {@link Year}.
      *
      * <p>
      * Since these values are not cached, we go directly to the {@link DbManager} to retrieve it.
      *
      * @param month the {@link Month} of the {@link MonthlyResult} to be retrieved
      * @param year  the {@link Year} of the {@link MonthlyResult} to be retrieved
-     * @return an {@link Optional} of the <code>Team Competition</code> {@link MonthlyResult}
+     * @return an {@link Optional} of the {@code Team Competition} {@link MonthlyResult}
      */
     @NotCached
     public Optional<MonthlyResult> getMonthlyResult(final Month month, final Year year) {
@@ -743,7 +743,7 @@ public class Storage {
     }
 
     /**
-     * Creates a {@link UserTcStats} for a {@link User}'s <code>Team Competition</code> stats for a specific hour.
+     * Creates a {@link UserTcStats} for a {@link User}'s {@code Team Competition} stats for a specific hour.
      *
      * <p>
      * Persists it with the {@link DbManager}, then adds it to the {@code tcStatsCache}.

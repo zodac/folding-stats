@@ -60,7 +60,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * REST endpoints for <code>Team Competition</code> {@link Hardware}s.
+ * REST endpoints for {@code Team Competition} {@link Hardware}s.
  */
 @RestController
 @RequestMapping("/hardware")

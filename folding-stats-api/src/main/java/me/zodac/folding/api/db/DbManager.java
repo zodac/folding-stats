@@ -199,7 +199,7 @@ public interface DbManager extends Closeable {
     UserChange updateUserChange(UserChange userChangeToUpdate);
 
     /**
-     * Creates a {@link UserTcStats} for a {@link User}'s <code>Team Competition</code> stats for a specific hour.
+     * Creates a {@link UserTcStats} for a {@link User}'s {@code Team Competition} stats for a specific hour.
      *
      * @param userTcStats the {@link UserTcStats} to be created
      * @return the created {@link UserTcStats}
@@ -330,19 +330,19 @@ public interface DbManager extends Closeable {
     void deleteAllRetiredUserStats();
 
     /**
-     * Creates a {@link MonthlyResult} for the <code>Team Competition</code> in the DB.
+     * Creates a {@link MonthlyResult} for the {@code Team Competition} in the DB.
      *
-     * @param monthlyResult a {@link MonthlyResult} for the <code>Team Competition</code>
-     * @return the <code>Team Competition</code> {@link MonthlyResult}
+     * @param monthlyResult a {@link MonthlyResult} for the {@code Team Competition}
+     * @return the {@code Team Competition} {@link MonthlyResult}
      */
     MonthlyResult createMonthlyResult(MonthlyResult monthlyResult);
 
     /**
-     * Retrieves the {@link MonthlyResult} of the <code>Team Competition</code> for the given {@link Month} and {@link Year} from the DB.
+     * Retrieves the {@link MonthlyResult} of the {@code Team Competition} for the given {@link Month} and {@link Year} from the DB.
      *
      * @param month the {@link Month} of the {@link MonthlyResult} to be retrieved
      * @param year  the {@link Year} of the {@link MonthlyResult} to be retrieved
-     * @return an {@link Optional} of the <code>Team Competition</code> {@link MonthlyResult}
+     * @return an {@link Optional} of the {@code Team Competition} {@link MonthlyResult}
      */
     Optional<MonthlyResult> getMonthlyResult(Month month, Year year);
 

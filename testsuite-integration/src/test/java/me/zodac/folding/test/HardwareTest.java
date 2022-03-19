@@ -66,7 +66,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 /**
- * Tests for the {@link Hardware} REST endpoint at <code>/folding/hardware</code>.
+ * Tests for the {@link Hardware} REST endpoint at {@code /folding/hardware}.
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class HardwareTest {

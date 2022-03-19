@@ -42,7 +42,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * POJO defining historic <code>Team Competition</code> stats (hourly, daily, monthly, etc.) for a {@link me.zodac.folding.api.tc.User}.
+ * POJO defining historic {@code Team Competition} stats (hourly, daily, monthly, etc.) for a {@link me.zodac.folding.api.tc.User}.
  */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)

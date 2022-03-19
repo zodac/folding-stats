@@ -38,7 +38,7 @@ import lombok.ToString;
 
 /**
  * Summary of the stats of all {@link me.zodac.folding.api.tc.Team}s and their {@link me.zodac.folding.api.tc.User}s in
- * the <code>Team Competition</code>.
+ * the {@code Team Competition}.
  */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -62,7 +62,7 @@ public class AllTeamsSummary {
      * The points, multiplied points and units from each {@link TeamSummary} are added up to give the total competition
      * points, multiplied points and units.
      *
-     * @param teams the {@link TeamSummary}s taking part in the <code>Team Competition</code>
+     * @param teams the {@link TeamSummary}s taking part in the {@code Team Competition}
      * @return the created {@link AllTeamsSummary}
      */
     public static AllTeamsSummary create(final Collection<TeamSummary> teams) {

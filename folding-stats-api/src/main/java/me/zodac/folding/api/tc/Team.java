@@ -29,7 +29,7 @@ import me.zodac.folding.api.ResponsePojo;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
 
 /**
- * POJO defining a single {@link Team} participating in the <code>Team Competition</code>. There is a limit on the number of users each team can have,
+ * POJO defining a single {@link Team} participating in the {@code Team Competition}. There is a limit on the number of users each team can have,
  * defined by the {@link Category}.
  *
  * <p>
@@ -116,7 +116,7 @@ public record Team(int id, String teamName, String teamDescription, String forum
      * if it is the same as an existing {@link Team}.
      *
      * @param teamRequest input {@link TeamRequest}
-     * @return <code>true</code> if the input{@link TeamRequest} is equal to the {@link Team}
+     * @return {@code true} if the input{@link TeamRequest} is equal to the {@link Team}
      */
     public boolean isEqualRequest(final TeamRequest teamRequest) {
         return Objects.equals(teamName, teamRequest.getTeamName())

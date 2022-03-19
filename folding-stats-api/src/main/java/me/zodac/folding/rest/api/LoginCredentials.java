@@ -37,7 +37,7 @@ import me.zodac.folding.api.util.EncodingUtils;
 /**
  * Simple POJO defining {@link java.util.Base64}-encoded credentials. The credentials are created by:
  * <ol>
- *     <li>Concatenate the username and password, with a <code>:</code> as delimiter (i.e., 'username:password')</li>
+ *     <li>Concatenate the username and password, with a {@code :} as delimiter (i.e., 'username:password')</li>
  *     <li>Encode the result with {@link java.util.Base64}</li>
  *     <li>Prefix the encoded result with "Basic " (note the space)</li>
  * </ol>

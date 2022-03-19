@@ -83,7 +83,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for the {@link User} REST endpoint at <code>/folding/users</code>.
+ * Tests for the {@link User} REST endpoint at {@code /folding/users}.
  */
 class UserTest {
 

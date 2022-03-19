@@ -41,7 +41,7 @@ public final class PasskeyChecker {
      * Validates that the provided {@code passkey} is correctly hidden.
      *
      * <p>
-     * The first 8 characters should not contain the <code>*</code> character, while the remaining 24 characters should not contain any alphanumeric
+     * The first 8 characters should not contain the {@code *} character, while the remaining 24 characters should not contain any alphanumeric
      * characters.
      *
      * @param passkey the passkey to validate
@@ -64,7 +64,7 @@ public final class PasskeyChecker {
      * Validates that the provided {@code passkey} is correctly shown.
      *
      * <p>
-     * There should be no <code>*</code> character in the passkey.
+     * There should be no {@code *} character in the passkey.
      *
      * @param passkey the passkey to validate
      */

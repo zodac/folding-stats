@@ -47,7 +47,7 @@ public record TeamRequestSender(String teamsUrl) {
     /**
      * Create an instance of {@link TeamRequestSender}.
      *
-     * @param foldingUrl the root URL of the <code>/folding</code> endpoint, i.e:
+     * @param foldingUrl the root URL of the {@code /folding} endpoint, i.e:
      *                   <pre>http://127.0.0.1:8080/folding</pre>
      * @return the created {@link TeamRequestSender}
      */
@@ -71,10 +71,10 @@ public record TeamRequestSender(String teamsUrl) {
      * Send a <b>GET</b> request to retrieve all {@link me.zodac.folding.api.tc.Team}s in the system.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.api.tc.Team} based on the <code>ETag</code>, an empty
+     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.api.tc.Team} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
-     * @param entityTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve cached {@link me.zodac.folding.api.tc.Team}s
+     * @param entityTag the {@code ETag} from a previous {@link HttpResponse}, to retrieve cached {@link me.zodac.folding.api.tc.Team}s
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      * @see #getAll()
@@ -117,11 +117,11 @@ public record TeamRequestSender(String teamsUrl) {
      * Send a <b>GET</b> request to retrieve a single {@link me.zodac.folding.api.tc.Team} with the given {@code teamId}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.api.tc.Team} based on the <code>ETag</code>, an empty
+     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.api.tc.Team} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
      * @param teamId    the ID of the {@link me.zodac.folding.api.tc.Team} to be retrieved
-     * @param entityTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached {@link me.zodac.folding.api.tc.Team}
+     * @param entityTag the {@code ETag} from a previous {@link HttpResponse}, to retrieve a cached {@link me.zodac.folding.api.tc.Team}
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      * @see #get(int)
@@ -164,11 +164,11 @@ public record TeamRequestSender(String teamsUrl) {
      * Send a <b>GET</b> request to retrieve a single {@link me.zodac.folding.api.tc.Team} with the given {@code teamName}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.api.tc.Team} based on the <code>ETag</code>, an empty
+     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.api.tc.Team} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
      * @param teamName  the {@code teamName} of the {@link me.zodac.folding.api.tc.Team} to be retrieved
-     * @param entityTag the <code>ETag</code> from a previous {@link HttpResponse}, to retrieve a cached {@link me.zodac.folding.api.tc.Team}
+     * @param entityTag the {@code ETag} from a previous {@link HttpResponse}, to retrieve a cached {@link me.zodac.folding.api.tc.Team}
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      * @see #get(String)

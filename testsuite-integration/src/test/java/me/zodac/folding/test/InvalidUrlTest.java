@@ -38,7 +38,7 @@ import me.zodac.folding.rest.api.header.RestHeader;
 import org.junit.jupiter.api.Test;
 
 /**
- * Test to verify that an invalid URL will redirect to the <code>Team Competition</code> home page.
+ * Test to verify that an invalid URL will redirect to the {@code Team Competition} home page.
  */
 class InvalidUrlTest {
 

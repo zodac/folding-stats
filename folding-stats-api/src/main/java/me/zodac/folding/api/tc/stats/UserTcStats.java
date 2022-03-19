@@ -31,7 +31,7 @@ import lombok.ToString;
 import me.zodac.folding.api.util.DateTimeUtils;
 
 /**
- * POJO that extends {@link UserStats} adding multiplied points for a <code>Team Competition</code>
+ * POJO that extends {@link UserStats} adding multiplied points for a {@code Team Competition}
  * {@link me.zodac.folding.api.tc.User}, based on a hardware multiplier.
  */
 @Getter
@@ -40,7 +40,7 @@ import me.zodac.folding.api.util.DateTimeUtils;
 public class UserTcStats extends UserStats {
 
     /**
-     * The default number of multiplied points, <code>0</code>.
+     * The default number of multiplied points, {@code 0}.
      */
     public static final long DEFAULT_MULTIPLIED_POINTS = 0L;
 

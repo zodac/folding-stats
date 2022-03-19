@@ -48,7 +48,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 /**
- * Class that parses {@link Stats} for <code>Team Competition</code> {@link User}s.
+ * Class that parses {@link Stats} for {@code Team Competition} {@link User}s.
  */
 @Component
 public class UserStatsParser {
