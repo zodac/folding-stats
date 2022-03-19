@@ -115,11 +115,6 @@ public final class HardwareSplitter {
      * @return a {@link Map} of the {@link Hardware} to be updated, where the key is the LARS {@link Hardware} and value is the DB {@link Hardware}
      */
     public static Map<Hardware, Hardware> toUpdate(final Collection<Hardware> fromLars, final Collection<Hardware> inDb) {
-        // Causing issues when there are duplicate hardware names coming from LARS
-        // final Map<String, Hardware> fromLarsHardware = fromLars
-        //    .stream()
-        //    .collect(toMap(hardware -> hardware.getHardwareName().toLowerCase(Locale.UK), hardware -> hardware));
-
         final Map<String, Hardware> fromLarsHardware = new HashMap<>();
         for (final Hardware hardwareFromLars : fromLars) {
             fromLarsHardware.putIfAbsent(hardwareFromLars.hardwareName().toLowerCase(Locale.UK), hardwareFromLars);
