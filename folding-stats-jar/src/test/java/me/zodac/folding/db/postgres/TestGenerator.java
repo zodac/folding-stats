@@ -29,9 +29,9 @@ package me.zodac.folding.db.postgres;
  */
 final class TestGenerator {
 
-    private static int hardwareCount;
-    private static int userCount;
-    private static int teamCount;
+    private static int hardwareCount = 1;
+    private static int userCount = 1;
+    private static int teamCount = 1;
 
     private TestGenerator() {
 
