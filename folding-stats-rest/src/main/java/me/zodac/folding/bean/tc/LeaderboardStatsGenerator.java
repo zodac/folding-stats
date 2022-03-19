@@ -82,10 +82,11 @@ public class LeaderboardStatsGenerator {
 
         final TeamLeaderboardEntry leader = TeamLeaderboardEntry.createLeader(teamResults.get(0));
 
-        final List<TeamLeaderboardEntry> teamSummaries = new ArrayList<>(teamResults.size());
+        final int numberOfTeamResults = teamResults.size();
+        final List<TeamLeaderboardEntry> teamSummaries = new ArrayList<>(numberOfTeamResults);
         teamSummaries.add(leader);
 
-        for (int i = 1; i < teamResults.size(); i++) {
+        for (int i = 1; i < numberOfTeamResults; i++) {
             final TeamSummary teamSummary = teamResults.get(i);
             final TeamSummary teamAhead = teamResults.get(i - 1);
 
@@ -124,21 +125,22 @@ public class LeaderboardStatsGenerator {
         return categoryLeaderboard;
     }
 
-    private List<UserCategoryLeaderboardEntry> getUserLeaderboardForCategory(final List<UserSummary> userSummaries) {
+    private List<UserCategoryLeaderboardEntry> getUserLeaderboardForCategory(final List<UserSummary> userResults) {
         // If we have no users for the category, no need to do anything
-        if (userSummaries.isEmpty()) {
+        if (userResults.isEmpty()) {
             return Collections.emptyList();
         }
 
-        final UserSummary firstResult = userSummaries.get(0);
+        final UserSummary firstResult = userResults.get(0);
         final UserCategoryLeaderboardEntry categoryLeader = UserCategoryLeaderboardEntry.createLeader(firstResult);
 
-        final List<UserCategoryLeaderboardEntry> userSummariesInCategory = new ArrayList<>(userSummaries.size());
+        final int numberOfUserResults = userResults.size();
+        final List<UserCategoryLeaderboardEntry> userSummariesInCategory = new ArrayList<>(numberOfUserResults);
         userSummariesInCategory.add(categoryLeader);
 
-        for (int i = 1; i < userSummaries.size(); i++) {
-            final UserSummary userSummary = userSummaries.get(i);
-            final UserSummary userAhead = userSummaries.get(i - 1);
+        for (int i = 1; i < numberOfUserResults; i++) {
+            final UserSummary userSummary = userResults.get(i);
+            final UserSummary userAhead = userResults.get(i - 1);
 
             final long diffToLeader = categoryLeader.getMultipliedPoints() - userSummary.getMultipliedPoints();
             final long diffToNext = userAhead.getMultipliedPoints() - userSummary.getMultipliedPoints();
