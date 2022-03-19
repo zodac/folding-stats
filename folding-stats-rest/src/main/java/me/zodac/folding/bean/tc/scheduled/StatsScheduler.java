@@ -46,7 +46,7 @@ import org.springframework.stereotype.Component;
 public class StatsScheduler {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final boolean IS_STATS_SCHEDULED_PARSING_ENABLED = EnvironmentVariableUtils.getBoolean("ENABLE_STATS_SCHEDULED_PARSING");
+    private static final boolean IS_STATS_SCHEDULED_PARSING_ENABLED = EnvironmentVariableUtils.isEnabled("ENABLE_STATS_SCHEDULED_PARSING");
 
     @Autowired
     private FoldingRepository foldingRepository;

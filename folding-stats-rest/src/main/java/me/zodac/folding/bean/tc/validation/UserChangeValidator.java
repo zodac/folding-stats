@@ -102,7 +102,7 @@ public class UserChangeValidator {
         }
 
         final User previousUser = user(userChangeRequest);
-        isUserChangeUnnecessary(userChangeRequest, previousUser);
+        validateUserChangeIsUnnecessary(userChangeRequest, previousUser);
         validateExistingPasskeyMatchesExistingUser(userChangeRequest, previousUser);
         validateUpdateUserWorkUnits(userChangeRequest, previousUser);
         final Hardware newHardware = hardware(userChangeRequest);
@@ -163,7 +163,7 @@ public class UserChangeValidator {
         }
     }
 
-    private void isUserChangeUnnecessary(final UserChangeRequest userChangeRequest, final User previousUser) {
+    private void validateUserChangeIsUnnecessary(final UserChangeRequest userChangeRequest, final User previousUser) {
         if (previousUser.hardware().id() == userChangeRequest.getHardwareId()
             && previousUser.foldingUserName().equals(userChangeRequest.getFoldingUserName())
             && previousUser.passkey().equals(userChangeRequest.getPasskey())

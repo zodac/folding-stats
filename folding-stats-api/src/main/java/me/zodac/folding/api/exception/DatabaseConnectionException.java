@@ -46,10 +46,10 @@ public class DatabaseConnectionException extends RuntimeException {
     /**
      * Constructor taking in an error message and a cause {@link Throwable}.
      *
-     * @param message   the error message
-     * @param throwable the cause {@link Throwable}
+     * @param message the error message
+     * @param cause   the cause {@link Throwable}
      */
-    public DatabaseConnectionException(final String message, final Throwable throwable) {
-        super(message, throwable);
+    public DatabaseConnectionException(final String message, final Throwable cause) {
+        super(message, cause);
     }
 }

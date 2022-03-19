@@ -76,9 +76,9 @@ import org.springframework.stereotype.Component;
 public class TeamCompetitionScheduler {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final boolean IS_MONTHLY_RESET_ENABLED = EnvironmentVariableUtils.getBoolean("ENABLE_STATS_MONTHLY_RESET");
-    private static final boolean IS_MONTHLY_RESULT_ENABLED = EnvironmentVariableUtils.getBoolean("ENABLE_MONTHLY_RESULT_STORAGE");
-    private static final boolean IS_LARS_UPDATE_ENABLED = EnvironmentVariableUtils.getBoolean("ENABLE_LARS_HARDWARE_UPDATE");
+    private static final boolean IS_MONTHLY_RESET_ENABLED = EnvironmentVariableUtils.isEnabled("ENABLE_STATS_MONTHLY_RESET");
+    private static final boolean IS_MONTHLY_RESULT_ENABLED = EnvironmentVariableUtils.isEnabled("ENABLE_MONTHLY_RESULT_STORAGE");
+    private static final boolean IS_LARS_UPDATE_ENABLED = EnvironmentVariableUtils.isEnabled("ENABLE_LARS_HARDWARE_UPDATE");
 
     private final LarsHardwareUpdater larsHardwareUpdater;
     private final UserChangeApplier userChangeApplier;

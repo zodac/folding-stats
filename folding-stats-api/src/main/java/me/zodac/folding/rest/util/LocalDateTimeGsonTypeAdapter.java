@@ -83,9 +83,9 @@ public final class LocalDateTimeGsonTypeAdapter implements JsonDeserializer<Loca
     }
 
     @Override
-    public LocalDateTime deserialize(final JsonElement json, final Type typeOfT, final JsonDeserializationContext context) {
-        final JsonObject date = json.getAsJsonObject().get("date").getAsJsonObject();
-        final JsonObject time = json.getAsJsonObject().get("time").getAsJsonObject();
+    public LocalDateTime deserialize(final JsonElement jsonElement, final Type type, final JsonDeserializationContext jsonDeserializationContext) {
+        final JsonObject date = jsonElement.getAsJsonObject().get("date").getAsJsonObject();
+        final JsonObject time = jsonElement.getAsJsonObject().get("time").getAsJsonObject();
 
         final int year = date.get("year").getAsInt();
         final int month = date.get("month").getAsInt();
@@ -100,7 +100,7 @@ public final class LocalDateTimeGsonTypeAdapter implements JsonDeserializer<Loca
     }
 
     @Override
-    public JsonElement serialize(final LocalDateTime localDateTime, final Type typeOfSrc, final JsonSerializationContext context) {
+    public JsonElement serialize(final LocalDateTime localDateTime, final Type type, final JsonSerializationContext jsonSerializationContext) {
         final JsonObject output = new JsonObject();
 
         final JsonObject date = new JsonObject();

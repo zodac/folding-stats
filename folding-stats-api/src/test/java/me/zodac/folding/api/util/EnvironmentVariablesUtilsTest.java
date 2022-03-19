@@ -92,30 +92,30 @@ class EnvironmentVariablesUtilsTest {
     }
 
     @Test
-    void whenGetBoolean_givenVariableIsNotSet_thenFalseIsReturned() {
+    void whenIsEnabled_givenVariableIsNotSet_thenFalseIsReturned() {
         final String propertyName = getSystemPropertyName();
 
-        final boolean result = EnvironmentVariableUtils.getBoolean(propertyName);
+        final boolean result = EnvironmentVariableUtils.isEnabled(propertyName);
         assertThat(result)
             .isFalse();
     }
 
     @Test
-    void whenGetBoolean_givenVariableIsSet_andValueIsNotValidBoolean_thenFalseIsReturned() {
+    void whenIsEnabled_givenVariableIsSet_andValueIsNotValidBoolean_thenFalseIsReturned() {
         final String propertyName = getSystemPropertyName();
 
         System.setProperty(propertyName, "value");
-        final boolean result = EnvironmentVariableUtils.getBoolean(propertyName);
+        final boolean result = EnvironmentVariableUtils.isEnabled(propertyName);
         assertThat(result)
             .isFalse();
     }
 
     @Test
-    void whenGetBoolean_givenVariableIsSet_andValueIsPositiveBoolean_thenTrueIsReturned() {
+    void whenIsEnabled_givenVariableIsSet_andValueIsPositiveBoolean_thenTrueIsReturned() {
         final String propertyName = getSystemPropertyName();
 
         System.setProperty(propertyName, "tRuE");
-        final boolean result = EnvironmentVariableUtils.getBoolean(propertyName);
+        final boolean result = EnvironmentVariableUtils.isEnabled(propertyName);
         assertThat(result)
             .isTrue();
     }
@@ -124,9 +124,9 @@ class EnvironmentVariablesUtilsTest {
     void whenGetIntOrDefault_givenVariableIsNotSet_thenDefaultIsReturned() {
         final String propertyName = getSystemPropertyName();
 
-        final int result = EnvironmentVariableUtils.getIntOrDefault(propertyName, 0);
+        final int result = EnvironmentVariableUtils.getIntOrDefault(propertyName, 5);
         assertThat(result)
-            .isZero();
+            .isEqualTo(5);
     }
 
     @Test
@@ -134,19 +134,19 @@ class EnvironmentVariablesUtilsTest {
         final String propertyName = getSystemPropertyName();
 
         System.setProperty(propertyName, "value");
-        final int result = EnvironmentVariableUtils.getIntOrDefault(propertyName, 0);
+        final int result = EnvironmentVariableUtils.getIntOrDefault(propertyName, 5);
         assertThat(result)
-            .isZero();
+            .isEqualTo(5);
     }
 
     @Test
     void whenGetBoolean_givenVariableIsSet_andValueIsValidInt_thenValueIsReturned() {
         final String propertyName = getSystemPropertyName();
 
-        System.setProperty(propertyName, "1");
-        final int result = EnvironmentVariableUtils.getIntOrDefault(propertyName, 0);
+        System.setProperty(propertyName, "20");
+        final int result = EnvironmentVariableUtils.getIntOrDefault(propertyName, 5);
         assertThat(result)
-            .isOne();
+            .isEqualTo(20);
     }
 
     private static Map.Entry<String, String> getEnvironmentVariableThatIsNotAlsoSystemProperty() {

@@ -109,7 +109,7 @@ record IntegerRankingCollector<T>(Comparator<? super T> comparator, Function<T, 
 
     @Override
     public Function<List<T>, List<T>> finisher() {
-        return l -> l;
+        return list -> list;
     }
 
     @Override

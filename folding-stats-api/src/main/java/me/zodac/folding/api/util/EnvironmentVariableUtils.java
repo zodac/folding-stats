@@ -76,7 +76,7 @@ public final class EnvironmentVariableUtils {
      * @param variableName the property to search for
      * @return the value of the property as a {@link Boolean}, defaulting to {@code false} if the value does not exist or is not valid
      */
-    public static boolean getBoolean(final String variableName) {
+    public static boolean isEnabled(final String variableName) {
         final String value = System.getProperty(variableName, System.getenv(variableName));
         return Boolean.parseBoolean(value);
     }

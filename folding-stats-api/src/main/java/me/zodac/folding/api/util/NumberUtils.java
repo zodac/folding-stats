@@ -46,21 +46,7 @@ public final class NumberUtils {
      * @param number the {@code long} to be formatted
      * @return the formatted {@code long}
      */
-    public static String formatWithCommas(final long number) {
-        return getNumberFormat().format(number);
-    }
-
-    /**
-     * Formats the input {@code int} with commas, based on {@link Locale#UK}.
-     *
-     * <p>
-     * <b>NOTE:</b> This should only be used for logging. Any values making it to the frontend should be formatted there,
-     * otherwise we may end up formatting with the incorrect style.
-     *
-     * @param number the {@code int} to be formatted
-     * @return the formatted {@code int}
-     */
-    public static String formatWithCommas(final int number) {
+    public static String formatWithCommas(final Number number) {
         return getNumberFormat().format(number);
     }
 

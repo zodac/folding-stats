@@ -46,10 +46,10 @@ public class FoldingRestException extends Exception {
     /**
      * Constructor taking in an error message and a cause {@link Throwable}.
      *
-     * @param message   the error message
-     * @param throwable the cause {@link Throwable}
+     * @param message the error message
+     * @param cause   the cause {@link Throwable}
      */
-    public FoldingRestException(final String message, final Throwable throwable) {
-        super(message, throwable);
+    public FoldingRestException(final String message, final Throwable cause) {
+        super(message, cause);
     }
 }

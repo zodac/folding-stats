@@ -33,8 +33,8 @@ import me.zodac.folding.api.util.EnvironmentVariableUtils;
  */
 public final class PostgresDataSource extends HikariDataSource {
 
-    private PostgresDataSource(final HikariConfig hikariConfig) {
-        super(hikariConfig);
+    private PostgresDataSource(final HikariConfig configuration) {
+        super(configuration);
     }
 
     /**
