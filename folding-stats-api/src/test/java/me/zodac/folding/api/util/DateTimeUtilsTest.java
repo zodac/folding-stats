@@ -131,4 +131,26 @@ class DateTimeUtilsTest {
         assertThat(currentUtcDateTime)
             .isNotEqualTo(TEST_TIME);
     }
+
+    @Test
+    void whenIsLastDayOfMonth_given28thFeburary_andNotLeapYear_thenTrueIsReturned() {
+        final LocalDateTime testTime = LocalDateTime.of(2019, 2, 28, 0, 0);
+        final Supplier<OffsetDateTime> testTimeSupplier = () -> OffsetDateTime.of(testTime, ZoneOffset.UTC);
+        final DateTimeUtils dateTimeUtils = DateTimeUtils.createWithSupplier(testTimeSupplier);
+
+        final boolean actual = dateTimeUtils.isLastDayOfMonth();
+        assertThat(actual)
+            .isTrue();
+    }
+
+    @Test
+    void whenIsLastDayOfMonth_given28thFeburary_andLeapYear_thenFalseIsReturned() {
+        final LocalDateTime testTime = LocalDateTime.of(2020, 2, 28, 0, 0);
+        final Supplier<OffsetDateTime> testTimeSupplier = () -> OffsetDateTime.of(testTime, ZoneOffset.UTC);
+        final DateTimeUtils dateTimeUtils = DateTimeUtils.createWithSupplier(testTimeSupplier);
+
+        final boolean actual = dateTimeUtils.isLastDayOfMonth();
+        assertThat(actual)
+            .isFalse();
+    }
 }

@@ -32,7 +32,6 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.Year;
 import java.time.ZoneOffset;
-import java.util.Date;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -61,7 +60,7 @@ class DateTimeConverterUtilsTest {
     @Test
     void whenConvertDateToUtcLocalDateTime_givenDate_thenUtcLocalDateTimeIsReturned() {
         final long currentTimeInMilliseconds = System.currentTimeMillis();
-        final Date date = new Date(currentTimeInMilliseconds);
+        final Timestamp date = new Timestamp(currentTimeInMilliseconds);
 
         final LocalDateTime actual = DateTimeConverterUtils.toUtcLocalDateTime(date);
         final LocalDateTime expected = Instant.ofEpochMilli(currentTimeInMilliseconds)

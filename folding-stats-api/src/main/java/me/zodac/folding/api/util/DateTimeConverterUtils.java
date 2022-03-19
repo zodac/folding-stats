@@ -29,7 +29,6 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.Year;
 import java.time.ZoneOffset;
-import java.util.Date;
 import java.util.Locale;
 
 /**
@@ -72,13 +71,13 @@ public final class DateTimeConverterUtils {
     }
 
     /**
-     * Convert the given {@link Date} into a {@link LocalDateTime} in {@link ZoneOffset#UTC}.
+     * Convert the given {@link Timestamp} into a {@link LocalDateTime} in {@link ZoneOffset#UTC}.
      *
-     * @param date the {@link Date} to convert
+     * @param timestamp the {@link Timestamp} to convert
      * @return the {@link ZoneOffset#UTC} {@link LocalDateTime}
      */
-    public static LocalDateTime toUtcLocalDateTime(final Date date) {
-        return date
+    public static LocalDateTime toUtcLocalDateTime(final Timestamp timestamp) {
+        return timestamp
             .toInstant()
             .atOffset(ZoneOffset.UTC)
             .toLocalDateTime();

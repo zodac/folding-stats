@@ -32,6 +32,7 @@ import java.time.OffsetDateTime;
 import java.time.Year;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
 import java.util.function.Supplier;
 
 /**
@@ -118,6 +119,20 @@ public record DateTimeUtils(Supplier<OffsetDateTime> timeSupplier) {
             currentUtcDateTime().toInstant(),
             Instant.parse(nextMonthAsDate).atZone(ZoneOffset.UTC)
         );
+    }
+
+    /**
+     * Checks if the current {@link OffsetDateTime} day in {@link ZoneOffset#UTC} is the last day of the month.
+     *
+     * @return {@code true} if the current day is the last day of the month.
+     */
+    public boolean isLastDayOfMonth() {
+        final int currentDayOfMonth = currentUtcDateTime().getDayOfMonth();
+        final int lastDayOfMonth = currentUtcDateTime().toLocalDate()
+            .with(TemporalAdjusters.lastDayOfMonth())
+            .getDayOfMonth();
+
+        return lastDayOfMonth == currentDayOfMonth;
     }
 
     private OffsetDateTime currentUtcDateTime() {

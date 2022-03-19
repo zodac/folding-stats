@@ -24,13 +24,10 @@
 
 package me.zodac.folding.bean.tc.scheduled;
 
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.util.Calendar;
-import java.util.TimeZone;
 import me.zodac.folding.api.state.ParsingState;
 import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.tc.change.UserChange;
+import me.zodac.folding.api.util.DateTimeUtils;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
 import me.zodac.folding.bean.tc.lars.LarsHardwareUpdater;
 import me.zodac.folding.bean.tc.user.UserChangeApplier;
@@ -76,6 +73,7 @@ import org.springframework.stereotype.Component;
 public class TeamCompetitionScheduler {
 
     private static final Logger LOGGER = LogManager.getLogger();
+    private static final DateTimeUtils DATE_TIME_UTILS = DateTimeUtils.create();
     private static final boolean IS_MONTHLY_RESET_ENABLED = EnvironmentVariableUtils.isEnabled("ENABLE_STATS_MONTHLY_RESET");
     private static final boolean IS_MONTHLY_RESULT_ENABLED = EnvironmentVariableUtils.isEnabled("ENABLE_MONTHLY_RESULT_STORAGE");
     private static final boolean IS_LARS_UPDATE_ENABLED = EnvironmentVariableUtils.isEnabled("ENABLE_LARS_HARDWARE_UPDATE");
@@ -136,7 +134,7 @@ public class TeamCompetitionScheduler {
             // Because we cannot set up a cron schedule with last day for each month, we use the range '28-31'.
             // We then check if the current day in the month is the last day of the month.
             // If not, we skip the reset.
-            if (!isLastDayInMonth()) {
+            if (!DATE_TIME_UTILS.isLastDayOfMonth()) {
                 LOGGER.warn("End of month reset triggered, but not actually end of the month, skipping");
                 return;
             }
@@ -165,11 +163,5 @@ public class TeamCompetitionScheduler {
         } catch (final Exception e) {
             LOGGER.error("Error with end of month schedule", e);
         }
-    }
-
-    private static boolean isLastDayInMonth() {
-        final TimeZone utcTimeZone = TimeZone.getTimeZone(ZoneId.from(ZoneOffset.UTC));
-        final Calendar calendar = Calendar.getInstance(utcTimeZone);
-        return calendar.get(Calendar.DATE) == calendar.getActualMaximum(Calendar.DATE);
     }
 }
