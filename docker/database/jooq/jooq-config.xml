@@ -17,7 +17,7 @@
                 | SECRET_SCHEMA\.SECRET_TABLE # This table (qualified name) should not be generated
                 | SECRET_ROUTINE # This routine (unqualified name) ...
             </excludes>
-			<inputSchema>public</inputSchema>
+            <inputSchema>public</inputSchema>
         </database>
 
         <target>
