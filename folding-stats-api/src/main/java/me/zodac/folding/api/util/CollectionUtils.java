@@ -59,7 +59,7 @@ public final class CollectionUtils {
      * @param <E>    the type of the elements in the {@link Collection}s
      * @return an unsorted {@link Set} of the elements that only exist in the first {@link Collection}
      */
-    public static <E> Set<E> existsInFirstOnly(final Collection<E> first, final Collection<E> second) {
+    public static <E> Set<E> existsInFirstOnly(final Collection<? extends E> first, final Collection<E> second) {
         final Set<E> copyOfFirst = new HashSet<>(first);
         copyOfFirst.removeAll(second);
         return copyOfFirst;

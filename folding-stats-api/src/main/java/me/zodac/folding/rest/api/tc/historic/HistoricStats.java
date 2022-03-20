@@ -88,7 +88,7 @@ public class HistoricStats {
      * @param allStats the {@link HistoricStats} for multiple {@link me.zodac.folding.api.tc.User}s and {@link LocalDateTime}s
      * @return a {@link Collection} of combined {@link HistoricStats}
      */
-    public static Collection<HistoricStats> combine(final Collection<HistoricStats> allStats) {
+    public static Collection<HistoricStats> combine(final Collection<? extends HistoricStats> allStats) {
         final Set<LocalDateTime> keys = allStats.stream()
             .map(HistoricStats::getDateTime)
             .sorted()

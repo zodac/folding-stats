@@ -87,8 +87,8 @@ public class TeamSummary {
      */
     public static TeamSummary createWithDefaultRank(final Team team,
                                                     final String captainName,
-                                                    final Collection<UserSummary> activeUsers,
-                                                    final Collection<RetiredUserSummary> retiredUsers) {
+                                                    final Collection<? extends UserSummary> activeUsers,
+                                                    final Collection<? extends RetiredUserSummary> retiredUsers) {
         int teamUnits = 0;
         long teamPoints = 0L;
         long teamMultipliedPoints = 0L;

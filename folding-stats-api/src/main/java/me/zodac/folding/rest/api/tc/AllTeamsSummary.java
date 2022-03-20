@@ -65,7 +65,7 @@ public class AllTeamsSummary {
      * @param teams the {@link TeamSummary}s taking part in the {@code Team Competition}
      * @return the created {@link AllTeamsSummary}
      */
-    public static AllTeamsSummary create(final Collection<TeamSummary> teams) {
+    public static AllTeamsSummary create(final Collection<? extends TeamSummary> teams) {
         int totalUnits = 0;
         long totalPoints = 0L;
         long totalMultipliedPoints = 0L;

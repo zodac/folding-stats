@@ -98,7 +98,7 @@ record IntegerRankingCollector<T>(Comparator<? super T> comparator, Function<T, 
         return ranker.apply(lastElementOnTheLeft.get());
     }
 
-    private Optional<T> optGet(final List<T> list, final int index) {
+    private Optional<T> optGet(final List<? extends T> list, final int index) {
         return list == null || list.isEmpty() ? Optional.empty() : Optional.of(list.get(index));
     }
 

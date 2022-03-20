@@ -1212,7 +1212,7 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
         });
     }
 
-    private <T> T executeQuery(final Function<DSLContext, T> sqlQuery) {
+    private <T> T executeQuery(final Function<? super DSLContext, T> sqlQuery) {
         try (final Connection connection = dataSource.getConnection()) {
             final DSLContext queryContext = DSL.using(connection, SQLDialect.POSTGRES);
             return sqlQuery.apply(queryContext);
