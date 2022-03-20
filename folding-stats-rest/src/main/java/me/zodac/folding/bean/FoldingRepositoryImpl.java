@@ -274,7 +274,7 @@ public class FoldingRepositoryImpl implements FoldingRepository {
         // Using BigDecimal since equality checks with doubles can be imprecise
         final BigDecimal existingMultiplier = BigDecimal.valueOf(existingHardware.multiplier());
         final BigDecimal updatedMultiplier = BigDecimal.valueOf(updatedHardware.multiplier());
-        final boolean isMultiplierChange = !existingMultiplier.equals(updatedMultiplier);
+        final boolean isMultiplierChange = existingMultiplier.compareTo(updatedMultiplier) != 0;
 
         if (isMultiplierChange) {
             LOGGER.debug("Hardware '{}' (ID: {}) had state change to multiplier, {} -> {}", updatedHardware.id(),

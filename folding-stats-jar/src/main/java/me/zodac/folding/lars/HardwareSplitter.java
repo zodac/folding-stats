@@ -140,7 +140,7 @@ public final class HardwareSplitter {
 
             // We know the name is already equal, now we check multiplier and average PPD
             // If the stats have not changed since the last update, no need to update again now
-            if (!updatedMultiplier.equals(existingMultiplier) || updatedHardware.averagePpd() != existingHardware.averagePpd()) {
+            if (updatedMultiplier.compareTo(existingMultiplier) != 0 || updatedHardware.averagePpd() != existingHardware.averagePpd()) {
                 toUpdate.put(updatedHardware, existingHardware);
             }
         }
