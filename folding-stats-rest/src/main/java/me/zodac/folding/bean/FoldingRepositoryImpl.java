@@ -40,6 +40,7 @@ import me.zodac.folding.api.tc.change.UserChange;
 import me.zodac.folding.api.tc.change.UserChangeState;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
+import me.zodac.folding.api.tc.stats.StatsConverter;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.bean.tc.user.UserStatsParser;
@@ -296,7 +297,7 @@ public class FoldingRepositoryImpl implements FoldingRepository {
             statsRepository.createInitialStats(userTotalStats);
 
             final UserTcStats currentUserTcStats = statsRepository.getHourlyTcStats(userWithStateChange);
-            final OffsetTcStats offsetTcStats = OffsetTcStats.create(currentUserTcStats);
+            final OffsetTcStats offsetTcStats = StatsConverter.toOffsetStats(currentUserTcStats);
             final OffsetTcStats createdOffsetStats = statsRepository.createOffsetStats(userWithStateChange, offsetTcStats);
             LOGGER.debug("Added offset stats of: {}", createdOffsetStats);
 
