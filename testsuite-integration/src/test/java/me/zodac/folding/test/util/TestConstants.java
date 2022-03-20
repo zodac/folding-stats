@@ -27,7 +27,7 @@ package me.zodac.folding.test.util;
 /**
  * Constants class for test convenience.
  */
-public class TestConstants {
+public final class TestConstants {
 
     // URL
     public static final String TEST_IP_ADDRESS = System.getProperty("testIpAddress", "127.0.0.1");
@@ -37,4 +37,8 @@ public class TestConstants {
     // ID
     public static final int NON_EXISTING_ID = 9_999;
     public static final String INVALID_FORMAT_ID = "id";
+
+    private TestConstants() {
+
+    }
 }
