@@ -55,7 +55,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * The {@code jooq} transitive dependency {@link R2dbcAutoConfiguration} must also be excluded.
  */
 @EnableScheduling
-@SpringBootApplication(exclude = {R2dbcAutoConfiguration.class})
+@SpringBootApplication(exclude = R2dbcAutoConfiguration.class)
 public class FoldingStatsApplication {
 
     private static final Logger LOGGER = LogManager.getLogger();
