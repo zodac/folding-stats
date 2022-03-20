@@ -64,7 +64,7 @@ public class UserStatsResetter {
      * </ol>
      *
      * @see StatsRepository#resetAllTeamCompetitionUserStats()
-     * @see UserStatsParser#parseTcStatsForUsersAndWait(Collection)
+     * @see UserStatsParser#parseTcStatsForUsersAndWait(Iterable)
      */
     public void resetTeamCompetitionStats() {
         try {

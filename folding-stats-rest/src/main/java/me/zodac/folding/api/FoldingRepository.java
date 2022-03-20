@@ -101,7 +101,7 @@ public interface FoldingRepository {
      * @param team the {@link Team} to create
      * @return the created {@link Team}, with ID
      * @see ParsingStateManager
-     * @see UserStatsParser#parseTcStatsForUsersAndWait(Collection)
+     * @see UserStatsParser#parseTcStatsForUsersAndWait(Iterable)
      */
     Team createTeam(Team team);
 
