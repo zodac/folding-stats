@@ -60,7 +60,7 @@ public class HistoricStatsEndpoint {
     private static final Logger AUDIT_LOGGER = LogManager.getLogger("audit");
 
     // Stat updates occur every hour, so we must invalidate responses every hour
-    private static final int CACHE_EXPIRATION_TIME = (int) TimeUnit.HOURS.toSeconds(1);
+    private static final long CACHE_EXPIRATION_TIME = TimeUnit.HOURS.toSeconds(1);
 
     private final FoldingRepository foldingRepository;
     private final StatsRepository statsRepository;
