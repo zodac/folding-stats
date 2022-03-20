@@ -247,7 +247,7 @@ public class FoldingRepositoryImpl implements FoldingRepository {
         return updatedUser;
     }
 
-    private boolean isUserStateChange(final User updatedUser, final User existingUser) {
+    private static boolean isUserStateChange(final User updatedUser, final User existingUser) {
         if (existingUser.hardware().id() != updatedUser.hardware().id()) {
             LOGGER.debug("User '{}' (ID: {}) had state change to hardware, {} -> {}", existingUser.displayName(),
                 existingUser.id(), existingUser.hardware(), updatedUser.hardware());
@@ -270,7 +270,7 @@ public class FoldingRepositoryImpl implements FoldingRepository {
         return false;
     }
 
-    private boolean isHardwareStateChange(final Hardware updatedHardware, final Hardware existingHardware) {
+    private static boolean isHardwareStateChange(final Hardware updatedHardware, final Hardware existingHardware) {
         // Using BigDecimal since equality checks with doubles can be imprecise
         final BigDecimal existingMultiplier = BigDecimal.valueOf(existingHardware.multiplier());
         final BigDecimal updatedMultiplier = BigDecimal.valueOf(updatedHardware.multiplier());
@@ -307,7 +307,7 @@ public class FoldingRepositoryImpl implements FoldingRepository {
         }
     }
 
-    private boolean isUserTeamChange(final User updatedUser, final User existingUser) {
+    private static boolean isUserTeamChange(final User updatedUser, final User existingUser) {
         if (updatedUser.team().id() != existingUser.team().id()) {
             LOGGER.info("User '{}' (ID: {}) moved from team '{}' -> '{}'", existingUser.displayName(), existingUser.id(),
                 updatedUser.team().teamName(), existingUser.team().teamName());

@@ -273,7 +273,7 @@ public class UserValidator {
             .findAny();
     }
 
-    private Category validateCategoryIsValidForHardware(final UserRequest userRequest, final Hardware hardwareForUser) {
+    private static Category validateCategoryIsValidForHardware(final UserRequest userRequest, final Hardware hardwareForUser) {
         final Category category = Category.get(userRequest.getCategory());
 
         if (!category.isHardwareMakeSupported(hardwareForUser.hardwareMake())) {

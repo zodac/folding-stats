@@ -85,7 +85,7 @@ public class StateInterceptor implements HandlerInterceptor {
         return handler instanceof CorsConfigurationSource && handler instanceof HttpRequestHandler;
     }
 
-    private void validateSystemState(final HandlerMethod handlerMethod) {
+    private static void validateSystemState(final HandlerMethod handlerMethod) {
         final Method method = handlerMethod.getMethod();
         LOGGER.trace("Access requested to: #{}()", method.getName());
 

@@ -156,7 +156,7 @@ public class UserChangeEndpoint {
         return ok(userChanges);
     }
 
-    private Collection<UserChangeState> getStatesBasedOnInput(final String state) {
+    private static Collection<UserChangeState> getStatesBasedOnInput(final String state) {
         if (ALL_STATES_OPTION.equals(state)) {
             return UserChangeState.getAllValues();
         }

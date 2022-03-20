@@ -948,7 +948,7 @@ public class Storage {
         LOGGER.info("AllTeamsSummaryCache: {}", allTeamsSummaryCache.asMap());
     }
 
-    private <T> T dbManagerFunction(final Function<? super DbManager, T> function) {
+    private static <T> T dbManagerFunction(final Function<? super DbManager, T> function) {
         try (final DbManager dbManager = DbManagerRetriever.get()) {
             return function.apply(dbManager);
         } catch (final IOException e) {
@@ -956,7 +956,7 @@ public class Storage {
         }
     }
 
-    private void dbManagerConsumer(final Consumer<? super DbManager> consumer) {
+    private static void dbManagerConsumer(final Consumer<? super DbManager> consumer) {
         try (final DbManager dbManager = DbManagerRetriever.get()) {
             consumer.accept(dbManager);
         } catch (final IOException e) {

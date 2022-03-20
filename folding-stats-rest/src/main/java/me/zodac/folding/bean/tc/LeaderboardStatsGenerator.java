@@ -124,7 +124,7 @@ public class LeaderboardStatsGenerator {
         return categoryLeaderboard;
     }
 
-    private List<UserCategoryLeaderboardEntry> getUserLeaderboardForCategory(final List<? extends UserSummary> userResults) {
+    private static List<UserCategoryLeaderboardEntry> getUserLeaderboardForCategory(final List<? extends UserSummary> userResults) {
         // If we have no users for the category, no need to do anything
         if (userResults.isEmpty()) {
             return Collections.emptyList();

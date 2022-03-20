@@ -163,7 +163,7 @@ public class UserChangeValidator {
         }
     }
 
-    private void validateUserChangeIsUnnecessary(final UserChangeRequest userChangeRequest, final User previousUser) {
+    private static void validateUserChangeIsUnnecessary(final UserChangeRequest userChangeRequest, final User previousUser) {
         if (previousUser.hardware().id() == userChangeRequest.getHardwareId()
             && previousUser.foldingUserName().equals(userChangeRequest.getFoldingUserName())
             && previousUser.passkey().equals(userChangeRequest.getPasskey())
@@ -224,7 +224,7 @@ public class UserChangeValidator {
             && Objects.equals(user.liveStatsLink(), userChangeRequest.getLiveStatsLink());
     }
 
-    private void validateExistingPasskeyMatchesExistingUser(final UserChangeRequest userChangeRequest, final User previousUser) {
+    private static void validateExistingPasskeyMatchesExistingUser(final UserChangeRequest userChangeRequest, final User previousUser) {
         if (!previousUser.passkey().equals(userChangeRequest.getExistingPasskey())) {
             throw new ValidationException(userChangeRequest, "Field 'existingPasskey' does not match the existing passkey for the user");
         }
