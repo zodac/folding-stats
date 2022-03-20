@@ -117,18 +117,18 @@ public final class TeamCompetitionStatsResponseParser {
     }
 
     /**
-     * Private class defining the {@link Map} for {@link TeamLeaderboardEntry}s.
+     * Private class defining the {@link Map} for {@link UserCategoryLeaderboardEntry}s.
      */
     private static final class UserCategoryLeaderboardEntryMapType extends TypeToken<Map<String, List<UserCategoryLeaderboardEntry>>> {
 
-        private static final TeamLeaderboardEntryCollectionType INSTANCE = new TeamLeaderboardEntryCollectionType();
+        private static final UserCategoryLeaderboardEntryMapType INSTANCE = new UserCategoryLeaderboardEntryMapType();
 
         /**
-         * Retrieve a singleton instance of {@link TeamLeaderboardEntryCollectionType}.
+         * Retrieve a singleton instance of {@link UserCategoryLeaderboardEntryMapType}.
          *
-         * @return {@link TeamLeaderboardEntryCollectionType} instance.
+         * @return {@link UserCategoryLeaderboardEntryMapType} instance.
          */
-        static TeamLeaderboardEntryCollectionType getInstance() {
+        static UserCategoryLeaderboardEntryMapType getInstance() {
             return INSTANCE;
         }
     }
