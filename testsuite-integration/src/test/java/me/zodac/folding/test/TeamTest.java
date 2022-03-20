@@ -53,7 +53,6 @@ import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
-import me.zodac.folding.rest.util.RestUtilConstants;
 import me.zodac.folding.test.util.TestConstants;
 import me.zodac.folding.test.util.TestGenerator;
 import me.zodac.folding.test.util.rest.request.TeamUtils;
@@ -425,12 +424,12 @@ class TeamTest {
         final TeamRequest teamToCreate = generateTeam();
 
         final HttpRequest request = HttpRequest.newBuilder()
-            .POST(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(teamToCreate)))
+            .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(teamToCreate)))
             .uri(URI.create(FOLDING_URL + "/teams/"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
-        final HttpResponse<String> response = RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+        final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertThat(response.statusCode())
             .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
@@ -449,12 +448,12 @@ class TeamTest {
             .build();
 
         final HttpRequest request = HttpRequest.newBuilder()
-            .PUT(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(teamToUpdate)))
+            .PUT(HttpRequest.BodyPublishers.ofString(GSON.toJson(teamToUpdate)))
             .uri(URI.create(FOLDING_URL + "/teams/" + createdTeam.id()))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
-        final HttpResponse<String> response = RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+        final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertThat(response.statusCode())
             .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
@@ -472,7 +471,7 @@ class TeamTest {
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
-        final HttpResponse<Void> response = RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
+        final HttpResponse<Void> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
         assertThat(response.statusCode())
             .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
@@ -601,13 +600,13 @@ class TeamTest {
             .build();
 
         final HttpRequest request = HttpRequest.newBuilder()
-            .POST(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(team)))
+            .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(team)))
             .uri(URI.create(FOLDING_URL + "/teams/"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.TEXT.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
             .build();
 
-        final HttpResponse<String> response = RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+        final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
             .as("Did not receive a 415_UNSUPPORTED_MEDIA_TYPE HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNSUPPORTED_TYPE);
