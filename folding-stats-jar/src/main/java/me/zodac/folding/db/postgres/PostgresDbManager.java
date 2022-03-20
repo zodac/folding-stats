@@ -440,8 +440,8 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
     }
 
     @Override
-    public Collection<UserChange> getAllUserChanges(final Collection<UserChangeState> states, final int numberOfMonths) {
-        return numberOfMonths == 0
+    public Collection<UserChange> getAllUserChanges(final Collection<UserChangeState> states, final long numberOfMonths) {
+        return numberOfMonths == 0L
             ? getAllUserChangesWithState(states)
             : getAllUserChangesWithStateForPastMonths(states, numberOfMonths);
     }
@@ -464,7 +464,7 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
         });
     }
 
-    private List<UserChange> getAllUserChangesWithStateForPastMonths(final Collection<UserChangeState> states, final int numberOfMonths) {
+    private List<UserChange> getAllUserChangesWithStateForPastMonths(final Collection<UserChangeState> states, final long numberOfMonths) {
         final LocalDateTime toTime = DATE_TIME_UTILS.currentUtcLocalDateTime();
         final LocalDateTime fromTime = toTime.minusMonths(numberOfMonths);
 
@@ -748,8 +748,8 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
             return UserTcStats.create(
                 firstHourTcStatsCurrentDay.getUserId(),
                 firstHourTcStatsCurrentDay.getTimestamp(),
-                Math.max(0, firstHourTcStatsCurrentDay.getPoints() - initialStats.getPoints()),
-                Math.max(0, firstHourTcStatsCurrentDay.getMultipliedPoints() - Math.round(hardwareMultiplier * initialStats.getPoints())),
+                Math.max(0L, firstHourTcStatsCurrentDay.getPoints() - initialStats.getPoints()),
+                Math.max(0L, firstHourTcStatsCurrentDay.getMultipliedPoints() - Math.round(hardwareMultiplier * initialStats.getPoints())),
                 Math.max(0, firstHourTcStatsCurrentDay.getUnits() - initialStats.getUnits())
             );
         }
@@ -759,8 +759,8 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
         return UserTcStats.create(
             firstHourTcStatsCurrentDay.getUserId(),
             firstHourTcStatsCurrentDay.getTimestamp(),
-            Math.max(0, firstHourTcStatsCurrentDay.getPoints() - lastHourTcStatsPreviousDay.getPoints()),
-            Math.max(0, firstHourTcStatsCurrentDay.getMultipliedPoints() - lastHourTcStatsPreviousDay.getMultipliedPoints()),
+            Math.max(0L, firstHourTcStatsCurrentDay.getPoints() - lastHourTcStatsPreviousDay.getPoints()),
+            Math.max(0L, firstHourTcStatsCurrentDay.getMultipliedPoints() - lastHourTcStatsPreviousDay.getMultipliedPoints()),
             Math.max(0, firstHourTcStatsCurrentDay.getUnits() - lastHourTcStatsPreviousDay.getUnits())
         );
     }

@@ -68,13 +68,13 @@ public class Storage {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final int ALL_TEAMS_SUMMARY_ID = 1; // We only ever have one entry
 
-    private static final int STANDARD_CACHE_SIZE = 25;
-    private static final Duration STANDARD_CACHE_EXPIRATION_TIME = Duration.ofHours(1);
+    private static final long STANDARD_CACHE_SIZE = 25L;
+    private static final Duration STANDARD_CACHE_EXPIRATION_TIME = Duration.ofHours(1L);
 
     // POJO caches
     private final Cache<Integer, Hardware> hardwareCache = Caffeine.newBuilder()
-        .maximumSize(300)
-        .expireAfterWrite(Duration.ofDays(30))
+        .maximumSize(300L)
+        .expireAfterWrite(Duration.ofDays(30L))
         .build();
     private final Cache<Integer, Team> teamCache = Caffeine.newBuilder()
         .maximumSize(STANDARD_CACHE_SIZE)
@@ -85,7 +85,7 @@ public class Storage {
 
     // Stats caches
     private final Cache<Integer, AllTeamsSummary> allTeamsSummaryCache = Caffeine.newBuilder()
-        .maximumSize(1)
+        .maximumSize(1L)
         .expireAfterWrite(STANDARD_CACHE_EXPIRATION_TIME)
         .build();
     private final Cache<Integer, UserStats> initialStatsCache = Caffeine.newBuilder()
@@ -890,10 +890,10 @@ public class Storage {
      * @param states         the {@link UserChangeState}s to look for
      * @param numberOfMonths the number of months back from which to retrieve {@link UserChange}s (<b>0</b> means retrieve all)
      * @return a {@link Collection} of the retrieved {@link UserChange}
-     * @see DbManager#getAllUserChanges(Collection, int)
+     * @see DbManager#getAllUserChanges(Collection, long)
      */
     @NotCached
-    public Collection<UserChange> getAllUserChanges(final Collection<UserChangeState> states, final int numberOfMonths) {
+    public Collection<UserChange> getAllUserChanges(final Collection<UserChangeState> states, final long numberOfMonths) {
         return dbManagerFunction(dbManager -> dbManager.getAllUserChanges(states, numberOfMonths));
     }
 

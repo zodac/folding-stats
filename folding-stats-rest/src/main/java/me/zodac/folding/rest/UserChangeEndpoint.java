@@ -143,7 +143,7 @@ public class UserChangeEndpoint {
     @ReadRequired
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getAll(@RequestParam(value = "state", required = false, defaultValue = ALL_STATES_OPTION) final String state,
-                                    @RequestParam(value = "numberOfMonths", required = false, defaultValue = "0") final int numberOfMonths,
+                                    @RequestParam(value = "numberOfMonths", required = false, defaultValue = "0") final long numberOfMonths,
                                     final HttpServletRequest request) {
         AUDIT_LOGGER.debug("GET request for all user changes received at '{}?{}'", request::getRequestURI, () -> extractParameters(request));
 
@@ -180,7 +180,7 @@ public class UserChangeEndpoint {
     @GetMapping(path = "/passkey", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getAllWithPasskeys(@RequestParam(value = "state", required = false, defaultValue = ALL_STATES_OPTION) final String state,
                                                 @RequestParam(value = "numberOfMonths", required = false, defaultValue = "0")
-                                                final int numberOfMonths,
+                                                final long numberOfMonths,
                                                 final HttpServletRequest request) {
         AUDIT_LOGGER.info("GET request for all user changes with passkey received at '{}?{}'", request::getRequestURI,
             () -> extractParameters(request));

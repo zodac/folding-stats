@@ -247,7 +247,7 @@ public interface FoldingRepository {
      * @param numberOfMonths the number of months back from which to retrieve {@link UserChange}s (<b>0</b> means retrieve all)
      * @return a {@link Collection} of the retrieved {@link UserChange}
      */
-    Collection<UserChange> getAllUserChangesWithPasskeys(Collection<UserChangeState> states, int numberOfMonths);
+    Collection<UserChange> getAllUserChangesWithPasskeys(Collection<UserChangeState> states, long numberOfMonths);
 
     /**
      * Retrieves all {@link UserChange}s with any of the given {@link UserChangeState}s, with {@link User} passkeys masked.
@@ -256,7 +256,7 @@ public interface FoldingRepository {
      * @param numberOfMonths the number of months back from which to retrieve {@link UserChange}s (<b>0</b> means retrieve all)
      * @return a {@link Collection} of the retrieved {@link UserChange}
      */
-    Collection<UserChange> getAllUserChangesWithoutPasskeys(Collection<UserChangeState> states, int numberOfMonths);
+    Collection<UserChange> getAllUserChangesWithoutPasskeys(Collection<UserChangeState> states, long numberOfMonths);
 
     /**
      * Retrieves all {@link UserChange}s that have been approved for {@link UserChangeState#APPROVED_NEXT_MONTH}.

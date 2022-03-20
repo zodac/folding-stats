@@ -81,7 +81,7 @@ public class UserTcStatsCalculator {
      */
     public void calculateAndPersist(final User user, final Stats initialStats, final OffsetTcStats offsetTcStats, final UserStats totalStats) {
         final double hardwareMultiplier = user.hardware().multiplier();
-        final long points = Math.max(0, totalStats.getPoints() - initialStats.getPoints());
+        final long points = Math.max(0L, totalStats.getPoints() - initialStats.getPoints());
         final long multipliedPoints = Math.round(points * hardwareMultiplier);
         final int units = Math.max(0, totalStats.getUnits() - initialStats.getUnits());
 

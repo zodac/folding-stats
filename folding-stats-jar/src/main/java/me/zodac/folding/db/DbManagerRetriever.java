@@ -70,7 +70,7 @@ public final class DbManagerRetriever {
     private static Retry getRetry() {
         final RetryConfig retryConfig = RetryConfig.custom()
             .maxAttempts(10)
-            .intervalFunction(IntervalFunction.ofExponentialBackoff(Duration.ofSeconds(10)))
+            .intervalFunction(IntervalFunction.ofExponentialBackoff(Duration.ofSeconds(10L)))
             .build();
         return Retry.of("DatabaseConnection", retryConfig);
     }

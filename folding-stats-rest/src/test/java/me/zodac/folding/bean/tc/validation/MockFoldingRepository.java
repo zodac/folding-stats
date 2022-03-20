@@ -174,7 +174,7 @@ class MockFoldingRepository implements FoldingRepository {
     }
 
     @Override
-    public Collection<UserChange> getAllUserChangesWithPasskeys(final Collection<UserChangeState> states, final int numberOfMonths) {
+    public Collection<UserChange> getAllUserChangesWithPasskeys(final Collection<UserChangeState> states, final long numberOfMonths) {
         return userChanges.values()
             .stream()
             .filter(userChange -> states.contains(userChange.state()))
@@ -182,7 +182,7 @@ class MockFoldingRepository implements FoldingRepository {
     }
 
     @Override
-    public Collection<UserChange> getAllUserChangesWithoutPasskeys(final Collection<UserChangeState> states, final int numberOfMonths) {
+    public Collection<UserChange> getAllUserChangesWithoutPasskeys(final Collection<UserChangeState> states, final long numberOfMonths) {
         return userChanges.values()
             .stream()
             .map(UserChange::hidePasskey)

@@ -544,7 +544,7 @@ class PostgresDbManagerTest {
         assertThat(createdUserChange.id())
             .isNotZero();
 
-        final Collection<UserChange> allUserChanges = POSTGRES_DB_MANAGER.getAllUserChanges(UserChangeState.getAllValues(), 0);
+        final Collection<UserChange> allUserChanges = POSTGRES_DB_MANAGER.getAllUserChanges(UserChangeState.getAllValues(), 0L);
         assertThat(allUserChanges)
             .hasSize(1);
 

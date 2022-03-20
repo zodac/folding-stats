@@ -433,12 +433,12 @@ public class FoldingRepositoryImpl implements FoldingRepository {
     }
 
     @Override
-    public Collection<UserChange> getAllUserChangesWithPasskeys(final Collection<UserChangeState> states, final int numberOfMonths) {
+    public Collection<UserChange> getAllUserChangesWithPasskeys(final Collection<UserChangeState> states, final long numberOfMonths) {
         return storage.getAllUserChanges(states, numberOfMonths);
     }
 
     @Override
-    public Collection<UserChange> getAllUserChangesWithoutPasskeys(final Collection<UserChangeState> states, final int numberOfMonths) {
+    public Collection<UserChange> getAllUserChangesWithoutPasskeys(final Collection<UserChangeState> states, final long numberOfMonths) {
         return storage.getAllUserChanges(states, numberOfMonths)
             .stream()
             .map(UserChange::hidePasskey)
@@ -447,7 +447,7 @@ public class FoldingRepositoryImpl implements FoldingRepository {
 
     @Override
     public Collection<UserChange> getAllUserChangesForNextMonth() {
-        return storage.getAllUserChanges(Collections.singletonList(UserChangeState.APPROVED_NEXT_MONTH), 0);
+        return storage.getAllUserChanges(Collections.singletonList(UserChangeState.APPROVED_NEXT_MONTH), 0L);
     }
 
     @Override
