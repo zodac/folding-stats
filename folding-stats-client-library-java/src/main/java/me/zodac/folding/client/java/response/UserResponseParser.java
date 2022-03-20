@@ -50,8 +50,7 @@ public final class UserResponseParser {
      * @return the retrieved {@link User}s
      */
     public static Collection<User> getAll(final HttpResponse<String> response) {
-        final Type collectionType = new TypeToken<Collection<User>>() {
-        }.getType();
+        final Type collectionType = UserCollectionType.getInstance().getType();
         return RestUtilConstants.GSON.fromJson(response.body(), collectionType);
     }
 
@@ -86,5 +85,22 @@ public final class UserResponseParser {
      */
     public static User update(final HttpResponse<String> response) {
         return RestUtilConstants.GSON.fromJson(response.body(), User.class);
+    }
+
+    /**
+     * Private class defining the {@link Collection} for {@link User}s.
+     */
+    private static final class UserCollectionType extends TypeToken<Collection<User>> {
+
+        private static final UserCollectionType INSTANCE = new UserCollectionType();
+
+        /**
+         * Retrieve a singleton instance of {@link UserCollectionType}.
+         *
+         * @return {@link UserCollectionType} instance.
+         */
+        static UserCollectionType getInstance() {
+            return INSTANCE;
+        }
     }
 }

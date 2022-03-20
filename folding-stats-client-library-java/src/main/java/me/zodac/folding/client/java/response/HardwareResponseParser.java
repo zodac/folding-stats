@@ -48,8 +48,7 @@ public final class HardwareResponseParser {
      * @return the retrieved {@link Hardware}s
      */
     public static Collection<Hardware> getAll(final HttpResponse<String> response) {
-        final Type collectionType = new TypeToken<Collection<Hardware>>() {
-        }.getType();
+        final Type collectionType = HardwareCollectionType.getInstance().getType();
         return RestUtilConstants.GSON.fromJson(response.body(), collectionType);
     }
 
@@ -84,5 +83,22 @@ public final class HardwareResponseParser {
      */
     public static Hardware update(final HttpResponse<String> response) {
         return RestUtilConstants.GSON.fromJson(response.body(), Hardware.class);
+    }
+
+    /**
+     * Private class defining the {@link Collection} for {@link Hardware}s.
+     */
+    private static final class HardwareCollectionType extends TypeToken<Collection<Hardware>> {
+
+        private static final HardwareCollectionType INSTANCE = new HardwareCollectionType();
+
+        /**
+         * Retrieve a singleton instance of {@link HardwareCollectionType}.
+         *
+         * @return {@link HardwareCollectionType} instance.
+         */
+        static HardwareCollectionType getInstance() {
+            return INSTANCE;
+        }
     }
 }

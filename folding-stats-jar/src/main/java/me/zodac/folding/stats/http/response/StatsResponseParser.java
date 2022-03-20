@@ -109,8 +109,7 @@ public final class StatsResponseParser {
 
     private static List<UnitsApiInstance> parseUnitsResponse(final HttpResponse<String> httpResponse) {
         try {
-            final Type collectionType = new TypeToken<Collection<UnitsApiInstance>>() {
-            }.getType();
+            final Type collectionType = UnitsApiInstanceCollectionType.getInstance().getType();
             return GSON.fromJson(httpResponse.body(), collectionType);
         } catch (final JsonSyntaxException e) {
             LOGGER.warn("Error parsing the units JSON response from the API: '{}'", httpResponse.body(), e);
@@ -119,6 +118,23 @@ public final class StatsResponseParser {
             LOGGER.warn("Unexpected error parsing units JSON response from the API with status code {}: '{}'", httpResponse.statusCode(),
                 httpResponse.body(), e);
             throw e;
+        }
+    }
+
+    /**
+     * Private class defining the {@link Collection} for {@link UnitsApiInstance}s.
+     */
+    private static final class UnitsApiInstanceCollectionType extends TypeToken<Collection<UnitsApiInstance>> {
+
+        private static final UnitsApiInstanceCollectionType INSTANCE = new UnitsApiInstanceCollectionType();
+
+        /**
+         * Retrieve a singleton instance of {@link UnitsApiInstanceCollectionType}.
+         *
+         * @return {@link UnitsApiInstanceCollectionType} instance.
+         */
+        static UnitsApiInstanceCollectionType getInstance() {
+            return INSTANCE;
         }
     }
 }

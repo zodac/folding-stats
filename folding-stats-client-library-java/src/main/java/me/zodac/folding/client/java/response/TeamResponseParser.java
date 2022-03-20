@@ -47,8 +47,7 @@ public final class TeamResponseParser {
      * @return the retrieved {@link Team}s
      */
     public static Collection<Team> getAll(final HttpResponse<String> response) {
-        final Type collectionType = new TypeToken<Collection<Team>>() {
-        }.getType();
+        final Type collectionType = TeamCollectionType.getInstance().getType();
         return RestUtilConstants.GSON.fromJson(response.body(), collectionType);
     }
 
@@ -83,5 +82,22 @@ public final class TeamResponseParser {
      */
     public static Team update(final HttpResponse<String> response) {
         return RestUtilConstants.GSON.fromJson(response.body(), Team.class);
+    }
+
+    /**
+     * Private class defining the {@link Collection} for {@link Team}s.
+     */
+    private static final class TeamCollectionType extends TypeToken<Collection<Team>> {
+
+        private static final TeamCollectionType INSTANCE = new TeamCollectionType();
+
+        /**
+         * Retrieve a singleton instance of {@link TeamCollectionType}.
+         *
+         * @return {@link TeamCollectionType} instance.
+         */
+        static TeamCollectionType getInstance() {
+            return INSTANCE;
+        }
     }
 }

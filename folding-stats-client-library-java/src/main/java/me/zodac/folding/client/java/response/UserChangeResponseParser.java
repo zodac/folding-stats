@@ -51,8 +51,7 @@ public final class UserChangeResponseParser {
      * @return the retrieved {@link UserChange}s
      */
     public static Collection<UserChange> getAll(final HttpResponse<String> response) {
-        final Type collectionType = new TypeToken<Collection<UserChange>>() {
-        }.getType();
+        final Type collectionType = UserChangeCollectionType.getInstance().getType();
         return RestUtilConstants.GSON.fromJson(response.body(), collectionType);
     }
 
@@ -86,5 +85,22 @@ public final class UserChangeResponseParser {
      */
     public static UserChange create(final HttpResponse<String> response) {
         return RestUtilConstants.GSON.fromJson(response.body(), UserChange.class);
+    }
+
+    /**
+     * Private class defining the {@link Collection} for {@link UserChange}s.
+     */
+    private static final class UserChangeCollectionType extends TypeToken<Collection<UserChange>> {
+
+        private static final UserChangeCollectionType INSTANCE = new UserChangeCollectionType();
+
+        /**
+         * Retrieve a singleton instance of {@link UserChangeCollectionType}.
+         *
+         * @return {@link UserChangeCollectionType} instance.
+         */
+        static UserChangeCollectionType getInstance() {
+            return INSTANCE;
+        }
     }
 }

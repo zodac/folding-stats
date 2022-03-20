@@ -109,8 +109,24 @@ public final class HistoricStatsResponseParser {
     }
 
     private static Collection<HistoricStats> convertHistoricStats(final String responseBody) {
-        final Type collectionType = new TypeToken<Collection<HistoricStats>>() {
-        }.getType();
+        final Type collectionType = HistoricStatsCollectionType.getInstance().getType();
         return RestUtilConstants.GSON.fromJson(responseBody, collectionType);
+    }
+
+    /**
+     * Private class defining the {@link Collection} for {@link HistoricStats}.
+     */
+    private static final class HistoricStatsCollectionType extends TypeToken<Collection<HistoricStats>> {
+
+        private static final HistoricStatsCollectionType INSTANCE = new HistoricStatsCollectionType();
+
+        /**
+         * Retrieve a singleton instance of {@link HistoricStatsCollectionType}.
+         *
+         * @return {@link HistoricStatsCollectionType} instance.
+         */
+        static HistoricStatsCollectionType getInstance() {
+            return INSTANCE;
+        }
     }
 }

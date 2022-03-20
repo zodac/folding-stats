@@ -84,8 +84,7 @@ public final class TeamCompetitionStatsResponseParser {
      * @return the retrieved {@link TeamLeaderboardEntry}s
      */
     public static Collection<TeamLeaderboardEntry> getTeamLeaderboard(final HttpResponse<String> response) {
-        final Type collectionType = new TypeToken<Collection<TeamLeaderboardEntry>>() {
-        }.getType();
+        final Type collectionType = TeamLeaderboardEntryCollectionType.getInstance().getType();
         return RestUtilConstants.GSON.fromJson(response.body(), collectionType);
     }
 
@@ -96,8 +95,41 @@ public final class TeamCompetitionStatsResponseParser {
      * @return the retrieved {@link UserCategoryLeaderboardEntry}s
      */
     public static Map<String, List<UserCategoryLeaderboardEntry>> getCategoryLeaderboard(final HttpResponse<String> response) {
-        final Type collectionType = new TypeToken<Map<String, List<UserCategoryLeaderboardEntry>>>() {
-        }.getType();
+        final Type collectionType = UserCategoryLeaderboardEntryMapType.getInstance().getType();
         return RestUtilConstants.GSON.fromJson(response.body(), collectionType);
+    }
+
+    /**
+     * Private class defining the {@link Collection} for {@link TeamLeaderboardEntry}s.
+     */
+    private static final class TeamLeaderboardEntryCollectionType extends TypeToken<Collection<TeamLeaderboardEntry>> {
+
+        private static final TeamLeaderboardEntryCollectionType INSTANCE = new TeamLeaderboardEntryCollectionType();
+
+        /**
+         * Retrieve a singleton instance of {@link TeamLeaderboardEntryCollectionType}.
+         *
+         * @return {@link TeamLeaderboardEntryCollectionType} instance.
+         */
+        static TeamLeaderboardEntryCollectionType getInstance() {
+            return INSTANCE;
+        }
+    }
+
+    /**
+     * Private class defining the {@link Map} for {@link TeamLeaderboardEntry}s.
+     */
+    private static final class UserCategoryLeaderboardEntryMapType extends TypeToken<Map<String, List<UserCategoryLeaderboardEntry>>> {
+
+        private static final TeamLeaderboardEntryCollectionType INSTANCE = new TeamLeaderboardEntryCollectionType();
+
+        /**
+         * Retrieve a singleton instance of {@link TeamLeaderboardEntryCollectionType}.
+         *
+         * @return {@link TeamLeaderboardEntryCollectionType} instance.
+         */
+        static TeamLeaderboardEntryCollectionType getInstance() {
+            return INSTANCE;
+        }
     }
 }
