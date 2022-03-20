@@ -26,7 +26,7 @@ package me.zodac.folding.api.tc.result;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import me.zodac.folding.api.tc.Category;
@@ -86,7 +86,7 @@ public record MonthlyResult(List<TeamLeaderboardEntry> teamLeaderboard,
      * @return the empty {@link MonthlyResult}
      */
     public static MonthlyResult empty() {
-        final Map<Category, List<UserCategoryLeaderboardEntry>> emptyCategoryResult = new HashMap<>(Category.getAllValues().size());
+        final Map<Category, List<UserCategoryLeaderboardEntry>> emptyCategoryResult = new EnumMap<>(Category.class);
         for (final Category category : Category.getAllValues()) {
             emptyCategoryResult.put(category, Collections.emptyList());
         }
@@ -106,7 +106,7 @@ public record MonthlyResult(List<TeamLeaderboardEntry> teamLeaderboard,
      * @return the updated {@link MonthlyResult}
      */
     public static MonthlyResult updateWithEmptyCategories(final MonthlyResult monthlyResult) {
-        final Map<Category, List<UserCategoryLeaderboardEntry>> categories = new HashMap<>(monthlyResult.userCategoryLeaderboard());
+        final Map<Category, List<UserCategoryLeaderboardEntry>> categories = new EnumMap<>(monthlyResult.userCategoryLeaderboard());
 
         for (final Category category : Category.getAllValues()) {
             if (!categories.containsKey(category)) {

@@ -31,7 +31,6 @@ import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.bean.StatsRepository;
 import me.zodac.folding.rest.api.tc.AllTeamsSummary;
@@ -110,7 +109,7 @@ public class LeaderboardStatsGenerator {
         final AllTeamsSummary allTeamsSummary = statsRepository.getAllTeamsSummary();
         final Map<Category, List<UserSummary>> usersByCategory = getUsersSortedByCategory(allTeamsSummary);
 
-        final Map<Category, List<UserCategoryLeaderboardEntry>> categoryLeaderboard = new TreeMap<>();
+        final Map<Category, List<UserCategoryLeaderboardEntry>> categoryLeaderboard = new EnumMap<>(Category.class);
         for (final var entry : usersByCategory.entrySet()) {
             final Category category = entry.getKey();
             final List<UserSummary> userSummaries = entry.getValue()
