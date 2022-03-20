@@ -228,7 +228,7 @@ public record User(int id,
 
     private static String hidePasskey(final String passkey) {
         final int endIndex = Math.min(PASSKEY_LENGTH_NOT_TO_HIDE, passkey.length()); // In case passkey has fewer than 8 characters, though unlikely
-        return passkey.substring(0, endIndex).concat(PASSKEY_MASK);
+        return passkey.substring(0, endIndex) + PASSKEY_MASK;
     }
 
     /**
