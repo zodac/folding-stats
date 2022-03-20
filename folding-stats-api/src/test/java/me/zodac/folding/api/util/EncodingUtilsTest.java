@@ -100,26 +100,13 @@ class EncodingUtilsTest {
 
     @Test
     void whenDecodingAuthentication_givenInputIsNull_thenExceptionIsThrown() {
-        assertThatThrownBy(() -> EncodingUtils.decodeAuthentication(null))
+        assertThatThrownBy(() -> EncodingUtils.decodeBasicAuthentication(null))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     void whenDecodingAuthentication_givenInputIsBlank_thenExceptionIsThrown() {
-        assertThatThrownBy(() -> EncodingUtils.decodeAuthentication("invalid"))
+        assertThatThrownBy(() -> EncodingUtils.decodeBasicAuthentication("invalid"))
             .isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
-    void whenDecodingAuthentication_givenInputIsValid_thenDecodedUsernameAndPasswordIsReturned() {
-        final Map<String, String> result = EncodingUtils.decodeAuthentication("dXNlck5hbWU6cGFzc3dvcmQ=");
-
-        assertThat(result)
-            .containsExactlyEntriesOf(
-                Map.of(
-                    EncodingUtils.DECODED_PASSWORD_KEY, "password",
-                    EncodingUtils.DECODED_USERNAME_KEY, "userName"
-                )
-            );
     }
 }

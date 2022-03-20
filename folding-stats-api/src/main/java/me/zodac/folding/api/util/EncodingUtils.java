@@ -27,6 +27,7 @@ package me.zodac.folding.api.util;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Utility class to assist with encoding or decoding {@link String}s for authentication.
@@ -49,6 +50,7 @@ public final class EncodingUtils {
     public static final String BASIC_AUTHENTICATION_SCHEME = "Basic ";
 
     private static final String DECODED_USERNAME_PASSWORD_DELIMITER = ":";
+    private static final Pattern BASIC_AUTHENTICATION_PATTERN = Pattern.compile(BASIC_AUTHENTICATION_SCHEME);
 
     private EncodingUtils() {
 
@@ -96,18 +98,11 @@ public final class EncodingUtils {
             throw new IllegalArgumentException(String.format("Cannot decode input that does not start with: '%s'", BASIC_AUTHENTICATION_SCHEME));
         }
 
-        final String encodedUserNameAndPassword = authorizationPayload.split(BASIC_AUTHENTICATION_SCHEME)[1];
+        final String encodedUserNameAndPassword = BASIC_AUTHENTICATION_PATTERN.split(authorizationPayload)[1];
         return decodeAuthentication(encodedUserNameAndPassword);
     }
 
-    /**
-     * Decodes the encoded username and password.
-     *
-     * @param encodedUserNameAndPassword the encoded username and password to decode
-     * @return a {@link Map} with two keys, the {@link #DECODED_USERNAME_KEY} and {@link #DECODED_PASSWORD_KEY}
-     * @throws IllegalArgumentException thrown if the input is not a valid {@link Base64} {@link String}
-     */
-    public static Map<String, String> decodeAuthentication(final String encodedUserNameAndPassword) {
+    private static Map<String, String> decodeAuthentication(final String encodedUserNameAndPassword) {
         if (encodedUserNameAndPassword == null) {
             throw new IllegalArgumentException("Cannot decode null");
         }

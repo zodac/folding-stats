@@ -117,9 +117,9 @@ public final class DateTimeConverterUtils {
     }
 
     /**
-     * Convert the given {@link LocalDateTime} into a {@link Timestamp} in {@link ZoneOffset#UTC}.
+     * Convert the given {@link ChronoLocalDateTime} into a {@link Timestamp} in {@link ZoneOffset#UTC}.
      *
-     * @param chronoLocalDateTime the {@link LocalDateTime} to convert
+     * @param chronoLocalDateTime the {@link ChronoLocalDateTime} to convert
      * @return the {@link ZoneOffset#UTC} {@link Timestamp}
      */
     public static Timestamp toTimestamp(final ChronoLocalDateTime<LocalDate> chronoLocalDateTime) {

@@ -31,7 +31,6 @@ import java.time.Month;
 import java.time.OffsetDateTime;
 import java.time.Year;
 import java.time.ZoneOffset;
-import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.TemporalUnit;
 import java.util.function.Supplier;
@@ -103,10 +102,10 @@ public record DateTimeUtils(Supplier<OffsetDateTime> timeSupplier) {
     }
 
     /**
-     * Calculates the number of {@link ChronoUnit}s between the {@link #currentUtcDateTime()} and the start of next {@link Month}.
+     * Calculates the number of {@link TemporalUnit}s between the {@link #currentUtcDateTime()} and the start of next {@link Month}.
      *
-     * @param temporalUnit the {@link ChronoUnit} of the response
-     * @return the number of {@link ChronoUnit}s until {@code 00:00:000} {@link ZoneOffset#UTC} of the 1st of next {@link Month}
+     * @param temporalUnit the {@link TemporalUnit} of the response
+     * @return the number of {@link TemporalUnit}s until {@code 00:00:000} {@link ZoneOffset#UTC} of the 1st of next {@link Month}
      */
     public long untilNextMonthUtc(final TemporalUnit temporalUnit) {
         final int currentMonth = currentUtcMonth().getValue();

@@ -36,6 +36,7 @@ import java.sql.Statement;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Pattern;
 import javax.sql.DataSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -46,6 +47,7 @@ import org.apache.logging.log4j.Logger;
 public final class EmbeddedPostgresDataSource {
 
     private static final Logger LOGGER = LogManager.getLogger();
+    private static final Pattern BLANK_LINE_PATTERN = Pattern.compile("((\\n\\r)|(\\r\\n)){2}|(\\r){2}|(\\n){2}");
 
     private final DataSource dataSource;
 
@@ -77,9 +79,7 @@ public final class EmbeddedPostgresDataSource {
             final Path initScript =
                 Paths.get(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("db/" + sqlFile)).toURI());
 
-            final List<String> createStatements = Arrays.stream(Files
-                    .readString(initScript)
-                    .split("((\\n\\r)|(\\r\\n)){2}|(\\r){2}|(\\n){2}")) // Split on blank line(s)
+            final List<String> createStatements = Arrays.stream(BLANK_LINE_PATTERN.split(Files.readString(initScript)))
                 .map(String::trim)
                 .toList();
 
