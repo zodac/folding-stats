@@ -48,13 +48,13 @@ public class InvalidStateException extends RuntimeException {
     /**
      * Basic constructor.
      *
-     * @param existingUserChangeState the current {@link UserChangeState}
-     * @param wantedUserChangeState   the {@link UserChangeState} value trying to be updated
+     * @param fromState the current {@link UserChangeState}
+     * @param toState   the {@link UserChangeState} value trying to be updated
      */
-    public InvalidStateException(final UserChangeState existingUserChangeState, final UserChangeState wantedUserChangeState) {
+    public InvalidStateException(final UserChangeState fromState, final UserChangeState toState) {
         super();
-        this.fromState = existingUserChangeState;
-        this.toState = wantedUserChangeState;
+        this.fromState = fromState;
+        this.toState = toState;
     }
 
     /**

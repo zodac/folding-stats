@@ -836,7 +836,7 @@ public class Storage {
      */
     @Cached
     public AllTeamsSummary createAllTeamsSummary(final AllTeamsSummary allTeamsSummary) {
-        this.allTeamsSummaryCache.put(ALL_TEAMS_SUMMARY_ID, allTeamsSummary);
+        allTeamsSummaryCache.put(ALL_TEAMS_SUMMARY_ID, allTeamsSummary);
         return allTeamsSummary;
     }
 
