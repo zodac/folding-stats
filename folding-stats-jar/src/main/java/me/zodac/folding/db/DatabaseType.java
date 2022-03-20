@@ -57,6 +57,6 @@ public enum DatabaseType {
             .stream()
             .filter(category -> category.toString().equalsIgnoreCase(input))
             .findAny()
-            .orElse(DatabaseType.INVALID);
+            .orElse(INVALID);
     }
 }

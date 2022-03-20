@@ -80,6 +80,6 @@ public enum HardwareMake {
             .stream()
             .filter(hardwareMake -> hardwareMake.toString().equalsIgnoreCase(input))
             .findAny()
-            .orElse(HardwareMake.INVALID);
+            .orElse(INVALID);
     }
 }

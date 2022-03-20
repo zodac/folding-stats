@@ -129,7 +129,7 @@ public enum Category {
             .stream()
             .filter(category -> category.toString().equalsIgnoreCase(input))
             .findAny()
-            .orElse(Category.INVALID);
+            .orElse(INVALID);
     }
 
     /**

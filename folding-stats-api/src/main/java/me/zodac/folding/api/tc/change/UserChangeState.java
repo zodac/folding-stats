@@ -89,7 +89,7 @@ public enum UserChangeState {
             .stream()
             .filter(changeRequestState -> changeRequestState.toString().equalsIgnoreCase(input))
             .findAny()
-            .orElse(UserChangeState.INVALID);
+            .orElse(INVALID);
     }
 
     /**

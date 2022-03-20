@@ -75,6 +75,6 @@ public enum HardwareType {
             .stream()
             .filter(hardwareType -> hardwareType.toString().equalsIgnoreCase(input))
             .findAny()
-            .orElse(HardwareType.INVALID);
+            .orElse(INVALID);
     }
 }
