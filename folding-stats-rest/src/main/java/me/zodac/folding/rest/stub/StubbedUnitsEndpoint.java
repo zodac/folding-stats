@@ -103,7 +103,7 @@ public class StubbedUnitsEndpoint {
 
         if (units == NO_UNITS) {
             // Remove all units from the user
-            unitsByUserAndPasskey.put(key, units);
+            unitsByUserAndPasskey.put(key, NO_UNITS);
         } else {
             unitsByUserAndPasskey.put(key, unitsByUserAndPasskey.getOrDefault(key, NO_UNITS) + units);
         }

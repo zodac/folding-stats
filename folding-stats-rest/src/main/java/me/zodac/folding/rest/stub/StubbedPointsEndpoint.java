@@ -102,7 +102,7 @@ public class StubbedPointsEndpoint {
 
         if (points == NO_POINTS) {
             // Remove all points from the user
-            pointsByUserAndPasskey.put(key, points);
+            pointsByUserAndPasskey.put(key, NO_POINTS);
         } else {
             pointsByUserAndPasskey.put(key, pointsByUserAndPasskey.getOrDefault(key, NO_POINTS) + points);
         }
