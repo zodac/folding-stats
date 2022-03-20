@@ -25,10 +25,12 @@
 package me.zodac.folding.api.util;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.Year;
 import java.time.ZoneOffset;
+import java.time.chrono.ChronoLocalDateTime;
 import java.util.Locale;
 
 /**
@@ -117,11 +119,11 @@ public final class DateTimeConverterUtils {
     /**
      * Convert the given {@link LocalDateTime} into a {@link Timestamp} in {@link ZoneOffset#UTC}.
      *
-     * @param localDateTime the {@link LocalDateTime} to convert
+     * @param chronoLocalDateTime the {@link LocalDateTime} to convert
      * @return the {@link ZoneOffset#UTC} {@link Timestamp}
      */
-    public static Timestamp toTimestamp(final LocalDateTime localDateTime) {
-        return new Timestamp(localDateTime.toInstant(ZoneOffset.UTC).toEpochMilli());
+    public static Timestamp toTimestamp(final ChronoLocalDateTime<LocalDate> chronoLocalDateTime) {
+        return new Timestamp(chronoLocalDateTime.toInstant(ZoneOffset.UTC).toEpochMilli());
     }
 
     /**

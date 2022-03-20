@@ -606,7 +606,7 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
             SQL_LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
             try (final ResultSet resultSet = preparedStatement.executeQuery()) {
 
-                final List<HistoricStats> userStats = new ArrayList<>();
+                final Collection<HistoricStats> userStats = new ArrayList<>();
 
                 // First entry will be zeroed, so we need to manually get the first hour's stats for the user
                 if (resultSet.next()) {
@@ -791,7 +791,7 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
             SQL_LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
             try (final ResultSet resultSet = preparedStatement.executeQuery()) {
 
-                final List<HistoricStats> userStats = new ArrayList<>();
+                final Collection<HistoricStats> userStats = new ArrayList<>();
 
                 // First entry will be zeroed, so we need to manually get the first day's stats for the user
                 if (resultSet.next()) {

@@ -28,7 +28,6 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -95,7 +94,7 @@ public class HistoricStats {
             .sorted()
             .collect(Collectors.toCollection(TreeSet::new));
 
-        final List<HistoricStats> combinedStats = new ArrayList<>();
+        final Collection<HistoricStats> combinedStats = new ArrayList<>();
 
         for (final LocalDateTime key : keys) {
             long combinedPoints = DEFAULT_POINTS;

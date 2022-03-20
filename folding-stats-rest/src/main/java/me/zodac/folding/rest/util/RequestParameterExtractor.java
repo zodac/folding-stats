@@ -27,10 +27,10 @@ package me.zodac.folding.rest.util;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.ServletRequest;
 
 /**
- * Utility class to extract parameters from a {@link HttpServletRequest}.
+ * Utility class to extract parameters from a REST request.
  */
 public final class RequestParameterExtractor {
 
@@ -39,15 +39,15 @@ public final class RequestParameterExtractor {
     }
 
     /**
-     * Extracts the parameters from the supplied {@link HttpServletRequest} and returns them as a comma-separated {@link String} in the form:
+     * Extracts the parameters from the supplied {@link ServletRequest} and returns them as a comma-separated {@link String} in the form:
      * <pre>
      *     paramName1=paramValue1,paramName2=paramValue2
      * </pre>
      *
-     * @param request the {@link HttpServletRequest} from which the parameters are to be extracted
+     * @param request the {@link ServletRequest} from which the parameters are to be extracted
      * @return the extract parameters as a comma-separated {@link String}
      */
-    public static String extractParameters(final HttpServletRequest request) {
+    public static String extractParameters(final ServletRequest request) {
         final Collection<String> parameters = new ArrayList<>();
 
         final Enumeration<String> parameterNames = request.getParameterNames();

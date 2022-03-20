@@ -28,7 +28,6 @@ import static me.zodac.folding.api.util.NumberUtils.formatWithCommas;
 
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.Summary;
-import java.util.Collection;
 import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.state.ParsingState;
 import me.zodac.folding.api.state.SystemState;
@@ -96,7 +95,7 @@ public class UserStatsParser {
      *
      * @param users the {@link User}s whose TC stats are to be parsed
      */
-    public void parseTcStatsForUsersAndWait(final Collection<User> users) {
+    public void parseTcStatsForUsersAndWait(final Iterable<User> users) {
         updateTcStatsForUsers(users);
     }
 
@@ -106,11 +105,11 @@ public class UserStatsParser {
      * @param users the {@link User}s whose TC stats are to be parsed
      */
     @Async
-    public void parseTcStatsForUsers(final Collection<User> users) {
+    public void parseTcStatsForUsers(final Iterable<User> users) {
         updateTcStatsForUsers(users);
     }
 
-    private void updateTcStatsForUsers(final Collection<User> users) {
+    private void updateTcStatsForUsers(final Iterable<User> users) {
         ParsingStateManager.next(ParsingState.ENABLED_TEAM_COMPETITION);
         SystemStateManager.next(SystemState.UPDATING_STATS);
 

@@ -25,7 +25,7 @@
 package me.zodac.folding.stats.http.request;
 
 /**
- * Simple wrapper for a {@link String} to hold the URL for a points or units REST request.
+ * Simple wrapper to hold the URL for a points or units REST request.
  */
 public record StatsRequestUrl(String url) {
 
@@ -35,7 +35,7 @@ public record StatsRequestUrl(String url) {
      * @param statsRequestUrl the URL
      * @return the created {@link StatsRequestUrl}
      */
-    public static StatsRequestUrl create(final StringBuilder statsRequestUrl) {
+    public static StatsRequestUrl create(final CharSequence statsRequestUrl) {
         return new StatsRequestUrl(statsRequestUrl.toString());
     }
 }

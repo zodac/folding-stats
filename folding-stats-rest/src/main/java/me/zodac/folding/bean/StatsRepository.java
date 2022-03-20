@@ -391,7 +391,7 @@ public class StatsRepository {
         return UserSummary.createWithDefaultRank(user, userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits());
     }
 
-    private static String getCaptainDisplayName(final String teamName, final Collection<User> usersOnTeam) {
+    private static String getCaptainDisplayName(final String teamName, final Iterable<User> usersOnTeam) {
         for (final User user : usersOnTeam) {
             if (user.userIsCaptain()) {
                 return user.displayName();

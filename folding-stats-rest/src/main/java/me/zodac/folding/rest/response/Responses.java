@@ -27,6 +27,7 @@ package me.zodac.folding.rest.response;
 import static me.zodac.folding.rest.util.RestUtilConstants.GSON;
 
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 import me.zodac.folding.api.util.DateTimeUtils;
@@ -121,7 +122,7 @@ public final class Responses {
      * @param entity the entity being retrieved
      * @param <E>    the response body type
      * @return the <b>200_OK</b> {@link ResponseEntity}
-     * @see DateTimeUtils#untilNextMonthUtc(ChronoUnit)
+     * @see DateTimeUtils#untilNextMonthUtc(TemporalUnit)
      */
     public static <E> ResponseEntity<String> cachedOk(final E entity) {
         return ResponseEntity
@@ -141,7 +142,7 @@ public final class Responses {
      * @param entities the {@link Collection} of entities being retrieved
      * @param <E>      the response body type
      * @return the <b>200_OK</b> {@link ResponseEntity}
-     * @see DateTimeUtils#untilNextMonthUtc(ChronoUnit)
+     * @see DateTimeUtils#untilNextMonthUtc(TemporalUnit)
      */
     public static <E> ResponseEntity<String> cachedOk(final Collection<E> entities) {
         return cachedOk(entities, DATE_TIME_UTILS.untilNextMonthUtc(ChronoUnit.SECONDS));
@@ -157,7 +158,7 @@ public final class Responses {
      * @param cachePeriodInSeconds the cache period for the entity in seconds
      * @param <E>                  the response body type
      * @return the <b>200_OK</b> {@link ResponseEntity}
-     * @see DateTimeUtils#untilNextMonthUtc(ChronoUnit)
+     * @see DateTimeUtils#untilNextMonthUtc(TemporalUnit)
      */
     public static <E> ResponseEntity<String> cachedOk(final Collection<E> entities, final long cachePeriodInSeconds) {
         return ResponseEntity

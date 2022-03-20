@@ -30,7 +30,6 @@ import java.time.Month;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.security.PermitAll;
 import javax.servlet.http.HttpServletRequest;
@@ -173,7 +172,7 @@ public class HistoricStatsEndpoint {
         final Team team = foldingRepository.getTeam(teamId);
 
         final Collection<User> teamUsers = foldingRepository.getUsersOnTeam(team);
-        final List<HistoricStats> teamHourlyStats = new ArrayList<>(teamUsers.size());
+        final Collection<HistoricStats> teamHourlyStats = new ArrayList<>(teamUsers.size());
 
         for (final User user : teamUsers) {
             AUDIT_LOGGER.debug("Getting historic stats for user with ID: {}", user.id());
@@ -207,7 +206,7 @@ public class HistoricStatsEndpoint {
         final Team team = foldingRepository.getTeam(teamId);
 
         final Collection<User> teamUsers = foldingRepository.getUsersOnTeam(team);
-        final List<HistoricStats> teamDailyStats = new ArrayList<>(teamUsers.size());
+        final Collection<HistoricStats> teamDailyStats = new ArrayList<>(teamUsers.size());
 
         for (final User user : teamUsers) {
             AUDIT_LOGGER.debug("Getting historic stats for user with ID: {}", user.id());
@@ -239,7 +238,7 @@ public class HistoricStatsEndpoint {
         final Team team = foldingRepository.getTeam(teamId);
 
         final Collection<User> teamUsers = foldingRepository.getUsersOnTeam(team);
-        final List<HistoricStats> teamMonthlyStats = new ArrayList<>(teamUsers.size());
+        final Collection<HistoricStats> teamMonthlyStats = new ArrayList<>(teamUsers.size());
 
         for (final User user : teamUsers) {
             AUDIT_LOGGER.debug("Getting historic stats for user with ID: {}", user.id());
