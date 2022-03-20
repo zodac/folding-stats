@@ -72,9 +72,18 @@ class DateTimeConverterUtilsTest {
     }
 
     @Test
-    void whenGetTimeStamp_givenFullDateAndTime_thenValidTimestampIsReturned() {
-        final Timestamp actual = DateTimeConverterUtils.getTimestampOf(Year.of(2020), Month.DECEMBER, 3, 15, 27, 55);
-        final Timestamp expected = new Timestamp(Instant.parse("2020-12-03T15:27:55.00Z").toEpochMilli());
+    void whenGetFirstTimeStamp_givenFullDate_thenFirstTimestampIsReturned() {
+        final Timestamp actual = DateTimeConverterUtils.getFirstTimestampOf(Year.of(2020), Month.DECEMBER, 3);
+        final Timestamp expected = new Timestamp(Instant.parse("2020-12-03T00:00:00.00Z").toEpochMilli());
+
+        assertThat(actual)
+            .isEqualTo(expected);
+    }
+
+    @Test
+    void whenGetLastTimeStamp_givenFullDate_thenFirstTimestampIsReturned() {
+        final Timestamp actual = DateTimeConverterUtils.getLastTimestampOf(Year.of(2020), Month.DECEMBER, 3);
+        final Timestamp expected = new Timestamp(Instant.parse("2020-12-03T23:59:59.00Z").toEpochMilli());
 
         assertThat(actual)
             .isEqualTo(expected);

@@ -390,7 +390,7 @@ class PostgresDbManagerTest {
         final long currentDayFirstMultipliedPoints = 2_000L;
         final int currentDayFirstUnits = 10;
         final UserTcStats currentDayFirstUserTcStats = UserTcStats
-            .create(userId, DateTimeConverterUtils.getTimestampOf(year, month, yesterday, 0, 0, 0), currentDayFirstPoints,
+            .create(userId, DateTimeConverterUtils.getFirstTimestampOf(year, month, yesterday), currentDayFirstPoints,
                 currentDayFirstMultipliedPoints, currentDayFirstUnits);
         POSTGRES_DB_MANAGER.createHourlyTcStats(currentDayFirstUserTcStats);
 
@@ -398,7 +398,7 @@ class PostgresDbManagerTest {
         final long currentDaySecondMultipliedPoints = 3_000L;
         final int currentDaySecondUnits = 15;
         final UserTcStats currentDaySecondUserTcStats = UserTcStats
-            .create(userId, DateTimeConverterUtils.getTimestampOf(year, month, yesterday, 1, 0, 0), currentDaySecondPoints,
+            .create(userId, DateTimeConverterUtils.getLastTimestampOf(year, month, yesterday), currentDaySecondPoints,
                 currentDaySecondMultipliedPoints, currentDaySecondUnits);
         POSTGRES_DB_MANAGER.createHourlyTcStats(currentDaySecondUserTcStats);
 
@@ -406,7 +406,7 @@ class PostgresDbManagerTest {
         final long currentDayThirdMultipliedPoints = 3_000L;
         final int currentDayThirdUnits = 15;
         final UserTcStats currentDayThirdUserTcStats = UserTcStats
-            .create(userId, DateTimeConverterUtils.getTimestampOf(year, month, day, 1, 0, 0), currentDayThirdPoints, currentDayThirdMultipliedPoints,
+            .create(userId, DateTimeConverterUtils.getFirstTimestampOf(year, month, day), currentDayThirdPoints, currentDayThirdMultipliedPoints,
                 currentDayThirdUnits);
         POSTGRES_DB_MANAGER.createHourlyTcStats(currentDayThirdUserTcStats);
 

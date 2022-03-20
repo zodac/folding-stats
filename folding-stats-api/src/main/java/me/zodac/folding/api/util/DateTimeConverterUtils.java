@@ -36,6 +36,13 @@ import java.util.Locale;
  */
 public final class DateTimeConverterUtils {
 
+    private static final int FIRST_HOUR = 0;
+    private static final int FIRST_MINUTE = 0;
+    private static final int FIRST_SECOND = 0;
+    private static final int LAST_HOUR = 23;
+    private static final int LAST_MINUTE = 59;
+    private static final int LAST_SECOND = 59;
+
     private DateTimeConverterUtils() {
 
     }
@@ -84,18 +91,27 @@ public final class DateTimeConverterUtils {
     }
 
     /**
-     * Get the {@link Timestamp} in {@link ZoneOffset#UTC} for the given values.
+     * Gets the first {@link Timestamp} in {@link ZoneOffset#UTC} for the given date. The time will be <b>00:00:00</b>.
      *
-     * @param year   the {@link Year}
-     * @param month  the {@link Month}
-     * @param day    the day of the {@link Month}
-     * @param hour   the hour
-     * @param minute the minute
-     * @param second the second
-     * @return the {@link ZoneOffset#UTC} {@link Timestamp}
+     * @param year  the {@link Year}
+     * @param month the {@link Month}
+     * @param day   the day of the {@link Month}
+     * @return the first {@link ZoneOffset#UTC} {@link Timestamp}
      */
-    public static Timestamp getTimestampOf(final Year year, final Month month, final int day, final int hour, final int minute, final int second) {
-        return toTimestamp(LocalDateTime.of(year.getValue(), month.getValue(), day, hour, minute, second));
+    public static Timestamp getFirstTimestampOf(final Year year, final Month month, final int day) {
+        return toTimestamp(LocalDateTime.of(year.getValue(), month.getValue(), day, FIRST_HOUR, FIRST_MINUTE, FIRST_SECOND));
+    }
+
+    /**
+     * Gets the last {@link Timestamp} in {@link ZoneOffset#UTC} for the given date. The time will be <b>23:59:59</b>.
+     *
+     * @param year  the {@link Year}
+     * @param month the {@link Month}
+     * @param day   the day of the {@link Month}
+     * @return the last {@link ZoneOffset#UTC} {@link Timestamp}
+     */
+    public static Timestamp getLastTimestampOf(final Year year, final Month month, final int day) {
+        return toTimestamp(LocalDateTime.of(year.getValue(), month.getValue(), day, LAST_HOUR, LAST_MINUTE, LAST_SECOND));
     }
 
     /**

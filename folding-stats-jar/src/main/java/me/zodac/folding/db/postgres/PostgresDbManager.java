@@ -599,8 +599,8 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
         try (final Connection connection = dataSource.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
 
-            preparedStatement.setTimestamp(1, DateTimeConverterUtils.getTimestampOf(year, month, day, 0, 0, 0));
-            preparedStatement.setTimestamp(2, DateTimeConverterUtils.getTimestampOf(year, month, day, 23, 59, 59));
+            preparedStatement.setTimestamp(1, DateTimeConverterUtils.getFirstTimestampOf(year, month, day));
+            preparedStatement.setTimestamp(2, DateTimeConverterUtils.getLastTimestampOf(year, month, day));
             preparedStatement.setInt(3, userId);
 
             SQL_LOGGER.debug("Executing prepared statement: '{}'", preparedStatement);
