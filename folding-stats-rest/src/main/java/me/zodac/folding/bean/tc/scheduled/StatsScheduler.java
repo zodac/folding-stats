@@ -46,7 +46,7 @@ import org.springframework.stereotype.Component;
 public class StatsScheduler {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final boolean IS_STATS_SCHEDULED_PARSING_ENABLED = EnvironmentVariableUtils.isEnabled("ENABLE_STATS_SCHEDULED_PARSING");
+    private static final boolean IS_STATS_SCHEDULED_PARSING_DISABLED = EnvironmentVariableUtils.isDisabled("ENABLE_STATS_SCHEDULED_PARSING");
 
     @Autowired
     private FoldingRepository foldingRepository;
@@ -59,7 +59,7 @@ public class StatsScheduler {
      */
     @Scheduled(cron = "0 55 * 3-31 * *", zone = "UTC")
     public void scheduledTeamCompetitionStatsParsing() {
-        if (!IS_STATS_SCHEDULED_PARSING_ENABLED) {
+        if (IS_STATS_SCHEDULED_PARSING_DISABLED) {
             LOGGER.error("Scheduled TC stats parsing not enabled");
             return;
         }

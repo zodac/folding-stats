@@ -121,6 +121,35 @@ class EnvironmentVariablesUtilsTest {
     }
 
     @Test
+    void whenIsDisabled_givenVariableIsNotSet_thenTrueIsReturned() {
+        final String propertyName = getSystemPropertyName();
+
+        final boolean result = EnvironmentVariableUtils.isDisabled(propertyName);
+        assertThat(result)
+            .isTrue();
+    }
+
+    @Test
+    void whenIsDisabled_givenVariableIsSet_andValueIsNotValidBoolean_thenTrueIsReturned() {
+        final String propertyName = getSystemPropertyName();
+
+        System.setProperty(propertyName, "value");
+        final boolean result = EnvironmentVariableUtils.isDisabled(propertyName);
+        assertThat(result)
+            .isTrue();
+    }
+
+    @Test
+    void whenIsDisabled_givenVariableIsSet_andValueIsPositiveBoolean_thenFalseIsReturned() {
+        final String propertyName = getSystemPropertyName();
+
+        System.setProperty(propertyName, "tRuE");
+        final boolean result = EnvironmentVariableUtils.isDisabled(propertyName);
+        assertThat(result)
+            .isFalse();
+    }
+
+    @Test
     void whenGetIntOrDefault_givenVariableIsNotSet_thenDefaultIsReturned() {
         final String propertyName = getSystemPropertyName();
 

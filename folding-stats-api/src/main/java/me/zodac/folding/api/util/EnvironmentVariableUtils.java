@@ -67,11 +67,7 @@ public final class EnvironmentVariableUtils {
     }
 
     /**
-     * Returns the {@code variableName} specified if it is set as a {@link System} property or as an environment variable. The order of
-     * the search is property first then environment variable.
-     *
-     * <p>
-     * The returned value is then converted to a {@link Boolean}.
+     * Checks whether the boolean {@code variableName} specified is set to {@code true}.
      *
      * @param variableName the property to search for
      * @return the value of the property as a {@link Boolean}, defaulting to {@code false} if the value does not exist or is not valid
@@ -79,6 +75,16 @@ public final class EnvironmentVariableUtils {
     public static boolean isEnabled(final String variableName) {
         final String value = System.getProperty(variableName, System.getenv(variableName));
         return Boolean.parseBoolean(value);
+    }
+
+    /**
+     * Checks whether the boolean {@code variableName} specified is set to {@code false}.
+     *
+     * @param variableName the property to search for
+     * @return the value of the property as a {@link Boolean}, defaulting to {@code true} if the value does not exist or is not valid
+     */
+    public static boolean isDisabled(final String variableName) {
+        return !isEnabled(variableName);
     }
 
     /**

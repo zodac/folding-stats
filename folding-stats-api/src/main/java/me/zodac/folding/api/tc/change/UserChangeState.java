@@ -37,46 +37,46 @@ public enum UserChangeState {
     /**
      * A {@link UserChange} has been requested, to be applied immediately.
      */
-    REQUESTED_NOW(true),
+    REQUESTED_NOW(false),
 
     /**
      * A {@link UserChange} has been requested, to be applied next month.
      */
-    REQUESTED_NEXT_MONTH(true),
+    REQUESTED_NEXT_MONTH(false),
 
     /**
      * A {@link UserChange} has been approved, to be applied immediately.
      */
-    APPROVED_NOW(true),
+    APPROVED_NOW(false),
 
     /**
      * A {@link UserChange} has been approved, to be applied next month.
      */
-    APPROVED_NEXT_MONTH(true),
+    APPROVED_NEXT_MONTH(false),
 
     /**
      * A {@link UserChange} has been rejected.
      */
-    REJECTED(false),
+    REJECTED(true),
 
     /**
      * {@link UserChange} has been applied to the system.
      */
-    COMPLETED(false),
+    COMPLETED(true),
 
     /**
      * Not a valid {@link UserChangeState}.
      */
-    INVALID(false);
+    INVALID(true);
 
     private static final Collection<UserChangeState> ALL_VALUES = Stream.of(values())
         .filter(value -> value != INVALID)
         .toList();
 
-    private final boolean canBeUpdated;
+    private final boolean isFinalState;
 
-    UserChangeState(final boolean canBeUpdated) {
-        this.canBeUpdated = canBeUpdated;
+    UserChangeState(final boolean isFinalState) {
+        this.isFinalState = isFinalState;
     }
 
     /**
@@ -114,7 +114,7 @@ public enum UserChangeState {
     public static Collection<UserChangeState> getOpenStates() {
         return ALL_VALUES
             .stream()
-            .filter(changeRequestState -> !changeRequestState.isFinalState())
+            .filter(changeRequestState -> !changeRequestState.isFinalState)
             .toList();
     }
 
@@ -124,6 +124,6 @@ public enum UserChangeState {
      * @return {@code true} if the {@link UserChangeState} is not permitted to be updated to another value
      */
     public boolean isFinalState() {
-        return !canBeUpdated;
+        return isFinalState;
     }
 }
