@@ -151,7 +151,7 @@ public class StubbedPointsEndpoint {
         }
 
         public static PointsResponse empty() {
-            return create(NO_POINTS);
+            return create(0L);
         }
     }
 }

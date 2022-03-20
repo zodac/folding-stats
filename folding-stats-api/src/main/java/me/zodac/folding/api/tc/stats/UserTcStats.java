@@ -40,7 +40,7 @@ import me.zodac.folding.api.util.DateTimeUtils;
 public class UserTcStats extends UserStats {
 
     /**
-     * The default number of multiplied points, {@code 0}.
+     * The default number of multiplied points, <b>0</b>.
      */
     public static final long DEFAULT_MULTIPLIED_POINTS = 0L;
 

@@ -25,6 +25,7 @@
 package me.zodac.folding.api.tc;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.stream.Stream;
 
 /**
@@ -66,7 +67,7 @@ public enum HardwareMake {
      * @return a {@link Collection} of all {@link HardwareMake}s
      */
     public static Collection<HardwareMake> getAllValues() {
-        return ALL_VALUES;
+        return Collections.unmodifiableCollection(ALL_VALUES);
     }
 
     /**

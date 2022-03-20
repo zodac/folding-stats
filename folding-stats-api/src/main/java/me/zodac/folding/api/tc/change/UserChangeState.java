@@ -25,6 +25,7 @@
 package me.zodac.folding.api.tc.change;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.stream.Stream;
 import me.zodac.folding.api.tc.HardwareType;
 
@@ -102,7 +103,7 @@ public enum UserChangeState {
      * @return a {@link Collection} of all {@link UserChangeState}s
      */
     public static Collection<UserChangeState> getAllValues() {
-        return ALL_VALUES;
+        return Collections.unmodifiableCollection(ALL_VALUES);
     }
 
     /**

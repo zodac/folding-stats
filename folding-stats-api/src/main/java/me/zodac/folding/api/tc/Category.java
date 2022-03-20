@@ -104,7 +104,7 @@ public enum Category {
      * @return a {@link Collection} of all {@link Category}s
      */
     public static Collection<Category> getAllValues() {
-        return ALL_VALUES;
+        return Collections.unmodifiableCollection(ALL_VALUES);
     }
 
     /**
@@ -167,7 +167,7 @@ public enum Category {
      * @return a {@link Set} of the supported {@link HardwareMake}s
      */
     public Set<HardwareMake> supportedHardwareMakes() {
-        return supportedHardwareMakes;
+        return Collections.unmodifiableSet(supportedHardwareMakes);
     }
 
     /**
@@ -176,7 +176,7 @@ public enum Category {
      * @return a {@link Set} of the supported {@link HardwareType}s
      */
     public Set<HardwareType> supportedHardwareTypes() {
-        return supportedHardwareTypes;
+        return Collections.unmodifiableSet(supportedHardwareTypes);
     }
 
     private static int getCategoryCount(final String categoryEnvironmentVariable) {
