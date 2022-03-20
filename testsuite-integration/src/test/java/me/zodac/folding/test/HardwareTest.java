@@ -34,6 +34,7 @@ import static me.zodac.folding.test.util.TestAuthenticationData.INVALID_USERNAME
 import static me.zodac.folding.test.util.TestAuthenticationData.READ_ONLY_USER;
 import static me.zodac.folding.test.util.TestConstants.FOLDING_URL;
 import static me.zodac.folding.test.util.TestGenerator.generateHardware;
+import static me.zodac.folding.test.util.TestGenerator.nextHardwareName;
 import static me.zodac.folding.test.util.rest.request.HardwareUtils.HARDWARE_REQUEST_SENDER;
 import static me.zodac.folding.test.util.rest.request.HardwareUtils.create;
 import static me.zodac.folding.test.util.rest.response.HttpResponseHeaderUtils.getEntityTag;
@@ -47,6 +48,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Collection;
 import me.zodac.folding.api.tc.Hardware;
+import me.zodac.folding.api.tc.HardwareMake;
+import me.zodac.folding.api.tc.HardwareType;
 import me.zodac.folding.client.java.response.HardwareResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
@@ -254,6 +257,28 @@ class HardwareTest {
         assertThat(response.body())
             .as("Did not receive valid error message: " + response.body())
             .contains("not a valid format");
+    }
+
+    @Test
+    void whenCreatingHardware_givenTeamWithInvalidMultiplier_thenJsonResponseWithErrorIsReturned_andHas400Status() throws FoldingRestException {
+        final String hardwareName = nextHardwareName();
+        final HardwareRequest hardwareRequest = HardwareRequest.builder()
+            .hardwareName(hardwareName)
+            .displayName(hardwareName)
+            .hardwareMake(HardwareMake.NVIDIA.toString())
+            .hardwareType(HardwareType.GPU.toString())
+            .multiplier(-1.00D)
+            .averagePpd(1L)
+            .build();
+        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.create(hardwareRequest, ADMIN_USER.userName(), ADMIN_USER.password());
+
+        assertThat(response.statusCode())
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
+
+        assertThat(response.body())
+            .as("Did not receive expected error message in response")
+            .contains("multiplier");
     }
 
     @Test

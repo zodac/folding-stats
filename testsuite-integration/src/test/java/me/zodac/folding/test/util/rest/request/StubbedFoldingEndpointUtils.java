@@ -148,13 +148,7 @@ public final class StubbedFoldingEndpointUtils {
         addUnits(user.foldingUserName(), user.passkey(), units);
     }
 
-    /**
-     * Adds the number of units for a {@link UserRequest}.
-     *
-     * @param user the {@link UserRequest} to update
-     * @throws FoldingRestException thrown if an error occurs sending the HTTP request
-     */
-    public static void addUnits(final UserRequest user, final int units) throws FoldingRestException {
+    private static void addUnits(final UserRequest user, final int units) throws FoldingRestException {
         addUnits(user.getFoldingUserName(), user.getPasskey(), units);
     }
 

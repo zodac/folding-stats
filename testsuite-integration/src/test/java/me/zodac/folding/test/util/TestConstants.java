@@ -31,8 +31,7 @@ public final class TestConstants {
 
     // URL
     public static final String TEST_IP_ADDRESS = System.getProperty("testIpAddress", "127.0.0.1");
-    public static final String TEST_SERVICE_URL = "http://" + TEST_IP_ADDRESS + ":8081";
-    public static final String FOLDING_URL = TEST_SERVICE_URL + "/folding";
+    public static final String FOLDING_URL = String.format("http://%s:8081/folding", TEST_IP_ADDRESS);
 
     // ID
     public static final int NON_EXISTING_ID = 9_999;

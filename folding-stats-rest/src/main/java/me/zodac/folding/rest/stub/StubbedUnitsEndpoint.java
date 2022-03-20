@@ -146,7 +146,7 @@ public class StubbedUnitsEndpoint {
 
         private int finished;
 
-        public static UnitsResponse create(final int finished) {
+        static UnitsResponse create(final int finished) {
             return new UnitsResponse(finished);
         }
     }

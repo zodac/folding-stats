@@ -146,11 +146,11 @@ public class StubbedPointsEndpoint {
 
         private long earned;
 
-        public static PointsResponse create(final long earned) {
+        static PointsResponse create(final long earned) {
             return new PointsResponse(earned);
         }
 
-        public static PointsResponse empty() {
+        static PointsResponse empty() {
             return create(0L);
         }
     }

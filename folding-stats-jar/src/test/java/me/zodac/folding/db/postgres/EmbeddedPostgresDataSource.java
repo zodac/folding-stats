@@ -44,7 +44,7 @@ import org.apache.logging.log4j.Logger;
 /**
  * {@link EmbeddedPostgres} DB to be used for tests.
  */
-public final class EmbeddedPostgresDataSource {
+final class EmbeddedPostgresDataSource {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Pattern BLANK_LINE_PATTERN = Pattern.compile("((\\n\\r)|(\\r\\n)){2}|(\\r){2}|(\\n){2}");
@@ -68,7 +68,7 @@ public final class EmbeddedPostgresDataSource {
      *
      * @return the created {@link EmbeddedPostgresDataSource}
      */
-    public static DataSource create() {
+    static DataSource create() {
         return new EmbeddedPostgresDataSource().dataSource;
     }
 
