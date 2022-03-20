@@ -83,7 +83,7 @@ record IntegerRankingCollector<T>(Comparator<? super T> comparator, Function<T, 
         };
     }
 
-    private int getRankAdjustment(final List<T> left, final List<T> right) {
+    private int getRankAdjustment(final List<? extends T> left, final List<? extends T> right) {
         final Optional<T> lastElementOnTheLeft = optGet(left, left.size() - 1);
         final Optional<T> firstElementOnTheRight = optGet(right, 0);
 
