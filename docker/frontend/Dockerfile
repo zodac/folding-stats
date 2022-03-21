@@ -55,15 +55,6 @@ COPY ./docker/frontend/conf/httpd-ssl.conf /usr/local/apache2/conf/extra/httpd-s
 
 WORKDIR /usr/local/apache2/htdocs/
 
-# Copy the RAML API and minified JS/CSS files
-COPY --from=raml /docker/apache/api.html ./api.html
-COPY --from=minifier /docker/apache/site/res ./res
-
-# Copy the static content (images, 3PP JS/CSS files)
-COPY ./docker/frontend/res/img ./res/img
-COPY ./docker/frontend/res/js/*.js ./res/js/
-COPY ./docker/frontend/res/css/*.css ./res/css/
-
 # Website structure
 COPY ./docker/frontend/pages/robots.txt ./robots.txt
 COPY ./docker/frontend/pages/index.html ./index.html
@@ -79,6 +70,29 @@ COPY ./docker/frontend/pages/historic/historic_team_monthly.html ./historic_team
 COPY ./docker/frontend/pages/historic/historic_user_daily.html ./historic_user_daily
 COPY ./docker/frontend/pages/historic/historic_user_hourly.html ./historic_user_hourly
 COPY ./docker/frontend/pages/historic/historic_user_monthly.html ./historic_user_monthly
+
+# Copy the RAML API and minified JS/CSS files
+COPY --from=raml /docker/apache/api.html ./api.html
+COPY --from=minifier /docker/apache/site/res ./res
+
+# Add a hash to each of the JS files to avoid Apache caching them after changes are made
+# Also update all existing HTML pages references to the files to the new name
+WORKDIR /usr/local/apache2/htdocs/res/js
+RUN for file_name in *.js; do \
+      base=$(basename "${file_name}") && \
+      name_without_extension=$(echo "${base%%.*}")  && \
+      hash=$(cat "${file_name}" | md5sum | tr -s ' ' | cut -d ' ' -f1) && \
+      new_file_name="${name_without_extension}-${hash}.min.js" && \
+      mv "${file_name}" "${new_file_name}" && \
+      echo "'${file_name}'" && \
+      grep -rl "${file_name}" /usr/local/apache2/htdocs | xargs sed -i "s|${file_name}|${new_file_name}|g" \
+    ; done
+WORKDIR /usr/local/apache2/htdocs/
+
+# Copy the static content (images, 3PP JS/CSS files) only after the src JS files have been renamed and moved
+COPY ./docker/frontend/res/img ./res/img
+COPY ./docker/frontend/res/js/*.js ./res/js/
+COPY ./docker/frontend/res/css/*.css ./res/css/
 
 ARG FORUM_LINK
 ARG ROOT_URL
