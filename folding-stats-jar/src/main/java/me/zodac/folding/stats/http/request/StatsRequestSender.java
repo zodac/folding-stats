@@ -24,14 +24,14 @@
 
 package me.zodac.folding.stats.http.request;
 
+import static me.zodac.folding.rest.util.RestUtilConstants.HTTP_CLIENT;
+
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import me.zodac.folding.api.exception.ExternalConnectionException;
@@ -60,10 +60,7 @@ import org.apache.logging.log4j.Logger;
 public final class StatsRequestSender {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
-        .version(HttpClient.Version.HTTP_2)
-        .connectTimeout(Duration.ofSeconds(10L))
-        .build();
+    private static final int MAX_NUMBER_OF_REQUEST_ATTEMPTS = 2;
 
     private static final Map<String, String> CACHED_RESPONSE_BODIES = new HashMap<>();
 
@@ -91,10 +88,13 @@ public final class StatsRequestSender {
      */
     public static HttpResponse<String> sendFoldingRequest(final StatsRequestUrl statsRequestUrl) throws ExternalConnectionException {
         final String requestUrl = statsRequestUrl.url();
+        final String cachedResponseBody = CACHED_RESPONSE_BODIES.get(requestUrl);
 
-        try {
-            final HttpResponse<String> response = sendRequest(requestUrl);
+        HttpResponse<String> response = sendHttpRequest(requestUrl);
+        int requestAttempts = 1;
 
+        // Continue making requests as long as we have not hit max attempts
+        while (requestAttempts < MAX_NUMBER_OF_REQUEST_ATTEMPTS) {
             // All user searches 'should' return a 200 response, even if the user/passkey is invalid
             // The response should be parsed and validated, which we do later
             if (response.statusCode() != HttpURLConnection.HTTP_OK) {
@@ -102,10 +102,30 @@ public final class StatsRequestSender {
             }
 
             if (StringUtils.isBlank(response.body())) {
-                throw new ExternalConnectionException(response.uri().toString(), "Empty Folding points response");
+                throw new ExternalConnectionException(response.uri().toString(), "Empty Folding@Home stats response");
             }
 
-            return response;
+            // If the response body is different to the cached both, we have the latest data and can stop making additional requests
+            if (!response.body().equalsIgnoreCase(cachedResponseBody)) {
+                break;
+            }
+
+            // If response body is same as cached body, it could mean:
+            //   1 - No additional stats have been creditted to the user
+            //   2 - The Folding@Home API is caching its response
+            // To try and be as up to date as possible, we will make up to MAX_NUMBER_OF_REQUEST_ATTEMPTS requests to get an up to date value
+            response = sendHttpRequest(requestUrl);
+            requestAttempts++;
+        }
+
+        CACHED_RESPONSE_BODIES.put(requestUrl, response.body());
+        return response;
+    }
+
+    private static HttpResponse<String> sendHttpRequest(final String requestUrl) throws ExternalConnectionException {
+        try {
+            final HttpRequest request = createHttpRequest(requestUrl);
+            return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (final ConnectException e) {
             LOGGER.debug("Connection error retrieving stats for user", e);
             LOGGER.warn("Connection error retrieving stats for user");
@@ -123,31 +143,13 @@ public final class StatsRequestSender {
         }
     }
 
-    private static HttpResponse<String> sendRequest(final String requestUrl) throws IOException, InterruptedException {
-        final HttpRequest request = HttpRequest.newBuilder()
+    private static HttpRequest createHttpRequest(final String requestUrl) {
+        return HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(requestUrl))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
-            .header(RestHeader.CACHE_CONTROL.headerName(),
-                CacheControl.NO_CACHE.cacheControlValue() + " " + CacheControl.NO_STORE.cacheControlValue())
+            .header(RestHeader.CACHE_CONTROL.headerName(), CacheControl.NO_CACHE.combine(CacheControl.NO_STORE))
             .build();
-
-        final String cachedResponseBody = CACHED_RESPONSE_BODIES.get(requestUrl);
-
-        final HttpResponse<String> firstResponse = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-        LOGGER.trace("First response: {}", firstResponse::body);
-
-        if (firstResponse.body().equalsIgnoreCase(cachedResponseBody)) {
-            final HttpResponse<String> secondResponse = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-            LOGGER.debug("Initial request returned a response equal to response in the cache, sent second request to Stanford: '{}' vs '{}'",
-                firstResponse::body, secondResponse::body);
-
-            CACHED_RESPONSE_BODIES.put(requestUrl, secondResponse.body());
-            return secondResponse;
-        }
-
-        CACHED_RESPONSE_BODIES.put(requestUrl, firstResponse.body());
-        return firstResponse;
     }
 }
 

@@ -60,15 +60,18 @@ public class StateInterceptor implements HandlerInterceptor {
     public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler) {
         LOGGER.debug("Checking system state for REST request at '{}'", request.getRequestURI());
 
-        try {
-            if (handler instanceof HandlerMethod) {
-                validateSystemState((HandlerMethod) handler);
-            } else if (isPreflightRequest(handler)) {
+        if (!(handler instanceof HandlerMethod)) {
+            if (isPreflightRequest(handler)) {
                 LOGGER.debug("Preflight request, no need to validate: {}", handler.getClass());
+                return true;
             } else {
                 LOGGER.warn("Unable to validate, handler is type: {}", handler.getClass());
                 throw new ServiceUnavailableException();
             }
+        }
+
+        try {
+            validateSystemState((HandlerMethod) handler);
         } catch (final ServiceUnavailableException e) {
             LOGGER.debug("Handling exception: {}", e.getClass().getSimpleName());
             throw e;

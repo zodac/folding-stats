@@ -51,11 +51,12 @@ public enum CacheControl {
     }
 
     /**
-     * The value of the {@link CacheControl}.
+     * Combines with the input {@link CacheControl}, with a single space as the delimiter.
      *
-     * @return the {@link CacheControl} value
+     * @param input the second {@link CacheControl}
+     * @return the {@link CacheControl}s as a {@link String}
      */
-    public String cacheControlValue() {
-        return cacheControlValue;
+    public String combine(final CacheControl input) {
+        return cacheControlValue + " " + input.cacheControlValue;
     }
 }

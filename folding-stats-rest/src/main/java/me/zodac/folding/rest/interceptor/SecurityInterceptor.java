@@ -102,15 +102,18 @@ public final class SecurityInterceptor implements HandlerInterceptor {
     public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler) {
         SECURITY_LOGGER.debug("Validating REST request at '{}'", request::getRequestURI);
 
-        try {
-            if (handler instanceof HandlerMethod) {
-                validateRequest(request, (HandlerMethod) handler);
-            } else if (isPreflightRequest(handler)) {
+        if (!(handler instanceof HandlerMethod)) {
+            if (isPreflightRequest(handler)) {
                 SECURITY_LOGGER.debug("Preflight request, no need to validate: {}", handler.getClass());
+                return true;
             } else {
                 SECURITY_LOGGER.warn("Unable to validate, handler is type: {}", handler.getClass());
                 throw new UnauthorizedException();
             }
+        }
+
+        try {
+            validateRequest(request, (HandlerMethod) handler);
         } catch (final ForbiddenException | UnauthorizedException e) {
             SECURITY_LOGGER.debug("Handling exception: {}", e.getClass().getSimpleName());
             throw e;
