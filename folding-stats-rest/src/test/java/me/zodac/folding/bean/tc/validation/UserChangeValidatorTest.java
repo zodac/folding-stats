@@ -27,7 +27,6 @@ package me.zodac.folding.bean.tc.validation;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowableOfType;
 
-import me.zodac.folding.api.FoldingRepository;
 import me.zodac.folding.api.exception.ConflictException;
 import me.zodac.folding.api.exception.ValidationException;
 import me.zodac.folding.api.tc.Category;
@@ -38,6 +37,7 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.change.UserChange;
 import me.zodac.folding.api.tc.change.UserChangeState;
+import me.zodac.folding.bean.api.FoldingRepository;
 import me.zodac.folding.bean.tc.validation.retriever.ExternalConnectionFoldingStatsRetriever;
 import me.zodac.folding.bean.tc.validation.retriever.NoUnitsFoldingStatsRetriever;
 import me.zodac.folding.bean.tc.validation.retriever.UnexpectedExceptionFoldingStatsRetriever;

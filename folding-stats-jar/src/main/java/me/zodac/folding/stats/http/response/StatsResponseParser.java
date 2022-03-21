@@ -24,7 +24,7 @@
 
 package me.zodac.folding.stats.http.response;
 
-import static me.zodac.folding.rest.util.RestUtilConstants.GSON;
+import static me.zodac.folding.rest.api.util.RestUtilConstants.GSON;
 
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;

@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.rest.util;
+package me.zodac.folding.rest.api.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

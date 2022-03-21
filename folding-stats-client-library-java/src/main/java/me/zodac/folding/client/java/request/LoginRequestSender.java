@@ -33,7 +33,7 @@ import me.zodac.folding.rest.api.LoginCredentials;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
-import me.zodac.folding.rest.util.RestUtilConstants;
+import me.zodac.folding.rest.api.util.RestUtilConstants;
 
 /**
  * Convenience class to send HTTP requests to the {@link LoginCredentials} REST endpoint.

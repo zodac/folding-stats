@@ -25,7 +25,7 @@
 package me.zodac.folding.test;
 
 import static me.zodac.folding.api.util.EncodingUtils.encodeBasicAuthentication;
-import static me.zodac.folding.rest.util.RestUtilConstants.HTTP_CLIENT;
+import static me.zodac.folding.rest.api.util.RestUtilConstants.HTTP_CLIENT;
 import static me.zodac.folding.test.util.PasskeyChecker.assertPasskeyIsHidden;
 import static me.zodac.folding.test.util.PasskeyChecker.assertPasskeyIsShown;
 import static me.zodac.folding.test.util.SystemCleaner.cleanSystemForComplexTests;
@@ -54,7 +54,7 @@ import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.tc.request.UserChangeRequest;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
-import me.zodac.folding.rest.util.RestUtilConstants;
+import me.zodac.folding.rest.api.util.RestUtilConstants;
 import me.zodac.folding.test.util.TestConstants;
 import me.zodac.folding.test.util.rest.request.UserUtils;
 import org.junit.jupiter.api.AfterAll;

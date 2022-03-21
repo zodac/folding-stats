@@ -24,7 +24,7 @@
 
 package me.zodac.folding.stats.http.request;
 
-import static me.zodac.folding.rest.util.RestUtilConstants.HTTP_CLIENT;
+import static me.zodac.folding.rest.api.util.RestUtilConstants.HTTP_CLIENT;
 
 import java.io.IOException;
 import java.net.ConnectException;

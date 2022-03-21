@@ -27,7 +27,7 @@ package me.zodac.folding.rest;
 import static me.zodac.folding.rest.response.Responses.ok;
 
 import javax.annotation.security.RolesAllowed;
-import me.zodac.folding.api.FoldingRepository;
+import me.zodac.folding.bean.api.FoldingRepository;
 import me.zodac.folding.bean.tc.lars.LarsHardwareUpdater;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

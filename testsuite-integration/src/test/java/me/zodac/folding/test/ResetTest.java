@@ -55,7 +55,7 @@ import me.zodac.folding.rest.api.tc.AllTeamsSummary;
 import me.zodac.folding.rest.api.tc.TeamSummary;
 import me.zodac.folding.rest.api.tc.UserSummary;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
-import me.zodac.folding.rest.util.RestUtilConstants;
+import me.zodac.folding.rest.api.util.RestUtilConstants;
 import me.zodac.folding.test.util.rest.request.HardwareUtils;
 import me.zodac.folding.test.util.rest.request.StubbedFoldingEndpointUtils;
 import me.zodac.folding.test.util.rest.request.TeamCompetitionStatsUtils;

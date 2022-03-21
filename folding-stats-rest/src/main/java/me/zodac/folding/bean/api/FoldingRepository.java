@@ -22,9 +22,10 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.api;
+package me.zodac.folding.bean.api;
 
 import java.util.Collection;
+import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.state.ParsingState;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;

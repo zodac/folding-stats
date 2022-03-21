@@ -24,7 +24,7 @@
 
 package me.zodac.folding.test.util.rest.request;
 
-import static me.zodac.folding.rest.util.RestUtilConstants.HTTP_CLIENT;
+import static me.zodac.folding.rest.api.util.RestUtilConstants.HTTP_CLIENT;
 import static me.zodac.folding.test.util.TestConstants.FOLDING_URL;
 import static org.assertj.core.api.Assertions.assertThat;
 

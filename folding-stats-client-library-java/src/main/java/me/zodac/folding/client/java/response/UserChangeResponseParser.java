@@ -31,7 +31,7 @@ import java.util.Collection;
 import me.zodac.folding.api.tc.change.UserChange;
 import me.zodac.folding.client.java.request.UserChangeRequestSender;
 import me.zodac.folding.rest.api.tc.request.UserChangeRequest;
-import me.zodac.folding.rest.util.RestUtilConstants;
+import me.zodac.folding.rest.api.util.RestUtilConstants;
 
 /**
  * Utility class used to parse a {@link HttpResponse} returned from {@link me.zodac.folding.client.java.request.UserChangeRequestSender}.

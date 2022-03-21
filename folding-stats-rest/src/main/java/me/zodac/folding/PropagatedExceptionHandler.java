@@ -24,7 +24,7 @@
 
 package me.zodac.folding;
 
-import static me.zodac.folding.rest.util.RestUtilConstants.GSON;
+import static me.zodac.folding.rest.api.util.RestUtilConstants.GSON;
 
 import me.zodac.folding.api.exception.ConflictException;
 import me.zodac.folding.api.exception.UsedByException;

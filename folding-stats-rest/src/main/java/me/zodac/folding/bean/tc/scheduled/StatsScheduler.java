@@ -25,10 +25,10 @@
 package me.zodac.folding.bean.tc.scheduled;
 
 import java.util.Collection;
-import me.zodac.folding.api.FoldingRepository;
 import me.zodac.folding.api.state.ParsingState;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
+import me.zodac.folding.bean.api.FoldingRepository;
 import me.zodac.folding.bean.tc.user.UserStatsParser;
 import me.zodac.folding.state.ParsingStateManager;
 import org.apache.logging.log4j.LogManager;

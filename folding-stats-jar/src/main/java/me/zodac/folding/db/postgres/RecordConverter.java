@@ -59,7 +59,7 @@ import me.zodac.folding.db.postgres.gen.tables.records.UserTcStatsHourlyRecord;
 import me.zodac.folding.db.postgres.gen.tables.records.UserTotalStatsRecord;
 import me.zodac.folding.db.postgres.gen.tables.records.UsersRecord;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
-import me.zodac.folding.rest.util.LocalDateTimeGsonTypeAdapter;
+import me.zodac.folding.rest.api.util.LocalDateTimeGsonTypeAdapter;
 import org.jooq.Record;
 
 /**

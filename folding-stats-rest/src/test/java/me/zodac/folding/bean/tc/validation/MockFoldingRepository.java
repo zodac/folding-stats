@@ -29,13 +29,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import me.zodac.folding.api.FoldingRepository;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.change.UserChange;
 import me.zodac.folding.api.tc.change.UserChangeState;
+import me.zodac.folding.bean.api.FoldingRepository;
 import me.zodac.folding.rest.exception.NotFoundException;
 
 /**

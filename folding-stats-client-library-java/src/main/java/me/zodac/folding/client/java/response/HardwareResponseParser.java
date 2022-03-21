@@ -30,7 +30,7 @@ import java.net.http.HttpResponse;
 import java.util.Collection;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
-import me.zodac.folding.rest.util.RestUtilConstants;
+import me.zodac.folding.rest.api.util.RestUtilConstants;
 
 /**
  * Utility class used to parse a {@link HttpResponse} returned from {@link me.zodac.folding.client.java.request.HardwareRequestSender}.

@@ -24,7 +24,7 @@
 
 package me.zodac.folding.test;
 
-import static me.zodac.folding.rest.util.RestUtilConstants.HTTP_CLIENT;
+import static me.zodac.folding.rest.api.util.RestUtilConstants.HTTP_CLIENT;
 import static me.zodac.folding.test.util.SystemCleaner.cleanSystemForComplexTests;
 import static me.zodac.folding.test.util.TestAuthenticationData.ADMIN_USER;
 import static me.zodac.folding.test.util.TestConstants.FOLDING_URL;

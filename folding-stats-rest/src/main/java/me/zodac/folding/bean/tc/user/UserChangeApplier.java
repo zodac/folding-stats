@@ -25,10 +25,10 @@
 package me.zodac.folding.bean.tc.user;
 
 import java.util.Collection;
-import me.zodac.folding.api.FoldingRepository;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.change.UserChange;
 import me.zodac.folding.api.tc.change.UserChangeState;
+import me.zodac.folding.bean.api.FoldingRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

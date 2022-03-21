@@ -24,7 +24,7 @@
 
 package me.zodac.folding.rest.response;
 
-import static me.zodac.folding.rest.util.RestUtilConstants.GSON;
+import static me.zodac.folding.rest.api.util.RestUtilConstants.GSON;
 
 import java.net.URI;
 import java.time.temporal.ChronoUnit;
