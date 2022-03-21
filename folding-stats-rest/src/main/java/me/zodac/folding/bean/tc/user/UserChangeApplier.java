@@ -64,18 +64,14 @@ public class UserChangeApplier {
      * @see FoldingRepository#getAllUserChangesForNextMonth()
      */
     public void applyAllForNextMonth() {
-        try {
-            final Collection<UserChange> nextMonthUserChanges = foldingRepository.getAllUserChangesForNextMonth();
+        final Collection<UserChange> nextMonthUserChanges = foldingRepository.getAllUserChangesForNextMonth();
 
-            for (final UserChange userChange : nextMonthUserChanges) {
-                try {
-                    apply(userChange);
-                } catch (final Exception e) {
-                    LOGGER.warn("Error occurred applying user change '{}'", userChange, e);
-                }
+        for (final UserChange userChange : nextMonthUserChanges) {
+            try {
+                apply(userChange);
+            } catch (final Exception e) {
+                LOGGER.warn("Error occurred applying user change '{}'", userChange, e);
             }
-        } catch (final Exception e) {
-            LOGGER.warn("Unexpected error applying next month's user changes", e);
         }
     }
 

@@ -447,7 +447,12 @@ public class FoldingRepositoryImpl implements FoldingRepository {
 
     @Override
     public Collection<UserChange> getAllUserChangesForNextMonth() {
-        return storage.getAllUserChanges(Collections.singletonList(UserChangeState.APPROVED_NEXT_MONTH), 0L);
+        try {
+            return storage.getAllUserChanges(Collections.singletonList(UserChangeState.APPROVED_NEXT_MONTH), 0L);
+        } catch (final Exception e) {
+            LOGGER.warn("Error retrieving all user changes for next month", e);
+            return Collections.emptyList();
+        }
     }
 
     @Override

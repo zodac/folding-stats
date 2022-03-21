@@ -583,18 +583,19 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
     @Override
     public Collection<HistoricStats> getHistoricStatsHourly(final int userId, final Year year, final Month month, final int day) {
         SQL_LOGGER.info("Getting historic hourly user TC stats for {}/{}/{} for user {}", () -> year, () -> formatMonth(month),
-            () -> day,
-            () -> userId);
+            () -> day, () -> userId);
 
-        final String selectSqlStatement = "SELECT MAX(utc_timestamp) AS hourly_timestamp, "
-            + "COALESCE(MAX(tc_points) - LAG(MAX(tc_points)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points, "
-            + "COALESCE(MAX(tc_points_multiplied) - LAG(MAX(tc_points_multiplied)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points_multiplied, "
-            + "COALESCE(MAX(tc_units) - LAG(MAX(tc_units)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_units "
-            + "FROM user_tc_stats_hourly "
-            + "WHERE utc_timestamp BETWEEN ? AND ? "
-            + "AND user_id = ? "
-            + "GROUP BY EXTRACT(HOUR FROM utc_timestamp) "
-            + "ORDER BY EXTRACT(HOUR FROM utc_timestamp) ASC";
+        final String selectSqlStatement = """
+            SELECT MAX(utc_timestamp) AS hourly_timestamp
+            COALESCE(MAX(tc_points) - LAG(MAX(tc_points)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points
+            COALESCE(MAX(tc_points_multiplied) - LAG(MAX(tc_points_multiplied)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points_multiplied
+            COALESCE(MAX(tc_units) - LAG(MAX(tc_units)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_units
+            FROM user_tc_stats_hourly
+            WHERE utc_timestamp BETWEEN ? AND ?
+            AND user_id = ?
+            GROUP BY EXTRACT(HOUR FROM utc_timestamp)
+            ORDER BY EXTRACT(HOUR FROM utc_timestamp) ASC";
+            """;
 
         try (final Connection connection = dataSource.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
@@ -767,19 +768,20 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
 
     @Override
     public Collection<HistoricStats> getHistoricStatsDaily(final int userId, final Year year, final Month month) {
-        SQL_LOGGER.info("Getting historic daily user TC stats for {}/{} for user {}", () -> formatMonth(month), () -> year,
-            () -> userId);
+        SQL_LOGGER.info("Getting historic daily user TC stats for {}/{} for user {}", () -> formatMonth(month), () -> year, () -> userId);
 
-        final String selectSqlStatement = "SELECT utc_timestamp::DATE AS daily_timestamp, "
-            + "COALESCE(MAX(tc_points) - LAG(MAX(tc_points)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points, "
-            + "COALESCE(MAX(tc_points_multiplied) - LAG(MAX(tc_points_multiplied)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points_multiplied, "
-            + "COALESCE(MAX(tc_units) - LAG(MAX(tc_units)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_units "
-            + "FROM user_tc_stats_hourly "
-            + "WHERE EXTRACT(MONTH FROM utc_timestamp) = ? "
-            + "AND EXTRACT(YEAR FROM utc_timestamp) = ? "
-            + "AND user_id = ? "
-            + "GROUP BY utc_timestamp::DATE "
-            + "ORDER BY utc_timestamp::DATE ASC;";
+        final String selectSqlStatement = """
+            SELECT utc_timestamp::DATE AS daily_timestamp,
+            COALESCE(MAX(tc_points) - LAG(MAX(tc_points)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points,
+            COALESCE(MAX(tc_points_multiplied) - LAG(MAX(tc_points_multiplied)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_points_multiplied,
+            COALESCE(MAX(tc_units) - LAG(MAX(tc_units)) OVER (ORDER BY MIN(utc_timestamp)), 0) AS diff_units
+            FROM user_tc_stats_hourly
+            WHERE EXTRACT(MONTH FROM utc_timestamp) = ?
+            AND EXTRACT(YEAR FROM utc_timestamp) = ?
+            AND user_id = ?
+            GROUP BY utc_timestamp::DATE
+            ORDER BY utc_timestamp::DATE ASC;
+            """;
 
         try (final Connection connection = dataSource.getConnection();
              final PreparedStatement preparedStatement = connection.prepareStatement(selectSqlStatement)) {
