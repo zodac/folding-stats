@@ -25,6 +25,7 @@
 package me.zodac.folding.rest;
 
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
+import me.zodac.folding.rest.response.Responses;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,10 +47,7 @@ public class InvalidUrlRedirecter {
      * @return {@link HttpStatus#SEE_OTHER} {@link ResponseEntity} with the <b>Location</b> header to the URL defined by <b>REDIRECT_URL</b>
      */
     @GetMapping
-    public ResponseEntity<?> redirectOnError() {
-        return ResponseEntity
-            .status(HttpStatus.SEE_OTHER)
-            .header("Location", REDIRECT_URL)
-            .build();
+    public ResponseEntity<String> redirectOnError() {
+        return Responses.redirect(REDIRECT_URL);
     }
 }

@@ -56,6 +56,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * @see <a href="https://folding.lar.systems/">LARS PPD DB</a>
  */
+@SuppressWarnings("ClassOnlyUsedInOneModule")
 @ConditionalOnProperty("stubbed.endpoints.enabled")
 @RestController
 @RequestMapping("/gpu_ppd/overall_ranks")

@@ -36,7 +36,6 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
-import me.zodac.folding.api.exception.LarsParseException;
 import me.zodac.folding.api.tc.lars.LarsGpu;
 import org.apache.commons.text.StringSubstitutor;
 import org.jsoup.Jsoup;

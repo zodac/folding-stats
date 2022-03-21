@@ -36,7 +36,6 @@ import java.util.HashMap;
 import java.util.Map;
 import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.util.StringUtils;
-import me.zodac.folding.rest.api.header.CacheControl;
 import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.stats.http.response.StatsResponseParser;
@@ -79,7 +78,7 @@ public final class StatsRequestSender {
      * Includes the headers:
      * <ul>
      *     <li>{@link RestHeader#CONTENT_TYPE}: {@link ContentType#JSON}</li>
-     *     <li>{@link RestHeader#CACHE_CONTROL}: {@link CacheControl#NO_CACHE}</li>
+     *     <li>{@link RestHeader#CACHE_CONTROL}: {@link CacheControl#NO_CACHE} {@link CacheControl#NO_STORE}</li>
      * </ul>
      *
      * @param statsRequestUrl the URL the stats request should be sent to
@@ -148,7 +147,7 @@ public final class StatsRequestSender {
             .GET()
             .uri(URI.create(requestUrl))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
-            .header(RestHeader.CACHE_CONTROL.headerName(), CacheControl.NO_CACHE.combine(CacheControl.NO_STORE))
+            .header(RestHeader.CACHE_CONTROL.headerName(), CacheControl.NO_CACHE.headerValue() + " " + CacheControl.NO_STORE.headerValue())
             .build();
     }
 }

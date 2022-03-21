@@ -26,13 +26,14 @@ package me.zodac.folding.rest.response;
 
 import static me.zodac.folding.rest.util.RestUtilConstants.GSON;
 
+import java.net.URI;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 import me.zodac.folding.api.util.DateTimeUtils;
+import me.zodac.folding.rest.api.header.RestHeader;
 import org.springframework.http.CacheControl;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -93,7 +94,7 @@ public final class Responses {
     public static <E> ResponseEntity<String> ok(final Collection<E> entities) {
         return ResponseEntity
             .ok()
-            .header("X-Total-Count", String.valueOf(entities.size()))
+            .header(RestHeader.TOTAL_COUNT.headerName(), String.valueOf(entities.size()))
             .body(GSON.toJson(entities));
     }
 
@@ -163,7 +164,7 @@ public final class Responses {
     public static <E> ResponseEntity<String> cachedOk(final Collection<E> entities, final long cachePeriodInSeconds) {
         return ResponseEntity
             .ok()
-            .header("X-Total-Count", String.valueOf(entities.size()))
+            .header(RestHeader.TOTAL_COUNT.headerName(), String.valueOf(entities.size()))
             .cacheControl(CacheControl.maxAge(cachePeriodInSeconds, TimeUnit.SECONDS))
             .eTag(String.valueOf(entities.stream().mapToInt(Object::hashCode).sum()))
             .body(GSON.toJson(entities));
@@ -185,23 +186,39 @@ public final class Responses {
     }
 
     private static <E> ResponseEntity<String> responseWithLocation(final E entity, final int entityId, final HttpStatus httpStatus) {
-        final String location = ServletUriComponentsBuilder
+        final URI location = ServletUriComponentsBuilder
             .fromCurrentRequest()
             .path("/{id}")
             .buildAndExpand(entityId)
-            .toUriString();
+            .toUri();
 
         return ResponseEntity
             .status(httpStatus)
-            .header(HttpHeaders.LOCATION, location)
+            .location(location)
             .body(GSON.toJson(entity));
+    }
+
+    /**
+     * A <b>303_SEE_OTHER</b> {@link ResponseEntity}.
+     *
+     * <p>
+     * Used to redirect to another URL in the 'location' header
+     *
+     * @param redirectUrl the URL to redirect to
+     * @return the <b>303_SEE_OTHER</b> {@link ResponseEntity}
+     */
+    public static ResponseEntity<String> redirect(final String redirectUrl) {
+        return ResponseEntity
+            .status(HttpStatus.SEE_OTHER)
+            .location(URI.create(redirectUrl))
+            .build();
     }
 
     /**
      * A <b>404_NOT_FOUND</b> {@link ResponseEntity}.
      *
      * <p>
-     * Generally used for cases when an ID is supplied in a REST request, but no resource exists matching that ID..
+     * Generally used for cases when an ID is supplied in a REST request, but no resource exists matching that ID.
      *
      * @param <E> the response body type
      * @return the <b>404_NOT_FOUND</b> {@link ResponseEntity}

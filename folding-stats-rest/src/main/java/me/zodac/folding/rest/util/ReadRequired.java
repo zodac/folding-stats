@@ -22,16 +22,18 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.api.state;
+package me.zodac.folding.rest.util;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import me.zodac.folding.api.state.OperationType;
+import me.zodac.folding.api.state.SystemState;
 
 /**
- * Marker annotation defining a function that will perform {@link OperationType#WRITE} operations on the system.
+ * Marker annotation defining a function that will perform {@link OperationType#READ} operations on the system.
  *
  * <p>
  * To be used to check against a {@link SystemState}.
@@ -39,6 +41,6 @@ import java.lang.annotation.Target;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface WriteRequired {
+public @interface ReadRequired {
 
 }

@@ -22,41 +22,25 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.rest.api.header;
+package me.zodac.folding.rest.util;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import me.zodac.folding.api.state.OperationType;
+import me.zodac.folding.api.state.SystemState;
 
 /**
- * Values for {@link RestHeader#CACHE_CONTROL} REST headers.
+ * Marker annotation defining a function that will perform {@link OperationType#WRITE} operations on the system.
+ *
+ * <p>
+ * To be used to check against a {@link SystemState}.
  */
-public enum CacheControl {
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface WriteRequired {
 
-    /**
-     * The {@code no-cache} value.
-     */
-    NO_CACHE("no-cache"),
-
-    /**
-     * The {@code no-store} value.
-     */
-    NO_STORE("no-store");
-
-    private final String cacheControlValue;
-
-    /**
-     * Constructs a {@link CacheControl} with the header value as a {@link String}.
-     *
-     * @param cacheControlValue the {@link CacheControl} value as a {@link String}
-     */
-    CacheControl(final String cacheControlValue) {
-        this.cacheControlValue = cacheControlValue;
-    }
-
-    /**
-     * Combines with the input {@link CacheControl}, with a single space as the delimiter.
-     *
-     * @param input the second {@link CacheControl}
-     * @return the {@link CacheControl}s as a {@link String}
-     */
-    public String combine(final CacheControl input) {
-        return cacheControlValue + " " + input.cacheControlValue;
-    }
 }

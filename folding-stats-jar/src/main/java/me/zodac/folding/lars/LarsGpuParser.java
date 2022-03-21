@@ -24,7 +24,6 @@
 
 package me.zodac.folding.lars;
 
-import me.zodac.folding.api.exception.LarsParseException;
 import me.zodac.folding.api.tc.lars.LarsGpu;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

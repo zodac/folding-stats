@@ -45,9 +45,19 @@ public enum RestHeader {
     CONTENT_TYPE("Content-Type"),
 
     /**
+     * The {@code ETag} header.
+     */
+    ETAG("ETag"),
+
+    /**
      * The {@code If-None-Match} header.
      */
-    IF_NONE_MATCH("If-None-Match");
+    IF_NONE_MATCH("If-None-Match"),
+
+    /**
+     * The {@code X-Total-Count} header.
+     */
+    TOTAL_COUNT("X-Total-Count");
 
     private final String headerName;
 

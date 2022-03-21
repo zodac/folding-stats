@@ -22,34 +22,42 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.api.exception;
+package me.zodac.folding.stats.http.request;
 
-import java.io.Serial;
+import me.zodac.folding.rest.api.header.RestHeader;
 
 /**
- * {@link Exception} for when errors occur when parsing LARS DB content.
+ * Values for {@link RestHeader#CACHE_CONTROL} REST headers.
  */
-public class LarsParseException extends Exception {
-
-    @Serial
-    private static final long serialVersionUID = -4059920979584050749L;
+public enum CacheControl {
 
     /**
-     * Constructor taking in an error message.
-     *
-     * @param message the error message
+     * The {@code no-cache} value.
      */
-    public LarsParseException(final String message) {
-        super(message);
+    NO_CACHE("no-cache"),
+
+    /**
+     * The {@code no-store} value.
+     */
+    NO_STORE("no-store");
+
+    private final String headerValue;
+
+    /**
+     * Constructs a {@link CacheControl} with the header value as a {@link String}.
+     *
+     * @param headerValue the {@link CacheControl} value as a {@link String}
+     */
+    CacheControl(final String headerValue) {
+        this.headerValue = headerValue;
     }
 
     /**
-     * Constructor taking in an error message and a cause {@link Throwable}.
+     * The value of the {@link CacheControl}.
      *
-     * @param message the error message
-     * @param cause   the cause {@link Throwable}
+     * @return the {@link CacheControl} value
      */
-    public LarsParseException(final String message, final Throwable cause) {
-        super(message, cause);
+    public String headerValue() {
+        return headerValue;
     }
 }

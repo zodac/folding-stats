@@ -22,23 +22,34 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.api.state;
+package me.zodac.folding.lars;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.io.Serial;
 
 /**
- * Marker annotation defining a function that will perform {@link OperationType#READ} operations on the system.
- *
- * <p>
- * To be used to check against a {@link SystemState}.
+ * {@link Exception} for when errors occur when parsing LARS DB content.
  */
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface ReadRequired {
+class LarsParseException extends Exception {
 
+    @Serial
+    private static final long serialVersionUID = -4059920979584050749L;
+
+    /**
+     * Constructor taking in an error message.
+     *
+     * @param message the error message
+     */
+    LarsParseException(final String message) {
+        super(message);
+    }
+
+    /**
+     * Constructor taking in an error message and a cause {@link Throwable}.
+     *
+     * @param message the error message
+     * @param cause   the cause {@link Throwable}
+     */
+    LarsParseException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
 }

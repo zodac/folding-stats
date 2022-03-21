@@ -30,6 +30,7 @@ import java.net.http.HttpHeaders;
 import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Map;
+import me.zodac.folding.rest.api.header.RestHeader;
 
 /**
  * Utility class with convenience functions extract {@link HttpHeaders} from a {@link HttpResponse}.
@@ -43,11 +44,11 @@ public final class HttpResponseHeaderUtils {
     /**
      * Retrieves the value of the {@code ETag} header from the {@link HttpResponse}.
      *
-     * @param response the {@link HttpResponse} from which to extract the {@code ETag} header
+     * @param response the {@link HttpResponse} from which to extract the {@link RestHeader#ETAG} header
      * @return the value of the {@code ETag} header
      */
     public static String getEntityTag(final HttpResponse<String> response) {
-        return getHeader(response, "ETag");
+        return getHeader(response, RestHeader.ETAG.headerName());
     }
 
     /**
@@ -57,7 +58,7 @@ public final class HttpResponseHeaderUtils {
      * @return the value of the {@code X-Total-Count} header
      */
     public static int getTotalCount(final HttpResponse<String> response) {
-        final String headerValue = getHeader(response, "X-Total-Count");
+        final String headerValue = getHeader(response, RestHeader.TOTAL_COUNT.headerName());
         return Integer.parseInt(headerValue);
     }
 
