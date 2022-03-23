@@ -78,7 +78,7 @@ class LarsTest {
             .isEmpty();
 
         addGpusToLarsDb(
-            LarsGpu.create("Hardware1", "nVidia", "Hardware #1", 1, 1_000L)
+            create("Hardware1", HardwareMake.NVIDIA, "Hardware #1", 1, 1_000L, 1.00D)
         );
 
         manualLarsUpdate();
@@ -92,7 +92,7 @@ class LarsTest {
     @Test
     void whenUpdatingHardwareFromLars_givenLarsHasNoNewHardware_thenSystemIsNotUpdated() throws FoldingRestException {
         addGpusToLarsDb(
-            LarsGpu.create("Hardware1", "nVidia", "Hardware #1", 1, 1_000L)
+            create("Hardware1", HardwareMake.NVIDIA, "Hardware #1", 1, 1_000L, 1.00D)
         );
 
         manualLarsUpdate();
@@ -113,7 +113,7 @@ class LarsTest {
     @Test
     void whenUpdatingHardwareFromLars_givenLarsHasChangesToExistingHardware_thenExistingHardwareIsUpdated() throws FoldingRestException {
         addGpusToLarsDb(
-            LarsGpu.create("Hardware1", "nVidia", "Hardware #1", 1, 1_000L)
+            create("Hardware1", HardwareMake.NVIDIA, "Hardware #1", 1, 1_000L, 1.00D)
         );
 
         manualLarsUpdate();
@@ -130,7 +130,7 @@ class LarsTest {
             .containsExactly("Hardware #1", HardwareMake.NVIDIA, 1_000L);
 
         addGpusToLarsDb(
-            LarsGpu.create("Hardware1", "AMD", "Hardware #1", 1, 1_500L)
+            create("Hardware1", HardwareMake.AMD, "Hardware #1", 1, 1_500L, 1.00D)
         );
         manualLarsUpdate();
 
@@ -149,8 +149,8 @@ class LarsTest {
     @Test
     void whenUpdatingHardwareFromLars_givenLarsHasRemovedSomeExistingHardware_thenThatExistingHardwareIsDeleted() throws FoldingRestException {
         addGpusToLarsDb(
-            LarsGpu.create("Hardware1", "nVidia", "Hardware #1", 1, 1_000L),
-            LarsGpu.create("Hardware2", "nVidia", "Hardware #2", 2, 900L)
+            create("Hardware1", HardwareMake.NVIDIA, "Hardware #1", 1, 1_000L, 1.00D),
+            create("Hardware2", HardwareMake.NVIDIA, "Hardware #2", 2, 900L, 1.11D)
         );
 
         manualLarsUpdate();
@@ -162,7 +162,7 @@ class LarsTest {
 
         deleteAllGpusFromLarsDb();
         addGpusToLarsDb(
-            LarsGpu.create("Hardware1", "nVidia", "Hardware #1", 1, 1_000L)
+            create("Hardware1", HardwareMake.NVIDIA, "Hardware #1", 1, 1_000L, 1.00D)
         );
         manualLarsUpdate();
 
@@ -180,8 +180,8 @@ class LarsTest {
     @Test
     void whenUpdatingHardwareFromLars_givenLarsHasAddedSomeNewHardware_thenNewHardwareIsCreated() throws FoldingRestException {
         addGpusToLarsDb(
-            LarsGpu.create("Hardware1", "nVidia", "Hardware #1", 1, 1_000L),
-            LarsGpu.create("Hardware2", "nVidia", "Hardware #2", 2, 900L)
+            create("Hardware1", HardwareMake.NVIDIA, "Hardware #1", 1, 1_000L, 1.00D),
+            create("Hardware2", HardwareMake.NVIDIA, "Hardware #2", 2, 900L, 1.11D)
         );
 
         manualLarsUpdate();
@@ -192,7 +192,7 @@ class LarsTest {
             .hasSize(2);
 
         addGpusToLarsDb(
-            LarsGpu.create("Hardware3", "AMD", "Hardware #3", 3, 750L)
+            create("Hardware3", HardwareMake.AMD, "Hardware #3", 3, 750L, 1.33D)
         );
         manualLarsUpdate();
 
@@ -205,8 +205,8 @@ class LarsTest {
     @Test
     void whenUpdatingHardwareFromLars_givenNewLarsEntryHasNoPpd_thenNewHardwareIsIgnored() throws FoldingRestException {
         addGpusToLarsDb(
-            LarsGpu.create("Hardware1", "nVidia", "Hardware #1", 1, 1_000L),
-            LarsGpu.create("Hardware2", "nVidia", "Hardware #2", 2, 900L)
+            create("Hardware1", HardwareMake.NVIDIA, "Hardware #1", 1, 1_000L, 1.00D),
+            create("Hardware2", HardwareMake.NVIDIA, "Hardware #2", 2, 900L, 1.11D)
         );
 
         manualLarsUpdate();
@@ -217,7 +217,7 @@ class LarsTest {
             .hasSize(2);
 
         addGpusToLarsDb(
-            LarsGpu.create("Hardware3", "nVidia", "Hardware #3", 3, 0L)
+            create("Hardware3", HardwareMake.NVIDIA, "Hardware #3", 3, 0L, 0.00D)
         );
         manualLarsUpdate();
 
@@ -230,9 +230,9 @@ class LarsTest {
     @Test
     void whenUpdatingHardwareFromLars_givenBestHardwareHasNewPpdValue_thenAllOtherHardwareMultipliersAreUpdated() throws FoldingRestException {
         addGpusToLarsDb(
-            LarsGpu.create("Hardware1", "nVidia", "Hardware #1", 1, 10_000L),
-            LarsGpu.create("Hardware2", "nVidia", "Hardware #2", 2, 5_000L),
-            LarsGpu.create("Hardware3", "nVidia", "Hardware #3", 3, 1_000L)
+            create("Hardware1", HardwareMake.NVIDIA, "Hardware #1", 1, 10_000L, 1.00D),
+            create("Hardware2", HardwareMake.NVIDIA, "Hardware #2", 2, 5_000L, 2.00D),
+            create("Hardware3", HardwareMake.NVIDIA, "Hardware #3", 3, 1_000L, 10.00D)
         );
 
         manualLarsUpdate();
@@ -257,9 +257,9 @@ class LarsTest {
 
         deleteAllGpusFromLarsDb();
         addGpusToLarsDb(
-            LarsGpu.create("Hardware1", "nVidia", "Hardware #1", 1, 20_000L),
-            LarsGpu.create("Hardware2", "nVidia", "Hardware #2", 2, 5_000L),
-            LarsGpu.create("Hardware3", "nVidia", "Hardware #3", 3, 1_000L)
+            create("Hardware1", HardwareMake.NVIDIA, "Hardware #1", 1, 20_000L, 1.00D),
+            create("Hardware2", HardwareMake.NVIDIA, "Hardware #2", 2, 5_000L, 4.00D),
+            create("Hardware3", HardwareMake.NVIDIA, "Hardware #3", 3, 1_000L, 20.00D)
         );
         manualLarsUpdate();
 
@@ -280,5 +280,29 @@ class LarsTest {
             .as("Expected third hardware to have an updated multiplier after second update")
             .extracting("hardwareName", "multiplier")
             .containsExactly("Hardware #3", 20.0D);
+    }
+
+    private static LarsGpu create(final String displayName,
+                                  final HardwareMake hardwareMake,
+                                  final String modelInfo,
+                                  final int rank,
+                                  final long averagePpd,
+                                  final double multiplier) {
+        return new LarsGpu(
+            displayName,
+            modelInfo,
+            hardwareMake.name(),
+            rank,
+            multiplier,
+            averagePpd,
+            "",
+            "",
+            0L,
+            0L,
+            0L,
+            0L,
+            0L,
+            ""
+        );
     }
 }

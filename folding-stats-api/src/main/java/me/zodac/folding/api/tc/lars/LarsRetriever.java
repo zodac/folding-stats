@@ -22,34 +22,21 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.lars;
+package me.zodac.folding.api.tc.lars;
 
-import java.io.Serial;
+import java.util.Set;
+import me.zodac.folding.api.tc.Hardware;
 
 /**
- * {@link Exception} for when errors occur when parsing LARS DB content.
+ * Interface defining a class that can retrieve LARS PPD data.
  */
-class LarsParseException extends Exception {
-
-    @Serial
-    private static final long serialVersionUID = -4059920979584050749L;
+public interface LarsRetriever {
 
     /**
-     * Constructor taking in an error message.
+     * Gets the GPU {@link Hardware} data from LARS.
      *
-     * @param message the error message
+     * @param gpuApiUrl the URL to the LARS GPU PPD database API
+     * @return the LARS GPU {@link Hardware}
      */
-    LarsParseException(final String message) {
-        super(message);
-    }
-
-    /**
-     * Constructor taking in an error message and a cause {@link Throwable}.
-     *
-     * @param message the error message
-     * @param cause   the cause {@link Throwable}
-     */
-    LarsParseException(final String message, final Throwable cause) {
-        super(message, cause);
-    }
+    Set<Hardware> retrieveGpus(String gpuApiUrl);
 }

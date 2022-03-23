@@ -333,7 +333,6 @@
                                 <version>${lombok.version}</version>
                             </path>
                         </annotationProcessorPaths>
-                        <fork>true</fork>
                         <compilerArgs>
                             <arg>-Xlint:all</arg>
                             <arg>-Xdoclint:all</arg>
@@ -351,7 +350,9 @@
                             <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
                             <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
                         </compilerArgs>
+                        <fork>true</fork>
                     </configuration>
+                    <inherited>true</inherited>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

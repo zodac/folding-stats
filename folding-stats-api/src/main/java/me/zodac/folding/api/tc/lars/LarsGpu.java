@@ -24,7 +24,7 @@
 
 package me.zodac.folding.api.tc.lars;
 
-import lombok.AccessLevel;
+import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -33,35 +33,80 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Representation of a GPU entry from the LARS DB.
+ * Representation of an individual GPU from the LARS DB.
  *
- * @see <a href="https://folding.lar.systems/gpu_ppd/overall_ranks">LARS GPU PPD database</a>
+ * <p>
+ * Each GPU will be in the format:
+ * <pre>
+ *     {
+ *         "gpu_rank": 1,
+ *         "gpu_handicap": 1,
+ *         "gpu_name": "GeForce RTX 3080 Ti",
+ *         "sub_version": "",
+ *         "gpu_chip": "GA102",
+ *         "make": "Nvidia",
+ *         "fah_client_description": "GA102 [GeForce RTX 3080 Ti]",
+ *         "ppd_average_overall": 7323554,
+ *         "ppd_samples_overall": 45721,
+ *         "ppd_average_linux": 8745636,
+ *         "ppd_samples_linux": 1314,
+ *         "ppd_average_windows": 6931872,
+ *         "ppd_samples_windows": 44407,
+ *         "url_profile": "https://folding.lar.systems/gpu_ppd/brands/nvidia/folding_profile/ga102_geforce_rtx_3080_ti"
+ *     }
+ * </pre>
+ *
+ * @see <a href="https://folding.lar.systems/api/gpu_ppd/gpu_rank_list.json">LARS GPU PPD database API</a>
  */
 @NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
 @Getter
 @Setter
 @EqualsAndHashCode
 @ToString(doNotUseGetters = true)
 public class LarsGpu {
 
-    private String displayName;
-    private String manufacturer;
-    private String modelInfo;
-    private int rank;
-    private long averagePpd;
+    @SerializedName("gpu_name")
+    private String name;
 
-    /**
-     * Create a {@link LarsGpu}.
-     *
-     * @param displayName  the name
-     * @param manufacturer the manufacturer
-     * @param modelInfo    the model information
-     * @param rank         the {@link LarsGpu}'s PPD rank compared to all other {@link LarsGpu}s
-     * @param averagePpd   the average PPD for the {@link LarsGpu} across all operating systems
-     * @return the created {@link LarsGpu}
-     */
-    public static LarsGpu create(final String displayName, final String manufacturer, final String modelInfo, final int rank, final long averagePpd) {
-        return new LarsGpu(displayName, manufacturer, modelInfo, rank, averagePpd);
-    }
+    @SerializedName("fah_client_description")
+    private String detailedName;
+
+    @SerializedName("make")
+    private String make;
+
+    @SerializedName("gpu_rank")
+    private int rank;
+
+    @SerializedName("gpu_handicap")
+    private double multiplier;
+
+    @SerializedName("ppd_average_overall")
+    private long ppdAverageOverall;
+
+    // Unused fields, kept for completion
+
+    @SerializedName("sub_version")
+    private String subVersion;
+
+    @SerializedName("gpu_chip")
+    private String chip;
+
+    @SerializedName("ppd_samples_overall")
+    private long ppdSamplesOverall;
+
+    @SerializedName("ppd_average_linux")
+    private long ppdAverageLinux;
+
+    @SerializedName("ppd_samples_linux")
+    private long ppdSamplesLinux;
+
+    @SerializedName("ppd_average_windows")
+    private long ppdAverageWindows;
+
+    @SerializedName("ppd_samples_windows")
+    private long ppdSamplesWindows;
+
+    @SerializedName("url_profile")
+    private String urlProfile;
 }

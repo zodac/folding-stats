@@ -27,11 +27,15 @@ package me.zodac.folding.db.postgres;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * <b>PostgreSQL</b> implementation of {@link HikariDataSource}.
  */
 public final class PostgresDataSource extends HikariDataSource {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private PostgresDataSource(final HikariConfig configuration) {
         super(configuration);
@@ -61,6 +65,7 @@ public final class PostgresDataSource extends HikariDataSource {
         hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
         hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
 
+        LOGGER.debug("Connecting to DB...");
         return new PostgresDataSource(hikariConfig);
     }
 }

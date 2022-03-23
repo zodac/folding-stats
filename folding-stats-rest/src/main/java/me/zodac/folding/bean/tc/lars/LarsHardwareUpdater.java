@@ -24,20 +24,16 @@
 
 package me.zodac.folding.bean.tc.lars;
 
-import static java.util.stream.Collectors.toSet;
 import static me.zodac.folding.api.util.NumberUtils.formatWithCommas;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import me.zodac.folding.api.tc.Hardware;
-import me.zodac.folding.api.tc.HardwareMake;
-import me.zodac.folding.api.tc.HardwareType;
-import me.zodac.folding.api.tc.lars.LarsGpu;
+import me.zodac.folding.api.tc.lars.LarsRetriever;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
 import me.zodac.folding.bean.api.FoldingRepository;
 import me.zodac.folding.lars.HardwareSplitter;
-import me.zodac.folding.lars.LarsGpuRetriever;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,15 +50,18 @@ public class LarsHardwareUpdater {
     private static final String LARS_URL_ROOT = EnvironmentVariableUtils.getOrDefault("LARS_URL_ROOT", "https://folding.lar.systems");
 
     private final FoldingRepository foldingRepository;
+    private final LarsRetriever larsRetriever;
 
     /**
      * {@link Autowired} constructor.
      *
      * @param foldingRepository the {@link FoldingRepository}
+     * @param larsRetriever     the {@link LarsRetriever}
      */
     @Autowired
-    public LarsHardwareUpdater(final FoldingRepository foldingRepository) {
+    public LarsHardwareUpdater(final FoldingRepository foldingRepository, final LarsRetriever larsRetriever) {
         this.foldingRepository = foldingRepository;
+        this.larsRetriever = larsRetriever;
     }
 
     /**
@@ -88,10 +87,9 @@ public class LarsHardwareUpdater {
      * </ul>
      *
      * <p>
-     * Since each {@link Hardware} requires a {@code multiplier}, we will manually calculate it based off the highest-ranked
-     * {@link LarsGpu} that is retrieved. The formula for the {@code multiplier} is:
+     * Each {@link Hardware} requires a {@code multiplier}, which is calculated by the LARS PPD DB itself. The formula for the {@code multiplier} is:
      * <pre>
-     *     (PPD of best {@link LarsGpu}) / (PPD of current {@link LarsGpu})
+     *     (PPD of best {@link Hardware}) / (PPD of current {@link Hardware})
      * </pre>
      */
     public void retrieveHardwareAndPersist() {
@@ -104,80 +102,57 @@ public class LarsHardwareUpdater {
     }
 
     private void retrieveGpusAndPersist() {
-        final String gpuDbUrl = LARS_URL_ROOT + "/gpu_ppd/overall_ranks";
-        final List<LarsGpu> larsGpus = LarsGpuRetriever.retrieveGpus(gpuDbUrl);
-        LARS_LOGGER.debug("Retrieved GPUs from LARS DB: {}", larsGpus);
-        LARS_LOGGER.info("Retrieved {} GPUs from LARS DB", larsGpus.size());
+        final String gpuDbUrl = LARS_URL_ROOT + "/api/gpu_ppd/gpu_rank_list.json";
+        final Set<Hardware> larsGpus = larsRetriever.retrieveGpus(gpuDbUrl);
 
         if (larsGpus.isEmpty()) {
             LARS_LOGGER.warn("No GPUs retrieved from LARs DB");
             return;
         }
 
-        final LarsGpu bestGpu = larsGpus.get(0);
-        final long bestPpd = bestGpu.getAveragePpd();
-        LARS_LOGGER.info("Best GPU PPD is '{}' for '{}', will compare to this", formatWithCommas(bestPpd), bestGpu.getModelInfo());
+        LARS_LOGGER.debug("Retrieved GPUs from LARS DB: {}", larsGpus);
+        LARS_LOGGER.info("Retrieved {} GPUs from LARS DB", larsGpus.size());
 
-        final Collection<Hardware> lars = larsGpus
-            .stream()
-            .map(larsGpu -> toHardware(larsGpu, bestPpd))
-            .collect(toSet());
         final Collection<Hardware> existing = foldingRepository.getAllHardware();
 
-        for (final Hardware hardware : HardwareSplitter.toDelete(lars, existing)) {
+        for (final Hardware hardware : HardwareSplitter.toDelete(larsGpus, existing)) {
             foldingRepository.deleteHardware(hardware);
             LARS_LOGGER.info("Deleted GPU hardware '{}' (ID: {})", hardware.hardwareName(), hardware.id());
         }
 
-        for (final Map.Entry<Hardware, Hardware> entry : HardwareSplitter.toUpdate(lars, existing).entrySet()) {
+        for (final Map.Entry<Hardware, Hardware> entry : HardwareSplitter.toUpdate(larsGpus, existing).entrySet()) {
             try {
-                final Hardware updatedHardware = entry.getKey();
-                final Hardware existingHardware = entry.getValue();
-                final Hardware updatedHardwareWithId = Hardware.updateWithId(existingHardware.id(), updatedHardware);
-
-                foldingRepository.updateHardware(updatedHardwareWithId, existingHardware);
-
-                LARS_LOGGER.info("""
-                        LARS updated GPU hardware:
-                        {}
-                        ID: {}
-                        Multiplier: {} -> {}
-                        Average PPD: {} -> {}
-                        """,
-                    updatedHardware.hardwareName(),
-                    existingHardware.id(),
-                    existingHardware.multiplier(),
-                    updatedHardware.multiplier(),
-                    formatWithCommas(existingHardware.averagePpd()),
-                    formatWithCommas(updatedHardware.averagePpd()));
+                updateHardware(entry);
             } catch (final Exception e) {
                 LARS_LOGGER.warn("Unexpected error connecting to Folding@Home stats to verify new GPU hardware", e);
             }
         }
 
-        for (final Hardware hardware : HardwareSplitter.toCreate(lars, existing)) {
+        for (final Hardware hardware : HardwareSplitter.toCreate(larsGpus, existing)) {
             final Hardware createdHardware = foldingRepository.createHardware(hardware);
             LARS_LOGGER.info("Created GPU hardware '{}' (ID: {})", createdHardware.hardwareName(), createdHardware.id());
         }
     }
 
-    private static Hardware toHardware(final LarsGpu larsGpu, final long bestPpd) {
-        return Hardware.createWithoutId(
-            larsGpu.getModelInfo(),
-            larsGpu.getDisplayName(),
-            HardwareMake.get(larsGpu.getManufacturer()),
-            HardwareType.GPU,
-            getMultiplier(bestPpd, larsGpu.getAveragePpd()),
-            larsGpu.getAveragePpd()
-        );
-    }
+    private void updateHardware(final Map.Entry<Hardware, Hardware> entry) {
+        final Hardware updatedHardware = entry.getKey();
+        final Hardware existingHardware = entry.getValue();
+        final Hardware updatedHardwareWithId = Hardware.updateWithId(existingHardware.id(), updatedHardware);
 
-    private static double getMultiplier(final long bestPpd, final long currentPpd) {
-        return roundDoubleToTwoPlaces((double) bestPpd / currentPpd);
-    }
+        foldingRepository.updateHardware(updatedHardwareWithId, existingHardware);
 
-    private static double roundDoubleToTwoPlaces(final double input) {
-        final String doubleAsString = String.format("%.2f", input);
-        return Double.parseDouble(doubleAsString);
+        LARS_LOGGER.info("""
+                LARS updated GPU hardware:
+                {}
+                ID: {}
+                Multiplier: {} -> {}
+                Average PPD: {} -> {}
+                """,
+            updatedHardware.hardwareName(),
+            existingHardware.id(),
+            existingHardware.multiplier(),
+            updatedHardware.multiplier(),
+            formatWithCommas(existingHardware.averagePpd()),
+            formatWithCommas(updatedHardware.averagePpd()));
     }
 }

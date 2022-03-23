@@ -22,36 +22,25 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.lars;
+package me.zodac.folding.bean.tc.lars;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.Comparator;
-import me.zodac.folding.api.tc.lars.LarsGpu;
+import java.util.Set;
+import me.zodac.folding.api.tc.Hardware;
+import me.zodac.folding.api.tc.lars.LarsRetriever;
+import me.zodac.folding.lars.HttpLarsRetriever;
+import org.springframework.stereotype.Component;
 
 /**
- * Custom {@link Comparator} that allows for sorting of {@link LarsGpu}s by only comparing the value of {@link LarsGpu#getAveragePpd()}.
+ * Implementation of {@link LarsRetriever} which essentially wraps {@link HttpLarsRetriever}. Used so we can inject an instance
+ * instead of creating an instance of {@link HttpLarsRetriever}.
  */
-final class LarsGpuAveragePpdComparator implements Comparator<LarsGpu>, Serializable {
+@Component
+public class LarsRetrieverImpl implements LarsRetriever {
 
-    @Serial
-    private static final long serialVersionUID = -7988652908218460899L;
-
-    private LarsGpuAveragePpdComparator() {
-
-    }
-
-    /**
-     * Creates an instance of {@link LarsGpuAveragePpdComparator}.
-     *
-     * @return the created {@link LarsGpuAveragePpdComparator}
-     */
-    static LarsGpuAveragePpdComparator create() {
-        return new LarsGpuAveragePpdComparator();
-    }
+    private static final HttpLarsRetriever HTTP_LARS_RETRIEVER = HttpLarsRetriever.create();
 
     @Override
-    public int compare(final LarsGpu first, final LarsGpu second) {
-        return Long.compare(second.getAveragePpd(), first.getAveragePpd());
+    public Set<Hardware> retrieveGpus(final String gpuApiUrl) {
+        return HTTP_LARS_RETRIEVER.retrieveGpus(gpuApiUrl);
     }
 }

@@ -50,7 +50,7 @@ import org.apache.logging.log4j.Logger;
  * header is used to try and reduce the caching done on to the Folding@Home API, but is not guaranteed to work.
  * In addition to using this header, we keep a cache of the most recent response for each request URL, since the URL
  * will contain a unique username/passkey for each request. We will compare the response to this cached version, and if
- * there is no change, we will send a second REST request to the server.
+ * there is no change, we will send up to {@value #MAX_NUMBER_OF_REQUEST_ATTEMPTS} REST requests to the server.
  *
  * <p>
  * While not ideal, I'm not sure of any other way of forcing an update since it seems to be a server-side decision. This
@@ -97,7 +97,8 @@ public final class StatsRequestSender {
             // All user searches 'should' return a 200 response, even if the user/passkey is invalid
             // The response should be parsed and validated, which we do later
             if (response.statusCode() != HttpURLConnection.HTTP_OK) {
-                throw new ExternalConnectionException(response.uri().toString(), String.format("Invalid response: %s", response));
+                throw new ExternalConnectionException(response.uri().toString(),
+                    String.format("Invalid response (status code: %s): %s", response.statusCode(), response.body()));
             }
 
             if (StringUtils.isBlank(response.body())) {

@@ -90,7 +90,7 @@ public final class LarsUtils {
     private static void addGpuToLarsDb(final LarsGpu larsGpu) throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(larsGpu)))
-            .uri(URI.create(FOLDING_URL + "/gpu_ppd/overall_ranks"))
+            .uri(URI.create(FOLDING_URL + "/api/gpu_ppd"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
@@ -117,7 +117,7 @@ public final class LarsUtils {
     public static void deleteAllGpusFromLarsDb() throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
             .DELETE()
-            .uri(URI.create(FOLDING_URL + "/gpu_ppd/overall_ranks/"))
+            .uri(URI.create(FOLDING_URL + "/api/gpu_ppd"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
             .build();
