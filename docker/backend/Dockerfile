@@ -32,7 +32,7 @@ RUN mkdir --parents /folding-stats-spring-boot
 WORKDIR /folding-stats-spring-boot
 
 ARG NEXUS_URL
-COPY ./docker/backend/scripts/configure_custom_nexus.sh /tmp/configure_custom_nexus.sh
+COPY --chmod=777 ./docker/backend/scripts/configure_custom_nexus.sh /tmp/configure_custom_nexus.sh
 RUN /tmp/configure_custom_nexus.sh "${NEXUS_URL}"
 
 # Copy source code
@@ -40,18 +40,15 @@ RUN /tmp/configure_custom_nexus.sh "${NEXUS_URL}"
 COPY ./pom.xml ./pom.xml
 RUN mvn install -P docker
 
-COPY ./folding-stats-api/pom.xml ./folding-stats-api/pom.xml
-COPY ./folding-stats-api/proguard-rules.cfg ./folding-stats-api/proguard-rules.cfg
+COPY ./folding-stats-api/pom.xml ./folding-stats-api/proguard-rules.cfg ./folding-stats-api/
 COPY ./folding-stats-api/src/main ./folding-stats-api/src/main
 RUN cd ./folding-stats-api && mvn install --projects . && cd ..
 
-COPY ./folding-stats-client-library-java/pom.xml ./folding-stats-client-library-java/pom.xml
-COPY ./folding-stats-client-library-java/proguard-rules.cfg ./folding-stats-client-library-java/proguard-rules.cfg
+COPY ./folding-stats-client-library-java/pom.xml ./folding-stats-client-library-java/proguard-rules.cfg ./folding-stats-client-library-java/
 COPY ./folding-stats-client-library-java/src/main ./folding-stats-client-library-java/src/main
 RUN cd ./folding-stats-client-library-java && mvn install --projects . && cd ..
 
-COPY ./folding-stats-jar/pom.xml ./folding-stats-jar/pom.xml
-COPY ./folding-stats-jar/proguard-rules.cfg ./folding-stats-jar/proguard-rules.cfg
+COPY ./folding-stats-jar/pom.xml ./folding-stats-jar/proguard-rules.cfg ./folding-stats-jar/
 COPY ./folding-stats-jar/src/main ./folding-stats-jar/src/main
 RUN cd ./folding-stats-jar && mvn install --projects . && cd ..
 
