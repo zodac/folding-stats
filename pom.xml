@@ -59,6 +59,7 @@
         <embedded-postgres-binaries-bom.version>14.2.0</embedded-postgres-binaries-bom.version>
         <flyway-core>8.5.4</flyway-core>
         <junit-jupiter.version>5.8.2</junit-jupiter.version>
+        <selenium.version>4.1.2</selenium.version>
 
         <!-- Plugin Versions -->
         <jmeter-maven-plugin.version>3.5.0</jmeter-maven-plugin.version>
@@ -269,6 +270,12 @@
                 <version>${junit-jupiter.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.seleniumhq.selenium</groupId>
+                <artifactId>selenium-java</artifactId>
+                <version>${selenium.version}</version>
+                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -121,6 +121,24 @@ services:
     networks:
       - development
 
+  selenium_edge:
+    build:
+      context: .
+      dockerfile: docker/selenium/edge/Dockerfile
+      args:
+        # Docker image versions
+        EDGE_VERSION: "99.0"
+    container_name: selenium_edge
+    hostname: selenium_edge
+    depends_on:
+      - frontend_dev
+    links:
+      - frontend_dev
+    ports:
+      - "4445:4444"
+    networks:
+      - development
+
   selenium_firefox:
     build:
       context: .
@@ -135,7 +153,25 @@ services:
     links:
       - frontend_dev
     ports:
-      - "4445:4444"
+      - "4446:4444"
+    networks:
+      - development
+
+  selenium_opera:
+    build:
+      context: .
+      dockerfile: docker/selenium/opera/Dockerfile
+      args:
+        # Docker image versions
+        OPERA_VERSION: "3.141"
+    container_name: selenium_opera
+    hostname: selenium_opera
+    depends_on:
+      - frontend_dev
+    links:
+      - frontend_dev
+    ports:
+      - "4447:4444"
     networks:
       - development
 

@@ -28,13 +28,11 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-params</artifactId>
-            <version>5.8.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
-            <version>4.1.2</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -78,14 +76,22 @@
                             <!-- <value>192.168.99.100</value> -->
                         </property>
 
-                        <!-- Ports for the Selenium containers, should match docker-compose-dev.yml -->
+                        <!-- Ports for the Selenium containers, should match values in 'docker-compose-dev.yml' -->
                         <property>
                             <name>chromePort</name>
                             <value>4444</value>
                         </property>
                         <property>
-                            <name>firefoxPort</name>
+                            <name>edgePort</name>
                             <value>4445</value>
+                        </property>
+                        <property>
+                            <name>firefoxPort</name>
+                            <value>4446</value>
+                        </property>
+                        <property>
+                            <name>operaPort</name>
+                            <value>4447</value>
                         </property>
                     </systemProperties>
                 </configuration>
