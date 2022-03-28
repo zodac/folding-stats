@@ -6,7 +6,7 @@ services:
       dockerfile: docker/frontend/Dockerfile
       args:
         # Docker image versions
-        NODE_VERSION: 17
+        NODE_VERSION: "17"
         # Build arguments
         FORUM_LINK: "https://forums.extremehw.net/forum/125-extreme-team-folding"
         REST_ENDPOINT_URL: "http://127.0.0.1:8081/folding"
@@ -32,9 +32,9 @@ services:
       dockerfile: docker/backend/Dockerfile
       args:
         # Docker image versions
-        DEBIAN_VERSION: 11.2
-        JAVA_VERSION: 17
-        MAVEN_VERSION: 3.8.4
+        DEBIAN_VERSION: "11.2"
+        JAVA_VERSION: "17"
+        MAVEN_VERSION: "3.8.4"
         # Build arguments
         KEYSTORE_PASSWORD: "shroot"
         NEXUS_URL: "${NEXUS_URL}"
@@ -78,7 +78,7 @@ services:
       dockerfile: docker/database/Dockerfile
       args:
         # Docker image versions
-        POSTGRES_VERSION: 14.1
+        POSTGRES_VERSION: "14.2"
         # Build arguments
         ADMIN_USERNAME: "root"
         ADMIN_PASSWORD: "shroot"
@@ -102,6 +102,42 @@ services:
       - development
     ports:
       - "5433:5432"
+
+  selenium_chrome:
+    build:
+      context: .
+      dockerfile: docker/selenium/chrome/Dockerfile
+      args:
+        # Docker image versions
+        CHROME_VERSION: "99.0"
+    container_name: selenium_chrome
+    hostname: selenium_chrome
+    depends_on:
+      - frontend_dev
+    links:
+      - frontend_dev
+    ports:
+      - "4444:4444"
+    networks:
+      - development
+
+  selenium_firefox:
+    build:
+      context: .
+      dockerfile: docker/selenium/firefox/Dockerfile
+      args:
+        # Docker image versions
+        FIREFOX_VERSION: "98.0"
+    container_name: selenium_firefox
+    hostname: selenium_firefox
+    depends_on:
+      - frontend_dev
+    links:
+      - frontend_dev
+    ports:
+      - "4445:4444"
+    networks:
+      - development
 
 networks:
   development:

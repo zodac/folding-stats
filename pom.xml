@@ -34,6 +34,7 @@
         <skip-integration-tests>true</skip-integration-tests>
         <skip-performance-tests>true</skip-performance-tests>
         <skip-tests>true</skip-tests>
+        <skip-ui-tests>true</skip-ui-tests>
 
         <!-- 3PP Versions -->
         <caffeine.version>3.0.5</caffeine.version>
@@ -718,6 +719,7 @@
                 <module>folding-stats-rest</module>
                 <module>testsuite-integration</module>
                 <module>testsuite-performance</module>
+                <module>testsuite-ui</module>
             </modules>
         </profile>
 
@@ -747,12 +749,14 @@
                 <module>folding-stats-rest</module>
                 <module>testsuite-integration</module>
                 <module>testsuite-performance</module>
+                <module>testsuite-ui</module>
             </modules>
             <properties>
                 <skip-performance-tests>false</skip-performance-tests>
                 <skip-integration-tests>false</skip-integration-tests>
                 <skip-linters>false</skip-linters>
                 <skip-tests>false</skip-tests>
+                <skip-ui-tests>false</skip-ui-tests>
             </properties>
         </profile>
 
@@ -770,6 +774,7 @@
                 <module>folding-stats-jar</module>
                 <module>folding-stats-rest</module>
                 <module>testsuite-integration</module>
+                <module>testsuite-ui</module>
             </modules>
             <properties>
                 <skip-linters>false</skip-linters>
@@ -791,11 +796,13 @@
                 <module>folding-stats-rest</module>
                 <module>testsuite-integration</module>
                 <module>testsuite-performance</module>
+                <module>testsuite-ui</module>
             </modules>
             <properties>
                 <skip-performance-tests>false</skip-performance-tests>
                 <skip-integration-tests>false</skip-integration-tests>
                 <skip-tests>false</skip-tests>
+                <skip-ui-tests>false</skip-ui-tests>
             </properties>
         </profile>
 
@@ -839,7 +846,7 @@
             <id>activate_performance_tests</id>
             <activation>
                 <property>
-                    <name>integration-tests</name>
+                    <name>performance-tests</name>
                 </property>
             </activation>
             <modules>
@@ -847,6 +854,22 @@
             </modules>
             <properties>
                 <skip-performance-tests>false</skip-performance-tests>
+            </properties>
+        </profile>
+
+        <!-- Profile used to execute each module's UI testsuite (if any) -->
+        <profile>
+            <id>activate_ui_tests</id>
+            <activation>
+                <property>
+                    <name>ui-tests</name>
+                </property>
+            </activation>
+            <modules>
+                <module>testsuite-ui</module>
+            </modules>
+            <properties>
+                <skip-ui-tests>false</skip-ui-tests>
             </properties>
         </profile>
     </profiles>
