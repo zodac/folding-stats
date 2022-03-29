@@ -8,7 +8,7 @@ services:
       dockerfile: docker/frontend/Dockerfile
       args:
         # Docker image versions
-        NODE_VERSION: "17"
+        NODE_VERSION: "17.8"
         # Build arguments
         FORUM_LINK: "${FORUM_LINK}"
         REST_ENDPOINT_URL: "${REST_ENDPOINT_URL}"

@@ -6,7 +6,7 @@ services:
       dockerfile: docker/frontend/Dockerfile
       args:
         # Docker image versions
-        NODE_VERSION: "17"
+        NODE_VERSION: "17.8"
         # Build arguments
         FORUM_LINK: "https://forums.extremehw.net/forum/125-extreme-team-folding"
         REST_ENDPOINT_URL: "http://127.0.0.1:8081/folding"
