@@ -62,16 +62,15 @@ COPY ./docker/frontend/pages/robots.txt \
 
 # The index.html file requires the file extension since that is what the axihub URL points to
 # The other files are all referenced relatively, so can get away without the extension to clean up the displayed URL
-COPY ./docker/frontend/pages/results.html \
-     ./docker/frontend/pages/admin.html \
-     ./docker/frontend/pages/requests.html \
-     ./docker/frontend/pages/historic/historic_team_daily.html \
-     ./docker/frontend/pages/historic/historic_team_hourly.html \
-     ./docker/frontend/pages/historic/historic_team_monthly.html \
-     ./docker/frontend/pages/historic/historic_user_daily.html \
-     ./docker/frontend/pages/historic/historic_user_hourly.html \
-     ./docker/frontend/pages/historic/historic_user_monthly.html \
-     ./
+COPY ./docker/frontend/pages/results.html ./results
+COPY ./docker/frontend/pages/admin.html ./admin
+COPY ./docker/frontend/pages/requests.html ./requests
+COPY ./docker/frontend/pages/historic/historic_team_daily.html ./historic_team_daily
+COPY ./docker/frontend/pages/historic/historic_team_hourly.html ./historic_team_hourly
+COPY ./docker/frontend/pages/historic/historic_team_monthly.html ./historic_team_monthly
+COPY ./docker/frontend/pages/historic/historic_user_daily.html ./historic_user_daily
+COPY ./docker/frontend/pages/historic/historic_user_hourly.html ./historic_user_hourly
+COPY ./docker/frontend/pages/historic/historic_user_monthly.html ./historic_user_monthly
 
 # Copy the RAML API and minified JS/CSS files
 COPY --from=raml /docker/apache/api.html ./api.html
@@ -85,6 +84,19 @@ RUN for file_name in *.js; do \
       name_without_extension=$(echo "${base%%.*}")  && \
       hash=$(cat "${file_name}" | md5sum | tr -s ' ' | cut -d ' ' -f1) && \
       new_file_name="${name_without_extension}-${hash}.min.js" && \
+      mv "${file_name}" "${new_file_name}" && \
+      echo "'${file_name}'" && \
+      grep -rl "${file_name}" /usr/local/apache2/htdocs | xargs sed -i "s|${file_name}|${new_file_name}|g" \
+    ; done
+WORKDIR /usr/local/apache2/htdocs/
+
+# Do the same for the CSS files
+WORKDIR /usr/local/apache2/htdocs/res/css
+RUN for file_name in *.css; do \
+      base=$(basename "${file_name}") && \
+      name_without_extension=$(echo "${base%%.*}")  && \
+      hash=$(cat "${file_name}" | md5sum | tr -s ' ' | cut -d ' ' -f1) && \
+      new_file_name="${name_without_extension}-${hash}.min.css" && \
       mv "${file_name}" "${new_file_name}" && \
       echo "'${file_name}'" && \
       grep -rl "${file_name}" /usr/local/apache2/htdocs | xargs sed -i "s|${file_name}|${new_file_name}|g" \
