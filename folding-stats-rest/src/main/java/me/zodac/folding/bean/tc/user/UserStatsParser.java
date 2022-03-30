@@ -28,6 +28,7 @@ import static me.zodac.folding.api.util.NumberUtils.formatWithCommas;
 
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.Summary;
+import java.util.concurrent.TimeUnit;
 import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.state.ParsingState;
 import me.zodac.folding.api.state.SystemState;
@@ -53,6 +54,7 @@ import org.springframework.stereotype.Component;
 public class UserStatsParser {
 
     private static final Logger LOGGER = LogManager.getLogger();
+    private static final long MILLISECONDS_BETWEEN_STATS_REQUESTS = TimeUnit.SECONDS.toMillis(20L);
 
     private final FoldingStatsRetriever foldingStatsRetriever;
     private final StatsRepository statsRepository;
@@ -117,6 +119,10 @@ public class UserStatsParser {
         for (final User user : users) {
             try {
                 updateTcStatsForUser(user);
+                Thread.sleep(MILLISECONDS_BETWEEN_STATS_REQUESTS);
+            } catch (final InterruptedException e) {
+                Thread.currentThread().interrupt();
+                LOGGER.error("Error updating TC stats for user '{}' (ID: {})", user.displayName(), user.id(), e);
             } catch (final Exception e) {
                 LOGGER.error("Error updating TC stats for user '{}' (ID: {})", user.displayName(), user.id(), e);
             }

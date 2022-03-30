@@ -76,12 +76,12 @@ public class OffsetTcStats {
 
     /**
      * Updates an instance of {@link OffsetTcStats} based on a multiplier. It is possible for an {@link OffsetTcStats} instance
-     * to be set with either the {@code pointsOffset} or the {@code multipliedPointsOffset} as <b>0L</b>. In some cases,
+     * to be set with either the {@code pointsOffset} or the {@code multipliedPointsOffset} as <b>0</b>. In some cases,
      * we will still want to calculate the other based on a multiplier. We will do that calculation here, depending on
      * which field is not set.
      *
      * <p>
-     * If both {@code pointsOffset} and {@code multipliedPointsOffset} are set (meaning neither are <b>0L</b>, or the
+     * If both {@code pointsOffset} and {@code multipliedPointsOffset} are set (meaning neither are <b>0</b>, or the
      * provided {@link OffsetTcStats} instance is equal to {@link OffsetTcStats#empty()}, then no changes are made.
      *
      * @param offsetTcStats the {@link OffsetTcStats} to update

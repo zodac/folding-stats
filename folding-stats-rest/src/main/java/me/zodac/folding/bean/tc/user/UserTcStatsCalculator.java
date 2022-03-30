@@ -86,7 +86,9 @@ public class UserTcStatsCalculator {
         final int units = Math.max(0, totalStats.getUnits() - initialStats.getUnits());
 
         final UserTcStats statsBeforeOffset = UserTcStats.create(user.id(), totalStats.getTimestamp(), points, multipliedPoints, units);
-        final UserTcStats hourlyUserTcStats = statsBeforeOffset.updateWithOffsets(offsetTcStats);
+        final UserTcStats hourlyUserTcStats = statsBeforeOffset.add(offsetTcStats);
+        final UserTcStats previousHourlyTcStats = statsRepository.getHourlyTcStats(user);
+        final UserTcStats createdHourlyTcStats = statsRepository.createHourlyTcStats(hourlyUserTcStats);
 
         // Only debug log if user has some points
         if (multipliedPoints != UserTcStats.DEFAULT_MULTIPLIED_POINTS) {
@@ -94,9 +96,13 @@ public class UserTcStatsCalculator {
                 () -> formatWithCommas(totalStats.getPoints()), () -> formatWithCommas(totalStats.getUnits()));
             STATS_LOGGER.debug("{} (ID: {}): {} TC multiplied points (pre-offset) | {} TC units (pre-offset)", user::displayName, user::id,
                 () -> formatWithCommas(multipliedPoints), () -> formatWithCommas(units));
+            
+            final UserTcStats tcStatsForThisUpdate = createdHourlyTcStats.subtract(previousHourlyTcStats);
+            STATS_LOGGER.debug("{} (ID: {}): {} TC multiplied points (update) | {} TC units (update)", user::displayName, user::id,
+                () -> formatWithCommas(tcStatsForThisUpdate.getMultipliedPoints()), () -> formatWithCommas(tcStatsForThisUpdate.getUnits()));
         }
 
-        final UserTcStats createdHourlyTcStats = statsRepository.createHourlyTcStats(hourlyUserTcStats);
+
         STATS_LOGGER.info("{} (ID: {}): {} TC points | {} TC units", user.displayName(), user.id(),
             formatWithCommas(createdHourlyTcStats.getMultipliedPoints()), formatWithCommas(createdHourlyTcStats.getUnits()));
     }

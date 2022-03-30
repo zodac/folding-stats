@@ -101,22 +101,40 @@ public class UserTcStats extends UserStats {
     }
 
     /**
-     * Creates a new instance of {@link UserTcStats} with {@link OffsetTcStats}. Can be used when retrieving a current
-     * {@link me.zodac.folding.api.tc.User}'s {@link UserTcStats} and wanted to make an offset.
+     * Creates a new instance of {@link UserTcStats} where the original {@link UserTcStats} has been added to by the values in the input {@link OffsetTcStats}.
      *
      * <p>
-     * In case the {@link OffsetTcStats} values are greater than the {@link UserTcStats}, the values will not be negative
-     * and will be set to <b>0L</b>
+     * In case the {@link OffsetTcStats} values are negative and greater than the {@link UserTcStats}, the final values will not be negative and will
+     * be set to <b>0</b>.
      *
      * @param offsetTcStats the {@link OffsetTcStats} to apply
      * @return the new {@link UserTcStats} instances with {@link OffsetTcStats} applied
      */
-    public UserTcStats updateWithOffsets(final OffsetTcStats offsetTcStats) {
+    public UserTcStats add(final OffsetTcStats offsetTcStats) {
         final long offsetPoints = Math.max(getPoints() + offsetTcStats.getPointsOffset(), Stats.DEFAULT_POINTS);
         final long offsetMultipliedPoints = Math.max(multipliedPoints + offsetTcStats.getMultipliedPointsOffset(), DEFAULT_MULTIPLIED_POINTS);
         final int offsetUnits = Math.max(getUnits() + offsetTcStats.getUnitsOffset(), Stats.DEFAULT_UNITS);
 
         return create(getUserId(), getTimestamp(), offsetPoints, offsetMultipliedPoints, offsetUnits);
+    }
+
+    /**
+     * Creates a new instance of {@link UserTcStats} where the original {@link UserTcStats} has been subtracted by the values in the input
+     * {@link UserTcStats}.
+     *
+     * <p>
+     * In case the input {@link UserTcStats} values are greater than the {@link UserTcStats}, the final values will not be negative and will be set to
+     * <b>0</b>.
+     *
+     * @param userTcStats the {@link UserTcStats} to subtract
+     * @return the new {@link UserTcStats} instances with {@link OffsetTcStats} applied
+     */
+    public UserTcStats subtract(final UserTcStats userTcStats) {
+        final long updatedPoints = Math.max(getPoints() - userTcStats.getPoints(), Stats.DEFAULT_POINTS);
+        final long updatedMultipliedPoints = Math.max(multipliedPoints - userTcStats.multipliedPoints, DEFAULT_MULTIPLIED_POINTS);
+        final int updatedUnits = Math.max(getUnits() - userTcStats.getUnits(), Stats.DEFAULT_UNITS);
+
+        return create(getUserId(), getTimestamp(), updatedPoints, updatedMultipliedPoints, updatedUnits);
     }
 
     @Override

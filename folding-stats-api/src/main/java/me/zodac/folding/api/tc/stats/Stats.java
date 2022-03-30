@@ -64,8 +64,7 @@ public class Stats {
     }
 
     /**
-     * Checks if the {@link Stats} instance has both {@code points} set to <b>0L</b> and {@code unitsOffset} set to
-     * <b>0</b>.
+     * Checks if the {@link Stats} instance has both {@code points} set to <b>0</b> and {@code unitsOffset} set to <b>0</b>.
      *
      * @return {@code true} if the {@link Stats} instance is empty
      */
