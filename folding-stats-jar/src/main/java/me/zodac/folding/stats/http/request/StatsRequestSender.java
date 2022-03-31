@@ -90,7 +90,7 @@ public final class StatsRequestSender {
         final String cachedResponseBody = CACHED_RESPONSE_BODIES.get(requestUrl);
 
         HttpResponse<String> response = sendHttpRequest(requestUrl);
-        int requestAttempts = 1;
+        int requestAttempts = 0;
 
         // Continue making requests as long as we have not hit max attempts
         while (requestAttempts < MAX_NUMBER_OF_REQUEST_ATTEMPTS) {

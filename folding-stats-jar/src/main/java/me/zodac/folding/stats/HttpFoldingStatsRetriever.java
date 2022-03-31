@@ -29,6 +29,7 @@ import static me.zodac.folding.stats.http.response.StatsResponseParser.getPoints
 import static me.zodac.folding.stats.http.response.StatsResponseParser.getUnitsFromResponse;
 
 import java.net.http.HttpResponse;
+import java.util.concurrent.TimeUnit;
 import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.stats.FoldingStatsDetails;
 import me.zodac.folding.api.stats.FoldingStatsRetriever;
@@ -48,6 +49,8 @@ import org.apache.logging.log4j.Logger;
  */
 public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
 
+    private static final int MAX_RETRY_ATTEMPTS = 3;
+    private static final long MILLISECONDS_BETWEEN_ATTEMPTS = TimeUnit.SECONDS.toMillis(2L);
     private static final Logger LOGGER = LogManager.getLogger();
 
     private HttpFoldingStatsRetriever() {
@@ -85,7 +88,7 @@ public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
             .build();
 
         LOGGER.debug("Sending points request to: {}", pointsRequestUrl);
-        final HttpResponse<String> response = sendFoldingRequest(pointsRequestUrl);
+        final HttpResponse<String> response = sendWithRetries(pointsRequestUrl);
         LOGGER.debug("Points response: {}", response::body);
         return getPointsFromResponse(response);
     }
@@ -97,8 +100,31 @@ public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
             .build();
 
         LOGGER.debug("Sending units request to: {}", unitsRequestUrl);
-        final HttpResponse<String> response = sendFoldingRequest(unitsRequestUrl);
+        final HttpResponse<String> response = sendWithRetries(unitsRequestUrl);
         LOGGER.debug("Units response: {}", response::body);
         return getUnitsFromResponse(foldingStatsDetails, response);
+    }
+
+    private static HttpResponse<String> sendWithRetries(final StatsRequestUrl statsRequestUrl) throws ExternalConnectionException {
+        int count = 0;
+        ExternalConnectionException caughtException = null;
+
+        while (count < MAX_RETRY_ATTEMPTS) {
+            try {
+                Thread.sleep(MILLISECONDS_BETWEEN_ATTEMPTS);
+                count++;
+                return sendFoldingRequest(statsRequestUrl);
+            } catch (final ExternalConnectionException e) {
+                LOGGER.debug("Error when sending HTTP request to '{}'", statsRequestUrl.url(), e);
+                // If an exception is thrown, keep it saved in a variable
+                // If the WHILE loop finishes with no success, the most recent exception can be thrown as a result
+                caughtException = e;
+            } catch (final InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new IllegalStateException(String.format("Unexpected interrupt when sending HTTP request to '%s'", statsRequestUrl.url()), e);
+            }
+        }
+
+        throw caughtException;
     }
 }

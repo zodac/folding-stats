@@ -101,7 +101,8 @@ public class UserTcStats extends UserStats {
     }
 
     /**
-     * Creates a new instance of {@link UserTcStats} where the original {@link UserTcStats} has been added to by the values in the input {@link OffsetTcStats}.
+     * Creates a new instance of {@link UserTcStats} where the original {@link UserTcStats} has been added to by the values in the input
+     * {@link OffsetTcStats}.
      *
      * <p>
      * In case the {@link OffsetTcStats} values are negative and greater than the {@link UserTcStats}, the final values will not be negative and will

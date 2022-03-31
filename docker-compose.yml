@@ -50,7 +50,7 @@ services:
       REDIRECT_URL: "${ROOT_URL}"
       # Building configuration
       DEPLOYMENT_TYPE: "production"
-      # NOTE: The monthly reset, result storage and LARS update will always occur at 23:57 on the last day of the month
+      # NOTE: The monthly reset, result storage and LARS update will always occur at 23:58:30 on the last day of the month
       ENABLE_LARS_HARDWARE_UPDATE: "${ENABLE_LARS_HARDWARE_UPDATE}"
       ENABLE_MONTHLY_RESULT_STORAGE: "${ENABLE_MONTHLY_RESULT_STORAGE}"
       ENABLE_STATS_MONTHLY_RESET: "${ENABLE_STATS_MONTHLY_RESET}"
