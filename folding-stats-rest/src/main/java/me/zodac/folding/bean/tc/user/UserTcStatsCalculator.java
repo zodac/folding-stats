@@ -96,12 +96,11 @@ public class UserTcStatsCalculator {
                 () -> formatWithCommas(totalStats.getPoints()), () -> formatWithCommas(totalStats.getUnits()));
             STATS_LOGGER.debug("{} (ID: {}): {} TC multiplied points (pre-offset) | {} TC units (pre-offset)", user::displayName, user::id,
                 () -> formatWithCommas(multipliedPoints), () -> formatWithCommas(units));
-            
+
             final UserTcStats tcStatsForThisUpdate = createdHourlyTcStats.subtract(previousHourlyTcStats);
             STATS_LOGGER.debug("{} (ID: {}): {} TC multiplied points (update) | {} TC units (update)", user::displayName, user::id,
                 () -> formatWithCommas(tcStatsForThisUpdate.getMultipliedPoints()), () -> formatWithCommas(tcStatsForThisUpdate.getUnits()));
         }
-
 
         STATS_LOGGER.info("{} (ID: {}): {} TC points | {} TC units", user.displayName(), user.id(),
             formatWithCommas(createdHourlyTcStats.getMultipliedPoints()), formatWithCommas(createdHourlyTcStats.getUnits()));
