@@ -51,7 +51,7 @@
         <micrometer.version>1.8.4</micrometer.version>
         <postgresql-driver.version>42.3.3</postgresql-driver.version>
         <resilience4j.version>1.7.1</resilience4j.version>
-        <spring-boot.version>2.6.5</spring-boot.version>
+        <spring-boot.version>2.6.6</spring-boot.version>
 
         <!-- Test 3PP Versions -->
         <assertj-core.version>3.22.0</assertj-core.version>
@@ -230,13 +230,6 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-web</artifactId>
                 <version>${spring-boot.version}</version>
-            </dependency>
-            <!-- Due to CVE-2020-36518 with jackson-databind:2.13.1 in spring-boot-starter-web -->
-            <!-- Remove this dependency when the above dependency is updated -->
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-databind</artifactId>
-                <version>2.13.2.1</version>
             </dependency>
 
             <!-- Test Dependencies -->
