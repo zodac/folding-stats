@@ -149,7 +149,7 @@ public class FoldingRepositoryImpl implements FoldingRepository {
         // Manual update to add the new (empty) team to the stats
         final Collection<User> users = getAllUsersWithPasskeys();
         if (ParsingStateManager.current() != ParsingState.DISABLED) {
-            userStatsParser.parseTcStatsForUsersAndWait(users);
+            userStatsParser.parseTcStatsForUsers(users);
         }
         return createdTeam;
     }
@@ -341,7 +341,7 @@ public class FoldingRepositoryImpl implements FoldingRepository {
 
         // Pull stats to update teams
         final Collection<User> users = getAllUsersWithPasskeys();
-        userStatsParser.parseTcStatsForUsersAndWait(users);
+        userStatsParser.parseTcStatsForUsers(users);
 
         LOGGER.info("Handled team change for user '{}' (ID: {})", userWithTeamChange.displayName(), userWithTeamChange.id());
     }

@@ -27,8 +27,8 @@ package me.zodac.folding.bean.tc.user;
 import static me.zodac.folding.api.util.EnvironmentVariableUtils.getIntOrDefault;
 import static me.zodac.folding.api.util.NumberUtils.formatWithCommas;
 
-import io.prometheus.client.CollectorRegistry;
-import io.prometheus.client.Summary;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.state.ParsingState;
@@ -45,7 +45,6 @@ import me.zodac.folding.state.SystemStateManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 /**
@@ -61,45 +60,20 @@ public class UserStatsParser {
     private final StatsRepository statsRepository;
     private final UserTcStatsCalculator userTcStatsCalculator;
 
-    // Prometheus summaries
-    private final Summary summary;
-
     /**
      * {@link Autowired} constructor.
      *
-     * @param registry              the {@link CollectorRegistry}
      * @param foldingStatsRetriever the {@link FoldingStatsRetriever}
      * @param statsRepository       the {@link StatsRepository}
      * @param userTcStatsCalculator the {@link UserTcStatsCalculator}
      */
     @Autowired
-    public UserStatsParser(final CollectorRegistry registry,
-                           final FoldingStatsRetriever foldingStatsRetriever,
+    public UserStatsParser(final FoldingStatsRetriever foldingStatsRetriever,
                            final StatsRepository statsRepository,
                            final UserTcStatsCalculator userTcStatsCalculator) {
         this.foldingStatsRetriever = foldingStatsRetriever;
         this.statsRepository = statsRepository;
         this.userTcStatsCalculator = userTcStatsCalculator;
-
-        summary = Summary.build()
-            .quantile(0.5, 0.05)   // Add 50th percentile (= median) with 5% tolerated error
-            .quantile(0.9, 0.01)   // Add 90th percentile with 1% tolerated error
-            .quantile(0.99, 0.001) // Add 99th percentile with 0.1% tolerated error
-            .name("user_stats_retrieval")
-            .help("Stats Retrieval For A Single User")
-            .register(registry);
-    }
-
-    /**
-     * Parses the latest TC stats for the given {@link User}s.
-     *
-     * <p>
-     * Method blocks until the stats have been parsed, calculated and persisted.
-     *
-     * @param users the {@link User}s whose TC stats are to be parsed
-     */
-    public void parseTcStatsForUsersAndWait(final Iterable<User> users) {
-        updateTcStatsForUsers(users);
     }
 
     /**
@@ -107,25 +81,17 @@ public class UserStatsParser {
      *
      * @param users the {@link User}s whose TC stats are to be parsed
      */
-    @Async
     public void parseTcStatsForUsers(final Iterable<User> users) {
-        updateTcStatsForUsers(users);
-    }
-
-    private void updateTcStatsForUsers(final Iterable<User> users) {
         ParsingStateManager.next(ParsingState.ENABLED_TEAM_COMPETITION);
         SystemStateManager.next(SystemState.UPDATING_STATS);
 
         LOGGER.info("Starting Folding stats parsing");
+        final Map<Integer, UserStats> totalStatsByUserId = getTotalStatsForAllUsers(users);
+        LOGGER.debug("Starting Folding stats persisting");
+
         for (final User user : users) {
             try {
-                updateTcStatsForUser(user);
-                if (MILLIS_BETWEEN_STATS_REQUESTS != 0) {
-                    Thread.sleep(MILLIS_BETWEEN_STATS_REQUESTS);
-                }
-            } catch (final InterruptedException e) {
-                Thread.currentThread().interrupt();
-                LOGGER.error("Error updating TC stats for user '{}' (ID: {})", user.displayName(), user.id(), e);
+                updateTcStatsForUser(user, totalStatsByUserId);
             } catch (final Exception e) {
                 LOGGER.error("Error updating TC stats for user '{}' (ID: {})", user.displayName(), user.id(), e);
             }
@@ -135,47 +101,57 @@ public class UserStatsParser {
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
     }
 
-    private void updateTcStatsForUser(final User user) {
-        try (final Summary.Timer timer = summary.startTimer()) {
-            LOGGER.trace("Starting timer: {}", timer);
-
-            LOGGER.debug("Updating stats for '{}': {}", user.displayName(), user);
-            if (StringUtils.isBlank(user.passkey())) {
-                LOGGER.warn("Not parsing TC stats for user, missing passkey: {}", user);
-                return;
-            }
-
-            final Stats initialStats = statsRepository.getInitialStats(user);
-            if (initialStats.isEmpty()) {
-                LOGGER.warn("Retrieved empty initial stats for user: {}", user);
-                return;
-            }
-
-            final OffsetTcStats offsetTcStats = statsRepository.getOffsetStats(user);
-            if (offsetTcStats.isEmpty()) {
-                LOGGER.trace("Retrieved empty stats offset for user: {}", () -> user);
-            } else {
-                LOGGER.debug("{}: {} offset points | {} offset units", user::displayName,
-                    () -> formatWithCommas(offsetTcStats.getMultipliedPointsOffset()), () -> formatWithCommas(offsetTcStats.getUnitsOffset()));
-            }
-
-            final UserStats totalStats = getTotalStatsForUserOrEmpty(user);
-            if (totalStats.isEmpty()) {
-                LOGGER.warn("Retrieved empty total stats for user: {}", user);
-                return;
-            }
-
-            final UserStats createdTotalStats = statsRepository.createTotalStats(totalStats);
-            userTcStatsCalculator.calculateAndPersist(user, initialStats, offsetTcStats, createdTotalStats);
-
-            LOGGER.trace("Ending timer: {}", timer);
-            timer.observeDuration();
+    private void updateTcStatsForUser(final User user, final Map<Integer, UserStats> totalStatsByUserId) {
+        LOGGER.debug("Updating stats for '{}': {}", user.displayName(), user);
+        if (StringUtils.isBlank(user.passkey())) {
+            LOGGER.warn("Not parsing TC stats for user, missing passkey: {}", user);
+            return;
         }
+
+        final Stats initialStats = statsRepository.getInitialStats(user);
+        if (initialStats.isEmpty()) {
+            LOGGER.warn("Retrieved empty initial stats for user: {}", user);
+            return;
+        }
+
+        final OffsetTcStats offsetTcStats = statsRepository.getOffsetStats(user);
+        if (offsetTcStats.isEmpty()) {
+            LOGGER.trace("Retrieved empty stats offset for user: {}", () -> user);
+        } else {
+            LOGGER.debug("{}: {} offset points | {} offset units", user::displayName,
+                () -> formatWithCommas(offsetTcStats.getMultipliedPointsOffset()), () -> formatWithCommas(offsetTcStats.getUnitsOffset()));
+        }
+
+        final UserStats totalStats = totalStatsByUserId.getOrDefault(user.id(), UserStats.empty());
+        if (totalStats.isEmpty()) {
+            LOGGER.warn("Retrieved empty total stats for user: {}", user);
+            return;
+        }
+
+        final UserStats createdTotalStats = statsRepository.createTotalStats(totalStats);
+        userTcStatsCalculator.calculateAndPersist(user, initialStats, offsetTcStats, createdTotalStats);
+    }
+
+    // Retrieving the stats for all users first, since we need to add a delay between requests
+    // This way we can parallelise the rest of the stats retrieval flow, while keeping the HTTP requests single-threaded
+    private Map<Integer, UserStats> getTotalStatsForAllUsers(final Iterable<User> users) {
+        final Map<Integer, UserStats> totalStatsByUserId = new HashMap<>();
+        for (final User user : users) {
+            totalStatsByUserId.put(user.id(), getTotalStatsForUserOrEmpty(user));
+        }
+        return totalStatsByUserId;
     }
 
     private UserStats getTotalStatsForUserOrEmpty(final User user) {
         try {
-            return foldingStatsRetriever.getTotalStats(user);
+            final UserStats totalStatsForUser = foldingStatsRetriever.getTotalStats(user);
+            if (MILLIS_BETWEEN_STATS_REQUESTS != 0) {
+                Thread.sleep(MILLIS_BETWEEN_STATS_REQUESTS);
+            }
+            return totalStatsForUser;
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+            LOGGER.warn("Error connecting to Folding@Home API", e);
         } catch (final ExternalConnectionException e) {
             LOGGER.warn("Error connecting to Folding@Home API at '{}'", e.getUrl(), e);
         }

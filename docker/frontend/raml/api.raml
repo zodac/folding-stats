@@ -743,13 +743,6 @@ traits:
       post:
         is: [ "adminOnly" ]
         description: "Requests an update of all user/team stats"
-        queryParameters:
-          async:
-            displayName: Async
-            type: boolean
-            description: "Whether the stats should be retrieved asynchronously, or the request should only return a response when complete"
-            example: true
-            required: false
         responses:
           401:
             description: "System user cannot be successfully logged in with provided credentials"

@@ -66,7 +66,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -201,7 +200,7 @@ public class TeamCompetitionStatsEndpoint {
         final OffsetTcStats createdOffsetStats = statsRepository.createOrUpdateOffsetStats(user, offsetTcStatsToPersist);
 
         SystemStateManager.next(SystemState.UPDATING_STATS);
-        userStatsParser.parseTcStatsForUsersAndWait(Collections.singletonList(user));
+        userStatsParser.parseTcStatsForUsers(Collections.singletonList(user));
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
         AUDIT_LOGGER.info("Updated user with ID {} with points offset: {}", userId, createdOffsetStats);
         userStatsOffsets.increment();
@@ -239,23 +238,16 @@ public class TeamCompetitionStatsEndpoint {
     /**
      * {@link PostMapping} request to manually update the {@code Team Competition} stats.
      *
-     * @param async   whether the execution should be performed asynchronously or synchronously
      * @param request the {@link HttpServletRequest}
      * @return {@link me.zodac.folding.rest.response.Responses#ok()}
      */
     @WriteRequired
     @RolesAllowed("admin")
     @PostMapping(path = "/manual/update")
-    public ResponseEntity<?> updateStats(@RequestParam(value = "async", required = false, defaultValue = "false") final boolean async,
-                                         final HttpServletRequest request) {
+    public ResponseEntity<?> updateStats(final HttpServletRequest request) {
         AUDIT_LOGGER.info("GET request received to manually update TC stats at '{}?{}", request::getRequestURI, () -> extractParameters(request));
         final Collection<User> users = foldingRepository.getAllUsersWithPasskeys();
-
-        if (async) {
-            userStatsParser.parseTcStatsForUsers(users);
-        } else {
-            userStatsParser.parseTcStatsForUsersAndWait(users);
-        }
+        userStatsParser.parseTcStatsForUsers(users);
         return ok();
     }
 

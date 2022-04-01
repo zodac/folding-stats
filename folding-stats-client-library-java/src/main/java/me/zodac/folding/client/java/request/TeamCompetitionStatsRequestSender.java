@@ -291,33 +291,15 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
      * Sends a <b>POST</b> request to manually trigger an update of the {@code Team Competition} stats for all
      * {@link me.zodac.folding.api.tc.User}s and {@link me.zodac.folding.api.tc.Team}s.
      *
-     * <p>
-     * Request will be sent and only return when the update is complete. If an asynchronous update is required, look at
-     * {@link #manualUpdate(boolean, String, String)}.
-     *
      * @param userName the username
      * @param password the password
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<Void> manualUpdate(final String userName, final String password) throws FoldingRestException {
-        return manualUpdate(false, userName, password);
-    }
-
-    /**
-     * Sends a <b>POST</b> request to manually trigger an update of the {@code Team Competition} stats for all
-     * {@link me.zodac.folding.api.tc.User}s and {@link me.zodac.folding.api.tc.Team}s.
-     *
-     * @param async    should the update be performed asynchronously, or wait for the result
-     * @param userName the username
-     * @param password the password
-     * @return the {@link HttpResponse} from the {@link HttpRequest}
-     * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
-     */
-    public HttpResponse<Void> manualUpdate(final boolean async, final String userName, final String password) throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.noBody())
-            .uri(URI.create(statsUrl + "/manual/update?async=" + async))
+            .uri(URI.create(statsUrl + "/manual/update"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
             .build();

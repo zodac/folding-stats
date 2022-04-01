@@ -64,20 +64,20 @@ public class UserStatsResetter {
      * </ol>
      *
      * @see StatsRepository#resetAllTeamCompetitionUserStats()
-     * @see UserStatsParser#parseTcStatsForUsersAndWait(Iterable)
+     * @see UserStatsParser#parseTcStatsForUsers(Iterable)
      */
     public void resetTeamCompetitionStats() {
         try {
             final Collection<User> users = foldingRepository.getAllUsersWithPasskeys();
 
             // Pull stats one more time to get the latest values
-            userStatsParser.parseTcStatsForUsersAndWait(users);
+            userStatsParser.parseTcStatsForUsers(users);
 
             LOGGER.info("Resetting Team Competition stats");
             statsRepository.resetAllTeamCompetitionUserStats();
 
             // Pull stats for new month
-            userStatsParser.parseTcStatsForUsersAndWait(users);
+            userStatsParser.parseTcStatsForUsers(users);
         } catch (final Exception e) {
             LOGGER.warn("Unexpected error manually resetting TC stats", e);
         }

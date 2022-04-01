@@ -54,9 +54,10 @@ class PageLoadTest {
     @ParameterizedTest
     @EnumSource(BrowserType.class)
     void loadPages(final BrowserType browserType) throws MalformedURLException {
+        log("%nLoading '%s' browser", browserType);
         executeTest(browserType, driver -> {
             for (final FrontendLink frontendLink : FrontendLink.getAllValues()) {
-                System.out.printf("Visiting '%s' with %s browser%n", frontendLink.getUrl(), browserType);
+                log("Visiting '%s'", frontendLink.getUrl());
                 driver.navigate().to(frontendLink.getUrl());
 
                 assertThat(driver.getTitle())
@@ -69,5 +70,10 @@ class PageLoadTest {
         final RemoteWebDriver driver = browserType.getDriver();
         consumer.accept(driver);
         driver.quit();
+    }
+
+    private static void log(final String format, final Object... args) {
+        final String logEntry = format + "%n";
+        System.out.printf(logEntry, args); // NOPMD: SystemPrintln - Easier than adding a logger to test module
     }
 }
