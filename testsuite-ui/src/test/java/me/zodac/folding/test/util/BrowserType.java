@@ -29,7 +29,6 @@ import java.net.URL;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxOptions;
-import org.openqa.selenium.opera.OperaOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 /**
@@ -70,18 +69,6 @@ public enum BrowserType {
             final String port = System.getProperty("firefoxPort", "4446");
             final URL url = new URL(String.format(WEB_DRIVER_URL_FORMAT, TEST_IP_ADDRESS, port));
             return new RemoteWebDriver(url, new FirefoxOptions());
-        }
-    },
-
-    /**
-     * {@code Opera} web browser.
-     */
-    OPERA {
-        @Override
-        public RemoteWebDriver getDriver() throws MalformedURLException {
-            final String port = System.getProperty("operaPort", "4447");
-            final URL url = new URL(String.format(WEB_DRIVER_URL_FORMAT, TEST_IP_ADDRESS, port));
-            return new RemoteWebDriver(url, new OperaOptions());
         }
     };
 

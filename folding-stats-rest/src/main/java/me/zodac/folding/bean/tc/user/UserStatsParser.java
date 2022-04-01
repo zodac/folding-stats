@@ -24,6 +24,7 @@
 
 package me.zodac.folding.bean.tc.user;
 
+import static me.zodac.folding.api.util.EnvironmentVariableUtils.getIntOrDefault;
 import static me.zodac.folding.api.util.NumberUtils.formatWithCommas;
 
 import io.prometheus.client.CollectorRegistry;
@@ -54,7 +55,7 @@ import org.springframework.stereotype.Component;
 public class UserStatsParser {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final long MILLISECONDS_BETWEEN_STATS_REQUESTS = TimeUnit.SECONDS.toMillis(20L);
+    private static final long MILLIS_BETWEEN_STATS_REQUESTS = TimeUnit.SECONDS.toMillis(getIntOrDefault("SECONDS_BETWEEN_USER_STATS_RETRIEVAL", 20));
 
     private final FoldingStatsRetriever foldingStatsRetriever;
     private final StatsRepository statsRepository;
@@ -119,7 +120,9 @@ public class UserStatsParser {
         for (final User user : users) {
             try {
                 updateTcStatsForUser(user);
-                Thread.sleep(MILLISECONDS_BETWEEN_STATS_REQUESTS);
+                if (MILLIS_BETWEEN_STATS_REQUESTS != 0) {
+                    Thread.sleep(MILLIS_BETWEEN_STATS_REQUESTS);
+                }
             } catch (final InterruptedException e) {
                 Thread.currentThread().interrupt();
                 LOGGER.error("Error updating TC stats for user '{}' (ID: {})", user.displayName(), user.id(), e);

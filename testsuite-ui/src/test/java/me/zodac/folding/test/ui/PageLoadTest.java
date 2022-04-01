@@ -28,35 +28,46 @@ package me.zodac.folding.test.ui;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.MalformedURLException;
+import java.util.function.Consumer;
 import me.zodac.folding.test.util.BrowserType;
-import me.zodac.folding.test.util.UiTestConstants;
+import me.zodac.folding.test.util.FrontendLink;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 /**
- * Simple UI test.
+ * Verifies that each page of the UI can be loaded.
+ *
+ * <p>
+ * Does not do any in depth testing of the page (see related UI test), but checks the following:
+ * <ul>
+ *     <li>That the page can be loaded</li>
+ *     <li>That the tab title is {@code "Extreme Team Folding"}</li>
+ * </ul>
+ *
+ * @see FrontendLink
  */
-class SimpleUiTest {
+class PageLoadTest {
+
+    private static final String EXPECTED_TAB_TITLE = "Extreme Team Folding";
 
     @ParameterizedTest
     @EnumSource(BrowserType.class)
-    void testHomePage(final BrowserType browserType) throws MalformedURLException {
+    void loadPages(final BrowserType browserType) throws MalformedURLException {
+        executeTest(browserType, driver -> {
+            for (final FrontendLink frontendLink : FrontendLink.getAllValues()) {
+                System.out.printf("Visiting '%s' with %s browser%n", frontendLink.getUrl(), browserType);
+                driver.navigate().to(frontendLink.getUrl());
+
+                assertThat(driver.getTitle())
+                    .isEqualTo(EXPECTED_TAB_TITLE);
+            }
+        });
+    }
+
+    private static void executeTest(final BrowserType browserType, final Consumer<? super RemoteWebDriver> consumer) throws MalformedURLException {
         final RemoteWebDriver driver = browserType.getDriver();
-
-        driver.navigate().to(UiTestConstants.FRONTEND_URL);
-        driver.manage().window().maximize();
-
-        assertThat(driver.getTitle())
-            .isEqualTo("Extreme Team Folding");
-
-        final WebElement navbarBrand = driver.findElement(By.className("navbar-brand"));
-
-        assertThat(navbarBrand.getText())
-            .isEqualTo("Extreme Team Folding");
-
+        consumer.accept(driver);
         driver.quit();
     }
 }

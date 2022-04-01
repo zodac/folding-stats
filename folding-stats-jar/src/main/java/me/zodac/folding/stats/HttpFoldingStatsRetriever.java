@@ -24,6 +24,7 @@
 
 package me.zodac.folding.stats;
 
+import static me.zodac.folding.api.util.EnvironmentVariableUtils.getIntOrDefault;
 import static me.zodac.folding.stats.http.request.StatsRequestSender.sendFoldingRequest;
 import static me.zodac.folding.stats.http.response.StatsResponseParser.getPointsFromResponse;
 import static me.zodac.folding.stats.http.response.StatsResponseParser.getUnitsFromResponse;
@@ -49,8 +50,8 @@ import org.apache.logging.log4j.Logger;
  */
 public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
 
-    private static final int MAX_RETRY_ATTEMPTS = 3;
-    private static final long MILLISECONDS_BETWEEN_ATTEMPTS = TimeUnit.SECONDS.toMillis(2L);
+    private static final int MAX_RETRY_ATTEMPTS = getIntOrDefault("MAXIMUM_HTTP_REQUEST_ATTEMPTS", 3);
+    private static final long MILLIS_BETWEEN_ATTEMPTS = TimeUnit.SECONDS.toMillis(getIntOrDefault("SECONDS_BETWEEN_HTTP_REQUEST_ATTEMPTS", 2));
     private static final Logger LOGGER = LogManager.getLogger();
 
     private HttpFoldingStatsRetriever() {
@@ -88,7 +89,7 @@ public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
             .build();
 
         LOGGER.debug("Sending points request to: {}", pointsRequestUrl);
-        final HttpResponse<String> response = sendWithRetries(pointsRequestUrl);
+        final HttpResponse<String> response = sendFoldingRequestWithRetries(pointsRequestUrl);
         LOGGER.debug("Points response: {}", response::body);
         return getPointsFromResponse(response);
     }
@@ -100,18 +101,20 @@ public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
             .build();
 
         LOGGER.debug("Sending units request to: {}", unitsRequestUrl);
-        final HttpResponse<String> response = sendWithRetries(unitsRequestUrl);
+        final HttpResponse<String> response = sendFoldingRequestWithRetries(unitsRequestUrl);
         LOGGER.debug("Units response: {}", response::body);
         return getUnitsFromResponse(foldingStatsDetails, response);
     }
 
-    private static HttpResponse<String> sendWithRetries(final StatsRequestUrl statsRequestUrl) throws ExternalConnectionException {
+    private static HttpResponse<String> sendFoldingRequestWithRetries(final StatsRequestUrl statsRequestUrl) throws ExternalConnectionException {
         int count = 0;
         ExternalConnectionException caughtException = null;
 
         while (count < MAX_RETRY_ATTEMPTS) {
             try {
-                Thread.sleep(MILLISECONDS_BETWEEN_ATTEMPTS);
+                if (MILLIS_BETWEEN_ATTEMPTS != 0) {
+                    Thread.sleep(MILLIS_BETWEEN_ATTEMPTS);
+                }
                 count++;
                 return sendFoldingRequest(statsRequestUrl);
             } catch (final ExternalConnectionException e) {
@@ -125,6 +128,9 @@ public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
             }
         }
 
+        if (caughtException == null) {
+            throw new IllegalStateException("Trying to throw stored exception, but no exception was stored!");
+        }
         throw caughtException;
     }
 }

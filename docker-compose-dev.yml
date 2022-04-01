@@ -51,8 +51,11 @@ services:
       ENABLE_LARS_HARDWARE_UPDATE: "false"
       ENABLE_MONTHLY_RESULT_STORAGE: "false"
       ENABLE_STATS_MONTHLY_RESET: "false"
-      # Scheduled stats parsing configuration
+      # Stats parsing configuration
       ENABLE_STATS_SCHEDULED_PARSING: "false"
+      SECONDS_BETWEEN_USER_STATS_RETRIEVAL: "0"
+      SECONDS_BETWEEN_HTTP_REQUEST_ATTEMPTS: "0"
+      MAXIMUM_HTTP_REQUEST_ATTEMPTS: "3"
       # Category configuration
       USERS_IN_AMD_GPU: "1"
       USERS_IN_NVIDIA_GPU: "1"
@@ -154,24 +157,6 @@ services:
       - frontend_dev
     ports:
       - "4446:4444"
-    networks:
-      - development
-
-  selenium_opera:
-    build:
-      context: .
-      dockerfile: docker/selenium/opera/Dockerfile
-      args:
-        # Docker image versions
-        OPERA_VERSION: "3.141"
-    container_name: selenium_opera
-    hostname: selenium_opera
-    depends_on:
-      - frontend_dev
-    links:
-      - frontend_dev
-    ports:
-      - "4447:4444"
     networks:
       - development
 
