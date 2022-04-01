@@ -140,11 +140,15 @@ function loadTeamLeaderboard() {
                 } else if (property === "teamName") {
                     leaderboardCell.innerHTML = team['team']['teamName'].toLocaleString()
                 } else if (property === "pointsPerUnit"){
-                    leaderboardCell.setAttribute("data-bs-toggle", "tooltip")
-                    leaderboardCell.setAttribute("data-placement", "top")
-                    leaderboardCell.setAttribute("title", "Unmultiplied: " + (team['teamPoints']/team['teamUnits']).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0}))
-                    new bootstrap.Tooltip(leaderboardCell)
-                    leaderboardCell.innerHTML = (team['teamMultipliedPoints']/team['teamUnits']).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})
+                    if(team['teamPoints'] === 0 || team['teamUnits'] === 0){
+                      leaderboardCell.innerHTML = "0"
+                    } else {
+                      leaderboardCell.setAttribute("data-bs-toggle", "tooltip")
+                      leaderboardCell.setAttribute("data-placement", "top")
+                      leaderboardCell.setAttribute("title", "Unmultiplied: " + (team['teamPoints']/team['teamUnits']).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0}))
+                      new bootstrap.Tooltip(leaderboardCell)
+                      leaderboardCell.innerHTML = (team['teamMultipliedPoints']/team['teamUnits']).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})
+                    }
                 } else {
                     leaderboardCell.innerHTML = team[property].toLocaleString()
                 }
