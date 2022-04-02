@@ -151,6 +151,11 @@
         <appender-ref ref="SERVER_LOG"/>
         <appender-ref ref="CONSOLE"/>
     </logger>
+    <!-- Not interested in the DispatcherServlet -->
+    <logger name="org.springframework.web.servlet.DispatcherServlet" level="WARN">
+        <appender-ref ref="SERVER_LOG"/>
+        <appender-ref ref="CONSOLE"/>
+    </logger>
     <!-- Not interested in Hikari DB logs when starting DB connection -->
     <logger name="com.zaxxer.hikari" level="WARN">
         <appender-ref ref="SERVER_LOG"/>

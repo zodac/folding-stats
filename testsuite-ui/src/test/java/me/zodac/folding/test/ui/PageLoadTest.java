@@ -25,15 +25,16 @@
 
 package me.zodac.folding.test.ui;
 
+import static me.zodac.folding.test.util.Logger.log;
+import static me.zodac.folding.test.util.Logger.logWithBlankLine;
+import static me.zodac.folding.test.util.TestExecutor.executeWithDriver;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.MalformedURLException;
-import java.util.function.Consumer;
 import me.zodac.folding.test.util.BrowserType;
 import me.zodac.folding.test.util.FrontendLink;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.openqa.selenium.remote.RemoteWebDriver;
 
 /**
  * Verifies that each page of the UI can be loaded.
@@ -54,8 +55,9 @@ class PageLoadTest {
     @ParameterizedTest
     @EnumSource(BrowserType.class)
     void loadPages(final BrowserType browserType) throws MalformedURLException {
-        log("%nLoading '%s' browser", browserType);
-        executeTest(browserType, driver -> {
+        logWithBlankLine("Loading '%s' browser", browserType);
+
+        executeWithDriver(browserType, driver -> {
             for (final FrontendLink frontendLink : FrontendLink.getAllValues()) {
                 log("Visiting '%s'", frontendLink.getUrl());
                 driver.navigate().to(frontendLink.getUrl());
@@ -64,16 +66,5 @@ class PageLoadTest {
                     .isEqualTo(EXPECTED_TAB_TITLE);
             }
         });
-    }
-
-    private static void executeTest(final BrowserType browserType, final Consumer<? super RemoteWebDriver> consumer) throws MalformedURLException {
-        final RemoteWebDriver driver = browserType.getDriver();
-        consumer.accept(driver);
-        driver.quit();
-    }
-
-    private static void log(final String format, final Object... args) {
-        final String logEntry = format + "%n";
-        System.out.printf(logEntry, args); // NOPMD: SystemPrintln - Easier than adding a logger to test module
     }
 }
