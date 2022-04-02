@@ -50,14 +50,13 @@ services:
       REDIRECT_URL: "${ROOT_URL}"
       # Building configuration
       DEPLOYMENT_TYPE: "production"
-      # NOTE: The monthly reset, result storage and LARS update will always occur at 23:58:30 on the last day of the month
+      # NOTE: The monthly reset, result storage and LARS update will always occur at 23:57:00 on the last day of the month
       ENABLE_LARS_HARDWARE_UPDATE: "${ENABLE_LARS_HARDWARE_UPDATE}"
       ENABLE_MONTHLY_RESULT_STORAGE: "${ENABLE_MONTHLY_RESULT_STORAGE}"
       ENABLE_STATS_MONTHLY_RESET: "${ENABLE_STATS_MONTHLY_RESET}"
       # Stats parsing configuration
       # This value should match the value of 'UPDATE_ENABLED' in the 'frontend' container
       ENABLE_STATS_SCHEDULED_PARSING: "${STATS_ENABLED}"
-      SECONDS_BETWEEN_USER_STATS_RETRIEVAL: "${SECONDS_BETWEEN_USER_STATS_RETRIEVAL}"
       SECONDS_BETWEEN_HTTP_REQUEST_ATTEMPTS: "${SECONDS_BETWEEN_HTTP_REQUEST_ATTEMPTS}"
       MAXIMUM_HTTP_REQUEST_ATTEMPTS: "${MAXIMUM_HTTP_REQUEST_ATTEMPTS}"
       # Category configuration

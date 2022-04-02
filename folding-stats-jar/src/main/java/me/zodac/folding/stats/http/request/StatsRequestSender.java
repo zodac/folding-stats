@@ -24,6 +24,7 @@
 
 package me.zodac.folding.stats.http.request;
 
+import static me.zodac.folding.api.util.EnvironmentVariableUtils.getIntOrDefault;
 import static me.zodac.folding.rest.api.util.RestUtilConstants.HTTP_CLIENT;
 
 import java.io.IOException;
@@ -34,6 +35,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.rest.api.header.ContentType;
@@ -50,7 +52,8 @@ import org.apache.logging.log4j.Logger;
  * header is used to try and reduce the caching done on to the Folding@Home API, but is not guaranteed to work.
  * In addition to using this header, we keep a cache of the most recent response for each request URL, since the URL
  * will contain a unique username/passkey for each request. We will compare the response to this cached version, and if
- * there is no change, we will send up to {@value #MAX_NUMBER_OF_REQUEST_ATTEMPTS} REST requests to the server.
+ * there is no change, we will send REST requests to the server. The number of requests is defined by the environment variable
+ * <b>MAXIMUM_HTTP_REQUEST_ATTEMPTS</b>.
  *
  * <p>
  * While not ideal, I'm not sure of any other way of forcing an update since it seems to be a server-side decision. This
@@ -59,7 +62,9 @@ import org.apache.logging.log4j.Logger;
 public final class StatsRequestSender {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final int MAX_NUMBER_OF_REQUEST_ATTEMPTS = 2;
+    private static final int HTTP_TOO_MANY_REQUESTS_STATUS_CODE = 429;
+    private static final int MAX_RETRY_ATTEMPTS = getIntOrDefault("MAXIMUM_HTTP_REQUEST_ATTEMPTS", 2);
+    private static final long MILLIS_BETWEEN_ATTEMPTS = TimeUnit.SECONDS.toMillis(getIntOrDefault("SECONDS_BETWEEN_HTTP_REQUEST_ATTEMPTS", 20));
 
     private static final Map<String, String> CACHED_RESPONSE_BODIES = new HashMap<>();
 
@@ -89,36 +94,53 @@ public final class StatsRequestSender {
         final String requestUrl = statsRequestUrl.url();
         final String cachedResponseBody = CACHED_RESPONSE_BODIES.get(requestUrl);
 
-        HttpResponse<String> response = sendHttpRequest(requestUrl);
-        int requestAttempts = 0;
+        final HttpResponse<String> response = sendRequestWithRetries(requestUrl, cachedResponseBody);
+        CACHED_RESPONSE_BODIES.put(requestUrl, response.body());
+        return response;
+    }
+
+    private static HttpResponse<String> sendRequestWithRetries(final String requestUrl, final String cachedResponseBody)
+        throws ExternalConnectionException {
+        HttpResponse<String> response = null;
+
+        // In case env variable is set too low, we will always do at least 1 attempt
+        final int maxRetryAttempts = Math.max(MAX_RETRY_ATTEMPTS, 1);
 
         // Continue making requests as long as we have not hit max attempts
-        while (requestAttempts < MAX_NUMBER_OF_REQUEST_ATTEMPTS) {
-            // All user searches 'should' return a 200 response, even if the user/passkey is invalid
-            // The response should be parsed and validated, which we do later
-            if (response.statusCode() != HttpURLConnection.HTTP_OK) {
-                throw new ExternalConnectionException(response.uri().toString(),
-                    String.format("Invalid response (status code: %s): %s", response.statusCode(), response.body()));
-            }
-
-            if (StringUtils.isBlank(response.body())) {
-                throw new ExternalConnectionException(response.uri().toString(), "Empty Folding@Home stats response");
-            }
-
-            // If the response body is different to the cached both, we have the latest data and can stop making additional requests
-            if (!response.body().equalsIgnoreCase(cachedResponseBody)) {
-                break;
-            }
-
-            // If response body is same as cached body, it could mean:
-            //   1 - No additional stats have been creditted to the user
-            //   2 - The Folding@Home API is caching its response
-            // To try and be as up to date as possible, we will make up to MAX_NUMBER_OF_REQUEST_ATTEMPTS requests to get an up to date value
+        for (int i = 1; i <= maxRetryAttempts; i++) {
+            LOGGER.debug("Sending request #{}", i);
             response = sendHttpRequest(requestUrl);
-            requestAttempts++;
+
+            // Possible 429 response if too many requests are sent at once, so we sleep when this occurs
+            if (response.statusCode() == HTTP_TOO_MANY_REQUESTS_STATUS_CODE) {
+                try {
+                    LOGGER.warn("Received 'too many requests' response, sleeping for {}s", TimeUnit.MILLISECONDS.toSeconds(MILLIS_BETWEEN_ATTEMPTS));
+                    Thread.sleep(MILLIS_BETWEEN_ATTEMPTS);
+                } catch (final InterruptedException e) {
+                    LOGGER.debug("Unexpected interrupt", e);
+                    Thread.currentThread().interrupt();
+                }
+            } else {
+                if (response.statusCode() != HttpURLConnection.HTTP_OK) {
+                    throw new ExternalConnectionException(response.uri().toString(),
+                        String.format("Invalid response (status code: %s): %s", response.statusCode(), response.body()));
+                }
+
+                if (StringUtils.isBlank(response.body())) {
+                    throw new ExternalConnectionException(response.uri().toString(), "Empty Folding@Home stats response");
+                }
+
+                // If the response body is different to the cached both, we have the latest data and can stop making additional requests
+                // If response body is same as cached body, it could mean:
+                //   1 - No additional stats have been creditted to the user
+                //   2 - The Folding@Home API is caching its response
+                // To try and be as up to date as possible, we will make up to 'maxRetryAttempts' requests to get an up to date value
+                if (!response.body().equalsIgnoreCase(cachedResponseBody)) {
+                    break;
+                }
+            }
         }
 
-        CACHED_RESPONSE_BODIES.put(requestUrl, response.body());
         return response;
     }
 

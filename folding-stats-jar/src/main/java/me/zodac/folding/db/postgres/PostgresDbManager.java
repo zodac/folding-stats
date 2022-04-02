@@ -45,8 +45,6 @@ import static org.jooq.impl.DSL.max;
 import static org.jooq.impl.DSL.month;
 import static org.jooq.impl.DSL.year;
 
-import java.io.Closeable;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -1225,18 +1223,7 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
             final DSLContext queryContext = DSL.using(connection, SQLDialect.POSTGRES);
             return sqlQuery.apply(queryContext);
         } catch (final SQLException e) {
-            throw new DatabaseConnectionException("Error closing connection", e);
-        }
-    }
-
-    @Override
-    public void close() {
-        if (dataSource instanceof Closeable closeable) {
-            try {
-                closeable.close();
-            } catch (final IOException e) {
-                SQL_LOGGER.warn("Error closing dataSource", e);
-            }
+            throw new DatabaseConnectionException("Error closing DB connection", e);
         }
     }
 }

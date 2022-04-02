@@ -24,12 +24,10 @@
 
 package me.zodac.folding.bean.tc.user;
 
-import static me.zodac.folding.api.util.EnvironmentVariableUtils.getIntOrDefault;
 import static me.zodac.folding.api.util.NumberUtils.formatWithCommas;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.state.ParsingState;
 import me.zodac.folding.api.state.SystemState;
@@ -54,7 +52,6 @@ import org.springframework.stereotype.Component;
 public class UserStatsParser {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final long MILLIS_BETWEEN_STATS_REQUESTS = TimeUnit.SECONDS.toMillis(getIntOrDefault("SECONDS_BETWEEN_USER_STATS_RETRIEVAL", 20));
 
     private final FoldingStatsRetriever foldingStatsRetriever;
     private final StatsRepository statsRepository;
@@ -144,14 +141,7 @@ public class UserStatsParser {
 
     private UserStats getTotalStatsForUserOrEmpty(final User user) {
         try {
-            final UserStats totalStatsForUser = foldingStatsRetriever.getTotalStats(user);
-            if (MILLIS_BETWEEN_STATS_REQUESTS != 0) {
-                Thread.sleep(MILLIS_BETWEEN_STATS_REQUESTS);
-            }
-            return totalStatsForUser;
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-            LOGGER.warn("Error connecting to Folding@Home API", e);
+            return foldingStatsRetriever.getTotalStats(user);
         } catch (final ExternalConnectionException e) {
             LOGGER.warn("Error connecting to Folding@Home API at '{}'", e.getUrl(), e);
         }

@@ -315,7 +315,7 @@ public class StatsRepository {
      */
     public AllTeamsSummary getAllTeamsSummary() {
         if (SystemStateManager.current() != SystemState.WRITE_EXECUTED) {
-            LOGGER.debug("System is not in state {}, retrieving all teams summary", SystemState.WRITE_EXECUTED);
+            LOGGER.debug("System is not in state {}, retrieving cached TC result", SystemState.WRITE_EXECUTED);
 
             final Optional<AllTeamsSummary> cachedCompetitionResult = storage.getAllTeamsSummary();
             if (cachedCompetitionResult.isPresent()) {

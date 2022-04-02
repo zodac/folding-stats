@@ -58,7 +58,7 @@ public class StateInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler) {
-        LOGGER.debug("Checking system state for REST request at '{}'", request.getRequestURI());
+        LOGGER.debug("Checking system state for REST request at '{}', current state: {}", request.getRequestURI(), SystemStateManager.current());
 
         if (!(handler instanceof HandlerMethod)) {
             if (isPreflightRequest(handler)) {

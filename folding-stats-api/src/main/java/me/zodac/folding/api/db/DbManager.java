@@ -24,7 +24,6 @@
 
 package me.zodac.folding.api.db;
 
-import java.io.Closeable;
 import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
@@ -49,7 +48,7 @@ import me.zodac.folding.rest.api.tc.historic.HistoricStats;
  * <p>
  * Any method can throw a {@link DatabaseConnectionException} if an error occurs connecting to the underlying DB.
  */
-public interface DbManager extends Closeable {
+public interface DbManager {
 
     /**
      * Creates a {@link Hardware} instance in the DB.

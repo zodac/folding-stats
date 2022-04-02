@@ -47,13 +47,12 @@ services:
       REDIRECT_URL: "http://127.0.0.1:81/"
       # Spring configuration
       DEPLOYMENT_TYPE: "test"
-      # NOTE: The monthly reset, result storage and LARS update will always occur at 23:58:30 on the last day of the month
+      # NOTE: The monthly reset, result storage and LARS update will always occur at 23:57:00 on the last day of the month
       ENABLE_LARS_HARDWARE_UPDATE: "false"
       ENABLE_MONTHLY_RESULT_STORAGE: "false"
       ENABLE_STATS_MONTHLY_RESET: "false"
       # Stats parsing configuration
       ENABLE_STATS_SCHEDULED_PARSING: "false"
-      SECONDS_BETWEEN_USER_STATS_RETRIEVAL: "0"
       SECONDS_BETWEEN_HTTP_REQUEST_ATTEMPTS: "0"
       MAXIMUM_HTTP_REQUEST_ATTEMPTS: "3"
       # Category configuration

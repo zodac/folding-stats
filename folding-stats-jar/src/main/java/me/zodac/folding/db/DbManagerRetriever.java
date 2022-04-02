@@ -28,18 +28,24 @@ import io.github.resilience4j.core.IntervalFunction;
 import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryConfig;
 import java.time.Duration;
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.function.Supplier;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
 import me.zodac.folding.db.postgres.PostgresDataSource;
 import me.zodac.folding.db.postgres.PostgresDbManager;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Utility class used to retrieve an instance of {@link DbManager} for the system.
  */
 public final class DbManagerRetriever {
 
+    private static final Logger LOGGER = LogManager.getLogger();
     private static final String DATABASE_VARIABLE_NAME = "DEPLOYED_DATABASE";
+    private static final Map<DatabaseType, DbManager> DB_MANAGER_BY_TYPE = new EnumMap<>(DatabaseType.class);
 
     private DbManagerRetriever() {
 
@@ -57,17 +63,24 @@ public final class DbManagerRetriever {
         final String deployedDatabase = EnvironmentVariableUtils.get(DATABASE_VARIABLE_NAME);
         final DatabaseType databaseType = DatabaseType.get(deployedDatabase);
 
+        if (DB_MANAGER_BY_TYPE.containsKey(databaseType)) {
+            LOGGER.trace("Found existing {} of type '{}'", DbManager.class.getSimpleName(), databaseType);
+            return DB_MANAGER_BY_TYPE.get(databaseType);
+        }
+
         if (databaseType == DatabaseType.POSTGRESQL) {
-            final Supplier<PostgresDataSource> supplier = Retry.decorateSupplier(getRetry(), PostgresDataSource::create);
-            final PostgresDataSource postgresDataSource = supplier.get(); // NOPMD: CloseResource - Closed later manually
-            return PostgresDbManager.create(postgresDataSource);
+            final Supplier<PostgresDataSource> supplier = Retry.decorateSupplier(retry(), PostgresDataSource::create);
+            final PostgresDataSource postgresDataSource = supplier.get(); // NOPMD: CloseResource - Don't want to close the Datasource connection pool
+            final PostgresDbManager postgresDbManager = PostgresDbManager.create(postgresDataSource);
+            DB_MANAGER_BY_TYPE.put(DatabaseType.POSTGRESQL, postgresDbManager);
+            return postgresDbManager;
         }
 
         throw new IllegalStateException(String.format("Unable to find database of type using variable '%s': %s",
             DATABASE_VARIABLE_NAME, deployedDatabase));
     }
 
-    private static Retry getRetry() {
+    private static Retry retry() {
         final RetryConfig retryConfig = RetryConfig.custom()
             .maxAttempts(10)
             .intervalFunction(IntervalFunction.ofExponentialBackoff(Duration.ofSeconds(10L)))

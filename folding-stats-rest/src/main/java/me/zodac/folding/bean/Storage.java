@@ -26,7 +26,6 @@ package me.zodac.folding.bean;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import java.io.IOException;
 import java.time.Duration;
 import java.time.Month;
 import java.time.Year;
@@ -37,7 +36,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.db.DbManager;
-import me.zodac.folding.api.exception.DatabaseConnectionException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
@@ -949,18 +947,12 @@ public class Storage {
     }
 
     private static <T> T dbManagerFunction(final Function<? super DbManager, T> function) {
-        try (final DbManager dbManager = DbManagerRetriever.get()) {
-            return function.apply(dbManager);
-        } catch (final IOException e) {
-            throw new DatabaseConnectionException("Error closing connection", e);
-        }
+        final DbManager dbManager = DbManagerRetriever.get();
+        return function.apply(dbManager);
     }
 
     private static void dbManagerConsumer(final Consumer<? super DbManager> consumer) {
-        try (final DbManager dbManager = DbManagerRetriever.get()) {
-            consumer.accept(dbManager);
-        } catch (final IOException e) {
-            throw new DatabaseConnectionException("Error closing connection", e);
-        }
+        final DbManager dbManager = DbManagerRetriever.get();
+        consumer.accept(dbManager);
     }
 }

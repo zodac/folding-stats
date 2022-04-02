@@ -128,7 +128,7 @@ public class TeamCompetitionScheduler {
      * @see UserStatsResetter#resetTeamCompetitionStats()
      * @see LarsHardwareUpdater#retrieveHardwareAndPersist()
      */
-    @Scheduled(cron = "30 58 23 28-31 * *", zone = "UTC")
+    @Scheduled(cron = "0 57 23 28-31 * *", zone = "UTC")
     public void endOfTeamCompetition() {
         try {
             // Because we cannot set up a cron schedule with last day for each month, we use the range '28-31'.
