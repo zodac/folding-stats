@@ -141,6 +141,11 @@ public final class StatsRequestSender {
             }
         }
 
+        if (response.statusCode() == HTTP_TOO_MANY_REQUESTS_STATUS_CODE) {
+            throw new ExternalConnectionException(response.uri().toString(),
+                String.format("'Too many requests' response returned after %s attempts", maxRetryAttempts);
+        }
+
         return response;
     }
 
