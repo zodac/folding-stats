@@ -31,6 +31,7 @@ import java.time.Duration;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.function.Supplier;
+import javax.sql.DataSource;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
 import me.zodac.folding.db.postgres.PostgresDataSource;
@@ -70,7 +71,7 @@ public final class DbManagerRetriever {
 
         if (databaseType == DatabaseType.POSTGRESQL) {
             final Supplier<PostgresDataSource> supplier = Retry.decorateSupplier(retry(), PostgresDataSource::create);
-            final PostgresDataSource postgresDataSource = supplier.get(); // NOPMD: CloseResource - Don't want to close the Datasource connection pool
+            final DataSource postgresDataSource = supplier.get();
             final PostgresDbManager postgresDbManager = PostgresDbManager.create(postgresDataSource);
             DB_MANAGER_BY_TYPE.put(DatabaseType.POSTGRESQL, postgresDbManager);
             return postgresDbManager;

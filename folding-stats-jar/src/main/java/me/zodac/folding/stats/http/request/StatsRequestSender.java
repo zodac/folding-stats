@@ -33,8 +33,6 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.util.StringUtils;
@@ -64,9 +62,8 @@ public final class StatsRequestSender {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final int HTTP_TOO_MANY_REQUESTS_STATUS_CODE = 429;
     private static final int MAX_RETRY_ATTEMPTS = getIntOrDefault("MAXIMUM_HTTP_REQUEST_ATTEMPTS", 2);
-    private static final long MILLIS_BETWEEN_ATTEMPTS = TimeUnit.SECONDS.toMillis(getIntOrDefault("SECONDS_BETWEEN_HTTP_REQUEST_ATTEMPTS", 20));
-
-    private static final Map<String, String> CACHED_RESPONSE_BODIES = new HashMap<>();
+    private static final long SECONDS_BETWEEN_ATTEMPTS = getIntOrDefault("SECONDS_BETWEEN_HTTP_REQUEST_ATTEMPTS", 20);
+    private static final long MINIMUM_REQUESTS_TO_FLUSH_EXTERNAL_CACHE = 1;
 
     private StatsRequestSender() {
 
@@ -92,61 +89,57 @@ public final class StatsRequestSender {
      */
     public static HttpResponse<String> sendFoldingRequest(final StatsRequestUrl statsRequestUrl) throws ExternalConnectionException {
         final String requestUrl = statsRequestUrl.url();
-        final String cachedResponseBody = CACHED_RESPONSE_BODIES.get(requestUrl);
-
-        final HttpResponse<String> response = sendRequestWithRetries(requestUrl, cachedResponseBody);
-        CACHED_RESPONSE_BODIES.put(requestUrl, response.body());
-        return response;
+        return sendRequestWithRetries(requestUrl);
     }
 
-    private static HttpResponse<String> sendRequestWithRetries(final String requestUrl, final String cachedResponseBody)
-        throws ExternalConnectionException {
-        HttpResponse<String> response = null;
+    private static HttpResponse<String> sendRequestWithRetries(final String requestUrl) throws ExternalConnectionException {
+        // In case the user has set the env variable less than 1, we will always do at least 1 attempt
+        final int maximumHttpRequests = Math.max(MAX_RETRY_ATTEMPTS, 1);
 
-        // In case env variable is set too low, we will always do at least 1 attempt
-        final int maxRetryAttempts = Math.max(MAX_RETRY_ATTEMPTS, 1);
-
-        // Continue making requests as long as we have not hit max attempts
-        for (int i = 1; i <= maxRetryAttempts; i++) {
-            LOGGER.debug("Sending request #{}", i);
-            response = sendHttpRequest(requestUrl);
+        // Continue making requests as long as we have not hit max attempts, or a response is found
+        for (int requestCount = 1; requestCount <= maximumHttpRequests; requestCount++) {
+            LOGGER.debug("Sending request #{}", requestCount);
+            final HttpResponse<String> response = sendHttpRequest(requestUrl);
 
             // Possible 429 response if too many requests are sent at once, so we sleep when this occurs
             if (response.statusCode() == HTTP_TOO_MANY_REQUESTS_STATUS_CODE) {
                 try {
-                    LOGGER.warn("Received 'too many requests' response, sleeping for {}s", TimeUnit.MILLISECONDS.toSeconds(MILLIS_BETWEEN_ATTEMPTS));
-                    Thread.sleep(MILLIS_BETWEEN_ATTEMPTS);
+                    LOGGER.debug("Received 'too many requests' response for request #{} to {}, sleeping for {}s", requestCount, requestUrl,
+                        SECONDS_BETWEEN_ATTEMPTS);
+                    Thread.sleep(TimeUnit.SECONDS.toMillis(SECONDS_BETWEEN_ATTEMPTS));
                 } catch (final InterruptedException e) {
                     LOGGER.debug("Unexpected interrupt", e);
                     Thread.currentThread().interrupt();
                 }
-            } else {
-                if (response.statusCode() != HttpURLConnection.HTTP_OK) {
-                    throw new ExternalConnectionException(response.uri().toString(),
-                        String.format("Invalid response (status code: %s): %s", response.statusCode(), response.body()));
-                }
 
-                if (StringUtils.isBlank(response.body())) {
-                    throw new ExternalConnectionException(response.uri().toString(), "Empty Folding@Home stats response");
-                }
+                // After sleeping, continue the FOR loop for the next HTTP request, no need to parse the response any futher
+                continue;
+            }
 
-                // If the response body is different to the cached both, we have the latest data and can stop making additional requests
-                // If response body is same as cached body, it could mean:
-                //   1 - No additional stats have been creditted to the user
-                //   2 - The Folding@Home API is caching its response
-                // To try and be as up to date as possible, we will make up to 'maxRetryAttempts' requests to get an up to date value
-                if (!response.body().equalsIgnoreCase(cachedResponseBody)) {
-                    break;
-                }
+            validateFoldingResponse(response);
+
+            // We don't want to return the first response, since it is often a cached value from the Stanford Folding@Home API
+            // Since the returned value from the Stanford Folding@Home API is often cached, we will ignore requests until we hit the minumum
+            // number of requests, and only then return a subsequent valid response (or else go into error handling).
+            // However, if we are only allowing one HTTP request, we will return the potentially cached response
+            if (requestCount > MINIMUM_REQUESTS_TO_FLUSH_EXTERNAL_CACHE && maximumHttpRequests != 1) {
+                return response;
             }
         }
 
-        if (response.statusCode() == HTTP_TOO_MANY_REQUESTS_STATUS_CODE) {
+        throw new ExternalConnectionException(requestUrl,
+            String.format("'Too many requests' response returned after %s attempts", maximumHttpRequests));
+    }
+
+    private static void validateFoldingResponse(final HttpResponse<String> response) throws ExternalConnectionException {
+        if (response.statusCode() != HttpURLConnection.HTTP_OK) {
             throw new ExternalConnectionException(response.uri().toString(),
-                String.format("'Too many requests' response returned after %s attempts", maxRetryAttempts));
+                String.format("Invalid response (status code: %s): %s", response.statusCode(), response.body()));
         }
 
-        return response;
+        if (StringUtils.isBlank(response.body())) {
+            throw new ExternalConnectionException(response.uri().toString(), "Empty Folding@Home stats response");
+        }
     }
 
     private static HttpResponse<String> sendHttpRequest(final String requestUrl) throws ExternalConnectionException {

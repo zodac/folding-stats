@@ -26,8 +26,6 @@ package me.zodac.folding.bean.tc.user;
 
 import static me.zodac.folding.api.util.NumberUtils.formatWithCommas;
 
-import java.util.HashMap;
-import java.util.Map;
 import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.state.ParsingState;
 import me.zodac.folding.api.state.SystemState;
@@ -83,12 +81,10 @@ public class UserStatsParser {
         SystemStateManager.next(SystemState.UPDATING_STATS);
 
         LOGGER.info("Starting Folding stats parsing");
-        final Map<Integer, UserStats> totalStatsByUserId = getTotalStatsForAllUsers(users);
-        LOGGER.debug("Starting Folding stats persisting");
 
         for (final User user : users) {
             try {
-                updateTcStatsForUser(user, totalStatsByUserId);
+                updateTcStatsForUser(user);
             } catch (final Exception e) {
                 LOGGER.error("Error updating TC stats for user '{}' (ID: {})", user.displayName(), user.id(), e);
             }
@@ -98,7 +94,7 @@ public class UserStatsParser {
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
     }
 
-    private void updateTcStatsForUser(final User user, final Map<Integer, UserStats> totalStatsByUserId) {
+    private void updateTcStatsForUser(final User user) {
         LOGGER.debug("Updating stats for '{}': {}", user.displayName(), user);
         if (StringUtils.isBlank(user.passkey())) {
             LOGGER.warn("Not parsing TC stats for user, missing passkey: {}", user);
@@ -119,7 +115,7 @@ public class UserStatsParser {
                 () -> formatWithCommas(offsetTcStats.getMultipliedPointsOffset()), () -> formatWithCommas(offsetTcStats.getUnitsOffset()));
         }
 
-        final UserStats totalStats = totalStatsByUserId.getOrDefault(user.id(), UserStats.empty());
+        final UserStats totalStats = getTotalStatsForUserOrEmpty(user);
         if (totalStats.isEmpty()) {
             LOGGER.warn("Retrieved empty total stats for user: {}", user);
             return;
@@ -127,16 +123,6 @@ public class UserStatsParser {
 
         final UserStats createdTotalStats = statsRepository.createTotalStats(totalStats);
         userTcStatsCalculator.calculateAndPersist(user, initialStats, offsetTcStats, createdTotalStats);
-    }
-
-    // Retrieving the stats for all users first, since we need to add a delay between requests
-    // This way we can parallelise the rest of the stats retrieval flow, while keeping the HTTP requests single-threaded
-    private Map<Integer, UserStats> getTotalStatsForAllUsers(final Iterable<User> users) {
-        final Map<Integer, UserStats> totalStatsByUserId = new HashMap<>();
-        for (final User user : users) {
-            totalStatsByUserId.put(user.id(), getTotalStatsForUserOrEmpty(user));
-        }
-        return totalStatsByUserId;
     }
 
     private UserStats getTotalStatsForUserOrEmpty(final User user) {
