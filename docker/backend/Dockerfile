@@ -32,7 +32,7 @@ RUN mkdir --parents /folding-stats-spring-boot
 WORKDIR /folding-stats-spring-boot
 
 ARG NEXUS_URL
-COPY --chmod=777 ./docker/backend/scripts/configure_custom_nexus.sh /tmp/configure_custom_nexus.sh
+COPY ./docker/backend/scripts/configure_custom_nexus.sh /tmp/configure_custom_nexus.sh
 RUN /tmp/configure_custom_nexus.sh "${NEXUS_URL}"
 
 # Copy source code
