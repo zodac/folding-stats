@@ -42,6 +42,7 @@ function adminLogin(){
         successToast("Logged in successfully!")
         hide("login_form")
 
+        sessionSet("Authorization", authorizationPayload)
         loadHardware()
         loadTeams()
         loadUsersAdmin()
@@ -50,8 +51,6 @@ function adminLogin(){
 
         hide("loader")
         show("admin_functions")
-
-        sessionSet("Authorization", authorizationPayload)
     })
     .catch((error) => {
         hide("loader")

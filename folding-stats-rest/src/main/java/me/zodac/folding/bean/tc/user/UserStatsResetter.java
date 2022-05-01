@@ -71,7 +71,7 @@ public class UserStatsResetter {
             final Collection<User> users = foldingRepository.getAllUsersWithPasskeys();
 
             // Pull stats one more time to get the latest values
-            // No longer pulling latest stats due to rate-limiting from Folding@Home API
+            // No longer pulling the latest stats due to rate-limiting from Folding@Home API
             // Technically means we could have some points drop in the two minutes between last update and reset,
             // But I think we can live with that. :)
             // userStatsParser.parseTcStatsForUsers(users);
