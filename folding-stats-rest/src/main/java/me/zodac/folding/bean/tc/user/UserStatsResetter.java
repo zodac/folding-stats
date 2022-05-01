@@ -24,10 +24,8 @@
 
 package me.zodac.folding.bean.tc.user;
 
-import java.util.Collection;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.bean.StatsRepository;
-import me.zodac.folding.bean.api.FoldingRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,9 +38,6 @@ import org.springframework.stereotype.Component;
 public class UserStatsResetter {
 
     private static final Logger LOGGER = LogManager.getLogger();
-
-    @Autowired
-    private FoldingRepository foldingRepository;
 
     @Autowired
     private StatsRepository statsRepository;
@@ -68,19 +63,13 @@ public class UserStatsResetter {
      */
     public void resetTeamCompetitionStats() {
         try {
-            final Collection<User> users = foldingRepository.getAllUsersWithPasskeys();
-
-            // Pull stats one more time to get the latest values
-            // No longer pulling the latest stats due to rate-limiting from Folding@Home API
+            // Not pulling the latest stats due to rate-limiting from Folding@Home API
             // Technically means we could have some points drop in the two minutes between last update and reset,
             // But I think we can live with that. :)
             // userStatsParser.parseTcStatsForUsers(users);
 
             LOGGER.info("Resetting Team Competition stats");
             statsRepository.resetAllTeamCompetitionUserStats();
-
-            // Pull stats for new month
-            userStatsParser.parseTcStatsForUsers(users);
         } catch (final Exception e) {
             LOGGER.warn("Unexpected error manually resetting TC stats", e);
         }
