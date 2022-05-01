@@ -290,7 +290,8 @@ public class StatsRepository {
         for (final User user : storage.getAllUsers()) {
             LOGGER.info("Resetting TC stats for {}", user.displayName());
             final UserStats totalStats = getTotalStats(user);
-            createInitialStats(totalStats);
+            final UserStats totalStatsWithNewTime  = UserStats.createNow(totalStats.getUserId(), totalStats.getPoints(), totalStats.getUnits());
+            createInitialStats(totalStatsWithNewTime);
         }
 
         LOGGER.info("Deleting retired user TC stats");
