@@ -104,7 +104,7 @@ public enum Category {
      * @return a {@link Collection} of all {@link Category}s
      */
     public static Collection<Category> getAllValues() {
-        return Collections.unmodifiableCollection(ALL_VALUES);
+        return ALL_VALUES;
     }
 
     /**

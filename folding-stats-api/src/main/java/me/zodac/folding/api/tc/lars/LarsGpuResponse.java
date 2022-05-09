@@ -52,7 +52,7 @@ import lombok.ToString;
  *
  * @see <a href="https://folding.lar.systems/api/gpu_ppd/gpu_rank_list.json">LARS GPU PPD database API</a>
  */
-@NoArgsConstructor
+
 @Getter
 @Setter
 @EqualsAndHashCode
@@ -81,4 +81,11 @@ public class LarsGpuResponse {
 
     @SerializedName("date_last_update")
     private String dateOfLastUpdate;
+
+    /**
+     * Default constructor.
+     */
+    public LarsGpuResponse() {
+
+    }
 }

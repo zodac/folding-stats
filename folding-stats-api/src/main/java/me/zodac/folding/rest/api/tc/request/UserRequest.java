@@ -56,15 +56,8 @@ import me.zodac.folding.api.tc.HardwareMake;
 @ToString(doNotUseGetters = true)
 public class UserRequest implements RequestPojo {
 
-    /**
-     * {@link Pattern} defining a valid Folding@Home username.
-     */
-    public static final Pattern FOLDING_USER_NAME_PATTERN = Pattern.compile("^[a-zA-Z0-9._-]*$");
-
-    /**
-     * {@link Pattern} defining a valid Folding@home passkey for a user.
-     */
-    public static final Pattern PASSKEY_PATTERN = Pattern.compile("[a-zA-Z0-9]{32}");
+    private static final Pattern FOLDING_USER_NAME_PATTERN = Pattern.compile("^[a-zA-Z\\d._-]*$");
+    private static final Pattern PASSKEY_PATTERN = Pattern.compile("[a-zA-Z\\d]{32}");
 
     private String foldingUserName;
     private String displayName;

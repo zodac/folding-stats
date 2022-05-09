@@ -8,7 +8,7 @@ services:
       dockerfile: docker/frontend/Dockerfile
       args:
         # Docker image versions
-        NODE_VERSION: "17.8"
+        NODE_VERSION: "18.1"
         # Build arguments
         FORUM_LINK: "${FORUM_LINK}"
         REST_ENDPOINT_URL: "${REST_ENDPOINT_URL}"
@@ -35,9 +35,9 @@ services:
       dockerfile: docker/backend/Dockerfile
       args:
         # Docker image versions
-        DEBIAN_VERSION: "11.2"
-        JAVA_VERSION: "17"
-        MAVEN_VERSION: "3.8.4"
+        DEBIAN_VERSION: "11.3"
+        JAVA_VERSION: "18"
+        MAVEN_VERSION: "3.8.5"
         # Build arguments
         KEYSTORE_PASSWORD: "${KEYSTORE_PASSWORD}"
         NEXUS_URL: "${NEXUS_URL}"
@@ -133,9 +133,9 @@ services:
       dockerfile: docker/metrics/prometheus/Dockerfile
       args:
         # Docker image versions
-        DEBIAN_VERSION: "11.2"
-        JAVA_VERSION: "17"
-        PROMETHEUS_VERSION: "v2.34.0"
+        DEBIAN_VERSION: "11.3"
+        JAVA_VERSION: "18"
+        PROMETHEUS_VERSION: "v2.35.0"
         # Build arguments
         ADMIN_USERNAME: "${ADMIN_USER}"
         ADMIN_PASSWORD: "${ADMIN_PASSWORD}"

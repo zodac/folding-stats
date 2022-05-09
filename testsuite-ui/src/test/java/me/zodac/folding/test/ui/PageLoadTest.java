@@ -25,14 +25,14 @@
 
 package me.zodac.folding.test.ui;
 
-import static me.zodac.folding.test.util.Logger.log;
-import static me.zodac.folding.test.util.Logger.logWithBlankLine;
-import static me.zodac.folding.test.util.TestExecutor.executeWithDriver;
+import static me.zodac.folding.test.ui.util.Logger.log;
+import static me.zodac.folding.test.ui.util.Logger.logWithBlankLine;
+import static me.zodac.folding.test.ui.util.TestExecutor.executeWithDriver;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.MalformedURLException;
-import me.zodac.folding.test.util.BrowserType;
-import me.zodac.folding.test.util.FrontendLink;
+import me.zodac.folding.test.ui.util.BrowserType;
+import me.zodac.folding.test.ui.util.FrontendLink;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 

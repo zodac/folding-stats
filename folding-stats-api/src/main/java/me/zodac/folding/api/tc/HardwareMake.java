@@ -67,7 +67,7 @@ public enum HardwareMake {
      * @return a {@link Collection} of all {@link HardwareMake}s
      */
     public static Collection<HardwareMake> getAllValues() {
-        return Collections.unmodifiableCollection(ALL_VALUES);
+        return ALL_VALUES;
     }
 
     /**

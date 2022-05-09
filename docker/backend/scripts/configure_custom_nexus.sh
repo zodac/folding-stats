@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 nexusUrl="${1}"
 
+# shellcheck disable=SC2236
 if [[ ! -z "${nexusUrl}" ]]; then
   mkdir --parents /root/.m2
 

@@ -292,6 +292,7 @@ public class StatsRepository {
             final UserStats totalStats = getTotalStats(user);
             final UserStats totalStatsWithNewTime  = UserStats.createNow(totalStats.getUserId(), totalStats.getPoints(), totalStats.getUnits());
             createInitialStats(totalStatsWithNewTime);
+            createHourlyTcStats(UserTcStats.empty(totalStats.getUserId()));
         }
 
         LOGGER.info("Deleting retired user TC stats");
@@ -300,9 +301,11 @@ public class StatsRepository {
         LOGGER.info("Deleting offset TC stats");
         storage.deleteAllOffsetTcStats();
 
-        LOGGER.info("Evicting TC and initial stats caches");
+        LOGGER.info("Evicting TC and initial stats caches, and all teams summary cache");
         storage.evictTcStatsCache();
         storage.evictInitialStatsCache();
+        storage.evictAllTeamsSummaryCache();
+        SystemStateManager.next(SystemState.WRITE_EXECUTED);
     }
 
     /**

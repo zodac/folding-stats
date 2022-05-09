@@ -849,6 +849,14 @@ public class Storage {
     }
 
     /**
+     * Evicts all {@link AllTeamsSummary}s from the {@code allTeamsSummaryCache}.
+     */
+    @Cached
+    public void evictAllTeamsSummaryCache() {
+        allTeamsSummaryCache.invalidateAll();
+    }
+
+    /**
      * Evicts all {@link User}s from the {@code totalStatsCache}.
      */
     @Cached

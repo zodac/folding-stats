@@ -103,7 +103,7 @@ public enum UserChangeState {
      * @return a {@link Collection} of all {@link UserChangeState}s
      */
     public static Collection<UserChangeState> getAllValues() {
-        return Collections.unmodifiableCollection(ALL_VALUES);
+        return ALL_VALUES;
     }
 
     /**

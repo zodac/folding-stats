@@ -26,11 +26,10 @@ package me.zodac.folding.rest.api.tc.request;
 
 import static me.zodac.folding.api.util.StringUtils.isBlank;
 import static me.zodac.folding.api.util.StringUtils.isBlankOrValidUrl;
-import static me.zodac.folding.rest.api.tc.request.UserRequest.FOLDING_USER_NAME_PATTERN;
-import static me.zodac.folding.rest.api.tc.request.UserRequest.PASSKEY_PATTERN;
 
 import java.util.Collection;
 import java.util.Objects;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -55,6 +54,9 @@ import me.zodac.folding.api.exception.ValidationException;
 @ToString(doNotUseGetters = true)
 public class UserChangeRequest implements RequestPojo {
 
+    private static final Pattern FOLDING_USER_NAME_PATTERN = Pattern.compile("^[a-zA-Z\\d._-]*$");
+    private static final Pattern PASSKEY_PATTERN = Pattern.compile("[a-zA-Z\\d]{32}");
+
     private int userId;
     private String existingPasskey;
     private String foldingUserName;
@@ -66,8 +68,8 @@ public class UserChangeRequest implements RequestPojo {
     /**
      * Simple check that validates that the REST payload is valid. Checks that:
      * <ul>
-     *     <li>'foldingUserName' matches {@link UserRequest#FOLDING_USER_NAME_PATTERN}</li>
-     *     <li>'passkey' matches {@link UserRequest#PASSKEY_PATTERN}</li>
+     *     <li>'foldingUserName' matches {@link #FOLDING_USER_NAME_PATTERN}</li>
+     *     <li>'passkey' matches {@link #PASSKEY_PATTERN}</li>
      *     <li>'liveStatsLink' is null or empty, or else is a valid {@link java.net.URI}</li>
      * </ul>
      *

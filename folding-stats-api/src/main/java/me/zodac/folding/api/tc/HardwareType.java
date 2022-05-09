@@ -62,7 +62,7 @@ public enum HardwareType {
      * @return a {@link Collection} of all {@link HardwareType}s
      */
     public static Collection<HardwareType> getAllValues() {
-        return Collections.unmodifiableCollection(ALL_VALUES);
+        return ALL_VALUES;
     }
 
     /**
