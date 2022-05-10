@@ -25,6 +25,7 @@
 package me.zodac.folding.integration.util.rest.request;
 
 import static me.zodac.folding.api.util.EncodingUtils.encodeBasicAuthentication;
+import static me.zodac.folding.integration.util.TestAuthenticationData.ADMIN_USER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
@@ -33,7 +34,6 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import me.zodac.folding.api.tc.lars.LarsGpu;
-import me.zodac.folding.integration.util.TestAuthenticationData;
 import me.zodac.folding.integration.util.TestConstants;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
@@ -59,7 +59,7 @@ public final class LarsUtils {
             .POST(HttpRequest.BodyPublishers.noBody())
             .uri(URI.create(TestConstants.FOLDING_URL + "/debug/lars"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
-            .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password()))
+            .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
             .build();
 
         try {
@@ -119,7 +119,7 @@ public final class LarsUtils {
             .DELETE()
             .uri(URI.create(TestConstants.FOLDING_URL + "/api/gpu_ppd"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
-            .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password()))
+            .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
             .build();
 
         try {

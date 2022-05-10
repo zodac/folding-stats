@@ -24,6 +24,7 @@
 
 package me.zodac.folding.integration;
 
+import static me.zodac.folding.integration.util.rest.request.HardwareUtils.HARDWARE_REQUEST_SENDER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
@@ -34,7 +35,6 @@ import me.zodac.folding.api.tc.HardwareMake;
 import me.zodac.folding.api.tc.lars.LarsGpu;
 import me.zodac.folding.client.java.response.HardwareResponseParser;
 import me.zodac.folding.integration.util.SystemCleaner;
-import me.zodac.folding.integration.util.rest.request.HardwareUtils;
 import me.zodac.folding.integration.util.rest.request.LarsUtils;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import org.junit.jupiter.api.AfterEach;
@@ -62,7 +62,7 @@ class LarsTest {
     void whenUpdatingHardwareFromLars_givenLarsHasNoHardware_thenSystemIsNotUpdated() throws FoldingRestException {
         LarsUtils.manualLarsUpdate();
 
-        final Collection<Hardware> allHardwareAfterUpdate = HardwareResponseParser.getAll(HardwareUtils.HARDWARE_REQUEST_SENDER.getAll());
+        final Collection<Hardware> allHardwareAfterUpdate = HardwareResponseParser.getAll(HARDWARE_REQUEST_SENDER.getAll());
         assertThat(allHardwareAfterUpdate)
             .as("Expected no hardware to have been added to the system")
             .isEmpty();
@@ -70,7 +70,7 @@ class LarsTest {
 
     @Test
     void whenUpdatingHardwareFromLars_givenSystemHasNoHardware_thenSystemIsUpdatedWithLarsHardware() throws FoldingRestException {
-        final Collection<Hardware> allHardwareBeforeUpdate = HardwareResponseParser.getAll(HardwareUtils.HARDWARE_REQUEST_SENDER.getAll());
+        final Collection<Hardware> allHardwareBeforeUpdate = HardwareResponseParser.getAll(HARDWARE_REQUEST_SENDER.getAll());
         assertThat(allHardwareBeforeUpdate)
             .as("Expected there to be no hardware in the system when starting the test")
             .isEmpty();
@@ -81,7 +81,7 @@ class LarsTest {
 
         LarsUtils.manualLarsUpdate();
 
-        final Collection<Hardware> allHardwareAfterUpdate = HardwareResponseParser.getAll(HardwareUtils.HARDWARE_REQUEST_SENDER.getAll());
+        final Collection<Hardware> allHardwareAfterUpdate = HardwareResponseParser.getAll(HARDWARE_REQUEST_SENDER.getAll());
         assertThat(allHardwareAfterUpdate)
             .as("Expected one hardware to have been added to the system")
             .hasSize(1);
@@ -95,14 +95,14 @@ class LarsTest {
 
         LarsUtils.manualLarsUpdate();
 
-        final Collection<Hardware> allHardwareAfterFirstUpdate = HardwareResponseParser.getAll(HardwareUtils.HARDWARE_REQUEST_SENDER.getAll());
+        final Collection<Hardware> allHardwareAfterFirstUpdate = HardwareResponseParser.getAll(HARDWARE_REQUEST_SENDER.getAll());
         assertThat(allHardwareAfterFirstUpdate)
             .as("Expected one hardware to have been added to the system after first update")
             .hasSize(1);
 
         LarsUtils.manualLarsUpdate();
 
-        final Collection<Hardware> allHardwareAfterSecondUpdate = HardwareResponseParser.getAll(HardwareUtils.HARDWARE_REQUEST_SENDER.getAll());
+        final Collection<Hardware> allHardwareAfterSecondUpdate = HardwareResponseParser.getAll(HARDWARE_REQUEST_SENDER.getAll());
         assertThat(allHardwareAfterSecondUpdate)
             .as("Expected no additional hardware to have been added to the system after second update")
             .hasSize(1);
@@ -116,7 +116,7 @@ class LarsTest {
 
         LarsUtils.manualLarsUpdate();
 
-        final Collection<Hardware> allHardwareAfterFirstUpdate = HardwareResponseParser.getAll(HardwareUtils.HARDWARE_REQUEST_SENDER.getAll());
+        final Collection<Hardware> allHardwareAfterFirstUpdate = HardwareResponseParser.getAll(HARDWARE_REQUEST_SENDER.getAll());
         assertThat(allHardwareAfterFirstUpdate)
             .as("Expected one hardware to have been added to the system after first update")
             .hasSize(1);
@@ -132,7 +132,7 @@ class LarsTest {
         );
         LarsUtils.manualLarsUpdate();
 
-        final Collection<Hardware> allHardwareAfterSecondUpdate = HardwareResponseParser.getAll(HardwareUtils.HARDWARE_REQUEST_SENDER.getAll());
+        final Collection<Hardware> allHardwareAfterSecondUpdate = HardwareResponseParser.getAll(HARDWARE_REQUEST_SENDER.getAll());
         assertThat(allHardwareAfterSecondUpdate)
             .as("Expected no additional hardware to have been added to the system after second update")
             .hasSize(1);
@@ -153,7 +153,7 @@ class LarsTest {
 
         LarsUtils.manualLarsUpdate();
 
-        final Collection<Hardware> allHardwareAfterFirstUpdate = HardwareResponseParser.getAll(HardwareUtils.HARDWARE_REQUEST_SENDER.getAll());
+        final Collection<Hardware> allHardwareAfterFirstUpdate = HardwareResponseParser.getAll(HARDWARE_REQUEST_SENDER.getAll());
         assertThat(allHardwareAfterFirstUpdate)
             .as("Expected two hardwares to have been added to the system after first update")
             .hasSize(2);
@@ -164,7 +164,7 @@ class LarsTest {
         );
         LarsUtils.manualLarsUpdate();
 
-        final Collection<Hardware> allHardwareAfterSecondUpdate = HardwareResponseParser.getAll(HardwareUtils.HARDWARE_REQUEST_SENDER.getAll());
+        final Collection<Hardware> allHardwareAfterSecondUpdate = HardwareResponseParser.getAll(HARDWARE_REQUEST_SENDER.getAll());
         assertThat(allHardwareAfterFirstUpdate)
             .as("Expected one hardware to have been deleted from the system after second update")
             .hasSize(2);
@@ -184,7 +184,7 @@ class LarsTest {
 
         LarsUtils.manualLarsUpdate();
 
-        final Collection<Hardware> allHardwareAfterFirstUpdate = HardwareResponseParser.getAll(HardwareUtils.HARDWARE_REQUEST_SENDER.getAll());
+        final Collection<Hardware> allHardwareAfterFirstUpdate = HardwareResponseParser.getAll(HARDWARE_REQUEST_SENDER.getAll());
         assertThat(allHardwareAfterFirstUpdate)
             .as("Expected two hardwares to have been added to the system after first update")
             .hasSize(2);
@@ -194,7 +194,7 @@ class LarsTest {
         );
         LarsUtils.manualLarsUpdate();
 
-        final Collection<Hardware> allHardwareAfterSecondUpdate = HardwareResponseParser.getAll(HardwareUtils.HARDWARE_REQUEST_SENDER.getAll());
+        final Collection<Hardware> allHardwareAfterSecondUpdate = HardwareResponseParser.getAll(HARDWARE_REQUEST_SENDER.getAll());
         assertThat(allHardwareAfterSecondUpdate)
             .as("Expected one hardware to have been added to the system after second update")
             .hasSize(3);
@@ -209,7 +209,7 @@ class LarsTest {
 
         LarsUtils.manualLarsUpdate();
 
-        final Collection<Hardware> allHardwareAfterFirstUpdate = HardwareResponseParser.getAll(HardwareUtils.HARDWARE_REQUEST_SENDER.getAll());
+        final Collection<Hardware> allHardwareAfterFirstUpdate = HardwareResponseParser.getAll(HARDWARE_REQUEST_SENDER.getAll());
         assertThat(allHardwareAfterFirstUpdate)
             .as("Expected two hardwares to have been added to the system after first update")
             .hasSize(2);
@@ -219,7 +219,7 @@ class LarsTest {
         );
         LarsUtils.manualLarsUpdate();
 
-        final Collection<Hardware> allHardwareAfterSecondUpdate = HardwareResponseParser.getAll(HardwareUtils.HARDWARE_REQUEST_SENDER.getAll());
+        final Collection<Hardware> allHardwareAfterSecondUpdate = HardwareResponseParser.getAll(HARDWARE_REQUEST_SENDER.getAll());
         assertThat(allHardwareAfterSecondUpdate)
             .as("Expected no hardware to have been added to the system after second update")
             .hasSize(2);
@@ -235,7 +235,7 @@ class LarsTest {
 
         LarsUtils.manualLarsUpdate();
 
-        final List<Hardware> allHardwareAfterFirstUpdate = new ArrayList<>(HardwareResponseParser.getAll(HardwareUtils.HARDWARE_REQUEST_SENDER.getAll()));
+        final List<Hardware> allHardwareAfterFirstUpdate = new ArrayList<>(HardwareResponseParser.getAll(HARDWARE_REQUEST_SENDER.getAll()));
         assertThat(allHardwareAfterFirstUpdate)
             .as("Expected three hardwares to have been added to the system after first update")
             .hasSize(3);
@@ -261,7 +261,7 @@ class LarsTest {
         );
         LarsUtils.manualLarsUpdate();
 
-        final List<Hardware> allHardwareAfterSecondUpdate = new ArrayList<>(HardwareResponseParser.getAll(HardwareUtils.HARDWARE_REQUEST_SENDER.getAll()));
+        final List<Hardware> allHardwareAfterSecondUpdate = new ArrayList<>(HardwareResponseParser.getAll(HARDWARE_REQUEST_SENDER.getAll()));
         assertThat(allHardwareAfterSecondUpdate)
             .as("Expected no hardware to have been added to the system after second update")
             .hasSize(3);

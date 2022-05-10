@@ -24,6 +24,7 @@
 
 package me.zodac.folding.integration.util.rest.request;
 
+import static me.zodac.folding.integration.util.TestAuthenticationData.ADMIN_USER;
 import static me.zodac.folding.integration.util.rest.response.HttpResponseHeaderUtils.getTotalCount;
 
 import java.net.HttpURLConnection;
@@ -32,7 +33,6 @@ import java.util.Collection;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.client.java.request.HardwareRequestSender;
 import me.zodac.folding.client.java.response.HardwareResponseParser;
-import me.zodac.folding.integration.util.TestAuthenticationData;
 import me.zodac.folding.integration.util.TestConstants;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
@@ -56,7 +56,7 @@ public final class HardwareUtils {
      * @throws FoldingRestException thrown if an error occurs creating the {@link Hardware}
      */
     public static Hardware create(final HardwareRequest hardware) throws FoldingRestException {
-        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.create(hardware, TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.create(hardware, ADMIN_USER.userName(), ADMIN_USER.password());
         if (response.statusCode() == HttpURLConnection.HTTP_CREATED) {
             return HardwareResponseParser.create(response);
         }

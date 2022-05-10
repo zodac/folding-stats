@@ -49,7 +49,7 @@ public final class EnvironmentVariableUtils {
 
     /**
      * Returns the {@code variableName} specified if it is set as a {@link System} property or as an environment variable. The order of
-     * the search is check for an environment variable first, then if none is found, check for a system property.
+     * the search is to check for an environment variable first, then if none is found, check for a system property.
      *
      * <p>
      * If neither is set then the default value provided is returned.

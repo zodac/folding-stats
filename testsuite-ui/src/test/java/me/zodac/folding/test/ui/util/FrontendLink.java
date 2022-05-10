@@ -25,7 +25,6 @@
 package me.zodac.folding.test.ui.util;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.stream.Stream;
 
 /**
@@ -59,32 +58,32 @@ public enum FrontendLink {
     RESULTS_URL("http://frontend_dev/results"),
 
     /**
-     * The URL for the hourly team stats page of the frontend UI.
+     * The URL for the hourly team page of the frontend UI.
      */
     TEAM_HOURLY_URL("http://frontend_dev/historic_team_hourly"),
 
     /**
-     * The URL for the daily team stats page of the frontend UI.
+     * The URL for the daily team page of the frontend UI.
      */
     TEAM_DAILY_URL("http://frontend_dev/historic_team_daily"),
 
     /**
-     * The URL for the monthly team stats page of the frontend UI.
+     * The URL for the monthly team page of the frontend UI.
      */
     TEAM_MONTHLY_URL("http://frontend_dev/historic_team_monthly"),
 
     /**
-     * The URL for the hourly user stats page of the frontend UI.
+     * The URL for the hourly user page of the frontend UI.
      */
     USER_HOURLY_URL("http://frontend_dev/historic_user_hourly"),
 
     /**
-     * The URL for the daily user stats page of the frontend UI.
+     * The URL for the daily user page of the frontend UI.
      */
     USER_DAILY_URL("http://frontend_dev/historic_user_daily"),
 
     /**
-     * The URL for the monthly user stats page of the frontend UI.
+     * The URL for the monthly user page of the frontend UI.
      */
     USER_MONTHLY_URL("http://frontend_dev/historic_user_monthly");
 

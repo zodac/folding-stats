@@ -24,6 +24,7 @@
 
 package me.zodac.folding.integration.util.rest.request;
 
+import static me.zodac.folding.integration.util.TestAuthenticationData.ADMIN_USER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.HttpURLConnection;
@@ -31,7 +32,6 @@ import java.net.http.HttpResponse;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.client.java.request.TeamCompetitionStatsRequestSender;
 import me.zodac.folding.client.java.response.TeamCompetitionStatsResponseParser;
-import me.zodac.folding.integration.util.TestAuthenticationData;
 import me.zodac.folding.integration.util.TestConstants;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.tc.AllTeamsSummary;
@@ -141,7 +141,7 @@ public final class TeamCompetitionStatsUtils {
      * @throws FoldingRestException thrown if an error occurs sending the HTTP request
      */
     public static void manuallyResetStats() throws FoldingRestException {
-        final HttpResponse<Void> response = TEAM_COMPETITION_REQUEST_SENDER.manualReset(TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+        final HttpResponse<Void> response = TEAM_COMPETITION_REQUEST_SENDER.manualReset(ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
             .as("Expected a 200_OK")
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -153,7 +153,7 @@ public final class TeamCompetitionStatsUtils {
      * @throws FoldingRestException thrown if an error occurs sending the HTTP request
      */
     public static void manuallyUpdateStats() throws FoldingRestException {
-        final HttpResponse<Void> response = TEAM_COMPETITION_REQUEST_SENDER.manualUpdate(TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+        final HttpResponse<Void> response = TEAM_COMPETITION_REQUEST_SENDER.manualUpdate(ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
             .as("Expected a 200_OK")
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -169,7 +169,7 @@ public final class TeamCompetitionStatsUtils {
     public static void offsetUserPoints(final User user, final long points) throws FoldingRestException {
         final HttpResponse<Void> response =
             TEAM_COMPETITION_REQUEST_SENDER.offset(user.id(), points, Math.round(points * user.hardware().multiplier()), 0,
-                TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+                ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);

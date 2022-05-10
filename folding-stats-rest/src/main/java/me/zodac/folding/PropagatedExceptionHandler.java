@@ -70,7 +70,7 @@ public class PropagatedExceptionHandler {
      * Returned when an object requested through a REST endpoint cannot be found.
      *
      * <p>
-     * Returns a <b>404_NOT_FOUND</b> response with no body.
+     * Returns a <b>404_NOT_FOUND</b> response with no response body.
      *
      * @param e the {@link NotFoundException}
      */
@@ -84,7 +84,7 @@ public class PropagatedExceptionHandler {
      * Returned when the user making a request through a REST endpoint is not authorized for the request.
      *
      * <p>
-     * Returns a <b>403_FORBIDDEN</b> response with no body.
+     * Returns a <b>403_FORBIDDEN</b> response with no response body.
      *
      * @param e the {@link ForbiddenException}
      */
@@ -98,7 +98,7 @@ public class PropagatedExceptionHandler {
      * Returned when the user making a request through a REST endpoint cannot be authenticated for the request.
      *
      * <p>
-     * Returns a <b>401_UNAUTHORIZED</b> response with no body.
+     * Returns a <b>401_UNAUTHORIZED</b> response with no response body.
      *
      * @param e the {@link UnauthorizedException}
      */
@@ -112,7 +112,7 @@ public class PropagatedExceptionHandler {
      * Returned when a service is unavailable to fulfil a request made through a REST endpoint.
      *
      * <p>
-     * Returns a <b>503_SERVICE_UNAVAILABLE</b> response with no body.
+     * Returns a <b>503_SERVICE_UNAVAILABLE</b> response with no response body.
      *
      * @param e the {@link ServiceUnavailableException}
      */
@@ -338,7 +338,7 @@ public class PropagatedExceptionHandler {
      * Returned when a request made to a REST endpoint has an invalid 'Content-Type' header.
      *
      * <p>
-     * Returns a <b>415_UNSUPPORTED_MEDIA_TYPE</b> response with a the invalid 'Content-Type' as the error message body.
+     * Returns a <b>415_UNSUPPORTED_MEDIA_TYPE</b> response with the invalid 'Content-Type' as the error message body.
      *
      * @param e the {@link HttpMediaTypeNotSupportedException}
      * @return the {@link ErrorResponse} body

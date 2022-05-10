@@ -24,6 +24,9 @@
 
 package me.zodac.folding.integration;
 
+import static me.zodac.folding.integration.util.TestAuthenticationData.ADMIN_USER;
+import static me.zodac.folding.integration.util.TestAuthenticationData.INVALID_USERNAME;
+import static me.zodac.folding.integration.util.TestAuthenticationData.READ_ONLY_USER;
 import static me.zodac.folding.rest.api.util.RestUtilConstants.HTTP_CLIENT;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,7 +36,6 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import me.zodac.folding.client.java.request.LoginRequestSender;
-import me.zodac.folding.integration.util.TestAuthenticationData;
 import me.zodac.folding.integration.util.TestConstants;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
@@ -49,7 +51,7 @@ class LoginTest {
 
     @Test
     void whenLoggingIn_givenCredentialsAreCorrect_andUserIsAdmin_thenResponseHas200Status() throws FoldingRestException {
-        final HttpResponse<Void> response = LOGIN_REQUEST_SENDER.loginAsAdmin(TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+        final HttpResponse<Void> response = LOGIN_REQUEST_SENDER.loginAsAdmin(ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -57,7 +59,7 @@ class LoginTest {
 
     @Test
     void whenLoggingIn_givenCredentialsAreCorrect_andUserIsNotAdmin_thenResponseHas403Status() throws FoldingRestException {
-        final HttpResponse<Void> response = LOGIN_REQUEST_SENDER.loginAsAdmin(TestAuthenticationData.READ_ONLY_USER.userName(), TestAuthenticationData.READ_ONLY_USER.password());
+        final HttpResponse<Void> response = LOGIN_REQUEST_SENDER.loginAsAdmin(READ_ONLY_USER.userName(), READ_ONLY_USER.password());
         assertThat(response.statusCode())
             .as("Did not receive a 403_FORBIDDEN HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_FORBIDDEN);
@@ -65,7 +67,7 @@ class LoginTest {
 
     @Test
     void whenLoggingIn_givenCredentialsAreIncorrect_thenResponseHas401Status() throws FoldingRestException {
-        final HttpResponse<Void> response = LOGIN_REQUEST_SENDER.loginAsAdmin(TestAuthenticationData.INVALID_USERNAME.userName(), TestAuthenticationData.INVALID_USERNAME.password());
+        final HttpResponse<Void> response = LOGIN_REQUEST_SENDER.loginAsAdmin(INVALID_USERNAME.userName(), INVALID_USERNAME.password());
         assertThat(response.statusCode())
             .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);

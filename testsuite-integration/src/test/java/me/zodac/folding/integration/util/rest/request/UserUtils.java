@@ -24,6 +24,7 @@
 
 package me.zodac.folding.integration.util.rest.request;
 
+import static me.zodac.folding.integration.util.TestAuthenticationData.ADMIN_USER;
 import static me.zodac.folding.integration.util.rest.response.HttpResponseHeaderUtils.getTotalCount;
 
 import java.net.HttpURLConnection;
@@ -32,7 +33,6 @@ import java.util.Collection;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.client.java.request.UserRequestSender;
 import me.zodac.folding.client.java.response.UserResponseParser;
-import me.zodac.folding.integration.util.TestAuthenticationData;
 import me.zodac.folding.integration.util.TestConstants;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
@@ -61,7 +61,7 @@ public final class UserUtils {
      */
     public static User create(final UserRequest user) throws FoldingRestException {
         StubbedFoldingEndpointUtils.enableUser(user);
-        final HttpResponse<String> response = USER_REQUEST_SENDER.create(user, TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+        final HttpResponse<String> response = USER_REQUEST_SENDER.create(user, ADMIN_USER.userName(), ADMIN_USER.password());
         if (response.statusCode() == HttpURLConnection.HTTP_CREATED) {
             return UserResponseParser.create(response);
         }
@@ -83,7 +83,7 @@ public final class UserUtils {
      */
     public static User update(final int userId, final UserRequest user) throws FoldingRestException {
         StubbedFoldingEndpointUtils.enableUser(user);
-        final HttpResponse<String> response = USER_REQUEST_SENDER.update(userId, user, TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+        final HttpResponse<String> response = USER_REQUEST_SENDER.update(userId, user, ADMIN_USER.userName(), ADMIN_USER.password());
         if (response.statusCode() == HttpURLConnection.HTTP_OK) {
             return UserResponseParser.create(response);
         }
@@ -143,7 +143,7 @@ public final class UserUtils {
      * @throws FoldingRestException thrown if an error occurs retrieving the {@link User}
      */
     public static User getWithPasskey(final int userId) throws FoldingRestException {
-        final HttpResponse<String> response = USER_REQUEST_SENDER.getWithPasskey(userId, TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+        final HttpResponse<String> response = USER_REQUEST_SENDER.getWithPasskey(userId, ADMIN_USER.userName(), ADMIN_USER.password());
         if (response.statusCode() == HttpURLConnection.HTTP_OK) {
             return UserResponseParser.get(response);
         }

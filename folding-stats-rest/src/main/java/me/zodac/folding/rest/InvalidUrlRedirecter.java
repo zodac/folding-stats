@@ -42,7 +42,7 @@ public class InvalidUrlRedirecter {
     private static final String REDIRECT_URL = EnvironmentVariableUtils.getOrDefault("REDIRECT_URL", "https://etf.axihub.ca/");
 
     /**
-     * {@link GetMapping} for the {@code /error} URL (any request with an invalid URL will be sent this this endpoint by Spring).
+     * {@link GetMapping} for the {@code /error} URL (any request with an invalid URL will be sent to this endpoint by Spring).
      *
      * @return {@link HttpStatus#SEE_OTHER} {@link ResponseEntity} with the <b>Location</b> header to the URL defined by <b>REDIRECT_URL</b>
      */

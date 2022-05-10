@@ -24,10 +24,10 @@
 
 package me.zodac.folding.integration;
 
-import static me.zodac.folding.rest.api.util.RestUtilConstants.HTTP_CLIENT;
 import static me.zodac.folding.integration.util.SystemCleaner.cleanSystemForComplexTests;
 import static me.zodac.folding.integration.util.TestConstants.FOLDING_URL;
 import static me.zodac.folding.integration.util.rest.response.HttpResponseHeaderUtils.getEntityTag;
+import static me.zodac.folding.rest.api.util.RestUtilConstants.HTTP_CLIENT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
@@ -42,15 +42,15 @@ import java.util.Collection;
 import java.util.List;
 import me.zodac.folding.client.java.request.HistoricStatsRequestSender;
 import me.zodac.folding.client.java.response.HistoricStatsResponseParser;
-import me.zodac.folding.rest.api.exception.FoldingRestException;
-import me.zodac.folding.rest.api.header.ContentType;
-import me.zodac.folding.rest.api.header.RestHeader;
-import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import me.zodac.folding.integration.util.TestConstants;
 import me.zodac.folding.integration.util.TestGenerator;
 import me.zodac.folding.integration.util.TestStats;
 import me.zodac.folding.integration.util.db.DatabaseUtils;
 import me.zodac.folding.integration.util.rest.request.UserUtils;
+import me.zodac.folding.rest.api.exception.FoldingRestException;
+import me.zodac.folding.rest.api.header.ContentType;
+import me.zodac.folding.rest.api.header.RestHeader;
+import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

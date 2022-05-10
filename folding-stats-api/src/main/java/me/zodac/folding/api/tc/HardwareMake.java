@@ -25,7 +25,6 @@
 package me.zodac.folding.api.tc;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.stream.Stream;
 
 /**

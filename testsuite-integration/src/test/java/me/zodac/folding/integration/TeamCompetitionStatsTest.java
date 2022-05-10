@@ -25,7 +25,6 @@
 package me.zodac.folding.integration;
 
 import static me.zodac.folding.api.util.EncodingUtils.encodeBasicAuthentication;
-import static me.zodac.folding.rest.api.util.RestUtilConstants.HTTP_CLIENT;
 import static me.zodac.folding.integration.util.SystemCleaner.cleanSystemForComplexTests;
 import static me.zodac.folding.integration.util.TestAuthenticationData.ADMIN_USER;
 import static me.zodac.folding.integration.util.TestConstants.FOLDING_URL;
@@ -45,6 +44,7 @@ import static me.zodac.folding.integration.util.rest.request.TeamCompetitionStat
 import static me.zodac.folding.integration.util.rest.request.TeamCompetitionStatsUtils.manuallyUpdateStats;
 import static me.zodac.folding.integration.util.rest.request.TeamCompetitionStatsUtils.offsetUserPoints;
 import static me.zodac.folding.integration.util.rest.request.UserUtils.USER_REQUEST_SENDER;
+import static me.zodac.folding.rest.api.util.RestUtilConstants.HTTP_CLIENT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
@@ -59,6 +59,12 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.client.java.response.TeamCompetitionStatsResponseParser;
+import me.zodac.folding.integration.util.TestConstants;
+import me.zodac.folding.integration.util.rest.request.HardwareUtils;
+import me.zodac.folding.integration.util.rest.request.StubbedFoldingEndpointUtils;
+import me.zodac.folding.integration.util.rest.request.TeamCompetitionStatsUtils;
+import me.zodac.folding.integration.util.rest.request.TeamUtils;
+import me.zodac.folding.integration.util.rest.request.UserUtils;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
@@ -70,12 +76,6 @@ import me.zodac.folding.rest.api.tc.UserSummary;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 import me.zodac.folding.rest.api.util.RestUtilConstants;
-import me.zodac.folding.integration.util.TestConstants;
-import me.zodac.folding.integration.util.rest.request.HardwareUtils;
-import me.zodac.folding.integration.util.rest.request.StubbedFoldingEndpointUtils;
-import me.zodac.folding.integration.util.rest.request.TeamCompetitionStatsUtils;
-import me.zodac.folding.integration.util.rest.request.TeamUtils;
-import me.zodac.folding.integration.util.rest.request.UserUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

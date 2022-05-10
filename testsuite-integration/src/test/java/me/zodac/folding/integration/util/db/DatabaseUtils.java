@@ -31,7 +31,6 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.stream.Collectors;
-
 import me.zodac.folding.integration.util.TestConstants;
 import me.zodac.folding.integration.util.TestStats;
 

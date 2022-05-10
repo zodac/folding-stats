@@ -25,7 +25,6 @@
 package me.zodac.folding.api.tc.change;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.stream.Stream;
 import me.zodac.folding.api.tc.HardwareType;
 

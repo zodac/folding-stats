@@ -28,7 +28,6 @@ import com.google.gson.annotations.SerializedName;
 import java.util.Collection;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -81,11 +80,4 @@ public class LarsGpuResponse {
 
     @SerializedName("date_last_update")
     private String dateOfLastUpdate;
-
-    /**
-     * Default constructor.
-     */
-    public LarsGpuResponse() {
-
-    }
 }

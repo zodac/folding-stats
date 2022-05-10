@@ -25,6 +25,12 @@
 package me.zodac.folding.integration;
 
 import static me.zodac.folding.api.util.EncodingUtils.encodeBasicAuthentication;
+import static me.zodac.folding.integration.util.TestAuthenticationData.ADMIN_USER;
+import static me.zodac.folding.integration.util.TestAuthenticationData.INVALID_PASSWORD;
+import static me.zodac.folding.integration.util.TestAuthenticationData.INVALID_USERNAME;
+import static me.zodac.folding.integration.util.TestAuthenticationData.READ_ONLY_USER;
+import static me.zodac.folding.integration.util.TestConstants.NON_EXISTING_ID;
+import static me.zodac.folding.integration.util.rest.request.UserUtils.USER_REQUEST_SENDER;
 import static me.zodac.folding.rest.api.util.RestUtilConstants.GSON;
 import static me.zodac.folding.rest.api.util.RestUtilConstants.HTTP_CLIENT;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,7 +48,10 @@ import me.zodac.folding.api.tc.User;
 import me.zodac.folding.client.java.response.HardwareResponseParser;
 import me.zodac.folding.client.java.response.TeamResponseParser;
 import me.zodac.folding.client.java.response.UserResponseParser;
-import me.zodac.folding.integration.util.*;
+import me.zodac.folding.integration.util.PasskeyChecker;
+import me.zodac.folding.integration.util.SystemCleaner;
+import me.zodac.folding.integration.util.TestConstants;
+import me.zodac.folding.integration.util.TestGenerator;
 import me.zodac.folding.integration.util.rest.request.HardwareUtils;
 import me.zodac.folding.integration.util.rest.request.StubbedFoldingEndpointUtils;
 import me.zodac.folding.integration.util.rest.request.TeamUtils;
@@ -54,8 +63,6 @@ import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
-import me.zodac.folding.integration.util.TestConstants;
-import me.zodac.folding.integration.util.TestGenerator;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -77,7 +84,7 @@ class UserTest {
 
     @Test
     void whenGettingAllUsers_givenNoUserHasBeenCreated_thenAnEmptyJsonResponseIsReturned_andHas200Status() throws FoldingRestException {
-        final HttpResponse<String> response = UserUtils.USER_REQUEST_SENDER.getAllWithoutPasskeys();
+        final HttpResponse<String> response = USER_REQUEST_SENDER.getAllWithoutPasskeys();
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -97,7 +104,7 @@ class UserTest {
         UserUtils.create(TestGenerator.generateUser());
         UserUtils.create(TestGenerator.generateUser());
 
-        final HttpResponse<String> response = UserUtils.USER_REQUEST_SENDER.getAllWithoutPasskeys();
+        final HttpResponse<String> response = USER_REQUEST_SENDER.getAllWithoutPasskeys();
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -121,7 +128,7 @@ class UserTest {
         UserUtils.create(TestGenerator.generateUser());
         UserUtils.create(TestGenerator.generateUser());
 
-        final HttpResponse<String> response = UserUtils.USER_REQUEST_SENDER.getAllWithPasskeys(TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+        final HttpResponse<String> response = USER_REQUEST_SENDER.getAllWithPasskeys(ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -145,7 +152,7 @@ class UserTest {
         final UserRequest userToCreate = TestGenerator.generateUser();
         StubbedFoldingEndpointUtils.enableUser(userToCreate);
 
-        final HttpResponse<String> response = UserUtils.USER_REQUEST_SENDER.create(userToCreate, TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+        final HttpResponse<String> response = USER_REQUEST_SENDER.create(userToCreate, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
             .as("Did not receive a 201_CREATED HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_CREATED);
@@ -163,7 +170,7 @@ class UserTest {
     void whenGettingUser_givenValidUserId_thenUserIsReturned_andPasskeyIsMasked_andHas200Status() throws FoldingRestException {
         final int userId = UserUtils.create(TestGenerator.generateUser()).id();
 
-        final HttpResponse<String> response = UserUtils.USER_REQUEST_SENDER.get(userId);
+        final HttpResponse<String> response = USER_REQUEST_SENDER.get(userId);
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -179,7 +186,7 @@ class UserTest {
     void whenGettingUserWithPasskey_givenValidUserId_thenUserIsReturned_andPasskeyIsNotMasked_andHas200Status() throws FoldingRestException {
         final int userId = UserUtils.create(TestGenerator.generateUser()).id();
 
-        final HttpResponse<String> response = UserUtils.USER_REQUEST_SENDER.getWithPasskey(userId, TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+        final HttpResponse<String> response = USER_REQUEST_SENDER.getWithPasskey(userId, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -212,7 +219,7 @@ class UserTest {
         StubbedFoldingEndpointUtils.enableUser(userToUpdate);
 
         final HttpResponse<String> response =
-            UserUtils.USER_REQUEST_SENDER.update(createdUser.id(), userToUpdate, TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+            USER_REQUEST_SENDER.update(createdUser.id(), userToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -236,12 +243,12 @@ class UserTest {
         final int userId = UserUtils.create(TestGenerator.generateUser()).id();
         final int initialSize = UserUtils.getNumberOfUsers();
 
-        final HttpResponse<Void> response = UserUtils.USER_REQUEST_SENDER.delete(userId, TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+        final HttpResponse<Void> response = USER_REQUEST_SENDER.delete(userId, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
-        final HttpResponse<String> getResponse = UserUtils.USER_REQUEST_SENDER.get(userId);
+        final HttpResponse<String> getResponse = USER_REQUEST_SENDER.get(userId);
         assertThat(getResponse.statusCode())
             .as("Was able to retrieve the user instance, despite deleting it")
             .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
@@ -259,7 +266,7 @@ class UserTest {
         final int invalidHardwareId = 0;
         final UserRequest user = TestGenerator.generateUserWithHardwareId(invalidHardwareId);
 
-        final HttpResponse<String> response = UserUtils.USER_REQUEST_SENDER.create(user, TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+        final HttpResponse<String> response = USER_REQUEST_SENDER.create(user, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(response.statusCode())
             .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
@@ -275,7 +282,7 @@ class UserTest {
         final UserRequest user = TestGenerator.generateUser();
         StubbedFoldingEndpointUtils.disableUser(user);
 
-        final HttpResponse<String> response = UserUtils.USER_REQUEST_SENDER.create(user, TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+        final HttpResponse<String> response = USER_REQUEST_SENDER.create(user, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(response.statusCode())
             .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
@@ -287,9 +294,9 @@ class UserTest {
         final UserRequest userToCreate = TestGenerator.generateUser();
         StubbedFoldingEndpointUtils.enableUser(userToCreate);
 
-        UserUtils.USER_REQUEST_SENDER.create(userToCreate, TestAuthenticationData.ADMIN_USER.userName(),
-            TestAuthenticationData.ADMIN_USER.password()); // Send one request and ignore it (even if the user already exists, we can verify the conflict with the next one)
-        final HttpResponse<String> response = UserUtils.USER_REQUEST_SENDER.create(userToCreate, TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+        USER_REQUEST_SENDER.create(userToCreate, ADMIN_USER.userName(),
+            ADMIN_USER.password()); // Send one request and ignore it (even if the user already exists, we can verify the conflict with the next one)
+        final HttpResponse<String> response = USER_REQUEST_SENDER.create(userToCreate, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(response.statusCode())
             .as("Did not receive a 409_CONFLICT HTTP response: " + response.body())
@@ -298,7 +305,7 @@ class UserTest {
 
     @Test
     void whenGettingUser_givenNonExistingUserId_thenResponseHas404Status() throws FoldingRestException {
-        final HttpResponse<String> response = UserUtils.USER_REQUEST_SENDER.get(TestConstants.NON_EXISTING_ID);
+        final HttpResponse<String> response = USER_REQUEST_SENDER.get(NON_EXISTING_ID);
 
         assertThat(response.statusCode())
             .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
@@ -333,7 +340,7 @@ class UserTest {
         StubbedFoldingEndpointUtils.enableUser(updatedUser);
 
         final HttpResponse<String> response =
-            UserUtils.USER_REQUEST_SENDER.update(TestConstants.NON_EXISTING_ID, updatedUser, TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+            USER_REQUEST_SENDER.update(NON_EXISTING_ID, updatedUser, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
             .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
@@ -362,7 +369,7 @@ class UserTest {
             .PUT(HttpRequest.BodyPublishers.ofString(GSON.toJson(userToUpdate)))
             .uri(URI.create(TestConstants.FOLDING_URL + "/users/" + TestConstants.INVALID_FORMAT_ID))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
-            .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password()))
+            .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
             .build();
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -378,7 +385,7 @@ class UserTest {
     @Test
     void whenDeletingUser_givenUserIsTeamCaptain_thenResponseHas400Status() throws FoldingRestException {
         final User captainUser = UserUtils.create(TestGenerator.generateCaptainUser());
-        final HttpResponse<Void> response = UserUtils.USER_REQUEST_SENDER.delete(captainUser.id(), TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+        final HttpResponse<Void> response = USER_REQUEST_SENDER.delete(captainUser.id(), ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(response.statusCode())
             .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
@@ -387,7 +394,7 @@ class UserTest {
 
     @Test
     void whenDeletingUser_givenNonExistingUserId_thenResponseHas404Status() throws FoldingRestException {
-        final HttpResponse<Void> response = UserUtils.USER_REQUEST_SENDER.delete(TestConstants.NON_EXISTING_ID, TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+        final HttpResponse<Void> response = USER_REQUEST_SENDER.delete(NON_EXISTING_ID, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(response.statusCode())
             .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
@@ -400,7 +407,7 @@ class UserTest {
             .DELETE()
             .uri(URI.create(TestConstants.FOLDING_URL + "/users/" + TestConstants.INVALID_FORMAT_ID))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
-            .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password()))
+            .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
             .build();
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -429,7 +436,7 @@ class UserTest {
             .build();
 
         final HttpResponse<String> updateResponse =
-            UserUtils.USER_REQUEST_SENDER.update(createdUser.id(), userToUpdate, TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+            USER_REQUEST_SENDER.update(createdUser.id(), userToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(updateResponse.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + updateResponse.body())
@@ -448,14 +455,14 @@ class UserTest {
     void whenGettingUserById_givenRequestUsesPreviousEntityTag_andUserHasNotChanged_thenResponseHas304Status_andNoBody() throws FoldingRestException {
         final int userId = UserUtils.create(TestGenerator.generateUser()).id();
 
-        final HttpResponse<String> response = UserUtils.USER_REQUEST_SENDER.get(userId);
+        final HttpResponse<String> response = USER_REQUEST_SENDER.get(userId);
         assertThat(response.statusCode())
             .as("Expected first request to have a 200_OK HTTP response")
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final String eTag = HttpResponseHeaderUtils.getEntityTag(response);
 
-        final HttpResponse<String> cachedResponse = UserUtils.USER_REQUEST_SENDER.get(userId, eTag);
+        final HttpResponse<String> cachedResponse = USER_REQUEST_SENDER.get(userId, eTag);
         assertThat(cachedResponse.statusCode())
             .as("Expected second request to have a 304_NOT_MODIFIED HTTP response")
             .isEqualTo(HttpURLConnection.HTTP_NOT_MODIFIED);
@@ -470,14 +477,14 @@ class UserTest {
         throws FoldingRestException {
         UserUtils.create(TestGenerator.generateUser());
 
-        final HttpResponse<String> response = UserUtils.USER_REQUEST_SENDER.getAllWithoutPasskeys();
+        final HttpResponse<String> response = USER_REQUEST_SENDER.getAllWithoutPasskeys();
         assertThat(response.statusCode())
             .as("Expected first GET request to have a 200_OK HTTP response")
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final String eTag = HttpResponseHeaderUtils.getEntityTag(response);
 
-        final HttpResponse<String> cachedResponse = UserUtils.USER_REQUEST_SENDER.getAllWithoutPasskeys(eTag);
+        final HttpResponse<String> cachedResponse = USER_REQUEST_SENDER.getAllWithoutPasskeys(eTag);
         assertThat(cachedResponse.statusCode())
             .as("Expected second request to have a 304_NOT_MODIFIED HTTP response")
             .isEqualTo(HttpURLConnection.HTTP_NOT_MODIFIED);
@@ -492,14 +499,14 @@ class UserTest {
         throws FoldingRestException {
         UserUtils.create(TestGenerator.generateUser());
 
-        final HttpResponse<String> response = UserUtils.USER_REQUEST_SENDER.getAllWithPasskeys(TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+        final HttpResponse<String> response = USER_REQUEST_SENDER.getAllWithPasskeys(ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
             .as("Expected first GET request to have a 200_OK HTTP response")
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final String eTag = HttpResponseHeaderUtils.getEntityTag(response);
 
-        final HttpResponse<String> cachedResponse = UserUtils.USER_REQUEST_SENDER.getAllWithPasskeys(eTag, TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+        final HttpResponse<String> cachedResponse = USER_REQUEST_SENDER.getAllWithPasskeys(eTag, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(cachedResponse.statusCode())
             .as("Expected second request to have a 304_NOT_MODIFIED HTTP response")
             .isEqualTo(HttpURLConnection.HTTP_NOT_MODIFIED);
@@ -583,7 +590,7 @@ class UserTest {
         final UserRequest userToCreate = TestGenerator.generateUser();
         StubbedFoldingEndpointUtils.enableUser(userToCreate);
 
-        final HttpResponse<String> response = UserUtils.USER_REQUEST_SENDER.create(userToCreate, TestAuthenticationData.INVALID_USERNAME.userName(), TestAuthenticationData.INVALID_USERNAME.password());
+        final HttpResponse<String> response = USER_REQUEST_SENDER.create(userToCreate, INVALID_USERNAME.userName(), INVALID_USERNAME.password());
         assertThat(response.statusCode())
             .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
@@ -595,7 +602,7 @@ class UserTest {
         final UserRequest userToCreate = TestGenerator.generateUser();
         StubbedFoldingEndpointUtils.enableUser(userToCreate);
 
-        final HttpResponse<String> response = UserUtils.USER_REQUEST_SENDER.create(userToCreate, TestAuthenticationData.INVALID_PASSWORD.userName(), TestAuthenticationData.INVALID_PASSWORD.password());
+        final HttpResponse<String> response = USER_REQUEST_SENDER.create(userToCreate, INVALID_PASSWORD.userName(), INVALID_PASSWORD.password());
         assertThat(response.statusCode())
             .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
@@ -607,7 +614,7 @@ class UserTest {
         final UserRequest userToCreate = TestGenerator.generateUser();
         StubbedFoldingEndpointUtils.enableUser(userToCreate);
 
-        final HttpResponse<String> response = UserUtils.USER_REQUEST_SENDER.create(userToCreate, TestAuthenticationData.READ_ONLY_USER.userName(), TestAuthenticationData.READ_ONLY_USER.password());
+        final HttpResponse<String> response = USER_REQUEST_SENDER.create(userToCreate, READ_ONLY_USER.userName(), READ_ONLY_USER.password());
         assertThat(response.statusCode())
             .as("Did not receive a 403_FORBIDDEN HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_FORBIDDEN);
@@ -619,7 +626,7 @@ class UserTest {
             .POST(HttpRequest.BodyPublishers.noBody())
             .uri(URI.create(TestConstants.FOLDING_URL + "/users"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
-            .header("Authorization", encodeBasicAuthentication(TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password()))
+            .header("Authorization", encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
             .build();
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -637,7 +644,7 @@ class UserTest {
             .PUT(HttpRequest.BodyPublishers.noBody())
             .uri(URI.create(TestConstants.FOLDING_URL + "/users/" + createdUser.id()))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
-            .header("Authorization", encodeBasicAuthentication(TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password()))
+            .header("Authorization", encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
             .build();
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
@@ -676,7 +683,7 @@ class UserTest {
             .build();
 
         final HttpResponse<String> response =
-            UserUtils.USER_REQUEST_SENDER.update(createdUser.id(), userToUpdate, TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+            USER_REQUEST_SENDER.update(createdUser.id(), userToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -709,7 +716,7 @@ class UserTest {
             .build();
 
         final HttpResponse<String> response =
-            HardwareUtils.HARDWARE_REQUEST_SENDER.update(hardware.id(), hardwareUpdateRequest, TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+            HardwareUtils.HARDWARE_REQUEST_SENDER.update(hardware.id(), hardwareUpdateRequest, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -756,7 +763,7 @@ class UserTest {
             .build();
 
         final HttpResponse<String> response =
-            TeamUtils.TEAM_REQUEST_SENDER.update(team.id(), teamUpdateRequest, TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+            TeamUtils.TEAM_REQUEST_SENDER.update(team.id(), teamUpdateRequest, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -784,7 +791,7 @@ class UserTest {
         throws FoldingRestException {
         final User existingCaptain = UserUtils.create(TestGenerator.generateCaptainUser());
 
-        final User retrievedExistingCaptain = UserResponseParser.get(UserUtils.USER_REQUEST_SENDER.get(existingCaptain.id()));
+        final User retrievedExistingCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(existingCaptain.id()));
         assertThat(retrievedExistingCaptain.userIsCaptain())
             .as("Expected existing user to be captain")
             .isTrue();
@@ -802,12 +809,12 @@ class UserTest {
 
         final User newCaptain = UserUtils.create(userRequest);
 
-        final User retrievedOldCaptain = UserResponseParser.get(UserUtils.USER_REQUEST_SENDER.get(existingCaptain.id()));
+        final User retrievedOldCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(existingCaptain.id()));
         assertThat(retrievedOldCaptain.userIsCaptain())
             .as("Expected original user to no longer be captain")
             .isFalse();
 
-        final User retrievedNewCaptain = UserResponseParser.get(UserUtils.USER_REQUEST_SENDER.get(newCaptain.id()));
+        final User retrievedNewCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(newCaptain.id()));
         assertThat(retrievedNewCaptain.userIsCaptain())
             .as("Expected new user to be captain")
             .isTrue();
@@ -828,11 +835,11 @@ class UserTest {
             .teamId(existingCaptain.team().id())
             .build());
 
-        final User retrievedExistingCaptain = UserResponseParser.get(UserUtils.USER_REQUEST_SENDER.get(existingCaptain.id()));
+        final User retrievedExistingCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(existingCaptain.id()));
         assertThat(retrievedExistingCaptain.userIsCaptain())
             .as("Expected existing captain to be captain")
             .isTrue();
-        final User retrievedExistingNonCaptain = UserResponseParser.get(UserUtils.USER_REQUEST_SENDER.get(nonCaptain.id()));
+        final User retrievedExistingNonCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(nonCaptain.id()));
         assertThat(retrievedExistingNonCaptain.userIsCaptain())
             .as("Expected other user to not be captain")
             .isFalse();
@@ -847,11 +854,11 @@ class UserTest {
             .userIsCaptain(true)
             .build());
 
-        final User retrievedOldCaptain = UserResponseParser.get(UserUtils.USER_REQUEST_SENDER.get(existingCaptain.id()));
+        final User retrievedOldCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(existingCaptain.id()));
         assertThat(retrievedOldCaptain.userIsCaptain())
             .as("Expected original captain to no longer be captain")
             .isFalse();
-        final User retrievedNewCaptain = UserResponseParser.get(UserUtils.USER_REQUEST_SENDER.get(newCaptain.id()));
+        final User retrievedNewCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(newCaptain.id()));
         assertThat(retrievedNewCaptain.userIsCaptain())
             .as("Expected other user to be new captain")
             .isTrue();
@@ -864,11 +871,11 @@ class UserTest {
         final User firstTeamCaptain = UserUtils.create(TestGenerator.generateCaptainUser());
         final User secondTeamCaptain = UserUtils.create(TestGenerator.generateCaptainUser());
 
-        final User retrievedFirstTeamCaptain = UserResponseParser.get(UserUtils.USER_REQUEST_SENDER.get(firstTeamCaptain.id()));
+        final User retrievedFirstTeamCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(firstTeamCaptain.id()));
         assertThat(retrievedFirstTeamCaptain.userIsCaptain())
             .as("Expected user of first team to be captain")
             .isTrue();
-        final User retrievedSecondTeamCaptain = UserResponseParser.get(UserUtils.USER_REQUEST_SENDER.get(secondTeamCaptain.id()));
+        final User retrievedSecondTeamCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(secondTeamCaptain.id()));
         assertThat(retrievedSecondTeamCaptain.userIsCaptain())
             .as("Expected user of second team to be captain")
             .isTrue();
@@ -883,11 +890,11 @@ class UserTest {
             .userIsCaptain(firstTeamCaptain.userIsCaptain())
             .build());
 
-        final User retrievedSecondTeamNewCaptain = UserResponseParser.get(UserUtils.USER_REQUEST_SENDER.get(firstUserMovingToSecondTeam.id()));
+        final User retrievedSecondTeamNewCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(firstUserMovingToSecondTeam.id()));
         assertThat(retrievedSecondTeamNewCaptain.userIsCaptain())
             .as("Expected moved user to be captain of new team")
             .isTrue();
-        final User retrievedSecondTeamOldCaptain = UserResponseParser.get(UserUtils.USER_REQUEST_SENDER.get(secondTeamCaptain.id()));
+        final User retrievedSecondTeamOldCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(secondTeamCaptain.id()));
         assertThat(retrievedSecondTeamOldCaptain.userIsCaptain())
             .as("Expected old captain of team to no longer be captain")
             .isFalse();
@@ -902,7 +909,7 @@ class UserTest {
             .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(userToCreate)))
             .uri(URI.create(TestConstants.FOLDING_URL + "/users/"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.TEXT.contentTypeValue())
-            .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password()))
+            .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
             .build();
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());

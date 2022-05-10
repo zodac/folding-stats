@@ -39,27 +39,21 @@ public class UserStatsResetter {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @Autowired
-    private StatsRepository statsRepository;
+    private final StatsRepository statsRepository;
 
-    @Autowired
-    private UserStatsParser userStatsParser;
+    /**
+     * {@link Autowired} constructor.
+     *
+     * @param statsRepository the {@link StatsRepository}
+     */
+    public UserStatsResetter(final StatsRepository statsRepository) {
+        this.statsRepository = statsRepository;
+    }
 
     /**
      * Resets the {@code Team Competition} stats for all {@link User}s.
      *
-     * <p>
-     * Actions performed:
-     * <ol>
-     * <li>Retrieves the current stats for all {@link User}s and updates their initial stats to these current values</li>
-     * <li>Remove offset stats for all users</li>
-     * <li>Delete all retired user stats</li>
-     * <li>Invalidate all stats caches</li>
-     * <li>Execute a new stats update to set all values to <b>0</b></li>
-     * </ol>
-     *
      * @see StatsRepository#resetAllTeamCompetitionUserStats()
-     * @see UserStatsParser#parseTcStatsForUsers(Iterable)
      */
     public void resetTeamCompetitionStats() {
         try {

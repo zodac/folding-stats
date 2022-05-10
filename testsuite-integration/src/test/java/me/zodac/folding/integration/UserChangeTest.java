@@ -25,7 +25,6 @@
 package me.zodac.folding.integration;
 
 import static me.zodac.folding.api.util.EncodingUtils.encodeBasicAuthentication;
-import static me.zodac.folding.rest.api.util.RestUtilConstants.HTTP_CLIENT;
 import static me.zodac.folding.integration.util.PasskeyChecker.assertPasskeyIsHidden;
 import static me.zodac.folding.integration.util.PasskeyChecker.assertPasskeyIsShown;
 import static me.zodac.folding.integration.util.SystemCleaner.cleanSystemForComplexTests;
@@ -34,6 +33,7 @@ import static me.zodac.folding.integration.util.TestConstants.FOLDING_URL;
 import static me.zodac.folding.integration.util.TestGenerator.generateUser;
 import static me.zodac.folding.integration.util.rest.request.UserUtils.USER_REQUEST_SENDER;
 import static me.zodac.folding.integration.util.rest.response.HttpResponseHeaderUtils.getTotalCount;
+import static me.zodac.folding.rest.api.util.RestUtilConstants.HTTP_CLIENT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
@@ -49,14 +49,14 @@ import me.zodac.folding.api.tc.change.UserChangeState;
 import me.zodac.folding.client.java.request.UserChangeRequestSender;
 import me.zodac.folding.client.java.response.UserChangeResponseParser;
 import me.zodac.folding.client.java.response.UserResponseParser;
+import me.zodac.folding.integration.util.TestConstants;
+import me.zodac.folding.integration.util.rest.request.UserUtils;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.tc.request.UserChangeRequest;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 import me.zodac.folding.rest.api.util.RestUtilConstants;
-import me.zodac.folding.integration.util.TestConstants;
-import me.zodac.folding.integration.util.rest.request.UserUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

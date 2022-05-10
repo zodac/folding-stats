@@ -81,7 +81,7 @@ public class OffsetTcStats {
      * which field is not set.
      *
      * <p>
-     * If both {@code pointsOffset} and {@code multipliedPointsOffset} are set (meaning neither are <b>0</b>, or the
+     * If both {@code pointsOffset} and {@code multipliedPointsOffset} are set (meaning neither are <b>0</b>), or the
      * provided {@link OffsetTcStats} instance is equal to {@link OffsetTcStats#empty()}, then no changes are made.
      *
      * @param offsetTcStats the {@link OffsetTcStats} to update

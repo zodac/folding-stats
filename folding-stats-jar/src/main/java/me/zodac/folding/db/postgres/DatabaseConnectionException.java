@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.api.exception;
+package me.zodac.folding.db.postgres;
 
 import java.io.Serial;
 

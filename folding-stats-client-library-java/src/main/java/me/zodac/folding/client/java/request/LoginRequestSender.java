@@ -55,7 +55,7 @@ public record LoginRequestSender(String loginUrl) {
     }
 
     /**
-     * Send a <b>POST</b> request to login to the system as an admin.
+     * Send a <b>POST</b> request to log in to the system as an admin.
      *
      * <p>
      * The username and password will be encoded using {@link EncodingUtils#encodeBasicAuthentication(String, String)}.
@@ -71,7 +71,7 @@ public record LoginRequestSender(String loginUrl) {
     }
 
     /**
-     * Send a <b>POST</b> request to login to the system as an admin.
+     * Send a <b>POST</b> request to log in to the system as an admin.
      *
      * @param encodedUserNameAndPassword the encoded username and password
      * @return the {@link HttpResponse} from the {@link HttpRequest}

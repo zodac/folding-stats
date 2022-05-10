@@ -53,8 +53,8 @@ public record DateTimeUtils(Supplier<OffsetDateTime> timeSupplier) {
      * Creates a {@link DateTimeUtils} with the provided {@link Supplier} for the current UTC time.
      *
      * <p>
-     * Required to allow for testing since we cannot reliable unit test functions that use the actual current time, and instead need to supply a test
-     * time that can be asserted against.
+     * Required to allow for testing since we cannot consistently execute unit test functions that use the actual current time, and instead need to
+     * supply a test time that can be asserted against.
      *
      * <p>
      * Should not be used outside of tests unless absolutely necessary.

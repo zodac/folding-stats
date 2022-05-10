@@ -24,6 +24,8 @@
 
 package me.zodac.folding.integration;
 
+import static me.zodac.folding.integration.util.TestAuthenticationData.ADMIN_USER;
+import static me.zodac.folding.integration.util.TestConstants.FOLDING_URL;
 import static me.zodac.folding.rest.api.util.RestUtilConstants.HTTP_CLIENT;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -43,8 +45,6 @@ import me.zodac.folding.api.tc.result.MonthlyResult;
 import me.zodac.folding.client.java.request.MonthlyResultRequestSender;
 import me.zodac.folding.client.java.response.MonthlyResultResponseParser;
 import me.zodac.folding.integration.util.SystemCleaner;
-import me.zodac.folding.integration.util.TestAuthenticationData;
-import me.zodac.folding.integration.util.TestConstants;
 import me.zodac.folding.integration.util.TestGenerator;
 import me.zodac.folding.integration.util.rest.request.StubbedFoldingEndpointUtils;
 import me.zodac.folding.integration.util.rest.request.TeamCompetitionStatsUtils;
@@ -64,7 +64,7 @@ import org.junit.jupiter.api.Test;
  */
 class MonthlyResultTest {
 
-    private static final MonthlyResultRequestSender MONTHLY_RESULT_REQUEST_SENDER = MonthlyResultRequestSender.createWithUrl(TestConstants.FOLDING_URL);
+    private static final MonthlyResultRequestSender MONTHLY_RESULT_REQUEST_SENDER = MonthlyResultRequestSender.createWithUrl(FOLDING_URL);
 
     @BeforeEach
     void setUp() throws FoldingRestException {
@@ -82,7 +82,7 @@ class MonthlyResultTest {
         UserUtils.create(TestGenerator.generateUserWithTeamIdAndCategory(team.id(), Category.NVIDIA_GPU));
 
         TeamCompetitionStatsUtils.manuallyUpdateStats();
-        MONTHLY_RESULT_REQUEST_SENDER.manualSave(TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+        MONTHLY_RESULT_REQUEST_SENDER.manualSave(ADMIN_USER.userName(), ADMIN_USER.password());
 
         final HttpResponse<String> response = MONTHLY_RESULT_REQUEST_SENDER.getCurrentMonthlyResult();
         assertThat(response.statusCode())
@@ -135,7 +135,7 @@ class MonthlyResultTest {
 
         StubbedFoldingEndpointUtils.addPoints(user, 10_000L);
         TeamCompetitionStatsUtils.manuallyUpdateStats();
-        MONTHLY_RESULT_REQUEST_SENDER.manualSave(TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+        MONTHLY_RESULT_REQUEST_SENDER.manualSave(ADMIN_USER.userName(), ADMIN_USER.password());
 
         final HttpResponse<String> response = MONTHLY_RESULT_REQUEST_SENDER.getCurrentMonthlyResult();
         assertThat(response.statusCode())
@@ -198,7 +198,7 @@ class MonthlyResultTest {
         StubbedFoldingEndpointUtils.addPoints(fourthUser, 30_000L);
 
         TeamCompetitionStatsUtils.manuallyUpdateStats();
-        MONTHLY_RESULT_REQUEST_SENDER.manualSave(TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+        MONTHLY_RESULT_REQUEST_SENDER.manualSave(ADMIN_USER.userName(), ADMIN_USER.password());
 
         final HttpResponse<String> response = MONTHLY_RESULT_REQUEST_SENDER.getCurrentMonthlyResult();
         assertThat(response.statusCode())
@@ -282,11 +282,11 @@ class MonthlyResultTest {
 
         StubbedFoldingEndpointUtils.addPoints(user, 10_000L);
         TeamCompetitionStatsUtils.manuallyUpdateStats();
-        MONTHLY_RESULT_REQUEST_SENDER.manualSave(TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+        MONTHLY_RESULT_REQUEST_SENDER.manualSave(ADMIN_USER.userName(), ADMIN_USER.password());
 
         StubbedFoldingEndpointUtils.addPoints(user, 12_000L);
         TeamCompetitionStatsUtils.manuallyUpdateStats();
-        MONTHLY_RESULT_REQUEST_SENDER.manualSave(TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+        MONTHLY_RESULT_REQUEST_SENDER.manualSave(ADMIN_USER.userName(), ADMIN_USER.password());
 
         final HttpResponse<String> response = MONTHLY_RESULT_REQUEST_SENDER.getCurrentMonthlyResult();
         assertThat(response.statusCode())
@@ -335,7 +335,7 @@ class MonthlyResultTest {
     void whenGettingMonthlyResult_andInvalidMonthIsGiven_thenResponseHas400Status() throws IOException, InterruptedException {
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(TestConstants.FOLDING_URL + "/results/result/2000/invalidMonth"))
+            .uri(URI.create(FOLDING_URL + "/results/result/2000/invalidMonth"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
@@ -349,7 +349,7 @@ class MonthlyResultTest {
     void whenGettingMonthlyResult_andInvalidYearIsGiven_thenResponseHas400Status() throws IOException, InterruptedException {
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(TestConstants.FOLDING_URL + "/results/result/invalidYear/01"))
+            .uri(URI.create(FOLDING_URL + "/results/result/invalidYear/01"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
@@ -361,7 +361,7 @@ class MonthlyResultTest {
 
     @Test
     void whenManualSaveOccurs_givenNoStatsExist_thenRequestSucceeds_andResponseHasA400Status() throws FoldingRestException {
-        final HttpResponse<Void> response = MONTHLY_RESULT_REQUEST_SENDER.manualSave(TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+        final HttpResponse<Void> response = MONTHLY_RESULT_REQUEST_SENDER.manualSave(ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
@@ -371,7 +371,7 @@ class MonthlyResultTest {
     void whenManualSaveOccurs_givenNoAuthentication_thenRequestFails_andResponseHasA401Status() throws IOException, InterruptedException {
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.noBody())
-            .uri(URI.create(TestConstants.FOLDING_URL + "/results/manual/save"))
+            .uri(URI.create(FOLDING_URL + "/results/manual/save"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 

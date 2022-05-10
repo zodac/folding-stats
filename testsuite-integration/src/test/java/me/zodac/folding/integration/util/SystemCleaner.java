@@ -24,6 +24,7 @@
 
 package me.zodac.folding.integration.util;
 
+import static me.zodac.folding.integration.util.TestAuthenticationData.ADMIN_USER;
 import static me.zodac.folding.integration.util.rest.request.HardwareUtils.HARDWARE_REQUEST_SENDER;
 import static me.zodac.folding.integration.util.rest.request.TeamUtils.TEAM_REQUEST_SENDER;
 import static me.zodac.folding.integration.util.rest.request.UserUtils.USER_REQUEST_SENDER;
@@ -31,14 +32,14 @@ import static me.zodac.folding.integration.util.rest.request.UserUtils.USER_REQU
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
-import me.zodac.folding.rest.api.exception.FoldingRestException;
-import me.zodac.folding.rest.api.tc.request.UserRequest;
 import me.zodac.folding.integration.util.db.DatabaseUtils;
 import me.zodac.folding.integration.util.rest.request.HardwareUtils;
 import me.zodac.folding.integration.util.rest.request.StubbedFoldingEndpointUtils;
 import me.zodac.folding.integration.util.rest.request.TeamCompetitionStatsUtils;
 import me.zodac.folding.integration.util.rest.request.TeamUtils;
 import me.zodac.folding.integration.util.rest.request.UserUtils;
+import me.zodac.folding.rest.api.exception.FoldingRestException;
+import me.zodac.folding.rest.api.tc.request.UserRequest;
 
 /**
  * Utility class to clean the system for tests.
@@ -76,7 +77,7 @@ public final class SystemCleaner {
 
         for (final User user : UserUtils.getAll()) {
             if (!user.userIsCaptain()) {
-                USER_REQUEST_SENDER.delete(user.id(), TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+                USER_REQUEST_SENDER.delete(user.id(), ADMIN_USER.userName(), ADMIN_USER.password());
                 continue;
             }
 
@@ -94,16 +95,16 @@ public final class SystemCleaner {
                 .userIsCaptain(false)
                 .build();
 
-            USER_REQUEST_SENDER.update(userWithPasskey.id(), userNoLongerCaptain, TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
-            USER_REQUEST_SENDER.delete(userWithPasskey.id(), TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+            USER_REQUEST_SENDER.update(userWithPasskey.id(), userNoLongerCaptain, ADMIN_USER.userName(), ADMIN_USER.password());
+            USER_REQUEST_SENDER.delete(userWithPasskey.id(), ADMIN_USER.userName(), ADMIN_USER.password());
         }
 
         for (final Team team : TeamUtils.getAll()) {
-            TEAM_REQUEST_SENDER.delete(team.id(), TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+            TEAM_REQUEST_SENDER.delete(team.id(), ADMIN_USER.userName(), ADMIN_USER.password());
         }
 
         for (final Hardware hardware : HardwareUtils.getAll()) {
-            HARDWARE_REQUEST_SENDER.delete(hardware.id(), TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+            HARDWARE_REQUEST_SENDER.delete(hardware.id(), ADMIN_USER.userName(), ADMIN_USER.password());
         }
 
         DatabaseUtils.truncateTableAndResetId("hardware", "users", "teams");

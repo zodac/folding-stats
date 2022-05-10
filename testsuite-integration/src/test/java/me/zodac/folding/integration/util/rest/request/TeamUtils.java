@@ -24,6 +24,7 @@
 
 package me.zodac.folding.integration.util.rest.request;
 
+import static me.zodac.folding.integration.util.TestAuthenticationData.ADMIN_USER;
 import static me.zodac.folding.integration.util.rest.response.HttpResponseHeaderUtils.getTotalCount;
 
 import java.net.HttpURLConnection;
@@ -32,7 +33,6 @@ import java.util.Collection;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.client.java.request.TeamRequestSender;
 import me.zodac.folding.client.java.response.TeamResponseParser;
-import me.zodac.folding.integration.util.TestAuthenticationData;
 import me.zodac.folding.integration.util.TestConstants;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
@@ -56,7 +56,7 @@ public final class TeamUtils {
      * @throws FoldingRestException thrown if an error occurs creating the {@link Team}
      */
     public static Team create(final TeamRequest team) throws FoldingRestException {
-        final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(team, TestAuthenticationData.ADMIN_USER.userName(), TestAuthenticationData.ADMIN_USER.password());
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(team, ADMIN_USER.userName(), ADMIN_USER.password());
         if (response.statusCode() == HttpURLConnection.HTTP_CREATED) {
             return TeamResponseParser.create(response);
         }

@@ -41,7 +41,7 @@ import me.zodac.folding.rest.api.util.RestUtilConstants;
 /**
  * Convenience class to send HTTP requests to the {@code Team Competition} stats REST endpoint.
  *
- * @param statsUrl the URL to the {@code Team Competition} stats} REST endpoint
+ * @param statsUrl the URL to the {@code Team Competition} stats REST endpoint
  */
 public record TeamCompetitionStatsRequestSender(String statsUrl) {
 

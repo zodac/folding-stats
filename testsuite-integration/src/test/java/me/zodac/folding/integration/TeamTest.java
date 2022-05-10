@@ -25,8 +25,6 @@
 package me.zodac.folding.integration;
 
 import static me.zodac.folding.api.util.EncodingUtils.encodeBasicAuthentication;
-import static me.zodac.folding.rest.api.util.RestUtilConstants.GSON;
-import static me.zodac.folding.rest.api.util.RestUtilConstants.HTTP_CLIENT;
 import static me.zodac.folding.integration.util.SystemCleaner.cleanSystemForSimpleTests;
 import static me.zodac.folding.integration.util.TestAuthenticationData.ADMIN_USER;
 import static me.zodac.folding.integration.util.TestAuthenticationData.INVALID_PASSWORD;
@@ -39,6 +37,8 @@ import static me.zodac.folding.integration.util.rest.request.TeamUtils.TEAM_REQU
 import static me.zodac.folding.integration.util.rest.request.TeamUtils.create;
 import static me.zodac.folding.integration.util.rest.response.HttpResponseHeaderUtils.getEntityTag;
 import static me.zodac.folding.integration.util.rest.response.HttpResponseHeaderUtils.getTotalCount;
+import static me.zodac.folding.rest.api.util.RestUtilConstants.GSON;
+import static me.zodac.folding.rest.api.util.RestUtilConstants.HTTP_CLIENT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
@@ -49,14 +49,14 @@ import java.net.http.HttpResponse;
 import java.util.Collection;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.client.java.response.TeamResponseParser;
-import me.zodac.folding.rest.api.exception.FoldingRestException;
-import me.zodac.folding.rest.api.header.ContentType;
-import me.zodac.folding.rest.api.header.RestHeader;
-import me.zodac.folding.rest.api.tc.request.TeamRequest;
 import me.zodac.folding.integration.util.TestConstants;
 import me.zodac.folding.integration.util.TestGenerator;
 import me.zodac.folding.integration.util.rest.request.TeamUtils;
 import me.zodac.folding.integration.util.rest.request.UserUtils;
+import me.zodac.folding.rest.api.exception.FoldingRestException;
+import me.zodac.folding.rest.api.header.ContentType;
+import me.zodac.folding.rest.api.header.RestHeader;
+import me.zodac.folding.rest.api.tc.request.TeamRequest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;

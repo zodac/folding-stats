@@ -522,7 +522,8 @@
                         <excludePackageNames>
                             me.zodac.folding.db.postgres.gen:me.zodac.folding.db.postgres.gen.*
                         </excludePackageNames>
-                        <failOnWarnings>true</failOnWarnings>
+                        <!-- Would prefer this to be true, but annoying false positive with default constructors -->
+                        <failOnWarnings>false</failOnWarnings>
                         <quiet>true</quiet>
                         <serialwarn>true</serialwarn>
                         <skip>${skip-linters}</skip>

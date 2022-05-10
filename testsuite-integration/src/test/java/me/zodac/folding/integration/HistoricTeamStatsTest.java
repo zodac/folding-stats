@@ -24,6 +24,8 @@
 
 package me.zodac.folding.integration;
 
+import static me.zodac.folding.integration.util.TestConstants.FOLDING_URL;
+import static me.zodac.folding.integration.util.TestConstants.INVALID_FORMAT_ID;
 import static me.zodac.folding.rest.api.util.RestUtilConstants.HTTP_CLIENT;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -62,7 +64,7 @@ import org.junit.jupiter.api.Test;
  */
 class HistoricTeamStatsTest {
 
-    private static final HistoricStatsRequestSender HISTORIC_STATS_REQUEST_SENDER = HistoricStatsRequestSender.createWithUrl(TestConstants.FOLDING_URL);
+    private static final HistoricStatsRequestSender HISTORIC_STATS_REQUEST_SENDER = HistoricStatsRequestSender.createWithUrl(FOLDING_URL);
 
     @BeforeAll
     static void setUp() throws FoldingRestException {
@@ -242,8 +244,7 @@ class HistoricTeamStatsTest {
     void whenGettingHourlyStats_givenInvalidTeamId_thenResponseHasA400Status() throws IOException, InterruptedException {
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(
-                TestConstants.FOLDING_URL + "/historic/teams/" + TestConstants.INVALID_FORMAT_ID + '/' + Year.parse("2020") + '/' + Month.of(4) + '/' + 12))
+            .uri(URI.create(FOLDING_URL + "/historic/teams/" + INVALID_FORMAT_ID + '/' + Year.parse("2020") + '/' + Month.of(4) + '/' + 12))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
@@ -433,7 +434,7 @@ class HistoricTeamStatsTest {
     void whenGettingDailyStats_givenInvalidTeamId_thenResponseHas400Status() throws IOException, InterruptedException {
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(TestConstants.FOLDING_URL + "/historic/teams/" + TestConstants.INVALID_FORMAT_ID + '/' + Year.parse("2020") + '/' + Month.of(4)))
+            .uri(URI.create(FOLDING_URL + "/historic/teams/" + INVALID_FORMAT_ID + '/' + Year.parse("2020") + '/' + Month.of(4)))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
@@ -456,7 +457,7 @@ class HistoricTeamStatsTest {
 
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(TestConstants.FOLDING_URL + "/historic/teams/" + team.id() + "/2020/" + invalidMonth))
+            .uri(URI.create(FOLDING_URL + "/historic/teams/" + team.id() + "/2020/" + invalidMonth))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         final HttpRequest request = requestBuilder.build();
@@ -630,7 +631,7 @@ class HistoricTeamStatsTest {
     void whenGettingMonthlyStats_givenInvalidTeamId_thenResponseHas400Status() throws IOException, InterruptedException {
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(TestConstants.FOLDING_URL + "/historic/teams/" + TestConstants.INVALID_FORMAT_ID + '/' + Year.parse("2020")))
+            .uri(URI.create(FOLDING_URL + "/historic/teams/" + INVALID_FORMAT_ID + '/' + Year.parse("2020")))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
@@ -652,7 +653,7 @@ class HistoricTeamStatsTest {
 
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(TestConstants.FOLDING_URL + "/historic/teams/" + team.id() + "/invalidYear"))
+            .uri(URI.create(FOLDING_URL + "/historic/teams/" + team.id() + "/invalidYear"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         final HttpRequest request = requestBuilder.build();

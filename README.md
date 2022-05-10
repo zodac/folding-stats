@@ -1,7 +1,7 @@
 # Folding@Home Team Competition
 
 The *Folding@Home Team Competition* is a competition where members of a [Folding@Home](https://foldingathome.org/) team can group together into
-sub-teams to compete against each other, while still continuing to contribute to their parent team in the
+subteams to compete against each other, while still continuing to contribute to their parent team in the
 overall [Folding@Home donor statistics](https://stats.foldingathome.org/).
 
 A live example of this competition can be seen running for the [ExtremeHW Folding@Home team](https://etf.axihub.ca/).
@@ -43,8 +43,8 @@ A live example of this competition can be seen running for the [ExtremeHW Foldin
 
 # Overview
 
-The idea is that sub-teams will be created with 'categories' of hardware, which will be filled by Folding@Home users. In order to uniquely identify a
-piece of hardware for a user (while still allowing them to contribute under the same Folding@Home user name and team), we require each piece of
+The idea is that subteams will be created with 'categories' of hardware, which will be filled by Folding@Home users. In order to uniquely identify a
+piece of hardware for a user (while still allowing them to contribute under the same Folding@Home username and team), we require each piece of
 hardware to have its own [Folding@Home passkey](https://apps.foldingathome.org/getpasskey). Since it is possible to retrieve the points for a
 user+passkey combination, this allows us to get the points for a single CPU or GPU.
 
@@ -77,7 +77,7 @@ You'll need to have the following installed on your system:
 ## Configuration
 
 You can start by using `git clone` to copy the repository, then configuring the environment variables for your system. Copy the
-existing `.env.template` file and rename it to `.env`. Then open it up and read the instructions, filling in the variables. By default:
+existing `.env.template` file and rename it to `.env`. Then open it up and read the instructions, filling in the variables. Using the default values:
 
 - The competition runs from the 3rd of the month until the end of the month
 - Both the backend and frontend will run using HTTPS
@@ -146,8 +146,8 @@ Restrictions:
 
 #### LARS Hardware Update
 
-We currently only support GPUs as hardware in the system, so we only retrieve the GPU data from LARS. CPU support may be introduced in future, but if
-a CPU is needed, it can be manually added using the UI.
+We currently only support GPUs as hardware in the system, so we only retrieve the GPU data from LARS. CPU support may be introduced in the future, but
+if a CPU is needed, it can be manually added using the UI.
 
 ### Adding Teams
 
@@ -185,29 +185,29 @@ searchable, so no need to scroll through all available options.
 
 A **user** has the following fields:
 
-| Field Name          | Description                                                                                                          |
-|---------------------|----------------------------------------------------------------------------------------------------------------------|
-| _ID_                | System-generated ID for the user                                                                                     |
-| _Folding User Name_ | Folding@Home user name                                                                                               |
-| _Display Name_      | Name to be displayed on the UI for the user (for example, if a user's forum name differs from Folding@Home user name |
-| _Passkey_           | User's passkey **for this specific hardware**                                                                        |
-| _Category_          | Category the user is competing under (see [User Categories](#user-categories) for more info)                         |
-| _Profile Link_      | Link to the user's forum profile                                                                                     |
-| _Live Stats Link_   | Link to the user's live stats link, if exposed through HFM, for example                                              |
-| _Hardware_          | The hardware this user is competing under                                                                            |
-| _Team_              | The team this user is competing under                                                                                |
-| _Is Captain_        | Whether this user is the captain of the team                                                                         |
+| Field Name         | Description                                                                                                          |
+|--------------------|----------------------------------------------------------------------------------------------------------------------|
+| _ID_               | System-generated ID for the user                                                                                     |
+| _Folding UserName_ | Folding@Home user name                                                                                               |
+| _Display Name_     | Name to be displayed on the UI for the user (for example, if a user's forum name differs from Folding@Home user name |
+| _Passkey_          | User's passkey **for this specific hardware**                                                                        |
+| _Category_         | Category the user is competing under (see [User Categories](#user-categories) for more info)                         |
+| _Profile Link_     | Link to the user's forum profile                                                                                     |
+| _Live Stats Link_  | Link to the user's live stats link, if exposed through HFM, for example                                              |
+| _Hardware_         | The hardware this user is competing under                                                                            |
+| _Team_             | The team this user is competing under                                                                                |
+| _Is Captain_       | Whether this user is the captain of the team                                                                         |
 
 Restrictions:
 
-- _Folding User Name_ can only include alphanumeric characters, or underscore (_), hyphen (-) or period (.)
+- _Folding UserName_ can only include alphanumeric characters, or underscore (_), hyphen (-) or period (.)
 - _Display Name_ cannot be empty
 - _Passkey_ must be 32 characters long, and can only include alphanumeric characters
-- The combination of _Folding User Name_ and _Passkey_ must be unique
+- The combination of _Folding UserName_ and _Passkey_ must be unique
 - _Category_ must be valid according to [User Categories](#user-categories), and match the _Hardware Make_ and _Hardware Type_ of the user's hardware
 - _Profile Link_ is optional, but if it is populated, it must be a valid URL
 - _Live Stats Link_ is optional, but if it is populated, it must be a valid URL
-- We expect at least 1 Work Unit to have been successfully completed by the _Folding User Name_ and _Passkey_, to confirm it is being used
+- We expect at least 1 Work Unit to have been successfully completed by the _Folding UserName_ and _Passkey_, to confirm it is being used
 - User cannot be added to a category that already has a maximum number of users
 - User cannot be added to a team that already has the maximum number of users
 
@@ -275,7 +275,7 @@ the new team will get the user with 0 stats.
 
 ## Supported Browsers
 
-Currently the UI is only tested against the latest version of Google Chrome. Hopefully this will be expanded, but for now if you see any issues,
+Currently, the UI is only tested against the latest version of Google Chrome. Hopefully this will be expanded, but for now if you see any issues,
 please try again using Google Chrome.
 
 ## Containers
@@ -286,7 +286,7 @@ To check the status of any containers, the following command can be used:
 
     docker ps -a
 
-This will show any docker containers (running and stopped) on the system and their status. When the system first comes online, you you should see the
+This will show any docker containers (running and stopped) on the system and their status. When the system first comes online, you should see the
 following:
 
     CONTAINER ID   IMAGE                      COMMAND                  CREATED                  STATUS                            PORTS                                           NAMES

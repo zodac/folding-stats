@@ -48,11 +48,19 @@ public class StatsScheduler {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final boolean IS_STATS_SCHEDULED_PARSING_DISABLED = EnvironmentVariableUtils.isDisabled("ENABLE_STATS_SCHEDULED_PARSING");
 
-    @Autowired
-    private FoldingRepository foldingRepository;
+    private final FoldingRepository foldingRepository;
+    private final UserStatsParser userStatsParser;
 
-    @Autowired
-    private UserStatsParser userStatsParser;
+    /**
+     * {@link Autowired} constructor.
+     *
+     * @param foldingRepository the {@link FoldingRepository}
+     * @param userStatsParser   the {@link UserStatsParser}
+     */
+    public StatsScheduler(final FoldingRepository foldingRepository, final UserStatsParser userStatsParser) {
+        this.foldingRepository = foldingRepository;
+        this.userStatsParser = userStatsParser;
+    }
 
     /**
      * Scheduled execution to parse {@code Team Competition} stats.

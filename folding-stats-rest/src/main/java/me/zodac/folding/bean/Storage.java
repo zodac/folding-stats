@@ -81,7 +81,7 @@ public class Storage {
         .maximumSize(STANDARD_CACHE_SIZE)
         .build();
 
-    // Stats caches
+    // Stat caches
     private final Cache<Integer, AllTeamsSummary> allTeamsSummaryCache = Caffeine.newBuilder()
         .maximumSize(1L)
         .expireAfterWrite(STANDARD_CACHE_EXPIRATION_TIME)

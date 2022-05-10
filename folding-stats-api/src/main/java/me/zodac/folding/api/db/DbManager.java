@@ -29,7 +29,6 @@ import java.time.Year;
 import java.util.Collection;
 import java.util.Optional;
 import me.zodac.folding.api.UserAuthenticationResult;
-import me.zodac.folding.api.exception.DatabaseConnectionException;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
@@ -44,9 +43,6 @@ import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 
 /**
  * Interface used to interact with the storage backend and perform CRUD operations.
- *
- * <p>
- * Any method can throw a {@link DatabaseConnectionException} if an error occurs connecting to the underlying DB.
  */
 public interface DbManager {
 
