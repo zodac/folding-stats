@@ -91,6 +91,7 @@ public class TeamCompetitionScheduler {
      * @param userStatsResetter   the {@link UserStatsResetter}
      * @param userStatsStorer     the {@link UserStatsStorer}
      */
+    @Autowired
     public TeamCompetitionScheduler(final LarsHardwareUpdater larsHardwareUpdater,
                                     final UserChangeApplier userChangeApplier,
                                     final UserStatsResetter userStatsResetter,

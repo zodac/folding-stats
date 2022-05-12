@@ -169,7 +169,7 @@ public class StatsRepository {
      */
     public UserStats getTotalStats(final User user) {
         return storage.getTotalStats(user.id())
-                .orElse(UserStats.empty());
+            .orElse(UserStats.empty());
     }
 
     /**
@@ -210,7 +210,7 @@ public class StatsRepository {
      */
     public OffsetTcStats getOffsetStats(final User user) {
         return storage.getOffsetStats(user.id())
-                .orElse(OffsetTcStats.empty());
+            .orElse(OffsetTcStats.empty());
     }
 
     /**
@@ -231,7 +231,7 @@ public class StatsRepository {
      */
     public UserTcStats getHourlyTcStats(final User user) {
         return storage.getHourlyTcStats(user.id())
-                .orElse(UserTcStats.empty(user.id()));
+            .orElse(UserTcStats.empty(user.id()));
     }
 
     /**
@@ -252,7 +252,7 @@ public class StatsRepository {
      */
     public UserStats getInitialStats(final User user) {
         return storage.getInitialStats(user.id())
-                .orElse(UserStats.empty());
+            .orElse(UserStats.empty());
     }
 
     /**
@@ -351,9 +351,9 @@ public class StatsRepository {
 
     private List<TeamSummary> getStatsForTeams() {
         return storage.getAllTeams()
-                .stream()
-                .map(this::getTcTeamResult)
-                .toList();
+            .stream()
+            .map(this::getTcTeamResult)
+            .toList();
     }
 
     private TeamSummary getTcTeamResult(final Team team) {
@@ -363,15 +363,15 @@ public class StatsRepository {
         LOGGER.debug("Found {} users for team '{}': {}", usersOnTeam.size(), team.teamName(), usersOnTeam);
 
         final Collection<UserSummary> activeUserSummaries = usersOnTeam
-                .stream()
-                .map(User::hidePasskey) // Since we are retrieving users from StorageService, the passkeys will need to be explicitly hidden
-                .map(this::getTcStatsForUser)
-                .toList();
+            .stream()
+            .map(User::hidePasskey) // Since we are retrieving users from StorageService, the passkeys will need to be explicitly hidden
+            .map(this::getTcStatsForUser)
+            .toList();
 
         final Collection<RetiredUserSummary> retiredUserSummaries = getAllRetiredUsersForTeam(team)
-                .stream()
-                .map(RetiredUserSummary::createWithDefaultRank)
-                .toList();
+            .stream()
+            .map(RetiredUserSummary::createWithDefaultRank)
+            .toList();
 
         final String captainDisplayName = getCaptainDisplayName(team.teamName(), usersOnTeam);
         return TeamSummary.createWithDefaultRank(team, captainDisplayName, activeUserSummaries, retiredUserSummaries);
@@ -379,22 +379,22 @@ public class StatsRepository {
 
     private Collection<User> getUsersFromTeam(final Team team) {
         return storage.getAllUsers()
-                .stream()
-                .filter(user -> user.team().id() == team.id())
-                .toList();
+            .stream()
+            .filter(user -> user.team().id() == team.id())
+            .toList();
     }
 
     private Collection<RetiredUserTcStats> getAllRetiredUsersForTeam(final Team team) {
         return storage.getAllRetiredUsers()
-                .stream()
-                .filter(retiredUserTcStats -> retiredUserTcStats.getTeamId() == team.id())
-                .toList();
+            .stream()
+            .filter(retiredUserTcStats -> retiredUserTcStats.getTeamId() == team.id())
+            .toList();
     }
 
     private UserSummary getTcStatsForUser(final User user) {
         final UserTcStats userTcStats = getHourlyTcStats(user);
         LOGGER.debug("Results for {}: {} points | {} multiplied points | {} units", user::displayName, userTcStats::getPoints,
-                userTcStats::getMultipliedPoints, userTcStats::getUnits);
+            userTcStats::getMultipliedPoints, userTcStats::getUnits);
         return UserSummary.createWithDefaultRank(user, userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits());
     }
 

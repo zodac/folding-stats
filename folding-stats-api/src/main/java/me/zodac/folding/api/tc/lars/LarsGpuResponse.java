@@ -51,7 +51,6 @@ import lombok.ToString;
  *
  * @see <a href="https://folding.lar.systems/api/gpu_ppd/gpu_rank_list.json">LARS GPU PPD database API</a>
  */
-
 @Getter
 @Setter
 @EqualsAndHashCode

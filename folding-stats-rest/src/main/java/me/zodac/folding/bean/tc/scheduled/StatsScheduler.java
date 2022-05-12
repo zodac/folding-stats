@@ -57,6 +57,7 @@ public class StatsScheduler {
      * @param foldingRepository the {@link FoldingRepository}
      * @param userStatsParser   the {@link UserStatsParser}
      */
+    @Autowired
     public StatsScheduler(final FoldingRepository foldingRepository, final UserStatsParser userStatsParser) {
         this.foldingRepository = foldingRepository;
         this.userStatsParser = userStatsParser;

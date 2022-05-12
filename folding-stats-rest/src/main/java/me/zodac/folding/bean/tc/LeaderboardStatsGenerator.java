@@ -58,6 +58,7 @@ public class LeaderboardStatsGenerator {
      *
      * @param statsRepository the {@link StatsRepository}
      */
+    @Autowired
     public LeaderboardStatsGenerator(final StatsRepository statsRepository) {
         this.statsRepository = statsRepository;
     }

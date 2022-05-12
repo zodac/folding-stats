@@ -71,6 +71,7 @@ public class HistoricStatsEndpoint {
      * @param foldingRepository the {@link FoldingRepository}
      * @param statsRepository   the {@link StatsRepository}
      */
+    @Autowired
     public HistoricStatsEndpoint(final FoldingRepository foldingRepository, final StatsRepository statsRepository) {
         this.foldingRepository = foldingRepository;
         this.statsRepository = statsRepository;

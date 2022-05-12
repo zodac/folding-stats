@@ -53,8 +53,8 @@ public final class Responses {
      * A <b>200_OK</b> {@link ResponseEntity}.
      *
      * <p>
-     * Generally used for cases where an HTTP request is sent to request something from the system, but no response body is required, such as a DELETE
-     * request, for example.
+     * Generally used for cases where an HTTP request is sent to request something from the system, but no response body is required, such as a
+     * <b>DELETE</b> request, for example.
      *
      * @param <E> the response body type
      * @return the <b>200_OK</b> {@link ResponseEntity}

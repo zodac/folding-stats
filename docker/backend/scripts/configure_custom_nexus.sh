@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 nexusUrl="${1}"
 
-# shellcheck disable=SC2236
-if [[ ! -z "${nexusUrl}" ]]; then
+if [[ -n "${nexusUrl}" ]]; then
   mkdir --parents /root/.m2
 
   cat << EOF > /root/.m2/settings.xml

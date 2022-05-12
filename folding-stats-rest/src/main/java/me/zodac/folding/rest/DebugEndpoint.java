@@ -59,6 +59,7 @@ public class DebugEndpoint {
      * @param foldingRepository   the {@link FoldingRepository}
      * @param larsHardwareUpdater the {@link LarsHardwareUpdater}
      */
+    @Autowired
     public DebugEndpoint(final FoldingRepository foldingRepository, final LarsHardwareUpdater larsHardwareUpdater) {
         this.foldingRepository = foldingRepository;
         this.larsHardwareUpdater = larsHardwareUpdater;

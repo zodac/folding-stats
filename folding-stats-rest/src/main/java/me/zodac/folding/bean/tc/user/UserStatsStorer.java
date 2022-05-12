@@ -51,6 +51,7 @@ public class UserStatsStorer {
      * @param leaderboardStatsGenerator the {@link LeaderboardStatsGenerator}
      * @param statsRepository           the {@link StatsRepository}
      */
+    @Autowired
     public UserStatsStorer(final LeaderboardStatsGenerator leaderboardStatsGenerator, final StatsRepository statsRepository) {
         this.leaderboardStatsGenerator = leaderboardStatsGenerator;
         this.statsRepository = statsRepository;

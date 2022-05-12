@@ -46,6 +46,7 @@ public class UserStatsResetter {
      *
      * @param statsRepository the {@link StatsRepository}
      */
+    @Autowired
     public UserStatsResetter(final StatsRepository statsRepository) {
         this.statsRepository = statsRepository;
     }
