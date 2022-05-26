@@ -62,6 +62,7 @@
         <selenium.version>4.1.4</selenium.version>
 
         <!-- Plugin Versions -->
+        <build-helper-maven-plugin.version>3.3.0</build-helper-maven-plugin.version>
         <jmeter-maven-plugin.version>3.5.0</jmeter-maven-plugin.version>
         <maven-clean-plugin.version>3.2.0</maven-clean-plugin.version>
         <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
@@ -285,6 +286,29 @@
     <build>
         <pluginManagement>
             <plugins>
+                <!-- Plugin run at first phase to define properties for use in later phases -->
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>${build-helper-maven-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>timestamp-property</id>
+                            <goals>
+                                <goal>timestamp-property</goal>
+                            </goals>
+                            <configuration>
+                                <name>current-year</name>
+                                <!-- Property config -->
+                                <locale>en_GB</locale>
+                                <pattern>yyyy</pattern>
+                                <timeZone>UTC</timeZone>
+                                <unit>year</unit>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
                 <plugin>
                     <groupId>com.lazerycode.jmeter</groupId>
                     <artifactId>jmeter-maven-plugin</artifactId>
@@ -454,7 +478,9 @@
                     <configuration>
                         <header>${license-file}</header>
                         <properties>
-                            <year>2022</year>
+                            <initial-year>2021</initial-year>
+                            <!--suppress UnresolvedMavenProperty, defined by build-helper-maven-plugin -->
+                            <year>${current-year}</year>
                             <website>zodac.me</website>
                         </properties>
                         <includes>
@@ -527,7 +553,7 @@
                         <excludePackageNames>
                             me.zodac.folding.db.postgres.gen:me.zodac.folding.db.postgres.gen.*
                         </excludePackageNames>
-                        <!-- Would prefer this to be true, but annoying false positive with default constructors -->
+                        <!-- TODO: Would prefer this to be true, but annoying false positive with default constructors -->
                         <failOnWarnings>false</failOnWarnings>
                         <quiet>true</quiet>
                         <serialwarn>true</serialwarn>
@@ -713,6 +739,14 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+
+        <plugins>
+            <!-- Run to create properties for other plugins -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
     </build>
 
     <profiles>
