@@ -42,11 +42,9 @@ RUN minify --verbose --match=\.*.css$ --type=css --output /docker/apache/site/re
 FROM httpd:2.4-alpine
 
 # Updating system packages, and installing any required packages
-# Upgrading expact from 2.4.4-r0 due to CVE-2022-25315
 RUN apk update && apk upgrade && \
     apk add \
-      brotli \
-      expat=2.4.7-r0
+      brotli
 
 # Apache configuration (SSL certs are provided through a volume mount)
 COPY ./docker/frontend/conf/httpd.conf /usr/local/apache2/conf/httpd.conf
