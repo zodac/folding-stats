@@ -275,6 +275,12 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-to-slf4j</artifactId>
+                <version>${log4j.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.seleniumhq.selenium</groupId>
                 <artifactId>selenium-java</artifactId>
                 <version>${selenium.version}</version>
@@ -421,6 +427,7 @@
                         <failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
                         <skipTests>${skip-tests}</skipTests>
                         <includes>
+                            <include>**/*Suite.java</include>
                             <include>**/*Test.java</include>
                         </includes>
                     </configuration>
