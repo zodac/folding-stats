@@ -45,26 +45,30 @@ public final class TestSuiteExecutor {
      * @param testSuite the {@link TestSuite} to execute
      */
     public static void execute(final TestSuite testSuite) {
-        LOGGER.info("Executing test suite: {}", testSuite.getTestSuiteName());
+        final List<TestCase> testCases = testSuite.getTestCases();
+        LOGGER.info("Executing test suite '{}' with {} test cases", testSuite.getTestSuiteName(), testCases.size());
 
-        for (final TestCase testCase : testSuite.getTestCases()) {
-            final List<TestStep> testSteps = testCase.getTestSteps();
-            LOGGER.info("Executing test case:\n{}", testCase.getTestCaseDescription());
-            int testStepNumber = 1;
+        // Using a normal FOR loop instead of an enhanced-FOR loop, allowing us to initialise the TestCase using a TRY-WITH-RESOURCES block
+        for (int testCaseNumber = 1; testCaseNumber <= testCases.size(); testCaseNumber++) {
+            try (final TestCase testCase = testCases.get(testCaseNumber - 1)) {
+                final List<TestStep> testSteps = testCase.getTestSteps();
+                LOGGER.info("Executing test case ({}/{}):\n{}", testCaseNumber, testCases.size(), testCase.getTestCaseDescription());
+                int testStepNumber = 1;
 
-            for (final TestStep testStep : testCase.getTestSteps()) {
-                try {
-                    LOGGER.info("Executing test step ({}/{}):\n{}", testStepNumber, testSteps.size(), testStep.getTestStepDescription());
-                    testStep.execute(testCase.getTestContext());
-                    LOGGER.info("PASSED");
-                    testStepNumber++;
-                } catch (final Exception e) {
-                    LOGGER.info("Test step #{} '{}' failed", testStepNumber, testStep.getTestStepDescription());
-                    throw new AssertionError(e);
+                for (final TestStep testStep : testCase.getTestSteps()) {
+                    try {
+                        LOGGER.info("--> Executing test step ({}/{}) <--\n{}", testStepNumber, testSteps.size(), testStep.getTestStepDescription());
+                        testStep.execute(testCase.getTestContext());
+                        LOGGER.info("PASSED");
+                        testStepNumber++;
+                    } catch (final Exception e) {
+                        LOGGER.info("Test step #{} '{}' failed", testStepNumber, testStep.getTestStepDescription());
+                        throw new AssertionError(e);
+                    }
                 }
-            }
 
-            testCase.getTestContext().clear();
+                LOGGER.info("");
+            }
         }
     }
 }

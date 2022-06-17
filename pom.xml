@@ -37,7 +37,7 @@
         <skip-ui-tests>true</skip-ui-tests>
 
         <!-- 3PP Versions -->
-        <caffeine.version>3.1.0</caffeine.version>
+        <caffeine.version>3.1.1</caffeine.version>
         <commons-text.version>1.9</commons-text.version>
         <gson.version>2.9.0</gson.version>
         <hikariCP.version>5.0.1</hikariCP.version>
@@ -49,17 +49,17 @@
         <logback.version>1.2.9</logback.version>
         <lombok.version>1.18.24</lombok.version>
         <micrometer.version>1.9.0</micrometer.version>
-        <postgresql-driver.version>42.3.6</postgresql-driver.version>
+        <postgresql-driver.version>42.4.0</postgresql-driver.version>
         <resilience4j.version>1.7.1</resilience4j.version>
         <spring-boot.version>2.7.0</spring-boot.version>
 
         <!-- Test 3PP Versions -->
-        <assertj-core.version>3.22.0</assertj-core.version>
+        <assertj-core.version>3.23.1</assertj-core.version>
         <embedded-postgres.version>2.0.0</embedded-postgres.version>
         <embedded-postgres-binaries-bom.version>14.3.0</embedded-postgres-binaries-bom.version>
-        <flyway-core>8.5.11</flyway-core>
+        <flyway-core>8.5.12</flyway-core>
         <junit-jupiter.version>5.9.0-M1</junit-jupiter.version>
-        <selenium.version>4.1.4</selenium.version>
+        <selenium.version>4.2.2</selenium.version>
 
         <!-- Plugin Versions -->
         <build-helper-maven-plugin.version>3.3.0</build-helper-maven-plugin.version>

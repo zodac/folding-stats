@@ -45,12 +45,32 @@ public class TestContext {
     private final Map<String, Object> context = new HashMap<>();
 
     /**
-     * Adds a {@link HttpResponse} to the {@link TestContext}.
+     * Puts an {@link Object} in the {@link TestContext} for the specified {@link String} key.
+     *
+     * @param key   the {@link String} key
+     * @param value the {@link Object} value
+     */
+    public void put(final String key, final Object value) {
+        context.put(key, value);
+    }
+
+    /**
+     * Retrives an {@link Object} from the {@link TestContext} for the specified {@link String} key.
+     *
+     * @param key the {@link String} key
+     * @return the {@link Object} value
+     */
+    public Object get(final String key) {
+        return context.get(key);
+    }
+
+    /**
+     * Puts a {@link HttpResponse} in the {@link TestContext}.
      *
      * @param response the {@link HttpResponse}
      */
-    public void addResponse(final HttpResponse<String> response) {
-        context.put(RESPONSE_KEY, response);
+    public void putResponse(final HttpResponse<String> response) {
+        put(RESPONSE_KEY, response);
     }
 
     /**
@@ -60,7 +80,7 @@ public class TestContext {
      * @throws IllegalStateException if the stored value is an invalid type
      */
     public HttpResponse<String> getResponse() {
-        final Object response = context.get(RESPONSE_KEY);
+        final Object response = get(RESPONSE_KEY);
 
         if (response instanceof HttpResponse r) {
             final Object body = r.body();

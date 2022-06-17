@@ -24,6 +24,7 @@
 
 package me.zodac.folding.test.proto.steps;
 
+import static me.zodac.folding.test.integration.util.TestAuthenticationData.ADMIN_USER;
 import static me.zodac.folding.test.integration.util.rest.request.HardwareUtils.HARDWARE_REQUEST_SENDER;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -32,7 +33,9 @@ import java.net.http.HttpResponse;
 import java.util.Collection;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.client.java.response.HardwareResponseParser;
+import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 import me.zodac.folding.test.framework.TestStep;
+import me.zodac.folding.test.integration.util.TestGenerator;
 import me.zodac.folding.test.integration.util.rest.response.HttpResponseHeaderUtils;
 
 /**
@@ -47,10 +50,21 @@ public final class HardwareSteps {
         "Retrieve all hardware from the system using a GET HTTP request",
         (testContext) -> {
             final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.getAll();
+            testContext.putResponse(response);
+        }
+    );
+
+    /**
+     * Uses the existing {@link me.zodac.folding.test.framework.TestContext#getResponse()} and verifies that a <b>200_OK</b> HTTP status code was
+     * returned.
+     */
+    public static final TestStep VERIFY_GET_ALL_HARDWARE_STATUS_CODE = new TestStep(
+        "Verify the 'get all harware' reponse has a 200_OK HTTP status code",
+        (testContext) -> {
+            final HttpResponse<String> response = testContext.getResponse();
             assertThat(response.statusCode())
                 .as("Did not receive a 200_OK HTTP response: " + response.body())
                 .isEqualTo(HttpURLConnection.HTTP_OK);
-            testContext.addResponse(response);
         }
     );
 
@@ -88,6 +102,48 @@ public final class HardwareSteps {
             assertThat(xTotalCount)
                 .as("Expected number of hardware in JSON response to be the same as value of 'X-Total-Count' header")
                 .isEqualTo(allHardware.size());
+        }
+    );
+
+    /**
+     * Creates a new {@link Hardware} in the system.
+     *
+     * @see TestGenerator#generateHardware()
+     * @see me.zodac.folding.client.java.request.HardwareRequestSender#create(HardwareRequest, String, String)
+     */
+    public static final TestStep CREATE_NEW_HARDWARE = new TestStep(
+        "Create a new hardware on the system",
+        (testContext) -> {
+            final HardwareRequest hardwareToCreate = TestGenerator.generateHardware();
+            final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.create(hardwareToCreate, ADMIN_USER.userName(), ADMIN_USER.password());
+            testContext.putResponse(response);
+        }
+    );
+
+    /**
+     * Uses the existing {@link me.zodac.folding.test.framework.TestContext#getResponse()} to perform the following checks.
+     *
+     * <ol>
+     *     <li>Verifies that a <b>200_OK</b> HTTP status code was returned</li>
+     *     <li>Extract the created {@link Hardware} and verify the fields 'hardwareName', 'displayName' and 'multiplier' match the input JSON</li>
+     * </ol>
+     */
+    public static final TestStep VERIFY_CREATED_HARDWARE = new TestStep(
+        "Verify the 'create harware' response has a 201_CREATED HTTP status code and fields match the input JSON request",
+        (testContext) -> {
+            final HardwareRequest hardwareToCreate = TestGenerator.generateHardware();
+            final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.create(hardwareToCreate, ADMIN_USER.userName(), ADMIN_USER.password());
+            assertThat(response.statusCode())
+                .as("Did not receive a 201_CREATED HTTP response: " + response.body())
+                .isEqualTo(HttpURLConnection.HTTP_CREATED);
+
+            final Hardware actual = HardwareResponseParser.create(response);
+            assertThat(actual)
+                .as("Did not receive created object as JSON response: " + response.body())
+                .extracting("hardwareName", "displayName", "multiplier")
+                .containsExactly(hardwareToCreate.getHardwareName(), hardwareToCreate.getDisplayName(), hardwareToCreate.getMultiplier());
+
+            testContext.putResponse(response);
         }
     );
 
