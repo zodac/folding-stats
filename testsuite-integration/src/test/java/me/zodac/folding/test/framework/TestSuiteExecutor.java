@@ -43,6 +43,10 @@ public final class TestSuiteExecutor {
     /**
      * Execute the {@link TestSuite}.
      *
+     * <p>
+     * The {@link TestCase}s will be executed in the order that they were added to the {@link TestSuite}. Similar for the {@link TestStep}s, they will
+     * be executed in the order they were added to the {@link TestCase}.
+     *
      * @param testSuite the {@link TestSuite} to execute
      */
     public static void execute(final TestSuite testSuite) {

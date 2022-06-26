@@ -35,6 +35,7 @@ import me.zodac.folding.client.java.response.HardwareResponseParser;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 import me.zodac.folding.test.framework.TestStep;
 import me.zodac.folding.test.framework.annotation.NeedsHttpResponse;
+import me.zodac.folding.test.framework.annotation.SavesHttpResponse;
 import me.zodac.folding.test.integration.util.TestGenerator;
 import me.zodac.folding.test.integration.util.rest.response.HttpResponseHeaderUtils;
 
@@ -46,11 +47,9 @@ public final class HardwareSteps {
     /**
      * Retrieves existing {@link Hardware} from the system, and verifies that a <b>200_OK</b> HTTP status code was returned.
      *
-     * <p>
-     * Stores the {@link HttpResponse} in the {@link me.zodac.folding.test.framework.TestContext}.
-     *
      * @param expectedHttpStatusCode the expected HTTP status code
      */
+    @SavesHttpResponse
     public static TestStep getAllHardware(final int expectedHttpStatusCode) {
         return new TestStep(
             "Retrieve all hardware from the system using a GET HTTP request",
@@ -61,6 +60,60 @@ public final class HardwareSteps {
                     .isEqualTo(expectedHttpStatusCode);
 
                 testContext.putHttpResponse(response);
+            }
+        );
+    }
+
+    /**
+     * Retrieves existing {@link Hardware} from the system, and verifies that a <b>200_OK</b> HTTP status code was returned. The {@link Hardware} is
+     * retrieved by 'id', and the 'id' value is retrieved from the previous {@link #createNewHardware(int)} {@link HttpResponse}.
+     *
+     * @param expectedHttpStatusCode the expected HTTP status code
+     */
+    @NeedsHttpResponse
+    public static TestStep getHardwareByIdFromPreviousResponse(final int expectedHttpStatusCode) {
+        return new TestStep(
+            "Retrieves hardware by ID from the system using a GET HTTP request",
+            (testContext) -> {
+                final HttpResponse<String> createResponse = testContext.getHttpResponse();
+                final Hardware createdHardware = HardwareResponseParser.create(createResponse);
+
+                final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get(createdHardware.id());
+                assertThat(response.statusCode())
+                    .as(String.format("Did not receive a %d HTTP response: %s", expectedHttpStatusCode, response.body()))
+                    .isEqualTo(expectedHttpStatusCode);
+
+                final Hardware retrievedHardware = HardwareResponseParser.get(response);
+                assertThat(retrievedHardware)
+                    .as("Retrieved hardware was not the same as the created hardware")
+                    .isEqualTo(createdHardware);
+            }
+        );
+    }
+
+    /**
+     * Retrieves existing {@link Hardware} from the system, and verifies that a <b>200_OK</b> HTTP status code was returned. The {@link Hardware} is
+     * retrieved by 'hardwareName', and the 'hardwareName' value is retrieved from the previous {@link #createNewHardware(int)} {@link HttpResponse}.
+     *
+     * @param expectedHttpStatusCode the expected HTTP status code
+     */
+    @NeedsHttpResponse
+    public static TestStep getHardwareByNameFromPreviousResponse(final int expectedHttpStatusCode) {
+        return new TestStep(
+            "Retrieves hardware by ID from the system using a GET HTTP request",
+            (testContext) -> {
+                final HttpResponse<String> createResponse = testContext.getHttpResponse();
+                final Hardware createdHardware = HardwareResponseParser.create(createResponse);
+
+                final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get(createdHardware.hardwareName());
+                assertThat(response.statusCode())
+                    .as(String.format("Did not receive a %d HTTP response: %s", expectedHttpStatusCode, response.body()))
+                    .isEqualTo(expectedHttpStatusCode);
+
+                final Hardware retrievedHardware = HardwareResponseParser.get(response);
+                assertThat(retrievedHardware)
+                    .as("Retrieved hardware was not the same as the created hardware")
+                    .isEqualTo(createdHardware);
             }
         );
     }
@@ -118,6 +171,7 @@ public final class HardwareSteps {
      * @see TestGenerator#generateHardware()
      * @see me.zodac.folding.client.java.request.HardwareRequestSender#create(HardwareRequest, String, String)
      */
+    @SavesHttpResponse
     public static TestStep createNewHardware(final int expectedHttpStatusCode) {
         return new TestStep(
             "Create a new hardware on the system",
@@ -136,7 +190,6 @@ public final class HardwareSteps {
                     .containsExactly(hardwareToCreate.getHardwareName(), hardwareToCreate.getDisplayName(), hardwareToCreate.getMultiplier());
 
                 testContext.putHttpResponse(response);
-
             }
         );
     }
