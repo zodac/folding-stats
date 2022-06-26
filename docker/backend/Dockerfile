@@ -38,38 +38,36 @@ RUN /tmp/configure_custom_nexus.sh "${NEXUS_URL}"
 # Copy source code
 # Adding and building each module incrementally so we can retain some docker caches when building for tests
 COPY ./pom.xml ./pom.xml
-RUN mvn install -P docker
+RUN mvn -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dhttps.protocols=TLSv1,TLSv1.1,TLSv1.2 install -P docker
 
 COPY ./folding-stats-api/pom.xml ./folding-stats-api/proguard-rules.cfg ./folding-stats-api/
 COPY ./folding-stats-api/src/main ./folding-stats-api/src/main
-RUN cd ./folding-stats-api && mvn install --projects . && cd ..
+RUN cd ./folding-stats-api && mvn -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dhttps.protocols=TLSv1,TLSv1.1,TLSv1.2 install --projects . && cd ..
 
 COPY ./folding-stats-client-library-java/pom.xml ./folding-stats-client-library-java/proguard-rules.cfg ./folding-stats-client-library-java/
 COPY ./folding-stats-client-library-java/src/main ./folding-stats-client-library-java/src/main
-RUN cd ./folding-stats-client-library-java && mvn install --projects . && cd ..
+RUN cd ./folding-stats-client-library-java && mvn -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dhttps.protocols=TLSv1,TLSv1.1,TLSv1.2 install --projects . && cd ..
 
 COPY ./folding-stats-jar/pom.xml ./folding-stats-jar/proguard-rules.cfg ./folding-stats-jar/
 COPY ./folding-stats-jar/src/main ./folding-stats-jar/src/main
-RUN cd ./folding-stats-jar && mvn install --projects . && cd ..
+RUN cd ./folding-stats-jar && mvn -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dhttps.protocols=TLSv1,TLSv1.1,TLSv1.2 install --projects . && cd ..
 
 COPY ./folding-stats-rest/pom.xml ./folding-stats-rest/pom.xml
 COPY ./folding-stats-rest/src/main ./folding-stats-rest/src/main
 
 RUN cd ./folding-stats-rest && \
-    mvn package && \
+    mvn -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dhttps.protocols=TLSv1,TLSv1.1,TLSv1.2 package && \
     mv ./target/folding-stats-rest*.jar /folding-stats.jar
 
 ARG JAVA_VERSION
 FROM openjdk:${JAVA_VERSION}-jdk-slim AS jdk_builder
 
-RUN apt-get update && apt-get install -y binutils
 RUN jlink --compress=2 \
     --no-header-files \
     --no-man-pages \
-    --strip-debug \
+    --strip-java-debug-attributes \
     --add-modules java.se,jdk.crypto.cryptoki,jdk.management,jdk.unsupported \
-    --output /opt/jdk && \
-    strip -p --strip-unneeded /opt/jdk/lib/server/libjvm.so
+    --output /opt/jdk
 
 FROM debian:${DEBIAN_VERSION}-slim AS spring_base
 
@@ -84,14 +82,15 @@ ENV PATH "${PATH}:${JAVA_HOME}/bin"
 # Updating system packages, and installing:
 # - curl to run healthcheck
 # - nano to allow user to edit logback.xml
-RUN apt-get update && apt-get upgrade -y && \
-    apt-get install -y \
-      curl \
-      nano \
-    && \
-    apt-get autoremove && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+#RUN apt-get update && apt-get upgrade -y && \
+#RUN #apt-get update && \
+#    apt-get install -y \
+#      curl \
+#      nano \
+#    && \
+#    apt-get autoremove && \
+#    apt-get clean && \
+#    rm -rf /var/lib/apt/lists/*
 
 # Copy SSL certs
 COPY --from=cert_builder /usr/local/certs/stats/folding-stats.p12 /usr/local/certs/stats/folding-stats.p12

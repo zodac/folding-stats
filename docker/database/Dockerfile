@@ -2,7 +2,7 @@ ARG POSTGRES_VERSION
 FROM postgres:${POSTGRES_VERSION}-alpine
 
 # Updating system packages
-RUN apk update && apk upgrade
+#RUN apk update && apk upgrade
 
 ARG ADMIN_USERNAME
 ARG ADMIN_PASSWORD

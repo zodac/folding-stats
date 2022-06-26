@@ -1,20 +1,20 @@
-ARG NODE_VERSION
-FROM node:${NODE_VERSION}-alpine AS raml
-# Install raml2html
-RUN npm i -g raml2html
-
-ARG REST_ENDPOINT_URL
-ARG TITLE
-
-RUN mkdir /docker/
-WORKDIR /docker/
-
-COPY ./docker/frontend/raml/ /docker/apache/raml/
-
-# Replace environment arguments in RAML files, then build RAML output HTML
-RUN grep -rl '%REST_ENDPOINT_URL%' . | xargs sed -i "s|%REST_ENDPOINT_URL%|${REST_ENDPOINT_URL}|g" && \
-    grep -rl '%TITLE%' . | xargs sed -i "s|%TITLE%|${TITLE}|g" && \
-    raml2html --input /docker/apache/raml/api.raml --output /docker/apache/api.html
+#ARG NODE_VERSION
+#FROM node:${NODE_VERSION}-alpine AS raml
+## Install raml2html
+#RUN npm i -g raml2html
+#
+#ARG REST_ENDPOINT_URL
+#ARG TITLE
+#
+#RUN mkdir /docker/
+#WORKDIR /docker/
+#
+#COPY ./docker/frontend/raml/ /docker/apache/raml/
+#
+## Replace environment arguments in RAML files, then build RAML output HTML
+#RUN grep -rl '%REST_ENDPOINT_URL%' . | xargs sed -i "s|%REST_ENDPOINT_URL%|${REST_ENDPOINT_URL}|g" && \
+#    grep -rl '%TITLE%' . | xargs sed -i "s|%TITLE%|${TITLE}|g" && \
+#    raml2html --input /docker/apache/raml/api.raml --output /docker/apache/api.html
 
 FROM mysocialobservations/docker-tdewolff-minify AS minifier
 
@@ -42,9 +42,10 @@ RUN minify --verbose --match=\.*.css$ --type=css --output /docker/apache/site/re
 FROM httpd:2.4-alpine
 
 # Updating system packages, and installing any required packages
-RUN apk update && apk upgrade && \
-    apk add \
-      brotli
+#RUN apk update && apk upgrade && \
+#RUN apk update && \
+#    apk add \
+#      brotli
 
 # Apache configuration (SSL certs are provided through a volume mount)
 COPY ./docker/frontend/conf/httpd.conf /usr/local/apache2/conf/httpd.conf
@@ -71,7 +72,7 @@ COPY ./docker/frontend/pages/historic/historic_user_hourly.html ./historic_user_
 COPY ./docker/frontend/pages/historic/historic_user_monthly.html ./historic_user_monthly
 
 # Copy the RAML API and minified JS/CSS files
-COPY --from=raml /docker/apache/api.html ./api.html
+#COPY --from=raml /docker/apache/api.html ./api.html
 COPY --from=minifier /docker/apache/site/res ./res
 
 # Add a hash to each of the JS files to avoid Apache caching them after changes are made
