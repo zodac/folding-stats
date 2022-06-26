@@ -24,6 +24,7 @@
 
 package me.zodac.folding.test.integration.util.db;
 
+import java.net.ConnectException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -33,6 +34,7 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 import me.zodac.folding.test.integration.util.TestConstants;
 import me.zodac.folding.test.integration.util.TestStats;
+import org.postgresql.util.PSQLException;
 
 /**
  * Utility class for database tables for tests.
@@ -82,6 +84,11 @@ public final class DatabaseUtils {
             try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
                  final PreparedStatement preparedStatement = connection.prepareStatement(truncateQuery)) {
                 preparedStatement.execute();
+            } catch (final PSQLException e) {
+                if (e.getCause() instanceof ConnectException) {
+                    throw new AssertionError("Unable to connect to test database"); // NOPMD: PreserveStackTrace - Not interested in trace
+                }
+                throw new AssertionError(String.format("Error truncating or resetting table: '%s'", tableName), e);
             } catch (final SQLException e) {
                 throw new AssertionError(String.format("Error truncating or resetting table: '%s'", tableName), e);
             }

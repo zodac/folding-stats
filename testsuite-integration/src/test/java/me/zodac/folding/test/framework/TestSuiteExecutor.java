@@ -25,6 +25,7 @@
 package me.zodac.folding.test.framework;
 
 import java.util.List;
+import me.zodac.folding.test.framework.annotation.NeedsHttpResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -56,13 +57,21 @@ public final class TestSuiteExecutor {
                 int testStepNumber = 1;
 
                 for (final TestStep testStep : testCase.getTestSteps()) {
+                    LOGGER.info("--> Executing test step ({}/{}) <--\n{}", testStepNumber, testSteps.size(), testStep.getTestStepDescription());
+
+                    // If the TestStep requires a HttpResponse but non exists in the TestContext, fail
+                    if (testStep.getClass().isAnnotationPresent(NeedsHttpResponse.class) && !testCase.getTestContext().hasHttpResponse()) {
+                        throw new AssertionError(String.format("Test step #%d '%s' failed due to no HttpResponse being saved in a previous step",
+                            testStepNumber, testStep.getTestStepDescription()));
+                    }
+
                     try {
-                        LOGGER.info("--> Executing test step ({}/{}) <--\n{}", testStepNumber, testSteps.size(), testStep.getTestStepDescription());
                         testStep.execute(testCase.getTestContext());
                         LOGGER.info("PASSED");
                         testStepNumber++;
                     } catch (final Exception e) {
-                        LOGGER.info("Test step #{} '{}' failed", testStepNumber, testStep.getTestStepDescription());
+                        LOGGER.error("Test step #{} '{}' failed", testStepNumber, testStep.getTestStepDescription());
+                        // TODO: Add a system property to allow full stacktraces, but default to simple error message
                         throw new AssertionError(e);
                     }
                 }

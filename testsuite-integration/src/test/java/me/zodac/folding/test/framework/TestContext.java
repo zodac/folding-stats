@@ -40,7 +40,7 @@ import javax.net.ssl.SSLSession;
  */
 public class TestContext {
 
-    private static final String RESPONSE_KEY = "response";
+    private static final String HTTP_RESPONSE_KEY = "response";
 
     private final Map<String, Object> context = new HashMap<>();
 
@@ -67,10 +67,10 @@ public class TestContext {
     /**
      * Puts a {@link HttpResponse} in the {@link TestContext}.
      *
-     * @param response the {@link HttpResponse}
+     * @param httpResponse the {@link HttpResponse}
      */
-    public void putResponse(final HttpResponse<String> response) {
-        put(RESPONSE_KEY, response);
+    public void putHttpResponse(final HttpResponse<String> httpResponse) {
+        put(HTTP_RESPONSE_KEY, httpResponse);
     }
 
     /**
@@ -79,8 +79,8 @@ public class TestContext {
      * @return the {@link HttpResponse}
      * @throws IllegalStateException if the stored value is an invalid type
      */
-    public HttpResponse<String> getResponse() {
-        final Object response = get(RESPONSE_KEY);
+    public HttpResponse<String> getHttpResponse() {
+        final Object response = get(HTTP_RESPONSE_KEY);
 
         if (response instanceof HttpResponse r) {
             final Object body = r.body();
@@ -92,6 +92,15 @@ public class TestContext {
         }
 
         throw new IllegalStateException("Expected 'response' to be of type HttpResponse, instead was: " + response.getClass().getSimpleName());
+    }
+
+    /**
+     * Checks whether the current {@link TestContext} has a saved {@link HttpResponse}.
+     *
+     * @return {@code true} if the {@link TestContext} has a saved {@link HttpResponse}
+     */
+    public boolean hasHttpResponse() {
+        return context.containsKey(HTTP_RESPONSE_KEY);
     }
 
     /**

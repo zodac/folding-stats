@@ -29,6 +29,7 @@ import java.util.List;
 import me.zodac.folding.test.framework.TestCase;
 import me.zodac.folding.test.framework.TestStep;
 import me.zodac.folding.test.framework.TestSuite;
+import me.zodac.folding.test.framework.TestSuiteExecutor;
 
 /**
  * Builder class to construct a {@link TestSuite} with {@link TestCase}s and {@link TestStep}s.
@@ -338,6 +339,17 @@ public class SuiteBuilder {
         public TestSuite build() {
             suiteBuilder.cases.add(buildTestCase());
             return new TestSuite(suiteBuilder.name, suiteBuilder.cases);
+        }
+
+        /**
+         * Uses the supplied values and builds the {@link TestSuite}, then executes it.
+         *
+         * @see me.zodac.folding.test.framework.TestSuiteExecutor
+         */
+        public void execute() {
+            suiteBuilder.cases.add(buildTestCase());
+            final TestSuite testSuite = new TestSuite(suiteBuilder.name, suiteBuilder.cases);
+            TestSuiteExecutor.execute(testSuite);
         }
 
         private TestCase buildTestCase() {

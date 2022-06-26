@@ -22,28 +22,21 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding.test.proto.steps;
+package me.zodac.folding.test.framework.annotation;
 
-import me.zodac.folding.api.tc.Hardware;
-import me.zodac.folding.test.framework.TestStep;
-import me.zodac.folding.test.integration.util.SystemCleaner;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * {@link TestStep}s used to execute test logic on the system.
+ * Marker annotation to define a {@link me.zodac.folding.test.framework.TestStep} that requires a {@link java.net.http.HttpResponse} to have been
+ * saved to the {@link me.zodac.folding.test.framework.TestContext} in a previous {@link me.zodac.folding.test.framework.TestStep}.
  */
-public final class SystemSteps {
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD) // TODO: Possible to limit this only to methods that return TestStep?
+public @interface NeedsHttpResponse {
 
-    /**
-     * Cleans the system of any existing {@link Hardware}, {@link me.zodac.folding.api.tc.Team}s and {@link me.zodac.folding.api.tc.User}s.
-     */
-    public static TestStep cleanSystem() {
-        return new TestStep(
-            "Cleans the system of all hardware, teams and users (and resets the IDs in the database to 1)",
-            (testContext) -> SystemCleaner.cleanSystemForSimpleTests()
-        );
-    }
-
-    private SystemSteps() {
-
-    }
 }
