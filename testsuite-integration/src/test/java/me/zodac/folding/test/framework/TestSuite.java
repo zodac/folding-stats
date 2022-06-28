@@ -24,7 +24,6 @@
 
 package me.zodac.folding.test.framework;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -35,28 +34,17 @@ import java.util.List;
  *
  * <p>
  * Once created, a {@link TestSuite} can be executed using {@link TestSuiteExecutor}.
+ *
+ * @param testSuiteName         the name of the {@link TestSuite}
+ * @param continueOnTestFailure whether to continue executing {@link TestCase}s after one fails
+ * @param fullErrorStackTrace   whether to print the full error stack trace on error, or just the error message
+ * @param testCases             the {@link TestCase}s for the {@link TestSuite}
+ * @param commonTestSteps       the common {@link TestStep}s for the {@link TestSuite}
  */
-public class TestSuite {
-
-    private final String testSuiteName;
-    private final List<TestCase> testCases;
-
-    /**
-     * Creates a {@link TestSuite} instance.
-     *
-     * @param testSuiteName the name of the {@link TestSuite}
-     * @param testCases     the {@link TestCase}s for the {@link TestSuite}
-     */
-    public TestSuite(final String testSuiteName, final List<TestCase> testCases) {
-        this.testSuiteName = testSuiteName;
-        this.testCases = Collections.unmodifiableList(testCases);
-    }
-
-    public String getTestSuiteName() {
-        return testSuiteName;
-    }
-
-    public List<TestCase> getTestCases() {
-        return testCases;
-    }
+public record TestSuite(String testSuiteName,
+                        boolean continueOnTestFailure,
+                        boolean fullErrorStackTrace,
+                        List<TestCase> testCases,
+                        List<TestStep> commonTestSteps
+) {
 }

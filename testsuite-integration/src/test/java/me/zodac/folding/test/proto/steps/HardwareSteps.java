@@ -37,10 +37,9 @@ import me.zodac.folding.test.framework.TestStep;
 import me.zodac.folding.test.framework.annotation.NeedsHttpResponse;
 import me.zodac.folding.test.framework.annotation.SavesHttpResponse;
 import me.zodac.folding.test.integration.util.TestGenerator;
-import me.zodac.folding.test.integration.util.rest.response.HttpResponseHeaderUtils;
 
 /**
- * Common {@link TestStep}s used to execute test logic for {@link Hardware}-based integration tests.
+ * {@link TestStep}s used to execute test logic for {@link Hardware}-based integration tests.
  */
 public final class HardwareSteps {
 
@@ -134,27 +133,6 @@ public final class HardwareSteps {
                 assertThat(allHardware.size())
                     .as("Unexpected number of hardware was returned in the JSON response")
                     .isEqualTo(expectedNumberOfHardware);
-            }
-        );
-    }
-
-    /**
-     * Verifies that the value of the 'X-Total-Count' header is the same as the number of {@link Hardware} in the system.
-     *
-     * @see HttpResponseHeaderUtils#getTotalCount(HttpResponse)
-     */
-    @NeedsHttpResponse
-    public static TestStep checkAllHardwareEqualsTotalCount() {
-        return new TestStep(
-            "Verify that the returned hardware from the system has the same number of entries as the 'X-Total-Count' header value",
-            (testContext) -> {
-                final HttpResponse<String> response = testContext.getHttpResponse();
-                final Collection<Hardware> allHardware = HardwareResponseParser.getAll(response);
-                final int xTotalCount = HttpResponseHeaderUtils.getTotalCount(response);
-
-                assertThat(allHardware.size())
-                    .as("Expected number of hardware in JSON response to be the same as value of 'X-Total-Count' header")
-                    .isEqualTo(xTotalCount);
             }
         );
     }

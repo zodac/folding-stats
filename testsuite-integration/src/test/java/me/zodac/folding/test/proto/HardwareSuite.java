@@ -24,12 +24,12 @@
 
 package me.zodac.folding.test.proto;
 
-import static me.zodac.folding.test.proto.steps.HardwareSteps.checkAllHardwareEqualsTotalCount;
 import static me.zodac.folding.test.proto.steps.HardwareSteps.createNewHardware;
 import static me.zodac.folding.test.proto.steps.HardwareSteps.getAllHardware;
 import static me.zodac.folding.test.proto.steps.HardwareSteps.getHardwareByIdFromPreviousResponse;
 import static me.zodac.folding.test.proto.steps.HardwareSteps.getHardwareByNameFromPreviousResponse;
 import static me.zodac.folding.test.proto.steps.HardwareSteps.verifyNumberOfHardwareOnSystemEquals;
+import static me.zodac.folding.test.proto.steps.RestSteps.verifyTotalCountHeaderValue;
 import static me.zodac.folding.test.proto.steps.SystemSteps.cleanSystem;
 
 import java.net.HttpURLConnection;
@@ -47,23 +47,25 @@ class HardwareSuite {
     void hardwareSuite() {
         new SuiteBuilder()
             .testSuiteName("Hardware Test Suite")
+            .withCommonTestStep(cleanSystem())
+            .withConfiguration()
+                .continueOnFailure()
+                .fullErrorStackTrace(false)
             .withTestCase()
                 .when("Getting all hardware")
                 .given("No hardware exists in the system")
                 .then("An empty JSON response should be returned")
                     .and("The JSON response should have a 200_OK HTTP status code")
                     .and("The 'X-Total-Count' HTTP header should have the same value as the number of hardware in the system")
-                .withTestStep(cleanSystem())
                 .withTestStep(getAllHardware(HttpURLConnection.HTTP_OK))
                 .withTestStep(verifyNumberOfHardwareOnSystemEquals(0))
-                .withTestStep(checkAllHardwareEqualsTotalCount())
+                .withTestStep(verifyTotalCountHeaderValue(0))
             .withTestCase()
                 .when("Creating a hardware")
                 .given("No the input JSON payload is a valid hardware")
                 .then("The created hardware is returned in the response")
                     .and("The JSON response should have a 201_CREATED HTTP status code")
                     .and("The returned hardware should have the same 'hardwareName', 'displayName' and 'multiplier' as the input JSON")
-                .withTestStep(cleanSystem())
                 .withTestStep(createNewHardware(HttpURLConnection.HTTP_CREATED))
                 .withTestStep(getAllHardware(HttpURLConnection.HTTP_OK))
                 .withTestStep(verifyNumberOfHardwareOnSystemEquals(1))
@@ -72,7 +74,6 @@ class HardwareSuite {
                 .given("A hardware with that 'ID' exists on the system")
                 .then("The existing hardware is returned in the response")
                     .and("The JSON response should have a 200_OK HTTP status code")
-                .withTestStep(cleanSystem())
                 .withTestStep(createNewHardware(HttpURLConnection.HTTP_CREATED))
                 .withTestStep(getHardwareByIdFromPreviousResponse(HttpURLConnection.HTTP_OK))
             .withTestCase()
@@ -80,7 +81,6 @@ class HardwareSuite {
                 .given("A hardware with that 'hardwareName' exists on the system")
                 .then("The existing hardware is returned in the response")
                     .and("The JSON response should have a 200_OK HTTP status code")
-                .withTestStep(cleanSystem())
                 .withTestStep(createNewHardware(HttpURLConnection.HTTP_CREATED))
                 .withTestStep(getHardwareByNameFromPreviousResponse(HttpURLConnection.HTTP_OK))
             .execute();

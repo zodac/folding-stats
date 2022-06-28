@@ -45,6 +45,11 @@ import me.zodac.folding.test.framework.TestSuiteExecutor;
  * {@snippet :
  * final TestSuite customTestSuite = new SuiteBuilder()
  *     .testSuiteName("Custom Test Suite")
+ *     .withCommonTestStep(SystemSteps.cleanSystem())
+ *     .withCommonTestStep(SystemSteps.systemIsOnline())
+ *     .withConfiguration()
+ *         .continueOnFailure()
+ *         .fullErrorStackTrace(false)
  *     .withTestCase()
  *         .when("System is deployed")
  *             .and("System is cleaned of existing items")
@@ -54,22 +59,17 @@ import me.zodac.folding.test.framework.TestSuiteExecutor;
  *         .then("A JSON response should be returned")
  *             .and("The JSON response should have a 200 HTTP status code")
  *             .and("The correct resource(s) should be returned")
- *         .withTestStep(SystemSteps.SYSTEM_IS_ONLINE)
- *         .withTestStep(SystemSteps.CLEAN_SYSTEM)
- *         .withTestStep(RestSteps.SEND_GET_REQUEST(1))
- *         .withTestStep(RestSteps.VERIFY_STATUS_CODE(200))
- *         .withTestStep(RestSteps.VERIFY_GET_HARDWARE_ID(1))
+ *         .withTestStep(RestSteps.sendGetRequest(1))
+ *         .withTestStep(RestSteps.verifyStatusCode(200))
+ *         .withTestStep(RestSteps.verifyGetId(1))
  *     .withTestCase()
  *         .when("System is deployed")
  *             .and("System is cleaned of existing items")
  *         .given("A DELETE REST request is send with an non-existing ID")
  *         .then("The DELETE request should fail")
  *             .and("The JSON response should have a 404 HTTP status code")
- *             .and("The returned hardware should have the same 'hardwareName', 'displayName' and 'multiplier' as the input JSON")
- *         .withTestStep(SystemSteps.SYSTEM_IS_ONLINE)
- *         .withTestStep(SystemSteps.CLEAN_SYSTEM)
- *         .withTestStep(RestSteps.SEND_DELETE_REQUEST(-1))
- *         .withTestStep(RestSteps.VERIFY_STATUS_CODE(404))
+ *         .withTestStep(RestSteps.sendDeleteRequest(-1))
+ *         .withTestStep(RestSteps.verifyStatusCode(404))
  *     .build();
  *}
  */
@@ -78,6 +78,11 @@ public class SuiteBuilder {
     // TestSuite fields
     private String name;
     private final List<TestCase> cases = new ArrayList<>();
+    private final List<TestStep> commonTestSteps = new ArrayList<>();
+
+    // TestSuite configuration fields, default values can be overridden
+    private boolean continueOnFailure;
+    private boolean fullErrorStackTrace = true;
 
     // TestCase description fields
     private String given;
@@ -91,7 +96,7 @@ public class SuiteBuilder {
     private final List<String> thenOrs = new ArrayList<>();
 
     /**
-     * Add a name.
+     * Add a name for the {@link TestSuite}.
      *
      * @param name the name of the {@link TestSuite}
      * @return the {@link SuiteBuilder}
@@ -102,12 +107,79 @@ public class SuiteBuilder {
     }
 
     /**
+     * Adds a {@link TestStep} that will be executed as part of every {@link TestCase}.
+     *
+     * @param commonTestStep the common {@link TestStep}
+     * @return the {@link SuiteBuilder}
+     */
+    public SuiteBuilder withCommonTestStep(final TestStep commonTestStep) {
+        commonTestSteps.add(commonTestStep);
+        return this;
+    }
+
+    /**
+     * Optionally allows for the runtime configuration of the {@link TestSuite}.
+     *
+     * @return a {@link SuiteConfigurationBuilder}
+     */
+    public SuiteConfigurationBuilder withConfiguration() {
+        return new SuiteConfigurationBuilder(this);
+    }
+
+    /**
      * Add a {@link TestCase}.
      *
-     * @return the {@link SuiteBuilder}
+     * @return the {@link CaseWhenBuilder}
      */
     public CaseWhenBuilder withTestCase() {
         return new CaseWhenBuilder(this);
+    }
+
+    /**
+     * Inner builder class to optionally define the configuration for the {@link TestSuite}.
+     */
+    public static class SuiteConfigurationBuilder {
+
+        private final SuiteBuilder suiteBuilder;
+
+        /**
+         * Creates a {@link SuiteConfigurationBuilder} instance.
+         *
+         * @param suiteBuilder the parent {@link SuiteBuilder}
+         */
+        public SuiteConfigurationBuilder(final SuiteBuilder suiteBuilder) {
+            this.suiteBuilder = suiteBuilder;
+        }
+
+        /**
+         * Instructs the {@link TestSuite} to continue executing {@link TestCase}s even if one or more fails.
+         *
+         * @return the {@link SuiteConfigurationBuilder}
+         */
+        public SuiteConfigurationBuilder continueOnFailure() {
+            this.suiteBuilder.continueOnFailure = true;
+            return this;
+        }
+
+        /**
+         * Instructs the {@link TestSuite} to print the full error stacktrace when a {@link TestCase} fails.
+         *
+         * @param fullErrorStackTrace whether to print the full error stacktrace on error
+         * @return the {@link SuiteConfigurationBuilder}
+         */
+        public SuiteConfigurationBuilder fullErrorStackTrace(final boolean fullErrorStackTrace) {
+            this.suiteBuilder.fullErrorStackTrace = fullErrorStackTrace;
+            return this;
+        }
+
+        /**
+         * Add a {@link TestCase}.
+         *
+         * @return the {@link CaseWhenBuilder}
+         */
+        public CaseWhenBuilder withTestCase() {
+            return new CaseWhenBuilder(suiteBuilder);
+        }
     }
 
     /**
@@ -338,7 +410,13 @@ public class SuiteBuilder {
          */
         public TestSuite build() {
             suiteBuilder.cases.add(buildTestCase());
-            return new TestSuite(suiteBuilder.name, suiteBuilder.cases);
+            return new TestSuite(
+                suiteBuilder.name,
+                suiteBuilder.continueOnFailure,
+                suiteBuilder.fullErrorStackTrace,
+                suiteBuilder.cases,
+                suiteBuilder.commonTestSteps
+            );
         }
 
         /**
@@ -347,8 +425,7 @@ public class SuiteBuilder {
          * @see me.zodac.folding.test.framework.TestSuiteExecutor
          */
         public void execute() {
-            suiteBuilder.cases.add(buildTestCase());
-            final TestSuite testSuite = new TestSuite(suiteBuilder.name, suiteBuilder.cases);
+            final TestSuite testSuite = build();
             TestSuiteExecutor.execute(testSuite);
         }
 
@@ -372,5 +449,4 @@ public class SuiteBuilder {
             return testCase;
         }
     }
-
 }

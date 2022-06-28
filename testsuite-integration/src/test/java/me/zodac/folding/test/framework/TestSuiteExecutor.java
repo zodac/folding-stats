@@ -50,37 +50,67 @@ public final class TestSuiteExecutor {
      * @param testSuite the {@link TestSuite} to execute
      */
     public static void execute(final TestSuite testSuite) {
-        final List<TestCase> testCases = testSuite.getTestCases();
-        LOGGER.info("Executing test suite '{}' with {} test cases", testSuite.getTestSuiteName(), testCases.size());
+        final List<TestCase> testCases = testSuite.testCases();
+        final List<TestStep> commonTestSteps = testSuite.commonTestSteps();
+        LOGGER.info("Executing test suite '{}' with {} test cases", testSuite.testSuiteName(), testCases.size());
 
         // Using a normal FOR loop instead of an enhanced-FOR loop, allowing us to initialise the TestCase using a TRY-WITH-RESOURCES block
         for (int testCaseNumber = 1; testCaseNumber <= testCases.size(); testCaseNumber++) {
             try (final TestCase testCase = testCases.get(testCaseNumber - 1)) {
                 final List<TestStep> testSteps = testCase.getTestSteps();
                 LOGGER.info("Executing test case ({}/{}):\n{}", testCaseNumber, testCases.size(), testCase.getTestCaseDescription());
-                int testStepNumber = 1;
 
-                for (final TestStep testStep : testCase.getTestSteps()) {
-                    LOGGER.info("--> Executing test step ({}/{}) <--\n{}", testStepNumber, testSteps.size(), testStep.getTestStepDescription());
-
-                    // If the TestStep requires a HttpResponse but non exists in the TestContext, fail
-                    if (testStep.getClass().isAnnotationPresent(NeedsHttpResponse.class) && !testCase.getTestContext().hasHttpResponse()) {
-                        throw new AssertionError(String.format("Test step #%d '%s' failed due to no HttpResponse being saved in a previous step",
-                            testStepNumber, testStep.getTestStepDescription()));
-                    }
-
-                    try {
-                        testStep.execute(testCase.getTestContext());
-                        LOGGER.info("PASSED");
-                        testStepNumber++;
-                    } catch (final Exception e) {
-                        LOGGER.error("Test step #{} '{}' failed", testStepNumber, testStep.getTestStepDescription());
-                        // TODO: Add a system property to allow full stacktraces, but default to simple error message
-                        throw new AssertionError(e);
-                    }
-                }
+                executeCommonTestSteps(testSuite, commonTestSteps, testCase);
+                executeTestCaseTestSteps(testSuite, testCase, testSteps);
 
                 LOGGER.info("");
+            } catch (final Exception | AssertionError e) {
+                if (!testSuite.continueOnTestFailure()) {
+                    throw e;
+                }
+            }
+        }
+    }
+
+    private static void executeCommonTestSteps(final TestSuite testSuite, final List<TestStep> commonTestSteps, final TestCase testCase) {
+        int commonTestStepNumber = 1;
+        for (final TestStep commonTestStep : commonTestSteps) {
+            LOGGER.info("--> Executing common test step ({}/{}) <--\n{}", commonTestStepNumber, commonTestSteps.size(),
+                commonTestStep.getTestStepDescription());
+
+            executeTestStep(testSuite, commonTestStep, testCase.getTestContext(), commonTestStepNumber++);
+        }
+    }
+
+    private static void executeTestCaseTestSteps(final TestSuite testSuite, final TestCase testCase, final List<TestStep> testSteps) {
+        int testStepNumber = 1;
+        for (final TestStep testStep : testCase.getTestSteps()) {
+            LOGGER.info("--> Executing test step ({}/{}) <--\n{}", testStepNumber, testSteps.size(), testStep.getTestStepDescription());
+
+            // If the TestStep requires a HttpResponse but non exists in the TestContext, fail
+            if (testStep.getClass().isAnnotationPresent(NeedsHttpResponse.class) && !testCase.getTestContext().hasHttpResponse()) {
+                throw new AssertionError(String.format("Test step #%d '%s' failed due to no HttpResponse being saved in a previous step",
+                    testStepNumber, testStep.getTestStepDescription()));
+            }
+
+            executeTestStep(testSuite, testStep, testCase.getTestContext(), testStepNumber++);
+        }
+    }
+
+    private static void executeTestStep(final TestSuite testSuite,
+                                        final TestStep testStep,
+                                        final TestContext testContext,
+                                        final int currentTestStepNumber) {
+        try {
+            testStep.execute(testContext);
+            LOGGER.info("PASSED");
+        } catch (final Exception e) {
+            LOGGER.error("Test step #{} '{}' failed", currentTestStepNumber, testStep.getTestStepDescription());
+
+            if (testSuite.fullErrorStackTrace()) {
+                throw new AssertionError(e);
+            } else {
+                throw new AssertionError(e.getMessage());  // NOPMD: PreserveStackTrace - Not interested in trace
             }
         }
     }
