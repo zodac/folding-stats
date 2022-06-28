@@ -44,7 +44,7 @@ import me.zodac.folding.test.integration.util.TestGenerator;
 public final class HardwareSteps {
 
     /**
-     * Retrieves existing {@link Hardware} from the system, and verifies that a <b>200_OK</b> HTTP status code was returned.
+     * Retrieves existing {@link Hardware} from the system, and verifies that the expected HTTP status code was returned.
      *
      * @param expectedHttpStatusCode the expected HTTP status code
      */
@@ -64,7 +64,7 @@ public final class HardwareSteps {
     }
 
     /**
-     * Retrieves existing {@link Hardware} from the system, and verifies that a <b>200_OK</b> HTTP status code was returned. The {@link Hardware} is
+     * Retrieves existing {@link Hardware} from the system, and verifies that the expected HTTP status code was returned. The {@link Hardware} is
      * retrieved by 'id', and the 'id' value is retrieved from the previous {@link #createNewHardware(int)} {@link HttpResponse}.
      *
      * @param expectedHttpStatusCode the expected HTTP status code
@@ -91,7 +91,7 @@ public final class HardwareSteps {
     }
 
     /**
-     * Retrieves existing {@link Hardware} from the system, and verifies that a <b>200_OK</b> HTTP status code was returned. The {@link Hardware} is
+     * Retrieves existing {@link Hardware} from the system, and verifies that the expected HTTP status code was returned. The {@link Hardware} is
      * retrieved by 'hardwareName', and the 'hardwareName' value is retrieved from the previous {@link #createNewHardware(int)} {@link HttpResponse}.
      *
      * @param expectedHttpStatusCode the expected HTTP status code
