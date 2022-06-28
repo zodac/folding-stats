@@ -39,6 +39,7 @@ import org.postgresql.util.PSQLException;
 /**
  * Utility class for database tables for tests.
  */
+// TODO: Replace AssertionErrors, not the right place for them
 public final class DatabaseUtils {
 
     private static final String JDBC_CONNECTION_URL = "jdbc:postgresql://" + TestConstants.TEST_IP_ADDRESS + ":5433/folding_db";

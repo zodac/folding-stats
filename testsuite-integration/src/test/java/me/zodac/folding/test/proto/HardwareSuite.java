@@ -62,7 +62,7 @@ class HardwareSuite {
                 .withTestStep(verifyTotalCountHeaderValue(0))
             .withTestCase()
                 .when("Creating a hardware")
-                .given("No the input JSON payload is a valid hardware")
+                .given("The input JSON payload is a valid hardware")
                 .then("The created hardware is returned in the response")
                     .and("The JSON response should have a 201_CREATED HTTP status code")
                     .and("The returned hardware should have the same 'hardwareName', 'displayName' and 'multiplier' as the input JSON")

@@ -39,10 +39,11 @@ public final class RestSteps {
     /**
      * Verifies that the value of the 'X-Total-Count' header is matches the expected value.
      *
+     * @param expectedTotalCountValue the expected value of the 'X-Total-Count' header
      * @see HttpResponseHeaderUtils#getTotalCount(HttpResponse)
      */
     @NeedsHttpResponse
-    public static TestStep verifyTotalCountHeaderValue(final int expectedValue) {
+    public static TestStep verifyTotalCountHeaderValue(final int expectedTotalCountValue) {
         return new TestStep(
             "Verify that 'X-Total-Counter' header value has the expected number of entries",
             (testContext) -> {
@@ -51,7 +52,7 @@ public final class RestSteps {
 
                 assertThat(xTotalCount)
                     .as("Unexpected value for 'X-Total-Count' header")
-                    .isEqualTo(expectedValue);
+                    .isEqualTo(expectedTotalCountValue);
             }
         );
     }
