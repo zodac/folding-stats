@@ -103,10 +103,6 @@ public final class EncodingUtils {
     }
 
     private static Map<String, String> decodeAuthentication(final String encodedUserNameAndPassword) {
-        if (encodedUserNameAndPassword == null) {
-            throw new IllegalArgumentException("Cannot decode null");
-        }
-
         final String decodedUserNameAndPassword = new String(Base64.getDecoder().decode(encodedUserNameAndPassword), StandardCharsets.ISO_8859_1);
 
         if (!decodedUserNameAndPassword.contains(DECODED_USERNAME_PASSWORD_DELIMITER)) {

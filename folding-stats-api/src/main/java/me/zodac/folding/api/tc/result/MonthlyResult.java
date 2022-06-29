@@ -71,8 +71,8 @@ public record MonthlyResult(List<TeamLeaderboardEntry> teamLeaderboard,
      * @param userCategoryLeaderboard the leaderboard for {@link me.zodac.folding.api.tc.User} {@link Category}s
      * @return the created {@link MonthlyResult}
      */
-    public static MonthlyResult create(final List<TeamLeaderboardEntry> teamLeaderboard,
-                                       final Map<Category, List<UserCategoryLeaderboardEntry>> userCategoryLeaderboard) {
+    public static MonthlyResult createWithCurrentDateTime(final List<TeamLeaderboardEntry> teamLeaderboard,
+                                                          final Map<Category, List<UserCategoryLeaderboardEntry>> userCategoryLeaderboard) {
         return create(teamLeaderboard, userCategoryLeaderboard, DATE_TIME_UTILS.currentUtcLocalDateTime());
     }
 
@@ -91,7 +91,7 @@ public record MonthlyResult(List<TeamLeaderboardEntry> teamLeaderboard,
             emptyCategoryResult.put(category, Collections.emptyList());
         }
 
-        return create(Collections.emptyList(), emptyCategoryResult);
+        return createWithCurrentDateTime(Collections.emptyList(), emptyCategoryResult);
     }
 
     /**
@@ -106,12 +106,11 @@ public record MonthlyResult(List<TeamLeaderboardEntry> teamLeaderboard,
      * @return the updated {@link MonthlyResult}
      */
     public static MonthlyResult updateWithEmptyCategories(final MonthlyResult monthlyResult) {
-        final Map<Category, List<UserCategoryLeaderboardEntry>> categories = new EnumMap<>(monthlyResult.userCategoryLeaderboard());
+        final Map<Category, List<UserCategoryLeaderboardEntry>> userCategoryLeaderboard = monthlyResult.userCategoryLeaderboard();
+        final Map<Category, List<UserCategoryLeaderboardEntry>> categories = new EnumMap<>(Category.class);
 
         for (final Category category : Category.getAllValues()) {
-            if (!categories.containsKey(category)) {
-                categories.put(category, Collections.emptyList());
-            }
+            categories.put(category, userCategoryLeaderboard.getOrDefault(category, Collections.emptyList()));
         }
 
         return create(monthlyResult.teamLeaderboard, categories, monthlyResult.utcTimestamp);

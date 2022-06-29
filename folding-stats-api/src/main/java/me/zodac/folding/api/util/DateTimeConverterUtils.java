@@ -38,6 +38,7 @@ import java.util.Locale;
  */
 public final class DateTimeConverterUtils {
 
+    private static final int FIRST_DAY = 1;
     private static final int FIRST_HOUR = 0;
     private static final int FIRST_MINUTE = 0;
     private static final int FIRST_SECOND = 0;
@@ -60,7 +61,7 @@ public final class DateTimeConverterUtils {
      * @return the {@link LocalDateTime}
      */
     public static LocalDateTime getLocalDateTimeOf(final Year year, final Month month) {
-        return LocalDateTime.of(year.getValue(), month.getValue(), 1, 0, 0, 0);
+        return LocalDateTime.of(year.getValue(), month.getValue(), FIRST_DAY, FIRST_HOUR, FIRST_MINUTE, FIRST_SECOND);
     }
 
     /**

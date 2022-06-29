@@ -93,7 +93,7 @@ public class LeaderboardStatsGenerator {
             final long diffToLeader = leader.getTeamMultipliedPoints() - teamSummary.getTeamMultipliedPoints();
             final long diffToNext = teamAhead.getTeamMultipliedPoints() - teamSummary.getTeamMultipliedPoints();
 
-            final int rank = i + 1;
+            final int rank = i + 1; // TODO: Can we use the rank from the teamSummary?
             final TeamLeaderboardEntry teamLeaderboardEntry = TeamLeaderboardEntry.create(teamSummary, rank, diffToLeader, diffToNext);
             teamSummaries.add(teamLeaderboardEntry);
         }

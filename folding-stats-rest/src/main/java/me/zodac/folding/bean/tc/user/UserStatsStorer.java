@@ -625,7 +625,7 @@ public class UserStatsStorer {
      * </pre>
      */
     public void storeMonthlyResult() {
-        final MonthlyResult monthlyResult = MonthlyResult.create(
+        final MonthlyResult monthlyResult = MonthlyResult.createWithCurrentDateTime(
             leaderboardStatsGenerator.generateTeamLeaderboards(),
             leaderboardStatsGenerator.generateUserCategoryLeaderboards()
         );

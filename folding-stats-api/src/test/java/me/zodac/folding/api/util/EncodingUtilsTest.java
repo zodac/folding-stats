@@ -27,6 +27,8 @@ package me.zodac.folding.api.util;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -80,14 +82,16 @@ class EncodingUtilsTest {
     }
 
     @Test
-    void whenDecodingBasicAuthentication_givenInputIsInvalidEncoding_thenExceptionIsThrown() {
-        assertThatThrownBy(() -> EncodingUtils.decodeBasicAuthentication("NonBasic dXNlck5hbWU6cGFzc3dvcmQ="))
+    void whenDecodingBasicAuthentication_givenInputHasInvalidEncoding_thenExceptionIsThrown() {
+        final String encodedInput = encode("NonBasic", "userName:password");
+        assertThatThrownBy(() -> EncodingUtils.decodeBasicAuthentication(encodedInput))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     void whenDecodingBasicAuthentication_givenInputIsValid_thenDecodedUsernameAndPasswordIsReturned() {
-        final Map<String, String> result = EncodingUtils.decodeBasicAuthentication("Basic dXNlck5hbWU6cGFzc3dvcmQ=");
+        final String encodedInput = encode("Basic", "userName:password");
+        final Map<String, String> result = EncodingUtils.decodeBasicAuthentication(encodedInput);
 
         assertThat(result)
             .containsExactlyEntriesOf(
@@ -108,5 +112,20 @@ class EncodingUtilsTest {
     void whenDecodingAuthentication_givenInputIsBlank_thenExceptionIsThrown() {
         assertThatThrownBy(() -> EncodingUtils.decodeBasicAuthentication("invalid"))
             .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void whenDecodingAuthentication_givenInputDoesNotHaveValidDelimiter_thenExceptionIsThrown() {
+        final String encodedInput = encode("Basic", "userName+password");
+
+        assertThatThrownBy(() -> EncodingUtils.decodeBasicAuthentication(encodedInput))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    private static String encode(final String prefix, final String input) {
+        final byte[] usernameAndPassword = input.getBytes(StandardCharsets.ISO_8859_1);
+        return prefix + " " + Base64
+            .getEncoder()
+            .encodeToString(usernameAndPassword);
     }
 }
