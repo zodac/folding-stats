@@ -122,7 +122,7 @@ public record User(int id,
                                        final String liveStatsLink,
                                        final Hardware hardware,
                                        final Team team,
-                                       final boolean isCaptain) {
+                                       final boolean isCaptain) { // TODO: Use enum for team membership
         return create(EMPTY_USER_ID, foldingUserName, displayName, passkey, category, profileLink, liveStatsLink, hardware, team, isCaptain);
     }
 

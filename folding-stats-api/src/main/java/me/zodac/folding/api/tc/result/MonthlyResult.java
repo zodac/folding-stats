@@ -122,17 +122,20 @@ public record MonthlyResult(List<TeamLeaderboardEntry> teamLeaderboard,
      * <p>
      * This can occur if a month's stats have been reset before attempting to create the {@link MonthlyResult}
      *
-     * @return {@code true} if no {@link TeamLeaderboardEntry} has any points or units.
+     * @return {@code true} if no {@link TeamLeaderboardEntry} has any points, multiplied points or units.
      */
     public boolean hasNoStats() {
         long totalTeamPoints = 0L;
+        long totalTeamMultipliedPoints = 0L;
         int totalTeamUnits = 0;
 
         for (final TeamLeaderboardEntry teamLeaderboardEntry : teamLeaderboard) {
             totalTeamPoints += teamLeaderboardEntry.getTeamPoints();
+            totalTeamMultipliedPoints += teamLeaderboardEntry.getTeamMultipliedPoints();
             totalTeamUnits += teamLeaderboardEntry.getTeamUnits();
         }
 
-        return totalTeamPoints == 0L && totalTeamUnits == 0;
+        // Using Math.max to avoid a scenario where (somehow) a team's points/units are negative
+        return Math.max(0L, totalTeamPoints) == 0L && Math.max(0L, totalTeamMultipliedPoints) == 0L && Math.max(0, totalTeamUnits) == 0;
     }
 }

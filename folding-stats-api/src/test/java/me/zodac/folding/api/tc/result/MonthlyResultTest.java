@@ -32,8 +32,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import me.zodac.folding.api.tc.Category;
+import me.zodac.folding.api.tc.Hardware;
+import me.zodac.folding.api.tc.HardwareMake;
+import me.zodac.folding.api.tc.HardwareType;
 import me.zodac.folding.api.tc.Team;
+import me.zodac.folding.api.tc.User;
 import me.zodac.folding.rest.api.tc.TeamSummary;
+import me.zodac.folding.rest.api.tc.UserSummary;
 import me.zodac.folding.rest.api.tc.leaderboard.TeamLeaderboardEntry;
 import me.zodac.folding.rest.api.tc.leaderboard.UserCategoryLeaderboardEntry;
 import org.junit.jupiter.api.Test;
@@ -77,7 +82,35 @@ class MonthlyResultTest {
                         ""
                     ),
                     "captain",
-                    Collections.emptyList(),
+                    List.of(
+                        UserSummary.createWithDefaultRank(
+                            User.createWithoutId(
+                                "foldingUserName",
+                                "displayName",
+                                "passkey",
+                                Category.AMD_GPU,
+                                "",
+                                "",
+                                Hardware.createWithoutId(
+                                    "hardwareName",
+                                    "displayName",
+                                    HardwareMake.AMD,
+                                    HardwareType.GPU,
+                                    1.0D,
+                                    1L
+                                ),
+                                Team.createWithoutId(
+                                    "Team",
+                                    "",
+                                    ""
+                                ),
+                                true
+                            ),
+                            5L,
+                            500L,
+                            1
+                        )
+                    ),
                     Collections.emptyList()
                 ),
                 1, 0L, 0L
@@ -90,7 +123,7 @@ class MonthlyResultTest {
         );
 
         assertThat(monthlyResult.hasNoStats())
-            .isTrue();
+            .isFalse();
 
         final MonthlyResult emptyMonthlyResult = MonthlyResult.empty();
         assertThat(emptyMonthlyResult.hasNoStats())
@@ -108,19 +141,15 @@ class MonthlyResultTest {
             Category.AMD_GPU,
             Category.NVIDIA_GPU,
             Category.WILDCARD
-        ).forEach(category -> {
-            assertThat(monthlyResult.userCategoryLeaderboard())
-                .doesNotContainKey(category);
-        });
+        ).forEach(category -> assertThat(monthlyResult.userCategoryLeaderboard())
+            .doesNotContainKey(category));
 
         final MonthlyResult updatedMonthlyResult = MonthlyResult.updateWithEmptyCategories(monthlyResult);
         Set.of(
             Category.AMD_GPU,
             Category.NVIDIA_GPU,
             Category.WILDCARD
-        ).forEach(category -> {
-            assertThat(updatedMonthlyResult.userCategoryLeaderboard())
-                .containsKey(category);
-        });
+        ).forEach(category -> assertThat(updatedMonthlyResult.userCategoryLeaderboard())
+            .containsKey(category));
     }
 }
