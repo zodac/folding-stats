@@ -432,7 +432,7 @@
                     <version>${dependency-check-maven.version}</version>
                     <configuration>
                         <failBuildOnAnyVulnerability>true</failBuildOnAnyVulnerability>
-                        <skip>true</skip>
+                        <skip>${skip-linters}</skip>
                         <suppressionFiles>
                             <suppressionFile>${dependency-check-suppression-file}</suppressionFile>
                         </suppressionFiles>
