@@ -109,7 +109,7 @@ public class HardwareEndpoint {
     @WriteRequired
     @RolesAllowed("admin")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> create(@RequestBody final HardwareRequest hardwareRequest, final HttpServletRequest request) {
+    public ResponseEntity<Hardware> create(@RequestBody final HardwareRequest hardwareRequest, final HttpServletRequest request) {
         AUDIT_LOGGER.info("POST request received to create hardware at '{}' with request: {}", request::getRequestURI, () -> hardwareRequest);
 
         final Hardware validatedHardware = hardwareValidator.create(hardwareRequest);
@@ -130,7 +130,7 @@ public class HardwareEndpoint {
     @ReadRequired
     @PermitAll
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getAll(final HttpServletRequest request) {
+    public ResponseEntity<Collection<Hardware>> getAll(final HttpServletRequest request) {
         AUDIT_LOGGER.debug("GET request received for all hardwares at '{}'", request::getRequestURI);
         final Collection<Hardware> elements = foldingRepository.getAllHardware();
         return cachedOk(elements);
@@ -146,7 +146,7 @@ public class HardwareEndpoint {
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/{hardwareId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getById(@PathVariable("hardwareId") final int hardwareId, final HttpServletRequest request) {
+    public ResponseEntity<Hardware> getById(@PathVariable("hardwareId") final int hardwareId, final HttpServletRequest request) {
         AUDIT_LOGGER.debug("GET request for hardware received at '{}'", request::getRequestURI);
 
         final Hardware element = foldingRepository.getHardware(hardwareId);
@@ -163,7 +163,7 @@ public class HardwareEndpoint {
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/fields", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getByHardwareName(@RequestParam("hardwareName") final String hardwareName, final HttpServletRequest request) {
+    public ResponseEntity<Hardware> getByHardwareName(@RequestParam("hardwareName") final String hardwareName, final HttpServletRequest request) {
         AUDIT_LOGGER.debug("GET request for hardware received at '{}?{}'", request::getRequestURI, () -> extractParameters(request));
 
         final Hardware retrievedHardware = foldingRepository.getAllHardware()
@@ -186,7 +186,7 @@ public class HardwareEndpoint {
     @WriteRequired
     @RolesAllowed("admin")
     @PutMapping(path = "/{hardwareId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> updateById(@PathVariable("hardwareId") final int hardwareId,
+    public ResponseEntity<Hardware> updateById(@PathVariable("hardwareId") final int hardwareId,
                                         @RequestBody final HardwareRequest hardwareRequest,
                                         final HttpServletRequest request) {
         AUDIT_LOGGER.info("PUT request for hardware received at '{}' with request {}", request::getRequestURI, () -> hardwareRequest);
@@ -220,7 +220,7 @@ public class HardwareEndpoint {
     @WriteRequired
     @RolesAllowed("admin")
     @DeleteMapping(path = "/{hardwareId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> deleteById(@PathVariable("hardwareId") final int hardwareId, final HttpServletRequest request) {
+    public ResponseEntity<Hardware> deleteById(@PathVariable("hardwareId") final int hardwareId, final HttpServletRequest request) {
         AUDIT_LOGGER.info("DELETE request for hardware received at '{}'", request::getRequestURI);
 
         final Hardware hardware = foldingRepository.getHardware(hardwareId);
