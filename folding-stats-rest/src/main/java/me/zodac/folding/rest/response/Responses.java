@@ -75,10 +75,10 @@ public final class Responses {
      * @param <E>    the response body type
      * @return the <b>200_OK</b> {@link ResponseEntity}
      */
-    public static <E> ResponseEntity<E> ok(final E entity) {
+    public static <E> ResponseEntity<String> ok(final E entity) {
         return ResponseEntity
             .ok()
-            .body(entity);
+            .body(GSON.toJson(entity));
     }
 
     /**
@@ -109,7 +109,7 @@ public final class Responses {
      * @param <E>      the response body type
      * @return the <b>200_OK</b> {@link ResponseEntity}
      */
-    public static <E> ResponseEntity<E> ok(final E entity, final int entityId) {
+    public static <E> ResponseEntity<String> ok(final E entity, final int entityId) {
         return responseWithLocation(entity, entityId, HttpStatus.OK);
     }
 
@@ -125,12 +125,12 @@ public final class Responses {
      * @return the <b>200_OK</b> {@link ResponseEntity}
      * @see DateTimeUtils#untilNextMonthUtc(TemporalUnit)
      */
-    public static <E> ResponseEntity<E> cachedOk(final E entity) {
+    public static <E> ResponseEntity<String> cachedOk(final E entity) {
         return ResponseEntity
             .ok()
             .cacheControl(CacheControl.maxAge(DATE_TIME_UTILS.untilNextMonthUtc(ChronoUnit.SECONDS), TimeUnit.SECONDS))
             .eTag(String.valueOf(entity.hashCode()))
-            .body(entity);
+            .body(GSON.toJson(entity));
     }
 
     /**
@@ -145,7 +145,7 @@ public final class Responses {
      * @return the <b>200_OK</b> {@link ResponseEntity}
      * @see DateTimeUtils#untilNextMonthUtc(TemporalUnit)
      */
-    public static <E> ResponseEntity<Collection<E>> cachedOk(final Collection<E> entities) {
+    public static <E> ResponseEntity<String> cachedOk(final Collection<E> entities) {
         return cachedOk(entities, DATE_TIME_UTILS.untilNextMonthUtc(ChronoUnit.SECONDS));
     }
 
@@ -161,13 +161,13 @@ public final class Responses {
      * @return the <b>200_OK</b> {@link ResponseEntity}
      * @see DateTimeUtils#untilNextMonthUtc(TemporalUnit)
      */
-    public static <E> ResponseEntity<Collection<E>> cachedOk(final Collection<E> entities, final long cachePeriodInSeconds) {
+    public static <E> ResponseEntity<String> cachedOk(final Collection<E> entities, final long cachePeriodInSeconds) {
         return ResponseEntity
             .ok()
             .header(RestHeader.TOTAL_COUNT.headerName(), String.valueOf(entities.size()))
             .cacheControl(CacheControl.maxAge(cachePeriodInSeconds, TimeUnit.SECONDS))
             .eTag(String.valueOf(entities.stream().mapToInt(Object::hashCode).sum()))
-            .body(entities);
+            .body(GSON.toJson(entities));
     }
 
     /**
@@ -181,11 +181,11 @@ public final class Responses {
      * @param <E>      the response body type
      * @return the <b>201_CREATED</b> {@link ResponseEntity}
      */
-    public static <E> ResponseEntity<E> created(final E entity, final int entityId) {
+    public static <E> ResponseEntity<String> created(final E entity, final int entityId) {
         return responseWithLocation(entity, entityId, HttpStatus.CREATED);
     }
 
-    private static <E> ResponseEntity<E> responseWithLocation(final E entity, final int entityId, final HttpStatus httpStatus) {
+    private static <E> ResponseEntity<String> responseWithLocation(final E entity, final int entityId, final HttpStatus httpStatus) {
         final URI location = ServletUriComponentsBuilder
             .fromCurrentRequest()
             .path("/{id}")
@@ -195,7 +195,7 @@ public final class Responses {
         return ResponseEntity
             .status(httpStatus)
             .location(location)
-            .body(entity);
+            .body(GSON.toJson(entity));
     }
 
     /**
