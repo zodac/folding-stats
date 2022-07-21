@@ -13,7 +13,7 @@ if [[ -n "${nexusUrl}" ]]; then
       <mirror>
         <id>central</id>
         <name>central</name>
-        <url>${nexusUrl}</url>
+        <url>${nexusUrl}/repository/maven-public/</url>
         <mirrorOf>*</mirrorOf>
       </mirror>
     </mirrors>
