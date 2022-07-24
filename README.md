@@ -410,6 +410,7 @@ Then create a simple container, attaching the `folding-stats_backend_logs` volum
 We can then copy the logs from the `dummy` container to our local machine:
 
     docker cp dummy:/root/audit.log ./audit.log
+    docker cp dummy:/root/lars.log ./lars.log
     docker cp dummy:/root/security.log ./security.log
     docker cp dummy:/root/server.log ./server.log
     docker cp dummy:/root/sql.log ./sql.log
