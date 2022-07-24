@@ -114,7 +114,7 @@ public enum FrontendLink {
      *
      * @return the URL
      */
-    public String getUrl() {
+    public String url() {
         return url;
     }
 }

@@ -59,10 +59,11 @@ class PageLoadTest {
 
         executeWithDriver(browserType, driver -> {
             for (final FrontendLink frontendLink : FrontendLink.getAllValues()) {
-                log("Visiting '%s'", frontendLink.getUrl());
-                driver.navigate().to(frontendLink.getUrl());
+                log("Visiting '%s'", frontendLink.url());
+                driver.navigate().to(frontendLink.url());
 
                 assertThat(driver.getTitle())
+                    .as(String.format("Unexpected tab title for '%s'", frontendLink.url()))
                     .isEqualTo(EXPECTED_TAB_TITLE);
             }
         });
