@@ -43,23 +43,23 @@
         <hikariCP.version>5.0.1</hikariCP.version>
         <javaee-web-api.version>8.0.1</javaee-web-api.version>
         <jersey-server.version>1.19.4</jersey-server.version>
-        <jooq.version>3.16.7</jooq.version>
-        <jsoup.version>1.15.1</jsoup.version>
-        <log4j.version>2.17.2</log4j.version>
+        <jooq.version>3.17.2</jooq.version>
+        <jsoup.version>1.15.2</jsoup.version>
+        <log4j.version>2.18.0</log4j.version>
         <logback.version>1.2.9</logback.version>
         <lombok.version>1.18.24</lombok.version>
-        <micrometer.version>1.9.1</micrometer.version>
+        <micrometer.version>1.9.2</micrometer.version>
         <postgresql-driver.version>42.4.0</postgresql-driver.version>
         <resilience4j.version>1.7.1</resilience4j.version>
-        <spring-boot.version>2.7.0</spring-boot.version>
+        <spring-boot.version>2.7.1</spring-boot.version>
 
         <!-- Test 3PP Versions -->
         <assertj-core.version>3.23.1</assertj-core.version>
         <embedded-postgres.version>2.0.0</embedded-postgres.version>
-        <embedded-postgres-binaries-bom.version>14.3.0</embedded-postgres-binaries-bom.version>
-        <flyway-core>8.5.13</flyway-core>
-        <junit-jupiter.version>5.9.0-M1</junit-jupiter.version>
-        <selenium.version>4.2.2</selenium.version>
+        <embedded-postgres-binaries-bom.version>14.4.0</embedded-postgres-binaries-bom.version>
+        <flyway-core>9.0.1</flyway-core>
+        <junit-jupiter.version>5.9.0-RC1</junit-jupiter.version>
+        <selenium.version>4.3.0</selenium.version>
 
         <!-- Plugin Versions -->
         <build-helper-maven-plugin.version>3.3.0</build-helper-maven-plugin.version>
@@ -81,7 +81,7 @@
         <licenses.version>1</licenses.version>
         <spotbugs.version>4.7.0</spotbugs.version>
         <pitest-junit5-plugin.version>0.15</pitest-junit5-plugin.version>
-        <pmd.version>6.45.0</pmd.version>
+        <pmd.version>6.47.0</pmd.version>
 
         <!-- Linter Plugin Versions -->
         <dependency-check-maven.version>7.1.0</dependency-check-maven.version>
