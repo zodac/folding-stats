@@ -24,6 +24,8 @@
 
 package me.zodac.folding.api.tc;
 
+import static me.zodac.folding.api.util.StringUtils.isBlank;
+
 import java.util.Objects;
 import me.zodac.folding.api.ResponsePojo;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
@@ -102,10 +104,6 @@ public record Team(int id, String teamName, String teamDescription, String forum
      */
     public static Team updateWithId(final int teamId, final Team team) {
         return create(teamId, team.teamName, team.teamDescription, team.forumLink);
-    }
-
-    private static boolean isBlank(final String input) {
-        return input == null || input.isBlank();
     }
 
     /**

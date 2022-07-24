@@ -24,8 +24,6 @@
 
 package me.zodac.folding.test.framework;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import me.zodac.folding.test.framework.annotation.NeedsHttpResponse;
@@ -101,7 +99,7 @@ public final class TestSuiteExecutor {
         }
     }
 
-    private static void executeCommonTestSteps(final TestSuite testSuite, final List<TestStep> commonTestSteps, final TestCase testCase) {
+    private static void executeCommonTestSteps(final TestSuite testSuite, final List<? extends TestStep> commonTestSteps, final TestCase testCase) {
         int commonTestStepNumber = 1;
         for (final TestStep commonTestStep : commonTestSteps) {
             LOGGER.info("""
@@ -138,13 +136,16 @@ public final class TestSuiteExecutor {
         try {
             testStep.execute(testContext);
             LOGGER.info("PASSED");
-        } catch (final Exception | AssertionError e) { // TODO: Make a TestException or something cleaner
+        } catch (final AssertionError e) {
+            if (testSuite.fullErrorStackTrace()) {
+                throw e;
+            }
+
+            throw new AssertionError(e.getMessage()); // NOPMD: PreserveStackTrace - Not interested in trace
+        } catch (final Exception e) { // TODO: Make a TestException or something cleaner
             LOGGER.error("Error: {}", e.getMessage());
 
             if (testSuite.fullErrorStackTrace()) {
-                if (e instanceof AssertionError a) {
-                    throw a;
-                }
                 throw new AssertionError(e);
             } else {
                 throw new AssertionError(e.getMessage()); // NOPMD: PreserveStackTrace - Not interested in trace

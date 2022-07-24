@@ -92,6 +92,7 @@ public record User(int id,
                               final Hardware hardware,
                               final Team team,
                               final boolean isCaptain) {
+        // TODO: Enforce that hardware and team cannot be null here
         final String profileLinkOrNull = StringUtils.isBlank(profileLink) ? null : profileLink;
         final String liveStatsLinkOrNull = StringUtils.isBlank(liveStatsLink) ? null : liveStatsLink;
         return new User(userId, foldingUserName, displayName, passkey, category, profileLinkOrNull, liveStatsLinkOrNull, hardware, team, isCaptain);
@@ -122,7 +123,7 @@ public record User(int id,
                                        final String liveStatsLink,
                                        final Hardware hardware,
                                        final Team team,
-                                       final boolean isCaptain) { // TODO: Use enum for team membership
+                                       final boolean isCaptain) { // TODO: Use 'Role' enum for team membership
         return create(EMPTY_USER_ID, foldingUserName, displayName, passkey, category, profileLink, liveStatsLink, hardware, team, isCaptain);
     }
 

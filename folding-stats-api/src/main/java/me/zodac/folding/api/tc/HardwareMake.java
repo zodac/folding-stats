@@ -25,7 +25,7 @@
 package me.zodac.folding.api.tc;
 
 import java.util.Collection;
-import java.util.stream.Stream;
+import java.util.List;
 
 /**
  * Specifies the make/brand of {@link Hardware}.
@@ -52,9 +52,7 @@ public enum HardwareMake {
      */
     INVALID;
 
-    private static final Collection<HardwareMake> ALL_VALUES = Stream.of(values())
-        .filter(value -> value != INVALID)
-        .toList();
+    private static final Collection<HardwareMake> ALL_VALUES = List.of(values());
 
     /**
      * Retrieve all available {@link HardwareMake}s (excluding {@link HardwareMake#INVALID}).
@@ -63,10 +61,13 @@ public enum HardwareMake {
      * Should be used instead of {@link HardwareMake#values()}, as that recalculates the array for each call,
      * while this method uses a static {@link Collection}.
      *
-     * @return a {@link Collection} of all {@link HardwareMake}s
+     * @return an unmodifiable {@link Collection} of all {@link HardwareMake}s
      */
     public static Collection<HardwareMake> getAllValues() {
-        return ALL_VALUES;
+        return ALL_VALUES
+            .stream()
+            .filter(value -> value != INVALID)
+            .toList();
     }
 
     /**

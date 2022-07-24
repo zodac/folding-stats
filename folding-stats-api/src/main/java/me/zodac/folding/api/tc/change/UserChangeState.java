@@ -25,7 +25,7 @@
 package me.zodac.folding.api.tc.change;
 
 import java.util.Collection;
-import java.util.stream.Stream;
+import java.util.List;
 import me.zodac.folding.api.tc.HardwareType;
 
 /**
@@ -68,9 +68,7 @@ public enum UserChangeState {
      */
     INVALID(true);
 
-    private static final Collection<UserChangeState> ALL_VALUES = Stream.of(values())
-        .filter(value -> value != INVALID)
-        .toList();
+    private static final Collection<UserChangeState> ALL_VALUES = List.of(values());
 
     private final boolean isFinalState;
 
@@ -99,10 +97,13 @@ public enum UserChangeState {
      * Should be used instead of {@link UserChangeState#values()}, as that recalculates the array for each call,
      * while this method uses a static {@link UserChangeState}.
      *
-     * @return a {@link Collection} of all {@link UserChangeState}s
+     * @return an unmodifiable {@link Collection} of all {@link UserChangeState}s
      */
     public static Collection<UserChangeState> getAllValues() {
-        return ALL_VALUES;
+        return ALL_VALUES
+            .stream()
+            .filter(value -> value != INVALID)
+            .toList();
     }
 
     /**

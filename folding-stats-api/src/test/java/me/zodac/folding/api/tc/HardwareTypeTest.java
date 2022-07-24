@@ -29,26 +29,26 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 
 /**
- * Unit tests for {@link HardwareMake}.
+ * Unit tests for {@link HardwareType}.
  */
-class HardwareMakeTest {
+class HardwareTypeTest {
 
     @Test
     void testGetAllValues() {
-        assertThat(HardwareMake.getAllValues())
-            .hasSize(3)
-            .doesNotContain(HardwareMake.INVALID);
+        assertThat(HardwareType.getAllValues())
+            .hasSize(2)
+            .doesNotContain(HardwareType.INVALID);
     }
 
     @Test
     void testGetCaseInsensitive() {
-        assertThat(HardwareMake.get("nVidIA"))
-            .isEqualTo(HardwareMake.NVIDIA);
+        assertThat(HardwareType.get("gPU"))
+            .isEqualTo(HardwareType.GPU);
     }
 
     @Test
     void testGetInvalid() {
-        assertThat(HardwareMake.get("does_not_exist"))
-            .isEqualTo(HardwareMake.INVALID);
+        assertThat(HardwareType.get("does_not_exist"))
+            .isEqualTo(HardwareType.INVALID);
     }
 }

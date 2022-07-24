@@ -55,7 +55,7 @@ class PageLoadTest {
     @ParameterizedTest
     @EnumSource(BrowserType.class)
     void loadPages(final BrowserType browserType) throws MalformedURLException {
-        logWithBlankLine("Loading '%s' browser", browserType);
+        logWithBlankLine("Loading '%s' browser", browserType.displayName());
 
         executeWithDriver(browserType, driver -> {
             for (final FrontendLink frontendLink : FrontendLink.getAllValues()) {
@@ -63,7 +63,7 @@ class PageLoadTest {
                 driver.navigate().to(frontendLink.url());
 
                 assertThat(driver.getTitle())
-                    .as(String.format("Unexpected tab title for '%s'", frontendLink.url()))
+                    .as(String.format("Unexpected tab title for '%s': %s", frontendLink.url(), driver.getPageSource()))
                     .isEqualTo(EXPECTED_TAB_TITLE);
             }
         });

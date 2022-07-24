@@ -25,7 +25,7 @@
 package me.zodac.folding.api.tc;
 
 import java.util.Collection;
-import java.util.stream.Stream;
+import java.util.List;
 
 /**
  * Specifies the type of {@link Hardware}.
@@ -47,9 +47,7 @@ public enum HardwareType {
      */
     INVALID;
 
-    private static final Collection<HardwareType> ALL_VALUES = Stream.of(values())
-        .filter(value -> value != INVALID)
-        .toList();
+    private static final Collection<HardwareType> ALL_VALUES = List.of(values());
 
     /**
      * Retrieve all available {@link HardwareType}s (excluding {@link HardwareType#INVALID}).
@@ -58,10 +56,13 @@ public enum HardwareType {
      * Should be used instead of {@link HardwareType#values()}, as that recalculates the array for each call,
      * while this method uses a static {@link Collection}.
      *
-     * @return a {@link Collection} of all {@link HardwareType}s
+     * @return an unmodifiable {@link Collection} of all {@link HardwareType}s
      */
     public static Collection<HardwareType> getAllValues() {
-        return ALL_VALUES;
+        return ALL_VALUES
+            .stream()
+            .filter(value -> value != INVALID)
+            .toList();
     }
 
     /**

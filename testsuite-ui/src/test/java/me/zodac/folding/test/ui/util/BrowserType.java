@@ -39,7 +39,7 @@ public enum BrowserType {
     /**
      * {@code Google Chrome} web browser.
      */
-    CHROME {
+    CHROME("Google Chrome") {
         @Override
         public RemoteWebDriver getDriver() throws MalformedURLException {
             final String port = System.getProperty("chromePort", "4444");
@@ -51,7 +51,7 @@ public enum BrowserType {
     /**
      * {@code Microsoft Edge} web browser.
      */
-    EDGE {
+    EDGE("Microsoft Edge") {
         @Override
         public RemoteWebDriver getDriver() throws MalformedURLException {
             final String port = System.getProperty("edgePort", "4445");
@@ -63,7 +63,7 @@ public enum BrowserType {
     /**
      * {@code Mozilla Firefox} web browser.
      */
-    FIREFOX {
+    FIREFOX("Mozilla Firefox") {
         @Override
         public RemoteWebDriver getDriver() throws MalformedURLException {
             final String port = System.getProperty("firefoxPort", "4446");
@@ -74,6 +74,21 @@ public enum BrowserType {
 
     private static final String TEST_IP_ADDRESS = System.getProperty("testIpAddress", "127.0.0.1");
     private static final String WEB_DRIVER_URL_FORMAT = "http://%s:%s/wd/hub";
+
+    private final String displayName;
+
+    BrowserType(final String displayName) {
+        this.displayName = displayName;
+    }
+
+    /**
+     * The user-friendly display name for the {@link BrowserType}.
+     *
+     * @return the display name
+     */
+    public String displayName() {
+        return displayName;
+    }
 
     /**
      * Abstract method to be implemented by {@link BrowserType} values, to return a {@link RemoteWebDriver} for UI testing.

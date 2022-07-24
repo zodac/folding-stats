@@ -27,8 +27,8 @@ package me.zodac.folding.api.tc;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
 
 /**
@@ -61,9 +61,7 @@ public enum Category {
 
     private static final int DEFAULT_USERS_PER_CATEGORY = 1;
 
-    private static final Collection<Category> ALL_VALUES = Stream.of(values())
-        .filter(value -> value != INVALID)
-        .toList();
+    private static final Collection<Category> ALL_VALUES = List.of(values());
 
     private final int permittedUsers;
     private final EnumSet<HardwareMake> supportedHardwareMakes;
@@ -101,10 +99,13 @@ public enum Category {
      * Should be used instead of {@link Category#values()}, as that recalculates the array for each call,
      * while this method uses a static {@link Collection}.
      *
-     * @return a {@link Collection} of all {@link Category}s
+     * @return an unmodifiable {@link Collection} of all {@link Category}s
      */
     public static Collection<Category> getAllValues() {
-        return ALL_VALUES;
+        return ALL_VALUES
+            .stream()
+            .filter(value -> value != INVALID)
+            .toList();
     }
 
     /**
