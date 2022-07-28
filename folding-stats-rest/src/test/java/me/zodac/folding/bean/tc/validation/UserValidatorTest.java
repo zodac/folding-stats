@@ -2158,7 +2158,7 @@ class UserValidatorTest {
             Category.NVIDIA_GPU,
             "https://www.google.com",
             "https://www.google.com",
-            null,
+            generateHardware(),
             team,
             true
         );
@@ -2244,7 +2244,7 @@ class UserValidatorTest {
             "https://www.google.com",
             "https://www.google.com",
             hardware,
-            null,
+            generateTeam(),
             true
         );
 

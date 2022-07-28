@@ -55,6 +55,26 @@ public class RetiredUserSummary {
     private int rankInTeam;
 
     /**
+     * Creates a {@link RetiredUserSummary}.
+     *
+     * @param id               the ID of the {@link RetiredUserSummary}
+     * @param displayName      the display name for the {@link RetiredUserSummary}
+     * @param points           the points for the {@link RetiredUserSummary}
+     * @param multipliedPoints the multiplied points for the {@link RetiredUserSummary}
+     * @param units            the units for the {@link RetiredUserSummary}
+     * @param rankInTeam       the rank of the {@link RetiredUserTcStats} in the {@link me.zodac.folding.api.tc.Team}
+     * @return the created {@link RetiredUserSummary}
+     */
+    public static RetiredUserSummary create(final int id,
+                                            final String displayName, // TODO: Fail if blank
+                                            final long points,
+                                            final long multipliedPoints,
+                                            final int units,
+                                            final int rankInTeam) {
+        return new RetiredUserSummary(id, displayName, points, multipliedPoints, units, rankInTeam);
+    }
+
+    /**
      * Creates a {@link RetiredUserSummary}, summarising the stats for a now retired {@link me.zodac.folding.api.tc.User}.
      *
      * <p>
@@ -66,8 +86,8 @@ public class RetiredUserSummary {
      * @param rankInTeam         the rank of the {@link RetiredUserTcStats} in the {@link me.zodac.folding.api.tc.Team}
      * @return the created {@link RetiredUserSummary}
      */
-    public static RetiredUserSummary create(final RetiredUserTcStats retiredUserTcStats, final int rankInTeam) {
-        return new RetiredUserSummary(
+    public static RetiredUserSummary createWithStats(final RetiredUserTcStats retiredUserTcStats, final int rankInTeam) {
+        return create(
             retiredUserTcStats.getUserId(),
             retiredUserTcStats.getDisplayName(),
             retiredUserTcStats.getPoints(),
@@ -89,7 +109,7 @@ public class RetiredUserSummary {
      * @return the created {@link RetiredUserSummary}
      */
     public static RetiredUserSummary createWithDefaultRank(final RetiredUserTcStats retiredUserTcStats) {
-        return create(retiredUserTcStats, DEFAULT_USER_RANK);
+        return createWithStats(retiredUserTcStats, DEFAULT_USER_RANK);
     }
 
     /**
@@ -100,7 +120,7 @@ public class RetiredUserSummary {
      * @return the updated {@link RetiredUserSummary}
      */
     public static RetiredUserSummary updateWithRankInTeam(final RetiredUserSummary retiredUserSummary, final int rankInTeam) {
-        return new RetiredUserSummary(
+        return create(
             retiredUserSummary.id,
             retiredUserSummary.displayName,
             retiredUserSummary.points,

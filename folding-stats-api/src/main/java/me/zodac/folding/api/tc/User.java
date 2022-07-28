@@ -81,6 +81,7 @@ public record User(int id,
      * @param team            the {@link Team} that the {@link User} is Folding for
      * @param isCaptain       whether the {@link User} is the captain of their {@link Team}
      * @return the created {@link User}
+     * @throws IllegalArgumentException thrown if {@code hardware} or {@code team} is null
      */
     public static User create(final int userId,
                               final String foldingUserName,
@@ -92,7 +93,14 @@ public record User(int id,
                               final Hardware hardware,
                               final Team team,
                               final boolean isCaptain) {
-        // TODO: Enforce that hardware and team cannot be null here
+        if (hardware == null) {
+            throw new IllegalArgumentException("'hardware' must not be null");
+        }
+
+        if (team == null) {
+            throw new IllegalArgumentException("'team' must not be null");
+        }
+
         final String profileLinkOrNull = StringUtils.isBlank(profileLink) ? null : profileLink;
         final String liveStatsLinkOrNull = StringUtils.isBlank(liveStatsLink) ? null : liveStatsLink;
         return new User(userId, foldingUserName, displayName, passkey, category, profileLinkOrNull, liveStatsLinkOrNull, hardware, team, isCaptain);
@@ -114,6 +122,7 @@ public record User(int id,
      * @param team            the {@link Team} that the {@link User} is Folding for
      * @param isCaptain       whether the {@link User} is the captain of their {@link Team}
      * @return the created {@link User}
+     * @throws IllegalArgumentException thrown if {@code hardware} or {@code team} is null
      */
     public static User createWithoutId(final String foldingUserName,
                                        final String displayName,
@@ -140,6 +149,7 @@ public record User(int id,
      * @param hardware    the {@link Hardware} that this {@link User} is Folding on
      * @param team        the {@link Team} that the {@link User} is Folding for
      * @return the created {@link User}
+     * @throws IllegalArgumentException thrown if {@code hardware} or {@code team} is null
      */
     public static User createWithoutId(final UserRequest userRequest, final Hardware hardware, final Team team) {
         return createWithoutId(
@@ -165,6 +175,7 @@ public record User(int id,
      * @param userId the DB-generated ID
      * @param user   the {@link User} to be updated with the ID
      * @return the updated {@link User}
+     * @throws IllegalArgumentException thrown if {@code hardware} or {@code team} is null
      */
     public static User updateWithId(final int userId, final User user) {
         return create(userId, user.foldingUserName, user.displayName, user.passkey, user.category, user.profileLink, user.liveStatsLink,
@@ -180,6 +191,7 @@ public record User(int id,
      * @param user     the {@link User} to be updated with the new {@link Hardware}
      * @param hardware the updated {@link Hardware}
      * @return the updated {@link User}
+     * @throws IllegalArgumentException thrown if {@code hardware} or {@code team} is null
      */
     public static User updateHardware(final User user, final Hardware hardware) {
         return create(user.id, user.foldingUserName, user.displayName, user.passkey, user.category, user.profileLink, user.liveStatsLink, hardware,
@@ -195,6 +207,7 @@ public record User(int id,
      * @param user the {@link User} to be updated with the new {@link Team}
      * @param team the updated {@link Team}
      * @return the updated {@link User}
+     * @throws IllegalArgumentException thrown if {@code hardware} or {@code team} is null
      */
     public static User updateTeam(final User user, final Team team) {
         return create(user.id, user.foldingUserName, user.displayName, user.passkey, user.category, user.profileLink, user.liveStatsLink,
@@ -206,6 +219,7 @@ public record User(int id,
      *
      * @param user the {@link User} to update
      * @return the updated {@link User}
+     * @throws IllegalArgumentException thrown if {@code hardware} or {@code team} is null
      */
     public static User removeCaptaincyFromUser(final User user) {
         return create(user.id, user.foldingUserName, user.displayName, user.passkey, user.category, user.profileLink, user.liveStatsLink,

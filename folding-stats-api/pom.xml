@@ -12,12 +12,6 @@
     <artifactId>folding-stats-api</artifactId>
     <name>[${project.parent.artifactId}] API module</name>
 
-    <properties>
-        <!-- Using a lower threshold for the API module since mutations fail for a lot of POJOs -->
-        <!-- TODO: Fix those tests and remove this lower threshold -->
-        <pitest-test-strength-threshold>90</pitest-test-strength-threshold>
-    </properties>
-
     <dependencies>
         <!-- 3PP Dependencies -->
         <!-- Required for custom LocalDateTime serializer/deserializer -->

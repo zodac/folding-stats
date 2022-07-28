@@ -32,6 +32,9 @@ import me.zodac.folding.api.exception.ConflictException;
 import me.zodac.folding.api.exception.UsedByException;
 import me.zodac.folding.api.exception.ValidationException;
 import me.zodac.folding.api.tc.Category;
+import me.zodac.folding.api.tc.Hardware;
+import me.zodac.folding.api.tc.HardwareMake;
+import me.zodac.folding.api.tc.HardwareType;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.bean.api.FoldingRepository;
@@ -43,6 +46,7 @@ import org.junit.jupiter.api.Test;
  */
 class TeamValidatorTest {
 
+    private static int hardwareId = 1;
     private static int teamId = 1;
     private static int userId = 1;
 
@@ -386,7 +390,7 @@ class TeamValidatorTest {
             Category.NVIDIA_GPU,
             "https://www.google.com",
             "https://www.google.com",
-            null,
+            generateHardware(),
             existingTeam,
             false
         );
@@ -429,7 +433,7 @@ class TeamValidatorTest {
             Category.NVIDIA_GPU,
             "https://www.google.com",
             "https://www.google.com",
-            null,
+            generateHardware(),
             userTeam,
             false
         );
@@ -451,6 +455,18 @@ class TeamValidatorTest {
             "teamName",
             "teamDescription",
             "https://www.google.com"
+        );
+    }
+
+    private static Hardware generateHardware() {
+        return Hardware.create(
+            hardwareId++,
+            "hardwareName",
+            "displayName",
+            HardwareMake.AMD,
+            HardwareType.GPU,
+            1.00D,
+            1L
         );
     }
 }

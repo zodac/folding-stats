@@ -124,10 +124,40 @@ class MonthlyResultTest {
 
         assertThat(monthlyResult.hasNoStats())
             .isFalse();
+        long totalTeamPoints = 0L;
+        long totalTeamMultipliedPoints = 0L;
+        int totalTeamUnits = 0;
+
+        for (final TeamLeaderboardEntry teamLeaderboardEntry : monthlyResult.teamLeaderboard()) {
+            totalTeamPoints += teamLeaderboardEntry.getTeamPoints();
+            totalTeamMultipliedPoints += teamLeaderboardEntry.getTeamMultipliedPoints();
+            totalTeamUnits += teamLeaderboardEntry.getTeamUnits();
+        }
+        assertThat(totalTeamPoints)
+            .isEqualTo(5L);
+        assertThat(totalTeamMultipliedPoints)
+            .isEqualTo(500L);
+        assertThat(totalTeamUnits)
+            .isEqualTo(1);
 
         final MonthlyResult emptyMonthlyResult = MonthlyResult.empty();
         assertThat(emptyMonthlyResult.hasNoStats())
             .isTrue();
+        long totalEmptyTeamPoints = 0L;
+        long totalEmptyTeamMultipliedPoints = 0L;
+        int totalEmptyTeamUnits = 0;
+
+        for (final TeamLeaderboardEntry teamLeaderboardEntry : emptyMonthlyResult.teamLeaderboard()) {
+            totalEmptyTeamPoints += teamLeaderboardEntry.getTeamPoints();
+            totalEmptyTeamMultipliedPoints += teamLeaderboardEntry.getTeamMultipliedPoints();
+            totalEmptyTeamUnits += teamLeaderboardEntry.getTeamUnits();
+        }
+        assertThat(totalEmptyTeamPoints)
+            .isEqualTo(0L);
+        assertThat(totalEmptyTeamMultipliedPoints)
+            .isEqualTo(0L);
+        assertThat(totalEmptyTeamUnits)
+            .isEqualTo(0);
     }
 
     @Test

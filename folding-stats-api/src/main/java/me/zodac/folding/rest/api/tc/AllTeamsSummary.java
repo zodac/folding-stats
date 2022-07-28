@@ -48,6 +48,8 @@ import lombok.ToString;
 @ToString(doNotUseGetters = true)
 public class AllTeamsSummary {
 
+    private static final int DEFAULT_TEAM_RANK = 1;
+
     private CompetitionSummary competitionSummary;
     private Collection<TeamSummary> teams = new ArrayList<>();
 
@@ -55,8 +57,7 @@ public class AllTeamsSummary {
      * Creates a {@link AllTeamsSummary} from a {@link Collection} of {@link TeamSummary}s.
      *
      * <p>
-     * The {@link TeamSummary}s are not ranked, so we will rank them using {@link IntegerRankingCollector}, by comparing
-     * the multiplied points of each {@link TeamSummary}.
+     * The {@link TeamSummary}s are not ranked, so we will rank them by comparing the multiplied points of each {@link TeamSummary}.
      *
      * <p>
      * The points, multiplied points and units from each {@link TeamSummary} are added up to give the total competition
@@ -76,14 +77,35 @@ public class AllTeamsSummary {
             totalMultipliedPoints += team.getTeamMultipliedPoints();
         }
 
-        final List<TeamSummary> rankedTeams = teams
+        // Sort the teams by their points
+        final List<? extends TeamSummary> teamsSortedByPoints = teams
             .stream()
             .sorted(Comparator.comparingLong(TeamSummary::getTeamMultipliedPoints).reversed())
-            .collect(IntegerRankingCollector.create(
-                Comparator.comparingLong(TeamSummary::getTeamMultipliedPoints),
-                TeamSummary::getRank,
-                TeamSummary::updateWithRank)
-            );
+            .toList();
+
+        final int numberOfTeams = teams.size();
+        final Collection<TeamSummary> rankedTeams = new ArrayList<>(numberOfTeams);
+
+        long previousValue = 0;
+        int previousRank = DEFAULT_TEAM_RANK;
+
+        for (int i = 0; i < numberOfTeams; i++) {
+            // If the current team has the same points as the previous team, don't increment the rank
+            final TeamSummary teamSummary = teamsSortedByPoints.get(i);
+            final int newRank;
+            if (previousValue == teamSummary.getTeamMultipliedPoints()) {
+                newRank = previousRank;
+            } else {
+                // We explicitly want to move to the next rank after a tie (1st, 1st, 3rd) and skipping the tied value
+                // So we increment based on index rather than previousRank (which would give us 1st, 1st, 2nd)
+                newRank = i + 1;
+            }
+
+            rankedTeams.add(TeamSummary.updateWithRank(teamSummary, newRank));
+
+            previousValue = teamSummary.getTeamMultipliedPoints();
+            previousRank = newRank;
+        }
 
         final CompetitionSummary competitionSummary = CompetitionSummary.create(totalPoints, totalMultipliedPoints, totalUnits);
         return new AllTeamsSummary(competitionSummary, rankedTeams);

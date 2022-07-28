@@ -40,13 +40,16 @@ import me.zodac.folding.api.tc.User;
 @ToString(doNotUseGetters = true, callSuper = true)
 public class RetiredUserTcStats extends UserTcStats {
 
+    /**
+     * The default {@link RetiredUserTcStats} ID. We may not know the ID at the time of object creation, so we use this and update the ID later.
+     */
+    public static final int EMPTY_RETIRED_USER_ID = 0;
+
     private static final String DEFAULT_DISPLAY_NAME = "retiredUser";
-    private static final int EMPTY_RETIRED_USER_ID = 0;
-    private static final int EMPTY_TEAM_ID = 0;
 
     private final int retiredUserId;
     private final int teamId;
-    private final String displayName;
+    private final String displayName; // TODO: Fail if blank
 
     /**
      * Constructor for {@link RetiredUserTcStats}.

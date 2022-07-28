@@ -456,7 +456,7 @@ class UserChangeValidatorTest {
                 user.profileLink(),
                 "https://www.google.ie",
                 user.hardware(),
-                null,
+                user.team(),
                 user.userIsCaptain()
             ),
             UserChangeState.APPROVED_NEXT_MONTH
@@ -506,7 +506,7 @@ class UserChangeValidatorTest {
                 user.profileLink(),
                 "https://www.google.com",
                 user.hardware(),
-                null,
+                user.team(),
                 user.userIsCaptain()
             ),
             UserChangeState.APPROVED_NEXT_MONTH
@@ -549,7 +549,7 @@ class UserChangeValidatorTest {
                 user.profileLink(),
                 "https://www.google.ie",
                 user.hardware(),
-                null,
+                user.team(),
                 user.userIsCaptain()
             ),
             UserChangeState.APPROVED_NOW

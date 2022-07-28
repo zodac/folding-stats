@@ -44,13 +44,13 @@ import me.zodac.folding.api.tc.User;
 @ToString(doNotUseGetters = true)
 public class UserSummary {
 
-    private static final int DEFAULT_RANK = 0;
+    private static final int DEFAULT_RANK = 1;
     private static final long DEFAULT_POINTS = 0L;
     private static final long DEFAULT_MULTIPLIED_POINTS = 0L;
     private static final int DEFAULT_UNITS = 0;
 
     private User user;
-    private long points;
+    private long points; // TODO: Replace with stats object?
     private long multipliedPoints;
     private int units;
     private int rankInTeam;
@@ -64,8 +64,13 @@ public class UserSummary {
      * @param units            the units of the {@link User}
      * @param rankInTeam       the rank of the {@link User} in this {@link me.zodac.folding.api.tc.Team}
      * @return the created {@link UserSummary}
+     * @throws IllegalArgumentException thrown if {@code user} is null
      */
     public static UserSummary create(final User user, final long points, final long multipliedPoints, final int units, final int rankInTeam) {
+        if (user == null) {
+            throw new IllegalArgumentException("'user' must not be null");
+        }
+
         return new UserSummary(user, points, multipliedPoints, units, rankInTeam);
     }
 
@@ -81,6 +86,7 @@ public class UserSummary {
      * @param multipliedPoints the multiplied points of the {@link User}
      * @param units            the units of the {@link User}
      * @return the created {@link UserSummary}
+     * @throws IllegalArgumentException thrown if {@code user} is null
      */
     public static UserSummary createWithDefaultRank(final User user, final long points, final long multipliedPoints, final int units) {
         return create(user, points, multipliedPoints, units, DEFAULT_RANK);
@@ -92,6 +98,7 @@ public class UserSummary {
      * @param userSummary the {@link UserSummary} to update
      * @param rankInTeam  the rank within the {@link TeamSummary}
      * @return the updated {@link UserSummary}
+     * @throws IllegalArgumentException thrown if {@code user} is null
      */
     public static UserSummary updateWithRankInTeam(final UserSummary userSummary, final int rankInTeam) {
         return create(userSummary.user, userSummary.points, userSummary.multipliedPoints, userSummary.units, rankInTeam);

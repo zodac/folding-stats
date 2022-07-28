@@ -35,6 +35,7 @@ import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.HardwareMake;
 import me.zodac.folding.api.tc.HardwareType;
+import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.bean.api.FoldingRepository;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
@@ -46,6 +47,7 @@ import org.junit.jupiter.api.Test;
 class HardwareValidatorTest {
 
     private static int hardwareId = 1;
+    private static int teamId = 1;
     private static int userId = 1;
 
     @Test
@@ -570,7 +572,7 @@ class HardwareValidatorTest {
             "https://www.google.com",
             "https://www.google.com",
             existingHardware,
-            null,
+            generateTeam(),
             false
         );
 
@@ -610,7 +612,7 @@ class HardwareValidatorTest {
             "https://www.google.com",
             "https://www.google.com",
             userHardware,
-            null,
+            generateTeam(),
             false
         );
 
@@ -634,6 +636,15 @@ class HardwareValidatorTest {
             HardwareType.GPU,
             1.00D,
             1L
+        );
+    }
+
+    private static Team generateTeam() {
+        return Team.create(
+            teamId++,
+            "teamName",
+            "teamDescription",
+            null
         );
     }
 }
