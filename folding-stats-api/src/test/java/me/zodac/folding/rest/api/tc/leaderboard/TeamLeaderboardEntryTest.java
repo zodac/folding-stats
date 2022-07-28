@@ -74,9 +74,9 @@ class TeamLeaderboardEntryTest {
         final UserSummary userSummary1 = UserSummary.create(user, 10L, 1_000L, 2, 1);
         final UserSummary userSummary2 = UserSummary.create(user, 5L, 500L, 1, 2);
         final TeamSummary teamSummary =
-            TeamSummary.createWithDefaultRank(user.team(), "captain", List.of(userSummary1, userSummary2), Collections.emptyList());
+            TeamSummary.createWithPoints(user.team(), "captain", 15L, 1_500L, 3, 2, List.of(userSummary1, userSummary2), Collections.emptyList());
 
-        final TeamLeaderboardEntry teamLeaderboardEntry = TeamLeaderboardEntry.create(teamSummary, 2, 5_000L, 5_000L);
+        final TeamLeaderboardEntry teamLeaderboardEntry = TeamLeaderboardEntry.create(teamSummary, 5_000L, 5_000L);
 
         assertThat(teamLeaderboardEntry.getTeamPoints())
             .isEqualTo(15L);

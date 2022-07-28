@@ -49,7 +49,6 @@ import me.zodac.folding.rest.api.tc.TeamSummary;
 public class TeamLeaderboardEntry {
 
     private static final long DEFAULT_DIFF = 0L;
-    private static final int DEFAULT_RANK = 1;
 
     private Team team;
     private long teamPoints;
@@ -64,18 +63,17 @@ public class TeamLeaderboardEntry {
      * Creates the {@link TeamLeaderboardEntry} for a {@link Team}.
      *
      * @param teamSummary  the {@link TeamSummary} for the {@link Team}
-     * @param rank         the rank of the {@link Team}
      * @param diffToLeader the number of points between this {@link Team} and the one in first place
      * @param diffToNext   the number of points between this {@link Team} and the one a single place above
      * @return the created {@link TeamLeaderboardEntry}
      */
-    public static TeamLeaderboardEntry create(final TeamSummary teamSummary, final int rank, final long diffToLeader, final long diffToNext) {
+    public static TeamLeaderboardEntry create(final TeamSummary teamSummary, final long diffToLeader, final long diffToNext) {
         return new TeamLeaderboardEntry(
             teamSummary.getTeam(),
             teamSummary.getTeamPoints(),
             teamSummary.getTeamMultipliedPoints(),
             teamSummary.getTeamUnits(),
-            rank,
+            teamSummary.getRank(),
             diffToLeader,
             diffToNext
         );
@@ -89,6 +87,6 @@ public class TeamLeaderboardEntry {
      * @return the created {@link TeamLeaderboardEntry}
      */
     public static TeamLeaderboardEntry createLeader(final TeamSummary teamSummary) {
-        return create(teamSummary, DEFAULT_RANK, DEFAULT_DIFF, DEFAULT_DIFF);
+        return create(teamSummary, DEFAULT_DIFF, DEFAULT_DIFF);
     }
 }

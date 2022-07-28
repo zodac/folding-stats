@@ -431,7 +431,7 @@ class PostgresDbManagerTest {
                         Collections.emptyList(),
                         Collections.emptyList()
                     ),
-                    1, 0L, 0L
+                    0L, 0L
                 )
             ),
             Map.of(Category.AMD_GPU, List.of(
@@ -463,7 +463,7 @@ class PostgresDbManagerTest {
                         Collections.emptyList(),
                         Collections.emptyList()
                     ),
-                    1, 0L, 0L
+                    0L, 0L
                 )
             ),
             Map.of(Category.NVIDIA_GPU, List.of(

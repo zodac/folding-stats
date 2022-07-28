@@ -113,7 +113,7 @@ class MonthlyResultTest {
                     ),
                     Collections.emptyList()
                 ),
-                1, 0L, 0L
+                0L, 0L
             )
         );
 
