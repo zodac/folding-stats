@@ -26,8 +26,6 @@ package me.zodac.folding.rest.api.tc;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -77,35 +75,10 @@ public class AllTeamsSummary {
             totalMultipliedPoints += team.getTeamMultipliedPoints();
         }
 
-        // Sort the teams by their points
-        final List<? extends TeamSummary> teamsSortedByPoints = teams
+        final Collection<TeamSummary> rankedTeams = RankableSummary.rank(teams)
             .stream()
-            .sorted(Comparator.comparingLong(TeamSummary::getTeamMultipliedPoints).reversed())
+            .map(rankableSummary -> (TeamSummary) rankableSummary)
             .toList();
-
-        final int numberOfTeams = teams.size();
-        final Collection<TeamSummary> rankedTeams = new ArrayList<>(numberOfTeams);
-
-        long previousValue = 0;
-        int previousRank = DEFAULT_TEAM_RANK;
-
-        for (int i = 0; i < numberOfTeams; i++) {
-            // If the current team has the same points as the previous team, don't increment the rank
-            final TeamSummary teamSummary = teamsSortedByPoints.get(i);
-            final int newRank;
-            if (previousValue == teamSummary.getTeamMultipliedPoints()) {
-                newRank = previousRank;
-            } else {
-                // We explicitly want to move to the next rank after a tie (1st, 1st, 3rd) and skipping the tied value
-                // So we increment based on index rather than previousRank (which would give us 1st, 1st, 2nd)
-                newRank = i + 1;
-            }
-
-            rankedTeams.add(TeamSummary.updateWithRank(teamSummary, newRank));
-
-            previousValue = teamSummary.getTeamMultipliedPoints();
-            previousRank = newRank;
-        }
 
         final CompetitionSummary competitionSummary = CompetitionSummary.create(totalPoints, totalMultipliedPoints, totalUnits);
         return new AllTeamsSummary(competitionSummary, rankedTeams);

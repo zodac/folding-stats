@@ -49,7 +49,7 @@ class RetiredUserSummaryTest {
         assertThat(retiredUserSummary.getRankInTeam())
             .isOne();
 
-        final RetiredUserSummary updatedRetiredUserSummary = RetiredUserSummary.updateWithRankInTeam(retiredUserSummary, 2);
+        final RetiredUserSummary updatedRetiredUserSummary = retiredUserSummary.updateWithNewRank(2);
         assertThat(updatedRetiredUserSummary.getRankInTeam())
             .isEqualTo(2);
     }

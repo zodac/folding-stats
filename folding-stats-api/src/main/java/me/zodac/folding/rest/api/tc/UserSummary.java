@@ -42,7 +42,7 @@ import me.zodac.folding.api.tc.User;
 @Setter
 @EqualsAndHashCode
 @ToString(doNotUseGetters = true)
-public class UserSummary {
+public non-sealed class UserSummary implements RankableSummary {
 
     private static final int DEFAULT_RANK = 1;
     private static final long DEFAULT_POINTS = 0L;
@@ -79,7 +79,7 @@ public class UserSummary {
      *
      * <p>
      * The {@link UserSummary} is not ranked to begin with, since it is not aware of the other {@link UserSummary}s.
-     * The rank can be updated later using {@link UserSummary#updateWithRankInTeam(UserSummary, int)}.
+     * The rank can be updated later using {@link UserSummary#updateWithNewRank(int)}.
      *
      * @param user             the {@link User}
      * @param points           the points of the {@link User}
@@ -92,15 +92,13 @@ public class UserSummary {
         return create(user, points, multipliedPoints, units, DEFAULT_RANK);
     }
 
-    /**
-     * Updates a {@link UserSummary} with a rank, after it has been calculated.
-     *
-     * @param userSummary the {@link UserSummary} to update
-     * @param rankInTeam  the rank within the {@link TeamSummary}
-     * @return the updated {@link UserSummary}
-     * @throws IllegalArgumentException thrown if {@code user} is null
-     */
-    public static UserSummary updateWithRankInTeam(final UserSummary userSummary, final int rankInTeam) {
-        return create(userSummary.user, userSummary.points, userSummary.multipliedPoints, userSummary.units, rankInTeam);
+    @Override
+    public UserSummary updateWithNewRank(final int newRank) {
+        return create(user, points, multipliedPoints, units, newRank);
+    }
+
+    @Override
+    public long getRankableValue() {
+        return multipliedPoints;
     }
 }

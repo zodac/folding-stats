@@ -193,7 +193,7 @@ class TeamSummaryTest {
         assertThat(teamSummary.getRank())
             .isOne();
 
-        final TeamSummary updatedTeamSummary = TeamSummary.updateWithRank(teamSummary, 2);
+        final TeamSummary updatedTeamSummary = teamSummary.updateWithNewRank(2);
         assertThat(updatedTeamSummary.getRank())
             .isEqualTo(2);
     }

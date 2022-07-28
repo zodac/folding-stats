@@ -87,7 +87,7 @@ class UserSummaryTest {
         assertThat(userSummary.getRankInTeam())
             .isOne();
 
-        final UserSummary updatedUserSummary = UserSummary.updateWithRankInTeam(userSummary, 2);
+        final UserSummary updatedUserSummary = userSummary.updateWithNewRank(2);
         assertThat(updatedUserSummary.getRankInTeam())
             .isEqualTo(2);
     }

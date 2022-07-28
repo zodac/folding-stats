@@ -24,10 +24,7 @@
 
 package me.zodac.folding.rest.api.tc;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -49,7 +46,7 @@ import me.zodac.folding.api.tc.Team;
 @Setter
 @EqualsAndHashCode
 @ToString(doNotUseGetters = true)
-public class TeamSummary {
+public non-sealed class TeamSummary implements RankableSummary {
 
     private static final int DEFAULT_TEAM_RANK = 1;
 
@@ -98,7 +95,7 @@ public class TeamSummary {
      *
      * <p>
      * The {@link TeamSummary} is not ranked to begin with, since it is not aware of the other {@link TeamSummary}s. The
-     * rank can be updated later using {@link TeamSummary#updateWithRank(TeamSummary, int)}.
+     * rank can be updated later using {@link TeamSummary#updateWithNewRank(int)}.
      *
      * <p>
      * The points, multiplied points and units from each {@link UserSummary} and {@link RetiredUserSummary} are added
@@ -135,29 +132,21 @@ public class TeamSummary {
             teamMultipliedPoints += retired.getMultipliedPoints();
         }
 
-        // Sort the active users by their points
-        final List<? extends UserSummary> activeUsersSortedByPoints = activeUsers
-            .stream()
-            .sorted(Comparator.comparingLong(UserSummary::getMultipliedPoints).reversed())
-            .toList();
-
         // Create new UserSummary instances for each active user, with the new rank
         // Their rank is their index in the sorted list
-        final int numberOfActiveUsers = activeUsers.size();
-        final Collection<UserSummary> rankedActiveUsers = getRankedActiveUsers(activeUsersSortedByPoints, numberOfActiveUsers);
-
-        // Sort the retired users by their points
-        final List<? extends RetiredUserSummary> retiredUsersSortedByPoints = retiredUsers
+        final Collection<UserSummary> rankedActiveUsers = RankableSummary.rank(activeUsers)
             .stream()
-            .sorted(Comparator.comparingLong(RetiredUserSummary::getMultipliedPoints).reversed())
+            .map(rankableSummary -> (UserSummary) rankableSummary)
             .toList();
 
         // Create new RetiredUserSummary instances for each retired user, with the new rank
         // Their rank is their index in the sorted list, plus the number of active users
         // This way retired users are always ranked below active users
-        final int numberOfRetiredUsers = retiredUsers.size();
-        final Collection<RetiredUserSummary> rankedRetiredUsers =
-            getRankedRetiredUsers(numberOfActiveUsers, retiredUsersSortedByPoints, numberOfRetiredUsers);
+        final int numberOfActiveUsers = activeUsers.size();
+        final Collection<RetiredUserSummary> rankedRetiredUsers = RankableSummary.rank(retiredUsers, numberOfActiveUsers)
+            .stream()
+            .map(rankableSummary -> (RetiredUserSummary) rankableSummary)
+            .toList();
 
         // Not ranked to begin with, will be updated by the calling class
         return createWithPoints(
@@ -172,78 +161,13 @@ public class TeamSummary {
         );
     }
 
-    // TODO: Move this ranking logic out of here and AllTeamSummary, use in single place
-    private static Collection<UserSummary> getRankedActiveUsers(final List<? extends UserSummary> activeUsersSortedByPoints,
-                                                                final int numberOfActiveUsers) {
-        final Collection<UserSummary> rankedActiveUsers = new ArrayList<>(numberOfActiveUsers);
-        long previousValue = 0;
-        int previousRank = DEFAULT_TEAM_RANK;
-
-        for (int i = 0; i < numberOfActiveUsers; i++) {
-            // If the current user has the same points as the previous user, don't increment the rank
-            final UserSummary userSummary = activeUsersSortedByPoints.get(i);
-            final int newRank;
-            if (previousValue == userSummary.getMultipliedPoints()) {
-                newRank = previousRank;
-            } else {
-                // We explicitly want to move to the next rank after a tie (1st, 1st, 3rd) and skipping the tied value
-                // So we increment based on index rather than previousRank (which would give us 1st, 1st, 2nd)
-                newRank = i + 1;
-            }
-
-            rankedActiveUsers.add(UserSummary.updateWithRankInTeam(userSummary, newRank));
-
-            previousValue = userSummary.getMultipliedPoints();
-            previousRank = newRank;
-        }
-        return rankedActiveUsers;
+    @Override
+    public TeamSummary updateWithNewRank(final int newRank) {
+        return createWithPoints(team, captainName, teamPoints, teamMultipliedPoints, teamUnits, newRank, activeUsers, retiredUsers);
     }
 
-    private static Collection<RetiredUserSummary> getRankedRetiredUsers(final int numberOfActiveUsers,
-                                                                        final List<? extends RetiredUserSummary> retiredUsersSortedByPoints,
-                                                                        final int numberOfRetiredUsers) {
-        final Collection<RetiredUserSummary> rankedRetiredUsers = new ArrayList<>(numberOfRetiredUsers);
-        long previousValue = 0;
-        int previousRank = DEFAULT_TEAM_RANK;
-
-        for (int i = 0; i < numberOfRetiredUsers; i++) {
-            final RetiredUserSummary retiredUserSummary = retiredUsersSortedByPoints.get(i);
-
-            final int newRank;
-            if (previousValue == retiredUserSummary.getMultipliedPoints()) {
-                newRank = previousRank;
-            } else {
-                // We explicitly want to move to the next rank after a tie (1st, 1st, 3rd) and skipping the tied value
-                // So we increment based on index rather than previousRank (which would give us 1st, 1st, 2nd)
-                newRank = i + 1 + numberOfActiveUsers;
-            }
-
-            rankedRetiredUsers.add(RetiredUserSummary.updateWithRankInTeam(retiredUserSummary, newRank));
-
-            previousValue = retiredUserSummary.getMultipliedPoints();
-            previousRank = newRank;
-        }
-        return rankedRetiredUsers;
-    }
-
-    /**
-     * Updates a {@link TeamSummary} with a rank, after it has been calculated.
-     *
-     * @param teamSummary the {@link TeamSummary} to update
-     * @param rank        the rank
-     * @return the updated {@link TeamSummary}
-     * @throws IllegalArgumentException thrown if {@code team} is null
-     */
-    public static TeamSummary updateWithRank(final TeamSummary teamSummary, final int rank) {
-        return createWithPoints(
-            teamSummary.team,
-            teamSummary.captainName,
-            teamSummary.teamPoints,
-            teamSummary.teamMultipliedPoints,
-            teamSummary.teamUnits,
-            rank,
-            teamSummary.activeUsers,
-            teamSummary.retiredUsers
-        );
+    @Override
+    public long getRankableValue() {
+        return teamMultipliedPoints;
     }
 }
