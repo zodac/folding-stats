@@ -6,11 +6,4 @@
         <packageUrl regex="true">^pkg:maven/org\.springframework/spring.*$</packageUrl>
         <cve>CVE-2016-1000027</cve>
     </suppress>
-
-    <!-- TODO: Remove when spring-boot/Tomcat is updated -->
-    <suppress>
-        <notes><![CDATA[No fix currently available in Tomcat]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.apache.*tomcat.*$</packageUrl>
-        <cve>CVE-2022-34305</cve>
-    </suppress>
 </suppressions>
