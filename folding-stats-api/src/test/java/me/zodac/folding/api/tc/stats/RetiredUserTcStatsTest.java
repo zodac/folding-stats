@@ -25,6 +25,7 @@
 package me.zodac.folding.api.tc.stats;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.Test;
 
@@ -40,6 +41,20 @@ class RetiredUserTcStatsTest {
         assertThat(retiredUserTcStats)
             .extracting("retiredUserId", "teamId", "displayName", "points", "multipliedPoints", "units")
             .containsExactly(1, 1, "user", 5L, 500L, 1);
+    }
+
+    @Test
+    void testCreate_nullDisplayName() {
+        assertThatThrownBy(() -> RetiredUserTcStats.create(1, 1, null, UserTcStats.createNow(1, 5L, 500L, 1)))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("displayName");
+    }
+
+    @Test
+    void testCreate_blankDisplayName() {
+        assertThatThrownBy(() -> RetiredUserTcStats.create(1, 1, "", UserTcStats.createNow(1, 5L, 500L, 1)))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("displayName");
     }
 
     @Test

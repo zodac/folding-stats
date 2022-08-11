@@ -176,7 +176,18 @@ class TeamSummaryTest {
     void testCreate_nullTeam() {
         assertThatThrownBy(
             () -> TeamSummary.createWithDefaultRank(null, "captainName", Collections.emptyList(), Collections.emptyList()))
-            .isInstanceOf(IllegalArgumentException.class);
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("team");
+    }
+
+    @Test
+    void testCreate_nullCaptainName_noException() {
+        final UserSummary userSummary = createUserSummary(1, 10);
+        final Team team = userSummary.user().team();
+        final TeamSummary teamSummary = TeamSummary.createWithDefaultRank(team, null, Collections.emptyList(), Collections.emptyList());
+
+        assertThat(teamSummary.captainName())
+            .isNull();
     }
 
     @Test

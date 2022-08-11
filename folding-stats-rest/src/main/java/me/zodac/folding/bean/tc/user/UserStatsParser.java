@@ -34,7 +34,6 @@ import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
-import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.bean.StatsRepository;
 import me.zodac.folding.state.ParsingStateManager;
 import me.zodac.folding.state.SystemStateManager;
@@ -96,8 +95,8 @@ public class UserStatsParser {
 
     private void updateTcStatsForUser(final User user) {
         LOGGER.debug("Updating stats for '{}': {}", user.displayName(), user);
-        if (StringUtils.isBlank(user.passkey())) { // TODO: Confirm passkey is not masked
-            LOGGER.warn("Not parsing TC stats for user, missing passkey: {}", user);
+        if (user.isPasskeyHidden()) {
+            LOGGER.warn("Not parsing TC stats for user, missing/masked passkey: {}", user);
             return;
         }
 

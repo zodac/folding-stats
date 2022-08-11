@@ -72,20 +72,23 @@ class EncodingUtilsTest {
     @Test
     void whenDecodingBasicAuthentication_givenInputIsNull_thenExceptionIsThrown() {
         assertThatThrownBy(() -> EncodingUtils.decodeBasicAuthentication(null))
-            .isInstanceOf(IllegalArgumentException.class);
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("Cannot decode null");
     }
 
     @Test
     void whenDecodingBasicAuthentication_givenInputIsNotBasicAuthentication_thenExceptionIsThrown() {
         assertThatThrownBy(() -> EncodingUtils.decodeBasicAuthentication("invalid"))
-            .isInstanceOf(IllegalArgumentException.class);
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("Cannot decode input that does not start with: 'Basic '");
     }
 
     @Test
     void whenDecodingBasicAuthentication_givenInputHasInvalidEncoding_thenExceptionIsThrown() {
         final String encodedInput = encode("NonBasic", "userName:password");
         assertThatThrownBy(() -> EncodingUtils.decodeBasicAuthentication(encodedInput))
-            .isInstanceOf(IllegalArgumentException.class);
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("Cannot decode input that does not start with: 'Basic '");
     }
 
     @Test
@@ -111,7 +114,8 @@ class EncodingUtilsTest {
     @Test
     void whenDecodingAuthentication_givenInputIsBlank_thenExceptionIsThrown() {
         assertThatThrownBy(() -> EncodingUtils.decodeBasicAuthentication("invalid"))
-            .isInstanceOf(IllegalArgumentException.class);
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("Cannot decode input that does not start with: 'Basic '");
     }
 
     @Test
@@ -119,7 +123,8 @@ class EncodingUtilsTest {
         final String encodedInput = encode("Basic", "userName+password");
 
         assertThatThrownBy(() -> EncodingUtils.decodeBasicAuthentication(encodedInput))
-            .isInstanceOf(IllegalArgumentException.class);
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("Decoded input does not contain: ':'");
     }
 
     private static String encode(final String prefix, final String input) {

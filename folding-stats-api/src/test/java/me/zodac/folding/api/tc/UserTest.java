@@ -63,7 +63,8 @@ class UserTest {
         final Team team = createTeam();
         assertThatThrownBy(
             () -> User.create(1, "user", "user", DUMMY_PASSKEY, Category.AMD_GPU, VALID_PROFILE_LINK, VALID_LIVE_STATS_LINK, null, team, true))
-            .isInstanceOf(IllegalArgumentException.class);
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("hardware");
     }
 
     @Test
@@ -71,7 +72,8 @@ class UserTest {
         final Hardware hardware = createHardware();
         assertThatThrownBy(
             () -> User.create(1, "user", "user", DUMMY_PASSKEY, Category.AMD_GPU, VALID_PROFILE_LINK, VALID_LIVE_STATS_LINK, hardware, null, true))
-            .isInstanceOf(IllegalArgumentException.class);
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("team");
     }
 
     @Test
@@ -142,10 +144,14 @@ class UserTest {
 
         assertThat(user.passkey())
             .isEqualTo(DUMMY_PASSKEY);
+        assertThat(user.isPasskeyHidden())
+            .isFalse();
 
         final User updatedUser = User.hidePasskey(user);
         assertThat(updatedUser.passkey())
             .isEqualTo("DummyPas************************");
+        assertThat(updatedUser.isPasskeyHidden())
+            .isTrue();
     }
 
     @Test

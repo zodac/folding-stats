@@ -76,7 +76,8 @@ class UserSummaryTest {
     void testCreate_nullUser() {
         assertThatThrownBy(
             () -> UserSummary.createWithDefaultRank(null, 5L, 500L, 1))
-            .isInstanceOf(IllegalArgumentException.class);
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("user");
     }
 
     @Test

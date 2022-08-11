@@ -33,6 +33,7 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
+import me.zodac.folding.api.util.StringUtils;
 
 /**
  * Summary of the stats of a retired {@link me.zodac.folding.api.tc.User} in the {@code Team Competition}.
@@ -66,6 +67,7 @@ public non-sealed class RetiredUserSummary implements RankableSummary {
      * @param units            the units for the {@link RetiredUserSummary}
      * @param rankInTeam       the rank of the {@link RetiredUserTcStats} in the {@link me.zodac.folding.api.tc.Team}
      * @return the created {@link RetiredUserSummary}
+     * @throws IllegalArgumentException thrown if {@code displayName} {@link StringUtils#isBlank(String)}
      */
     public static RetiredUserSummary create(final int id,
                                             final String displayName, // TODO: Fail if blank
@@ -73,6 +75,10 @@ public non-sealed class RetiredUserSummary implements RankableSummary {
                                             final long multipliedPoints,
                                             final int units,
                                             final int rankInTeam) {
+        if (StringUtils.isBlank(displayName)) {
+            throw new IllegalArgumentException("'displayName' must not be null or blank");
+        }
+
         return new RetiredUserSummary(id, displayName, points, multipliedPoints, units, rankInTeam);
     }
 
@@ -87,6 +93,7 @@ public non-sealed class RetiredUserSummary implements RankableSummary {
      * @param retiredUserTcStats the {@link RetiredUserTcStats} for the {@link me.zodac.folding.api.tc.User}
      * @param rankInTeam         the rank of the {@link RetiredUserTcStats} in the {@link me.zodac.folding.api.tc.Team}
      * @return the created {@link RetiredUserSummary}
+     * @throws IllegalArgumentException thrown if {@code displayName} {@link StringUtils#isBlank(String)}
      */
     public static RetiredUserSummary createWithStats(final RetiredUserTcStats retiredUserTcStats, final int rankInTeam) {
         return create(
@@ -109,6 +116,7 @@ public non-sealed class RetiredUserSummary implements RankableSummary {
      *
      * @param retiredUserTcStats the {@link RetiredUserTcStats} for the {@link me.zodac.folding.api.tc.User}
      * @return the created {@link RetiredUserSummary}
+     * @throws IllegalArgumentException thrown if {@code displayName} {@link StringUtils#isBlank(String)}
      */
     public static RetiredUserSummary createWithDefaultRank(final RetiredUserTcStats retiredUserTcStats) {
         return createWithStats(retiredUserTcStats, DEFAULT_USER_RANK);

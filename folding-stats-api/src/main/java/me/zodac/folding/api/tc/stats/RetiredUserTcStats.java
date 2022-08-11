@@ -30,6 +30,7 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.util.StringUtils;
 
 /**
  * POJO that extends {@link UserTcStats} adding a retired user ID, team ID and a display name.When a
@@ -47,11 +48,9 @@ public class RetiredUserTcStats extends UserTcStats {
      */
     public static final int EMPTY_RETIRED_USER_ID = 0;
 
-    private static final String DEFAULT_DISPLAY_NAME = "retiredUser";
-
     private final int retiredUserId;
     private final int teamId;
-    private final String displayName; // TODO: Fail if blank
+    private final String displayName;
 
     /**
      * Constructor for {@link RetiredUserTcStats}.
@@ -79,8 +78,13 @@ public class RetiredUserTcStats extends UserTcStats {
      * @param displayName    the {@link User}'s display name for the points
      * @param retiredTcStats the {@link UserTcStats}
      * @return the created {@link RetiredUserTcStats}
+     * @throws IllegalArgumentException thrown if {@code displayName} {@link StringUtils#isBlank(String)}
      */
     public static RetiredUserTcStats create(final int retiredUserId, final int teamId, final String displayName, final UserTcStats retiredTcStats) {
+        if (StringUtils.isBlank(displayName)) {
+            throw new IllegalArgumentException("'displayName' must not be null or blank");
+        }
+
         return new RetiredUserTcStats(retiredUserId, teamId, displayName, retiredTcStats);
     }
 
@@ -94,6 +98,7 @@ public class RetiredUserTcStats extends UserTcStats {
      * @param displayName    the {@link User}'s display name for the points
      * @param retiredTcStats the {@link UserTcStats}
      * @return the created {@link RetiredUserTcStats}
+     * @throws IllegalArgumentException thrown if {@code displayName} {@link StringUtils#isBlank(String)}
      */
     public static RetiredUserTcStats createWithoutId(final int teamId, final String displayName, final UserTcStats retiredTcStats) {
         return create(EMPTY_RETIRED_USER_ID, teamId, displayName, retiredTcStats);
@@ -108,6 +113,7 @@ public class RetiredUserTcStats extends UserTcStats {
      * @param user           the {@link User} being retired
      * @param retiredTcStats the {@link UserTcStats}
      * @return the created {@link RetiredUserTcStats}
+     * @throws IllegalArgumentException thrown if {@code displayName} {@link StringUtils#isBlank(String)}
      */
     public static RetiredUserTcStats createWithoutId(final User user, final UserTcStats retiredTcStats) {
         return create(EMPTY_RETIRED_USER_ID, user.team().id(), user.displayName(), retiredTcStats);
@@ -123,6 +129,7 @@ public class RetiredUserTcStats extends UserTcStats {
      * @param retiredUserId      the DB-generated ID
      * @param retiredUserTcStats the {@link RetiredUserTcStats} to be updated with the ID
      * @return the updated {@link RetiredUserTcStats}
+     * @throws IllegalArgumentException thrown if {@code displayName} {@link StringUtils#isBlank(String)}
      */
     public static RetiredUserTcStats updateWithId(final int retiredUserId, final RetiredUserTcStats retiredUserTcStats) {
         return create(

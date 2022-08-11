@@ -53,7 +53,7 @@ public non-sealed class TeamSummary implements RankableSummary {
     private static final int DEFAULT_TEAM_RANK = 1;
 
     private Team team;
-    private String captainName;
+    private String captainName; // Can be null for cases where no captain is set for a team
 
     private long teamPoints;
     private long teamMultipliedPoints;

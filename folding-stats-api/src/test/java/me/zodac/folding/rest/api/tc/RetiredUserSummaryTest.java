@@ -25,6 +25,7 @@
 package me.zodac.folding.rest.api.tc;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
@@ -42,6 +43,20 @@ class RetiredUserSummaryTest {
         assertThat(retiredUserSummary)
             .extracting("id", "displayName", "points", "multipliedPoints", "units", "rankInTeam")
             .containsExactly(1, "user", 5L, 500L, 1, 2);
+    }
+
+    @Test
+    void testCreate_nullDisplayName() {
+        assertThatThrownBy(() -> RetiredUserSummary.create(1, null, 5L, 500L, 1, 2))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("displayName");
+    }
+
+    @Test
+    void testCreate_blankDisplayName() {
+        assertThatThrownBy(() -> RetiredUserSummary.create(1, "", 5L, 500L, 1, 2))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("displayName");
     }
 
     @Test

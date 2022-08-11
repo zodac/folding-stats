@@ -227,6 +227,15 @@ public record User(int id,
     }
 
     /**
+     * Checks if the {@link User}'s {@code passkey} has been removed/hidden with a mask, or is exposed as plain-text.
+     *
+     * @return {@code true} if the {@code passkey} is hidden
+     */
+    public boolean isPasskeyHidden() {
+        return StringUtils.isBlank(passkey) || passkey.contains(PASSKEY_MASK);
+    }
+
+    /**
      * Hides the {@code passkey} for the given {@link User}.
      *
      * <p>
