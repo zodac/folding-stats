@@ -79,9 +79,9 @@
         <checkstyle.version>10.2</checkstyle.version>
         <errorprone.version>2.9.0</errorprone.version>
         <licenses.version>1</licenses.version>
-        <spotbugs.version>4.7.0</spotbugs.version>
-        <pitest-junit5-plugin.version>0.15</pitest-junit5-plugin.version>
-        <pmd.version>6.47.0</pmd.version>
+        <spotbugs.version>4.7.1</spotbugs.version>
+        <pitest-junit5-plugin.version>1.0.0</pitest-junit5-plugin.version>
+        <pmd.version>6.48.0</pmd.version>
 
         <!-- Linter Plugin Versions -->
         <dependency-check-maven.version>7.1.0</dependency-check-maven.version>
@@ -89,8 +89,8 @@
         <maven-checkstyle-plugin.version>3.1.2</maven-checkstyle-plugin.version>
         <maven-javadoc-plugin.version>3.4.0</maven-javadoc-plugin.version>
         <maven-pmd-plugin.version>3.16.0</maven-pmd-plugin.version>
-        <pitest-maven.version>1.7.6</pitest-maven.version>
-        <spotbugs-maven-plugin.version>4.6.0.0</spotbugs-maven-plugin.version>
+        <pitest-maven.version>1.9.4</pitest-maven.version>
+        <spotbugs-maven-plugin.version>4.7.1.1</spotbugs-maven-plugin.version>
 
         <!-- Linter Properties -->
         <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
@@ -643,6 +643,10 @@
                     <configuration>
                         <excludedClasses>
                             <param>*Responses</param>
+
+                            <!-- folding-stats-api: False positives -->
+                            <param>*RetiredUserSummary</param>
+                            <param>*UserStats</param>
                         </excludedClasses>
                         <excludedMethods>
                             <param>canEqual</param>

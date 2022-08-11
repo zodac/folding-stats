@@ -31,6 +31,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 
 /**
  * Response returned from {@link me.zodac.folding.stats.http.request.PointsUrlBuilder} for a user/passkey.
@@ -51,6 +52,7 @@ import lombok.ToString;
  * </pre>
  */
 @NoArgsConstructor
+@Accessors(fluent = true)
 @Getter
 @Setter
 @EqualsAndHashCode
@@ -61,8 +63,8 @@ class PointsApiInstance implements Comparable<PointsApiInstance> {
     private long earned;
 
     @Override
-    public int compareTo(final PointsApiInstance other) {
-        return Comparator.comparingLong(PointsApiInstance::getEarned)
-            .compare(other, this);
+    public int compareTo(final PointsApiInstance o) {
+        return Comparator.comparingLong((PointsApiInstance pointsApiInstance) -> pointsApiInstance.earned())
+            .compare(o, this);
     }
 }

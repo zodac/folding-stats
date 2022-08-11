@@ -27,6 +27,7 @@ package me.zodac.folding.api.tc.stats;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 
@@ -35,6 +36,7 @@ import me.zodac.folding.api.tc.User;
  * {@link me.zodac.folding.api.tc.User} is deleted, their stats are stored for the remainder of the {@code Team Competition}
  * period for their team.
  */
+@Accessors(fluent = true)
 @Getter
 @EqualsAndHashCode(callSuper = true)
 @ToString(doNotUseGetters = true, callSuper = true)
@@ -60,8 +62,7 @@ public class RetiredUserTcStats extends UserTcStats {
      * @param userTcStats   the {@link UserTcStats}
      */
     protected RetiredUserTcStats(final int retiredUserId, final int teamId, final String displayName, final UserTcStats userTcStats) {
-        super(userTcStats.getUserId(), userTcStats.getTimestamp(), userTcStats.getPoints(), userTcStats.getMultipliedPoints(),
-            userTcStats.getUnits());
+        super(userTcStats.userId(), userTcStats.timestamp(), userTcStats.points(), userTcStats.multipliedPoints(), userTcStats.units());
         this.retiredUserId = retiredUserId;
         this.teamId = teamId;
         this.displayName = displayName;

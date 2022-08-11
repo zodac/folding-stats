@@ -523,7 +523,7 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
 
     @Override
     public UserTcStats createHourlyTcStats(final UserTcStats userTcStats) {
-        SQL_LOGGER.debug("Inserting TC stats for user ID: {}", userTcStats::getUserId);
+        SQL_LOGGER.debug("Inserting TC stats for user ID: {}", userTcStats::userId);
 
         executeQuery(queryContext -> {
             final var query = queryContext
@@ -536,11 +536,11 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
                     USER_TC_STATS_HOURLY.TC_UNITS
                 )
                 .values(
-                    userTcStats.getUserId(),
-                    DateTimeConverterUtils.toUtcLocalDateTime(userTcStats.getTimestamp()),
-                    userTcStats.getPoints(),
-                    userTcStats.getMultipliedPoints(),
-                    userTcStats.getUnits()
+                    userTcStats.userId(),
+                    DateTimeConverterUtils.toUtcLocalDateTime(userTcStats.timestamp()),
+                    userTcStats.points(),
+                    userTcStats.multipliedPoints(),
+                    userTcStats.units()
                 );
             SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
@@ -616,9 +616,9 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
                     userStats.add(
                         HistoricStats.create(
                             resultSet.getTimestamp("hourly_timestamp").toLocalDateTime(),
-                            userTcStats.getPoints(),
-                            userTcStats.getMultipliedPoints(),
-                            userTcStats.getUnits()
+                            userTcStats.points(),
+                            userTcStats.multipliedPoints(),
+                            userTcStats.units()
                         )
                     );
                 }
@@ -747,22 +747,22 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
             final double hardwareMultiplier = hardware.multiplier();
 
             return UserTcStats.create(
-                firstHourTcStatsCurrentDay.getUserId(),
-                firstHourTcStatsCurrentDay.getTimestamp(),
-                Math.max(0L, firstHourTcStatsCurrentDay.getPoints() - initialStats.getPoints()),
-                Math.max(0L, firstHourTcStatsCurrentDay.getMultipliedPoints() - Math.round(hardwareMultiplier * initialStats.getPoints())),
-                Math.max(0, firstHourTcStatsCurrentDay.getUnits() - initialStats.getUnits())
+                firstHourTcStatsCurrentDay.userId(),
+                firstHourTcStatsCurrentDay.timestamp(),
+                Math.max(0L, firstHourTcStatsCurrentDay.points() - initialStats.points()),
+                Math.max(0L, firstHourTcStatsCurrentDay.multipliedPoints() - Math.round(hardwareMultiplier * initialStats.points())),
+                Math.max(0, firstHourTcStatsCurrentDay.units() - initialStats.units())
             );
         }
 
         SQL_LOGGER.info("Removing previous day's last hour stats from current day's first hour stats: {} - {}", firstHourTcStatsCurrentDay,
             lastHourTcStatsPreviousDay);
         return UserTcStats.create(
-            firstHourTcStatsCurrentDay.getUserId(),
-            firstHourTcStatsCurrentDay.getTimestamp(),
-            Math.max(0L, firstHourTcStatsCurrentDay.getPoints() - lastHourTcStatsPreviousDay.getPoints()),
-            Math.max(0L, firstHourTcStatsCurrentDay.getMultipliedPoints() - lastHourTcStatsPreviousDay.getMultipliedPoints()),
-            Math.max(0, firstHourTcStatsCurrentDay.getUnits() - lastHourTcStatsPreviousDay.getUnits())
+            firstHourTcStatsCurrentDay.userId(),
+            firstHourTcStatsCurrentDay.timestamp(),
+            Math.max(0L, firstHourTcStatsCurrentDay.points() - lastHourTcStatsPreviousDay.points()),
+            Math.max(0L, firstHourTcStatsCurrentDay.multipliedPoints() - lastHourTcStatsPreviousDay.multipliedPoints()),
+            Math.max(0, firstHourTcStatsCurrentDay.units() - lastHourTcStatsPreviousDay.units())
         );
     }
 
@@ -810,9 +810,9 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
                         userStats.add(
                             HistoricStats.create(
                                 localDateTime,
-                                userTcStats.getPoints(),
-                                userTcStats.getMultipliedPoints(),
-                                userTcStats.getUnits()
+                                userTcStats.points(),
+                                userTcStats.multipliedPoints(),
+                                userTcStats.units()
                             )
                         );
                     }
@@ -891,7 +891,7 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
 
     @Override
     public UserStats createInitialStats(final UserStats userStats) {
-        SQL_LOGGER.debug("Inserting initial stats for user {} to DB", userStats::getUserId);
+        SQL_LOGGER.debug("Inserting initial stats for user {} to DB", userStats::userId);
 
         executeQuery(queryContext -> {
             final var query = queryContext
@@ -903,10 +903,10 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
                     USER_INITIAL_STATS.INITIAL_UNITS
                 )
                 .values(
-                    userStats.getUserId(),
-                    DateTimeConverterUtils.toUtcLocalDateTime(userStats.getTimestamp()),
-                    userStats.getPoints(),
-                    userStats.getUnits());
+                    userStats.userId(),
+                    DateTimeConverterUtils.toUtcLocalDateTime(userStats.timestamp()),
+                    userStats.points(),
+                    userStats.units());
             SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
@@ -939,14 +939,14 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
 
     @Override
     public UserStats createTotalStats(final UserStats userStats) {
-        SQL_LOGGER.debug("Inserting total stats for user ID {} to DB", userStats::getUserId);
+        SQL_LOGGER.debug("Inserting total stats for user ID {} to DB", userStats::userId);
 
         executeQuery(queryContext -> {
             final var query = queryContext
                 .insertInto(USER_TOTAL_STATS)
                 .columns(USER_TOTAL_STATS.USER_ID, USER_TOTAL_STATS.UTC_TIMESTAMP, USER_TOTAL_STATS.TOTAL_POINTS, USER_TOTAL_STATS.TOTAL_UNITS)
-                .values(userStats.getUserId(), DateTimeConverterUtils.toUtcLocalDateTime(userStats.getTimestamp()), userStats.getPoints(),
-                    userStats.getUnits());
+                .values(userStats.userId(), DateTimeConverterUtils.toUtcLocalDateTime(userStats.timestamp()), userStats.points(),
+                    userStats.units());
             SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query.execute();
@@ -1080,22 +1080,22 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
                     RETIRED_USER_STATS.FINAL_UNITS
                 )
                 .values(
-                    retiredUserTcStats.getTeamId(),
-                    retiredUserTcStats.getUserId(),
-                    retiredUserTcStats.getDisplayName(),
+                    retiredUserTcStats.teamId(),
+                    retiredUserTcStats.userId(),
+                    retiredUserTcStats.displayName(),
                     currentUtcLocalDateTime,
-                    retiredUserTcStats.getPoints(),
-                    retiredUserTcStats.getMultipliedPoints(),
-                    retiredUserTcStats.getUnits()
+                    retiredUserTcStats.points(),
+                    retiredUserTcStats.multipliedPoints(),
+                    retiredUserTcStats.units()
                 )
                 .onConflict(RETIRED_USER_STATS.USER_ID)
                 .doUpdate()
-                .set(RETIRED_USER_STATS.TEAM_ID, retiredUserTcStats.getTeamId())
+                .set(RETIRED_USER_STATS.TEAM_ID, retiredUserTcStats.teamId())
                 .set(RETIRED_USER_STATS.UTC_TIMESTAMP, currentUtcLocalDateTime)
-                .set(RETIRED_USER_STATS.DISPLAY_USERNAME, retiredUserTcStats.getDisplayName())
-                .set(RETIRED_USER_STATS.FINAL_POINTS, retiredUserTcStats.getPoints())
-                .set(RETIRED_USER_STATS.FINAL_MULTIPLIED_POINTS, retiredUserTcStats.getMultipliedPoints())
-                .set(RETIRED_USER_STATS.FINAL_UNITS, retiredUserTcStats.getUnits())
+                .set(RETIRED_USER_STATS.DISPLAY_USERNAME, retiredUserTcStats.displayName())
+                .set(RETIRED_USER_STATS.FINAL_POINTS, retiredUserTcStats.points())
+                .set(RETIRED_USER_STATS.FINAL_MULTIPLIED_POINTS, retiredUserTcStats.multipliedPoints())
+                .set(RETIRED_USER_STATS.FINAL_UNITS, retiredUserTcStats.units())
                 .returning();
             SQL_LOGGER.debug("Executing SQL: '{}'", query);
 

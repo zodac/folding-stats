@@ -75,7 +75,7 @@ public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
     @Override
     public UserStats getTotalStats(final User user) throws ExternalConnectionException {
         final Stats userStats = getStats(FoldingStatsDetails.createFromUser(user));
-        return UserStats.createNow(user.id(), userStats.getPoints(), userStats.getUnits());
+        return UserStats.createNow(user.id(), userStats.points(), userStats.units());
     }
 
     private static long getPoints(final FoldingStatsDetails foldingStatsDetails) throws ExternalConnectionException {

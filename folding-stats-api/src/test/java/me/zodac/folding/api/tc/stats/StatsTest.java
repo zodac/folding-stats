@@ -29,27 +29,26 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 
 /**
- * Unit tests for {@link RetiredUserTcStats}.
+ * Unit tests for {@link Stats}.
  */
-class RetiredUserTcStatsTest {
+class StatsTest {
 
     @Test
     void testCreate() {
-        final RetiredUserTcStats retiredUserTcStats = RetiredUserTcStats.create(1, 1, "user", UserTcStats.createNow(1, 5L, 500L, 1));
-
-        assertThat(retiredUserTcStats)
-            .extracting("retiredUserId", "teamId", "displayName", "points", "multipliedPoints", "units")
-            .containsExactly(1, 1, "user", 5L, 500L, 1);
+        final Stats stats = Stats.create(10L, 1);
+        assertThat(stats)
+            .extracting("points", "units")
+            .containsExactly(10L, 1);
     }
 
     @Test
-    void testCreateWithoutId_andUpdateWithId() {
-        final RetiredUserTcStats retiredUserTcStats = RetiredUserTcStats.createWithoutId(1, "user", UserTcStats.createNow(1, 5L, 500L, 1));
-        assertThat(retiredUserTcStats.retiredUserId())
-            .isEqualTo(RetiredUserTcStats.EMPTY_RETIRED_USER_ID);
+    void testEmpty() {
+        final Stats stats = Stats.create(10L, 1);
+        assertThat(stats.isEmpty())
+            .isFalse();
 
-        final RetiredUserTcStats updatedRetiredUserTcStats = RetiredUserTcStats.updateWithId(3, retiredUserTcStats);
-        assertThat(updatedRetiredUserTcStats.retiredUserId())
-            .isEqualTo(3);
+        final Stats emptyStats = Stats.create(0L, 0);
+        assertThat(emptyStats.isEmpty())
+            .isTrue();
     }
 }

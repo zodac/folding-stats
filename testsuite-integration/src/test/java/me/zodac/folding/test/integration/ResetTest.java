@@ -139,11 +139,11 @@ class ResetTest {
         final AllTeamsSummary result = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamSummary = getTeamFromCompetition(result, team.teamName());
 
-        assertThat(teamSummary.getActiveUsers())
+        assertThat(teamSummary.activeUsers())
             .as("Expected exactly 2 active users at start: " + teamSummary)
             .hasSize(2);
 
-        assertThat(teamSummary.getRetiredUsers())
+        assertThat(teamSummary.retiredUsers())
             .as("Expected no retired users at start: " + teamSummary)
             .isEmpty();
 
@@ -157,11 +157,11 @@ class ResetTest {
         final AllTeamsSummary resultAfterRetirement = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamSummaryAfterRetirement = getTeamFromCompetition(resultAfterRetirement, team.teamName());
 
-        assertThat(teamSummaryAfterRetirement.getActiveUsers())
+        assertThat(teamSummaryAfterRetirement.activeUsers())
             .as("Expected exactly 1 active users after retirement: " + teamSummaryAfterRetirement)
             .hasSize(1);
 
-        assertThat(teamSummaryAfterRetirement.getRetiredUsers())
+        assertThat(teamSummaryAfterRetirement.retiredUsers())
             .as("Expected exactly 1 retired users after retirement: " + teamSummaryAfterRetirement)
             .hasSize(1);
 
@@ -170,11 +170,11 @@ class ResetTest {
         final AllTeamsSummary resultAfterReset = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamSummaryAfterReset = getTeamFromCompetition(resultAfterReset, team.teamName());
 
-        assertThat(teamSummaryAfterReset.getActiveUsers())
+        assertThat(teamSummaryAfterReset.activeUsers())
             .as("Expected exactly 1 active users after reset: " + teamSummaryAfterReset)
             .hasSize(1);
 
-        assertThat(teamSummaryAfterReset.getRetiredUsers())
+        assertThat(teamSummaryAfterReset.retiredUsers())
             .as("Expected no retired users after reset: " + teamSummaryAfterReset)
             .isEmpty();
     }
@@ -204,18 +204,18 @@ class ResetTest {
         manuallyUpdateStats();
 
         final AllTeamsSummary result = TeamCompetitionStatsUtils.getStats();
-        assertThat(result.getCompetitionSummary().getTotalPoints())
+        assertThat(result.competitionSummary().totalPoints())
             .as("Expected points from all three users: " + result)
             .isEqualTo(firstUserPoints + secondUserPoints + thirdUserPoints);
 
         final TeamSummary firstTeamSummary = getTeamFromCompetition(result, firstTeam.teamName());
         final TeamSummary secondTeamSummary = getTeamFromCompetition(result, secondTeam.teamName());
 
-        assertThat(firstTeamSummary.getTeamPoints())
+        assertThat(firstTeamSummary.teamPoints())
             .as("Expected points for team for first and second user: " + firstTeamSummary)
             .isEqualTo(firstUserPoints + secondUserPoints);
 
-        assertThat(secondTeamSummary.getTeamPoints())
+        assertThat(secondTeamSummary.teamPoints())
             .as("Expected no points for team for third user only: " + secondTeamSummary)
             .isEqualTo(thirdUserPoints);
 
@@ -223,33 +223,33 @@ class ResetTest {
         final UserSummary secondUserSummary = getActiveUserFromTeam(firstTeamSummary, secondUser.getDisplayName());
         final UserSummary thirdUserSummary = getActiveUserFromTeam(secondTeamSummary, thirdUser.getDisplayName());
 
-        assertThat(firstUserSummary.getPoints())
+        assertThat(firstUserSummary.points())
             .as("Expected points for user: " + firstUserSummary)
             .isEqualTo(firstUserPoints);
 
-        assertThat(secondUserSummary.getPoints())
+        assertThat(secondUserSummary.points())
             .as("Expected points for user: " + secondUserSummary)
             .isEqualTo(secondUserPoints);
 
-        assertThat(thirdUserSummary.getPoints())
+        assertThat(thirdUserSummary.points())
             .as("Expected points for user: " + thirdUserSummary)
             .isEqualTo(thirdUserPoints);
 
         manuallyResetStats();
 
         final AllTeamsSummary resultAfterReset = TeamCompetitionStatsUtils.getStats();
-        assertThat(resultAfterReset.getCompetitionSummary().getTotalPoints())
+        assertThat(resultAfterReset.competitionSummary().totalPoints())
             .as("Expected no points overall: " + result)
             .isZero();
 
         final TeamSummary firstTeamSummaryAfterReset = getTeamFromCompetition(resultAfterReset, firstTeam.teamName());
         final TeamSummary secondTeamSummaryAfterReset = getTeamFromCompetition(resultAfterReset, secondTeam.teamName());
 
-        assertThat(firstTeamSummaryAfterReset.getTeamPoints())
+        assertThat(firstTeamSummaryAfterReset.teamPoints())
             .as("Expected no points for team: " + firstTeamSummaryAfterReset)
             .isZero();
 
-        assertThat(secondTeamSummaryAfterReset.getTeamPoints())
+        assertThat(secondTeamSummaryAfterReset.teamPoints())
             .as("Expected no points for team: " + secondTeamSummaryAfterReset)
             .isZero();
 
@@ -257,15 +257,15 @@ class ResetTest {
         final UserSummary secondUserSummaryAfterReset = getActiveUserFromTeam(firstTeamSummaryAfterReset, secondUser.getDisplayName());
         final UserSummary thirdUserSummaryAfterReset = getActiveUserFromTeam(secondTeamSummaryAfterReset, thirdUser.getDisplayName());
 
-        assertThat(firstUserSummaryAfterReset.getPoints())
+        assertThat(firstUserSummaryAfterReset.points())
             .as("Expected no points for user: " + firstUserSummaryAfterReset)
             .isZero();
 
-        assertThat(secondUserSummaryAfterReset.getPoints())
+        assertThat(secondUserSummaryAfterReset.points())
             .as("Expected no points for user: " + secondUserSummaryAfterReset)
             .isZero();
 
-        assertThat(thirdUserSummaryAfterReset.getPoints())
+        assertThat(thirdUserSummaryAfterReset.points())
             .as("Expected no points for user: " + thirdUserSummaryAfterReset)
             .isZero();
     }

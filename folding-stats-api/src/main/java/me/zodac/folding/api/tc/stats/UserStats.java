@@ -26,13 +26,17 @@ package me.zodac.folding.api.tc.stats;
 
 import java.sql.Timestamp;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.util.DateTimeUtils;
 
 /**
  * POJO that extends {@link Stats} adding a {@link User} ID and a {@link Timestamp}.
  */
+@Accessors(fluent = true)
+@Getter
 @EqualsAndHashCode(callSuper = true)
 @ToString(doNotUseGetters = true, callSuper = true)
 public class UserStats extends Stats {
@@ -89,24 +93,6 @@ public class UserStats extends Stats {
      */
     public static UserStats empty() {
         return create(User.EMPTY_USER_ID, DATE_TIME_UTILS.currentUtcTimestamp(), Stats.DEFAULT_POINTS, Stats.DEFAULT_UNITS);
-    }
-
-    /**
-     * Retrieve the ID of the {@link User}.
-     *
-     * @return the {@link User} ID
-     */
-    public int getUserId() {
-        return userId;
-    }
-
-    /**
-     * The {@link Timestamp} for when the {@link UserStats} were created.
-     *
-     * @return the {@link Timestamp}
-     */
-    public Timestamp getTimestamp() {
-        return new Timestamp(timestamp.getTime());
     }
 
     @Override

@@ -31,6 +31,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 import me.zodac.folding.api.util.EncodingUtils;
 
 
@@ -44,6 +45,7 @@ import me.zodac.folding.api.util.EncodingUtils;
  */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Accessors(fluent = false) // Need #get*()
 @Getter
 @Setter
 @EqualsAndHashCode

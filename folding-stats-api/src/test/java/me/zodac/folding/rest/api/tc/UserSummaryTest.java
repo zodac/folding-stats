@@ -45,10 +45,10 @@ class UserSummaryTest {
         final User user = createUser();
         final UserSummary userSummary = UserSummary.createWithDefaultRank(user, 10L, 1_000L, 2);
 
-        assertThat(userSummary.getUser())
+        assertThat(userSummary.user())
             .isEqualTo(user);
 
-        assertThat(userSummary.getRankInTeam())
+        assertThat(userSummary.rankInTeam())
             .isOne();
 
         assertThat(userSummary)
@@ -61,10 +61,10 @@ class UserSummaryTest {
         final User user = createUser();
         final UserSummary userSummary = UserSummary.create(user, 5L, 500L, 1, 2);
 
-        assertThat(userSummary.getUser())
+        assertThat(userSummary.user())
             .isEqualTo(user);
 
-        assertThat(userSummary.getRankInTeam())
+        assertThat(userSummary.rankInTeam())
             .isEqualTo(2);
 
         assertThat(userSummary)
@@ -84,11 +84,11 @@ class UserSummaryTest {
         final User user = createUser();
         final UserSummary userSummary = UserSummary.createWithDefaultRank(user, 5L, 500L, 1);
 
-        assertThat(userSummary.getRankInTeam())
+        assertThat(userSummary.rankInTeam())
             .isOne();
 
         final UserSummary updatedUserSummary = userSummary.updateWithNewRank(2);
-        assertThat(updatedUserSummary.getRankInTeam())
+        assertThat(updatedUserSummary.rankInTeam())
             .isEqualTo(2);
     }
 

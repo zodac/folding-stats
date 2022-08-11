@@ -132,11 +132,11 @@ class HistoricTeamStatsTest {
             .hasSize(2);
 
         final HistoricStats result = results.get(1); // Ignore first result, as it is the "initial" stats for the team
-        assertThat(result.getPoints())
+        assertThat(result.points())
             .isEqualTo(80L);
-        assertThat(result.getMultipliedPoints())
+        assertThat(result.multipliedPoints())
             .isEqualTo(800L);
-        assertThat(result.getUnits())
+        assertThat(result.units())
             .isEqualTo(8);
     }
 
@@ -162,11 +162,11 @@ class HistoricTeamStatsTest {
             .hasSize(2);
 
         final HistoricStats result = results.get(1); // Ignore first result, as it is the "initial" stats for the team
-        assertThat(result.getPoints())
+        assertThat(result.points())
             .isEqualTo(60L);
-        assertThat(result.getMultipliedPoints())
+        assertThat(result.multipliedPoints())
             .isEqualTo(600L);
-        assertThat(result.getUnits())
+        assertThat(result.units())
             .isEqualTo(6);
     }
 
@@ -196,11 +196,11 @@ class HistoricTeamStatsTest {
             .hasSize(2);
 
         final HistoricStats result = results.get(1); // Ignore first result, as it is the "initial" stats for the team
-        assertThat(result.getPoints())
+        assertThat(result.points())
             .isEqualTo(210L);
-        assertThat(result.getMultipliedPoints())
+        assertThat(result.multipliedPoints())
             .isEqualTo(2_100L);
-        assertThat(result.getUnits())
+        assertThat(result.units())
             .isEqualTo(21);
     }
 
@@ -326,11 +326,11 @@ class HistoricTeamStatsTest {
             .hasSize(2);
 
         final HistoricStats result = results.get(1); // Ignore first result, as it is the "initial" stats for the team
-        assertThat(result.getPoints())
+        assertThat(result.points())
             .isEqualTo(80L);
-        assertThat(result.getMultipliedPoints())
+        assertThat(result.multipliedPoints())
             .isEqualTo(800L);
-        assertThat(result.getUnits())
+        assertThat(result.units())
             .isEqualTo(8);
     }
 
@@ -354,11 +354,11 @@ class HistoricTeamStatsTest {
             .hasSize(2);
 
         final HistoricStats result = results.get(1); // Ignore first result, as it is the "initial" stats for the team
-        assertThat(result.getPoints())
+        assertThat(result.points())
             .isEqualTo(100L);
-        assertThat(result.getMultipliedPoints())
+        assertThat(result.multipliedPoints())
             .isEqualTo(1_000L);
-        assertThat(result.getUnits())
+        assertThat(result.units())
             .isEqualTo(10);
     }
 
@@ -386,11 +386,11 @@ class HistoricTeamStatsTest {
             .hasSize(2);
 
         final HistoricStats result = results.get(1); // Ignore first result, as it is the "initial" stats for the team
-        assertThat(result.getPoints())
+        assertThat(result.points())
             .isEqualTo(210L);
-        assertThat(result.getMultipliedPoints())
+        assertThat(result.multipliedPoints())
             .isEqualTo(2_100L);
-        assertThat(result.getUnits())
+        assertThat(result.units())
             .isEqualTo(21);
     }
 
@@ -524,11 +524,11 @@ class HistoricTeamStatsTest {
             .hasSize(2);
 
         final HistoricStats result = results.get(1); // Ignore first result, as it is the "initial" stats for the team
-        assertThat(result.getPoints())
+        assertThat(result.points())
             .isEqualTo(100L);
-        assertThat(result.getMultipliedPoints())
+        assertThat(result.multipliedPoints())
             .isEqualTo(1_000L);
-        assertThat(result.getUnits())
+        assertThat(result.units())
             .isEqualTo(10);
     }
 
@@ -553,11 +553,11 @@ class HistoricTeamStatsTest {
             .hasSize(2);
 
         final HistoricStats result = results.get(1); // Ignore first result, as it is the "initial" stats for the team
-        assertThat(result.getPoints())
+        assertThat(result.points())
             .isEqualTo(110L);
-        assertThat(result.getMultipliedPoints())
+        assertThat(result.multipliedPoints())
             .isEqualTo(1_100L);
-        assertThat(result.getUnits())
+        assertThat(result.units())
             .isEqualTo(11);
     }
 
@@ -585,11 +585,11 @@ class HistoricTeamStatsTest {
             .hasSize(2);
 
         final HistoricStats result = results.get(1); // Ignore first result, as it is the "initial" stats for the team
-        assertThat(result.getPoints())
+        assertThat(result.points())
             .isEqualTo(310L);
-        assertThat(result.getMultipliedPoints())
+        assertThat(result.multipliedPoints())
             .isEqualTo(3_100L);
-        assertThat(result.getUnits())
+        assertThat(result.units())
             .isEqualTo(31);
     }
 

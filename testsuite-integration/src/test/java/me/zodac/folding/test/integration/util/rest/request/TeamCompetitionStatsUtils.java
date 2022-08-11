@@ -93,12 +93,12 @@ public final class TeamCompetitionStatsUtils {
      * @throws FoldingRestException thrown if an error occurs sending the HTTP request
      */
     public static TeamSummary getTeamFromCompetition(final AllTeamsSummary allTeamsSummary, final String teamName) throws FoldingRestException {
-        for (final TeamSummary teamSummary : allTeamsSummary.getTeams()) {
-            if (teamSummary.getTeam().teamName().equalsIgnoreCase(teamName)) {
+        for (final TeamSummary teamSummary : allTeamsSummary.teams()) {
+            if (teamSummary.team().teamName().equalsIgnoreCase(teamName)) {
                 return teamSummary;
             }
         }
-        throw new FoldingRestException(String.format("Unable to find team '%s' in competition teams: %s", teamName, allTeamsSummary.getTeams()));
+        throw new FoldingRestException(String.format("Unable to find team '%s' in competition teams: %s", teamName, allTeamsSummary.teams()));
     }
 
     /**
@@ -110,12 +110,12 @@ public final class TeamCompetitionStatsUtils {
      * @throws FoldingRestException thrown if an error occurs sending the HTTP request
      */
     public static UserSummary getActiveUserFromTeam(final TeamSummary teamSummary, final String userName) throws FoldingRestException {
-        for (final UserSummary userSummary : teamSummary.getActiveUsers()) {
-            if (userSummary.getUser().displayName().equalsIgnoreCase(userName)) {
+        for (final UserSummary userSummary : teamSummary.activeUsers()) {
+            if (userSummary.user().displayName().equalsIgnoreCase(userName)) {
                 return userSummary;
             }
         }
-        throw new FoldingRestException(String.format("Unable to find user '%s' in active users: %s", userName, teamSummary.getActiveUsers()));
+        throw new FoldingRestException(String.format("Unable to find user '%s' in active users: %s", userName, teamSummary.activeUsers()));
     }
 
     /**
@@ -127,12 +127,12 @@ public final class TeamCompetitionStatsUtils {
      * @throws FoldingRestException thrown if an error occurs sending the HTTP request
      */
     public static RetiredUserSummary getRetiredUserFromTeam(final TeamSummary teamSummary, final String userName) throws FoldingRestException {
-        for (final RetiredUserSummary userResult : teamSummary.getRetiredUsers()) {
-            if (userResult.getDisplayName().equalsIgnoreCase(userName)) {
+        for (final RetiredUserSummary userResult : teamSummary.retiredUsers()) {
+            if (userResult.displayName().equalsIgnoreCase(userName)) {
                 return userResult;
             }
         }
-        throw new FoldingRestException(String.format("Unable to find user '%s' in retired users: %s", userName, teamSummary.getRetiredUsers()));
+        throw new FoldingRestException(String.format("Unable to find user '%s' in retired users: %s", userName, teamSummary.retiredUsers()));
     }
 
     /**

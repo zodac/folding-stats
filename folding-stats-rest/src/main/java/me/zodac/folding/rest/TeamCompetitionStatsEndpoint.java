@@ -131,7 +131,7 @@ public class TeamCompetitionStatsEndpoint {
         AUDIT_LOGGER.debug("GET request received to show TC overall stats");
         visitCounter.increment();
         final AllTeamsSummary allTeamsSummary = statsRepository.getAllTeamsSummary();
-        return ok(allTeamsSummary.getCompetitionSummary());
+        return ok(allTeamsSummary.competitionSummary());
     }
 
     /**
@@ -164,13 +164,13 @@ public class TeamCompetitionStatsEndpoint {
         final User user = foldingRepository.getUserWithoutPasskey(userId);
 
         final AllTeamsSummary allTeamsSummary = statsRepository.getAllTeamsSummary();
-        final Collection<UserSummary> userSummaries = allTeamsSummary.getTeams()
+        final Collection<UserSummary> userSummaries = allTeamsSummary.teams()
             .stream()
-            .flatMap(teamResult -> teamResult.getActiveUsers().stream())
+            .flatMap(teamResult -> teamResult.activeUsers().stream())
             .toList();
 
         for (final UserSummary userSummary : userSummaries) {
-            if (userSummary.getUser().id() == user.id()) {
+            if (userSummary.user().id() == user.id()) {
                 return ok(userSummary);
             }
         }
@@ -197,6 +197,7 @@ public class TeamCompetitionStatsEndpoint {
         final User user = foldingRepository.getUserWithPasskey(userId);
         final Hardware hardware = user.hardware();
         final OffsetTcStats offsetTcStatsToPersist = OffsetTcStats.updateWithHardwareMultiplier(offsetTcStats, hardware.multiplier());
+
         final OffsetTcStats createdOffsetStats = statsRepository.createOrUpdateOffsetStats(user, offsetTcStatsToPersist);
 
         SystemStateManager.next(SystemState.UPDATING_STATS);

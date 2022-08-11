@@ -129,9 +129,9 @@ class MonthlyResultTest {
         int totalTeamUnits = 0;
 
         for (final TeamLeaderboardEntry teamLeaderboardEntry : monthlyResult.teamLeaderboard()) {
-            totalTeamPoints += teamLeaderboardEntry.getTeamPoints();
-            totalTeamMultipliedPoints += teamLeaderboardEntry.getTeamMultipliedPoints();
-            totalTeamUnits += teamLeaderboardEntry.getTeamUnits();
+            totalTeamPoints += teamLeaderboardEntry.teamPoints();
+            totalTeamMultipliedPoints += teamLeaderboardEntry.teamMultipliedPoints();
+            totalTeamUnits += teamLeaderboardEntry.teamUnits();
         }
         assertThat(totalTeamPoints)
             .isEqualTo(5L);
@@ -148,9 +148,9 @@ class MonthlyResultTest {
         int totalEmptyTeamUnits = 0;
 
         for (final TeamLeaderboardEntry teamLeaderboardEntry : emptyMonthlyResult.teamLeaderboard()) {
-            totalEmptyTeamPoints += teamLeaderboardEntry.getTeamPoints();
-            totalEmptyTeamMultipliedPoints += teamLeaderboardEntry.getTeamMultipliedPoints();
-            totalEmptyTeamUnits += teamLeaderboardEntry.getTeamUnits();
+            totalEmptyTeamPoints += teamLeaderboardEntry.teamPoints();
+            totalEmptyTeamMultipliedPoints += teamLeaderboardEntry.teamMultipliedPoints();
+            totalEmptyTeamUnits += teamLeaderboardEntry.teamUnits();
         }
         assertThat(totalEmptyTeamPoints)
             .isEqualTo(0L);

@@ -28,12 +28,14 @@ import java.sql.Timestamp;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 import me.zodac.folding.api.util.DateTimeUtils;
 
 /**
  * POJO that extends {@link UserStats} adding multiplied points for a {@code Team Competition}
  * {@link me.zodac.folding.api.tc.User}, based on a hardware multiplier.
  */
+@Accessors(fluent = true)
 @Getter
 @EqualsAndHashCode(callSuper = true)
 @ToString(doNotUseGetters = true, callSuper = true)
@@ -112,11 +114,11 @@ public class UserTcStats extends UserStats {
      * @return the new {@link UserTcStats} instances with {@link OffsetTcStats} applied
      */
     public UserTcStats add(final OffsetTcStats offsetTcStats) {
-        final long offsetPoints = Math.max(getPoints() + offsetTcStats.getPointsOffset(), Stats.DEFAULT_POINTS);
+        final long offsetPoints = Math.max(points() + offsetTcStats.getPointsOffset(), Stats.DEFAULT_POINTS);
         final long offsetMultipliedPoints = Math.max(multipliedPoints + offsetTcStats.getMultipliedPointsOffset(), DEFAULT_MULTIPLIED_POINTS);
-        final int offsetUnits = Math.max(getUnits() + offsetTcStats.getUnitsOffset(), Stats.DEFAULT_UNITS);
+        final int offsetUnits = Math.max(units() + offsetTcStats.getUnitsOffset(), Stats.DEFAULT_UNITS);
 
-        return create(getUserId(), getTimestamp(), offsetPoints, offsetMultipliedPoints, offsetUnits);
+        return create(userId(), timestamp(), offsetPoints, offsetMultipliedPoints, offsetUnits);
     }
 
     /**
@@ -131,11 +133,11 @@ public class UserTcStats extends UserStats {
      * @return the new {@link UserTcStats} instances with {@link OffsetTcStats} applied
      */
     public UserTcStats subtract(final UserTcStats userTcStats) {
-        final long updatedPoints = Math.max(getPoints() - userTcStats.getPoints(), Stats.DEFAULT_POINTS);
+        final long updatedPoints = Math.max(points() - userTcStats.points(), Stats.DEFAULT_POINTS);
         final long updatedMultipliedPoints = Math.max(multipliedPoints - userTcStats.multipliedPoints, DEFAULT_MULTIPLIED_POINTS);
-        final int updatedUnits = Math.max(getUnits() - userTcStats.getUnits(), Stats.DEFAULT_UNITS);
+        final int updatedUnits = Math.max(units() - userTcStats.units(), Stats.DEFAULT_UNITS);
 
-        return create(getUserId(), getTimestamp(), updatedPoints, updatedMultipliedPoints, updatedUnits);
+        return create(userId(), timestamp(), updatedPoints, updatedMultipliedPoints, updatedUnits);
     }
 
     @Override

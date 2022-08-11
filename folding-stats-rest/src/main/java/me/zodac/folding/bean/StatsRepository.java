@@ -293,9 +293,9 @@ public class StatsRepository {
         for (final User user : storage.getAllUsers()) {
             LOGGER.info("Resetting TC stats for {}", user.displayName());
             final UserStats totalStats = getTotalStats(user);
-            final UserStats totalStatsWithNewTime = UserStats.createNow(totalStats.getUserId(), totalStats.getPoints(), totalStats.getUnits());
+            final UserStats totalStatsWithNewTime = UserStats.createNow(totalStats.userId(), totalStats.points(), totalStats.units());
             createInitialStats(totalStatsWithNewTime);
-            createHourlyTcStats(UserTcStats.empty(totalStats.getUserId()));
+            createHourlyTcStats(UserTcStats.empty(totalStats.userId()));
         }
 
         LOGGER.info("Deleting retired user TC stats");
@@ -387,15 +387,15 @@ public class StatsRepository {
     private Collection<RetiredUserTcStats> getAllRetiredUsersForTeam(final Team team) {
         return storage.getAllRetiredUsers()
             .stream()
-            .filter(retiredUserTcStats -> retiredUserTcStats.getTeamId() == team.id())
+            .filter(retiredUserTcStats -> retiredUserTcStats.teamId() == team.id())
             .toList();
     }
 
     private UserSummary getTcStatsForUser(final User user) {
         final UserTcStats userTcStats = getHourlyTcStats(user);
-        LOGGER.debug("Results for {}: {} points | {} multiplied points | {} units", user::displayName, userTcStats::getPoints,
-            userTcStats::getMultipliedPoints, userTcStats::getUnits);
-        return UserSummary.createWithDefaultRank(user, userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits());
+        LOGGER.debug("Results for {}: {} points | {} multiplied points | {} units", user::displayName, userTcStats::points,
+            userTcStats::multipliedPoints, userTcStats::units);
+        return UserSummary.createWithDefaultRank(user, userTcStats.points(), userTcStats.multipliedPoints(), userTcStats.units());
     }
 
     private static String getCaptainDisplayName(final String teamName, final Iterable<User> usersOnTeam) {

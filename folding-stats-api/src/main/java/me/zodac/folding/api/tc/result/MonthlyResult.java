@@ -130,9 +130,9 @@ public record MonthlyResult(List<TeamLeaderboardEntry> teamLeaderboard,
         int totalTeamUnits = 0;
 
         for (final TeamLeaderboardEntry teamLeaderboardEntry : teamLeaderboard) {
-            totalTeamPoints = incrementOrZero(totalTeamPoints, teamLeaderboardEntry.getTeamPoints());
-            totalTeamMultipliedPoints = incrementOrZero(totalTeamMultipliedPoints, teamLeaderboardEntry.getTeamMultipliedPoints());
-            totalTeamUnits = Math.toIntExact(incrementOrZero(totalTeamUnits, teamLeaderboardEntry.getTeamUnits()));
+            totalTeamPoints = incrementOrZero(totalTeamPoints, teamLeaderboardEntry.teamPoints());
+            totalTeamMultipliedPoints = incrementOrZero(totalTeamMultipliedPoints, teamLeaderboardEntry.teamMultipliedPoints());
+            totalTeamUnits = Math.toIntExact(incrementOrZero(totalTeamUnits, teamLeaderboardEntry.teamUnits()));
         }
 
         return totalTeamPoints == 0L && totalTeamMultipliedPoints == 0L && totalTeamUnits == 0;

@@ -104,7 +104,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'category' must be one of: [AMD_GPU, NVIDIA_GPU, WILDCARD]");
     }
 
@@ -130,7 +130,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen");
     }
 
@@ -157,7 +157,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen");
     }
 
@@ -184,7 +184,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'displayName' must not be empty");
     }
 
@@ -211,7 +211,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'passkey' must be 32 characters long and include only alphanumeric characters");
     }
 
@@ -238,7 +238,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'passkey' must be 32 characters long and include only alphanumeric characters");
     }
 
@@ -294,7 +294,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'profileLink' is not a valid link: 'invalidUrl'");
     }
 
@@ -350,7 +350,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'liveStatsLink' is not a valid link: 'invalidUrl'");
     }
 
@@ -444,13 +444,13 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ConflictException e = catchThrowableOfType(() -> userValidator.create(user), ConflictException.class);
-        assertThat(e.getConflictFailure().getConflictingAttributes())
+        assertThat(e.getConflictFailure().conflictingAttributes())
             .containsOnly(
                 "foldingUserName",
                 "passkey"
             );
 
-        assertThat(e.getConflictFailure().getConflictingObject())
+        assertThat(e.getConflictFailure().conflictingObject())
             .isNotNull();
     }
 
@@ -477,7 +477,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly(String.format("Category '%s' cannot be filled by hardware of make '%s', must be one of: %s", Category.AMD_GPU,
                 hardware.hardwareMake(), Category.AMD_GPU.supportedHardwareMakes()));
     }
@@ -513,7 +513,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly(String.format("Category '%s' cannot be filled by hardware of type '%s', must be one of: %s", Category.AMD_GPU,
                 hardware.hardwareType(), Category.AMD_GPU.supportedHardwareTypes()));
     }
@@ -549,7 +549,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly(String.format("Field 'hardwareId' must be one of: [%s: %s]", hardware.id(), hardware.hardwareName()));
     }
 
@@ -574,7 +574,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("No hardwares exist on the system");
     }
 
@@ -609,7 +609,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly(String.format("Field 'teamId' must be one of: [%s: %s]", team.id(), team.teamName()));
     }
 
@@ -634,7 +634,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("No teams exist on the system");
     }
 
@@ -764,7 +764,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly(String.format("Team '%1$s' has %2$s users, maximum permitted is %2$s", team.teamName(),
                 Category.maximumPermittedAmountForAllCategories()));
     }
@@ -855,7 +855,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly(
                 String.format("Team '%1$s' already has %3$s users in category '%2$s', only %3$s permitted", team.teamName(), Category.NVIDIA_GPU,
                     Category.NVIDIA_GPU.permittedUsers()));
@@ -884,7 +884,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new NoUnitsFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly(
                 String.format("User '%s' has 0 Work Units with passkey '%s', there must be at least one completed Work Unit before adding the user",
                     user.getDisplayName(), user.getPasskey())
@@ -914,7 +914,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ExternalConnectionFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly(String.format("Unable to connect to 'https://www.google.com' to check stats for user '%s': Error connecting",
                 user.getDisplayName())
             );
@@ -943,7 +943,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new UnexpectedExceptionFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly(String.format("Unable to check stats for user '%s': Error", user.getDisplayName()));
     }
 
@@ -970,7 +970,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly(
                 "Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen",
                 "Field 'displayName' must not be empty",
@@ -1061,7 +1061,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'category' must be one of: [AMD_GPU, NVIDIA_GPU, WILDCARD]");
     }
 
@@ -1102,7 +1102,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen");
     }
 
@@ -1143,7 +1143,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen");
     }
 
@@ -1184,7 +1184,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'displayName' must not be empty");
     }
 
@@ -1225,7 +1225,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'passkey' must be 32 characters long and include only alphanumeric characters");
     }
 
@@ -1266,7 +1266,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'passkey' must be 32 characters long and include only alphanumeric characters");
     }
 
@@ -1307,7 +1307,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'passkey' must be 32 characters long and include only alphanumeric characters");
     }
 
@@ -1391,7 +1391,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'profileLink' is not a valid link: 'invalidUrl'");
     }
 
@@ -1475,7 +1475,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'liveStatsLink' is not a valid link: 'invalidUrl'");
     }
 
@@ -1535,13 +1535,13 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ConflictException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ConflictException.class);
-        assertThat(e.getConflictFailure().getConflictingAttributes())
+        assertThat(e.getConflictFailure().conflictingAttributes())
             .containsOnly(
                 "foldingUserName",
                 "passkey"
             );
 
-        assertThat(e.getConflictFailure().getConflictingObject())
+        assertThat(e.getConflictFailure().conflictingObject())
             .isNotNull();
     }
 
@@ -1860,7 +1860,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly(String.format("Team '%1$s' has %2$s users, maximum permitted is %2$s", team.teamName(),
                 Category.maximumPermittedAmountForAllCategories())
             );
@@ -1923,7 +1923,7 @@ class UserValidatorTest {
         final ValidationException e =
             catchThrowableOfType(() -> userValidator.update(user, existingUser),
                 ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly(String.format("Team '%1$s' already has %3$s users in category '%2$s', only %3$s permitted", team.teamName(),
                 Category.NVIDIA_GPU, Category.NVIDIA_GPU.permittedUsers())
             );
@@ -1984,7 +1984,7 @@ class UserValidatorTest {
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e =
             catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly(String.format("Team '%1$s' already has %3$s users in category '%2$s', only %3$s permitted", team.teamName(),
                 Category.NVIDIA_GPU, Category.NVIDIA_GPU.permittedUsers())
             );
@@ -2027,7 +2027,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly(String.format("Category '%s' cannot be filled by hardware of make '%s', must be one of: %s", Category.AMD_GPU,
                 hardware.hardwareMake(), Category.AMD_GPU.supportedHardwareMakes())
             );
@@ -2078,7 +2078,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly(String.format("Category '%s' cannot be filled by hardware of type '%s', must be one of: %s", Category.AMD_GPU,
                 hardware.hardwareType(), Category.AMD_GPU.supportedHardwareTypes())
             );
@@ -2130,7 +2130,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly(String.format("Field 'hardwareId' must be one of: [%s: %s]", hardware.id(), hardware.hardwareName()));
     }
 
@@ -2169,7 +2169,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("No hardwares exist on the system");
     }
 
@@ -2215,7 +2215,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly(String.format("Field 'teamId' must be one of: [%s: %s]", team.id(), team.teamName()));
     }
 
@@ -2254,7 +2254,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("No teams exist on the system");
     }
 
@@ -2338,7 +2338,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new NoUnitsFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly(String.format(
                 "User '%s' has 0 Work Units with passkey '%s', there must be at least one completed Work Unit before adding the user",
                 user.getDisplayName(), user.getPasskey())
@@ -2382,7 +2382,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ExternalConnectionFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly(String.format("Unable to connect to 'https://www.google.com' to check stats for user '%s': Error connecting",
                 user.getDisplayName())
             );
@@ -2425,7 +2425,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new UnexpectedExceptionFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly(String.format("Unable to check stats for user '%s': Error", user.getDisplayName()));
     }
 
@@ -2466,7 +2466,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly(
                 "Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen",
                 "Field 'displayName' must not be empty",
@@ -2527,7 +2527,7 @@ class UserValidatorTest {
 
         final UserValidator userValidator = new UserValidator(foldingRepository, new ValidFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.delete(userToDelete), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly(String.format("Cannot delete user '%s' since they are team captain", userToDelete.displayName()));
     }
 

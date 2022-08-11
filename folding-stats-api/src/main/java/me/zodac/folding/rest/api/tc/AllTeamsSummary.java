@@ -33,6 +33,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 
 /**
  * Summary of the stats of all {@link me.zodac.folding.api.tc.Team}s and their {@link me.zodac.folding.api.tc.User}s in
@@ -40,6 +41,7 @@ import lombok.ToString;
  */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Accessors(fluent = true)
 @Getter
 @Setter
 @EqualsAndHashCode
@@ -65,14 +67,14 @@ public class AllTeamsSummary {
      * @return the created {@link AllTeamsSummary}
      */
     public static AllTeamsSummary create(final Collection<? extends TeamSummary> teams) {
-        int totalUnits = 0;
         long totalPoints = 0L;
         long totalMultipliedPoints = 0L;
+        int totalUnits = 0;
 
         for (final TeamSummary team : teams) {
-            totalUnits += team.getTeamUnits();
-            totalPoints += team.getTeamPoints();
-            totalMultipliedPoints += team.getTeamMultipliedPoints();
+            totalPoints += team.teamPoints();
+            totalMultipliedPoints += team.teamMultipliedPoints();
+            totalUnits += team.teamUnits();
         }
 
         final Collection<TeamSummary> rankedTeams = RankableSummary.rank(teams)

@@ -31,6 +31,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 import me.zodac.folding.api.tc.User;
 
 /**
@@ -38,6 +39,7 @@ import me.zodac.folding.api.tc.User;
  */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Accessors(fluent = true)
 @Getter
 @Setter
 @EqualsAndHashCode

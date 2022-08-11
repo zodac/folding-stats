@@ -230,7 +230,7 @@ public record User(int id,
      * Hides the {@code passkey} for the given {@link User}.
      *
      * <p>
-     * Since we do not want {@link User}s' passkeys to be made available through the REST API, we hide most of the passkey, though we leave the first
+     * Since we do not want {@link User} passkeys to be made available through the REST API, we hide most of the passkey, though we leave the first
      * eight (8) digits visible.
      *
      * @param user the {@link User} whose passkey is to be hidden

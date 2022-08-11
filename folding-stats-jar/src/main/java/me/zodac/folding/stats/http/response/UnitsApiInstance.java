@@ -31,6 +31,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 
 /**
  * Response returned from {@link me.zodac.folding.stats.http.request.UnitsUrlBuilder} for a user/passkey.
@@ -53,6 +54,7 @@ import lombok.ToString;
  * </pre>
  */
 @NoArgsConstructor
+@Accessors(fluent = true)
 @Getter
 @Setter
 @EqualsAndHashCode
@@ -69,10 +71,10 @@ class UnitsApiInstance implements Comparable<UnitsApiInstance> {
     private int active;
 
     @Override
-    public int compareTo(final UnitsApiInstance other) {
-        return Comparator.comparingInt(UnitsApiInstance::getFinished)
-            .thenComparingInt(UnitsApiInstance::getActive)
-            .thenComparingInt(UnitsApiInstance::getExpired)
-            .compare(other, this);
+    public int compareTo(final UnitsApiInstance o) {
+        return Comparator.comparingInt((UnitsApiInstance unitsApiInstance) -> unitsApiInstance.finished())
+            .thenComparingInt(UnitsApiInstance::active)
+            .thenComparingInt(UnitsApiInstance::expired)
+            .compare(o, this);
     }
 }

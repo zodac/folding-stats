@@ -236,9 +236,9 @@ class PostgresDbManagerTest {
         final Optional<UserStats> userStatsAfterUpdate = POSTGRES_DB_MANAGER.getInitialStats(userId);
         assertThat(userStatsAfterUpdate)
             .isPresent();
-        assertThat(userStatsAfterUpdate.get().getPoints())
+        assertThat(userStatsAfterUpdate.get().points())
             .isEqualTo(points);
-        assertThat(userStatsAfterUpdate.get().getUnits())
+        assertThat(userStatsAfterUpdate.get().units())
             .isEqualTo(units);
     }
 
@@ -256,9 +256,9 @@ class PostgresDbManagerTest {
         final Optional<UserStats> userStatsAfterUpdate = POSTGRES_DB_MANAGER.getTotalStats(userId);
         assertThat(userStatsAfterUpdate)
             .isPresent();
-        assertThat(userStatsAfterUpdate.get().getPoints())
+        assertThat(userStatsAfterUpdate.get().points())
             .isEqualTo(points);
-        assertThat(userStatsAfterUpdate.get().getUnits())
+        assertThat(userStatsAfterUpdate.get().units())
             .isEqualTo(units);
     }
 
@@ -286,11 +286,11 @@ class PostgresDbManagerTest {
 
         final RetiredUserTcStats retiredUserTcStats = retiredUserStats.iterator().next();
 
-        assertThat(retiredUserTcStats.getPoints())
+        assertThat(retiredUserTcStats.points())
             .isEqualTo(points);
-        assertThat(retiredUserTcStats.getMultipliedPoints())
+        assertThat(retiredUserTcStats.multipliedPoints())
             .isEqualTo(multipliedPoints);
-        assertThat(retiredUserTcStats.getUnits())
+        assertThat(retiredUserTcStats.units())
             .isEqualTo(units);
 
         POSTGRES_DB_MANAGER.deleteAllRetiredUserStats();

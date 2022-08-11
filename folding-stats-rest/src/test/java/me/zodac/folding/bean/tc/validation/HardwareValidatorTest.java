@@ -86,7 +86,7 @@ class HardwareValidatorTest {
 
         final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
         final ValidationException e = catchThrowableOfType(() -> hardwareValidator.create(hardware), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'hardwareName' must not be empty");
     }
 
@@ -148,10 +148,10 @@ class HardwareValidatorTest {
 
         final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
         final ConflictException e = catchThrowableOfType(() -> hardwareValidator.create(hardware), ConflictException.class);
-        assertThat(e.getConflictFailure().getConflictingAttributes())
+        assertThat(e.getConflictFailure().conflictingAttributes())
             .containsOnly("hardwareName");
 
-        assertThat(e.getConflictFailure().getConflictingObject())
+        assertThat(e.getConflictFailure().conflictingObject())
             .isNotNull();
     }
 
@@ -170,7 +170,7 @@ class HardwareValidatorTest {
 
         final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
         final ValidationException e = catchThrowableOfType(() -> hardwareValidator.create(hardware), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'displayName' must not be empty");
     }
 
@@ -189,7 +189,7 @@ class HardwareValidatorTest {
 
         final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
         final ValidationException e = catchThrowableOfType(() -> hardwareValidator.create(hardware), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'hardwareMake' must be one of: [AMD, INTEL, NVIDIA]");
     }
 
@@ -208,7 +208,7 @@ class HardwareValidatorTest {
 
         final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
         final ValidationException e = catchThrowableOfType(() -> hardwareValidator.create(hardware), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'hardwareType' must be one of: [CPU, GPU]");
     }
 
@@ -227,7 +227,7 @@ class HardwareValidatorTest {
 
         final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
         final ValidationException e = catchThrowableOfType(() -> hardwareValidator.create(hardware), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'multiplier' must be 1.00 or higher");
     }
 
@@ -246,7 +246,7 @@ class HardwareValidatorTest {
 
         final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
         final ValidationException e = catchThrowableOfType(() -> hardwareValidator.create(hardware), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'averagePpd' must be 1 or higher");
     }
 
@@ -265,7 +265,7 @@ class HardwareValidatorTest {
 
         final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
         final ValidationException e = catchThrowableOfType(() -> hardwareValidator.create(hardware), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly(
                 "Field 'hardwareName' must not be empty",
                 "Field 'displayName' must not be empty",
@@ -317,7 +317,7 @@ class HardwareValidatorTest {
         final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
         final ValidationException e =
             catchThrowableOfType(() -> hardwareValidator.update(hardware, existingHardware), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'hardwareName' must not be empty");
     }
 
@@ -358,10 +358,10 @@ class HardwareValidatorTest {
         final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
         final ConflictException e =
             catchThrowableOfType(() -> hardwareValidator.update(hardware, existingHardware), ConflictException.class);
-        assertThat(e.getConflictFailure().getConflictingAttributes())
+        assertThat(e.getConflictFailure().conflictingAttributes())
             .containsOnly("hardwareName");
 
-        assertThat(e.getConflictFailure().getConflictingObject())
+        assertThat(e.getConflictFailure().conflictingObject())
             .isNotNull();
     }
 
@@ -425,7 +425,7 @@ class HardwareValidatorTest {
         final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
         final ValidationException e =
             catchThrowableOfType(() -> hardwareValidator.update(hardware, existingHardware), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'displayName' must not be empty");
     }
 
@@ -447,7 +447,7 @@ class HardwareValidatorTest {
         final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
         final ValidationException e =
             catchThrowableOfType(() -> hardwareValidator.update(hardware, existingHardware), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'hardwareMake' must be one of: [AMD, INTEL, NVIDIA]");
     }
 
@@ -469,7 +469,7 @@ class HardwareValidatorTest {
         final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
         final ValidationException e =
             catchThrowableOfType(() -> hardwareValidator.update(hardware, existingHardware), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'hardwareType' must be one of: [CPU, GPU]");
     }
 
@@ -491,7 +491,7 @@ class HardwareValidatorTest {
         final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
         final ValidationException e =
             catchThrowableOfType(() -> hardwareValidator.update(hardware, existingHardware), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'multiplier' must be 1.00 or higher");
     }
 
@@ -513,7 +513,7 @@ class HardwareValidatorTest {
         final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
         final ValidationException e =
             catchThrowableOfType(() -> hardwareValidator.update(hardware, existingHardware), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'averagePpd' must be 1 or higher");
     }
 
@@ -535,7 +535,7 @@ class HardwareValidatorTest {
         final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
         final ValidationException e =
             catchThrowableOfType(() -> hardwareValidator.update(hardware, existingHardware), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly(
                 "Field 'displayName' must not be empty",
                 "Field 'hardwareMake' must be one of: [AMD, INTEL, NVIDIA]",
@@ -581,7 +581,7 @@ class HardwareValidatorTest {
 
         final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
         final UsedByException e = catchThrowableOfType(() -> hardwareValidator.delete(existingHardware), UsedByException.class);
-        final List<?> usedBy = List.of(e.getUsedByFailure().getUsedBy());
+        final List<?> usedBy = List.of(e.getUsedByFailure().usedBy());
         assertThat(usedBy)
             .hasSize(1);
 

@@ -47,11 +47,11 @@ class HistoricStatsTest {
         final int minute = 1;
 
         final HistoricStats zero = HistoricStats.create(LocalDateTime.of(year, month, 25, hour, minute), 300L, 3_000L, 30);
-        assertThat(zero.getPoints())
+        assertThat(zero.points())
             .isEqualTo(300L);
-        assertThat(zero.getMultipliedPoints())
+        assertThat(zero.multipliedPoints())
             .isEqualTo(3_000L);
-        assertThat(zero.getUnits())
+        assertThat(zero.units())
             .isEqualTo(30);
 
         final HistoricStats first = HistoricStats.create(LocalDateTime.of(year, month, 1, hour, minute), 500L, 5_000L, 50);
@@ -60,9 +60,9 @@ class HistoricStatsTest {
 
         final Collection<HistoricStats> result = HistoricStats.combine(List.of(zero, first, second, third));
 
-        final LocalDateTime zeroDateTime = zero.getDateTime().truncatedTo(ChronoUnit.HOURS);
-        final LocalDateTime firstDateTime = first.getDateTime().truncatedTo(ChronoUnit.HOURS);
-        final LocalDateTime thirdDateTime = third.getDateTime().truncatedTo(ChronoUnit.HOURS);
+        final LocalDateTime zeroDateTime = zero.dateTime().truncatedTo(ChronoUnit.HOURS);
+        final LocalDateTime firstDateTime = first.dateTime().truncatedTo(ChronoUnit.HOURS);
+        final LocalDateTime thirdDateTime = third.dateTime().truncatedTo(ChronoUnit.HOURS);
 
         // Verify same dates are combined
         assertThat(result)

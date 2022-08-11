@@ -514,7 +514,7 @@ public class Storage {
     public RetiredUserTcStats createRetiredUserStats(final RetiredUserTcStats retiredUserTcStats) {
         return dbManagerFunction(dbManager -> {
             final RetiredUserTcStats createdRetiredUserTcStats = dbManager.createRetiredUserStats(retiredUserTcStats);
-            retiredTcStatsCache.put(createdRetiredUserTcStats.getRetiredUserId(), createdRetiredUserTcStats);
+            retiredTcStatsCache.put(createdRetiredUserTcStats.retiredUserId(), createdRetiredUserTcStats);
             return createdRetiredUserTcStats;
         });
     }
@@ -541,7 +541,7 @@ public class Storage {
             final Collection<RetiredUserTcStats> fromDb = dbManager.getAllRetiredUserStats();
 
             for (final RetiredUserTcStats retiredUserTcStats : fromDb) {
-                retiredTcStatsCache.put(retiredUserTcStats.getRetiredUserId(), retiredUserTcStats);
+                retiredTcStatsCache.put(retiredUserTcStats.retiredUserId(), retiredUserTcStats);
             }
 
             return fromDb;
@@ -630,7 +630,7 @@ public class Storage {
     public UserStats createTotalStats(final UserStats userStats) {
         return dbManagerFunction(dbManager -> {
             final UserStats fromDb = dbManager.createTotalStats(userStats);
-            totalStatsCache.put(fromDb.getUserId(), fromDb);
+            totalStatsCache.put(fromDb.userId(), fromDb);
             return fromDb;
         });
     }
@@ -753,7 +753,7 @@ public class Storage {
     public UserTcStats createHourlyTcStats(final UserTcStats userTcStats) {
         return dbManagerFunction(dbManager -> {
             final UserTcStats fromDb = dbManager.createHourlyTcStats(userTcStats);
-            tcStatsCache.put(userTcStats.getUserId(), fromDb);
+            tcStatsCache.put(userTcStats.userId(), fromDb);
             return fromDb;
         });
     }
@@ -796,7 +796,7 @@ public class Storage {
     public UserStats createInitialStats(final UserStats userStats) {
         return dbManagerFunction(dbManager -> {
             final UserStats fromDb = dbManager.createInitialStats(userStats);
-            initialStatsCache.put(fromDb.getUserId(), fromDb);
+            initialStatsCache.put(fromDb.userId(), fromDb);
             return fromDb;
         });
     }

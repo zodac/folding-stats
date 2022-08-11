@@ -52,20 +52,20 @@ class TeamSummaryTest {
 
         final RetiredUserSummary retiredUserSummary = createRetiredUserSummary(3, 0);
 
-        final Team team = userSummary1.getUser().team();
+        final Team team = userSummary1.user().team();
         final TeamSummary teamSummary =
             TeamSummary.createWithPoints(team, "captain", 75L, 7_500L, 15, 1, List.of(userSummary1, userSummary2), List.of(retiredUserSummary));
 
-        assertThat(teamSummary.getTeam())
+        assertThat(teamSummary.team())
             .isEqualTo(team);
 
-        assertThat(teamSummary.getActiveUsers())
+        assertThat(teamSummary.activeUsers())
             .containsExactly(userSummary1, userSummary2);
 
-        assertThat(teamSummary.getRetiredUsers())
+        assertThat(teamSummary.retiredUsers())
             .containsExactly(retiredUserSummary);
 
-        assertThat(teamSummary.getRank())
+        assertThat(teamSummary.rank())
             .isOne();
 
         assertThat(teamSummary)
@@ -80,17 +80,17 @@ class TeamSummaryTest {
 
         final RetiredUserSummary retiredUserSummary = createRetiredUserSummary(3, 1);
 
-        final Team team = userSummary1.getUser().team();
+        final Team team = userSummary1.user().team();
         final TeamSummary teamSummary =
             TeamSummary.createWithDefaultRank(team, "captain", List.of(userSummary1, userSummary2), List.of(retiredUserSummary));
 
-        assertThat(teamSummary.getActiveUsers())
+        assertThat(teamSummary.activeUsers())
             .containsExactly(userSummary1, userSummary2);
 
-        assertThat(teamSummary.getRetiredUsers())
+        assertThat(teamSummary.retiredUsers())
             .containsExactly(retiredUserSummary);
 
-        assertThat(teamSummary.getRank())
+        assertThat(teamSummary.rank())
             .isOne();
 
         assertThat(teamSummary)
@@ -106,20 +106,20 @@ class TeamSummaryTest {
         final RetiredUserSummary retiredUserSummary1 = createRetiredUserSummary(1, 20);
         final RetiredUserSummary retiredUserSummary2 = createRetiredUserSummary(3, 6);
 
-        final Team team = userSummary1.getUser().team();
+        final Team team = userSummary1.user().team();
         final TeamSummary teamSummary = TeamSummary.createWithDefaultRank(team, "captain", List.of(userSummary1, userSummary2),
             List.of(retiredUserSummary1, retiredUserSummary2));
 
-        final Collection<Integer> activeUserRanks = teamSummary.getActiveUsers()
+        final Collection<Integer> activeUserRanks = teamSummary.activeUsers()
             .stream()
-            .map(UserSummary::getRankInTeam)
+            .map(UserSummary::rankInTeam)
             .toList();
         assertThat(activeUserRanks)
             .containsExactly(1, 2);
 
-        final Collection<Integer> retiredUserRanks = teamSummary.getRetiredUsers()
+        final Collection<Integer> retiredUserRanks = teamSummary.retiredUsers()
             .stream()
-            .map(RetiredUserSummary::getRankInTeam)
+            .map(RetiredUserSummary::rankInTeam)
             .toList();
         assertThat(retiredUserRanks)
             .containsExactly(3, 4);
@@ -139,7 +139,7 @@ class TeamSummaryTest {
         final RetiredUserSummary retiredUserSummary4 = createRetiredUserSummary(2, 6);
         final RetiredUserSummary retiredUserSummary5 = createRetiredUserSummary(3, 0);
 
-        final Team team = userSummary1.getUser().team();
+        final Team team = userSummary1.user().team();
         final TeamSummary teamSummary = TeamSummary.createWithDefaultRank(team, "captain",
             List.of(
                 userSummary1,
@@ -157,16 +157,16 @@ class TeamSummaryTest {
             )
         );
 
-        final Collection<Integer> activeUserRanks = teamSummary.getActiveUsers()
+        final Collection<Integer> activeUserRanks = teamSummary.activeUsers()
             .stream()
-            .map(UserSummary::getRankInTeam)
+            .map(UserSummary::rankInTeam)
             .toList();
         assertThat(activeUserRanks)
             .containsExactly(1, 1, 3, 4, 4);
 
-        final Collection<Integer> retiredUserRanks = teamSummary.getRetiredUsers()
+        final Collection<Integer> retiredUserRanks = teamSummary.retiredUsers()
             .stream()
-            .map(RetiredUserSummary::getRankInTeam)
+            .map(RetiredUserSummary::rankInTeam)
             .toList();
         assertThat(retiredUserRanks)
             .containsExactly(6, 6, 6, 9, 10);
@@ -186,15 +186,15 @@ class TeamSummaryTest {
 
         final RetiredUserSummary retiredUserSummary = createRetiredUserSummary(3, 1);
 
-        final Team team = userSummary1.getUser().team();
+        final Team team = userSummary1.user().team();
         final TeamSummary teamSummary =
             TeamSummary.createWithDefaultRank(team, "captain", List.of(userSummary1, userSummary2), List.of(retiredUserSummary));
 
-        assertThat(teamSummary.getRank())
+        assertThat(teamSummary.rank())
             .isOne();
 
         final TeamSummary updatedTeamSummary = teamSummary.updateWithNewRank(2);
-        assertThat(updatedTeamSummary.getRank())
+        assertThat(updatedTeamSummary.rank())
             .isEqualTo(2);
     }
 

@@ -53,18 +53,18 @@ class TeamLeaderboardEntryTest {
 
         final TeamLeaderboardEntry teamLeaderboardEntry = TeamLeaderboardEntry.createLeader(teamSummary);
 
-        assertThat(teamLeaderboardEntry.getTeamPoints())
+        assertThat(teamLeaderboardEntry.teamPoints())
             .isEqualTo(45L);
-        assertThat(teamLeaderboardEntry.getTeamMultipliedPoints())
+        assertThat(teamLeaderboardEntry.teamMultipliedPoints())
             .isEqualTo(4_500L);
-        assertThat(teamLeaderboardEntry.getTeamUnits())
+        assertThat(teamLeaderboardEntry.teamUnits())
             .isEqualTo(9);
 
-        assertThat(teamLeaderboardEntry.getRank())
+        assertThat(teamLeaderboardEntry.rank())
             .isOne();
 
-        assertThat(teamLeaderboardEntry.getDiffToLeader())
-            .isEqualTo(teamLeaderboardEntry.getDiffToNext())
+        assertThat(teamLeaderboardEntry.diffToLeader())
+            .isEqualTo(teamLeaderboardEntry.diffToNext())
             .isZero();
     }
 
@@ -78,18 +78,18 @@ class TeamLeaderboardEntryTest {
 
         final TeamLeaderboardEntry teamLeaderboardEntry = TeamLeaderboardEntry.create(teamSummary, 5_000L, 5_000L);
 
-        assertThat(teamLeaderboardEntry.getTeamPoints())
+        assertThat(teamLeaderboardEntry.teamPoints())
             .isEqualTo(15L);
-        assertThat(teamLeaderboardEntry.getTeamMultipliedPoints())
+        assertThat(teamLeaderboardEntry.teamMultipliedPoints())
             .isEqualTo(1_500L);
-        assertThat(teamLeaderboardEntry.getTeamUnits())
+        assertThat(teamLeaderboardEntry.teamUnits())
             .isEqualTo(3);
 
-        assertThat(teamLeaderboardEntry.getRank())
+        assertThat(teamLeaderboardEntry.rank())
             .isEqualTo(2);
 
-        assertThat(teamLeaderboardEntry.getDiffToLeader())
-            .isEqualTo(teamLeaderboardEntry.getDiffToNext())
+        assertThat(teamLeaderboardEntry.diffToLeader())
+            .isEqualTo(teamLeaderboardEntry.diffToNext())
             .isEqualTo(5_000L);
     }
 

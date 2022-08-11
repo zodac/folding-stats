@@ -141,7 +141,7 @@ public class UserChangeValidator {
 
     private void validateUserWorkUnits(final UserChangeRequest userChangeRequest) {
         final Stats statsForUserAndPasskey = getStatsForUserAndPasskey(userChangeRequest);
-        if (statsForUserAndPasskey.getUnits() == Stats.DEFAULT_UNITS) {
+        if (statsForUserAndPasskey.units() == Stats.DEFAULT_UNITS) {
             throw new ValidationException(userChangeRequest, String.format(
                 "User '%s' has 0 Work Units with passkey '%s', there must be at least one completed Work Unit before adding the user",
                 userChangeRequest.getFoldingUserName(), userChangeRequest.getPasskey()));

@@ -96,7 +96,7 @@ public class UserStatsParser {
 
     private void updateTcStatsForUser(final User user) {
         LOGGER.debug("Updating stats for '{}': {}", user.displayName(), user);
-        if (StringUtils.isBlank(user.passkey())) {
+        if (StringUtils.isBlank(user.passkey())) { // TODO: Confirm passkey is not masked
             LOGGER.warn("Not parsing TC stats for user, missing passkey: {}", user);
             return;
         }

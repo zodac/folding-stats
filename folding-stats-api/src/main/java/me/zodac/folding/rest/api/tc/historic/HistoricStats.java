@@ -39,12 +39,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 
 /**
  * POJO defining historic {@code Team Competition} stats (hourly, daily, monthly, etc.) for a {@link me.zodac.folding.api.tc.User}.
  */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Accessors(fluent = true)
 @Getter
 @Setter
 @EqualsAndHashCode
@@ -90,7 +92,7 @@ public class HistoricStats {
      */
     public static Collection<HistoricStats> combine(final Collection<? extends HistoricStats> allStats) {
         final Set<LocalDateTime> keys = allStats.stream()
-            .map(HistoricStats::getDateTime)
+            .map(HistoricStats::dateTime)
             .sorted()
             .collect(Collectors.toCollection(TreeSet::new));
 

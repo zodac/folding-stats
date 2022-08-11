@@ -31,6 +31,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 
 /**
  * Representation of an individual GPU from the LARS DB.
@@ -60,6 +61,7 @@ import lombok.ToString;
  */
 @NoArgsConstructor
 @AllArgsConstructor
+@Accessors(fluent = false) // Need #get*()
 @Getter
 @Setter
 @EqualsAndHashCode

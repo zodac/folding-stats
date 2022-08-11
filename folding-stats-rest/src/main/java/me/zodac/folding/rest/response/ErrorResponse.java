@@ -31,6 +31,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 
 /**
  * Simple POJO used for REST responses where an error message is required. Allows us to have a JSON payload with a name value, instead of the response
@@ -46,6 +47,7 @@ import lombok.ToString;
  */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Accessors(fluent = true)
 @Getter
 @Setter
 @EqualsAndHashCode

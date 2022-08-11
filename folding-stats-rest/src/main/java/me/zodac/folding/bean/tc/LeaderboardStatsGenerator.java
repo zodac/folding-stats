@@ -70,9 +70,9 @@ public class LeaderboardStatsGenerator {
      */
     public List<TeamLeaderboardEntry> generateTeamLeaderboards() {
         final AllTeamsSummary allTeamsSummary = statsRepository.getAllTeamsSummary();
-        final List<TeamSummary> teamResults = allTeamsSummary.getTeams()
+        final List<TeamSummary> teamResults = allTeamsSummary.teams()
             .stream()
-            .sorted(Comparator.comparingLong(TeamSummary::getTeamMultipliedPoints).reversed())
+            .sorted(Comparator.comparingLong((TeamSummary teamSummary) -> teamSummary.teamMultipliedPoints()).reversed())
             .toList();
 
         if (teamResults.isEmpty()) {
@@ -90,8 +90,8 @@ public class LeaderboardStatsGenerator {
             final TeamSummary teamSummary = teamResults.get(i);
             final TeamSummary teamAhead = teamResults.get(i - 1);
 
-            final long diffToLeader = leader.getTeamMultipliedPoints() - teamSummary.getTeamMultipliedPoints();
-            final long diffToNext = teamAhead.getTeamMultipliedPoints() - teamSummary.getTeamMultipliedPoints();
+            final long diffToLeader = leader.teamMultipliedPoints() - teamSummary.teamMultipliedPoints();
+            final long diffToNext = teamAhead.teamMultipliedPoints() - teamSummary.teamMultipliedPoints();
 
             final TeamLeaderboardEntry teamLeaderboardEntry = TeamLeaderboardEntry.create(teamSummary, diffToLeader, diffToNext);
             teamSummaries.add(teamLeaderboardEntry);
@@ -114,7 +114,7 @@ public class LeaderboardStatsGenerator {
             final Category category = entry.getKey();
             final List<UserSummary> userSummaries = entry.getValue()
                 .stream()
-                .sorted(Comparator.comparingLong(UserSummary::getMultipliedPoints).reversed())
+                .sorted(Comparator.comparingLong((UserSummary userSummary) -> userSummary.multipliedPoints()).reversed())
                 .toList();
 
             final List<UserCategoryLeaderboardEntry> userSummariesInCategory = getUserLeaderboardForCategory(userSummaries);
@@ -141,8 +141,8 @@ public class LeaderboardStatsGenerator {
             final UserSummary userSummary = userResults.get(i);
             final UserSummary userAhead = userResults.get(i - 1);
 
-            final long diffToLeader = categoryLeader.getMultipliedPoints() - userSummary.getMultipliedPoints();
-            final long diffToNext = userAhead.getMultipliedPoints() - userSummary.getMultipliedPoints();
+            final long diffToLeader = categoryLeader.multipliedPoints() - userSummary.multipliedPoints();
+            final long diffToNext = userAhead.multipliedPoints() - userSummary.multipliedPoints();
 
             final int rank = i + 1;
             final UserCategoryLeaderboardEntry userCategoryLeaderboardEntry = UserCategoryLeaderboardEntry.create(userSummary, rank, diffToLeader,
@@ -155,9 +155,9 @@ public class LeaderboardStatsGenerator {
     private static Map<Category, List<UserSummary>> getUsersSortedByCategory(final AllTeamsSummary allTeamsSummary) {
         final Map<Category, List<UserSummary>> usersByCategory = new EnumMap<>(Category.class);
         final Collection<UserSummary> usersInAllTeams = allTeamsSummary
-            .getTeams()
+            .teams()
             .stream()
-            .map(TeamSummary::getActiveUsers)
+            .map(TeamSummary::activeUsers)
             .flatMap(Collection::stream)
             .toList();
 
@@ -165,7 +165,7 @@ public class LeaderboardStatsGenerator {
         for (final Category category : Category.getAllValues()) {
             final List<UserSummary> usersInCategory = usersInAllTeams
                 .stream()
-                .filter(userSummary -> userSummary.getUser().category() == category)
+                .filter(userSummary -> userSummary.user().category() == category)
                 .toList();
 
             usersByCategory.put(category, usersInCategory);

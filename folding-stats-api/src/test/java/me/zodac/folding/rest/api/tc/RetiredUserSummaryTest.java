@@ -26,6 +26,8 @@ package me.zodac.folding.rest.api.tc;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
+import me.zodac.folding.api.tc.stats.UserTcStats;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -35,22 +37,44 @@ class RetiredUserSummaryTest {
 
     @Test
     void testCreate() {
-        final RetiredUserSummary retiredUserSummary = RetiredUserSummary.create(1, "user", 5L, 500L, 1, 1);
+        final RetiredUserSummary retiredUserSummary = RetiredUserSummary.create(1, "user", 5L, 500L, 1, 2);
 
         assertThat(retiredUserSummary)
             .extracting("id", "displayName", "points", "multipliedPoints", "units", "rankInTeam")
-            .containsExactly(1, "user", 5L, 500L, 1, 1);
+            .containsExactly(1, "user", 5L, 500L, 1, 2);
+    }
+
+    @Test
+    void testCreateWithDefaultRank() {
+        final UserTcStats userTcStats = UserTcStats.createNow(3, 5L, 500L, 1);
+        final RetiredUserTcStats retiredUserTcStats = RetiredUserTcStats.create(2, 2, "user1", userTcStats);
+        final RetiredUserSummary retiredUserSummary = RetiredUserSummary.createWithDefaultRank(retiredUserTcStats);
+
+        assertThat(retiredUserSummary)
+            .extracting("id", "displayName", "points", "multipliedPoints", "units", "rankInTeam")
+            .containsExactly(2, "user1", 5L, 500L, 1, 0);
+    }
+
+    @Test
+    void testCreateWithStats() {
+        final UserTcStats userTcStats = UserTcStats.createNow(1, 5L, 500L, 1);
+        final RetiredUserTcStats retiredUserTcStats = RetiredUserTcStats.create(2, 2, "user", userTcStats);
+        final RetiredUserSummary retiredUserSummary = RetiredUserSummary.createWithStats(retiredUserTcStats, 4);
+
+        assertThat(retiredUserSummary)
+            .extracting("id", "displayName", "points", "multipliedPoints", "units", "rankInTeam")
+            .containsExactly(2, "user", 5L, 500L, 1, 4);
     }
 
     @Test
     void testUpdateRank() {
         final RetiredUserSummary retiredUserSummary = RetiredUserSummary.create(1, "user", 5L, 500L, 1, 1);
 
-        assertThat(retiredUserSummary.getRankInTeam())
+        assertThat(retiredUserSummary.rankInTeam())
             .isOne();
 
         final RetiredUserSummary updatedRetiredUserSummary = retiredUserSummary.updateWithNewRank(2);
-        assertThat(updatedRetiredUserSummary.getRankInTeam())
+        assertThat(updatedRetiredUserSummary.rankInTeam())
             .isEqualTo(2);
     }
 }

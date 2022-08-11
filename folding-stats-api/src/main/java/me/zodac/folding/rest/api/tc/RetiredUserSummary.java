@@ -31,6 +31,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 
 /**
@@ -38,13 +39,14 @@ import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
  */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Accessors(fluent = true)
 @Getter
 @Setter
 @EqualsAndHashCode
 @ToString(doNotUseGetters = true)
 public non-sealed class RetiredUserSummary implements RankableSummary {
 
-    private static final int DEFAULT_USER_RANK = 0;
+    private static final int DEFAULT_USER_RANK = 0; // TODO: Should be 1?
 
     private int id;
     private String displayName;
@@ -88,11 +90,11 @@ public non-sealed class RetiredUserSummary implements RankableSummary {
      */
     public static RetiredUserSummary createWithStats(final RetiredUserTcStats retiredUserTcStats, final int rankInTeam) {
         return create(
-            retiredUserTcStats.getUserId(),
-            retiredUserTcStats.getDisplayName(),
-            retiredUserTcStats.getPoints(),
-            retiredUserTcStats.getMultipliedPoints(),
-            retiredUserTcStats.getUnits(),
+            retiredUserTcStats.retiredUserId(),
+            retiredUserTcStats.displayName(),
+            retiredUserTcStats.points(),
+            retiredUserTcStats.multipliedPoints(),
+            retiredUserTcStats.units(),
             rankInTeam
         );
     }

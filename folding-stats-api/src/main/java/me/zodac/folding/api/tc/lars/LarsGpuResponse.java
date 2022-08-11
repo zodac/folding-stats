@@ -30,6 +30,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 
 /**
  * Representation of the LARS GPU PPD database API response.
@@ -51,6 +52,7 @@ import lombok.ToString;
  *
  * @see <a href="https://folding.lar.systems/api/gpu_ppd/gpu_rank_list.json">LARS GPU PPD database API</a>
  */
+@Accessors(fluent = true)
 @Getter
 @Setter
 @EqualsAndHashCode

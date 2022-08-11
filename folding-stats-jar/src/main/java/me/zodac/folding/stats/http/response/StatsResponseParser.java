@@ -59,7 +59,7 @@ public final class StatsResponseParser {
      */
     public static long getPointsFromResponse(final HttpResponse<String> httpResponse) {
         final PointsApiInstance pointsApiInstance = parsePointsResponse(httpResponse);
-        return pointsApiInstance.getEarned();
+        return pointsApiInstance.earned();
     }
 
     private static PointsApiInstance parsePointsResponse(final HttpResponse<String> httpResponse) {
@@ -104,7 +104,7 @@ public final class StatsResponseParser {
             LOGGER.warn("Too many unit responses returned for user, using {} from response: {}", firstEntry, httpResponse.body());
         }
 
-        return firstEntry.getFinished();
+        return firstEntry.finished();
     }
 
     private static List<UnitsApiInstance> parseUnitsResponse(final HttpResponse<String> httpResponse) {

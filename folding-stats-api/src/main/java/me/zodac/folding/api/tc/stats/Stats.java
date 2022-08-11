@@ -29,11 +29,13 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 
 /**
  * Simple POJO containing stats for a Folding@Home user: points and units.
  */
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
+@Accessors(fluent = true)
 @Getter
 @EqualsAndHashCode
 @ToString(doNotUseGetters = true)

@@ -32,6 +32,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 import me.zodac.folding.api.tc.Team;
 
 /**
@@ -42,6 +43,7 @@ import me.zodac.folding.api.tc.Team;
  */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Accessors(fluent = true)
 @Getter
 @Setter
 @EqualsAndHashCode
@@ -116,20 +118,20 @@ public non-sealed class TeamSummary implements RankableSummary {
                                                     final String captainName,
                                                     final Collection<? extends UserSummary> activeUsers,
                                                     final Collection<? extends RetiredUserSummary> retiredUsers) {
-        int teamUnits = 0;
         long teamPoints = 0L;
         long teamMultipliedPoints = 0L;
+        int teamUnits = 0;
 
         for (final UserSummary activeUser : activeUsers) {
-            teamUnits += activeUser.getUnits();
-            teamPoints += activeUser.getPoints();
-            teamMultipliedPoints += activeUser.getMultipliedPoints();
+            teamPoints += activeUser.points();
+            teamMultipliedPoints += activeUser.multipliedPoints();
+            teamUnits += activeUser.units();
         }
 
         for (final RetiredUserSummary retired : retiredUsers) {
-            teamUnits += retired.getUnits();
-            teamPoints += retired.getPoints();
-            teamMultipliedPoints += retired.getMultipliedPoints();
+            teamPoints += retired.points();
+            teamMultipliedPoints += retired.multipliedPoints();
+            teamUnits += retired.units();
         }
 
         // Create new UserSummary instances for each active user, with the new rank

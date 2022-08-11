@@ -39,6 +39,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 import me.zodac.folding.api.RequestPojo;
 import me.zodac.folding.api.exception.ValidationException;
 import me.zodac.folding.api.tc.Category;
@@ -50,6 +51,7 @@ import me.zodac.folding.api.tc.HardwareMake;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
+@Accessors(fluent = false) // Need #get*()
 @Getter
 @Setter
 @EqualsAndHashCode

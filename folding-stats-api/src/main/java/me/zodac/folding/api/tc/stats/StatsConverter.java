@@ -40,6 +40,6 @@ public final class StatsConverter {
      * @return the created {@link OffsetTcStats}
      */
     public static OffsetTcStats toOffsetStats(final UserTcStats userTcStats) {
-        return OffsetTcStats.create(userTcStats.getPoints(), userTcStats.getMultipliedPoints(), userTcStats.getUnits());
+        return OffsetTcStats.create(userTcStats.points(), userTcStats.multipliedPoints(), userTcStats.units());
     }
 }

@@ -31,6 +31,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.rest.api.tc.TeamSummary;
 
@@ -42,6 +43,7 @@ import me.zodac.folding.rest.api.tc.TeamSummary;
  */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Accessors(fluent = true)
 @Getter
 @Setter
 @EqualsAndHashCode
@@ -69,11 +71,11 @@ public class TeamLeaderboardEntry {
      */
     public static TeamLeaderboardEntry create(final TeamSummary teamSummary, final long diffToLeader, final long diffToNext) {
         return new TeamLeaderboardEntry(
-            teamSummary.getTeam(),
-            teamSummary.getTeamPoints(),
-            teamSummary.getTeamMultipliedPoints(),
-            teamSummary.getTeamUnits(),
-            teamSummary.getRank(),
+            teamSummary.team(),
+            teamSummary.teamPoints(),
+            teamSummary.teamMultipliedPoints(),
+            teamSummary.teamUnits(),
+            teamSummary.rank(),
             diffToLeader,
             diffToNext
         );

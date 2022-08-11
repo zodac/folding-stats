@@ -64,20 +64,20 @@ class AllTeamSummaryTest {
 
         final AllTeamsSummary allTeamsSummary = AllTeamsSummary.create(List.of(teamSummary1, teamSummary2, teamSummary3));
 
-        assertThat(allTeamsSummary.getCompetitionSummary())
+        assertThat(allTeamsSummary.competitionSummary())
             .extracting("totalPoints", "totalMultipliedPoints", "totalUnits")
             .containsExactly(375L, 37_500L, 75);
 
-        final Collection<Integer> teamRanks = allTeamsSummary.getTeams()
+        final Collection<Integer> teamRanks = allTeamsSummary.teams()
             .stream()
-            .map(TeamSummary::getRank)
+            .map(TeamSummary::rank)
             .toList();
         assertThat(teamRanks)
             .containsExactly(1, 1, 3);
     }
 
     private static TeamSummary createTeamSummary(final UserSummary... userSummaries) {
-        return TeamSummary.createWithDefaultRank(userSummaries[0].getUser().team(), "captain", List.of(userSummaries), Collections.emptyList());
+        return TeamSummary.createWithDefaultRank(userSummaries[0].user().team(), "captain", List.of(userSummaries), Collections.emptyList());
     }
 
     private static UserSummary createUserSummary(final int units) {

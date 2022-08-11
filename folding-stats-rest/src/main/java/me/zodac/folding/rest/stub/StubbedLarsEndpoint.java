@@ -74,13 +74,13 @@ public class StubbedLarsEndpoint {
         final LarsGpu larsGpu = GSON.fromJson(larsGpuInput, LarsGpu.class);
 
         final Map<String, LarsGpu> existingLarsGpus = new HashMap<>();
-        for (final LarsGpu existingGpu : LARS_GPU_RESPONSE.getRankedGpus()) {
+        for (final LarsGpu existingGpu : LARS_GPU_RESPONSE.rankedGpus()) {
             existingLarsGpus.put(existingGpu.getDetailedName(), existingGpu);
         }
 
         existingLarsGpus.put(larsGpu.getDetailedName(), larsGpu);
 
-        LARS_GPU_RESPONSE.setRankedGpus(existingLarsGpus.values());
+        LARS_GPU_RESPONSE.rankedGpus(existingLarsGpus.values());
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(larsGpu);
@@ -94,7 +94,7 @@ public class StubbedLarsEndpoint {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping
     public ResponseEntity<Void> deleteGpus() {
-        LARS_GPU_RESPONSE.setRankedGpus(new ArrayList<>());
+        LARS_GPU_RESPONSE.rankedGpus(new ArrayList<>());
         return ResponseEntity
             .ok()
             .build();
@@ -118,13 +118,13 @@ public class StubbedLarsEndpoint {
 
     private static LarsGpuResponse createLarsResponse() {
         final LarsGpuResponse larsGpuResponse = new LarsGpuResponse();
-        larsGpuResponse.setApiName("");
-        larsGpuResponse.setApiDescription("");
-        larsGpuResponse.setApiLicence("");
-        larsGpuResponse.setCreditLinkWebsite("");
-        larsGpuResponse.setCreditLinkChromeExtension("");
-        larsGpuResponse.setDateOfLastUpdate("");
-        larsGpuResponse.setRankedGpus(new ArrayList<>());
+        larsGpuResponse.apiName("");
+        larsGpuResponse.apiDescription("");
+        larsGpuResponse.apiLicence("");
+        larsGpuResponse.creditLinkWebsite("");
+        larsGpuResponse.creditLinkChromeExtension("");
+        larsGpuResponse.dateOfLastUpdate("");
+        larsGpuResponse.rankedGpus(new ArrayList<>());
 
         return larsGpuResponse;
     }

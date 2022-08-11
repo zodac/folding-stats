@@ -201,7 +201,7 @@ class TeamCompetitionLeaderboardTest {
             .isEmpty();
 
         final UserCategoryLeaderboardEntry firstResult = firstCategoryUsers.get(0);
-        assertThat(firstResult.getUser().displayName())
+        assertThat(firstResult.user().displayName())
             .as("Did not receive the expected user for rank 1, " + Category.AMD_GPU + ": " + response.body())
             .isEqualTo(secondUser.displayName());
         assertThat(firstResult)
@@ -210,7 +210,7 @@ class TeamCompetitionLeaderboardTest {
             .containsExactly(1, 15_000L, 0L, 0L);
 
         final UserCategoryLeaderboardEntry secondResult = firstCategoryUsers.get(1);
-        assertThat(secondResult.getUser().displayName())
+        assertThat(secondResult.user().displayName())
             .as("Did not receive the expected user for rank 2, " + Category.AMD_GPU + ": " + response.body())
             .isEqualTo(firstUser.displayName());
         assertThat(secondResult)
@@ -219,7 +219,7 @@ class TeamCompetitionLeaderboardTest {
             .containsExactly(2, 10_000L, 5_000L, 5_000L);
 
         final UserCategoryLeaderboardEntry thirdResult = firstCategoryUsers.get(2);
-        assertThat(thirdResult.getUser().displayName())
+        assertThat(thirdResult.user().displayName())
             .as("Did not receive the expected user for rank 3, " + Category.AMD_GPU + ": " + response.body())
             .isEqualTo(thirdUser.displayName());
         assertThat(thirdResult)
@@ -228,7 +228,7 @@ class TeamCompetitionLeaderboardTest {
             .containsExactly(3, 1_000L, 14_000L, 9_000L);
 
         final UserCategoryLeaderboardEntry fourthResult = secondCategoryUsers.get(0);
-        assertThat(fourthResult.getUser().displayName())
+        assertThat(fourthResult.user().displayName())
             .as("Did not receive the expected user for rank 1, " + Category.NVIDIA_GPU + ": " + response.body())
             .isEqualTo(fourthUser.displayName());
         assertThat(fourthResult)
@@ -236,7 +236,7 @@ class TeamCompetitionLeaderboardTest {
             .extracting("rank", "multipliedPoints", "diffToLeader", "diffToNext")
             .containsExactly(1, 1_000L, 0L, 0L);
 
-        assertThat(fourthResult.getUser().passkey())
+        assertThat(fourthResult.user().passkey())
             .as("Expected user passkey to be masked: " + response.body())
             .contains("*");
     }

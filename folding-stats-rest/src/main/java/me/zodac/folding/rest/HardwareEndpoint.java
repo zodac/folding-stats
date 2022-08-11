@@ -66,7 +66,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/hardware")
 public class HardwareEndpoint {
 
-    private static final Logger AUDIT_LOGGER = LogManager.getLogger("audit");
+    private static final Logger AUDIT_LOGGER = LogManager.getLogger("audit"); // TODO: Switch on env variable to single/multi files
 
     private final HardwareValidator hardwareValidator;
     private final FoldingRepository foldingRepository;

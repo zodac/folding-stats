@@ -80,7 +80,7 @@ class TeamValidatorTest {
 
         final TeamValidator teamValidator = new TeamValidator(foldingRepository);
         final ValidationException e = catchThrowableOfType(() -> teamValidator.create(team), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'teamName' must not be empty");
     }
 
@@ -130,10 +130,10 @@ class TeamValidatorTest {
 
         final TeamValidator teamValidator = new TeamValidator(foldingRepository);
         final ConflictException e = catchThrowableOfType(() -> teamValidator.create(team), ConflictException.class);
-        assertThat(e.getConflictFailure().getConflictingAttributes())
+        assertThat(e.getConflictFailure().conflictingAttributes())
             .containsOnly("teamName");
 
-        assertThat(e.getConflictFailure().getConflictingObject())
+        assertThat(e.getConflictFailure().conflictingObject())
             .isNotNull();
     }
 
@@ -185,7 +185,7 @@ class TeamValidatorTest {
 
         final TeamValidator teamValidator = new TeamValidator(foldingRepository);
         final ValidationException e = catchThrowableOfType(() -> teamValidator.create(team), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'forumLink' is not a valid link: 'invalidUrl'");
     }
 
@@ -229,7 +229,7 @@ class TeamValidatorTest {
         final TeamValidator teamValidator = new TeamValidator(foldingRepository);
         final ValidationException e =
             catchThrowableOfType(() -> teamValidator.update(team, existingTeam), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'teamName' must not be empty");
     }
 
@@ -260,10 +260,10 @@ class TeamValidatorTest {
 
         final TeamValidator teamValidator = new TeamValidator(foldingRepository);
         final ConflictException e = catchThrowableOfType(() -> teamValidator.update(team, existingTeam), ConflictException.class);
-        assertThat(e.getConflictFailure().getConflictingAttributes())
+        assertThat(e.getConflictFailure().conflictingAttributes())
             .containsOnly("teamName");
 
-        assertThat(e.getConflictFailure().getConflictingObject())
+        assertThat(e.getConflictFailure().conflictingObject())
             .isNotNull();
     }
 
@@ -355,7 +355,7 @@ class TeamValidatorTest {
         final TeamValidator teamValidator = new TeamValidator(foldingRepository);
         final ValidationException e =
             catchThrowableOfType(() -> teamValidator.update(team, existingTeam), ValidationException.class);
-        assertThat(e.getValidationFailure().getErrors())
+        assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'forumLink' is not a valid link: 'invalidUrl'");
     }
 
@@ -400,7 +400,7 @@ class TeamValidatorTest {
 
         final TeamValidator teamValidator = new TeamValidator(foldingRepository);
         final UsedByException e = catchThrowableOfType(() -> teamValidator.delete(existingTeam), UsedByException.class);
-        final List<?> usedBy = List.of(e.getUsedByFailure().getUsedBy());
+        final List<?> usedBy = List.of(e.getUsedByFailure().usedBy());
         assertThat(usedBy)
             .hasSize(1);
 

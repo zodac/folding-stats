@@ -332,7 +332,7 @@ public class FoldingRepositoryImpl implements FoldingRepository {
                 RetiredUserTcStats.createWithoutId(oldTeam.id(), userWithTeamChange.displayName(), userStats);
             final RetiredUserTcStats createdRetiredUserTcStats = statsRepository.createRetiredUserStats(retiredUserTcStats);
             LOGGER.info("User '{}' (ID: {}) retired with retired stats ID: {}", userWithTeamChange.displayName(), userWithTeamChange.id(),
-                createdRetiredUserTcStats.getRetiredUserId());
+                createdRetiredUserTcStats.retiredUserId());
         }
 
         // Reset user stats
@@ -398,7 +398,7 @@ public class FoldingRepositoryImpl implements FoldingRepository {
         final RetiredUserTcStats retiredUserTcStats = RetiredUserTcStats.createWithoutId(user, userStats);
         final RetiredUserTcStats createdRetiredUserTcStats = storage.createRetiredUserStats(retiredUserTcStats);
         LOGGER.info("User '{}' (ID: {}) retired with retired stats ID: {}", user.displayName(), user.id(),
-            createdRetiredUserTcStats.getRetiredUserId());
+            createdRetiredUserTcStats.retiredUserId());
     }
 
     @Override

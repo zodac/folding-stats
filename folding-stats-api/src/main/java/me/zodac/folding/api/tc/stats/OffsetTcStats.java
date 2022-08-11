@@ -31,6 +31,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 
 /**
  * POJO defining a stats offset for a {@link me.zodac.folding.api.tc.User} within the {@code Team Competition}. In the case of a manual change
@@ -38,11 +39,12 @@ import lombok.ToString;
  */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Accessors(fluent = false) // Need #get*()
 @Getter
 @Setter
 @EqualsAndHashCode
 @ToString(doNotUseGetters = true)
-public class OffsetTcStats {
+public class OffsetTcStats { // TODO: Make a request version of this for REST endpoint
 
     private static final long DEFAULT_POINTS = 0L;
     private static final long DEFAULT_MULTIPLIED_POINTS = 0L;
@@ -94,12 +96,14 @@ public class OffsetTcStats {
         }
 
         if (offsetTcStats.pointsOffset == DEFAULT_POINTS) {
+            // Offset only included multiplied points
             final long pointsOffset = Math.round(offsetTcStats.multipliedPointsOffset / multiplier);
             return create(pointsOffset, offsetTcStats.multipliedPointsOffset, offsetTcStats.unitsOffset);
-        } else {
-            final long multipliedPointsOffset = Math.round(offsetTcStats.pointsOffset * multiplier);
-            return create(offsetTcStats.pointsOffset, multipliedPointsOffset, offsetTcStats.unitsOffset);
         }
+
+        // Offset only included non-multiplied points
+        final long multipliedPointsOffset = Math.round(offsetTcStats.pointsOffset * multiplier);
+        return create(offsetTcStats.pointsOffset, multipliedPointsOffset, offsetTcStats.unitsOffset);
     }
 
     /**

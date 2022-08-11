@@ -26,6 +26,9 @@ package me.zodac.folding.api.tc.stats;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import me.zodac.folding.api.util.DateTimeConverterUtils;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -35,14 +38,27 @@ class UserStatsTest {
 
     @Test
     void testCreate() {
-        final UserStats userStats = UserStats.createNow(1, 5L, 1);
+        final Timestamp timestamp = DateTimeConverterUtils.toTimestamp(LocalDateTime.now());
+        final UserStats userStats = UserStats.create(1, timestamp, 5L, 1);
 
-        assertThat(userStats.getTimestamp())
+        assertThat(userStats.timestamp())
+            .isNotNull();
+
+        assertThat(userStats)
+            .extracting("userId", "timestamp", "points", "units")
+            .containsExactly(1, timestamp, 5L, 1);
+    }
+
+    @Test
+    void testCreateNow() {
+        final UserStats userStats = UserStats.createNow(2, 5L, 1);
+
+        assertThat(userStats.timestamp())
             .isNotNull();
 
         assertThat(userStats)
             .extracting("userId", "points", "units")
-            .containsExactly(1, 5L, 1);
+            .containsExactly(2, 5L, 1);
     }
 
     @Test
@@ -53,6 +69,21 @@ class UserStatsTest {
 
         final UserStats emptyUserStats = UserStats.empty();
         assertThat(emptyUserStats.isEmpty())
+            .isTrue();
+    }
+
+    @Test
+    void testEmptyStats() {
+        final UserStats userStats = UserStats.createNow(1, 1L, 1);
+        assertThat(userStats.isEmpty())
+            .isFalse();
+        assertThat(userStats.isEmptyStats())
+            .isFalse();
+
+        final UserStats emptyUserStats = UserStats.createNow(1, 0L, 0);
+        assertThat(emptyUserStats.isEmpty())
+            .isFalse();
+        assertThat(emptyUserStats.isEmptyStats())
             .isTrue();
     }
 }

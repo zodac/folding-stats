@@ -31,6 +31,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.rest.api.tc.UserSummary;
 
@@ -40,6 +41,7 @@ import me.zodac.folding.rest.api.tc.UserSummary;
  */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Accessors(fluent = true)
 @Getter
 @Setter
 @EqualsAndHashCode
@@ -69,10 +71,10 @@ public class UserCategoryLeaderboardEntry {
      */
     public static UserCategoryLeaderboardEntry create(final UserSummary userSummary, final int rank, final long diffToLeader, final long diffToNext) {
         return new UserCategoryLeaderboardEntry(
-            userSummary.getUser(),
-            userSummary.getPoints(),
-            userSummary.getMultipliedPoints(),
-            userSummary.getUnits(),
+            userSummary.user(),
+            userSummary.points(),
+            userSummary.multipliedPoints(),
+            userSummary.units(),
             rank,
             diffToLeader,
             diffToNext
