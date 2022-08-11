@@ -46,7 +46,7 @@ import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 @ToString(doNotUseGetters = true)
 public non-sealed class RetiredUserSummary implements RankableSummary {
 
-    private static final int DEFAULT_USER_RANK = 0; // TODO: Should be 1?
+    private static final int DEFAULT_USER_RANK = 1;
 
     private int id;
     private String displayName;

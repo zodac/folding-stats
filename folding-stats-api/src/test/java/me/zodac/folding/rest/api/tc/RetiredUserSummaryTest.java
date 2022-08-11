@@ -52,7 +52,7 @@ class RetiredUserSummaryTest {
 
         assertThat(retiredUserSummary)
             .extracting("id", "displayName", "points", "multipliedPoints", "units", "rankInTeam")
-            .containsExactly(2, "user1", 5L, 500L, 1, 0);
+            .containsExactly(2, "user1", 5L, 500L, 1, 1);
     }
 
     @Test
