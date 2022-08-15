@@ -76,14 +76,14 @@ FROM debian:${DEBIAN_VERSION}-slim AS spring_base
 COPY --from=jdk_builder /opt/jdk /opt/jdk
 COPY --from=maven_builder /folding-stats.jar /folding-stats.jar
 COPY ./docker/backend/scripts/startup.sh /startup.sh
-COPY ./docker/backend/config/logback.xml /var/backend/logback.xml
+COPY ./docker/backend/config/logback-spring.xml /var/backend/logback-spring.xml
 
 ENV JAVA_HOME "/opt/jdk"
 ENV PATH "${PATH}:${JAVA_HOME}/bin"
 
 # Updating system packages, and installing:
 # - curl to run healthcheck
-# - nano to allow user to edit logback.xml
+# - nano to allow user to edit logback-spring.xml
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y \
       curl \
@@ -101,7 +101,7 @@ COPY --from=cert_builder /usr/local/certs/stats/folding-stats.key /usr/local/cer
 # Create non-root user, make owner of log directory
 RUN useradd -ms /bin/bash backend_user && \
     mkdir --parents /var/backend/logs && \
-    chown -R backend_user:backend_user /var/backend/logs
+    chown -R backend_user:backend_user /var/backend/logs /var/backend/logback-spring.xml
 USER backend_user
 
 # Set default directory to the log directory

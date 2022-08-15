@@ -70,7 +70,7 @@ public non-sealed class RetiredUserSummary implements RankableSummary {
      * @throws IllegalArgumentException thrown if {@code displayName} {@link StringUtils#isBlank(String)}
      */
     public static RetiredUserSummary create(final int id,
-                                            final String displayName, // TODO: Fail if blank
+                                            final String displayName,
                                             final long points,
                                             final long multipliedPoints,
                                             final int units,

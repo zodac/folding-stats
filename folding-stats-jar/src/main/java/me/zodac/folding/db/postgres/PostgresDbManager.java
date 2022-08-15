@@ -73,6 +73,7 @@ import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.api.util.DateTimeConverterUtils;
 import me.zodac.folding.api.util.DateTimeUtils;
+import me.zodac.folding.api.util.LoggerName;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -89,7 +90,7 @@ import org.jooq.impl.DSL;
 public record PostgresDbManager(DataSource dataSource) implements DbManager {
 
     private static final DateTimeUtils DATE_TIME_UTILS = DateTimeUtils.create();
-    private static final Logger SQL_LOGGER = LogManager.getLogger("sql");
+    private static final Logger SQL_LOGGER = LogManager.getLogger(LoggerName.SQL.get());
     private static final int SINGLE_RESULT = 1;
 
     /**

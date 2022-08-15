@@ -57,7 +57,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * @see <a href="https://api2.foldingathome.org/#GET-/user/:name/stats">Real user stats API</a>
  */
-@ConditionalOnProperty("stubbed.endpoints.enabled")
+@ConditionalOnProperty(name = "stubbed.endpoints.enabled", havingValue = "true")
 @RestController
 @RequestMapping("/user")
 public class StubbedPointsEndpoint {

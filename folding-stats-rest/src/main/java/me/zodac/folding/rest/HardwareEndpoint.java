@@ -37,6 +37,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.tc.Hardware;
+import me.zodac.folding.api.util.LoggerName;
 import me.zodac.folding.bean.api.FoldingRepository;
 import me.zodac.folding.bean.tc.validation.HardwareValidator;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
@@ -66,7 +67,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/hardware")
 public class HardwareEndpoint {
 
-    private static final Logger AUDIT_LOGGER = LogManager.getLogger("audit"); // TODO: Switch on env variable to single/multi files
+    private static final Logger AUDIT_LOGGER = LogManager.getLogger(LoggerName.AUDIT.get());
 
     private final HardwareValidator hardwareValidator;
     private final FoldingRepository foldingRepository;

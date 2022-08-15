@@ -35,6 +35,7 @@ import javax.annotation.security.PermitAll;
 import javax.servlet.http.HttpServletRequest;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.util.LoggerName;
 import me.zodac.folding.bean.StatsRepository;
 import me.zodac.folding.bean.api.FoldingRepository;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
@@ -57,7 +58,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/historic")
 public class HistoricStatsEndpoint {
 
-    private static final Logger AUDIT_LOGGER = LogManager.getLogger("audit");
+    private static final Logger AUDIT_LOGGER = LogManager.getLogger(LoggerName.AUDIT.get());
 
     // Stat updates occur every hour, so we must invalidate responses every hour
     private static final long CACHE_EXPIRATION_TIME = TimeUnit.HOURS.toSeconds(1L);

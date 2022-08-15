@@ -32,6 +32,7 @@ import java.util.Map;
 import javax.annotation.security.PermitAll;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.util.EncodingUtils;
+import me.zodac.folding.api.util.LoggerName;
 import me.zodac.folding.bean.api.FoldingRepository;
 import me.zodac.folding.rest.api.LoginCredentials;
 import me.zodac.folding.rest.exception.ForbiddenException;
@@ -55,7 +56,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/login")
 public class LoginEndpoint {
 
-    private static final Logger AUDIT_LOGGER = LogManager.getLogger("audit");
+    private static final Logger AUDIT_LOGGER = LogManager.getLogger(LoggerName.AUDIT.get());
 
     private final FoldingRepository foldingRepository;
 

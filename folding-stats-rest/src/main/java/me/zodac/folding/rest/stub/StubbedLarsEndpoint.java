@@ -56,7 +56,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @see <a href="https://folding.lar.systems/">LARS PPD DB</a>
  */
 @SuppressWarnings("ClassOnlyUsedInOneModule")
-@ConditionalOnProperty("stubbed.endpoints.enabled")
+@ConditionalOnProperty(name = "stubbed.endpoints.enabled", havingValue = "true")
 @RestController
 @RequestMapping("/api/gpu_ppd")
 public class StubbedLarsEndpoint {

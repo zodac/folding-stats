@@ -38,6 +38,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import me.zodac.folding.api.tc.change.UserChange;
 import me.zodac.folding.api.tc.change.UserChangeState;
+import me.zodac.folding.api.util.LoggerName;
 import me.zodac.folding.bean.api.FoldingRepository;
 import me.zodac.folding.bean.tc.user.UserChangeApplier;
 import me.zodac.folding.bean.tc.validation.UserChangeValidator;
@@ -67,7 +68,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/changes")
 public class UserChangeEndpoint {
 
-    private static final Logger AUDIT_LOGGER = LogManager.getLogger("audit");
+    private static final Logger AUDIT_LOGGER = LogManager.getLogger(LoggerName.AUDIT.get());
     private static final String ALL_STATES_OPTION = "*";
 
     private final FoldingRepository foldingRepository;

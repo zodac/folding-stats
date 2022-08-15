@@ -42,6 +42,7 @@ import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
+import me.zodac.folding.api.util.LoggerName;
 import me.zodac.folding.bean.StatsRepository;
 import me.zodac.folding.bean.api.FoldingRepository;
 import me.zodac.folding.bean.tc.LeaderboardStatsGenerator;
@@ -75,7 +76,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/stats")
 public class TeamCompetitionStatsEndpoint {
 
-    private static final Logger AUDIT_LOGGER = LogManager.getLogger("audit");
+    private static final Logger AUDIT_LOGGER = LogManager.getLogger(LoggerName.AUDIT.get());
 
     private final FoldingRepository foldingRepository;
     private final LeaderboardStatsGenerator leaderboardStatsGenerator;

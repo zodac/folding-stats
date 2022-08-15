@@ -39,6 +39,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.util.EncodingUtils;
+import me.zodac.folding.api.util.LoggerName;
 import me.zodac.folding.bean.api.FoldingRepository;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.exception.ForbiddenException;
@@ -84,7 +85,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Component
 public final class SecurityInterceptor implements HandlerInterceptor {
 
-    private static final Logger SECURITY_LOGGER = LogManager.getLogger("security");
+    private static final Logger SECURITY_LOGGER = LogManager.getLogger(LoggerName.SECURITY.get());
 
     private final FoldingRepository foldingRepository;
 

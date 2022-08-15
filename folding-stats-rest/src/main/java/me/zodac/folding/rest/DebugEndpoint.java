@@ -27,6 +27,7 @@ package me.zodac.folding.rest;
 import static me.zodac.folding.rest.response.Responses.ok;
 
 import javax.annotation.security.RolesAllowed;
+import me.zodac.folding.api.util.LoggerName;
 import me.zodac.folding.bean.api.FoldingRepository;
 import me.zodac.folding.bean.tc.lars.LarsHardwareUpdater;
 import org.apache.logging.log4j.LogManager;
@@ -48,7 +49,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/debug")
 public class DebugEndpoint {
 
-    private static final Logger AUDIT_LOGGER = LogManager.getLogger("audit");
+    private static final Logger AUDIT_LOGGER = LogManager.getLogger(LoggerName.AUDIT.get());
 
     private final FoldingRepository foldingRepository;
     private final LarsHardwareUpdater larsHardwareUpdater;

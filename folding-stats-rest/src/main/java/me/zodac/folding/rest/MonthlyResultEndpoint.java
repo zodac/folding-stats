@@ -33,6 +33,7 @@ import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import me.zodac.folding.api.tc.result.MonthlyResult;
+import me.zodac.folding.api.util.LoggerName;
 import me.zodac.folding.bean.StatsRepository;
 import me.zodac.folding.bean.tc.user.UserStatsStorer;
 import me.zodac.folding.rest.util.DateDetails;
@@ -56,7 +57,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/results")
 public class MonthlyResultEndpoint {
 
-    private static final Logger AUDIT_LOGGER = LogManager.getLogger("audit");
+    private static final Logger AUDIT_LOGGER = LogManager.getLogger(LoggerName.AUDIT.get());
 
     private final StatsRepository statsRepository;
     private final UserStatsStorer userStatsStorer;

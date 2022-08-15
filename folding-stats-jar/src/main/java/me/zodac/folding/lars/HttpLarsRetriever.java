@@ -43,6 +43,7 @@ import me.zodac.folding.api.tc.HardwareType;
 import me.zodac.folding.api.tc.lars.LarsGpu;
 import me.zodac.folding.api.tc.lars.LarsGpuResponse;
 import me.zodac.folding.api.tc.lars.LarsRetriever;
+import me.zodac.folding.api.util.LoggerName;
 import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
@@ -56,7 +57,7 @@ import org.apache.logging.log4j.Logger;
  */
 public final class HttpLarsRetriever implements LarsRetriever {
 
-    private static final Logger LARS_LOGGER = LogManager.getLogger("lars");
+    private static final Logger LARS_LOGGER = LogManager.getLogger(LoggerName.LARS.get());
 
     private HttpLarsRetriever() {
 

@@ -32,6 +32,7 @@ import java.util.Set;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.lars.LarsRetriever;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
+import me.zodac.folding.api.util.LoggerName;
 import me.zodac.folding.bean.api.FoldingRepository;
 import me.zodac.folding.lars.HardwareSplitter;
 import org.apache.logging.log4j.LogManager;
@@ -46,7 +47,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class LarsHardwareUpdater {
 
-    private static final Logger LARS_LOGGER = LogManager.getLogger("lars");
+    private static final Logger LARS_LOGGER = LogManager.getLogger(LoggerName.LARS.get());
     private static final String LARS_URL_ROOT = EnvironmentVariableUtils.getOrDefault("LARS_URL_ROOT", "https://folding.lar.systems");
 
     private final FoldingRepository foldingRepository;

@@ -36,6 +36,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.tc.User;
+import me.zodac.folding.api.util.LoggerName;
 import me.zodac.folding.bean.api.FoldingRepository;
 import me.zodac.folding.bean.tc.validation.UserValidator;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
@@ -63,7 +64,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/users")
 public class UserEndpoint {
 
-    private static final Logger AUDIT_LOGGER = LogManager.getLogger("audit");
+    private static final Logger AUDIT_LOGGER = LogManager.getLogger(LoggerName.AUDIT.get());
 
     private final FoldingRepository foldingRepository;
     private final UserValidator userValidator;

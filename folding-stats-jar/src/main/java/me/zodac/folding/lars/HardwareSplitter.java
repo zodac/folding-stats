@@ -37,6 +37,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.util.CollectionUtils;
+import me.zodac.folding.api.util.LoggerName;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -48,7 +49,7 @@ import org.apache.logging.log4j.Logger;
  */
 public final class HardwareSplitter {
 
-    private static final Logger LARS_LOGGER = LogManager.getLogger("lars");
+    private static final Logger LARS_LOGGER = LogManager.getLogger(LoggerName.LARS.get());
 
     private HardwareSplitter() {
 
