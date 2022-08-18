@@ -751,7 +751,6 @@ class TeamCompetitionStatsTest {
 
         final long pointsOffset = 1_000L;
         offsetUserPoints(user, pointsOffset);
-        manuallyUpdateStats();
 
         final AllTeamsSummary result = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamSummary = getTeamFromCompetition(result, team.teamName());
@@ -777,7 +776,6 @@ class TeamCompetitionStatsTest {
 
         final long firstPointsOffset = 1_000L;
         offsetUserPoints(user, firstPointsOffset);
-        manuallyUpdateStats();
 
         final AllTeamsSummary resultAfterFirstOffset = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamSummaryAfterFirstOffset = getTeamFromCompetition(resultAfterFirstOffset, team.teamName());
@@ -793,7 +791,6 @@ class TeamCompetitionStatsTest {
 
         final long secondPointsOffset = 250L;
         offsetUserPoints(user, secondPointsOffset);
-        manuallyUpdateStats();
 
         final AllTeamsSummary resultAfterSecondOffset = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamSummaryAfterSecondOffset = getTeamFromCompetition(resultAfterSecondOffset, team.teamName());
@@ -820,7 +817,6 @@ class TeamCompetitionStatsTest {
 
         final long pointsOffset = -20_000L;
         offsetUserPoints(user, pointsOffset);
-        manuallyUpdateStats(); // TODO: Needed?
 
         final AllTeamsSummary result = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamSummary = getTeamFromCompetition(result, team.teamName());
@@ -1032,7 +1028,6 @@ class TeamCompetitionStatsTest {
 
         final long firstOffsetPoints = 2_000L;
         offsetUserPoints(user, firstOffsetPoints);
-        manuallyUpdateStats();
 
         final AllTeamsSummary resultAfterSecondUpdate = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamAfterSecondUpdate = getTeamFromCompetition(resultAfterSecondUpdate, team.teamName());
@@ -1072,7 +1067,6 @@ class TeamCompetitionStatsTest {
 
         final long secondOffsetPoints = 95L;
         offsetUserPoints(user, secondOffsetPoints);
-        manuallyUpdateStats();
 
         final AllTeamsSummary resultAfterFourthUpdate = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamAfterFourthUpdate = getTeamFromCompetition(resultAfterFourthUpdate, team.teamName());

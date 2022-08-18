@@ -44,10 +44,6 @@ COPY ./folding-stats-api/pom.xml ./folding-stats-api/proguard-rules.cfg ./foldin
 COPY ./folding-stats-api/src/main ./folding-stats-api/src/main
 RUN cd ./folding-stats-api && mvn install --projects . && cd ..
 
-COPY ./folding-stats-client-library-java/pom.xml ./folding-stats-client-library-java/proguard-rules.cfg ./folding-stats-client-library-java/
-COPY ./folding-stats-client-library-java/src/main ./folding-stats-client-library-java/src/main
-RUN cd ./folding-stats-client-library-java && mvn install --projects . && cd ..
-
 COPY ./folding-stats-jar/pom.xml ./folding-stats-jar/proguard-rules.cfg ./folding-stats-jar/
 COPY ./folding-stats-jar/src/main ./folding-stats-jar/src/main
 RUN cd ./folding-stats-jar && mvn install --projects . && cd ..

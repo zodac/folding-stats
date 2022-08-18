@@ -29,10 +29,29 @@ package me.zodac.folding.api.util;
  */
 public enum LoggerName {
 
+    /**
+     * The {@code audit.log} for REST requests.
+     */
     AUDIT("audit"),
+
+    /**
+     * The {@code lars.log} for LARS hardware updates.
+     */
     LARS("lars"),
+
+    /**
+     * The {@code security.log} for privileged REST requests.
+     */
     SECURITY("security"),
+
+    /**
+     * The {@code sql.log} for SQL queries.
+     */
     SQL("sql"),
+
+    /**
+     * The {@code stats.log} for {@code Team Competition} stats updates.
+     */
     STATS("stats");
 
     private static final String DEFAULT_VALUE = null;

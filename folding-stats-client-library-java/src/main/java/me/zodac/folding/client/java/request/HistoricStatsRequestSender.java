@@ -83,7 +83,7 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
      * <b>NOTE:</b> The {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are based on {@link java.time.ZoneOffset#UTC}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the {@code ETag}, an empty
+     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
      * @param userId    the ID of the {@link me.zodac.folding.api.tc.User} whose {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are to be
@@ -130,7 +130,7 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
      * <b>NOTE:</b> The {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are based on {@link java.time.ZoneOffset#UTC}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the {@code ETag}, an empty
+     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
      * @param teamId    the ID of the {@link me.zodac.folding.api.tc.Team} whose {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are to be
@@ -181,7 +181,7 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
      * <b>NOTE:</b> The {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are based on {@link java.time.ZoneOffset#UTC}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the {@code ETag}, an empty
+     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
      * @param userId the ID of the {@link me.zodac.folding.api.tc.User} whose {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are to be
@@ -204,7 +204,7 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
      * <b>NOTE:</b> The {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are based on {@link java.time.ZoneOffset#UTC}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the {@code ETag}, an empty
+     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
      * @param userId    the ID of the {@link me.zodac.folding.api.tc.User} whose {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are to be
@@ -230,7 +230,7 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
      * <b>NOTE:</b> The {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are based on {@link java.time.ZoneOffset#UTC}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the {@code ETag}, an empty
+     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
      * @param teamId the ID of the {@link me.zodac.folding.api.tc.Team} whose {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are to be
@@ -253,7 +253,7 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
      * <b>NOTE:</b> The {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are based on {@link java.time.ZoneOffset#UTC}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the {@code ETag}, an empty
+     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
      * @param teamId    the ID of the {@link me.zodac.folding.api.tc.Team} whose {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are to be
@@ -303,7 +303,7 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
      * <b>NOTE:</b> The {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are based on {@link java.time.ZoneOffset#UTC}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the {@code ETag}, an empty
+     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
      * @param userId the ID of the {@link me.zodac.folding.api.tc.User} whose {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are to be
@@ -325,7 +325,7 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
      * <b>NOTE:</b> The {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are based on {@link java.time.ZoneOffset#UTC}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the {@code ETag}, an empty
+     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
      * @param userId    the ID of the {@link me.zodac.folding.api.tc.User} whose {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are to be
@@ -349,7 +349,7 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
      * <b>NOTE:</b> The {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are based on {@link java.time.ZoneOffset#UTC}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the {@code ETag}, an empty
+     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
      * @param teamId the ID of the {@link me.zodac.folding.api.tc.Team} whose {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are to be
@@ -371,7 +371,7 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
      * <b>NOTE:</b> The {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are based on {@link java.time.ZoneOffset#UTC}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the {@code ETag}, an empty
+     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
      * @param teamId    the ID of the {@link me.zodac.folding.api.tc.Team} whose {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} are to be

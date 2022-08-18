@@ -81,7 +81,7 @@ public record MonthlyResultRequestSender(String monthlyResultUrl) {
      * <b>NOTE:</b> The {@link me.zodac.folding.api.tc.result.MonthlyResult} are based on {@link java.time.ZoneOffset#UTC}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.api.tc.result.MonthlyResult} based on the {@code ETag}, an empty
+     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.api.tc.result.MonthlyResult} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
      * @param entityTag the {@code ETag} from a previous {@link HttpResponse}, to retrieve a cached
@@ -117,7 +117,7 @@ public record MonthlyResultRequestSender(String monthlyResultUrl) {
      * <b>NOTE:</b> The {@link me.zodac.folding.api.tc.result.MonthlyResult} are based on {@link java.time.ZoneOffset#UTC}.
      *
      * <p>
-     * <b>NOTE:</b> If the server has a cached  {@link me.zodac.folding.api.tc.result.MonthlyResult} based on the {@code ETag}, an empty
+     * <b>NOTE:</b> If the server has a cached {@link me.zodac.folding.api.tc.result.MonthlyResult} based on the {@code ETag}, an empty
      * {@link HttpResponse#body()} is returned.
      *
      * @param year      the {@link Year} of the {@link me.zodac.folding.api.tc.result.MonthlyResult}

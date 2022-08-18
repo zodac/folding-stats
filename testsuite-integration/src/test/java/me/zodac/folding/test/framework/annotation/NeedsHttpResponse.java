@@ -36,7 +36,7 @@ import java.lang.annotation.Target;
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD) // TODO: Possible to limit this only to methods that return TestStep?
+@Target(ElementType.METHOD)
 public @interface NeedsHttpResponse {
 
 }

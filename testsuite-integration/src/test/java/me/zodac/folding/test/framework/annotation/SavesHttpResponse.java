@@ -33,7 +33,7 @@ import java.lang.annotation.Target;
  * {@link me.zodac.folding.test.framework.TestContext}.
  */
 @Documented
-@Target(ElementType.METHOD) // TODO: Possible to limit this only to methods that return TestStep?
+@Target(ElementType.METHOD)
 public @interface SavesHttpResponse {
 
 }
