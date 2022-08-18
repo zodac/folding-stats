@@ -55,10 +55,10 @@ public class ExternalConnectionException extends Exception {
      *
      * @param url       the URL which was unable to be connected to
      * @param message   the error message
-     * @param throwable the cause {@link Throwable}
+     * @param cause the cause {@link Throwable}
      */
-    public ExternalConnectionException(final String url, final String message, final Throwable throwable) {
-        super(message, throwable);
+    public ExternalConnectionException(final String url, final String message, final Throwable cause) {
+        super(message, cause);
         this.url = url;
     }
 

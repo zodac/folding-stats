@@ -100,19 +100,19 @@ public final class LocalDateTimeGsonTypeAdapter implements JsonDeserializer<Loca
     }
 
     @Override
-    public JsonElement serialize(final LocalDateTime localDateTime, final Type type, final JsonSerializationContext jsonSerializationContext) {
+    public JsonElement serialize(final LocalDateTime t, final Type type, final JsonSerializationContext jsonSerializationContext) {
         final JsonObject output = new JsonObject();
 
         final JsonObject date = new JsonObject();
-        date.addProperty("year", localDateTime.getYear());
-        date.addProperty("month", localDateTime.getMonthValue());
-        date.addProperty("day", localDateTime.getDayOfMonth());
+        date.addProperty("year", t.getYear());
+        date.addProperty("month", t.getMonthValue());
+        date.addProperty("day", t.getDayOfMonth());
 
         final JsonObject time = new JsonObject();
-        time.addProperty("hour", localDateTime.getHour());
-        time.addProperty("minute", localDateTime.getMinute());
-        time.addProperty("second", localDateTime.getSecond());
-        time.addProperty("nano", localDateTime.getNano());
+        time.addProperty("hour", t.getHour());
+        time.addProperty("minute", t.getMinute());
+        time.addProperty("second", t.getSecond());
+        time.addProperty("nano", t.getNano());
 
         output.add("date", date);
         output.add("time", time);

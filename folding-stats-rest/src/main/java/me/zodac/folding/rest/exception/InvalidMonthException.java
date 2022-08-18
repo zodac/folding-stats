@@ -44,10 +44,10 @@ public class InvalidMonthException extends RuntimeException {
      * Basic constructor.
      *
      * @param month     the invalid month
-     * @param throwable the cause {@link Throwable}
+     * @param cause the cause {@link Throwable}
      */
-    public InvalidMonthException(final String month, final Throwable throwable) {
-        super(throwable);
+    public InvalidMonthException(final String month, final Throwable cause) {
+        super(cause);
         this.month = month;
     }
 

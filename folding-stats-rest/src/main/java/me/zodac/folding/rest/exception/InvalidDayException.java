@@ -43,10 +43,10 @@ public class InvalidDayException extends RuntimeException {
      * Basic constructor.
      *
      * @param day       the invalid day
-     * @param throwable the cause {@link Throwable}
+     * @param cause the cause {@link Throwable}
      */
-    public InvalidDayException(final String day, final Throwable throwable) {
-        super(throwable);
+    public InvalidDayException(final String day, final Throwable cause) {
+        super(cause);
         this.day = day;
     }
 

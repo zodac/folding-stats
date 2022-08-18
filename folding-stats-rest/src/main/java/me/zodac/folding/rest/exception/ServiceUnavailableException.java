@@ -47,9 +47,9 @@ public class ServiceUnavailableException extends RuntimeException {
     /**
      * Constructor taking in a cause {@link Throwable}.
      *
-     * @param throwable the cause {@link Throwable}
+     * @param cause the cause {@link Throwable}
      */
-    public ServiceUnavailableException(final Throwable throwable) {
-        super("Service unavailable: " + throwable.getMessage(), throwable);
+    public ServiceUnavailableException(final Throwable cause) {
+        super("Service unavailable: " + cause.getMessage(), cause);
     }
 }

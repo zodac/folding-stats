@@ -44,10 +44,10 @@ public class InvalidYearException extends RuntimeException {
      * Basic constructor.
      *
      * @param year      the invalid year
-     * @param throwable the cause {@link Throwable}
+     * @param cause the cause {@link Throwable}
      */
-    public InvalidYearException(final String year, final Throwable throwable) {
-        super(throwable);
+    public InvalidYearException(final String year, final Throwable cause) {
+        super(cause);
         this.year = year;
     }
 

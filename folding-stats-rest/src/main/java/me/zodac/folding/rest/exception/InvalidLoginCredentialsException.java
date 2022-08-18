@@ -54,10 +54,10 @@ public class InvalidLoginCredentialsException extends RuntimeException {
      * Basic constructor.
      *
      * @param loginCredentials the invalid {@link LoginCredentials}
-     * @param throwable        the cause {@link Throwable}
+     * @param cause        the cause {@link Throwable}
      */
-    public InvalidLoginCredentialsException(final LoginCredentials loginCredentials, final Throwable throwable) {
-        super(throwable);
+    public InvalidLoginCredentialsException(final LoginCredentials loginCredentials, final Throwable cause) {
+        super(cause);
         this.loginCredentials = loginCredentials;
     }
 

@@ -42,6 +42,8 @@ import org.apache.logging.log4j.Logger;
 /**
  * Utility class used to retrieve an instance of {@link DbManager} for the system.
  */
+// TODO: Get rid of this, inject the DbManager in folding-stats-rest instead
+// TODO: Also introduce TestContainers for testing
 public final class DbManagerRetriever {
 
     private static final Logger LOGGER = LogManager.getLogger();

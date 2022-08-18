@@ -45,9 +45,9 @@ public class UnauthorizedException extends RuntimeException {
     /**
      * Constructor taking in a cause {@link Throwable}.
      *
-     * @param throwable the cause {@link Throwable}
+     * @param cause the cause {@link Throwable}
      */
-    public UnauthorizedException(final Throwable throwable) {
-        super("Unauthorized access: " + throwable.getMessage(), throwable);
+    public UnauthorizedException(final Throwable cause) {
+        super("Unauthorized access: " + cause.getMessage(), cause);
     }
 }

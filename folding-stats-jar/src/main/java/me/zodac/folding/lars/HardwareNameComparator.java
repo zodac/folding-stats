@@ -51,7 +51,7 @@ final class HardwareNameComparator implements Comparator<Hardware>, Serializable
     }
 
     @Override
-    public int compare(final Hardware first, final Hardware second) {
-        return String.CASE_INSENSITIVE_ORDER.compare(first.hardwareName(), second.hardwareName());
+    public int compare(final Hardware o1, final Hardware o2) {
+        return String.CASE_INSENSITIVE_ORDER.compare(o1.hardwareName(), o2.hardwareName());
     }
 }
