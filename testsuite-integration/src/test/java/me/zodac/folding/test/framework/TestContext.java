@@ -82,7 +82,7 @@ public class TestContext {
     public HttpResponse<String> getHttpResponse() {
         final Object response = get(HTTP_RESPONSE_KEY);
 
-        if (response instanceof HttpResponse r) {
+        if (response instanceof HttpResponse<?> r) {
             final Object body = r.body();
             if (body instanceof String) {
                 return new StringHttpResponse(r);

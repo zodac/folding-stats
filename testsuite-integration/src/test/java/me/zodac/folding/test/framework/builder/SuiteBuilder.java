@@ -157,7 +157,7 @@ public class SuiteBuilder {
          * @return the {@link SuiteConfigurationBuilder}
          */
         public SuiteConfigurationBuilder continueOnFailure() {
-            this.suiteBuilder.continueOnFailure = true;
+            suiteBuilder.continueOnFailure = true;
             return this;
         }
 
@@ -168,7 +168,7 @@ public class SuiteBuilder {
          * @return the {@link SuiteConfigurationBuilder}
          */
         public SuiteConfigurationBuilder fullErrorStackTrace(final boolean fullErrorStackTrace) {
-            this.suiteBuilder.fullErrorStackTrace = fullErrorStackTrace;
+            suiteBuilder.fullErrorStackTrace = fullErrorStackTrace;
             return this;
         }
 

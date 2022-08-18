@@ -32,7 +32,6 @@ public enum LoggerName {
     AUDIT("audit"),
     LARS("lars"),
     SECURITY("security"),
-    SERVER(null),
     SQL("sql"),
     STATS("stats");
 

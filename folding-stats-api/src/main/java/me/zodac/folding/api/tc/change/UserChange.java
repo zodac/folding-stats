@@ -126,7 +126,7 @@ public record UserChange(int id,
      * Hides the {@code passkey} for the given {@link UserChange}'s {@link User}.
      *
      * <p>
-     * Since we do not want {@link User}s' passkeys to be made available through the REST API, we hide most of the passkey, though we leave the first
+     * Since we do not want {@link User} passkeys to be made available through the REST API, we hide most of the passkey, though we leave the first
      * eight (8) digits visible.
      *
      * @param userChange the {@link UserChange} whose {@link User} passkey is to be hidden

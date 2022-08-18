@@ -39,7 +39,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
@@ -92,11 +91,10 @@ public class FoldingStatsApplication {
      *     <li>Sets the {@link SystemState} to {@link SystemState#AVAILABLE} when complete</li>
      * </ol>
      *
-     * @param ctx the {@link ApplicationContext}
      * @return the {@link CommandLineRunner} with the execution to be run by {@link FoldingStatsApplication}
      */
     @Bean
-    public CommandLineRunner initialisation(final ApplicationContext ctx) {
+    public CommandLineRunner initialisation() {
         return args -> {
             initCaches();
 
