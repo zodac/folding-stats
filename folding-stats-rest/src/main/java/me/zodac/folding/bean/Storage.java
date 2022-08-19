@@ -46,11 +46,11 @@ import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
-import me.zodac.folding.db.DbManagerRetriever;
 import me.zodac.folding.rest.api.tc.AllTeamsSummary;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -106,6 +106,18 @@ public class Storage {
         .maximumSize(STANDARD_CACHE_SIZE)
         .expireAfterWrite(STANDARD_CACHE_EXPIRATION_TIME)
         .build();
+
+    private final DbManager dbManagerImpl;
+
+    /**
+     * {@link Autowired} constructor.
+     *
+     * @param dbManagerImpl the {@link DbManager}
+     */
+    @Autowired
+    public Storage(final DbManager dbManagerImpl) {
+        this.dbManagerImpl = dbManagerImpl;
+    }
 
     /**
      * Creates a {@link Hardware}.
@@ -954,13 +966,11 @@ public class Storage {
         LOGGER.info("AllTeamsSummaryCache: {}", allTeamsSummaryCache.asMap());
     }
 
-    private static <T> T dbManagerFunction(final Function<? super DbManager, T> function) {
-        final DbManager dbManager = DbManagerRetriever.get();
-        return function.apply(dbManager);
+    private <T> T dbManagerFunction(final Function<? super DbManager, T> function) {
+        return function.apply(dbManagerImpl);
     }
 
-    private static void dbManagerConsumer(final Consumer<? super DbManager> consumer) {
-        final DbManager dbManager = DbManagerRetriever.get();
-        consumer.accept(dbManager);
+    private void dbManagerConsumer(final Consumer<? super DbManager> consumer) {
+        consumer.accept(dbManagerImpl);
     }
 }
