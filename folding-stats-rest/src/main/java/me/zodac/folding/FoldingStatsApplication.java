@@ -109,11 +109,13 @@ public class FoldingStatsApplication {
         final Collection<User> users = foldingRepository.getAllUsersWithoutPasskeys();
 
         for (final User user : users) {
+            LOGGER.info("\nInitialising cache for user '{}' (ID: {})", user.foldingUserName(), user.id());
+
             final OffsetTcStats offsetTcStatsForUser = statsRepository.getOffsetStats(user);
-            LOGGER.debug("Found offset stats for user {}: {}", user, offsetTcStatsForUser);
+            LOGGER.info("Found offset stats for user '{}': {}", user.foldingUserName(), offsetTcStatsForUser);
 
             final UserStats initialStatsForUser = statsRepository.getInitialStats(user);
-            LOGGER.debug("Found initial stats for user {}: {}", user, initialStatsForUser);
+            LOGGER.info("Found initial stats for user '{}': {}", user.foldingUserName(), initialStatsForUser);
         }
 
         LOGGER.debug("Initialised stats caches");

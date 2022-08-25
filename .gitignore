@@ -3,6 +3,7 @@
 .idea/
 
 # Build
+*.args
 *.log
 target/
 pom.xml.versionsBackup

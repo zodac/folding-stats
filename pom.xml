@@ -35,60 +35,61 @@
         <skip-performance-tests>true</skip-performance-tests>
         <skip-tests>true</skip-tests>
         <skip-ui-tests>true</skip-ui-tests>
+        <!-- Adding so Maven plugins also no not to copy/compile test resources -->
+        <maven.test.skip>${skip-tests}</maven.test.skip>
 
         <!-- 3PP Versions -->
         <caffeine.version>3.1.1</caffeine.version>
         <gson.version>2.9.1</gson.version>
         <hikariCP.version>5.0.1</hikariCP.version>
         <javaee-web-api.version>8.0.1</javaee-web-api.version>
-        <jersey-server.version>1.19.4</jersey-server.version>
-        <jooq.version>3.17.2</jooq.version>
-        <jsoup.version>1.15.2</jsoup.version>
+        <jersey-server.version>3.1.0-M3</jersey-server.version>
+        <jooq.version>3.17.3</jooq.version>
+        <jsoup.version>1.15.3</jsoup.version>
         <log4j.version>2.18.0</log4j.version>
         <lombok.version>1.18.24</lombok.version>
-        <micrometer.version>1.9.2</micrometer.version>
-        <postgresql-driver.version>42.4.1</postgresql-driver.version>
+        <micrometer.version>1.9.3</micrometer.version>
+        <postgresql-driver.version>42.5.0</postgresql-driver.version>
         <resilience4j.version>1.7.1</resilience4j.version>
-        <spring-boot.version>2.7.2</spring-boot.version>
+        <spring-boot.version>2.7.3</spring-boot.version>
 
         <!-- Test 3PP Versions -->
         <assertj-core.version>3.23.1</assertj-core.version>
-        <embedded-postgres.version>2.0.0</embedded-postgres.version>
-        <embedded-postgres-binaries-bom.version>14.4.0</embedded-postgres-binaries-bom.version>
-        <flyway-core>9.1.2</flyway-core>
+        <embedded-postgres.version>2.0.1</embedded-postgres.version>
+        <embedded-postgres-binaries-bom.version>14.5.0</embedded-postgres-binaries-bom.version>
+        <flyway-core>9.2.0</flyway-core>
         <junit-jupiter.version>5.9.0</junit-jupiter.version>
-        <logback.version>1.2.11</logback.version>
-        <selenium.version>4.3.0</selenium.version>
+        <selenium.version>4.4.0</selenium.version>
 
         <!-- Plugin Versions -->
         <build-helper-maven-plugin.version>3.3.0</build-helper-maven-plugin.version>
-        <jmeter-maven-plugin.version>3.5.0</jmeter-maven-plugin.version>
+        <jmeter-maven-plugin.version>3.6.1</jmeter-maven-plugin.version>
         <maven-clean-plugin.version>3.2.0</maven-clean-plugin.version>
         <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
         <maven-dependency-plugin.version>3.3.0</maven-dependency-plugin.version>
-        <maven-failsafe-plugin.version>3.0.0-M6</maven-failsafe-plugin.version>
-        <maven-install-plugin.version>3.0.0-M1</maven-install-plugin.version>
+        <maven-failsafe-plugin.version>3.0.0-M7</maven-failsafe-plugin.version>
+        <maven-install-plugin.version>3.0.1</maven-install-plugin.version>
         <maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>
-        <maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
-        <maven-surefire-plugin.version>3.0.0-M6</maven-surefire-plugin.version>
+        <maven-resources-plugin.version>3.3.0</maven-resources-plugin.version>
+        <maven-surefire-plugin.version>3.0.0-M7</maven-surefire-plugin.version>
         <maven-war-plugin.version>3.3.2</maven-war-plugin.version>
-        <versions-maven-plugin.version>2.10.0</versions-maven-plugin.version>
+        <versions-maven-plugin.version>2.11.0</versions-maven-plugin.version>
 
         <!-- Linter 3PP Versions -->
-        <checkstyle.version>10.2</checkstyle.version>
-        <errorprone.version>2.9.0</errorprone.version>
+        <checkstyle.version>10.3.2</checkstyle.version>
+        <errorprone.version>2.11.0</errorprone.version>
         <licenses.version>1</licenses.version>
         <spotbugs.version>4.7.1</spotbugs.version>
         <pitest-junit5-plugin.version>1.0.0</pitest-junit5-plugin.version>
         <pmd.version>6.48.0</pmd.version>
 
         <!-- Linter Plugin Versions -->
-        <dependency-check-maven.version>7.1.0</dependency-check-maven.version>
+        <dependency-check-maven.version>7.1.2</dependency-check-maven.version>
         <license-maven-plugin.version>4.2.rc3</license-maven-plugin.version>
-        <maven-checkstyle-plugin.version>3.1.2</maven-checkstyle-plugin.version>
-        <maven-javadoc-plugin.version>3.4.0</maven-javadoc-plugin.version>
-        <maven-pmd-plugin.version>3.16.0</maven-pmd-plugin.version>
-        <pitest-maven.version>1.9.4</pitest-maven.version>
+        <maven-checkstyle-plugin.version>3.2.0</maven-checkstyle-plugin.version>
+        <maven-javadoc-plugin.version>3.4.1</maven-javadoc-plugin.version>
+        <maven-pmd-plugin.version>3.18.0</maven-pmd-plugin.version>
+        <pitest-maven.version>1.9.5</pitest-maven.version>
         <spotbugs-maven-plugin.version>4.7.1.1</spotbugs-maven-plugin.version>
 
         <!-- Linter Properties -->
@@ -105,11 +106,11 @@
         <pitest-test-strength-threshold>100</pitest-test-strength-threshold>
 
         <!-- ProGuard 3PP Versions -->
-        <proguard-base.version>7.2.1</proguard-base.version>
-        <proguard-core.version>9.0.0</proguard-core.version>
+        <proguard-base.version>7.2.2</proguard-base.version>
+        <proguard-core.version>9.0.3</proguard-core.version>
 
         <!-- ProGuard Plugin Versions -->
-        <proguard-maven-plugin.version>2.5.3</proguard-maven-plugin.version>
+        <proguard-maven-plugin.version>2.6.0</proguard-maven-plugin.version>
 
         <!-- ProGuard Properties -->
         <!-- Each module must have own ProGuard definition -->
@@ -262,7 +263,7 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>com.sun.jersey</groupId>
+                <groupId>org.glassfish.jersey.core</groupId>
                 <artifactId>jersey-server</artifactId>
                 <version>${jersey-server.version}</version>
                 <scope>test</scope>
@@ -273,18 +274,6 @@
                 <version>${junit-jupiter.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-to-slf4j</artifactId>
-                <version>${log4j.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-classic</artifactId>
-                <version>${logback.version}</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.seleniumhq.selenium</groupId>
@@ -450,10 +439,7 @@
                     <configuration>
                         <!-- List of dependencies to not be updated, due to incompatible versions -->
                         <!-- If a valid update becomes available, it can be updated and removed from below -->
-                        <excludes>
-                            <!-- Excluding update to 1.3.0-alpha13 -->
-                            <exclude>:logback-classic:::</exclude>
-                        </excludes>
+                        <excludes/>
                         <generateBackupPoms>false</generateBackupPoms>
                     </configuration>
                 </plugin>
@@ -627,7 +613,6 @@
                             <ruleset>${pmd-ruleset}</ruleset>
                         </rulesets>
                         <skip>${skip-linters}</skip>
-                        <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
                         <targetJdk>${java-release}</targetJdk>
                     </configuration>
                     <executions>

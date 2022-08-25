@@ -42,17 +42,17 @@ RUN mvn install -P docker
 
 COPY ./folding-stats-api/pom.xml ./folding-stats-api/proguard-rules.cfg ./folding-stats-api/
 COPY ./folding-stats-api/src/main ./folding-stats-api/src/main
-RUN cd ./folding-stats-api && mvn install --projects . && cd ..
+RUN cd ./folding-stats-api && mvn install -P docker && cd ..
 
 COPY ./folding-stats-jar/pom.xml ./folding-stats-jar/proguard-rules.cfg ./folding-stats-jar/
 COPY ./folding-stats-jar/src/main ./folding-stats-jar/src/main
-RUN cd ./folding-stats-jar && mvn install --projects . && cd ..
+RUN cd ./folding-stats-jar && mvn install -P docker && cd ..
 
 COPY ./folding-stats-rest/pom.xml ./folding-stats-rest/pom.xml
 COPY ./folding-stats-rest/src/main ./folding-stats-rest/src/main
 
 RUN cd ./folding-stats-rest && \
-    mvn package && \
+    mvn package -P docker && \
     mv ./target/folding-stats-rest*.jar /folding-stats.jar
 
 ARG JAVA_VERSION
@@ -79,7 +79,7 @@ ENV PATH "${PATH}:${JAVA_HOME}/bin"
 
 # Updating system packages, and installing:
 # - curl to run healthcheck
-# - nano to allow user to edit logback-spring.xml
+# - nano to allow user to edit log4j2.xml (smaller than vi)
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y \
       curl \

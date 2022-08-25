@@ -8,7 +8,7 @@ services:
       dockerfile: docker/frontend/Dockerfile
       args:
         # Docker image versions
-        NODE_VERSION: "18.6"
+        NODE_VERSION: "18.8"
         # Build arguments
         FORUM_LINK: "${FORUM_LINK}"
         REST_ENDPOINT_URL: "${REST_ENDPOINT_URL}"
@@ -95,7 +95,7 @@ services:
       dockerfile: docker/database/Dockerfile
       args:
         # Docker image versions
-        POSTGRES_VERSION: "14.4"
+        POSTGRES_VERSION: "14.5"
         # Build arguments
         ADMIN_USERNAME: "${ADMIN_USER}"
         ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
@@ -136,7 +136,7 @@ services:
         # Docker image versions
         DEBIAN_VERSION: "11.4"
         JAVA_VERSION: "18"
-        PROMETHEUS_VERSION: "v2.37.0"
+        PROMETHEUS_VERSION: "v2.38.0"
         # Build arguments
         ADMIN_USERNAME: "${ADMIN_USER}"
         ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
