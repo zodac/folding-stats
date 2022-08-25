@@ -30,7 +30,6 @@ import java.util.Collection;
 import java.util.Optional;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.db.DbManager;
-import me.zodac.folding.api.stats.FoldingStatsRetriever;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
@@ -43,7 +42,6 @@ import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.db.DbManagerRetriever;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
-import me.zodac.folding.stats.HttpFoldingStatsRetriever;
 import org.springframework.stereotype.Component;
 
 /**

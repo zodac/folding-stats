@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration monitorInterval="60">
+    <Properties>
+        <Property name="LOG_DIRECTORY">/var/backend/logs</Property>
+    </Properties>
+
+    <Appenders>
+        <Console name="CONSOLE" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%-55logger{55}] %msg%n"/>
+        </Console>
+
+        <!-- General application log -->
+        <RollingFile name="SERVER_LOG"
+                     fileName="${LOG_DIRECTORY}/server.log"
+                     filePattern="${LOG_DIRECTORY}/server.log-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%-55logger{55}] %msg%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="100 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10">
+                <Delete basePath="${LOG_DIRECTORY}" maxDepth="10">
+                    <!-- Delete all files older than 31 days -->
+                    <IfLastModified age="31d" />
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+
+        <!-- Log for login/authentication requests -->
+        <RollingFile name="SECURITY_LOG"
+                     fileName="${LOG_DIRECTORY}/security.log"
+                     filePattern="${LOG_DIRECTORY}/security.log-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%-8logger{8}] %msg%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="100 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10">
+                <Delete basePath="${LOG_DIRECTORY}" maxDepth="10">
+                    <!-- Delete all files older than 31 days -->
+                    <IfLastModified age="31d" />
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+
+        <!-- Log for REST requests -->
+        <RollingFile name="AUDIT_LOG"
+                     fileName="${LOG_DIRECTORY}/audit.log"
+                     filePattern="${LOG_DIRECTORY}/audit.log-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%-5logger{5}] %msg%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="100 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10">
+                <Delete basePath="${LOG_DIRECTORY}" maxDepth="10">
+                    <!-- Delete all files older than 31 days -->
+                    <IfLastModified age="31d" />
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+
+        <!-- Log for SQL queries -->
+        <RollingFile name="SQL_LOG"
+                     fileName="${LOG_DIRECTORY}/sql.log"
+                     filePattern="${LOG_DIRECTORY}/sql.log-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%-3logger{3}] %msg%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="100 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10">
+                <Delete basePath="${LOG_DIRECTORY}" maxDepth="10">
+                    <!-- Delete all files older than 31 days -->
+                    <IfLastModified age="31d" />
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+
+        <!-- Log for stats retrieval -->
+        <RollingFile name="STATS_LOG"
+                     fileName="${LOG_DIRECTORY}/stats.log"
+                     filePattern="${LOG_DIRECTORY}/stats.log-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%-5logger{5}] %msg%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="100 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10">
+                <Delete basePath="${LOG_DIRECTORY}" maxDepth="10">
+                    <!-- Delete all files older than 31 days -->
+                    <IfLastModified age="31d" />
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+
+        <!-- Log for LARS update -->
+        <!-- Monthly rollover -->
+        <RollingFile name="LARS_LOG"
+                     fileName="${LOG_DIRECTORY}/lars.log"
+                     filePattern="${LOG_DIRECTORY}/lars.log-%d{MM-dd}-%i.log.gz">
+            <PatternLayout>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%-5logger{5}] %msg%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="100 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10">
+                <Delete basePath="${LOG_DIRECTORY}" maxDepth="10">
+                    <!-- Delete all files older than 31 days -->
+                    <IfLastModified age="31d" />
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <root level="INFO">
+            <Appender-ref ref="SERVER_LOG"/>
+            <Appender-ref ref="CONSOLE"/>
+        </root>
+
+        <!-- The 'additivity=false' option ensures audit data only goes to the audit log -->
+        <Logger name="audit" level="INFO" additivity="false">
+            <Appender-ref ref="AUDIT_LOG"/>
+        </Logger>
+
+        <!-- The 'additivity=false' option ensures security data only goes to the security log -->
+        <Logger name="security" level="DEBUG" additivity="false">
+            <Appender-ref ref="SECURITY_LOG"/>
+        </Logger>
+
+        <!-- The 'additivity=false' option ensures sql data only goes to the sql log -->
+        <Logger name="sql" level="INFO" additivity="false">
+            <Appender-ref ref="SQL_LOG"/>
+        </Logger>
+
+        <!-- The 'additivity=false' option ensures stats data only goes to the stats log -->
+        <Logger name="stats" level="DEBUG" additivity="false">
+            <Appender-ref ref="STATS_LOG"/>
+        </Logger>
+
+        <!-- The 'additivity=false' option ensures stats data only goes to the stats log -->
+        <Logger name="lars" level="DEBUG" additivity="false">
+            <Appender-ref ref="LARS_LOG"/>
+        </Logger>
+
+        <!-- Suppress logging for unwanted packages -->
+
+        <!-- Not interested in the jOOQ startup messages -->
+        <Logger name="org.jooq" level="WARN">
+            <Appender-ref ref="SERVER_LOG"/>
+            <Appender-ref ref="CONSOLE"/>
+        </Logger>
+        <!-- Not interested in the DispatcherServlet -->
+        <Logger name="org.springframework.web.servlet.DispatcherServlet" level="WARN">
+            <Appender-ref ref="SERVER_LOG"/>
+            <Appender-ref ref="CONSOLE"/>
+        </Logger>
+        <!-- Not interested in Hikari DB logs when starting DB connection -->
+        <Logger name="com.zaxxer.hikari" level="WARN">
+            <Appender-ref ref="SERVER_LOG"/>
+            <Appender-ref ref="CONSOLE"/>
+        </Logger>
+        <!-- On system startup, we see errors due to the DB not being online, don't need to see those exceptions -->
+        <Logger name="com.zaxxer.hikari.pool" level="OFF">
+            <Appender-ref ref="SERVER_LOG"/>
+            <Appender-ref ref="CONSOLE"/>
+        </Logger>
+    </Loggers>
+</Configuration>
