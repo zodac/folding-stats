@@ -826,6 +826,8 @@
                 <module>testsuite-ui</module>
             </modules>
             <properties>
+                <!-- Needed to build test resources for mutation testing -->
+                <maven.test.skip>false</maven.test.skip>
                 <skip-linters>false</skip-linters>
             </properties>
         </profile>
