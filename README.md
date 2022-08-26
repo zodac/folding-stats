@@ -72,7 +72,6 @@ You'll need to have the following installed on your system:
 
 - [git](https://git-scm.com/)
 - [docker](https://www.docker.com/get-started)
-- [docker-compose](https://docs.docker.com/compose/install/)
 
 ## Configuration
 
@@ -92,11 +91,12 @@ location of any SSL certificates needed, and the URLs to your own frontend.
 
 ## Starting The System
 
-There are three components to the system:
+There are four components to the system:
 
-- The `frontend`, hosting the UI
-- The `backend`, for stats calculation and hardware/team/user management
-- The `database`, for persistent storage
+- The `frontend` container, hosting the UI
+- The `backend` container, for stats calculation and hardware/team/user management
+- The `database` container, for persistent storage
+- The `prometheus` container, for metrics
 
 These are all run as individual docker containers, and are configured by the `docker-compose.yml` file in the root of the repository. To start, you
 can run the commands:

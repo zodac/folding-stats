@@ -35,7 +35,7 @@
         <skip-performance-tests>true</skip-performance-tests>
         <skip-tests>true</skip-tests>
         <skip-ui-tests>true</skip-ui-tests>
-        <!-- Adding so Maven plugins also no not to copy/compile test resources -->
+        <!-- Adding so Maven plugins will not copy/compile test resources -->
         <maven.test.skip>${skip-tests}</maven.test.skip>
 
         <!-- 3PP Versions -->
